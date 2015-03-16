@@ -73,6 +73,14 @@ var Result = function (snippet, result) {
     return self.hasResultset() && self.data().length > 0; // status() == 'available'
   });
 
+  self.getContext = function() {
+    return {
+        id: self.id,
+        type: self.type,
+        handle: self.handle
+    };
+  }
+  
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function (key, val) {
       self.handle()[key] = val;
@@ -262,6 +270,16 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.checkStatusTimeout = null;
 
+  self.getContext = function() {
+    return {
+      id: self.id,
+      type: self.type,
+      status: self.status,
+      statement: self.statement,
+      result: self.result.getContext()
+    };
+  }
+  
   self._ajax_error = function (data, callback) {
     if (data.status == -2) {
       self.create_session(callback);
@@ -281,8 +299,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.create_session = function (callback) {
     self.status('loading');
     $.post("/spark/api/create_session", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         notebook.addSession(ko.mapping.fromJS(data.session));
@@ -305,17 +322,17 @@ var Snippet = function (vm, notebook, snippet) {
     $(".jHueNotify").hide();
     logGA('/execute/' + self.type());
 
+    self.status('running');
+    self.result.clear();
+    self.progress(0);
+
     if (self.result.fetchedOnce()) {
       self.close();
     }
 
-    self.result.clear();
-    self.progress(0);
-    self.status('running');
-
     $.post("/spark/api/execute", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         $.each(data.handle, function (key, val) {
@@ -343,8 +360,8 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.fetchResultData = function (rows, startOver) {
     $.post("/spark/api/fetch_result_data", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self),
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext()),
       rows: rows,
       startOver: startOver
     }, function (data) {
@@ -384,8 +401,8 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.fetchResultMetadata = function () {
     $.post("/spark/api/fetch_result_metadata", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self),
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext()),
     }, function (data) {
       if (data.status == 0) {
         self.result.meta(data.result.meta);
@@ -400,8 +417,8 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.checkStatus = function () {
     $.post("/spark/api/check_status", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         self.status(data.query_status.status);
@@ -431,8 +448,8 @@ var Snippet = function (vm, notebook, snippet) {
     }
 
     $.post("/spark/api/cancel_statement", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         self.status('canceled');
@@ -452,8 +469,8 @@ var Snippet = function (vm, notebook, snippet) {
     }
 
     $.post("/spark/api/close_statement", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
@@ -468,8 +485,8 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.getLogs = function () {
     $.post("/spark/api/get_logs", {
-      notebook: ko.mapping.toJSON(notebook),
-      snippet: ko.mapping.toJSON(self)
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         self.result.logs(data.logs); // Way to append?
@@ -491,10 +508,6 @@ var Snippet = function (vm, notebook, snippet) {
     if (self.status() == 'loading') {
       self.status('failed');
       self.progress(0);
-    }
-
-    if (self.status() != 'loading' && self.status() != 'ready') {
-      self.getLogs();
     }
   };
 }
@@ -565,6 +578,14 @@ var Notebook = function (vm, notebook) {
       self.addSnippet(snippet);
     });
   }
+  
+  self.getContext = function() {
+    return {
+        id: self.id,
+        uuid: self.uuid,
+        sessions: self.sessions
+    };
+  }
 
   self.save = function () {
     $.post("/spark/api/notebook/save", {
@@ -588,7 +609,7 @@ var Notebook = function (vm, notebook) {
   self.close = function () {
     if (self.id() != null) {
       $.post("/spark/api/notebook/close", {
-        "notebook": ko.mapping.toJSON(self)
+        "notebook": ko.mapping.toJSON(self.getContext())
       });
     }
   };
