@@ -46,7 +46,7 @@ LIVY_ASSEMBLY_JAR = Config(
   key="livy_assembly_jar",
   help=_t("Path to livy-assembly.jar"),
   private=True,
-  default=os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "livy-assembly-3.7.0-cdh5.4.0-SNAPSHOT.jar"))
+  default=os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "livy-assembly-3.7.0-cdh5.4.1-SNAPSHOT.jar"))
 
 LIVY_SERVER_HOST = Config(
   key="livy_server_host",
