@@ -138,10 +138,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     
     &nbsp;&nbsp;&nbsp;
 
-    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
+    <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
         data-bind="click: saveNotebook, css: {'btn': true}">
       <i class="fa fa-save"></i>
-    </button>
+    </a>
       
     &nbsp;&nbsp;&nbsp;
       
@@ -158,7 +158,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <ul class="nav nav-tabs">
     <!-- ko foreach: notebooks -->
       <li data-bind="css: { active: $parent.selectedNotebook() === $data }">
-        <a href="javascript:void(0)" data-bind="text: name, click: $parent.selectedNotebook.bind(null, $data)"></a>
+        <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></a>
       </li>
     <!-- /ko -->
     <li>
