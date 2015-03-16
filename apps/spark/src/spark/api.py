@@ -152,6 +152,7 @@ def save_notebook(request):
 
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook['name']
+  notebook_doc.description = notebook['description']
   notebook_doc.save()
 
   response['status'] = 0

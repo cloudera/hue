@@ -25,6 +25,8 @@ from django.core.management.base import BaseCommand
 from django.utils.translation import ugettext as _
 
 from desktop.models import Document
+from useradmin.models import install_sample_user
+
 
 LOG = logging.getLogger(__name__)
 
@@ -39,7 +41,9 @@ class Command(BaseCommand):
     else:
       user = options['user']
 
-    management.call_command('loaddata', 'initial_spark_examples.json', verbosity=2)
+    install_sample_user()
+
+    management.call_command('loaddata', 'apps/spark/src/spark/fixtures/initial_spark_examples.json', verbosity=2)
     Document.objects.sync()
 
     from beeswax.management.commands.beeswax_install_examples import Command
