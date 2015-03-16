@@ -409,10 +409,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <input type="hidden" name="format" class="download-format"/>
 
               <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
-                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                <a class="btn dropdown-toggle" data-toggle="dropdown">
                   <i class="fa fa-download"></i>
                   <i class="fa fa-caret-down"></i>
-                </button>
+                </a>
                 <ul class="dropdown-menu pull-right">
                   <li>
                     <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('csv'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as CSV') }">
@@ -482,7 +482,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </a>
             </div>
             <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }">
-              <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360">
+              <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="true">
                 <thead>
                   <tr data-bind="foreach: result.meta">
                     <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
@@ -1175,7 +1175,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       },
       "fnDrawCallback": function (oSettings) {
         $(el).parents(".dataTables_wrapper").jHueTableScroller({
-          minHeight: $(window).height() - 400,
+          minHeight: Math.max($(window).height() - 400, 300),
           heightAfterCorrection: 0
         });
 
@@ -1201,7 +1201,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       ]
     });
     $(el).parents(".dataTables_wrapper").jHueTableScroller({
-      minHeight: $(window).height() - 400,
+      minHeight: Math.max($(window).height() - 400, 300),
       heightAfterCorrection: 0
     });
 
@@ -1700,6 +1700,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             var _el = $("#snippet_" + snippet.id()).find(".resultTable");
             window.setTimeout(function () {
               var _dt = createDatatable(_el, snippet);
+              _dt.fnClearTable();
               _dt.fnAddData(snippet.result.data());
               resizeToggleLeftPanel(snippet);
               $(document).trigger("forceChartDraw", snippet);
