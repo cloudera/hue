@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.repl.python.PythonSession
+import org.json4s.JsonAST.JValue
 import org.json4s.{Extraction, DefaultFormats}
 import org.scalatest.{BeforeAndAfter, FunSpec}
 import org.scalatest.matchers.ShouldMatchers
@@ -106,6 +107,42 @@ class PythonSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter 
         "data" -> Map(
           "text/plain" -> "Hello World"
         )
+      ))
+
+      result should equal (expectedResult)
+    }
+
+    it("should report an error if accessing an unknown variable") {
+      val result = Await.result(session.execute("""x"""), Duration.Inf)
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "error",
+        "execution_count" -> 0,
+        "traceback" -> List(
+          "Traceback (most recent call last):\n",
+          "NameError: name 'x' is not defined\n"
+        ),
+        "ename" -> "NameError",
+        "evalue" -> "name 'x' is not defined"
+      ))
+
+      result should equal (expectedResult)
+    }
+
+    it("should report an error if exception is thrown") {
+      val result = Await.result(session.execute(
+        """def foo():
+          |    raise Exception()
+          |foo()
+          |""".stripMargin), Duration.Inf)
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "error",
+        "execution_count" -> 0,
+        "traceback" -> List(
+          "Traceback (most recent call last):\n",
+          "Exception\n"
+        ),
+        "ename" -> "Exception",
+        "evalue" -> ""
       ))
 
       result should equal (expectedResult)

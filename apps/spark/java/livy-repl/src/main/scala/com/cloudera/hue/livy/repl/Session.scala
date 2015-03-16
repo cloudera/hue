@@ -17,7 +17,7 @@ object Session {
 }
 
 trait Session {
-  import com.cloudera.hue.livy.repl.Session._
+  import Session._
 
   def state: State
 

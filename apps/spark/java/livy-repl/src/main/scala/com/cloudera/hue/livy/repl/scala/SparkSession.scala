@@ -56,16 +56,14 @@ private class SparkSession extends Session {
             "status" -> "error",
             "execution_count" -> executeCount,
             "ename" -> "Error",
-            "evalue" -> "output",
-            "traceback" -> List()
+            "evalue" -> output
           )
         case ExecuteError(executeCount, output) =>
           Map(
             "status" -> "error",
             "execution_count" -> executeCount,
             "ename" -> "Error",
-            "evalue" -> "output",
-            "traceback" -> List()
+            "evalue" -> output
           )
       }
 

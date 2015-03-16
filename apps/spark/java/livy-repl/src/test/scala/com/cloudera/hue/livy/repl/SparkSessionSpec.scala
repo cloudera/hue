@@ -1,9 +1,10 @@
 package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.repl.scala.SparkSession
+import org.json4s.JsonAST.JValue
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{FunSpec, BeforeAndAfter}
+import org.scalatest.{BeforeAndAfter, FunSpec}
 
 import _root_.scala.concurrent.Await
 import _root_.scala.concurrent.duration.Duration
@@ -91,6 +92,33 @@ class SparkSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter {
       ))
 
       result should equal (expectedResult)
+    }
+
+    it("should report an error if accessing an unknown variable") {
+      val result = Await.result(session.execute("""x"""), Duration.Inf)
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "error",
+        "execution_count" -> 0,
+        "ename" -> "Error",
+        "evalue" ->
+          """<console>:8: error: not found: value x
+            |              x
+            |              ^""".stripMargin
+      ))
+
+      result should equal (expectedResult)
+    }
+
+    it("should report an error if exception is thrown") {
+      val result = Await.result(session.execute("""throw new Exception()"""), Duration.Inf)
+      val resultMap = result.extract[Map[String, JValue]]
+
+      // Manually extract the values since the line numbers in the exception could change.
+      resultMap("status").extract[String] should equal ("error")
+      resultMap("execution_count").extract[Int] should equal (0)
+      resultMap("ename").extract[String] should equal ("Error")
+      resultMap("evalue").extract[String] should include ("java.lang.Exception")
+      resultMap.get("traceback") should equal (None)
     }
   }
  }
