@@ -519,6 +519,7 @@ var Notebook = function (vm, notebook) {
   self.id = ko.observable(typeof notebook.id != "undefined" && notebook.id != null ? notebook.id : null);
   self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
+  self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable(vm.availableSnippets()[0].type());
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []);
