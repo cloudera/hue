@@ -39,7 +39,7 @@ def editor(request):
   notebook_id = request.GET.get('notebook')
 
   if notebook_id:
-    notebook = Notebook(document=Document2.objects.get(id=notebook_id)) # Todo perms
+    notebook = Notebook(document=Document2.objects.get(id=notebook_id))
   else:
     notebook = Notebook()
 

@@ -62,6 +62,7 @@ class Notebook():
     else:
       self.data = json.dumps({
           'name': 'My Notebook',
+          'description': '',
           'snippets': []
       })
 
