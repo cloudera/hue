@@ -155,7 +155,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 
 
-  <ul class="nav nav-tabs">
+  <ul class="nav nav-tabs pull-left">
     <!-- ko foreach: notebooks -->
       <li data-bind="css: { active: $parent.selectedNotebook() === $data }">
         <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></a>
@@ -165,6 +165,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       ## <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
     </li>
   </ul>
+
+  <div class="pull-left" style="padding: 9px">
+    <!-- ko foreach: notebooks -->
+      <!-- ko if: $root.isEditing() -->
+        <span data-bind="editable: description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}" class="muted"></span>
+      <!-- /ko  -->
+      <!-- ko ifnot: $root.isEditing() -->
+        <span data-bind="text: description" class="muted"></span>
+      <!-- /ko  -->
+    <!-- /ko -->
+  </div>
+
 </div>
 
 
