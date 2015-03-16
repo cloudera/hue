@@ -181,6 +181,14 @@
   color: #DDD !important;
 }
 
+.editable-click, a.editable-click, a.editable-click:hover {
+  cursor: pointer !important;
+}
+
+.editable-click.editable-disabled, a.editable-click.editable-disabled, a.editable-click.editable-disabled:hover {
+  cursor: default !important;
+}
+
 .results table tr td {
   white-space: nowrap;
 }
