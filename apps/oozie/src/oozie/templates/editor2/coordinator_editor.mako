@@ -286,7 +286,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                   </span>
                   <span data-bind="visible: dataset_variable().length > 0">
                     ${ _('Will convert to') }
-                    <a data-bind="text: convertVariables(dataset_variable()), attr: {'href': '/filebrowser/view' + convertVariables(dataset_variable())}"></a>
+                    <a target="_blank" data-bind="text: convertVariables(dataset_variable()), attr: {'href': '/filebrowser/view' + convertVariables(dataset_variable())}"></a>
                   </span>
                   </a>
                 </span>
