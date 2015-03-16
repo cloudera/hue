@@ -311,3 +311,16 @@ h1.empty {
     border: none;
   }
 }
+
+.widget-type.dropdown a.dropdown-toggle {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.widget-type.dropdown .dropdown-toggle .caret {
+  margin-top: 0;
+}
+
+.no-underline:hover {
+  text-decoration: none!important;
+}
