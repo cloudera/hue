@@ -434,7 +434,7 @@ def get_facet_field(category, field, facets):
   else:
     return None
 
-def pairwise2(field, cat, fq_filter, iterable):
+def pairwise2(field, fq_filter, iterable):
   pairs = []
   selected_values = [f['value'] for f in fq_filter]
   a, b = itertools.tee(iterable)
@@ -506,7 +506,7 @@ def augment_solr_response(response, collection, query):
       if category == 'field' and response['facet_counts']['facet_fields']:
         name = NAME % facet
         collection_facet = get_facet_field(category, name, collection['facets'])
-        counts = pairwise2(facet['field'], name, selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
+        counts = pairwise2(facet['field'], selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
         facet = {
