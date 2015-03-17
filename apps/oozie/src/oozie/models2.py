@@ -1600,8 +1600,6 @@ class Coordinator(Job):
               'execution': None,
               'throttle': None,
               'job_xml': '',
-              'sla_enabled': False,
-              'sla_workflow_enabled': False,
               'credentials': [],
               'parameters': [
                   {'name': 'oozie.use.system.libpath', 'value': True},
@@ -1692,7 +1690,7 @@ class Coordinator(Job):
 
   @property
   def sla_enabled(self):
-    return self.data['properties']['sla_enabled']
+    return self.data['properties']['sla'][0].get('value')
 
   @property
   def sla(self):
