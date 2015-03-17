@@ -123,6 +123,7 @@
                     <systemProperties>
                         <spark.master>local</spark.master>
                         <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
+                        <spark.ui.enabled>false</spark.ui.enabled>
                         <settings.usejavacp.value>true</settings.usejavacp.value>
                     </systemProperties>
                 </configuration>

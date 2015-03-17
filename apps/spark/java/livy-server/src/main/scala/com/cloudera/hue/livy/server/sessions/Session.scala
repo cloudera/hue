@@ -5,6 +5,7 @@ import java.net.URL
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
 
+import scala.annotation.tailrec
 import scala.concurrent.Future
 
 object Session {
@@ -45,5 +46,15 @@ trait Session {
   def interrupt(): Future[Unit]
 
   def stop(): Future[Unit]
+
+  @tailrec
+  final def waitForStateChange[A](oldState: State, f: => A): A = {
+    if (state == oldState) {
+      Thread.sleep(1000)
+      waitForStateChange(oldState, f)
+    } else {
+      f
+    }
+  }
 }
 
