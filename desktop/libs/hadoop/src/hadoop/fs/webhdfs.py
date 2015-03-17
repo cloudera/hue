@@ -59,6 +59,7 @@ class WebHdfs(Hdfs):
                logical_name=None,
                hdfs_superuser=None,
                security_enabled=False,
+               ssl_cert_ca_verify=True,
                temp_dir="/tmp",
                umask=01022):
     self._url = url
@@ -69,33 +70,37 @@ class WebHdfs(Hdfs):
     self._fs_defaultfs = fs_defaultfs
     self._logical_name = logical_name
 
-    self._client = self._make_client(url, security_enabled)
+    self._client = self._make_client(url, security_enabled, ssl_cert_ca_verify)
     self._root = resource.Resource(self._client)
 
     # To store user info
     self._thread_local = threading.local()
 
-    LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" %
-              (self._url, self._security_enabled, self._superuser))
+    LOG.debug("Initializing Hadoop WebHdfs: %s (security: %s, superuser: %s)" % (self._url, self._security_enabled, self._superuser))
 
   @classmethod
   def from_config(cls, hdfs_config):
     fs_defaultfs = hdfs_config.FS_DEFAULTFS.get()
+
     return cls(url=_get_service_url(hdfs_config),
                fs_defaultfs=fs_defaultfs,
                logical_name=hdfs_config.LOGICAL_NAME.get(),
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
+               ssl_cert_ca_verify=hdfs_config.SSL_CERT_CA_VERIFY.get(),
                temp_dir=hdfs_config.TEMP_DIR.get(),
                umask=get_umask_mode())
 
   def __str__(self):
     return "WebHdfs at %s" % self._url
 
-  def _make_client(self, url, security_enabled):
-    client = http_client.HttpClient(
-        url, exc_class=WebHdfsException, logger=LOG)
+  def _make_client(self, url, security_enabled, ssl_cert_ca_verify=True):
+    client = http_client.HttpClient(url, exc_class=WebHdfsException, logger=LOG)
+
     if security_enabled:
       client.set_kerberos_auth()
+
+    client.set_verify(ssl_cert_ca_verify)
+
     return client
 
   @property
