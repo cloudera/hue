@@ -498,7 +498,7 @@
 
 <script type="text/html" id="common-action-credentials">
   <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
-  <select data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, options: $root.credentials, value: properties.credentials" size="5" multiple="true"></select>
+  <select data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, options: $root.credentials, selectedOptions: properties.credentials" size="5" multiple="true"></select>
 </script>
 
 

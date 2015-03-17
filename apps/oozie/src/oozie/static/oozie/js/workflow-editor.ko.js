@@ -481,7 +481,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);
-  self.credentials = ko.mapping.fromJSON(credentials_json);
+  self.credentials = ko.mapping.fromJS(credentials_json);
 
   self.inited = ko.observable(self.oozieColumns().length > 0);
   self.init = function (callback) {
