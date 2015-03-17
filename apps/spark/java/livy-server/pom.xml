@@ -33,6 +33,23 @@
     <dependencies>
 
         <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-assembly_${scala.binary.version}</artifactId>
+            <version>${spark.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpclient</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.httpcomponents</groupId>
+                    <artifactId>httpcore</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>com.cloudera.hue.livy</groupId>
             <artifactId>livy-core_${scala.binary.version}</artifactId>
             <version>${project.version}</version>
@@ -105,6 +122,51 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.scalatra</groupId>
+            <artifactId>scalatra-scalatest_${scala.binary.version}</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.cloudera.hue.livy.repl.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <systemProperties>
+                        <spark.master>local</spark.master>
+                        <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
+                        <spark.ui.enabled>false</spark.ui.enabled>
+                        <settings.usejavacp.value>true</settings.usejavacp.value>
+                    </systemProperties>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
 
 </project>

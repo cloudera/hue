@@ -96,15 +96,15 @@ class WebSession(val id: String) extends Session with Logging {
           }
         case NotStarted() =>
           Future {
-            waitForStateChangeFrom(NotStarted(), { stop() })
+            waitForStateChange(NotStarted(), { stop() })
           }
         case Starting() =>
           Future {
-            waitForStateChangeFrom(Starting(), { stop() })
+            waitForStateChange(Starting(), { stop() })
           }
         case Busy() =>
           Future {
-            waitForStateChangeFrom(Busy(), { stop() })
+            waitForStateChange(Busy(), { stop() })
           }
         case Error() | Dead() =>
           Future.successful(Unit)
@@ -114,16 +114,6 @@ class WebSession(val id: String) extends Session with Logging {
 
   private def transition(state: State) = synchronized {
     _state = state
-  }
-
-  @tailrec
-  private def waitForStateChangeFrom[A](state: State, f: => A): A = {
-    if (_state == state) {
-      Thread.sleep(1000)
-      waitForStateChangeFrom(state, f)
-    } else {
-      f
-    }
   }
 
   private def touchLastActivity() = {
