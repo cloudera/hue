@@ -84,7 +84,7 @@ class Workflow(Job):
   XML_FILE_NAME = 'workflow.xml'
   PROPERTY_APP_PATH = 'oozie.wf.application.path'
   SLA_DEFAULT = [
-      {'key': 'enabled', 'value': False},
+      {'key': 'enabled', 'value': False}, # Always first element
       {'key': 'nominal-time', 'value': '${nominal_time}'},
       {'key': 'should-start', 'value': ''},
       {'key': 'should-end', 'value': '${30 * MINUTES}'},
@@ -123,7 +123,6 @@ class Workflow(Job):
                   "job_xml": "",
                   "sla_enabled": False,
                   "schema_version": "uri:oozie:workflow:0.5",
-                  "sla_workflow_enabled": False,
                   "credentials": [],
                   "properties": [],
                   "sla": Workflow.SLA_DEFAULT,
@@ -223,7 +222,11 @@ class Workflow(Job):
   @property
   def sla_enabled(self):
     _data = self.get_data()
-    return _data['workflow']['properties']['sla_enabled']
+    return _data['workflow']['properties']['sla'][0].get('value')
+
+  @property
+  def has_some_slas(self):
+    return self.sla_enabled or any([node.sla_enabled for node in self.nodes])
 
   @property
   def sla(self):
@@ -320,8 +323,7 @@ class Node():
 
   @property
   def sla_enabled(self):
-    _data = self.get_data()
-    return _data['workflow']['properties']['sla_enabled']
+    return 'sla' in self.data['properties'] and self.data['properties']['sla'] and self.data['properties']['sla'][0].get('value')
 
   def _augment_data(self):
     self.data['type'] = self.data['type'].replace('-widget', '')
@@ -351,7 +353,7 @@ class Node():
     return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
 
   def find_parameters(self):
-    return find_parameters(self)
+    return find_parameters(self) + find_parameters(self, ['sla']) if self.sla_enabled else []
 
 
 class Action(object):

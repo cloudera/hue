@@ -71,9 +71,9 @@
 
 
 <%def name="sla(element)">
-        % if element['properties']['sla_enabled']:
+        % if element['properties']['sla'][0].get('value'):
           <sla:info>
-          % for sla in element['sla']:
+          % for sla in element['properties']['sla']:
             % if sla['value'] and sla['key'] != 'enabled':
             <sla:${ sla['key'] }>${ sla['value'] }</sla:${ sla['key'] }>
             % endif
