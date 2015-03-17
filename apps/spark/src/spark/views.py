@@ -17,6 +17,7 @@
 
 import json
 import logging
+import uuid
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -26,7 +27,8 @@ from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 
 from spark.conf import LANGUAGES
-from spark.decorators import check_document_access_permission
+from spark.decorators import check_document_access_permission,\
+  check_document_modify_permission
 from spark.models import Notebook, get_api
 from spark.management.commands.spark_setup import Command
 
@@ -75,6 +77,42 @@ def notebooks(request):
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
   })
+
+
+@check_document_modify_permission()
+def delete(request):
+  notebooks = json.loads(request.POST.get('notebooks', '[]'))
+
+  for notebook in notebooks:
+    doc2 = Document2.objects.get(uuid=notebook['uuid'])
+    doc = doc2.doc.get()
+    doc.can_write_or_exception(request.user)
+
+    doc.delete()
+    doc2.delete()
+
+  return JsonResponse({})
+
+
+@check_document_access_permission()
+def copy(request):
+  notebooks = json.loads(request.POST.get('notebooks', '[]'))
+
+  for notebook in notebooks:
+    doc2 = Document2.objects.get(uuid=notebook['uuid'])
+    copy_doc = doc2.doc.get().copy(owner=request.user)
+
+    doc2.pk = None
+    doc2.id = None
+    doc2.uuid = str(uuid.uuid4())
+    doc2.owner = request.user
+    doc2.save()
+
+    doc2.doc.all().delete()
+    doc2.doc.add(copy_doc)
+    doc2.save()
+
+  return JsonResponse({})
 
 
 @check_document_access_permission()

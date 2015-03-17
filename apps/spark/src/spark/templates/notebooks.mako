@@ -35,11 +35,6 @@ ${ commonheader(_("Notebooks"), "oozie", user, "60px") | n,unicode }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a data-bind="click: showSubmitPopup, css: {'btn': true, 'disabled': ! oneSelected()}">
-          <i class="fa fa-play"></i> ${ _('Submit') }
-        </a>
-
-        <span style="padding-right:40px"></span>
 
         <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
           attr: {'data-original-title': '${ _("Share") } ' + name},
@@ -161,18 +156,9 @@ ${ commonshare() | n,unicode }
 
     self.datatable = null;
 
-    self.showSubmitPopup = function () {
-      $.get("/oozie/editor/workflow/submit/" + self.selectedJobs()[0].id(), {
-      }, function (data) {
-        $(document).trigger("showSubmitPopup", data);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    };
-
     self.delete2 = function() {
-      $.post("${ url('oozie:delete_editor_workflow') }", {
-        "selection": ko.mapping.toJSON(self.selectedJobs)
+      $.post("${ url('spark:delete') }", {
+        "notebooks": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
         window.location.reload();
         $('#deleteNotebook').modal('hide');
@@ -182,8 +168,8 @@ ${ commonshare() | n,unicode }
     };
 
     self.copy = function() {
-      $.post("${ url('oozie:copy_workflow') }", {
-        "selection": ko.mapping.toJSON(self.selectedJobs)
+      $.post("${ url('spark:copy') }", {
+        "notebooks": ko.mapping.toJSON(self.selectedJobs)
       }, function(data) {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {

@@ -35,6 +35,8 @@ urlpatterns = patterns('spark.views',
   url(r'^new$', 'new', name='new'),
   url(r'^download$', 'download', name='download'),
   url(r'^install_examples$', 'install_examples', name='install_examples'),
+  url(r'^delete$', 'delete', name='delete'),
+  url(r'^copy$', 'copy', name='copy'),
 )
 
 # APIs
