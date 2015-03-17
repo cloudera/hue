@@ -20,7 +20,7 @@
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Notebooks"), "oozie", user, "60px") | n,unicode }
+${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
 
 <div id="editor">
 
@@ -35,18 +35,17 @@ ${ commonheader(_("Notebooks"), "oozie", user, "60px") | n,unicode }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-
-        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: prepareShareModal,
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function(e){ oneSelected() ? prepareShareModal(e) : void(0) },
           attr: {'data-original-title': '${ _("Share") } ' + name},
           css: {'disabled': ! oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
 
-        <a data-bind="click: copy, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
+        <a data-bind="click: function(e){ atLeastOneSelected() ? copy(e) : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
           <i class="fa fa-files-o"></i> ${ _('Copy') }
         </a>
 
-        <a data-bind="click: function() { $('#deleteNotebook').modal('show'); }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+        <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteNotebook').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
 
