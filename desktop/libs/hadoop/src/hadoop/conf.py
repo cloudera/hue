@@ -67,6 +67,10 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                                    default="hdfs", type=str),
       SECURITY_ENABLED=Config("security_enabled", help="Is running with Kerberos authentication",
                               default=False, type=coerce_bool),
+      SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
+                  help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
+                  default=True,
+                  type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
       HADOOP_CONF_DIR = Config(
