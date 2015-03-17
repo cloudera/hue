@@ -46,6 +46,7 @@ class SanitizedResponse(Response):
         self.reason = response.reason
         self.url = response.url
         self.request = response.request
+        self.history = list(response.history)
         self.connection = response.connection
         self._content_consumed = True
 
@@ -165,34 +166,35 @@ class HTTPKerberosAuth(AuthBase):
             log.debug("handle_401(): returning {0}".format(response))
             return response
 
-    def handle_other(self, response):
-        """Handles all responses with the exception of 401s.
+    def handle_mutual_auth(self, response):
+        """
+        Performs mutual auth checking if possible and requested. This handling
+        is applied to *all* responses, not just 401s.
+        """
 
-        This is necessary so that we can authenticate responses if requested"""
-
-        log.debug("handle_other(): Handling: %d" % response.status_code)
+        log.debug("handle_mutual_auth(): Handling: %d" % response.status_code)
 
         if self.mutual_authentication in (REQUIRED, OPTIONAL):
 
             is_http_error = response.status_code >= 400
 
             if _negotiate_value(response) is not None:
-                log.debug("handle_other(): Authenticating the server")
+                log.debug("handle_mutual_auth(): Authenticating the server")
                 if not self.authenticate_server(response):
                     # Mutual authentication failure when mutual auth is wanted,
                     # raise an exception so the user doesn't use an untrusted
                     # response.
-                    log.error("handle_other(): Mutual authentication failed")
+                    log.error("handle_mutual_auth(): Mutual authentication failed")
                     raise MutualAuthenticationError("Unable to authenticate "
                                                     "{0}".format(response))
 
                 # Authentication successful
-                log.debug("handle_other(): returning {0}".format(response))
+                log.debug("handle_mutual_auth(): returning {0}".format(response))
                 return response
 
             elif is_http_error or self.mutual_authentication == OPTIONAL:
                 if not response.ok:
-                    log.error("handle_other(): Mutual authentication unavailable "
+                    log.error("handle_mutual_auth(): Mutual authentication unavailable "
                               "on {0} response".format(response.status_code))
 
                 if self.mutual_authentication == REQUIRED:
@@ -203,11 +205,11 @@ class HTTPKerberosAuth(AuthBase):
                 # Unable to attempt mutual authentication when mutual auth is
                 # required, raise an exception so the user doesnt use an
                 # untrusted response.
-                log.error("handle_other(): Mutual authentication failed")
+                log.error("handle_mutual_auth(): Mutual authentication failed")
                 raise MutualAuthenticationError("Unable to authenticate "
                                                 "{0}".format(response))
         else:
-            log.debug("handle_other(): returning {0}".format(response))
+            log.debug("handle_mutual_auth(): returning {0}".format(response))
             return response
 
     def authenticate_server(self, response):
@@ -248,9 +250,9 @@ class HTTPKerberosAuth(AuthBase):
         if response.status_code == 401:
             _r = self.handle_401(response, **kwargs)
             log.debug("handle_response(): returning {0}".format(_r))
-            return self.handle_response(_r, **kwargs)
+            return self.handle_mutual_auth(_r)
         else:
-            _r = self.handle_other(response)
+            _r = self.handle_mutual_auth(response)
             log.debug("handle_response(): returning {0}".format(_r))
             return _r
 
