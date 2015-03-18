@@ -38,7 +38,7 @@ def get_resource_manager_api(api_url):
 
 
 class ResourceManagerApi(object):
-  def __init__(self, oozie_url, security_enabled=False, ssl_cert_ca_verify=False):
+  def __init__(self, oozie_url, security_enabled=False, ssl_cert_ca_verify=True):
     self._url = posixpath.join(oozie_url, 'ws', _API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
