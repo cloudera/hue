@@ -29,9 +29,9 @@
     % endif
   </global>
   % endif
-  % if workflow['properties']['credentials']:
+  % if wf.credentials:
   <credentials>
-    % for cred_type in workflow['properties']['credentials']:
+    % for cred_type in wf.credentials:
     <%
       credential = mapping['credentials'][cred_type]
     %>
