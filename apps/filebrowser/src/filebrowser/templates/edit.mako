@@ -147,7 +147,7 @@ ${ fb_components.menubar() }
 
       function resizeTextarea() {
         var RESIZE_CORRECTION = 246;
-        $("textarea[name='contents']").height( $(window).height() - RESIZE_CORRECTION);
+        $("textarea[name='contents']").height($(window).height() - RESIZE_CORRECTION);
       }
 
       var _resizeTimeout = -1;

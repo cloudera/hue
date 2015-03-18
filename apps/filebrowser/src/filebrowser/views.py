@@ -16,16 +16,16 @@
 # limitations under the License.
 
 import errno
-import logging
 import json
+import logging
 import mimetypes
 import operator
+import os
 import parquet
 import posixpath
 import re
 import shutil
 import stat as stat_module
-import os
 
 from datetime import datetime
 
@@ -63,6 +63,7 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm
+import urllib
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -279,6 +280,7 @@ def parse_breadcrumbs(path):
     while (i < len(breadcrumbs_parts)):
         breadcrumb_url = breadcrumbs[i - 1]['url'] + '/' + breadcrumbs_parts[i]
         if breadcrumb_url != '/':
+            #breadcrumbs.append({'url': breadcrumb_url, 'label': urllib.unquote(breadcrumbs_parts[i])})
             breadcrumbs.append({'url': breadcrumb_url, 'label': breadcrumbs_parts[i]})
         i = i + 1
     return breadcrumbs
