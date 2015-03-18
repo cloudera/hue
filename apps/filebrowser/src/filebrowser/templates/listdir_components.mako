@@ -558,10 +558,8 @@ from django.utils.translation import ugettext as _
       return $.totalStorage('hue_fb_history') || [];
     };
 
-    var showHistory = function (num) {
-      //keep last 10 items
-      var num = num || -10,
-        history = getHistory().slice(num),
+    var showHistory = function () {
+      var history = getHistory().slice(0, 10),
         frag = $('<ul/>', {
                   'id': 'hashHistory',
                   'class': 'dropdown-menu',
@@ -611,7 +609,7 @@ from django.utils.translation import ugettext as _
           history.unshift(history.splice(history.indexOf(path), 1)[0]);
         }
 
-        $.totalStorage('hue_fb_history', history);
+        $.totalStorage('hue_fb_history', history.slice(0, 10));
       }
     };
 
