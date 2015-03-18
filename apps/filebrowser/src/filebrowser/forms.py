@@ -15,19 +15,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import urllib
+
 from django import forms
+from django.contrib.auth.models import User, Group
 from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet, ManagementForm
 
 from desktop.lib import i18n
 from filebrowser.lib import rwx
 from hadoop.fs import normpath
-from django.contrib.auth.models import User, Group
+
 
 from django.utils.translation import ugettext_lazy as _
 
-import logging
+
 logger = logging.getLogger(__name__)
+
 
 class FormSet(BaseFormSet):
   def __init__(self, data=None, prefix=None, *args, **kwargs):
@@ -62,6 +67,9 @@ class EditorForm(forms.Form):
   path = PathField(label=_("File to edit"))
   contents = CharField(widget=Textarea, label=_("Contents"), required=False)
   encoding = CharField(label=_('Encoding'), required=False)
+
+  def clean_path(self):
+    return urllib.unquote(self.cleaned_data.get('path', ''))
 
   def clean_contents(self):
     return self.cleaned_data.get('contents', '').replace('\r\n', '\n')
