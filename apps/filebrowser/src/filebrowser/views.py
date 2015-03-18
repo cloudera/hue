@@ -63,7 +63,6 @@ from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
                               TrashPurgeForm
-import urllib
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -280,7 +279,6 @@ def parse_breadcrumbs(path):
     while (i < len(breadcrumbs_parts)):
         breadcrumb_url = breadcrumbs[i - 1]['url'] + '/' + breadcrumbs_parts[i]
         if breadcrumb_url != '/':
-            #breadcrumbs.append({'url': breadcrumb_url, 'label': urllib.unquote(breadcrumbs_parts[i])})
             breadcrumbs.append({'url': breadcrumb_url, 'label': breadcrumbs_parts[i]})
         i = i + 1
     return breadcrumbs
@@ -425,7 +423,6 @@ def listdir_paged(request, path):
     shown_stats.insert(1, current_stat)
 
     page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
-
 
     data = {
         'path': path,
