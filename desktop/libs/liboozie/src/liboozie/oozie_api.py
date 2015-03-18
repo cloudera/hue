@@ -23,8 +23,7 @@ from desktop.conf import DEFAULT_USER
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
-from liboozie.conf import SECURITY_ENABLED
-from liboozie.conf import OOZIE_URL
+from liboozie.conf import SECURITY_ENABLED, OOZIE_URL, SSL_CERT_CA_VERIFY
 from liboozie.types import WorkflowList, CoordinatorList, Coordinator, Workflow,\
   CoordinatorAction, WorkflowAction, BundleList, Bundle, BundleAction
 from liboozie.utils import config_gen
@@ -40,15 +39,20 @@ _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
 def get_oozie(user, api_version=API_VERSION):
   oozie_url = OOZIE_URL.get()
   secure = SECURITY_ENABLED.get()
-  return OozieApi(oozie_url, user, security_enabled=secure, api_version=api_version)
+  ssl_cert_ca_verify = SSL_CERT_CA_VERIFY.get()
+  return OozieApi(oozie_url, user, security_enabled=secure, api_version=api_version, ssl_cert_ca_verify=ssl_cert_ca_verify)
 
 
 class OozieApi(object):
-  def __init__(self, oozie_url, user, security_enabled=False, api_version=API_VERSION):
+  def __init__(self, oozie_url, user, security_enabled=False, api_version=API_VERSION, ssl_cert_ca_verify=True):
     self._url = posixpath.join(oozie_url, api_version)
     self._client = HttpClient(self._url, logger=LOG)
+
     if security_enabled:
       self._client.set_kerberos_auth()
+
+    self._client.set_verify(ssl_cert_ca_verify)
+
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
     # To store username info
