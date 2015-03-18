@@ -983,7 +983,7 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
   c = make_logged_in_client(cluster.superuser)
 
   # This path is non-normalized to test normalization too
-  filename = u'//test-filebrowser//./test-edit-carácter-internacional with space and ()'
+  filename = u'//test-filebrowser//./test-edit-carácter-internacional with space and () en-hello pt-Olá ch-你好 ko-안녕 ru-Здравствуйте'
 
   # File doesn't exist - should be empty
   edit_url = '/filebrowser/edit' + filename
