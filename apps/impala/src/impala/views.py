@@ -34,21 +34,19 @@ LOG = logging.getLogger(__name__)
 
 def refresh_tables(request):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)  
+  query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server=query_server)
-  
-  response = {'status': -1, 'message': ''}
-  
+
+  response = {'status': 0, 'message': ''}
+
   if request.method == "POST":
     try:
       database = json.loads(request.POST['database'])
       added = json.loads(request.POST['added'])
       removed = json.loads(request.POST['removed'])
-      
+
       db.invalidate_tables(database, added + removed)
-      
-      response['status'] = 0
     except Exception, e:
-      response['message'] = str(e)    
-  
+      response['message'] = str(e)
+
   return JsonResponse(response)
