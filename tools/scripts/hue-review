@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ $# -lt 3 ]; then
+	echo "Usage: hue-review rev-list reviewer(s) summary ..." 1>&2
+	exit 1
+fi
+
+RBT=`which rbt`
+if [ "$?" -ne "0" ]; then
+	echo "Please install rbt from https://www.reviewboard.org/" 1>&2
+	exit 1
+fi
+
+REVLIST=$1;
+REVRANGE=${REVLIST//\.\./:};
+REVIEWER=$2;
+SUMMARY=$3;
+shift 3;
+
+exec $RBT post -o --description="$(git whatchanged $REVLIST)" --target-groups=hue --target-people="$REVIEWER" --summary="$SUMMARY" $REVLIST $@
