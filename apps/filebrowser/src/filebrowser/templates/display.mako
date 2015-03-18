@@ -22,7 +22,6 @@
   from django.utils.translation import ugettext as _
 %>
 <%
-  path_enc = urlencode(path)
   path_enc = path
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser.views.view', path=path_enc)

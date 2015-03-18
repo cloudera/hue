@@ -994,7 +994,7 @@ from django.utils.translation import ugettext as _
           self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + stripHashes(file.path));
           location.hash = stripHashes(file.path);
         } else {
-          location.href = "${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(file.path);
+          location.href = file.url;
         }
       };
 
