@@ -111,7 +111,10 @@ def manage_oozie_jobs(request, job_id, action):
     if 'notification' in request.POST:
       request.info(_(request.POST.get('notification')))
   except RestException, ex:
-    response['data'] = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex.message)
+    msg = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex.message)
+    LOG.exception(msg)
+
+    response['data'] = msg
 
   return JsonResponse(response)
 
@@ -134,6 +137,8 @@ def bulk_manage_oozie_jobs(request):
       try:
         oozie_api.job_control(job_id, request.POST.get('action'))
       except RestException, ex:
+        LOG.exception("Error performing bulk operation for job_id=%s", job_id)
+
         response['totalErrors'] = response['totalErrors'] + 1
         response['messages'] += str(ex)
 
@@ -145,6 +150,8 @@ def show_oozie_error(view_func):
     try:
       return view_func(request, *args, **kwargs)
     except RestException, ex:
+      LOG.exception("Error communicating with Oozie in %s", view_func.__name__)
+
       detail = ex._headers.get('oozie-error-message', ex)
       if 'Max retries exceeded with url' in str(detail):
         detail = '%s: %s' % (_('The Oozie server is not running'), detail)
@@ -283,7 +290,7 @@ def list_oozie_workflow(request, job_id):
       else:
         workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
     except:
-      pass
+      LOG.exception("Ignoring error updating Document2 record for job_id=%s", job_id)
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 
@@ -355,14 +362,14 @@ def list_oozie_coordinator(request, job_id):
   try:
     coordinator = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
   except:
-    pass
+    LOG.exception("Ignoring error getting oozie job coordinator for job_id=%s", job_id)
 
   oozie_bundle = None
   if request.GET.get('bundle_job_id'):
     try:
       oozie_bundle = check_job_access_permission(request, request.GET.get('bundle_job_id'))
     except:
-      pass
+      LOG.exception("Ignoring error getting oozie bundle for job_id=%s", job_id)
 
   show_all_actions = request.GET.get('show_all_actions') == 'true'
 
@@ -419,7 +426,7 @@ def list_oozie_bundle(request, job_id):
     else:
       bundle = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
   except:
-    pass
+    LOG.exception("Ignoring error getting oozie job bundle for job_id=%s", job_id)
 
   if request.GET.get('format') == 'json':
     return_obj = {
@@ -444,7 +451,10 @@ def list_oozie_workflow_action(request, action):
     action = get_oozie(request.user).get_action(action)
     workflow = check_job_access_permission(request, action.id.split('@')[0])
   except RestException, ex:
-    raise PopupException(_("Error accessing Oozie action %s.") % (action,), detail=ex.message)
+    msg = _("Error accessing Oozie action %s.") % (action,)
+    LOG.exception(msg)
+
+    raise PopupException(msg, detail=ex.message)
 
   oozie_coordinator = None
   if request.GET.get('coordinator_job_id'):
@@ -613,8 +623,10 @@ def _rerun_workflow(request, oozie_id, run_args, mapping):
     job_id = submission.rerun(**run_args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error re-running workflow %s.") % (oozie_id,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+    msg = _("Error re-running workflow %s.") % (oozie_id,)
+    LOG.exception(msg)
+
+    raise PopupException(msg, detail=ex._headers.get('oozie-error-message', ex))
 
 
 @show_oozie_error
@@ -667,8 +679,10 @@ def _rerun_coordinator(request, oozie_id, args, params, properties):
     job_id = submission.rerun_coord(params=params, **args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error re-running coordinator %s.") % (oozie_id,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+    msg = _("Error re-running coordinator %s.") % (oozie_id,)
+    LOG.exception(msg)
+
+    raise PopupException(msg, detail=ex._headers.get('oozie-error-message', ex))
 
 
 @show_oozie_error
@@ -730,8 +744,10 @@ def _rerun_bundle(request, oozie_id, args, params, properties):
     job_id = submission.rerun_bundle(params=params, **args)
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error re-running bundle %s.") % (oozie_id,),
-                         detail=ex._headers.get('oozie-error-message', ex))
+    msg = _("Error re-running bundle %s.") % (oozie_id,)
+    LOG.exception(msg)
+
+    raise PopupException(msg, detail=ex._headers.get('oozie-error-message', ex))
 
 
 def submit_external_job(request, application_path):
@@ -753,7 +769,9 @@ def submit_external_job(request, application_path):
         detail = ex._headers.get('oozie-error-message', ex)
         if 'Max retries exceeded with url' in str(detail):
           detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-        LOG.error(smart_str(detail))
+
+        LOG.exception(smart_str(detail))
+
         raise PopupException(_("Error submitting job %s") % (application_path,), detail=detail)
 
       request.info(_('Oozie job submitted'))
@@ -953,7 +971,10 @@ def check_job_access_permission(request, job_id):
     try:
       oozie_job = get_job(job_id)
     except RestException, ex:
-      raise PopupException(_("Error accessing Oozie job %s.") % (job_id,),
+      msg = _("Error accessing Oozie job %s.") % (job_id,)
+      LOG.exception(msg)
+
+      raise PopupException(msg,
                            detail=ex._headers['oozie-error-message', ''])
 
   if request.user.is_superuser \
