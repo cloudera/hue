@@ -123,7 +123,6 @@ class Workflow(Job):
                   "job_xml": "",
                   "sla_enabled": False,
                   "schema_version": "uri:oozie:workflow:0.5",
-                  "credentials": [],
                   "properties": [],
                   "sla": Workflow.SLA_DEFAULT,
                   "show_arrows": True,
@@ -227,6 +226,10 @@ class Workflow(Job):
   @property
   def has_some_slas(self):
     return self.sla_enabled or any([node.sla_enabled for node in self.nodes])
+
+  @property
+  def credentials(self):
+    return list(set([cred for node in self.nodes for cred in node.data['properties']['credentials']]))
 
   @property
   def sla(self):
