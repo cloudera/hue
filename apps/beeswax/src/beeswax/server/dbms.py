@@ -31,6 +31,7 @@ from beeswax.models import QueryHistory, QUERY_TYPES
 
 from filebrowser.views import location_to_url
 from desktop.lib.django_util import format_preserving_redirect
+from desktop.lib.i18n import smart_str
 
 
 
@@ -255,14 +256,19 @@ class HiveServer2Dbms(object):
 
 
   def invalidate_tables(self, database, tables):
+    handle = None
+
     for table in tables:
-      hql = "INVALIDATE METADATA %s.%s" % (database, table,)
-      query = hql_query(hql, database, query_type=QUERY_TYPES[1])
-
-      handle = self.execute_and_wait(query, timeout_sec=10.0)
-
-      if handle:
-        self.close(handle)
+      try:
+        hql = "INVALIDATE METADATA %s.%s" % (database, table,)
+        query = hql_query(hql, database, query_type=QUERY_TYPES[1])
+  
+        handle = self.execute_and_wait(query, timeout_sec=10.0)
+      except Exception, e:
+        LOG.warn('Refresh tables cache out of sync: %s' % smart_str(e))
+      finally:
+        if handle:
+          self.close(handle)
 
 
   def drop_database(self, database):
