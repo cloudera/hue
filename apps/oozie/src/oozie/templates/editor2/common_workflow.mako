@@ -499,6 +499,10 @@
 <script type="text/html" id="common-action-credentials">
   <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
   <select data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, options: $root.credentials, selectedOptions: properties.credentials" size="5" multiple="true"></select>
+
+  <em data-bind="visible: properties.credentials.indexOf('hbase') != -1">
+    ${ _('Requires hbase-site.xml in job path') }
+  </em>
 </script>
 
 
