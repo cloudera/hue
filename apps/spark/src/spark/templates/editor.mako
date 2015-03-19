@@ -110,7 +110,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-  
+
      <div class="btn-group" data-bind="visible: isEditing">
        <a class="btn dropdown-toggle" data-toggle="dropdown">
          <i class="fa fa-check-square-o"></i>
@@ -128,23 +128,23 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
            </a>
         </li>
       </ul>
-    </div>  
-  
+    </div>
+
    &nbsp;&nbsp;&nbsp;
-  
+
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
-    
+
     &nbsp;&nbsp;&nbsp;
 
     <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
         data-bind="click: saveNotebook, css: {'btn': true}">
       <i class="fa fa-save"></i>
     </a>
-      
+
     &nbsp;&nbsp;&nbsp;
-      
+
     <a class="btn" href="${ url('spark:new') }" title="${ _('Brand New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
@@ -270,8 +270,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <div class="overlay pointer">
           <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px">
           </select>
-          <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>          
-        </div>       
+          <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
+        </div>
       </div>
       <div class="overlay" style="padding-bottom:70px"></div>
     </div>
@@ -422,15 +422,15 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
           <div class="pull-right">
             <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></strong>
-            
+
             &nbsp;
-            
+
             <a data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
               <i class="fa fa-file-text-o"></i>
             </a>
 
             &nbsp;
-            
+
             <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
               ${ csrf_token(request) | n,unicode }
               <input type="hidden" name="notebook"/>
@@ -445,18 +445,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <ul class="dropdown-menu pull-right">
                   <li>
                     <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
-                      <i class="fa fa-file-o"></i> ${ _('CSV') } 
+                      <i class="fa fa-file-o"></i> ${ _('CSV') }
                     </a>
                   </li>
                   <li>
                     <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
-                      <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
-                    </a>                  
+                      <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
+                    </a>
                   </li>
-                </ul>            
+                </ul>
               </div>
             </form>
-            
+
           </div>
         </div>
 
@@ -468,29 +468,29 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
           <span data-bind="text: result.errors"></span>
         </div>
-        
+
         <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass">
           ${ _('Success.') }
         </div>
-        
+
         <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass">
           ${ _('Success but empty results.') }
         </div>
-        
+
         <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass">
           ${ _('Loading...') }
         </div>
 
         <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
         <div class="row-fluid" style="max-height: 400px; margin-top: 50px">
-          <pre data-bind="text: result.data()[0][1]">            
+          <pre data-bind="text: result.data()[0][1]">
           </pre>
         </div>
         <!-- /ko -->
 
         <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
           <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
-            <ul class="nav nav-list" style="border: none; background-color: #FFF">              
+            <ul class="nav nav-list" style="border: none; background-color: #FFF">
               <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
               </a>
             </ul>
@@ -1036,7 +1036,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
       editor.on("blur", function () {
         if (editor.getValue() == ""){
-          editor.setValue(viewModel.snippetPlaceholders[snippet.type()]); 
+          editor.setValue(viewModel.snippetPlaceholders[snippet.type()]);
         }
       });
 
@@ -1146,13 +1146,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   }
 
   if (assist.options.baseURL != ""){
-    loadAssistMain();  
+    loadAssistMain();
   }
   else {
     viewModel.isAssistVisible(false);
     viewModel.isAssistAvailable(false);
   }
-  
+
   function reloadAssist() {
     loadAssistMain(true);
   }
@@ -1365,7 +1365,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         });
       });
     }
-    
+
     return _data;
   }
 
@@ -1459,7 +1459,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   function scatterChartDataTransformer(rawDatum) {
     var _datum = [];
-    
+
     if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYSingle() != null) {
       function addToDatum(col) {
         var _idxX = -1;
@@ -1517,7 +1517,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       else {
         addToDatum('${ _('Distribution') }');
       }
-      
+
     }
     return _datum;
   }
@@ -1604,7 +1604,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $(document).on("snippetAdded", function(e, snippet) {
       var _handle = $("#snippet_" + snippet.id()).find(".resize-panel a");
       if (_handle.length > 0){
-        _handle.draggable(getDraggableOptions(_handle.offset().top));  
+        _handle.draggable(getDraggableOptions(_handle.offset().top));
       }
     });
 
