@@ -70,23 +70,8 @@ ${ header.menubar() }
           </div>
 
           <div id="step2" class="stepDetails hide">
-            <div class="card card-tab card-listcontent">
-              <h2 class="card-heading simple">${ _('Install all the application examples') }</h2>
 
-              <div class="card-body">
-                <p>
-                <ul>
-                  <li>
-                    <a href="javascript:void(0)" class="installAllBtn" data-loading-text="${ _('Installing...') }">
-                      <i class="fa fa-download"></i> ${ _('All') }
-                    </a>
-                  </li>
-                </ul>
-                </p>
-              </div>
-            </div>
-
-          <div class="card card-home card-tab card-tab-bordertop card-listcontent">
+          <div class="card card-home card-tab card-listcontent">
             <h2 class="card-heading simple">${ _('Install individual application examples') }</h2>
           <div class="card-body">
             <p>
@@ -149,7 +134,7 @@ ${ header.menubar() }
           % endif
           % if 'jobsub' in app_names:
               <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('oozie:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
                 </a>
