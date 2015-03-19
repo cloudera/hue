@@ -65,6 +65,7 @@ class WebHdfs(Hdfs):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
+    self._ssl_cert_ca_verify = ssl_cert_ca_verify
     self._temp_dir = temp_dir
     self._umask = umask
     self._fs_defaultfs = fs_defaultfs
@@ -128,6 +129,10 @@ class WebHdfs(Hdfs):
   @property
   def security_enabled(self):
     return self._security_enabled
+
+  @property
+  def ssl_cert_ca_verify(self):
+    return self._ssl_cert_ca_verify
 
   @property
   def superuser(self):
@@ -693,11 +698,10 @@ class WebHdfs(Hdfs):
       next_url = self._get_redirect_url(ex)
 
     if next_url is None:
-      raise WebHdfsException(
-        _("Failed to create '%s'. HDFS did not return a redirect") % path)
+      raise WebHdfsException(_("Failed to create '%s'. HDFS did not return a redirect") % path)
 
     # Now talk to the real thing. The redirect url already includes the params.
-    client = self._make_client(next_url, self.security_enabled)
+    client = self._make_client(next_url, self.security_enabled, self.ssl_cert_ca_verify)
     headers = {'Content-Type': 'application/octet-stream'}
     return resource.Resource(client).invoke(method, data=data, headers=headers)
 
@@ -715,8 +719,7 @@ class WebHdfs(Hdfs):
         raise webhdfs_ex
       return http_error.response.headers['location']
     except Exception, ex:
-      LOG.error("Failed to read redirect from response: %s (%s)" %
-                (webhdfs_ex, ex))
+      LOG.exception("Failed to read redirect from response: %s (%s)" % (webhdfs_ex, ex))
       raise webhdfs_ex
 
   def get_delegation_token(self, renewer):
