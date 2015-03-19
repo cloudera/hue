@@ -117,7 +117,11 @@ def get_next_ha_mrcluster():
   candidates = all_mrclusters()
   has_ha = sum([conf.MR_CLUSTERS[name].SUBMIT_TO.get() for name in conf.MR_CLUSTERS.keys()]) >= 2
 
-  current_user = get_default_mrcluster().user
+  mrcluster = get_default_mrcluster()
+  if mrcluster is None:
+    return None
+
+  current_user = mrcluster.user
 
   for name in conf.MR_CLUSTERS.keys():
     config = conf.MR_CLUSTERS[name]
