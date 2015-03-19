@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.repl.scala.interpreter
 
 import java.io._
 
+import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.repl.SparkIMain
 
 import scala.concurrent.ExecutionContext
@@ -29,6 +30,7 @@ class Interpreter {
   private var _state: Interpreter.State = Interpreter.NotStarted()
   private val outputStream = new ByteArrayOutputStream()
   private var sparkIMain: SparkIMain = _
+  private var sparkContext: SparkContext = _
   private var executeCount = 0
 
   def state = _state
@@ -44,9 +46,22 @@ class Interpreter {
     val settings = new Settings()
     settings.usejavacp.value = true
 
+    val sparkConf = new SparkConf(true)
+      .setAppName("Livy Spark shell")
+
+    sparkContext = new SparkContext(sparkConf)
+
     sparkIMain = createSparkIMain(classLoader, settings)
+    sparkIMain.initializeSynchronous()
+    sparkIMain.beQuietDuring {
+      sparkIMain.bind("sc", "org.apache.spark.SparkContext", sparkContext, List("""@transient"""))
+    }
 
     _state = Interpreter.Idle()
+  }
+
+  private def getMaster(): String = {
+    sys.props.get("spark.master").getOrElse("local[*]")
   }
 
   private def createSparkIMain(classLoader: ClassLoader, settings: Settings) = {
