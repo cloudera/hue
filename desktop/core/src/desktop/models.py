@@ -489,6 +489,8 @@ class Document(models.Model):
         return staticfiles_storage.url('oozie/art/icon_oozie_coordinator_48.png')
       elif self.extra == 'bundle2':
         return staticfiles_storage.url('oozie/art/icon_oozie_bundle_48.png')
+      elif self.extra == 'notebook':
+        return staticfiles_storage.url('spark/art/icon_spark_48.png')
       elif self.content_type.app_label == 'beeswax':
         if self.extra == '0':
           return staticfiles_storage.url(apps['beeswax'].icon_path)
@@ -564,7 +566,7 @@ class DocumentPermissionManager(models.Manager):
 
   def share_to_default(self, document, name='read'):
     from useradmin.models import get_default_user_group # Remove build dependency
-    
+
     self._check_perm(name)
 
     if name == DocumentPermission.WRITE_PERM:
@@ -655,7 +657,7 @@ def uuid_default():
   return str(uuid.uuid4())
 
 
-class Document2(models.Model):    
+class Document2(models.Model):
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -666,19 +668,19 @@ class Document2(models.Model):
   extra = models.TextField(default='')
 
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
-  version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True) 
+  version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
 
   tags = models.ManyToManyField('self', db_index=True)
   dependencies = models.ManyToManyField('self', db_index=True)
   doc = generic.GenericRelation(Document, related_name='doc_doc') # Compatibility with Hue 3
-  
+
   objects = Document2Manager()
   unique_together = ('uuid', 'version', 'is_history')
-  
+
   def natural_key(self):
     return (self.uuid, self.version, self.is_history)
-  
+
   @property
   def data_dict(self):
     if not self.data:
@@ -698,10 +700,12 @@ class Document2(models.Model):
     if self.type == 'oozie-coordinator2':
       return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
     elif self.type == 'oozie-bundle2':
-      return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)    
+      return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
+    elif self.type == 'notebook':
+      return reverse('spark:editor') + '?notebook=' + str(self.id)
     else:
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
-    
+
   def to_dict(self):
     return {
       'owner': self.owner.username,
@@ -715,6 +719,6 @@ class Document2(models.Model):
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
       'isSelected': False
     }
-  
+
   def can_read_or_exception(self, user):
     self.doc.get().can_read_or_exception(user)
