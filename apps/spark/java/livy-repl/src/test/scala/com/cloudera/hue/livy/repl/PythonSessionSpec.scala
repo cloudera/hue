@@ -147,5 +147,17 @@ class PythonSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter 
 
       result should equal (expectedResult)
     }
+
+    it("should access the spark context") {
+      val result = Await.result(session.execute("""sc"""), Duration.Inf)
+      val resultMap = result.extract[Map[String, JValue]]
+
+      // Manually extract the values since the line numbers in the exception could change.
+      resultMap("status").extract[String] should equal ("ok")
+      resultMap("execution_count").extract[Int] should equal (0)
+
+      val data = resultMap("data").extract[Map[String, JValue]]
+      data("text/plain").extract[String] should include ("<pyspark.context.SparkContext object at")
+    }
   }
 }
