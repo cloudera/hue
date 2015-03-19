@@ -138,7 +138,7 @@ def get_next_ha_mrcluster():
           else:
             LOG.info('JobTracker %s is not RUNNING, skipping it: %s' % (name, status))
         except Exception, ex:
-          LOG.info('JobTracker %s is not available, skipping it: %s' % (name, ex))
+          LOG.exception('JobTracker %s is not available, skipping it: %s' % (name, ex))
       else:
         return (config, jt)
   return None
@@ -198,7 +198,7 @@ def get_next_ha_yarncluster():
           else:
             LOG.info('RM %s is not RUNNING, skipping it: %s' % (name, cluster_info))
         except Exception, ex:
-          LOG.info('RM %s is not available, skipping it: %s' % (name, ex))
+          LOG.exception('RM %s is not available, skipping it: %s' % (name, ex))
       else:
         return (config, rm)
   return None
