@@ -279,6 +279,38 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 </script>
 
+<script type="text/html" id="snippetIcon">
+
+  <!-- ko if: type() == 'text' -->
+  <i class="fa fa-header snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">${ _('Text') }</sup>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'hive' -->
+  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon">
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'impala' -->
+  <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon">
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'scala' -->
+  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'python' -->
+  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">python</sup>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'sql' -->
+  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">sql</sup>
+  <!-- /ko -->
+
+  <!-- ko if: type() == 'pig' -->
+  <img src="${ static('pig/art/icon_pig_48.png') }" class="snippet-icon">
+  <!-- /ko -->
+
+</script>
+
 
 <script type="text/html" id="snippet">
   <div class="row-fluid">
@@ -293,39 +325,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           &nbsp;
         </span>
         <div class="dropdown inline widget-type">
+          <!-- ko if: $root.isEditing() -->
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
-            <!-- ko if: type() == 'text' -->
-            <i class="fa fa-header snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">${ _('Text') }</sup>
-            <!-- /ko -->
-
-            <!-- ko if: type() == 'hive' -->
-            <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon">
-            <!-- /ko -->
-
-            <!-- ko if: type() == 'impala' -->
-            <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon">
-            <!-- /ko -->
-
-            <!-- ko if: type() == 'scala' -->
-            <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
-            <!-- /ko -->
-
-            <!-- ko if: type() == 'python' -->
-            <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">python</sup>
-            <!-- /ko -->
-
-            <!-- ko if: type() == 'sql' -->
-            <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">sql</sup>
-            <!-- /ko -->
-
-            <!-- ko if: type() == 'pig' -->
-            <img src="${ static('pig/art/icon_pig_48.png') }" class="snippet-icon">
-            <!-- /ko -->
+            <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
             <b class="caret" data-bind="visible: $root.isEditing()"></b>
           </a>
           <ul class="dropdown-menu" data-bind="foreach: $root.availableSnippets">
             <li><a class="pointer" data-bind="click: function(){ $parent.type($data.type()); }, text: name"></a></li>
           </ul>
+          <!-- /ko -->
+          <!-- ko ifnot: $root.isEditing() -->
+          <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
+          <!-- /ko -->
         </div>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
