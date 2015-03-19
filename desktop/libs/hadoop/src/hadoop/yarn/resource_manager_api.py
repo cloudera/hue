@@ -54,6 +54,10 @@ def get_resource_manager():
   return _api_cache
 
 
+class YarnFailoverOccurred(Exception):
+  pass
+
+
 class ResourceManagerApi(object):
   def __init__(self, oozie_url, security_enabled=False, ssl_cert_ca_verify=False):
     self._url = posixpath.join(oozie_url, 'ws', _API_VERSION)
@@ -80,12 +84,26 @@ class ResourceManagerApi(object):
 
   def cluster(self, **kwargs):
     return self._root.get('cluster', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(self._root.get, 'cluster', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def apps(self, **kwargs):
     return self._root.get('cluster/apps', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(self._root.get, 'cluster/apps', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def app(self, app_id):
     return self._root.get('cluster/apps/%(app_id)s' % {'app_id': app_id}, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def kill(self, app_id):
     return self._root.put('cluster/apps/%(app_id)s/state' % {'app_id': app_id}, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
+    return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
+
+  def _execute(self, function, *args, **kwargs):
+    response = function(*args, **kwargs)
+
+    # YARN-2605: Yarn does not use proper HTTP redirects when the standby RM has
+    # failed back to the master RM.
+    if isinstance(response, str) and response.startswith('This is standby RM. Redirecting to the current active RM'):
+      raise YarnFailoverOccurred(response)
+
+    return response
