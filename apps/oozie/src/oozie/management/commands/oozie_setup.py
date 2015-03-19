@@ -95,17 +95,8 @@ class Command(NoArgsCommand):
   def install_examples(self):
     data_dir = LOCAL_SAMPLE_DIR.get()
 
-    managed_dir = os.path.join(data_dir, 'managed')
-    self._import_workflows(managed_dir, managed=True)
-
     unmanaged_dir = os.path.join(data_dir, 'unmanaged')
     self._import_workflows(unmanaged_dir, managed=False)
-
-    coordinators_dir = os.path.join(data_dir, 'coordinators')
-    self._import_coordinators(coordinators_dir)
-
-    bundles_dir = os.path.join(data_dir, 'bundles')
-    self._import_bundles(bundles_dir)
 
   def handle_noargs(self, **options):
     self.user = install_sample_user()
@@ -135,7 +126,7 @@ class Command(NoArgsCommand):
 
     if ENABLE_V2.get():
       management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
-    else:
-      self.install_examples()
+
+    self.install_examples()
 
     Document.objects.sync()
