@@ -347,10 +347,8 @@ class Node():
       self.data['properties']['files'] = []
     if 'archives' not in self.data['properties']:
       self.data['properties']['archives'] = []
-    if 'sla_enabled' not in self.data['properties']:
-      self.data['properties']['sla_enabled'] = False
     if 'sla' not in self.data['properties']:
-      self.data['properties']['sla'] = []
+      self.data['properties']['sla'] = Workflow.SLA_DEFAULT
 
   def get_template_name(self):
     return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
