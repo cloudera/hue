@@ -433,8 +433,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             
             <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
               ${ csrf_token(request) | n,unicode }
-              <input type="hidden" name="notebook" data-bind="value: ko.mapping.toJSON($root.selectedNotebook)"/>
-              <input type="hidden" name="snippet" data-bind="value: ko.mapping.toJSON($data)"/>
+              <input type="hidden" name="notebook"/>
+              <input type="hidden" name="snippet"/>
               <input type="hidden" name="format" class="download-format"/>
 
               <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
@@ -444,12 +444,12 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 </a>
                 <ul class="dropdown-menu pull-right">
                   <li>
-                    <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('csv'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as CSV') }">
+                    <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
                       <i class="fa fa-file-o"></i> ${ _('CSV') } 
                     </a>
                   </li>
                   <li>
-                    <a class="download" href="javascript:void(0)" data-bind="click: function() { $('#snippet_' + $data.id()).find('.download-format').val('xls'); $('#snippet_' + $data.id()).find('.download-form').submit(); }" title="${ _('Download first rows as XLS') }">
+                    <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
                       <i class="fa fa-file-excel-o"></i> ${ _('Excel') } 
                     </a>                  
                   </li>
@@ -1754,6 +1754,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }, 200);
     });
   });
+
+
+  function downloadResult(snippet, format) {
+    $('#snippet_' + snippet.id()).find('.download-format').val(format);
+    $('#snippet_' + snippet.id()).find('input[name=\'notebook\']').val(ko.mapping.toJSON(viewModel.selectedNotebook().getContext()));
+    $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
+    $('#snippet_' + snippet.id()).find('.download-form').submit();
+  }
 
 </script>
 
