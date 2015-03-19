@@ -449,7 +449,7 @@
   </h6>
   <ul class="unstyled" data-bind="foreach: properties.files">
     <li style="margin-bottom: 3px">
-      <input type="text" class="filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions hdfsAutocomplete: value"/>
+      <input type="text" class="filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value"/>
       <span data-bind='template: { name: "common-fs-link", data: { path: value(), with_label: false} }'></span>
       <a href="#" data-bind="click: function(){ $parent.properties.files.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
