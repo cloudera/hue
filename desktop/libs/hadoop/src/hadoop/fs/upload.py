@@ -29,19 +29,23 @@ import errno
 import logging
 import time
 
-from django.core.files.uploadhandler import \
-    FileUploadHandler, StopFutureHandlers, StopUpload
+from django.core.files.uploadhandler import FileUploadHandler, StopFutureHandlers, StopUpload
 from django.utils.translation import ugettext as _
+
 import hadoop.cluster
+
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.fs.exceptions import WebHdfsException
 
-UPLOAD_SUBDIR = 'hue-uploads'
 LOG = logging.getLogger(__name__)
+
+
+UPLOAD_SUBDIR = 'hue-uploads'
 
 
 class HDFSerror(Exception):
   pass
+
 
 class HDFStemporaryUploadedFile(object):
   """
