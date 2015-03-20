@@ -17,6 +17,7 @@ object Interpreter {
   case class Idle() extends State
   case class Busy() extends State
   case class ShuttingDown() extends State
+  case class ShutDown() extends State
 }
 
 sealed abstract class ExecuteResponse(executeCount: Int)
@@ -46,13 +47,15 @@ class Interpreter {
     val settings = new Settings()
     settings.usejavacp.value = true
 
+    sparkIMain = createSparkIMain(classLoader, settings)
+    sparkIMain.initializeSynchronous()
+
     val sparkConf = new SparkConf(true)
       .setAppName("Livy Spark shell")
+      .set("spark.repl.class.uri", sparkIMain.classServerUri)
 
     sparkContext = new SparkContext(sparkConf)
 
-    sparkIMain = createSparkIMain(classLoader, settings)
-    sparkIMain.initializeSynchronous()
     sparkIMain.beQuietDuring {
       sparkIMain.bind("sc", "org.apache.spark.SparkContext", sparkContext, List("""@transient"""))
     }
@@ -107,9 +110,15 @@ class Interpreter {
   def shutdown(): Unit = {
     _state = Interpreter.ShuttingDown()
 
+    if (sparkContext != null) {
+      sparkContext.stop()
+    }
+
     if (sparkIMain != null) {
       sparkIMain.close()
       sparkIMain = null
     }
+
+    _state = Interpreter.ShutDown()
   }
 }

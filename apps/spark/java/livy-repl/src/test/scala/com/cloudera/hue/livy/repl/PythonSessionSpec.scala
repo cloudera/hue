@@ -159,5 +159,22 @@ class PythonSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter 
       val data = resultMap("data").extract[Map[String, JValue]]
       data("text/plain").extract[String] should include ("<pyspark.context.SparkContext object at")
     }
+
+    it("should execute spark commands") {
+      val result = Await.result(session.execute(
+        """
+          |sc.parallelize(xrange(0, 2)).map(lambda i: i + 1).collect()
+          |""".stripMargin), Duration.Inf)
+
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "ok",
+        "execution_count" -> 0,
+        "data" -> Map(
+          "text/plain" -> "[1, 2]"
+        )
+      ))
+
+      result should equal (expectedResult)
+    }
   }
 }
