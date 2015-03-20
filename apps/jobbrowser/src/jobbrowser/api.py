@@ -268,7 +268,7 @@ class YarnApi(JobBrowserApi):
         return KilledYarnJob(self.resource_manager_api, job)
 
       if job.get('applicationType') == 'SPARK':
-        job = SparkJob(job)
+        job = SparkJob(job, self.resource_manager_api)
       elif job.get('applicationType') == 'MAPREDUCE':
         jobid = jobid.replace('application', 'job')
 
