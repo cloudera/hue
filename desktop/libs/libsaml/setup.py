@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "libsaml",
-      version = "3.7.0",
+      version = "3.8.0",
       url = 'http://github.com/cloudera/hue',
       description = "SAML Libraries",
       packages = find_packages('src'),

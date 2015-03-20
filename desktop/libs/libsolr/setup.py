@@ -18,7 +18,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "libsolr",
-      version = "3.7.0",
+      version = "3.8.0",
       url = 'http://github.com/cloudera/hue',
       description = "Search Libraries",
       packages = find_packages('src'),
