@@ -212,7 +212,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
 
   <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span12" data-bind="style:{'margin-top' : $root.isEditing() ? '120px': '50px'}">
+    <div class="span12" data-bind="style:{'marginTop' : $root.isEditing() ? '120px': '50px'}">
     <div class="object-name" style="text-align: center">
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
