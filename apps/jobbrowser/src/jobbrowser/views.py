@@ -280,7 +280,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
   debug_info = ''
   try:
     response = root.get(link, params=params)
-    log = html.fromstring(response).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
+    log = html.fromstring(response, parser=html.HTMLParser()).xpath('/html/body/table/tbody/tr/td[2]')[0].text_content()
   except Exception, e:
     log = _('Failed to retrieve log: %s' % e)
     try:
