@@ -354,7 +354,7 @@ class Node():
     return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
 
   def find_parameters(self):
-    return find_parameters(self) + find_parameters(self, ['sla']) if self.sla_enabled else []
+    return find_parameters(self) + (find_parameters(self, ['sla']) if self.sla_enabled else [])
 
 
 class Action(object):
