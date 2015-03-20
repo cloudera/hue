@@ -1205,11 +1205,13 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
           handleChoice(filePath, stripHdfsPrefix);
           if (selectFolder) {
             $("#chooseFile").modal("hide");
+            $(".modal-backdrop").remove();
           }
         },
         onFileChoose: function (filePath) {
           handleChoice(filePath, stripHdfsPrefix);
           $("#chooseFile").modal("hide");
+          $(".modal-backdrop").remove();
         },
         createFolder: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.createFolder,
         uploadFile: allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.uploadFile,
