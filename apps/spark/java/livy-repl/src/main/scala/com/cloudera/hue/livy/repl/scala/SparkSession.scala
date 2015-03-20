@@ -28,6 +28,7 @@ private class SparkSession extends Session {
     case Interpreter.Idle() => Session.Idle()
     case Interpreter.Busy() => Session.Busy()
     case Interpreter.ShuttingDown() => Session.ShuttingDown()
+    case Interpreter.ShutDown() => Session.ShutDown()
   }
 
   override def history(): Seq[JValue] = _history
