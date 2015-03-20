@@ -610,7 +610,7 @@ var Notebook = function (vm, notebook) {
   self.close = function () {
     if (self.id() != null) {
       $.post("/spark/api/notebook/close", {
-        "notebook": ko.mapping.toJSON(self.getContext())
+        "notebook": ko.mapping.toJSON(self)
       });
     }
   };
