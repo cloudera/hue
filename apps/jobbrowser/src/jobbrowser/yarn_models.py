@@ -86,8 +86,8 @@ class Application(object):
 
 class SparkJob(Application):
 
-  def __init__(self, job):
-    super(SparkJob, self).__init__(job)
+  def __init__(self, job, api=None):
+    super(SparkJob, self).__init__(job, api)
     self._scrape()
 
   def _history_application_metrics(self, html_doc):
