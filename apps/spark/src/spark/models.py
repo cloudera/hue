@@ -279,7 +279,7 @@ class SparkApi():
     status = api.get_session(response['id'])
     count = 0
 
-    while status['state'] == 'starting' and count < 60:
+    while status['state'] == 'starting' and count < 120:
       status = api.get_session(response['id'])
       count += 1
       time.sleep(1)
