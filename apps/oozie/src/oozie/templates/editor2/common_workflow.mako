@@ -500,7 +500,7 @@
   <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
   <select data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, options: $root.credentials, selectedOptions: properties.credentials" size="5" multiple="true"></select>
 
-  <em data-bind="visible: properties.credentials.indexOf('hbase') != -1">
+  <em data-bind="visible: properties.credentials && properties.credentials.indexOf('hbase') != -1">
     ${ _('Requires hbase-site.xml in job path') }
   </em>
 </script>
@@ -1056,6 +1056,26 @@
             <i class="fa fa-external-link-square"></i>
           </a>
         </span>
+
+        <h6>
+          <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+            ${ _('Properties') } <i class="fa fa-plus"></i>
+          </a>
+        </h6>
+        <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
+          <li>
+            <input type="text" data-bind="value: name"/>
+
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" />
+            <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
+
+            <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
+              <i class="fa fa-minus"></i>
+             </a>
+           </li>
+         </ul>
+        <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
+
       </div>
     </div>
 
@@ -1068,27 +1088,6 @@
           </a>
         </span>
       <!-- /ko -->
-    </div>
-
-    <div data-bind="visible: $root.isEditing()">
-      <h6>
-        <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
-          ${ _('Properties') } <i class="fa fa-plus"></i>
-        </a>
-      </h6>
-      <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
-        <li>
-          <input type="text" data-bind="value: name"/>
-
-          <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" />
-          <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
-
-           <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
-             <i class="fa fa-minus"></i>
-           </a>
-         </li>
-       </ul>
-      <em data-bind="visible: properties.job_properties().length == 0">${ _('No properties defined.') }</em>
     </div>
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
