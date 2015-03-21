@@ -22,6 +22,7 @@ import re
 import urllib
 
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -649,6 +650,8 @@ def test_user_admin():
 
 @attr('requires_hadoop')
 def test_ensure_home_directory():
+  raise SkipTest
+
   reset_all_users()
   reset_all_groups()
 

@@ -251,6 +251,12 @@ class PseudoHdfs4(object):
     self.fs.do_as_superuser(self.fs.mkdir, '/tmp/hadoop-yarn/staging/history', 01777)
     self.fs.do_as_superuser(self.fs.chmod, '/tmp/hadoop-yarn/staging/history', 01777)
 
+    self.fs.do_as_superuser(self.fs.mkdir, '/tmp/hadoop-yarn/staging/history/done', 01777)
+    self.fs.do_as_superuser(self.fs.chmod, '/tmp/hadoop-yarn/staging/history/done', 01777)
+
+    self.fs.do_as_superuser(self.fs.mkdir, '/tmp/hadoop-yarn/staging/history/done/2015', 01777)
+    self.fs.do_as_superuser(self.fs.chmod, '/tmp/hadoop-yarn/staging/history/done/2015', 01777)
+
     self.fs.do_as_superuser(self.fs.mkdir, '/var/log/hadoop-yarn/apps', 01777)
     self.fs.do_as_superuser(self.fs.chmod, '/var/log/hadoop-yarn/apps', 01777)
 
