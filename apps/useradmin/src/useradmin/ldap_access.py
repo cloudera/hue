@@ -45,7 +45,7 @@ def get_connection(ldap_config):
 
   ldap_url = ldap_config.LDAP_URL.get()
   username = ldap_config.BIND_DN.get()
-  password = desktop.conf.get_ldap_password(ldap_config)
+  password = desktop.conf.get_ldap_bind_password(ldap_config)
   ldap_cert = ldap_config.LDAP_CERT.get()
   search_bind_authentication = ldap_config.SEARCH_BIND_AUTHENTICATION.get()
 
