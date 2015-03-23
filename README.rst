@@ -104,12 +104,11 @@ your system:
       * sqlite-devel
       * openssl-devel (for version 7+)
 
-    MacOS (mac port):
-      * liblxml
-      * libxml2
-      * libxslt
-      * mysql5-devel
-      * sqlite3
+    MacOS:
+      * Xcode command line tools
+      * Oracle's JDK 1.7+
+      * maven (Homebrew)
+      * mysql (Homebrew)
 
 
 File Layout
