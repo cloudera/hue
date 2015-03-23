@@ -19,12 +19,14 @@
 import json
 import ldap
 import re
+import sys
 import urllib
 
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
+import desktop.conf
 from desktop.lib.django_test_util import make_logged_in_client
 from django.contrib.auth.models import User, Group
 from django.utils.encoding import smart_unicode
@@ -35,6 +37,7 @@ from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
 
 import useradmin.conf
+import useradmin.ldap_access
 from hadoop import pseudo_hdfs4
 from useradmin.password_policy import reset_password_policy
 
@@ -724,3 +727,68 @@ def test_list_for_autocomplete():
   assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete2'], users)
   assert_true('test_list_for_autocomplete' in groups, groups)
   assert_true('test_list_for_autocomplete_other_group' in groups, groups)
+
+class MockLdapConnection(object):
+  def __init__(self, ldap_config, ldap_url, username, password, ldap_cert):
+    self.ldap_config = ldap_config
+    self.ldap_url = ldap_url
+    self.username = username
+    self.password = password
+    self.ldap_cert = ldap_cert
+
+def test_get_connection_bind_password():
+  # Monkey patch the LdapConnection class as we don't want to make a real connection.
+  OriginalLdapConnection = useradmin.ldap_access.LdapConnection
+  reset = [
+      desktop.conf.LDAP.LDAP_URL.set_for_testing('default.example.com'),
+      desktop.conf.LDAP.BIND_PASSWORD.set_for_testing('default-password'),
+      desktop.conf.LDAP.LDAP_SERVERS.set_for_testing({
+        'test': {
+          'ldap_url': 'test.example.com',
+          'bind_password': 'test-password',
+        }
+      })
+  ]
+  try:
+    useradmin.ldap_access.LdapConnection = MockLdapConnection
+
+    connection = useradmin.ldap_access.get_connection_from_server()
+    assert_equal(connection.password, 'default-password')
+
+    connection = useradmin.ldap_access.get_connection_from_server('test')
+    assert_equal(connection.password, 'test-password')
+  finally:
+    useradmin.ldap_access.LdapConnection = OriginalLdapConnection
+    for f in reset:
+      f()
+
+def test_get_connection_bind_password_script():
+  SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
+
+  # Monkey patch the LdapConnection class as we don't want to make a real connection.
+  OriginalLdapConnection = useradmin.ldap_access.LdapConnection
+  reset = [
+      desktop.conf.LDAP.LDAP_URL.set_for_testing('default.example.com'),
+      desktop.conf.LDAP.BIND_PASSWORD_SCRIPT.set_for_testing(
+        '%s -c "print \'\\n default password \\n\'"' % sys.executable
+      ),
+      desktop.conf.LDAP.LDAP_SERVERS.set_for_testing({
+        'test': {
+          'ldap_url': 'test.example.com',
+          'bind_password_script':
+            '%s -c "print \'\\n test password \\n\'"' % sys.executable,
+        }
+      })
+  ]
+  try:
+    useradmin.ldap_access.LdapConnection = MockLdapConnection
+
+    connection = useradmin.ldap_access.get_connection_from_server()
+    assert_equal(connection.password, ' default password ')
+
+    connection = useradmin.ldap_access.get_connection_from_server('test')
+    assert_equal(connection.password, ' test password ')
+  finally:
+    useradmin.ldap_access.LdapConnection = OriginalLdapConnection
+    for f in reset:
+      f()
