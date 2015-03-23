@@ -259,6 +259,10 @@
     # anonymous searches
     ## bind_password=
 
+    # Execute this script to produce the bind user password. This will be used
+    # when `bind_password` is not set.
+    ## bind_password_script=
+
     # Pattern for searching for usernames -- Use <username> for the parameter
     # For use when using LdapBackend for Hue authentication
     ## ldap_username_pattern="uid=<username>,ou=People,dc=mycompany,dc=com"
@@ -339,6 +343,10 @@
         # Password of the bind user -- not necessary if the LDAP server supports
         # anonymous searches
         ## bind_password=
+
+        # Execute this script to produce the bind user password. This will be used
+        # when `bind_password` is not set.
+        ## bind_password_script=
 
         # Pattern for searching for usernames -- Use <username> for the parameter
         # For use when using LdapBackend for Hue authentication
