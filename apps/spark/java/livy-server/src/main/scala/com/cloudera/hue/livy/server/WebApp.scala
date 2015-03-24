@@ -38,7 +38,9 @@ class WebApp(sessionManager: SessionManager)
   }
 
   get("/sessions") {
-    sessionManager.getSessionIds
+    Map(
+      "sessions" -> sessionManager.getSessionIds
+    )
   }
 
   val getSession = get("/sessions/:sessionId") {
@@ -116,7 +118,10 @@ class WebApp(sessionManager: SessionManager)
 
   get("/sessions/:sessionId/statements") {
     sessionManager.get(params("sessionId")) match {
-      case Some(session: Session) => session.statements().map(formatStatement)
+      case Some(session: Session) =>
+        Map(
+          "statements" -> session.statements().map(formatStatement)
+        )
       case None => NotFound("Session not found")
     }
   }
