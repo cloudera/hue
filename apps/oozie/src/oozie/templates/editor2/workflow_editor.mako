@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.views import commonheader, commonfooter, commonshare
+from desktop import conf
 from django.utils.translation import ugettext as _
 %>
 
@@ -384,6 +385,14 @@ ${ dashboard.import_bindings() }
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .card-toolbar {
+    top: 100px!important;
+  }
+% endif
+</style>
 
 
 <script type="text/javascript">

@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from desktop import conf
   from django.utils.translation import ugettext as _
 %>
 
@@ -106,6 +107,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <script src="${ static('desktop/ext/js/classList.min.js') }" type="text/javascript" charset="utf-8"></script>
 <![endif]-->
 <script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
+
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .search-bar {
+    top: 58px!important;
+  }
+  .show-assist {
+    top: 110px!important;
+  }
+% endif
+</style>
 
 
 <div class="search-bar">

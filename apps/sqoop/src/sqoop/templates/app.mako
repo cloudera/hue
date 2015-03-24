@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
   from desktop.views import commonheader, commonfooter
+  from desktop import conf
   from django.utils.translation import ugettext as _
   from django.core.urlresolvers import reverse
 %>
@@ -700,6 +701,14 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
 <link href="${ static('sqoop/css/sqoop.css') }" rel="stylesheet">
+
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .top-bar {
+    top: 58px!important;
+  }
+% endif
+</style>
 
 <script type="text/javascript" charset="utf-8">
 
