@@ -76,6 +76,21 @@ from django.utils.translation import ugettext as _
       .navbar-fixed-top {
         top: 58px!important;
       }
+      % if current_app == "sqoop":
+      .top-bar {
+        top: 58px!important;
+      }
+      % endif
+
+      % if current_app == "spark":
+      .search-bar {
+        top: 58px!important;
+      }
+      .show-assist {
+        top: 110px!important;
+      }
+      % endif
+
     % else:
       body {
         display: none;
