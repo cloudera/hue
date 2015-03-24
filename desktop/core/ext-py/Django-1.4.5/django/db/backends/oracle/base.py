@@ -204,7 +204,7 @@ WHEN (new.%(col_name)s IS NULL)
 
     def field_cast_sql(self, db_type):
         if db_type and db_type.endswith('LOB'):
-            return "DBMS_LOB.SUBSTR(%s)"
+            return "DBMS_LOB.SUBSTR(%s, 4000)"
         else:
             return "%s"
 
