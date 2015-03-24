@@ -728,8 +728,8 @@
       <span data-bind="text: properties.spark_master" />
       <span data-bind="text: properties.mode" />
       <br/>
-      <span data-bind="text: properties.class" />
       <span data-bind="text: properties.jars" />
+      <span data-bind="text: properties.class" />
     </div>
 
     <div data-bind="visible: $root.isEditing">
@@ -751,17 +751,17 @@
 
         <br/>
 
-        <span data-bind="text: $root.workflow_properties.class.label" style="display: inline-block; width: 75px"></span>
-        <input type="text" class="input-xlarge" data-bind="value: properties.class, attr: { placeholder: $root.workflow_properties.class.help_text }" />
-
-        <br/>
-
         <span data-bind="text: $root.workflow_properties.jars.label" style="display: inline-block; width: 75px"></span>
         <input type="text" class="filechooser-input" data-bind="filechooser: properties.jars, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.jars, attr: { placeholder:  $root.workflow_properties.jars.help_text }" />
         <span data-bind='template: { name: "common-fs-link", data: {path: properties.jars(), with_label: false}}'></span>
 
+        <br/>
+
+        <span data-bind="text: $root.workflow_properties.class.label" style="display: inline-block; width: 75px"></span>
+        <input type="text" class="input-xlarge" data-bind="value: properties.class, attr: { placeholder: $root.workflow_properties.class.help_text }" />
+
         <h6>
-          <a class="pointer" data-bind="click: function(){ properties.spark_arguments.push({'value': ''}); $(document).trigger('drawArrows') }">
+          <a class="pointer" data-bind="click: function(){ properties.spark_arguments.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
             ${ _('Arguments') } <i class="fa fa-plus"></i>
           </a>
         </h6>
@@ -1058,15 +1058,15 @@
         </span>
 
         <h6>
-          <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+          <a class="pointer" data-bind="click: function(){ properties.job_properties.push(ko.mapping.fromJS({'name': '', 'value': ''})); $(document).trigger('drawArrows') }">
             ${ _('Properties') } <i class="fa fa-plus"></i>
           </a>
         </h6>
         <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
           <li>
-            <input type="text" data-bind="value: name"/>
+            <input type="text" data-bind="value: name" placeholder="${ _('Name, e.g. input') }"/>
 
-            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" />
+            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.job_properties.help_text }" />
             <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
 
             <a href="#" data-bind="click: function(){ $parent.properties.job_properties.remove(this); $(document).trigger('drawArrows') }">
