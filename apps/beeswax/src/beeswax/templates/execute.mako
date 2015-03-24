@@ -1098,7 +1098,7 @@ $(document).ready(function () {
         $(data.queries).each(function(cnt, item){
           _rows.push([
             '<span data-sort-value="' + item.timeInMs + '">' + moment(item.timeInMs*1000).format("L LTS") + '</span>',
-            '<code style="cursor:pointer">' + hue.htmlEncode(item.query) + '</code>',
+            '<code style="cursor:pointer">' + item.query + '</code>',
             (item.resultsUrl != "" ? '<a href="' + item.resultsUrl + '" data-row-selector-exclude="true">${_('See results...')}</a>': ''),
             (item.designUrl != "" ? '<a href="' + item.designUrl + '" data-row-selector="true">&nbsp;</a>': '')
           ]);
