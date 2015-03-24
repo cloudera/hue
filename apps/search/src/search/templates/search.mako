@@ -16,6 +16,7 @@
 
 <%!
 from desktop.views import commonheader, commonfooter
+from desktop import conf
 from django.utils.translation import ugettext as _
 %>
 
@@ -1395,6 +1396,20 @@ ${ dashboard.import_layout() }
 
 ${ dashboard.import_bindings() }
 ${ dashboard.import_charts() }
+
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .search-bar {
+    top: 58px!important;
+  }
+  .card-toolbar {
+    top: 100px!important;
+  }
+  #emptyDashboardEditing {
+    top: 190px!important;
+  }
+% endif
+</style>
 
 <script type="text/javascript" charset="utf-8">
 var viewModel;
