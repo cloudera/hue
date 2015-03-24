@@ -1144,7 +1144,7 @@ class SparkAction(Action):
           'label': _('Main class'),
           'value': '',
           'help_text': _("e.g. org.apache.spark.examples.mllib.JavaALS."),
-          'type': ''
+          'type': 'text'
      },
      'jars': {
           'name': 'jars',
@@ -1164,28 +1164,25 @@ class SparkAction(Action):
           'name': 'spark_arguments',
           'label': _('Arguments'),
           'value': [],
-          'help_text': _('Arguments, one by one, e.g. 1000, /path/a.'),
-          'type': ''
+          'help_text': _('Arguments, one by one, e.g. 1000, /path/a.')
      },
      # Common
      'job_properties': {
           'name': 'job_properties',
           'label': _('Hadoop job properties'),
           'value': [],
-          'help_text': _('value, e.g. production'),
-          'type': ''
+          'help_text': _('value, e.g. production')
      },
      'prepares': {
           'name': 'prepares',
           'label': _('Prepares'),
           'value': [],
-          'help_text': _('Path to manipulate before starting the application.'),
-          'type': ''
+          'help_text': _('Path to manipulate before starting the application.')
      },
      'job_xml': {
           'name': 'job_xml',
           'label': _('Job XML'),
-          'value': [],
+          'value': '',
           'help_text': _('Refer to a Hadoop JobConf job.xml'),
           'type': ''
      }
@@ -1193,7 +1190,7 @@ class SparkAction(Action):
 
   @classmethod
   def get_mandatory_fields(cls):
-    return [cls.FIELDS['spark_master'], cls.FIELDS['mode'], cls.FIELDS['class'], cls.FIELDS['jars']]
+    return [cls.FIELDS['spark_master'], cls.FIELDS['mode'], cls.FIELDS['jars'], cls.FIELDS['class']]
 
 
 class KillAction(Action):
