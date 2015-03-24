@@ -47,7 +47,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
   override def init(context: ServletContext): Unit = {
     val livyConf = new LivyConf()
 
-    val sessionFactoryKind = livyConf.get("livy.server.session.factory", "thread")
+    val sessionFactoryKind = livyConf.get("livy.server.session.factory", "process")
 
     info(f"Using $sessionFactoryKind sessions")
 
