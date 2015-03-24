@@ -737,6 +737,9 @@ class MockLdapConnection(object):
     self.ldap_cert = ldap_cert
 
 def test_get_connection_bind_password():
+  # Unfortunately our tests leak a cached test ldap connection across functions, so we need to clear it out.
+  useradmin.ldap_access.CACHED_LDAP_CONN = None
+
   # Monkey patch the LdapConnection class as we don't want to make a real connection.
   OriginalLdapConnection = useradmin.ldap_access.LdapConnection
   reset = [
@@ -763,6 +766,9 @@ def test_get_connection_bind_password():
       f()
 
 def test_get_connection_bind_password_script():
+  # Unfortunately our tests leak a cached test ldap connection across functions, so we need to clear it out.
+  useradmin.ldap_access.CACHED_LDAP_CONN = None
+
   SCRIPT = '%s -c "print \'\\n password from script \\n\'"' % sys.executable
 
   # Monkey patch the LdapConnection class as we don't want to make a real connection.
