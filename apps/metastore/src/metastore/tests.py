@@ -84,7 +84,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     # And have detail
     response = self.client.get("/metastore/table/default/test")
     assert_true("foo" in response.content)
-    assert_true("serdeInfo:SerDeInfo" in response.content, response.content)
+    assert_true("SerDe Library" in response.content, response.content)
 
     # Remember the number of history items. Use a generic fragment 'test' to pass verification.
     history_cnt = verify_history(self.client, fragment='test')

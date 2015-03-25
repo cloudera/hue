@@ -996,7 +996,7 @@ for x in sys.stdin:
     hql = "SELECT foo, bar FROM test"
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
     resp = save_and_verify(resp, TARGET_FILE, overwrite=False, verify=False)
-    assert_true('-3' in resp.content)
+    assert_true('-3' in resp.content, resp.content)
     assert_true('already exists' in resp.content)
 
     # Partition tables
@@ -1859,14 +1859,53 @@ ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2);"""
 
 class MockHiveServerTable(HiveServerTable):
 
-  def __init__(self, data):
-    self.path_location = data.get('path_location')
+  def __init__(self, describe=None):
+    if describe is not None:
+      self.describe = describe
+    else:
+      self.describe = [
+            {'comment': 'comment             ', 'col_name': '# col_name            ', 'data_type': 'data_type           '},
+            {'comment': None, 'col_name': '', 'data_type': None},
+            {'comment': '', 'col_name': 'foo', 'data_type': 'int'},
+            {'comment': '', 'col_name': 'bar', 'data_type': 'string'},
+            {'comment': None, 'col_name': '', 'data_type': None},
+            {'comment': None, 'col_name': '# Partition Information', 'data_type': None},
+            {'comment': 'comment             ', 'col_name': '# col_name            ', 'data_type': 'data_type           '},
+            {'comment': None, 'col_name': '', 'data_type': None},
+            {'comment': '', 'col_name': 'baz', 'data_type': 'string'},
+            {'comment': '', 'col_name': 'boom', 'data_type': 'string'},
+            {'comment': None, 'col_name': '', 'data_type': None},
+            {'comment': None, 'col_name': '# Detailed Table Information', 'data_type': None},
+            {'comment': None, 'col_name': 'Database:           ', 'data_type': 'default             '},
+            {'comment': None, 'col_name': 'Owner:              ', 'data_type': 'romain              '},
+            {'comment': None, 'col_name': 'CreateTime:         ', 'data_type': 'Wed Aug 13 13:39:53 PDT 2014'},
+            {'comment': None, 'col_name': 'LastAccessTime:     ', 'data_type': 'UNKNOWN             '},
+            {'comment': None, 'col_name': 'Protect Mode:       ', 'data_type': 'None                '},
+            {'comment': None, 'col_name': 'Retention:          ', 'data_type': '0                   '},
+            {'comment': None, 'col_name': 'Location:           ', 'data_type': 'hdfs://localhost:8020/user/hive/warehouse/test_partitions'},
+            {'comment': None, 'col_name': 'Table Type:         ', 'data_type': 'MANAGED_TABLE       '},
+            {'comment': None, 'col_name': 'Table Parameters:', 'data_type': None},
+            {'comment': '1407962393          ', 'col_name': '', 'data_type': 'transient_lastDdlTime'},
+            {'comment': None, 'col_name': '', 'data_type': None},
+            {'comment': None, 'col_name': '# Storage Information', 'data_type': None},
+            {'comment': None, 'col_name': 'SerDe Library:      ', 'data_type': 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'},
+            {'comment': None, 'col_name': 'InputFormat:        ', 'data_type': 'org.apache.hadoop.mapred.TextInputFormat'},
+            {'comment': None, 'col_name': 'OutputFormat:       ', 'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'},
+            {'comment': None, 'col_name': 'Compressed:         ', 'data_type': 'No                  '},
+            {'comment': None, 'col_name': 'Num Buckets:        ', 'data_type': '-1                  '},
+            {'comment': None, 'col_name': 'Bucket Columns:     ', 'data_type': '[]                  '},
+            {'comment': None, 'col_name': 'Sort Columns:       ', 'data_type': '[]                  '},
+            {'comment': None, 'col_name': 'Storage Desc Params:', 'data_type': None},
+            {'comment': '\\t                  ', 'col_name': '', 'data_type': 'field.delim         '},
+            {'comment': '\\n                  ', 'col_name': '', 'data_type': 'line.delim          '},
+            {'comment': '\\t                  ', 'col_name': '', 'data_type': 'serialization.format'}
+        ]
 
 
 class TestHiveServer2API():
 
   def test_parsing_partition_values(self):
-    table = MockHiveServerTable({'path_location': '/my/table'})
+    table = MockHiveServerTable()
 
     value = PartitionValueCompatible(['datehour=2013022516'], table)
     assert_equal(['2013022516'], value.values)
@@ -1874,120 +1913,74 @@ class TestHiveServer2API():
     value = PartitionValueCompatible(['month=2011-07/dt=2011-07-01/hr=12'], table)
     assert_equal(['2011-07', '2011-07-01', '12'], value.values)
 
-  def test_table_properties(self):
-    table = MockHiveServerTable({})
-    prev_extended_describe = getattr(MockHiveServerTable, 'extended_describe')
+  def test_hiveserver_table(self):
+    table = MockHiveServerTable()
 
-    try:
-      extended_describe = (
-        'Table('
-          'tableName:page_view, '
-          'dbName:default, '
-          'owner:romain, '
-          'createTime:1360732885, '
-          'lastAccessTime:0, '
-          'retention:0, '
-          'sd:StorageDescriptor('
-            'cols:['
-              'FieldSchema(name:viewtime, type:int, comment:null), '
-              'FieldSchema(name:userid, type:bigint, comment:null), '
-              'FieldSchema(name:page_url, type:string, comment:null), '
-              'FieldSchema(name:referrer_url, type:string, comment:null), '
-              'FieldSchema(name:ip, type:string, comment:IP Address of the User), '
-              'FieldSchema(name:dt, type:string, comment:null), '
-              'FieldSchema(name:country, type:string, comment:null)'
-            '], '
-            'location:hdfs://localhost:8020/user/hive/warehouse/page_view, '
-            'inputFormat:org.apache.hadoop.mapred.TextInputFormat, '
-            'outputFormat:org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat, '
-            'compressed:false, '
-            'numBuckets:-1, '
-            'serdeInfo:SerDeInfo('
-              'name:null, '
-              'serializationLib:org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe, '
-              'parameters:{serialization.format=1}'
-            '), '
-            'bucketCols:[], '
-            'sortCols:[], '
-            'parameters:{}, '
-            'skewedInfo:SkewedInfo('
-              'skewedColNames:[], '
-              'skewedColValues:[], '
-              'skewedColValueLocationMaps:{}'
-            '), '
-            'storedAsSubDirectories:false'
-          '), '
-          'partitionKeys:['
-            'FieldSchema(name:dt, type:string, comment:null), '
-            'FieldSchema(name:country, type:string, comment:null), '
-            'FieldSchema(name:decimal, type:decimal(9, 7), comment:this, has extra: sigils), '
-            'FieldSchema(name:complex, type:UNIONTYPE<int, double, array<string>, struct<a:int,b:string>>, comment:null), '
-          '], '
-          'parameters:{'
-            'numPartitions=0, '
-            'numFiles=1, '
-            'transient_lastDdlTime=1360732885, '
-            'comment=This is the page view table'
-          '}, '
-          'viewOriginalText:null, '
-          'viewExpandedText:null, '
-          'tableType:MANAGED_TABLE'
-        ')'
-      )
-      setattr(table, 'extended_describe', extended_describe)
+    assert_equal([
+        {'comment': None, 'col_name': '# Partition Information', 'data_type': None},
+        {'comment': 'comment             ', 'col_name': '# col_name            ', 'data_type': 'data_type           '},
+        {'comment': None, 'col_name': '', 'data_type': None},
+        {'comment': '', 'col_name': 'baz', 'data_type': 'string'},
+        {'comment': '', 'col_name': 'boom', 'data_type': 'string'},
+        {'comment': None, 'col_name': '', 'data_type': None},
+        {'comment': None, 'col_name': '# Detailed Table Information', 'data_type': None},
+        {'comment': None, 'col_name': 'Database:           ', 'data_type': 'default             '},
+        {'comment': None, 'col_name': 'Owner:              ', 'data_type': 'romain              '},
+        {'comment': None, 'col_name': 'CreateTime:         ', 'data_type': 'Wed Aug 13 13:39:53 PDT 2014'},
+        {'comment': None, 'col_name': 'LastAccessTime:     ', 'data_type': 'UNKNOWN             '},
+        {'comment': None, 'col_name': 'Protect Mode:       ', 'data_type': 'None                '},
+        {'comment': None, 'col_name': 'Retention:          ', 'data_type': '0                   '},
+        {'comment': None, 'col_name': 'Location:           ', 'data_type': 'hdfs://localhost:8020/user/hive/warehouse/test_partitions'},
+        {'comment': None, 'col_name': 'Table Type:         ', 'data_type': 'MANAGED_TABLE       '},
+        {'comment': None, 'col_name': 'Table Parameters:', 'data_type': None},
+        {'comment': '1407962393          ', 'col_name': '', 'data_type': 'transient_lastDdlTime'},
+        {'comment': None, 'col_name': '', 'data_type': None},
+        {'comment': None, 'col_name': '# Storage Information', 'data_type': None},
+        {'comment': None, 'col_name': 'SerDe Library:      ', 'data_type': 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'},
+        {'comment': None, 'col_name': 'InputFormat:        ', 'data_type': 'org.apache.hadoop.mapred.TextInputFormat'},
+        {'comment': None, 'col_name': 'OutputFormat:       ', 'data_type': 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'},
+        {'comment': None, 'col_name': 'Compressed:         ', 'data_type': 'No                  '},
+        {'comment': None, 'col_name': 'Num Buckets:        ', 'data_type': '-1                  '},
+        {'comment': None, 'col_name': 'Bucket Columns:     ', 'data_type': '[]                  '},
+        {'comment': None, 'col_name': 'Sort Columns:       ', 'data_type': '[]                  '},
+        {'comment': None, 'col_name': 'Storage Desc Params:', 'data_type': None},
+        {'comment': '\\t                  ', 'col_name': '', 'data_type': 'field.delim         '},
+        {'comment': '\\n                  ', 'col_name': '', 'data_type': 'line.delim          '},
+        {'comment': '\\t                  ', 'col_name': '', 'data_type': 'serialization.format'}],
+            table.properties)
 
-      assert_equal([['tableName', 'page_view'],
-                    ['dbName', 'default'],
-                    ['owner', 'romain'],
-                    ['createTime', '1360732885'],
-                    ['lastAccessTime', '0'],
-                    ['retention', '0'],
-                    ['location:hdfs://localhost', '8020/user/hive/warehouse/page_view'],
-                    ['inputFormat', 'org.apache.hadoop.mapred.TextInputFormat'],
-                    ['outputFormat', 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'],
-                    ['compressed', 'false'],
-                    ['numBuckets', '-1'],
-                    ['serdeInfo:SerDeInfo(name', 'null'],
-                    ['serializationLib', 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'],
-                    ['parameters', '{serialization.format=1})'],
-                    ['bucketCols', '[]'],
-                    ['sortCols', '[]'],
-                    ['parameters', '{}'],
-                    ['skewedInfo:SkewedInfo(skewedColNames', '[]'],
-                    ['skewedColValues', '[]'],
-                    ['skewedColValueLocationMaps', '{})'],
-                    ['storedAsSubDirectories', 'false)'],
-                    ['partitionKeys:[FieldSchema(name', 'dt'],
-                    ['type', 'string'],
-                    ['comment', 'null)'],
-                    ['FieldSchema(name', 'country'],
-                    ['type', 'string'],
-                    ['comment', 'null)'],
-                    ['FieldSchema(name', 'decimal'],
-                    ['type', 'decimal(9'],
-                    ['comment', 'this'],
-                    ['has extra', ' sigils)'],
-                    ['FieldSchema(name', 'complex'],
-                    ['type', 'UNIONTYPE<int'],
-                    ['struct<a:int,b', 'string>>'],
-                    ['comment', 'null)'],
-                    ['parameters', '{numPartitions=0'],
-                    ['numFiles', '1'],
-                    ['transient_lastDdlTime', '1360732885'],
-                    ['comment', 'This is the page view table}'],
-                    ['viewOriginalText', 'null'],
-                    ['viewExpandedText', 'null'],
-                    ['tableType', 'MANAGED_TABLE']
-                  ],
-                  table.properties)
+    assert_equal('hdfs://localhost:8020/user/hive/warehouse/test_partitions', table.path_location)
 
-      assert_equal([PartitionKeyCompatible('dt', 'string', 'null'),
-                    PartitionKeyCompatible('country', 'string', 'null'),
-                    PartitionKeyCompatible('decimal', 'decimal(9, 7)', 'this, has extra: sigils'),
-                    PartitionKeyCompatible('complex', 'UNIONTYPE<int, double, array<string>, struct<a:int,b:string>>', 'null'),
-                   ], table.partition_keys)
-    finally:
-      setattr(table, 'extended_describe', prev_extended_describe)
+    assert_equal([
+      {'col_name': 'foo', 'comment': '', 'data_type': 'int'},
+      {'col_name': 'bar', 'comment': '', 'data_type': 'string'},
+      {'col_name': 'baz', 'comment': '', 'data_type': 'string'},
+      {'col_name': 'boom', 'comment': '', 'data_type': 'string'}], table.cols)
+
+    assert_equal([PartitionKeyCompatible('baz', 'string', ''),
+                  PartitionKeyCompatible('boom', 'string', '')
+                 ], table.partition_keys)
+
+
+  def test_hiveserver_table_partition_keys(self):
+    describe = [
+        {'comment': None, 'col_name': '# Partition Information', 'data_type': None},
+        {'comment': 'comment             ', 'col_name': '# col_name            ', 'data_type': 'data_type           '},
+        {'comment': None, 'col_name': '', 'data_type': None},
+        {'comment': '', 'col_name': 'dt', 'data_type': 'string'},
+        {'comment': '', 'col_name': 'country', 'data_type': 'string'},
+        {'comment': 'this, has extra: sigils', 'col_name': 'decimal', 'data_type': 'decimal(9, 7)'},
+        {'comment': '', 'col_name': 'complex', 'data_type': 'UNIONTYPE<int, double, array<string>, struct<a:int,b:string>>'},
+        {'comment': None, 'col_name': '', 'data_type': None}
+    ]
+    table = MockHiveServerTable(describe)
+
+    assert_equal([PartitionKeyCompatible('dt', 'string', ''),
+                  PartitionKeyCompatible('country', 'string', ''),
+                  PartitionKeyCompatible('decimal', 'decimal(9, 7)', 'this, has extra: sigils'),
+                  PartitionKeyCompatible('complex', 'UNIONTYPE<int, double, array<string>, struct<a:int,b:string>>', ''),
+                 ], table.partition_keys)
+
 
   def test_column_format_values_nulls(self):
     data = [1, 1, 1]

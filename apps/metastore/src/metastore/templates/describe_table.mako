@@ -103,12 +103,12 @@ ${ components.menubar() }
 
             <div class="tab-content">
               <div class="active tab-pane" id="columns">
-                ${column_table(table.cols)}
+                ${ column_table(table.cols) }
               </div>
 
               % if table.partition_keys:
               <div class="tab-pane" id="partitionColumns">
-                ${column_table(table.partition_keys)}
+                ${ column_table(table.partition_keys) }
               </div>
               % endif
 
@@ -156,13 +156,15 @@ ${ components.menubar() }
                     <tr>
                       <th>${ _('Name') }</th>
                       <th>${ _('Value') }</th>
+                      <th>${ _('Comment') }</th>
                     </tr>
                   </thead>
                   <tbody>
-                    % for name, value in table.properties:
+                    % for prop in table.properties:
                       <tr>
-                        <td>${ smart_unicode(name) }</td>
-                        <td>${ smart_unicode(value) }</td>
+                        <td>${ smart_unicode(prop['col_name']) }</td>
+                        <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
+                        <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
                       </tr>
                      % endfor
                   </tbody>

@@ -118,9 +118,6 @@ class HiveServer2Dbms(object):
     self.server_name = self.client.query_server['server_name']
 
   def get_table(self, database, table_name):
-    # DB name not supported in SHOW PARTITIONS required in Table
-    self.use(database)
-
     return self.client.get_table(database, table_name)
 
 
@@ -553,8 +550,8 @@ def expand_exception(exc, db, handle=None):
     # Always show something, even if server has died on the job.
     log = _("Could not retrieve logs: %s." % e)
 
-  if not hasattr(exc, 'message') or not exc.message:
+  if not exc.args or not exc.args[0]:
     error_message = _("Unknown exception.")
   else:
-    error_message = force_unicode(exc.message, strings_only=True, errors='replace')
+    error_message = force_unicode(exc.args[0], strings_only=True, errors='replace')
   return error_message, log

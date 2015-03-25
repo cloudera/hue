@@ -52,9 +52,9 @@ DEFAULT_USER = DEFAULT_USER.get()
 
 class HiveServerTable(Table):
   """
-  We are parsing DESCRIBE EXTENDED text as the metastore API like GetColumns() misses most of the information.
-  Impala only supports a simple DESCRIBE.
+  We get the table details from a DESCRIBE FORMATTED.
   """
+
   def __init__(self, table_results, table_schema, desc_results, desc_schema):
     if beeswax_conf.THRIFT_VERSION.get() >= 7:
       if not table_results.columns:
@@ -69,99 +69,62 @@ class HiveServerTable(Table):
     self.desc_results = desc_results
     self.desc_schema = desc_schema
 
+    self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+
   @property
   def name(self):
     return HiveServerTRow(self.table, self.table_schema).col('TABLE_NAME')
 
   @property
   def is_view(self):
-    return HiveServerTRow(self.table, self.table_schema).col('TABLE_TYPE') == 'VIEW' # Used to be VIRTUAL_VIEW
+    return HiveServerTRow(self.table, self.table_schema).col('TABLE_TYPE') == 'VIEW'
 
   @property
   def partition_keys(self):
-    describe = self.extended_describe
-    # Parses a list of: partitionKeys:[FieldSchema(name:baz, type:string, comment:null), FieldSchema(name:boom, type:string, comment:null)]
-    match = re.search('partitionKeys:\[([^\]]+)\]', describe)
-    if match is not None:
-      match = match.group(1)
-      return [PartitionKeyCompatible(*partition)
-          for partition in re.findall('FieldSchema\(name:(.+?), type:(.+?), comment:(.+?)\)', match)]
-    else:
+    try:
+      return [PartitionKeyCompatible(row['col_name'], row['data_type'], row['comment']) for row in self._get_partition_column()]
+    except:
       return []
 
   @property
   def path_location(self):
     try:
-      describe = self.extended_describe
-      match = re.search('location:([^,]+)', describe)
-      if match is not None:
-        match = match.group(1)
-      return match
+      rows = self.describe
+      rows = [row for row in rows if row['col_name'].startswith('Location:')]
+      if rows:
+        return rows[0]['data_type']
     except:
-      # Impala does not have extended_describe
       return None
 
   @property
-  def parameters(self):
-    # Parses a list of: parameters:{serialization.format=1}),... parameters:{numPartitions=2, EXTERNAL=TRUE}
-    describe = self.extended_describe
-    params = re.findall('parameters:\{([^\}]+?)\}', describe)
-    if params:
-      params_list = ', '.join(params).split(', ')
-      return dict([param.split('=')for param in params_list])
-    else:
-      return {}
-
-  @property
   def cols(self):
-    cols = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    rows = self.describe
     try:
-      end_cols_index = map(itemgetter('col_name'), cols).index('') # Truncate below extended describe
-      return cols[0:end_cols_index]
+      col_row_index = 2
+      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+      return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
     except:
-      try:
-        # Spark SQL: does not have an empty line in extended describe
-        try:
-          end_cols_index = map(itemgetter('col_name'), cols).index('# Partition Information')
-        except:
-          end_cols_index = map(itemgetter('col_name'), cols).index('Detailed Table Information')
-        return cols[0:end_cols_index]
-      except:
-        # Impala: uses non extended describe and 'col' instead of 'col_name'
-        return cols
+      return rows
+
+  def _get_partition_column(self):
+    rows = self.describe
+    try:
+      col_row_index = map(itemgetter('col_name'), rows).index('# Partition Information') + 3
+      end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+      return rows[col_row_index:][:end_cols_index]
+    except:
+      return []
 
   @property
   def comment(self):
     return HiveServerTRow(self.table, self.table_schema).col('REMARKS')
 
   @property
-  def extended_describe(self):
-    # Just keep rows after 'Detailed Table Information'
-    rows = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
-    detailed_row_index = map(itemgetter('col_name'), rows).index('Detailed Table Information')
-    # Hack because of bad delimiter escaping in LazySimpleSerDe in HS2: parameters:{serialization.format=})
-    describe_text = rows[detailed_row_index]['data_type']
-    try:
-      # LazySimpleSerDe case, also add full next row
-      return describe_text + rows[detailed_row_index + 1]['col_name'] + rows[detailed_row_index + 1]['data_type']
-    except:
-      return describe_text
-
-  @property
   def properties(self):
-    # Ugly but would need a recursive parsing to be clean
-    no_table = re.sub('\)$', '', re.sub('^Table\(', '', self.extended_describe))
-    properties = re.sub(', sd:StorageDescriptor\(cols.+?\]', '', no_table).split(', ')
-    props = []
-
-    for prop in properties:
-      key_val = prop.rsplit(':', 1)
-      if len(key_val) == 1:
-        key_val = key_val[0].rsplit('=', 1)
-      if len(key_val) == 2:
-        props.append(key_val)
-
-    return props
+    rows = self.describe
+    col_row_index = 2
+    end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
+    return rows[col_row_index + end_cols_index + 1:]
 
 
 class HiveServerTRowSet2:
@@ -311,7 +274,7 @@ class HiveServerTTableSchema:
       cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
       for col in cols:
         col['col_name'] = col.pop('name')
-        col['col_type'] = col.pop('type')
+        col['data_type'] = col.pop('type')
       return cols
 
   def col(self, colName):
@@ -626,11 +589,7 @@ class HiveServerClient:
     table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
-    if self.query_server['server_name'] == 'impala':
-      # Impala does not supported extended
-      query = 'DESCRIBE %s' % table_name
-    else:
-      query = 'DESCRIBE EXTENDED %s' % table_name
+    query = 'DESCRIBE FORMATTED %s' % table_name
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
@@ -772,7 +731,7 @@ class HiveServerClient:
     else:
       max_rows = 1000 if max_parts <= 250 else max_parts
 
-    partitionTable = self.execute_query_statement('SHOW PARTITIONS %s' % table_name, max_rows=max_rows) # DB prefix supported since Hive 0.13
+    partitionTable = self.execute_query_statement('SHOW PARTITIONS %s.%s' % (database, table_name), max_rows=max_rows)
     return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
 
 
@@ -789,11 +748,17 @@ class HiveServerTableCompatible(HiveServerTable):
     self.desc_results = hive_table.desc_results
     self.desc_schema = hive_table.desc_schema
 
+    self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+
   @property
   def cols(self):
-    return [type('Col', (object,), {'name': col.get('col_name', '').strip(),
-                                    'type': col.get('data_type', col.get('col_type', '')).strip(), # Impala is col_type
-                                    'comment': col.get('comment', '').strip() if col.get('comment') else '', }) for col in HiveServerTable.cols.fget(self)]
+    return [
+        type('Col', (object,), {
+          'name': col.get('col_name', '').strip(),
+          'type': col.get('data_type', '').strip(),
+          'comment': col.get('comment', '').strip() if col.get('comment') else ''
+        }) for col in HiveServerTable.cols.fget(self)
+  ]
 
 
 class ResultCompatible:
