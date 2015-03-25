@@ -33,7 +33,7 @@ function initLogsElement(element) {
 function appendAndScroll(element, logs) {
   var newLines = logs.split("\n").slice(element.text().split("\n").length);
   if (newLines.length > 0) {
-    element.text(element.text() + newLines.join("\n") + "\n");
+    element.html(element.text() + newLines.join("\n") + "\n");
   }
   if (element.data("logsAtEnd")) {
     element.scrollTop(element[0].scrollHeight - element.height());
