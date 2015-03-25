@@ -87,28 +87,28 @@ ${ comps.menubar() }
                       % if not log_diagnostic:
                         <pre>-- empty --</pre>
                       % else:
-                        <pre>${format_log(log_diagnostic)}</pre>
+                        <pre></pre>
                       % endif
                   </div>
                   <div class="tab-pane ${ first_log_tab == 1 and 'active' or '' }" id="logsStdOut">
                       % if not log_stdout:
                         <pre>-- empty --</pre>
                       % else:
-                        <pre>${format_log(log_stdout)}</pre>
+                        <pre></pre>
                       % endif
                   </div>
                   <div class="tab-pane ${ first_log_tab == 2 and 'active' or '' }" id="logsStdErr">
                       % if not log_stderr:
                         <pre>-- empty --</pre>
                       % else:
-                        <pre>${format_log(log_stderr)}</pre>
+                        <pre></pre>
                       % endif
                   </div>
                   <div class="tab-pane ${ first_log_tab == 3 and 'active' or '' }" id="logsSysLog">
                       % if not log_syslog:
                         <pre>-- empty --</pre>
                       % else:
-                        <pre>${format_log(log_syslog)}</pre>
+                        <pre></pre>
                       % endif
                   </div>
                 </div>

@@ -23,8 +23,11 @@ import urllib2
 
 from urlparse import urlparse, urlunparse
 
+from django.core.urlresolvers import reverse
 from desktop.lib.view_util import format_duration_in_millis
 from desktop.lib import i18n
+from django.utils.html import escape
+from filebrowser.views import location_to_url
 from hadoop import job_tracker
 from hadoop import confparse
 from hadoop.api.jobtracker.ttypes import JobNotFoundException
@@ -540,6 +543,39 @@ class Cluster(object):
     self.blacklistedTrackerNames = self.status.blacklistedTrackerNames
     self.hostname = self.status.hostname
     self.httpPort = self.status.httpPort
+
+
+class LinkJobLogs(object):
+
+  @classmethod
+  def _make_hdfs_links(cls, log):
+    escaped_logs = escape(log)
+    return re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+
+  @classmethod
+  def _make_mr_links(cls, log):
+    escaped_logs = escape(log)
+    return re.sub('(job_[0-9_]+(/|\.)?)', LinkJobLogs._replace_mr_link, escaped_logs)
+
+  @classmethod
+  def _make_links(cls, log):
+    escaped_logs = escape(log)
+    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
+    return re.sub('(job_[0-9_]+(/|\.)?)', LinkJobLogs._replace_mr_link, hdfs_links)
+
+  @classmethod
+  def _replace_hdfs_link(self, match):
+    try:
+      return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
+    except:
+      return match.group(0)
+
+  @classmethod
+  def _replace_mr_link(self, match):
+    try:
+      return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
+    except:
+      return match.group(0)
 
 
 def get_jobconf(jt, jobid):

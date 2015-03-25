@@ -21,13 +21,12 @@ import re
 import time
 
 from django.core.urlresolvers import reverse
-from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_str
 from desktop.lib.view_util import format_duration_in_millis
-from filebrowser.views import location_to_url
 from jobbrowser.views import job_single_logs
+from jobbrowser.models import LinkJobLogs
 from liboozie.oozie_api import get_oozie
 from oozie.models import Workflow, Pig
 from oozie.views.editor import _submit_workflow
@@ -159,7 +158,7 @@ class OozieApi(object):
           data = job_single_logs(request, **{'job': action.externalId})
           if data:
             matched_logs = self._match_logs(data)
-            logs[action.name] = self._make_links(matched_logs)
+            logs[action.name] = LinkJobLogs._make_links(matched_logs)
             is_really_done = OozieApi.RE_LOG_END.search(data['logs'][1]) is not None
 
       except Exception, e:
@@ -195,25 +194,6 @@ class OozieApi(object):
       i = logs.index(group.group(1)) + len(group.group(1))
       return logs[i:].strip()
 
-  @classmethod
-  def _make_links(cls, log):
-    escaped_logs = escape(log)
-    hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', OozieApi._make_hdfs_link, escaped_logs)
-    return re.sub('(job_[0-9_]+(/|\.)?)', OozieApi._make_mr_link, hdfs_links)
-
-  @classmethod
-  def _make_hdfs_link(self, match):
-    try:
-      return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
-    except:
-      return match.group(0)
-
-  @classmethod
-  def _make_mr_link(self, match):
-    try:
-      return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
-    except:
-      return match.group(0)
 
   def massaged_jobs_for_json(self, request, oozie_jobs, hue_jobs):
     jobs = []
