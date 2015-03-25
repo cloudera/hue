@@ -344,8 +344,8 @@ class Attempt:
       except Exception, e:
         log = _('Failed to retrieve log: %s' % e)
         try:
-          debug_info = _('\nLog Link: %s' % log_link)
-          debug_info += _('\nHTML Response: %s' % response)
+          debug_info = '\nLog Link: %s' % log_link
+          debug_info += '\nHTML Response: %s' % response
           LOGGER.error(debug_info)
         except:
           pass
