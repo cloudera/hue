@@ -496,7 +496,7 @@ def augment_solr_response(response, collection, query):
   NAME = '%(field)s-%(id)s'
   normalized_facets = []
 
-  selected_values = dict([((fq['id'], NAME % fq, fq['type']), fq['filter']) for fq in query['fqs']])
+  selected_values = dict([(fq['id'], fq['filter']) for fq in query['fqs']])
 
   if response and response.get('facet_counts'):
     # e.g. [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
@@ -506,7 +506,7 @@ def augment_solr_response(response, collection, query):
       if category == 'field' and response['facet_counts']['facet_fields']:
         name = NAME % facet
         collection_facet = get_facet_field(category, name, collection['facets'])
-        counts = pairwise2(facet['field'], selected_values.get((facet['id'], name, category), []), response['facet_counts']['facet_fields'][name])
+        counts = pairwise2(facet['field'], selected_values.get(facet['id'], []), response['facet_counts']['facet_fields'][name])
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
         facet = {
@@ -522,7 +522,7 @@ def augment_solr_response(response, collection, query):
         collection_facet = get_facet_field(category, name, collection['facets'])
         counts = response['facet_counts']['facet_ranges'][name]['counts']
         end = response['facet_counts']['facet_ranges'][name]['end']
-        counts = range_pair(facet['field'], name, selected_values.get((facet['id'], name, category), []), counts, end, collection_facet)
+        counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, end, collection_facet)
         facet = {
           'id': collection_facet['id'],
           'field': facet['field'],
@@ -544,10 +544,10 @@ def augment_solr_response(response, collection, query):
           }
           normalized_facets.append(facet)
       elif category == 'pivot':
-        name = ','.join([facet['field']] + [f['field'] for f in facet['properties']['facets']])
+        name = NAME % facet
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
           if facet['properties']['scope'] == 'stack':
-            count = _augment_pivot_2d(facet['id'], response['facet_counts']['facet_pivot'][name], selected_values)
+            count = _augment_pivot_2d(name, facet['id'], response['facet_counts']['facet_pivot'][name], selected_values)
           else:
             count = response['facet_counts']['facet_pivot'][name]
             _augment_pivot_nd(facet['id'], count, selected_values)
@@ -601,7 +601,7 @@ def augment_solr_response(response, collection, query):
   return augmented
 
 
-def _augment_pivot_2d(facet_id, counts, selected_values):
+def _augment_pivot_2d(name, facet_id, counts, selected_values):
   values = set()
 
   for dimension in counts:
@@ -609,7 +609,6 @@ def _augment_pivot_2d(facet_id, counts, selected_values):
       values.add(pivot['value'])
 
   values = sorted(list(values))
-
   augmented = []
 
   for dimension in counts:
@@ -621,12 +620,14 @@ def _augment_pivot_2d(facet_id, counts, selected_values):
     for val in values:
       fq_values = '%s:%s' % (dimension['value'], val)
       fq_fields = '%s:%s' % (dimension['field'], pivot_field)
-
-      fq_filter = selected_values.get((facet_id, fq_fields, 'field'), [])
+      fq_filter = selected_values.get(facet_id, [])
       _selected_values = [f['value'] for f in fq_filter]
 
       augmented.append({
-          "count": count.get(val, 0), "value": val, "cat": dimension['value'], 'selected': fq_values in _selected_values,
+          "count": count.get(val, 0),
+          "value": val,
+          "cat": dimension['value'],
+          'selected': fq_values in _selected_values,
           'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val]),
           'fq_fields': fq_fields,
           'fq_values': fq_values,
@@ -643,7 +644,7 @@ def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
     if 'pivot' in c:
       _augment_pivot_nd(facet_id, c['pivot'], selected_values, fq_fields, fq_values)
 
-    fq_filter = selected_values.get((facet_id, fq_fields, 'field'), [])
+    fq_filter = selected_values.get(facet_id, [])
     _selected_values = [f['value'] for f in fq_filter]
     c['selected'] = fq_values in _selected_values
     c['exclude'] = False
