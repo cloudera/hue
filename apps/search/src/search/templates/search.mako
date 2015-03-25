@@ -814,7 +814,7 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <!-- ko if: type() == 'range' -->
+      <!-- ko if: type() == 'range' || type() == 'range-up' -->
         <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
           <span class="facet-field-label">${ _('Zoom') }</span>
           <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
@@ -828,7 +828,11 @@ ${ dashboard.layout_skeleton() }
       onStateChange: function(state){ },
       onClick: function(d) {
         if (d.obj.field != undefined) {
-          viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+          if ($data.type == 'range-up') {
+            viewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: true});
+          } else {
+            viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+          }
         } else {
           viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
         }
@@ -886,7 +890,14 @@ ${ dashboard.layout_skeleton() }
         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
       <!-- /ko -->
-      <!-- ko if: type() != 'range' -->
+      <!-- ko if: type() == 'range-up' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+        transformer: rangePieChartDataTransformer,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
+      <!-- /ko -->
+      <!-- ko if: type().indexOf('range') == -1 -->
       <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
         maxWidth: 250,
