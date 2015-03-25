@@ -80,8 +80,6 @@ class SolrApi(object):
 
     for fq in merged_fqs:
       if fq['type'] == 'field':
-        # This does not work if spaces in Solr:
-        # params += (('fq', ' '.join([urllib.unquote(utf_quoter('{!tag=%s}{!field f=%s}%s' % (fq['field'], fq['field'], _filter))) for _filter in fq['filter']])),)
         fields = fq['field'].split(':') # 2D facets support
         for field in fields:
           f = []
@@ -94,13 +92,13 @@ class SolrApi(object):
                 f.append('%s%s:"%s"' % (exclude, field, value))
               else:
                 f.append('%s{!field f=%s}%s' % (exclude, field, value))
-          _params ='{!tag=%s}' % field + ' '.join(f)
+          _params ='{!tag=%(id)s}' % fq + ' '.join(f)
           params += (('fq', urllib.unquote(utf_quoter(_params))),)
       elif fq['type'] == 'range':
-        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
+        params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'], f['to']))) for field, f in zip(fq['filter'], fq['properties'])])),)
       elif fq['type'] == 'range-up':
-        params += (('fq', '{!tag=%s}' % fq['field'] + ' '.join([urllib.unquote(
+        params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
                                                           for field, f in zip(fq['filter'], fq['properties'])])),)
     return params
@@ -139,6 +137,7 @@ class SolrApi(object):
           params += (('facet.query', '%s' % facet['field']),)
         elif facet['type'] == 'range' or facet['type'] == 'range-up':
           keys = {
+              'id': '%(id)s' % facet,
               'field': facet['field'],
               'key': '%(field)s-%(id)s' % facet,
               'start': facet['properties']['start'],
@@ -147,28 +146,38 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount'])
           }
           params += (
-             ('facet.range', '{!key=%(key)s ex=%(field)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
+             ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'field':
           keys = {
+              'id': '%(id)s' % facet,
               'field': facet['field'],
               'key': '%(field)s-%(id)s' % facet,
               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
               'mincount': int(facet['properties']['mincount'])
           }
           params += (
-              ('facet.field', '{!key=%(key)s ex=%(field)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
+              ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']
+            fields_limits = []
             for f in facet['properties']['facets']:
-              params += (('f.%s.facet.limit' % f['field'], f['limit']),)
+              fields_limits.append('f.%s.facet.limit=%s' % (f['field'], f['limit']))
+              fields_limits.append('f.%s.facet.mincount=%s' % (f['field'], f['mincount']))
               fields += ',' + f['field']
+            keys = {
+                'id': '%(id)s' % facet,
+                'key': '%(field)s-%(id)s' % facet,
+                'field': facet['field'],
+                'fields': fields,
+                'limit': int(facet['properties'].get('limit', 10)),
+                'mincount': int(facet['properties']['mincount']),
+                'fields_limits': ' '.join(fields_limits)
+            }
             params += (
-                ('facet.pivot', '{!ex=%s}%s' % (fields, fields)),
-                ('f.%s.facet.limit' % facet['field'], int(facet['properties'].get('limit', 10))),
-                ('facet.pivot.mincount', int(facet['properties']['mincount'])),
+                ('facet.pivot', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s %(fields_limits)s}%(fields)s' % keys),
             )
 
     params += self._get_fq(query)

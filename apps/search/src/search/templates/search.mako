@@ -1060,7 +1060,7 @@ ${ dashboard.layout_skeleton() }
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function() { chartsUpdatingState(); $root.query.removeFilter($data); $root.search(); }">
           <i class="fa fa-times"></i>
         </a>
-        <span data-bind="text: $data.field"></span>
+        <span data-bind="text: $data.field()"></span>
         &nbsp;
       </div>
       <div class="content">
