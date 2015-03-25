@@ -99,7 +99,7 @@ msgstr "パーミッションが拒否されました。ユーザー %(username)
 
 #: src/jobbrowser/views.py:247
 msgid "Job did not appear as killed within 15 seconds."
-msgstr "ジョブは、15 秒以内に強制終了されたため、表示されませんでした。"
+msgstr "ジョブは、15秒以内に強制終了されたため、表示されませんでした。"
 
 #: src/jobbrowser/views.py:266
 #, python-format
@@ -123,15 +123,15 @@ msgstr "試行 '%(id)s' がタスク内に見つかりません"
 
 #: src/jobbrowser/views.py:417
 msgid "Failed to retrieve log. TaskTracker not found."
-msgstr "ログを取得できませんでした。TaskTracker が見つかりません。"
+msgstr "ログを取得できませんでした。TaskTrackerが見つかりません。"
 
 #: src/jobbrowser/views.py:419
 msgid "Failed to retrieve log. TaskTracker not ready."
-msgstr "ログを取得できませんでした。TaskTracker の準備ができていません。"
+msgstr "ログを取得できませんでした。TaskTrackerの準備ができていません。"
 
 #: src/jobbrowser/views.py:478
 msgid "The tracker could not be contacted."
-msgstr "Tracker に接続できませんでした。"
+msgstr "TaskTrackerに接続できませんでした。"
 
 #: src/jobbrowser/views.py:488
 msgid "The container disappears as soon as the job finishes."
@@ -151,7 +151,7 @@ msgstr "タスク試行：%(attemptId)s"
 #: src/jobbrowser/templates/job_attempt_logs.mako:31
 #: src/jobbrowser/templates/task.mako:66
 msgid "Attempt ID"
-msgstr "試行 ID"
+msgstr "試行ID"
 
 #: src/jobbrowser/templates/attempt.mako:34
 #: src/jobbrowser/templates/attempt_logs.mako:32
@@ -220,7 +220,7 @@ msgstr "値"
 #: src/jobbrowser/templates/attempt.mako:87
 #: src/jobbrowser/templates/task.mako:32 src/jobbrowser/templates/tasks.mako:73
 msgid "Task ID"
-msgstr "タスク ID"
+msgstr "タスクID"
 
 #: src/jobbrowser/templates/attempt.mako:89
 #: src/jobbrowser/templates/attempt_logs.mako:33
@@ -235,7 +235,7 @@ msgstr "タスクタイプ"
 #: src/jobbrowser/templates/attempt.mako:96
 #: src/jobbrowser/templates/task.mako:123
 msgid "JobId"
-msgstr "ジョブ ID"
+msgstr "ジョブID"
 
 #: src/jobbrowser/templates/attempt.mako:98
 #: src/jobbrowser/templates/attempt_logs.mako:36
@@ -339,7 +339,7 @@ msgstr "コンテナ：%(trackerId)s"
 #: src/jobbrowser/templates/container.mako:33
 #, python-format
 msgid "Container at %(trackerHost)s on port %(trackerPort)s"
-msgstr "ポート %(trackerPort)s 上の  %(trackerHost)s のコンテナ"
+msgstr "ポート %(trackerPort)s 上の %(trackerHost)s のコンテナ"
 
 #: src/jobbrowser/templates/container.mako:36
 #: src/jobbrowser/templates/job.mako:329 src/jobbrowser/templates/jobs.mako:66
@@ -354,7 +354,7 @@ msgstr "メモリ測定値"
 
 #: src/jobbrowser/templates/container.mako:44
 msgid "Node Id"
-msgstr "ノード ID"
+msgstr "ノードID"
 
 #: src/jobbrowser/templates/container.mako:48
 #: src/jobbrowser/templates/job.mako:111 src/jobbrowser/templates/job.mako:213
@@ -369,7 +369,7 @@ msgstr "診断"
 
 #: src/jobbrowser/templates/container.mako:52
 msgid "Total Memory Needed in MB"
-msgstr "必要な合計メモリ (MB)"
+msgstr "必要な合計メモリ(MB)"
 
 #: src/jobbrowser/templates/container.mako:54
 msgid "Exit Code"
@@ -398,7 +398,7 @@ msgstr "ジョブ：%(jobId)s"
 #: src/jobbrowser/templates/job.mako:109
 
 msgid "App ID"
-msgstr "アプリケーション ID"
+msgstr "アプリID"
 
 #: src/jobbrowser/templates/job.mako:119 src/jobbrowser/templates/job.mako:225
 #: src/jobbrowser/templates/job.mako:356 src/jobbrowser/templates/jobs.mako:74
@@ -438,11 +438,11 @@ msgstr "終了"
 
 #: src/jobbrowser/templates/job.mako:165
 msgid "Pre-empted Resource VCores"
-msgstr "プリエンプトされたリソース VCore"
+msgstr "プリエンプトされたリソースVCore"
 
 #: src/jobbrowser/templates/job.mako:169
 msgid "VCore seconds"
-msgstr "VCore 秒"
+msgstr "VCore秒"
 
 #: src/jobbrowser/templates/job.mako:173
 
@@ -461,17 +461,17 @@ msgstr "ヘッダー"
 #: src/jobbrowser/templates/job.mako:211
 #: src/jobbrowser/templates/job_not_assigned.mako:36
 msgid "Job ID"
-msgstr "ジョブ ID"
+msgstr "ジョブID"
 
 #: src/jobbrowser/templates/job.mako:220 src/jobbrowser/templates/job.mako:338
 #: src/jobbrowser/templates/jobs.mako:70
 msgid "Maps"
-msgstr "マップ"
+msgstr "Map"
 
 #: src/jobbrowser/templates/job.mako:222 src/jobbrowser/templates/job.mako:342
 #: src/jobbrowser/templates/jobs.mako:71
 msgid "Reduces"
-msgstr "Reduces"
+msgstr "Reduce"
 
 #: src/jobbrowser/templates/job.mako:234
 msgid "Output"
@@ -693,7 +693,7 @@ msgstr "ソートの終了"
 
 #: src/jobbrowser/templates/task.mako:76
 msgid "Map Finish"
-msgstr "Map の終了"
+msgstr "Mapの終了"
 
 #: src/jobbrowser/templates/task.mako:83
 msgid "View this attempt"
@@ -701,7 +701,7 @@ msgstr "この試行を表示"
 
 #: src/jobbrowser/templates/task.mako:115
 msgid "Task id"
-msgstr "タスク ID"
+msgstr "タスクID"
 
 #: src/jobbrowser/templates/task.mako:139
 msgid "Execution Start Time"
@@ -719,7 +719,7 @@ msgstr "タスク表示：ジョブ：%(jobId)s"
 
 #: src/jobbrowser/templates/tasks.mako:39
 msgid "Filter tasks:"
-msgstr "タスクのフィル処理："
+msgstr "タスクをフィルタする："
 
 #: src/jobbrowser/templates/tasks.mako:41
 msgid "All states"
@@ -735,7 +735,7 @@ msgstr "実行中"
 
 #: src/jobbrowser/templates/tasks.mako:44
 msgid "failed"
-msgstr "失敗しました"
+msgstr "失敗"
 
 #: src/jobbrowser/templates/tasks.mako:45
 msgid "killed"
@@ -780,7 +780,7 @@ msgstr "試行を表示"
 #: src/jobbrowser/templates/tasks.mako:98
 #, python-format
 msgid "Show only %(state)s tasks"
-msgstr "%(state)s  のタスクのみを表示"
+msgstr "%(state)s のタスクのみを表示"
 
 #: src/jobbrowser/templates/tasktracker.mako:23
 #, python-format
@@ -790,7 +790,7 @@ msgstr "Tracker：%(trackerId)s"
 #: src/jobbrowser/templates/tasktracker.mako:33
 #, python-format
 msgid "Tracker at %(trackerHost)s on port %(trackerPort)s"
-msgstr "ポート %(trackerPort)s 上の  %(trackerHost)s での Tracker"
+msgstr "ポート %(trackerPort)s 上の %(trackerHost)s でのTracker"
 
 #: src/jobbrowser/templates/tasktracker.mako:38
 msgid "Last heard from at"
@@ -810,23 +810,23 @@ msgstr "空き容量："
 
 #: src/jobbrowser/templates/tasktracker.mako:55
 msgid "Map and Reduce"
-msgstr "Map および Reduce"
+msgstr "MapおよびReduce"
 
 #: src/jobbrowser/templates/tasktracker.mako:58
 msgid "Map count:"
-msgstr "Map カウント："
+msgstr "Mapカウント："
 
 #: src/jobbrowser/templates/tasktracker.mako:60
 msgid "Reduce count:"
-msgstr "Reduce カウント："
+msgstr "Reduceカウント："
 
 #: src/jobbrowser/templates/tasktracker.mako:62
 msgid "Max map tasks:"
-msgstr "最大 Map タスク："
+msgstr "最大Mapタスク："
 
 #: src/jobbrowser/templates/tasktracker.mako:64
 msgid "Max reduce tasks:"
-msgstr "最大 Reduce タスク："
+msgstr "最大Reduceタスク："
 
 #: src/jobbrowser/templates/tasktrackers.mako:22
 #: src/jobbrowser/templates/tasktrackers.mako:28
@@ -851,19 +851,19 @@ msgstr "失敗カウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:41
 msgid "Map Count"
-msgstr "Map カウント"
+msgstr "Mapカウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:42
 msgid "Reduce Count"
-msgstr "Reduce カウント"
+msgstr "Reduceカウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:43
 msgid "Max Map Tasks"
-msgstr "最大 Map タスク"
+msgstr "最大Mapタスク"
 
 #: src/jobbrowser/templates/tasktrackers.mako:44
 msgid "Max Reduce Tasks"
-msgstr "最大 Reduce タスク"
+msgstr "最大Reduceタスク"
 
 #: src/jobbrowser/templatetags/unix_ms_to_datetime.py:29
 msgid "No time"
