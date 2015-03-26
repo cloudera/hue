@@ -62,5 +62,5 @@ class LivyConf(loadDefaults: Boolean) {
   def getInt(key: String, default: Int) = getOption(key).map(_.toInt).getOrElse(default)
 
   /** Return if the configuration includes this setting */
-  def contains(key: String): Boolean = settings.contains(key)
+  def contains(key: String): Boolean = settings.containsKey(key)
 }
