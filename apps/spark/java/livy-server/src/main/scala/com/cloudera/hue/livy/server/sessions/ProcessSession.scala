@@ -10,6 +10,7 @@ import scala.concurrent.Future
 
 object ProcessSession extends Logging {
 
+  val CONF_LIVY_REPL_JAR = "livy.repl.jar"
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
 
   def create(livyConf: LivyConf, id: String, lang: String): Session = {
@@ -30,7 +31,7 @@ object ProcessSession extends Logging {
       args += javaOpts
     }
 
-    args += Utils.jarOfClass(getClass).head
+    args += livyJar(livyConf)
     args += lang
 
     val pb = new ProcessBuilder(args)
@@ -46,7 +47,12 @@ object ProcessSession extends Logging {
     pb.redirectError(Redirect.INHERIT)
 
     pb.start()
+  }
 
+  private def livyJar(conf: LivyConf): String = {
+    conf.getOption(CONF_LIVY_REPL_JAR).getOrElse {
+      Utils.jarOfClass(getClass).head
+    }
   }
 }
 
