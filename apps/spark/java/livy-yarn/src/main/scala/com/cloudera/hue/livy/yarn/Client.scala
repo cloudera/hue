@@ -42,15 +42,12 @@ class Client(livyConf: LivyConf) extends Logging {
   def submitApplication(id: String, lang: String, callbackUrl: String): Future[Job] = {
     val url = f"$callbackUrl/sessions/$id/callback"
 
-    val livyJar: String = livyConf.getOption("livy.yarn.jar")
-      .getOrElse(Utils.jarOfClass(classOf[Client]).head)
-
     val builder: ProcessBuilder = new ProcessBuilder(
       "spark-submit",
       "--master", "yarn-cluster",
       "--class", "com.cloudera.hue.livy.repl.Main",
       "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0",
-      livyJar,
+      livyJar(livyConf),
       lang
     )
 
