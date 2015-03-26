@@ -428,19 +428,6 @@
                             <include>com.google.guava:guava</include>
                         </includes>
                     </artifactSet>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.eclipse.jetty</pattern>
-                            <shadedPattern>com.cloudera.hue.jetty</shadedPattern>
-                            <excludes>
-                                <exclude>com/google/common/base/Absent*</exclude>
-                                <exclude>com/google/common/base/Function*</exclude>
-                                <exclude>com/google/common/base/Optional*</exclude>
-                                <exclude>com/google/common/base/Present*</exclude>
-                                <exclude>com/google/common/base/Supplier</exclude>
-                            </excludes>
-                        </relocation>
-                    </relocations>
                 </configuration>
                 <executions>
                     <execution>
