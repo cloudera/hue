@@ -167,6 +167,7 @@
                         <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
                         <spark.ui.enabled>false</spark.ui.enabled>
                         <settings.usejavacp.value>true</settings.usejavacp.value>
+                        <livy.assembly.jar>../livy-repl/target/livy-repl_${scala.binary.version}-${project.version}.jar</livy.assembly.jar>
                     </systemProperties>
                 </configuration>
             </plugin>
