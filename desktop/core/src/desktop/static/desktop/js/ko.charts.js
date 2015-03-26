@@ -56,7 +56,10 @@ ko.bindingHandlers.pieChart = {
               return d.value
             })
             .height($(element).width())
-            .showLabels(true).showLegend(false);
+            .showLabels(true).showLegend(false)
+            .tooltipContent(function (key, y, e, graph) {
+              return '<h3>' + hue.htmlEncode(key) + '</h3><p>' + y + '</p>'
+            });
 
         var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
 
@@ -76,14 +79,14 @@ ko.bindingHandlers.pieChart = {
         }
 
         var _resizeTimeout = -1;
-        nv.utils.windowResize(function(){
+        nv.utils.windowResize(function () {
           window.clearTimeout(_resizeTimeout);
-          _resizeTimeout = window.setTimeout(function(){
+          _resizeTimeout = window.setTimeout(function () {
             _chart.update();
           }, 200);
         });
 
-        $(element).on("forceUpdate", function(){
+        $(element).on("forceUpdate", function () {
           _chart.update();
         });
 
@@ -169,8 +172,8 @@ ko.bindingHandlers.leafletMapChart = {
       }
     });
 
-    if (_options.height != null){
-      $(element).height(_options.height*1);
+    if (_options.height != null) {
+      $(element).height(_options.height * 1);
     }
     else {
       if ($(element).parents(".tab-pane").length > 0) {
@@ -509,11 +512,11 @@ ko.bindingHandlers.scatterChart = {
     if ($(element).is(":visible")) {
       nv.addGraph(function () {
         var _chart = nv.models.scatterChart()
-          .transitionDuration(350)
-          .color(d3.scale.category10().range());
+            .transitionDuration(350)
+            .color(d3.scale.category10().range());
 
-        _chart.tooltipContent(function(key, x, y, obj) {
-            return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
+        _chart.tooltipContent(function (key, x, y, obj) {
+          return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
         });
 
         _chart.xAxis.tickFormat(d3.format('.02f'));
@@ -527,14 +530,14 @@ ko.bindingHandlers.scatterChart = {
             .call(_chart);
 
         var _resizeTimeout = -1;
-        nv.utils.windowResize(function(){
+        nv.utils.windowResize(function () {
           window.clearTimeout(_resizeTimeout);
-          _resizeTimeout = window.setTimeout(function(){
+          _resizeTimeout = window.setTimeout(function () {
             _chart.update();
           }, 200);
         });
 
-        $(element).on("forceUpdate", function(){
+        $(element).on("forceUpdate", function () {
           _chart.update();
         });
 
@@ -543,7 +546,6 @@ ko.bindingHandlers.scatterChart = {
     }
   }
 };
-
 
 
 function lineChartBuilder(element, options) {
@@ -582,14 +584,14 @@ function lineChartBuilder(element, options) {
           .call(_chart);
 
       var _resizeTimeout = -1;
-      nv.utils.windowResize(function(){
+      nv.utils.windowResize(function () {
         window.clearTimeout(_resizeTimeout);
-        _resizeTimeout = window.setTimeout(function(){
+        _resizeTimeout = window.setTimeout(function () {
           _chart.update();
         }, 200);
       });
 
-      $(element).on("forceUpdate", function(){
+      $(element).on("forceUpdate", function () {
         _chart.update();
       });
 
@@ -685,13 +687,19 @@ function barChartBuilder(element, options, isTimeline) {
               .y(function (d) {
                 return d.y
               })
-              .staggerLabels(true);
+              .staggerLabels(true)
+              .tooltipContent(function (key, x, y) {
+                return '<h3>' + key + '</h3><p>' + y + ' on ' + hue.htmlEncode(x) + '</p>'
+              });
         }
         else {
           if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
             $(element).find("svg").empty();
           }
           _chart = nv.models.multiBarWithBrushChart();
+          _chart.tooltipContent(function (key, x, y) {
+            return '<h3>' + hue.htmlEncode(key) + '</h3><p>' + y + ' on ' + hue.htmlEncode(x) + '</p>'
+          });
           if (_datum.length > 0 && _datum[0].values.length > 10) {
             _chart.enableSelection();
           }
@@ -711,7 +719,7 @@ function barChartBuilder(element, options, isTimeline) {
           });
         }
       }
-      if ($(element).width() < 300 && typeof _chart.showLegend != "undefined"){
+      if ($(element).width() < 300 && typeof _chart.showLegend != "undefined") {
         _chart.showLegend(false);
       }
       _chart.transitionDuration(0);
@@ -752,14 +760,14 @@ function barChartBuilder(element, options, isTimeline) {
       }
 
       var _resizeTimeout = -1;
-      nv.utils.windowResize(function(){
+      nv.utils.windowResize(function () {
         window.clearTimeout(_resizeTimeout);
-        _resizeTimeout = window.setTimeout(function(){
+        _resizeTimeout = window.setTimeout(function () {
           _chart.update();
         }, 200);
       });
 
-      $(element).on("forceUpdate", function(){
+      $(element).on("forceUpdate", function () {
         _chart.update();
       });
 
