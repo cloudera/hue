@@ -33,7 +33,7 @@ class ProcessSessionFactory(livyConf: LivyConf) extends SessionFactory {
   override def createSession(lang: String): Future[Session] = {
     Future {
       val id = UUID.randomUUID().toString
-      ProcessSession.create(id, lang)
+      ProcessSession.create(livyConf, id, lang)
     }
   }
 }
