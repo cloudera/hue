@@ -12,6 +12,7 @@ object ProcessSession extends Logging {
 
   val CONF_LIVY_REPL_JAR = "livy.repl.jar"
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
+  val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
   def create(livyConf: LivyConf, id: String, lang: String): Session = {
     val process = startProcess(livyConf, id, lang)
@@ -29,6 +30,11 @@ object ProcessSession extends Logging {
     sys.env.get("LIVY_REPL_JAVA_OPTS").foreach { case javaOpts =>
       args += "--driver-java-options"
       args += javaOpts
+    }
+
+    livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach { case extraClassPath =>
+      args += "--driver-class-path"
+      args += extraClassPath
     }
 
     args += livyJar(livyConf)
