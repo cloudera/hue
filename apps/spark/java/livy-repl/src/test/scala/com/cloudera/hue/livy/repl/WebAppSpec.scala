@@ -5,11 +5,11 @@ import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.{DefaultFormats, Extraction, JValue}
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.scalatest.{FunSpecLike, BeforeAndAfter}
 import org.scalatra.test.scalatest.ScalatraSuite
 import _root_.scala.concurrent.Future
 
-class WebAppSpec extends ScalatraSuite with FunSpec with BeforeAndAfter {
+class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
 
   implicit val formats = DefaultFormats
 

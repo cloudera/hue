@@ -1,5 +1,6 @@
 package com.cloudera.hue.livy.repl
 
+import java.util.concurrent.TimeUnit
 import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy.repl.python.PythonSession
@@ -118,7 +119,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
         case _ => System.exit(1)
       }
 
-      Await.result(rep, 10 seconds)
+      Await.result(rep, Duration(10, TimeUnit.SECONDS))
     }
   }
 

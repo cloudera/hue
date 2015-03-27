@@ -3,13 +3,12 @@ package com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.repl.scala.SparkSession
 import org.json4s.JsonAST.JValue
 import org.json4s.{DefaultFormats, Extraction}
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
 import _root_.scala.concurrent.Await
 import _root_.scala.concurrent.duration.Duration
 
-class SparkSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter {
+class SparkSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
 
   implicit val formats = DefaultFormats
 
