@@ -338,8 +338,8 @@ EMAIL_HOST_PASSWORD = desktop.conf.get_smtp_password()
 EMAIL_USE_TLS = desktop.conf.SMTP.USE_TLS.get()
 DEFAULT_FROM_EMAIL = desktop.conf.SMTP.DEFAULT_FROM.get()
 
-# Used for securely creating sessions.  Should be unique and not shared with anybody.
-SECRET_KEY = desktop.conf.SECRET_KEY.get()
+# Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
+SECRET_KEY = desktop.conf.SECRET_KEY.get() + str(AUTHENTICATION_BACKENDS)
 if SECRET_KEY == "":
   import uuid
   SECRET_KEY = str(uuid.uuid4())
