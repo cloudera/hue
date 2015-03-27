@@ -58,10 +58,10 @@ var Query = function (vm, query) {
 
   var defaultMultiqGroup = {'id': 'query', 'label': 'query'};
   self.multiqs = ko.computed(function () { // List of widgets supporting multiqs
-    var histogram_id = vm.collection.getHistogramFacet();
+    var histogram_ids = $.map(vm.collection.getHistogramFacets(), function (histo) { return histo.id(); });
     return [defaultMultiqGroup].concat(
         $.map($.grep(self.fqs(), function(fq, i) {
-            return (fq.type() == 'field' || fq.type() == 'range') && (histogram_id == null || histogram_id.id() != fq.id());
+            return (fq.type() == 'field' || fq.type() == 'range') && (histogram_ids.indexOf(fq.id()) == -1);
         }), function(fq) { return {'id': fq.id(), 'label': fq.field()} })
       );
   });
@@ -585,19 +585,15 @@ var Collection = function (vm, collection) {
     return _facet;
   }
 
-  self.getFacetByType = function (facetType) {
-    var _facet = null;
+  self.getHistogramFacets = function () {
+    var _facets = [];
     $.each(self.facets(), function (index, facet) {
-      if (facet.widgetType() == facetType) {
-        _facet = facet;
+      if (facet.widgetType() == 'histogram-widget') {
+        _facets.push(facet);
         return false;
       }
     });
-    return _facet;
-  }
-
-  self.getHistogramFacet = function () { // Should do multi histogram
-    return self.getFacetByType('histogram-widget');
+    return _facets;	
   }
 
   self.template.fields = ko.computed(function () {
@@ -1058,7 +1054,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     return getWidgets(function(widget) { return widget.widgetType() == 'filter-widget'; }).length == 0;
   });
   self.availableDraggableHistogram = ko.computed(function() {
-    return getWidgets(function(widget) { return widget.widgetType() == 'histogram-widget'; }).length == 0 && self.availableDateFields().length > 0;
+    return self.availableDateFields().length > 0;
   });
   self.availableDraggableNumbers = ko.computed(function() {
     return self.availableNumberFields().length > 0;
@@ -1191,11 +1187,13 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     )
     .done(function() {
       if (arguments[0] instanceof Array) { // If multi queries
-        var histoFacetId = self.collection.getHistogramFacet().id();
-        var histoFacet = self.getFacetFromQuery(histoFacetId);
-        for (var i = 1; i < arguments.length; i++) {
-          histoFacet.extraSeries.push(arguments[i][0]['series']);
-        }
+    	$.each(self.collection.getHistogramFacets(), function(index, histoFacet) {
+          var histoFacetId = histoFacet.id();
+          var histoFacet = self.getFacetFromQuery(histoFacetId);
+          for (var i = 1; i < arguments.length; i++) {
+            histoFacet.extraSeries.push(arguments[i][0]['series']);
+          }
+    	});
         self.response.valueHasMutated();
       }
     })

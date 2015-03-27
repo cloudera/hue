@@ -18,11 +18,9 @@
 import json
 import logging
 
-from django.core.urlresolvers import reverse
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import force_unicode
 from django.utils.html import escape
 from django.utils.translation import ugettext as _
-from django.shortcuts import redirect
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
