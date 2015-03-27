@@ -19,7 +19,7 @@ class PythonSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
   }
 
   after {
-    session.close()
+    Await.result(session.close(), Duration.Inf)
   }
 
   describe("A python session") {
