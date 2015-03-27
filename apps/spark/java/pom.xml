@@ -48,12 +48,12 @@
 
     <properties>
         <guava.version>11.0.2</guava.version>
-        <jetty.version>8.1.14.v20131031</jetty.version>
+        <jetty.version>9.2.10.v20150310</jetty.version>
         <json4s.version>3.2.11</json4s.version>
         <logback.version>1.1.2</logback.version>
-        <scala.version>2.10.3</scala.version>
+        <scala.version>2.10.4</scala.version>
         <scala.binary.version>2.10</scala.binary.version>
-        <scalatra.version>2.2.1</scalatra.version>
+        <scalatra.version>2.3.0</scalatra.version>
         <dispatch.version>0.11.2</dispatch.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
@@ -301,6 +301,10 @@
                     </executions>
                     <configuration>
                         <scalaVersion>${scala.version}</scalaVersion>
+                        <args>
+                            <arg>-deprecation</arg>
+                            <arg>-feature</arg>
+                        </args>
                     </configuration>
                 </plugin>
 

@@ -2,14 +2,13 @@ package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions.{Session, ThreadSession}
-import org.json4s.{Extraction, DefaultFormats}
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.json4s.{DefaultFormats, Extraction}
+import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-class ThreadSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter {
+class ThreadSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
 
   implicit val formats = DefaultFormats
 

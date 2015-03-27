@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server
 
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
@@ -167,7 +168,7 @@ class WebApp(sessionManager: SessionManager)
   private def formatStatement(statement: Statement) = {
     // Take a couple milliseconds to see if the statement has finished.
     val output = try {
-      Await.result(statement.output, 100 milliseconds)
+      Await.result(statement.output, Duration(100, TimeUnit.MILLISECONDS))
     } catch {
       case _: TimeoutException => null
     }

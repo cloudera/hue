@@ -3,13 +3,12 @@ package com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.repl.python.PythonSession
 import org.json4s.JsonAST.JValue
 import org.json4s.{Extraction, DefaultFormats}
-import org.scalatest.{BeforeAndAfter, FunSpec}
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{Matchers, BeforeAndAfter, FunSpec}
 
 import _root_.scala.concurrent.Await
 import _root_.scala.concurrent.duration.Duration
 
-class PythonSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter {
+class PythonSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
 
   implicit val formats = DefaultFormats
 

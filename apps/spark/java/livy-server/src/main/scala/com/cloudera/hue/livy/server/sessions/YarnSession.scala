@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
+import java.util.concurrent.TimeUnit
+
 import com.cloudera.hue.livy.yarn.{Client, Job}
 
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
@@ -25,7 +27,7 @@ private class YarnSession(id: String, job: Future[Job]) extends WebSession(id) {
     super.stop().andThen {
       case _ =>
         try {
-          val job_ = Await.result(job, 1 second)
+          val job_ = Await.result(job, Duration(1, TimeUnit.SECONDS))
           job_.waitForFinish(10000)
         } catch {
           case e: Throwable =>
