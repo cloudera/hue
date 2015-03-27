@@ -1,9 +1,11 @@
 package com.cloudera.hue.livy.repl
 
+import com.cloudera.hue.livy.Utils
 import org.json4s.JValue
 
 import _root_.scala.annotation.tailrec
-import _root_.scala.concurrent.Future
+import _root_.scala.concurrent.duration.Duration
+import _root_.scala.concurrent.{TimeoutException, Future}
 
 object Session {
   sealed trait State
@@ -27,13 +29,11 @@ trait Session {
 
   def history(id: Int): Option[JValue]
 
-  def close(): Future[Unit]
+  def close(): Unit
 
-  @tailrec
-  final def waitForStateChange(oldState: State): Unit = {
-    if (state == oldState) {
-      Thread.sleep(1000)
-      waitForStateChange(oldState)
-    }
+  @throws(classOf[TimeoutException])
+  @throws(classOf[InterruptedException])
+  final def waitForStateChange(oldState: State, atMost: Duration) = {
+    Utils.waitUntil({ () => state != oldState }, atMost)
   }
 }

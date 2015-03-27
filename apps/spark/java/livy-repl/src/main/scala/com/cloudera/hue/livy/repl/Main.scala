@@ -98,7 +98,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
   override def destroy(context: ServletContext): Unit = {
     if (session != null) {
-      Await.result(session.close(), Duration.Inf)
+      session.close()
     }
   }
 
@@ -106,7 +106,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
     info(s"Notifying $callbackUrl that we're up")
 
     Future {
-      session.waitForStateChange(Session.Starting())
+      session.waitForStateChange(Session.Starting(), Duration(10, TimeUnit.SECONDS))
 
       // Wait for our url to be discovered.
       val replUrl = waitForReplUrl()

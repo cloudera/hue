@@ -76,9 +76,7 @@ private class SparkSession extends Session {
     }
   }
 
-  override def close(): Future[Unit] = {
-    Future {
-      interpreter.shutdown()
-    }
+  override def close(): Unit = {
+    interpreter.shutdown()
   }
 }

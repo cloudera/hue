@@ -1,5 +1,7 @@
 package com.cloudera.hue.livy.repl
 
+import java.util.concurrent.TimeUnit
+
 import com.cloudera.hue.livy.repl.python.PythonSession
 import org.json4s.JsonAST.JValue
 import org.json4s.{Extraction, DefaultFormats}
@@ -19,7 +21,7 @@ class PythonSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
   }
 
   after {
-    Await.result(session.close(), Duration.Inf)
+    session.close()
   }
 
   describe("A python session") {
@@ -28,7 +30,7 @@ class PythonSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
     }
 
     it("should eventually become the idle state") {
-      session.waitForStateChange(Session.Starting())
+      session.waitForStateChange(Session.Starting(), Duration(10, TimeUnit.SECONDS))
       session.state should equal (Session.Idle())
     }
 
