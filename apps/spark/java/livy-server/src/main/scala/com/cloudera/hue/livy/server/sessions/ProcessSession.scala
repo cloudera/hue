@@ -1,12 +1,16 @@
 package com.cloudera.hue.livy.server.sessions
 
 import java.lang.ProcessBuilder.Redirect
+import java.net.URL
 
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
+import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
+import scala.io.Source
+import scala.util.control.Breaks._
 
 object ProcessSession extends Logging {
 
@@ -48,8 +52,7 @@ object ProcessSession extends Logging {
 
     pb.environment().put("LIVY_PORT", "0")
 
-
-    pb.redirectOutput(Redirect.INHERIT)
+    pb.redirectOutput(Redirect.PIPE)
     pb.redirectError(Redirect.INHERIT)
 
     pb.start()
@@ -64,10 +67,47 @@ object ProcessSession extends Logging {
 
 private class ProcessSession(id: String, process: Process) extends WebSession(id) {
 
+  val stdoutThread = new Thread {
+    override def run() = {
+      val regex = """Starting livy-repl on (https?://.*)""".r
+
+      val lines = Source.fromInputStream(process.getInputStream).getLines()
+
+      // Loop until we find the ip address to talk to livy-repl.
+      @tailrec
+      def readUntilURL(): Boolean = {
+        if (lines.hasNext) {
+          val line = lines.next()
+          println(line)
+
+          line match {
+            case regex(url_) =>
+              url = new URL(url_)
+              true
+            case _ => readUntilURL()
+          }
+        } else {
+          false
+        }
+      }
+
+      if (readUntilURL()) {
+        for (line <- lines) {
+          println(line)
+        }
+      }
+    }
+  }
+
+  stdoutThread.setName("process session stdout reader")
+  stdoutThread.setDaemon(true)
+  stdoutThread.start()
+
   override def stop(): Future[Unit] = {
     super.stop() andThen { case r =>
       // Make sure the process is reaped.
       process.waitFor()
+      stdoutThread.join()
 
       r
     }
