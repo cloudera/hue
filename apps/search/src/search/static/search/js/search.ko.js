@@ -472,6 +472,11 @@ var Collection = function (vm, collection) {
     facet.properties.limit.subscribe(function () {
       vm.search();
     });
+    if (facet.properties.gap) {
+      facet.properties.gap.subscribe(function () {
+        vm.search();
+      });
+    }
   });
   self.template.rows.subscribe(function() {
     vm.search();
@@ -502,6 +507,11 @@ var Collection = function (vm, collection) {
           facet.properties.limit.subscribe(function () {
             vm.search();
           });
+          if (facet.properties.gap) {
+            facet.properties.gap.subscribe(function () {
+              vm.search();
+            });
+          }
           self.facets.push(facet);
           vm.search();
         } else {
