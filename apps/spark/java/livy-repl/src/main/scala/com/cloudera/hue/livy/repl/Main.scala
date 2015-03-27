@@ -60,8 +60,10 @@ object Main extends Logging {
 
     try {
       val replUrl = s"http://${server.host}:${server.port}"
-      println(s"Starting livy-repl on $replUrl")
       System.setProperty("livy.repl.url", replUrl)
+
+      println(s"Starting livy-repl on $replUrl")
+      Console.flush()
 
       server.join()
       server.stop()
