@@ -209,9 +209,13 @@ class LdapConnection(object):
             LOG.warn('Could not find %s in ldap attributes' % group_name_attr)
             continue
 
+          group_name = data[group_name_attr][0]
+          if desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.get():
+            group_name = group_name.lower()
+
           ldap_info = {
             'dn': dn,
-            'name': data[group_name_attr][0]
+            'name': group_name
           }
 
           if group_member_attr in data and 'posixGroup' not in data['objectClass']:
