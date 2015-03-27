@@ -7,7 +7,7 @@ import org.json4s.{DefaultFormats, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import _root_.scala.concurrent.ExecutionContext
+import _root_.scala.concurrent.{Future, ExecutionContext}
 
 object WebApp extends Logging
 
@@ -58,7 +58,9 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
   }
 
   delete("/") {
-    session.close().onComplete { _ =>
+    session.close()
+    Future {
+      Thread.sleep(1000)
       System.exit(0)
     }
   }

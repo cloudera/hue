@@ -3,7 +3,10 @@ package com.cloudera.hue.livy
 import java.io.{FileInputStream, InputStreamReader, File}
 import java.util.Properties
 
+import scala.annotation.tailrec
 import scala.collection.JavaConversions._
+import scala.concurrent.TimeoutException
+import scala.concurrent.duration.Duration
 
 object Utils {
   def getPropertiesFromFile(filename: String): Map[String, String] = {
@@ -54,5 +57,38 @@ object Utils {
     } else {
       None
     }
+  }
+
+  /**
+   * Checks if event has occurred during some time period. This performs an exponential backoff
+   * to limit the poll calls.
+   *
+   * @param checkForEvent
+   * @param atMost
+   * @throws java.util.concurrent.TimeoutException
+   * @throws java.lang.InterruptedException
+   * @return
+   */
+  @throws(classOf[TimeoutException])
+  @throws(classOf[InterruptedException])
+  final def waitUntil(checkForEvent: () => Boolean, atMost: Duration) = {
+    val endTime = System.currentTimeMillis() + atMost.toMillis
+
+    @tailrec
+    def aux(count: Int): Unit = {
+      if (!checkForEvent()) {
+        val now = System.currentTimeMillis()
+
+        if (now < endTime) {
+          val sleepTime = Math.max(10 * (2 << (count - 1)), 1000)
+          Thread.sleep(sleepTime)
+          aux(count + 1)
+        } else {
+          throw new TimeoutException
+        }
+      }
+    }
+
+    aux(1)
   }
 }

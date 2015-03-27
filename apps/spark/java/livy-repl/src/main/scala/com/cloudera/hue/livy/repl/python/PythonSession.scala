@@ -3,7 +3,8 @@ package com.cloudera.hue.livy.repl.python
 import java.io._
 import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Files
-import java.util.concurrent.SynchronousQueue
+import java.util.concurrent.{TimeUnit, SynchronousQueue}
+
 
 import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.repl.Session
@@ -16,7 +17,8 @@ import py4j.GatewayServer
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.{ExecutionContext, Future, Promise}
+import scala.concurrent.duration.Duration
+import scala.concurrent._
 
 object PythonSession {
   def createPython(): Session = {
@@ -175,11 +177,18 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
           require(state == Session.Idle() || state == Session.Error())
 
           _state = Session.ShuttingDown()
-          process.getInputStream.close()
-          process.getOutputStream.close()
-          process.destroy()
-          _state = Session.ShutDown()
-          promise.success(())
+
+          try {
+            process.getInputStream.close()
+            process.getOutputStream.close()
+
+            try {
+              process.destroy()
+            } finally {
+              _state = Session.ShutDown()
+              promise.success(())
+            }
+          }
       }
     }
   }
@@ -204,22 +213,23 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
     promise.future
   }
 
-  override def close(): Future[Unit] = synchronized {
+  override def close(): Unit = synchronized {
     _state match {
       case Session.ShutDown() =>
-        Future.successful(())
       case Session.ShuttingDown() =>
-        Future {
-          waitForStateChange(Session.ShuttingDown())
-          Future.successful(())
-        }
+        // Another thread must be tearing down the process.
+        waitForStateChange(Session.ShuttingDown(), Duration(10, TimeUnit.SECONDS))
       case _ =>
         val promise = Promise[Unit]()
         queue.put(ShutdownRequest(promise))
-        promise.future.map({ case () =>
+
+        // Give ourselves 10 seconds to tear down the process.
+        try {
+          Await.result(promise.future, Duration(10, TimeUnit.SECONDS))
           thread.join()
+        } finally {
           gatewayServer.shutdown()
-        })
+        }
     }
   }
 }

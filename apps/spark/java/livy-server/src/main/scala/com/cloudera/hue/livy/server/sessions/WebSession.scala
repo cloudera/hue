@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
 import java.net.URL
+import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
@@ -12,6 +13,7 @@ import org.json4s.{DefaultFormats, Formats}
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
+import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
 class WebSession(val id: String) extends Session with Logging {
@@ -96,15 +98,18 @@ class WebSession(val id: String) extends Session with Logging {
           }
         case NotStarted() =>
           Future {
-            waitForStateChange(NotStarted(), { stop() })
+            waitForStateChange(NotStarted(), Duration(10, TimeUnit.SECONDS))
+            stop()
           }
         case Starting() =>
           Future {
-            waitForStateChange(Starting(), { stop() })
+            waitForStateChange(Starting(), Duration(10, TimeUnit.SECONDS))
+            stop()
           }
         case Busy() =>
           Future {
-            waitForStateChange(Busy(), { stop() })
+            waitForStateChange(Busy(), Duration(10, TimeUnit.SECONDS))
+            stop()
           }
         case Error() | Dead() =>
           Future.successful(Unit)

@@ -10,7 +10,7 @@ import com.cloudera.hue.livy.server.Statement
 import com.cloudera.hue.livy.server.sessions.Session._
 
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 object ThreadSession {
   val LIVY_HOME = System.getenv("LIVY_HOME")
@@ -28,6 +28,9 @@ object ThreadSession {
 }
 
 private class ThreadSession(val id: String, session: com.cloudera.hue.livy.repl.Session) extends Session {
+
+  protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+
   private var executedStatements = 0
   private var statements_ = new ArrayBuffer[Statement]
 
@@ -68,5 +71,7 @@ private class ThreadSession(val id: String, session: com.cloudera.hue.livy.repl.
     stop()
   }
 
-  override def stop(): Future[Unit] = session.close()
+  override def stop(): Future[Unit] = Future {
+    session.close()
+  }
 }

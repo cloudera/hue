@@ -1,12 +1,14 @@
 package com.cloudera.hue.livy.server.sessions
 
 import java.net.URL
+import java.util.concurrent.TimeoutException
 
+import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Statement
 
-import scala.annotation.tailrec
-import scala.concurrent.Future
+import scala.concurrent._
+import scala.concurrent.duration.Duration
 
 object Session {
   sealed trait State
@@ -47,14 +49,10 @@ trait Session {
 
   def stop(): Future[Unit]
 
-  @tailrec
-  final def waitForStateChange[A](oldState: State, f: => A): A = {
-    if (state == oldState) {
-      Thread.sleep(1000)
-      waitForStateChange(oldState, f)
-    } else {
-      f
-    }
+  @throws(classOf[TimeoutException])
+  @throws(classOf[InterruptedException])
+  final def waitForStateChange(oldState: State, atMost: Duration) = {
+    Utils.waitUntil({ () => state != oldState }, atMost)
   }
 }
 
