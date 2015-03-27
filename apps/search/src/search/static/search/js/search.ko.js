@@ -834,9 +834,10 @@ var Collection = function (vm, collection) {
   }
 
   self.rangeZoomOut = function (facet_json) {
-    var facet = self.getFacetById(typeof facet_json.id == "function" ? facet_json.id() : facet_json.id);
+	var facet_id = ko.mapping.toJS(facet_json).id;
+    var facet = self.getFacetById(facet_id);
 
-    vm.query.removeFilter(ko.mapping.fromJS({'id': facet_json.id}));
+    vm.query.removeFilter(ko.mapping.fromJS({'id': facet_id}));
     if (facet.properties.gap() != null) { // Bar, line charts don't have gap
       facet.properties.gap(facet.properties.initial_gap());
     }

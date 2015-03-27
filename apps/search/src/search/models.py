@@ -499,7 +499,6 @@ def augment_solr_response(response, collection, query):
   selected_values = dict([(fq['id'], fq['filter']) for fq in query['fqs']])
 
   if response and response.get('facet_counts'):
-    # e.g. [{u'field': u'sun', u'type': u'query', u'id': u'67b43a63-ed22-747b-47e8-b31aad1431ea', u'label': u'sun'}
     for facet in collection['facets']:
       category = facet['type']
 
@@ -561,6 +560,10 @@ def augment_solr_response(response, collection, query):
           'count': count,
         }
         normalized_facets.append(facet)
+
+    # Remove unnecessary facet data
+    if response:
+      response.pop('facet_counts')
 
   # HTML escaping
   for doc in response['response']['docs']:
