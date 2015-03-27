@@ -34,6 +34,7 @@ def runcmd(cmdv, additional_env=None):
   env = os.environ.copy()
   if additional_env is not None:
     env.update(additional_env)
+  env['PATH'] = os.path.join(common.INSTALL_ROOT, 'build', 'env', 'bin') + os.path.pathsep + env['PATH']
   shell_command = ' '.join(cmdv)
   LOG.info("Running '%s' with %r" % (shell_command, additional_env))
   popen = subprocess.Popen(shell_command, env=env, shell=True)
