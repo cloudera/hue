@@ -6,12 +6,12 @@
 # ===================================
 #
 # For complete documentation about the contents of this file, run
-#       $ <hue_root>/build/env/bin/hue config_help
+#   $ <hue_root>/build/env/bin/hue config_help
 #
 # All .ini files under the current directory are treated equally.  Their
 # contents are merged to form the Hue configuration, which can
 # can be viewed on the Hue at
-#       http://<hue_host>:<port>/dump_config
+#   http://<hue_host>:<port>/dump_config
 
 
 ###########################################################################
@@ -33,7 +33,7 @@
   # Time zone name
   time_zone=America/Los_Angeles
 
-  # Enable or disable Django debug mode
+  # Enable or disable Django debug mode.
   ## django_debug_mode=true
 
   # Enable or disable database debug mode.
@@ -165,12 +165,12 @@
   #     }
   #   ]
   # }
+  ## log_redaction_file=
 
   # Comma separated list of strings representing the host/domain names that the Hue server can serve.
   # e.g.: localhost,domain1,*
   ## allowed_hosts=*
 
-#poll_enabled=false
 
   # Administrators
   # ----------------
@@ -183,8 +183,9 @@
   # -------------------
   [[custom]]
 
-  # Top banner HTML code
-  ## banner_top_html=
+    # Top banner HTML code
+    # e.g. <H2>Test Lab A2 Hue Services</H2>
+    ## banner_top_html=
 
   # Configuration options for user authentication into the web application
   # ------------------------------------------------------------------------
@@ -217,6 +218,9 @@
     #
     # Defaults to HTTP_REMOTE_USER
     ## remote_user_header=HTTP_REMOTE_USER
+
+    # Synchronize a users groups when they login
+    ## sync_groups_on_login=false
 
     # Ignore the case of usernames when searching for existing users.
     # Only supported in remoteUserDjangoBackend.
@@ -271,9 +275,6 @@
     # For use when using LdapBackend for Hue authentication
     ## create_users_on_login = true
 
-    # Synchronize a users groups when they login
-    ## sync_groups_on_login=false
-
     # Ignore the case of usernames when searching for existing users in Hue.
     ## ignore_username_case=false
 
@@ -315,8 +316,11 @@
       # Base filter for searching for groups
       ## group_filter="objectclass=*"
 
-      # The username attribute in the LDAP schema
+      # The group name attribute in the LDAP schema
       ## group_name_attr=cn
+
+      # The attribute of the group object which identifies the members of the group
+      ## group_member_attr=members
 
     [[[ldap_servers]]]
 
@@ -381,7 +385,7 @@
     # Database engine is typically one of:
     # postgresql_psycopg2, mysql, sqlite3 or oracle.
     #
-    # Note that for sqlite3, 'name', below is a a path to the filename. For other backends, it is the database name.
+    # Note that for sqlite3, 'name', below is a path to the filename. For other backends, it is the database name.
     # Note for Oracle, options={'threaded':true} must be set in order to avoid crashes.
     # Note for Oracle, you can use the Oracle Service Name by setting "port=0" and then "name=<host>:<port>/<service_name>".
     ## engine=sqlite3
@@ -508,7 +512,7 @@
 
 
 ###########################################################################
-# Settings to configure OpenId
+# Settings to configure OpenID
 ###########################################################################
 
 [libopenid]
@@ -834,6 +838,7 @@
   ## close_queries=false
 
   # Thrift version to use when communicating with HiveServer2.
+  # New column format is from version 7.
   ## thrift_version=7
 
   [[ssl]]
@@ -991,7 +996,7 @@
 
 
 ###########################################################################
-# Settings to configure Job Browser
+# Settings to configure Job Browser.
 ###########################################################################
 
 [jobbrowser]
