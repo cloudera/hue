@@ -9,7 +9,7 @@ import com.cloudera.hue.livy.yarn.Client
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SessionFactory {
-  def createSession(lang: String): Future[Session]
+  def createSession(kind: Session.Kind): Future[Session]
 
   def close(): Unit = {}
 }
@@ -18,10 +18,10 @@ class ThreadSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
   implicit def executor: ExecutionContext = ExecutionContext.global
 
-  override def createSession(lang: String): Future[Session] = {
+  override def createSession(kind: Session.Kind): Future[Session] = {
     Future {
       val id = UUID.randomUUID().toString
-      ThreadSession.create(id, lang)
+      ThreadSession.create(id, kind)
     }
   }
 }
@@ -30,10 +30,10 @@ class ProcessSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
   implicit def executor: ExecutionContext = ExecutionContext.global
 
-  override def createSession(lang: String): Future[Session] = {
+  override def createSession(kind: Session.Kind): Future[Session] = {
     Future {
       val id = UUID.randomUUID().toString
-      ProcessSession.create(livyConf, id, lang)
+      ProcessSession.create(livyConf, id, kind)
     }
   }
 }
@@ -42,9 +42,9 @@ class YarnSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
   val client = new Client(livyConf)
 
-  override def createSession(lang: String): Future[Session] = {
+  override def createSession(kind: Session.Kind): Future[Session] = {
     val id = UUID.randomUUID().toString
-    YarnSession.create(client, id, lang)
+    YarnSession.create(client, id, kind)
   }
 
   override def close(): Unit = {

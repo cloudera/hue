@@ -16,10 +16,21 @@ object Session {
   case class Error() extends State
   case class ShuttingDown() extends State
   case class ShutDown() extends State
+
+  sealed trait Kind
+  case class Spark() extends Kind {
+    override def toString = "spark"
+  }
+
+  case class PySpark() extends Kind {
+    override def toString = "pyspark"
+  }
 }
 
 trait Session {
   import Session._
+
+  def kind: Kind
 
   def state: State
 

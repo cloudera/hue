@@ -12,12 +12,40 @@ import scala.concurrent.duration.Duration
 
 object Session {
   sealed trait State
-  case class NotStarted() extends State
-  case class Starting() extends State
-  case class Idle() extends State
-  case class Busy() extends State
-  case class Error() extends State
-  case class Dead() extends State
+
+  case class NotStarted() extends State {
+    override def toString = "not_started"
+  }
+
+  case class Starting() extends State {
+    override def toString = "starting"
+  }
+
+  case class Idle() extends State {
+    override def toString = "idle"
+  }
+
+  case class Busy() extends State {
+    override def toString = "busy"
+  }
+
+  case class Error() extends State {
+    override def toString = "error"
+  }
+
+  case class Dead() extends State {
+    override def toString = "dead"
+  }
+
+  sealed trait Kind
+
+  case class Spark() extends Kind {
+    override def toString = "spark"
+  }
+
+  case class PySpark() extends Kind {
+    override def toString = "pyspark"
+  }
 
   class SessionFailedToStart(msg: String) extends Exception(msg)
 
@@ -28,6 +56,8 @@ trait Session {
   import Session._
 
   def id: String
+
+  def kind: Kind
 
   def lastActivity: Long
 

@@ -32,8 +32,8 @@ class SessionManager(factory: SessionFactory) extends Logging {
     sessions.keys
   }
 
-  def createSession(lang: String): Future[Session] = {
-    val session = factory.createSession(lang)
+  def createSession(kind: Session.Kind): Future[Session] = {
+    val session = factory.createSession(kind)
 
     session.map({ case(session: Session) =>
       info("created session %s" format session.id)

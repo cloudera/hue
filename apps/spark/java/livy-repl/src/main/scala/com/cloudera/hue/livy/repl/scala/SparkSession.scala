@@ -22,6 +22,8 @@ private class SparkSession extends Session {
   private val interpreter = new Interpreter()
   interpreter.start()
 
+  override def kind: Session.Kind = Session.Spark()
+
   override def state: Session.State = interpreter.state match {
     case Interpreter.NotStarted() => Session.NotStarted()
     case Interpreter.Starting() => Session.Starting()
