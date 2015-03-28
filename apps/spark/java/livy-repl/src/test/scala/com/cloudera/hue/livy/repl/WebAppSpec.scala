@@ -1,6 +1,6 @@
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.repl.Session.State
+import com.cloudera.hue.livy.repl.Session.{Kind, State}
 import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
@@ -16,6 +16,8 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
   class MockSession extends Session {
     var _state: State = Session.Idle()
     var _history = List[JValue]()
+
+    override def kind: Kind = Session.Spark()
 
     override def state = _state
 

@@ -18,17 +18,16 @@ object ProcessSession extends Logging {
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def create(livyConf: LivyConf, id: String, lang: String): Session = {
-    val process = startProcess(livyConf, id, lang)
-    new ProcessSession(id, process)
+  def create(livyConf: LivyConf, id: String, kind: Session.Kind): Session = {
+    val process = startProcess(livyConf, id, kind)
+    new ProcessSession(id, kind, process)
   }
 
   // Loop until we've started a process with a valid port.
-  private def startProcess(livyConf: LivyConf, id: String, lang: String): Process = {
+  private def startProcess(livyConf: LivyConf, id: String, kind: Session.Kind): Process = {
     val args = ArrayBuffer(
       "spark-submit",
-      "--class",
-      "com.cloudera.hue.livy.repl.Main"
+      "--class", "com.cloudera.hue.livy.repl.Main"
     )
 
     sys.env.get("LIVY_REPL_JAVA_OPTS").foreach { case javaOpts =>
@@ -42,7 +41,7 @@ object ProcessSession extends Logging {
     }
 
     args += livyJar(livyConf)
-    args += lang
+    args += kind.toString
 
     val pb = new ProcessBuilder(args)
 
@@ -65,7 +64,7 @@ object ProcessSession extends Logging {
   }
 }
 
-private class ProcessSession(id: String, process: Process) extends WebSession(id) {
+private class ProcessSession(id: String, kind: Session.Kind, process: Process) extends WebSession(id, kind) {
 
   val stdoutThread = new Thread {
     override def run() = {

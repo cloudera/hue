@@ -16,18 +16,18 @@ object ThreadSession {
   val LIVY_HOME = System.getenv("LIVY_HOME")
   val LIVY_REPL = LIVY_HOME + "/bin/livy-repl"
 
-  def create(id: String, lang: String): Session = {
-    val session = lang match {
-      case "python" | "pyspark" =>
-        PythonSession.createPySpark()
-      case "scala" | "spark" =>
+  def create(id: String, kind: Session.Kind): Session = {
+    val session = kind match {
+      case Session.Spark() =>
         SparkSession.create()
+      case Session.PySpark() =>
+        PythonSession.createPySpark()
     }
-    new ThreadSession(id, session)
+    new ThreadSession(id, kind, session)
   }
 }
 
-private class ThreadSession(val id: String, session: com.cloudera.hue.livy.repl.Session) extends Session {
+private class ThreadSession(val id: String, val kind: Session.Kind, session: com.cloudera.hue.livy.repl.Session) extends Session {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 

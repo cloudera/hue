@@ -195,6 +195,8 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
 
   thread.start()
 
+  override def kind = Session.PySpark()
+
   override def state = _state
 
   override def history(): Seq[JValue] = _history
