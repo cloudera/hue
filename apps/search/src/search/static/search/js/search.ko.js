@@ -120,7 +120,7 @@ var Query = function (vm, query) {
     } else {
       $.each(self.fqs(), function (index, fq) {
         if (fq.id() == data.widget_id) {
-          var f = $.grep(fq.filter(), function(f) { return f.value() == data.facet.value; });
+          var f = $.grep(fq.filter(), function(f) { return JSON.stringify(f.value()) == JSON.stringify(data.facet.value); });
           if (f.length > 0) {
             fq.filter.remove(f[0]);
             if (fq.filter().length == 0) {

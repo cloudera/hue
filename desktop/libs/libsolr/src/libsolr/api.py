@@ -80,11 +80,11 @@ class SolrApi(object):
 
     for fq in merged_fqs:
       if fq['type'] == 'field':
-        fields = fq['field'].split(':') # 2D facets support
+        fields = fq['field'] if type(fq['field']) == list else [fq['field']] # 2D facets support
         for field in fields:
           f = []
           for _filter in fq['filter']:
-            values = _filter['value'].split(':') if len(fields) > 1 else [_filter['value']]
+            values = _filter['value'] if type(_filter['value']) == list else [_filter['value']] # 2D facets support
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
               exclude = '-' if _filter['exclude'] else ''
