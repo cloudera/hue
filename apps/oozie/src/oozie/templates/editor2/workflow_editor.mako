@@ -293,8 +293,8 @@ ${ workflow.render() }
       <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
         <!-- ko if: name() != 'oozie.use.system.libpath' -->
         <li>
-          <input type="text" data-bind="value: name"/>
-          <input type="text" data-bind="value: value"/>
+          <input type="text" data-bind="value: name" placeholder="${ _('Name, e.g. market') }"/>
+          <input type="text" data-bind="value: value" placeholder="${ _('Value, e.g. US') }"/>
           <a href="#" data-bind="click: function(){ $root.workflow.properties.parameters.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
@@ -312,8 +312,8 @@ ${ workflow.render() }
 	  <h4>${ _('Hadoop Properties') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.properties" class="unstyled">
         <li>
-          <input type="text" data-bind="value: name"/>
-          <input type="text" data-bind="value: value"/>
+          <input type="text" data-bind="value: name" placeholder="${ _('Name, e.g. mapred.map.tasks') }"/>
+          <input type="text" data-bind="value: value" placeholder="${ _('Value, e.g. ${n}') }"/>
           <a href="#" data-bind="click: function(){ $root.workflow.properties.properties.remove(this); }">
             <i class="fa fa-minus"></i>
           </a>
@@ -330,7 +330,7 @@ ${ workflow.render() }
       <select class="input-xlarge" data-bind="value: $root.workflow.properties.schema_version, options: $root.workflow.versions"></select>
 
       <h4>${ _("Job XML") }</h4>
-      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.job_xml, filechooserOptions: globalFilechooserOptions"/>
+      <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: $root.workflow.properties.job_xml, filechooserOptions: globalFilechooserOptions" placeholder="${ _('Path to job.xml') }"/>
       <span data-bind='template: { name: "common-fs-link", data: {path: $root.workflow.properties.job_xml(), with_label: false}}'></span>
 
       <h4>${ _('SLA Configuration') }</h4>
