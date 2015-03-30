@@ -5,13 +5,12 @@ import java.util.concurrent.TimeUnit
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions.Session
 import org.json4s.{DefaultFormats, Extraction}
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{BeforeAndAfter, FunSpec}
+import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-abstract class BaseSessionSpec extends FunSpec with ShouldMatchers with BeforeAndAfter {
+abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
 
   implicit val formats = DefaultFormats
 
