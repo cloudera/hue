@@ -34,7 +34,7 @@ Getting Started
 ===============
 To build and get the development server running::
 
-    $ git clone http://github.com/cloudera/hue.git
+    $ git clone https://github.com/cloudera/hue.git
     $ cd hue
     $ make apps
     $ build/env/bin/hue runserver
