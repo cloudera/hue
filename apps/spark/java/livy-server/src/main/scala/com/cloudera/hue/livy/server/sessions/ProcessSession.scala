@@ -47,6 +47,8 @@ object ProcessSession extends Logging {
     args += livyJar(livyConf)
     args += kind.toString
 
+    debug("Running %s", args.mkString(" "))
+
     val pb = new ProcessBuilder(args)
 
     livyConf.getOption(CONF_LIVY_REPL_CALLBACK_URL).foreach { case callbackUrl =>

@@ -60,6 +60,8 @@ class Client(livyConf: LivyConf) extends Logging {
     args += livyJar(livyConf)
     args += kind
 
+    debug("Running %s", args.mkString(" "))
+
     val builder: ProcessBuilder = new ProcessBuilder(args)
 
     builder.redirectOutput(Redirect.PIPE)
