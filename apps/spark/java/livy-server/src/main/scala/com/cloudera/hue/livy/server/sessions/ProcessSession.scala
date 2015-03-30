@@ -10,7 +10,6 @@ import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.io.Source
-import scala.util.control.Breaks._
 
 object ProcessSession extends Logging {
 
@@ -18,13 +17,13 @@ object ProcessSession extends Logging {
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def create(livyConf: LivyConf, id: String, kind: Session.Kind): Session = {
-    val process = startProcess(livyConf, id, kind)
-    new ProcessSession(id, kind, process)
+  def create(livyConf: LivyConf, id: String, kind: Session.Kind, proxyUser: Option[String] = None): Session = {
+    val process = startProcess(livyConf, id, kind, proxyUser)
+    new ProcessSession(id, kind, proxyUser, process)
   }
 
   // Loop until we've started a process with a valid port.
-  private def startProcess(livyConf: LivyConf, id: String, kind: Session.Kind): Process = {
+  private def startProcess(livyConf: LivyConf, id: String, kind: Session.Kind, proxyUser: Option[String]): Process = {
     val args = ArrayBuffer(
       "spark-submit",
       "--class", "com.cloudera.hue.livy.repl.Main"
@@ -38,6 +37,11 @@ object ProcessSession extends Logging {
     livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach { case extraClassPath =>
       args += "--driver-class-path"
       args += extraClassPath
+    }
+
+    proxyUser.foreach { case user =>
+      args += "--proxy-user"
+      args += user
     }
 
     args += livyJar(livyConf)
@@ -64,7 +68,10 @@ object ProcessSession extends Logging {
   }
 }
 
-private class ProcessSession(id: String, kind: Session.Kind, process: Process) extends WebSession(id, kind) {
+private class ProcessSession(id: String,
+                             kind: Session.Kind,
+                             proxyUser: Option[String],
+                             process: Process) extends WebSession(id, kind, proxyUser) {
 
   val stdoutThread = new Thread {
     override def run() = {

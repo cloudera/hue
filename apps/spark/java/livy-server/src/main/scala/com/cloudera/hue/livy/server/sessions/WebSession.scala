@@ -9,14 +9,15 @@ import com.cloudera.hue.livy.server.Statement
 import com.cloudera.hue.livy.server.sessions.Session._
 import dispatch._
 import org.json4s.jackson.Serialization.write
-import org.json4s.{JValue, DefaultFormats, Formats}
+import org.json4s.{DefaultFormats, Formats}
 
-import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-class WebSession(val id: String, val kind: Kind) extends Session with Logging {
+class WebSession(val id: String,
+                 val kind: Kind,
+                 val proxyUser: Option[String]) extends Session with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats

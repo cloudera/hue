@@ -59,6 +59,8 @@ trait Session {
 
   def kind: Kind
 
+  def proxyUser: Option[String]
+
   def lastActivity: Long
 
   def state: State

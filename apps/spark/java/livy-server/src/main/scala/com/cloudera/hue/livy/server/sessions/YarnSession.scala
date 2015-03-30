@@ -10,15 +10,22 @@ import scala.concurrent.duration._
 object YarnSession {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  def create(client: Client, id: String, kind: Session.Kind): Future[Session] = {
+  def create(client: Client, id: String, kind: Session.Kind, proxyUser: Option[String] = None): Future[Session] = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
-    val job = client.submitApplication(id, kind.toString, callbackUrl)
+    val job = client.submitApplication(
+      id = id,
+      kind = kind.toString,
+      proxyUser = proxyUser,
+      callbackUrl = callbackUrl)
 
-    Future.successful(new YarnSession(id, kind, job))
+    Future.successful(new YarnSession(id, kind, proxyUser, job))
   }
 }
 
-private class YarnSession(id: String, kind: Session.Kind, job: Future[Job]) extends WebSession(id, kind) {
+private class YarnSession(id: String,
+                          kind: Session.Kind,
+                          proxyUser: Option[String],
+                          job: Future[Job]) extends WebSession(id, kind, proxyUser) {
   job.onFailure { case _ =>
     _state = Session.Error()
   }

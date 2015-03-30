@@ -10,12 +10,12 @@ import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
 
 import scala.annotation.tailrec
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, Future}
 
 object Client extends Logging {
-  private val LIVY_JAR = "__livy__.jar"
   private val CONF_LIVY_JAR = "livy.yarn.jar"
-  private val LOCAL_SCHEME = "local"
   private lazy val regex = """Application report for (\w+)""".r.unanchored
 
   private def livyJar(conf: LivyConf) = {
@@ -39,17 +39,28 @@ class Client(livyConf: LivyConf) extends Logging {
   yarnClient.init(yarnConf)
   yarnClient.start()
 
-  def submitApplication(id: String, kind: String, callbackUrl: String): Future[Job] = {
+  def submitApplication(id: String,
+                        kind: String,
+                        proxyUser: Option[String],
+                        callbackUrl: String): Future[Job] = {
     val url = f"$callbackUrl/sessions/$id/callback"
 
-    val builder: ProcessBuilder = new ProcessBuilder(
+    val args: ArrayBuffer[String] = ArrayBuffer(
       "spark-submit",
       "--master", "yarn-cluster",
       "--class", "com.cloudera.hue.livy.repl.Main",
-      "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0",
-      livyJar(livyConf),
-      kind
+      "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0"
     )
+
+    proxyUser.foreach { case user =>
+      args += "--proxy-user"
+      args += user
+    }
+
+    args += livyJar(livyConf)
+    args += kind
+
+    val builder: ProcessBuilder = new ProcessBuilder(args)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(true)
@@ -97,9 +108,8 @@ class Job(yarnClient: YarnClient, appId: ApplicationId) {
     while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
       val status = getStatus
       status match {
-        case SuccessfulFinish() | UnsuccessfulFinish() => {
+        case SuccessfulFinish() | UnsuccessfulFinish() =>
           return Some(status)
-        }
         case _ =>
       }
 
