@@ -618,8 +618,8 @@ def _augment_pivot_2d(name, facet_id, counts, selected_values):
       count[pivot['value']] = pivot['count']
       pivot_field = pivot['field']
     for val in values:
-      fq_values = '%s:%s' % (dimension['value'], val)
-      fq_fields = '%s:%s' % (dimension['field'], pivot_field)
+      fq_values = [dimension['value'], val]
+      fq_fields = [dimension['field'], pivot_field]
       fq_filter = selected_values.get(facet_id, [])
       _selected_values = [f['value'] for f in fq_filter]
 
@@ -639,8 +639,9 @@ def _augment_pivot_2d(name, facet_id, counts, selected_values):
 def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
 
   for c in counts:
-    fq_fields = (fields + ':' if fields else '') + c['field']
-    fq_values = (smart_str(values) + ':' if values else '') + smart_str(c['value'])
+    fq_fields = (fields if fields else []) + [c['field']]
+    fq_values = (values if values else []) + [smart_str(c['value'])]
+
     if 'pivot' in c:
       _augment_pivot_nd(facet_id, c['pivot'], selected_values, fq_fields, fq_values)
 
