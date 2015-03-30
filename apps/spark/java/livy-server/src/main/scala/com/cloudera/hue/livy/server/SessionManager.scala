@@ -28,6 +28,10 @@ class SessionManager(factory: SessionFactory) extends Logging {
     sessions.get(id)
   }
 
+  def getSessions = {
+    sessions.values
+  }
+
   def getSessionIds = {
     sessions.keys
   }
