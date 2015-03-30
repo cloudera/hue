@@ -27,12 +27,16 @@ object ThreadSession {
   }
 }
 
-private class ThreadSession(val id: String, val kind: Session.Kind, session: com.cloudera.hue.livy.repl.Session) extends Session {
+private class ThreadSession(val id: String,
+                            val kind: Session.Kind,
+                            session: com.cloudera.hue.livy.repl.Session) extends Session {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
   private var executedStatements = 0
   private var statements_ = new ArrayBuffer[Statement]
+
+  override def proxyUser: Option[String] = None
 
   override def lastActivity: Long = 0
 

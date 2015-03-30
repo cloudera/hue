@@ -47,7 +47,7 @@ class WebApp(sessionManager: SessionManager)
 
   post("/sessions") {
     val createSessionRequest = parsedBody.extract[CreateSessionRequest]
-    val sessionFuture = sessionManager.createSession(createSessionRequest.lang)
+    val sessionFuture = sessionManager.createSession(createSessionRequest.lang, createSessionRequest.proxyUser)
 
     val rep = sessionFuture.map { case session =>
       Created(session,
@@ -179,7 +179,8 @@ private object Serializers {
 
       ("id", session.id) ~
       ("state", serializeSessionState(session.state)) ~
-      ("kind", serializeSessionKind(session.kind))
+      ("kind", serializeSessionKind(session.kind)) ~
+      ("proxyUser", session.proxyUser)
   }
     )
   )
