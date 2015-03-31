@@ -6,11 +6,24 @@ import org.json4s.JValue
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
-class Statement(val id: Int, val request: ExecuteRequest, val output: Future[JValue]) {
+object Statement {
   sealed trait State
-  case class Running() extends State
-  case class Available() extends State
-  case class Error() extends State
+
+  case class Running() extends State {
+    override def toString = "running"
+  }
+
+  case class Available() extends State {
+    override def toString = "available"
+  }
+
+  case class Error() extends State {
+    override def toString = "error"
+  }
+}
+
+class Statement(val id: Int, val request: ExecuteRequest, val output: Future[JValue]) {
+  import Statement._
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
