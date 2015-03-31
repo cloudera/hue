@@ -590,7 +590,6 @@ var Collection = function (vm, collection) {
     $.each(self.facets(), function (index, facet) {
       if (facet.widgetType() == 'histogram-widget') {
         _facets.push(facet);
-        return false;
       }
     });
     return _facets;
@@ -1197,13 +1196,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     )
     .done(function() {
       if (arguments[0] instanceof Array) { // If multi queries
-        $.each(self.collection.getHistogramFacets(), function(index, histoFacet) {
-          var histoFacetId = histoFacet.id();
+    	var histograms = self.collection.getHistogramFacets();
+    	for(var h = 0; h < histograms.length; h++){ // Do not use $.each here
+          var histoFacetId = histograms[h].id();
           var histoFacet = self.getFacetFromQuery(histoFacetId);
           for (var i = 1; i < arguments.length; i++) {
             histoFacet.extraSeries.push(arguments[i][0]['series']);
           }
-        });
+        };
         self.response.valueHasMutated();
       }
     })
