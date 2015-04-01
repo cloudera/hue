@@ -178,10 +178,10 @@ from django.utils.translation import ugettext as _
   </div>
 
   <!-- chown modal -->
-  % if is_superuser:
+  % if is_fs_superuser:
   <div id="changeOwnerModal" class="modal hide fade">
     <%
-      select_filter = is_superuser and 'SelectWithOther' or ''
+      select_filter = is_fs_superuser and 'SelectWithOther' or ''
     %>
     <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
       ${ csrf_token(request) | n,unicode }
@@ -191,7 +191,7 @@ from django.utils.translation import ugettext as _
       </div>
 
       <div class="modal-body change-owner-modal-body clearfix" >
-        <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, "%(superuser)s" on this file system, may change the owner of a file.') % dict(superuser=superuser)}</div>
+        <div class="alert alert-message block-message info">${_('Note: Only the Hadoop superuser, "%(superuser)s" or the HDFS supergroup, "%(supergroup)s" on this file system, may change the owner of a file.') % dict(superuser=superuser, supergroup=supergroup)}</div>
         <div style="padding-left: 15px; padding-bottom: 10px;">
           <label>${_('User')}</label>
           ${ edit.selection("user", users, user.username, "user_other") }
