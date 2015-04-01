@@ -3,6 +3,7 @@ package com.cloudera.hue.livy.server.sessions
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
+import com.cloudera.hue.livy.spark.SparkProcessBuilder
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
@@ -24,43 +25,25 @@ object ProcessSession extends Logging {
 
   // Loop until we've started a process with a valid port.
   private def startProcess(livyConf: LivyConf, id: String, kind: Session.Kind, proxyUser: Option[String]): Process = {
-    val args = ArrayBuffer(
-      "spark-submit",
-      "--class", "com.cloudera.hue.livy.repl.Main"
-    )
 
-    sys.env.get("LIVY_REPL_JAVA_OPTS").foreach { case javaOpts =>
-      args += "--driver-java-options"
-      args += javaOpts
-    }
+    val builder = new SparkProcessBuilder()
 
-    livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach { case extraClassPath =>
-      args += "--driver-class-path"
-      args += extraClassPath
-    }
+    builder.className("com.cloudera.hue.livy.repl.Main")
 
-    proxyUser.foreach { case user =>
-      args += "--proxy-user"
-      args += user
-    }
-
-    args += livyJar(livyConf)
-    args += kind.toString
-
-    debug("Running %s", args.mkString(" "))
-
-    val pb = new ProcessBuilder(args)
+    sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
+    livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach(builder.driverClassPath)
+    proxyUser.foreach(builder.proxyUser)
 
     livyConf.getOption(CONF_LIVY_REPL_CALLBACK_URL).foreach { case callbackUrl =>
-      pb.environment().put("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
+      builder.env("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
     }
 
-    pb.environment().put("LIVY_PORT", "0")
+    builder.env("LIVY_PORT", "0")
 
-    pb.redirectOutput(Redirect.PIPE)
-    pb.redirectError(Redirect.INHERIT)
+    builder.redirectOutput(Redirect.PIPE)
+    builder.redirectError(Redirect.INHERIT)
 
-    pb.start()
+    builder.start(livyJar(livyConf), List(kind.toString))
   }
 
   private def livyJar(conf: LivyConf): String = {
