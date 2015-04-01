@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions.Session
+import com.cloudera.hue.livy.sessions.{Starting, Idle}
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
@@ -28,16 +29,16 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
 
   describe("A spark session") {
     it("should start in the starting or idle state") {
-      session.state should (equal (Session.Starting()) or equal (Session.Idle()))
+      session.state should (equal (Starting()) or equal (Idle()))
     }
 
     it("should eventually become the idle state") {
-      session.waitForStateChange(Session.Starting(), Duration(30, TimeUnit.SECONDS))
-      session.state should equal (Session.Idle())
+      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
+      session.state should equal (Idle())
     }
 
     it("should execute `1 + 2` == 3") {
-      session.waitForStateChange(Session.Starting(), Duration(30, TimeUnit.SECONDS))
+      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("1 + 2"))
       val result = Await.result(stmt.output, Duration.Inf)
 
@@ -53,7 +54,7 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
     }
 
     it("should report an error if accessing an unknown variable") {
-      session.waitForStateChange(Session.Starting(), Duration(30, TimeUnit.SECONDS))
+      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("x"))
       val result = Await.result(stmt.output, Duration.Inf)
       val expectedResult = Extraction.decompose(Map(

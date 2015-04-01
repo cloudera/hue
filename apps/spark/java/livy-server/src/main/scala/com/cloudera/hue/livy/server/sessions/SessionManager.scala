@@ -1,6 +1,7 @@
 package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.sessions.Kind
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration.Duration
@@ -35,7 +36,7 @@ class SessionManager(factory: SessionFactory) extends Logging {
     sessions.keys
   }
 
-  def createSession(kind: Session.Kind, proxyUser: Option[String] = None): Future[Session] = {
+  def createSession(kind: Kind, proxyUser: Option[String] = None): Future[Session] = {
     val session = factory.createSession(kind, proxyUser = proxyUser)
 
     session.map({ case(session: Session) =>

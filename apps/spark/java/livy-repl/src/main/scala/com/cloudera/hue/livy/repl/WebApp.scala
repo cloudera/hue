@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.repl
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, MappingException}
 import org.scalatra._
@@ -20,20 +21,20 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
     contentType = formats("json")
 
     session.state match {
-      case Session.ShuttingDown() => halt(500, "Shutting down")
+      case ShuttingDown() => halt(500, "Shutting down")
       case _ => {}
     }
   }
 
   get("/") {
     val state = session.state match {
-      case Session.NotStarted() => "not_started"
-      case Session.Starting() => "starting"
-      case Session.Idle() => "idle"
-      case Session.Busy() => "busy"
-      case Session.Error() => "error"
-      case Session.ShuttingDown() => "shutting_down"
-      case Session.ShutDown() => "shut_down"
+      case NotStarted() => "not_started"
+      case Starting() => "starting"
+      case Idle() => "idle"
+      case Busy() => "busy"
+      case Error() => "error"
+      case ShuttingDown() => "shutting_down"
+      case Dead() => "dead"
     }
     Map("state" -> state)
   }

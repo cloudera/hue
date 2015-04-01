@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.repl.scala
 
 import com.cloudera.hue.livy.repl.Session
 import com.cloudera.hue.livy.repl.scala.interpreter._
+import com.cloudera.hue.livy.sessions._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{JValue, _}
@@ -22,15 +23,15 @@ private class SparkSession extends Session {
   private val interpreter = new Interpreter()
   interpreter.start()
 
-  override def kind: Session.Kind = Session.Spark()
+  override def kind: Kind = Spark()
 
-  override def state: Session.State = interpreter.state match {
-    case Interpreter.NotStarted() => Session.NotStarted()
-    case Interpreter.Starting() => Session.Starting()
-    case Interpreter.Idle() => Session.Idle()
-    case Interpreter.Busy() => Session.Busy()
-    case Interpreter.ShuttingDown() => Session.ShuttingDown()
-    case Interpreter.ShutDown() => Session.ShutDown()
+  override def state: State = interpreter.state match {
+    case Interpreter.NotStarted() => NotStarted()
+    case Interpreter.Starting() => Starting()
+    case Interpreter.Idle() => Idle()
+    case Interpreter.Busy() => Busy()
+    case Interpreter.ShuttingDown() => ShuttingDown()
+    case Interpreter.ShutDown() => Dead()
   }
 
   override def history(): Seq[JValue] = _history

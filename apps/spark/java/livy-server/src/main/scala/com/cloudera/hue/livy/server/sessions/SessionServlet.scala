@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
+import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonAST.JString
 import org.json4s._
@@ -15,9 +16,9 @@ import org.scalatra.json.JacksonJsonSupport
 import scala.concurrent._
 import scala.concurrent.duration._
 
-object WebApp extends Logging
+object SessionServlet extends Logging
 
-class WebApp(sessionManager: SessionManager)
+class SessionServlet(sessionManager: SessionManager)
   extends ScalatraServlet
   with FutureSupport
   with MethodOverride
@@ -31,20 +32,20 @@ class WebApp(sessionManager: SessionManager)
     contentType = formats("json")
   }
 
-  get("/sessions") {
+  get("/") {
     Map(
       "sessions" -> sessionManager.getSessions
     )
   }
 
-  val getSession = get("/sessions/:sessionId") {
+  val getSession = get("/:sessionId") {
     sessionManager.get(params("sessionId")) match {
       case Some(session) => session
       case None => NotFound("Session not found")
     }
   }
 
-  post("/sessions") {
+  post("/") {
     val createSessionRequest = parsedBody.extract[CreateSessionRequest]
     val sessionFuture = sessionManager.createSession(createSessionRequest.lang, createSessionRequest.proxyUser)
 
@@ -59,12 +60,12 @@ class WebApp(sessionManager: SessionManager)
     new AsyncResult { val is = rep }
   }
 
-  post("/sessions/:sessionId/callback") {
+  post("/:sessionId/callback") {
     val callback = parsedBody.extract[CallbackRequest]
 
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
-        if (session.state == Session.Starting()) {
+        if (session.state == Starting()) {
           session.url = new URL(callback.url)
           Accepted()
         } else {
@@ -74,7 +75,7 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  post("/sessions/:sessionId/stop") {
+  post("/:sessionId/stop") {
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         val future = session.stop()
@@ -84,7 +85,7 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  post("/sessions/:sessionId/interrupt") {
+  post("/:sessionId/interrupt") {
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         val future = for {
@@ -97,7 +98,7 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  delete("/sessions/:sessionId") {
+  delete("/:sessionId") {
     val future = for {
       _ <- sessionManager.delete(params("sessionId"))
     } yield Accepted()
@@ -105,7 +106,7 @@ class WebApp(sessionManager: SessionManager)
     new AsyncResult() { val is = for { _ <- future } yield NoContent() }
   }
 
-  get("/sessions/:sessionId/statements") {
+  get("/:sessionId/statements") {
     sessionManager.get(params("sessionId")) match {
       case Some(session: Session) =>
         Map(
@@ -115,7 +116,7 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  val getStatement = get("/sessions/:sessionId/statements/:statementId") {
+  val getStatement = get("/:sessionId/statements/:statementId") {
     sessionManager.get(params("sessionId")) match {
       case Some(session) =>
         session.statement(params("statementId").toInt) match {
@@ -126,7 +127,7 @@ class WebApp(sessionManager: SessionManager)
     }
   }
 
-  post("/sessions/:sessionId/statements") {
+  post("/:sessionId/statements") {
     val req = parsedBody.extract[ExecuteRequest]
 
     sessionManager.get(params("sessionId")) match {
@@ -148,12 +149,12 @@ class WebApp(sessionManager: SessionManager)
     case e: SessionFailedToStart => InternalServerError(e.getMessage)
     case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
     case e =>
-      WebApp.error("internal error", e)
+      SessionServlet.error("internal error", e)
       InternalServerError(e.toString)
   }
 }
 
-private case class CreateSessionRequest(lang: Session.Kind, proxyUser: Option[String])
+private case class CreateSessionRequest(lang: Kind, proxyUser: Option[String])
 private case class CallbackRequest(url: String)
 
 private object Serializers {
@@ -163,9 +164,9 @@ private object Serializers {
   def StatementFormats: List[CustomSerializer[_]] = List(StatementSerializer, StatementStateSerializer)
   def Formats: List[CustomSerializer[_]] = SessionFormats ++ StatementFormats
 
-  private def serializeSessionState(state: Session.State) = JString(state.toString)
+  private def serializeSessionState(state: State) = JString(state.toString)
 
-  private def serializeSessionKind(kind: Session.Kind) = JString(kind.toString)
+  private def serializeSessionKind(kind: Kind) = JString(kind.toString)
 
   private def serializeStatementState(state: Statement.State) = JString(state.toString)
 
@@ -184,20 +185,20 @@ private object Serializers {
     )
   )
 
-  case object SessionKindSerializer extends CustomSerializer[Session.Kind](implicit formats => ( {
-    case JString("spark") | JString("scala") => Session.Spark()
-    case JString("pyspark") | JString("python") => Session.PySpark()
+  case object SessionKindSerializer extends CustomSerializer[Kind](implicit formats => ( {
+    case JString("spark") | JString("scala") => Spark()
+    case JString("pyspark") | JString("python") => PySpark()
   }, {
-    case kind: Session.Kind => serializeSessionKind(kind)
+    case kind: Kind => serializeSessionKind(kind)
   }
     )
   )
 
-  case object SessionStateSerializer extends CustomSerializer[Session.State](implicit formats => ( {
+  case object SessionStateSerializer extends CustomSerializer[State](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case state: Session.State => JString(state.toString)
+    case state: State => JString(state.toString)
   }
     )
   )

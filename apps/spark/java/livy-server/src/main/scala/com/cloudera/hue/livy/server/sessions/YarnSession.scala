@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.server.sessions
 
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.sessions.{Kind, Error}
 import com.cloudera.hue.livy.yarn.{Client, Job}
 
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
@@ -10,7 +11,7 @@ import scala.concurrent.duration._
 object YarnSession {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  def create(client: Client, id: String, kind: Session.Kind, proxyUser: Option[String] = None): Future[Session] = {
+  def create(client: Client, id: String, kind: Kind, proxyUser: Option[String] = None): Future[Session] = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val job = client.submitApplication(
       id = id,
@@ -23,11 +24,11 @@ object YarnSession {
 }
 
 private class YarnSession(id: String,
-                          kind: Session.Kind,
+                          kind: Kind,
                           proxyUser: Option[String],
                           job: Future[Job]) extends WebSession(id, kind, proxyUser) {
   job.onFailure { case _ =>
-    _state = Session.Error()
+    _state = Error()
   }
 
   override def stop(): Future[Unit] = {
@@ -38,7 +39,7 @@ private class YarnSession(id: String,
           job_.waitForFinish(10000)
         } catch {
           case e: Throwable =>
-            _state = Session.Error()
+            _state = Error()
             throw e
         }
     }

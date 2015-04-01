@@ -63,7 +63,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
     sessionManager = new SessionManager(sessionFactory)
 
-    context.mount(new WebApp(sessionManager), "/*")
+    context.mount(new SessionServlet(sessionManager), "/sessions/*")
   }
 
   override def destroy(context: ServletContext): Unit = {
