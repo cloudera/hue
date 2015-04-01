@@ -424,6 +424,7 @@ def listdir_paged(request, path):
 
     page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
+    is_fs_superuser = _is_hdfs_superuser(request)
     data = {
         'path': path,
         'breadcrumbs': breadcrumbs,
@@ -438,11 +439,11 @@ def listdir_paged(request, path):
         'cwd_set': True,
         'file_filter': 'any',
         'current_dir_path': path,
-        'is_fs_superuser': request.user.username == request.fs.superuser,
-        'is_superuser': request.user.username == request.fs.superuser,
-        'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
-        'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
+        'is_fs_superuser': is_fs_superuser,
+        'groups': is_fs_superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
+        'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
+        'supergroup': request.fs.supergroup,
         'is_sentry_managed': request.fs.is_sentry_managed(path)
     }
     return render('listdir.mako', request, data)
@@ -944,9 +945,9 @@ def generic_op(form_class, request, op, parameter_names, piggyback=None, templat
                 op(*args)
             except (IOError, WebHdfsException), e:
                 msg = _("Cannot perform operation.")
-                if request.user.is_superuser and not request.user == request.fs.superuser:
-                    msg += _(' Note: you are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') \
-                           % {'superuser': request.fs.superuser}
+                if request.user.is_superuser and not _is_hdfs_superuser(request):
+                    msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
+                           % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
                 raise PopupException(msg, detail=e)
             if next:
                 logging.debug("Next: %s" % next)
@@ -1312,3 +1313,6 @@ def truncate(toTruncate, charsToKeep=50):
         return truncated
     else:
         return toTruncate
+
+def _is_hdfs_superuser(request):
+  return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()
