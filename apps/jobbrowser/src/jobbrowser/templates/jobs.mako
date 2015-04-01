@@ -231,7 +231,7 @@ ${ components.menubar() }
                 '>${ _('Kill') }</a>';
       }
       return [
-        '<a href="' + emptyStringIfNull(job.logs) + '" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>',
+        job.applicationType != 'SPARK' ? '<a href="' + emptyStringIfNull(job.logs) + '" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>' : '',
         '<a href="' + emptyStringIfNull(job.url) + '" title="${_('View this job')}" data-row-selector="true">' + emptyStringIfNull(job.shortId) + '</a>',
         emptyStringIfNull(job.name),
         '<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="fa fa-briefcase fa fa-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>',
