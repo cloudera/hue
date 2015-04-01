@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.util.concurrent.{TimeUnit, SynchronousQueue}
 
 
-import com.cloudera.hue.livy.Utils
+import com.cloudera.hue.livy.{Logging, Utils}
 import com.cloudera.hue.livy.repl.Session
 import org.apache.spark.SparkContext
 import org.json4s.jackson.JsonMethods._
@@ -104,7 +104,7 @@ object PythonSession {
   }
 }
 
-private class PythonSession(process: Process, gatewayServer: GatewayServer) extends Session {
+private class PythonSession(process: Process, gatewayServer: GatewayServer) extends Session with Logging {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   implicit val formats = DefaultFormats
@@ -127,12 +127,19 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
     }
 
     @tailrec
-    def waitUntilReady(): Unit = {
+    private def waitUntilReady(): Unit = {
       val line = stdout.readLine()
       line match {
         case null | "READY" =>
         case _ => waitUntilReady()
       }
+    }
+
+    private def sendRequest(request: Map[String, Any]): Option[JValue] = {
+      stdin.println(write(request))
+      stdin.flush()
+
+      Option(stdout.readLine()).map { case line => parse(line) }
     }
 
     @tailrec
@@ -147,31 +154,21 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
 
           _state = Session.Busy()
 
-          val msg = Map(
-            "msg_type" -> "execute_request",
-            "content" -> Map("code" -> code))
+          sendRequest(Map("msg_type" -> "execute_request", "content" -> Map("code" -> code))) match {
+            case Some(rep) =>
+              assert((rep \ "msg_type").extract[String] == "execute_reply")
 
-          stdin.println(write(msg))
-          stdin.flush()
+              val content: JValue = rep \ "content"
+              _history += content
 
-          val line = stdout.readLine()
-          // The python process shut down
-          if (line == null) {
-            _state = Session.Error()
-            promise.failure(new Exception("session has been terminated"))
-          } else {
-            val rep = parse(line)
-            assert((rep \ "msg_type").extract[String] == "execute_reply")
+              _state = Session.Idle()
 
-            val content: JValue = rep \ "content"
-            _history += content
-
-            _state = Session.Idle()
-
-            promise.success(content)
+              promise.success(content)
+              loop()
+            case None =>
+              _state = Session.Error()
+              promise.failure(new Exception("session has been terminated"))
           }
-
-          loop()
 
         case (_, ShutdownRequest(promise)) =>
           require(state == Session.Idle() || state == Session.Error())
@@ -179,6 +176,12 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
           _state = Session.ShuttingDown()
 
           try {
+            sendRequest(Map("msg_type" -> "shutdown_request", "content" -> ())) match {
+              case Some(rep) =>
+                warn(f"process failed to shut down while returning $rep")
+              case None =>
+            }
+
             process.getInputStream.close()
             process.getOutputStream.close()
 

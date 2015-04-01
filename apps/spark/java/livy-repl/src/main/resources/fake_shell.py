@@ -235,6 +235,10 @@ def magic_table(name):
     })
 
 
+def shutdown_request(content):
+    sys.exit()
+
+
 magic_router = {
     'table': magic_table,
 }
@@ -242,6 +246,7 @@ magic_router = {
 
 msg_type_router = {
     'execute_request': execute_request,
+    'shutdown_request': shutdown_request,
 }
 
 sys_stdin = sys.stdin
@@ -319,6 +324,8 @@ try:
         print >> sys_stdout, response
         sys_stdout.flush()
 finally:
+    global_dict['sc'].stop()
+
     sys.stdin = sys_stdin
     sys.stdout = sys_stdout
     sys.stderr = sys_stderr
