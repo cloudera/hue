@@ -112,7 +112,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_true('Annalisa A Guaragna' in response.content, response.content)
 
     assert_true('journal_title' in response.content, response.content)
-    assert_true('angewandte' in response.content, response.content)
+    assert_true('Angewandte' in response.content, response.content)
 
     assert_true('"numFound": 4' in response.content, response.content)
 
