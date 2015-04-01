@@ -1,6 +1,6 @@
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.repl.Session.{Kind, State}
+import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
@@ -14,10 +14,10 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
   implicit val formats = DefaultFormats
 
   class MockSession extends Session {
-    var _state: State = Session.Idle()
+    var _state: State = Idle()
     var _history = List[JValue]()
 
-    override def kind: Kind = Session.Spark()
+    override def kind: Kind = Spark()
 
     override def state = _state
 
@@ -27,7 +27,7 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
     }
 
     override def close(): Unit = {
-      _state = Session.ShuttingDown()
+      _state = Dead()
     }
 
     override def history(): Seq[JValue] = _history
@@ -49,7 +49,7 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
         parsedBody \ "state" should equal (JString("idle"))
       }
 
-      session._state = Session.Busy()
+      session._state = Busy()
 
       get("/") {
         status should equal (200)
@@ -80,7 +80,7 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
   }
 
   after {
-    session._state = Session.Idle()
+    session._state = Idle()
     session._history = List()
   }
 }

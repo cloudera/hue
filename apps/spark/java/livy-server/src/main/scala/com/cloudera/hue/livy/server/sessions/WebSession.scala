@@ -5,8 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.sessions.Session._
-import com.cloudera.hue.livy.server.sessions.Statement
+import com.cloudera.hue.livy.sessions._
 import dispatch._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats}
@@ -33,7 +32,7 @@ class WebSession(val id: String,
   override def url: Option[URL] = _url
 
   override def url_=(url: URL) = {
-    ensureState(Session.Starting(), {
+    ensureState(Starting(), {
       _state = Idle()
       _url = Some(url)
     })
@@ -110,6 +109,11 @@ class WebSession(val id: String,
         case Busy() =>
           Future {
             waitForStateChange(Busy(), Duration(10, TimeUnit.SECONDS))
+            stop()
+          }
+        case ShuttingDown() =>
+          Future {
+            waitForStateChange(ShuttingDown(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
         case Error() | Dead() =>

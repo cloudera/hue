@@ -5,7 +5,8 @@ import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy.repl.python.PythonSession
 import com.cloudera.hue.livy.repl.scala.SparkSession
-import com.cloudera.hue.livy.{Utils, Logging, WebServer}
+import com.cloudera.hue.livy.sessions.Starting
+import com.cloudera.hue.livy.{Logging, WebServer}
 import dispatch._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats}
@@ -106,7 +107,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
     info(s"Notifying $callbackUrl that we're up")
 
     Future {
-      session.waitForStateChange(Session.Starting(), Duration(10, TimeUnit.SECONDS))
+      session.waitForStateChange(Starting(), Duration(10, TimeUnit.SECONDS))
 
       // Wait for our url to be discovered.
       val replUrl = waitForReplUrl()

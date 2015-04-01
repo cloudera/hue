@@ -3,11 +3,11 @@ package com.cloudera.hue.livy.repl.python
 import java.io._
 import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Files
-import java.util.concurrent.{TimeUnit, SynchronousQueue}
+import java.util.concurrent.{SynchronousQueue, TimeUnit}
 
-
-import com.cloudera.hue.livy.{Logging, Utils}
 import com.cloudera.hue.livy.repl.Session
+import com.cloudera.hue.livy.sessions._
+import com.cloudera.hue.livy.{Logging, Utils}
 import org.apache.spark.SparkContext
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
@@ -17,8 +17,8 @@ import py4j.GatewayServer
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.duration.Duration
 import scala.concurrent._
+import scala.concurrent.duration.Duration
 
 object PythonSession {
   def createPython(): Session = {
@@ -113,7 +113,7 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
   private val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
 
   private var _history = ArrayBuffer[JValue]()
-  private var _state: Session.State = Session.Starting()
+  private var _state: State = Starting()
 
   private val queue = new SynchronousQueue[Request]
 
@@ -121,7 +121,7 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
     override def run() = {
       waitUntilReady()
 
-      _state = Session.Idle()
+      _state = Idle()
 
       loop()
     }
@@ -145,14 +145,14 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
     @tailrec
     def loop(): Unit = {
       (_state, queue.take()) match {
-        case (Session.Error(), ExecuteRequest(code, promise)) =>
+        case (Error(), ExecuteRequest(code, promise)) =>
           promise.failure(new Exception("session has been terminated"))
           loop()
 
         case (state, ExecuteRequest(code, promise)) =>
-          require(state == Session.Idle())
+          require(state == Idle())
 
-          _state = Session.Busy()
+          _state = Busy()
 
           sendRequest(Map("msg_type" -> "execute_request", "content" -> Map("code" -> code))) match {
             case Some(rep) =>
@@ -161,19 +161,19 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
               val content: JValue = rep \ "content"
               _history += content
 
-              _state = Session.Idle()
+              _state = Idle()
 
               promise.success(content)
               loop()
             case None =>
-              _state = Session.Error()
+              _state = Error()
               promise.failure(new Exception("session has been terminated"))
           }
 
         case (_, ShutdownRequest(promise)) =>
-          require(state == Session.Idle() || state == Session.Error())
+          require(state == Idle() || state == Error())
 
-          _state = Session.ShuttingDown()
+          _state = ShuttingDown()
 
           try {
             sendRequest(Map("msg_type" -> "shutdown_request", "content" -> ())) match {
@@ -188,7 +188,7 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
             try {
               process.destroy()
             } finally {
-              _state = Session.ShutDown()
+              _state = Dead()
               promise.success(())
             }
           }
@@ -198,7 +198,7 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
 
   thread.start()
 
-  override def kind = Session.PySpark()
+  override def kind = PySpark()
 
   override def state = _state
 
@@ -220,10 +220,10 @@ private class PythonSession(process: Process, gatewayServer: GatewayServer) exte
 
   override def close(): Unit = synchronized {
     _state match {
-      case Session.ShutDown() =>
-      case Session.ShuttingDown() =>
+      case Dead() =>
+      case ShuttingDown() =>
         // Another thread must be tearing down the process.
-        waitForStateChange(Session.ShuttingDown(), Duration(10, TimeUnit.SECONDS))
+        waitForStateChange(ShuttingDown(), Duration(10, TimeUnit.SECONDS))
       case _ =>
         val promise = Promise[Unit]()
         queue.put(ShutdownRequest(promise))

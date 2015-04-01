@@ -1,39 +1,17 @@
 package com.cloudera.hue.livy.repl
 
-import java.util.concurrent.TimeUnit
-
 import com.cloudera.hue.livy.repl.python.PythonSession
+import org.json4s.Extraction
 import org.json4s.JsonAST.JValue
-import org.json4s.{Extraction, DefaultFormats}
-import org.scalatest.{Matchers, BeforeAndAfter, FunSpec}
 
 import _root_.scala.concurrent.Await
 import _root_.scala.concurrent.duration.Duration
 
-class PythonSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
+class PythonSessionSpec extends BaseSessionSpec {
 
-  implicit val formats = DefaultFormats
-
-  var session: Session = null
-
-  before {
-    session = PythonSession.createPython()
-  }
-
-  after {
-    session.close()
-  }
+  override def createSession() = PythonSession.createPySpark()
 
   describe("A python session") {
-    it("should start in the starting or idle state") {
-      session.state should (equal (Session.Starting()) or equal (Session.Idle()))
-    }
-
-    it("should eventually become the idle state") {
-      session.waitForStateChange(Session.Starting(), Duration(10, TimeUnit.SECONDS))
-      session.state should equal (Session.Idle())
-    }
-
     it("should execute `1 + 2` == 3") {
       val result = Await.result(session.execute("1 + 2"), Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
