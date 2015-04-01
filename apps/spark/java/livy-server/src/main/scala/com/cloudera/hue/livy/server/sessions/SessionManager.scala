@@ -1,7 +1,6 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.server.sessions.Session
 
 import scala.collection.concurrent.TrieMap
 import scala.concurrent.duration.Duration

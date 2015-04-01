@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.Statement
 import com.cloudera.hue.livy.server.sessions.Session._
+import com.cloudera.hue.livy.server.sessions.Statement
 import dispatch._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats}

@@ -5,7 +5,7 @@ import java.util.concurrent.TimeoutException
 
 import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.Statement
+import com.cloudera.hue.livy.server.sessions.Statement
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration

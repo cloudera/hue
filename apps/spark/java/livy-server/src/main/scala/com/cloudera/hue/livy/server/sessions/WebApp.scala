@@ -1,11 +1,10 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.sessions.Session
 import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonAST.JString

@@ -1,4 +1,4 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import org.json4s.JValue
