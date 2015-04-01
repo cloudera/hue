@@ -35,7 +35,14 @@ CACHED_LDAP_CONN = None
 
 
 def get_connection_from_server(server=None):
-  ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
+
+  ldap_servers = desktop.conf.LDAP.LDAP_SERVERS.get()
+
+  if server and ldap_servers:
+    ldap_config = ldap_servers[server]
+  else:
+    ldap_config = desktop.conf.LDAP
+     
   return get_connection(ldap_config)
 
 def get_connection(ldap_config):
