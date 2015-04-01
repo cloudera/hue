@@ -34,7 +34,7 @@ from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
-from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode
+from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup
 
 import hadoop.conf
 import desktop.conf
@@ -61,7 +61,8 @@ class WebHdfs(Hdfs):
                security_enabled=False,
                ssl_cert_ca_verify=True,
                temp_dir="/tmp",
-               umask=01022):
+               umask=01022,
+               hdfs_supergroup=None):
     self._url = url
     self._superuser = hdfs_superuser
     self._security_enabled = security_enabled
@@ -70,6 +71,7 @@ class WebHdfs(Hdfs):
     self._umask = umask
     self._fs_defaultfs = fs_defaultfs
     self._logical_name = logical_name
+    self._supergroup = hdfs_supergroup
 
     self._client = self._make_client(url, security_enabled, ssl_cert_ca_verify)
     self._root = resource.Resource(self._client)
@@ -89,7 +91,8 @@ class WebHdfs(Hdfs):
                security_enabled=hdfs_config.SECURITY_ENABLED.get(),
                ssl_cert_ca_verify=hdfs_config.SSL_CERT_CA_VERIFY.get(),
                temp_dir=hdfs_config.TEMP_DIR.get(),
-               umask=get_umask_mode())
+               umask=get_umask_mode(),
+               hdfs_supergroup=get_supergroup())
 
   def __str__(self):
     return "WebHdfs at %s" % self._url
@@ -125,6 +128,10 @@ class WebHdfs(Hdfs):
   @property
   def umask(self):
     return self._umask
+
+  @property
+  def supergroup(self):
+    return self._supergroup
 
   @property
   def security_enabled(self):
