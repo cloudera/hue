@@ -6,8 +6,8 @@ import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.repl.python.PythonSession
 import com.cloudera.hue.livy.repl.scala.SparkSession
-import com.cloudera.hue.livy.server.Statement
 import com.cloudera.hue.livy.server.sessions.Session._
+import com.cloudera.hue.livy.server.sessions.Statement
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}

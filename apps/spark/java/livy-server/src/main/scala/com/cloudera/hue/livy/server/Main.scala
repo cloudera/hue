@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.server
 
 import javax.servlet.ServletContext
 
+import com.cloudera.hue.livy.server.sessions._
 import com.cloudera.hue.livy.{Utils, Logging, LivyConf, WebServer}
 import org.scalatra._
 import org.scalatra.servlet.ScalatraListener

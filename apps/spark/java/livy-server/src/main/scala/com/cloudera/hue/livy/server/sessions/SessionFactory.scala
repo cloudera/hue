@@ -1,9 +1,8 @@
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.sessions
 
 import java.util.UUID
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.server.sessions._
 import com.cloudera.hue.livy.yarn.Client
 
 import scala.concurrent.{ExecutionContext, Future}
