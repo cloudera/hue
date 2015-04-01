@@ -23,6 +23,7 @@ import re
 import urlparse
 from avro import schema, datafile, io
 
+from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
@@ -357,6 +358,12 @@ def test_chmod_sticky():
 @attr('requires_hadoop')
 def test_chown():
   cluster = pseudo_hdfs4.shared_cluster()
+
+  # Login as Non Hadoop superuser
+  c = make_logged_in_client('test')
+
+  response = c.post(reverse('index'))
+  assert_false('Change owner' in response.content)
 
   # Only the Hadoop superuser really has carte blanche here
   c = make_logged_in_client(cluster.superuser)

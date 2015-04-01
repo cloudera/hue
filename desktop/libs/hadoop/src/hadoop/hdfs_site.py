@@ -30,6 +30,7 @@ _HDFS_SITE_DICT = None
 
 _CNF_NN_PERMISSIONS_UMASK_MODE = 'fs.permissions.umask-mode'
 _CNF_NN_SENTRY_PREFIX = 'sentry.authorization-provider.hdfs-path-prefixes'
+_CNF_NN_PERMISSIONS_SUPERGROUP = 'dfs.permissions.superusergroup'
 
 
 def reset():
@@ -52,6 +53,9 @@ def get_umask_mode():
 
 def get_nn_sentry_prefixes():
   return get_conf().get(_CNF_NN_SENTRY_PREFIX, '')
+
+def get_supergroup():
+  return get_conf().get(_CNF_NN_PERMISSIONS_SUPERGROUP, 'supergroup')
 
 
 def _parse_hdfs_site():
