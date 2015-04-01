@@ -610,6 +610,20 @@ LDAP = ConfigSection(
                                     type=coerce_bool,
                                     default=False),
 
+          DEBUG = Config("debug",
+            type=coerce_bool,
+            default=False,
+            help=_("Set to a value to enable python-ldap debugging.")),
+          DEBUG_LEVEL = Config("debug_level",
+            default=255,
+            type=int,
+            help=_("Sets the debug level within the underlying LDAP C lib.")),
+          TRACE_LEVEL = Config("trace_level",
+            default=0,
+            type=int,
+            help=_("Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,"
+                   "2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls.")),
+
           USERS = ConfigSection(
             key="users",
             help=_("Configuration for LDAP user schema and search."),
