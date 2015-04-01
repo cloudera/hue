@@ -3,6 +3,7 @@ package com.cloudera.hue.livy.yarn
 import java.io.{BufferedReader, InputStreamReader}
 import java.lang.ProcessBuilder.Redirect
 
+import com.cloudera.hue.livy.spark.SparkProcessBuilder
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus, YarnApplicationState}
 import org.apache.hadoop.yarn.client.api.YarnClient
@@ -45,32 +46,19 @@ class Client(livyConf: LivyConf) extends Logging {
                         callbackUrl: String): Future[Job] = {
     val url = f"$callbackUrl/sessions/$id/callback"
 
-    val args: ArrayBuffer[String] = ArrayBuffer(
-      "spark-submit",
-      "--master", "yarn-cluster",
-      "--class", "com.cloudera.hue.livy.repl.Main",
-      "--driver-java-options", f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0"
-    )
+    val builder = new SparkProcessBuilder()
 
-    proxyUser.foreach { case user =>
-      args += "--proxy-user"
-      args += user
-    }
-
-    args += livyJar(livyConf)
-    args += kind
-
-    debug("Running %s", args.mkString(" "))
-
-    val builder: ProcessBuilder = new ProcessBuilder(args)
+    builder.master("yarn-cluster")
+    builder.className("com.cloudera.hue.livy.repl.Main")
+    builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
+    proxyUser.foreach(builder.proxyUser)
 
     builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(true)
+    builder.redirectErrorStream(redirect = true)
+
+    val process = builder.start(livyJar(livyConf), List(kind.toString))
 
     Future {
-
-      val process = builder.start()
-
       val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
 
       val applicationId = parseApplicationId(stdout).getOrElse(throw new FailedToSubmitApplication)
