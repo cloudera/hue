@@ -824,12 +824,12 @@ ${ dashboard.layout_skeleton() }
 
     <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
       fqs: $root.query.fqs,
-      transformer: barChartDataTransformer,
+      transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
       onStateChange: function(state){ },
       onClick: function(d) {
         if (d.obj.field != undefined) {
           if ($data.type == 'range-up') {
-            viewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: true});
+            viewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: d.obj.is_up});
           } else {
             viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
           }
@@ -892,7 +892,8 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
       <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
-        transformer: rangePieChartDataTransformer,
+        transformer: rangeUpPieChartDataTransformer,
+        rangeUp: true,
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
         onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
@@ -1442,12 +1443,13 @@ function pieChartDataTransformer(data) {
   return _data;
 }
 
-function rangePieChartDataTransformer(data) {
+function _rangePieChartDataTransformer(data, isUp) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
+    var _label = isUp ? (item.from + (item.is_up ? ' & ${ _('Up') }' : ' & ${ _('Less') }')) : (item.from + ' - ' + item.to);
     _data.push({
-      label: item.from + ' - ' + item.to,
+      label: _label,
       from: item.from,
       to: item.to,
       value: item.value,
@@ -1457,20 +1459,39 @@ function rangePieChartDataTransformer(data) {
   return _data;
 }
 
-function barChartDataTransformer(rawDatum) {
+
+function rangePieChartDataTransformer(data) {
+  return _rangePieChartDataTransformer(data, false);
+}
+
+function rangeUpPieChartDataTransformer(data) {
+  return _rangePieChartDataTransformer(data, true);
+}
+
+function _barChartDataTransformer(rawDatum, isUp) {
   var _datum = [];
   var _data = [];
 
   $(rawDatum.counts).each(function (cnt, item) {
     item.widget_id = rawDatum.widget_id;
     if (typeof item.from != "undefined") {
-      _data.push({
-        series: 0,
-        x: item.from,
-        x_end: item.to,
-        y: item.value,
-        obj: item
-      });
+      if (isUp){
+        _data.push({
+          series: 0,
+          x: item.from + (item.is_up ? ' & ${ _('Up') }' : ' & ${ _('Less') }'),
+          y: item.value,
+          obj: item
+        });
+      }
+      else {
+        _data.push({
+          series: 0,
+          x: item.from,
+          x_end: item.to,
+          y: item.value,
+          obj: item
+        });
+      }
     }
     else {
       _data.push({
@@ -1486,6 +1507,14 @@ function barChartDataTransformer(rawDatum) {
     values: _data
   });
   return _datum;
+}
+
+function barChartDataTransformer(rawDatum) {
+  return _barChartDataTransformer(rawDatum, false);
+}
+
+function barChartRangeUpDataTransformer(rawDatum) {
+  return _barChartDataTransformer(rawDatum, true);
 }
 
 
