@@ -4,7 +4,7 @@ import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
 import com.cloudera.hue.livy.sessions.Kind
-import com.cloudera.hue.livy.spark.SparkProcessBuilder
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
@@ -27,7 +27,7 @@ object ProcessSession extends Logging {
   // Loop until we've started a process with a valid port.
   private def startProcess(livyConf: LivyConf, id: String, kind: Kind, proxyUser: Option[String]): Process = {
 
-    val builder = new SparkProcessBuilder()
+    val builder = new SparkSubmitProcessBuilder()
 
     builder.className("com.cloudera.hue.livy.repl.Main")
 

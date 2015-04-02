@@ -5,7 +5,13 @@ import com.cloudera.hue.livy.Logging
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
-class SparkProcessBuilder extends Logging {
+object SparkSubmitProcessBuilder {
+  def apply(): SparkSubmitProcessBuilder = {
+    new SparkSubmitProcessBuilder()
+  }
+}
+
+class SparkSubmitProcessBuilder extends Logging {
 
   private[this] var _executable = "spark-submit"
   private[this] var _master: Option[String] = None
@@ -33,142 +39,150 @@ class SparkProcessBuilder extends Logging {
   private[this] var _redirectError: Option[ProcessBuilder.Redirect] = None
   private[this] var _redirectErrorStream: Option[Boolean] = None
 
-  def executable(executable: String): SparkProcessBuilder = {
+  def executable(executable: String): SparkSubmitProcessBuilder = {
     _executable = executable
     this
   }
 
-  def master(masterUrl: String): SparkProcessBuilder = {
+  def master(masterUrl: String): SparkSubmitProcessBuilder = {
     _master = Some(masterUrl)
     this
   }
 
-  def deployMode(deployMode: String): SparkProcessBuilder = {
+  def deployMode(deployMode: String): SparkSubmitProcessBuilder = {
     _deployMode = Some(deployMode)
     this
   }
 
-  def className(className: String): SparkProcessBuilder = {
+  def className(className: String): SparkSubmitProcessBuilder = {
     _className = Some(className)
     this
   }
 
-  def name(name: String): SparkProcessBuilder = {
+  def name(name: String): SparkSubmitProcessBuilder = {
     _name = Some(name)
     this
   }
 
-  def jar(jar: String): SparkProcessBuilder = {
+  def jar(jar: String): SparkSubmitProcessBuilder = {
     this._jars += jar
     this
   }
 
-  def jars(jars: Traversable[String]): SparkProcessBuilder = {
+  def jars(jars: Traversable[String]): SparkSubmitProcessBuilder = {
     this._jars ++= jars
     this
   }
 
-  def pyFile(pyFile: String): SparkProcessBuilder = {
+  def pyFile(pyFile: String): SparkSubmitProcessBuilder = {
     this._pyFiles += pyFile
     this
   }
 
-  def pyFiles(pyFiles: Traversable[String]): SparkProcessBuilder = {
+  def pyFiles(pyFiles: Traversable[String]): SparkSubmitProcessBuilder = {
     this._pyFiles ++= pyFiles
     this
   }
 
-  def file(file: String): SparkProcessBuilder = {
+  def file(file: String): SparkSubmitProcessBuilder = {
     this._files += file
     this
   }
 
-  def files(files: Traversable[String]): SparkProcessBuilder = {
+  def files(files: Traversable[String]): SparkSubmitProcessBuilder = {
     this._files ++= files
     this
   }
 
-  def conf(key: String, value: String): SparkProcessBuilder = {
+  def conf(key: String, value: String): SparkSubmitProcessBuilder = {
     this._conf += ((key, value))
     this
   }
 
-  def conf(conf: Traversable[(String, String)]): SparkProcessBuilder = {
+  def conf(conf: Traversable[(String, String)]): SparkSubmitProcessBuilder = {
     this._conf ++= conf
     this
   }
 
-  def driverMemory(driverMemory: String): SparkProcessBuilder = {
+  def driverMemory(driverMemory: String): SparkSubmitProcessBuilder = {
     _driverMemory = Some(driverMemory)
     this
   }
 
-  def driverJavaOptions(driverJavaOptions: String): SparkProcessBuilder = {
+  def driverJavaOptions(driverJavaOptions: String): SparkSubmitProcessBuilder = {
     _driverJavaOptions = Some(driverJavaOptions)
     this
   }
 
-  def driverClassPath(classPath: String): SparkProcessBuilder = {
+  def driverClassPath(classPath: String): SparkSubmitProcessBuilder = {
     _driverClassPath += classPath
     this
   }
 
-  def driverClassPaths(classPaths: Traversable[String]): SparkProcessBuilder = {
+  def driverClassPaths(classPaths: Traversable[String]): SparkSubmitProcessBuilder = {
     _driverClassPath ++= classPaths
     this
   }
 
-  def executorMemory(executorMemory: String): SparkProcessBuilder = {
+  def executorMemory(executorMemory: String): SparkSubmitProcessBuilder = {
     _executorMemory = Some(executorMemory)
     this
   }
 
-  def proxyUser(proxyUser: String): SparkProcessBuilder = {
+  def proxyUser(proxyUser: String): SparkSubmitProcessBuilder = {
     _proxyUser = Some(proxyUser)
     this
   }
 
-  def driverCores(driverCores: String): SparkProcessBuilder = {
+  def driverCores(driverCores: Int): SparkSubmitProcessBuilder = {
+    this.driverCores(driverCores.toString)
+  }
+
+  def driverCores(driverCores: String): SparkSubmitProcessBuilder = {
     _driverCores = Some(driverCores)
     this
   }
 
-  def executorCores(executorCores: String): SparkProcessBuilder = {
+  def executorCores(executorCores: Int): SparkSubmitProcessBuilder = {
+    this.executorCores(executorCores.toString)
+  }
+
+  def executorCores(executorCores: String): SparkSubmitProcessBuilder = {
     _executorCores = Some(executorCores)
     this
   }
 
-  def queue(queue: String): SparkProcessBuilder = {
+  def queue(queue: String): SparkSubmitProcessBuilder = {
     _queue = Some(queue)
     this
   }
 
-  def archive(archive: String): SparkProcessBuilder = {
+  def archive(archive: String): SparkSubmitProcessBuilder = {
     _archives += archive
     this
   }
 
-  def archives(archives: Traversable[String]): SparkProcessBuilder = {
+  def archives(archives: Traversable[String]): SparkSubmitProcessBuilder = {
     _archives ++= archives
     this
   }
 
-  def env(key: String, value: String): SparkProcessBuilder = {
+  def env(key: String, value: String): SparkSubmitProcessBuilder = {
     _env += ((key, value))
     this
   }
 
-  def redirectOutput(redirect: ProcessBuilder.Redirect): SparkProcessBuilder = {
+  def redirectOutput(redirect: ProcessBuilder.Redirect): SparkSubmitProcessBuilder = {
     _redirectOutput = Some(redirect)
     this
   }
 
-  def redirectError(redirect: ProcessBuilder.Redirect): SparkProcessBuilder = {
+  def redirectError(redirect: ProcessBuilder.Redirect): SparkSubmitProcessBuilder = {
     _redirectError = Some(redirect)
     this
   }
 
-  def redirectErrorStream(redirect: Boolean): SparkProcessBuilder = {
+  def redirectErrorStream(redirect: Boolean): SparkSubmitProcessBuilder = {
     _redirectErrorStream = Some(redirect)
     this
   }

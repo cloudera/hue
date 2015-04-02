@@ -175,8 +175,6 @@ private object Serializers {
     PartialFunction.empty
   }, {
     case session: Session =>
-      import JsonDSL._
-
       ("id", session.id) ~
       ("state", serializeSessionState(session.state)) ~
       ("kind", serializeSessionKind(session.kind)) ~

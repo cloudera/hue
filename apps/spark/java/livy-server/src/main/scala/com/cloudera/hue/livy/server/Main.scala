@@ -2,6 +2,7 @@ package com.cloudera.hue.livy.server
 
 import javax.servlet.ServletContext
 
+import com.cloudera.hue.livy.server.batch.{BatchProcessFactory, BatchServlet, BatchManager}
 import com.cloudera.hue.livy.server.sessions._
 import com.cloudera.hue.livy.{Utils, Logging, LivyConf, WebServer}
 import org.scalatra._
@@ -44,6 +45,7 @@ object Main {
 class ScalatraBootstrap extends LifeCycle with Logging {
 
   var sessionManager: SessionManager = null
+  var batchManager: BatchManager = null
 
   override def init(context: ServletContext): Unit = {
     val livyConf = new LivyConf()
@@ -63,12 +65,20 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
     sessionManager = new SessionManager(sessionFactory)
 
+    val batchFactory = new BatchProcessFactory()
+    batchManager = new BatchManager(batchFactory)
+
     context.mount(new SessionServlet(sessionManager), "/sessions/*")
+    context.mount(new BatchServlet(batchManager), "/batches/*")
   }
 
   override def destroy(context: ServletContext): Unit = {
     if (sessionManager != null) {
       sessionManager.shutdown()
+    }
+
+    if (batchManager != null) {
+      batchManager.shutdown()
     }
   }
 }
