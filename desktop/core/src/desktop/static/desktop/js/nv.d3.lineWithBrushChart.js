@@ -63,6 +63,7 @@ nv.models.lineWithBrushChart = function() {
     , selectionEnabled = false
     , onSelectRange = null
     , onStateChange = null
+    , onChartUpdate = null
     ;
 
   xAxis
@@ -107,7 +108,7 @@ nv.models.lineWithBrushChart = function() {
 
 
       chart.update = function() {
-        container.transition().duration(transitionDuration).call(chart)
+        container.transition().duration(transitionDuration).each("end", onChartUpdate).call(chart)
         if (selectionEnabled){
           enableBrush();
         }
@@ -610,6 +611,12 @@ nv.models.lineWithBrushChart = function() {
   chart.onSelectRange = function(_) {
     if (!arguments.length) return onSelectRange;
     onSelectRange = _;
+    return chart;
+  };
+
+  chart.onChartUpdate = function(_) {
+    if (!arguments.length) return onChartUpdate;
+    onChartUpdate = _;
     return chart;
   };
 

@@ -137,6 +137,12 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       'canRange': True,
       'isDate': is_date,
     })
+
+    if widget_type == 'histogram-widget':
+      properties.update({
+      'timelineChartType': 'bar'
+      })
+
   except Exception, e:
     print e
     # stats not supported on all the fields, like text
