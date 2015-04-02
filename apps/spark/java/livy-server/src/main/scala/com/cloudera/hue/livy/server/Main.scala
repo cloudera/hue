@@ -2,7 +2,7 @@ package com.cloudera.hue.livy.server
 
 import javax.servlet.ServletContext
 
-import com.cloudera.hue.livy.server.batch.{BatchProcessFactory, BatchServlet, BatchManager}
+import com.cloudera.hue.livy.server.batch.{BatchYarnFactory, BatchProcessFactory, BatchServlet, BatchManager}
 import com.cloudera.hue.livy.server.sessions._
 import com.cloudera.hue.livy.{Utils, Logging, LivyConf, WebServer}
 import org.scalatra._
@@ -59,13 +59,20 @@ class ScalatraBootstrap extends LifeCycle with Logging {
       case "process" => new ProcessSessionFactory(livyConf)
       case "yarn" => new YarnSessionFactory(livyConf)
       case _ =>
-        println(f"Unknown session factory: $sessionFactoryKind}")
+        println(f"Unknown session factory: $sessionFactoryKind")
         sys.exit(1)
     }
 
     sessionManager = new SessionManager(sessionFactory)
 
-    val batchFactory = new BatchProcessFactory()
+    val batchFactory = sessionFactoryKind match {
+      case "thread" | "process" => new BatchProcessFactory()
+      case "yarn" => new BatchYarnFactory()
+      case _ =>
+        println(f"Unknown batch factory: $sessionFactoryKind")
+        sys.exit(1)
+    }
+
     batchManager = new BatchManager(batchFactory)
 
     context.mount(new SessionServlet(sessionManager), "/sessions/*")

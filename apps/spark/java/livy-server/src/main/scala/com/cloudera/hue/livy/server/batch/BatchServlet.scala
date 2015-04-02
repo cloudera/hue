@@ -47,9 +47,14 @@ class BatchServlet(batchManager: BatchManager)
 
   val getBatch = get("/:id") {
     val id = params("id").toInt
+
     batchManager.getBatch(id) match {
       case None => NotFound("batch not found")
-      case Some(batch) => batch
+      case Some(batch) =>
+        val from = params.get("from").map(_.toInt)
+        val size = params.get("size").map(_.toInt)
+
+        Serializers.serializeBatch(batch, from, size)
     }
   }
 
@@ -82,11 +87,26 @@ private object Serializers {
 
   def Formats: List[CustomSerializer[_]] = List(BatchSerializer)
 
-  case object BatchSerializer extends CustomSerializer[Batch](implicit formats => ( {
+  def serializeBatch(batch: Batch,
+                     fromOpt: Option[Int],
+                     sizeOpt: Option[Int]): JValue = {
+    val lines = batch.lines
+    val size = sizeOpt.getOrElse(10)
+    val from = fromOpt.getOrElse(math.max(0, lines.length - 10))
+    val until = from + size
+
+    ("id", batch.id) ~
+      ("state", batch.state.toString) ~
+      ("lines", lines.slice(from, until))
+  }
+
+  case object BatchSerializer extends CustomSerializer[Batch](
+    implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case batch: Batch => JObject(JField("id", batch.id))
+    case batch: Batch =>
+      serializeBatch(batch, None, None)
   }
     )
   )
