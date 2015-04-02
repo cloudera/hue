@@ -3,7 +3,7 @@ package com.cloudera.hue.livy.yarn
 import java.io.{BufferedReader, InputStreamReader}
 import java.lang.ProcessBuilder.Redirect
 
-import com.cloudera.hue.livy.spark.SparkProcessBuilder
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus, YarnApplicationState}
 import org.apache.hadoop.yarn.client.api.YarnClient
@@ -46,7 +46,7 @@ class Client(livyConf: LivyConf) extends Logging {
                         callbackUrl: String): Future[Job] = {
     val url = f"$callbackUrl/sessions/$id/callback"
 
-    val builder = new SparkProcessBuilder()
+    val builder = new SparkSubmitProcessBuilder()
 
     builder.master("yarn-cluster")
     builder.className("com.cloudera.hue.livy.repl.Main")
