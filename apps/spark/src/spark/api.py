@@ -18,7 +18,6 @@
 import json
 import logging
 
-from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 

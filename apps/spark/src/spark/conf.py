@@ -36,6 +36,7 @@ LANGUAGES = Config(
   default="""[
       {"name": "Scala", "type": "scala"},
       {"name": "Python", "type": "python"},
+      {"name": "Jar", "type": "jar"},
       {"name": "Impala SQL", "type": "impala"},
       {"name": "Hive SQL", "type": "hive"},
       {"name": "Text", "type": "text"}
