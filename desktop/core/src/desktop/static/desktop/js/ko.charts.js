@@ -124,13 +124,21 @@ ko.bindingHandlers.barChart = {
 
 ko.bindingHandlers.timelineChart = {
   update: function (element, valueAccessor) {
-    barChartBuilder(element, valueAccessor(), true);
+    if ($(element).find("svg").length > 0) {
+      $(element).find("svg").remove();
+    }
+    if (valueAccessor().type && valueAccessor().type() == "line"){
+      lineChartBuilder(element, valueAccessor(), true);
+    }
+    else {
+      barChartBuilder(element, valueAccessor(), true);
+    }
   }
 };
 
 ko.bindingHandlers.lineChart = {
   update: function (element, valueAccessor) {
-    lineChartBuilder(element, valueAccessor());
+    lineChartBuilder(element, valueAccessor(), false);
   }
 };
 
@@ -547,8 +555,23 @@ ko.bindingHandlers.scatterChart = {
   }
 };
 
+var insertLinebreaks = function (d, ref) {
+  var _el = d3.select(ref);
+  var _mom = moment(d);
+  if (_mom != null && _mom.isValid()) {
+    var _words = _mom.format("HH:mm:ss YYYY-MM-DD").split(" ");
+    _el.text("");
+    for (var i = 0; i < _words.length; i++) {
+      var tspan = _el.append("tspan").text(_words[i]);
+      if (i > 0) {
+        tspan.attr("x", 0).attr("dy", "15");
+      }
+    }
+  }
+};
 
-function lineChartBuilder(element, options) {
+
+function lineChartBuilder(element, options, isTimeline) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);
   if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
@@ -570,9 +593,17 @@ function lineChartBuilder(element, options) {
       }
       _chart.onSelectRange(function (from, to) {
         chartsUpdatingState();
-        options.onSelectRange(from, to);
+        options.onSelectRange($.isNumeric(from) ? new Date(moment(from).valueOf()) : from, $.isNumeric(to) ? new Date(moment(to).valueOf()) : to);
       });
       _chart.xAxis.showMaxMin(false);
+      if (isTimeline){
+        _chart.xAxis.tickFormat(function(d) { return d3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
+        _chart.onChartUpdate(function () {
+          _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+            insertLinebreaks(d, this);
+          });
+        });
+      }
 
       _chart.yAxis
           .tickFormat(d3.format(",0f"));
@@ -580,8 +611,16 @@ function lineChartBuilder(element, options) {
       var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
       _d3.datum(_datum)
           .transition().duration(150)
-          .each("end", options.onComplete != null ? options.onComplete : void(0))
-          .call(_chart);
+          .each("end", function () {
+            if (options.onComplete != null) {
+              options.onComplete();
+            }
+            if (isTimeline) {
+              _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+                insertLinebreaks(d, this);
+              });
+            }
+          }).call(_chart);
 
       var _resizeTimeout = -1;
       nv.utils.windowResize(function () {
@@ -630,22 +669,6 @@ function barChartBuilder(element, options, isTimeline) {
     nv.addGraph(function () {
       var _chart;
 
-
-      var insertLinebreaks = function (d) {
-        var _el = d3.select(this);
-        var _mom = moment(d);
-        if (_mom != null && _mom.isValid()) {
-          var _words = _mom.format("HH:mm:ss YYYY-MM-DD").split(" ");
-          _el.text("");
-          for (var i = 0; i < _words.length; i++) {
-            var tspan = _el.append("tspan").text(_words[i]);
-            if (i > 0) {
-              tspan.attr("x", 0).attr("dy", "15");
-            }
-          }
-        }
-      };
-
       if (isTimeline) {
         if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
           $(element).find("svg").empty();
@@ -663,7 +686,9 @@ function barChartBuilder(element, options, isTimeline) {
         _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
         _chart.onStateChange(options.onStateChange);
         _chart.onChartUpdate(function () {
-          _d3.selectAll("g.nv-x.nv-axis g text").each(insertLinebreaks);
+          _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+            insertLinebreaks(d, this);
+          });
         });
       }
       else {
@@ -735,7 +760,9 @@ function barChartBuilder(element, options, isTimeline) {
               options.onComplete();
             }
             if (isTimeline) {
-              _d3.selectAll("g.nv-x.nv-axis g text").each(insertLinebreaks);
+              _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+                insertLinebreaks(d, this);
+              });
             }
           }).call(_chart);
 
