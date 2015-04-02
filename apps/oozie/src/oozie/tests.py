@@ -111,22 +111,25 @@ class MockOozieApi:
 
   def get_workflows(self, **kwargs):
     workflows = MockOozieApi.JSON_WORKFLOW_LIST
-    if 'user' in kwargs:
-      workflows = filter(lambda wf: wf['user'] == kwargs['user'], workflows)
+    user_filters = [val for key, val in kwargs['filters'] if key == 'user']
+    if user_filters:
+      workflows = filter(lambda wf: wf['user'] == user_filters[0], workflows)
 
     return WorkflowList(self, {'offset': 0, 'total': 4, 'workflows': workflows})
 
   def get_coordinators(self, **kwargs):
     coordinatorjobs = MockOozieApi.JSON_COORDINATOR_LIST
-    if 'user' in kwargs:
-      coordinatorjobs = filter(lambda coord: coord['user'] == kwargs['user'], coordinatorjobs)
+    user_filters = [val for key, val in kwargs['filters'] if key == 'user']
+    if user_filters:
+      coordinatorjobs = filter(lambda coord: coord['user'] == user_filters[0], coordinatorjobs)
 
     return CoordinatorList(self, {'offset': 0, 'total': 5, 'coordinatorjobs': coordinatorjobs})
 
   def get_bundles(self, **kwargs):
     bundlejobs = MockOozieApi.JSON_BUNDLE_LIST
-    if 'user' in kwargs:
-      bundlejobs = filter(lambda coord: coord['user'] == kwargs['user'], bundlejobs)
+    user_filters = [val for key, val in kwargs['filters'] if key == 'user']
+    if user_filters:
+      bundlejobs = filter(lambda coord: coord['user'] == user_filters[0], bundlejobs)
 
     return BundleList(self, {'offset': 0, 'total': 4, 'bundlejobs': bundlejobs})
 
@@ -3228,19 +3231,55 @@ class TestDashboard(OozieMockBase):
 
 
   def test_list_workflows(self):
+    response = self.c.get(reverse('oozie:list_oozie_workflows'))
+    assert_true('Running' in response.content, response.content)
+    assert_true('Completed' in response.content, response.content)
+
     response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json")
+    for wf_id in MockOozieApi.WORKFLOW_IDS:
+      assert_true(wf_id in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json&type=running")
+    for wf_id in MockOozieApi.WORKFLOW_IDS:
+      assert_true(wf_id in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json&type=completed")
     for wf_id in MockOozieApi.WORKFLOW_IDS:
       assert_true(wf_id in response.content, response.content)
 
 
   def test_list_coordinators(self):
+    response = self.c.get(reverse('oozie:list_oozie_coordinators'))
+    assert_true('Running' in response.content, response.content)
+    assert_true('Completed' in response.content, response.content)
+
     response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json")
+    for coord_id in MockOozieApi.COORDINATOR_IDS:
+      assert_true(coord_id in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&type=running")
+    for coord_id in MockOozieApi.COORDINATOR_IDS:
+      assert_true(coord_id in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&type=completed")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
 
   def test_list_bundles(self):
+    response = self.c.get(reverse('oozie:list_oozie_bundles'))
+    assert_true('Running' in response.content, response.content)
+    assert_true('Completed' in response.content, response.content)
+
     response = self.c.get(reverse('oozie:list_oozie_bundles') + "?format=json")
+    for coord_id in MockOozieApi.BUNDLE_IDS:
+      assert_true(coord_id in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_bundles') + "?format=json&type=running")
+    for coord_id in MockOozieApi.BUNDLE_IDS:
+      assert_true(coord_id in response.content, response.content)
+
+    response = self.c.get(reverse('oozie:list_oozie_bundles') + "?format=json&type=completed")
     for coord_id in MockOozieApi.BUNDLE_IDS:
       assert_true(coord_id in response.content, response.content)
 

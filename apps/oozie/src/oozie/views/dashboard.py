@@ -119,17 +119,17 @@ def show_oozie_error(view_func):
 
 @show_oozie_error
 def list_oozie_workflows(request):
-  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
+  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
   if not has_dashboard_jobs_access(request.user):
-    kwargs['user'] = request.user.username
+    kwargs['filters'].append(('user', request.user.username))
   oozie_api = get_oozie(request.user)
 
   if request.GET.get('format') == 'json':
     just_sla = request.GET.get('justsla') == 'true'
     if request.GET.get('type') in ('running', 'progress'):
-      kwargs['filters'] = [('status', status) for status in OozieWorkflow.RUNNING_STATUSES]
+      kwargs['filters'].extend([('status', status) for status in OozieWorkflow.RUNNING_STATUSES])
     elif request.GET.get('type') == 'completed':
-      kwargs['filters'] = [('status', status) for status in OozieWorkflow.FINISHED_STATUSES]
+      kwargs['filters'].extend([('status', status) for status in OozieWorkflow.FINISHED_STATUSES])
 
     json_jobs = oozie_api.get_workflows(**kwargs).jobs
     if request.GET.get('type') == 'progress':
@@ -146,18 +146,18 @@ def list_oozie_workflows(request):
 
 @show_oozie_error
 def list_oozie_coordinators(request):
-  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
+  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
   if not has_dashboard_jobs_access(request.user):
-    kwargs['user'] = request.user.username
+    kwargs['filters'].append(('user', request.user.username))
   oozie_api = get_oozie(request.user)
 
   enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
 
   if request.GET.get('format') == 'json':
     if request.GET.get('type') in ('running', 'progress'):
-      kwargs['filters'] = [('status', status) for status in CoordinatorWorkflow.RUNNING_STATUSES]
+      kwargs['filters'].extend([('status', status) for status in CoordinatorWorkflow.RUNNING_STATUSES])
     elif request.GET.get('type') == 'completed':
-      kwargs['filters'] = [('status', status) for status in CoordinatorWorkflow.FINISHED_STATUSES]
+      kwargs['filters'].extend([('status', status) for status in CoordinatorWorkflow.FINISHED_STATUSES])
 
     json_jobs = oozie_api.get_coordinators(**kwargs).jobs
     if request.GET.get('type') == 'progress':
@@ -174,16 +174,16 @@ def list_oozie_coordinators(request):
 
 @show_oozie_error
 def list_oozie_bundles(request):
-  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(),}
+  kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
   if not has_dashboard_jobs_access(request.user):
-    kwargs['user'] = request.user.username
+    kwargs['filters'].append(('user', request.user.username))
   oozie_api = get_oozie(request.user)
 
   if request.GET.get('format') == 'json':
     if request.GET.get('type') in ('running', 'progress'):
-      kwargs['filters'] = [('status', status) for status in BundleWorkflow.RUNNING_STATUSES]
+      kwargs['filters'].extend([('status', status) for status in BundleWorkflow.RUNNING_STATUSES])
     elif request.GET.get('type') == 'completed':
-      kwargs['filters'] = [('status', status) for status in BundleWorkflow.FINISHED_STATUSES]
+      kwargs['filters'].extend([('status', status) for status in BundleWorkflow.FINISHED_STATUSES])
 
     json_jobs = oozie_api.get_bundles(**kwargs).jobs
     if request.GET.get('type') == 'progress':
