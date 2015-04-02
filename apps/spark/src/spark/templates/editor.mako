@@ -366,7 +366,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 <input type="text" data-bind="value: value" />
               </div>
             </div>
-            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
+            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
             <a data-bind="visible: status() == 'loading'" class="btn btn-disabled codeMirror-overlaybtn" title="${ _('Creating session') }">
               <i class="fa fa-spinner fa-spin"></i>
