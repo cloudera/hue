@@ -5,6 +5,12 @@ import org.slf4j.LoggerFactory
 trait Logging {
   lazy val logger = LoggerFactory.getLogger(this.getClass)
 
+  def trace(message: => Any) = {
+    if (logger.isTraceEnabled) {
+      logger.trace(message.toString)
+    }
+  }
+
   def debug(message: => Any) = {
     if (logger.isDebugEnabled) {
       logger.debug(message.toString)
