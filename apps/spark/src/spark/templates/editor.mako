@@ -301,6 +301,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon">
   <!-- /ko -->
 
+  <!-- ko if: type() == 'jar' -->
+  <i class="fa fa-file-archive-o" class="snippet-icon"></i>
+  <!-- /ko -->
+
   <!-- ko if: type() == 'impala' -->
   <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon">
   <!-- /ko -->
@@ -356,7 +360,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
-      <!-- ko if: type() != 'text' -->
+      <!-- ko if: ['text', 'jar'].indexOf(type()) == -1  -->
       <div class="snippet-body">
         <div class="row-fluid">
           <div data-bind="css: editorKlass">
@@ -635,6 +639,29 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
         </div>
       <!-- /ko -->
+      <!-- ko if: type() == 'jar' -->
+        <div class="snippet-body">
+          <input type="text" class="input-xlarge" data-bind="value: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
+          </br>
+          <input type="text" class="input-xlarge" data-bind="value: properties.class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
+          </br>
+          <ul data-bind="foreach: properties.arguments" class="unstyled">
+            <li>
+              <input type="text" data-bind="value: $data" placeholder="${ _('e.g. 1000, market') }"/>
+              <a href="#" data-bind="click: function(){ $parent.arguments.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+          <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push(''); }">
+            <i class="fa fa-plus"></i> ${ _('Add argument') }
+          </a>
+          </br>
+          <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="btn btn-primary disable-feedback pointer">
+            <i class="fa fa-play"></i>
+          </a>
+        </div>
+      <!-- /ko -->      
     </div>
   </div>
 </script>

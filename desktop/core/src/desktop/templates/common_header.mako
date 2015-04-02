@@ -416,7 +416,7 @@ from django.utils.translation import ugettext as _
              <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
            % endif
            % if 'spark' in apps:
-             <li><a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark')}</a></li>
+             <li><a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark (alpha)')}</a></li>
            % endif
          </ul>
        </li>

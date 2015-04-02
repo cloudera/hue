@@ -119,7 +119,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
   // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
-  self.settings = ko.mapping.fromJS(typeof snippet.settings != "undefined" && snippet.settings != null ? snippet.settings : {});
+  self.properties = ko.mapping.fromJS(typeof snippet.properties != "undefined" && snippet.properties != null ? snippet.properties : {});
   self.variables = ko.observableArray([]);
   self.variableNames = ko.computed(function () {
     var matches = [];
@@ -562,7 +562,15 @@ var Notebook = function (vm, notebook) {
   };
 
   self.newSnippet = function () {
-    var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), result: {}});
+	var properties = {}
+
+    if (self.selectedSnippet() == 'jar') {
+      properties['app_jar'] = '';
+      properties['class'] = '';
+      properties['arguments'] = [];
+    }
+
+    var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), properties: properties, result: {}});
     self.snippets.push(_snippet);
 
     if (self.getSession(self.selectedSnippet()) == null) {

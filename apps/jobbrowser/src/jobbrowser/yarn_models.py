@@ -81,7 +81,7 @@ class Application(object):
     return self.api.kill(self.id)
 
   def filter_tasks(self, *args, **kwargs):
-    return []
+    pass
 
 
 class SparkJob(Application):
