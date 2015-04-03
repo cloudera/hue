@@ -53,7 +53,7 @@ class BatchProcessSpec
       val req = CreateBatchRequest(
         file = script.toString
       )
-      val batch = BatchProcess(0, "local[*]", req)
+      val batch = BatchProcess(0, req)
 
       Utils.waitUntil({ () =>
         batch.state == Dead()

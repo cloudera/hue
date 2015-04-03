@@ -19,74 +19,50 @@
 package com.cloudera.hue.livy.yarn
 
 import java.io.{BufferedReader, InputStreamReader}
-import java.lang.ProcessBuilder.Redirect
 
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
+import com.cloudera.hue.livy.yarn.Client._
+import com.cloudera.hue.livy.{LivyConf, Logging}
 import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus, YarnApplicationState}
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
 
 import scala.annotation.tailrec
-import scala.collection.JavaConversions._
-import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-object Client extends Logging {
-  private val CONF_LIVY_JAR = "livy.yarn.jar"
+object Client {
   private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  private def livyJar(conf: LivyConf) = {
-    if (conf.contains(CONF_LIVY_JAR)) {
-      conf.get(CONF_LIVY_JAR)
-    } else {
-      Utils.jarOfClass(classOf[Client]).head
-    }
-  }
+  sealed trait ApplicationStatus
+  case class New() extends ApplicationStatus
+  case class Accepted() extends ApplicationStatus
+  case class Running() extends ApplicationStatus
+  case class SuccessfulFinish() extends ApplicationStatus
+  case class UnsuccessfulFinish() extends ApplicationStatus
 }
 
 class FailedToSubmitApplication extends Exception
 
 class Client(livyConf: LivyConf) extends Logging {
-  import com.cloudera.hue.livy.yarn.Client._
+  import Client._
 
   protected implicit def executor: ExecutionContext = ExecutionContext.global
 
-  val yarnConf = new YarnConfiguration()
-  val yarnClient = YarnClient.createYarnClient()
+  private[this] val yarnConf = new YarnConfiguration()
+  private[this] val yarnClient = YarnClient.createYarnClient()
   yarnClient.init(yarnConf)
   yarnClient.start()
 
-  def submitApplication(id: String,
-                        kind: String,
-                        proxyUser: Option[String],
-                        callbackUrl: String): Future[Job] = {
-    val url = f"$callbackUrl/sessions/$id/callback"
+  def getJobFromProcess(process: Process): Job = {
+    val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
 
-    val builder = new SparkSubmitProcessBuilder()
+    val applicationId = parseApplicationId(stdout).getOrElse(throw new FailedToSubmitApplication)
 
-    builder.master("yarn-cluster")
-    builder.className("com.cloudera.hue.livy.repl.Main")
-    builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
-    proxyUser.foreach(builder.proxyUser)
+    // Application has been submitted, so we don't need to keep the process around anymore.
+    stdout.close()
+    process.destroy()
 
-    builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(redirect = true)
-
-    val process = builder.start(livyJar(livyConf), List(kind.toString))
-
-    Future {
-      val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
-
-      val applicationId = parseApplicationId(stdout).getOrElse(throw new FailedToSubmitApplication)
-
-      // Application has been submitted, so we don't need to keep the process around anymore.
-      stdout.close()
-      process.destroy()
-
-      new Job(yarnClient, ConverterUtils.toApplicationId(applicationId))
-    }
+    new Job(yarnClient, ConverterUtils.toApplicationId(applicationId))
   }
 
   def close() = {
@@ -168,9 +144,13 @@ class Job(yarnClient: YarnClient, appId: ApplicationId) {
     statusResponse.getRpcPort
   }
 
-  private def getStatus: ApplicationStatus = {
+  def getStatus: ApplicationStatus = {
     val statusResponse = yarnClient.getApplicationReport(appId)
     convertState(statusResponse.getYarnApplicationState, statusResponse.getFinalApplicationStatus)
+  }
+
+  def stop(): Unit = {
+    yarnClient.killApplication(appId)
   }
 
   private def convertState(state: YarnApplicationState, status: FinalApplicationStatus): ApplicationStatus = {
@@ -187,10 +167,3 @@ class Job(yarnClient: YarnClient, appId: ApplicationId) {
     }
   }
 }
-
-trait ApplicationStatus
-case class New() extends ApplicationStatus
-case class Accepted() extends ApplicationStatus
-case class Running() extends ApplicationStatus
-case class SuccessfulFinish() extends ApplicationStatus
-case class UnsuccessfulFinish() extends ApplicationStatus
