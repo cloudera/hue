@@ -276,6 +276,7 @@ var Snippet = function (vm, notebook, snippet) {
       type: self.type,
       status: self.status,
       statement: self.statement,
+      properties: self.properties,
       result: self.result.getContext()
     };
   }
