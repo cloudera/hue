@@ -90,7 +90,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
       {
         val batch: Batch = batchManager.getBatch(0).get
         Utils.waitUntil({ () =>
-          batch.state == Dead()
+          batch.state == Success()
         }, Duration(10, TimeUnit.SECONDS))
       }
 
@@ -99,7 +99,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         header("Content-Type") should include("application/json")
         val parsedBody = parse(body)
         parsedBody \ "id" should equal (JInt(0))
-        parsedBody \ "state" should equal (JString("dead"))
+        parsedBody \ "state" should equal (JString("success"))
         parsedBody \ "lines" should equal (JArray(List(
           JString("hello world")
         )))

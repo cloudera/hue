@@ -23,7 +23,7 @@ import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Utils
-import com.cloudera.hue.livy.server.batch.{Dead, CreateBatchRequest, BatchProcess}
+import com.cloudera.hue.livy.server.batch.{Success, CreateBatchRequest, BatchProcess}
 import org.scalatest.{ShouldMatchers, BeforeAndAfterAll, FunSpec}
 
 import scala.concurrent.duration.Duration
@@ -56,7 +56,7 @@ class BatchProcessSpec
       val batch = BatchProcess(0, req)
 
       Utils.waitUntil({ () =>
-        batch.state == Dead()
+        batch.state == Success()
       }, Duration(10, TimeUnit.SECONDS))
 
       batch.lines should contain("hello world")

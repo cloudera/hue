@@ -26,7 +26,7 @@ import com.cloudera.hue.livy.yarn._
 
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContextExecutor, ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util
 
 object BatchYarn {
 
@@ -69,8 +69,8 @@ private class BatchYarn(val id: Int, jobFuture: Future[Job]) extends Batch {
   private var _jobThread: Thread = _
 
   jobFuture.onComplete {
-    case Failure(_) => _state = Error()
-    case Success(job) =>
+    case util.Failure(_) => _state = Error()
+    case util.Success(job) =>
       _state = Running()
 
       _jobThread = new Thread {
@@ -81,7 +81,7 @@ private class BatchYarn(val id: Int, jobFuture: Future[Job]) extends Batch {
               Thread.sleep(5000)
               job.getStatus match {
                 case Client.SuccessfulFinish() =>
-                  _state = Dead()
+                  _state = Success()
                 case Client.UnsuccessfulFinish() =>
                   _state = Error()
                 case _ => aux()
@@ -101,7 +101,7 @@ private class BatchYarn(val id: Int, jobFuture: Future[Job]) extends Batch {
   override def stop(): Future[Unit] = {
     jobFuture.map { job =>
       job.stop()
-      _state = Dead()
+      _state = Success()
       ()
     }
   }
