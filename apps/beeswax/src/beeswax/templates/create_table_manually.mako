@@ -413,6 +413,29 @@ ${ layout.metastore_menubar() }
                     </div>
                 </div>
         % endif
+        <div class="charSpec hide">
+            <div class="control-group">
+                <label class="control-label">${_('Size')}</label>
+                <div class="controls">
+                ${comps.field(form["char_length"], render_default=True)}
+                    <span class="help-block">
+                    ${_("Length of char value (1~255)")}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="varcharSpec hide">
+            <div class="control-group">
+                <label class="control-label">${_('Size')}</label>
+                <div class="controls">
+                ${comps.field(form["varchar_length"], render_default=True)}
+                    <span class="help-block">
+                    ${_("Length of varchar value (1~65355)")}
+                    </span>
+                </div>
+            </div>
+        </div>
+
     ${unicode(form["_exists"]) | n}
 
     </div>
@@ -615,13 +638,24 @@ $(document).ready(function () {
   $(".columnType").find("select").change(function () {
     $(this).parents(".cnt").find(".arraySpec").hide();
     $(this).parents(".cnt").find(".mapSpec").hide();
+    $(this).parents(".cnt").find(".charSpec").hide();
+    $(this).parents(".cnt").find(".varcharSpec").hide();
+
     if ($(this).val() == "array") {
       $(this).parents(".cnt").find(".arraySpec").show();
     }
     if ($(this).val() == "map") {
       $(this).parents(".cnt").find(".mapSpec").show();
     }
+    if ($(this).val() == "char") {
+      $(this).parents(".cnt").find(".charSpec").show();
+    }
+    if ($(this).val() == "varchar") {
+      $(this).parents(".cnt").find(".varcharSpec").show();
+    }
   });
+  // to show spec forms after clicking "Add a column" button
+  $(".columnType").find("select").trigger("change");
 
   $("#step4").find("ul").addClass("inputs-list");
 
