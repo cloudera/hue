@@ -35,8 +35,9 @@ LANGUAGES = Config(
   type=coerce_json,
   default="""[
       {"name": "Scala", "type": "scala"},
-      {"name": "Python", "type": "python"},
+      {"name": "PySpark", "type": "python"},
       {"name": "Jar", "type": "jar"},
+      {"name": "Python", "type": "py"},
       {"name": "Impala SQL", "type": "impala"},
       {"name": "Hive SQL", "type": "hive"},
       {"name": "Text", "type": "text"}
