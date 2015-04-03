@@ -18,8 +18,11 @@
 
 package com.cloudera.hue.livy.server.sessions
 
+import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.{Utils, LivyConf}
 import com.cloudera.hue.livy.sessions.{Kind, Error}
 import com.cloudera.hue.livy.yarn.{Client, Job}
 
@@ -29,15 +32,38 @@ import scala.concurrent.duration._
 object YarnSession {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  def create(client: Client, id: String, kind: Kind, proxyUser: Option[String] = None): Future[Session] = {
-    val callbackUrl = System.getProperty("livy.server.callback-url")
-    val job = client.submitApplication(
-      id = id,
-      kind = kind.toString,
-      proxyUser = proxyUser,
-      callbackUrl = callbackUrl)
+  private val CONF_LIVY_JAR = "livy.yarn.jar"
+  private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-    Future.successful(new YarnSession(id, kind, proxyUser, job))
+  def create(livyConf: LivyConf, client: Client, id: String, kind: Kind, proxyUser: Option[String] = None): Session = {
+    val callbackUrl = System.getProperty("livy.server.callback-url")
+    val url = f"$callbackUrl/sessions/$id/callback"
+
+    val builder = SparkSubmitProcessBuilder()
+
+    builder.master("yarn-cluster")
+    builder.className("com.cloudera.hue.livy.repl.Main")
+    builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
+    proxyUser.foreach(builder.proxyUser)
+
+    builder.redirectOutput(Redirect.PIPE)
+    builder.redirectErrorStream(redirect = true)
+
+    val process = builder.start(livyJar(livyConf), List(kind.toString))
+
+    val job = Future {
+      client.getJobFromProcess(process)
+    }
+
+    new YarnSession(id, kind, proxyUser, job)
+  }
+
+  private def livyJar(livyConf: LivyConf) = {
+    if (livyConf.contains(CONF_LIVY_JAR)) {
+      livyConf.get(CONF_LIVY_JAR)
+    } else {
+      Utils.jarOfClass(classOf[Client]).head
+    }
   }
 }
 

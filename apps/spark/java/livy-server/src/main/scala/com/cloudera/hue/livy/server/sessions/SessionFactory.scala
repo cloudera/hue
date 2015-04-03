@@ -58,11 +58,16 @@ class ProcessSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
 class YarnSessionFactory(livyConf: LivyConf) extends SessionFactory {
 
+  implicit def executor: ExecutionContext = ExecutionContext.global
+
   val client = new Client(livyConf)
 
   override def createSession(kind: Kind, proxyUser: Option[String] = None): Future[Session] = {
     val id = UUID.randomUUID().toString
-    YarnSession.create(client, id, kind, proxyUser)
+
+    Future {
+      YarnSession.create(livyConf, client, id, kind, proxyUser)
+    }
   }
 
   override def close(): Unit = {

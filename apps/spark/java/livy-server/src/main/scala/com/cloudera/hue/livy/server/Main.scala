@@ -85,7 +85,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
     val batchFactory = sessionFactoryKind match {
       case "thread" | "process" => new BatchProcessFactory()
-      case "yarn" => new BatchYarnFactory()
+      case "yarn" => new BatchYarnFactory(livyConf)
       case _ =>
         println(f"Unknown batch factory: $sessionFactoryKind")
         sys.exit(1)
