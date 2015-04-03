@@ -26,6 +26,10 @@ def col_type(col):
     return "array <%s>" % col["array_type"]
   elif col["column_type"] == "map":
     return "map <%s, %s>" % (col["map_key_type"], col["map_value_type"])
+  elif col["column_type"] == "char":
+    return "char(%d)" % col["char_length"]
+  elif col["column_type"] == "varchar":
+    return "varchar(%d)" % col["varchar_length"]
   return col["column_type"]
 %>\
 <%def name="column_list(columns)">\

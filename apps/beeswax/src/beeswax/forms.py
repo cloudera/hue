@@ -17,6 +17,8 @@
 
 from django import forms
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.forms import NumberInput
 
 from desktop.lib.django_forms import simple_formset_factory, DependencyAwareForm
 from desktop.lib.django_forms import ChoiceOrOtherField, MultiForm, SubmitButton
@@ -332,9 +334,11 @@ class CreateByImportDelimForm(forms.Form):
 # Note, struct is not currently supported.  (Because it's recursive, for example.)
 HIVE_TYPES = \
     ( "string", "tinyint", "smallint", "int", "bigint", "boolean",
-      "float", "double", "array", "map", "timestamp")
+      "float", "double", "array", "map", "timestamp", "date",
+      "char", "varchar")
 HIVE_PRIMITIVE_TYPES = \
-    ("string", "tinyint", "smallint", "int", "bigint", "boolean", "float", "double", "timestamp")
+    ("string", "tinyint", "smallint", "int", "bigint", "boolean",
+      "float", "double", "timestamp", "date", "char", "varchar")
 
 class PartitionTypeForm(forms.Form):
   column_name = common.HiveIdentifierField(required=True)
@@ -348,6 +352,8 @@ class ColumnTypeForm(DependencyAwareForm):
     ("column_type", "array", "array_type"),
     ("column_type", "map", "map_key_type"),
     ("column_type", "map", "map_value_type"),
+    ("column_type", "char", "char_length"),
+    ("column_type", "varchar", "varchar_length")
   ]
   column_name = common.HiveIdentifierField(label=_t('Column Name'), required=True)
   column_type = forms.ChoiceField(label=_t('Column Type'), required=True,
@@ -360,6 +366,15 @@ class ColumnTypeForm(DependencyAwareForm):
   map_value_type = forms.ChoiceField(required=False,
                                      choices=common.to_choices(HIVE_PRIMITIVE_TYPES),
                                      help_text=_t("Specify if column_type is map."))
+  char_length = forms.IntegerField(required=True, initial=1,
+                                   widget=NumberInput(attrs={'min': 1, 'max': 255}),
+                                   validators=[MinValueValidator(1), MaxValueValidator(255)],
+                                   help_text=_t("Specify if column_type is char"))
+  varchar_length = forms.IntegerField(required=True, initial=1,
+                                      widget=NumberInput(attrs={'min': 1, 'max': 65355}),
+                                      validators=[MinValueValidator(1), MaxValueValidator(65355)],
+                                      help_text=_t("Specify if column_is varchar"))
+
 
 ColumnTypeFormSet = simple_formset_factory(ColumnTypeForm, initial=[{}], add_label=_t("Add a column"))
 # Default to no partitions
