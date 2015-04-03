@@ -32,6 +32,6 @@ case class Error() extends State {
   override def toString = "error"
 }
 
-case class Dead() extends State {
-  override def toString = "dead"
+case class Success() extends State {
+  override def toString = "success"
 }

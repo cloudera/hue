@@ -69,7 +69,7 @@ private class BatchProcess(val id: Int,
       destroyProcess()
     }
 
-    Dead()
+    Success()
   }
 
   override def lines: IndexedSeq[String] = process.stdoutLines
