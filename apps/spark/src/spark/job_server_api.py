@@ -79,7 +79,7 @@ class JobServerApi(object):
       self._thread_local.user = user.username
     else:
       self._thread_local.user = user
-  
+
   def get_status(self):
     return self._root.get('sessions')
 
@@ -102,3 +102,15 @@ class JobServerApi(object):
 
   def cancel(self, session):
     return self._root.post('sessions/%s/interrupt' % session)
+
+  def get_batches(self):
+    return self._root.get('batches')
+
+  def submit_batch(self, properties):
+    return self._root.post('batches', data=json.dumps(properties), contenttype=_JSON_CONTENT_TYPE)
+
+  def get_batch(self, uuid):
+    return self._root.get('batches/%s' % uuid)
+
+  def delete_batch(self, uuid):
+    return self._root.delete('batches/%s' % uuid)
