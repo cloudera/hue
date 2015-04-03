@@ -565,8 +565,9 @@ var Notebook = function (vm, notebook) {
   self.newSnippet = function () {
 	var properties = {}
 
-    if (self.selectedSnippet() == 'jar') {
+    if (self.selectedSnippet() == 'jar' || self.selectedSnippet() == 'py') {
       properties['app_jar'] = '';
+      properties['py_file'] = '';
       properties['class'] = '';
       properties['arguments'] = [];
     }

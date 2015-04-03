@@ -83,7 +83,7 @@ class Notebook():
 def get_api(user, snippet):
   if snippet['type'] in ('hive', 'impala', 'spark-sql'):
     return HS2Api(user)
-  elif snippet['type'] == 'jar':
+  elif snippet['type'] in ('jar', 'py'):
     return SparkBatchApi(user)
   elif snippet['type'] == 'text':
     return TextApi(user)
@@ -424,10 +424,10 @@ class SparkBatchApi():
     api = get_spark_api(self.user)
 
     properties = {
-        'file': snippet['properties']['app_jar'],
-        'className': snippet['properties']['class'],
-        'args': snippet['properties']['arguments'],
-        # pyFiles
+        'file': snippet['properties'].get('app_jar'),
+        'className': snippet['properties'].get('class'),
+        'args': [arg['value'] for arg in snippet['properties'].get('arguments')],
+        'pyFiles': snippet['properties'].get('py_file'),
         # files
         # driverMemory
         # driverCores
