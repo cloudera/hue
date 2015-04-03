@@ -17,6 +17,7 @@
 #
 # Utilities for dealing with file modes.
 
+import bz2
 import os
 import posixpath
 import tarfile
@@ -171,11 +172,59 @@ class TarballArchive(Archive):
       new_file.close()
 
 
+class BZ2Archive(Archive):
+  """
+  Acts on a bzip2 file in memory or in a temporary location.
+  Python's BZ2File class inherently buffers all reading.
+  """
+
+  def __init__(self, file):
+    # bzip2 only compresses single files and there is no direct method in the bz2 library to get the file name
+    self.name = file.name[:-6] if file.name.lower().endswith('.bzip2') else file.name[:-4]
+
+    if isinstance(file, basestring):
+      self.path = file
+    else:
+      f = tempfile.NamedTemporaryFile(delete=False)
+      f.write(file.read())
+      self.path = f.name
+      f.close()
+    self.fh = bz2.BZ2File(self.path)
+
+  def extract(self):
+    """
+    Extracts a bz2 file.
+    Opens the file for writing and meta pipe the contents bz2file to the new file.
+    """
+    # Store all extracted files in a temporary directory.
+    if ARCHIVE_UPLOAD_TEMPDIR.get():
+      directory = tempfile.mkdtemp(dir=ARCHIVE_UPLOAD_TEMPDIR.get())
+    else:
+      directory = tempfile.mkdtemp()
+
+    files = [self.name]
+    self._create_files(directory, files)
+
+    return directory
+
+  def _create_files(self, basepath, files=[]):
+    """
+    Files are written to a temporary directory immediately after being decompressed.
+    """
+    for f in files:
+      new_path = os.path.join(basepath, f)
+      new_file = open(new_path, 'w')
+      new_file.write(self.fh.read())
+      new_file.close()
+
+
 def archive_factory(path, archive_type='zip'):
   if archive_type == 'zip':
     return ZipArchive(path)
   elif archive_type == 'tarball' or archive_type == 'tar.gz' or archive_type == 'tgz':
     return TarballArchive(path)
+  elif archive_type == 'bz2' or archive_type == 'bzip2':
+    return BZ2Archive(path)
 
 class IllegalPathException(PopupException):
 

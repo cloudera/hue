@@ -1245,7 +1245,13 @@ def _upload_archive(request):
                 if not temp_path:
                     raise PopupException(_('Could not extract contents of file.'))
                 # Move the file to where it belongs
-                dest = dest[:-7]
+                dest = dest[:-7] if dest.lower().endswith('.tar.gz') else dest[:-4]
+            elif dest.lower().endswith('.bz2') or dest.lower().endswith('.bzip2'):
+              temp_path = archive_factory(uploaded_file, 'bz2').extract()
+              if not temp_path:
+                  raise PopupException(_('Could not extract contents of file.'))
+                # Move the file to where it belongs
+              dest = dest[:-6] if dest.lower().endswith('.bzip2') else dest[:-4]
             else:
                 raise PopupException(_('Could not interpret archive type.'))
 
