@@ -959,19 +959,22 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   // UI
   self.response = ko.observable({});
   self.results = ko.observableArray([]);
-  self.norm_facets = ko.computed(function () {
-    return self.response().normalized_facets;
-  });
-  self.getFacetFromQuery = function (facet_id) {
-    var _facet = null;
-    if (self.norm_facets() !== undefined) {
-      $.each(self.norm_facets(), function (index, norm_facet) {
-        if (norm_facet.id == facet_id) {
-          _facet = norm_facet;
-        }
+  self.resultsHash = '';
+  self.norm_facets = {};
+  self.getFacetFromQuery = function (facet_id) {	
+    if (! (facet_id in self.norm_facets)) {
+      self.norm_facets[facet_id] = ko.mapping.fromJS({
+          id: facet_id,
+          has_data: false,
+          hash: '',
+          counts: [],
+          label: '',
+          field: '',
+          extraSeries: []
       });
     }
-    return _facet;
+
+    return self.norm_facets[facet_id];
   };
   self.toggledGridlayoutResultChevron = ko.observable(false);
   self.enableGridlayoutResultChevron = function() {
@@ -1084,8 +1087,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self.search = function (callback) {
-    self.isRetrievingResults(true);
-
     $(".jHueNotify").hide();
     logGA('search');
 
@@ -1133,64 +1134,83 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         if (typeof callback != undefined && callback != null){
           callback(data);
         }
+
+        $.each(data.normalized_facets, function (index, new_facet) {
+          var facet = self.getFacetFromQuery(new_facet.id);
+          var _hash = ko.mapping.toJSON(new_facet.counts);
+
+          if (! facet.has_data() || facet.hash() != _hash) {
+            facet.counts(new_facet.counts);
+            facet.label(new_facet.label);
+            facet.field(new_facet.field);
+            facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
+            facet.hash(_hash);
+            facet.has_data(true);
+          }
+        });
+
+        // Delete norm_facets that were deleted
+
         self.response(data);
-        self.results.removeAll();
+
         if (data.error) {
           $(document).trigger("error", data.error);
         }
         else {
-          if (self.collection.template.isGridLayout()) {
-            // Table view
-            var _docs = [];
-            var leafletmap = {};
-            $.each(data.response.docs, function (index, item) {
-              var row = [];
-              var _showDetails = item.showDetails;
-              var _details = item.details;
-              delete item["showDetails"];
-              delete item["details"];
-              var fields = self.collection.template.fieldsSelected();
-              // Display selected fields or whole json document
-              if (fields.length != 0) {
-                $.each(self.collection.template.fieldsSelected(), function (index, field) {
-                  row.push(item[field]);
-                });
-              } else {
-                row.push(ko.mapping.toJSON(item));
-              }
-              if (self.collection.template.leafletmapOn()) {
-                leafletmap = {
-                  'latitude': item[self.collection.template.leafletmap.latitudeField()],
-                  'longitude': item[self.collection.template.leafletmap.longitudeField()],
-                  'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
+          var _resultsHash = ko.mapping.toJSON(data.response.docs);
+
+          if (self._resultsHash != _resultsHash) {
+            if (self.collection.template.isGridLayout()) {
+              // Table view
+              var _docs = [];
+              var leafletmap = {};
+              $.each(data.response.docs, function (index, item) {
+                var row = [];
+                var _showDetails = item.showDetails;
+                var _details = item.details;
+                delete item["showDetails"];
+                delete item["details"];
+                var fields = self.collection.template.fieldsSelected();
+                // Display selected fields or whole json document
+                if (fields.length != 0) {
+                  $.each(self.collection.template.fieldsSelected(), function (index, field) {
+                    row.push(item[field]);
+                  });
+                } else {
+                  row.push(ko.mapping.toJSON(item));
                 }
-              }
-              var doc = {
-                'id': item[self.collection.idField()],
-                'row': row,
-                'showDetails': ko.observable(_showDetails),
-                'details': ko.observableArray(_details),
-                'leafletmap': leafletmap
-              };
-              _docs.push(doc);
-            });
-            self.results(_docs);
+                if (self.collection.template.leafletmapOn()) {
+                  leafletmap = {
+                    'latitude': item[self.collection.template.leafletmap.latitudeField()],
+                    'longitude': item[self.collection.template.leafletmap.longitudeField()],
+                    'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
+                  }
+                }
+                var doc = {
+                  'id': item[self.collection.idField()],
+                  'row': row,
+                  'showDetails': ko.observable(_showDetails),
+                  'details': ko.observableArray(_details),
+                  'leafletmap': leafletmap
+                };
+                _docs.push(doc);
+              });
+              self.results(_docs);
+            }
+            else {
+              // Template view
+              var _docs = [];
+              var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
+              $.each(data.response.docs, function (index, item) {
+                // fix the fields that contain dots in the name
+                addTemplateFunctions(item);
+                _docs.push(Mustache.render(_mustacheTmpl, item));
+              });
+              self.results(_docs);
+            }
           }
-          else {
-            // Template view
-            var _docs = [];
-            var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
-            $.each(data.response.docs, function (index, item) {
-              // fix the fields that contain dots in the name
-              addTemplateFunctions(item);
-              _docs.push(Mustache.render(_mustacheTmpl, item));
-            });
-            self.results(_docs);
-          }
-          self.isRetrievingResults(false);
+          self._resultsHash = _resultsHash;
         }
-
-
       })
       ].concat(multiQs)
     )
@@ -1211,6 +1231,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       $(document).trigger("error", xhr.responseText);
     })
     .always(function () {
+      self.isRetrievingResults(false);
       $('.btn-loading').button('reset');
     });
   };
