@@ -289,8 +289,11 @@ class Collection(models.Model):
       if 'end' in properties and not 'initial_end' in properties:
         properties['initial_end'] = properties['end']
 
-      if facet['widgetType'] == 'histogram-widget' and 'timelineChartType' not in properties:
-        properties['timelineChartType'] = 'bar'
+      if facet['widgetType'] == 'histogram-widget':
+        if 'timelineChartType' not in properties:
+          properties['timelineChartType'] = 'bar'
+        if 'extraSeries' not in properties:
+          properties['extraSeries'] = []
 
       if facet['widgetType'] == 'map-widget' and facet['type'] == 'field':
         facet['type'] = 'pivot'
@@ -542,7 +545,7 @@ def augment_solr_response(response, collection, query):
             'query': name,
             'type': category,
             'label': name,
-            'count': value,
+            'counts': value,
           }
           normalized_facets.append(facet)
       elif category == 'pivot':
@@ -557,10 +560,10 @@ def augment_solr_response(response, collection, query):
           count = []
         facet = {
           'id': facet['id'],
-          'query': name,
+          'field': name,
           'type': category,
           'label': name,
-          'count': count,
+          'counts': count,
         }
         normalized_facets.append(facet)
 

@@ -237,7 +237,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="hit-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       ${ _('Label') }: <input type="text" data-bind="value: label" />
@@ -376,10 +376,10 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
+      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
@@ -423,7 +423,7 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="foreach: $parent.counts">
           <div class="trigger-exclude">
               <!-- ko if: ! selected -->
-                <a class="pointer" data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
+                <a class="pointer" data-bind="text: is_single_unit_gap ? from : from + ' - ' + to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></a>
                 <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
               <!-- /ko -->
@@ -767,25 +767,27 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
       </span>
     </div>
 
-    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts.length > 0">
+    <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
       <span data-bind="with: $root.collection.getFacetById($parent.id())">
         <span class="facet-field-label">${ _('Chart Type') }</span>
-         <select class="input-small" data-bind="options: $root.timelineChartTypes,
+        <select class="input-small" data-bind="options: $root.timelineChartTypes,
                        optionsText: 'label',
                        optionsValue: 'value',
-                       value: properties.timelineChartType"></select>&nbsp;
+                       value: properties.timelineChartType">
+        </select>&nbsp;
         <span class="facet-field-label">${ _('Interval') }</span>
-         <select class="input-small" data-bind="options: $root.intervalOptions,
+        <select class="input-small" data-bind="options: $root.intervalOptions,
                        optionsText: 'label',
                        optionsValue: 'value',
-                       value: properties.gap"></select>&nbsp;
+                       value: properties.gap">
+        </select>&nbsp;
       </span>
       <span class="facet-field-label">${ _('Zoom') }</span>
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
@@ -793,13 +795,13 @@ ${ dashboard.layout_skeleton() }
       <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
     </div>
     <!-- ko if: $root.collection.getFacetById($parent.id()) -->
-    <div data-bind="timelineChart: {datum: {counts: counts, extraSeries: (typeof extraSeries != 'undefined' ? extraSeries : []), widget_id: $parent.id(), label: label}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label, transformer: timelineChartDataTransformer,
+    <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
       type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
       fqs: $root.query.fqs,
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
-      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
-      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) }}" />
+      onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -812,7 +814,7 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
@@ -828,7 +830,7 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
     </div>
 
-    <div data-bind="barChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, stacked: false, field: field, label: label,
+    <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: false, field: field, label: label(),
       fqs: $root.query.fqs,
       transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
       onStateChange: function(state){ },
@@ -843,8 +845,8 @@ ${ dashboard.layout_skeleton() }
           viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
         }
       },
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: id}) },
-      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
+      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
   </div>
   <!-- /ko -->
@@ -857,7 +859,7 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
 
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
@@ -869,11 +871,11 @@ ${ dashboard.layout_skeleton() }
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
     </div>
 
-    <div data-bind="lineChart: {datum: {counts: counts, widget_id: $parent.id(), label: label}, field: field, label: label,
+    <div data-bind="lineChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, field: field, label: label(),
       transformer: lineChartDataTransformer,
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ viewModel.getWidgetById(id).isLoading(false) } }"
+      onComplete: function(){ viewModel.getWidgetById(parent.id()).isLoading(false) } }"
     />
   </div>
   <!-- /ko -->
@@ -881,7 +883,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="pie-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
@@ -890,26 +892,26 @@ ${ dashboard.layout_skeleton() }
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
       <!-- ko if: type() == 'range' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: rangePieChartDataTransformer,
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: rangeUpPieChartDataTransformer,
         rangeUp: true,
         maxWidth: 250,
         onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id).isLoading(false)} }" />
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <!-- /ko -->
       <!-- ko if: type().indexOf('range') == -1 -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts, widget_id: $parent.id}, field: field, fqs: $root.query.fqs,
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
         maxWidth: 250,
-        onClick: function(d){viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id})},
-        onComplete: function(){viewModel.getWidgetById($parent.id).isLoading(false)}}" />
+        onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <!-- /ko -->
     </div>
   </div>
@@ -922,10 +924,10 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="tree-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div class="responsive-facet-toggle-section" data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())">
-      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
+      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
 
@@ -967,7 +969,7 @@ ${ dashboard.layout_skeleton() }
       <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'tree' -->
-        <div data-bind="partitionChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label},
+        <div data-bind="partitionChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()},
           fqs: $root.query.fqs,
           tooltip: '${ _('Click to zoom, double click to select') }',
           transformer: partitionChartDataTransformer,
@@ -975,7 +977,7 @@ ${ dashboard.layout_skeleton() }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
+          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
       <!-- /ko -->
 
@@ -991,10 +993,10 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="heatmap-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div class="floating-facet-toggle-section" data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())">
-      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
+      <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
       </span>
     </div>
 
@@ -1036,7 +1038,7 @@ ${ dashboard.layout_skeleton() }
       <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'stack' -->
-        <div data-bind="barChart: {datum: {counts: $parent.count, widget_id: id(), label: $parent.label}, stacked: true,
+        <div data-bind="barChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()}, stacked: true,
           isPivot: true,
           fqs: $root.query.fqs,
           transformer: pivotChartDataTransformer,
@@ -1044,7 +1046,7 @@ ${ dashboard.layout_skeleton() }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) } }"
+          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
       <!-- /ko -->
     </div>
@@ -1067,7 +1069,7 @@ ${ dashboard.layout_skeleton() }
         <a href="javascript:void(0)" class="pull-right" data-bind="click: function() { chartsUpdatingState(); $root.query.removeFilter($data); $root.search(); }">
           <i class="fa fa-times"></i>
         </a>
-        <span data-bind="text: $data.field()"></span>
+        <span data-bind="text: $data.field"></span>
         &nbsp;
       </div>
       <div class="content">
@@ -1134,11 +1136,11 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="map-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()) -->
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <div class="floating-facet-toggle-section">
-        <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id).isLoading(false); } }">
+        <span data-bind="template: { name: 'facet-toggle', afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); } }">
         </span>
       </div>
       <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
@@ -1189,14 +1191,14 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="mapChart: {data: {counts: $parent.count, scope: $root.collection.getFacetById($parent.id).properties.scope()},
+      <div data-bind="mapChart: {data: {counts: $parent.counts(), scope: $root.collection.getFacetById($parent.id()).properties.scope()},
         transformer: mapChartDataTransformer,
         maxWidth: 750,
         isScale: true,
         onClick: function(d) {
           $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
         },
-        onComplete: function(){ var widget = viewModel.getWidgetById($parent.id); if (widget != null) {widget.isLoading(false)};} }" />
+        onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
     </div>
   </div>
   <!-- /ko -->
@@ -1224,7 +1226,7 @@ ${ dashboard.layout_skeleton() }
 
     <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
-      onComplete: function(){ var widget = viewModel.getWidgetById(id); if (widget != null) {widget.isLoading(false)};} }">
+      onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
   </div>
 
