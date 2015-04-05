@@ -205,11 +205,11 @@ def is_finished(response):
   return 'error' in status or status.get('isSuccess') or status.get('isFailure')
 
 
-def fetch_query_result_data(client, status_response, n=0):
+def fetch_query_result_data(client, status_response, n=0, server_name='beeswax'):
   # Take a wait_for_query_to_finish() response in input
   status = json.loads(status_response.content)
 
-  response = client.get("/beeswax/results/%(id)s/%(n)s?format=json" % {'id': status.get('id'), 'n': n})
+  response = client.get("/%(server_name)s/results/%(id)s/%(n)s?format=json" % {'server_name': server_name, 'id': status.get('id'), 'n': n})
   content = json.loads(response.content)
 
   return content

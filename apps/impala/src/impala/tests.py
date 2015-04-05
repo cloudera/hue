@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 import re
 import sys
@@ -159,7 +160,7 @@ class TestImpalaIntegration:
 
     # Check that we multiple fetches get all the result set
     while len(results) < 5:
-      content = fetch_query_result_data(self.client, response, n=len(results)) # We get less than 5 results most of the time, so increase offset
+      content = fetch_query_result_data(self.client, response, n=len(results), server_name='impala') # We get less than 5 results most of the time, so increase offset
       results += content['results']
 
     assert_equal([1, 2, 3, 4, 5], [col[0] for col in results])
@@ -168,10 +169,19 @@ class TestImpalaIntegration:
     results_start_over = []
 
     while len(results_start_over) < 5:
-      content = fetch_query_result_data(self.client, response, n=len(results_start_over))
+      content = fetch_query_result_data(self.client, response, n=len(results_start_over), server_name='impala')
       results_start_over += content['results']
 
     assert_equal(results_start_over, results)
+
+  def test_explain(self):
+    QUERY = """
+      SELECT * FROM tweets ORDER BY row_num;
+    """
+    response = _make_query(self.client, QUERY, database=self.DATABASE, local=False, server_name='impala', submission_type='Explain')
+    json_response = json.loads(response.content)
+    assert_true('MERGING-EXCHANGE' in json_response['explanation'], json_response)
+    assert_true('SCAN HDFS' in json_response['explanation'], json_response)
 
 
 # Could be refactored with SavedQuery.create_empty()

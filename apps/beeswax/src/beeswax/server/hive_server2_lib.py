@@ -601,8 +601,8 @@ class HiveServerClient:
     return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
 
 
-  def execute_query_statement(self, statement, max_rows=1000, configuration={}):
-    (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration)
+  def execute_query_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_FIRST):
+    (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation)
     return HiveServerDataTable(results, schema, operation_handle, self.query_server)
 
 
@@ -625,7 +625,7 @@ class HiveServerClient:
     return self.execute_async_statement(statement=query_statement, confOverlay=configuration)
 
 
-  def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_FIRST):
+  def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_NEXT):
     if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       configuration['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
@@ -711,7 +711,7 @@ class HiveServerClient:
   def explain(self, query):
     query_statement = query.get_query_statement(0)
     configuration = self._get_query_configuration(query)
-    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration)
+    return self.execute_query_statement(statement='EXPLAIN %s' % query_statement, configuration=configuration, orientation=TFetchOrientation.FETCH_NEXT)
 
 
   def get_log(self, operation_handle):
