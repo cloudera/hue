@@ -81,7 +81,7 @@ do
       MEM=`echo ${LINE} | awk '{print $3}' | awk -F, '{print $1}'`
       MEM=`printf "%.f" $MEM` # convert from scientific to decimal
       MEM_MB=`expr ${MEM} / ${MB_BYTES}`
-      debug "${DATE} - ROLENAME: ${ROLENAME} - MEM: ${MEM} - MEM_MB: ${MEM_MB}" 
+      debug "${DATE} - ROLENAME: ${ROLENAME} - MEM: ${MEM} - MEM_MB: ${MEM_MB}"
       if [ ${MEM_MB} -gt ${KILL_ME} ]
       then
          echo "${DATE} - Restart the Hue Process: Too much memory: ${MEM_MB} : ROLENAME: ${ROLENAME}" >> ${LOG_FILE}
