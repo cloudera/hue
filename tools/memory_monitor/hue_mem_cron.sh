@@ -30,8 +30,8 @@ ROTATE_SIZE=10 #MB before rotating, size in MB before rotating log to .1, we onl
 
 main()
 {
-#  Command to get memory usage.  This will handle multiple Hue instances per server, so 
-#  this command grabs the highest memory Hue process at the time of running and 
+#  Command to get memory usage.  This will handle multiple Hue instances per server, so
+#  this command grabs the highest memory Hue process at the time of running and
 #  kills it.  Then the next run it'll get the next process.
 PS_COMMAND=`ps aux | grep [r]uncherrypyserver | awk '{print $6" "$2" "$3" "$12}'`
 MEM=`echo ${PS_COMMAND} | awk '{print $1}'`

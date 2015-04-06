@@ -16,8 +16,8 @@
 # limitations under the License.
 
 #NOTE: This script requires curl, strace and lsof to be installed. It
-# must be run on the Hue server. Set HUE_USER to a user in Hue with 
-# Superuser access to get thread dumps.  Set HUE_PASSWORD to HUE_USER's 
+# must be run on the Hue server. Set HUE_USER to a user in Hue with
+# Superuser access to get thread dumps.  Set HUE_PASSWORD to HUE_USER's
 # password.
 
 # Location for output files
@@ -121,7 +121,7 @@ do
 done
 
 mkdir ${OUTPUT_DIR}/logs
-cp -pr ${HUE_LOG_DIR}/* ${OUTPUT_DIR}/logs 
+cp -pr ${HUE_LOG_DIR}/* ${OUTPUT_DIR}/logs
 
 echo "Collecting done, please zip ${OUTPUT_DIR} and upload to the ticket"
 }
