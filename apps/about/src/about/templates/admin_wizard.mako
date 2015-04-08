@@ -134,7 +134,7 @@ ${ header.menubar() }
           % endif
           % if 'jobsub' in app_names:
               <li>
-                <a href="javascript:void(0)" data-loading-text="${ _('Installing...') }"
+                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                    data-sample-url="${ url('oozie:install_examples') }">
                   <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
                 </a>
