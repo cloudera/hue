@@ -118,17 +118,29 @@ ko.bindingHandlers.pieChart = {
   },
   update: function (element, valueAccessor) {
     var _options = valueAccessor();
+    var _data = _options.transformer(_options.data);
     var _chart = $(element).data("chart");
     if (_chart) {
       var _d3 = d3.select($(element).find("svg")[0]);
-      var _data = _options.transformer(_options.data);
       _d3.datum(_data)
             .transition().duration(150)
             .each("end", _options.onComplete != null ? _options.onComplete : void(0))
             .call(_chart);
-      _chart.update();
+
+      if (_options.fqs) {
+          $.each(_options.fqs(), function (cnt, item) {
+            if (item.id() == _options.data.widget_id && item.field() == _options.field()) {
+              _chart.selectSlices($.map(item.filter(), function (it) {
+                return it.value();
+              }));
+            }
+          });
+        }
+      chartsNormalState();
     }
-    chartsNormalState();
+    else if (_data.length > 0) {
+      ko.bindingHandlers.pieChart.init(element, valueAccessor);
+    }
   }
 };
 
@@ -138,10 +150,10 @@ ko.bindingHandlers.barChart = {
   },
   update: function (element, valueAccessor) {
     var _options = valueAccessor();
+    var _datum = _options.transformer(_options.datum);
     var _chart = $(element).data("chart");
     if (_chart) {
       var _d3 = d3.select($(element).find("svg")[0]);
-      var _datum = _options.transformer(_options.datum);
       _d3.datum(_datum)
         .transition().duration(150)
         .each("end", function () {
@@ -149,8 +161,32 @@ ko.bindingHandlers.barChart = {
             _options.onComplete();
           }
         }).call(_chart);
+      if (_chart.selectBars) {
+        var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
+        $.each(_options.fqs(), function (cnt, item) {
+          if (item.id() == _options.datum.widget_id) {
+
+            if (item.field() == _field) {
+              _chart.selectBars($.map(item.filter(), function (it) {
+                return it.value();
+              }));
+            }
+            if (item.field().indexOf(":") > -1) {
+              _chart.selectBars({
+                field: item.field(),
+                selected: $.map(item.filter(), function (it) {
+                  return it.value();
+                })
+              });
+            }
+          }
+        });
+      }
+      chartsNormalState();
     }
-    chartsNormalState();
+    else if (_datum.length > 0) {
+      ko.bindingHandlers.barChart.init(element, valueAccessor);
+    }
   }
 };
 
@@ -182,8 +218,27 @@ ko.bindingHandlers.timelineChart = {
 };
 
 ko.bindingHandlers.lineChart = {
-  update: function (element, valueAccessor) {
+  init: function (element, valueAccessor) {
     lineChartBuilder(element, valueAccessor(), false);
+  },
+  update: function (element, valueAccessor) {
+    var _options = valueAccessor();
+    var _datum = _options.transformer(_options.datum);
+    var _chart = $(element).data("chart");
+    if (_chart) {
+      var _d3 = d3.select($(element).find("svg")[0]);
+      _d3.datum(_datum)
+        .transition().duration(150)
+        .each("end", function () {
+          if (_options.onComplete != null) {
+            _options.onComplete();
+          }
+        }).call(_chart);
+      chartsNormalState();
+    }
+    else if (_datum.length > 0) {
+      ko.bindingHandlers.lineChart.init(element, valueAccessor);
+    }
   }
 };
 
