@@ -37,7 +37,7 @@ nv.models.growingMultiBar = function() {
     , hideable = false
     , barColor = null // adding the ability to set the color for each rather than the whole group
     , disabled // used in conjunction with barColor to communicate from multiBarHorizontalChart what series are disabled
-    , delay = 1200
+    , delay = 0
     , xDomain
     , yDomain
     , xRange
