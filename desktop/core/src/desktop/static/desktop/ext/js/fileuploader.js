@@ -1042,6 +1042,12 @@ qq.extend(qq.UploadHandlerForm.prototype, {
         dest.value = params.dest;
         form.appendChild(dest);
 
+        var csrfmiddlewaretoken = document.createElement('input');
+        csrfmiddlewaretoken.type = 'hidden';
+        csrfmiddlewaretoken.name = 'csrfmiddlewaretoken';
+        csrfmiddlewaretoken.value = $.cookie('csrftoken');
+        form.appendChild(csrfmiddlewaretoken);
+
         var self = this;
         this._attachLoadEvent(iframe, function(){
             self.log('iframe loaded');
@@ -1095,10 +1101,10 @@ qq.extend(qq.UploadHandlerForm.prototype, {
             response;
 
         this.log("converting iframe's innerHTML to JSON");
-        this.log("innerHTML = " + doc.body.innerHTML);
+        this.log("innerHTML = " + $(doc.body.innerHTML).text());
 
         try {
-            response = eval("(" + doc.body.innerHTML + ")");
+            response = eval("(" + $(doc.body.innerHTML).text() + ")");
         } catch(err){
             response = {};
         }
@@ -1182,7 +1188,7 @@ qq.extend(qq.UploadHandlerXhr.prototype, {
         // HUE-815: [fb] Upload button does not work in Firefox 3.6
         // see https://github.com/valums/ajax-upload/issues/91
         //if (!(file instanceof File)){
-        if (!(file instanceof File || file.__proto__.constructor.name == 'File' || file instanceof Object) ){
+        if (!(file instanceof File || (file.__proto__ && file.__proto__.constructor.name == 'File') || file instanceof Object) ){
             throw new Error('Passed obj in not a File (in qq.UploadHandlerXhr)');
         }
 
