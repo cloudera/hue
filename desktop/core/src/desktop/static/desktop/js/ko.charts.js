@@ -165,7 +165,6 @@ ko.bindingHandlers.barChart = {
         var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
         $.each(_options.fqs(), function (cnt, item) {
           if (item.id() == _options.datum.widget_id) {
-
             if (item.field() == _field) {
               _chart.selectBars($.map(item.filter(), function (it) {
                 return it.value();
