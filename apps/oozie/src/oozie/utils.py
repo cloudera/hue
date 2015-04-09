@@ -118,6 +118,9 @@ def smart_path(path, mapping, is_coordinator=False):
 
   return path
 
+def contains_symlink(path, mapping):
+  vars = find_variables(path)
+  return any([var in mapping and '#' in mapping[var] for var in vars]) or '#' in path
 
 def utc_datetime_format(utc_time):
   return utc_time.strftime(UTC_TIME_FORMAT)

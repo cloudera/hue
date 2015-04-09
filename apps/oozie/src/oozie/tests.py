@@ -48,7 +48,7 @@ from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.models2 import _get_hiveserver2_url
-from oozie.utils import workflow_to_dict, model_to_dict, smart_path
+from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
@@ -3622,6 +3622,16 @@ class TestUtils(OozieMockBase):
     assert_equal('${output}', smart_path('${output}', {'output': '${path}'}))
     assert_equal('${output_dir}', smart_path('${output_dir}', {'output': '/path/out', 'output_dir': 'hdfs://nn/path/out'}))
 
+  def test_contains_symlink(self):
+    assert_false(contains_symlink('out', {'output': '/path/out'}))
+    assert_true(contains_symlink('out#out', {'output': '/path/out'}))
+    assert_false(contains_symlink('${output}', {'output': '/path/out'}))
+    assert_true(contains_symlink('hdfs://nn${output}', {'output': '/path/out#out'}))
+    assert_false(contains_symlink('hdfs://nn${output}', {'output': '/path/out'}))
+    assert_true(contains_symlink('hdfs://nn#${output}', {'output': 'output'}))
+    assert_false(contains_symlink('${output}', {}))
+    assert_false(contains_symlink('${output}', {'output': '${path}'}))
+    assert_true(contains_symlink('${output_dir}', {'output': '/path/out', 'output_dir': 'hdfs://nn/path/out#out'}))
 
 # Utils
 WORKFLOW_DICT = {
