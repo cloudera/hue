@@ -17,7 +17,7 @@
 
 <%!
   import posixpath
-  from oozie.utils import smart_path
+  from oozie.utils import smart_path, contains_symlink
 %>
 
 
@@ -59,7 +59,11 @@
 <%def name="distributed_cache(files, archives)">
     % for f in files:
         % if f:
+          % if contains_symlink(f['value'], mapping):
+            <file>${ f['value'] }</file>
+          % else:
             <file>${ filelink(f['value']) }</file>
+          % endif
         % endif
     % endfor
     % for a in archives:
