@@ -77,11 +77,15 @@ class Application(object):
     if not hasattr(self, 'acls'):
       setattr(self, 'acls', {})
 
+    # YARN returns a N/A url if it's not set.
+    if not hasattr(self, 'trackingUrl') or self.trackingUrl == 'http://N/A':
+      self.trackingUrl = None
+
   def kill(self):
     return self.api.kill(self.id)
 
   def filter_tasks(self, *args, **kwargs):
-    pass
+    return []
 
 
 class SparkJob(Application):
@@ -153,7 +157,7 @@ class Job(object):
     setattr(self, 'desiredMaps', None)
     setattr(self, 'finishedReduces', self.reducesCompleted)
     setattr(self, 'desiredReduces', None)
-    setattr(self, 'applicationType', None)
+    setattr(self, 'applicationType', 'MR2')
 
   def kill(self):
     return self.api.kill(self.id)
