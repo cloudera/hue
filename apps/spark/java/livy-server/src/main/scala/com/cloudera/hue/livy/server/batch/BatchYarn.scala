@@ -55,6 +55,7 @@ object BatchYarn {
     createBatchRequest.archives.foreach(builder.archive)
 
     builder.redirectOutput(Redirect.PIPE)
+    builder.redirectErrorStream(true)
 
     builder
   }
