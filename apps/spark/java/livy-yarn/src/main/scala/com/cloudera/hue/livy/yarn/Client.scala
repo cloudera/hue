@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.yarn
 import java.io.{InputStream, BufferedReader, InputStreamReader}
 
 import com.cloudera.hue.livy.yarn.Client._
-import com.cloudera.hue.livy.{LivyConf, Logging}
+import com.cloudera.hue.livy.{Utils, LineBufferedProcess, LivyConf, Logging}
 import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus, YarnApplicationState}
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
@@ -54,14 +54,11 @@ class Client(livyConf: LivyConf) extends Logging {
   yarnClient.init(yarnConf)
   yarnClient.start()
 
-  def getJobFromProcess(process: Process): Job = {
-    val lines = Source.fromInputStream(process.getInputStream).getLines()
-    val applicationId = parseApplicationId(lines).getOrElse(throw new FailedToSubmitApplication)
-
-    // Application has been submitted, so we don't need to keep the process around anymore.
-    process.destroy()
-
-    new Job(yarnClient, ConverterUtils.toApplicationId(applicationId))
+  def getJobFromProcess(process: LineBufferedProcess): Job = {
+    parseApplicationId(process.inputIterator) match {
+      case Some(appId) => new Job(yarnClient, ConverterUtils.toApplicationId(appId))
+      case None => throw new FailedToSubmitApplication
+    }
   }
 
   def close() = {
@@ -72,9 +69,6 @@ class Client(livyConf: LivyConf) extends Logging {
   private def parseApplicationId(lines: Iterator[String]): Option[String] = {
     if (lines.hasNext) {
       val line = lines.next()
-
-      info(f"shell output: $line")
-
       line match {
         case regex(applicationId) => Some(applicationId)
         case _ => parseApplicationId(lines)

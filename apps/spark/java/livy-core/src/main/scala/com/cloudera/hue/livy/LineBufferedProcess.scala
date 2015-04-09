@@ -18,43 +18,27 @@
 
 package com.cloudera.hue.livy
 
-import scala.io.Source
-
 class LineBufferedProcess(process: Process) extends Logging {
 
-  private[this] var _stdoutLines: IndexedSeq[String] = IndexedSeq()
-  private[this] var _stderrLines: IndexedSeq[String] = IndexedSeq()
+  private[this] val _inputStream = new LineBufferedStream(process.getInputStream)
+  private[this] val _errorStream = new LineBufferedStream(process.getErrorStream)
 
-  private val stdoutThread = new Thread {
-    override def run() = {
-      val lines = Source.fromInputStream(process.getInputStream).getLines()
-      for (line <- lines) {
-        trace("stdout: ", line)
-        _stdoutLines +:= line
-      }
-    }
-  }
-  stdoutThread.setDaemon(true)
-  stdoutThread.start()
+  def inputLines: IndexedSeq[String] = _inputStream.lines
+  def errorLines: IndexedSeq[String] = _errorStream.lines
 
-  private val stderrThread = new Thread {
-    override def run() = {
-      val lines = Source.fromInputStream(process.getErrorStream).getLines()
-      for (line <- lines) {
-        trace("stderr: ", line)
-        _stderrLines +:= line
-      }
-    }
-  }
-  stderrThread.setDaemon(true)
-  stderrThread.start()
-
-  def stdoutLines: IndexedSeq[String] = _stdoutLines
-
-  def stderrLines: IndexedSeq[String] = _stderrLines
+  def inputIterator: Iterator[String] = _inputStream.iterator
+  def errorIterator: Iterator[String] = _errorStream.iterator
 
   def destroy(): Unit = {
     process.destroy()
+  }
+
+  /** Returns if the process is still actively running. */
+  def isAlive: Boolean = try {
+    exitValue()
+    false
+  } catch {
+    case _: IllegalStateException => true
   }
 
   def exitValue(): Int = {
@@ -62,9 +46,7 @@ class LineBufferedProcess(process: Process) extends Logging {
   }
 
   def waitFor(): Int = {
-    val output = process.waitFor()
-    stdoutThread.join()
-    stderrThread.join()
-    output
+    process.waitFor()
   }
 }
+
