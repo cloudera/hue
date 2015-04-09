@@ -27,7 +27,7 @@ ko.HUE_CHARTS = {
 };
 
 ko.bindingHandlers.pieChart = {
-  update: function (element, valueAccessor) {
+  init: function (element, valueAccessor) {
     var _options = valueAccessor();
     var _data = _options.transformer(_options.data);
     $(element).css("marginLeft", "auto");
@@ -78,6 +78,8 @@ ko.bindingHandlers.pieChart = {
           });
         }
 
+        $(element).data("chart", _chart);
+
         var _resizeTimeout = -1;
         nv.utils.windowResize(function () {
           window.clearTimeout(_resizeTimeout);
@@ -113,25 +115,68 @@ ko.bindingHandlers.pieChart = {
             });
       });
     }
+  },
+  update: function (element, valueAccessor) {
+    var _options = valueAccessor();
+    var _chart = $(element).data("chart");
+    if (_chart) {
+      var _d3 = d3.select($(element).find("svg")[0]);
+      var _data = _options.transformer(_options.data);
+      _d3.datum(_data)
+            .transition().duration(150)
+            .each("end", _options.onComplete != null ? _options.onComplete : void(0))
+            .call(_chart);
+      _chart.update();
+    }
+    chartsNormalState();
   }
 };
 
 ko.bindingHandlers.barChart = {
-  update: function (element, valueAccessor) {
+  init: function (element, valueAccessor) {
     barChartBuilder(element, valueAccessor(), false);
+  },
+  update: function (element, valueAccessor) {
+    var _options = valueAccessor();
+    var _chart = $(element).data("chart");
+    if (_chart) {
+      var _d3 = d3.select($(element).find("svg")[0]);
+      var _datum = _options.transformer(_options.datum);
+      _d3.datum(_datum)
+        .transition().duration(150)
+        .each("end", function () {
+          if (_options.onComplete != null) {
+            _options.onComplete();
+          }
+        }).call(_chart);
+    }
+    chartsNormalState();
   }
 };
 
 ko.bindingHandlers.timelineChart = {
-  update: function (element, valueAccessor) {
-    if ($(element).find("svg").length > 0) {
-      $(element).find("svg").remove();
-    }
+  init: function (element, valueAccessor) {
     if (valueAccessor().type && valueAccessor().type() == "line"){
       lineChartBuilder(element, valueAccessor(), true);
+      $(element).data("type", "line");
     }
     else {
       barChartBuilder(element, valueAccessor(), true);
+      $(element).data("type", "bar");
+    }
+  },
+  update: function (element, valueAccessor) {
+    if (valueAccessor().type && valueAccessor().type() != $(element).data("type")){
+      if ($(element).find("svg").length > 0) {
+        $(element).find("svg").remove();
+      }
+      if (valueAccessor().type() == "line"){
+        lineChartBuilder(element, valueAccessor(), true);
+      }
+      else {
+        barChartBuilder(element, valueAccessor(), true);
+      }
+      $(element).data("type", valueAccessor().type());
     }
   }
 };
@@ -570,7 +615,6 @@ var insertLinebreaks = function (d, ref) {
   }
 };
 
-
 function lineChartBuilder(element, options, isTimeline) {
   var _datum = options.transformer(options.datum);
   $(element).height(300);
@@ -585,6 +629,8 @@ function lineChartBuilder(element, options, isTimeline) {
   if ($(element).is(":visible")) {
     nv.addGraph(function () {
       var _chart = nv.models.lineWithBrushChart();
+      $(element).data("chart", _chart);
+      _chart.transitionDuration(0);
       if (_datum.length > 0 && _datum[0].values.length > 10) {
         _chart.enableSelection();
       }
@@ -668,7 +714,6 @@ function barChartBuilder(element, options, isTimeline) {
   if ($(element).is(":visible")) {
     nv.addGraph(function () {
       var _chart;
-
       if (isTimeline) {
         if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
           $(element).find("svg").empty();
@@ -751,6 +796,8 @@ function barChartBuilder(element, options, isTimeline) {
 
       _chart.yAxis
           .tickFormat(d3.format(",0f"));
+
+      $(element).data("chart", _chart);
 
       var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
       _d3.datum(_datum)
@@ -988,6 +1035,10 @@ ko.bindingHandlers.partitionChart = {
 
 function chartsUpdatingState() {
   $(document).find("svg").css("opacity", "0.5");
+}
+
+function chartsNormalState() {
+  $(document).find("svg").css("opacity", "1");
 }
 
 

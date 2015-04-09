@@ -63,6 +63,7 @@ nv.models.growingPieChart = function() {
 
   function chart(selection) {
     selection.each(function(data) {
+
       var container = d3.select(this),
           that = this;
 
