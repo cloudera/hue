@@ -21,6 +21,7 @@ import time
 import logging
 import string
 import urlparse
+
 from urllib import quote_plus
 from lxml import html
 
@@ -40,10 +41,12 @@ from desktop.views import register_status_bar_view
 from hadoop import cluster
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 from hadoop.yarn.clients import get_log_client
+import hadoop.yarn.resource_manager_api as resource_manager_api
 
 from jobbrowser import conf
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs
+from jobbrowser.yarn_models import Application
 
 import urllib2
 
@@ -61,8 +64,12 @@ def check_job_permission(view_func):
     try:
       job = get_api(request.user, request.jt).get_job(jobid=jobid)
     except ApplicationNotRunning, e:
-      # reverse() seems broken, using request.path but beware, it discards GET and POST info
-      return job_not_assigned(request, jobid, request.path)
+      if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
+        rm_api = resource_manager_api.get_resource_manager()
+        job = Application(e.job, rm_api)
+      else:
+        # reverse() seems broken, using request.path but beware, it discards GET and POST info
+        return job_not_assigned(request, jobid, request.path)
     except JobExpired, e:
       raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
     except Exception, e:
@@ -158,7 +165,7 @@ def massage_job_for_json(job, request):
     'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or '',
-    'canKill': job.status.lower() in ('running', 'pending') and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job)),
+    'canKill': job.status.lower() in ('running', 'pending', 'accepted') and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job)),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
   }
   return job
