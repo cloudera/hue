@@ -415,7 +415,7 @@ class TestMapReduce2NoHadoop:
   def test_jobs(self):
     response = self.c.get('/jobbrowser/?format=json')
     response_content = json.loads(response.content)
-    assert_equal(len(response_content['jobs']), 2)
+    assert_equal(len(response_content['jobs']), 4)
 
     response = self.c.get('/jobbrowser/jobs/?format=json&text=W=MapReduce-copy2')
     response_content = json.loads(response.content)
@@ -436,6 +436,14 @@ class TestMapReduce2NoHadoop:
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009')
     assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
+
+  def test_spark_job(self):
+    response = self.c.get('/jobbrowser/jobs/application_1428442704693_0006')
+    assert_equal(response.context['job'].jobId, 'application_1428442704693_0006')
+
+  def test_yarn_job(self):
+    response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007')
+    assert_equal(response.context['job'].jobId, 'application_1428442704693_0007')
 
   def job_not_assigned(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url')
@@ -469,23 +477,102 @@ class TestMapReduce2NoHadoop:
 class MockResourceManagerApi:
   APPS = {
     'application_1356251510842_0054': {
-        u'finishedTime': 1356961070119, u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
-        u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain', u'clusterId': 1356251510842,
-        u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054', u'amHostHttpAddress': u'runreal:8042',
-        u'startedTime': 1356961057225, u'queue': u'default', u'state': u'RUNNING', u'elapsedTime': 12894, u'finalStatus': u'UNDEFINED', u'diagnostics': u'',
-        u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0054', u'user': u'test',
+        u'finishedTime': 1356961070119,
+        u'name': u'oozie:launcher:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
+        u'amContainerLogs': u'http://localhost:8042/node/containerlogs/container_1356251510842_0054_01_000001/romain',
+        u'clusterId': 1356251510842,
+        u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0054/jobhistory/job/job_1356251510842_0054',
+        u'amHostHttpAddress': u'localhost:8042',
+        u'startedTime': 1356961057225,
+        u'queue': u'default',
+        u'state': u'RUNNING',
+        u'elapsedTime': 12894,
+        u'finalStatus': u'UNDEFINED',
+        u'diagnostics': u'',
+        u'progress': 100.0,
+        u'trackingUI': u'History',
+        u'id': u'application_1356251510842_0054',
+        u'user': u'test',
         # For when the job is KILLED
-        'startTime': 1356961057226, 'finishTime': 1356961057226,
-        'applicationType': 'MAPREDUCE'
+        u'startTime': 1356961057226,
+        u'finishTime': 1356961057226,
+        u'applicationType': 'MAPREDUCE'
     },
     'application_1356251510842_0009': {
-        u'finishedTime': 1356467118570, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
-        u'amContainerLogs': u'http://runreal:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain', u'clusterId': 1356251510842,
-        u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009', u'amHostHttpAddress': u'runreal:8042',
-        u'startedTime': 1356467081121, u'queue': u'default', u'state': u'FINISHED', u'elapsedTime': 37449, u'finalStatus': u'SUCCEEDED', u'diagnostics': u'',
-        u'progress': 100.0, u'trackingUI': u'History', u'id': u'application_1356251510842_0009', u'user': u'test',
-        'applicationType': 'MAPREDUCE'
-    }
+        u'finishedTime': 1356467118570,
+        u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy2:A=Sleep:ID=0000002-121223003201296-oozie-oozi-W',
+        u'amContainerLogs': u'http://localhost:8042/node/containerlogs/container_1356251510842_0009_01_000001/romain',
+        u'clusterId': 1356251510842,
+        u'trackingUrl': u'http://localhost:8088/proxy/application_1356251510842_0009/jobhistory/job/job_1356251510842_0009',
+        u'amHostHttpAddress': u'localhost:8042',
+        u'startedTime': 1356467081121,
+        u'queue': u'default',
+        u'state': u'FINISHED',
+        u'elapsedTime': 37449,
+        u'finalStatus': u'SUCCEEDED',
+        u'diagnostics': u'',
+        u'progress': 100.0,
+        u'trackingUI': u'History',
+        u'id': u'application_1356251510842_0009',
+        u'user': u'test',
+        u'applicationType': 'MAPREDUCE'
+    },
+    'application_1428442704693_0006': {
+        u'allocatedMB': 4096,
+        u'allocatedVCores': 3,
+        u'amContainerLogs': u'http://localhost:8042/node/containerlogs/container_1428442704693_0006_01_000001/erickt',
+        u'amHostHttpAddress': u'localhost:8042',
+        u'applicationTags': u'',
+        u'applicationType': u'SPARK',
+        u'clusterId': 1428442704693,
+        u'diagnostics': u'',
+        u'elapsedTime': 529040,
+        u'finalStatus': u'UNDEFINED',
+        u'finishedTime': 0,
+        u'id': u'application_1428442704693_0006',
+        u'memorySeconds': 2138468,
+        u'name': u'Spark shell',
+        u'numAMContainerPreempted': 0,
+        u'numNonAMContainerPreempted': 0,
+        u'preemptedResourceMB': 0,
+        u'preemptedResourceVCores': 0,
+        u'progress': 10.0,
+        u'queue': u'root.erickt',
+        u'runningContainers': 3,
+        u'startedTime': 1428443335161,
+        u'state': u'RUNNING',
+        u'trackingUI': u'ApplicationMaster',
+        u'trackingUrl': u'http://localhost:8088/proxy/application_1428442704693_0006/',
+        u'user': u'test',
+        u'vcoreSeconds': 1567,
+    },
+    'application_1428442704693_0007': {
+        u'allocatedMB': -1,
+        u'allocatedVCores': -1,
+        u'applicationTags': u'',
+        u'applicationType': u'YARN',
+        u'clusterId': 1428442704693,
+        u'diagnostics': u'',
+        u'elapsedTime': 4056,
+        u'finalStatus': u'SUCCEEDED',
+        u'finishedTime': 1428454945371,
+        u'id': u'application_1428442704693_0007',
+        u'memorySeconds': 2290,
+        u'name': u'UnmanagedAM',
+        u'numAMContainerPreempted': 0,
+        u'numNonAMContainerPreempted': 0,
+        u'preemptedResourceMB': 0,
+        u'preemptedResourceVCores': 0,
+        u'progress': 100.0,
+        u'queue': u'root.erickt',
+        u'runningContainers': -1,
+        u'startedTime': 1428454941315,
+        u'state': u'FINISHED',
+        u'trackingUI': u'History',
+        u'trackingUrl': u'http://N/A',
+        u'user': u'test',
+        u'vcoreSeconds': 1,
+    },
   }
 
   def __init__(self, oozie_url=None): pass
@@ -498,6 +585,10 @@ class MockResourceManagerApi:
          MockResourceManagerApi.APPS['application_1356251510842_0054'],
          # FINISHED
          MockResourceManagerApi.APPS['application_1356251510842_0009'],
+         # SPARK
+         MockResourceManagerApi.APPS['application_1428442704693_0006'],
+         # YARN
+         MockResourceManagerApi.APPS['application_1428442704693_0007'],
         ]
       }
     }

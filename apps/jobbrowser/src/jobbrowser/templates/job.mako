@@ -108,6 +108,8 @@ ${ comps.menubar() }
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
           <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="nav-header">${_('Type')}</li>
+          <li class="white hellipsify">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -202,7 +204,8 @@ ${ comps.menubar() }
   </div>
 </div>
 
-% else:
+% elif job.applicationType == 'MR2':
+
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
@@ -210,6 +213,8 @@ ${ comps.menubar() }
         <ul class="nav nav-list">
           <li class="nav-header">${_('Job ID')}</li>
           <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="nav-header">${_('Type')}</li>
+          <li class="white hellipsify">${job.applicationType or 'MR2'}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -249,7 +254,11 @@ ${ comps.menubar() }
     </div>
     <div class="span10">
       <div class="card card-small">
-	<h1 class="card-heading simple">${_('Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
+          % if hasattr(job, 'name'):
+            <h1 class="card-heading simple">${_(job.name)}</h1>
+          % else:
+	          <h1 class="card-heading simple">${_('Job: %(jobId)s') % dict(jobId=job.jobId_short)}</h1>
+          % endif
           <div class="card-body">
             <p>
 
@@ -411,6 +420,108 @@ ${ comps.menubar() }
     </div>
   </div>
 </div>
+
+% else:
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav" style="padding-top: 0">
+        <ul class="nav nav-list">
+          <li class="nav-header">${_('App ID')}</li>
+          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="nav-header">${_('Type')}</li>
+          <li class="white hellipsify">${job.applicationType}</li>
+          <li class="nav-header">${_('User')}</li>
+          <li class="white">${job.user}</li>
+          <li class="nav-header">${_('Status')}</li>
+          <li class="white" id="jobStatus">&nbsp;</li>
+
+          % if job.trackingUrl:
+            <li class="nav-header">${_('Tracking URL')}</li>
+            <li><a href="${job.trackingUrl }" target="_blank"><i class="fa fa-tasks"></i> ${_('Tracking URL')}</a></li>
+          % endif
+
+          <li class="nav-header">${_('Progress')}</li>
+          <li class="white">${job.progress}%</li>
+          <li class="nav-header">${_('Duration')}</li>
+          <li class="white">${job.durationFormatted}</li>
+          <li class="nav-header killJob">${_('Actions')}</li>
+          <li id="killJobContainer" class="white killJob"></li>
+        </ul>
+      </div>
+    </div>
+    <div class="span10">
+      <div class="card card-small">
+        <h1 class="card-heading simple">${_(job.name)}</h1>
+        <div class="card-body">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="metadata">
+              <table class="table table-condensed">
+                <thead>
+                  <th>${_('Name')}</th>
+                  <th>${_('Value')}</th>
+                </thead>
+                <tbody>
+
+                  % if job.trackingUrl:
+
+                  <tr>
+                    <td>${_('Jobs')}</td>
+                    <td><a href="${job.trackingUrl}">${job.trackingUrl}</a></td>
+                  </tr>
+
+                  % endif
+
+                  % if hasattr(job, 'amHostHttpAddress'):
+
+                  <tr>
+                    <td>${_('Host')}</td>
+                    <td><a href="http://${job.amHostHttpAddress}">http://${job.amHostHttpAddress}</a></td>
+                  </tr>
+
+                  %endif
+
+                  <tr>
+                    <td>${_('Queue Name')}</td>
+                    <td>${job.queueName}</td>
+                  </tr>
+                  <tr>
+                    <td>${_('Started')}</td>
+                    <td>${job.startTimeFormatted}</td>
+                  </tr>
+                  <tr>
+                    <td>${_('Finished')}</td>
+                    <td>${job.finishTimeFormatted}</td>
+                  </tr>
+                  <tr>
+                    <td>${_('Pre-empted Resource VCores')}</td>
+                    <td>${job.preemptedResourceVCores}</td>
+                  </tr>
+                  <tr>
+                    <td>${_('VCore seconds')}</td>
+                    <td>${job.vcoreSeconds}</td>
+                  </tr>
+                  <tr>
+                    <td>${_('Memory seconds')}</td>
+                    <td>${job.memorySeconds}</td>
+                  </tr>
+                  <tr>
+                    <td>${_('Diagnostics')}</td>
+                    <td>${job.diagnostics}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 % endif
 
 
