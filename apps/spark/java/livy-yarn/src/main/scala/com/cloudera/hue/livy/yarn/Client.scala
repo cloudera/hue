@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.yarn
 
-import java.io.{BufferedReader, InputStreamReader}
+import java.io.{InputStream, BufferedReader, InputStreamReader}
 
 import com.cloudera.hue.livy.yarn.Client._
 import com.cloudera.hue.livy.{LivyConf, Logging}
@@ -29,6 +29,7 @@ import org.apache.hadoop.yarn.util.ConverterUtils
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext
+import scala.io.Source
 
 object Client {
   private lazy val regex = """Application report for (\w+)""".r.unanchored
@@ -54,12 +55,10 @@ class Client(livyConf: LivyConf) extends Logging {
   yarnClient.start()
 
   def getJobFromProcess(process: Process): Job = {
-    val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
-
-    val applicationId = parseApplicationId(stdout).getOrElse(throw new FailedToSubmitApplication)
+    val lines = Source.fromInputStream(process.getInputStream).getLines()
+    val applicationId = parseApplicationId(lines).getOrElse(throw new FailedToSubmitApplication)
 
     // Application has been submitted, so we don't need to keep the process around anymore.
-    stdout.close()
     process.destroy()
 
     new Job(yarnClient, ConverterUtils.toApplicationId(applicationId))
@@ -70,17 +69,18 @@ class Client(livyConf: LivyConf) extends Logging {
   }
 
   @tailrec
-  private def parseApplicationId(stdout: BufferedReader): Option[String] = {
-    Option(stdout.readLine()) match {
-      case Some(line) =>
-        info(f"shell output: $line")
+  private def parseApplicationId(lines: Iterator[String]): Option[String] = {
+    if (lines.hasNext) {
+      val line = lines.next()
 
-        line match {
-          case regex(applicationId) => Some(applicationId)
-          case _ => parseApplicationId(stdout)
-        }
-      case None =>
-        None
+      info(f"shell output: $line")
+
+      line match {
+        case regex(applicationId) => Some(applicationId)
+        case _ => parseApplicationId(lines)
+      }
+    } else {
+      None
     }
   }
 }
