@@ -20,7 +20,7 @@ package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
 
-import com.cloudera.hue.livy.LivyConf
+import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.yarn._
 
@@ -35,8 +35,11 @@ object BatchYarn {
   def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): Batch = {
     val builder = sparkBuilder(createBatchRequest)
 
-    val process = builder.start(createBatchRequest.file, createBatchRequest.args)
-    new BatchYarn(id, Future { client.getJobFromProcess(process) })
+    val process = new LineBufferedProcess(builder.start(createBatchRequest.file, createBatchRequest.args))
+    val job = Future {
+      client.getJobFromProcess(process)
+    }
+    new BatchYarn(id, process, job)
   }
 
   private def sparkBuilder(createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
@@ -61,7 +64,7 @@ object BatchYarn {
   }
 }
 
-private class BatchYarn(val id: Int, jobFuture: Future[Job]) extends Batch {
+private class BatchYarn(val id: Int, process: LineBufferedProcess, jobFuture: Future[Job]) extends Batch {
 
   implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
@@ -107,5 +110,5 @@ private class BatchYarn(val id: Int, jobFuture: Future[Job]) extends Batch {
     }
   }
 
-  override def lines: IndexedSeq[String] = IndexedSeq()
+  override def lines: IndexedSeq[String] = process.inputLines
 }

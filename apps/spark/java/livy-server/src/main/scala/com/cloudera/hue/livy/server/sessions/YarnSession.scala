@@ -22,7 +22,7 @@ import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.{Utils, LivyConf}
+import com.cloudera.hue.livy.{LineBufferedProcess, Utils, LivyConf}
 import com.cloudera.hue.livy.sessions.{Kind, Error}
 import com.cloudera.hue.livy.yarn.{Client, Job}
 
@@ -52,7 +52,13 @@ object YarnSession {
     val process = builder.start(livyJar(livyConf), List(kind.toString))
 
     val job = Future {
-      client.getJobFromProcess(process)
+      val proc = new LineBufferedProcess(process)
+      val job = client.getJobFromProcess(proc)
+
+      // We don't need the process anymore.
+      proc.destroy()
+
+      job
     }
 
     new YarnSession(id, kind, proxyUser, job)

@@ -72,7 +72,7 @@ private class BatchProcess(val id: Int,
     Success()
   }
 
-  override def lines: IndexedSeq[String] = process.stdoutLines
+  override def lines: IndexedSeq[String] = process.inputLines
 
   override def stop(): Future[Unit] = {
     Future {
