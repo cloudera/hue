@@ -18,10 +18,13 @@
 
 package com.cloudera.hue.livy.server.sessions
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
+
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.sessions.Kind
 
-import scala.collection.concurrent.TrieMap
+import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 
@@ -37,13 +40,14 @@ class SessionManager(factory: SessionFactory) extends Logging {
 
   private implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  private val sessions = new TrieMap[String, Session]()
+  private[this] val _idCounter = new AtomicInteger()
+  private[this] val sessions = new ConcurrentHashMap[Int, Session]()
 
   private val garbageCollector = new GarbageCollector(this)
   garbageCollector.start()
 
-  def get(id: String): Option[Session] = {
-    sessions.get(id)
+  def get(sessionId: Int): Option[Session] = {
+    Option(sessions.get(sessionId))
   }
 
   def getSessions = {
@@ -55,7 +59,8 @@ class SessionManager(factory: SessionFactory) extends Logging {
   }
 
   def createSession(kind: Kind, proxyUser: Option[String] = None): Future[Session] = {
-    val session = factory.createSession(kind, proxyUser = proxyUser)
+    val id = _idCounter.getAndIncrement
+    val session = factory.createSession(id, kind, proxyUser = proxyUser)
 
     session.map({ case(session: Session) =>
       info("created session %s" format session.id)
@@ -69,8 +74,8 @@ class SessionManager(factory: SessionFactory) extends Logging {
     garbageCollector.shutdown()
   }
 
-  def delete(sessionId: String): Future[Unit] = {
-    sessions.get(sessionId) match {
+  def delete(sessionId: Int): Future[Unit] = {
+    get(sessionId) match {
       case Some(session) => delete(session)
       case None => Future.successful(Unit)
     }

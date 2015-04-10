@@ -32,7 +32,7 @@ object ThreadSession {
   val LIVY_HOME = System.getenv("LIVY_HOME")
   val LIVY_REPL = LIVY_HOME + "/bin/livy-repl"
 
-  def create(id: String, kind: Kind): Session = {
+  def create(id: Int, kind: Kind): Session = {
     val session = kind match {
       case Spark() =>
         SparkSession.create()
@@ -43,7 +43,7 @@ object ThreadSession {
   }
 }
 
-private class ThreadSession(val id: String,
+private class ThreadSession(val id: Int,
                             val kind: Kind,
                             session: com.cloudera.hue.livy.repl.Session) extends Session {
 

@@ -57,7 +57,9 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   val getSession = get("/:sessionId") {
-    sessionManager.get(params("sessionId")) match {
+    val sessionId = params("sessionId").toInt
+
+    sessionManager.get(sessionId) match {
       case Some(session) => session
       case None => NotFound("Session not found")
     }
@@ -79,9 +81,10 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   post("/:sessionId/callback") {
+    val sessionId = params("sessionId").toInt
     val callback = parsedBody.extract[CallbackRequest]
 
-    sessionManager.get(params("sessionId")) match {
+    sessionManager.get(sessionId) match {
       case Some(session) =>
         if (session.state == Starting()) {
           session.url = new URL(callback.url)
@@ -94,7 +97,8 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   post("/:sessionId/stop") {
-    sessionManager.get(params("sessionId")) match {
+    val sessionId = params("sessionId").toInt
+    sessionManager.get(sessionId) match {
       case Some(session) =>
         val future = session.stop()
 
@@ -104,7 +108,8 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   post("/:sessionId/interrupt") {
-    sessionManager.get(params("sessionId")) match {
+    val sessionId = params("sessionId").toInt
+    sessionManager.get(sessionId) match {
       case Some(session) =>
         val future = for {
           _ <- session.interrupt()
@@ -117,15 +122,19 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   delete("/:sessionId") {
+    val sessionId = params("sessionId").toInt
+
     val future = for {
-      _ <- sessionManager.delete(params("sessionId"))
+      _ <- sessionManager.delete(sessionId)
     } yield Accepted()
 
     new AsyncResult() { val is = for { _ <- future } yield NoContent() }
   }
 
   get("/:sessionId/statements") {
-    sessionManager.get(params("sessionId")) match {
+    val sessionId = params("sessionId").toInt
+
+    sessionManager.get(sessionId) match {
       case Some(session: Session) =>
         Map(
           "statements" -> session.statements()
@@ -135,9 +144,12 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   val getStatement = get("/:sessionId/statements/:statementId") {
-    sessionManager.get(params("sessionId")) match {
+    val sessionId = params("sessionId").toInt
+    val statementId = params("statementId").toInt
+
+    sessionManager.get(sessionId) match {
       case Some(session) =>
-        session.statement(params("statementId").toInt) match {
+        session.statement(statementId) match {
           case Some(statement) => statement
           case None => NotFound("Statement not found")
         }
@@ -146,9 +158,10 @@ class SessionServlet(sessionManager: SessionManager)
   }
 
   post("/:sessionId/statements") {
+    val sessionId = params("sessionId").toInt
     val req = parsedBody.extract[ExecuteRequest]
 
-    sessionManager.get(params("sessionId")) match {
+    sessionManager.get(sessionId) match {
       case Some(session) =>
         val statement = session.executeStatement(req)
 

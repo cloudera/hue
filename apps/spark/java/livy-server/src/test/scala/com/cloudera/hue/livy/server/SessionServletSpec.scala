@@ -35,7 +35,7 @@ import scala.concurrent.Future
 
 class SessionServletSpec extends ScalatraSuite with FunSpecLike {
 
-  class MockSession extends Session {
+  class MockSession(val id: Int) extends Session {
     var _state: State = Idle()
 
     var _idCounter = new AtomicInteger()
@@ -44,8 +44,6 @@ class SessionServletSpec extends ScalatraSuite with FunSpecLike {
     override def kind: Kind = Spark()
 
     override def state = _state
-
-    override def id: String = ???
 
     override def stop(): Future[Unit] = ???
 
@@ -79,8 +77,8 @@ class SessionServletSpec extends ScalatraSuite with FunSpecLike {
   }
 
   class MockSessionFactory() extends SessionFactory {
-    override def createSession(kind: Kind, proxyUser: Option[String]): Future[Session] = {
-      Future.successful(new MockSession())
+    override def createSession(id: Int, kind: Kind, proxyUser: Option[String]): Future[Session] = {
+      Future.successful(new MockSession(id))
     }
   }
 

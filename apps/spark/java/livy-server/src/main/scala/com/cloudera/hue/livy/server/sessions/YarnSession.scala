@@ -35,7 +35,7 @@ object YarnSession {
   private val CONF_LIVY_JAR = "livy.yarn.jar"
   private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  def create(livyConf: LivyConf, client: Client, id: String, kind: Kind, proxyUser: Option[String] = None): Session = {
+  def create(livyConf: LivyConf, client: Client, id: Int, kind: Kind, proxyUser: Option[String] = None): Session = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 
@@ -73,7 +73,7 @@ object YarnSession {
   }
 }
 
-private class YarnSession(id: String,
+private class YarnSession(id: Int,
                           kind: Kind,
                           proxyUser: Option[String],
                           job: Future[Job]) extends WebSession(id, kind, proxyUser) {

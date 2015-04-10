@@ -28,5 +28,5 @@ class ProcessSessionSpec extends BaseSessionSpec with FunSpecLike with Matchers 
   val livyConf = new LivyConf()
   livyConf.set("livy.repl.driverClassPath", sys.props("java.class.path"))
 
-  def createSession() = ProcessSession.create(livyConf, "0", Spark())
+  def createSession() = ProcessSession.create(livyConf, 0, Spark())
 }
