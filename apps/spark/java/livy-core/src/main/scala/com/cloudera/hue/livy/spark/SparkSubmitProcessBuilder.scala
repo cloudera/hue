@@ -244,7 +244,7 @@ class SparkSubmitProcessBuilder extends Logging {
     args_ += file
     args_ ++= args
 
-    info("Running %s", args.mkString(" "))
+    info(s"Running ${args.mkString(" ")}")
 
     val pb = new ProcessBuilder(args_)
     val env = pb.environment()
