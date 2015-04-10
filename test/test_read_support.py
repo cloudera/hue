@@ -125,9 +125,42 @@ class TestCompatibility(object):
                 if c in actual:
                     assert expected[i] == actual[c]
 
+    def _test_file_custom(self, parquet_file, csv_file):
+        """ Given the parquet_file and csv_file representation, converts the
+            parquet_file to json using the dump utility and then compares the
+            result to the csv_file using column agnostic ordering.
+        """
+        expected_data = []
+        with open(csv_file, 'rb') as f:
+            expected_data = list(csv.reader(f, delimiter='|'))
 
+        def _custom_datatype(in_dict, keys):
+            '''
+            return rows like the csv outputter
+
+            Could convert to a dataframe like this:
+                import pandas
+                df = pandas.DataFrame(in_dict)
+                return df
+            '''
+            columns = [in_dict[key] for key in keys]
+            rows = zip(*columns)
+            return rows
+
+        actual_data = parquet.dump(parquet_file, Options(format='custom'), out=_custom_datatype)
+
+        assert len(expected_data) == len(actual_data)
+        footer = parquet.read_footer(parquet_file)
+        cols = [s.name for s in footer.schema]
+
+        for expected, actual in zip(expected_data, actual_data):
+            assert len(expected) == len(actual)
+            for i, c in enumerate(cols):
+                if c in actual:
+                    assert expected[i] == actual[c]
 
     def test_all_files(self):
         for parquet_file, csv_file in self.files:
             yield self._test_file_csv, parquet_file, csv_file
             yield self._test_file_json, parquet_file, csv_file
+            yield self._test_file_custom, parquet_file, csv_file

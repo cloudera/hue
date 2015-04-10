@@ -372,6 +372,9 @@ def _dump(fo, options, out=sys.stdout):
                         _get_name(PageType, ph.type)))
         keys = options.col if options.col else [s.name for s in
                                                 footer.schema if s.name in res]
+        if options.format == 'custom':
+            custom_datatype = out(res, keys)
+            return custom_datatype
         if options.format == "csv" and not options.no_headers:
             println("\t".join(keys))
         for i in range(rg.num_rows):
