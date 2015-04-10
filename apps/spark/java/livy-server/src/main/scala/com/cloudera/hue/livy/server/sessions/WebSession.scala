@@ -32,7 +32,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-class WebSession(val id: String,
+class WebSession(val id: Int,
                  val kind: Kind,
                  val proxyUser: Option[String]) extends Session with Logging {
 

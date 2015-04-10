@@ -24,5 +24,5 @@ import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
 
 class ThreadSessionSpec extends BaseSessionSpec with FunSpecLike with Matchers with BeforeAndAfter {
 
-  def createSession() = ThreadSession.create("0", Spark())
+  def createSession() = ThreadSession.create(0, Spark())
 }

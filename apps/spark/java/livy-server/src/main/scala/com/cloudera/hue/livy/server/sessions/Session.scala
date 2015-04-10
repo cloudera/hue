@@ -35,7 +35,7 @@ object Session {
 }
 
 trait Session {
-  def id: String
+  def id: Int
 
   def kind: Kind
 

@@ -37,13 +37,13 @@ object ProcessSession extends Logging {
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def create(livyConf: LivyConf, id: String, kind: Kind, proxyUser: Option[String] = None): Session = {
+  def create(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String] = None): Session = {
     val process = startProcess(livyConf, id, kind, proxyUser)
     new ProcessSession(id, kind, proxyUser, process)
   }
 
   // Loop until we've started a process with a valid port.
-  private def startProcess(livyConf: LivyConf, id: String, kind: Kind, proxyUser: Option[String]): Process = {
+  private def startProcess(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String]): Process = {
 
     val builder = new SparkSubmitProcessBuilder()
 
@@ -72,7 +72,7 @@ object ProcessSession extends Logging {
   }
 }
 
-private class ProcessSession(id: String,
+private class ProcessSession(id: Int,
                              kind: Kind,
                              proxyUser: Option[String],
                              process: Process) extends WebSession(id, kind, proxyUser) {
