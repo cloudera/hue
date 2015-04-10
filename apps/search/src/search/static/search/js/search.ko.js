@@ -396,6 +396,8 @@ var Collection = function (vm, collection) {
   self.name = ko.mapping.fromJS(collection.name);
   self.label = ko.mapping.fromJS(collection.label);
   self.enabled = ko.mapping.fromJS(collection.enabled);
+  self.autorefresh = ko.mapping.fromJS(collection.autorefresh);
+  self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60);
   self.idField = ko.observable(collection.idField);
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
