@@ -225,10 +225,11 @@ ko.bindingHandlers.timelineChart = {
               _options.onComplete();
             }
           }).call(_chart);
-        _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
-          insertLinebreaks(d, this);
-        });
-        _d3.selectAll(".nv-brush").call(_chart.brush().clear());
+      _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+        insertLinebreaks(d, this);
+      });
+      _d3.selectAll(".nv-brush").call(_chart.brush().clear());
+      chartsNormalState();
     }
   }
 };
@@ -602,6 +603,7 @@ ko.bindingHandlers.mapChart = {
     $(element).parents(_parentSelector).one("resize", function () {
       ko.bindingHandlers.mapChart.render(element, valueAccessor);
     });
+    chartsNormalState();
   },
   init: function (element, valueAccessor) {
     ko.bindingHandlers.mapChart.render(element, valueAccessor);
@@ -933,7 +935,7 @@ function barChartBuilder(element, options, isTimeline) {
 }
 
 ko.bindingHandlers.partitionChart = {
-  update: function (element, valueAccessor) {
+  render: function (element, valueAccessor) {
 
     var MIN_HEIGHT_FOR_TOOLTIP = 24;
 
@@ -944,6 +946,10 @@ ko.bindingHandlers.partitionChart = {
         _h = 300,
         _x = d3.scale.linear().range([0, _w]),
         _y = d3.scale.linear().range([0, _h]);
+
+    if ($(element).find("svg").length > 0) {
+      $(element).find("svg").empty();
+    }
 
     var _tip = d3.tip()
         .attr("class", "d3-tip")
@@ -961,7 +967,9 @@ ko.bindingHandlers.partitionChart = {
         .offset([-12, 0])
 
 
-    var _svg = d3.select(element).append("svg:svg");
+    var _svg = ($(element).find("svg.tip").length > 0) ? d3.select($(element).find("svg.tip")[0]) : d3.select($(element)[0]).append("svg");
+    _svg.attr("class", "tip")
+        .style("height", "0px")
     _svg.call(_tip);
 
 
@@ -969,7 +977,6 @@ ko.bindingHandlers.partitionChart = {
     _vis.attr("class", "partitionChart")
         .style("width", _w + "px")
         .style("height", _h + "px")
-        .append("svg:svg")
         .attr("width", _w)
         .attr("height", _h);
 
@@ -1102,6 +1109,12 @@ ko.bindingHandlers.partitionChart = {
       return "translate(8," + d.dx * _ky / 2 + ")";
     }
 
+  },
+  init: function (element, valueAccessor) {
+    ko.bindingHandlers.partitionChart.render(element, valueAccessor);
+  },
+  update: function (element, valueAccessor) {
+    ko.bindingHandlers.partitionChart.render(element, valueAccessor);
   }
 };
 
