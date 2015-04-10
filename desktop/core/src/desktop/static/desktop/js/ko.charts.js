@@ -228,7 +228,6 @@ ko.bindingHandlers.timelineChart = {
         _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
           insertLinebreaks(d, this);
         });
-        //_d3.selectAll('.nv-brush').attr('display', 'none');
         _d3.selectAll(".nv-brush").call(_chart.brush().clear());
     }
   }
@@ -617,6 +616,9 @@ ko.bindingHandlers.mapChart = {
         $(element).hide();
       }
     }
+    else {
+      ko.bindingHandlers.mapChart.render(element, valueAccessor);
+    }
 
   }
 };
@@ -765,7 +767,6 @@ function lineChartBuilder(element, options, isTimeline) {
     });
   }
 }
-
 
 function barChartBuilder(element, options, isTimeline) {
   var _datum = options.transformer(options.datum);
@@ -1104,7 +1105,6 @@ ko.bindingHandlers.partitionChart = {
   }
 };
 
-
 function chartsUpdatingState() {
   $(document).find("svg").css("opacity", "0.5");
 }
@@ -1112,7 +1112,6 @@ function chartsUpdatingState() {
 function chartsNormalState() {
   $(document).find("svg").css("opacity", "1");
 }
-
 
 var tipBuilder = function () {
   var direction = d3_tip_direction,
