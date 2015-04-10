@@ -690,6 +690,12 @@ nv.models.multiBarWithBrushChart = function() {
     return chart;
   };
 
+  chart.brush = function(_) {
+    if (!arguments.length) return brush;
+    brush = _;
+    return chart;
+  };
+
 
   //============================================================
 

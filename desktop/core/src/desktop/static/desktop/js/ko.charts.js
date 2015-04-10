@@ -201,6 +201,7 @@ ko.bindingHandlers.timelineChart = {
     }
   },
   update: function (element, valueAccessor) {
+    var _options = valueAccessor();
     if (valueAccessor().type && valueAccessor().type() != $(element).data("type")){
       if ($(element).find("svg").length > 0) {
         $(element).find("svg").remove();
@@ -212,6 +213,23 @@ ko.bindingHandlers.timelineChart = {
         barChartBuilder(element, valueAccessor(), true);
       }
       $(element).data("type", valueAccessor().type());
+    }
+    var _datum = _options.transformer(_options.datum);
+    var _chart = $(element).data("chart");
+    if (_chart) {
+      var _d3 = d3.select($(element).find("svg")[0]);
+      _d3.datum(_datum)
+          .transition().duration(150)
+          .each("end", function () {
+            if (_options.onComplete != null) {
+              _options.onComplete();
+            }
+          }).call(_chart);
+        _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
+          insertLinebreaks(d, this);
+        });
+        //_d3.selectAll('.nv-brush').attr('display', 'none');
+        _d3.selectAll(".nv-brush").call(_chart.brush().clear());
     }
   }
 };
