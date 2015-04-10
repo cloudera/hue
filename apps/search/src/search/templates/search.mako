@@ -1377,6 +1377,10 @@ ${ dashboard.layout_skeleton() }
     <label class="checkbox" style="margin-top: 4px">
       ${ _('Visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled"/>
     </label>
+
+    <label class="checkbox" style="margin-top: 4px">
+      <input type="checkbox" style="margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="text" class="input-mini" style="margin-bottom: 0; margin-left: 6px" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+    </label>
   </div>
 </div>
 
@@ -1809,6 +1813,7 @@ $(document).ready(function () {
   viewModel.init(function(data){
     $(".chosen-select").trigger("chosen:updated");
   });
+
   viewModel.isRetrievingResults.subscribe(function(value){
     if (!value){
       resizeFieldsList();
@@ -1824,6 +1829,30 @@ $(document).ready(function () {
       }, 300);
     }
   });
+
+  var _refreshTimeout = null;
+
+  viewModel.collection.autorefresh.subscribe(function (value) {
+    if (value) {
+      refresh();
+    }
+    else {
+      window.clearTimeout(_refreshTimeout);
+    }
+  });
+
+  if (viewModel.collection.autorefresh()) {
+    refresh();
+  }
+
+  function refresh() {
+    _refreshTimeout = window.setTimeout(function () {
+      if (viewModel.collection.autorefresh()) {
+        viewModel.search(refresh);
+      }
+    }, ($.isNumeric(viewModel.collection.autorefreshSeconds()) ? viewModel.collection.autorefreshSeconds() * 1 : 60) * 1000)
+  }
+
 
   $("#addFacetDemiModal").on("hidden", function () {
     if (typeof selectedWidget.hasBeenSelected == "undefined"){
