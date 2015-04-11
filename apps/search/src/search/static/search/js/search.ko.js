@@ -1222,9 +1222,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     	for(var h = 0; h < histograms.length; h++){ // Do not use $.each here
           var histoFacetId = histograms[h].id();
           var histoFacet = self.getFacetFromQuery(histoFacetId);
+          var _series = [];
           for (var i = 1; i < arguments.length; i++) {
-            histoFacet.extraSeries.push(arguments[i][0]['series']);
+            _series.push(arguments[i][0]['series']);
           }
+          histoFacet.extraSeries(_series);
         };
         self.response.valueHasMutated();
       }
