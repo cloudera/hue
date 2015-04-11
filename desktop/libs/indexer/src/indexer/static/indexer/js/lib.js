@@ -45,23 +45,30 @@ var Collection = function(name) {
     self.addField('', 'text_general');
   };
 
+  self.newIdField = function() {
+    self.fields.push(new Field(self, 'id', 'string', true, true, true));
+    self.uniqueKeyField('id');
+  };
+
   self.setData = function(data_json) {
     self.data(data_json);
   };
 };
 
-var Field = function(collection, name, type, required, indexed, stored) {
+var Field = function(collection, name, type, required, indexed, stored, mockId) {
   var self = this;
 
   indexed = (indexed == undefined) ? true : !!indexed;
   required = (required == undefined) ? true : !!required;
   stored = (stored == undefined) ? true : !!stored;
+  mockId = (mockId == undefined) ? false: !!mockId;
 
   self.name = ko.observable(name).extend({'errors': null});
   self.type = ko.observable(type).extend({'errors': null});
   self.required = ko.observable(required).extend({'errors': null});
   self.indexed = ko.observable(indexed).extend({'errors': null});
   self.stored = ko.observable(stored).extend({'errors': null});
+  self.mockId = ko.observable(mockId).extend({'errors': null});
 
   // Metadata
   self.saved = ko.observable(false);

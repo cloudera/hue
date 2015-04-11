@@ -24,6 +24,8 @@ import re
 import shutil
 import StringIO
 import tempfile
+import uuid
+
 from dateutil.parser import parse
 
 from django.conf import settings
@@ -218,6 +220,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
   content = fh.read()
   headers = None
+
   while content:
     last_newline = content.rfind('\n')
     if last_newline > -1:
@@ -230,7 +233,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
           csvfile = StringIO.StringIO(content[:last_newline])
         else:
           csvfile = StringIO.StringIO('\n' + content[:last_newline])
-        content = content[last_newline+1:] + fh.read()
+        content = content[last_newline + 1:] + fh.read()
     else:
       if headers is None:
         csvfile = StringIO.StringIO(content)
@@ -285,6 +288,10 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
         for key in boolean_fields:
           if key in row:
             row[key] = str(row[key]).lower() == "true"
+
+      # Add mock id random value
+      if 'id' not in row:
+        row['id'] = str(uuid.uuid4())
 
       yield row
 
