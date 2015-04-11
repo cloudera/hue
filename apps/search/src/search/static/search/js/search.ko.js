@@ -1091,6 +1091,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.search = function (callback) {
     $(".jHueNotify").hide();
     logGA('search');
+    self.isRetrievingResults(true);
 
     // Multi queries
     var multiQs = [];
