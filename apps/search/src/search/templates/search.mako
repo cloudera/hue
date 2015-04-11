@@ -1065,7 +1065,9 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="filter-widget">
-  <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px">${_('There are currently no filters applied.')}</div>
+  <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px; min-height: 87px">
+    ${ _('There are currently no filters applied.') }
+  </div>
   <div data-bind="foreach: { data: $root.query.fqs, afterRender: function(){ isLoading(false); } }">
     <!-- ko if: $data.type() == 'field' -->
     <div class="filter-box">
