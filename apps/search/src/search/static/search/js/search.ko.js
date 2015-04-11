@@ -1006,6 +1006,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.isEditing(! self.isEditing());
   };
   self.isRetrievingResults = ko.observable(false);
+  self.hasRetrievedResults = ko.observable(true);
 
   self.showCores = ko.observable(false);
   self.showCores.subscribe(function(newValue) {
@@ -1237,6 +1238,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     })
     .always(function () {
       self.isRetrievingResults(false);
+      self.hasRetrievedResults(true);
       $('.btn-loading').button('reset');
     });
   };

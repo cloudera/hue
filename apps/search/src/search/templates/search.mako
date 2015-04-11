@@ -102,7 +102,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: ! isRetrievingResults()"/><![endif]-->        
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: ! isRetrievingResults()"/><![endif]-->
       </button>
     </div>
   </form>
@@ -506,36 +506,36 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div>
-      <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
       </div>
 
-      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
         </br>
         ${ _('Your search did not match any documents.') }
       </div>
 
-      <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length > 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0">
         <!-- ko if: $root.response().response -->
-          <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }" style="padding: 8px; color: #666"></div>
+          <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding: 8px; color: #666"></div>
         <!-- /ko -->
 
         <div id="result-main" style="overflow-x: auto">
-          <table id="result-container" data-bind="visible: ! $root.isRetrievingResults()" style="margin-top: 0; width: 100%">
+          <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
             <thead>
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
               </tr>
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
                 <th style="width: 18px">&nbsp;</th>
-                <th>${ ('Document') }</th>
+                <th>${ _('Document') }</th>
               </tr>
             </thead>
-            <tbody data-bind="foreach: { data: $root.results, as: 'doc'}" class="result-tbody">
+            <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
               <tr class="result-row">
                 <td>
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
-                    <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails() }"></i>
+                    <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
                   </a>
                 </td>
                 <!-- ko foreach: row -->
@@ -665,7 +665,7 @@ ${ dashboard.layout_skeleton() }
     <!-- /ko -->
 
     <div id="result-main" style="overflow-x: auto">
-      <div data-bind="visible: ! $root.isRetrievingResults() && $root.results().length == 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
         </br>
         ${ _('Your search did not match any documents.') }
       </div>
@@ -678,7 +678,7 @@ ${ dashboard.layout_skeleton() }
         <div class="result-row" data-bind="html: $data"></div>
       </div>
 
-      <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+      <div class="widget-spinner" data-bind="visible: ! hasRetrievedResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
       </div>
@@ -1230,13 +1230,13 @@ ${ dashboard.layout_skeleton() }
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
-    <div data-bind="leafletMapChart: {visible: ! $root.isRetrievingResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.response()},
+    <div data-bind="leafletMapChart: {visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
   </div>
 
-  <div class="widget-spinner" data-bind="visible: $root.isRetrievingResults()">
+  <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
@@ -1821,7 +1821,7 @@ $(document).ready(function () {
   });
 
   viewModel.isRetrievingResults.subscribe(function(value){
-    if (!value){
+    if (! value){
       resizeFieldsList();
     }
   });

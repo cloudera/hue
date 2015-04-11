@@ -297,7 +297,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
         <th width="5%" class="nowrap">${_('ID')}</th>
         <th width="0%" class="nowrap">${_('Required')}</th>
         <th width="0%" class="nowrap">${_('Indexed')}</th>
-        <th width="0%" class="nowrap">${_('Stored')}</th>        
+        <th width="0%" class="nowrap">${_('Stored')}</th>
         <th width="0%" class="nowrap">${_('Default Field')}</th>
         <th width="45%"></th>
       </tr>
@@ -315,7 +315,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, "29px") | n,unicode }
             <input data-bind="checked: uniqueKeyField, visible: !uniqueKeyField()" name="unique-key" type="checkbox" />
             <span class="fa" data-bind="css: {'fa-check': uniqueKeyField}">
           </p>
-        </td>        
+        </td>
         <td>
           <p class="text-center"><input data-bind="checked: required" type="checkbox"></p>
         </td>
