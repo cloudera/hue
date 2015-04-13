@@ -156,7 +156,7 @@ ${ layout.menubar(section='history') }
     </div>
 </div>
 
-<script src="/static/ext/js/moment-with-locales.min.js"></script>
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
