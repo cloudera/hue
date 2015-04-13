@@ -134,7 +134,7 @@ nv.models.growingDiscreteBar = function() {
 
 
       var bars = groups.selectAll('g.nv-bar')
-          .data(function(d) { return d.values });
+          .data(function(d) { return d.values }).classed('selected', false);
 
       bars.exit().remove();
 

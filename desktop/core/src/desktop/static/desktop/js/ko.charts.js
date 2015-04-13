@@ -229,6 +229,25 @@ ko.bindingHandlers.timelineChart = {
         insertLinebreaks(d, this);
       });
       _d3.selectAll(".nv-brush").call(_chart.brush().clear());
+      if (_chart.selectBars) {
+        $.each(_options.fqs(), function (cnt, item) {
+          if (item.id() == _options.datum.widget_id) {
+            if (item.field() == _options.field) {
+              _chart.selectBars($.map(item.filter(), function (it) {
+                return it.value();
+              }));
+            }
+            if (item.field().indexOf(":") > -1) {
+              _chart.selectBars({
+                field: item.field(),
+                selected: $.map(item.filter(), function (it) {
+                  return it.value();
+                })
+              });
+            }
+          }
+        });
+      }
       chartsNormalState();
     }
   }
