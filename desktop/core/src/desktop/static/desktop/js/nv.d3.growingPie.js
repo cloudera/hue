@@ -101,13 +101,14 @@ nv.models.growingPie = function() {
           .value(function(d) { return d.disabled ? 0 : getY(d) });
 
       var slices = wrap.select('.nv-pie').selectAll('.nv-slice')
-          .data(pie);
+          .data(pie).classed('selected', false);
 
       var pieLabels = wrap.select('.nv-pieLabels').selectAll('.nv-label')
           .data(pie);
 
       slices.exit().remove();
       pieLabels.exit().remove();
+
 
       selectSlices = function(selected) {
         $(selected).each(function(cnt, item){

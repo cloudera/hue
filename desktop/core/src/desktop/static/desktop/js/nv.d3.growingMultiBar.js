@@ -201,7 +201,7 @@ nv.models.growingMultiBar = function() {
 
 
       var bars = groups.selectAll('rect.nv-bar')
-          .data(function(d) { return (hideable && !data.length) ? hideable.values : d.values });
+          .data(function(d) { return (hideable && !data.length) ? hideable.values : d.values }).classed('selected', false);
 
       bars.exit().remove();
 
