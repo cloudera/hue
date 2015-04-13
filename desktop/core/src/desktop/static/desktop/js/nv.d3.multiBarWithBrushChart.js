@@ -160,9 +160,13 @@ nv.models.multiBarWithBrushChart = function() {
           .attr('y', margin.top + availableHeight / 2)
           .text(function(d) { return d });
 
+        container.selectAll('.nv-multiBarWithLegend').style('visibility', 'hidden');
+        container.selectAll('.nv-noData').style('visibility', 'visible');
+
         return chart;
       } else {
-        container.selectAll('.nv-noData').remove();
+        container.selectAll('.nv-multiBarWithLegend').style('visibility', 'visible');
+        container.selectAll('.nv-noData').style('visibility', 'hidden');
       }
 
       //------------------------------------------------------------

@@ -92,7 +92,16 @@ nv.models.growingPieChart = function() {
       //------------------------------------------------------------
       // Display No Data message if there's nothing to show.
 
-      if (!data || !data.length) {
+      var _allDataIsZero = true;
+      if (data){
+        data.forEach(function(obj){
+          if (obj.value > 0){
+            _allDataIsZero = false;
+          }
+        });
+      }
+
+      if (!data || !data.length || _allDataIsZero) {
         var noDataText = container.selectAll('.nv-noData').data([noData]);
 
         noDataText.enter().append('text')
@@ -105,9 +114,13 @@ nv.models.growingPieChart = function() {
           .attr('y', margin.top + availableHeight / 2)
           .text(function(d) { return d });
 
+        container.selectAll('.nv-pieChart').style('visibility', 'hidden');
+        container.selectAll('.nv-noData').style('visibility', 'visible');
+
         return chart;
       } else {
-        container.selectAll('.nv-noData').remove();
+        container.selectAll('.nv-pieChart').style('visibility', 'visible');
+        container.selectAll('.nv-noData').style('visibility', 'hidden');
       }
 
       //------------------------------------------------------------

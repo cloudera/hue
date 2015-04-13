@@ -329,9 +329,11 @@ ko.bindingHandlers.leafletMapChart = {
     }
     if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
       $(element).show();
+      $(element).siblings(".leaflet-nodata").remove();
     }
     else {
       $(element).hide();
+      $(element).before($("<div>").addClass("leaflet-nodata").css("textAlign", "center").text("No Data Available."));
     }
 
     var _map = null;
