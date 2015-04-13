@@ -283,107 +283,112 @@ ko.bindingHandlers.leafletMapChart = {
     var _options = valueAccessor();
     var _data = _options.transformer(valueAccessor().datum);
 
-    function getMapBounds(lats, lngs) {
-      lats = lats.sort();
-      lngs = lngs.sort();
-      return [
-        [lats[lats.length - 1], lngs[lngs.length - 1]], // north-east
-        [lats[0], lngs[0]] // south-west
-      ]
-    }
+    if ($(element).data("mapData") == null || $(element).data("mapData") != ko.toJSON(_data)) {
 
-    if ($(element).data("map") != null) {
-      try {
-        $(element).data("map").remove();
+      $(element).data("mapData", ko.toJSON(_data));
+
+      function getMapBounds(lats, lngs) {
+        lats = lats.sort();
+        lngs = lngs.sort();
+        return [
+          [lats[lats.length - 1], lngs[lngs.length - 1]], // north-east
+          [lats[0], lngs[0]] // south-west
+        ]
       }
-      catch (err) {
-        if (typeof console != "undefined") {
-          console.error(err);
+
+      if ($(element).data("map") != null) {
+        try {
+          $(element).data("map").remove();
+        }
+        catch (err) {
+          if (typeof console != "undefined") {
+            console.error(err);
+          }
         }
       }
-    }
 
-    var _lats = [];
-    _data.forEach(function (item) {
-      if (item.lat != null && $.isNumeric(item.lat)) {
-        _lats.push(item.lat);
-      }
-    });
-    var _lngs = [];
-    _data.forEach(function (item) {
-      if (item.lng != null && $.isNumeric(item.lng)) {
-        _lngs.push(item.lng);
-      }
-    });
+      var _lats = [];
+      _data.forEach(function (item) {
+        if (item.lat != null && $.isNumeric(item.lat)) {
+          _lats.push(item.lat);
+        }
+      });
+      var _lngs = [];
+      _data.forEach(function (item) {
+        if (item.lng != null && $.isNumeric(item.lng)) {
+          _lngs.push(item.lng);
+        }
+      });
 
-    if (_options.height != null) {
-      $(element).height(_options.height * 1);
-    }
-    else {
-      if ($(element).parents(".tab-pane").length > 0) {
-        $(element).height($(element).parents(".tab-pane").height() - 100);
+      if (_options.height != null) {
+        $(element).height(_options.height * 1);
       }
       else {
-        $(element).height(300);
-      }
-    }
-    if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
-      $(element).show();
-      $(element).siblings(".leaflet-nodata").remove();
-    }
-    else {
-      $(element).hide();
-      $(element).before($("<div>").addClass("leaflet-nodata").css("textAlign", "center").text("No Data Available."));
-    }
-
-    var _map = null;
-    if (element._map != null) {
-      element._leaflet = false;
-      element._map.remove();
-    }
-
-    if (_lats.length > 0 && _lngs.length > 0) {
-      try {
-
-        if (_map == null) {
-          _map = L.map(element);
-          L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-          }).addTo(_map);
+        if ($(element).parents(".tab-pane").length > 0) {
+          $(element).height($(element).parents(".tab-pane").height() - 100);
         }
+        else {
+          $(element).height(300);
+        }
+      }
+      if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
+        $(element).show();
+        $(element).siblings(".leaflet-nodata").remove();
+      }
+      else {
+        $(element).hide();
+        $(element).before($("<div>").addClass("leaflet-nodata").css("textAlign", "center").text("No Data Available."));
+      }
 
-        _map.fitBounds(getMapBounds(_lats, _lngs));
+      var _map = null;
+      if (element._map != null) {
+        element._leaflet = false;
+        element._map.remove();
+      }
 
-        _data.forEach(function (item) {
-          if (item.lng != null && item.lat != null) {
-            var _addMarker = false;
-            try {
-              var _latLngObj = L.latLng(item.lat, item.lng);
-              _addMarker = true;
-            }
-            catch (e) {
-              if (typeof console != "undefined") {
-                console.error(e);
-              }
-            }
-            if (_addMarker) {
-              var _marker = L.marker([item.lat, item.lng]).addTo(_map);
-              if (item.label != null) {
-                _marker.bindPopup(item.label);
-              }
-            }
+      if (_lats.length > 0 && _lngs.length > 0) {
+        try {
+
+          if (_map == null) {
+            _map = L.map(element);
+            L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
+              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(_map);
           }
-        });
-        if (_options.onComplete != null) {
-          _options.onComplete();
+
+          _map.fitBounds(getMapBounds(_lats, _lngs));
+
+          _data.forEach(function (item) {
+            if (item.lng != null && item.lat != null) {
+              var _addMarker = false;
+              try {
+                var _latLngObj = L.latLng(item.lat, item.lng);
+                _addMarker = true;
+              }
+              catch (e) {
+                if (typeof console != "undefined") {
+                  console.error(e);
+                }
+              }
+              if (_addMarker) {
+                var _marker = L.marker([item.lat, item.lng]).addTo(_map);
+                if (item.label != null) {
+                  _marker.bindPopup(item.label);
+                }
+              }
+            }
+          });
+          if (_options.onComplete != null) {
+            _options.onComplete();
+          }
+        }
+        catch (err) {
+          $.jHueNotify.error(err.message);
         }
       }
-      catch (err) {
-        $.jHueNotify.error(err.message);
-      }
-    }
-    element._map = _map;
+      element._map = _map;
 
+    }
   }
 };
 
