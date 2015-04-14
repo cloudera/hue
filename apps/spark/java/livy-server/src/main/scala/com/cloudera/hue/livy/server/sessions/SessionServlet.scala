@@ -135,11 +135,15 @@ class SessionServlet(sessionManager: SessionManager)
     val sessionId = params("sessionId").toInt
 
     sessionManager.get(sessionId) match {
-      case Some(session: Session) =>
-        Map(
-          "statements" -> session.statements()
-        )
       case None => NotFound("Session not found")
+      case Some(session: Session) =>
+        val from = params.get("from").map(_.toInt).getOrElse(0)
+        val size = params.get("size").map(_.toInt).getOrElse(session.statements.length)
+
+        Map(
+          "total_statements" -> session.statements.length,
+          "statements" -> session.statements.view(from, from + size)
+        )
     }
   }
 
@@ -147,13 +151,17 @@ class SessionServlet(sessionManager: SessionManager)
     val sessionId = params("sessionId").toInt
     val statementId = params("statementId").toInt
 
+    val from = params.get("from").map(_.toInt)
+    val size = params.get("size").map(_.toInt)
+
     sessionManager.get(sessionId) match {
-      case Some(session) =>
-        session.statement(statementId) match {
-          case Some(statement) => statement
-          case None => NotFound("Statement not found")
-        }
       case None => NotFound("Session not found")
+      case Some(session) =>
+        session.statements.lift(statementId) match {
+          case None => NotFound("Statement not found")
+          case Some(statement) =>
+            Serializers.serializeStatement(statement, from, size)
+        }
     }
   }
 
@@ -201,15 +209,32 @@ private object Serializers {
 
   private def serializeStatementState(state: Statement.State) = JString(state.toString)
 
+  def serializeSession(session: Session): JValue = {
+    ("id", session.id) ~
+      ("state", serializeSessionState(session.state)) ~
+      ("kind", serializeSessionKind(session.kind)) ~
+      ("proxyUser", session.proxyUser)
+  }
+
+  def serializeStatement(statement: Statement, from: Option[Int], size: Option[Int]): JValue = {
+    // Take a couple milliseconds to see if the statement has finished.
+    val output = try {
+      Await.result(statement.output(), Duration(100, TimeUnit.MILLISECONDS))
+    } catch {
+      case _: TimeoutException => null
+    }
+
+    ("id" -> statement.id) ~
+      ("state" -> serializeStatementState(statement.state)) ~
+      ("output" -> output)
+  }
+
   case object SessionSerializer extends CustomSerializer[Session](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
     case session: Session =>
-      ("id", session.id) ~
-      ("state", serializeSessionState(session.state)) ~
-      ("kind", serializeSessionKind(session.kind)) ~
-      ("proxyUser", session.proxyUser)
+      serializeSession(session)
   }
     )
   )
@@ -237,16 +262,7 @@ private object Serializers {
     PartialFunction.empty
   }, {
     case statement: Statement =>
-      // Take a couple milliseconds to see if the statement has finished.
-      val output = try {
-        Await.result(statement.output, Duration(100, TimeUnit.MILLISECONDS))
-      } catch {
-        case _: TimeoutException => null
-      }
-
-      ("id" -> statement.id) ~
-        ("state" -> serializeStatementState(statement.state)) ~
-        ("output" -> output)
+      serializeStatement(statement, None, None)
   }))
 
   case object StatementStateSerializer extends CustomSerializer[Statement.State](implicit formats => ( {

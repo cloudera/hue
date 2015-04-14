@@ -44,8 +44,8 @@ class WebSession(val id: Int,
   private[this] var _lastActivity = Long.MaxValue
   private[this] var _url: Option[URL] = None
 
-  private[this] var executedStatements = 0
-  private[this] var statements_ = new ArrayBuffer[Statement]
+  private[this] var _executedStatements = 0
+  private[this] var _statements = IndexedSeq[Statement]()
 
   override def url: Option[URL] = _url
 
@@ -80,22 +80,16 @@ class WebSession(val id: Int,
         }
       }
 
-      var statement = new Statement(executedStatements, content, future)
+      var statement = new Statement(_executedStatements, content, future)
 
-      executedStatements += 1
-      statements_ += statement
+      _executedStatements += 1
+      _statements = _statements :+ statement
 
       statement
     }
   }
 
-  override def statement(statementId: Int): Option[Statement] = statements_.lift(statementId)
-
-  override def statements(): Seq[Statement] = statements_.toSeq
-
-  override def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement] = {
-    statements_.slice(fromIndex, toIndex).toSeq
-  }
+  override def statements: IndexedSeq[Statement] = _statements
 
   override def interrupt(): Future[Unit] = {
     stop()

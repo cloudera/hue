@@ -71,11 +71,7 @@ private class ThreadSession(val id: Int,
     statement
   }
 
-  override def statement(statementId: Int): Option[Statement] = statements_.lift(statementId)
-
-  override def statements(): Seq[Statement] = statements_
-
-  override def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement] = statements_.slice(fromIndex, toIndex).toSeq
+  override def statements: IndexedSeq[Statement] = statements_
 
   override def interrupt(): Future[Unit] = {
     stop()
