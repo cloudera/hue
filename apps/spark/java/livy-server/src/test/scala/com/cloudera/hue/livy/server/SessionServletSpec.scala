@@ -24,13 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.sessions._
 import com.cloudera.hue.livy.sessions._
-import org.json4s.JValue
-import org.json4s.JsonAST.{JObject, JArray}
+import org.json4s.JsonAST.{JArray, JObject}
 import org.json4s.jackson.JsonMethods._
 import org.scalatest.FunSpecLike
 import org.scalatra.test.scalatest.ScalatraSuite
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 
 class SessionServletSpec extends ScalatraSuite with FunSpecLike {
@@ -39,7 +37,7 @@ class SessionServletSpec extends ScalatraSuite with FunSpecLike {
     var _state: State = Idle()
 
     var _idCounter = new AtomicInteger()
-    var _statements: ArrayBuffer[Statement] = ArrayBuffer()
+    var _statements = IndexedSeq[Statement]()
 
     override def kind: Kind = Spark()
 
@@ -58,7 +56,7 @@ class SessionServletSpec extends ScalatraSuite with FunSpecLike {
         executeRequest,
         Future.successful(JObject()))
 
-      _statements += statement
+      _statements :+= statement
 
       statement
     }
@@ -67,11 +65,7 @@ class SessionServletSpec extends ScalatraSuite with FunSpecLike {
 
     override def url: Option[URL] = ???
 
-    override def statement(statementId: Int): Option[Statement] = ???
-
-    override def statements(): Seq[Statement] = _statements
-
-    override def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement] = ???
+    override def statements: IndexedSeq[Statement] = _statements
 
     override def interrupt(): Future[Unit] = ???
   }

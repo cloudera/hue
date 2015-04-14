@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.server.sessions
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import org.json4s.JValue
+import org.json4s.JsonAST.{JArray, JObject, JField, JString}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
@@ -40,7 +41,7 @@ object Statement {
   }
 }
 
-class Statement(val id: Int, val request: ExecuteRequest, val output: Future[JValue]) {
+class Statement(val id: Int, val request: ExecuteRequest, _output: Future[JValue]) {
   import Statement._
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
@@ -49,7 +50,33 @@ class Statement(val id: Int, val request: ExecuteRequest, val output: Future[JVa
 
   def state = _state
 
-  output.onComplete {
+  def output(from: Option[Int] = None, size: Option[Int] = None): Future[JValue] = {
+    _output.map { case output =>
+      if (from.isEmpty && size.isEmpty) {
+        output
+      } else {
+        val from_ = from.getOrElse(0)
+        val size_ = size.getOrElse(100)
+        val until = from_ + size_
+
+        output \ "data" match {
+          case JObject(JField("text/plain", JString(text)) :: Nil) =>
+            val lines = text.split('\n').slice(from_, until)
+            output.replace(
+              "data" :: "text/plain" :: Nil,
+              JString(lines.mkString("\n")))
+          case JObject(JField("application/json", JArray(items)) :: Nil) =>
+            output.replace(
+              "data" :: "application/json" :: Nil,
+              JArray(items.slice(from_, until)))
+          case _ =>
+            output
+        }
+      }
+    }
+  }
+
+  _output.onComplete {
     case Success(_) => _state = Available()
     case Failure(_) => _state = Error()
   }

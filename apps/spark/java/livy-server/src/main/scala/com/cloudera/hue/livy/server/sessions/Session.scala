@@ -51,11 +51,7 @@ trait Session {
 
   def executeStatement(content: ExecuteRequest): Statement
 
-  def statement(statementId: Int): Option[Statement]
-
-  def statements(): Seq[Statement]
-
-  def statements(fromIndex: Integer, toIndex: Integer): Seq[Statement]
+  def statements: IndexedSeq[Statement]
 
   def interrupt(): Future[Unit]
 

@@ -58,7 +58,7 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
     it("should execute `1 + 2` == 3") {
       session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("1 + 2"))
-      val result = Await.result(stmt.output, Duration.Inf)
+      val result = Await.result(stmt.output(), Duration.Inf)
 
       val expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
@@ -74,7 +74,7 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
     it("should report an error if accessing an unknown variable") {
       session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("x"))
-      val result = Await.result(stmt.output, Duration.Inf)
+      val result = Await.result(stmt.output(), Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
         "status" -> "error",
         "execution_count" -> 0,
