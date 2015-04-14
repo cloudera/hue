@@ -678,7 +678,7 @@ ${ dashboard.layout_skeleton() }
         <div class="result-row" data-bind="html: $data"></div>
       </div>
 
-      <div class="widget-spinner" data-bind="visible: ! hasRetrievedResults()">
+      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
       </div>
