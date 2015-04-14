@@ -411,6 +411,7 @@ var Collection = function (vm, collection) {
   });
   self.template.isGridLayout.subscribe(function () {
     vm.results.removeAll();
+    vm.resultsHash = '';
     vm.search();
   });
   if (self.template.leafletmap.latitudeField == undefined) {
@@ -1163,7 +1164,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         else {
           var _resultsHash = ko.mapping.toJSON(data.response.docs);
 
-          if (self._resultsHash != _resultsHash) {
+          if (self.resultsHash != _resultsHash) {
             if (self.collection.template.isGridLayout()) {
               // Table view
               var _docs = [];
@@ -1213,7 +1214,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               self.results(_docs);
             }
           }
-          self._resultsHash = _resultsHash;
+          self.resultsHash = _resultsHash;
         }
       })
       ].concat(multiQs)
