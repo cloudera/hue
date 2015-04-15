@@ -42,8 +42,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username
-
+  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username,\
+  PasswordChangeForm
 
 
 LOG = logging.getLogger(__name__)
@@ -170,6 +170,12 @@ def delete_group(request):
     return render("delete_group.mako", request, {'path': request.path})
 
 
+def require_change_password(self):
+  """ Return true if user has never logged in before. """
+  if desktop.conf.AUTH.BACKEND.get() == 'desktop.auth.backend.AllowFirstUserDjangoBackend' and self.first_login and desktop.conf.AUTH.CHANGE_DEFAULT_PASSWORD.get():
+    return True
+
+
 def edit_user(request, username=None):
   """
   edit_user(request, username = None) -> reply
@@ -182,12 +188,16 @@ def edit_user(request, username=None):
   if request.user.username != username and not request.user.is_superuser:
     raise PopupException(_("You must be a superuser to add or edit another user."), error_code=401)
 
+  userprofile = get_profile(request.user)
+
   if username is not None:
     instance = User.objects.get(username=username)
   else:
     instance = None
 
-  if request.user.is_superuser:
+  if require_change_password(userprofile):
+    form_class = PasswordChangeForm
+  elif request.user.is_superuser:
     form_class = SuperUserChangeForm
   else:
     form_class = UserChangeForm
@@ -225,12 +235,20 @@ def edit_user(request, username=None):
           __users_lock.release()
 
       # Ensure home directory is created, if necessary.
-      if form.cleaned_data['ensure_home_directory']:
+      if form.cleaned_data.get('ensure_home_directory'):
         try:
           ensure_home_directory(request.fs, instance.username)
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.' % instance.username))
-      if request.user.is_superuser:
+
+      if require_change_password(userprofile):
+        userprofile.first_login = False
+        userprofile.save()
+        if request.user.is_superuser:
+          return redirect(reverse('about:index'))
+        else:
+          return redirect(reverse('desktop.views.home'))
+      elif request.user.is_superuser:
         return redirect(reverse(list_users))
       else:
         return redirect(reverse(edit_user, kwargs={'username': username}))
@@ -243,8 +261,10 @@ def edit_user(request, username=None):
     form = form_class(instance=instance, initial=initial)
     if request.user.is_superuser and request.user.username != username:
       form.fields.pop("password_old")
-
-  return render('edit_user.mako', request, dict(form=form, username=username))
+  if require_change_password(userprofile):
+    return render('change_password.mako', request, dict(form=form, username=username))
+  else:
+    return render('edit_user.mako', request, dict(form=form, username=username))
 
 
 def edit_group(request, name=None):

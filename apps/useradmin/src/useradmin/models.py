@@ -93,6 +93,8 @@ class UserProfile(models.Model):
   user = models.ForeignKey(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE)
+  first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
+                                   help_text=_t('If this is users first login.'))
 
   def get_groups(self):
     return self.user.groups.all()
