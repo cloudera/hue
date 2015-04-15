@@ -131,7 +131,9 @@ from django.utils.translation import ugettext as _
 
   <!--[if lt IE 9]>
   <script type="text/javascript">
-    location.href = "${ url('desktop.views.unsupported') }";
+    if (document.documentMode && document.documentMode < 9){
+      location.href = "${ url('desktop.views.unsupported') }";
+    }
   </script>
   <![endif]-->
 
@@ -142,6 +144,11 @@ from django.utils.translation import ugettext as _
       if (_UA.indexOf("firefox/" + i + ".") > -1) {
         location.href = "${ url('desktop.views.unsupported') }";
       }
+    }
+
+    // check for IE document modes
+    if (document.documentMode && document.documentMode < 9){
+      location.href = "${ url('desktop.views.unsupported') }";
     }
   </script>
 
