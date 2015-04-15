@@ -139,6 +139,18 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
     return user
 
 
+class PasswordChangeForm(UserChangeForm):
+  """
+  This inherits from UserChangeForm to allow for forced password change on first login
+  """
+  class Meta(UserChangeForm.Meta):
+    exclude = ('first_name', 'last_name', 'email')
+
+  def __init__(self, *args, **kwargs):
+    super(PasswordChangeForm, self).__init__(*args, **kwargs)
+    self.fields.pop('ensure_home_directory')
+
+
 class SuperUserChangeForm(UserChangeForm):
   class Meta(UserChangeForm.Meta):
     fields = ["username", "is_active"] + UserChangeForm.Meta.fields + ["is_superuser", "groups"]

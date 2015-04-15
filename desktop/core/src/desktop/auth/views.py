@@ -35,7 +35,8 @@ from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from hadoop.fs.exceptions import WebHdfsException
-from useradmin.views import ensure_home_directory
+from useradmin.models import get_profile
+from useradmin.views import ensure_home_directory, require_change_password
 
 from desktop.auth import forms as auth_forms
 from desktop.lib.django_util import render
@@ -106,7 +107,10 @@ def dt_login(request):
         # Must login by using the AuthenticationForm.
         # It provides 'backends' on the User object.
         user = auth_form.get_user()
+        userprofile = get_profile(user)
+
         login(request, user)
+
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
@@ -117,6 +121,12 @@ def dt_login(request):
           except (IOError, WebHdfsException), e:
             LOG.error(_('Could not create home directory.'), exc_info=e)
             request.error(_('Could not create home directory.'))
+
+        if require_change_password(userprofile):
+          return HttpResponseRedirect(urlresolvers.reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
+
+        userprofile.first_login = False
+        userprofile.save()
 
         access_warn(request, '"%s" login ok' % (user.username,))
         return HttpResponseRedirect(redirect_to)
