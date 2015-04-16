@@ -142,6 +142,13 @@ SECRET_KEY = Config(
   help=_("Used in hashing algorithms for sessions."),
   default="")
 
+SECRET_KEY_SCRIPT = Config(
+  key="secret_key_script",
+  help=_("Execute this script to produce the Django secret key. This will be used when `secret_key` is not set."),
+  type=coerce_password_from_script,
+  private=True,
+  default=None)
+
 USER_ACCESS_HISTORY_SIZE = Config(
   key="user_access_history_size",
   help=_("Number of user access to remember per view per user."),
@@ -985,6 +992,14 @@ def get_redaction_policy():
   """
 
   return LOG_REDACTION_FILE.get()
+
+
+def get_secret_key():
+  secret_key = SECRET_KEY.get()
+  if secret_key is None:
+    secret_key = SECRET_KEY_SCRIPT.get()
+
+  return secret_key
 
 
 def get_ssl_password():
