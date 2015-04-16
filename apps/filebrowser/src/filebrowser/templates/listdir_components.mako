@@ -1831,7 +1831,7 @@ from django.utils.translation import ugettext as _
 
       $.ajaxSetup({
         error:function (x, e) {
-          if (x.status == 500) {
+          if (x.status == 500 && x.responseText.indexOf("jobbrowser") == -1) {
             $(document).trigger("error", "${_('There was a problem with your request.')}");
             $("#hueBreadcrumbText").blur();
           }
