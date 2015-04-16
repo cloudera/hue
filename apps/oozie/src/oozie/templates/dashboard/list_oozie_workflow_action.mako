@@ -102,14 +102,18 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                   <td><a href="${ action.get_external_id_url() }">${ action.externalId }</a></td>
                 </tr>
               % endif
+              % if action.externalStatus:
               <tr>
                 <td>${ _('External Status') }</td>
                 <td><span class="label ${ utils.get_status(action.externalStatus) }">${ action.externalStatus }<span></td>
               </tr>
+              % endif
+              % if action.data:
               <tr>
                 <td>${ _('Data') }</td>
                 <td>${ action.data }</td>
               </tr>
+              % endif
               <tr>
                 <td>${ _('Start time') }</td>
                 <td>${ utils.format_time(action.startTime) }</td>
@@ -134,14 +138,18 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                   <td>${ action.errorMessage }</td>
                 </tr>
               % endif
+              % if action.trackerUri:
               <tr>
                 <td>${ _('TrackerURI') }</td>
                 <td>${ action.trackerUri }</td>
               </tr>
+              % endif
+              % if action.transition:
               <tr>
                 <td>${ _('Transition') }</td>
                 <td>${ action.transition }</td>
               </tr>
+              %endif
             </tbody>
           </table>
         </div>
