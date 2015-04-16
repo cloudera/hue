@@ -339,7 +339,7 @@ EMAIL_USE_TLS = desktop.conf.SMTP.USE_TLS.get()
 DEFAULT_FROM_EMAIL = desktop.conf.SMTP.DEFAULT_FROM.get()
 
 # Used for securely creating sessions. Should be unique and not shared with anybody. Changing auth backends will invalidate all open sessions.
-SECRET_KEY = desktop.conf.SECRET_KEY.get() + str(AUTHENTICATION_BACKENDS)
+SECRET_KEY = desktop.conf.get_secret_key() + str(AUTHENTICATION_BACKENDS)
 if SECRET_KEY == "":
   import uuid
   SECRET_KEY = str(uuid.uuid4())
