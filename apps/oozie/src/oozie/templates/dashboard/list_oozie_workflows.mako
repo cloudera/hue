@@ -80,11 +80,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="7%">${ _('Last Modified') }</th>
           <th width="23%">${ _('Id') }</th>
           <th width="5%">${ _('Parent') }</th>
+          <th width="0%">${ _('Submitted Manually') }</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
           <td></td>
           <td></td>
           <td></td>
@@ -111,11 +113,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           <th width="10%">${ _('Submitter') }</th>
           <th width="25%">${ _('Id') }</th>
           <th width="5%">${ _('Parent') }</th>
+          <th width="0%">${ _('Submitted Manually') }</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td><i class="fa fa-2x fa-spinner fa-spin muted"></i></td>
+          <td></td>
           <td></td>
           <td></td>
           <td></td>
@@ -187,6 +191,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       createdInMillis: wf.createdInMillis,
       run: wf.run,
       parentUrl: wf.parentUrl,
+      submittedManually: wf.submittedManually,
     }
   }
 
@@ -207,7 +212,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         null,
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
-        null
+        null,
+        { "bVisible": false }
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -242,7 +248,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
         null,
-        null
+        null,
+        { "bVisible": false }
       ],
       "aaSorting":[
         [ 0, "desc" ]
@@ -383,7 +390,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                     wf.user,
                     '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeFormatted) + '</span>',
                     '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                    wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>'
+                    wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>',
+                    wf.submittedManually
                   ]);
                 }
                 catch (error) {
@@ -438,7 +446,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
                   '<span data-sort-value="' + wf.durationInMillis + '">' + emptyStringIfNull(wf.duration) + '</span>',
               wf.user,
                   '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                  wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>'
+                  wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>',
+              wf.submittedManually
             ], false);
           }
           catch (error) {
