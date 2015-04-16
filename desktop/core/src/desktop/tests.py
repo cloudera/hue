@@ -727,6 +727,24 @@ class BaseTestPasswordConfig(object):
         reset()
 
 
+class TestSecretKeyConfig(BaseTestPasswordConfig):
+
+  def get_config_password(self):
+    return desktop.conf.SECRET_KEY
+
+  def get_config_password_script(self):
+    return desktop.conf.SECRET_KEY_SCRIPT
+
+  def get_password(self):
+    return desktop.conf.get_secret_key()
+
+  def test_read_password_from_script(self):
+    self.run_test_read_password_from_script()
+
+  def test_config_password_overrides_script_password(self):
+    self.run_test_config_password_overrides_script_password()
+
+
 class TestDatabasePasswordConfig(BaseTestPasswordConfig):
 
   def get_config_password(self):
