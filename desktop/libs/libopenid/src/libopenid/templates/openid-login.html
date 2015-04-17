@@ -115,6 +115,7 @@
   <div class="row">
     <div class="login-content">
       <form method="POST" action="{{ action }}" class="well">
+        {% csrf_token %}
         <img id="logo" src="/static/desktop/art/hue-login-logo.png" data-orig="/static/desktop/art/hue-login-logo.png"
              data-hover="/static/desktop/art/hue-login-logo-skew.png"/>
 
