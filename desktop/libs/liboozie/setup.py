@@ -15,10 +15,11 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+from hueversion import VERSION
 
 setup(
       name = "liboozie",
-      version = "3.6.0",
+      version = VERSION,
       url = 'http://github.com/cloudera/hue',
       description = "Oozie Libraries",
       packages = find_packages('src'),

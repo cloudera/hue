@@ -15,10 +15,11 @@
 # limitations under the License.
 
 from setuptools import setup, find_packages
+from hueversion import VERSION
 
 setup(
       name = "librdbms",
-      version = "3.5.0",
+      version = VERSION,
       url = 'http://github.com/cloudera/hue',
       description = "RDBMS Libraries",
       packages = find_packages('src'),
