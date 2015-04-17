@@ -19,6 +19,7 @@
 import json
 import logging
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -726,6 +727,32 @@ class BaseTestPasswordConfig(object):
       for reset in resets:
         reset()
 
+  @nottest
+  def run_test_password_script_raises_exception(self):
+    resets = [
+      self.get_config_password().set_for_testing(None),
+      self.get_config_password_script().set_for_testing(
+          '%s -c "import sys; sys.exit(1)"' % sys.executable
+      ),
+    ]
+
+    try:
+      assert_raises(subprocess.CalledProcessError, self.get_password)
+    finally:
+      for reset in resets:
+        reset()
+
+    resets = [
+      self.get_config_password().set_for_testing(None),
+      self.get_config_password_script().set_for_testing('/does-not-exist')
+    ]
+
+    try:
+      assert_raises(subprocess.CalledProcessError, self.get_password)
+    finally:
+      for reset in resets:
+        reset()
+
 
 class TestSecretKeyConfig(BaseTestPasswordConfig):
 
@@ -743,6 +770,9 @@ class TestSecretKeyConfig(BaseTestPasswordConfig):
 
   def test_config_password_overrides_script_password(self):
     self.run_test_config_password_overrides_script_password()
+
+  def test_password_script_raises_exception(self):
+    self.run_test_password_script_raises_exception()
 
 
 class TestDatabasePasswordConfig(BaseTestPasswordConfig):
@@ -762,6 +792,9 @@ class TestDatabasePasswordConfig(BaseTestPasswordConfig):
   def test_config_password_overrides_script_password(self):
     self.run_test_config_password_overrides_script_password()
 
+  def test_password_script_raises_exception(self):
+    self.run_test_password_script_raises_exception()
+
 
 class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
@@ -779,6 +812,10 @@ class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
   def test_config_password_overrides_script_password(self):
     self.run_test_config_password_overrides_script_password()
+
+  def test_password_script_raises_exception(self):
+    self.run_test_password_script_raises_exception()
+
 
 class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
 
@@ -803,6 +840,10 @@ class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
   def test_config_password_overrides_script_password(self):
     self.run_test_config_password_overrides_script_password()
 
+  def test_password_script_raises_exception(self):
+    self.run_test_password_script_raises_exception()
+
+
 class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
   def get_config_password(self):
@@ -819,3 +860,6 @@ class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
   def test_config_password_overrides_script_password(self):
     self.run_test_config_password_overrides_script_password()
+
+  def test_password_script_raises_exception(self):
+    self.run_test_password_script_raises_exception()
