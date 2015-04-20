@@ -280,7 +280,3 @@ def clone_design(request, design_id):
   cloned_action.save()
 
   return get_design(request, clone.id)
-
-
-def jasmine(request):
-  return render('jasmine.mako', request, None)

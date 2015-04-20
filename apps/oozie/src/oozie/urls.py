@@ -63,7 +63,6 @@ urlpatterns = patterns(
   url(r'^list_history$', 'list_history', name='list_history'), # Unused
   url(r'^list_history/(?P<record_id>[-\w]+)$', 'list_history_record', name='list_history_record'),
   url(r'^install_examples/$', 'install_examples', name='install_examples'),
-  url(r'^jasmine', 'jasmine'),
 )
 
 
