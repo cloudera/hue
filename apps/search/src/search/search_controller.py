@@ -22,10 +22,10 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
+from desktop.models import Document2
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
-from search.models import Collection
 
 
 LOG = logging.getLogger(__name__)
@@ -40,22 +40,33 @@ class SearchController(object):
 
   def get_search_collections(self):
     if self.user.is_superuser:
-      return Collection.objects.all().order_by('-id')
+      return Document2.objects.filter(type='search-dashboard').order_by('-id')
     else:
-      return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True)).order_by('-id')
+      return Document2.objects.filter(type='search-dashboard').filter(owner=self.user).order_by('-id')
 
   def get_shared_search_collections(self):
-    return Collection.objects.filter(Q(owner=self.user) | Q(enabled=True, owner__in=User.objects.filter(is_superuser=True)) | Q(id__in=[20000000, 20000001, 20000002, 20000003])).order_by('-id')
+    return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user) | Q(owner__in=User.objects.filter(is_superuser=True)) | Q(id__in=[20000000, 20000001, 20000002])).order_by('-id')
 
   def get_owner_search_collections(self):
     if self.user.is_superuser:
-      return Collection.objects.all()
+      return Document2.objects.filter(type='search-dashboard')
     else:
-      return Collection.objects.filter(Q(owner=self.user))
+      return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user))
+
+  def get_icon(self, name):
+    if name == 'twitter_demo':
+      return 'search/art/icon_twitter_48.png'
+    elif name == 'yelp_demo':
+      return 'search/art/icon_yelp_48.png'
+    elif name == 'log_analytics_demo':
+      return 'search/art/icon_logs_48.png'
+    else:
+      return 'search/art/icon_search_48.png'
 
   def delete_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
+      # todo
       self.get_owner_search_collections().filter(id__in=collection_ids).delete()
       result['status'] = 0
     except Exception, e:
@@ -71,6 +82,8 @@ class SearchController(object):
         copy = collection
         copy.label += _(' (Copy)')
         copy.id = copy.pk = None
+
+        # todo
 
         facets = copy.facets
         facets.id = None
