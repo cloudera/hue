@@ -79,7 +79,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
                 <span data-bind="click: toggleSelectAll, css: {'fa-check': ! ko.utils.arrayFilter(filteredCollections(), function(collection) {return !collection.selected()}).length}" class="hueCheckbox fa"></span>
               </th>
               <th>${ _('Name') }</th>
-              <th>${ _('Solr Index') }</th>
+              <th>${ _('Description') }</th>
               <th width="15%">${ _('Owner') }</th>
             </tr>
           </thead>
@@ -88,8 +88,8 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
               <td data-bind="click: $root.toggleCollectionSelect.bind($root), clickBubble: false">
                 <span data-bind="css: {'fa-check': $root.filteredCollections()[$index()].selected()}" class="hueCheckbox fa"></span>
               </td>
-              <td><a data-bind="text: label, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
-              <td><a data-bind="text: name, click: $root.editIndex" title="${ _('Click to edit the index') }" class="pointer"></a></td>
+              <td><a data-bind="text: name, click: $root.editCollection" title="${ _('Click to edit') }" class="pointer"></a></td>
+              <td><span data-bind="text: description"></span></td>
               <td><span data-bind="text: owner"></span></td>
             </tr>
           </tbody>

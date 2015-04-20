@@ -29,7 +29,7 @@ var Collection = function (coll) {
 
   self.id = ko.observable(coll.id);
   self.name = ko.observable(coll.name);
-  self.label = ko.observable(coll.label);
+  self.description = ko.observable(coll.description);
   self.enabled = ko.observable(coll.enabled);
   self.isCoreOnly = ko.observable(coll.isCoreOnly);
   self.absoluteUrl = ko.observable(coll.absoluteUrl);
@@ -80,6 +80,7 @@ var SearchCollectionsModel = function (props) {
       return coll.selected();
     });
   }, self);
+
   self.selectedOwnerCollections = ko.computed(function () {
     return ko.utils.arrayFilter(self.selectedCollections(), function (coll) {
       return coll.isOwner();
@@ -119,10 +120,6 @@ var SearchCollectionsModel = function (props) {
   self.editCollection = function (collection) {
     cleanCollections();
     location.href = collection.absoluteUrl();
-  };
-
-  self.editIndex = function (collection) {
-    location.href = self.INDEXER_URL + collection.name();
   };
 
   self.markManyForDeletion = function (collections) {

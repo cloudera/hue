@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import logging
+import uuid
 
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -26,6 +27,7 @@ from desktop.models import Document2
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
+from search.models import Collection2
 
 
 LOG = logging.getLogger(__name__)
@@ -79,28 +81,27 @@ class SearchController(object):
     result = {'status': -1, 'message': ''}
     try:
       for collection in self.get_shared_search_collections().filter(id__in=collection_ids):
-        copy = collection
-        copy.label += _(' (Copy)')
-        copy.id = copy.pk = None
-
-        # todo
-
-        facets = copy.facets
-        facets.id = None
-        facets.save()
-        copy.facets = facets
-
-        result_ = copy.result
-        result_.id = None
-        result_.save()
-        copy.result = result_
-
-        sorting = copy.sorting
-        sorting.id = None
-        sorting.save()
-        copy.sorting = sorting
-
-        copy.save()
+        doc2 = Document2.objects.get(type='search-dashboard', id=collection.id)
+    
+        name = doc2.name + '-copy'
+        copy_doc = doc2.doc.get().copy(name=name, owner=self.user)
+    
+        doc2.pk = None
+        doc2.id = None
+        doc2.uuid = str(uuid.uuid4())
+        doc2.name = name
+        doc2.owner = self.user
+        doc2.save()
+    
+        doc2.doc.all().delete()
+        doc2.doc.add(copy_doc)
+        doc2.save()
+    
+        copy = Collection2(document=doc2)
+        copy['collection']['name'] = name
+    
+        doc2.update_data({'collection': copy['collection']})
+        doc2.save()
       result['status'] = 0
     except Exception, e:
       LOG.warn('Error copying collection: %s' % e)
