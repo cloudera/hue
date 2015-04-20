@@ -229,6 +229,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
+                    draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Counter')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
+                       <i class="fa fa-tachometer"></i>
+         </a>
+    </div>
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -1078,6 +1087,34 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<script type="text/html" id="counter-widget">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+      <span class="facet-field-label">${ _('Metric') }</span> <select>
+        <option value="0" selected="selected" label="Count">Count</option>
+        <option value="1" label="Average">Average</option>
+        <option value="2" label="Sum">Sum</option>
+        <option value="3" label="Min">Min</option>
+        <option value="4" label="Max">Max</option>
+        <option value="5" label="Standard Deviation">Standard Deviation</option>
+        <option value="6" label="Unique count">Unique count</option>
+        <option value="7" label="Percentiles">Percentiles</option>
+      </select>
+    </div>
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+        <div class="big-counter">2312323</div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
 <script type="text/html" id="filter-widget">
   <div data-bind="visible: $root.query.fqs().length == 0" style="margin-top: 10px; min-height: 87px">
     ${ _('There are currently no filters applied.') }
@@ -1232,15 +1269,15 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="leafletmap-widget">
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px;" class="leaflet-align">
-      ${_('Latitude')}<div class="break-on-small-column"></div>
+      <span class="facet-field-label">${_('Latitude')}</span><div class="break-on-small-column"></div>
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
-      ${_('Longitude')}<div class="break-on-small-column"></div>
+      <span class="facet-field-label">${_('Longitude')}</span><div class="break-on-small-column"></div>
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
-      ${_('Label')}<div class="break-on-small-column"></div>
+      <span class="facet-field-label">${_('Label')}</span><div class="break-on-small-column"></div>
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
