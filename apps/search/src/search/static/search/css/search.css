@@ -517,3 +517,10 @@ em {
 .card-column.span2 .map-scope {
   margin-left: 0;
 }
+
+.big-counter {
+  font-size: 4em;
+  padding: .5em;
+  padding-left: 0;
+  letter-spacing: .1em;
+}
