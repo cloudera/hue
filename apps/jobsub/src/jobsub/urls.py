@@ -31,7 +31,4 @@ urlpatterns = patterns(
   url(r'^designs/(?P<design_id>\d+)/clone$', 'clone_design'),
   url(r'^designs/(?P<design_id>\d+)/delete$', 'delete_design'),
   url(r'^designs/(?P<design_id>\d+)/restore$', 'restore_design'),
-
-  # Jasmine - Skip until rewritten
-  url(r'^jasmine', 'jasmine'),
 )

@@ -1,7 +1,7 @@
 describe("jHueTableExtender plugin", function () {
 
   beforeEach(function () {
-    jasmine.getFixtures().fixturesPath = 'static/jasmine/';
+    jasmine.getFixtures().fixturesPath = 'static/desktop/jasmine/';
     loadFixtures('jHueTableExtenderFixture.html');
     $(".resultTable").dataTable({
       "bPaginate":false,

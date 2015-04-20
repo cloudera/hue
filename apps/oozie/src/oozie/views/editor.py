@@ -938,7 +938,3 @@ def install_examples(request):
       result['message'] = str(e)
 
   return JsonResponse(result)
-
-
-def jasmine(request):
-  return render('editor/jasmine.mako', request, None)

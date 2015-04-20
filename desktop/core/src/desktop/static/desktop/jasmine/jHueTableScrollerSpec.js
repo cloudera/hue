@@ -4,7 +4,7 @@ describe("jHueTableScroller plugin", function () {
   var minHeightTableOriginalHeight = 0;
 
   beforeEach(function () {
-    jasmine.getFixtures().fixturesPath = 'static/jasmine/';
+    jasmine.getFixtures().fixturesPath = 'static/desktop/jasmine/';
     loadFixtures('jHueTableScrollerFixture.html');
 
     defaultTableOriginalHeight = $("#defaultTable").height();
@@ -20,7 +20,7 @@ describe("jHueTableScroller plugin", function () {
 
   it("should make the default table scroll with min height enabled", function () {
     expect($("#defaultTable").parent(".dataTables_wrapper").height()).toBeLessThan(defaultTableOriginalHeight);
-    expect($("#defaultTable").parent(".dataTables_wrapper").height()).toBe(400);
+    expect($("#defaultTable").parent(".dataTables_wrapper").height()).toBe(300);
   });
 
   it("should set a specific minimum height when data-tablescroller-min-height is specified", function () {
