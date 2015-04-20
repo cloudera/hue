@@ -360,12 +360,29 @@ em {
   z-index: 10000;
 }
 
+.trigger-exclude {
+  margin-left: 4px;
+}
+
+.trigger-exclude .hellip {
+  text-overflow:ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .trigger-exclude .exclude {
   display: none;
-  margin-left: 10px;
+  float: right;
+  margin-right: 3px;
+}
+
+.trigger-exclude .include {
+  float: right;
+  margin-right: 3px;
 }
 
 .trigger-exclude:hover {
+  background-color: #F6F6F6;
   text-decoration: none;
 }
 
