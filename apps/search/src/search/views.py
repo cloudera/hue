@@ -235,7 +235,6 @@ def admin_collection_delete(request):
   return JsonResponse(response)
 
 
-@allow_owner_only
 def admin_collection_copy(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
