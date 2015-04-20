@@ -327,6 +327,23 @@ class DocumentManager(models.Manager):
 
     try:
       with transaction.atomic():
+        from search.models import Collection
+
+        for dashboard in Collection.objects.all():
+          if not dashboard.doc.exists(): # not dashbord uuid?   
+            # if brand new
+            # if 3.7, 3.8
+            # if 3.6
+            data = ''         
+            dashboard_doc = Document2.objects.create(name=dashboard.name, uuid=str(uuid.uuid4()), type='search-dashboard', owner=dashboard.owner, description=dashboard.label)
+            Document.objects.link(dashboard_doc, owner=dashboard.owner, name=dashboard.name, description=dashboard.label, extra='search-dashboard')
+            # set uuid
+    
+    except Exception, e:
+      LOG.warn(force_unicode(e))
+
+    try:
+      with transaction.atomic():
         for job in Document2.objects.all():
           if job.doc.count() > 1:
             LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
@@ -341,6 +358,8 @@ class DocumentManager(models.Manager):
               extra = 'bundle2'
             elif job.type == 'notebook':
               extra = 'notebook'
+            elif job.type == 'search-dashboard':
+              extra = 'search-dashboard'
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
@@ -703,6 +722,8 @@ class Document2(models.Model):
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
     elif self.type == 'notebook':
       return reverse('spark:editor') + '?notebook=' + str(self.id)
+    elif self.type == 'search-dashboard':
+      return reverse('search:index') + '?collection=' + str(self.id)
     else:
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
 

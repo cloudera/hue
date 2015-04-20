@@ -52,6 +52,7 @@ function loadLayout(viewModel, json_layout) {
 var Query = function (vm, query) {
   var self = this;
 
+  self.uuid = ko.observable(typeof query.uuid != "undefined" && query.uuid != null ? query.uuid : UUID());
   self.qs = ko.mapping.fromJS(query.qs);
   self.fqs = ko.mapping.fromJS(query.fqs);
   self.start = ko.mapping.fromJS(query.start);
@@ -393,6 +394,7 @@ var Collection = function (vm, collection) {
   var self = this;
 
   self.id = ko.mapping.fromJS(collection.id);
+  self.uuid = ko.observable(typeof collection.uuid != "undefined" && collection.uuid != null ? collection.uuid : UUID());
   self.name = ko.mapping.fromJS(collection.name);
   self.label = ko.mapping.fromJS(collection.label);
   self.enabled = ko.mapping.fromJS(collection.enabled);

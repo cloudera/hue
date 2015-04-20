@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import RestException
+from desktop.models import Document2, Document
 
 from libsolr.api import SolrApi
 from indexer.management.commands import indexer_setup
@@ -34,7 +35,7 @@ from search.conf import SOLR_URL
 from search.data_export import download as export_download
 from search.decorators import allow_owner_only, allow_viewer_only
 from search.management.commands import search_setup
-from search.models import Collection, augment_solr_response, augment_solr_exception, pairwise2
+from search.models import Collection2, augment_solr_response, augment_solr_exception, pairwise2
 from search.search_controller import SearchController
 
 
@@ -49,7 +50,8 @@ def index(request):
     return admin_collections(request, True)
 
   try:
-    collection = hue_collections.get(id=collection_id)
+    collection_doc = hue_collections.get(id=collection_id)
+    collection = Collection2(request.user, document=collection_doc)
   except Exception, e:
     raise PopupException(e, title=_("Dashboard does not exist or you don't have the permission to access it."))
 
@@ -59,7 +61,7 @@ def index(request):
     'collection': collection,
     'query': query,
     'initial': json.dumps({'collections': [], 'layout': []}),
-    'is_owner': request.user == collection.owner
+    'is_owner': request.user == collection_doc.owner
   })
 
 
@@ -68,7 +70,7 @@ def new_search(request):
   if not collections:
     return no_collections(request)
 
-  collection = Collection(name=collections[0], label=collections[0])
+  collection = Collection2(user=request.user, name=collections[0])
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   return render('search.mako', request, {
@@ -96,7 +98,7 @@ def browse(request, name):
   if not collections:
     return no_collections(request)
 
-  collection = Collection(name=name, label=name)
+  collection = Collection2(user=request.user, name=name)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   return render('search.mako', request, {
@@ -157,17 +159,21 @@ def save(request):
 
   if collection:
     if collection['id']:
-      hue_collection = Collection.objects.get(id=collection['id'])
+      dashboard_doc = Document2.objects.get(id=collection['id'])
     else:
-      hue_collection = Collection.objects.create2(name=collection['name'], label=collection['label'], owner=request.user)
-    hue_collection.update_properties({'collection': collection})
-    hue_collection.update_properties({'layout': layout})
-    hue_collection.name = collection['name']
-    hue_collection.label = collection['label']
-    hue_collection.enabled = collection['enabled']
-    hue_collection.save()
+      dashboard_doc = Document2.objects.create(name=collection['name'], uuid=collection['uuid'], type='search-dashboard', owner=request.user, description=collection['label'])
+      Document.objects.link(dashboard_doc, owner=request.user, name=collection['name'], description=collection['label'], extra='search-dashboard')
+
+    dashboard_doc.update_data({
+        'collection': collection,
+        'layout': layout
+    })
+    dashboard_doc.name = collection['name']
+    dashboard_doc.description = collection['label']
+    dashboard_doc.save()
+    
     response['status'] = 0
-    response['id'] = hue_collection.id
+    response['id'] = dashboard_doc.id
     response['message'] = _('Page saved !')
   else:
     response['message'] = _('There is no collection to search.')
@@ -206,9 +212,7 @@ def admin_collections(request, is_redirect=False):
       massaged_collection = {
         'id': collection.id,
         'name': collection.name,
-        'label': collection.label,
-        'enabled': collection.enabled,
-        'isCoreOnly': collection.is_core_only,
+        'label': collection.description,
         'absoluteUrl': collection.get_absolute_url(),
         'owner': collection.owner and collection.owner.username,
         'isOwner': collection.owner == request.user or request.user.is_superuser

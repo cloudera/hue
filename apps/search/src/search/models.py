@@ -205,6 +205,7 @@ class Sorting(models.Model):
     return params
 
 
+# Deprecated
 class CollectionManager(models.Manager):
 
   def create2(self, name, label, is_core_only=False, owner=None):
@@ -227,6 +228,7 @@ class CollectionManager(models.Manager):
     return collection
 
 
+# Deprecated see Collection2
 class Collection(models.Model):
   """All the data is now saved into the properties field"""
   enabled = models.BooleanField(default=False) # Aka shared
@@ -431,6 +433,138 @@ class Collection(models.Model):
               "size":12,"name": facet['label'], "id":facet_id, "widgetType": "facet-widget",
               "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"
           })
+
+
+class Collection2(object):
+
+  def __init__(self, user, name='Default', data=None, document=None):
+    self.document = document
+
+    if document is not None:
+      self.data = json.loads(document.data)
+    elif data is not None:
+      self.data = json.loads(data)
+    else:
+      self.data = {
+          'collection': self.get_default(user, name),
+          'layout': []
+      }
+
+  def get_c(self, user):
+    props = self.data
+
+    if self.document is not None:
+      props['collection']['id'] = self.document.id
+
+    # For backward compatibility
+    if 'rows' not in props['collection']['template']:
+      props['collection']['template']['rows'] = 10
+    if 'enabled' not in props['collection']:
+      props['collection']['enabled'] = True
+    if 'leafletmap' not in props['collection']['template']:
+      props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
+
+    for facet in props['collection']['facets']:
+      properties = facet['properties']
+      if 'gap' in properties and not 'initial_gap' in properties:
+        properties['initial_gap'] = properties['gap']
+      if 'start' in properties and not 'initial_start' in properties:
+        properties['initial_start'] = properties['start']
+      if 'end' in properties and not 'initial_end' in properties:
+        properties['initial_end'] = properties['end']
+
+      if facet['widgetType'] == 'histogram-widget':
+        if 'timelineChartType' not in properties:
+          properties['timelineChartType'] = 'bar'
+        if 'extraSeries' not in properties:
+          properties['extraSeries'] = []
+
+      if facet['widgetType'] == 'map-widget' and facet['type'] == 'field':
+        facet['type'] = 'pivot'
+        properties['facets'] = []
+        properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
+
+    return json.dumps(props)
+
+  def get_default(self, user, name):
+    fields = self.fields_data(user, name)
+    id_field = [field['name'] for field in fields if field.get('isId')]
+    if id_field:
+      id_field = id_field[0]
+
+    TEMPLATE = {
+      "extracode": escape("<style type=\"text/css\">\nem {\n  font-weight: bold;\n  background-color: yellow;\n}</style>\n\n<script>\n</script>"),
+      "highlighting": [""],
+      "properties": {"highlighting_enabled": True},
+      "template": """
+      <div class="row-fluid">
+        <div class="row-fluid">
+          <div class="span12">%s</div>
+        </div>
+        <br/>
+      </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
+      "isGridLayout": True,
+      "showFieldList": True,
+      "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
+      "fieldsSelected": [],
+      "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},
+      "rows": 10,
+    }
+
+    FACETS = []
+
+    return {
+      'id': None,
+      'name': name,
+      'label': name,
+      'enabled': False,
+      'template': TEMPLATE,
+      'facets': FACETS,
+      'fields': fields,
+      'idField': id_field,
+    }
+
+  @classmethod
+  def _make_field(cls, field, attributes):
+    return {
+        'name': str(field),
+        'type': str(attributes.get('type', '')),
+        'isId': attributes.get('required') and attributes.get('uniqueKey'),
+        'isDynamic': 'dynamicBase' in attributes
+    }
+
+  @classmethod
+  def _make_gridlayout_header_field(cls, field, isDynamic=False):
+    return {'name': field['name'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
+
+  def get_absolute_url(self):
+    return reverse('search:index') + '?collection=%s' % self.id
+
+  def fields(self, user):
+    return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
+
+  def fields_data(self, user, name):
+    schema_fields = SolrApi(SOLR_URL.get(), user).fields(name)
+    schema_fields = schema_fields['schema']['fields']
+
+    return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.iteritems()])
+
+  def update_data(self, post_data):
+    data_dict = self.data
+
+    data_dict.update(post_data)
+
+    self.data = data_dict
+
+  @property
+  def autocomplete(self):
+    return self.data['autocomplete']
+
+  @autocomplete.setter
+  def autocomplete(self, autocomplete):
+    properties_ = self.data
+    properties_['autocomplete'] = autocomplete
+    self.data = json.dumps(properties_)
 
 
 def get_facet_field(category, field, facets):

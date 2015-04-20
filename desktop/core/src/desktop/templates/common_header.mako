@@ -491,17 +491,24 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'search' in apps:
          <% from search.search_controller import SearchController %>
-         <% collections = SearchController(user).get_shared_search_collections() %>
+         <% controller = SearchController(user) %>
+         <% collections = controller.get_shared_search_collections() %>
          % if not collections:
            <li>
              <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">Search</a>
            </li>
          % else:
            <li class="dropdown">
-             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">${_('Search')} <b class="caret"></b></a>
+             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+               ${_('Search')} <b class="caret"></b>
+             </a>
              <ul role="menu" class="dropdown-menu">
                % for collection in collections:
-                 <li><a href="${ url('search:index') }?collection=${ collection.id }"><img src="${ static(collection.icon) }" class="app-icon"/> ${ collection.label }</a></li>
+                 <li>
+                   <a href="${ url('search:index') }?collection=${ collection.id }">
+                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon"/> ${ collection.name }
+                   </a>
+                 </li>
                % endfor
                % if 'indexer' in apps or 'search' in apps:
                  <li class="divider"></li>
