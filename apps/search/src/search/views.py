@@ -212,7 +212,7 @@ def admin_collections(request, is_redirect=False):
       massaged_collection = {
         'id': collection.id,
         'name': collection.name,
-        'label': collection.description,
+        'description': collection.description,
         'absoluteUrl': collection.get_absolute_url(),
         'owner': collection.owner and collection.owner.username,
         'isOwner': collection.owner == request.user or request.user.is_superuser
