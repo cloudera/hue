@@ -462,10 +462,10 @@ class JsonResponse(HttpResponse):
       to ``True``.
     """
 
-    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, **kwargs):
+    def __init__(self, data, encoder=DjangoJSONEncoder, safe=True, indent=None, **kwargs):
         if safe and not isinstance(data, dict):
             raise TypeError('In order to allow non-dict objects to be '
                 'serialized set the safe parameter to False')
         kwargs.setdefault('content_type', 'application/json')
-        data = json.dumps(data, cls=encoder)
+        data = json.dumps(data, cls=encoder, indent=indent)
         super(JsonResponse, self).__init__(content=data, **kwargs)
