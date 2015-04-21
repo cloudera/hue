@@ -68,8 +68,10 @@ class SearchController(object):
   def delete_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
-      # todo
-      self.get_owner_search_collections().filter(id__in=collection_ids).delete()
+      for doc2 in self.get_owner_search_collections().filter(id__in=collection_ids):
+        doc = doc2.doc.get()
+        doc.delete()
+        doc2.delete()
       result['status'] = 0
     except Exception, e:
       LOG.warn('Error deleting collection: %s' % e)
