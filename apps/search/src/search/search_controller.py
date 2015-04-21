@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from django.utils.translation import ugettext as _
 
-from desktop.models import Document2
+from desktop.models import Document2, SAMPLE_USERNAME
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
@@ -47,7 +47,7 @@ class SearchController(object):
       return Document2.objects.filter(type='search-dashboard').filter(owner=self.user).order_by('-id')
 
   def get_shared_search_collections(self):
-    return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user) | Q(owner__in=User.objects.filter(is_superuser=True)) | Q(id__in=[20000000, 20000001, 20000002])).order_by('-id')
+    return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user) | Q(owner__in=User.objects.filter(is_superuser=True)) | Q(owner__username=SAMPLE_USERNAME)).order_by('-id')
 
   def get_owner_search_collections(self):
     if self.user.is_superuser:
@@ -56,11 +56,11 @@ class SearchController(object):
       return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user))
 
   def get_icon(self, name):
-    if name == 'twitter_demo':
+    if name == 'Twitter':
       return 'search/art/icon_twitter_48.png'
-    elif name == 'yelp_demo':
+    elif name == 'Yelp Reviews':
       return 'search/art/icon_yelp_48.png'
-    elif name == 'log_analytics_demo':
+    elif name == 'Web Logs':
       return 'search/art/icon_logs_48.png'
     else:
       return 'search/art/icon_search_48.png'
