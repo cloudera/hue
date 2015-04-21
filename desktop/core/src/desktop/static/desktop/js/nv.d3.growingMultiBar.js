@@ -215,7 +215,7 @@ nv.models.growingMultiBar = function() {
         $(selected).each(function(cnt, item){
           bars.each(function(d, i) {
             if (_pivotField != null){
-              if (d.obj.fq_fields == _pivotField && d.obj.fq_values == item){
+              if ((Array.isArray(_pivotField) ? ko.toJSON(d.obj.fq_fields) == ko.toJSON(_pivotField) : d.obj.fq_fields == _pivotField) && (item.values ? ko.toJSON(d.obj.fq_values) == ko.toJSON(item.values) : d.obj.fq_values == item)){
                 d3.select(this).classed('selected', true);
               }
             }
