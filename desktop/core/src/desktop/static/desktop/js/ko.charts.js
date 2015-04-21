@@ -161,6 +161,7 @@ ko.bindingHandlers.barChart = {
             _options.onComplete();
           }
         }).call(_chart);
+
       if (_chart.selectBars) {
         var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
         $.each(_options.fqs(), function (cnt, item) {
@@ -170,11 +171,11 @@ ko.bindingHandlers.barChart = {
                 return it.value();
               }));
             }
-            if (item.field().indexOf(":") > -1) {
+            if (Array.isArray(item.field())) {
               _chart.selectBars({
                 field: item.field(),
                 selected: $.map(item.filter(), function (it) {
-                  return it.value();
+                  return { values: it.value() };
                 })
               });
             }
@@ -230,18 +231,19 @@ ko.bindingHandlers.timelineChart = {
       });
       _d3.selectAll(".nv-brush").call(_chart.brush().clear());
       if (_chart.selectBars) {
+        var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
         $.each(_options.fqs(), function (cnt, item) {
           if (item.id() == _options.datum.widget_id) {
-            if (item.field() == _options.field) {
+            if (item.field() == _field) {
               _chart.selectBars($.map(item.filter(), function (it) {
                 return it.value();
               }));
             }
-            if (item.field().indexOf(":") > -1) {
+            if (Array.isArray(item.field())) {
               _chart.selectBars({
                 field: item.field(),
                 selected: $.map(item.filter(), function (it) {
-                  return it.value();
+                  return { values: it.value() };
                 })
               });
             }
@@ -915,18 +917,19 @@ function barChartBuilder(element, options, isTimeline) {
           }).call(_chart);
 
       if (_chart.selectBars) {
+        var _field = (typeof options.field == "function") ? options.field() : options.field;
         $.each(options.fqs(), function (cnt, item) {
           if (item.id() == options.datum.widget_id) {
-            if (item.field() == options.field) {
+            if (item.field() == _field) {
               _chart.selectBars($.map(item.filter(), function (it) {
                 return it.value();
               }));
             }
-            if (item.field().indexOf(":") > -1) {
+            if (Array.isArray(item.field())) {
               _chart.selectBars({
                 field: item.field(),
                 selected: $.map(item.filter(), function (it) {
-                  return it.value();
+                  return { values: it.value() };
                 })
               });
             }
