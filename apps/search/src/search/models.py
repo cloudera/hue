@@ -455,6 +455,8 @@ class Collection2(object):
 
     if self.document is not None:
       props['collection']['id'] = self.document.id
+      props['collection']['label'] = self.document.name
+      props['collection']['description'] = self.document.description
 
     # For backward compatibility
     if 'rows' not in props['collection']['template']:

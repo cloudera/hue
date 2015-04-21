@@ -1396,6 +1396,10 @@ ${ dashboard.layout_skeleton() }
       ${ _('Visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled"/>
     </label>
 
+    <span style="margin-top: 4px">
+      ${ _('Description') } <input type="text" class="input-xlarge" data-bind="value: $root.collection.description"></input>
+    </span>
+
     <label class="checkbox" style="margin-top: 4px">
       <input type="checkbox" style="margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="text" class="input-mini" style="margin-bottom: 0; margin-left: 6px" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
     </label>

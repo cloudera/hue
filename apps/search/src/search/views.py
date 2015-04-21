@@ -168,8 +168,8 @@ def save(request):
         'collection': collection,
         'layout': layout
     })
-    dashboard_doc.name = collection['name']
-    dashboard_doc.description = collection['label']
+    dashboard_doc.name = collection['label']
+    dashboard_doc.description = collection['description']
     dashboard_doc.save()
     
     response['status'] = 0
