@@ -341,9 +341,8 @@ class DocumentManager(models.Manager):
               owner = dashboard.owner
             dashboard_doc = Document2.objects.create(name=dashboard.label, uuid=_uuid, type='search-dashboard', owner=owner, description=dashboard.label, data=dashboard.properties)
             Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
-            dashboard.save()    
+            dashboard.save()
     except Exception, e:
-      print e
       LOG.warn(force_unicode(e))
 
     try:
