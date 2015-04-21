@@ -28,6 +28,7 @@ from desktop.lib import i18n
 
 LOG = logging.getLogger(__name__)
 MAX_XLS_ROWS = 30000
+MAX_XLS_COLS = 255
 
 
 def nullify(cell):
@@ -56,20 +57,32 @@ def dataset(headers, data, encoding=None):
 def create_generator(content_generator, format, encoding=None):
   if format == 'csv':
     show_headers = True
-    while True:
-      headers, data = content_generator.next()
+    for headers, data in content_generator:
       yield dataset(show_headers and headers or None, data, encoding).csv
       show_headers = False
+
   elif format == 'xls':
     headers = None
     data = []
     for _headers, _data in content_generator:
       # Forced limit on size from tablib
       if len(data) > MAX_XLS_ROWS:
-        data = data[:MAX_XLS_ROWS]
         break
+
+      if _headers and len(_headers) > MAX_XLS_COLS:
+        _headers = _headers[:MAX_XLS_COLS]
+
       headers = _headers
-      data.extend(_data)
+
+      for row in _data:
+        if len(row) >= MAX_XLS_COLS:
+          row = row[:MAX_XLS_COLS]
+
+        data.append(row)
+
+    if len(data) > MAX_XLS_ROWS:
+      data = data[:MAX_XLS_ROWS]
+
     yield dataset(headers, data, encoding).xls
     gc.collect()
 
