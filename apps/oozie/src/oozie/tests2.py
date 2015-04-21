@@ -117,6 +117,18 @@ LIMIT $limit"""))
     assert_equal('My_______1st_W$rkflow__With___Bad__lette', job.validated_name)
 
 
+class TestUtils():
+
+  def setUp(self):
+    self.wf = Workflow()
+
+  def test_gen_workflow_data_from_xml(self):
+    f = open('apps/oozie/src/oozie/test_data/xslt2/test-workflow.xml')
+    self.wf.definition = f.read()
+    node_list = "[{u'node_type': u'start', u'ok_to': u'fork-68d4', u'name': u''}, {u'node_type': u'kill', u'ok_to': u'', u'name': u'Kill'}, {u'path2': u'shell-0f44', u'node_type': u'fork', u'ok_to': u'', u'name': u'fork-68d4', u'path1': u'subworkflow-a13f'}, {u'node_type': u'join', u'ok_to': u'End', u'name': u'join-775e'}, {u'node_type': u'end', u'ok_to': u'', u'name': u'End'}, {u'node_type': u'sub-workflow', u'ok_to': u'join-775e', u'name': u'subworkflow-a13f', u'job_properties': [{u'name': u'hue-id-w', u'value': u'50001'}], u'error_to': u'Kill'}, {u'shell': {u'command': u'ls'}, u'node_type': u'shell', u'ok_to': u'join-775e', u'name': u'shell-0f44', u'error_to': u'Kill'}, {}]"
+    assert_equal(node_list, str(Workflow.gen_workflow_data_from_xml('admin', self.wf)))
+
+
 #  def test_workflow_name(self):
 #    try:
 #      workflow_dict = WORKFLOW_DICT.copy()
