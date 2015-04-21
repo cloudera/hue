@@ -1225,6 +1225,7 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
       $("#chooseFile").modal("show");
       $("#chooseFile").on("hidden", function(){
         $("html").removeClass("modal-open");
+        $(".modal-backdrop").remove();
       });
     }
 
