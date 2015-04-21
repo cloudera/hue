@@ -31,10 +31,9 @@ from django.db import models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop import appmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
-
-from desktop import appmanager
 
 
 LOG = logging.getLogger(__name__)
@@ -330,16 +329,21 @@ class DocumentManager(models.Manager):
         from search.models import Collection
 
         for dashboard in Collection.objects.all():
-          if not dashboard.doc.exists(): # not dashbord uuid?   
-            # if brand new
-            # if 3.7, 3.8
-            # if 3.6
-            data = ''         
-            dashboard_doc = Document2.objects.create(name=dashboard.name, uuid=str(uuid.uuid4()), type='search-dashboard', owner=dashboard.owner, description=dashboard.label)
-            Document.objects.link(dashboard_doc, owner=dashboard.owner, name=dashboard.name, description=dashboard.label, extra='search-dashboard')
-            # set uuid
-    
+          col_dict = dashboard.properties_dict['collection']
+          if not 'uuid' in col_dict:
+            _uuid = str(uuid.uuid4())
+            col_dict['uuid'] = _uuid
+            dashboard.update_properties({'collection': col_dict})
+            if dashboard.owner is None:
+              from useradmin.models import install_sample_user
+              owner = install_sample_user()
+            else:
+              owner = dashboard.owner
+            dashboard_doc = Document2.objects.create(name=dashboard.label, uuid=_uuid, type='search-dashboard', owner=owner, description=dashboard.label, data=dashboard.properties)
+            Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
+            dashboard.save()    
     except Exception, e:
+      print e
       LOG.warn(force_unicode(e))
 
     try:
@@ -510,6 +514,8 @@ class Document(models.Model):
         return staticfiles_storage.url('oozie/art/icon_oozie_bundle_48.png')
       elif self.extra == 'notebook':
         return staticfiles_storage.url('spark/art/icon_spark_48.png')
+      elif self.extra.startswith('search'):
+        return staticfiles_storage.url('search/art/icon_search_48.png')
       elif self.content_type.app_label == 'beeswax':
         if self.extra == '0':
           return staticfiles_storage.url(apps['beeswax'].icon_path)
