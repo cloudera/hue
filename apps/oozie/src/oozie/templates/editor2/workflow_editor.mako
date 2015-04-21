@@ -359,8 +359,6 @@ ${ workflow.render() }
 
 </div>
 
-<div id="exposeOverlay"></div>
-
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
@@ -394,6 +392,7 @@ ${ dashboard.import_bindings() }
 % endif
 </style>
 
+<div id="exposeOverlay"></div>
 
 <script type="text/javascript">
   ${ utils.slaGlobal() }
