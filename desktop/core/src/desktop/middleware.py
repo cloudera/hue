@@ -49,6 +49,7 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
+from desktop import metrics
 from hadoop import cluster
 from desktop.log import get_audit_logger
 
@@ -619,3 +620,22 @@ class EnsureSafeRedirectURLMiddleware(object):
       return response
     else:
       return response
+
+
+class MetricsMiddleware(object):
+  """
+  Middleware to track the number of active requests.
+  """
+
+  def process_request(self, request):
+    self._response_timer = metrics.response_time.time()
+    metrics.active_requests.inc()
+
+  def process_exception(self, request, exception):
+    self._response_timer.stop()
+    metrics.request_exceptions.inc()
+
+  def process_response(self, request, response):
+    self._response_timer.stop()
+    metrics.active_requests.dec()
+    return response

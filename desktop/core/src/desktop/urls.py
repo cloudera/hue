@@ -34,6 +34,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from desktop import appmanager
+from desktop import metrics
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -99,10 +100,14 @@ dynamic_patterns += patterns('useradmin.views',
   (r'^desktop/api/users/autocomplete', 'list_for_autocomplete'),
 )
 
+# Metrics specific
+dynamic_patterns += patterns('',
+  (r'^desktop/metrics/', include('desktop.lib.metrics.urls'))
+)
+
 dynamic_patterns += patterns('',
   (r'^admin/', include(admin.site.urls)),
 )
-
 
 static_patterns = []
 
