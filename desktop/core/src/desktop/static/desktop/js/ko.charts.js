@@ -153,6 +153,11 @@ ko.bindingHandlers.barChart = {
     var _datum = _options.transformer(_options.datum);
     var _chart = $(element).data("chart");
     if (_chart) {
+
+      if (_chart.multibar){
+        _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
+      }
+
       var _d3 = d3.select($(element).find("svg")[0]);
       _d3.datum(_datum)
         .transition().duration(150)
@@ -161,6 +166,8 @@ ko.bindingHandlers.barChart = {
             _options.onComplete();
           }
         }).call(_chart);
+
+
 
       if (_chart.selectBars) {
         var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
