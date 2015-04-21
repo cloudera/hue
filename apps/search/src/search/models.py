@@ -297,6 +297,12 @@ class Collection(models.Model):
         if 'extraSeries' not in properties:
           properties['extraSeries'] = []
 
+      if facet['widgetType'] == 'heatmap-widget' and 'stacked' not in properties:
+        properties['stacked'] = True
+
+      if facet['widgetType'] == 'bar-widget' and 'stacked' not in properties:
+        properties['stacked'] = False
+
       if facet['widgetType'] == 'map-widget' and facet['type'] == 'field':
         facet['type'] = 'pivot'
         properties['facets'] = []

@@ -503,6 +503,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     properties['mincount'] = 1
     properties['facets'] = []
+    properties['stacked'] = True
     properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
 
     if widget_type == 'map-widget':

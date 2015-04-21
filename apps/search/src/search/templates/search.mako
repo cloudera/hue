@@ -846,10 +846,10 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
     </div>
 
-    <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: false, field: field, label: label(),
+    <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
       fqs: $root.query.fqs,
       transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
-      onStateChange: function(state){ },
+      onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
       onClick: function(d) {
         if (d.obj.field != undefined) {
           if ($data.type == 'range-up') {
@@ -1054,11 +1054,11 @@ ${ dashboard.layout_skeleton() }
       <div class="clearfix"></div>
 
       <!-- ko if: properties.scope() == 'stack' -->
-        <div data-bind="barChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()}, stacked: true,
+        <div data-bind="barChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(),
           isPivot: true,
           fqs: $root.query.fqs,
           transformer: pivotChartDataTransformer,
-          onStateChange: function(state){ },
+          onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
@@ -1605,16 +1605,17 @@ function pivotChartDataTransformer(rawDatum) {
   $(rawDatum.counts).each(function (cnt, item) {
     item.widget_id = rawDatum.widget_id;
 
+    var _key = Array.isArray(item.value) ? item.value[1] : item.value;
     var _category = null;
     _categories.forEach(function (category) {
-      if (category.key == item.value) {
+      if (category.key == _key) {
         _category = category;
       }
     });
 
     if (_category == null) {
       _category = {
-        key: item.value,
+        key: _key,
         values: []
       };
       _categories.push(_category);
