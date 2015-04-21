@@ -17,7 +17,7 @@
 
 import tablib
 
-from desktop.lib.export_csvxls import create_generator, make_response
+from desktop.lib.export_csvxls import MAX_XLS_ROWS, MAX_XLS_COLS, create_generator, make_response
 from nose.tools import assert_equal
 
 
@@ -25,11 +25,11 @@ def content_generator(header, data):
   yield header, data
 
 def test_export_csv():
-  header = ["x", "y"]
+  headers = ["x", "y"]
   data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
 
   # Check CSV
-  generator = create_generator(content_generator(header, data), "csv")
+  generator = create_generator(content_generator(headers, data), "csv")
   response = make_response(generator, "csv", "foo")
   assert_equal("application/csv", response["content-type"])
   content = ''.join(response.streaming_content)
@@ -37,15 +37,45 @@ def test_export_csv():
   assert_equal("attachment; filename=foo.csv", response["content-disposition"])
 
 def test_export_xls():
-  header = ["x", "y"]
+  headers = ["x", "y"]
   data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
 
-  dataset = tablib.Dataset(headers=header)
+  dataset = tablib.Dataset(headers=headers)
   for row in data:
     dataset.append([cell is not None and cell or "NULL" for cell in row])
 
   # Check XLS
-  generator = create_generator(content_generator(header, data), "xls")
+  generator = create_generator(content_generator(headers, data), "xls")
+  response = make_response(generator, "xls", "foo")
+  assert_equal("application/xls", response["content-type"])
+  content = ''.join(response.streaming_content)
+  assert_equal(dataset.xls, content)
+  assert_equal("attachment; filename=foo.xls", response["content-disposition"])
+
+def test_export_xls_truncate_rows():
+  headers = ["a"]
+  data = [["1"]] * (MAX_XLS_ROWS + 1)
+
+  dataset = tablib.Dataset(headers=headers)
+  dataset.extend(data[:MAX_XLS_ROWS])
+
+  # Check XLS
+  generator = create_generator(content_generator(headers, data), "xls")
+  response = make_response(generator, "xls", "foo")
+  assert_equal("application/xls", response["content-type"])
+  content = ''.join(response.streaming_content)
+  assert_equal(dataset.xls, content)
+  assert_equal("attachment; filename=foo.xls", response["content-disposition"])
+
+def test_export_xls_truncate_cols():
+  headers = ["a"] * (MAX_XLS_COLS + 1)
+  data = [["1"] * (MAX_XLS_COLS + 1)]
+
+  dataset = tablib.Dataset(headers=headers[:MAX_XLS_COLS])
+  dataset.extend([data[0][:MAX_XLS_COLS]])
+
+  # Check XLS
+  generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
   assert_equal("application/xls", response["content-type"])
   content = ''.join(response.streaming_content)
