@@ -82,24 +82,24 @@ class SearchController(object):
     try:
       for collection in self.get_shared_search_collections().filter(id__in=collection_ids):
         doc2 = Document2.objects.get(type='search-dashboard', id=collection.id)
-    
+
         name = doc2.name + '-copy'
         copy_doc = doc2.doc.get().copy(name=name, owner=self.user)
-    
+
         doc2.pk = None
         doc2.id = None
         doc2.uuid = str(uuid.uuid4())
         doc2.name = name
         doc2.owner = self.user
         doc2.save()
-    
+
         doc2.doc.all().delete()
         doc2.doc.add(copy_doc)
         doc2.save()
-    
+
         copy = Collection2(document=doc2)
-        copy['collection']['name'] = name
-    
+        copy['collection']['label'] = name
+
         doc2.update_data({'collection': copy['collection']})
         doc2.save()
       result['status'] = 0

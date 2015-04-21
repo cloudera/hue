@@ -17,10 +17,8 @@
 
 import logging
 
-from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import NoArgsCommand
-from django.utils.translation import ugettext as _
 
 from desktop.models import Document
 from useradmin.models import install_sample_user
