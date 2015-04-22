@@ -1242,13 +1242,13 @@ ${ dashboard.layout_skeleton() }
       <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
-    <div data-bind="leafletMapChart: {visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), datum: {counts: $root.response()},
+    <div data-bind="leafletMapChart: {visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
   </div>
 
-  <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
