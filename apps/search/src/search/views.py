@@ -306,14 +306,13 @@ def index_fields_dynamic(request):
 
   try:
     name = request.POST['name']
-    hue_collection = Collection(name=name, label=name)
 
-    dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(hue_collection.name)
+    dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(name)
 
     result['message'] = ''
-    result['fields'] = [Collection._make_field(name, properties)
+    result['fields'] = [Collection2._make_field(name, properties)
                         for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
-    result['gridlayout_header_fields'] = [Collection._make_gridlayout_header_field({'name': name}, True)
+    result['gridlayout_header_fields'] = [Collection2._make_gridlayout_header_field({'name': name}, True)
                                           for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
     result['status'] = 0
   except Exception, e:
@@ -553,8 +552,8 @@ def get_collection(request):
   try:
     name = request.POST['name']
 
-    collection = Collection(name=name, label=name)
-    collection_json = collection.get_c(request.user)
+    collection = Collection2(request.user, name=name)
+    collection_json = collection.get_json(request.user)
 
     result['collection'] = json.loads(collection_json)
     result['status'] = 0

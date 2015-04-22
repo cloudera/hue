@@ -456,7 +456,7 @@ class Collection2(object):
           'layout': []
       }
 
-  def get_c(self, user):
+  def get_json(self, user):
     props = self.data
 
     if self.document is not None:

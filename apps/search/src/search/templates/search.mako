@@ -1819,7 +1819,7 @@ $(document).ready(function () {
     }
   }
 
-  viewModel = new SearchViewModel(${ collection.get_c(user) | n,unicode }, _query, ${ initial | n,unicode });
+  viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, _query, ${ initial | n,unicode });
 
   viewModel.timelineChartTypes = ko.observableArray([
     {
