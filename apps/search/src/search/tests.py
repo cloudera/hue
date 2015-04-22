@@ -83,7 +83,7 @@ class TestSearchBase(object):
 
 class TestWithMockedSolr(TestSearchBase):
   def _get_collection_param(self, collection):
-    col_json = json.loads(collection.get_c(self.user))
+    col_json = json.loads(collection.get_json(self.user))
     return col_json['collection']
 
   def test_index(self):
