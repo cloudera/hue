@@ -484,6 +484,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
+  elif widget_type == 'hit-widget':
+    facet_type = 'function'
   else:
     solr_api = SolrApi(SOLR_URL.get(), user)
     range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
@@ -494,8 +496,6 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['initial_gap'] = properties['gap']
       properties['initial_start'] = properties['start']
       properties['initial_end'] = properties['end']
-    elif widget_type == 'hit-widget':
-      facet_type = 'query'
     else:
       facet_type = 'field'
 

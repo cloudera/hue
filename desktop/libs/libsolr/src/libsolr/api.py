@@ -160,6 +160,10 @@ class SolrApi(object):
           params += (
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
+        elif facet['type'] == 'function':
+          params += (
+              ('json.facet', "{%(field)s-%(id)s: 'avg(%(field)s)'}" % facet),
+          )        
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']

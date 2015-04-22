@@ -1044,7 +1044,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableFilter = ko.observable(bareWidgetBuilder("Filter Bar", "filter-widget"));
   self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget"));
   self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget"));
-  self.draggableCounter = ko.observable(bareWidgetBuilder("Counter", "counter-widget"));
+  self.draggableCounter = ko.observable(bareWidgetBuilder("Counter", "hit-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });

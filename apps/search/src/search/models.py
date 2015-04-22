@@ -690,6 +690,20 @@ def augment_solr_response(response, collection, query):
             'counts': value,
           }
           normalized_facets.append(facet)
+      elif category == 'function' and response['facets']:
+        for name, value in response['facets'].iteritems(): # flat
+          collection_facet = get_facet_field(category, name, collection['facets'])
+          if collection_facet:
+            facet = {
+              'id': collection_facet['id'],
+              'query': name,
+              'type': category,
+              'label': name,
+              'counts': value,
+            }
+            normalized_facets.append(facet)
+          else:
+            print name, value
       elif category == 'pivot':
         name = NAME % facet
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
