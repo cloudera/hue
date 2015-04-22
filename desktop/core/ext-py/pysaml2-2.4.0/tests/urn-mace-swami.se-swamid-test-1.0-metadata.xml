@@ -1,0 +1,1771 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+      This file was automatically generated - do not edit 
+
+      NOTE WELL
+
+      This file is not signed. The contents of this file should not be used in
+      production environment. No trust should be placed in the objects described
+      by this metadata.
+
+      NOTE WELL
+
+    -->
+<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:shibmeta="urn:mace:shibboleth:metadata:1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" Name="urn:mace:swami.se:swamid:test-1.0">
+  <EntityDescriptor entityID="https://atmail.it.su.se/shibboleth" xml:base="swamid-1.0/atmail.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB3TCCAUagAwIBAgIJANxweZKmoF/1MA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNV
+BAMTD2F0bWFpbC5pdC5zdS5zZTAeFw0wOTAzMDYxMjAwMzZaFw0xMDAzMDYxMjAw
+MzZaMBoxGDAWBgNVBAMTD2F0bWFpbC5pdC5zdS5zZTCBnzANBgkqhkiG9w0BAQEF
+AAOBjQAwgYkCgYEArjRI35nDap2bPKSwCTCma3+JocxQH6YwkJG4E7BHwBpoFzbC
+r1vEZeP5feZNb7H1OrO7U/yTMqqLapljeCyHz7tIscnSfE/uRlaJ1rzpY4jEiRpo
+LWKpXOMSc484CDf3n2YERQonP3QHI2q+FyIPPPPyaHmQctKxeuPkH4sO4K0CAwEA
+AaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDAN
+BgkqhkiG9w0BAQUFAAOBgQCl0yPGhsEInSQRCRfAZlS4ZngXPxLpu2j4a6asoo2P
+LnWJfnUPCY81o90j6uNeZ5VEXbRoTi5ZoVjbi2hLzn0XAxRhL8VXrYk6/kduHH1Z
+2KVxwbLyfwYHUZZ2zijZRNiiG2Pi0ICqEjaT0iv4I4J/m7jZDn6vW7h5MELG6cH9
+ew==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://atmail.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Stockholms universitet</GivenName>
+    <SurName>Helpdesk</SurName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://order.kib.ki.se/shibboleth" xml:base="swamid-1.0/order.kib.ki.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB3TCCAUagAwIBAgIJAIJMRwSRhML5MA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNV
+BAMTD29yZGVyLmtpYi5raS5zZTAeFw0wOTAyMTAxMDIyMzRaFw0xMDAyMTAxMDIy
+MzRaMBoxGDAWBgNVBAMTD29yZGVyLmtpYi5raS5zZTCBnzANBgkqhkiG9w0BAQEF
+AAOBjQAwgYkCgYEAvlxRXM/J483VG0epYggM0vfL+vYbmlMigYtUBqHM0skjAnKc
+TtujE1AUY3tmSRRd0Xgl0WpCSI8NTXeJAdi2UZOXP1ws/jSnno/8i99wXusco2Vf
+Q8gBaBUvN5+qx0Rppoxr4QMKijbYPy9ZPFhW9Jk39x8eFixw1aIMWBgF8BMCAwEA
+AaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDAN
+BgkqhkiG9w0BAQUFAAOBgQAKwyqh0ZfM11pMJSCRg6SZ2/d5cWk0KYv1B5S5hdCv
+rQRHv+ED1BUZqNtwRQ7EBgiTo8j7Q+RhAghUTRqV3FPf8SNedrcvHL6zW6dyt5Yx
+MBf3wEO4O3lPkpCpb+FxEYGf0sClPyZBISZLKaI+o7MDeE30FlNf0100Fv9qCEi9
+QQ==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://order.kib.ki.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">KI</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Karolinska Institutet</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.ki.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>KI bibliotek</Company>
+    <GivenName>Ylva</GivenName>
+    <SurName>Gavel</SurName>
+    <EmailAddress>ylva.gavel@ki.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://atmail-dev-01.it.su.se/shibboleth" xml:base="swamid-1.0/atmail-dev-01.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB+TCCAWKgAwIBAgIJAKMLZOIZMhLZMA0GCSqGSIb3DQEBBQUAMCgxJjAkBgNV
+BAMTHWF0bWFpbC1kZXYuaXQuc3Uuc2Utc2hpYmIuY3J0MB4XDTA5MDMwNTEyMzMz
+OVoXDTEwMDMwNTEyMzMzOVowKDEmMCQGA1UEAxMdYXRtYWlsLWRldi5pdC5zdS5z
+ZS1zaGliYi5jcnQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAL3asHFQGZX3
+ojnZrBw89ufD1Co/bLyNCgC++XHCCdxgqC4Dup279+45hrVS4J3uyWhFjKx2luff
+88QQ5XS4Bao3lwBbnct5ds83adFxCsS05l20YgSfDydWr6YBcssOq7ZvV/OJdkMI
+a0Uk+i6c+3+ChEVCwEZ9iRJdpuYEBT+3AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsG
+AQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEASeqm
+fJn6M79EiZh66eKW+iaszRpXPVvJgr+Bzv0mXZ11IKBdZKRx0LoxcYWlu/RzT2q2
+qgK+ISTg38JgmSq0G2tqQ3M51njLA0Lyj9dTaSkV1r22jQkmh7q6lPeeA+yQ8RF4
+cNel/csgsvm7FfgPWaQyWTGnGzNo0PmNTl7nMoM=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://atmail-dev-01.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://atmail-dev-02.it.su.se/shibboleth" xml:base="swamid-1.0/atmail-dev-02.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB+TCCAWKgAwIBAgIJAKMLZOIZMhLZMA0GCSqGSIb3DQEBBQUAMCgxJjAkBgNV
+BAMTHWF0bWFpbC1kZXYuaXQuc3Uuc2Utc2hpYmIuY3J0MB4XDTA5MDMwNTEyMzMz
+OVoXDTEwMDMwNTEyMzMzOVowKDEmMCQGA1UEAxMdYXRtYWlsLWRldi5pdC5zdS5z
+ZS1zaGliYi5jcnQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAL3asHFQGZX3
+ojnZrBw89ufD1Co/bLyNCgC++XHCCdxgqC4Dup279+45hrVS4J3uyWhFjKx2luff
+88QQ5XS4Bao3lwBbnct5ds83adFxCsS05l20YgSfDydWr6YBcssOq7ZvV/OJdkMI
+a0Uk+i6c+3+ChEVCwEZ9iRJdpuYEBT+3AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsG
+AQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEASeqm
+fJn6M79EiZh66eKW+iaszRpXPVvJgr+Bzv0mXZ11IKBdZKRx0LoxcYWlu/RzT2q2
+qgK+ISTg38JgmSq0G2tqQ3M51njLA0Lyj9dTaSkV1r22jQkmh7q6lPeeA+yQ8RF4
+cNel/csgsvm7FfgPWaQyWTGnGzNo0PmNTl7nMoM=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://atmail-dev-02.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://atmail-dev-03.it.su.se/shibboleth" xml:base="swamid-1.0/atmail-dev-03.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB+TCCAWKgAwIBAgIJAKMLZOIZMhLZMA0GCSqGSIb3DQEBBQUAMCgxJjAkBgNV
+BAMTHWF0bWFpbC1kZXYuaXQuc3Uuc2Utc2hpYmIuY3J0MB4XDTA5MDMwNTEyMzMz
+OVoXDTEwMDMwNTEyMzMzOVowKDEmMCQGA1UEAxMdYXRtYWlsLWRldi5pdC5zdS5z
+ZS1zaGliYi5jcnQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAL3asHFQGZX3
+ojnZrBw89ufD1Co/bLyNCgC++XHCCdxgqC4Dup279+45hrVS4J3uyWhFjKx2luff
+88QQ5XS4Bao3lwBbnct5ds83adFxCsS05l20YgSfDydWr6YBcssOq7ZvV/OJdkMI
+a0Uk+i6c+3+ChEVCwEZ9iRJdpuYEBT+3AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsG
+AQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEASeqm
+fJn6M79EiZh66eKW+iaszRpXPVvJgr+Bzv0mXZ11IKBdZKRx0LoxcYWlu/RzT2q2
+qgK+ISTg38JgmSq0G2tqQ3M51njLA0Lyj9dTaSkV1r22jQkmh7q6lPeeA+yQ8RF4
+cNel/csgsvm7FfgPWaQyWTGnGzNo0PmNTl7nMoM=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://atmail-dev-03.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://atmail-dev-08.it.su.se/shibboleth" xml:base="swamid-1.0/atmail-dev-08.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB+TCCAWKgAwIBAgIJAKMLZOIZMhLZMA0GCSqGSIb3DQEBBQUAMCgxJjAkBgNV
+BAMTHWF0bWFpbC1kZXYuaXQuc3Uuc2Utc2hpYmIuY3J0MB4XDTA5MDMwNTEyMzMz
+OVoXDTEwMDMwNTEyMzMzOVowKDEmMCQGA1UEAxMdYXRtYWlsLWRldi5pdC5zdS5z
+ZS1zaGliYi5jcnQwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAL3asHFQGZX3
+ojnZrBw89ufD1Co/bLyNCgC++XHCCdxgqC4Dup279+45hrVS4J3uyWhFjKx2luff
+88QQ5XS4Bao3lwBbnct5ds83adFxCsS05l20YgSfDydWr6YBcssOq7ZvV/OJdkMI
+a0Uk+i6c+3+ChEVCwEZ9iRJdpuYEBT+3AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsG
+AQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEASeqm
+fJn6M79EiZh66eKW+iaszRpXPVvJgr+Bzv0mXZ11IKBdZKRx0LoxcYWlu/RzT2q2
+qgK+ISTg38JgmSq0G2tqQ3M51njLA0Lyj9dTaSkV1r22jQkmh7q6lPeeA+yQ8RF4
+cNel/csgsvm7FfgPWaQyWTGnGzNo0PmNTl7nMoM=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://atmail-dev-08.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://dedserv79.levonline.com/shibboleth" xml:base="swamid-1.0/dedserv79.levonline.com.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDqTCCAxKgAwIBAgIQR6zE+Dd0h7n/xp/glALOXTANBgkqhkiG9w0BAQUFADCB
+xDELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTESMBAGA1UEBxMJ
+Q2FwZSBUb3duMR0wGwYDVQQKExRUaGF3dGUgQ29uc3VsdGluZyBjYzEoMCYGA1UE
+CxMfQ2VydGlmaWNhdGlvbiBTZXJ2aWNlcyBEaXZpc2lvbjEZMBcGA1UEAxMQVGhh
+d3RlIFNlcnZlciBDQTEmMCQGCSqGSIb3DQEJARYXc2VydmVyLWNlcnRzQHRoYXd0
+ZS5jb20wHhcNMDgxMjMxMDAwMDAwWhcNMDkxMjMxMjM1OTU5WjCBvjEfMB0GA1UE
+ChMWd3d3LnN1LmRlc2lnbm1hbnVhbC5zZTE7MDkGA1UECxMyR28gdG8gaHR0cHM6
+Ly93d3cudGhhd3RlLmNvbS9yZXBvc2l0b3J5L2luZGV4Lmh0bWwxIjAgBgNVBAsT
+GVRoYXd0ZSBTU0wxMjMgY2VydGlmaWNhdGUxGTAXBgNVBAsTEERvbWFpbiBWYWxp
+ZGF0ZWQxHzAdBgNVBAMTFnd3dy5zdS5kZXNpZ25tYW51YWwuc2UwgZ8wDQYJKoZI
+hvcNAQEBBQADgY0AMIGJAoGBAOXSB2UaeXIMM6A3GLYEuJzLon24K7epkJ4+YuhI
+d5f8DkAURzp4ZQSy7xs51NH2sha/PrcJehsax0QqEfM/lZ7HVH0iXx1Rl8Ou2hXE
+69Dm3zCf4TJKXNPrayGhNfq1gWu96COQ2h7rwReQYDcLUZ6aN40fyWyx5fMDp71f
+tHk7AgMBAAGjgZ8wgZwwDAYDVR0TAQH/BAIwADA5BgNVHR8EMjAwMC6gLKAqhiho
+dHRwOi8vY3JsLnRoYXd0ZS5jb20vVGhhd3RlU2VydmVyQ0EuY3JsMB0GA1UdJQQW
+MBQGCCsGAQUFBwMBBggrBgEFBQcDAjAyBggrBgEFBQcBAQQmMCQwIgYIKwYBBQUH
+MAGGFmh0dHA6Ly9vY3NwLnRoYXd0ZS5jb20wDQYJKoZIhvcNAQEFBQADgYEAyEa5
+yGXa4LSFMNuxnj6s4l9gG+pndoPlUC2c7Ux6dvD6GS17RV5Xq2ZZUk0J9yIoBAnZ
+inwJzduHXWa66JEY8lPf9ir7WKOZ6BcDMfhsYDVRoBoFlStIgXbweoaA/pJbadXH
+qlG83cbyWydqYCCYruAVslAykrwfBXAXdCs4YBs=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://dedserv79.levonline.com/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Emanuel</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Emanuel AB</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.emanuel.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Emanuel AB</Company>
+    <GivenName>Fredrik</GivenName>
+    <SurName>Näslund</SurName>
+    <EmailAddress>fredrik.naslund@emanuel.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://mondo.su.se" xml:base="swamid-1.0/mondo.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEqDCCA5CgAwIBAgILAQAAAAABF+lM7GUwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDIwNTExMTMyOFoXDTExMDIwNTExMTMyOFowWDELMAkGA1UEBhMCU0UxEjAQBgNVBAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEUMBIGA1UEAxMLbW9uZG8uc3Uuc2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQClSBJoeuabz4UK5mlbnydJ2ETrTVWhvpxIeRWXaeuHZHVLDaN2OBy8aLAePUrjtQpVhDFzZJTaqXdXW69R8hnMi+e7/AWXErrgAHxzISqBzYWINR3NxUHuMKmrYrx2FAB/GHE5kcyXhK+FFOO9QHoKGnsY4C5eNy+LEQy85vN7TZbbynJh+wz1Zt/dFCRsG4wjAJ/LKgnzbCOTpStPWBFBs5LwROQfAKeat2J988FRePNk8mpJV3Ul9/mLuFTxTkQH0IsyVe5FFxuDgOleMVY/DPkwusTnbfH6romQ4MGgZjC+868AS4DQZD+6FlPHbo5Exff7e+gz8Ix/dEQf6539AgMBAAGjggFqMIIBZjBQBgNVHSAESTBHMEUGByqGSLE+AQAwOjA4BggrBgEFBQcCARYsaHR0cDovL3d3dy5nbG9iYWxzaWduLm5ldC9yZXBvc2l0b3J5L2Nwcy5jZm0wDgYDVR0PAQH/BAQDAgWgMB8GA1UdIwQYMBaAFGVloz3XOxGjCgclN8lCSlt2d1DhMB0GA1UdDgQWBBQRIAkpF6sLIzBkXpn7H6dKD+rxqzA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdsb2JhbHNpZ24ubmV0L2VkdWNhdGlvbmFsLmNybDBPBggrBgEFBQcBAQRDMEEwPwYIKwYBBQUHMAKGM2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5uZXQvY2FjZXJ0L2VkdWNhdGlvbmFsLmNydDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFgYDVR0RBA8wDYILbW9uZG8uc3Uuc2UwDQYJKoZIhvcNAQEFBQADggEBAAqtgxC6/5zH9LRXhegr4kfa2FOzPMoxzvzRB4r9WO+57xD2ssX+qufIKZwHxV7zllI8WVq4U85KOkrxxqXn3arv8DRkw5zR0nYVKjkhl/ufWHqUARag8hn14nTDJvvnoRfoV5eq0xP7EYEBg0b67riujYbVpMNQ/OKK+DOKr2bPOv966GyUfX/5hlu1rweOixOcS7kOV+jCkPu80xElv+ARBhqn+4qph6WngFNh4Z/zrnJpuBYHmywmv873kFPauHEZukzFRNCgfmmQhz6OzXSBhT0JpuZG3SbXAtW7g1UMUd+NsTJzMXfPbh1y04GkC1KJmzcqNYuc2L04Q3mNwRY=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://mondo.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <SurName>IT och Media</SurName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+    <TelephoneNumber>+46 8 161999</TelephoneNumber>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://sakailab2.it.secure.su.se" xml:base="swamid-1.0/sakailab2.it.secure.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB8TCCAVqgAwIBAgIJAP4MwiI1u4AIMA0GCSqGSIb3DQEBBQUAMCQxIjAgBgNVBAMTGXNha2FpbGFiMi5pdC5zZWN1cmUuc3Uuc2UwHhcNMDcwNDEzMDgyMzI0WhcNMDgwNDEyMDgyMzI0WjAkMSIwIAYDVQQDExlzYWthaWxhYjIuaXQuc2VjdXJlLnN1LnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCij2ONEMrxXluEiQ64CbRCzSxQytiYJZ+v4DEuE4EoLNFXNI6lgRuz4IJeE6Trc8A5k1yvBS8Nd+9XemLESG02z5xcaRI0dyc4SItOcPnsMYI9ionl/ieQmS0Nr3PBM4LPla6MDAQkGblnEdfKQ6Ht5UFI2VGBIAfZEpQezcxiWQIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4GBABHSliUMz1w1CBX2arDOnAwS61/a2uUMer4fejYGXIl5Ch3j8xtHrTQ5lezjNXYZKMZIT7rraDmqwPJv2SBsrD4CJVY/D5frOSYokfScetjtXIUyzSGqBGZruxEZcDkou9uUacG2AWTvLnUuagH1Xtu9RrWVV1+n/MpKPXgIzKEk</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sakailab2.it.secure.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>joakim.lundin@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://ensky.lhs.se/shibboleth" xml:base="swamid-1.0/ensky.lhs.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDGzCCAoSgAwIBAgIBADANBgkqhkiG9w0BAQQFADBtMQswCQYDVQQGEwJTRTESMBAGA1UECBMJU3RvY2tob2xtMRIwEAYDVQQHEwlTdG9ja2hvbG0xHzAdBgNVBAoTFlN0b2NraG9sbXMgdW5pdmVyc2l0ZXQxFTATBgNVBAMTDGVuc2t5Lmxocy5zZTAeFw0wODAxMDQxMzMyMjdaFw0wOTAxMDMxMzMyMjdaMG0xCzAJBgNVBAYTAlNFMRIwEAYDVQQIEwlTdG9ja2hvbG0xEjAQBgNVBAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEVMBMGA1UEAxMMZW5za3kubGhzLnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC2CiFF4kFxQldm58ws8hL5xZ+g9eJ+MyM51AstGYvu1RTcorlVtIZNcGSQQxdKZyh0sSxo7UYrKq5OqByycIxiya5jo7lwVrKZnd7Tto7RThgxiO6G6i3G36osvZiZpFGYgETSVQjh1XknN5n9samtrEqM6p1ASsW8iLmpcjJ0vwIDAQABo4HKMIHHMB0GA1UdDgQWBBSmAaEu+Tmvy3zW9M0oTdY68IlS+TCBlwYDVR0jBIGPMIGMgBSmAaEu+Tmvy3zW9M0oTdY68IlS+aFxpG8wbTELMAkGA1UEBhMCU0UxEjAQBgNVBAgTCVN0b2NraG9sbTESMBAGA1UEBxMJU3RvY2tob2xtMR8wHQYDVQQKExZTdG9ja2hvbG1zIHVuaXZlcnNpdGV0MRUwEwYDVQQDEwxlbnNreS5saHMuc2WCAQAwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQQFAAOBgQClgcpD+e9rYZ7Uk43AJ+Xbg/h7M8kMPzzTnikIGNIR1t+ArCoRxX/YchJ1LtCFEkOBC16HKewBxKoslypESqSOsVMyr3z/TUDvEBUaNbHLmwuD616gZK1Vb9FYAQWHmXBNeWJl09476pMXW3u9MTRL+FXFMjt7IiwIysrEcHht3Q==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://ensky.lhs.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <SurName>Helpdesk</SurName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://shib-sp.kau.se/shibboleth" xml:base="swamid-1.0/shib-sp.kau.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEOzCCAyOgAwIBAgILAQAAAAABGZV7kNAwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDQyODE0NDE0MloXDTExMDQyODE0NDE0MlowbDELMAkGA1UEBhMCU0UxETAPBgNVBAgTCFZhcm1sYW5kMREwDwYDVQQHEwhLYXJsc3RhZDEeMBwGA1UEChMVS2FybHN0YWRzIHVuaXZlcnNpdGV0MRcwFQYDVQQDEw5zaGliLXNwLmthdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwWLmt/yXGpvZePRdurs9d88gTVDwLlDXBjTqTIKVjSqLL/e2wcf4KVySNd1DM2/GDf1+w5GA+gnqsjLHjER98tZIKJ9k8M3Euj1eZGdOnqDmYBd1lv7aqny1H6HI6jGaDzLWh+lyTEZYGVToMPAEqjoa4JL9UVxe8NDf7QUYSfUCAwEAAaOCAW0wggFpMFAGA1UdIARJMEcwRQYHKoZIsT4BADA6MDgGCCsGAQUFBwIBFixodHRwOi8vd3d3Lmdsb2JhbHNpZ24ubmV0L3JlcG9zaXRvcnkvY3BzLmNmbTAOBgNVHQ8BAf8EBAMCBaAwHwYDVR0jBBgwFoAUZWWjPdc7EaMKByU3yUJKW3Z3UOEwHQYDVR0OBBYEFMvK6U7CjAuzqDcmFPeN7/Z2O64rMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5uZXQvZWR1Y2F0aW9uYWwuY3JsME8GCCsGAQUFBwEBBEMwQTA/BggrBgEFBQcwAoYzaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLm5ldC9jYWNlcnQvZWR1Y2F0aW9uYWwuY3J0MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAZBgNVHREEEjAQgg5zaGliLXNwLmthdS5zZTANBgkqhkiG9w0BAQUFAAOCAQEANiuwG1H0856K8Fyw42L21cA3OpGAgWGYQ8AM+wPlmxIKj8eWWNOgR/xSDNLbSVKBLY76bSLNeDbTpodz0Dxhepv0GEnUWic9qNK7mp3Y0swNLMlr3KvRpoSc3zNqjHu7DeAJvXQO+iiXdLQnwegCEaXPj6HXKOo4nETG43KW3GNLO8fAaCHnBDZqIgBqx/3jCIgIBtwZwAN6F92LTVYkzso6gi9Y15LDkqTUWuw0rTnM2xG/ceXxiLGJJ8cDVhvBpTKTedD6cslNY9DFOXyfbuToQv+4ZyCpYnnGc92CSU0AWmIabqfHozHN6aq9oGzD+/bgg5TSRP6yvb/RQgPICQ==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://shib-sp.kau.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">KAU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Karlstad university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.kau.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Karlstad University</Company>
+    <GivenName>Paul</GivenName>
+    <SurName>Scott</SurName>
+    <EmailAddress>paul.scott@kau.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://www.wisum.umdac.umu.se/shibboleth" xml:base="swamid-1.0/www.wisum.umdac.umu.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEIDCCAwigAwIBAgIJAK9QqKCZ3zkPMA0GCSqGSIb3DQEBBQUAMFoxCzAJBgNVBAYTAlNFMRkwFwYDVQQKExBVbWVhIHVuaXZlcnNpdGV0MQ4wDAYDVQQLEwVVTURBQzEgMB4GA1UEAxMXc2hpYi53aXN1bS51bWRhYy51bXUuc2UwHhcNMDgwNDA5MTMxODExWhcNMTgwNDA3MTMxODExWjBaMQswCQYDVQQGEwJTRTEZMBcGA1UEChMQVW1lYSB1bml2ZXJzaXRldDEOMAwGA1UECxMFVU1EQUMxIDAeBgNVBAMTF3NoaWIud2lzdW0udW1kYWMudW11LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmNj6WbsLMYpYHT4ADVRHbwuAQyFcOae7XyGOi8zBBBr72UP3xK6u1Hp3bt1yLRvt/RbHgCDpOzMmgMaRQ2cdl9Zvv5g/b+linOvMIYGQMPpyfLv2+bUcMVGRJdNLLEIMoLAXPBLxDxe6sFYYZXneJ23N/HcYLqlqAq6tcrRcYSqlg0MtgHb73X9pIGDOVkj4+kXRi8QgctJ6fP4smdjJ/czrit2pxpZVS/YPpd7+7HcNWW+KVBE21n0GiXB3+Xz/UlGDtJVK85xRLEeW968IshsIr2vb5owSw6bmCstJpfFAUnxUkFbSacPRZ6IE5RVwZsIDdU1x5fZWnZ7Go028vwIDAQABo4HoMIHlMB0GA1UdDgQWBBSKDBHqWWDKe3RRfwtFEKDYMT2QkjCBjAYDVR0jBIGEMIGBgBSKDBHqWWDKe3RRfwtFEKDYMT2QkqFepFwwWjELMAkGA1UEBhMCU0UxGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxDjAMBgNVBAsTBVVNREFDMSAwHgYDVQQDExdzaGliLndpc3VtLnVtZGFjLnVtdS5zZYIJAK9QqKCZ3zkPMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjANBgkqhkiG9w0BAQUFAAOCAQEADPd7MbU1LuZE1a109E/Aur9gr/A0OI6j4r5ODOlumR7XYKLvzjc8ccTh9//uznSGgxKsfB47YDRi1fNI+LemRfiLXaFex3gTPj0S8bXZtZHnotF9M97HgwXSihEfULhRqWZ/JYw4P96XX22BmAHCfAI6w6ZCxhDcY4ekDuOTKszPd9mdHw798GKqM0S+GRCtk4L0dQfeocWyEYaYI0bXNeJi7MNfmm5Qj9ynruEYKpOQfZ/oTeVmdhxe4T0CgOvygcsMPdYgTMrTItqtwO3vVRTn4ryNQLWtxs7sMF9v93ylUECtDyYoziBoL0qkD/aq7B+Wm9EV7D03jOf47P/LjQ==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www.wisum.umdac.umu.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå University</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>UMDAC</Company>
+    <GivenName>Tommy</GivenName>
+    <SurName>Larsson</SurName>
+    <EmailAddress>tommy.larsson@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://beta.augustus.se" xml:base="swamid-1.0/beta.augustus.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB1zCCAUCgAwIBAgIBADANBgkqhkiG9w0BAQUFADAbMRkwFwYDVQQDExBiZXRhLmF1Z3VzdHVzLnNlMB4XDTA3MDMwNjEwMDQxNFoXDTA3MDQwNTEwMDQxNFowGzEZMBcGA1UEAxMQYmV0YS5hdWd1c3R1cy5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAspI7ryh7WFO+CWytUzDg4U/WEKsX/ty82lQ31JdBhKkVV66vPRWz81QjzPruL7+dLLDtgcMJNPwNR8BHOHA0R/XlYsePA/GL0iGbwkXRlPs63wELlaj1TiXgtnOBRLrBRHyUIcnrq3c2tVrrUmLp4gifKIHhBgsKwZkDvUN+88UCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQCXjwpqbm73q7ZadtdRLeLCjMspJjHWMGRCJvIb+EqEaO4CFFHFl+XxSUHIkbZk3VUrTZkQ+gQSY649mhsz+TL+saFPRqQQtWIS8okALuVStN0ySkY1NRml8Ou9sq3/CRl77f02Ff5QgemFqQGilmso7XEXhLDL2kOFxKLHBtbQzg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://beta.augustus.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Genuine Text</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Genuine Text</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.genuinetext.com</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Know Net AB</Company>
+    <GivenName>Ingemar</GivenName>
+    <SurName>Lundström</SurName>
+    <EmailAddress>ingemar.lundstrom@knownet.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://dspace.it.su.se" xml:base="swamid-1.0/dspace.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB3TCCAUagAwIBAgIJAIn9WqXf82qOMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMTD2RzcGFjZS5pdC5zdS5zZTAeFw0wNzA3MTIxMzQyMTlaFw0wODA3MTExMzQyMTlaMBoxGDAWBgNVBAMTD2RzcGFjZS5pdC5zdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAyYoPpp6u3J8W5IWpucWDj0AsqQ/pQ57t69VPK3zgm1UYD8F5mLiOfS8QnKeQfrwZ9UY3kY6R/T1OQIQ3rO3v/48Kp4lAC6Dc2nHVYGLAWHiv7tE9PxT/JZlj8K7NJRNMhbiciwZvCPUkOSR5X9AL0OKdCHzjt+00iZ4HY5+nsFkCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQC5Iwgi0vCqM9wjQsPNlmcDhd3NtVpTVhLSNjQw7pwGT4Xpfh1OaiMU3IqWJoaiGDXhF4YqPNkt4IDcgR2a+U6j8pTG1WDqRnzmCCNSCLfBcsIKhvm+qbW1sazWdHCWE4Z6ZDPL2Gw88EHmYAgC+2s0Dhun9IueFTdaUpoY2EW21Q==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://dspace.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Jan</GivenName>
+    <SurName>Johansson</SurName>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://lists.su.se/shibboleth" xml:base="swamid-1.0/lists.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB1TCCAT6gAwIBAgIJAOsd1P/iHwDdMA0GCSqGSIb3DQEBBQUAMBYxFDASBgNVBAMTC2xpc3RzLnN1LnNlMB4XDTA4MDIxMjEyNTk0NVoXDTA5MDIxMTEyNTk0NVowFjEUMBIGA1UEAxMLbGlzdHMuc3Uuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALnNTH6G15SgAwQHMCa9FLJ4g/MnmZ+2Q0m8ZvXA5OKoLY+7vpH7XrojM2/ziobcPK+pE5UNaNOpVffBUFtibabgXs2N7BUDJWjcvRqk5rxmEoMd1mCRQ6WOATBPdSkZ3xFvs0yy5y+1xRNsBji7gb326dHS/WUIDAw/62dCLG5PAgMBAAGjKzApMCcGA1UdJQQgMB4GCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEAH7Ml0chViQ1GTX4RkL/S8bJpELYqTNBZ7+s7wMOwPF/TxJKeC6yFCkFKx4Ts8uGuJ3Bo3MsetTTUe24WD5aRO76k6p7y/HPs+nk0e0VJKz3NSktKGE/uXt59B/ax1tdVOMuZTGV9GwwlgHOMapYOBylI7Nriufub8Cgtwf4VwgQ=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://lists.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Helpdesk</GivenName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://shibboleth.sys.kth.se/identity" xml:base="swamid-1.0/shibboleth.sys.kth.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>kth.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB6TCCAVKgAwIBAgIJAOWxnEiImxnuMA0GCSqGSIb3DQEBBQUAMCAxHjAcBgNVBAMTFXNoaWJib2xldGguc3lzLmt0aC5zZTAeFw0wODAyMDcwMDI4MDFaFw0xMTAyMDYwMDI4MDFaMCAxHjAcBgNVBAMTFXNoaWJib2xldGguc3lzLmt0aC5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAsoH589Je8tY9QKR4fdR5IMw+EOAsGNETKCdap9hqbSKSX5cG8xsJ3wjgxwbe9LbiboKk8GwxU/iSuxtzIa+myfeFkgL/IR0En6lyFvPnJxcNOV2fAVlForH2OPrt/WxeP9AzkzyjzrjOtH6mi4pT7jiHjxKWX7L6vB7rgyTJjHsCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQB3Ktsl6UYCV5YRwJ/gnHndiiUR/kOdaJaC0sv5C1f+uNdBGxJqz6h8W4rKXv6B4m/oDyZY0P7GYY1bZ2fMTnTfVF5MsCscURIIHz8bo+/LoYp/fRQSm/AG2Xz3vJFEMFtKXoGvi9VgcSS1BoBAn2I9oxZTNmTxlmkocYMYXdMopA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://shibboleth.sys.kth.se:8443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>kth.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB6TCCAVKgAwIBAgIJAOWxnEiImxnuMA0GCSqGSIb3DQEBBQUAMCAxHjAcBgNVBAMTFXNoaWJib2xldGguc3lzLmt0aC5zZTAeFw0wODAyMDcwMDI4MDFaFw0xMTAyMDYwMDI4MDFaMCAxHjAcBgNVBAMTFXNoaWJib2xldGguc3lzLmt0aC5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAsoH589Je8tY9QKR4fdR5IMw+EOAsGNETKCdap9hqbSKSX5cG8xsJ3wjgxwbe9LbiboKk8GwxU/iSuxtzIa+myfeFkgL/IR0En6lyFvPnJxcNOV2fAVlForH2OPrt/WxeP9AzkzyjzrjOtH6mi4pT7jiHjxKWX7L6vB7rgyTJjHsCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQB3Ktsl6UYCV5YRwJ/gnHndiiUR/kOdaJaC0sv5C1f+uNdBGxJqz6h8W4rKXv6B4m/oDyZY0P7GYY1bZ2fMTnTfVF5MsCscURIIHz8bo+/LoYp/fRQSm/AG2Xz3vJFEMFtKXoGvi9VgcSS1BoBAn2I9oxZTNmTxlmkocYMYXdMopA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://shibboleth.sys.kth.se/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://shibboleth.sys.kth.se/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">KTH</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Royal Institute of Technology</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.kth.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Royal Institute of Technology</Company>
+    <EmailAddress>jbn@kth.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://pp-admin.it.su.se/shibboleth" xml:base="swamid-1.0/pp-admin.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEtDCCA5ygAwIBAgILAQAAAAABGexP22YwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDUxNTExMjA1OFoXDTExMDUxNTExMjA1OFowXjELMAkGA1UEBhMCU0UxEjAQBgNVBAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEaMBgGA1UEAxMRcHAtYWRtaW4uaXQuc3Uuc2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC6OjuBsS+ovpRix7TUGMEcb+i2oovl8ByI4/zVEhEnxx5+Ge87eWcmysYeWad+HubtiZY72lcaOwCAb4LBKwHr7EzoJeF7+fw4AfprJvbBvsPcc0OMCqzqDrw6PgXizNsQV8e4PaWEKCQctkRaUAxW62rWhJh2rHMy4EIostzUNlZpwQpy78VLylAVCCM1vPJJY0w6D0PJYW6i8kpjzafaghpkNjO0rMNK+gZpW+T6oIwE5cwfKUb0hIBWC8eyczpG7bpp3Vz/Wj8aKcNPsUAMv49qKKNs+J87rQ/BnWaTvFPT65UVdxDuFmtF+pZs0pkhd9zsTjgd7/3smOuBRTzpAgMBAAGjggFwMIIBbDBQBgNVHSAESTBHMEUGByqGSLE+AQAwOjA4BggrBgEFBQcCARYsaHR0cDovL3d3dy5nbG9iYWxzaWduLm5ldC9yZXBvc2l0b3J5L2Nwcy5jZm0wDgYDVR0PAQH/BAQDAgWgMB8GA1UdIwQYMBaAFGVloz3XOxGjCgclN8lCSlt2d1DhMB0GA1UdDgQWBBRMpoJHRqciKnJu7I96P/+zer9o3jA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdsb2JhbHNpZ24ubmV0L2VkdWNhdGlvbmFsLmNybDBPBggrBgEFBQcBAQRDMEEwPwYIKwYBBQUHMAKGM2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5uZXQvY2FjZXJ0L2VkdWNhdGlvbmFsLmNydDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwHAYDVR0RBBUwE4IRcHAtYWRtaW4uaXQuc3Uuc2UwDQYJKoZIhvcNAQEFBQADggEBAI3W3fQlz6aTvGwzQkGF1jAwCUruHjj2/Zmxyt1SiagyGDPx0SMIEm6QygWe64UgFmGOrql3eAE/4N7XfqMq6Ue4LO72I3Td6cDKVmR8jO0cjl4Uz0p4FL0gfIB/4HF7fEOGep+0LqITKt5DhG7N43naV+ZYkP0wXzfwFZhkKb95bH3csPGqAs4pwULQpD4bskN9IrwQZeSOsWHOVmrO/6T81W3zrqLwEwx1b9CRteuF6UlKHPSYCcsodl53PLCnAZU8MKXnzGN94d34gg88Es2F4XY6ulPwlr+wKBTlb0lZSH9ScgjSm3uKikSb2S57pLREth398dCkAXSBVbwL3Cg=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://pp-admin.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>SU Helpdesk</GivenName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://www.sub.su.se" xml:base="swamid-1.0/www.sub.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB2TCCAUKgAwIBAgIJAIRfFzH12j9JMA0GCSqGSIb3DQEBBQUAMBgxFjAUBgNVBAMTDXd3dy5zdWIuc3Uuc2UwHhcNMDgwNTE0MTQ0NzQ5WhcNMDkwNTE0MTQ0NzQ5WjAYMRYwFAYDVQQDEw13d3cuc3ViLnN1LnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC/9u6s9iHrmj7IvMgSpT8UEzo+Wld9S1QKximd7S6vkIf2arFtvC+Wr04ilfgS6Sp4fOXtGoo9nM7rp6CCdg2RNsrrPUrbs/QkLS5kii2lvQgJ+Q+cJNyJBJhUOgczKcF1nax1roIHKoRMrlRaaeYPv2hh4cVWT23gE5sd+L4pgwIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4GBABcE9tkmR3jTnoWrU5o54zbUKsehvKJozqBrMInvLqwyURkUG2M2jHG+RLtJ0VXBYqtEPbjq0O0kQ6JjAlciMsgv9SVyYryhMjtHZujTalMnRwLF7uWNtR62wY+w53G+7dr9F6cOh4bCXqEN/xs8SoYEymgUBrfKR8SVNxRihZFk</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www.sub.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Conny</GivenName>
+    <SurName>Richardson</SurName>
+    <EmailAddress>conny.richardson@sub.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.protectnetwork.org/protectnetwork-idp" xml:base="swamid-1.0/idp.protectnetwork.org.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>idp.protectnetwork.org</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIICxzCCAjCgAwIBAgIBATANBgkqhkiG9w0BAQUFADCBkTELMAkGA1UEBhMCVVMxDjAMBgNVBAgTBVRleGFzMRcwFQYDVQQKEw45U3RhciBSZXNlYXJjaDEXMBUGA1UECxMOUHJvdGVjdE5ldHdvcmsxGjAYBgNVBAMTEVByb3RlY3ROZXR3b3JrIENBMSQwIgYJKoZIhvcNAQkBFhVjYUBwcm90ZWN0bmV0d29yay5vcmcwHhcNMDcwMjE0MjA1ODA4WhcNMTcwMjExMjA1ODA4WjCBhzELMAkGA1UEBhMCVVMxDjAMBgNVBAgTBVRleGFzMQ8wDQYDVQQHEwZBdXN0aW4xHTAbBgNVBAoTFDlTdGFyIFJlc2VhcmNoLCBJbmMuMRcwFQYDVQQLEw5Qcm90ZWN0TmV0d29yazEfMB0GA1UEAxMWaWRwLnByb3RlY3RuZXR3b3JrLm9yZzBcMA0GCSqGSIb3DQEBAQUAA0sAMEgCQQDQt4HC/EHIKS8a+Qd/4JE20wR91v5N7jh8ScDw6DvZ5RcvHQngXCk6FfCFUAev/dZxR31U4RpvFzCbj3sGB+G1AgMBAAGjezB5MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBTRRyiPTvIDunJKy1+hmlkgl7/G+zAfBgNVHSMEGDAWgBQtFNiF4X/xTkU36JaWVCh08bzGgDANBgkqhkiG9w0BAQUFAAOBgQAm3BTIwg6Lxk3EAoLR2cDfb+jNWAtls7q077Mw3tMXxnuoi0uSo+LC6bPdPjC9YKujSKF34Au0s7y9bfXspClfCmyuviYVOrpVUze2h2MfHUVsKEUo/uivLYuMZjNp6Yrt90AoKPLPF6vU6gLAn6nsR7bhsdIqSXD/93r8HFV3NA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.protectnetwork.org:8443/protectnetwork-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>idp.protectnetwork.org</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIICxzCCAjCgAwIBAgIBATANBgkqhkiG9w0BAQUFADCBkTELMAkGA1UEBhMCVVMxDjAMBgNVBAgTBVRleGFzMRcwFQYDVQQKEw45U3RhciBSZXNlYXJjaDEXMBUGA1UECxMOUHJvdGVjdE5ldHdvcmsxGjAYBgNVBAMTEVByb3RlY3ROZXR3b3JrIENBMSQwIgYJKoZIhvcNAQkBFhVjYUBwcm90ZWN0bmV0d29yay5vcmcwHhcNMDcwMjE0MjA1ODA4WhcNMTcwMjExMjA1ODA4WjCBhzELMAkGA1UEBhMCVVMxDjAMBgNVBAgTBVRleGFzMQ8wDQYDVQQHEwZBdXN0aW4xHTAbBgNVBAoTFDlTdGFyIFJlc2VhcmNoLCBJbmMuMRcwFQYDVQQLEw5Qcm90ZWN0TmV0d29yazEfMB0GA1UEAxMWaWRwLnByb3RlY3RuZXR3b3JrLm9yZzBcMA0GCSqGSIb3DQEBAQUAA0sAMEgCQQDQt4HC/EHIKS8a+Qd/4JE20wR91v5N7jh8ScDw6DvZ5RcvHQngXCk6FfCFUAev/dZxR31U4RpvFzCbj3sGB+G1AgMBAAGjezB5MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBTRRyiPTvIDunJKy1+hmlkgl7/G+zAfBgNVHSMEGDAWgBQtFNiF4X/xTkU36JaWVCh08bzGgDANBgkqhkiG9w0BAQUFAAOBgQAm3BTIwg6Lxk3EAoLR2cDfb+jNWAtls7q077Mw3tMXxnuoi0uSo+LC6bPdPjC9YKujSKF34Au0s7y9bfXspClfCmyuviYVOrpVUze2h2MfHUVsKEUo/uivLYuMZjNp6Yrt90AoKPLPF6vU6gLAn6nsR7bhsdIqSXD/93r8HFV3NA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.protectnetwork.org/protectnetwork-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.protectnetwork.org/protectnetwork-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">ProtectNetwork</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">ProtectNetwork</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.protectnetwork.com/</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <SurName>Technical Contact</SurName>
+    <EmailAddress>support@protectnetwork.org</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://www2.genuinetext.com" xml:base="swamid-1.0/www2.genuinetext.com.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB3zCCAUigAwIBAgIBADANBgkqhkiG9w0BAQUFADAfMR0wGwYDVQQDExR3d3cyLmdlbnVpbmV0ZXh0LmNvbTAeFw0wNzA2MjgwNzQyMDFaFw0wODA2MjcwNzQyMDFaMB8xHTAbBgNVBAMTFHd3dzIuZ2VudWluZXRleHQuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDXrK5K9YE7tnnBVaTMz69QcJjidb7xnIWJdVeC9YYlelV9tFN36p+u7QgK/eG+vRc9Kwh1RUoI0XbuzC5Fdxc5YiMBZgZ2R2JxnYzEcfvdzos3II8RogwyivbLsUT5NU0F4FLjwov1zF1QpoSvGuW1/CJMExRgIp7vW3DVhS5YJQIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4GBAJTktMXh4KsNDVG1y2LbyetIzFPlBWlFRXlgAtIOR+zjCholmKT3CXm4adUiOPedWrI267c1d26rnWhkJQ8Oy8Z1m7byqR19jwrWVDzOhbr6jjBSevwl1KgswifirFvm8COPZcrliWg95lCuCwDHRH2QDJKzXPDNNmGBh6h3Ka/g</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www2.genuinetext.com/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Genuine Text</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Genuine Text</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.genuinetext.com</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Know Net AB</Company>
+    <GivenName>Ingemar</GivenName>
+    <SurName>Lundström</SurName>
+    <EmailAddress>ingemar.lundstrom@knownet.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://lab03.lab.it.su.se" xml:base="swamid-1.0/lab03.lab.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB4zCCAUygAwIBAgIJAKqPtbsIKhS9MA0GCSqGSIb3DQEBBQUAMB0xGzAZBgNVBAMTEmxhYjAzLmxhYi5pdC5zdS5zZTAeFw0wNzA1MDIwODA1NDdaFw0wODA1MDEwODA1NDdaMB0xGzAZBgNVBAMTEmxhYjAzLmxhYi5pdC5zdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAvwFbKHSn0UpnszEG7YuVxKj+ZXKfsbcOJqHSiZMhGemw4CWc+ExXYFPDTSaphqatht3q17u9CFUkpygMo2HUWLWO5Zdk2lgpnhnT2B1xk8esRS0yjCwE0Gv9QewxaSCS+e+i5cMsXVhXD5zkBIKmW10p59YJ0qPwkRuwTcs02uUCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQB10thLCTHsz++ZC5far37xRlor/7BF3o86JBtyqXNdYszFxgWYOILxC/rYiCxZr8ON1QKQ3ZNj+sZxZm1/fAQl+4hNCs1XgvoLRqK/eW4DHZLZWjQyn9+aHI1+ADkpzARLbJf5TQCJeJSmp+f3YIbqJQptXIGcBvLBSoe1R7Drag==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://lab03.lab.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Mattias</GivenName>
+    <SurName>Amnefelt</SurName>
+    <EmailAddress>mattiasa@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://calsrv1.it.secure.su.se" xml:base="swamid-1.0/calsrv1.it.secure.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB7TCCAVagAwIBAgIJALw0kc74UYP+MA0GCSqGSIb3DQEBBQUAMCIxIDAeBgNVBAMTF2NhbHNydjEuaXQuc2VjdXJlLnN1LnNlMB4XDTA3MDUyMjA3NDA0OFoXDTA4MDUyMTA3NDA0OFowIjEgMB4GA1UEAxMXY2Fsc3J2MS5pdC5zZWN1cmUuc3Uuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKVMn+fnnV8w2GuB1KMm6gEiZqqCBrHWWUDK5SEVDy6rT2qK/VkuxyxvDPFXdd8kbpaOpqxMcy+J4QvS74xkOSKHF8ISTvX9328cU1pUe9u7Gd5C37zD5OgAUqIVq1GwvZHrSstZuoF/4LQoJJbEBquwGGd8tldflGEJtcxb7iP7AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEAoFPwC0awA7gYbfZPCtUpHmly4cc8utYSgjb+rsTFGuYu5V7Ec5/o1F73vsibmRufBRyczQsX9oeNHENawKmka/0JUo1FTyTI0yN1or7LhW8mAle+80o5EVd/Xa5yP4jof+/Ey79UeLG+CuJbRiH0f9kO1e4r/fFGP60Ck76CeoU=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://calsrv1.it.secure.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Mattias</GivenName>
+    <SurName>Amnefelt</SurName>
+    <EmailAddress>mattiasa@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://samsok.libris.kb.se/shibboleth" xml:base="swamid-1.0/samsok.libris.kb.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB5TCCAU6gAwIBAgIJAKMZgDG7eScnMA0GCSqGSIb3DQEBBQUAMB4xHDAaBgNVBAMTE3NhbXNvay5saWJyaXMua2Iuc2UwHhcNMDcxMTA3MDk0MzI5WhcNMDgxMTA2MDk0MzI5WjAeMRwwGgYDVQQDExNzYW1zb2subGlicmlzLmtiLnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCydaK46C816+A1I6Ykb9AvLf0rfYlhFT6vMe0a3DM7A0HovsWl8HThJwQNTGSDowty1svAlRgBU5gQKuCA9ruc7XZi7pn0vuVgtayVvkoh9adN/8QVFvz2KY0uux7M2ewyQ+R2PA/w58LJa996RQlcHeDAdQFfg87nUFQEZauy5QIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4GBAHFDEp8qHZKfS1RQDYvG/pYJZ/0PHRcoDK5J2GGpQ4/SIsJBbtF/2uWLVfywNDYIP7DruWxHUOLaNE6ovJ9S1+RGi8iix8I44/Nh0EjyyQqU8w8IoyDdzUUV9fBZ2BWz0JvFT4uBZDR2b3keXr2OlxYphbx3ikXpwZrVzWQq6mKm</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://samsok.libris.kb.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Libris</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Libris</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.kb.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Kungliga Biblioteket</Company>
+    <GivenName>Arvid</GivenName>
+    <SurName>Oja</SurName>
+    <EmailAddress>arvid.oja@kb.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://shibidp.uu.se/identity" xml:base="swamid-1.0/shibidp.uu.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>user.uu.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB0TCCATqgAwIBAgIBADANBgkqhkiG9w0BAQUFADAYMRYwFAYDVQQDEw1zaGliaWRwLnV1LnNlMB4XDTA3MDUwODEwNDY1MFoXDTA4MDUwNzEwNDY1MFowGDEWMBQGA1UEAxMNc2hpYmlkcC51dS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAzGH4thr/rDNTlJ3TsiWJVn+2iyzT6Up6ovHXYmNvhltZ3+hmrtdnbCqQY4qukpBO88JDZ23PiVLJq4uR0UGwGsyz8Pv9xQo+N9v+LchgL0iGgjdN7ocrNGj4GZjtuJwyzi83QvAct7wVkkXi5aAmF8nJkRSvUTXWqhJxOiFztb8CAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQCd/cI5uIl8XgRP/dtC5veRO3m7phwQworwQMruTHgWvLL5cJ6Sh18dPOVZmHz/Hcldh0qeqPvL41oXe+84oMdscMHNGIUngj4tLywAwosjQiNGX9yqfxjUKqhuHJUcxZ0tEZHJZB+WEPybvVULvSUXa4ldQaKs4iRDPdCLHwCcQw==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://shibidp.uu.se:8443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>user.uu.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB0TCCATqgAwIBAgIBADANBgkqhkiG9w0BAQUFADAYMRYwFAYDVQQDEw1zaGliaWRwLnV1LnNlMB4XDTA3MDUwODEwNDY1MFoXDTA4MDUwNzEwNDY1MFowGDEWMBQGA1UEAxMNc2hpYmlkcC51dS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAzGH4thr/rDNTlJ3TsiWJVn+2iyzT6Up6ovHXYmNvhltZ3+hmrtdnbCqQY4qukpBO88JDZ23PiVLJq4uR0UGwGsyz8Pv9xQo+N9v+LchgL0iGgjdN7ocrNGj4GZjtuJwyzi83QvAct7wVkkXi5aAmF8nJkRSvUTXWqhJxOiFztb8CAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQCd/cI5uIl8XgRP/dtC5veRO3m7phwQworwQMruTHgWvLL5cJ6Sh18dPOVZmHz/Hcldh0qeqPvL41oXe+84oMdscMHNGIUngj4tLywAwosjQiNGX9yqfxjUKqhuHJUcxZ0tEZHJZB+WEPybvVULvSUXa4ldQaKs4iRDPdCLHwCcQw==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://shibidp.uu.se/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://shibidp.uu.se/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Uppsala University</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.uu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Uppsala Universitet</Company>
+    <SurName>IT Stöd</SurName>
+    <EmailAddress>shibboleth-datordrift@its.uu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://public.it.secure.su.se/shibboleth" xml:base="swamid-1.0/public.it.secure.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEvjCCA6agAwIBAgILAQAAAAABFmvKK3EwDQYJKoZIhvcNAQEFBQAwXzELMAkG
+A1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlv
+bmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA3
+MTEyMzA5MTUxOVoXDTEwMTEyMzA5MTUxOVowYzELMAkGA1UEBhMCU0UxEjAQBgNV
+BAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEf
+MB0GA1UEAxMWcHVibGljLml0LnNlY3VyZS5zdS5zZTCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBANux9UY7pUlBpN3lxrQWXjZ00DK1xzfcQEEC6LKspVYe
+GJsAiFRc+SMop1Cnc4YiOddStc9+IDRKwb73vHx/GFtnI7Zb1qIXpJ0M0ZrfGidA
+tztvxyCH4XfUtkt5FN7ddC5BliOyiMe3zyj8iFI+9nNfD78Y6j/3fE6WrvUJc/4d
+DDPRZTe6TrGUNBkciAJ6oacr4OpQZbfCfj+a2Yn7cOPR1zd6F8AlZJFq7Ar10GyK
+tyO9vtRYohrFPtyWzAcKtWviLqhMqtD7lJ0YhWWWG3v0urf4oEuV61V+kYdVkWfq
+e+IEYZE7PHh3KtlsAxR77MEGAOMUJBpSV0SwqYR1DW0CAwEAAaOCAXUwggFxMFAG
+A1UdIARJMEcwRQYHKoZIsT4BADA6MDgGCCsGAQUFBwIBFixodHRwOi8vd3d3Lmds
+b2JhbHNpZ24ubmV0L3JlcG9zaXRvcnkvY3BzLmNmbTAOBgNVHQ8BAf8EBAMCBaAw
+HwYDVR0jBBgwFoAUZWWjPdc7EaMKByU3yUJKW3Z3UOEwHQYDVR0OBBYEFPdeIF2l
+bPoooNDO34RQ7onNPa8+MDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwuZ2xv
+YmFsc2lnbi5uZXQvZWR1Y2F0aW9uYWwuY3JsME8GCCsGAQUFBwEBBEMwQTA/Bggr
+BgEFBQcwAoYzaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLm5ldC9jYWNlcnQvZWR1
+Y2F0aW9uYWwuY3J0MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAhBgNV
+HREEGjAYghZwdWJsaWMuaXQuc2VjdXJlLnN1LnNlMA0GCSqGSIb3DQEBBQUAA4IB
+AQAfFkW7oYLUfXyNkUeY0JhCRjyyjrqb9fhRNRsvB1VjTrHAv631Md9wUtMMb4+t
+aZTPnVsLtDlHA35spsrOMbW+9oDQ06SuKG3DV5WMSF8ikOMuKhlPdLK9+PPm3dHW
+A2A0TrQm1vGjxAOnswwqqEubsyxkmudvN2K+TIsX0H95rxQu3LgJsd0waABo6MmU
+eL583SvdxpG2Lm7xlIlcIH8jxWku6Mdr4ddGInUTlMsDuNnHXkVhVnnKZbw1vR/G
+c7BUOAsMn/LFsWGiq4tSa3HLbBcmEp2wS6Ige0RvRXqlks3NFiJmkQCtTsaf2W3A
+oVTP6ALo3SBZB1UvM5yfdUek</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://public.it.secure.su.se/shibboleth/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Leif</GivenName>
+    <SurName>Johansson</SurName>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://downloads.channel8.msdn.com/shibboleth-sp" xml:base="swamid-1.0/downloads.channel8.msdn.com.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEEDCCA3mgAwIBAgIQN06OsbviIojJc+SBPDreGzANBgkqhkiG9w0BAQUFADCBzjELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTESMBAGA1UEBxMJQ2FwZSBUb3duMR0wGwYDVQQKExRUaGF3dGUgQ29uc3VsdGluZyBjYzEoMCYGA1UECxMfQ2VydGlmaWNhdGlvbiBTZXJ2aWNlcyBEaXZpc2lvbjEhMB8GA1UEAxMYVGhhd3RlIFByZW1pdW0gU2VydmVyIENBMSgwJgYJKoZIhvcNAQkBFhlwcmVtaXVtLXNlcnZlckB0aGF3dGUuY29tMB4XDTA3MTAwOTAwMDAwMFoXDTA4MTAwODIzNTk1OVowgZAxCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdSZWRtb25kMR4wHAYDVQQKExVNaWNyb3NvZnQgQ29ycG9yYXRpb24xFDASBgNVBAsTC0NFUlRJRklDQVRFMSQwIgYDVQQDExtkb3dubG9hZHMuY2hhbm5lbDgubXNkbi5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCfyRQMTqYbgXsPNT2qgSnbF8qIkt1jsZ3rrT3s8ILtoYGSH6LgC7ILO/+Zktr5gBt84CMVmDY/XJ0jsN8NOzlBTD4yhpiaKxSABxSvyAHHTuzFBnXiGiLd4Pcw86vtaoBZ6srUBlrTwuvjIBBCB/g7L/aOUWAHEXUgXdi/yHi4jLZe/37lH0Wpfz/49NiesaIPRCZ8hYwYGnbVFr1BStSFztsM5YQFH3XabRF5XzapD8Gct1PwFCnyNdRvo2OXCrPLlEEBB+Y6+tNOwKOtqWtFsaUnURQWh/lf7sSHa+XrbI/Kne3ygVuEi3N5fqJaSo5unMBBPrrXR0ZZNV04Xqm7AgMBAAGjgaYwgaMwDAYDVR0TAQH/BAIwADBABgNVHR8EOTA3MDWgM6Axhi9odHRwOi8vY3JsLnRoYXd0ZS5jb20vVGhhd3RlU2VydmVyUHJlbWl1bUNBLmNybDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwMgYIKwYBBQUHAQEEJjAkMCIGCCsGAQUFBzABhhZodHRwOi8vb2NzcC50aGF3dGUuY29tMA0GCSqGSIb3DQEBBQUAA4GBALUFY4LBe1RA6yi+6jYgfqDP+8qnlVcTdYV9a9eJyrJvDZd8eMZqKuvAT9UXQeMSqbxZcgIn8GPEkCTX3HsuQChoZFadYsBWOha1je24YMZTSkouCE3W8yBR4XOFEs+bSTRT3KgVDqcKdr1Yf6FrxJzaVyKjMjWD3lNSYimR4opC</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://downloads.channel8.msdn.com/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www.dreamspark.com/Shibboleth.sso/SAML/POST" index="2"/>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://www.dreamspark.com/Shibboleth.sso/SAML/Artifact" index="3"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">STT</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Student Tech Toolbox</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">https://downloads.channel8.msdn.com</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="support">
+    <GivenName>STT Support</GivenName>
+    <EmailAddress>stt@9starresearch.com</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="technical">
+    <GivenName>STT Technical</GivenName>
+    <EmailAddress>stt@9starresearch.com</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="administrative">
+    <GivenName>Bruce</GivenName>
+    <SurName>Curling</SurName>
+    <EmailAddress>bcurling@microsoft.com</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.lhs.se/identity" xml:base="swamid-1.0/idp.lhs.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>lhs.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIByzCCATSgAwIBAgIBADANBgkqhkiG9w0BAQUFADAVMRMwEQYDVQQDEwppZHAubGhzLnNlMB4XDTA3MTAwMTExMjExOFoXDTA4MDkzMDExMjExOFowFTETMBEGA1UEAxMKaWRwLmxocy5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtSdeqn5nVMW4+ctoX2rGMh/o62G6qypOuVIWnKLK10B+pZ7bw8bqJ17zjVqjDKxNvX5QyPXD/mp+K1MPjCfw6Hgf6n2acXiXVXOZPQ+858dBmLzIl3fJAh+t7V3mdbT/PcjgMtgbCWZ48N0xquknoXS2KUOru0W7voTuHxqDOMUCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQAUAndrDJLIPtAmRnE1PmfQpMkO0Cn2HofaiWmmtG6n/IfGFql1cuyTSl9a2kMkHRNK1POUC7fypNmSFhBBxtvtdohCAJLoSKpZXd9KdE5tN2YgMlUFIfPd+2gVD4adgtKNspWQIp5uo83K5RQqSFdJrtQhmB8GjGbR3lRGzu46lg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.lhs.se:8443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>lhs.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIByzCCATSgAwIBAgIBADANBgkqhkiG9w0BAQUFADAVMRMwEQYDVQQDEwppZHAubGhzLnNlMB4XDTA3MTAwMTExMjExOFoXDTA4MDkzMDExMjExOFowFTETMBEGA1UEAxMKaWRwLmxocy5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAtSdeqn5nVMW4+ctoX2rGMh/o62G6qypOuVIWnKLK10B+pZ7bw8bqJ17zjVqjDKxNvX5QyPXD/mp+K1MPjCfw6Hgf6n2acXiXVXOZPQ+858dBmLzIl3fJAh+t7V3mdbT/PcjgMtgbCWZ48N0xquknoXS2KUOru0W7voTuHxqDOMUCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQAUAndrDJLIPtAmRnE1PmfQpMkO0Cn2HofaiWmmtG6n/IfGFql1cuyTSl9a2kMkHRNK1POUC7fypNmSFhBBxtvtdohCAJLoSKpZXd9KdE5tN2YgMlUFIfPd+2gVD4adgtKNspWQIp5uo83K5RQqSFdJrtQhmB8GjGbR3lRGzu46lg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.lhs.se/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.lhs.se/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">LHS</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Lärarhögskolan</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.lhs.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Lärarhögskolan</Company>
+    <EmailAddress>info@lhs.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://mondo-web.it.su.se/shibboleth" xml:base="swamid-1.0/mondo-web.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB4zCCAUygAwIBAgIJAN5zNlbssq13MA0GCSqGSIb3DQEBBQUAMB0xGzAZBgNVBAMTEm1vbmRvLXdlYi5pdC5zdS5zZTAeFw0wODA0MDIwNzI3MTZaFw0xNjA2MTkwNzI3MTZaMB0xGzAZBgNVBAMTEm1vbmRvLXdlYi5pdC5zdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA92ZD35RNWkg5x8yaykgO4gAU2j7VPrCfl9ut461Tai9XFRyK+OWp5Ln+hXguW7VylGTfcEbOjjh51gAvxX310OwiohlLXmnBdwjfMmIhv8tOjHOjlZQSuYSGC0TFCvHJu/9cvJ285S1Itcg0iqTZWhC7fOlXyEBCTBTC5dHZr2sCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQDtazBSwFaLjM2ac/Zup8SCVouGN10jYpvpMfLZWtiThdLJS1Q0q2ayq91V8kMp02Y1Wt3ruZNbC3SE0U5CvAX/KpJaYuaFJWJO7YXvfeIJwau3ZmTG4CFlf0mjd419TWErju6PXeo6wcsmaZ6vEuse7fj3596LiC6sXwry+nNzUg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://mondo-web.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <SurName>IT och media Helpdesk</SurName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.hig.se/identity" xml:base="swamid-1.0/idp.hig.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>hig.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEjTCCA3WgAwIBAgILAQAAAAABF3zoubQwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDExNTEwMDUwMloXDTExMDExNTEwMDUwMlowPjELMAkGA1UEBhMCU0UxGjAYBgNVBAoTEUhvZ3Nrb2xhbiBpIEdhdmxlMRMwEQYDVQQDEwppZHAuaGlnLnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzVJwkvrkl/JSBQKx95eRku9iUK8odClbfPr4AlDANP+b2mWYiUaSxoXu+SJkUO/HDtBDmcghRvGHYyv6YLXANk17bzV7PemQb4zA0plyKaurqY6M1FLx5RNEXDplElriWQsDA0Tyuhoz6t/uZpHETngtHpu7NlxWsyONUxeR7Cf6r2DjqiRBn76kI+8G1HBfTHf0xCGZmPWYewJzH1dnFT4pUaWu6psqhGMmZ5jgb0cDyVOz+sKcDp7MlMfQG/vziUySepAKfKSer7Dr84bVUIsa8C+ikQF582Q33Zuunpm+hJRDntXTA3ZJdmK38muiVaSBa70oL+ri7ZcnIceVWwIDAQABo4IBaTCCAWUwUAYDVR0gBEkwRzBFBgcqhkixPgEAMDowOAYIKwYBBQUHAgEWLGh0dHA6Ly93d3cuZ2xvYmFsc2lnbi5uZXQvcmVwb3NpdG9yeS9jcHMuY2ZtMA4GA1UdDwEB/wQEAwIFoDAfBgNVHSMEGDAWgBRlZaM91zsRowoHJTfJQkpbdndQ4TAdBgNVHQ4EFgQUc6OwpqVR5fUo66R7/PzCQUtL1mswOgYDVR0fBDMwMTAvoC2gK4YpaHR0cDovL2NybC5nbG9iYWxzaWduLm5ldC9lZHVjYXRpb25hbC5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAChjNodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24ubmV0L2NhY2VydC9lZHVjYXRpb25hbC5jcnQwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBUGA1UdEQQOMAyCCmlkcC5oaWcuc2UwDQYJKoZIhvcNAQEFBQADggEBAGYIiDLBZooLBBfMbHTA/aU6Vf2lD8++0uZ/pDsO0fHT52dhLB/zVOxQoJvs7P8z4VOQYM60N4iC18cOrEmt9//8V+4OzLnkrGKrr7xDuc6JBpHkMTUiYozHCPPOCAgmf/OZmCEnWc+ne0dHx+A+ThJy9PEebN2yvjs307dP/GFgWSjXKKGVVLnJ2G9/bYn/gTi51/etdbbC0oXZ7GnV2fEI2IhU18IacIogt0RODek8hnEEfSBBEvS7Yb+g/NPZsdM3NiKs486221H7eF0MllYb+Z68AKqtOv+bJZyXnmYaoyENgNrEyIHrd5rGeACUjq4u31pt2dlMWuPW1O/xbf0=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.hig.se:8443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>hig.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEjTCCA3WgAwIBAgILAQAAAAABF3zoubQwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDExNTEwMDUwMloXDTExMDExNTEwMDUwMlowPjELMAkGA1UEBhMCU0UxGjAYBgNVBAoTEUhvZ3Nrb2xhbiBpIEdhdmxlMRMwEQYDVQQDEwppZHAuaGlnLnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzVJwkvrkl/JSBQKx95eRku9iUK8odClbfPr4AlDANP+b2mWYiUaSxoXu+SJkUO/HDtBDmcghRvGHYyv6YLXANk17bzV7PemQb4zA0plyKaurqY6M1FLx5RNEXDplElriWQsDA0Tyuhoz6t/uZpHETngtHpu7NlxWsyONUxeR7Cf6r2DjqiRBn76kI+8G1HBfTHf0xCGZmPWYewJzH1dnFT4pUaWu6psqhGMmZ5jgb0cDyVOz+sKcDp7MlMfQG/vziUySepAKfKSer7Dr84bVUIsa8C+ikQF582Q33Zuunpm+hJRDntXTA3ZJdmK38muiVaSBa70oL+ri7ZcnIceVWwIDAQABo4IBaTCCAWUwUAYDVR0gBEkwRzBFBgcqhkixPgEAMDowOAYIKwYBBQUHAgEWLGh0dHA6Ly93d3cuZ2xvYmFsc2lnbi5uZXQvcmVwb3NpdG9yeS9jcHMuY2ZtMA4GA1UdDwEB/wQEAwIFoDAfBgNVHSMEGDAWgBRlZaM91zsRowoHJTfJQkpbdndQ4TAdBgNVHQ4EFgQUc6OwpqVR5fUo66R7/PzCQUtL1mswOgYDVR0fBDMwMTAvoC2gK4YpaHR0cDovL2NybC5nbG9iYWxzaWduLm5ldC9lZHVjYXRpb25hbC5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAChjNodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24ubmV0L2NhY2VydC9lZHVjYXRpb25hbC5jcnQwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBUGA1UdEQQOMAyCCmlkcC5oaWcuc2UwDQYJKoZIhvcNAQEFBQADggEBAGYIiDLBZooLBBfMbHTA/aU6Vf2lD8++0uZ/pDsO0fHT52dhLB/zVOxQoJvs7P8z4VOQYM60N4iC18cOrEmt9//8V+4OzLnkrGKrr7xDuc6JBpHkMTUiYozHCPPOCAgmf/OZmCEnWc+ne0dHx+A+ThJy9PEebN2yvjs307dP/GFgWSjXKKGVVLnJ2G9/bYn/gTi51/etdbbC0oXZ7GnV2fEI2IhU18IacIogt0RODek8hnEEfSBBEvS7Yb+g/NPZsdM3NiKs486221H7eF0MllYb+Z68AKqtOv+bJZyXnmYaoyENgNrEyIHrd5rGeACUjq4u31pt2dlMWuPW1O/xbf0=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.hig.se/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.hig.se/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">HIG</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Högskolan i Gävle</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.hig.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Högskolan i Gävle</Company>
+    <EmailAddress>Patrik.Carlsson@hig.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://kurssystem.theducation.se/shibboleth" xml:base="swamid-1.0/kurssystem.theducation.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDTTCCAragAwIBAgIDCCIdMA0GCSqGSIb3DQEBBAUAMFoxCzAJBgNVBAYTAlVTMRwwGgYDVQQKExNFcXVpZmF4IFNlY3VyZSBJbmMuMS0wKwYDVQQDEyRFcXVpZmF4IFNlY3VyZSBHbG9iYWwgZUJ1c2luZXNzIENBLTEwHhcNMDgwNDAzMTQ0MjQ5WhcNMTMwNDAzMTQ0MjQ5WjCBvDELMAkGA1UEBhMCU0UxGTAXBgNVBAoUECoudGhlZHVjYXRpb24uc2UxEzARBgNVBAsTCkdUNzA3NjI3MjExMTAvBgNVBAsTKFNlZSB3d3cucmFwaWRzc2wuY29tL3Jlc291cmNlcy9jcHMgKGMpMDgxLzAtBgNVBAsTJkRvbWFpbiBDb250cm9sIFZhbGlkYXRlZCAtIFJhcGlkU1NMKFIpMRkwFwYDVQQDFBAqLnRoZWR1Y2F0aW9uLnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC4Pzl5pjvT/SsuiWwP0z8+8r5BrbCuj8EqOipkuzGrGDf4tX99KZ3Th3A5oj+F0/Q+zvoahsjaNDApl+c4/1MSkFJ4zwvVzD6gKUT9IjNhvgo76AiESGc4H3Q9Cx5eOHlW3PZb52OReQHfMJE1fSEbkblcKN9My4jw8daHKUWa4QIDAQABo4G9MIG6MA4GA1UdDwEB/wQEAwIE8DAdBgNVHQ4EFgQUd0McrJB/XWAUvjR8pI3+KgMBVyQwOwYDVR0fBDQwMjAwoC6gLIYqaHR0cDovL2NybC5nZW90cnVzdC5jb20vY3Jscy9nbG9iYWxjYTEuY3JsMB8GA1UdIwQYMBaAFL6ooHRyUGtEt8kj2Puo/7NXa2hsMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMA0GCSqGSIb3DQEBBAUAA4GBAH9cyYy0MRdMkX1epA9L21g5gN0l6spUrUB59dmtp0g68Be+I6mLoeCcfY9h6g+6FIxLcs0Q9rK9fZeHdtfZ9DW8t4IqzYhY9GMgpKVnn3mt/K4tJKT1MAc//6UbHUtmqt7ESKx1aZF92zJCCKD1ZBTE6tV7mpzLyR4XW/ZbKAWZ</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://kurssystem.theducation.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">TheEducation</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">The Education</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.theducation.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>The Education AB</Company>
+    <GivenName>Niklas</GivenName>
+    <SurName>Hahn</SurName>
+    <EmailAddress>niklas.hahn@theducation.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://datordiagnos.theducation.se/shibboleth" xml:base="swamid-1.0/datordiagnos.theducation.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDYzCCAsygAwIBAgIDCpCbMA0GCSqGSIb3DQEBBQUAMFoxCzAJBgNVBAYTAlVT
+MRwwGgYDVQQKExNFcXVpZmF4IFNlY3VyZSBJbmMuMS0wKwYDVQQDEyRFcXVpZmF4
+IFNlY3VyZSBHbG9iYWwgZUJ1c2luZXNzIENBLTEwHhcNMDkwMTI4MjExOTIzWhcN
+MTAwMzMwMjAxOTIzWjCB0jELMAkGA1UEBhMCU0UxJDAiBgNVBAoTG2RhdG9yZGlh
+Z25vcy50aGVkdWNhdGlvbi5zZTETMBEGA1UECxMKR1Q4NzcwNjg0MDExMC8GA1UE
+CxMoU2VlIHd3dy5yYXBpZHNzbC5jb20vcmVzb3VyY2VzL2NwcyAoYykwOTEvMC0G
+A1UECxMmRG9tYWluIENvbnRyb2wgVmFsaWRhdGVkIC0gUmFwaWRTU0woUikxJDAi
+BgNVBAMTG2RhdG9yZGlhZ25vcy50aGVkdWNhdGlvbi5zZTCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEA4l35wegbwf4A2r9UxAAouQ8RtWt+lULu6ozCUBuDece4
+AjFxXak+PWLRMwhzqIatHGUqV1dmxHTswKjGvADiJELUvONZYrX7x1iK9ujOmUfX
+HaaWHWTU2xNu7kYviOVgVGTI6d0nQgIslOUzm0iQjPQatqz5BmhiMZEkUCbEAKUC
+AwEAAaOBvTCBujAOBgNVHQ8BAf8EBAMCBPAwHQYDVR0OBBYEFPsryoJD8yOSdDRA
+D1HJocGqUnSjMDsGA1UdHwQ0MDIwMKAuoCyGKmh0dHA6Ly9jcmwuZ2VvdHJ1c3Qu
+Y29tL2NybHMvZ2xvYmFsY2ExLmNybDAfBgNVHSMEGDAWgBS+qKB0clBrRLfJI9j7
+qP+zV2tobDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwDAYDVR0TAQH/
+BAIwADANBgkqhkiG9w0BAQUFAAOBgQA2j+xNoRdgGbDFgL0n+SzC8IJahAb+VFX6
+xOTDiLnVeyapjtQ1RxxPOdXCxssw/1AiEqia2jd2jueShPFnuMds6dKlWkowkuhz
+U5Jei29sH75lhE7LTrMijuDV+YxqhwxX8VXCbX8bG3OIkYJpHPg597UpESNtBIIT
+m9IladK+fg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://datordiagnos.theducation.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">TheEducation</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">The Education</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.theducation.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>The Education AB</Company>
+    <GivenName>Niklas</GivenName>
+    <SurName>Hahn</SurName>
+    <EmailAddress>niklas.hahn@theducation.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://toylan3.umdc.umu.se/shibboleth" xml:base="swamid-1.0/toylan3.umdc.umu.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDmTCCAoGgAwIBAgIBATANBgkqhkiG9w0BAQQFADA3MREwDwYDVQQKEwhUZXN0U2hpYjEiMCAGA1UEAxMZVGVzdFNoaWIgU2VydmljZSBQcm92aWRlcjAeFw0wNzAzMDgxNTM3MjZaFw0wOTAzMDgxNDM3MjZaMFUxETAPBgNVBAoTCFRlc3RTaGliMSIwIAYDVQQLExlUZXN0U2hpYiBTZXJ2aWNlIFByb3ZpZGVyMRwwGgYDVQQDExN0b3lsYW4zLnVtZGMudW11LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxfM9MoLpJxjRj5uRYnNGLZA8fme2UjKKvmONqPC1l+N1HStnlvwh/kfT4GQUK6JE2CgCqLlUJFBO1B3G5CRPI1A+P4ZKfM6P8JxQxhi7cy/2EwkPVyWwYhdkblLpUHG9fAQ1Db2Ly3DHvEeRhwJvTFWbszK1qQYkLEBOfeH96oQh/sR8PeIWl29VrGv8iBl9eYEMV+N9EXpv+RA/4OoHw5gKvxEaisXudvjPcqTfzi+05jUqtIWvTkhqLyLEFqGqwozbY6/xqKHOAMEGjL0Xiz4TnXBEtBLCIFAJUKhh5nNzD0IQdyfsIVt+dvGQ5dWulG/7lQEEfOp2eHnM1/BGbwIDAQABo4GRMIGOMB0GA1UdDgQWBBRkimJZ51LPqunOKtZDS5D1+ZGarDBfBgNVHSMEWDBWgBRkimJZ51LPqunOKtZDS5D1+ZGarKE7pDkwNzERMA8GA1UEChMIVGVzdFNoaWIxIjAgBgNVBAMTGVRlc3RTaGliIFNlcnZpY2UgUHJvdmlkZXKCAQEwDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQQFAAOCAQEAWtfBvtBEnBv55fG1204OmkimhP8p9M77Us6a3hwkXYLd1vKh+tA6XfPeKdHOZtLQoaUqa9j5xl6sbvGDhOrH4YOJCMheDICEolBRku0MyI5PJRMTlIE4Wu3B/v9p+J3jMeFgX0ZSH01EqeVuwtI1SiaLditmVYm//T19Q5ByArp0ccT+L6ly+p0BMnkDILJusTW8kRYTrk63kC8SepIQUNdQo7af1t5jtBn6o0+xx23QlQ13tx5WBbdT4AHaKZ/4NXEwvVCmr+myQKY0FH13453cRRwLleAQPHOkGO81eAo/9DPv6Udbjx4QBMYlObRQRzMLz3kjuGkhemYpVSu78A==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://toylan3.umdc.umu.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå University</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>UMDAC</Company>
+    <GivenName>Tommy</GivenName>
+    <SurName>Larsson</SurName>
+    <EmailAddress>tommy.larsson@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://sp1.lab.it.su.se" xml:base="swamid-1.0/sp1.lab.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB+jCCAWOgAwIBAgIRAJVCJLoWBVtmqwrsh0psrA0wDQYJKoZIhvcNAQEFBQAwGzEZMBcGA1UEAxMQc3AxLmxhYi5pdC5zdS5zZTAeFw0wNjExMjcwODI4MDFaFw0wNjEyMzEyMzAwMDBaMBsxGTAXBgNVBAMTEHNwMS5sYWIuaXQuc3Uuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAJHpeBYXpgvcLYDnlnJsATNVkEHzLsVga22m+Om1/32yCLnhH7DMlbhbaMb1r1oAX53O5rXXv5CX8AGR5rXkrADTO00LX7ChxFs3P6PhgQ/EnrSe0V71Armi82SAOHjzQkeWwjkxhLqLyWy7Y3Jw82VfBrAovUua7y+w21IGJtIJAgMBAAGjPjA8MA4GA1UdDwEB/wQEAwID6DAqBgNVHSUBAf8EIDAeBggrBgEFBQcDBAYIKwYBBQUHAwIGCCsGAQUFBwMBMA0GCSqGSIb3DQEBBQUAA4GBAFTiOOdKyQ+F9k++RqYiAkYYu/pXGwcl8vfhRTFX9Mnlzy/zy/ffDVBRRvhQPd0Lqm7mj/mkg1etLMb3S2fdWBa1pUeFQtSUxMqoACAngIdr+piFsbhu4u9UPUOdD8m9scpqQ1AusGxUmCBClEElZRtmqO9UwL7hD/fVE4TRU+a4</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sp1.lab.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Leif</GivenName>
+    <SurName>Johansson</SurName>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://hr-sso.pb.su.se/shibboleth" xml:base="swamid-1.0/hr-sso.pb.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEsDCCA5igAwIBAgILAQAAAAABFmJUXjMwDQYJKoZIhvcNAQEFBQAwXzELMAkG
+A1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlv
+bmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA3
+MTEyMTEzMTAwNFoXDTEwMTEyMTEzMTAwNFowXDELMAkGA1UEBhMCU0UxEjAQBgNV
+BAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEY
+MBYGA1UEAxMPaHItc3NvLnBiLnN1LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A
+MIIBCgKCAQEA6nJtfAvJ3JnERGef+Nukx94z98YailSaHC6kwm2iWy75PJQF3wS+
+7ZUCyK19nIYjBUWHyGf5+jCa7B7hIJCjEfYSII6JIn+fkX5WZAuhuSIP8YnlHMiF
+gqCEB6QVs99YEjsOVcHdNlhCFhbLQviItaA90aLdFTXN3PIulguG/PFP5kfui0To
+epO5Ko9j2eCboDRhrS/G+Hq4ulALBigu1GT5zJinGYOtcV/0noTbv2iS8H20N4gM
+Dt0ej3CCCSMk2Gr/P/IQEjOpHfR4IHle4JWhOkPjJrRpMc5vusvAOAH8S/TpvB3y
+jpbhQtBnOhtY921vX0jPMIT0c3KsefqZDQIDAQABo4IBbjCCAWowUAYDVR0gBEkw
+RzBFBgcqhkixPgEAMDowOAYIKwYBBQUHAgEWLGh0dHA6Ly93d3cuZ2xvYmFsc2ln
+bi5uZXQvcmVwb3NpdG9yeS9jcHMuY2ZtMA4GA1UdDwEB/wQEAwIFoDAfBgNVHSME
+GDAWgBRlZaM91zsRowoHJTfJQkpbdndQ4TAdBgNVHQ4EFgQUfU0a2PdASTZigfkX
+Ce/k93IclTAwOgYDVR0fBDMwMTAvoC2gK4YpaHR0cDovL2NybC5nbG9iYWxzaWdu
+Lm5ldC9lZHVjYXRpb25hbC5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAC
+hjNodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24ubmV0L2NhY2VydC9lZHVjYXRpb25h
+bC5jcnQwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBoGA1UdEQQTMBGC
+D2hyLXNzby5wYi5zdS5zZTANBgkqhkiG9w0BAQUFAAOCAQEAJumC9GPp4iTr8iI1
+VlYDEHunB0Ly7ij3okLwkNk4NWIoFfFt4DJNj4i6GDWjOisk1OoFQOKYv8pw3HZw
+SHPfcgeGE/LqgF0zxqw+xHw1ND/MEavfnS5pZ/7FCEkoTCHvSImuRn/0fmV8DtQI
+xlcHgQs3YwfCaqFPuTo/VPDTJcbS1UvH3A8SWzqP4CgFobzFRH6vg2NfwHH5tRaa
+uZ2/xGhPjpAwhqYe2eduOtM/8UetFmYbOR9Ku1D2i/v2sMtEp34iE51KRCQCW7bW
+Nyyybd8JvsVdmtfi3BZLfir3u4vG7e+Wi0dIn0MMQxCk1FawoB8LjFeHGcM3h6m7
+5ezhww==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://hr-sso.pb.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Max</GivenName>
+    <SurName>Quetel</SurName>
+    <EmailAddress>max@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://roundup-test.it.su.se/shibboleth" xml:base="swamid-1.0/roundup-test.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEvDCCA6SgAwIBAgILAQAAAAABHEtYz+8wDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDkxMDA4MjAyM1oXDTExMDkxMDA4MjAyM1owYjELMAkGA1UEBhMCU0UxEjAQBgNVBAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEeMBwGA1UEAxMVcm91bmR1cC10ZXN0Lml0LnN1LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuWia8Li3lAlfEHtajbEj7JE3xX31jtPI8mWIbrv82bM1UqfJNFOtrYoukrOLwB8y/trTytPxNOykhAEOK8uElNIJWvrmpe2Upmn/yAxT+7FT8RYECh558rLYdwE7RKiu9W4W/mztFKXGTVsG6c0PmUh+bchTW7XikyqhuvyHaYBZ2Qf+mMMk4No0qCtLakjvWaMXEEJRSEMiMPXBkkpaaAwBVc9baK0+EYuTKII2L4tx2eNSzposXqj2lSks70tHsJnTHUBYeVZiVPYpeu34kO/0NPBeq9CFgk49aHZpuq+iQBx/BX1I2Z5iRV+UY0eZpENVapWf6M1nYz6h7HcXUQIDAQABo4IBdDCCAXAwUAYDVR0gBEkwRzBFBgcqhkixPgEAMDowOAYIKwYBBQUHAgEWLGh0dHA6Ly93d3cuZ2xvYmFsc2lnbi5uZXQvcmVwb3NpdG9yeS9jcHMuY2ZtMA4GA1UdDwEB/wQEAwIFoDAfBgNVHSMEGDAWgBRlZaM91zsRowoHJTfJQkpbdndQ4TAdBgNVHQ4EFgQUdj87P0v1GpRPfbrHmKPY4EvzN8AwOgYDVR0fBDMwMTAvoC2gK4YpaHR0cDovL2NybC5nbG9iYWxzaWduLm5ldC9lZHVjYXRpb25hbC5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAChjNodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24ubmV0L2NhY2VydC9lZHVjYXRpb25hbC5jcnQwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMCAGA1UdEQQZMBeCFXJvdW5kdXAtdGVzdC5pdC5zdS5zZTANBgkqhkiG9w0BAQUFAAOCAQEAiRmbVYXHgEs6d68zfqAsHBLUGrysmZkJnx1603o5CbMxG0DSVtUPWL9artz68/dazxvI4zdrkxNb9j8mHTOZ6jYYon3VwI4d4RSjuXtRTfa+Tc9qGsi79U7ALH4RgFp6ltAZL+r3vKFKwWnD5ToXtm0S3ih8LUxtKNpTb3mlv2Ib8nCcsmR91y+Dl0ypgxp/Kqoi0jEcijffZXkfzmKmcOlsbrBZw4BJzogHVTdGFj3P5oJy13h+oldS7kwYljI2h7Z+BVMmrSguWTgqbErhQInbOiZggQhfB3x70OdJs4DDrMzSQctqEXlj+Eb7qSdYyuP1kMjI1P+0IGLq+PSN6A==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://roundup-test.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Klas</GivenName>
+    <SurName>Lindforss</SurName>
+    <EmailAddress>kllin@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.test.umu.se/identity" xml:base="swamid-1.0/idp.test.umu.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>umu.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEOjCCAyKgAwIBAgICAd4wDQYJKoZIhvcNAQEFBQAwRTELMAkGA1UEBhMCU0UxGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxGzAZBgNVBAMTElVtZWEgVW5pdmVyc2l0eSBDQTAeFw0wODAzMTIxNDEwNDFaFw0wODExMDcxNDEwNDFaMEIxCzAJBgNVBAYTAlNFMRkwFwYDVQQKExBVbWVhIHVuaXZlcnNpdGV0MRgwFgYDVQQDEw9pZHAudGVzdC51bXUuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKQGac7vCABvE1YFheXQHgAh1HVl6gFkekBpLJ8sEa6bNu/adQOW2xFI801HfgW3xqQYW48wLinru22nPUE3cF30ISIB/r8qL6mw6c1nkZB62g3Svy42mW7ay7Kio+W3gS9NxEHoiHvCLPVYFBtOKe3FVwV1mnBffEv9jvbGfYYfAgMBAAGjggG5MIIBtTAJBgNVHRMEAjAAMAsGA1UdDwQEAwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwHQYDVR0OBBYEFLWJ/IUQTsdgSBj3xq+hTSN2qZk5MH8GA1UdIwR4MHaAFHaQAcfvra4Asfdp2f4VKKzmMs5AoVukWTBXMQswCQYDVQQGEwJTRTEYMBYGA1UEChMPVW1lYSBVbml2ZXJzaXR5MRMwEQYDVQQLEwpTd1VQS0ktUENBMRkwFwYDVQQDExBTd1VQS0kgUG9saWN5IENBggERMCoGA1UdEgQjMCGBCWNhQHVtdS5zZYYUaHR0cDovL3d3dy5jYS51bXUuc2UwMAYDVR0fBCkwJzAloCOgIYYfaHR0cDovL3d3dy5jYS51bXUuc2UvY3JsX3YyLmNybDB+BgNVHSAEdzB1MHMGCCqFcCsCAQEBMGcwJAYIKwYBBQUHAgEWGGh0dHA6Ly93d3cuY2EudW11LnNlL0NQUzA/BggrBgEFBQcCAjAzGjFMaW1pdGVkIExpYWJpbGl0eSwgc2VlIGh0dHA6Ly93d3cuc3d1cGtpLnN1LnNlL0NQMA0GCSqGSIb3DQEBBQUAA4IBAQBjHF+0/RXKijMD2t6taOHp61TSP47fa/s9gD2H7mjlXKxwf2VHaN2mQ5Cy71atSzWpgfArCbND6lYLIaguDqkj+TtJAse3VBFe/nlaY5ewKxfaCLnnNGGNnoFaoVjTiZYrSYvSsqHjMmwIsgeAhVtAagkmB71B6QRL7nXwAJffNa1LVpVVI4e5T1tKa9BB5Z7LwqZSnC/MnBkNEU9h/Lw3gzIZyijNbnkOAVBnRf9gJwC8dHNafWhHyGj4urC2/GZIR+Mt+5HgQ2DKufHBjMv4a6edLS/gZFb4KfxmjgZDrb0ZC75Y9lcqiz8QZDXbu/4/ptMx7dNkEPfwJyuOD0TP</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.test.umu.se:9443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>umu.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEOjCCAyKgAwIBAgICAd4wDQYJKoZIhvcNAQEFBQAwRTELMAkGA1UEBhMCU0UxGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxGzAZBgNVBAMTElVtZWEgVW5pdmVyc2l0eSBDQTAeFw0wODAzMTIxNDEwNDFaFw0wODExMDcxNDEwNDFaMEIxCzAJBgNVBAYTAlNFMRkwFwYDVQQKExBVbWVhIHVuaXZlcnNpdGV0MRgwFgYDVQQDEw9pZHAudGVzdC51bXUuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKQGac7vCABvE1YFheXQHgAh1HVl6gFkekBpLJ8sEa6bNu/adQOW2xFI801HfgW3xqQYW48wLinru22nPUE3cF30ISIB/r8qL6mw6c1nkZB62g3Svy42mW7ay7Kio+W3gS9NxEHoiHvCLPVYFBtOKe3FVwV1mnBffEv9jvbGfYYfAgMBAAGjggG5MIIBtTAJBgNVHRMEAjAAMAsGA1UdDwQEAwIF4DAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwHQYDVR0OBBYEFLWJ/IUQTsdgSBj3xq+hTSN2qZk5MH8GA1UdIwR4MHaAFHaQAcfvra4Asfdp2f4VKKzmMs5AoVukWTBXMQswCQYDVQQGEwJTRTEYMBYGA1UEChMPVW1lYSBVbml2ZXJzaXR5MRMwEQYDVQQLEwpTd1VQS0ktUENBMRkwFwYDVQQDExBTd1VQS0kgUG9saWN5IENBggERMCoGA1UdEgQjMCGBCWNhQHVtdS5zZYYUaHR0cDovL3d3dy5jYS51bXUuc2UwMAYDVR0fBCkwJzAloCOgIYYfaHR0cDovL3d3dy5jYS51bXUuc2UvY3JsX3YyLmNybDB+BgNVHSAEdzB1MHMGCCqFcCsCAQEBMGcwJAYIKwYBBQUHAgEWGGh0dHA6Ly93d3cuY2EudW11LnNlL0NQUzA/BggrBgEFBQcCAjAzGjFMaW1pdGVkIExpYWJpbGl0eSwgc2VlIGh0dHA6Ly93d3cuc3d1cGtpLnN1LnNlL0NQMA0GCSqGSIb3DQEBBQUAA4IBAQBjHF+0/RXKijMD2t6taOHp61TSP47fa/s9gD2H7mjlXKxwf2VHaN2mQ5Cy71atSzWpgfArCbND6lYLIaguDqkj+TtJAse3VBFe/nlaY5ewKxfaCLnnNGGNnoFaoVjTiZYrSYvSsqHjMmwIsgeAhVtAagkmB71B6QRL7nXwAJffNa1LVpVVI4e5T1tKa9BB5Z7LwqZSnC/MnBkNEU9h/Lw3gzIZyijNbnkOAVBnRf9gJwC8dHNafWhHyGj4urC2/GZIR+Mt+5HgQ2DKufHBjMv4a6edLS/gZFb4KfxmjgZDrb0ZC75Y9lcqiz8QZDXbu/4/ptMx7dNkEPfwJyuOD0TP</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.test.umu.se:9443/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.test.umu.se:9443/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå University</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>UMDAC</Company>
+    <GivenName>Einar</GivenName>
+    <SurName>Hillbom</SurName>
+    <EmailAddress>einar.hillbom@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://cbs-vylvatest.kib.ki.se/shibboleth" xml:base="swamid-1.0/cbs-vylvatest.kib.ki.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB7TCCAVagAwIBAgIJAMV5iXtJKd2UMA0GCSqGSIb3DQEBBQUAMCIxIDAeBgNVBAMTF2Nicy12eWx2YXRlc3Qua2liLmtpLnNlMB4XDTA4MDcyMzEzMDM0OFoXDTA5MDcyMzEzMDM0OFowIjEgMB4GA1UEAxMXY2JzLXZ5bHZhdGVzdC5raWIua2kuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAPAnswr/MkrQXkXZJbv3ArV/q0kowtVLnQIM6nuJjyw/96cQ7UuYFOFpIEhT+fQdthkKdSAAa74U10+r6wUqj7HgGWrKDn6HfGaYUx5vuLt7kHIuLSTdnU5xbH+9D2S1BwdK8qEjCtT5kxPk4/2mXpTVEdQRXdaxLanrIk4Sex/bAgMBAAGjKzApMCcGA1UdJQQgMB4GCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEAvRiCRo0g0bZ8TNZWO5iCmdrMCtDTM4I9JYf0zR0hYbf61U2r1h2iE3IfC4JvNmclEDbhL/aJQrqgglG8mSyBVYN9mu3L3y+O0ZvCLGC5EOHTLVZjihfL1VDwt054lB18AkxOh2H+dkcq6B7cI0XdFesHi4iW9HGr23C22xfLIpQ=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://cbs-vylvatest.kib.ki.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">KI</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Karolinska Institutet</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.ki.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>KI bibliotek</Company>
+    <GivenName>Ylva</GivenName>
+    <SurName>Gavel</SurName>
+    <EmailAddress>ylva.gavel@ki.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://jolu.dev.it.secure.su.se/shibboleth" xml:base="swamid-1.0/jolu.dev.it.secure.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB7zCCAVigAwIBAgIJAJ4RwLsrE8VvMA0GCSqGSIb3DQEBBQUAMCMxITAfBgNVBAMTGGpvbHUuZGV2Lml0LnNlY3VyZS5zdS5zZTAeFw0wODA1MTIwODAyNDhaFw0wOTA1MTIwODAyNDhaMCMxITAfBgNVBAMTGGpvbHUuZGV2Lml0LnNlY3VyZS5zdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAqaabQgxKHFyHGXBa9TfOe9W/LbX9issL2lWtFaG5++KQMgcYOrFChkxyifmwJih+MJYoAaBZGWjDM/FfLyXe31flkC4uE1GScOGojtobRY9KcLR0XbHaxwPCSnkBOIncfEHuwOK9IUgCz1G8i4VGQm7lbIyijqPrt+aQXCePldUCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQBB6cbInUeuMbPM1WxT4xLKR4WF3lgIt5mqd/dpM6PySbW0d0+E+qkyhJeHFBhhHxFvnsaE9Y0hrIc862sCoe7EojgbFjV2SrqTrvQ4yVs/dXFZ0ipEli9wsc6RrgbVV9DRW6F2z7PSnw9Xi+wUm3vkvf/1/LqFU/sTz9Ek3zukHg==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://jolu.dev.it.secure.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://labs.swami.se" xml:base="swamid-1.0/labs.swami.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB2TCCAUKgAwIBAgIJANxR0VNsO3LLMA0GCSqGSIb3DQEBBQUAMBgxFjAUBgNVBAMTDWxhYnMuc3dhbWkuc2UwHhcNMDcwNDEzMDgxMjM0WhcNMDgwNDEyMDgxMjM0WjAYMRYwFAYDVQQDEw1sYWJzLnN3YW1pLnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDuZSnm1OGEZ+1NPqvCPX3P7EsxMd2kEoTMHKBuTsUngFk5hU0Zk6Jr8Cf4qdwzQRsvoacZjERnzrkOQw45NuMVvLLrErD8qon0uLQGpzsqNIoQ8eJz+CIsoHeSJUGi8FKbRvrKJm9DR2vlrxAxwxuUkyyZ/f/Uvk9S8E0+rwuOEQIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4GBAGIkqz4KXzPlA4mrprQuGgyXJLZGbZVmWWNxqaihEzjskAdZBom1VBbVuk1KMqiHCbxn2HasBucWGdoLDkAmITFbnL5Lt5lUQ4bdSuVQgboitHHLp49H3gLFg8Jym2Mlj5jzz7ZAEQ64yf2XWhTHK894Z2+5gApkK5N7pDEwUW03</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://labs.swami.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SWAMI</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">SWAMI</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.swami.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Leif</GivenName>
+    <SurName>Johansson</SurName>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="http://shibboleth.ebscohost.com" xml:base="swamid-1.0/shibboleth.ebscohost.com.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEZDCCA82gAwIBAgIQCj52FvC7d3ialzMyLa5a/TANBgkqhkiG9w0BAQUFADCBujEfMB0GA1UEChMWVmVyaVNpZ24gVHJ1c3QgTmV0d29yazEXMBUGA1UECxMOVmVyaVNpZ24sIEluYy4xMzAxBgNVBAsTKlZlcmlTaWduIEludGVybmF0aW9uYWwgU2VydmVyIENBIC0gQ2xhc3MgMzFJMEcGA1UECxNAd3d3LnZlcmlzaWduLmNvbS9DUFMgSW5jb3JwLmJ5IFJlZi4gTElBQklMSVRZIExURC4oYyk5NyBWZXJpU2lnbjAeFw0wODAzMzEwMDAwMDBaFw0wOTA0MDQyMzU5NTlaMIGbMQswCQYDVQQGEwJVUzEWMBQGA1UECBMNTWFzc2FjaHVzZXR0czEQMA4GA1UEBxQHSXBzd2ljaDEfMB0GA1UEChQWRUJTQ08gSW5kdXN0cmllcywgSW5jLjEeMBwGA1UECxQVc2hpYmJvbGV0aDEuZXBuZXQuY29tMSEwHwYDVQQDFBhzaGliYm9sZXRoLmVic2NvaG9zdC5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKeXf+L4GiuqTaeJVlsjwdZ4rKJ+vZy8dBTlrzGDFZigOqtHj8JG/XZzACJ+pmbrz6S1fU/TFbavF3DjOw+pB2VGV/nCfXExtnb0/X5Fh2n7HuWsXQytsBFNV8js6AKrWQf9zkjKih3CKtNhhegO2PWj7zcuBklF9jGcz0nhiY5LAgMBAAGjggGGMIIBgjAJBgNVHRMEAjAAMAsGA1UdDwQEAwIFoDBGBgNVHR8EPzA9MDugOaA3hjVodHRwOi8vY3JsLnZlcmlzaWduLmNvbS9DbGFzczNJbnRlcm5hdGlvbmFsU2VydmVyLmNybDBEBgNVHSAEPTA7MDkGC2CGSAGG+EUBBxcDMCowKAYIKwYBBQUHAgEWHGh0dHBzOi8vd3d3LnZlcmlzaWduLmNvbS9ycGEwNAYDVR0lBC0wKwYJYIZIAYb4QgQBBgorBgEEAYI3CgMDBggrBgEFBQcDAQYIKwYBBQUHAwIwNAYIKwYBBQUHAQEEKDAmMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC52ZXJpc2lnbi5jb20wbgYIKwYBBQUHAQwEYjBgoV6gXDBaMFgwVhYJaW1hZ2UvZ2lmMCEwHzAHBgUrDgMCGgQUS2u5KJYGDLvQUjibKaxLB4shBRgwJhYkaHR0cDovL2xvZ28udmVyaXNpZ24uY29tL3ZzbG9nbzEuZ2lmMA0GCSqGSIb3DQEBBQUAA4GBABIHjfxZW+PJ1V3daNHMcBfpadojtptZZeszBIDqVDwSqhz8ETMuvWUomS+lwIIm3Pxg6bRIcet9ND1cwre1fcnBhyjWy2PonxiryOrNvIIG12Omi53xkwL+zJfA9tG5G/qpYmoOU1GGCnTPrVDph+amUIIBFiwBgtVTyys/vkxm</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://shibboleth.ebscohost.com/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">epnet.com</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">EBSCO Information Services</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.ebsco.com/home/</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="administrative">
+    <GivenName>Burns</GivenName>
+    <SurName>Ron</SurName>
+    <EmailAddress>rburns@epnet.com</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="technical">
+    <GivenName>Flynn</GivenName>
+    <SurName>Dave</SurName>
+    <EmailAddress>dflynn@epnet.com</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="support">
+    <GivenName/>
+    <SurName>Customer Satisfaction</SurName>
+    <EmailAddress>eptech@epnet.com</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://shib-idp.kau.se/identity" xml:base="swamid-1.0/shib-idp.kau.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>kau.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEPTCCAyWgAwIBAgILAQAAAAABGTNtk4cwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDQwOTEzNDM0OVoXDTExMDQwOTEzNDM0OVowbTELMAkGA1UEBhMCU0UxETAPBgNVBAgTCFZhcm1sYW5kMREwDwYDVQQHEwhLYXJsc3RhZDEeMBwGA1UEChMVS2FybHN0YWRzIHVuaXZlcnNpdGV0MRgwFgYDVQQDEw9zaGliLWlkcC5rYXUuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKOQIKbkk/FiMrF0SnFnN+leGueG0+qQMczfPQuUkTp1y+nhtIuvD+3t2pzPsuUcHtArrJjBKPg3Mp5Tt8cHWNdRl1j6l0TN1Rtk+1rmyMck5HZp1b296ldPtyCzon/txPB356CiT6KvW/iHY0hAiupIKdlWLK360ZGqThCPext1AgMBAAGjggFuMIIBajBQBgNVHSAESTBHMEUGByqGSLE+AQAwOjA4BggrBgEFBQcCARYsaHR0cDovL3d3dy5nbG9iYWxzaWduLm5ldC9yZXBvc2l0b3J5L2Nwcy5jZm0wDgYDVR0PAQH/BAQDAgWgMB8GA1UdIwQYMBaAFGVloz3XOxGjCgclN8lCSlt2d1DhMB0GA1UdDgQWBBRUfoCGld9kbPhwSgnkIMv3jWpxODA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdsb2JhbHNpZ24ubmV0L2VkdWNhdGlvbmFsLmNybDBPBggrBgEFBQcBAQRDMEEwPwYIKwYBBQUHMAKGM2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5uZXQvY2FjZXJ0L2VkdWNhdGlvbmFsLmNydDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwGgYDVR0RBBMwEYIPc2hpYi1pZHAua2F1LnNlMA0GCSqGSIb3DQEBBQUAA4IBAQAI/dNIi3iuS6nw4Tll1ZCc3kuHyG5In67CmtjO0owGmkh/4+B+ZHA37U5SZeKYPliiNqjUX6rlz4WYtvj/wFcAXSbcbgVRWkCVTkYahWL4DysGEanzeTJvWgcnJXix1JO6nifJYw8nJEBhuZrmrEuDj/5EmkekkGxRgGA9QgLSsYCnzkcm71R3PNO+rvSiBzY8MeIgiS96Jpe09iafVA0/w1Q8pyhLdLa8KWl80Rjjo/JVi34LECLwq9emIXIxNTr6ot3WdamoIZtEVOVbdwPoEAlekE87VJ2w7Y/yMqFz6bLp4cQ91PQZG91Y2NtQY4RBFCci5LO0dlcJTF2kMxkT</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://shib-idp.kau.se:8443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>kau.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEPTCCAyWgAwIBAgILAQAAAAABGTNtk4cwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4MDQwOTEzNDM0OVoXDTExMDQwOTEzNDM0OVowbTELMAkGA1UEBhMCU0UxETAPBgNVBAgTCFZhcm1sYW5kMREwDwYDVQQHEwhLYXJsc3RhZDEeMBwGA1UEChMVS2FybHN0YWRzIHVuaXZlcnNpdGV0MRgwFgYDVQQDEw9zaGliLWlkcC5rYXUuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAKOQIKbkk/FiMrF0SnFnN+leGueG0+qQMczfPQuUkTp1y+nhtIuvD+3t2pzPsuUcHtArrJjBKPg3Mp5Tt8cHWNdRl1j6l0TN1Rtk+1rmyMck5HZp1b296ldPtyCzon/txPB356CiT6KvW/iHY0hAiupIKdlWLK360ZGqThCPext1AgMBAAGjggFuMIIBajBQBgNVHSAESTBHMEUGByqGSLE+AQAwOjA4BggrBgEFBQcCARYsaHR0cDovL3d3dy5nbG9iYWxzaWduLm5ldC9yZXBvc2l0b3J5L2Nwcy5jZm0wDgYDVR0PAQH/BAQDAgWgMB8GA1UdIwQYMBaAFGVloz3XOxGjCgclN8lCSlt2d1DhMB0GA1UdDgQWBBRUfoCGld9kbPhwSgnkIMv3jWpxODA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdsb2JhbHNpZ24ubmV0L2VkdWNhdGlvbmFsLmNybDBPBggrBgEFBQcBAQRDMEEwPwYIKwYBBQUHMAKGM2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5uZXQvY2FjZXJ0L2VkdWNhdGlvbmFsLmNydDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwGgYDVR0RBBMwEYIPc2hpYi1pZHAua2F1LnNlMA0GCSqGSIb3DQEBBQUAA4IBAQAI/dNIi3iuS6nw4Tll1ZCc3kuHyG5In67CmtjO0owGmkh/4+B+ZHA37U5SZeKYPliiNqjUX6rlz4WYtvj/wFcAXSbcbgVRWkCVTkYahWL4DysGEanzeTJvWgcnJXix1JO6nifJYw8nJEBhuZrmrEuDj/5EmkekkGxRgGA9QgLSsYCnzkcm71R3PNO+rvSiBzY8MeIgiS96Jpe09iafVA0/w1Q8pyhLdLa8KWl80Rjjo/JVi34LECLwq9emIXIxNTr6ot3WdamoIZtEVOVbdwPoEAlekE87VJ2w7Y/yMqFz6bLp4cQ91PQZG91Y2NtQY4RBFCci5LO0dlcJTF2kMxkT</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://shib-idp.kau.se/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://shib-idp.kau.se/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">KAU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Karlstad university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.kau.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Karlstad university</Company>
+    <EmailAddress>paul.scott@kau.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://callab0.it.secure.su.se" xml:base="swamid-1.0/callab0.it.secure.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB+TCCAWKgAwIBAgIJAOlQKzLVXB5JMA0GCSqGSIb3DQEBBQUAMCgxJjAkBgNVBAMTHXNoaWJiLWNhbGxhYjAuaXQuc2VjdXJlLnN1LnNlMB4XDTA3MDMyMDEyMTMxN1oXDTA4MDMxOTEyMTMxN1owKDEmMCQGA1UEAxMdc2hpYmItY2FsbGFiMC5pdC5zZWN1cmUuc3Uuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAL/+i70hIW+rIYYJ9mvNEUE1SztYa9mAZuPhH1J4li+pyvghKZQHTI3UuYpbRGEQ1/83a7MAM+6VOQmYQtZDSw8PhtJKcpd1fFhSACqpDQKgBRSwcYsQkjb52j63r3kDXT4VDosImeg0HRb+HIWo4blC8gP2sZLSKa5BHJK+87GdAgMBAAGjKzApMCcGA1UdJQQgMB4GCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEATDf77yw3aqQYXj4XpY3bUHrrnA9zwYrkboeTCk61s7VrNTLE0T/YEM2qFBxUOWdNxBGuuP6T30XsK2vS0VW7wHTGV+6j9KF+niUQbo/VqKOO69XaO5X0WbJKdI/WyTunmWY5uECoASNhFGcBMqcINAUSktTXlsDB6ttoP1cnjMo=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://callab0.it.secure.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://www3.genuinetext.com/shibboleth" xml:base="swamid-1.0/www3.genuinetext.com.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB5zCCAVCgAwIBAgIJALLUhMva/oz0MA0GCSqGSIb3DQEBBQUAMB8xHTAbBgNVBAMTFHd3dzMuZ2VudWluZXRleHQuY29tMB4XDTA4MDUwNTEwNDkyNloXDTA5MDUwNTEwNDkyNlowHzEdMBsGA1UEAxMUd3d3My5nZW51aW5ldGV4dC5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBAMSCzocotpl6yxJCA6Jy7LwbatFjJ1UQ94ZcLJ36OPNlyX3rtLKPJTRwaCS+ld+Z7MXEWfrtEXt6iHhrNuj94HNr8dpPeneqZ7jmSI7yE22x4Xt/zvJLHdvrZypxCUs+mCWGigPchih9OgvDcTPS8Vh5GWq22yWfI7v18oWg+CR3AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEAf8JbtDVoRymE0vdpbTlbjwsYK6CoXW3wi6/kb4ky6eqmGbz29niEa5xwoZKD8zDj/MNRMbVewLYqaYKanp9t/NnWY34wsiWGsszX88X91FXjjtVdVm5XaYl62RQvd6Z4OjffC0WdRzYMmqQcHQ3G5guQPQC5OaTB/2DkxLht4sg=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www3.genuinetext.com/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Genuine Text</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Genuine Text</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.genuinetext.com</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Knownet AB</Company>
+    <GivenName>Richard</GivenName>
+    <SurName>Bäckman</SurName>
+    <EmailAddress>rickard@knonet.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://xfire.mimas.ac.uk/shibboleth" xml:base="swamid-1.0/xfire.mimas.ac.uk.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEMjCCAxqgAwIBAgILAQAAAAABE7mOBYIwDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA3MDcxMjA4MzEzOFoXDTEwMDcxMjA4MzEzOFowYDELMAkGA1UEBhMCR0IxJTAjBgNVBAoTHFRoZSBVbml2ZXJzaXR5IG9mIE1hbmNoZXN0ZXIxDjAMBgNVBAsTBU1JTUFTMRowGAYDVQQDExF4ZmlyZS5taW1hcy5hYy51azCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAnvcQOid24BFRMId4stwyqEmQ3jcU9pqoJI7XkIh4FgYy++lBhGFDVDxkjikhbZKgGk1NONfTGRFHJ6TYRPNNjEjDtu8eTaKVDvvgIiW+E+pbdekmHGp5/1TW30yYUxJv12tBCWSWcHuqQjbnJiM+thHvVT0Rpz269VhaI9dWZY0CAwEAAaOCAXAwggFsMFAGA1UdIARJMEcwRQYHKoZIsT4BADA6MDgGCCsGAQUFBwIBFixodHRwOi8vd3d3Lmdsb2JhbHNpZ24ubmV0L3JlcG9zaXRvcnkvY3BzLmNmbTAOBgNVHQ8BAf8EBAMCBaAwHwYDVR0jBBgwFoAUZWWjPdc7EaMKByU3yUJKW3Z3UOEwHQYDVR0OBBYEFFffHJDYEluqeqPk2YaogEb6A+BvMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5uZXQvZWR1Y2F0aW9uYWwuY3JsME8GCCsGAQUFBwEBBEMwQTA/BggrBgEFBQcwAoYzaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLm5ldC9jYWNlcnQvZWR1Y2F0aW9uYWwuY3J0MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAcBgNVHREEFTATghF4ZmlyZS5taW1hcy5hYy51azANBgkqhkiG9w0BAQUFAAOCAQEAgIGtV9NaiG7yikJKZQgt+GP59EkAWhGYCR8JI5gZU7z6LIyTNLO19MPb2gJiirjUQpFEEh2ZNdiYmYNzf3yZAiVNtv45BOIa+poJbWUr7wXIv48ILhIQ5uTVLXrHofOU/aq3ySpVrLB2DZ1u24GHdxjwgiaKgwk6qntO9zwSeKiK9W2bcNk2mcJh5i7WPsB3RNID/pc4KZmw7T84F0/Ju0PrT4z8ry8286iZRQbZPkTi2D1eqBI52CQIJjUPnEMUJSFLup6kGPGLqtGqqoJNc8mtot4tEQIrqfKu9coHR386P0KAJyUV3PEdkyKcpEpnl4Ky0NDDXLK0BZ4CnMh3/A==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://xfire.mimas.ac.uk/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">MIMAS</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">MIMAS</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://xfire.mimas.ac.uk</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="support">
+    <SurName>CrossFire Helpdesk</SurName>
+    <EmailAddress>crossfire@mimas.ac.uk</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="technical">
+    <GivenName>david</GivenName>
+    <SurName>Chaplin</SurName>
+    <EmailAddress>david.chaplin@manchester.ac.uk</EmailAddress>
+  </ContactPerson>
+  <ContactPerson contactType="administrative">
+    <GivenName>Ross</GivenName>
+    <SurName>Macintyre</SurName>
+    <EmailAddress>Ross.MacIntyre@manchester.ac.uk</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.secure.su.se/identity" xml:base="swamid-1.0/idp.secure.su.se.xml">
+  <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>su.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEsjCCA5qgAwIBAgILAQAAAAABFxsEM3owDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA3MTIyNzA5NTIxNVoXDTEwMTIyNzA5NTIxNVowXTELMAkGA1UEBhMCU0UxEjAQBgNVBAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEZMBcGA1UEAxMQaWRwLnNlY3VyZS5zdS5zZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL8J47onJaot9vYgL5d+VXRuBTlwy4quLRkcFDvAhy9YwzdDAZ0bio2qgVpXMK1aP1kvpOn6+Zy9jUKuwaUraJpE8Yp7dCzTXujrCQSS3sfy+pTwS/kcDUM/sBd16gXU4lfub56+Oiuvi9eRISDKTeZebgTskN2O7gZS91nLSo7xz/Fsrinp3oRWcqZ0VWzc0+zLIldU50ASZ/AqDQQ/JLaqI84b6Ft8JjWZKCGUqBBoRURjvDxqr2e19i2+2mu5Cbayq6IJ62yH+dP3pVd9UZntSXABaTnq2+v9dt/unhOXibzMwh87q+fI9w7SyM7Wy/r6V3qk/aes0bYI6Sj8DW0CAwEAAaOCAW8wggFrMFAGA1UdIARJMEcwRQYHKoZIsT4BADA6MDgGCCsGAQUFBwIBFixodHRwOi8vd3d3Lmdsb2JhbHNpZ24ubmV0L3JlcG9zaXRvcnkvY3BzLmNmbTAOBgNVHQ8BAf8EBAMCBaAwHwYDVR0jBBgwFoAUZWWjPdc7EaMKByU3yUJKW3Z3UOEwHQYDVR0OBBYEFMAf54GaLCmlAHIKbGBskYgJ64yTMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5uZXQvZWR1Y2F0aW9uYWwuY3JsME8GCCsGAQUFBwEBBEMwQTA/BggrBgEFBQcwAoYzaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLm5ldC9jYWNlcnQvZWR1Y2F0aW9uYWwuY3J0MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAbBgNVHREEFDASghBpZHAuc2VjdXJlLnN1LnNlMA0GCSqGSIb3DQEBBQUAA4IBAQA2ZODtOolJMQNFz86urE/RM3LIwkaaRHv9WN743WEPVyrQ0s7XjYuHAuJCuLVhwteA0ODpbmYJHaesG1O4Hqilv/tRD+8MahGWqA2lk28T7mkx+/Hb2jsZWBIMGNNOf97sZUK100wbnsFvjvBsOAsznnRX2JKOBeemOnIPZR1EmA+VRxUaIHb2/SD63zSsa/+y8xkSYAo1Pxr9MU6jePNIPnMF7ixwfzTZElyoxKuNNbQAuxfvvbRElGs2YCmC9WBY8zGmyHfNWWblVt5tjeNH0pWu+qg1tVBSB9VZZ4xGuKgoMyoYKul4y3raQRiUCUaUmJCdAiQNqsSMpY3QpA+k</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AttributeService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.secure.su.se:8443/shibboleth-idp/AA"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+  </AttributeAuthorityDescriptor>
+  <IDPSSODescriptor WantAuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol urn:mace:shibboleth:1.0">
+    <Extensions>
+      <shibmeta:Scope>su.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEsjCCA5qgAwIBAgILAQAAAAABFxsEM3owDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA3MTIyNzA5NTIxNVoXDTEwMTIyNzA5NTIxNVowXTELMAkGA1UEBhMCU0UxEjAQBgNVBAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEZMBcGA1UEAxMQaWRwLnNlY3VyZS5zdS5zZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAL8J47onJaot9vYgL5d+VXRuBTlwy4quLRkcFDvAhy9YwzdDAZ0bio2qgVpXMK1aP1kvpOn6+Zy9jUKuwaUraJpE8Yp7dCzTXujrCQSS3sfy+pTwS/kcDUM/sBd16gXU4lfub56+Oiuvi9eRISDKTeZebgTskN2O7gZS91nLSo7xz/Fsrinp3oRWcqZ0VWzc0+zLIldU50ASZ/AqDQQ/JLaqI84b6Ft8JjWZKCGUqBBoRURjvDxqr2e19i2+2mu5Cbayq6IJ62yH+dP3pVd9UZntSXABaTnq2+v9dt/unhOXibzMwh87q+fI9w7SyM7Wy/r6V3qk/aes0bYI6Sj8DW0CAwEAAaOCAW8wggFrMFAGA1UdIARJMEcwRQYHKoZIsT4BADA6MDgGCCsGAQUFBwIBFixodHRwOi8vd3d3Lmdsb2JhbHNpZ24ubmV0L3JlcG9zaXRvcnkvY3BzLmNmbTAOBgNVHQ8BAf8EBAMCBaAwHwYDVR0jBBgwFoAUZWWjPdc7EaMKByU3yUJKW3Z3UOEwHQYDVR0OBBYEFMAf54GaLCmlAHIKbGBskYgJ64yTMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5uZXQvZWR1Y2F0aW9uYWwuY3JsME8GCCsGAQUFBwEBBEMwQTA/BggrBgEFBQcwAoYzaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLm5ldC9jYWNlcnQvZWR1Y2F0aW9uYWwuY3J0MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAbBgNVHREEFDASghBpZHAuc2VjdXJlLnN1LnNlMA0GCSqGSIb3DQEBBQUAA4IBAQA2ZODtOolJMQNFz86urE/RM3LIwkaaRHv9WN743WEPVyrQ0s7XjYuHAuJCuLVhwteA0ODpbmYJHaesG1O4Hqilv/tRD+8MahGWqA2lk28T7mkx+/Hb2jsZWBIMGNNOf97sZUK100wbnsFvjvBsOAsznnRX2JKOBeemOnIPZR1EmA+VRxUaIHb2/SD63zSsa/+y8xkSYAo1Pxr9MU6jePNIPnMF7ixwfzTZElyoxKuNNbQAuxfvvbRElGs2YCmC9WBY8zGmyHfNWWblVt5tjeNH0pWu+qg1tVBSB9VZZ4xGuKgoMyoYKul4y3raQRiUCUaUmJCdAiQNqsSMpY3QpA+k</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:1.0:bindings:SOAP-binding" Location="https://idp.secure.su.se/shibboleth-idp/Artifact" index="1" isDefault="true"/>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.secure.su.se/shibboleth-idp/SSO"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://umdac-humpdac.ad.umu.se/shibboleth" xml:base="swamid-1.0/umdac-humpdac.ad.umu.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB7TCCAVagAwIBAgIJAPLebS0CGJJJMA0GCSqGSIb3DQEBBQUAMCIxIDAeBgNVBAMTF3VtZGFjLWh1bXBkYWMuYWQudW11LnNlMB4XDTA3MDMxMzEwNTkzNloXDTA4MDMxMjEwNTkzNlowIjEgMB4GA1UEAxMXdW1kYWMtaHVtcGRhYy5hZC51bXUuc2UwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALA5VqzzCDXki71HDlWq9gwowL+0FBFZC9bCRmjKOGe9lmZveHhJ1oWN7g5wbAbC+oAciHe5vzUoEIrkl9enqqFCgOww3LhAURSuebJzbF8fz3zjdFlyzqDIlLet54YTvfdZmro4345Z46KW/dX5QOAEslLcSUev1Eq1F1rgXMV/AgMBAAGjKzApMCcGA1UdJQQgMB4GCCsGAQUFBwMBBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQEFBQADgYEAOHWzEvOqLpAeLm19FAZS/qG5i97eH5bx7opjABmDU7IIMT2jEhBykYL6BXbfYljLT2pyBEE2oILetNT/U09Angm2Lf8JzenPUgqS8qFGl54/Gw2GcIiDBbvmPuBWqw8CRYdfBQjBZmKs+jN+Lr1uvEvim/B4PPQg2Eypp8iz/VM=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://umdac-humpdac.ad.umu.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå University</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>UMDAC</Company>
+    <GivenName>Tommy</GivenName>
+    <SurName>Larsson</SurName>
+    <EmailAddress>tommy.larsson@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://sp.lhs.se/shibboleth" xml:base="swamid-1.0/sp.lhs.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEFTCCA36gAwIBAgIKGij19wAAAAAAeTANBgkqhkiG9w0BAQUFADCBgjELMAkGA1UEBhMCU0UxEjAQBgNVBAgTCVN0b2NraG9sbTESMBAGA1UEBxMJU3RvY2tob2xtMRgwFgYDVQQKEw9MSFMgaSBTdG9ja2hvbG0xFTATBgNVBAsTDElULUF2ZGVsbmluZzEaMBgGA1UEAxMRZ3JlZW5wb2ludC5saHMuc2UwHhcNMDcxMTE1MTE0NjUxWhcNMTIxMTE1MTE1NjUxWjCBqjEcMBoGCSqGSIb3DQEJARYNc2VjQHJ0Lmxocy5zZTELMAkGA1UEBhMCU1cxEjAQBgNVBAgTCVN0b2NraG9sbTESMBAGA1UEBxMJU3RvY2tob2xtMSkwJwYDVQQKEyBTdG9ja2hvbG0gSW5zdGl0dXRlIG9mIEVkdWNhdGlvbjEWMBQGA1UECxMNSVQtZGVwYXJ0bWVudDESMBAGA1UEAxMJc3AubGhzLnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA5OuqeuhMexhFh6i1Pm0vxvhDpFmJjm9Y6M1qa6Ug+vEoWZdCv5VQEh3A5kEEMtxi1QhxkcuQhtBoi+sKweDYEcMOlktzLnaSC0wMth/VLR7y2DP5oVzl1FjIlCZ0BdSf9bZENblHNpzb0/sCaVhW09vmp74/5AqV0jLt+XgVnmxVsUBDAgTzWK9fIoDLsClc1RQSUE8asIMiKVEH7KYMOcHRYIzp4Q2++iOvtvq8EVgWZvaDVzG7/CrqFRcuk/4naMyAOKXrGNNr7qB86yFy53Be43ZZjeJv0CQC9LaJZC2QsgbsG2OcCUHbTGEFOdl5DYVfEEVpU4s336WH/eARTQIDAQABo4HjMIHgMB0GA1UdDgQWBBTwtlrmSaEvXMNXT+kQj8ULsteJCTCBvgYDVR0jBIG2MIGzgBT/0okEYerF+Z8wLX763B0yh4G60qGBiKSBhTCBgjELMAkGA1UEBhMCU0UxEjAQBgNVBAgTCVN0b2NraG9sbTESMBAGA1UEBxMJU3RvY2tob2xtMRgwFgYDVQQKEw9MSFMgaSBTdG9ja2hvbG0xFTATBgNVBAsTDElULUF2ZGVsbmluZzEaMBgGA1UEAxMRZ3JlZW5wb2ludC5saHMuc2WCEEsrLPaG8gihTtyO+tjeJYcwDQYJKoZIhvcNAQEFBQADgYEAM4a5cBBOVKPXBLE6LKKrmExK2TtsOdw17EBL43RoG9IAH22mW1IY5vglf/zaYDm/WS4+8rvGJC+WP5QyMrHQQY52Z4iiSRhLs4ccbDoNR5EF3RxM9lb5tDprncT8d2VinlFztopWUQAmB6s447w+LzqXr62OKEgX3kzZvNSanZ4=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sp.lhs.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">LHS</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Lärarhögskolan</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.lhs.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>LHS</Company>
+    <GivenName>Patrik</GivenName>
+    <SurName>Blomkvist</SurName>
+    <EmailAddress>patrik.blomkvist@lhs.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://sakailab1.it.secure.su.se" xml:base="swamid-1.0/sakailab1.it.secure.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB8TCCAVqgAwIBAgIJAKXyew6LHCQ5MA0GCSqGSIb3DQEBBQUAMCQxIjAgBgNVBAMTGXNha2FpbGFiMS5pdC5zZWN1cmUuc3Uuc2UwHhcNMDcwNDA1MTU0NDMwWhcNMDgwNDA0MTU0NDMwWjAkMSIwIAYDVQQDExlzYWthaWxhYjEuaXQuc2VjdXJlLnN1LnNlMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCgun00RCrC7MkeeVC/Wrmpb3Z0oCFbsq4n54JSZ4LZcH2KQm5p34GSgRWv07ki4Sa9UPuG4cqv89RkHpDzGIWxQ5kBFK6Huo0Iq+/RnmerUnfpX6GKBNQqOqtS0CNmMl1dwKrVemiMAQjxOUEX0HQdCI3V77R7TMCodcbSOfotgQIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4GBAAFteLcTuaDnorYmeupV0+ZzPk6RN/6UP5SW+oxsFA7aeg86y5f0c2uxsDhdYV1XvMVmVZ+3FCtjARsup0I6hBcWl2GMRYhF2MxJQk23Vir43VOpAxt4OtHjH7Uo3eCgARMDlUayFVB1iiaoDAjsuucg0rOu+3V2nZ3OL6bkdHhz</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sakailab1.it.secure.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Leif</GivenName>
+    <SurName>Johansson</SurName>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://roundup.it.su.se" xml:base="swamid-1.0/roundup.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDbTCCAlWgAwIBAgIJANbxBppDW3WQMA0GCSqGSIb3DQEBBQUAMC0xCzAJBgNVBAYTAlNFMR4wHAYDVQQDExVzaGliLXJvdW5kdXAuaXQuc3Uuc2UwHhcNMDgwMzE3MDkyMjUwWhcNMTAwMzE3MDkyMjUwWjAtMQswCQYDVQQGEwJTRTEeMBwGA1UEAxMVc2hpYi1yb3VuZHVwLml0LnN1LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzfArE1PtdXywNARmL3st18I5GofeADtilz3/jzEmYg6a3/fK3mL0xvADBs0ulxL6T9qeGFZWA/APbBYO5/MP8FDsL+Mr1PVN2um4SFKpQdFym0MbJmb4qUZVKfPDcpI4dWgWZPItGA9uzzDxSKYjejWJOvgdycN8yt+rj5lwjCGHNo+/B4pAJpWFTaYZnV4bMvcin+TXib+2ome0HL+kC0ul7Vg/hLNqyOk7GbAsDuPbYzE7wIqFa3QoVDHPja5yq/UIttmOJiw7gcWJheWRCYBiMTOGCEvng+2jsxoNEM+PGSoBDWvoXY01yV9R8sMbJv5YyauDwEeVltHm47S2WwIDAQABo4GPMIGMMB0GA1UdDgQWBBSvWbE1iQBrDVnhe0JdJ+UrgKsCUTBdBgNVHSMEVjBUgBSvWbE1iQBrDVnhe0JdJ+UrgKsCUaExpC8wLTELMAkGA1UEBhMCU0UxHjAcBgNVBAMTFXNoaWItcm91bmR1cC5pdC5zdS5zZYIJANbxBppDW3WQMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADggEBAIIYR616CkgU6xlxM37KlBmrN6Dp2rU4VagC0OhkkqDa3Kt2AdOG11z1SEguKDygQT1oMztIVewIhgaq2ggF+WqqLWWfWHAi+ff/b0MOZICXlwQJPJXywXvqFgM2mEi0hMV8bITh8l3wFuO0aq6zaXlZv0XtmF8ac8Rx68DvX0n53fBI2yZ6d9Jcl2hxRtBOvUW/S8AbI8NQST1HBKnYGGX01nT7ShCXlP5hzki9PDu0gw/Z9LjvQT5KA/rkg2hHykqk7j4TYe5RyU43pkKi+Urf+RPS/6KmBqxzIfwceeUIIvou+42OK1Yhc9WcDgfxXh/BD83L74pey0npGc/X9R4=</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://roundup.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Joakim</GivenName>
+    <SurName>Lundin</SurName>
+    <EmailAddress>jolu@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://tracks.it.su.se/shibboleth" xml:base="swamid-1.0/tracks.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB3TCCAUagAwIBAgIJAKMNYLPEmQEHMA0GCSqGSIb3DQEBBQUAMBoxGDAWBgNVBAMTD3RyYWNrcy5pdC5zdS5zZTAeFw0wODA4MDYwODU4MzVaFw0wOTA4MDYwODU4MzVaMBoxGDAWBgNVBAMTD3RyYWNrcy5pdC5zdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAyp8tiALjvVcz8AtTw5lt8CljLmOnCReeZQtm2aGGsgA6mWW3Mf9B14/4EppJ2fpko2CcMihfpy/uiVQ70f8EBJtcH2ugzBpGymYp22taan2SFSmeeC5krk5cro9D9MTtoCWmRARyIqbPpn5beVE2gJDLaFyuDsiX1P2RXzNQTCcCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQCvxq/E3dnnlDsEAZMNTgg1qKgC9EvgCGTSCE/iOXLYLpDczN55HA2nlKG2h7QC/E2Pz0bOny/oVd9qVePgaoukYSSkhgcjz5GufkTHfuOjK9JlrK1cIxk9mZjZaLcYhK4mHf92hMhalIFwRBOvVGZLcbrXic2ceaJkptRV8xCYrw==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://tracks.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>SU</Company>
+    <GivenName>Leif</GivenName>
+    <SurName>Johansson</SurName>
+    <EmailAddress>leifj@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://sympa.lab.it.su.se" xml:base="swamid-1.0/sympa.lab.it.su.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIB4zCCAUygAwIBAgIJAKqPtbsIKhS9MA0GCSqGSIb3DQEBBQUAMB0xGzAZBgNVBAMTEmxhYjAzLmxhYi5pdC5zdS5zZTAeFw0wNzA1MDIwODA1NDdaFw0wODA1MDEwODA1NDdaMB0xGzAZBgNVBAMTEmxhYjAzLmxhYi5pdC5zdS5zZTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAvwFbKHSn0UpnszEG7YuVxKj+ZXKfsbcOJqHSiZMhGemw4CWc+ExXYFPDTSaphqatht3q17u9CFUkpygMo2HUWLWO5Zdk2lgpnhnT2B1xk8esRS0yjCwE0Gv9QewxaSCS+e+i5cMsXVhXD5zkBIKmW10p59YJ0qPwkRuwTcs02uUCAwEAAaMrMCkwJwYDVR0lBCAwHgYIKwYBBQUHAwEGCCsGAQUFBwMCBggrBgEFBQcDBDANBgkqhkiG9w0BAQUFAAOBgQB10thLCTHsz++ZC5far37xRlor/7BF3o86JBtyqXNdYszFxgWYOILxC/rYiCxZr8ON1QKQ3ZNj+sZxZm1/fAQl+4hNCs1XgvoLRqK/eW4DHZLZWjQyn9+aHI1+ADkpzARLbJf5TQCJeJSmp+f3YIbqJQptXIGcBvLBSoe1R7Drag==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sympa.lab.it.su.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <GivenName>Mattias</GivenName>
+    <SurName>Amnefelt</SurName>
+    <EmailAddress>mattiasa@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://moodle.lhs.se/shibboleth" xml:base="swamid-1.0/moodle.lhs.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIErDCCA5SgAwIBAgILAQAAAAABHGXBykcwDQYJKoZIhvcNAQEFBQAwXzELMAkG
+A1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlv
+bmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4
+MDkxNTExMjUxMVoXDTExMDkxNTExMjUxMVowWjELMAkGA1UEBhMCU0UxEjAQBgNV
+BAcTCVN0b2NraG9sbTEfMB0GA1UEChMWU3RvY2tob2xtcyB1bml2ZXJzaXRldDEW
+MBQGA1UEAxMNbW9vZGxlLmxocy5zZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCC
+AQoCggEBANqTklz0t3Gnkq1va4uPbxMZwOJJV1QwOrGBrCx24gSvSJWrhptcFyMw
+pll8QMneR+Pb7I4wm2YaI5rxLwtBruRdgLtxuOo3LSvhzwTZXzQtC4ouCQ1EAAHT
+ytXj6+TiC0r2s3qiWMwEvspR/VaGTGDjzoEHIM40ynsxsx3LFAFJjBpzGH8Si6IB
+mJqvXAkvuesphyLGvc8c2aTvd3Zg4GL5WR0ep2DuZo1dkpuZHUZlXmS4JVpn2yZa
+HVN/CdLP60jqxvh85HLBk9DZQ0sD3dgAgy1bV/hajO0OzYuV+VQd7kvG5wTKrlUs
+41RaZMLZGZ43t94LCtQZ5IKLZl6BQ6sCAwEAAaOCAWwwggFoMFAGA1UdIARJMEcw
+RQYHKoZIsT4BADA6MDgGCCsGAQUFBwIBFixodHRwOi8vd3d3Lmdsb2JhbHNpZ24u
+bmV0L3JlcG9zaXRvcnkvY3BzLmNmbTAOBgNVHQ8BAf8EBAMCBaAwHwYDVR0jBBgw
+FoAUZWWjPdc7EaMKByU3yUJKW3Z3UOEwHQYDVR0OBBYEFKgqzUsMQGdA4hivyxsK
+few6RFQvMDoGA1UdHwQzMDEwL6AtoCuGKWh0dHA6Ly9jcmwuZ2xvYmFsc2lnbi5u
+ZXQvZWR1Y2F0aW9uYWwuY3JsME8GCCsGAQUFBwEBBEMwQTA/BggrBgEFBQcwAoYz
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLm5ldC9jYWNlcnQvZWR1Y2F0aW9uYWwu
+Y3J0MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAYBgNVHREEETAPgg1t
+b29kbGUubGhzLnNlMA0GCSqGSIb3DQEBBQUAA4IBAQAsV0oNI80/L2tdAlf+ICR2
+YlEwgnkFtJGLRYZJ2uCojETA353C0NKd+IxMNuJkg7vO8fhtQbSyULRKp/XzekBx
+883u9zHDDFQOYYoTz0iLDq+6Cvx/t/b+EDO3yKt7kTRzV3idcNyygDCRAV8h2tUF
+gnZIWa5zCh0iOc5VJBW+Rupb6g9z7IYyjYopkl9ZGhwg8NwFa4qvEwwJcPgktiN/
+E0lpMFhmAzGdKZww+axLvL0lBxrPiFn747K4iJ6tc+oCCtn852zXLd/IsMY3oUWM
+t7tgUUB+rUENHrqryPN6AJ6QZR6UIWE6J6biQJVmXQldKGrGrMEnRecGyokj9kqi</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://moodle.lhs.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">SU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Stockholm university</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.su.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Stockholm university</Company>
+    <SurName>helpdesk</SurName>
+    <EmailAddress>helpdesk@it.su.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://staging.dreamspark.com/shibboleth-sp" xml:base="swamid-1.0/staging.dreamspark.com.xml">
+  <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor>
+      <ds:KeyInfo>
+        <ds:KeyName>staging.dreamspark.com</ds:KeyName>
+        <ds:X509Data>
+          <!-- Serial No. 435, expires on Mon Sep 20 18:11:20 2010 GMT -->
+          <ds:X509Certificate>MIIFGTCCBAGgAwIBAgICAb4wDQYJKoZIhvcNAQEFBQAwVjELMAkGA1UEBhMCVVMx
+HDAaBgNVBAoTE0luQ29tbW9uIEZlZGVyYXRpb24xKTAnBgNVBAMTIEluQ29tbW9u
+IENlcnRpZmljYXRpb24gQXV0aG9yaXR5MB4XDTA4MTAwNjE4MTQwNVoXDTEwMTAw
+NzE4MTQwNVowITEfMB0GA1UEAxMWc3RhZ2luZy5kcmVhbXNwYXJrLmNvbTCBnzAN
+BgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAvyt5Coj3UzRIAN4AMxfkCOJfldddhJjg
+7PEe/9HnY0GnXs3QExkFKoaLqdVa6BbGg8p5iOJvJ+hN8KW8rlEOdUaVhmPdE6y3
+ZHnErru6kmwwV/sFPQEqfsFKhENe7scfgfcMl4jx53PUkAn84itc1LSPhbJfsALu
+HurV5Nwk0+cCAwEAAaOCAqgwggKkMA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8E
+AjAAMB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAdBgNVHQ4EFgQUrQqs
+L1PyXk/vJ7oK+EACxDjcpwUwfgYDVR0jBHcwdYAUky3IYRitY+ObZbOd3Y2TuufK
+Y0WhWqRYMFYxCzAJBgNVBAYTAlVTMRwwGgYDVQQKExNJbkNvbW1vbiBGZWRlcmF0
+aW9uMSkwJwYDVQQDEyBJbkNvbW1vbiBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eYIB
+ADCBsgYIKwYBBQUHAQEEgaUwgaIwTwYIKwYBBQUHMAKGQ2h0dHA6Ly9pbmNvbW1v
+bmNhMS5pbmNvbW1vbmZlZGVyYXRpb24ub3JnL2JyaWRnZS9jZXJ0cy9jYS1jZXJ0
+cy5wN2IwTwYIKwYBBQUHMAKGQ2h0dHA6Ly9pbmNvbW1vbmNhMi5pbmNvbW1vbmZl
+ZGVyYXRpb24ub3JnL2JyaWRnZS9jZXJ0cy9jYS1jZXJ0cy5wN2IwgY0GA1UdHwSB
+hTCBgjA/oD2gO4Y5aHR0cDovL2luY29tbW9uY3JsMS5pbmNvbW1vbmZlZGVyYXRp
+b24ub3JnL2NybC9lZWNybHMuY3JsMD+gPaA7hjlodHRwOi8vaW5jb21tb25jcmwy
+LmluY29tbW9uZmVkZXJhdGlvbi5vcmcvY3JsL2VlY3Jscy5jcmwwXgYDVR0gBFcw
+VTBTBgsrBgEEAa4jAQQBATBEMEIGCCsGAQUFBwIBFjZodHRwOi8vaW5jb21tb25j
+YS5pbmNvbW1vbmZlZGVyYXRpb24ub3JnL3ByYWN0aWNlcy5wZGYwIQYDVR0RBBow
+GIIWc3RhZ2luZy5kcmVhbXNwYXJrLmNvbTANBgkqhkiG9w0BAQUFAAOCAQEAgFob
+QMnMr7WedSIrpSek0jZoGdwW+Ih2y2ZaNP96ygFyIZTxnYDbY4wGoVPDbA+1uGew
+MoOigJlZkBeJyinRCAaOjRaOWAU91JxtJi/4kZrJbPDY8djyCbfSRAEXUSAPuBwx
+PBUwwjoz57LnhrgSNNU6X20uGOpzt9IYmcujZ/7t5P9u8/tzVBOpa62QAgFJVBwD
+Ucr+wB3H3RDSF0kBH94nAgOPXJToHWJM7gcOr+m8AEEI1YukftZVrwE9/3cI7SPe
+eEW5lxwrxpzVESmLHCr+HpdOsZqG6B4Nrt6UjjI9jB1rguPXKBjfUw7YAeCwx7jT
+05NcwImw3Hy1xQdZqQ==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://staging.dreamspark.com/Shibboleth.sso/SAML/POST" index="1"/>  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Microsoft</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Microsoft</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.microsoft.com/en/us/default.aspx</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <GivenName>DreamSpark Engineering Team</GivenName>
+    <EmailAddress>dsengt@microsoft.com</EmailAddress>
+  </ContactPerson><ContactPerson contactType="administrative"><GivenName>Scott Blackwell</GivenName> 
+  <EmailAddress>Scott.Blackwell@microsoft.com</EmailAddress> 
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://sakai-utv1.umdc.umu.se/shibboleth" xml:base="swamid-1.0/sakai-utv1.umdc.umu.se.xml">
+  <SPSSODescriptor WantAssertionsSigned="false" AuthnRequestsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIC8DCCAdigAwIBAgIJAJvTriiPd5m5MA0GCSqGSIb3DQEBBQUAMCExHzAdBgNVBAMTFnNha2FpLXV0djEudW1kYy51bXUuc2UwHhcNMDgxMDE3MTEwMDA2WhcNMDkxMDE3MTEwMDA2WjAhMR8wHQYDVQQDExZzYWthaS11dHYxLnVtZGMudW11LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4kiULDipsxfHfDb2Mhk6wYwMCrcL1Ju/E9WhbSdlxEg/ACqAC5B5Rx52bfdgYb7En9/AbLHqGOlZTr61rOumve9CDT6IMimb1koIDrRMiVIC3EAYymstYOAnHMrpVC1mKGDCBfrUnd3T0Me4j7GV5wSH5GYgRdAhEqkERVEElHQSUkc+cipxceI/horF7kAh1YZSTkJEytS3nuDPJoxN+3+PSt2r7E/gicegvFG2VcWat3uyeTE3bOgw08c17hNjEoRhJcHAp1VkRazDrP6O9GeWYZCkGwKXQai3eyvaANG7QQP0TuL+tcK0yMmgWpX+XZzQJ8CmS3mNcOKp7Id7XQIDAQABoyswKTAnBgNVHSUEIDAeBggrBgEFBQcDAQYIKwYBBQUHAwIGCCsGAQUFBwMEMA0GCSqGSIb3DQEBBQUAA4IBAQA1vO7RMDHUikujfhdulfo5lRIbgwMEZmG2mK7ge0Bx2J1CkatOFhII5u6rNsVPEHpaTVfGrk0nQksSfzYYo2lXK6PeCHV/LxYAkP57yXqgc3poNwoDmA3bejqpEc/0sgsc/fE25TvEY4/YkmYsoeicXRBfLr2nljsCJvyu95ouDwJKBuMR+UU6FzwPMv3mjkOiWgI2goPFg3NHPc2b+rgEgtdwOq7eU7IsfesKybRvDEWyYesTeUcXEC1BJB3of5AazcFOTKL+eXtSdXD1MBx/3hCTLpNgSnrkWyWrm6rSRO2WggofMWAwndraQfSMAaju7nqUJfsq8T9RWx9dNRgD</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://sakai-utv1.umdc.umu.se/Shibboleth.sso/SAML/POST" index="1" isDefault="true"/>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UmU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå Universitet</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <Company>Umeå Universitet</Company>
+    <GivenName>Daniel</GivenName>
+    <SurName>Lind</SurName>
+    <EmailAddress>daniel.lind@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://slcstest.uninett.no/simplesaml/shib13/sp/metadata.php" xml:base="swamid-1.0/slcstest.uninett.no.xml">
+  <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <KeyDescriptor>
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEbjCCA1agAwIBAgIJAOJ+MVIlv1k/MA0GCSqGSIb3DQEBBQUAMIGAMQswCQYDVQQGEwJOTzEVMBMGA1UECBMMU29yVHJvbmRlbGFnMRIwEAYDVQQHEwlUcm9uZGhlaW0xEDAOBgNVBAoTB1VOSU5FVFQxFjAUBgNVBAsTDVVOSU5FVFQgU2lnbWExHDAaBgNVBAMTE3NsY3N0ZXN0LnVuaW5ldHQubm8wHhcNMDgwOTE1MDkzNjM1WhcNMTgwOTEzMDkzNjM1WjCBgDELMAkGA1UEBhMCTk8xFTATBgNVBAgTDFNvclRyb25kZWxhZzESMBAGA1UEBxMJVHJvbmRoZWltMRAwDgYDVQQKEwdVTklORVRUMRYwFAYDVQQLEw1VTklORVRUIFNpZ21hMRwwGgYDVQQDExNzbGNzdGVzdC51bmluZXR0Lm5vMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAq2ENRSwN3ZHAUWGBJHGzBPvQFvYqqz23qXMcu9+9XpXIO+YedYIo4wslQQpEMgQM9s4fFpHDLzhP1qlZ1hACUxe/UF8IDSGWad7uI7aKjra/uzOUjMIIC2mUvS79CJFm2Oz/b2X4HVq5jLma1l8rfk4goRuNQPA8UuwKsLNcu7cpBY5J4oeTvczEl/W4hWLx8ywwW6TjmIVr3a7wYWAo8zTntDTjstxV1hwOCcZan5B2tm8rUkZpFuzq3Uip3NI+01OBwuecrPRQd7eOs3UspjVjkYJoPu4utPuB9IeCaBhxrdMi6T2Wo4TVQr78MB3WQ/n2tiyjVQALuSIfEK7M5wIDAQABo4HoMIHlMB0GA1UdDgQWBBTCmIdZOcTZtp50V847byR2vB7ODTCBtQYDVR0jBIGtMIGqgBTCmIdZOcTZtp50V847byR2vB7ODaGBhqSBgzCBgDELMAkGA1UEBhMCTk8xFTATBgNVBAgTDFNvclRyb25kZWxhZzESMBAGA1UEBxMJVHJvbmRoZWltMRAwDgYDVQQKEwdVTklORVRUMRYwFAYDVQQLEw1VTklORVRUIFNpZ21hMRwwGgYDVQQDExNzbGNzdGVzdC51bmluZXR0Lm5vggkA4n4xUiW/WT8wDAYDVR0TBAUwAwEB/zANBgkqhkiG9w0BAQUFAAOCAQEAn8NZnWgeQgOhIOu0PWo5XyWxysSbOL+uCFDo/FD6F90LtN/OErIFQw+FaPrRxmLK1A2msKKCforXwuJV/9QjMjuJfccc9OWpQ7zDLjN1iZEkiW+vFP3ANCaT5FYAiWtzOHVu5ldcqDZ5c4VnTPCIPwGioUZpK5BTLS0gmWUikkz1EFNtxfSBbNGCcAxK1o46rKym8ReaLV5pNoqFwji/j90ODHB37d+CGe7mdXUyRWy/Kuc3D27BUt0PKrJwzSX89KI+i8U1NdQwtXXABOi7C51FKAUAXAzcXpUPBvctdomnJm+megBgm9oCwbvm8UCAMdz9kqjI2/4ui1ZTDtql4g==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <AssertionConsumerService index="0" Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://slcstest.uninett.no/simplesaml/shib13/sp/AssertionConsumerService.php"/>
+  </SPSSODescriptor>
+  <ContactPerson contactType="technical">
+    <SurName>Administrator</SurName>
+    <EmailAddress>henrik.austad@uninett.no</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <md:EntityDescriptor entityID="https://www.cambro.umu.se/shibboleth" xml:base="swamid-1.0/www.cambro.umu.se.xml">
+  <md:SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol urn:oasis:names:tc:SAML:1.1:protocol urn:oasis:names:tc:SAML:1.0:protocol">
+    <md:Extensions>
+      <DiscoveryResponse xmlns="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol" Location="https://www.cambro.umu.se/Shibboleth.sso/DS" index="1"/>
+    </md:Extensions>
+    <md:KeyDescriptor use="signing">
+      <ds:KeyInfo>
+        <ds:KeyName>www.cambro.umu.se</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=www.cambro.umu.se,O=Umea universitet,L=Umea,C=SE</ds:X509SubjectName>
+          <ds:X509Certificate>MIIEqTCCA5GgAwIBAgILAQAAAAABHfeXhjowDQYJKoZIhvcNAQEFBQAwXzELMAkG
+A1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlv
+bmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4
+MTIwMjExMTIxMloXDTExMTIwMjExMTIxMlowUzELMAkGA1UEBhMCU0UxDTALBgNV
+BAcTBFVtZWExGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxGjAYBgNVBAMTEXd3
+dy5jYW1icm8udW11LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+n4VtHhKL3qSK4FnDN8wABGknNsAtexRMlT36Al7fqK16cVApQRvcs03VOeDgLWNH
+X5UB9CTkbQPDzvR9FuxeJhEP7zZeXB6v1reSD7nA+Ec86UwSErBUMJ1I5h6SEGyY
+sSA+PxLr9ExrBDGKfPyR2zNbv2gUPKLtfGyr/gQJck2ACecejqMEDO0ycjCmPSEO
+sSrLRmnxA5l062dFC7P+PLvTnaNwLMydKDBt0tCgY69mT2dxnI7EvHwOQ5fiaGCh
+n452PAn+83xr4iBEVYilYaRmTWw3OrRgYLK8hgpZkTcoDPPKR/srWQ1LwMK92Pfz
+/yKdWHOpicRDdGVVPZMATwIDAQABo4IBcDCCAWwwUAYDVR0gBEkwRzBFBgcqhkix
+PgEAMDowOAYIKwYBBQUHAgEWLGh0dHA6Ly93d3cuZ2xvYmFsc2lnbi5uZXQvcmVw
+b3NpdG9yeS9jcHMuY2ZtMA4GA1UdDwEB/wQEAwIFoDAfBgNVHSMEGDAWgBRlZaM9
+1zsRowoHJTfJQkpbdndQ4TAdBgNVHQ4EFgQU74LauYzTDJG34JT4jcaAsiq3ECcw
+OgYDVR0fBDMwMTAvoC2gK4YpaHR0cDovL2NybC5nbG9iYWxzaWduLm5ldC9lZHVj
+YXRpb25hbC5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAChjNodHRwOi8v
+c2VjdXJlLmdsb2JhbHNpZ24ubmV0L2NhY2VydC9lZHVjYXRpb25hbC5jcnQwHQYD
+VR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBwGA1UdEQQVMBOCEXd3dy5jYW1i
+cm8udW11LnNlMA0GCSqGSIb3DQEBBQUAA4IBAQAUMW1oeb8zyJXdg0CPchb3aPir
+o3WQrpvQBYDksKFdPeueK6IIEIAYe6MVg2lQoJEqKEUqcvplHFucXX8k9bGodEak
+jBtdi4RA9WyrrhUenfKTDb00jipaGCEofudFdWtx31P5y0eWxBHxcFVKKoW/P9XF
+YOi8plQIEKpRiX2xhEt8xO983ek3D8OjjA4PRKcdglo5U7BbKI3Y+5hykYsTEHPv
+jluIfTG7td+0Q047IMaQYO7Fp7iSZ5TEXIgekeYWK4ZXiDpaNFMTtcEdpMfRz+89
+8Ox8mBeSmwljt29/3UxnnSTe+/YhS32WsH3ECMxU6kn+95yhYd2btBmY4zcp
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:KeyDescriptor use="encryption">
+      <ds:KeyInfo>
+        <ds:KeyName>www.cambro.umu.se</ds:KeyName>
+        <ds:X509Data>
+          <ds:X509SubjectName>CN=www.cambro.umu.se,O=Umea universitet,L=Umea,C=SE</ds:X509SubjectName>
+          <ds:X509Certificate>MIIEqTCCA5GgAwIBAgILAQAAAAABHfeXhjowDQYJKoZIhvcNAQEFBQAwXzELMAkG
+A1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlv
+bmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA4
+MTIwMjExMTIxMloXDTExMTIwMjExMTIxMlowUzELMAkGA1UEBhMCU0UxDTALBgNV
+BAcTBFVtZWExGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxGjAYBgNVBAMTEXd3
+dy5jYW1icm8udW11LnNlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+n4VtHhKL3qSK4FnDN8wABGknNsAtexRMlT36Al7fqK16cVApQRvcs03VOeDgLWNH
+X5UB9CTkbQPDzvR9FuxeJhEP7zZeXB6v1reSD7nA+Ec86UwSErBUMJ1I5h6SEGyY
+sSA+PxLr9ExrBDGKfPyR2zNbv2gUPKLtfGyr/gQJck2ACecejqMEDO0ycjCmPSEO
+sSrLRmnxA5l062dFC7P+PLvTnaNwLMydKDBt0tCgY69mT2dxnI7EvHwOQ5fiaGCh
+n452PAn+83xr4iBEVYilYaRmTWw3OrRgYLK8hgpZkTcoDPPKR/srWQ1LwMK92Pfz
+/yKdWHOpicRDdGVVPZMATwIDAQABo4IBcDCCAWwwUAYDVR0gBEkwRzBFBgcqhkix
+PgEAMDowOAYIKwYBBQUHAgEWLGh0dHA6Ly93d3cuZ2xvYmFsc2lnbi5uZXQvcmVw
+b3NpdG9yeS9jcHMuY2ZtMA4GA1UdDwEB/wQEAwIFoDAfBgNVHSMEGDAWgBRlZaM9
+1zsRowoHJTfJQkpbdndQ4TAdBgNVHQ4EFgQU74LauYzTDJG34JT4jcaAsiq3ECcw
+OgYDVR0fBDMwMTAvoC2gK4YpaHR0cDovL2NybC5nbG9iYWxzaWduLm5ldC9lZHVj
+YXRpb25hbC5jcmwwTwYIKwYBBQUHAQEEQzBBMD8GCCsGAQUFBzAChjNodHRwOi8v
+c2VjdXJlLmdsb2JhbHNpZ24ubmV0L2NhY2VydC9lZHVjYXRpb25hbC5jcnQwHQYD
+VR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMBwGA1UdEQQVMBOCEXd3dy5jYW1i
+cm8udW11LnNlMA0GCSqGSIb3DQEBBQUAA4IBAQAUMW1oeb8zyJXdg0CPchb3aPir
+o3WQrpvQBYDksKFdPeueK6IIEIAYe6MVg2lQoJEqKEUqcvplHFucXX8k9bGodEak
+jBtdi4RA9WyrrhUenfKTDb00jipaGCEofudFdWtx31P5y0eWxBHxcFVKKoW/P9XF
+YOi8plQIEKpRiX2xhEt8xO983ek3D8OjjA4PRKcdglo5U7BbKI3Y+5hykYsTEHPv
+jluIfTG7td+0Q047IMaQYO7Fp7iSZ5TEXIgekeYWK4ZXiDpaNFMTtcEdpMfRz+89
+8Ox8mBeSmwljt29/3UxnnSTe+/YhS32WsH3ECMxU6kn+95yhYd2btBmY4zcp
+</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://www.cambro.umu.se/Shibboleth.sso/SLO/SOAP"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://www.cambro.umu.se/Shibboleth.sso/SLO/Redirect"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.cambro.umu.se/Shibboleth.sso/SLO/POST"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://www.cambro.umu.se/Shibboleth.sso/SLO/Artifact"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://www.cambro.umu.se/Shibboleth.sso/NIM/SOAP"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://www.cambro.umu.se/Shibboleth.sso/NIM/Redirect"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.cambro.umu.se/Shibboleth.sso/NIM/POST"/>
+    <md:ManageNameIDService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://www.cambro.umu.se/Shibboleth.sso/NIM/Artifact"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://www.cambro.umu.se/Shibboleth.sso/SAML2/POST" index="1"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign" Location="https://www.cambro.umu.se/Shibboleth.sso/SAML2/POST-SimpleSign" index="2"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="https://www.cambro.umu.se/Shibboleth.sso/SAML2/Artifact" index="3"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS" Location="https://www.cambro.umu.se/Shibboleth.sso/SAML2/ECP" index="4"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:browser-post" Location="https://www.cambro.umu.se/Shibboleth.sso/SAML/POST" index="5"/>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:1.0:profiles:artifact-01" Location="https://www.cambro.umu.se/Shibboleth.sso/SAML/Artifact" index="6"/>
+  </md:SPSSODescriptor>
+</md:EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.umu.se/saml2/idp/metadata.php" xml:base="swamid-1.0/idp.umu.se-saml2.xml">
+  <IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <KeyDescriptor>
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEmzCCA4OgAwIBAgILAQAAAAABH0aCSWowDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA5MDIwNTExNTU1NloXDTEyMDIwNTExNTU1NlowTDELMAkGA1UEBhMCU0UxDTALBgNVBAcTBFVtZWExGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxEzARBgNVBAMTCmlkcC51bXUuc2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDTVztW5Apmw/AKx1SCpyKwGlkz89avgV9fkEwb6IANRMhcI3ftUOJ5BUVD3tsgyzGgZYNGgzYoGHvE3uvUGUHSGObLQv5Wy4a4yN36a2UCgGsaDxXBdAZDT6W9NOLDI86WbIQbKRSWZaeRPSWNkn46q3hE4q6NGh1b2ZY04y9VdvuDSqk3+8Z6w4wC+S2VPAG6hHbbG4gaEakCv/i4hA2haAI9vUP2RVu6aAdydoZR/DdI/GvIwHJsHl1QvmE9tkkAHmNwYhmykIFsMrOeQ8CCZbRswkemiuCWa0d0KyxH2eoJrVo6aAFIdz5yTALHsIli7n6YgSP/PC9TMAobUVU/AgMBAAGjggFpMIIBZTBQBgNVHSAESTBHMEUGByqGSLE+AQAwOjA4BggrBgEFBQcCARYsaHR0cDovL3d3dy5nbG9iYWxzaWduLm5ldC9yZXBvc2l0b3J5L2Nwcy5jZm0wDgYDVR0PAQH/BAQDAgWgMB8GA1UdIwQYMBaAFGVloz3XOxGjCgclN8lCSlt2d1DhMB0GA1UdDgQWBBQ44Zw5BzMzy6v5KrfuIjONSiDc8DA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdsb2JhbHNpZ24ubmV0L2VkdWNhdGlvbmFsLmNybDBPBggrBgEFBQcBAQRDMEEwPwYIKwYBBQUHMAKGM2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5uZXQvY2FjZXJ0L2VkdWNhdGlvbmFsLmNydDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFQYDVR0RBA4wDIIKaWRwLnVtdS5zZTANBgkqhkiG9w0BAQUFAAOCAQEAXNruvuq2mX23lgcwb7FoQXC9RGMkLnvU2+LF3QXZeGDg7VSzrfxFDEHPX6FuVH8E9KSfCemmkh/rb52oa/YXP97nLWf6tLAB6LHYp34Lx8z6FPWXi93X0vgRKrAkr8fCwk6kNO3yTyvBC8hxPX+zkMcB2Xxh281CjOE8WLTG5ORLC8Em/o4/DC+d1pu1aj24MmVdGcCKsfzXaVFiKhaB+1S8fJi539X0A/R0ig7lqzs46QzaimgcnbcFBIE4lxI0YLfl2YcOyI87jm7SPuBjDjEmNUhONbm896M82PMG4enEh47q76YYkei9ozIynoQ5kefpeSt6ru9GsnScD4eAdA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp.umu.se/saml2/idp/SingleLogoutService.php"/>
+    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://idp.umu.se/saml2/idp/SSOService.php"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UmU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå university (New SAML2)</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <SurName>UMDAC</SurName>
+    <EmailAddress>datordrift@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+  <EntityDescriptor entityID="https://idp.umu.se/shib13/idp/metadata.php" xml:base="swamid-1.0/idp.umu.se-saml1.xml">
+  <IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:1.1:protocol">
+    <Extensions>
+      <shibmeta:Scope>umu.se</shibmeta:Scope>
+    </Extensions>
+    <KeyDescriptor>
+      <ds:KeyInfo>
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEmzCCA4OgAwIBAgILAQAAAAABH0aCSWowDQYJKoZIhvcNAQEFBQAwXzELMAkGA1UEBhMCQkUxEzARBgNVBAoTCkN5YmVydHJ1c3QxFzAVBgNVBAsTDkVkdWNhdGlvbmFsIENBMSIwIAYDVQQDExlDeWJlcnRydXN0IEVkdWNhdGlvbmFsIENBMB4XDTA5MDIwNTExNTU1NloXDTEyMDIwNTExNTU1NlowTDELMAkGA1UEBhMCU0UxDTALBgNVBAcTBFVtZWExGTAXBgNVBAoTEFVtZWEgdW5pdmVyc2l0ZXQxEzARBgNVBAMTCmlkcC51bXUuc2UwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDTVztW5Apmw/AKx1SCpyKwGlkz89avgV9fkEwb6IANRMhcI3ftUOJ5BUVD3tsgyzGgZYNGgzYoGHvE3uvUGUHSGObLQv5Wy4a4yN36a2UCgGsaDxXBdAZDT6W9NOLDI86WbIQbKRSWZaeRPSWNkn46q3hE4q6NGh1b2ZY04y9VdvuDSqk3+8Z6w4wC+S2VPAG6hHbbG4gaEakCv/i4hA2haAI9vUP2RVu6aAdydoZR/DdI/GvIwHJsHl1QvmE9tkkAHmNwYhmykIFsMrOeQ8CCZbRswkemiuCWa0d0KyxH2eoJrVo6aAFIdz5yTALHsIli7n6YgSP/PC9TMAobUVU/AgMBAAGjggFpMIIBZTBQBgNVHSAESTBHMEUGByqGSLE+AQAwOjA4BggrBgEFBQcCARYsaHR0cDovL3d3dy5nbG9iYWxzaWduLm5ldC9yZXBvc2l0b3J5L2Nwcy5jZm0wDgYDVR0PAQH/BAQDAgWgMB8GA1UdIwQYMBaAFGVloz3XOxGjCgclN8lCSlt2d1DhMB0GA1UdDgQWBBQ44Zw5BzMzy6v5KrfuIjONSiDc8DA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsLmdsb2JhbHNpZ24ubmV0L2VkdWNhdGlvbmFsLmNybDBPBggrBgEFBQcBAQRDMEEwPwYIKwYBBQUHMAKGM2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5uZXQvY2FjZXJ0L2VkdWNhdGlvbmFsLmNydDAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwFQYDVR0RBA4wDIIKaWRwLnVtdS5zZTANBgkqhkiG9w0BAQUFAAOCAQEAXNruvuq2mX23lgcwb7FoQXC9RGMkLnvU2+LF3QXZeGDg7VSzrfxFDEHPX6FuVH8E9KSfCemmkh/rb52oa/YXP97nLWf6tLAB6LHYp34Lx8z6FPWXi93X0vgRKrAkr8fCwk6kNO3yTyvBC8hxPX+zkMcB2Xxh281CjOE8WLTG5ORLC8Em/o4/DC+d1pu1aj24MmVdGcCKsfzXaVFiKhaB+1S8fJi539X0A/R0ig7lqzs46QzaimgcnbcFBIE4lxI0YLfl2YcOyI87jm7SPuBjDjEmNUhONbm896M82PMG4enEh47q76YYkei9ozIynoQ5kefpeSt6ru9GsnScD4eAdA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </KeyDescriptor>
+    <NameIDFormat>urn:mace:shibboleth:1.0:nameIdentifier</NameIDFormat>
+    <SingleSignOnService Binding="urn:mace:shibboleth:1.0:profiles:AuthnRequest" Location="https://idp.umu.se/shib13/idp/SSOService.php"/>
+  </IDPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">UmU</OrganizationName>
+    <OrganizationDisplayName xml:lang="en">Umeå university (New SAML1)</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">http://www.umu.se</OrganizationURL>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <SurName>UMDAC</SurName>
+    <EmailAddress>datordrift@umdac.umu.se</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>
+</EntitiesDescriptor>

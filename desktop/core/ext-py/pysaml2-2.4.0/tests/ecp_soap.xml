@@ -1,0 +1,28 @@
+<ns0:Envelope xmlns:ns0="http://schemas.xmlsoap.org/soap/envelope/"
+              xmlns:ns1="urn:liberty:paos:2003-08"
+              xmlns:ns2="urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp"
+              xmlns:ns3="urn:oasis:names:tc:SAML:2.0:protocol"
+              xmlns:ns4="urn:oasis:names:tc:SAML:2.0:assertion">
+    <ns0:Header>
+        <ns1:Request responseConsumerURL="https://sp.example.org/PAOSConsumer"
+                     service="urn:oasis:names:tc:SAML:2.0:profiles:SSO:ecp"
+                     ns0:actor="http://schemas.xmlsoap.org/soap/actor/next"
+                     ns0:mustUnderstand="1"/>
+        <ns2:Request ProviderName="Example Service Provider"
+                     ns0:actor="http://schemas.xmlsoap.org/soap/actor/next"
+                     ns0:mustUnderstand="1">
+            <ns3:IDPList>
+                <ns3:IDPEntry Loc="https://idp.example.org/saml2/sso"
+                              Name="Example identity provider"
+                              ProviderID="https://idp.example.org/entity"/>
+            </ns3:IDPList>
+            <ns4:Issuer>https://sp.example.org/entity</ns4:Issuer>
+        </ns2:Request>
+        <ns2:RelayState ns0:actor="http://schemas.xmlsoap.org/soap/actor/next"
+                        ns0:mustUnderstand="1">ABCDEFGHI01234567
+        </ns2:RelayState>
+    </ns0:Header>
+    <ns0:Body>
+        <ns3:AuthnRequest/>
+    </ns0:Body>
+</ns0:Envelope>

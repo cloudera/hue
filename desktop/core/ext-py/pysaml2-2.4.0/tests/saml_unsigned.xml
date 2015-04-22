@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns0:Response xmlns:ns0="urn:oasis:names:tc:SAML:2.0:protocol" Destination="http://xenosmilus.umdc.umu.se:8087/login" ID="_5271694c3be6883137377fb076355c4bc97f28b3c1" InResponseTo="bahigehogffohiphlfmplepdpcohkhhmheppcdie" IssueInstant="2009-10-25T18:12:39Z" Version="2.0">
+  <ns1:Issuer xmlns:ns1="urn:oasis:names:tc:SAML:2.0:assertion">http://xenosmilus.umdc.umu.se/simplesaml/saml2/idp/metadata.php</ns1:Issuer>
+  <ns0:Status>
+    <ns0:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </ns0:Status>
+  <ns1:Assertion xmlns:ns1="urn:oasis:names:tc:SAML:2.0:assertion" ID="pfx9e022535-4b38-cc7f-41ec-9a01bcd2936d" IssueInstant="2009-10-25T18:12:39Z" Version="2.0">
+    <ns1:Issuer>http://xenosmilus.umdc.umu.se/simplesaml/saml2/idp/metadata.php</ns1:Issuer>
+    <ns1:Subject>               
+      <ns1:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:transient" SPNameQualifier="xenosmilus.umdc.umu.se">
+        _cddc88563d433f556d4cc70c3162deabddea3b5019
+      </ns1:NameID>
+      <ns1:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer">
+        <ns1:SubjectConfirmationData InResponseTo="bahigehogffohiphlfmplepdpcohkhhmheppcdie" NotOnOrAfter="2009-10-25T18:17:39Z" Recipient="http://xenosmilus.umdc.umu.se:8087/login"/>
+      </ns1:SubjectConfirmation>
+    </ns1:Subject>
+    <ns1:Conditions NotBefore="2009-10-25T18:12:09Z" NotOnOrAfter="2009-10-26T02:12:39Z">
+      <ns1:AudienceRestriction>
+        <ns1:Audience>xenosmilus.umdc.umu.se</ns1:Audience>
+      </ns1:AudienceRestriction>
+    </ns1:Conditions>
+    <ns1:AuthnStatement AuthnInstant="2009-10-25T18:12:39Z" SessionIndex="_788db107b9bb1b6ab94f00deebbfe3d92c999b3041">
+      <ns1:AuthnContext>                      
+        <ns1:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</ns1:AuthnContextClassRef>
+      </ns1:AuthnContext>
+    </ns1:AuthnStatement>
+    <ns1:AttributeStatement>
+      <ns1:Attribute Name="uid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <ns1:AttributeValue xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="xs:string">
+          student
+        </ns1:AttributeValue>
+      </ns1:Attribute>
+      <ns1:Attribute Name="eduPersonAffiliation" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic">
+        <ns1:AttributeValue xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="xs:string">
+          member
+        </ns1:AttributeValue>
+        <ns1:AttributeValue xmlns:ns2="http://www.w3.org/2001/XMLSchema-instance" ns2:type="xs:string">
+          student
+        </ns1:AttributeValue>
+      </ns1:Attribute>
+    </ns1:AttributeStatement>
+  </ns1:Assertion>
+</ns0:Response>
