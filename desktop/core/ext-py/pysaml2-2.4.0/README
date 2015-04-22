@@ -1,0 +1,45 @@
+README for PySAML2
+==================
+
+Dependencies
+------------
+PySAML2 should be compatible with any python >= 2.6 not 3.X yet.
+
+Install
+-------
+You will need xmlsec1 to be able to sign/verify, encrypt/decrypt.
+You can find xmlsec1 here:
+
+    http://www.aleksey.com/xmlsec/
+
+Apart from that a normal
+    
+    python setup.py install
+
+will install the package.
+
+Documentation
+-------------
+Look in the doc/ subdirectory.
+
+Comments, support, bug reports
+------------------------------
+
+Project page on : 
+
+https://github.com/rohe/pysaml2
+
+Use the Pysaml2@uma.es mailing list. Bug reports can either be emailed
+to this mailing list of added to the github repository
+https://github.com/rohe/pysaml2.
+
+You can subscribe to this mailing list at
+http://delfos.sci.uma.es/mailman/listinfo/pysaml2
+
+Archives are available at 
+http://delfos.sci.uma.es/mailman/private/pysaml2/
+
+Contributors
+------------
+* Roland Hedberg: main author / maintainer
+* Lorenzo Gil Sanchez: Django integration
