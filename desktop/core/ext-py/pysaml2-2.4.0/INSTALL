@@ -1,0 +1,27 @@
+You need repoze.who to get the examples working, can be gotten through 
+easy_install
+
+    easy_install "repoze.who=1.0.16"
+
+!! 2.0 or newer are missing the form plugin which is used in some instances
+
+Or from the PyPi site if you prefer to do it that way.
+Likewise for pyasn1.
+
+You should get the latest version, which is right now 1.0.18 .
+
+You also need xmlsec, which you can find here:
+
+    http://www.aleksey.com/xmlsec/
+
+You may also need:
+
+ mako
+ memcached
+ python-memcache
+ 
+Apart from that a normal
+    
+    python setup.py install
+
+will install the package.

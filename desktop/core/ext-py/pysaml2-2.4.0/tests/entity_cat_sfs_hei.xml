@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:EntityDescriptor xmlns:ns0="urn:oasis:names:tc:SAML:2.0:metadata"
+                      xmlns:ns1="urn:oasis:names:tc:SAML:metadata:attribute"
+                      xmlns:ns2="urn:oasis:names:tc:SAML:2.0:assertion"
+                      xmlns:ns4="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
+                      xmlns:ns5="http://www.w3.org/2000/09/xmldsig#"
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      entityID="urn:mace:example.com:saml:roland:sp">
+    <ns0:Extensions>
+        <ns1:EntityAttributes>
+            <ns2:Attribute Name="http://macedir.org/entity-category">
+                <ns2:AttributeValue xsi:type="xs:string">
+                    http://www.swamid.se/category/sfs-1993-1153
+                </ns2:AttributeValue>
+                <ns2:AttributeValue xsi:type="xs:string">
+                    http://www.swamid.se/category/hei-service
+                </ns2:AttributeValue>
+            </ns2:Attribute>
+        </ns1:EntityAttributes>
+    </ns0:Extensions>
+    <ns0:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="true"
+                         protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <ns0:Extensions>
+            <ns4:DiscoveryResponse
+                    Binding="urn:oasis:names:tc:SAML:profiles:SSO:idp-discovery-protocol"
+                    Location="http://lingon.catalogix.se:8087/disco" index="1"/>
+        </ns0:Extensions>
+        <ns0:KeyDescriptor use="encryption">
+            <ns5:KeyInfo>
+                <ns5:X509Data>
+                    <ns5:X509Certificate>
+                        MIICsDCCAhmgAwIBAgIJAJrzqSSwmDY9MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+                        BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+                        aWRnaXRzIFB0eSBMdGQwHhcNMDkxMDA2MTk0OTQxWhcNMDkxMTA1MTk0OTQxWjBF
+                        MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50
+                        ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+                        gQDJg2cms7MqjniT8Fi/XkNHZNPbNVQyMUMXE9tXOdqwYCA1cc8vQdzkihscQMXy
+                        3iPw2cMggBu6gjMTOSOxECkuvX5ZCclKr8pXAJM5cY6gVOaVO2PdTZcvDBKGbiaN
+                        efiEw5hnoZomqZGp8wHNLAUkwtH9vjqqvxyS/vclc6k2ewIDAQABo4GnMIGkMB0G
+                        A1UdDgQWBBRePsKHKYJsiojE78ZWXccK9K4aJTB1BgNVHSMEbjBsgBRePsKHKYJs
+                        iojE78ZWXccK9K4aJaFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUt
+                        U3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAJrzqSSw
+                        mDY9MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAJSrKOEzHO7TL5cy6
+                        h3qh+3+JAk8HbGBW+cbX6KBCAw/mzU8flK25vnWwXS3dv2FF3Aod0/S7AWNfKib5
+                        U/SA9nJaz/mWeF9S0farz9AQFc8/NSzAzaVq7YbM4F6f6N2FRl7GikdXRCed45j6
+                        mrPzGzk3ECbupFnqyREH3+ZPSdk=
+                    </ns5:X509Certificate>
+                </ns5:X509Data>
+            </ns5:KeyInfo>
+        </ns0:KeyDescriptor>
+        <ns0:KeyDescriptor use="signing">
+            <ns5:KeyInfo>
+                <ns5:X509Data>
+                    <ns5:X509Certificate>
+                        MIICsDCCAhmgAwIBAgIJAJrzqSSwmDY9MA0GCSqGSIb3DQEBBQUAMEUxCzAJBgNV
+                        BAYTAkFVMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5ldCBX
+                        aWRnaXRzIFB0eSBMdGQwHhcNMDkxMDA2MTk0OTQxWhcNMDkxMTA1MTk0OTQxWjBF
+                        MQswCQYDVQQGEwJBVTETMBEGA1UECBMKU29tZS1TdGF0ZTEhMB8GA1UEChMYSW50
+                        ZXJuZXQgV2lkZ2l0cyBQdHkgTHRkMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB
+                        gQDJg2cms7MqjniT8Fi/XkNHZNPbNVQyMUMXE9tXOdqwYCA1cc8vQdzkihscQMXy
+                        3iPw2cMggBu6gjMTOSOxECkuvX5ZCclKr8pXAJM5cY6gVOaVO2PdTZcvDBKGbiaN
+                        efiEw5hnoZomqZGp8wHNLAUkwtH9vjqqvxyS/vclc6k2ewIDAQABo4GnMIGkMB0G
+                        A1UdDgQWBBRePsKHKYJsiojE78ZWXccK9K4aJTB1BgNVHSMEbjBsgBRePsKHKYJs
+                        iojE78ZWXccK9K4aJaFJpEcwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgTClNvbWUt
+                        U3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZIIJAJrzqSSw
+                        mDY9MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAJSrKOEzHO7TL5cy6
+                        h3qh+3+JAk8HbGBW+cbX6KBCAw/mzU8flK25vnWwXS3dv2FF3Aod0/S7AWNfKib5
+                        U/SA9nJaz/mWeF9S0farz9AQFc8/NSzAzaVq7YbM4F6f6N2FRl7GikdXRCed45j6
+                        mrPzGzk3ECbupFnqyREH3+ZPSdk=
+                    </ns5:X509Certificate>
+                </ns5:X509Data>
+            </ns5:KeyInfo>
+        </ns0:KeyDescriptor>
+        <ns0:ArtifactResolutionService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="http://lingon.catalogix.se:8087/ars" index="1"/>
+        <ns0:SingleLogoutService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="http://lingon.catalogix.se:8087/sls"/>
+        <ns0:ManageNameIDService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP"
+                Location="http://lingon.catalogix.se:8087/mni/soap"/>
+        <ns0:ManageNameIDService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                Location="http://lingon.catalogix.se:8087/mni/post"/>
+        <ns0:ManageNameIDService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                Location="http://lingon.catalogix.se:8087/mni/redirect"/>
+        <ns0:ManageNameIDService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact"
+                Location="http://lingon.catalogix.se:8087/mni/art"/>
+        <ns0:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient
+        </ns0:NameIDFormat>
+        <ns0:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent
+        </ns0:NameIDFormat>
+        <ns0:AssertionConsumerService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                Location="http://lingon.catalogix.se:8087/" index="1"/>
+        <ns0:AssertionConsumerService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:PAOS"
+                Location="http://lingon.catalogix.se:8087/paos" index="2"/>
+        <ns0:AssertionConsumerService
+                Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                Location="http://lingon.catalogix.se:8087/redirect" index="3"/>
+    </ns0:SPSSODescriptor>
+    <ns0:Organization>
+        <ns0:OrganizationName xml:lang="se">AB Exempel</ns0:OrganizationName>
+        <ns0:OrganizationDisplayName xml:lang="se">AB Exempel
+        </ns0:OrganizationDisplayName>
+        <ns0:OrganizationURL xml:lang="en">http://www.example.org
+        </ns0:OrganizationURL>
+    </ns0:Organization>
+    <ns0:ContactPerson contactType="technical">
+        <ns0:GivenName>Roland</ns0:GivenName>
+        <ns0:SurName>Hedberg</ns0:SurName>
+        <ns0:EmailAddress>tech@eample.com</ns0:EmailAddress>
+        <ns0:EmailAddress>tech@example.org</ns0:EmailAddress>
+        <ns0:TelephoneNumber>+46 70 100 0000</ns0:TelephoneNumber>
+    </ns0:ContactPerson>
+</ns0:EntityDescriptor>
