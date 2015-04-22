@@ -11,23 +11,29 @@ Livy is used for powering the Spark Notebook of Hue, which you can see the
 
 .. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
 
+
 Prerequisites
 =============
 
 To build Livy, you will need:
 
-    Debian/Ubuntu:
-      * mvn (from ``maven`` package or maven3 tarball)
-      * openjdk-7-jdk (or Oracle Java7 jdk)
+Debian/Ubuntu:
+  * mvn (from ``maven`` package or maven3 tarball)
+  * openjdk-7-jdk (or Oracle Java7 jdk)
+  * spark 1.3 from (from `Apache Spark tarball`_)
 
-    Redhat/CentOS:
-      * mvn (from ``maven`` package or maven3 tarball)
-      * java-1.7.0-openjdk (or Oracle Java7 jdk)
+Redhat/CentOS:
+  * mvn (from ``maven`` package or maven3 tarball)
+  * java-1.7.0-openjdk (or Oracle Java7 jdk)
+  * spark 1.3 (from `Apache Spark tarball`_)
       
-    MacOS:
-      * Xcode command line tools
-      * Oracle's JDK 1.7+
-      * Maven (Homebrew)
+MacOS:
+  * Xcode command line tools
+  * Oracle's JDK 1.7+
+  * Maven (Homebrew)
+  * apache-spark (Homebrew)
+
+.. _Apache Spark Tarball: https://spark.apache.org/downloads.html
 
 
 Building Livy
