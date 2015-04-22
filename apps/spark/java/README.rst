@@ -1,12 +1,13 @@
 Welcome to Livy, the REST Spark Server
 ======================================
 
-Livy is an open source REST interface (in **Beta**) for interacting with a remote Spark Shell
-running locally or from inside YARN.
+Livy is an open source REST interface (in **Beta**) for interacting with a
+remote Spark Shell running locally or from inside YARN.
 
 Interactive Spark Scala, Python and batch jar/py submission are supported.
 
-Livy is used for powering the Spark Notebook of Hue, which you can see the `implementation here`_.
+Livy is used for powering the Spark Notebook of Hue, which you can see the
+`implementation here`_.
 
 .. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
 
@@ -32,8 +33,9 @@ To build Livy, you will need:
 Building Livy
 =============
 
-Livy is currently built by the `Hue Build System`_, it can also be built on it's
-own (aka without any other Hue dependency) with `Apache Maven`_. To build, run:
+Livy is currently built by the `Hue Build System`_, it can also be built on
+it's own (aka without any other Hue dependency) with `Apache Maven`_. To build,
+run:
 
 .. code:: shell
 
@@ -59,11 +61,20 @@ Livy`_. Then run:
 Running Livy
 ============
 
-In order to run Livy:
+In order to run Livy with local sessions, start the server with:
 
 .. code:: shell
 
-    % ????????????
+    % ./bin/livy-server
+
+Or with YARN sessions by running:
+
+.. code:: shell
+
+   % env \
+     LIVY_SERVER_JAVA_OPTS="-Dlivy.server.session.factory=yarn" \
+     CLASSPATH=`hadoop classpath` \
+     ./bin/livy-server
 
 
 Spark Example
@@ -71,7 +82,8 @@ Spark Example
 
 Now to see it in action by interacting with it in Python with the `Requests`_
 library. By default livy runs on port 8998 (which can be changed with the
-``livy_server_port config`` option). We’ll start off with a Spark session that takes Scala code:
+``livy_server_port config`` option). We’ll start off with a Spark session that
+takes Scala code:
 
 .. code:: python
 
@@ -80,7 +92,7 @@ library. By default livy runs on port 8998 (which can be changed with the
     >>> data = {'lang': 'spark'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
-    {u'state': u'starting', u'id': u'89beded3-04eb-4602-9a9e-6d77780f2572', u’kind’: u’spark’}
+    {u'state': u'starting', u'id': 0, u’kind’: u’spark’}
 
 Once the session has completed starting up, it transitions to the idle state:
 
@@ -89,7 +101,7 @@ Once the session has completed starting up, it transitions to the idle state:
     >>> session_url = host + r.headers['location']
     >>> r = requests.get(session_url, headers=headers)
     >>> r.json()
-    {u'state': u'idle', u'id': u'89beded3-04eb-4602-9a9e-6d77780f2572', u’kind’: u’spark’}
+    {u'state': u'idle', u'id': 0, u’kind’: u’spark’}
 
 Now we can execute Scala by passing in a simple JSON command:
 
@@ -142,7 +154,7 @@ Finally, lets close our session:
 
 .. code:: python
 
-    >>> session_url = 'http://localhost:8998/sessions/73e30e74-3bf9-49ce-8dbd-5345fd5128d6'
+    >>> session_url = 'http://localhost:8998/sessions/0'
     >>> requests.delete(session_url, headers=headers)
     <Response [204]>
 
@@ -160,7 +172,7 @@ pyspark has the exact same API, just with a different initial command:
     >>> data = {'lang': 'pyspark'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
-    {u'id': u'73e30e74-3bf9-49ce-8dbd-5345fd5128d6', u'state': u'idle'}
+    {u'id': 1, u'state': u'idle'}
 
 The PI example from before then can be run as:
 
