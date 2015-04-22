@@ -102,7 +102,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: ! isRetrievingResults()"/><![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
     </div>
   </form>
