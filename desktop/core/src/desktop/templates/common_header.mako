@@ -204,6 +204,8 @@ from django.utils.translation import ugettext as _
       return xrhsend.apply(this, arguments);
     }
 
+    $.fn.dataTableExt.sErrMode = "throw";
+
     $(document).ready(function () {
       // forces IE's ajax calls not to cache
       if ($.browser.msie) {
