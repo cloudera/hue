@@ -20,17 +20,18 @@ import logging
 from django.core import management
 from django.core.management.base import NoArgsCommand
 
-from desktop.models import Document
+from desktop.models import Document, Document2, SAMPLE_USERNAME
 from useradmin.models import install_sample_user
+
 
 LOG = logging.getLogger(__name__)
 
-# initial_search_examples.json: add 1000000 to the ids
 
 class Command(NoArgsCommand):
   def handle_noargs(self, **options):
 
-    # Load jobs
-#    install_sample_user()
-    management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
-    Document.objects.sync()
+    if not Document2.objects.filter(owner__username=SAMPLE_USERNAME).exists():
+      install_sample_user()
+
+      management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
+      Document.objects.sync()
