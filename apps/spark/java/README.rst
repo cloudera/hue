@@ -1,9 +1,14 @@
 Welcome to Livy, the REST Spark Server
 ======================================
 
-Livy is an open source REST interface for interacting with a remote Spark Shell
+Livy is an open source REST interface (in **Beta**) for interacting with a remote Spark Shell
 running locally or from inside YARN.
 
+Interactive Spark Scala, Python and batch jar/py submission are supported.
+
+Livy is used for powering the Spark Notebook of Hue, which you can see the `implementation here`_.
+
+.. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
 
 Prerequisites
 =============
@@ -17,13 +22,17 @@ To build Livy, you will need:
     Redhat/CentOS:
       * mvn (from ``maven`` package or maven3 tarball)
       * java-1.7.0-openjdk (or Oracle Java7 jdk)
-
+      
+    MacOS:
+      * Xcode command line tools
+      * Oracle's JDK 1.7+
+      * Maven (Homebrew)
 
 
 Building Livy
 =============
 
-Livy is normally built by the `Hue Build System`_, it can also be built on it's
+Livy is currently built by the `Hue Build System`_, it can also be built on it's
 own (aka without any other Hue dependency) with `Apache Maven`_. To build, run:
 
 .. code:: shell
@@ -47,13 +56,22 @@ Livy`_. Then run:
     % mvn test
 
 
+Running Livy
+============
+
+In order to run Livy:
+
+.. code:: shell
+
+    % ????????????
+
+
 Spark Example
 =============
 
 Now to see it in action by interacting with it in Python with the `Requests`_
 library. By default livy runs on port 8998 (which can be changed with the
-``livy_server_port config`` option). We’ll start off with a Spark session that
-takes Scala code:
+``livy_server_port config`` option). We’ll start off with a Spark session that takes Scala code:
 
 .. code:: python
 
@@ -135,14 +153,18 @@ Finally, lets close our session:
 PySpark Example
 ===============
 
-pyspark has the exact same API, just with a different initial command:: python
+pyspark has the exact same API, just with a different initial command:
+
+.. code:: python
 
     >>> data = {'lang': 'pyspark'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
     {u'id': u'73e30e74-3bf9-49ce-8dbd-5345fd5128d6', u'state': u'idle'}
 
-The PI example from before then can be run as:: python
+The PI example from before then can be run as:
+
+.. code:: python
 
     >>> data = {
     ...   'code': textwrap.dedent("""\
@@ -164,6 +186,15 @@ The PI example from before then can be run as:: python
                  u'execution_count': 12,
                  u'status': u'ok'},
      u'state': u'running'}
+
+
+
+Community
+=========
+
+ * User group: http://groups.google.com/a/cloudera.org/group/hue-user
+ * Jira: https://issues.cloudera.org/browse/HUE-2588
+ * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
 
 
 REST API
@@ -464,14 +495,6 @@ Statement Output
 |                 |                   | ``application/json``, the value  |
 |                 |                   | will be a JSON value             |
 +-----------------+-------------------+----------------------------------+
-
-
-Community
-=========
-
- * User group: http://groups.google.com/a/cloudera.org/group/hue-user
- * Jira: https://issues.cloudera.org/browse/HUE
- * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
 
 
 License
