@@ -145,6 +145,16 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          </a>
     </div>
 
+    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
+                    draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Counter')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
+                       <i class="fa fa-calculator"></i>
+         </a>
+    </div>
+
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableLeaflet()},
                     draggable: {data: draggableLeafletMap(), isEnabled: availableDraggableLeaflet,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -153,7 +163,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
          <a data-bind="style: { cursor: 'move' }">
              <i class="fa fa-map-marker"></i>
          </a>
-   </div>
+    </div>
+
 
       </%def>
       <%def name="widgets()">
@@ -229,15 +240,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
-    <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
-                    draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Counter')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
-                       <i class="fa fa-tachometer"></i>
-         </a>
-    </div>
       </%def>
 </%dashboard:layout_toolbar>
 
@@ -246,19 +248,6 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="empty-widget">
   ${ _('This is an empty widget.')}
-</script>
-
-
-<script type="text/html" id="hit-widget">
-  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      ${ _('Label') }: <input type="text" data-bind="value: label" />
-    </div>
-
-    <span data-bind="text: query" />: <span data-bind="text: count" />
-  </div>
-  <!-- /ko -->
 </script>
 
 
@@ -1087,8 +1076,8 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
-<script type="text/html" id="counter-widget">
-  <div class="widget-spinner" data-bind="visible: isLoading()">
+<script type="text/html" id="hit-widget">
+  <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   </div>
@@ -1096,7 +1085,8 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span class="facet-field-label">${ _('Metric') }</span> <select>
+      <span class="facet-field-label">${ _('Metric') }</span>
+      <select>
         <option value="0" selected="selected" label="Count">Count</option>
         <option value="1" label="Average">Average</option>
         <option value="2" label="Sum">Sum</option>
@@ -1107,9 +1097,9 @@ ${ dashboard.layout_skeleton() }
         <option value="7" label="Percentiles">Percentiles</option>
       </select>
     </div>
-    <div data-bind="with: $root.collection.getFacetById($parent.id())">
-        <div class="big-counter">2312323</div>
-    </div>
+
+    <span data-bind="text: 'max', visible: ! $root.isEditing()"></span>
+    <span class="big-counter" data-bind="text: counts"></span>
   </div>
   <!-- /ko -->
 </script>
