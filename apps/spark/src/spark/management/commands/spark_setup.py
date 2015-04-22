@@ -22,9 +22,8 @@ import pwd
 from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import BaseCommand
-from django.utils.translation import ugettext as _
 
-from desktop.models import Document
+from desktop.models import Document, Document2, SAMPLE_USERNAME
 from useradmin.models import install_sample_user
 
 
@@ -41,10 +40,11 @@ class Command(BaseCommand):
     else:
       user = options['user']
 
-    install_sample_user()
+    if not Document2.objects.filter(type='notebook', owner__username=SAMPLE_USERNAME).exists():
+      install_sample_user()
 
-    management.call_command('loaddata', 'apps/spark/src/spark/fixtures/initial_spark_examples.json', verbosity=2)
-    Document.objects.sync()
+      management.call_command('loaddata', 'apps/spark/src/spark/fixtures/initial_spark_examples.json', verbosity=2)
+      Document.objects.sync()
 
     from beeswax.management.commands.beeswax_install_examples import Command
     app_name = 'beeswax'
