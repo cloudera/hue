@@ -28,7 +28,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.lib.rest import resource
 
 from search.api import _round_number_range
-from search.models import Collection
+from search.models import Collection2
 
 
 QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
@@ -70,13 +70,11 @@ class TestSearchBase(object):
     self.c = make_logged_in_client(username='test_search', is_superuser=False)
     grant_access('test_search', 'test_search', 'search')
     self.user = User.objects.get(username='test_search')
-    try:
-      self.collection = Collection.objects.create2(name='collection_1', label='collection_1', owner=self.user)
-    except:
-      self.collection = Collection.objects.get(name='collection_1')
 
     self.prev_resource = resource.Resource
     resource.Resource = MockResource
+
+    self.collection = Collection2(user=self.user, name='collection_1')
 
   def tearDown(self):
     # Remove monkey patching
@@ -151,7 +149,7 @@ class TestWithMockedSolr(TestSearchBase):
          {'isDynamic': False, 'isId': None, 'type': 'text_general', 'name': 'url'},
          {'isDynamic': False, 'isId': None, 'type': 'float', 'name': 'weight'},
          {'isDynamic': False, 'isId': True, 'type': 'string', 'name': 'id'}],
-         self.collection.fields_data(self.user)
+         self.collection.fields_data(self.user, 'collection_1')
     )
 
   # TODO
