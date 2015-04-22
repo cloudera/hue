@@ -1,0 +1,232 @@
+Version 2.4.2
+-------------
+- Updated zoneinfo to 2015b.
+- Fixed issue with parsing of tzstr on Python 2.7.x; tzstr will now be decoded
+  if not a unicode type. gh #51 (lp:1331576), gh pr #55.
+- Fix a parser issue where AM and PM tokens were showing up in fuzzy date
+  stamps, triggering inappropriate errors. gh #56 (lp: 1428895), gh pr #63.
+- Missing function "setcachsize" removed from zoneinfo __all__ list by @ryanss,
+  fixing an issue with wildcard imports of dateutil.zoneinfo. (gh pr #66).
+- (PyPi only) Fix an issue with source distributions not including the test
+  suite.
+
+
+Version 2.4.1
+-------------
+
+- Added explicit check for valid hours if AM/PM is specified in parser.
+  (gh pr #22, issue #21)
+- Fix bug in rrule introduced in 2.4.0 where byweekday parameter was not
+  handled properly. (gh pr #35, issue #34)
+- Fix error where parser allowed some invalid dates, overwriting existing hours
+  with the last 2-digit number in the string. (gh pr #32, issue #31)
+- Fix and add test for Python 2.x compatibility with boolean checking of
+  relativedelta objects. Implemented by @nimasmi (gh pr #43) and Cédric Krier 
+  (lp: 1035038)
+- Replaced parse() calls with explicit datetime objects in unit tests unrelated
+  to parser. (gh pr #36)
+- Changed private _byxxx from sets to sorted tuples and fixed one currently
+  unreachable bug in _construct_byset. (gh pr #54)
+- Additional documentation for parser (gh pr #29, #33, #41) and rrule.
+- Formatting fixes to documentation of rrule and README.rst.
+- Updated zoneinfo to 2015a.
+
+Version 2.4.0
+-------------
+
+- Fix an issue with relativedelta and freezegun (lp:1374022)
+- Fix tzinfo in windows for timezones without dst (lp:1010050, gh #2)
+- Ignore missing timezones in windows like in POSIX
+- Fix minimal version requirement for six (gh #6)
+- Many rrule changes and fixes by @pganssle (gh pull requests #13 #14 #17),
+    including defusing some infinite loops (gh #4)
+
+Version 2.3
+-----------
+
+- Cleanup directory structure, moved test.py to dateutil/tests/test.py
+
+- Changed many aspects of dealing with the zone info file. Instead of a cache,
+  all the zones are loaded to memory, but symbolic links are loaded only once,
+  so not much memory is used.
+
+- The package is now zip-safe, and universal-wheelable, thanks to changes in 
+  the handling of the zoneinfo file. 
+
+- Fixed tzwin silently not imported on windows python2
+
+- New maintainer, together with new hosting: GitHub, Travis, Read-The-Docs
+
+Version 2.2
+-----------
+
+- Updated zoneinfo to 2013h
+
+- fuzzy_with_tokens parse addon from Christopher Corley
+
+- Bug with LANG=C fixed by Mike Gilbert
+
+Version 2.1
+-----------
+
+- New maintainer
+
+- Dateutil now works on Python 2.6, 2.7 and 3.2 from same codebase (with six)
+
+- #704047: Ismael Carnales' patch for a new time format
+
+- Small bug fixes, thanks for reporters!
+
+
+Version 2.0
+-----------
+
+- Ported to Python 3, by Brian Jones.  If you need dateutil for Python 2.X,
+  please continue using the 1.X series.
+
+- There's no such thing as a "PSF License".  This source code is now
+  made available under the Simplified BSD license.  See LICENSE for
+  details.
+
+Version 1.5
+-----------
+
+- As reported by Mathieu Bridon, rrules were matching the bysecond rules
+  incorrectly against byminute in some circumstances when the SECONDLY
+  frequency was in use, due to a copy & paste bug.  The problem has been
+  unittested and corrected.
+
+- Adam Ryan reported a problem in the relativedelta implementation which
+  affected the yearday parameter in the month of January specifically.
+  This has been unittested and fixed.
+
+- Updated timezone information.
+
+
+Version 1.4.1
+-------------
+
+- Updated timezone information.
+
+
+Version 1.4
+-----------
+
+- Fixed another parser precision problem on conversion of decimal seconds
+  to microseconds, as reported by Erik Brown.  Now these issues are gone
+  for real since it's not using floating point arithmetic anymore.
+
+- Fixed case where tzrange.utcoffset and tzrange.dst() might fail due
+  to a date being used where a datetime was expected (reported and fixed
+  by Lennart Regebro).
+
+- Prevent tzstr from introducing daylight timings in strings that didn't
+  specify them (reported by Lennart Regebro).
+
+- Calls like gettz("GMT+3") and gettz("UTC-2") will now return the
+  expected values, instead of the TZ variable behavior.
+
+- Fixed DST signal handling in zoneinfo files.  Reported by
+  Nicholas F. Fabry and John-Mark Gurney.
+
+
+Version 1.3
+-----------
+
+- Fixed precision problem on conversion of decimal seconds to
+  microseconds, as reported by Skip Montanaro.
+
+- Fixed bug in constructor of parser, and converted parser classes to
+  new-style classes.  Original report and patch by Michael Elsdörfer.
+
+- Initialize tzid and comps in tz.py, to prevent the code from ever
+  raising a NameError (even with broken files).  Johan Dahlin suggested
+  the fix after a pyflakes run.
+
+- Version is now published in dateutil.__version__, as requested
+  by Darren Dale.
+
+- All code is compatible with new-style division.
+
+
+Version 1.2
+-----------
+
+- Now tzfile will round timezones to full-minutes if necessary,
+  since Python's datetime doesn't support sub-minute offsets.
+  Thanks to Ilpo Nyyssönen for reporting the issue.
+
+- Removed bare string exceptions, as reported and fixed by
+  Wilfredo Sánchez Vega.
+
+- Fix bug in leap count parsing (reported and fixed by Eugene Oden).
+
+
+Version 1.1
+-----------
+
+- Fixed rrule byyearday handling. Abramo Bagnara pointed out that
+  RFC2445 allows negative numbers.
+
+- Fixed --prefix handling in setup.py (by Sidnei da Silva).
+
+- Now tz.gettz() returns a tzlocal instance when not given any
+  arguments and no other timezone information is found.
+
+- Updating timezone information to version 2005q.
+
+
+Version 1.0
+-----------
+
+- Fixed parsing of XXhXXm formatted time after day/month/year
+  has been parsed.
+
+- Added patch by Jeffrey Harris optimizing rrule.__contains__.
+
+
+Version 0.9
+-----------
+
+- Fixed pickling of timezone types, as reported by
+  Andreas Köhler.
+
+- Implemented internal timezone information with binary
+  timezone files [1]. datautil.tz.gettz() function will now
+  try to use the system timezone files, and fallback to
+  the internal versions. It's also possible to ask for
+  the internal versions directly by using
+  dateutil.zoneinfo.gettz().
+
+- New tzwin timezone type, allowing access to Windows
+  internal timezones (contributed by Jeffrey Harris).
+
+- Fixed parsing of unicode date strings.
+
+- Accept parserinfo instances as the parser constructor
+  parameter, besides parserinfo (sub)classes.
+
+- Changed weekday to spell the not-set n value as None
+  instead of 0.
+
+- Fixed other reported bugs.
+
+[1] http://www.twinsun.com/tz/tz-link.htm
+
+
+Version 0.5
+-----------
+
+- Removed FREQ_ prefix from rrule frequency constants
+  WARNING: this breaks compatibility with previous versions.
+
+- Fixed rrule.between() for cases where "after" is achieved
+  before even starting, as reported by Andreas Köhler.
+
+- Fixed two digit zero-year parsing (such as 31-Dec-00), as
+  reported by Jim Abramson, and included test case for this.
+
+- Sort exdate and rdate before iterating over them, so that
+  it's not necessary to sort them before adding to the rruleset,
+  as reported by Nicholas Piper.
+
