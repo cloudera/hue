@@ -30,7 +30,7 @@ LOG = logging.getLogger(__name__)
 class Command(NoArgsCommand):
   def handle_noargs(self, **options):
 
-    if not Document2.objects.filter(owner__username=SAMPLE_USERNAME).exists():
+    if not Document2.objects.filter(type='search-dashboard', owner__username=SAMPLE_USERNAME).exists():
       install_sample_user()
 
       management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)
