@@ -1388,21 +1388,21 @@ ${ dashboard.layout_skeleton() }
     <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
       <!-- ko if: $root.initial.inited() -->
       ${ _('Solr index') }
-      <select data-bind="options: $root.initial.collections, value: $root.collection.name" style="margin-bottom: 0">
+      <select data-bind="options: $root.initial.collections, value: $root.collection.name" style="margin-bottom: 0; margin-right: 20px">
       </select>
       <!-- /ko -->
+      ${ _('Description') } <input type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
     </div>
-    <label class="checkbox" style="margin-top: 4px">
-      ${ _('Visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled"/>
+    <div style="float: left;margin-right: 30px;">
+    <label class="checkbox" style="margin-top: 6px">
+      ${ _('Dashboard visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled" style="margin-left: 0; margin-right: 4px"/>
     </label>
-
-    <span style="margin-top: 4px">
-      ${ _('Description') } <input type="text" class="input-xlarge" data-bind="value: $root.collection.description"></input>
-    </span>
-
-    <label class="checkbox" style="margin-top: 4px">
-      <input type="checkbox" style="margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="text" class="input-mini" style="margin-bottom: 0; margin-left: 6px" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+    </div>
+    <div style="float: left;margin-right: 30px;">
+    <label class="checkbox">
+      <input type="checkbox"  style="margin-left: 0; margin-right: 4px;margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 30px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
     </label>
+    </div>
   </div>
 </div>
 
