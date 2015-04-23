@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue v2.1.0, released October 2nd, 2012</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div xml:lang="en" class="article" title="Hue v2.1.0, released October 2nd, 2012" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp25135680"></a>Hue v2.1.0, released October 2nd, 2012</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#_notable_features">1. Notable Features</a></span></dt><dt><span class="section"><a href="#_notable_fixes">2. Notable Fixes</a></span></dt><dt><span class="section"><a href="#_compatibility">3. Compatibility</a></span></dt><dt><span class="section"><a href="#_upgrade">4. Upgrade</a></span></dt><dt><span class="section"><a href="#_known_issue">5. Known Issue</a></span></dt><dt><span class="section"><a href="#_list_of_all_commits">6. List of All Commits</a></span></dt><dt><span class="section"><a href="#_contributors">7. Contributors</a></span></dt></dl></div><p>This is the release of Hue 2.1.0.
+Hue 2.1.0 is compatible with CDH4.1 (Cloudera’s Distribution Including Apache
+Hadoop 4.1).</p><div class="section" title="1. Notable Features"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_features"></a>1. Notable Features</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Hue now provides an Apache Oozie application for creating workflows of Apache MapReduce,
+  Apache Pig, Apache Hive, Apache Sqoop, Java, Shell, Ssh and Streaming jobs and
+  scheduling them repetitively (HUE-755).
+</li><li class="listitem">
+Hue is now available in German, Spanish, French, Japanese, Korean, Portuguese,
+  Brazilian and simplified Chinese (HUE-758).
+</li></ul></div></div><div class="section" title="2. Notable Fixes"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_fixes"></a>2. Notable Fixes</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HUE-755 [jobsub] Support Oozie workflows with sequential actions
+</li><li class="listitem">
+HUE-612 Show retired jobs in the job browser
+</li><li class="listitem">
+HUE-206 Browsing a large directory slow for IE
+</li><li class="listitem">
+HUE-811 [core] Notification messages working only on FF
+</li><li class="listitem">
+HUE-799 [useradmin] Cannot delete group
+</li><li class="listitem">
+HUE-797 [useradmin] The admin can’t delete a user
+</li><li class="listitem">
+HUE-758 [core] Internationalization
+</li><li class="listitem">
+HUE-720 [useradmin] Create home dir for user optionally
+</li><li class="listitem">
+HUE-704 Importing very large <span class="emphasis"><em>query</em></span> rows into beeswax_queryhistory on MySQL breaks if the length exceeds varchar(1024)
+</li><li class="listitem">
+HUE-652 HUE-617 [ui] Datatable shouldn’t sort dates literally
+</li><li class="listitem">
+HUE-504 Sticky bit support in Hue
+</li></ul></div></div><div class="section" title="3. Compatibility"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_compatibility"></a>3. Compatibility</h2></div></div></div><p>Hue 2.1.0 runs on CentOS versions 5 to 6, and Ubuntu 10.04 to 12.04.</p><p>Hue 2.1.0 is compatible with CDH4.1. Specifically:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+File Browser depends on Hadoop 0.20 (for WebHDFS/HttpFS).
+</li><li class="listitem">
+Beeswax is tested against Hive 0.9.0.
+</li><li class="listitem">
+Job Browser depends on MR1 (for the JobTracker plugin).
+</li><li class="listitem">
+Job Browser does <span class="strong"><strong>not</strong></span> work with Yarn/MR2.
+</li><li class="listitem">
+Job Designer depends on Oozie, using the Oozie web service API.
+</li></ul></div></div><div class="section" title="4. Upgrade"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_upgrade"></a>4. Upgrade</h2></div></div></div><p>Hue 2.1.0 is backward compatible with Hue 2.0.1.</p></div><div class="section" title="5. Known Issue"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_known_issue"></a>5. Known Issue</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Uploads with HttpFs in a federated cluster fail (HUE-742).
+</li></ul></div></div><div class="section" title="6. List of All Commits"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_all_commits"></a>6. List of All Commits</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+884941a [doc] 2.1.0 release notes
+</li><li class="listitem">
+274bfd5 [oozie] Fix HDFS permissions of shared workflows
+</li><li class="listitem">
+b78de53 [oozie] Users can copy accessible workflows
+</li><li class="listitem">
+0568235 [doc] Update JobDesigner and Oozie documentation
+</li><li class="listitem">
+bd383f0 [oozie] Edit action upload opens on deployment dir
+</li><li class="listitem">
+bebd820 [oozie] Adding NN url to each &lt;prepare&gt;
+</li><li class="listitem">
+64b21df [oozie] Fix Sqoop command XML field
+</li><li class="listitem">
+f5babd6 [oozie] Convert Sqoop action command to TextField
+</li><li class="listitem">
+70f04f9 [oozie] Add examples of all the available actions
+</li><li class="listitem">
+f63e11d [doc] Update help documentation with images
+</li><li class="listitem">
+01735aa HUE-847 [oozie] File selector corrupting the fields
+</li><li class="listitem">
+824096b HUE-833 [oozie] Add Shell action
+</li><li class="listitem">
+4874946 HUE-833 [oozie] Add Ssh action
+</li><li class="listitem">
+ef41254 HUE-833 [oozie] Add Sqoop action
+</li><li class="listitem">
+661c333 [core] Increase upload chunks from 64KB to 64MB
+</li><li class="listitem">
+50c17ec [help] Updating the documentation of all the apps
+</li><li class="listitem">
+b22901a HUE-883 [oozie] Add Hive action
+</li><li class="listitem">
+0b85584 [oozie] i18n of all the models
+</li><li class="listitem">
+4958337 [oozie] Update of the locales
+</li><li class="listitem">
+18b719a HUE-771 [beeswax] Can’t create a table with another delimiter
+</li><li class="listitem">
+a29fa65 [beeswax] Convert some error notifications to info level
+</li><li class="listitem">
+303b2f3 [oozie] Fixed layout problem on workflow dashboard for IE
+</li><li class="listitem">
+1bb94ef [oozie] Longer input fields for action forms
+</li><li class="listitem">
+aae4271 [desktop] Fix unicode error in server logs
+</li><li class="listitem">
+f10dc62 [oozie] Fix calendar selection when editing a dataset
+</li><li class="listitem">
+6dc5559 [oozie] Fix coordinator dataset input/output XML generation
+</li><li class="listitem">
+bcb133a [core] Updating pot and syncing po files
+</li><li class="listitem">
+203696c [oozie] Adding Portuguese translations
+</li><li class="listitem">
+17ea854 [core] Fixing extraction of strings
+</li><li class="listitem">
+6ab9d5d [core] Improving usage of translations across all apps
+</li><li class="listitem">
+0de08d4 [oozie] Initial localizations
+</li><li class="listitem">
+bea9e92 [beeswax] Fix some missed strings during i18n
+</li><li class="listitem">
+3aba683 [oozie] Create deployment directory when creating a new workflow
+</li><li class="listitem">
+6d7d47f [core] Updating translations of the apps
+</li><li class="listitem">
+9b21d6e [oozie] Fix edition permission on Coordinator
+</li><li class="listitem">
+d1d4763 [oozie] fix tests for dataset creation
+</li><li class="listitem">
+04730f6 [doc] Update of README, manual and SDK
+</li><li class="listitem">
+edbf6bf [oozie] Fix create dataset
+</li><li class="listitem">
+0876925 [desktop] Update PAM backend to use a configuration defined service
+</li><li class="listitem">
+b88c142 [oozie] Only accessible workflows can be scheduled
+</li><li class="listitem">
+30e81cf [desktop] Update sdk docs to reflect commonfooter change
+</li><li class="listitem">
+7658155 [beeswax,filebrowser,jobbrowser,jobsub,shell,desktop] Added javascript notifications to every template needed
+</li><li class="listitem">
+551b162 [oozie] Add progress information on dashboard
+</li><li class="listitem">
+7cc9c44 [oozie,beeswax,jobsub,jobbrowser] Replace table sorting <span class="emphasis"><em>type</em></span> customization with <span class="emphasis"><em>source</em></span> customizations
+</li><li class="listitem">
+ee5e0a5 [oozie] Need to multiply duration by 1000 in order to display properly
+</li><li class="listitem">
+84d3201 [oozie] Durability and progress sorting for workflows and coordinators
+</li><li class="listitem">
+44e9f29 [oozie] Prevent enter key from submitting the search forms
+</li><li class="listitem">
+2631b71 [oozie] IE support of dashboard buttons
+</li><li class="listitem">
+112a391 [oozie] Chmod 664 migration files
+</li><li class="listitem">
+216937f [jobsub] Add Oozie sharelib property to streaming example
+</li><li class="listitem">
+28705bb [oozie] Migrations for oozie app
+</li><li class="listitem">
+97ce533 [oozie] Improve examples description
+</li><li class="listitem">
+b51208b [oozie] New oozie examples
+</li><li class="listitem">
+57936d4 [oozie] Disable Decision node
+</li><li class="listitem">
+f7b8bcf [oozie] Fix layout of <span class="emphasis"><em>edit action</em></span> form with localization
+</li><li class="listitem">
+7ff26fa [oozie] Compatibility Python 2.4 for generate XML workflow
+</li><li class="listitem">
+d0e1141 [oozie] Workflows with a Fork can be submitted
+</li><li class="listitem">
+0bb59d4 HUE-816 [oozie] Sample data had defined schema_version twice, once empty
+</li><li class="listitem">
+31b9d03 [beeswax] Fix tests after the change of interface in Hive 0.9.0
+</li><li class="listitem">
+f0dc0ba HUE-815 [fb] Upload button does not work in Firefox
+</li><li class="listitem">
+a17c897 [oozie] Improve datasets UI
+</li><li class="listitem">
+670d875 [oozie] Add global configuration to Workflow
+</li><li class="listitem">
+c12df63 [oozie] Fix oozie unit tests from previous commit
+</li><li class="listitem">
+f440beb [oozie] Added confirmation popups for some actions
+</li><li class="listitem">
+2b7936b [oozie] Adding control fields to Coordinator
+</li><li class="listitem">
+aad045a [oozie] Improve Editor usability
+</li><li class="listitem">
+089ea70 [oozie] Prettify dataset in oozie app
+</li><li class="listitem">
+3201daf [core] Make Oozielib backward compatible with Jobsub
+</li><li class="listitem">
+219d5bd [oozie] Add prepare statement in a workflow action
+</li><li class="listitem">
+315d008 HUE-720 [useradmin] Created home directory should belong to the user
+</li><li class="listitem">
+d766032 [core] Update Jenkins Hive version
+</li><li class="listitem">
+59cf1c9 [oozie] Move Save button to Properties tab
+</li><li class="listitem">
+5fc85ba [oozie] Prettify dataset add in coordinator editor
+</li><li class="listitem">
+6bcf8bc [beeswax] Do not use lazy string extraction in views
+</li><li class="listitem">
+1985495 [oozie] Calendar widget images chmod 644
+</li><li class="listitem">
+91e7f4f [oozie] Added images associated with calendar
+</li><li class="listitem">
+622ecf7 [HUE-720] Create home directory checked by default on user "add" page
+</li><li class="listitem">
+d425493 [oozie] Workflow breaks when two branches join to the same node
+</li><li class="listitem">
+* b0cfd86 [oozie] import jobsub actions
+</li><li class="listitem">
+* 941ab54 [oozie] Add workflow and coordinator variables
+</li><li class="listitem">
+* abb916f [oozie] Adding translated messages
+</li><li class="listitem">
+* 85d9c91 [oozie] Add resubmit management command to workflow and coordinator dashboards
+</li><li class="listitem">
+* 29e7fb7 [oozie] Add kill command to oozie coordinator dashboard
+</li><li class="listitem">
+* f971054 [oozie] Update the list of jobs seen as <span class="emphasis"><em>RUNNING</em></span>
+</li><li class="listitem">
+d581141 HUE-811 [core] Notification messages working only on FF
+</li><li class="listitem">
+af2f86c [oozie] Update notify error on workflow page to use i18n translations
+</li><li class="listitem">
+22db019 [oozie] Update test_manage_workflow test case to incorporate negative test
+</li><li class="listitem">
+d785fd7 [oozie] Add kill button to workflow
+</li><li class="listitem">
+7e501e9 [beeswax] Test log searcher can understand different log formats
+</li><li class="listitem">
+f71073e [oozie] Fix calendar widget’s missing libs
+</li><li class="listitem">
+49545bc [oozie] Fix tests after new calendar widget
+</li><li class="listitem">
+1adc980 [oozie] A cloned job has a wrong deployment directory
+</li><li class="listitem">
+4034c6e [oozie] New calendar widget and field
+</li><li class="listitem">
+86d6a4e [oozie] XML configuration element of a coordinator shouldn’t be generated if empty
+</li><li class="listitem">
+338be2d [oozie] Refactor oozie_setup command
+</li><li class="listitem">
+aaabb2a [oozie] Display workflow graph as readonly when not edition perms
+</li><li class="listitem">
+aa942cc [beeswax] Fetch query based on server configuration
+</li><li class="listitem">
+8f42218 [oozie] Fix clone workflow action
+</li><li class="listitem">
+8f26521 [oozie] Fix the install of the examples from the editor
+</li><li class="listitem">
+c371fa8 [oozie] Sleep worflow and coordinator examples
+</li><li class="listitem">
+d7a6d69 [core] Latest Oozie 3.2 breaks the app
+</li><li class="listitem">
+3e4b20e [beeswax] Fix tests after changes in Hive logging format
+</li><li class="listitem">
+c17ebe4 HUE-803 [useradmin] Improved "sync users and groups" UI slightly.
+</li><li class="listitem">
+17142a5 Revert "[core] WebHDFS octal permissions should be at most 4 digits"
+</li><li class="listitem">
+dd27176 HUE-720 [useradmin] Add home dir.
+</li><li class="listitem">
+905a41f HUE-705 [fb] No error message when a file upload failed
+</li><li class="listitem">
+11d27e5 HUE-704 [beeswax] Update queryhistory model to use TextField for query.
+</li><li class="listitem">
+6b6d5bf [oozie] Can clone a coordinator
+</li><li class="listitem">
+cc814c5 [oozie] Cannot delete a coordinator
+</li><li class="listitem">
+2ed4dc8 [oozie] Mock submission to Oozie in the tests
+</li><li class="listitem">
+c6a4ada [core] Localization of 8 apps
+</li><li class="listitem">
+e0c9ade HUE-724 Integrate Django Flash for confirmation messages
+</li><li class="listitem">
+3f884f6 [oozie] Workflows and Coordinators security access checks
+</li><li class="listitem">
+9f02a72 [oozie] Adding tests suite to the Editor and Dashboard
+</li><li class="listitem">
+aa20455 [desktop] Header UI update
+</li><li class="listitem">
+d7bb460 HUE-755 [oozie] Oozie Application
+</li><li class="listitem">
+fb9491b HUE-724 [core] Integrate Django messages for notifications
+</li><li class="listitem">
+7f0bca6 [desktop] Header configuration
+</li><li class="listitem">
+7a40908 HUE-799 [ua] Fix delete group action.
+</li><li class="listitem">
+a581de0 [fb] Sticky bit testing.
+</li><li class="listitem">
+9a40ef8 HUE-797 [useradmin] Admin cannot delete a user account.
+</li><li class="listitem">
+3752cff HUE-504 [fb] Add sticky bit support.
+</li><li class="listitem">
+e2cc325 HUE-787 [Desktop] Config dump view uses raw values instead of type cased values in template.
+</li><li class="listitem">
+220f252 [core] REST Exception also gets the headers of urllib2.HTTPError
+</li><li class="listitem">
+3d4184e HUE-791 [core] Adding Django Transaction middleware
+</li><li class="listitem">
+38548f0 HUE-795 [core] Integrate latest MIT fileuploader.js
+</li><li class="listitem">
+8ab4ca3 HUE-758 [core] Finishing Internationalization
+</li><li class="listitem">
+27f232f [core] Revert back missing module
+</li><li class="listitem">
+c40fc08 [core] Removing unused files and updating NOTICE.txt
+</li><li class="listitem">
+94390b0 HUE-690 [fb] Disallowing multi-level directory creation in filebrowser.
+</li><li class="listitem">
+4a1b4a8 HUE-792 [core] Move the Oozie lib from Jobsub to Desktop
+</li><li class="listitem">
+45ec32f HUE-788 [core] Enable apps to be url namespaced
+</li><li class="listitem">
+5be5736 [doc] Improve getting started section
+</li><li class="listitem">
+f6e86b8 [jobsub] Changing job_properties field from CharField to TextField
+</li><li class="listitem">
+3b411c6 [core] Remove deprecated en_US locale
+</li><li class="listitem">
+dcb1a3c HUE-724 [core] Create jHueNotify plugin
+</li><li class="listitem">
+09b3d88 HUE-731 [ui] Clean old <span class="emphasis"><em>hidden</em></span> and <span class="emphasis"><em>jframe-hidden</em></span> CSS classes
+</li><li class="listitem">
+4de6d30 HUE-769 [jb] Sorting jobs by Duration can be wrong
+</li><li class="listitem">
+306199f HUE-782 [core] jHueFileChooser allowed to select a folder
+</li><li class="listitem">
+cdea584 [doc] Make the README up to date
+</li><li class="listitem">
+7ee080a HUE-758 [core] Internationalization
+</li><li class="listitem">
+11c9e52 HUE-767 [jb] Make kill column not clickable
+</li><li class="listitem">
+a849ded HUE-767 [jb] Improve the look and feel with bootstraps
+</li><li class="listitem">
+417d7e1 HUE-778 [beeswax] Fix email checkbox grammar
+</li><li class="listitem">
+5102dd4 [doc] Warn SDK users about using released downloads
+</li><li class="listitem">
+c8c9bdd HUE-780 [fb] Small improvements for a better usability
+</li><li class="listitem">
+e99bc2e [core] English corrections of user text
+</li><li class="listitem">
+6f685aa [doc] Fix create desktop app ambiguity in the SDK manual
+</li><li class="listitem">
+9f442c5 [jobsub] Extraneous comments in the "Job Designer" help file
+</li><li class="listitem">
+76ef2af HUE-779 [fb] Pagination on following page is not correct
+</li><li class="listitem">
+33d87f0 [core] Upgrading to Mako 0.7.2 for fixing regression in 0.7.1
+</li><li class="listitem">
+b18502a [core] Harmonize table row hover color
+</li><li class="listitem">
+166241a HUE-766 [core] Desktop i18n
+</li><li class="listitem">
+28a0eaf HUE-760 [beeswax] Backend i18n
+</li><li class="listitem">
+6c9657b [core] Rowselector jQuery plugin exclude element parameter
+</li><li class="listitem">
+a4f4208 HUE-206 [fb] Browsing a large directory slow for IE
+</li><li class="listitem">
+84a855f HUE-316 [core] Upgraded ext-py Mako to 0.7.1
+</li><li class="listitem">
+39a97e4 HUE-612 [jb] Get and display a retired job
+</li><li class="listitem">
+03ac5e9 HUE-768 [core] Remove ambiguity about table headers sort icons
+</li><li class="listitem">
+b1431da [beeswax] Make prettier create manually a table form
+</li><li class="listitem">
+6d5a20d HUE-728 [beeswax] Polish UI and make it consistent
+</li><li class="listitem">
+cdda28f [core] Remove unused AspectJ
+</li><li class="listitem">
+398bb4f [core] Add a relativePath to hue-parent pom to all the pom.xml
+</li><li class="listitem">
+b29ffbe [core] Update version of snapshots used by Jenkins
+</li><li class="listitem">
+21b66b8 HUE-761 [fb] Backend i18n
+</li><li class="listitem">
+b2a66d8 HUE-638 [beeswax] Use buttons instead of input type="button"
+</li><li class="listitem">
+7ad2b31 HUE-612 [jb] Show retired jobs in the job browser
+</li><li class="listitem">
+830f507 [beeswax] Fix share queries tests
+</li><li class="listitem">
+b400f94 [jobsub] Backend i18n
+</li><li class="listitem">
+053506c HUE-764 [shell] Backend i18n
+</li><li class="listitem">
+89018c3 HUE-765 [admin] Backend i18n
+</li><li class="listitem">
+70b53ae HUE-762 [jb] backend i18n
+</li><li class="listitem">
+5728384 HUE-766 [core] Desktop template i18n
+</li><li class="listitem">
+e58c95e [core] Deleting unused files
+</li><li class="listitem">
+9d22489 HUE-763 [jobsub] Fix i18n error when submitting a job
+</li><li class="listitem">
+7a91b19 HUE-763 [jobsub] Add the missing ugettext in some templates
+</li><li class="listitem">
+32d734d [doc] Updating required Ubuntu packages
+</li><li class="listitem">
+36a1b25 HUE-727 [fb] filechooser.js should not always open on / by default
+</li><li class="listitem">
+bdb090b HUE-760 [beeswax] Templates internationalization
+</li><li class="listitem">
+bcfec10 HUE-761 [fb] Templates Internationalization
+</li><li class="listitem">
+1435746 HUE-763 [jobsub] Templates internationalization
+</li><li class="listitem">
+d890c2d HUE-762 [jb] Templates Internationalization
+</li><li class="listitem">
+db7b1ca HUE-759 [about] Template Internationalization
+</li><li class="listitem">
+4120375 HUE-765 [admin] Integrating i18n
+</li><li class="listitem">
+20be268 HUE-765 [admin] Template Internationalization
+</li><li class="listitem">
+e60a5aa HUE-764 [shell] i18n ompile messages automatically for all locales
+</li><li class="listitem">
+3e57c89 HUE-764 [shell] Templates Internationalization
+</li><li class="listitem">
+4984b7b [jobsub] Misspell in job sample description
+</li><li class="listitem">
+1cde9c4 HUE-727 [fb] filechooser.js should not always open on / by default Changed filechooser.js Added initial path to the places where filechooser is used
+</li><li class="listitem">
+f6a36f8 HUE-744 [jb] Numeric/time columns are not sorted properly
+</li><li class="listitem">
+c1bb84f HUE-728 [beeswax] Polish UI and make it consistent
+</li><li class="listitem">
+8b1089b HUE-749 [beeswax] Create a new table from file page is broken
+</li><li class="listitem">
+edd14f0 HUE-731 [ui] Clean old <span class="emphasis"><em>jframe-hidden</em></span> CSS classes
+</li><li class="listitem">
+2d75bd9 HUE-746 [admin] Javacript error on Permissions page
+</li><li class="listitem">
+19afeef HUE-738 [admin] Groups page does not redimension automatically
+</li><li class="listitem">
+158cd9b [doc] Fixing version for the package installation
+</li><li class="listitem">
+1969955 [useradmin] "Sync users/groups LDAP" popup submission results in an embedded window
+</li><li class="listitem">
+7c277af HUE-735 [fb] Open on home folder by default
+</li><li class="listitem">
+452ce74 [shell] Auto scroll on new output with Firefox
+</li><li class="listitem">
+eac61ca [build] Adding release notes for 2.0.1
+</li><li class="listitem">
+d3dda42 Do not fail silentely on TTransportExceptions
+</li><li class="listitem">
+53ab476 [shell] Ambiguous message when launching the app with no shell
+</li><li class="listitem">
+d6b5644 [core] WebHDFS octal permissions should be at most 4 digits
+</li><li class="listitem">
+980aea5 [jobsub] Better error handling when submitting a job
+</li><li class="listitem">
+562585c Revert "[core] Thrift calls can hang forever in the unit tests"
+</li><li class="listitem">
+dbcda98 Revert "[core] Skip tests timing out after eventlet patching"
+</li><li class="listitem">
+5207d3e [core] Perform Eventlet patching only when running Spawning server
+</li><li class="listitem">
+82a7b6e [build] Updated version to 2.1.0
+</li><li class="listitem">
+f690aeb HUE-715 [ui] Light blue color for the selected row by jHueRowSelector
+</li><li class="listitem">
+f07e157 [Shell] Fix bad config name "hadoop.KERBEROS"
+</li><li class="listitem">
+f9f5487 HUE-643 Modal dialog too small for complex object creation
+</li><li class="listitem">
+e8795d1 [doc] The JT host name needs to be FQDN for a secured cluster
+</li><li class="listitem">
+409ed0d [core] Skip tests timing out after eventlet patching
+</li><li class="listitem">
+39c2af7 [shell] Hue shells cannot recall command history
+</li><li class="listitem">
+c73279d HUE-728 [beeswax] Polish UI and make it consistent
+</li><li class="listitem">
+c4695a9 [beeswax] Fix beeswax unit test (skip --superuser option)
+</li><li class="listitem">
+194640b [core] Overly alarming message when libtidy is not found
+</li><li class="listitem">
+895e408 [core] Thrift calls can hang forever in the unit tests
+</li><li class="listitem">
+db43064 [build] Mako files MUST not be executable
+</li><li class="listitem">
+5c5141e [core] Spawning server should not be blocked by network calls (cherry picked from commit 575205b18048d1467a3fb6709f28e790535d2b8d)
+</li><li class="listitem">
+10ae072 [beeswax] Pass in keytab to beeswax server for it to auto renew ticket
+</li><li class="listitem">
+999e05c HUE-712: Support refreshing kerberos ticket for beeswax runing in standalone mode with authentication enabled
+</li><li class="listitem">
+cafbb72 HUE-639. thrift enhancements for sync query execution and additional error diagnostics
+</li><li class="listitem">
+b3612e5 [build] Update Hadoop version to CDH4.0.0-SNAPSHOT
+</li><li class="listitem">
+f06352a HUE-715 Full rows are clickable across Hue (cherry picked from commit 040ddf40e9cf64a271ed853ab35344077fce92e2)
+</li><li class="listitem">
+1d4b48a HUE-726 applied jHueSelector to the permission list on Useradmin add/edit group (cherry picked from commit ac6b6dcddc640c7c5f39b51debe9f0f7cd1bc1f6)
+</li><li class="listitem">
+7f3b2d3 [shell] Can copy/paste shell output
+</li><li class="listitem">
+7137365 [beeswax] Do not show the <span class="emphasis"><em>Download links</em></span> before query completion
+</li><li class="listitem">
+dd5c997 [doc] Fix SDK link in manual
+</li><li class="listitem">
+041015d [ui] Restore icon library
+</li><li class="listitem">
+1644919 [beeswax] Save table as a file opens output directory
+</li><li class="listitem">
+9e0b032 [sdk] Update SDK docs for Hue 2.0
+</li><li class="listitem">
+081d73e [sdk] Update SDK app template
+</li><li class="listitem">
+9810072 [beeswax] Test randomly failing
+</li></ul></div></div><div class="section" title="7. Contributors"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_contributors"></a>7. Contributors</h2></div></div></div><p>This Hue release is made possible thanks to the contribution from:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Aaron Newton
+</li><li class="listitem">
+Aaron T. Myers
+</li><li class="listitem">
+Abraham Elmahrek
+</li><li class="listitem">
+Aditya Acharya
+</li><li class="listitem">
+Alex Newman
+</li><li class="listitem">
+Andrew Bayer
+</li><li class="listitem">
+Andrew Yao
+</li><li class="listitem">
+Ann McCown
+</li><li class="listitem">
+bc Wong
+</li><li class="listitem">
+Ben Bishop
+</li><li class="listitem">
+Bruce Mitchener
+</li><li class="listitem">
+Bruno Mahé
+</li><li class="listitem">
+Eli Collins
+</li><li class="listitem">
+Enrico Berti
+</li><li class="listitem">
+Eric Wong
+</li><li class="listitem">
+Harsh J
+</li><li class="listitem">
+Henry Robinson
+</li><li class="listitem">
+Jon Natkins
+</li><li class="listitem">
+Lars Francke
+</li><li class="listitem">
+Loren Siebert
+</li><li class="listitem">
+Marcus McLaughlin
+</li><li class="listitem">
+Mike Cotton
+</li><li class="listitem">
+Paul Battaglia
+</li><li class="listitem">
+Philip Zeyliger
+</li><li class="listitem">
+Romain Rigaux
+</li><li class="listitem">
+Roman Shaposhnik
+</li><li class="listitem">
+Shawn Van Ittersum
+</li><li class="listitem">
+Shrijeet Paliwal
+</li><li class="listitem">
+Thomas Aylott
+</li><li class="listitem">
+Todd Lipcon
+</li><li class="listitem">
+Vinithra Varadharajan
+</li></ul></div></div></div></body></html>

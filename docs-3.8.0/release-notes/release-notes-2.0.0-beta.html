@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title>Hue v2.0.0-beta, released Apr 10, 2012</title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.76.1" /></head><body><div xml:lang="en" class="article" title="Hue v2.0.0-beta, released Apr 10, 2012" lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="idp25228336"></a>Hue v2.0.0-beta, released Apr 10, 2012</h2></div></div><hr /></div><div class="toc"><p><strong>Table of Contents</strong></p><dl><dt><span class="section"><a href="#_notable_features">1. Notable Features</a></span></dt><dt><span class="section"><a href="#_notable_bug_fixes">2. Notable Bug Fixes</a></span></dt><dt><span class="section"><a href="#_compatibility">3. Compatibility</a></span></dt><dt><span class="section"><a href="#_upgrade">4. Upgrade</a></span></dt><dt><span class="section"><a href="#_known_issue">5. Known Issue</a></span></dt><dt><span class="section"><a href="#_list_of_all_commits">6. List of All Commits</a></span></dt><dt><span class="section"><a href="#_contributors">7. Contributors</a></span></dt></dl></div><p>This is a beta release of Hue 2.0.0, a major upgrade from previous Hue releases.
+Hue 2.0.0 is compatible with CDH4 (Cloudera’s Distribution Including Apache
+Hadoop 4).</p><div class="section" title="1. Notable Features"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_features"></a>1. Notable Features</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Frontend has been re-implemented as full screen pages. Whole page loading has
+  replaced the old "desktop" model. In this process, the new frontend is
+  rewritten with jQuery and Bootstrap. This fixes memory leaks in older
+  browsers. This also breaks compatibility of Hue SDK applications. (HUE-585,
+  HUE-609)
+</li><li class="listitem">
+Hue accesses HDFS via WebHDFS or HttpFS. It no longer requires the Hue plugin
+  on the NameNode and DataNodes. (HUE-610)
+</li><li class="listitem">
+Hue submits MapReduce jobs via Oozie. This fixes a security hole in the
+  previous scheme of Hue directly running the client job jar. (HUE-611)
+</li><li class="listitem">
+Hue supports LDAP (OpenLDAP and Active Directory). Hue can be configured to
+  authenticate against LDAP. Additionally, Hue can import users and groups from
+  LDAP, and refresh group membership from LDAP. (HUE-607, HUE-614, HUE-615)
+</li><li class="listitem">
+Hue supports per-application authorization. Administrators can grant or limit
+  group access to applications. (HUE-608)
+</li><li class="listitem"><p class="simpara">
+Hue has a new Shell application. Administrators can configure the types of
+  shells (e.g. Pig, HBase, Flume) to be exposed by the Shell app. (HUE-141)
+</p><div class="itemizedlist"><ul class="itemizedlist" type="circle"><li class="listitem">
+Hue runs on the Spawning web server by default, instead of the CherryPy web
+    server, in order to provide asynchronous connection I/O for the Shell
+    application.
+</li></ul></div></li><li class="listitem">
+Hue File Browser supports decoding Avro data files. (HUE-1)
+</li><li class="listitem">
+Hue uses Maven to build its Java source. (HUE-424)
+</li><li class="listitem">
+Beeswax reduces its memory usage and allows configuration of maximum query
+  result lifetime. (HUE-564)
+</li><li class="listitem">
+Hue installations can be made relocatable by invoking a script. (HUE-593)
+</li></ul></div></div><div class="section" title="2. Notable Bug Fixes"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_notable_bug_fixes"></a>2. Notable Bug Fixes</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HUE-238. beeswax: result from "limit" query unavailable
+</li><li class="listitem">
+HUE-438. Making beeswax dependent on hive install
+</li><li class="listitem">
+HUE-457: Filebrowser cannot delete directories with spaces in the name
+</li><li class="listitem">
+HUE-506. Jobs submitted through Hue do not set LANG
+</li><li class="listitem">
+HUE-526. Clicking "Browse Table" on a Hive View in Beeswax launches MR job
+</li><li class="listitem">
+HUE-534. JobBrowser does not impersonate logged in user while killing or viewing jobs
+</li><li class="listitem">
+HUE-550. Switching to LIFO queue for Thrift connection pool
+</li><li class="listitem">
+HUE-551. Support a wider set of username characters
+</li><li class="listitem">
+HUE-553. Thrift pooled client is not thread safe
+</li><li class="listitem">
+HUE-555. Build should not require a system python-setuptools
+</li><li class="listitem">
+HUE-584. Shade Thrift jar
+</li><li class="listitem">
+HUE-586. log files have wrong permission
+</li><li class="listitem">
+HUE-606. Error when browsing a table with too many partitions
+</li><li class="listitem">
+HUE-624. [jobbrowser] Non-ascii character in job name causes error
+</li><li class="listitem">
+HUE-640. kt_renewer workaround for krb compat is a race
+</li></ul></div></div><div class="section" title="3. Compatibility"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_compatibility"></a>3. Compatibility</h2></div></div></div><p>Hue 2.0.0-beta runs on CentOS versions 5 to 6, and Ubuntu 10.04 to 11.10.</p><p>Hue 2.0.0-beta is compatible with CDH4. Specifically:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+File Browser depends on Hadoop 0.23 (for WebHDFS/HttpFS).
+</li><li class="listitem">
+Beeswax is tested against Hive 0.8.1.
+</li><li class="listitem">
+Job Browser depends on MR1 (for the JobTracker plugin).
+</li><li class="listitem">
+Job Browser does <span class="strong"><strong>not</strong></span> work with Yarn/MR2.
+</li><li class="listitem">
+Job Designer depends on Oozie, using the Oozie web service API.
+</li></ul></div></div><div class="section" title="4. Upgrade"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_upgrade"></a>4. Upgrade</h2></div></div></div><p>Upgrading from Hue 1.2.0 is supported, with the following caveats:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Hue’s configuration file has changed regarding the specification of the HDFS
+  cluster, MR1 cluster and Yarn cluster. You also need to configure the Oozie
+  URL for Job Designer. Please see the
+  <a class="ulink" href="../manual.html" target="_top">Hue Installation Guide</a> for more.
+</li><li class="listitem">
+Hue by defaults run on port 8888, not 8088.
+</li><li class="listitem">
+Hue 2.0.0 uses a different model for job designs. Old job designs will be
+  automatically converted in a best effort. After the upgrade, the user may need
+  to fill in more information (e.g. the Java main class) about their job
+  designs.
+</li><li class="listitem">
+Custom Hue SDK applications will not render correctly in Hue 2.x, because the
+  frontend Javascript framework (jFrame) has been replaced by jQuery and
+  Bootstrap. The 2.0.0-beta release does not yet provide instruction on porting
+  SDK applications from Hue 1.x.
+</li></ul></div></div><div class="section" title="5. Known Issue"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_known_issue"></a>5. Known Issue</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+The contents in the Help application are out of date.
+</li></ul></div></div><div class="section" title="6. List of All Commits"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_list_of_all_commits"></a>6. List of All Commits</h2></div></div></div><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+HUE-425. Adding default taskScheduler and MR queue names to mini cluster.
+</li><li class="listitem">
+Added support to default tree row selection
+</li><li class="listitem">
+HUE-429. Make HueChart.Box’s series events set all applicable series as arguments.
+</li><li class="listitem">
+HUE-427. Allow the stroke color of dots on HueChart.Line to be configurable
+</li><li class="listitem">
+HUE-424 - Hue Mavenization
+</li><li class="listitem">
+HUE-435. Traversing a file in File Viewer using the navigation buttons results in a file not found error
+</li><li class="listitem">
+HUE-437 - Fixing Main-Class of Beeswax jar
+</li><li class="listitem">
+HUE-326. Beeswax might be leaking file descriptors
+</li><li class="listitem">
+HUE-444. Error message during ‘make install’
+</li><li class="listitem">
+HUE-454. TaskTrackerNotFound error popup when viewing individual attempt
+</li><li class="listitem">
+No ticket. Hash update: widgets, jframe, more-behaviors
+</li><li class="listitem">
+HUE-449. tarball build changes after mavenization
+</li><li class="listitem">
+HUE-455. Add ability to specify separator to humanize_duration.
+</li><li class="listitem">
+No Ticket. JFrame hash update (minor css tweak)
+</li><li class="listitem">
+Adding metadata handling to HueChart.
+</li><li class="listitem">
+HUE-449. tarball build changes after mavenization [part2]
+</li><li class="listitem">
+[BUILD] Fixed compilation of static-group-mapping since update to CDH3b4 nightly.
+</li><li class="listitem">
+No Ticket. Picking up the hash for MooTools More.
+</li><li class="listitem">
+Pass empty array to HueChart.Data if data is undefined.
+</li><li class="listitem">
+Add method to manage creation of display value, integrate <span class="emphasis"><em>amplitude</em></span> metadata field.
+</li><li class="listitem">
+HUE-472. JFrame Gallery’s icon is borked.
+</li><li class="listitem">
+HUE-473. Add ability to get the link for an app window and enter one in.
+</li><li class="listitem">
+HUE-433. Beeswax import table screen messed up.
+</li><li class="listitem">
+HUE-474. App Makefiles do not set APP_NAME correctly
+</li><li class="listitem">
+HUE-461. Clicking the Save As button in the file editor causes all changes to be thrown away.
+</li><li class="listitem">
+HUE-478. Including execution of 0.7 scripts in hive upgrade’s README.
+</li><li class="listitem">
+HUE-482. The Shortcuts button (at top right of Hue UI) does not do anything.
+</li><li class="listitem">
+Updating jframe.hash.
+</li><li class="listitem">
+HUE-481. Vertical Scrolling in Help doesn’t work
+</li><li class="listitem">
+HUE-483. Scrollable area for JFrame Gallery’s view source is broken
+</li><li class="listitem">
+HUE-485. Provision a way to start mini_cluster with customized configs.
+</li><li class="listitem">
+No Ticket. JFrame, MooTools More, and ART.Widgets hash updates
+</li><li class="listitem">
+HUE-487. Including the point value in HueChart.Box selection event parameter object.
+</li><li class="listitem">
+HUE-438. Making beeswax dependent on hive install.
+</li><li class="listitem">
+Update widgets.hash.
+</li><li class="listitem">
+No Ticket. Minor CSS fix for z-index positioning for CSS buttons.
+</li><li class="listitem">
+HUE-488. Add profiler for behavior and jframe filters.
+</li><li class="listitem">
+HUE-486. Enable renaming of top-level configs, and add a path for performing search/replace config upgrades
+</li><li class="listitem">
+[DOC] Updated dev and build dependency.
+</li><li class="listitem">
+HUE-492. Change amplitude calcuation in HueChart.Box to use toFloat rather than toInt.
+</li><li class="listitem">
+Small date display and rounding corrections in HueChart.
+</li><li class="listitem">
+[BUILD] Fixed Hadoop and Hive versions in pom.
+</li><li class="listitem">
+Update jframe.hash.
+</li><li class="listitem">
+HUE-495. HueChart.Box: Use chartStartTime and chartEndTime from metadata.
+</li><li class="listitem">
+HUE-494. Adding units to metadata and displaying in tip if present.
+</li><li class="listitem">
+HUE-498. Add shortenTick method to shorten tick labels on y-axis.
+</li><li class="listitem">
+HUE-500. Add information about Hue profiling to README.rst
+</li><li class="listitem">
+[BUILD] Use maven artifacts from cdh3u0.
+</li><li class="listitem">
+Re-ordering comments for database configuration.
+</li><li class="listitem">
+No Ticket. Updating Behavior hash.
+</li><li class="listitem">
+HUE-509, HUE-510
+</li><li class="listitem">
+HUE-506. Jobs submitted through Hue do not set LANG
+</li><li class="listitem">
+Update widgets.hash
+</li><li class="listitem">
+No Ticket. Updating Behavior hash.
+</li><li class="listitem">
+HUE-517. Tips should not be instantiated once per use
+</li><li class="listitem">
+HUE-521.  version specification duplication
+</li><li class="listitem">
+HUE-525. Implementing NOCREPO in Hue build.
+</li><li class="listitem">
+HUE-527. Small changes for HueChart.Area, Box, and js to repair Area functionality.
+</li><li class="listitem">
+HUE-528. Make deprecation work in Hue.JFrame.Chooser.
+</li><li class="listitem">
+HUE-529. Add vis.render() to HueChart.Circle setupChart method.
+</li><li class="listitem">
+HUE-530. Load Hue.JFrame.Chooser as part of initial Hue load.
+</li><li class="listitem">
+HUE-532. HDFS thrift plugin port is also in thriftfs-site.xml
+</li><li class="listitem">
+HUE-533. hue-plugin thriftfs test failure
+</li><li class="listitem">
+HUE-534. JobBrowser does not impersonate logged in user while killing or viewing jobs.
+</li><li class="listitem">
+HUE-496. Make hue support newer versions of python.
+</li><li class="listitem">
+HUE-540. Special characters in username breaks useradmin app.
+</li><li class="listitem">
+HUE-546. jobsubd should use a single file for Hadoop delegation tokens when submitting jobs
+</li><li class="listitem">
+HUE-489. Use Django 1.2 way to specify databases.
+</li><li class="listitem">
+HUE-1. Add avro file viewer support to File Browser.
+</li><li class="listitem">
+HUE-299. dump_config header links should point to the sections
+</li><li class="listitem">
+HUE-548. App tarballs contain invalid symlink to the VERSION file
+</li><li class="listitem">
+HUE-469. <span class="emphasis"><em>make docs</em></span> returns 0 even on error, could use a more restrictive "find" expression
+</li><li class="listitem">
+HUE-238. beeswax: result from "limit" query unavailable
+</li><li class="listitem">
+HUE-550. Switching to LIFO queue for Thrift connection pool.
+</li><li class="listitem">
+HUE-542. File browser sorting by size inconsistent.
+</li><li class="listitem">
+HUE-363. jobbrowser job state should fit well in the table
+</li><li class="listitem">
+HUE-549. Fix avro filebrowser test to run on all Python versions.
+</li><li class="listitem">
+[DOC] Document that Hue requires asciidoc to do a full build
+</li><li class="listitem">
+HUE-551. Support a wider set of username characters
+</li><li class="listitem">
+HUE-141. Adding Shell app to Hue.
+</li><li class="listitem">
+HUE-141. Fixing test failure for Shell app.
+</li><li class="listitem">
+HUE-141. Fixing a syntax error in tests for the Shell app that causes failures in Python 2.4.
+</li><li class="listitem">
+HUE-552. Default to a more professional wallpaper
+</li><li class="listitem">
+HUE-553. Thrift pooled client is not thread safe
+</li><li class="listitem">
+[BUILD] Make Shell known as "hue-shell"
+</li><li class="listitem">
+[DOC] Fix MySQL backend configuration step
+</li><li class="listitem">
+Online Help files for Hue Shell
+</li><li class="listitem">
+HUE-554. Modifying Shell app to use credentials merger utility.
+</li><li class="listitem">
+HUE-457: Filebrowser cannot delete directories with spaces in the name.
+</li><li class="listitem">
+HUE-555. Build should not require a system python-setuptools
+</li><li class="listitem">
+[BUILD] The shell app should share the common version
+</li><li class="listitem">
+HUE-556. LifoQueue thrift_util.py doesn’t work on Centos5’s python 2.4
+</li><li class="listitem">
+HUE-557. useradmin test with funny name fails on py2.4
+</li><li class="listitem">
+HUE-558. Shell hangs if subprocess exits immediately.
+</li><li class="listitem">
+[BUILD] Reuse the DESKTOP_PLUGIN_JAR variable for build target
+</li><li class="listitem">
+HUE-559. The setuid binary in the shell app should be in a build directory.
+</li><li class="listitem">
+HUE-561. Spawning creates incorrect log file names
+</li><li class="listitem">
+HUE-560: Shell app should have per-shell configurable environment variables.
+</li><li class="listitem">
+HUE-562. Spawning web server logs extraneous access log messages to stderr.
+</li><li class="listitem">
+HUE-563. Hue management commands should be backwards-compatible.
+</li><li class="listitem">
+[Doc] Fix broken release notes link
+</li><li class="listitem">
+HUE-565. Hue tarball contains duplicated js libraries
+</li><li class="listitem">
+Removing reference to Health application in doc, since it’s not in Hue.
+</li><li class="listitem">
+HUE-570. shell error when user has no access to any individual shell
+</li><li class="listitem">
+HUE-575. New version of IPython is causing Jenkins build to fail
+</li><li class="listitem">
+HUE-569: Making Hue work in IE9
+</li><li class="listitem">
+HUE-574: Making Hue start over SSL on Python 2.4.
+</li><li class="listitem">
+Adding missing packages to README.rst.
+</li><li class="listitem">
+HUE-578: Shell app should have more comprehensive logging for I/O
+</li><li class="listitem">
+HUE-582. Improve jobbrowser’s resilience to timing-related test failures
+</li><li class="listitem">
+HUE-330: Hue IE8 memory leaking
+</li><li class="listitem">
+Modifying Makefiles to not call scripts with shebangs directly.
+</li><li class="listitem">
+Add maven options parameters
+</li><li class="listitem">
+HUE-592. Update hue-plugins to work with new counter methods
+</li><li class="listitem">
+[Build] Upgrade hadoop version to cdh3u2-SNAPSHOT
+</li><li class="listitem">
+HUE-564. Improve handling of beeswax active queries and expiration
+</li><li class="listitem">
+HUE-593. Script to relocate a hue installation
+</li><li class="listitem">
+HUE-586. log files have wrong permission
+</li><li class="listitem">
+HUE-598. Hue Datanode plugin doesn’t reopen connection when registering with NameNode.
+</li><li class="listitem">
+Remove unnecessary warning for IE users.
+</li><li class="listitem">
+HUE-597. Show task diagnostic info for an attempt in Job Browser.
+</li><li class="listitem">
+HUE-584. Shade Thrift jar.
+</li><li class="listitem">
+Links to the relative parent in pom.xml.
+</li><li class="listitem">
+CDH-3689: Fix help links to point to CCP instead of wiki
+</li><li class="listitem">
+HUE-600. Update Beeswax’s hive_metastore.thrift interface spec
+</li><li class="listitem">
+[Build] Hue doesn’t build on Ubuntu 11.10
+</li><li class="listitem">
+HUE-526. Clicking "Browse Table" on a Hive View in Beeswax launches MR job
+</li><li class="listitem">
+HUE-526. Clicking "Browse Table" on a Hive View in Beeswax launches MR job
+</li><li class="listitem">
+HUE-602. Updated DatanodePlugin to reflect HDFS-2654.
+</li><li class="listitem">
+HUE-606. Error when browsing a table with too many partitions
+</li><li class="listitem">
+HUE-604. [Build] Jenkins build should remove old hadoop and hive directories
+</li><li class="listitem">
+[build] Upgrade to build against CDH3u3
+</li><li class="listitem">
+HUE-607. LDAP/PAM authentication
+</li><li class="listitem">
+Downgrading python-ldap to version 2.3.13
+</li><li class="listitem">
+[ui] Convert Hue to jQuery
+</li><li class="listitem">
+HUE-614. Add a mechanism to sync Hue DB with Unix passwd and groups
+</li><li class="listitem">
+HUE-615. Basic group management
+</li><li class="listitem">
+Add generic REST client library
+</li><li class="listitem">
+[webhdfs] Be able to browse filesystem via webhdfs
+</li><li class="listitem">
+HUE-616. Remove desktop-test.db from source control
+</li><li class="listitem">
+HUE-608. ACLS for Hue apps
+</li><li class="listitem">
+[filebrowser] Fix filebroser to be compatible with webhdfs
+</li><li class="listitem">
+Add group ID parameters to Unix sync
+</li><li class="listitem">
+[jobsub] Add configuration for "oozie_url"
+</li><li class="listitem">
+[build] Allow HADOOP_HOME to point to a CDH4 hadoop
+</li><li class="listitem">
+[jobsub] Remove java from jobsub
+</li><li class="listitem">
+[test] Skip cleanup of pseudo HDFS tmp dir if $MINI_CLUSTER_CLEANUP is ‘false’.
+</li><li class="listitem">
+[thriftfs] Remove irrelevant parts of thriftfs plugin
+</li><li class="listitem">
+[build] Point pom to build against CDH4 nightly jars
+</li><li class="listitem">
+[build] Updated version to 2.0.0
+</li><li class="listitem">
+[build] Upgrade thrift to 0.7.0
+</li><li class="listitem">
+[Beeswax] Fix Hive-0.8.1 compatibility
+</li><li class="listitem">
+[beeswax] Show welcome screen (when metastore is empty)
+</li><li class="listitem">
+[hadoop] Fix unit test for webhdfs
+</li><li class="listitem">
+[core] Python 2.4 treats HTTP 201 as error
+</li><li class="listitem">
+[filebrowser] Avoid using hashlib (py2.4 compat)
+</li><li class="listitem">
+Edit groups by permission
+</li><li class="listitem">
+Adding models to support LDAP integration
+</li><li class="listitem">
+Configuration parameters for integration with LDAP and Active Directory
+</li><li class="listitem">
+Command-line utility for importing users and groups from LDAP
+</li><li class="listitem">
+Revert "Command-line utility for importing users and groups from LDAP"
+</li><li class="listitem">
+[build] Build does not require $HADOOP_HOME
+</li><li class="listitem">
+Command-line utility for importing users and groups from LDAP (Fixed test)
+</li><li class="listitem">
+Removing executable permission from mako files
+</li><li class="listitem">
+Initial support for jHueSelector
+</li><li class="listitem">
+Support upgrades from Cloudera Enterprise 3.5 or Hue 1.2
+</li><li class="listitem">
+Add a group edit control to the Create/Edit User page
+</li><li class="listitem">
+Fix exception when importing a user that has a naming collision in Hue
+</li><li class="listitem">
+Add a configurable default user group
+</li><li class="listitem">
+[test] Have pseudo_hdfs4 start MR1
+</li><li class="listitem">
+[app_reg] Use ‘json’ if present on system, default to ‘simplejson’
+</li><li class="listitem">
+HUE-624. [jobbrowser] Non-ascii character in job name causes error
+</li><li class="listitem">
+[beeswax] Conditionally show the "save" form only if there’s no error
+</li><li class="listitem">
+Make PopupError render correctly as json
+</li><li class="listitem">
+[test] Temporarily disable broken tests
+</li><li class="listitem">
+[useradmin] Fix bug in filter clearing
+</li><li class="listitem">
+Useradmin actions are now in modal windows
+</li><li class="listitem">
+HUE-621 restyle of beeswax index page
+</li><li class="listitem">
+HUE-618 fixed Check configuration page
+</li><li class="listitem">
+Migrated about sections to common header and footer, converted logs to mako
+</li><li class="listitem">
+HUE-620 first attempt to restore the config check icon
+</li><li class="listitem">
+[frontend] Add knockout and jqueryui-autocomplete
+</li><li class="listitem">
+[frontend] Fix datatables style to match with bootstrap’s
+</li><li class="listitem">
+Remove executable bits on regular files
+</li><li class="listitem">
+[desktop] Allow MultiForm to work with ModelForm
+</li><li class="listitem">
+[hadoop] Add config for Yarn cluster, Mapred port, and ‘submit_to’ param
+</li><li class="listitem">
+[webhdfs] Make DEFAULT_USER an attribute of the filesystem object
+</li><li class="listitem">
+[webhdfs] Add copy method to copy a file
+</li><li class="listitem">
+[desktop] Add content-type support to REST library
+</li><li class="listitem">
+[hadoop] Allow Hdfs.urlsplit to deal with viewfs (federation)
+</li><li class="listitem">
+[hadoop] Add configuration for fs.defaultFS
+</li><li class="listitem">
+[filebrowser] HTML-escape the contents of the fileviewer
+</li><li class="listitem">
+HUE-206 (partial). Browsing a large directory slow for IE
+</li><li class="listitem">
+[doc] Update README
+</li><li class="listitem">
+[jobsub] Initial rewrite
+</li><li class="listitem">
+[build] Hue2 does not rely on crepo
+</li><li class="listitem">
+[beeswax] Run beeswax server using the specified HADOOP_BIN
+</li><li class="listitem">
+[test] Test cluster to set FS_DEFAULTFS.
+</li><li class="listitem">
+[hadoop] Change default location of HADOOP_CONF_DIR to ‘/etc/hadoop/conf’
+</li><li class="listitem">
+[dev] Update the development version of the hue config
+</li><li class="listitem">
+[useradmin] Fix useradmin test after modal form changes
+</li><li class="listitem">
+HUE-621 Fixed welcome screen
+</li><li class="listitem">
+HUE-629 the very first login warns about creating a superuser
+</li><li class="listitem">
+[conf] Remove oozie from the [hadoop] section
+</li><li class="listitem">
+[doc] Partial update to Hue manual
+</li><li class="listitem">
+Improved user admin experience for non-superusers
+</li><li class="listitem">
+HUE-628 Added user group selection on creating/editing user
+</li><li class="listitem">
+HUE-626 fixed stylesheet for upload button
+</li><li class="listitem">
+HUE-623 removed strict client side validation on the query
+</li><li class="listitem">
+Fixing a merge problem on user list.
+</li><li class="listitem">
+Fixed problem with jHueSelector and IE7+
+</li><li class="listitem">
+[beeswax] Undo local configuration change in commit fe69c15
+</li><li class="listitem">
+[docs] Fix ascii doc table syntax to be compatible with 8.1.0
+</li><li class="listitem">
+[hadoop] webhdfs should have security_enabled property
+</li><li class="listitem">
+[core] Add urllib2_kerberos library
+</li><li class="listitem">
+[core] Add kerberos (python-binding) library
+</li><li class="listitem">
+[core] Fix urllib2_kerberos’s logging
+</li><li class="listitem">
+[webhdfs] Client can now talk to a secured HDFS
+</li><li class="listitem">
+[test] Remove stale (and failing) jframe test
+</li><li class="listitem">
+[doc] More doc enhancement
+</li><li class="listitem">
+Pulling back in some changes that got accidentally deleted
+</li><li class="listitem">
+Use correct email field when extracting info from LDAP
+</li><li class="listitem">
+Add a couple LDAP-related parameters to hue.ini
+</li><li class="listitem">
+Use the correct EXTERNAL enum when logging in via a non-default backend
+</li><li class="listitem">
+HUE-640. kt_renewer workaround for krb compat is a race
+</li><li class="listitem">
+[hadoop] Remove NN_HTTP_PORT (again)
+</li><li class="listitem">
+[doc] Add krb5-devel build requirement (for python kerberos library)
+</li><li class="listitem">
+[ui] Fix typo on first login screen
+</li><li class="listitem">
+[conf] Add a useradmin configuration sectino to ini file
+</li><li class="listitem">
+[jobsub] Add security_enabled config for Oozie security
+</li><li class="listitem">
+HUE-632. Hue to talk to Oozie securely
+</li><li class="listitem">
+HUE-619. Hue to use port 8888 by default
+</li><li class="listitem">
+[jobsub] Clean up old files
+</li><li class="listitem">
+[jobsub] Job history should link back to design
+</li><li class="listitem">
+[jobsub] Fix terminology: rename ‘workflow’ to ‘design’
+</li><li class="listitem">
+[jobsub] Show paths in workflow info as hdfs links
+</li><li class="listitem">
+[webhdfs] rename operation should handle a relative destination path
+</li><li class="listitem">
+[webhdfs] Handle quoting of weird filename characters
+</li><li class="listitem">
+Put the first user to login in the default group
+</li><li class="listitem">
+Fix the logic determining the superuser when using the LdapBackend
+</li><li class="listitem">
+Add a bit of error checking when setting up an LDAP connection
+</li><li class="listitem">
+Miscellaneous cleanup in useradmin views
+</li><li class="listitem">
+Add an LDAP user to the default group at import time
+</li><li class="listitem">
+Deleting a user should also delete its user profile
+</li><li class="listitem">
+Permissions and default group-related tests
+</li><li class="listitem">
+[useradmin] Superuser shouldn’t be able to delete self
+</li><li class="listitem">
+[test] Use random ports for pseudo-distributed DN in testing
+</li><li class="listitem">
+[core] Add tidylib, a python wrapper for libtidy for HTML validation
+</li><li class="listitem">
+[core] Add HTML validation in debug mode
+</li><li class="listitem">
+[ui] Add favicon url mapping
+</li><li class="listitem">
+[jframegallery] Remove jframegallery
+</li><li class="listitem">
+[core] Remove depender usage
+</li><li class="listitem">
+[core] Remove depender external dependency
+</li><li class="listitem">
+Let syncdb work against mysql
+</li><li class="listitem">
+[jobsub] Add more properties to the oozie property autocomplete
+</li><li class="listitem">
+[jobbrowser] Fix broken link to jobsub
+</li><li class="listitem">
+HUE-633. [jobsub] Port examples to new design models
+</li><li class="listitem">
+[test] Work around a webhdfs redirect bug in test
+</li><li class="listitem">
+[doc] document dependency on libldap2-dev
+</li><li class="listitem">
+HUE-648. [fb] filebrowser.views.view() makes too many filesystem calls
+</li><li class="listitem">
+HUE-635 Porting to Bootstrap 2
+</li><li class="listitem">
+HUE-647 changed my home link and breadcrumbs
+</li><li class="listitem">
+Various fixes: HUE-657, HUE-650, HUE-649, HUE-646, HUE-645, HUE-652, HUE-642 and HUE-643
+</li><li class="listitem">
+Improved <span class="emphasis"><em>well</em></span> spacing and remove Clear button from filter
+</li><li class="listitem">
+[jobsub] Remove unused files
+</li><li class="listitem">
+[filebrowser] Unify breadcrumb display
+</li><li class="listitem">
+HUE-660 fix for scroll in Google Chrome
+</li><li class="listitem">
+Fix error page style
+</li><li class="listitem">
+HUE-661 Beeswax query now remembers initial value
+</li><li class="listitem">
+Fixed a datatables conf problem on Jobsub history page
+</li><li class="listitem">
+HUE-659. [config] Unite the various *.ini files
+</li><li class="listitem">
+[test] Add a bash shell for developer mode to test shell interactions
+</li><li class="listitem">
+[core] Do not skip apps because HADOOP_BIN is not there
+</li><li class="listitem">
+HUE-662. [config] Each Hadoop hdfs/mr/yarn cluster to define its own env
+</li><li class="listitem">
+HUE-663 jobbrowser styled
+</li><li class="listitem">
+[test] Fix jenkins script to clean up the correct hadoop directory
+</li><li class="listitem">
+[HUE-658] [fb] Hue should display hadoop fs errors in a popup and not in a 500
+</li><li class="listitem">
+[jobsub] Authenticate to Oozie in non-secure mode
+</li><li class="listitem">
+[build] Do not overwrite an existent pseudo-distributed.ini
+</li><li class="listitem">
+HUE-664. [ui] Jobsub design edit page mis-styled
+</li><li class="listitem">
+[ui] Contents in &lt;pre&gt; tags need to be html-escaped
+</li><li class="listitem">
+HUE-666. [ui] Jobbrowser attempt page unstyled
+</li><li class="listitem">
+[build] Markdown requires elementtree when generating docs
+</li><li class="listitem">
+[ui] Unify site name as ‘Hue’ (not jHue or Hue2)
+</li><li class="listitem">
+[build] Set version 2.0.0-beta
+</li><li class="listitem">
+[doc] Fix screenshots in user manual
+</li><li class="listitem">
+[ui] Beeswax clone query button gone
+</li><li class="listitem">
+[jobsub] Migration script needs to import simplejson for py2.4
+</li><li class="listitem">
+[doc] Document Oozie proxyuser configuration in manual
+</li><li class="listitem">
+[jobsub] Do not create sample directories as ‘hdfs’
+</li><li class="listitem">
+[doc] Fix broken link to CDH package installation guide
+</li><li class="listitem">
+[jobsub] Fix data upgrade from hue 1.x to properly convert streaming properties
+</li><li class="listitem">
+[doc] Release notes for 2.0.0-beta
+</li></ul></div></div><div class="section" title="7. Contributors"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="_contributors"></a>7. Contributors</h2></div></div></div><p>This Hue release is made possible thanks to the contribution from:</p><div class="itemizedlist"><ul class="itemizedlist" type="disc"><li class="listitem">
+Aaron Newton
+</li><li class="listitem">
+Aaron T. Myers
+</li><li class="listitem">
+Aditya Acharya
+</li><li class="listitem">
+Alex Newman
+</li><li class="listitem">
+Andrew Bayer
+</li><li class="listitem">
+Andrew Yao
+</li><li class="listitem">
+Ann McCown
+</li><li class="listitem">
+bc Wong
+</li><li class="listitem">
+Ben Bishop
+</li><li class="listitem">
+Bruce Mitchener
+</li><li class="listitem">
+Bruno Mahé
+</li><li class="listitem">
+Eli Collins
+</li><li class="listitem">
+Enrico Berti
+</li><li class="listitem">
+Harsh J
+</li><li class="listitem">
+Henry Robinson
+</li><li class="listitem">
+Jon Natkins
+</li><li class="listitem">
+Lars Francke
+</li><li class="listitem">
+Loren Siebert
+</li><li class="listitem">
+Marcus McLaughlin
+</li><li class="listitem">
+Mike Cotton
+</li><li class="listitem">
+Paul Battaglia
+</li><li class="listitem">
+Philip Zeyliger
+</li><li class="listitem">
+Romain Rigaux
+</li><li class="listitem">
+Roman Shaposhnik
+</li><li class="listitem">
+Shawn Van Ittersum
+</li><li class="listitem">
+Shrijeet Paliwal
+</li><li class="listitem">
+Thomas Aylott
+</li><li class="listitem">
+Todd Lipcon
+</li><li class="listitem">
+Vinithra Varadharajan
+</li></ul></div></div></div></body></html>
