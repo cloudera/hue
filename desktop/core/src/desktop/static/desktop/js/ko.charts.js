@@ -292,18 +292,9 @@ ko.bindingHandlers.leafletMapChart = {
     var _options = valueAccessor();
     var _data = _options.transformer(valueAccessor().datum);
 
-    if ($(element).data("mapData") == null || $(element).data("mapData") != ko.toJSON(_data)) {
+    if ($(element).data("mapData") == null || $(element).data("mapData") != ko.toJSON(_data) || _options.forceRedraw) {
 
       $(element).data("mapData", ko.toJSON(_data));
-
-      function getMapBounds(lats, lngs) {
-        lats = lats.sort();
-        lngs = lngs.sort();
-        return [
-          [lats[lats.length - 1], lngs[lngs.length - 1]], // north-east
-          [lats[0], lngs[0]] // south-west
-        ]
-      }
 
       if ($(element).data("map") != null) {
         try {
@@ -316,16 +307,16 @@ ko.bindingHandlers.leafletMapChart = {
         }
       }
 
-      var _lats = [];
+      var _hasAtLeastOneLat = false;
       _data.forEach(function (item) {
         if (item.lat != null && $.isNumeric(item.lat)) {
-          _lats.push(item.lat);
+          _hasAtLeastOneLat = true;
         }
       });
-      var _lngs = [];
+      var _hasAtLeastOneLng = false;
       _data.forEach(function (item) {
         if (item.lng != null && $.isNumeric(item.lng)) {
-          _lngs.push(item.lng);
+          _hasAtLeastOneLng = true;
         }
       });
 
@@ -347,7 +338,8 @@ ko.bindingHandlers.leafletMapChart = {
       else {
         $(element).hide();
         if ((_options.visible != null && _options.visible) && !_options.isLoading){
-          $(element).before($("<div>").addClass("leaflet-nodata").css("textAlign", "center").text("No Data Available."));
+          $(element).siblings(".leaflet-nodata").remove();
+          $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text("No Data Available."));
         }
       }
 
@@ -357,7 +349,7 @@ ko.bindingHandlers.leafletMapChart = {
         element._map.remove();
       }
 
-      if (_lats.length > 0 && _lngs.length > 0) {
+      if (_hasAtLeastOneLat && _hasAtLeastOneLng) {
         try {
 
           if (_map == null) {
@@ -367,10 +359,9 @@ ko.bindingHandlers.leafletMapChart = {
             }).addTo(_map);
           }
 
-          _map.fitBounds(getMapBounds(_lats, _lngs));
-
+          var _markers = [];
           _data.forEach(function (item) {
-            if (item.lng != null && item.lat != null) {
+            if (item && item.lng != null && item.lat != null) {
               var _addMarker = false;
               try {
                 var _latLngObj = L.latLng(item.lat, item.lng);
@@ -386,9 +377,15 @@ ko.bindingHandlers.leafletMapChart = {
                 if (item.label != null) {
                   _marker.bindPopup(item.label);
                 }
+                _markers.push(_marker);
               }
             }
           });
+
+          _map.markers = new L.featureGroup(_markers);
+          _map.fitBounds(_map.markers.getBounds());
+
+
           if (_options.onComplete != null) {
             _options.onComplete();
           }

@@ -48,7 +48,7 @@ ${ shared.menubar() }
 % for c in clusters:
   <h3 class="card-heading simple simpler">${ c }</h3>
   <p>
-    </br>
+    <br/>
     &nbsp;&nbsp;<a href="${ url('zookeeper:view', id=c) }">${ _("Znode Hierarchy") }</a> 
   </p>
   <table class="table">

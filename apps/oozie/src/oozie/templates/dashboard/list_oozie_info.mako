@@ -97,7 +97,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
                     % endif
                     ${ timer }
                     % if not loop.last:
-                        </br>
+                        <br/>
                     % endif
                     % endfor
                   </td>

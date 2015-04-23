@@ -524,7 +524,7 @@ ${ dashboard.layout_skeleton() }
       </div>
 
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
-        </br>
+        <br/>
         ${ _('Your search did not match any documents.') }
       </div>
 
@@ -678,7 +678,7 @@ ${ dashboard.layout_skeleton() }
 
     <div id="result-main" style="overflow-x: auto">
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
-        </br>
+        <br/>
         ${ _('Your search did not match any documents.') }
       </div>
 
