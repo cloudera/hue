@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import StringIO
 import json
 import logging
 import os
@@ -45,6 +46,7 @@ from desktop.lib.conf import GLOBAL_CONFIG
 from desktop.lib.django_util import login_notrequired, render_json, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
+from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.models import UserPreferences, Settings
 from desktop import appmanager
@@ -225,14 +227,10 @@ def threads(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
-  out = []
-  for thread_id, stack in sys._current_frames().iteritems():
-    out.append("Thread id: %s" % thread_id)
-    for filename, lineno, name, line in traceback.extract_stack(stack):
-      out.append("  %-20s %s(%d)" % (name, filename, lineno))
-      out.append("    %-80s" % (line))
-    out.append("")
-  return HttpResponse("\n".join(out), content_type="text/plain")
+  out = StringIO.StringIO()
+  dump_traceback(file=out)
+
+  return HttpResponse(out.getvalue(), content_type="text/plain")
 
 @access_log_level(logging.WARN)
 def memory(request):

@@ -69,18 +69,13 @@ def teardown_test_environment():
   themselves and leaving threads hanging around.
   """
   import threading
+  import desktop.lib.thread_util
+
   # We should shut down all relevant threads by test completion.
   threads = list(threading.enumerate())
 
-  try:
-    import threadframe
-    import traceback
-    if len(threads) > 1:
-      for v in threadframe.dict().values():
-        traceback.print_stack(v)
-  finally:
-    # threadframe is only available in the dev build.
-    pass
+  if len(threads) > 1:
+    desktop.lib.thread_util.dump_traceback()
 
   assert 1 == len(threads), threads
 

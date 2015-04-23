@@ -1,4 +1,4 @@
-#
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,31 +14,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-# Developer tools - this file is only included in SDK build.
 
-# May require download from PyPI or whereever
-DEVTOOLS += \
-	ipdb \
-	ipython \
-	nose \
-	coverage \
-	nosetty \
-	werkzeug \
-	windmill
+import sys
+import threading
+import traceback
 
-# Install/download dev tools for SDK into the virtual environment
-.PHONY: $(DEVTOOLS)
-$(DEVTOOLS):
-	@echo "--- Installing development tool: $@"
-	@# Force downloads from pypi host - developer sites are sometimes dead!
-	$(ENV_EASY_INSTALL) -f http://archive.cloudera.com/desktop-sdk-python-packages/ \
-	   -H archive.cloudera.com $(SETUPTOOLS_OPTS) $@
+def dump_traceback(file=sys.stderr, all_threads=True):
+  """Print a thread stacktrace"""
 
-$(BLD_DIR):
-	@mkdir -p $@
+  current_thread = threading.current_thread()
 
-$(BLD_DIR)/.devtools: $(BLD_DIR)
-	@# If $(DEVTOOLS) are the prerequisites, we\'ll end up rebuilding them everytime.
-	$(MAKE) $(DEVTOOLS)
-	@touch $@
+  if all_threads:
+    threads = threading.enumerate()
+  else:
+    threads = [current_thread]
+
+  for thread in threads:
+    if thread == current_thread:
+      name = "Current thread"
+    else:
+      name = "Thread"
+
+    print >> file, "%s %s %s (most recent call last):" % (name, thread.name, thread.ident)
+    frame = sys._current_frames()[thread.ident]
+    traceback.print_stack(frame, file=file)
+    print >> file
