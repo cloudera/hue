@@ -202,7 +202,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tfoot>
                   <tr>
                     <td data-bind="visible: !isLoading() && paginate()" colspan="10">
-                      </br>
+                      <br/>
                       <div class="alert">
                         ${ _('There are older actions to be shown:') }
                         <a class="btn" href="${ oozie_coordinator.get_absolute_url() }?show_all_actions=true">${ _('Expand') }</a>

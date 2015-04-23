@@ -165,7 +165,7 @@ ${ dashboard.layout_skeleton() }
   </div>
 
   <div data-bind="visible: !$root.isRetrievingResults() && $root.results().length == 0">
-    </br>
+    <br/>
     ${ _('Your search did not match any documents.') }
   </div>
 

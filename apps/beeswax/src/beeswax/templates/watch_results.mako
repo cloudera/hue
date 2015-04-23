@@ -109,7 +109,7 @@ ${layout.menubar(section='query')}
           % if not query.is_finished():
             <div id="multiStatementsQuery" class="alert">
               <button type="button" class="close" data-dismiss="alert">&times;</button>
-              <strong>${_('Multi-statement query')}</strong></br>
+              <strong>${_('Multi-statement query')}</strong><br/>
               ${_('Hue stopped as one of your query contains some results.') }
               ${_('Click on') }
               <form action="${ url(app_name + ':watch_query_history', query.id) }?context=${ query.design.get_query_context() }" method="POST">

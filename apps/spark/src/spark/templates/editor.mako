@@ -627,7 +627,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                   transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
             <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP}" class="chart"></div>
+                  transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
 
             <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data},
                   transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
@@ -647,9 +647,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <div class="snippet-body">
           <input type="text" class="input-xlarge" data-bind="value: properties.app_jar, visible: type() =='jar'" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
           <input type="text" class="input-xlarge" data-bind="value: properties.py_file, visible: type() =='py'" placeholder="${ _('Path to python file, e.g. script.py') }"/>
-          </br>
+          <br/>
           <input type="text" class="input-xlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
-          </br>
+          <br/>
           <ul data-bind="foreach: properties.arguments" class="unstyled">
             <li>
               <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
@@ -661,7 +661,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
             <i class="fa fa-plus"></i> ${ _('Add argument') }
           </a>
-          </br>
+          <br/>
           <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="btn btn-primary disable-feedback pointer">
             <i class="fa fa-play"></i>
           </a>
@@ -1763,6 +1763,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $(document).on("forceChartDraw", function (e, snippet) {
       window.setTimeout(function () {
         snippet.chartX.notifySubscribers();
+        snippet.chartX.valueHasMutated();
       }, 100);
     });
 
