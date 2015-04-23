@@ -302,11 +302,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <!-- /ko -->
 
   <!-- ko if: type() == 'jar' -->
-  <i class="fa fa-file-archive-o" class="snippet-icon"></i>
+  <i class="fa fa-file-archive-o snippet-icon"></i>
   <!-- /ko -->
 
   <!-- ko if: type() == 'py' -->
-  <i class="fa fa-file-code-o" class="snippet-icon"></i>
+  <i class="fa fa-file-code-o snippet-icon"></i>
   <!-- /ko -->
 
   <!-- ko if: type() == 'impala' -->
@@ -644,23 +644,38 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
       <!-- /ko -->
       <!-- ko if: type() == 'jar' || type() == 'py'-->
-        <div class="snippet-body">
-          <input type="text" class="input-xlarge" data-bind="value: properties.app_jar, visible: type() =='jar'" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
-          <input type="text" class="input-xlarge" data-bind="value: properties.py_file, visible: type() =='py'" placeholder="${ _('Path to python file, e.g. script.py') }"/>
-          <br/>
-          <input type="text" class="input-xlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
-          <br/>
-          <ul data-bind="foreach: properties.arguments" class="unstyled">
-            <li>
-              <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
-              <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
-                <i class="fa fa-minus"></i>
-              </a>
-            </li>
-          </ul>
-          <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
-            <i class="fa fa-plus"></i> ${ _('Add argument') }
-          </a>
+        <div class="snippet-body" style="padding: 10px">
+          <table class="airy">
+            <tr data-bind="visible: type() =='jar'">
+              <td>${_('Path')}</td>
+              <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
+            </tr>
+            <tr data-bind="visible: type() =='py'">
+              <td>${_('Path')}</td>
+              <td><input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/></td>
+            </tr>
+            <tr data-bind="visible: type() =='jar'">
+              <td>${_('Class')}</td>
+              <td><input type="text" class="input-xxlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
+            </tr>
+            <tr>
+              <td style="vertical-align: top; padding-top: 10px">${_('Arguments')}</td>
+              <td>
+                <ul data-bind="foreach: properties.arguments" class="unstyled">
+                  <li style="margin-bottom: 4px">
+                    <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
+                    <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
+                      <i class="fa fa-minus"></i>
+                    </a>
+                  </li>
+                </ul>
+                <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
+                  <i class="fa fa-plus"></i> ${ _('Add argument') }
+                </a>
+              </td>
+            </tr>
+          </table>
+
           <br/>
           <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="btn btn-primary disable-feedback pointer">
             <i class="fa fa-play"></i>
@@ -670,6 +685,20 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     </div>
   </div>
 </script>
+
+<div id="chooseFile" class="modal hide fade">
+  <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Choose a file')}</h3>
+  </div>
+  <div class="modal-body">
+      <div id="filechooser">
+      </div>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>
+
 
 
 <script type="text/javascript" charset="utf-8">
