@@ -700,6 +700,8 @@ var Collection = function (vm, collection) {
         $.each(data.collection.collection.fields, function(index, field) {
           self.fields.push(ko.mapping.fromJS(field));
         });
+
+        self.syncDynamicFields();
       }
     }).fail(function (xhr, textStatus, errorThrown) {});
   };
