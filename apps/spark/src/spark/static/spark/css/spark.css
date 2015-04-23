@@ -324,3 +324,16 @@ h1.empty {
 .no-underline:hover {
   text-decoration: none!important;
 }
+
+input[type="text"].filechooser-input {
+  border-right: none;
+  margin-bottom: 0;
+}
+
+.fileChooserBtn {
+  height: 31px;
+}
+
+table.airy tr td {
+  padding: 4px;
+}
