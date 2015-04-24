@@ -288,7 +288,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     $("a.btn-status").click(function () {
       $(this).toggleClass("active");
-      drawTable();
+      refreshRunning();
+      refreshCompleted();
     });
 
     $("a.btn-submitted").click(function () {
@@ -300,7 +301,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     $("a.btn-date").click(function () {
       $("a.btn-date").not(this).removeClass("active");
       $(this).toggleClass("active");
-      drawTable();
+      refreshRunning();
+      refreshCompleted();
     });
 
     var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
@@ -317,6 +319,38 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         hash += "date=" + $("a.btn-date.active").text();
       }
       window.location.hash = hash;
+    }
+
+    function getStatuses(type) {
+      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED'] : ['SUCCEEDED', 'KILLED', 'FAILED'];
+      var btnStatuses = [];
+
+      var statusBtns = $("a.btn-status.active");
+      $.each(statusBtns, function () {
+        val = $(this).data('value');
+        if (val == 'SUCCEEDED') {
+          btnStatuses = btnStatuses.concat(['SUCCEEDED']);
+        } else if (val == 'RUNNING') {
+          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED']);
+        } else if (val == 'KILLED') {
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED']);
+        }
+      });
+
+      if (btnStatuses.length > 0) {
+        selectedStatuses = $.makeArray($(selectedStatuses).filter(btnStatuses));
+      }
+
+      return selectedStatuses.length > 0 ? ('&status=' + selectedStatuses.join('&status=')) : '';
+    }
+
+    function getDaysFilter() {
+      var dateBtn = $("a.btn-date.active");
+      var daysFilter = ''
+      if (dateBtn.length > 0) {
+        daysFilter = '&startcreatedtime=-' + dateBtn.attr("data-value") + 'd';
+      }
+      return daysFilter;
     }
 
     $.fn.dataTableExt.sErrMode = "throw";
@@ -352,7 +386,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     var numRunning = 0;
 
     refreshRunning = function () {
-      $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
+      $.getJSON(window.location.pathname + "?format=json" + getStatuses('running') + getDaysFilter(), function (data) {
         if (data.jobs) {
           var nNodes = runningTable.fnGetNodes();
 
@@ -412,6 +446,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         }
         numRunning = data.jobs.length;
 
+        runningTable.fnDraw();
         window.setTimeout(refreshRunning, 5000);
       });
     }
@@ -435,7 +470,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
 
     function refreshCompleted() {
-      $.getJSON(window.location.pathname + "?format=json&type=completed", function (data) {
+      $.getJSON(window.location.pathname + "?format=json" + getStatuses('completed') + getDaysFilter(), function (data) {
         completedTable.fnClearTable();
         $(data.jobs).each(function (iWf, item) {
           var wf = new Workflow(item);
@@ -459,7 +494,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
 
     function refreshProgress() {
-      $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
+      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running') + getDaysFilter(), function (data) {
         var nNodes = runningTable.fnGetNodes();
         $(data.jobs).each(function (iWf, item) {
             var wf = new Workflow(item);
