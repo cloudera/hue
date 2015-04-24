@@ -1319,3 +1319,18 @@ ko.bindingHandlers.timepicker = {
 
     }
 }
+
+ko.bindingHandlers.textSqueezer = {
+  init: function (element, valueAccessor) {
+    var value = valueAccessor();
+    $(element).text(ko.unwrap(value));
+    $(element).textSqueezer({
+      decimalPrecision: 2
+    });
+  },
+  update: function (element, valueAccessor) {
+    var value = valueAccessor();
+    $(element).text(ko.unwrap(value));
+    $(element).trigger("redraw");
+  }
+};

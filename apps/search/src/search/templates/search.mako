@@ -1084,22 +1084,14 @@ ${ dashboard.layout_skeleton() }
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span class="facet-field-label">${ _('Metric') }</span>
-      <select data-bind="value: properties.function">
-        <option value="unique" selected="selected" label="${ _('Unique Count') }">${ _('Unique Count') }</option>
-        <option value="avg" label="${ _('Average') }">${ _('Average') }</option>
-        <option value="sum" label="${ _('Sum') }">${ _('Sum') }</option>
-        <option value="min" label="${ _('Min') }">${ _('Min') }</option>
-        <option value="max" label="${ _('Max') }">${ _('Max') }</option>
-        <option value="sumsq" label="${ _('Sum of square') }">${ _('Sum of square') }</option>
-        <option value="percentile" label="${ _('Percentiles') }">${ _('Percentiles') }</option>
-      </select>
+    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
+        <span class="facet-field-label">${ _('Metric') }</span>
+        <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.function"></select>
+      </div>
+      <div data-bind="visible: ! $root.isEditing(), text: getHitOption(properties.function())" class="muted"></div>
     </div>
-
-    <span data-bind="text: 'max', visible: ! $root.isEditing()"></span>
-    </br>
-    <span class="big-counter" data-bind="text: counts"></span>
+    <span class="big-counter" data-bind="textSqueezer: counts"></span>
   </div>
   <!-- /ko -->
 </script>
@@ -1461,6 +1453,7 @@ ${ dashboard.import_layout() }
 
 <script src="${ static('search/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('search/js/lzstring.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/shortcut.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1490,6 +1483,25 @@ ${ dashboard.import_charts() }
 var viewModel;
 
 nv.dev = false;
+
+var HIT_OPTIONS = [
+  { value: "unique", label: "${ _('Unique Count') }" },
+  { value: "avg", label: "${ _('Average') }" },
+  { value: "sum", label: "${ _('Sum') }" },
+  { value: "min", label: "${ _('Min') }" },
+  { value: "max", label: "${ _('Max') }" },
+  { value: "sumsq", label: "${ _('Sum of square') }" },
+  { value: "percentile", label: "${ _('Percentiles') }" }
+];
+
+function getHitOption(value){
+  for (var i=0;i<HIT_OPTIONS.length;i++){
+    if (HIT_OPTIONS[i].value == value){
+      return HIT_OPTIONS[i].label;
+    }
+  }
+  return '';
+}
 
 var lastWindowScrollPosition = 0;
 
