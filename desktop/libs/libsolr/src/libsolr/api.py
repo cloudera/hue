@@ -161,8 +161,17 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'function':
+          props = {
+              'function': facet['properties']['function'],
+              'key': '%(field)s-%(id)s' % facet
+          }
+          props.update(facet)
+          if facet['properties']['function'] == 'percentile':
+            props['formula'] = '%(function)s(%(field)s,25,50,75,90,99)' % props
+          else:
+            props['formula'] = '%(function)s(%(field)s)' % props          
           params += (
-              ('json.facet', "{%(field)s-%(id)s: 'avg(%(field)s)'}" % facet),
+              ('json.facet', "{%(key)s: '%(formula)s'}" % props),
           )        
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
