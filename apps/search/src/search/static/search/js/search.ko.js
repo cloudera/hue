@@ -483,6 +483,11 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
+    if (facet.properties.function) {
+      facet.properties.function.subscribe(function () {
+        vm.search();
+      });
+    }
   });
   self.template.rows.subscribe(function() {
     vm.search();
@@ -515,6 +520,11 @@ var Collection = function (vm, collection) {
           });
           if (facet.properties.gap) {
             facet.properties.gap.subscribe(function () {
+              vm.search();
+            });
+          }
+          if (facet.properties.function) {
+            facet.properties.function.subscribe(function () {
               vm.search();
             });
           }

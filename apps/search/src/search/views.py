@@ -486,6 +486,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     facet_type = 'pivot'
   elif widget_type == 'hit-widget':
     facet_type = 'function'
+    properties['function'] = 'unique'
   else:
     solr_api = SolrApi(SOLR_URL.get(), user)
     range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)

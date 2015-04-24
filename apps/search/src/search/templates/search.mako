@@ -151,7 +151,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Counter')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
-                       <i class="fa fa-calculator"></i>
+                       <i class="fa fa-font"></i>
          </a>
     </div>
 
@@ -1086,19 +1086,19 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span class="facet-field-label">${ _('Metric') }</span>
-      <select>
-        <option value="0" selected="selected" label="Count">Count</option>
-        <option value="1" label="Average">Average</option>
-        <option value="2" label="Sum">Sum</option>
-        <option value="3" label="Min">Min</option>
-        <option value="4" label="Max">Max</option>
-        <option value="5" label="Standard Deviation">Standard Deviation</option>
-        <option value="6" label="Unique count">Unique count</option>
-        <option value="7" label="Percentiles">Percentiles</option>
+      <select data-bind="value: properties.function">
+        <option value="unique" selected="selected" label="${ _('Unique Count') }">${ _('Unique Count') }</option>
+        <option value="avg" label="${ _('Average') }">${ _('Average') }</option>
+        <option value="sum" label="${ _('Sum') }">${ _('Sum') }</option>
+        <option value="min" label="${ _('Min') }">${ _('Min') }</option>
+        <option value="max" label="${ _('Max') }">${ _('Max') }</option>
+        <option value="sumsq" label="${ _('Sum of square') }">${ _('Sum of square') }</option>
+        <option value="percentile" label="${ _('Percentiles') }">${ _('Percentiles') }</option>
       </select>
     </div>
 
     <span data-bind="text: 'max', visible: ! $root.isEditing()"></span>
+    </br>
     <span class="big-counter" data-bind="text: counts"></span>
   </div>
   <!-- /ko -->
