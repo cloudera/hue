@@ -168,12 +168,15 @@ def list_oozie_workflows(request):
 
   if request.GET.get('format') == 'json':
     just_sla = request.GET.get('justsla') == 'true'
-    if request.GET.get('type') in ('running', 'progress'):
-      kwargs['filters'].extend([('status', status) for status in OozieWorkflow.RUNNING_STATUSES])
-    elif request.GET.get('type') == 'completed':
-      kwargs['filters'].extend([('status', status) for status in OozieWorkflow.FINISHED_STATUSES])
 
-    json_jobs = oozie_api.get_workflows(**kwargs).jobs
+    if request.GET.get('startcreatedtime'):
+      kwargs['filters'].extend([('startcreatedtime', request.GET.get('startcreatedtime'))])
+
+    json_jobs = []
+    if request.GET.getlist('status'):
+      kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
+      json_jobs = oozie_api.get_workflows(**kwargs).jobs
+
     if request.GET.get('type') == 'progress':
       json_jobs = [oozie_api.get_job(job.id) for job in json_jobs]
 

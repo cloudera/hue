@@ -48,34 +48,6 @@ function emptyStringIfNull(obj) {
 var PersistedButtonsFilters = function (oSettings, aData, iDataIndex) {
   var urlHashes = "";
 
-  var statusBtn = $("a.btn-status.active");
-  var statusFilter = true;
-  if (statusBtn.length > 0) {
-    var statuses = [];
-    $.each(statusBtn, function () {
-      statuses.push($(this).attr("data-value"));
-    });
-    var _statusColumn = aData[2];
-    if (typeof $(_statusColumn).attr("data-type") == "undefined") {
-      _statusColumn = aData[1];
-    }
-    statusFilter = _statusColumn.match(RegExp(statuses.join('|'), "i")) != null;
-  }
-
-  var dateBtn = $("a.btn-date.active");
-  var dateFilter = true;
-  if (dateBtn.length > 0) {
-    var minAge = new Date() - parseInt(dateBtn.attr("data-value")) * 1000 * 60 * 60 * 24;
-    var _dateColumn = aData[1];
-    if (typeof $(_dateColumn).attr("data-type") == "undefined" || $(_dateColumn).attr("data-type") == "status") {
-      _dateColumn = aData[0];
-    }
-    if (typeof _dateColumn == "string") {
-      _dateColumn = $(_dateColumn).attr("data-sort-value");
-    }
-    dateFilter = _dateColumn * 1000 >= minAge;
-  }
-
   var submittedBtn = $("a.btn-submitted.active");
   var submittedByFilter = true;
   if (submittedBtn.length > 0) {
@@ -94,5 +66,5 @@ var PersistedButtonsFilters = function (oSettings, aData, iDataIndex) {
     }
   }
 
-  return statusFilter && dateFilter && submittedByFilter;
+  return submittedByFilter;
 }
