@@ -158,6 +158,27 @@
   color: #CCC;
 }
 
+@media (max-width: 1438px) {
+  .draggable-widget {
+    width: 50px;
+  }
+
+  .draggable-widget a {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 1300px) {
+  .draggable-widget {
+    width: 40px;
+  }
+
+  .draggable-widget a {
+    font-size: 20px;
+  }
+}
+
+
 .layout-container {
   width: 100px;
   float: left;
