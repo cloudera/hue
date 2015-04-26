@@ -306,7 +306,7 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
     <!-- /ko -->
 
-    <!-- ko if: type() == 'field' -->
+    <!-- ko if: type() == 'field' || type() == 'terms' -->
       <div class="facet-field-cnt">
         <span class="spinedit-cnt">
           <span class="facet-field-label facet-field-label-fixed-width">
