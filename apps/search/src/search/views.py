@@ -497,6 +497,12 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['initial_gap'] = properties['gap']
       properties['initial_start'] = properties['start']
       properties['initial_end'] = properties['end']
+      
+      facet_type = 'terms' # if 5.2+ --> unify all
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'function': 'count'}
+      properties['facets'] = []
+      properties['scope'] = 'stack'
+      
     else:
       #facet_type = 'field'
       facet_type = 'terms' # if 5.2+

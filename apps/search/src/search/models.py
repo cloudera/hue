@@ -732,9 +732,12 @@ def augment_solr_response(response, collection, query):
         value = response['facets'][name]
         collection_facet = get_facet_field(category, name, collection['facets'])
 
-        # if 2D
+        # none empty
+
+        countss = []
         buckets = []
-        for bucket in response['facets'][name]['buckets']:
+        print response['facets'][name]['buckets']
+        for bucket in response['facets'][name]['buckets']:          
           buckets.append(bucket['val'])
           if 'd2' in bucket:
             buckets.append(bucket['d2'])
@@ -751,6 +754,7 @@ def augment_solr_response(response, collection, query):
           'label': collection_facet['label'],
           'counts': counts,
         }
+        print facet['counts']
         normalized_facets.append(facet)
 
     # Remove unnecessary facet data
