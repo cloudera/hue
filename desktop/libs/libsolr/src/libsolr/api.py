@@ -166,21 +166,27 @@ class SolrApi(object):
               'key': '%(field)s-%(id)s' % facet
           }
           props.update(facet)
-         
-          json_facets['%(key)s' % props] = {
+          print facet
+          _f = {
               'type': 'terms',
               'field': facet['field'],
               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
               'mincount': int(facet['properties']['mincount'])
           }
+          if facet['properties']['facets']: # [{u'field': u'salary_d', u'functionz': u'avg', u'limit': 10, u'mincount': 1}
+            _f['facet'] = {
+                'd2': '%(functionz)s(%(field)s)' % facet['properties']['facets'][0] 
+            }
+            
+          json_facets['%(key)s' % props] = _f
         elif facet['type'] == 'function':
           props = {
               'function': facet['properties']['function'],
               'key': '%(field)s-%(id)s' % facet
           }
           props.update(facet)
-          if facet['properties']['function'] == 'percentile':
-            props['formula'] = '%(function)s(%(field)s,25,50,75,90,99)' % props
+          if facet['properties']['function'] == 'median':
+            props['formula'] = 'percentile(%(field)s,50)' % props
           else:
             props['formula'] = '%(function)s(%(field)s)' % props          
           json_facets['%(key)s' % props] = '%(formula)s' % props

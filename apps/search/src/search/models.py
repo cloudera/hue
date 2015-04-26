@@ -736,7 +736,10 @@ def augment_solr_response(response, collection, query):
         buckets = []
         for bucket in response['facets'][name]['buckets']:
           buckets.append(bucket['val'])
-          buckets.append(bucket['count'])
+          if 'd2' in bucket:
+            buckets.append(bucket['d2'])
+          else:
+            buckets.append(bucket['count'])
 
         counts = pairwise2(facet['field'], selected_values.get(facet['id'], []), buckets)
         if collection_facet['properties']['sort'] == 'asc':

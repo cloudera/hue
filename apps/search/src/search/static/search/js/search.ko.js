@@ -543,21 +543,25 @@ var Collection = function (vm, collection) {
       pivot = ko.mapping.fromJS({
         'field': facet.properties.facets_form.field,
         'limit': facet.properties.facets_form.limit,
-        'mincount': facet.properties.facets_form.mincount
+        'mincount': facet.properties.facets_form.mincount,
+        'functionz': facet.properties.facets_form.function,
       });
       facet.properties.facets_form.field = null;
       facet.properties.facets_form.limit = 5;
       facet.properties.facets_form.mincount = 1;
+      facet.properties.facets_form.function = 'count';
     } else {
       if (typeof facet.properties.facets_form.field != 'undefined') {
         pivot = ko.mapping.fromJS({
           'field': facet.properties.facets_form.field(),
           'limit': facet.properties.facets_form.limit(),
-          'mincount': facet.properties.facets_form.mincount()
+          'mincount': facet.properties.facets_form.mincount(),
+          'functionz': facet.properties.facets_form.function()
         });
         facet.properties.facets_form.field(null);
         facet.properties.facets_form.limit(5);
         facet.properties.facets_form.mincount(1);
+        facet.properties.facets_form.function('count');
       }
     }
 
