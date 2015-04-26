@@ -169,7 +169,9 @@ class SolrApi(object):
          
           json_facets['%(key)s' % props] = {
               'type': 'terms',
-              'field': facet['field']
+              'field': facet['field'],
+              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
+              'mincount': int(facet['properties']['mincount'])
           }
         elif facet['type'] == 'function':
           props = {
