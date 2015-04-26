@@ -690,20 +690,6 @@ def augment_solr_response(response, collection, query):
             'counts': value,
           }
           normalized_facets.append(facet)
-      elif category == 'function' and response['facets']:
-        for name, value in response['facets'].iteritems(): # flat
-          collection_facet = get_facet_field(category, name, collection['facets'])
-          if collection_facet:
-            facet = {
-              'id': collection_facet['id'],
-              'query': name,
-              'type': category,
-              'label': name,
-              'counts': value,
-            }
-            normalized_facets.append(facet)
-          else:
-            print name, value
       elif category == 'pivot':
         name = NAME % facet
         if 'facet_pivot' in response['facet_counts'] and name in response['facet_counts']['facet_pivot']:
@@ -720,6 +706,47 @@ def augment_solr_response(response, collection, query):
           'type': category,
           'label': name,
           'counts': count,
+        }
+        normalized_facets.append(facet)
+
+  if response and response.get('facets'):
+    for facet in collection['facets']:
+      category = facet['type']
+      name = NAME % facet
+      
+      if category == 'function' and name in response['facets']:
+        value = response['facets'][name]
+        collection_facet = get_facet_field(category, name, collection['facets'])
+        if collection_facet:
+          facet = {
+            'id': collection_facet['id'],
+            'query': name,
+            'type': category,
+            'label': name,
+            'counts': value,
+          }
+          normalized_facets.append(facet)
+        else:
+          print name, value
+      elif category == 'terms' and name in response['facets']:
+        value = response['facets'][name]
+        collection_facet = get_facet_field(category, name, collection['facets'])
+
+        # if 2D
+        buckets = []
+        for bucket in response['facets'][name]['buckets']:
+          buckets.append(bucket['val'])
+          buckets.append(bucket['count'])
+
+        counts = pairwise2(facet['field'], selected_values.get(facet['id'], []), buckets)
+        if collection_facet['properties']['sort'] == 'asc':
+          counts.reverse()
+        facet = {
+          'id': collection_facet['id'],
+          'field': facet['field'],
+          'type': category,
+          'label': collection_facet['label'],
+          'counts': counts,
         }
         normalized_facets.append(facet)
 

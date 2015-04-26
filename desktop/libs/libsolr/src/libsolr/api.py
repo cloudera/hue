@@ -132,6 +132,7 @@ class SolrApi(object):
         ('facet.mincount', 0),
         ('facet.limit', 10),
       )
+      json_facets = {}
 
       for facet in collection['facets']:
         if facet['type'] == 'query':
@@ -160,6 +161,16 @@ class SolrApi(object):
           params += (
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
+        elif facet['type'] == 'terms':
+          props = {
+              'key': '%(field)s-%(id)s' % facet
+          }
+          props.update(facet)
+         
+          json_facets['%(key)s' % props] = {
+              'type': 'terms',
+              'field': facet['field']
+          }
         elif facet['type'] == 'function':
           props = {
               'function': facet['properties']['function'],
@@ -170,9 +181,7 @@ class SolrApi(object):
             props['formula'] = '%(function)s(%(field)s,25,50,75,90,99)' % props
           else:
             props['formula'] = '%(function)s(%(field)s)' % props          
-          params += (
-              ('json.facet', "{%(key)s: '%(formula)s'}" % props),
-          )        
+          json_facets['%(key)s' % props] = '%(formula)s' % props
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']
@@ -194,8 +203,14 @@ class SolrApi(object):
                 ('facet.pivot', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s %(fields_limits)s}%(fields)s' % keys),
             )
 
-    params += self._get_fq(query)
+      if json_facets:
+        params += (
+            ('json.facet', json.dumps(json_facets)),
+        )
+        print json.dumps(json_facets)
 
+    params += self._get_fq(query)
+    
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
       fields = set(collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else [])
       # Add field if needed

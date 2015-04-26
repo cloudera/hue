@@ -807,6 +807,18 @@ ${ dashboard.layout_skeleton() }
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
       <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
       <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
+      
+      <select data-bind="value: 'count'">
+        <option value="count" label="${ _('Count') }">${ _('Count') }</option>
+        <option value="unique" label="${ _('Unique Count') }">${ _('Unique Count') }</option>
+        <option value="avg" label="${ _('Average') }">${ _('Average') }</option>
+        <option value="sum" label="${ _('Sum') }">${ _('Sum') }</option>
+        <option value="min" label="${ _('Min') }">${ _('Min') }</option>
+        <option value="max" label="${ _('Max') }">${ _('Max') }</option>
+        <option value="sumsq" label="${ _('Sum of square') }">${ _('Sum of square') }</option>
+        <option value="percentile" label="${ _('Percentiles') }">${ _('Percentiles') }</option>
+      </select>      
+      
     </div>
     <!-- ko if: $root.collection.getFacetById($parent.id()) -->
     <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
