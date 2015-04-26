@@ -332,10 +332,12 @@ ${ dashboard.layout_skeleton() }
     <!-- /ko -->
     </div>
 
-    <!-- ko if: type() == 'pivot' -->
+    <!-- ko if: type() == 'pivot' || type() == 'terms' -->
       <div class="facet-field-tile" data-bind="visible: properties.scope() == 'tree' || properties.facets().length == 0">
         <div class="facet-field-cnt">
-          <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title">${ _('Add a dimension') }</span>
+          <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title">
+            ${ _('Add a dimension') }
+          </span>
         </div>
 
         <div class="facet-field-cnt">
@@ -346,6 +348,17 @@ ${ dashboard.layout_skeleton() }
             <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Choose...') }'"></select>
           </span>
         </div>
+
+     <span class="facet-field-label">${ _('Metric') }</span>
+      <select data-bind="value: properties.facets_form.function">
+        <option value="unique" selected="selected" label="${ _('Unique Count') }">${ _('Unique Count') }</option>
+        <option value="avg" label="${ _('Average') }">${ _('Average') }</option>
+        <option value="sum" label="${ _('Sum') }">${ _('Sum') }</option>
+        <option value="min" label="${ _('Min') }">${ _('Min') }</option>
+        <option value="max" label="${ _('Max') }">${ _('Max') }</option>
+        <option value="sumsq" label="${ _('Sum of square') }">${ _('Sum of square') }</option>
+        <option value="median" label="${ _('Median') }">${ _('Median') }</option>
+      </select>
 
         <div class="facet-field-cnt">
           <span class="spinedit-cnt">
@@ -807,18 +820,7 @@ ${ dashboard.layout_skeleton() }
       <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
       <span class="facet-field-label" data-bind="visible: $root.query.multiqs().length > 1">${ _('Group by') }</span>
       <select class="input-medium" data-bind="visible: $root.query.multiqs().length > 1, options: $root.query.multiqs, optionsValue: 'id', optionsText: 'label', value: $root.query.selectedMultiq"></select>
-      
-      <select data-bind="value: 'count'">
-        <option value="count" label="${ _('Count') }">${ _('Count') }</option>
-        <option value="unique" label="${ _('Unique Count') }">${ _('Unique Count') }</option>
-        <option value="avg" label="${ _('Average') }">${ _('Average') }</option>
-        <option value="sum" label="${ _('Sum') }">${ _('Sum') }</option>
-        <option value="min" label="${ _('Min') }">${ _('Min') }</option>
-        <option value="max" label="${ _('Max') }">${ _('Max') }</option>
-        <option value="sumsq" label="${ _('Sum of square') }">${ _('Sum of square') }</option>
-        <option value="percentile" label="${ _('Percentiles') }">${ _('Percentiles') }</option>
-      </select>      
-      
+
     </div>
     <!-- ko if: $root.collection.getFacetById($parent.id()) -->
     <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
@@ -854,6 +856,43 @@ ${ dashboard.layout_skeleton() }
           <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
         </div>
       <!-- /ko -->
+      
+<div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && $data.properties.facets().length > 0">
+        <span class="muted">${ _('Selected dimensions') }</span>
+      </div>
+      <div data-bind="foreach: $data.properties.facets, visible: $root.isEditing">
+        <div class="filter-box">
+          <div class="title">
+            <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
+              <i class="fa fa-times"></i>
+            </a>
+            <span data-bind="text: field"></span>
+            <span data-bind="text: functionz"></span>
+            &nbsp;
+          </div>
+
+          <div class="content">
+            <div class="facet-field-cnt">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label facet-field-label-fixed-width">
+                  ${ _('Limit') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: limit"/>
+              </span>
+            </div>
+
+            <div class="facet-field-cnt">
+              <span class="spinedit-cnt">
+                <span class="facet-field-label facet-field-label-fixed-width">
+                  ${ _('Min Count') }
+                </span>
+                <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="clearfix"></div>      
     </div>
 
     <!-- ko if: $root.collection.getFacetById($parent.id()) -->
@@ -1503,7 +1542,7 @@ var HIT_OPTIONS = [
   { value: "min", label: "${ _('Min') }" },
   { value: "max", label: "${ _('Max') }" },
   { value: "sumsq", label: "${ _('Sum of square') }" },
-  { value: "percentile", label: "${ _('Percentiles') }" }
+  { value: "median", label: "${ _('Median') }" }
 ];
 
 function getHitOption(value){

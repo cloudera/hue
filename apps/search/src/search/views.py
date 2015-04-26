@@ -479,14 +479,14 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'stacked': False,
     'limit': 10,
     'mincount': 0,
-    'isDate': False
+    'isDate': False,
+    'function': 'unique' # new
   }
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     facet_type = 'pivot'
   elif widget_type == 'hit-widget':
     facet_type = 'function'
-    properties['function'] = 'unique'
   else:
     solr_api = SolrApi(SOLR_URL.get(), user)
     range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
@@ -500,12 +500,16 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     else:
       #facet_type = 'field'
       facet_type = 'terms' # if 5.2+
+      # New
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'function': 'count'}
+      properties['facets'] = []
+      properties['scope'] = 'stack'
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     properties['mincount'] = 1
     properties['facets'] = []
     properties['stacked'] = True
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'function': 'count'} # todo
 
     if widget_type == 'map-widget':
       properties['scope'] = 'world'
