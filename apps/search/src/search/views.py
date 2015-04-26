@@ -498,7 +498,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['initial_start'] = properties['start']
       properties['initial_end'] = properties['end']
     else:
-      facet_type = 'field'
+      #facet_type = 'field'
+      facet_type = 'terms' # if 5.2+
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     properties['mincount'] = 1
