@@ -166,17 +166,35 @@ class SolrApi(object):
               'key': '%(field)s-%(id)s' % facet
           }
           props.update(facet)
-          print facet
-          _f = {
-              'type': 'terms',
-              'field': facet['field'],
-              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
-              'mincount': int(facet['properties']['mincount'])
-          }
-          if facet['properties']['facets']: # [{u'field': u'salary_d', u'functionz': u'avg', u'limit': 10, u'mincount': 1}
-            _f['facet'] = {
-                'd2': '%(functionz)s(%(field)s)' % facet['properties']['facets'][0] 
+          if 'start' in facet['properties']:
+            _f = {
+                'type': 'range',
+                'field': facet['field'],
+                'start': facet['properties']['start'],
+                'end': facet['properties']['end'],
+                'gap': facet['properties']['gap'],
+                'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
+                'mincount': int(facet['properties']['mincount'])
             }
+            if facet['properties']['facets']: # [{u'field': u'salary_d', u'functionz': u'avg', u'limit': 10, u'mincount': 1}
+              _f['facet'] = {
+                  'd2': {
+                      'type': 'terms',
+                      'field': '%(field)s' % facet['properties']['facets'][0]
+                  } 
+              }
+                        
+          else:
+            _f = {
+                'type': 'terms',
+                'field': facet['field'],
+                'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
+                'mincount': int(facet['properties']['mincount'])
+            }
+            if facet['properties']['facets']: # [{u'field': u'salary_d', u'functionz': u'avg', u'limit': 10, u'mincount': 1}
+              _f['facet'] = {
+                  'd2': '%(functionz)s(%(field)s)' % facet['properties']['facets'][0] 
+              }
             
           json_facets['%(key)s' % props] = _f
         elif facet['type'] == 'function':

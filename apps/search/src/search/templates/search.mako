@@ -296,7 +296,7 @@ ${ dashboard.layout_skeleton() }
       </div>
     <!-- /ko -->
 
-    <!-- ko if: type() == 'range' || type() == 'range-up' -->
+    <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'terms' && properties.min)-->
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
@@ -1632,6 +1632,7 @@ function _barChartDataTransformer(rawDatum, isUp) {
     key: rawDatum.label,
     values: _data
   });
+
   return _datum;
 }
 
