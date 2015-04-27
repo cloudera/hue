@@ -35,3 +35,9 @@ SECURITY_ENABLED = Config(
   help=_("Whether Solr requires client to perform Kerberos authentication."),
   default=False,
   type=coerce_bool)
+
+LATEST = Config(
+  key="latest",
+  help=_("Use latest Solr 5.2+ features."),
+  default=False,
+  type=coerce_bool)

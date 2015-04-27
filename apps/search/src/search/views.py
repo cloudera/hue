@@ -31,7 +31,7 @@ from libsolr.api import SolrApi
 from indexer.management.commands import indexer_setup
 
 from search.api import _guess_gap, _zoom_range_facet, _new_range_facet
-from search.conf import SOLR_URL
+from search.conf import SOLR_URL, LATEST
 from search.data_export import download as export_download
 from search.decorators import allow_owner_only, allow_viewer_only
 from search.management.commands import search_setup
@@ -60,7 +60,7 @@ def index(request):
   return render('search.mako', request, {
     'collection': collection,
     'query': query,
-    'initial': json.dumps({'collections': [], 'layout': []}),
+    'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
     'is_owner': request.user == collection_doc.owner
   })
 
@@ -87,7 +87,8 @@ def new_search(request):
                   {"size":12,"name":"Grid Results","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
                  "drops":["temp"],"klass":"card card-home card-column span10"},
-         ]
+         ],
+         'is_latest': LATEST.get()
      }),
     'is_owner': True
   })
@@ -112,7 +113,8 @@ def browse(request, name):
                   {"size":12,"name":"Grid Results","id":"52f07188-f30f-1296-2450-f77e02e1a5c0","widgetType":"resultset-widget",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
               "drops":["temp"],"klass":"card card-home card-column span10"}
-         ]
+         ],
+         'is_latest': LATEST.get()
      }),
      'is_owner': True
   })
@@ -480,7 +482,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'limit': 10,
     'mincount': 0,
     'isDate': False,
-    'function': 'unique' # new
+    'aggregate': 'unique'
   }
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
@@ -497,17 +499,12 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['initial_gap'] = properties['gap']
       properties['initial_start'] = properties['start']
       properties['initial_end'] = properties['end']
-      
-      facet_type = 'terms' # if 5.2+ --> unify all
-      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'function': 'count'}
-      properties['facets'] = []
-      properties['scope'] = 'stack'
-      
     else:
-      #facet_type = 'field'
-      facet_type = 'terms' # if 5.2+
-      # New
-      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'function': 'count'}
+      facet_type = 'field'
+
+    if widget_type == 'bucket-widget':
+      facet_type = 'nested'
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
       properties['facets'] = []
       properties['scope'] = 'stack'
 
@@ -515,7 +512,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     properties['mincount'] = 1
     properties['facets'] = []
     properties['stacked'] = True
-    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5, 'function': 'count'} # todo
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
 
     if widget_type == 'map-widget':
       properties['scope'] = 'world'
