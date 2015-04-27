@@ -713,40 +713,27 @@ def augment_solr_response(response, collection, query):
     for facet in collection['facets']:
       category = facet['type']
       name = NAME % facet
-      
+
       if category == 'function' and name in response['facets']:
         value = response['facets'][name]
         collection_facet = get_facet_field(category, name, collection['facets'])
-        if collection_facet:
-          facet = {
-            'id': collection_facet['id'],
-            'query': name,
-            'type': category,
-            'label': name,
-            'counts': value,
-          }
-          normalized_facets.append(facet)
-        else:
-          print name, value
-      elif category == 'terms' and name in response['facets']:
+        facet = {
+          'id': collection_facet['id'],
+          'query': name,
+          'type': category,
+          'label': name,
+          'counts': value,
+        }
+        normalized_facets.append(facet)
+      elif category == 'nested' and name in response['facets']:
         value = response['facets'][name]
         collection_facet = get_facet_field(category, name, collection['facets'])
 
-        # none empty
+        counts = _augment_stats_2d(name, facet, response['facets'][name]['buckets'], selected_values)
 
-        countss = []
-        buckets = []
-        print response['facets'][name]['buckets']
-        for bucket in response['facets'][name]['buckets']:          
-          buckets.append(bucket['val'])
-          if 'd2' in bucket:
-            buckets.append(bucket['d2'])
-          else:
-            buckets.append(bucket['count'])
-
-        counts = pairwise2(facet['field'], selected_values.get(facet['id'], []), buckets)
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
+
         facet = {
           'id': collection_facet['id'],
           'field': facet['field'],
@@ -754,12 +741,13 @@ def augment_solr_response(response, collection, query):
           'label': collection_facet['label'],
           'counts': counts,
         }
-        print facet['counts']
+
         normalized_facets.append(facet)
 
     # Remove unnecessary facet data
     if response:
       response.pop('facet_counts')
+      response.pop('facets')
 
   # HTML escaping
   for doc in response['response']['docs']:
@@ -835,8 +823,50 @@ def _augment_pivot_2d(name, facet_id, counts, selected_values):
   return augmented
 
 
-def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
+def _augment_stats_2d(name, facet, counts, selected_values):
+  fq_fields = []
+  fq_values = []
+  fq_filter = []
+  _selected_values = []
+  _fields = [facet['field']] + [facet['field'] for facet in facet['properties']['facets']]
 
+  return __augment_stats_2d(counts, facet['field'], fq_fields, fq_values, fq_filter, _selected_values, _fields)
+
+
+def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected_values, _fields):
+  augmented = []
+
+  for bucket in counts:
+    val = bucket['val']
+    count = bucket['count']
+
+    _fq_fields = fq_fields + _fields[0:1]
+    _fq_values = fq_values + [val]
+
+    if 'd2' in bucket:
+      if type(bucket['d2']) == dict:
+        augmented += __augment_stats_2d(bucket['d2']['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:])
+      else:
+        augmented.append(_get_augmented(bucket['d2'], val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
+    else:
+      augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
+
+  return augmented
+
+
+def _get_augmented(count, val, label, fq_values, fq_fields, fq_filter, _selected_values):
+    return {
+        "count": count,
+        "value": val,
+        "cat": label,
+        'selected': fq_values in _selected_values,
+        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val]),
+        'fq_fields': fq_fields,
+        'fq_values': fq_values,
+    }
+
+
+def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
   for c in counts:
     fq_fields = (fields if fields else []) + [c['field']]
     fq_values = (values if values else []) + [smart_str(c['value'])]

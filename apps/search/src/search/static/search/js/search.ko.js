@@ -483,8 +483,8 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
-    if (facet.properties.function) {
-      facet.properties.function.subscribe(function () {
+    if (facet.properties.aggregate) {
+      facet.properties.aggregate.subscribe(function () {
         vm.search();
       });
     }
@@ -523,8 +523,8 @@ var Collection = function (vm, collection) {
               vm.search();
             });
           }
-          if (facet.properties.function) {
-            facet.properties.function.subscribe(function () {
+          if (facet.properties.aggregate) {
+            facet.properties.aggregate.subscribe(function () {
               vm.search();
             });
           }
@@ -544,28 +544,31 @@ var Collection = function (vm, collection) {
         'field': facet.properties.facets_form.field,
         'limit': facet.properties.facets_form.limit,
         'mincount': facet.properties.facets_form.mincount,
-        'functionz': facet.properties.facets_form.function,
+        'aggregate': facet.properties.facets_form.aggregate,
       });
       facet.properties.facets_form.field = null;
       facet.properties.facets_form.limit = 5;
       facet.properties.facets_form.mincount = 1;
-      facet.properties.facets_form.function = 'count';
+      facet.properties.facets_form.aggregate = 'count';
     } else {
       if (typeof facet.properties.facets_form.field != 'undefined') {
         pivot = ko.mapping.fromJS({
           'field': facet.properties.facets_form.field(),
           'limit': facet.properties.facets_form.limit(),
           'mincount': facet.properties.facets_form.mincount(),
-          'functionz': facet.properties.facets_form.function()
+          'aggregate': facet.properties.facets_form.aggregate ? facet.properties.facets_form.aggregate() : ''
         });
         facet.properties.facets_form.field(null);
         facet.properties.facets_form.limit(5);
         facet.properties.facets_form.mincount(1);
-        facet.properties.facets_form.function('count');
+        facet.properties.facets_form.aggregate ? facet.properties.facets_form.aggregate('count') : '';
       }
     }
 
     if (pivot != null) {
+      pivot.aggregate.subscribe(function() {
+        vm.search();
+      });
       facet.properties.facets.push(pivot);
       vm.search();
     }
@@ -974,6 +977,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
   self.isNested = ko.observable(false);
+  self.isLatest = ko.mapping.fromJS(typeof initial_json.is_latest != "undefined" ? initial_json.is_latest : false);
 
   // Models
   self.collection = new Collection(self, collection_json.collection);
@@ -1059,6 +1063,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.draggableTree = ko.observable(bareWidgetBuilder("Tree", "tree-widget"));
   self.draggableHeatmap = ko.observable(bareWidgetBuilder("Heatmap", "heatmap-widget"));
   self.draggableCounter = ko.observable(bareWidgetBuilder("Counter", "hit-widget"));
+  self.draggableBucket = ko.observable(bareWidgetBuilder("Histogram", "bucket-widget"));
 
   self.availableDateFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });

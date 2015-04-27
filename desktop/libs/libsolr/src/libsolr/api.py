@@ -65,6 +65,15 @@ class SolrApi(object):
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
     return 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')
 
+  def _get_aggregate_function(self, facet):
+    props = {
+        'field': facet['field'],
+        'aggregate': facet['properties']['aggregate'] if 'properties' in facet else facet['aggregate']
+    }
+    if props['aggregate'] == 'median':
+      return 'percentile(%(field)s,50)' % props
+    else:
+      return '%(aggregate)s(%(field)s)' % props
 
   def _get_fq(self, query):
     params = ()
@@ -161,53 +170,52 @@ class SolrApi(object):
           params += (
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
-        elif facet['type'] == 'terms':
+        elif facet['type'] == 'nested':
           props = {
               'key': '%(field)s-%(id)s' % facet
           }
           props.update(facet)
+
+          _f = {
+              'field': facet['field'],
+              'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
+              'mincount': int(facet['properties']['mincount'])
+          }
+
           if 'start' in facet['properties']:
-            _f = {
+            _f.update({
                 'type': 'range',
-                'field': facet['field'],
                 'start': facet['properties']['start'],
                 'end': facet['properties']['end'],
                 'gap': facet['properties']['gap'],
-                'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
-                'mincount': int(facet['properties']['mincount'])
-            }
-            if facet['properties']['facets']: # [{u'field': u'salary_d', u'functionz': u'avg', u'limit': 10, u'mincount': 1}
+            })
+          else:
+            _f.update({
+                'type': 'terms',
+                'field': facet['field'],
+            })
+
+          if facet['properties']['facets']:
+            if facet['properties']['facets'][0]['aggregate'] == 'count':
               _f['facet'] = {
                   'd2': {
                       'type': 'terms',
                       'field': '%(field)s' % facet['properties']['facets'][0]
-                  } 
+                  }
               }
-                        
-          else:
-            _f = {
-                'type': 'terms',
-                'field': facet['field'],
-                'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
-                'mincount': int(facet['properties']['mincount'])
-            }
-            if facet['properties']['facets']: # [{u'field': u'salary_d', u'functionz': u'avg', u'limit': 10, u'mincount': 1}
+              if len(facet['properties']['facets']) > 1: # Get 3rd dimension calculation
+                _f['facet']['d2']['facet'] = {
+                    'd2': self._get_aggregate_function(facet['properties']['facets'][1])
+                }
+            else:
               _f['facet'] = {
-                  'd2': '%(functionz)s(%(field)s)' % facet['properties']['facets'][0] 
+                  'd2': self._get_aggregate_function(facet['properties']['facets'][0])
               }
-            
+
           json_facets['%(key)s' % props] = _f
         elif facet['type'] == 'function':
-          props = {
-              'function': facet['properties']['function'],
-              'key': '%(field)s-%(id)s' % facet
-          }
-          props.update(facet)
-          if facet['properties']['function'] == 'median':
-            props['formula'] = 'percentile(%(field)s,50)' % props
-          else:
-            props['formula'] = '%(function)s(%(field)s)' % props          
-          json_facets['%(key)s' % props] = '%(formula)s' % props
+          key = '%(field)s-%(id)s' % facet
+          json_facets[key] = self._get_aggregate_function(facet)
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']
@@ -233,10 +241,9 @@ class SolrApi(object):
         params += (
             ('json.facet', json.dumps(json_facets)),
         )
-        print json.dumps(json_facets)
 
     params += self._get_fq(query)
-    
+
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
       fields = set(collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else [])
       # Add field if needed
