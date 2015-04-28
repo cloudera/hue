@@ -151,7 +151,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
          title="${_('Counter')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
-                       <i class="fa fa-font"></i>
+                       <i class="fa fa-superscript" style="font-size: 110%"></i>
          </a>
     </div>
 
