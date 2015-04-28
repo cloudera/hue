@@ -311,7 +311,8 @@ var Workflow = function (vm, workflow) {
 
             // In case of Fork of Fork, we need to pick the link of the neighbor of new node instead of just the first forkParent.get_link('to')
             var newParentLink = $.grep(forkParent.children(), function (link) {
-              return vm.getWidgetPredecessor(ko.mapping.toJS(link)['to']).id() == fork.id();
+              var _link = ko.mapping.toJS(link)
+              return 'to' in _link && vm.getWidgetPredecessor(_link['to']).id() == fork.id();
             })[0];
 
             var afterParentId = ko.mapping.toJS(newParentLink).to;
