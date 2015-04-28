@@ -744,7 +744,11 @@ ko.bindingHandlers.codemirror = {
       clearTimeout(sourceDelay);
       var _cm = cm;
       sourceDelay = setTimeout(function () {
-        valueAccessor().data(_cm.getValue());
+        var _value = _cm.getValue();
+        if (options.stripScript){
+          _value = _value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "");
+        }
+        valueAccessor().data(_value);
         if ($(".widget-html-pill").parent().hasClass("active")) {
           $("[contenteditable=true]").html(stripHtmlFromFunctions(valueAccessor().data()));
         }
