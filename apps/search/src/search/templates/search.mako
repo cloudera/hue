@@ -614,7 +614,7 @@ ${ dashboard.layout_skeleton() }
       <div class="widget-section widget-html-section" style="display: none">
         <div class="row-fluid">
           <div class="span9">
-            <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html' }" data-template="true"></textarea>
+            <textarea data-bind="codemirror: {data: $root.collection.template.template, lineNumbers: true, htmlMode: true, mode: 'text/html', stripScript: true }" data-template="true"></textarea>
           </div>
           <div class="span3">
             <h5 class="editor-title">${_('Available Fields')}</h5>
