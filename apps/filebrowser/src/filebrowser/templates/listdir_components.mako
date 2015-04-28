@@ -154,7 +154,7 @@ from django.utils.translation import ugettext as _
 
   <!-- rename modal -->
   <div id="renameModal" class="modal hide fade">
-    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path}" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    <form id="renameForm" action="/filebrowser/rename?next=${current_request_path | n,unicode }" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -759,7 +759,7 @@ from django.utils.translation import ugettext as _
       self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200", "1000"],
       self.recordsPerPage = ko.observable($.cookie("hueFilebrowserRecordsPerPage"));
       self.targetPageNum = ko.observable(1);
-      self.targetPath = ko.observable("${current_request_path}");
+      self.targetPath = ko.observable("${current_request_path | n,unicode }");
       self.sortBy = ko.observable("name");
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
@@ -1784,13 +1784,12 @@ from django.utils.translation import ugettext as _
         }
         if (window.location.href.indexOf("#") == -1) {
           viewModel.targetPageNum(1);
-          targetPath = "${current_request_path}";
+          targetPath = "${current_request_path | n,unicode }";
         }
         if (targetPath != "") {
           viewModel.targetPath(targetPath);
         }
       }
-
       addPathToHistory(viewModel.targetPath())
 
       viewModel.retrieveData();
@@ -1862,7 +1861,7 @@ from django.utils.translation import ugettext as _
         }
         if (window.location.href.indexOf("#") == -1) {
           viewModel.targetPageNum(1);
-          targetPath = "${current_request_path}";
+          targetPath = "${current_request_path | n,unicode }";
         }
         if (targetPath != "") {
           viewModel.targetPath(targetPath);
