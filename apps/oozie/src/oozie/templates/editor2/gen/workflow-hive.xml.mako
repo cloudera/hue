@@ -26,7 +26,7 @@
             % if node['properties']['hive_xml']:
               <job-xml>${ node['properties']['hive_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node['properties']['properties']) }
+            ${ common.configuration(node['properties']['job_properties']) }
 
             <script>${ node['properties']['script_path'] }</script>
 
