@@ -26,7 +26,7 @@
             % if node['properties']['job_xml']:
               <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node['properties']['properties']) }
+            ${ common.configuration(node['properties']['job_properties']) }
             
             <jdbc-url>${ node['properties']['jdbc_url'] }</jdbc-url>
             % if node['properties']['password']:
