@@ -26,7 +26,7 @@
             % if node['properties']['job_xml']:
               <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node['properties']['properties']) }
+            ${ common.configuration(node['properties']['job_properties']) }
 
             % if node['properties']['command']:
             <command>${ node['properties']['command'] }</command>

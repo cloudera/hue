@@ -26,7 +26,7 @@
             % if node['properties']['job_xml']:
               <job-xml>${ node['properties']['job_xml'] }</job-xml>
             % endif
-            ${ common.configuration(node['properties']['properties']) }
+            ${ common.configuration(node['properties']['job_properties']) }
 
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </map-reduce>

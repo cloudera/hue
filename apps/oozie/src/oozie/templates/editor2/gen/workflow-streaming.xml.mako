@@ -29,7 +29,7 @@
                 <reducer>${ node['properties']['reducer'] }</reducer>
                 % endif
             </streaming>
-            ${ common.configuration(node['properties']['properties']) }
+            ${ common.configuration(node['properties']['job_properties']) }
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </map-reduce>
         <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
