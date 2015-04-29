@@ -294,6 +294,7 @@ nv.models.multiBarWithBrushChart = function() {
           brush
               .x(x)
               .on('brush', onBrush)
+              .on('brushstart', onBrushStart)
               .on('brushend', onBrushEnd)
 
           if (brushExtent) brush.extent(brushExtent);
@@ -479,6 +480,10 @@ nv.models.multiBarWithBrushChart = function() {
         dispatch.brush({extent: extent, brush: brush});
       }
 
+      function onBrushStart(){
+        gEnter.select(".nv-brush").select(".extent").style("display", "block");
+      }
+
       function onBrushEnd(){
         brushExtent = brush.empty() ? null : brush.extent();
         extent = brush.empty() ? x.domain() : brush.extent();
@@ -495,6 +500,8 @@ nv.models.multiBarWithBrushChart = function() {
 
           onSelectRange(_from, _to);
         }
+
+        gEnter.select(".nv-brush").select(".extent").style("display", "none");
       }
     });
 
@@ -659,6 +666,11 @@ nv.models.multiBarWithBrushChart = function() {
 
   chart.enableSelection = function() {
     selectionEnabled = true;
+    return chart;
+  };
+
+  chart.disableSelection = function() {
+    selectionEnabled = false;
     return chart;
   };
 

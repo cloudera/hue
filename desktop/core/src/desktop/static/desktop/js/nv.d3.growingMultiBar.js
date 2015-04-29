@@ -206,33 +206,44 @@ nv.models.growingMultiBar = function() {
       bars.exit().remove();
 
       selectBars = function(selected) {
-        var _pivotField = null;
-        if (!Array.isArray(selected)){
-          _pivotField = selected.field;
-          selected = selected.selected;
-        }
-
-        $(selected).each(function(cnt, item){
-          bars.each(function(d, i) {
-            if (_pivotField != null){
-              if ((Array.isArray(_pivotField) ? ko.toJSON(d.obj.fq_fields) == ko.toJSON(_pivotField) : d.obj.fq_fields == _pivotField) && (item.values ? ko.toJSON(d.obj.fq_values) == ko.toJSON(item.values) : d.obj.fq_values == item)){
+        if (selected.rangeValues){
+          $(selected.rangeValues).each(function(cnt, item){
+            bars.each(function(d, i) {
+              if (parseInt(d.x) >= parseInt(item.from) && parseInt(d.x_end) <= parseInt(item.to)) {
                 d3.select(this).classed('selected', true);
               }
-            }
-            else {
-              if (d.x instanceof Date){
-                if (moment(d.x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") == item) {
+            });
+          });
+        }
+        else {
+          var _pivotField = null;
+          if (!Array.isArray(selected)){
+            _pivotField = selected.field;
+            selected = selected.selected;
+          }
+
+          $(selected).each(function(cnt, item){
+            bars.each(function(d, i) {
+              if (_pivotField != null){
+                if ((Array.isArray(_pivotField) ? ko.toJSON(d.obj.fq_fields) == ko.toJSON(_pivotField) : d.obj.fq_fields == _pivotField) && (item.values ? ko.toJSON(d.obj.fq_values) == ko.toJSON(item.values) : d.obj.fq_values == item)){
                   d3.select(this).classed('selected', true);
                 }
               }
               else {
-                if (d.x == item) {
-                  d3.select(this).classed('selected', true);
+                if (d.x instanceof Date){
+                  if (moment(d.x).utc().format("YYYY-MM-DD[T]HH:mm:ss[Z]") == item) {
+                    d3.select(this).classed('selected', true);
+                  }
+                }
+                else {
+                  if (d.x == item) {
+                    d3.select(this).classed('selected', true);
+                  }
                 }
               }
-            }
+            });
           });
-        });
+        }
       };
 
 
