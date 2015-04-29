@@ -749,6 +749,36 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   }
 
+  self.getAllWidgets = function () {
+    var _widgets = [];
+
+    for (var i = 0; i < self.oozieColumns().length; i++) {
+      _widgets = _widgets.concat(self.deeplyGetAllWidgets(self.oozieColumns()[i]));
+    }
+
+    return _widgets;
+  }
+
+  self.deeplyGetAllWidgets = function (col) {
+    var _widgets = [];
+    if (col) {
+      for (var j = 0; j < col.rows().length; j++) {
+        var row = col.rows()[j];
+        if (row && row.widgets()) {
+          for (var z = 0; z < row.widgets().length; z++) {
+            _widgets = _widgets.concat(row.widgets()[z]);
+          }
+        }
+        if (row && row.columns()) {
+          for (var i = 0; i < row.columns().length; i++) {
+            _widgets = _widgets.concat(self.deeplyGetAllWidgets(row.columns()[i]));
+          }
+        }
+      }
+    }
+    return _widgets;
+  }
+
   self.getWidgetById = function (widget_id) {
     var _widget = null;
 
@@ -797,11 +827,22 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.removeWidget = function (widget_json) {
     self.workflow.removeNode(widget_json.id());
     self.removeWidgetById(widget_json.id());
+    self.cleanupDeadWidgets();
   }
 
   self.removeWidgetById = function (widget_id) {
     $.each(self.oozieColumns(), function (i, col) {
       self.deeplyRemoveWidgetById(widget_id, col, self)
+    });
+  }
+
+  self.cleanupDeadWidgets = function () {
+    var _modelWidgets = Object.keys(self.workflow.linkMapping());
+    var _uiWidgets = self.getAllWidgets();
+    _uiWidgets.forEach(function(widget){
+      if (_modelWidgets.indexOf(widget.id()) == -1){
+        self.removeWidgetById(widget.id());
+      }
     });
   }
 
@@ -861,6 +902,15 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   }
 
   self.getWidgetRelative = function (widget_id, isPredecessor) {
+    // fixes the order of the main column first
+    if (self.oozieColumns()[0].rows().length > 3) {
+      if (self.oozieColumns()[0].rows()[1].widgets()[0].id() == "33430f0f-ebfa-c3ec-f237-3e77efa03d0a") { // end widget
+        self.oozieColumns()[0].rows().move(1, self.oozieColumns()[0].rows().length - 1);
+      }
+      if (self.oozieColumns()[0].rows()[1].widgets()[0].id() ==  "17c9c895-5a16-7443-bb81-f34b30b21548") { // kill widget
+        self.oozieColumns()[0].rows().move(1, self.oozieColumns()[0].rows().length - 1);
+      }
+    }
     var _row = self.getWidgetParentRow(widget_id);
     var _col = self.getRowParentColumn(_row.id());
     var _nextRow = null;
@@ -909,15 +959,17 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.isRowAfterFork = function (row) {
     var _parentColumn = self.getRowParentColumn(row.id());
     var _prevRow = null;
-    for (var i = 0; i < _parentColumn.rows().length; i++) {
-      var _currentRow = _parentColumn.rows()[i];
-      if (_currentRow.id() == row.id()) {
-        break;
+    if (_parentColumn != null) {
+      for (var i = 0; i < _parentColumn.oozieRows().length; i++) {
+        var _currentRow = _parentColumn.oozieRows()[i];
+        if (_currentRow.id() == row.id()) {
+          break;
+        }
+        _prevRow = _currentRow;
       }
-      _prevRow = _currentRow;
-    }
-    if (_prevRow != null) {
-      return _prevRow.widgets().length > 0 && (_prevRow.widgets()[0].widgetType() == "fork-widget" || _prevRow.widgets()[0].widgetType() == "decision-widget");
+      if (_prevRow != null) {
+        return _prevRow.widgets().length > 0 && (_prevRow.widgets()[0].widgetType() == "fork-widget" || _prevRow.widgets()[0].widgetType() == "decision-widget");
+      }
     }
     return false;
   }
