@@ -141,7 +141,8 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                   <label class="control-label">${ _('Crontab') }</label>
                   <div class="controls">
                     <input id="coord-frequency" type="text" data-bind="value: coordinator.properties.cron_frequency" name="cron_frequency"/>
-                    <span class="help-inline"><a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
+                    <span class="help-inline">
+                      <a data-bind="visible: coordinator.properties.cron_advanced" href="http://quartz-scheduler.org/api/2.2.0/org/quartz/CronExpression.html" target="_blank">
                       <i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
                     </span>
                   </div>
@@ -175,10 +176,16 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                 <label class="control-label">${ _('From') }</label>
                 <div class="controls">
                   <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="input-small" data-bind="value: coordinator.properties.startDateUI, datepicker: {}" />
+                    <span class="add-on input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                    <input type="text" class="input-small" data-bind="value: coordinator.properties.startDateUI, datepicker: {}" />
                   </div>
                   <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><i class="fa fa-clock-o"></i></span><input type="text" class="input-mini" data-bind="value: coordinator.properties.startTimeUI, timepicker: {}" />
+                    <span class="add-on input-group-addon">
+                      <i class="fa fa-clock-o"></i>
+                    </span>
+                    <input type="text" class="input-mini" data-bind="value: coordinator.properties.startTimeUI, timepicker: {}" />
                   </div>
                   <span class="help-inline"></span>
                 </div>
@@ -187,10 +194,16 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                 <label class="control-label">${ _('To') }</label>
                 <div class="controls">
                   <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><i class="fa fa-calendar"></i></span><input type="text" class="input-small" data-bind="value: coordinator.properties.endDateUI, datepicker: {}" />
+                    <span class="add-on input-group-addon">
+                      <i class="fa fa-calendar"></i>
+                    </span>
+                    <input type="text" class="input-small" data-bind="value: coordinator.properties.endDateUI, datepicker: {}" />
                   </div>
                   <div class="input-prepend input-group">
-                    <span class="add-on input-group-addon"><i class="fa fa-clock-o"></i></span><input type="text" class="input-mini" data-bind="value: coordinator.properties.endTimeUI, timepicker: {}" />
+                    <span class="add-on input-group-addon">
+                      <i class="fa fa-clock-o"></i>
+                    </span>
+                    <input type="text" class="input-mini" data-bind="value: coordinator.properties.endTimeUI, timepicker: {}" />
                   </div>
                   <span class="help-inline"></span>
                 </div>
@@ -296,23 +309,23 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                     <div class="control-group">
                       <label class="control-label">${ _('Done flag') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag() ? '9px' : '-1px'}" />
-                        <input type="text" data-bind="value: done_flag, visible: use_done_flag"/>
+                        <input type="checkbox" data-bind="checked: use_done_flag, style: {'margin-top': !use_done_flag() ? '9px' : '-1px'}, enable: $root.isEditing" />
+                        <input type="text" data-bind="value: done_flag, visible: use_done_flag, enable: $root.isEditing"/>
                       </div>
                     </div>
                     <div class="control-group">
                       <label class="control-label">${ _('Same frequency') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: same_frequency, style: {'margin-top': same_frequency() ? '5px' : '0'}" />
+                        <input type="checkbox" data-bind="checked: same_frequency, style: {'margin-top': same_frequency() ? '5px' : '0'}, enable: $root.isEditing" />
                         <span data-bind="visible: ! same_frequency()">
                           ${ _('Every') }
                         </span>
-                        <select data-bind="value: frequency_number, visible: ! same_frequency()" style="width: 50px">
+                        <select data-bind="value: frequency_number, visible: ! same_frequency(), enable: $root.isEditing" style="width: 50px">
                           % for i in xrange(0, 60):
                           <option value="${ i }">${ i }</option>
                           % endfor
                         </select>
-                        <select data-bind="value: frequency_unit, visible: ! same_frequency()" style="width: 100px">
+                        <select data-bind="value: frequency_unit, visible: ! same_frequency(), enable: $root.isEditing" style="width: 100px">
                           <option value="minutes">${ _('Minutes') }</option>
                           <option value="hours">${ _('Hours') }</option>
                           <option value="days" selected="selected">${ _('Days') }</option>
@@ -323,15 +336,15 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                     <div class="control-group">
                       <label class="control-label">${ _('Same start') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start() ? '9px' : '-1px'}" />
-                        <input type="text" data-bind="value: start, visible: ! same_start()"/>
+                        <input type="checkbox" data-bind="checked: same_start, style: {'margin-top': same_start() ? '9px' : '-1px'}, enable: $root.isEditing" />
+                        <input type="text" data-bind="value: start, visible: ! same_start(), enable: $root.isEditing"/>
                       </div>
                     </div>
                     <div class="control-group">
                       <label class="control-label">${ _('Same timezone') }</label>
                       <div class="controls">
-                        <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone() ? '5px' : '0'}" />
-                        <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone()" style="width: 180px"></select>
+                        <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone() ? '5px' : '0'}, enable: $root.isEditing" />
+                        <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone(), enable: $root.isEditing" style="width: 180px"></select>
                       </div>
                     </div>
                     <div class="control-group">
@@ -339,15 +352,15 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                       <div class="controls">
                         <div class="btn-group" data-toggle="buttons-radio">
                           <button id="default-btn" type="button" class="btn"
-                                  data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }">
+                                  data-bind="click: function() { instance_choice('default'); }, css: { active: instance_choice() == 'default' }, enable: $root.isEditing">
                             ${ _('Default') }
                           </button>
                           <button id="single-btn" type="button" class="btn"
-                                  data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }">
+                                  data-bind="click: function() { instance_choice('single'); }, css: { active: instance_choice() == 'single' }, enable: $root.isEditing">
                             ${ _('Single') }
                           </button>
                           <button id="range-btn" type="button" class="btn"
-                                  data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }">
+                                  data-bind="click: function() { instance_choice('range'); }, css: { active: instance_choice() == 'range' }, enable: $root.isEditing">
                             ${ _('Range') }
                           </button>
                         </div>
@@ -356,25 +369,25 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                     <div class="control-group" data-bind="visible: $.inArray(instance_choice(), ['single', 'range']) != -1">
                       <label class="control-label">${ _('Start') }</label>
                       <div class="controls">
-                        <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance()"/>
+                        <input name="instance_start" type="number" data-bind="value: start_instance, enable: ! is_advanced_start_instance(), enable: $root.isEditing"/>
                         <label style="display: inline">
                             &nbsp;
-                            <input type="checkbox" data-bind="checked: is_advanced_start_instance" style="margin-top:0">
+                            <input type="checkbox" data-bind="checked: is_advanced_start_instance, enable: $root.isEditing" style="margin-top:0">
                             ${ _('(advanced)') }
                           </label>
-                          <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance()"/>
+                          <input type="text" data-bind="value: advanced_start_instance, visible: is_advanced_start_instance(), enable: $root.isEditing"/>
                       </div>
                     </div>
                     <div class="control-group" data-bind="visible: instance_choice() == 'range'">
                       <label class="control-label">${ _('End') }</label>
                       <div class="controls">
-                        <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance()"/>
+                        <input name="instance_end" type="number" data-bind="value: end_instance, enable: ! is_advanced_end_instance(), enable: $root.isEditing"/>
                         <label style="display: inline">
                             &nbsp;
-                            <input type="checkbox" data-bind="checked: is_advanced_end_instance" style="margin-top:0">
+                            <input type="checkbox" data-bind="checked: is_advanced_end_instance, enable: $root.isEditing" style="margin-top:0">
                             ${ _('(advanced)') }
                           </label>
-                          <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance()"/>
+                          <input type="text" data-bind="value: advanced_end_instance, visible: is_advanced_end_instance(), enable: $root.isEditing"/>
                       </div>
                     </div>
                   </form>
