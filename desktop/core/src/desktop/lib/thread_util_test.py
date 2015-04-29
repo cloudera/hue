@@ -29,7 +29,7 @@ def test_dump_traceback():
   class Thread(threading.Thread):
     def run(self):
       started.set()
-      assert_true(stop.wait(1.0))
+      assert_true(stop.wait(10.0))
 
   thread = Thread(name='thread_util_test thread')
   thread.start()
@@ -38,7 +38,7 @@ def test_dump_traceback():
   header = 'Thread thread_util_test thread %s' % thread_ident
 
   try:
-    assert_true(started.wait(1.0))
+    assert_true(started.wait(10.0))
 
     out = StringIO.StringIO()
     dump_traceback(file=out)
