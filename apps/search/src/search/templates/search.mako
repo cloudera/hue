@@ -846,6 +846,7 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
     </div>
 
+    <!-- ko if: $root.collection.getFacetById($parent.id()) -->
     <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
       fqs: $root.query.fqs,
       transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
@@ -864,6 +865,7 @@ ${ dashboard.layout_skeleton() }
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
       onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 </script>
@@ -891,7 +893,7 @@ ${ dashboard.layout_skeleton() }
       transformer: lineChartDataTransformer,
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ viewModel.getWidgetById(parent.id()).isLoading(false) } }"
+      onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
   </div>
   <!-- /ko -->
