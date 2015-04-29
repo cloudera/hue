@@ -1320,6 +1320,7 @@ ko.bindingHandlers.timepicker = {
     }
 }
 
+
 ko.bindingHandlers.textSqueezer = {
   init: function (element, valueAccessor) {
     var value = valueAccessor();
@@ -1334,3 +1335,8 @@ ko.bindingHandlers.textSqueezer = {
     $(element).trigger("redraw");
   }
 };
+
+
+ko.toJSONObject = function (koObj) {
+  return JSON.parse(ko.toJSON(koObj));
+}
