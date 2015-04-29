@@ -393,6 +393,7 @@ var Workflow = function (vm, workflow) {
       self.nodes.remove(node);
 
       // If need to remove fork
+
       if (parent.type() == 'fork-widget') {
         var fork = parent;
         var join = self.getNodeById(childId);
