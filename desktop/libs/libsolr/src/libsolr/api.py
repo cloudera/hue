@@ -25,6 +25,7 @@ from itertools import groupby
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
@@ -88,7 +89,7 @@ class SolrApi(object):
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
               exclude = '-' if _filter['exclude'] else ''
-              if value is not None and ' ' in value:
+              if value is not None and ' ' in smart_str(value):
                 f.append('%s%s:"%s"' % (exclude, field, value))
               else:
                 f.append('%s{!field f=%s}%s' % (exclude, field, value))
