@@ -81,10 +81,10 @@ def new_search(request):
          'layout': [
               {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
               {"size":10,"rows":[{"widgets":[
-                  {"size":12,"name":"Filter Bar","widgetType":"filter-widget",
+                  {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
                                  {"widgets":[
-                  {"size":12,"name":"Grid Results","widgetType":"resultset-widget",
+                  {"size":12,"name":"Grid Results","widgetType":"resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
                  "drops":["temp"],"klass":"card card-home card-column span10"},
          ],
