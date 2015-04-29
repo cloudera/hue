@@ -152,6 +152,7 @@ ko.bindingHandlers.barChart = {
     var _options = valueAccessor();
     var _datum = _options.transformer(_options.datum);
     var _chart = $(element).data("chart");
+
     if (_chart) {
 
       if (_chart.multibar){
@@ -167,16 +168,26 @@ ko.bindingHandlers.barChart = {
           }
         }).call(_chart);
 
-
-
       if (_chart.selectBars) {
         var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
         $.each(_options.fqs(), function (cnt, item) {
           if (item.id() == _options.datum.widget_id) {
             if (item.field() == _field) {
-              _chart.selectBars($.map(item.filter(), function (it) {
-                return it.value();
-              }));
+              if (item.properties){
+                _chart.selectBars({
+                  singleValues: $.map(item.filter(), function (it) {
+                    return it.value();
+                  }),
+                  rangeValues: $.map(item.properties(), function (it) {
+                    return {from: it.from(), to: it.to() };
+                  })
+                });
+              }
+              else {
+                _chart.selectBars($.map(item.filter(), function (it) {
+                    return it.value();
+                }));
+              }
             }
             if (Array.isArray(item.field())) {
               _chart.selectBars({

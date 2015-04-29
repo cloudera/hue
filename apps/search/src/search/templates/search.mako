@@ -1402,7 +1402,7 @@ ${ dashboard.layout_skeleton() }
     </div>
     <div style="float: left;margin-right: 30px;">
     <label class="checkbox">
-      <input type="checkbox"  style="margin-left: 0; margin-right: 4px;margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 30px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+      <input type="checkbox"  style="margin-left: 0; margin-right: 4px;margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
     </label>
     </div>
   </div>
