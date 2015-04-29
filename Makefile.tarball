@@ -29,6 +29,7 @@ PROD_INCLUDES := \
 	tools/app_reg \
 	tools/virtual-bootstrap \
 	tools/relocatable.sh \
+	tools/load-balancer \
 	VERSION
 
 # Check for things in BDIST_EXCLUDES in various apps
