@@ -34,8 +34,8 @@ LANGUAGES = Config(
   help=_t("List of available types of snippets."),
   type=coerce_json,
   default="""[
-      {"name": "Scala", "type": "scala"},
-      {"name": "PySpark", "type": "python"},
+      {"name": "Scala Shell", "type": "scala"},
+      {"name": "PySpark Shell", "type": "python"},
       {"name": "Jar", "type": "jar"},
       {"name": "Python", "type": "py"},
       {"name": "Impala SQL", "type": "impala"},
@@ -53,7 +53,7 @@ LIVY_ASSEMBLY_JAR = Config(
 LIVY_SERVER_HOST = Config(
   key="livy_server_host",
   help=_t("Host address of the Livy Server."),
-  default="0.0.0.0")
+  default="localhost")
 
 LIVY_SERVER_PORT = Config(
   key="livy_server_port",
