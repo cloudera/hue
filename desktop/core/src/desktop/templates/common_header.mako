@@ -254,9 +254,9 @@ from django.utils.translation import ugettext as _
 
       function checkJobBrowserStatus(){
         $.getJSON("/${apps['jobbrowser'].display_name}/?format=json&state=running&user=${user.username}", function(data){
-          if (data != null){
-            if (data.length > 0){
-              $("#jobBrowserCount").removeClass("hide").text(data.length);
+          if (data != null && data.jobs != null){
+            if (data.jobs.length > 0){
+              $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
             }
             else {
               $("#jobBrowserCount").addClass("hide");
