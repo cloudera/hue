@@ -140,7 +140,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
     if widget_type == 'histogram-widget':
       properties.update({
-      'timelineChartType': 'bar'
+        'timelineChartType': 'bar'
       })
 
   except Exception, e:
