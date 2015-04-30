@@ -171,11 +171,6 @@ class SolrApi(object):
               ('facet.field', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.limit=%(limit)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
         elif facet['type'] == 'nested':
-          props = {
-              'key': '%(field)s-%(id)s' % facet
-          }
-          props.update(facet)
-
           _f = {
               'field': facet['field'],
               'limit': int(facet['properties'].get('limit', 10)) + (1 if facet['widgetType'] == 'facet-widget' else 0),
@@ -193,6 +188,7 @@ class SolrApi(object):
             _f.update({
                 'type': 'terms',
                 'field': facet['field'],
+                'excludeTags': facet['id']
             })
 
           if facet['properties']['facets']:
@@ -212,10 +208,9 @@ class SolrApi(object):
                   'd2': self._get_aggregate_function(facet['properties']['facets'][0])
               }
 
-          json_facets['%(key)s' % props] = _f
+          json_facets[facet['id']] = _f
         elif facet['type'] == 'function':
-          key = '%(field)s-%(id)s' % facet
-          json_facets[key] = self._get_aggregate_function(facet)
+          json_facets[facet['id']] = self._get_aggregate_function(facet)
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']

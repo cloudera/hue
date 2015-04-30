@@ -576,7 +576,13 @@ class Collection2(object):
 
 
 def get_facet_field(category, field, facets):
-  facets = filter(lambda facet: facet['type'] == category and '%(field)s-%(id)s' % facet == field, facets)
+  if category in ('nested', 'function'):
+    id_pattern = '%(id)s'
+  else:
+    id_pattern = '%(field)s-%(id)s'
+
+  facets = filter(lambda facet: facet['type'] == category and id_pattern % facet == field, facets)
+
   if facets:
     return facets[0]
   else:
@@ -712,7 +718,7 @@ def augment_solr_response(response, collection, query):
   if response and response.get('facets'):
     for facet in collection['facets']:
       category = facet['type']
-      name = NAME % facet
+      name = facet['id'] # Nested facets can only have one name
 
       if category == 'function' and name in response['facets']:
         value = response['facets'][name]
@@ -827,7 +833,7 @@ def _augment_stats_2d(name, facet, counts, selected_values):
   fq_fields = []
   fq_values = []
   fq_filter = []
-  _selected_values = []
+  _selected_values = [f['value'] for f in selected_values.get(facet['id'], [])]
   _fields = [facet['field']] + [facet['field'] for facet in facet['properties']['facets']]
 
   return __augment_stats_2d(counts, facet['field'], fq_fields, fq_values, fq_filter, _selected_values, _fields)
@@ -855,15 +861,15 @@ def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected
 
 
 def _get_augmented(count, val, label, fq_values, fq_fields, fq_filter, _selected_values):
-    return {
-        "count": count,
-        "value": val,
-        "cat": label,
-        'selected': fq_values in _selected_values,
-        'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val]),
-        'fq_fields': fq_fields,
-        'fq_values': fq_values,
-    }
+  return {
+      "count": count,
+      "value": val,
+      "cat": label,
+      'selected': fq_values in _selected_values,
+      'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val]),
+      'fq_fields': fq_fields,
+      'fq_values': fq_values,
+  }
 
 
 def _augment_pivot_nd(facet_id, counts, selected_values, fields='', values=''):
