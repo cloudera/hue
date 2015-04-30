@@ -51,9 +51,9 @@ ${layout.menubar(section='users')}
                 class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
             % endif
 
-            <a href="http://gethue.tumblr.com/post/75499679342/making-hadoop-accessible-to-your-employees-with-ldap" class="btn"
+            <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/" class="btn"
               title="${ ('Learn how to integrate Hue with your company') }" target="_blank">
-              <i class="fa fa-question-circle"> LDAP</i>
+              <i class="fa fa-question-circle"></i> LDAP
             </a>
         %endif
       </%def>
