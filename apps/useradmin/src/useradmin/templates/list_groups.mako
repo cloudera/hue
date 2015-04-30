@@ -49,7 +49,7 @@ ${layout.menubar(section='groups')}
           % endif
           <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/" class="btn"
             title="${ ('Learn how to integrate Hue with your company') }" target="_blank">
-            <i class="fa fa-question-circle"> LDAP</i>
+            <i class="fa fa-question-circle"></i> LDAP
           </a>
         %endif
       </%def>
