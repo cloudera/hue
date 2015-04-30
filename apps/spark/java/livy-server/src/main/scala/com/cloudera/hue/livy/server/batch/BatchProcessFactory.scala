@@ -18,7 +18,9 @@
 
 package com.cloudera.hue.livy.server.batch
 
-class BatchProcessFactory extends BatchFactory {
+import com.cloudera.hue.livy.LivyConf
+
+class BatchProcessFactory(livyConf: LivyConf) extends BatchFactory {
   def create(id: Int, createBatchRequest: CreateBatchRequest): Batch =
-    BatchProcess(id, createBatchRequest)
+    BatchProcess(livyConf, id, createBatchRequest)
 }

@@ -45,7 +45,7 @@ object ProcessSession extends Logging {
   // Loop until we've started a process with a valid port.
   private def startProcess(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String]): Process = {
 
-    val builder = new SparkSubmitProcessBuilder()
+    val builder = new SparkSubmitProcessBuilder(livyConf)
 
     builder.className("com.cloudera.hue.livy.repl.Main")
 

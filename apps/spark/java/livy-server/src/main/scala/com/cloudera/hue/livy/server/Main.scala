@@ -68,29 +68,26 @@ class ScalatraBootstrap extends LifeCycle with Logging {
   override def init(context: ServletContext): Unit = {
     val livyConf = new LivyConf()
 
-    val sessionFactoryKind = livyConf.get("livy.server.session.factory", "process")
+    val sessionFactoryKind = try {
+      livyConf.sessionKind()
+    } catch {
+      case e: IllegalStateException =>
+        println(f"Unknown session factory: $e}")
+        sys.exit(1)
+    }
 
     info(f"Using $sessionFactoryKind sessions")
 
-    val sessionFactory = sessionFactoryKind match {
-      case "thread" => new ThreadSessionFactory(livyConf)
-      case "process" => new ProcessSessionFactory(livyConf)
-      case "yarn" => new YarnSessionFactory(livyConf)
-      case _ =>
-        println(f"Unknown session factory: $sessionFactoryKind")
-        sys.exit(1)
+    val (sessionFactory, batchFactory) = sessionFactoryKind match {
+      case LivyConf.Thread() =>
+        (new ThreadSessionFactory(livyConf), new BatchProcessFactory(livyConf) )
+      case LivyConf.Process() =>
+        (new ProcessSessionFactory(livyConf), new BatchProcessFactory(livyConf))
+      case LivyConf.Yarn() =>
+        (new YarnSessionFactory(livyConf), new BatchYarnFactory(livyConf))
     }
 
     sessionManager = new SessionManager(sessionFactory)
-
-    val batchFactory = sessionFactoryKind match {
-      case "thread" | "process" => new BatchProcessFactory()
-      case "yarn" => new BatchYarnFactory(livyConf)
-      case _ =>
-        println(f"Unknown batch factory: $sessionFactoryKind")
-        sys.exit(1)
-    }
-
     batchManager = new BatchManager(batchFactory)
 
     context.mount(new SessionServlet(sessionManager), "/sessions/*")
