@@ -550,6 +550,10 @@ ${ dashboard.import_bindings() }
       })
       .jqCronGetInstance();
 
+  $('#jqCron-container').on('cron:change', function(e, cron){
+    viewModel.coordinator.properties.cron_frequency(cron);
+  });
+
   function zeroPadding(value) {
     return (value < 10 ? '0':'') + value;
   }
