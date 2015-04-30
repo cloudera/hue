@@ -185,7 +185,11 @@ class HiveServer2Dbms(object):
     """No samples if it's a view (HUE-526)"""
     if not table.is_view:
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
-      hql = "SELECT * FROM %s.%s LIMIT %s" % (database, table.name, limit)
+      partition_query = ""
+      if table.partition_keys:
+        partitions = self.get_partitions(database, table, 1)
+        partition_query = 'WHERE ' + ' AND '.join(["%s='%s'" % (table.partition_keys[idx].name, key) for idx, key in enumerate(partitions[0].values)])
+      hql = "SELECT * FROM `%s.%s` %s LIMIT %s" % (database, table.name, partition_query, limit)
       query = hql_query(hql)
       handle = self.execute_and_wait(query, timeout_sec=5.0)
 
