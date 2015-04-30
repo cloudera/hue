@@ -243,7 +243,7 @@ ${ workflow.render() }
           <input type="text" data-bind="value: value, valueUpdate:'afterkeydown', attr: { placeholder: help_text }" class="input-xlarge"/>
           <!-- /ko -->
           <!-- ko if: type() == 'textarea' -->
-          <textarea data-bind="value: value, valueUpdate:'afterkeydown'" class="input-xlarge"></textarea>
+          <textarea data-bind="value: value, valueUpdate:'afterkeydown'" class="input-xlarge" style="resize:both"></textarea>
           <!-- /ko -->
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
