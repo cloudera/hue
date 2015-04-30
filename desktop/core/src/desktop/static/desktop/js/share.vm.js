@@ -93,16 +93,17 @@ function setupSharing(id, updateFunc) {
       self.hasSetupBeenCalled = true;
       JSON_USERS_GROUPS = data;
       dropdown = [];
-      map = {};
+      usermap = {};
+      groupmap = {};
 
       $.each(JSON_USERS_GROUPS.users, function (i, user) {
         var _display = prettifyUsername(user.id);
-        map[_display] = user;
+        usermap[_display] = user;
         dropdown.push(_display);
       });
 
       $.each(JSON_USERS_GROUPS.groups, function (i, group) {
-        map[group.name] = group;
+        groupmap[group.name] = group;
         dropdown.push(group.name);
       });
 
@@ -120,8 +121,7 @@ function setupSharing(id, updateFunc) {
         },
         highlighter: function (item) {
           var _icon = "fa";
-          var _display = "";
-          if (map[item].hasOwnProperty("username")) {
+          if (usermap[item]) {
             _icon += " fa-user";
           }
           else {
@@ -131,7 +131,7 @@ function setupSharing(id, updateFunc) {
           return "<i class='" + _icon + "'></i> " + item.replace(regex, "<strong>$1</strong>");
         },
         updater: function (item) {
-          selectedUserOrGroup = map[item];
+          selectedUserOrGroup = usermap[item] ? usermap[item] : groupmap[item];
           return item;
         }
       });

@@ -1932,3 +1932,13 @@ form.form-inline .modal-header .close {
 .no-margin {
   margin: 0;
 }
+
+.badge-left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.badge-right {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

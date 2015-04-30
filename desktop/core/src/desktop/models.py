@@ -549,9 +549,10 @@ class Document(models.Model):
     """
     for name, perm in perms_dict.iteritems():
       users = groups = None
-
       if perm.get('user_ids'):
         users = auth_models.User.objects.in_bulk(perm.get('user_ids'))
+      else:
+        users = []
 
       if perm.get('group_ids'):
         groups = auth_models.Group.objects.in_bulk(perm.get('group_ids'))
