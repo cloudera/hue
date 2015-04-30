@@ -109,8 +109,12 @@ private object Serializers {
                      fromOpt: Option[Int],
                      sizeOpt: Option[Int]): JValue = {
     val lines = batch.lines
+
     val size = sizeOpt.getOrElse(10)
-    val from = fromOpt.getOrElse(math.max(0, lines.length - 10))
+    var from = fromOpt.getOrElse(-1)
+    if (from < 0) {
+      from = math.min(0, lines.length - size)
+    }
     val until = from + size
 
     ("id", batch.id) ~
