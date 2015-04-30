@@ -22,7 +22,7 @@ import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.Utils
+import com.cloudera.hue.livy.{LivyConf, Utils}
 import com.cloudera.hue.livy.server.batch._
 import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
 import org.json4s.jackson.JsonMethods._
@@ -52,7 +52,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
     script
   }
 
-  val batchFactory = new BatchProcessFactory()
+  val batchFactory = new BatchProcessFactory(new LivyConf())
   val batchManager = new BatchManager(batchFactory)
   val servlet = new BatchServlet(batchManager)
 

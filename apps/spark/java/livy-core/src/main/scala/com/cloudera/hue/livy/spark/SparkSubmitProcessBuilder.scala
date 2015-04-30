@@ -18,18 +18,20 @@
 
 package com.cloudera.hue.livy.spark
 
-import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.{LivyConf, Logging}
 
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
 
 object SparkSubmitProcessBuilder {
-  def apply(): SparkSubmitProcessBuilder = {
-    new SparkSubmitProcessBuilder()
+  def apply(livyConf: LivyConf): SparkSubmitProcessBuilder = {
+    new SparkSubmitProcessBuilder(livyConf)
   }
 }
 
-class SparkSubmitProcessBuilder extends Logging {
+class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
+
+  private[this] val fsRoot = livyConf.filesystemRoot()
 
   private[this] var _executable = "spark-submit"
   private[this] var _master: Option[String] = None
@@ -83,32 +85,32 @@ class SparkSubmitProcessBuilder extends Logging {
   }
 
   def jar(jar: String): SparkSubmitProcessBuilder = {
-    this._jars += jar
+    this._jars += buildPath(jar)
     this
   }
 
   def jars(jars: Traversable[String]): SparkSubmitProcessBuilder = {
-    this._jars ++= jars
+    jars.foreach(jar)
     this
   }
 
   def pyFile(pyFile: String): SparkSubmitProcessBuilder = {
-    this._pyFiles += pyFile
+    this._pyFiles += buildPath(pyFile)
     this
   }
 
   def pyFiles(pyFiles: Traversable[String]): SparkSubmitProcessBuilder = {
-    this._pyFiles ++= pyFiles
+    pyFiles.foreach(pyFile)
     this
   }
 
   def file(file: String): SparkSubmitProcessBuilder = {
-    this._files += file
+    this._files += buildPath(file)
     this
   }
 
   def files(files: Traversable[String]): SparkSubmitProcessBuilder = {
-    this._files ++= files
+    files.foreach(file)
     this
   }
 
@@ -176,12 +178,12 @@ class SparkSubmitProcessBuilder extends Logging {
   }
 
   def archive(archive: String): SparkSubmitProcessBuilder = {
-    _archives += archive
+    _archives += buildPath(archive)
     this
   }
 
   def archives(archives: Traversable[String]): SparkSubmitProcessBuilder = {
-    _archives ++= archives
+    archives.foreach(archive)
     this
   }
 
@@ -241,7 +243,7 @@ class SparkSubmitProcessBuilder extends Logging {
     addOpt("--queue", _queue)
     addList("--archives", _archives)
 
-    args_ += file
+    args_ += buildPath(file)
     args_ ++= args
 
     info(s"Running ${args.mkString(" ")}")
@@ -259,4 +261,6 @@ class SparkSubmitProcessBuilder extends Logging {
 
     pb.start()
   }
+
+  private def buildPath(path: String) = fsRoot + "/" + path
 }

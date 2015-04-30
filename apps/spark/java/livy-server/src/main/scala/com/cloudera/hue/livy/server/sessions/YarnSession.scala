@@ -39,7 +39,7 @@ object YarnSession {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 
-    val builder = SparkSubmitProcessBuilder()
+    val builder = SparkSubmitProcessBuilder(livyConf)
 
     builder.master("yarn-cluster")
     builder.className("com.cloudera.hue.livy.repl.Main")

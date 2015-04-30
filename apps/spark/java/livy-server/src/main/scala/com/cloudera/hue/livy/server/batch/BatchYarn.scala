@@ -33,7 +33,7 @@ object BatchYarn {
   implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
   def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): Batch = {
-    val builder = sparkBuilder(createBatchRequest)
+    val builder = sparkBuilder(livyConf, createBatchRequest)
 
     val process = new LineBufferedProcess(builder.start(createBatchRequest.file, createBatchRequest.args))
     val job = Future {
@@ -42,8 +42,8 @@ object BatchYarn {
     new BatchYarn(id, process, job)
   }
 
-  private def sparkBuilder(createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
-    val builder = SparkSubmitProcessBuilder()
+  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
+    val builder = SparkSubmitProcessBuilder(livyConf)
 
     builder.master("yarn-cluster")
 

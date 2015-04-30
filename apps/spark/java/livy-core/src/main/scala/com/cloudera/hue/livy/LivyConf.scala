@@ -23,7 +23,12 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.collection.JavaConverters._
 
 object LivyConf {
+  val SESSION_FACTORY_KEY = "livy.server.session.factory"
 
+  sealed trait SessionKind
+  case class Thread() extends SessionKind
+  case class Process() extends SessionKind
+  case class Yarn() extends SessionKind
 }
 
 /**
@@ -31,6 +36,9 @@ object LivyConf {
  * @param loadDefaults whether to also load values from the Java system properties
  */
 class LivyConf(loadDefaults: Boolean) {
+
+  import LivyConf._
+
   /**
    * Create a LivyConf that loads defaults from the system properties and the classpath.
    * @return
@@ -81,4 +89,17 @@ class LivyConf(loadDefaults: Boolean) {
 
   /** Return if the configuration includes this setting */
   def contains(key: String): Boolean = settings.containsKey(key)
+
+  def sessionKind(): SessionKind = getOption(SESSION_FACTORY_KEY).getOrElse("process") match {
+    case "process" => Process()
+    case "thread" => Thread()
+    case "yarn" => Yarn()
+    case kind => throw new IllegalStateException(f"unknown kind $kind")
+  }
+
+  /** Return the filesystem root. Defaults to the local filesystem. */
+  def filesystemRoot(): String = sessionKind() match {
+    case Process() | Thread() => "file://"
+    case Yarn() => "hdfs://"
+  }
 }
