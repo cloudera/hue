@@ -897,7 +897,7 @@
     <div data-bind="visible: $root.isEditing">
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <span data-bind="text: $root.workflow_properties.command.label"></span>
-        <input type="text" data-bind="value: properties.command" />
+        <textarea data-bind="value: properties.command" class="input-xlarge" style="resize:both"></textarea>
 
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
