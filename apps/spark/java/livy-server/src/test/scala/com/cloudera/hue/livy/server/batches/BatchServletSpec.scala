@@ -100,9 +100,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         val parsedBody = parse(body)
         parsedBody \ "id" should equal (JInt(0))
         parsedBody \ "state" should equal (JString("success"))
-        parsedBody \ "lines" should equal (JArray(List(
-          JString("hello world")
-        )))
+        (parsedBody \ "lines").extract[List[String]] should contain ("hello world")
 
         val batch = batchManager.getBatch(0)
         batch should be (defined)

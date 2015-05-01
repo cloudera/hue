@@ -60,18 +60,18 @@ class StatementSpec extends FunSpec with Matchers {
         "status" -> "ok",
         "execution_count" -> 0,
         "data" -> Map(
-          "appliaction/json" -> List(1, 2, 3, 4)
+          "application/json" -> List(1, 2, 3, 4)
         )
       ))
       val stmt = new Statement(0, ExecuteRequest(""), Future.successful(rep))
       var output = Await.result(stmt.output(), Duration.Inf)
-      (output \ "data" \ "text/plain").extract[List[Int]] should equal (List(1, 2, 3, 4))
+      (output \ "data" \ "application/json").extract[List[Int]] should equal (List(1, 2, 3, 4))
 
       output = Await.result(stmt.output(Some(2)), Duration.Inf)
-      (output \ "data" \ "text/plain").extract[List[Int]] should equal (List(3, 4))
+      (output \ "data" \ "application/json").extract[List[Int]] should equal (List(3, 4))
 
       output = Await.result(stmt.output(Some(2), Some(1)), Duration.Inf)
-      (output \ "data" \ "text/plain").extract[List[Int]] should equal (List(3))
+      (output \ "data" \ "application/json").extract[List[Int]] should equal (List(3))
     }
   }
 
