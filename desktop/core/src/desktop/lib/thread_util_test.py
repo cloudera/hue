@@ -24,12 +24,13 @@ from desktop.lib.thread_util import dump_traceback
 
 def test_dump_traceback():
   started = threading.Event()
-  stop = threading.Event()
+  stopped = threading.Event()
 
   class Thread(threading.Thread):
     def run(self):
       started.set()
-      assert_true(stop.wait(10.0))
+      stopped.wait(10.0)
+      assert_true(stopped.is_set())
 
   thread = Thread(name='thread_util_test thread')
   thread.start()
@@ -38,7 +39,8 @@ def test_dump_traceback():
   header = 'Thread thread_util_test thread %s' % thread_ident
 
   try:
-    assert_true(started.wait(10.0))
+    started.wait(10.0)
+    assert_true(started.is_set())
 
     out = StringIO.StringIO()
     dump_traceback(file=out)
@@ -50,5 +52,5 @@ def test_dump_traceback():
 
     assert_true(header not in out.getvalue())
   finally:
-    stop.set()
+    stopped.set()
     thread.join()
