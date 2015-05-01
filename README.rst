@@ -80,6 +80,7 @@ your system:
       * libtidy-0.99-0 (for unit tests only)
       * libxml2-dev
       * libxslt-dev
+      * make
       * mvn (from ``maven`` package or maven3 tarball)
       * openldap-dev / libldap2-dev
       * python-dev
@@ -96,6 +97,7 @@ your system:
       * libtidy (for unit tests only)
       * libxml2-devel
       * libxslt-devel
+      * make
       * mvn (from ``maven`` package or maven3 tarball)
       * mysql
       * mysql-devel
