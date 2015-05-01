@@ -15,6 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+import json
+import random
+import threading
+import time
+
 from desktop.lib.exceptions_renderable import PopupException
 from django.utils.translation import ugettext as _
 
@@ -23,12 +29,6 @@ from kazoo.client import KazooClient
 from libsentry.client import SentryClient
 from libsentry.conf import HOSTNAME, PORT
 from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_has_security, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
-
-import logging
-import json
-import random
-import threading
-import time
 
 
 LOG = logging.getLogger(__name__)
