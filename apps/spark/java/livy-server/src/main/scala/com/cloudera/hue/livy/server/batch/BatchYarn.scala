@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
 
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.yarn._
@@ -35,7 +36,7 @@ object BatchYarn {
   def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): Batch = {
     val builder = sparkBuilder(livyConf, createBatchRequest)
 
-    val process = new LineBufferedProcess(builder.start(createBatchRequest.file, createBatchRequest.args))
+    val process = new LineBufferedProcess(builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args))
     val job = Future {
       client.getJobFromProcess(process)
     }
@@ -48,14 +49,14 @@ object BatchYarn {
     builder.master("yarn-cluster")
 
     createBatchRequest.className.foreach(builder.className)
-    createBatchRequest.jars.foreach(builder.jar)
-    createBatchRequest.pyFiles.foreach(builder.pyFile)
-    createBatchRequest.files.foreach(builder.file)
+    createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
+    createBatchRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
+    createBatchRequest.files.map(RelativePath).foreach(builder.file)
     createBatchRequest.driverMemory.foreach(builder.driverMemory)
     createBatchRequest.driverCores.foreach(builder.driverCores)
     createBatchRequest.executorMemory.foreach(builder.executorMemory)
     createBatchRequest.executorCores.foreach(builder.executorCores)
-    createBatchRequest.archives.foreach(builder.archive)
+    createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(true)
