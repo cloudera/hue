@@ -18,6 +18,7 @@
 
 package com.cloudera.hue.livy.spark
 
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath, Path}
 import com.cloudera.hue.livy.{LivyConf, Logging}
 
 import scala.collection.JavaConversions._
@@ -27,20 +28,28 @@ object SparkSubmitProcessBuilder {
   def apply(livyConf: LivyConf): SparkSubmitProcessBuilder = {
     new SparkSubmitProcessBuilder(livyConf)
   }
+
+  /**
+   * Represents a path that is either allowed to reference a local file, or must exist in our
+   * cache directory or on hdfs.
+   */
+  sealed trait Path
+  case class AbsolutePath(path: String) extends Path
+  case class RelativePath(path: String) extends Path
 }
 
 class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
 
   private[this] val fsRoot = livyConf.filesystemRoot()
 
-  private[this] var _executable = "spark-submit"
+  private[this] var _executable: Path = AbsolutePath("spark-submit")
   private[this] var _master: Option[String] = None
   private[this] var _deployMode: Option[String] = None
   private[this] var _className: Option[String] = None
   private[this] var _name: Option[String] = None
-  private[this] var _jars: ArrayBuffer[String] = ArrayBuffer()
-  private[this] var _pyFiles: ArrayBuffer[String] = ArrayBuffer()
-  private[this] var _files: ArrayBuffer[String] = ArrayBuffer()
+  private[this] var _jars: ArrayBuffer[Path] = ArrayBuffer()
+  private[this] var _pyFiles: ArrayBuffer[Path] = ArrayBuffer()
+  private[this] var _files: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _conf: ArrayBuffer[(String, String)] = ArrayBuffer()
   private[this] var _driverMemory: Option[String] = None
   private[this] var _driverJavaOptions: Option[String] = None
@@ -52,14 +61,14 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
   private[this] var _executorCores: Option[String] = None
   private[this] var _queue: Option[String] = None
   private[this] var _numExecutors: Option[String] = None
-  private[this] var _archives: ArrayBuffer[String] = ArrayBuffer()
+  private[this] var _archives: ArrayBuffer[Path] = ArrayBuffer()
 
   private[this] var _env: ArrayBuffer[(String, String)] = ArrayBuffer()
   private[this] var _redirectOutput: Option[ProcessBuilder.Redirect] = None
   private[this] var _redirectError: Option[ProcessBuilder.Redirect] = None
   private[this] var _redirectErrorStream: Option[Boolean] = None
 
-  def executable(executable: String): SparkSubmitProcessBuilder = {
+  def executable(executable: Path): SparkSubmitProcessBuilder = {
     _executable = executable
     this
   }
@@ -84,33 +93,33 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def jar(jar: String): SparkSubmitProcessBuilder = {
-    this._jars += buildPath(jar)
+  def jar(jar: Path): SparkSubmitProcessBuilder = {
+    this._jars += jar
     this
   }
 
-  def jars(jars: Traversable[String]): SparkSubmitProcessBuilder = {
-    jars.foreach(jar)
+  def jars(jars: Traversable[Path]): SparkSubmitProcessBuilder = {
+    this._jars ++= jars
     this
   }
 
-  def pyFile(pyFile: String): SparkSubmitProcessBuilder = {
-    this._pyFiles += buildPath(pyFile)
+  def pyFile(pyFile: Path): SparkSubmitProcessBuilder = {
+    this._pyFiles += pyFile
     this
   }
 
-  def pyFiles(pyFiles: Traversable[String]): SparkSubmitProcessBuilder = {
-    pyFiles.foreach(pyFile)
+  def pyFiles(pyFiles: Traversable[Path]): SparkSubmitProcessBuilder = {
+    this._pyFiles ++= pyFiles
     this
   }
 
-  def file(file: String): SparkSubmitProcessBuilder = {
-    this._files += buildPath(file)
+  def file(file: Path): SparkSubmitProcessBuilder = {
+    this._files += file
     this
   }
 
-  def files(files: Traversable[String]): SparkSubmitProcessBuilder = {
-    files.foreach(file)
+  def files(files: Traversable[Path]): SparkSubmitProcessBuilder = {
+    this._files ++= files
     this
   }
 
@@ -177,12 +186,12 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def archive(archive: String): SparkSubmitProcessBuilder = {
-    _archives += buildPath(archive)
+  def archive(archive: Path): SparkSubmitProcessBuilder = {
+    _archives += archive
     this
   }
 
-  def archives(archives: Traversable[String]): SparkSubmitProcessBuilder = {
+  def archives(archives: Traversable[Path]): SparkSubmitProcessBuilder = {
     archives.foreach(archive)
     this
   }
@@ -207,8 +216,8 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def start(file: String, args: Traversable[String]): Process = {
-    var args_ = ArrayBuffer(_executable)
+  def start(file: Path, args: Traversable[String]): Process = {
+    var args_ = ArrayBuffer(fromPath(_executable))
 
     def addOpt(option: String, value: Option[String]): Unit = {
       value.foreach { v =>
@@ -227,9 +236,9 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     addOpt("--master", _master)
     addOpt("--deploy-mode", _deployMode)
     addOpt("--name", _name)
-    addList("--jars", _jars)
-    addList("--py-files", _pyFiles)
-    addList("--files", _files)
+    addList("--jars", _jars.map(fromPath))
+    addList("--py-files", _pyFiles.map(fromPath))
+    addList("--files", _files.map(fromPath))
     addOpt("--class", _className)
     addList("--conf", _conf.map { case (key, value) => f"$key=$value" })
     addOpt("--driver-memory", _driverMemory)
@@ -241,12 +250,12 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     addOpt("--driver-cores", _driverCores)
     addOpt("--executor-cores", _executorCores)
     addOpt("--queue", _queue)
-    addList("--archives", _archives)
+    addList("--archives", _archives.map(fromPath))
 
-    args_ += buildPath(file)
+    args_ += fromPath(file)
     args_ ++= args
 
-    info(s"Running ${args.mkString(" ")}")
+    info(s"Running ${args_.mkString(" ")}")
 
     val pb = new ProcessBuilder(args_)
     val env = pb.environment()
@@ -262,5 +271,13 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     pb.start()
   }
 
-  private def buildPath(path: String) = fsRoot + "/" + path
+  private def fromPath(path: Path) = path match {
+    case AbsolutePath(p) => p
+    case RelativePath(p) =>
+      if (p.startsWith("hdfs://")) {
+        p
+      } else {
+        fsRoot + "/" + p
+      }
+  }
 }

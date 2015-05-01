@@ -23,6 +23,7 @@ import java.net.URL
 
 import com.cloudera.hue.livy.sessions.Kind
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.AbsolutePath
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
@@ -62,7 +63,7 @@ object ProcessSession extends Logging {
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectError(Redirect.INHERIT)
 
-    builder.start(livyJar(livyConf), List(kind.toString))
+    builder.start(AbsolutePath(livyJar(livyConf)), List(kind.toString))
   }
 
   private def livyJar(conf: LivyConf): String = {
