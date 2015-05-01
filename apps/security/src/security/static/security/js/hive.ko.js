@@ -72,7 +72,7 @@ var Privilege = function (vm, privilege) {
   });
 
   // UI
-  self.privilegeType = ko.observable(typeof privilege.URI != "undefined" && privilege.URI != null && privilege.URI != "" ? "uri" : "db");
+  self.privilegeType = ko.observable(typeof privilege.privilegeScope != "undefined" && privilege.privilegeScope == 'URI' ? "uri" : "db");
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
@@ -95,7 +95,9 @@ var Privilege = function (vm, privilege) {
     owner: self
   });
   self.privilegeScope = ko.computed(function () {
-    if (self.tableName().length > 0) {
+    if (self.privilegeType() == 'uri') {
+      return 'URI';
+    } else if (self.tableName().length > 0) {
       return 'TABLE';
     } else if (self.dbName().length > 0) {
       return 'DATABASE';
