@@ -91,14 +91,15 @@ ${ layout.menubar(section='hive') }
     </div>
     <!-- /ko -->
 
-    <em class="muted" data-bind="text: moment(timestamp()).fromNow()"></em> <span class="muted" data-bind="text: privilegeScope"></span>
+    <span class="muted" data-bind="text: privilegeScope, attr: {title: moment(timestamp()).fromNow()}"></span>
     <!-- ko if: grantOption -->
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
     <br/>
 
+    server=<span data-bind="text: serverName"></span>
+
     <!-- ko if: privilegeType() == 'db' -->
-      server=<span data-bind="text: serverName"></span>
       <span data-bind="visible: dbName">
         <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
       </span>
@@ -108,7 +109,7 @@ ${ layout.menubar(section='hive') }
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
     <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
