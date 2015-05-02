@@ -96,9 +96,9 @@ ${ layout.menubar(section='hive') }
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
     <br/>
-    server=<span data-bind="text: serverName"></span>
 
-    <!-- ko ifnot: URI -->
+    <!-- ko if: privilegeType() == 'db' -->
+      server=<span data-bind="text: serverName"></span>
       <span data-bind="visible: dbName">
         <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
       </span>
@@ -107,8 +107,8 @@ ${ layout.menubar(section='hive') }
       </span>
     <!-- /ko -->
 
-    <!-- ko if: URI -->
-      <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+    <!-- ko if: privilegeType() == 'uri' -->
+      <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
     <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
