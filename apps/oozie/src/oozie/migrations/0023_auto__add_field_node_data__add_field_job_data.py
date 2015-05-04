@@ -18,6 +18,10 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.TextField')(default='{}', blank=True),
                       keep_default=False)
 
+        if not db.dry_run:
+            orm.Job.objects.filter(data='').update(data='{}')
+            orm.Node.objects.filter(data='').update(data='{}')
+
 
     def backwards(self, orm):
         # Deleting field 'Node.data'
