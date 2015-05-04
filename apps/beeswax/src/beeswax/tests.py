@@ -263,6 +263,44 @@ for x in sys.stdin:
         [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu', 'some&nbsp;&nbsp;&nbsp;spaces'],
       ], content["results"], content)
 
+  def test_result_nullification(self):
+    QUERY = """
+      CREATE TABLE test_result_nullification (a int);
+      INSERT INTO TABLE test_result_nullification
+      VALUES
+      (1), (1), (1), (1), (1), (1), (1), (1),
+      (2), (2), (2), (2), (2), (2), (2), (2),
+      (NULL), (3), (3), (3), (3), (3), (3), (3),
+      (4), (4), (4), (4), (4), (4), (4), (4),
+      (5), (5), (5), (5), (5), (5), (5), (5),
+      (6), (6), (6), (6), (6), (6), (6), (6);
+    """
+    response = _make_query(self.client, QUERY, local=False)
+    content = json.loads(response.content)
+    assert_true('watch_url' in content)
+
+    response = wait_for_query_to_finish(self.client, response, max=180.0)
+    content = fetch_query_result_data(self.client, response)
+
+    QUERY = """
+      SELECT * FROM test_result_nullification;
+    """
+    response = _make_query(self.client, QUERY, local=False)
+    content = json.loads(response.content)
+    assert_true('watch_url' in content)
+
+    response = wait_for_query_to_finish(self.client, response, max=180.0)
+    content = fetch_query_result_data(self.client, response)
+
+    assert_equal([
+        [1], [1], [1], [1], [1], [1], [1], [1],
+        [2], [2], [2], [2], [2], [2], [2], [2],
+        [u'NULL'], [3], [3], [3], [3], [3], [3], [3],
+        [4], [4], [4], [4], [4], [4], [4], [4],
+        [5], [5], [5], [5], [5], [5], [5], [5],
+        [6], [6], [6], [6], [6], [6], [6], [6]
+      ], content["results"], content)
+
   def test_query_with_udf(self):
     """
     Testing query with udf
