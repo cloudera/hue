@@ -49,6 +49,8 @@ def error_handler(view_fn):
       message = e.message
       details = e.data or {}
     except Exception, e:
+      LOG.exception('error in %s' % view_fn)
+
       error_code = 500
       details = {}
       (type, value, tb) = sys.exc_info()

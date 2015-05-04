@@ -54,6 +54,8 @@ def error_handler(view_fn):
     except Http404, e:
       raise e
     except Exception, e:
+      LOG.exception('error in %s' % view_fn)
+
       if not hasattr(e, 'message') or not e.message:
         message = str(e)
       else:
