@@ -5,7 +5,7 @@
 Instructions to install the tarball release of Hue are available
 in the manual from http://gethue.com.
 
-If you're impatient, these are the key steps.  Please check the full manual
+If you're impatient, these are the key steps. Please check the full manual
 for more details.
 
 
@@ -25,11 +25,7 @@ ${PREFIX}/hue/build/env/bin/supervisor
 Configure Hadoop
 ----------------
 
-## Install JobTracker plug-in
-cd /usr/lib/hadoop-0.20-mapreduce/lib
-ln -s ${PREFIX}/hue/desktop/libs/hadoop/java-lib/hue*jar
-
-## Configure Hadoop
+## Configure HDFS
 Edit hdfs-site.xml:
 
 <property>
@@ -37,14 +33,11 @@ Edit hdfs-site.xml:
   <value>true</value>
 </property>
 
-Edit mapred-site.xml:
 
-<property>
-  <name>mapred.jobtracker.plugins</name>
-  <value>org.apache.hadoop.thriftfs.ThriftJobTrackerPlugin</value>
-  <description>Comma-separated list of jobtracker plug-ins to be activated.
-  </description>
-</property>
+Configure Hue
+-------------
+
+Point to other services: http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/
 
 
 Problems?
@@ -55,3 +48,4 @@ Search or ask questions on the forum and http://groups.google.com/a/cloudera.org
 Some packages might be required during the 'make install': https://github.com/cloudera/hue#development-prerequisites)
 
 Download a pre-built packaged version (apt-get/yum install...) of Hue on http://gethue.com
+
