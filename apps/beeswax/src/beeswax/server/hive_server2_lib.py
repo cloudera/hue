@@ -231,7 +231,10 @@ class HiveServerTColumnValue2:
     if bytestring == '' or re.match('^(\x00)+$', bytestring): # HS2 has just \x00 or '', Impala can have \x00\x00...
       return values
     else:
-      return [None if is_null else value for value, is_null in itertools.izip(values, cls.mark_nulls(values, bytestring))]
+      _values = [None if is_null else value for value, is_null in itertools.izip(values, cls.mark_nulls(values, bytestring))]
+      if len(values) != len(_values): # HS2 can have just \x00\x01 instead of \x00\x01\x00...
+        _values.extend(values[len(_values):])
+      return _values
 
 
 class HiveServerDataTable(DataTable):
