@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 setup(
       name = "indexer",
-      version = "3.8.0",
+      version = "3.8.1",
       author = "Hue",
       url = 'http://github.com/cloudera/hue',
       description = "Collections manager for Search",
