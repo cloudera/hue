@@ -54,9 +54,12 @@ def error_handler(view_fn):
     except Http404, e:
       raise e
     except Exception, e:
+      LOG.exception('error in %s' % view_fn)
+
       response = {
         'error': str(e)
       }
+
       return JsonResponse(response, status=500)
   return decorator
 
