@@ -72,12 +72,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select a search index') }
     <!-- ko if: columns().length == 0 -->
-    <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections">
-    </select>
-    <label class="checkbox" style="display:inline-block; margin-left: 10px">
-      <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
-      <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
-    </label>
+      <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections">
+      </select>
+
+      <label class="checkbox" style="display:inline-block; margin-left: 10px">
+        <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
+        <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
+      </label>
+      
+      <span data-bind="template: {name: 'time-filter'}"></span>
     <!-- /ko -->
   </form>
 
@@ -104,9 +107,45 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
+
+      <span data-bind="template: {name: 'time-filter'}"></span>
     </div>
   </form>
 </div>
+
+
+<script type="text/html" id="time-filter">
+  <span data-bind="visible: $root.availableDateFields().length > 0">
+    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
+
+    <span data-bind="visible: collection.timeFilter.type() == 'rolling'">
+      <select data-bind="value: collection.timeFilter.value" class="input-small"  style="margin-left:10px">
+        <option value="all">${ _('All') }</option>
+        <option value="5MINUTES">${ _('Last 5 Minutes') }</option>
+        <option value="15MINUTES">Last 15 Minutes</option>
+        <option value="1HOURS">Last 1 Hour</option>
+        <option value="6MONTHS">Last 6 Months</option>
+        <option value="1YEARS">Last Year</option>
+        <option value="2YEARS">Last 2 Years</option>
+      </select>      
+    </span>
+    
+    <span data-bind="visible: collection.timeFilter.type() == 'fixed'">
+      Start date/time <input type="text" data-bind="collection.timeFilter.from"></input>
+      End date/time <input type="text" data-bind="collection.timeFilter.to"></input>
+    </span>
+
+    <button class="btn">
+      <i class="fa fa-calendar"></i>
+    </button>
+    
+    <span>  
+      <a data-bind="style: { fontWeight: collection.timeFilter.type() == 'rolling' ? 'bold' : '' }, click: function() {collection.timeFilter.type('rolling'); }">Rolling</a> |
+      <a data-bind="style: { fontWeight: collection.timeFilter.type() == 'fixed' ? 'bold' : '' }, click: function() {collection.timeFilter.type('fixed'); }">Fixed</a>
+    </span>
+  </span>
+</script>
+
 
 <%dashboard:layout_toolbar>
   <%def name="results()">

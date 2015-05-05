@@ -75,8 +75,24 @@ class SolrApi(object):
     else:
       return '%(aggregate)s(%(field)s)' % props
 
-  def _get_fq(self, query):
+  def _get_range_borders(self, duration):
+    return {'from': 'NOW-%s' % duration, 'to': 'NOW'}
+
+  def _get_fq(self, collection, query):
     params = ()
+
+    if collection['timeFilter'].get('field'):
+      props = {}
+      if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all':
+        props.update(self._get_range_borders(collection['timeFilter']['value']))
+        props['field'] = collection['timeFilter']['field']
+      elif collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['from'] and collection['timeFilter']['to']:
+        props['field'] = collection['timeFilter']['field']
+        props['from'] = collection['timeFilter']['from']
+        props['to'] = collection['timeFilter']['to']
+
+      if props:
+        params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s}' % props))),)
 
     # Merge facets queries on same fields
     grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
@@ -237,7 +253,7 @@ class SolrApi(object):
             ('json.facet', json.dumps(json_facets)),
         )
 
-    params += self._get_fq(query)
+    params += self._get_fq(collection, query)
 
     if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
       fields = set(collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else [])

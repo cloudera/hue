@@ -471,6 +471,15 @@ class Collection2(object):
       props['collection']['enabled'] = True
     if 'leafletmap' not in props['collection']['template']:
       props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
+    if 'timeFilter' not in props['collection']:
+      props['collection']['timeFilter'] = {
+        'field': '',
+        'type': 'rolling',
+        'value': 'all',
+        'from': '',
+        'to': 'NOW',
+        'truncate': True
+      }
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
