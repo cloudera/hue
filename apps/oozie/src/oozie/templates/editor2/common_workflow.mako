@@ -278,13 +278,13 @@
     <div class="big-icon" data-bind="visible: ! $root.isEditing()"><i class="fa fa-magic"></i></div>
 
     <div data-bind="visible: $root.isEditing" style="padding: 10px">
-      <a class="custom-popover pull-right" href="javascript:void(0)" target="_blank" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover"
+      <a class="custom-popover pull-right" href="javascript:void(0)" data-trigger="click" data-toggle="popover" data-placement="right" rel="popover"
         data-html="true" data-content="<strong>${ _('Examples of predicates:') }</strong><br/>
                 <br/>${'${'} fs:fileSize(secondjobOutputDir) gt 10 * GB }
                 <br/>
                 ${"${"} hadoop:counters('secondjob')[RECORDS][REDUCE_OUT] lt 1000000 }
                 <br/>
-                <a href='http://oozie.apache.org/docs/4.1.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions'>${ _('Click for more') }</a>">
+                <a href='http://oozie.apache.org/docs/4.1.0/WorkflowFunctionalSpec.html#a4.2_Expression_Language_Functions' target='_blank'>${ _('Click for more') }</a>">
           <i class="fa fa-question-circle" title="${ _('Click for more info') }"></i>
       </a>
       <ul data-bind="foreach: children" class="unstyled">
