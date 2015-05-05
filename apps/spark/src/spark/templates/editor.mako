@@ -364,6 +364,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
+
       <!-- ko if: ['text', 'jar', 'py'].indexOf(type()) == -1  -->
       <div class="snippet-body">
         <div class="row-fluid">
@@ -382,7 +383,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn btn-primary disable-feedback codeMirror-overlaybtn pointer">
               <i class="fa fa-play"></i>
             </a>
-            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback codeMirror-overlaybtn pointer"><i class="fa fa-stop"></i></a>
+            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback codeMirror-overlaybtn pointer">
+              <i class="fa fa-stop"></i>
+            </a>
             <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
               <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
             </div>
@@ -441,13 +444,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
 
           <div class="pull-right">
-            <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></strong>
-
-            &nbsp;
-
-            <a data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
-              <i class="fa fa-file-text-o"></i>
-            </a>
+            <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
 
             &nbsp;
 
@@ -480,32 +477,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
         </div>
 
-        <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
-          <pre data-bind="visible: result.logs().length == 0" class="logs">${ _('Loading...') }</pre>
-          <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs"></pre>
-        </div>
-
-        <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
-          <span data-bind="text: result.errors"></span>
-        </div>
-
-        <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass">
-          ${ _('Success.') }
-        </div>
-
-        <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass">
-          ${ _('Success but empty results.') }
-        </div>
-
-        <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass">
-          ${ _('Loading...') }
-        </div>
-
         <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
-        <div class="row-fluid" style="max-height: 400px; margin-top: 50px">
-          <pre data-bind="text: result.data()[0][1]">
-          </pre>
-        </div>
+          <div class="row-fluid" style="max-height: 400px; margin-top: 50px">
+            <pre data-bind="text: result.data()[0][1]">
+            </pre>
+          </div>
         <!-- /ko -->
 
         <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
@@ -638,11 +614,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
       </div>
       <!-- /ko -->
+
       <!-- ko if: type() == 'text' -->
         <div class="snippet-body">
           <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
         </div>
       <!-- /ko -->
+
       <!-- ko if: type() == 'jar' || type() == 'py'-->
         <div class="snippet-body" style="padding: 10px">
           <table class="airy">
@@ -676,15 +654,53 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </tr>
           </table>
 
+          <div class="pull-right">
+            <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+          </div>
+
           <br/>
+
           <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="btn btn-primary disable-feedback pointer">
             <i class="fa fa-play"></i>
           </a>
         </div>
       <!-- /ko -->
+
+      <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
+        <pre data-bind="visible: result.logs().length == 0" class="logs">${ _('Loading...') }</pre>
+        <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs"></pre>
+      </div>
+
+      <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
+        <span data-bind="text: result.errors"></span>
+      </div>
+
+      <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass">
+        ${ _('Success.') }
+      </div>
+
+      <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass">
+        ${ _('Success but empty results.') }
+      </div>
+
+      <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass">
+        ${ _('Loading...') }
+      </div>
     </div>
   </div>
 </script>
+
+
+<script type="text/html" id="snippet-log">
+  <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></strong>
+
+  &nbsp;
+
+  <a data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
+    <i class="fa fa-file-text-o"></i>
+  </a>
+</script>
+
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">

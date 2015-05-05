@@ -425,7 +425,7 @@ var Snippet = function (vm, notebook, snippet) {
         self.status(data.query_status.status);
         self.getLogs();
 
-        if (self.status() == 'running') {
+        if (self.status() == 'running' || self.status() == 'starting') {
           self.result.endTime(new Date());
           self.checkStatusTimeout = setTimeout(self.checkStatus, 1000);
         }
@@ -584,18 +584,19 @@ var Notebook = function (vm, notebook) {
     $(document).trigger("snippetAdded", _snippet);
   };
 
+  self.getContext = function() {
+   return {
+       id: self.id,
+       uuid: self.uuid,
+       sessions: self.sessions
+    };
+  }
+
+  // Init
   if (notebook.snippets) {
     $.each(notebook.snippets, function (index, snippet) {
       self.addSnippet(snippet);
     });
-  }
-  
-  self.getContext = function() {
-    return {
-        id: self.id,
-        uuid: self.uuid,
-        sessions: self.sessions
-    };
   }
 
   self.save = function () {
