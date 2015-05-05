@@ -402,6 +402,10 @@ var Collection = function (vm, collection) {
   self.autorefresh = ko.mapping.fromJS(collection.autorefresh);
   self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60);
   self.idField = ko.observable(collection.idField);
+  self.timeFilter = ko.mapping.fromJS(collection.timeFilter);
+  self.timeFilter.value.subscribe(function () {
+    vm.search();
+  });
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
