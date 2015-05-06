@@ -121,12 +121,15 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <span data-bind="visible: collection.timeFilter.type() == 'rolling'">
       <select data-bind="value: collection.timeFilter.value" class="input-small"  style="margin-left:10px">
         <option value="all">${ _('All') }</option>
-        <option value="5MINUTES">${ _('Last 5 Minutes') }</option>
-        <option value="15MINUTES">Last 15 Minutes</option>
-        <option value="1HOURS">Last 1 Hour</option>
-        <option value="6MONTHS">Last 6 Months</option>
-        <option value="1YEARS">Last Year</option>
-        <option value="2YEARS">Last 2 Years</option>
+        <option value="5MINUTES/MINUTES">${ _('Last 5 Minutes') }</option>
+        <option value="15MINUTES/MINUTES">Last 15 Minutes</option>
+        <option value="1HOURS/HOURS">Last 1 Hour</option>
+        <option value="1DAYS/DAYS">Yesterday</option>
+        <option value="2DAYS/DAYS">Last 2 days</option>
+        <option value="1WEEKS/WEEKS">Last Week</option>
+        <option value="6MONTHS/MONTHS">Last 6 Months</option>
+        <option value="1YEARS/YEARS">Last Year</option>
+        <option value="2YEARS/YEARS">Last 2 Years</option>
       </select>      
     </span>
     
@@ -296,6 +299,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </%def>
 </%dashboard:layout_toolbar>
 
+
 ${ dashboard.layout_skeleton() }
 
 
@@ -351,7 +355,17 @@ ${ dashboard.layout_skeleton() }
       </div>
     <!-- /ko -->
 
-    <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined")-->
+    <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
+      ## <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />      
+      <div class="facet-field-cnt">
+        <span class="spinedit-cnt">
+          <span class="facet-field-label facet-field-label-fixed-width">
+            ${ _('Custom range') }
+          </span>
+          <input type="checkbox"/>
+        </span>
+      </div>
+
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
@@ -848,7 +862,7 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
-      </span>
+      </span>      
     </div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">

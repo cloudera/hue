@@ -75,24 +75,36 @@ class SolrApi(object):
     else:
       return '%(aggregate)s(%(field)s)' % props
 
-  def _get_range_borders(self, duration):
-    return {'from': 'NOW-%s' % duration, 'to': 'NOW'}
+  def _get_range_borders(self, collection):
+    props = {}
+    GAPS = {
+        '5MINUTES/MINUTES': '+3SECONDS',
+        '15MINUTES/MINUTES': '+10SECONDS',
+        '1HOURS/HOURS': '+36SECONDS',
+        '1DAYS/DAYS': '+15MINUTES',
+        '2DAYS/DAYS': '+30MINUTES',
+        '1WEEKS/WEEKS': '+3HOURS',        
+    }
+    
+    if collection['timeFilter'].get('field'):
+      if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all': # todo all for chart range? guess based on min
+        props['field'] = collection['timeFilter']['field']
+        props['from'] = 'NOW-%s' % collection['timeFilter']['value']
+        props['to'] = 'NOW'
+        props['gap'] = GAPS.get(collection['timeFilter']['value'])
+      elif collection['timeFilter']['type'] == 'fixed' and collection['timeFilter']['from'] and collection['timeFilter']['to']:
+        props['field'] = collection['timeFilter']['field']
+        props['from'] = collection['timeFilter']['from']
+        props['to'] = collection['timeFilter']['to']
+            
+    return props
 
   def _get_fq(self, collection, query):
     params = ()
 
-    if collection['timeFilter'].get('field'):
-      props = {}
-      if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all':
-        props.update(self._get_range_borders(collection['timeFilter']['value']))
-        props['field'] = collection['timeFilter']['field']
-      elif collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['from'] and collection['timeFilter']['to']:
-        props['field'] = collection['timeFilter']['field']
-        props['from'] = collection['timeFilter']['from']
-        props['to'] = collection['timeFilter']['to']
-
-      if props:
-        params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s}' % props))),)
+    timeFilter = self._get_range_borders(collection)
+    if timeFilter:
+      params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s}' % timeFilter))),)
 
     # Merge facets queries on same fields
     grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
@@ -159,6 +171,8 @@ class SolrApi(object):
       )
       json_facets = {}
 
+      timeFilter = self._get_range_borders(collection)
+
       for facet in collection['facets']:
         if facet['type'] == 'query':
           params += (('facet.query', '%s' % facet['field']),)
@@ -169,9 +183,20 @@ class SolrApi(object):
               'key': '%(field)s-%(id)s' % facet,
               'start': facet['properties']['start'],
               'end': facet['properties']['end'],
-              'gap': facet['properties']['gap'],
+              'gap': facet['properties']['gap'],              
               'mincount': int(facet['properties']['mincount'])
           }
+          
+          # todo round by gap? 
+          
+          if timeFilter:
+            if facet['widgetType'] == 'histogram-widget':
+              keys.update({
+                'start': timeFilter['from'],
+                'end': timeFilter['to'],
+                'gap': timeFilter['gap'],
+              })
+
           params += (
              ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
           )
