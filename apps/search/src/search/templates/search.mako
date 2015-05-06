@@ -1859,7 +1859,7 @@ function mapChartDataTransformer(data) {
     item.counts = item.pivot ? item.pivot[0].count : item.count; // unused yet
     item.is2d = item.pivot ? true : false; // unused yet
     _data.push({
-      label: item.value,
+      label: data.scope == "world" ? HueGeo.getISOAlpha3(item.value) : item.value,
       value: item.pivot ? item.pivot[0].fq_values : item.count,
       obj: item
     });
