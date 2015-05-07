@@ -1942,3 +1942,7 @@ form.form-inline .modal-header .close {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
+div.navigator ul.dropdown-menu {
+  overflow-y: auto;
+}

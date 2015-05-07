@@ -43,6 +43,16 @@ from django.template.defaultfilters import escape, escapejs
       %endfor
     %endif
 
+
+    $("div.navigator ul.dropdown-menu").css("maxHeight", $(window).height() - 50);
+    var scrollableDropdownTimeout = -1;
+    $(window).on("resize", function () {
+      window.clearTimeout(scrollableDropdownTimeout);
+      scrollableDropdownTimeout = window.setTimeout(function () {
+        $("div.navigator ul.dropdown-menu").css("maxHeight", $(window).height() - 50);
+      }, 500);
+    });
+
     $(".dataTables_wrapper").jHueTableScroller();
     var resetTimeout = -1;
     var pendingRequestsInterval = -1;
