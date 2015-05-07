@@ -78,37 +78,60 @@ class SolrApi(object):
   def _get_range_borders(self, collection, query):
     props = {}
     GAPS = {
-        '5MINUTES/MINUTES': {
-            'histogram-widget': '+3SECONDS', # 100 slots
-            'facet-widget': '+30SECONDS', # 10 slots
+        '5MINUTES': {
+            'histogram-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
+            'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'}, # ~10 slots
         },
-        '15MINUTES/MINUTES': {
-            'histogram-widget': '+10SECONDS',
-            'facet-widget': '+90SECONDS',
+        '30MINUTES': {
+            'histogram-widget': {'coeff': '+20', 'unit': 'SECONDS'},
+            'facet-widget': {'coeff': '+5', 'unit': 'MINUTES'},
         },
-        '1HOURS/MINUTES': {
-            'histogram-widget': '+36SECONDS',
-            'facet-widget': '+6MINUTES',
+        '1HOURS': {
+            'histogram-widget': {'coeff': '+30', 'unit': 'SECONDS'},
+            'facet-widget': {'coeff': '+10', 'unit': 'MINUTES'},
         },
-        '1DAYS/DAYS': {
-            'histogram-widget': '+15MINUTES',
-            'facet-widget': '+144MINUTES',
+        '12HOURS': {
+            'histogram-widget': {'coeff': '+7', 'unit': 'MINUTES'},
+            'facet-widget': {'coeff': '+1', 'unit': 'HOURS'},
         },
-        '2DAYS/DAYS': {
-            'histogram-widget': '+30MINUTES',
-            'facet-widget': '+288MINUTES',
+        '1DAYS': {
+            'histogram-widget': {'coeff': '+15', 'unit': 'MINUTES'},
+            'facet-widget': {'coeff': '+3', 'unit': 'HOURS'},
         },
-        '7DAYS/DAYS': {
-            'histogram-widget': '+3HOURS',
-            'facet-widget': '+1008MINUTES',
+        '2DAYS': {
+            'histogram-widget': {'coeff': '+30', 'unit': 'MINUTES'},
+            'facet-widget': {'coeff': '+6', 'unit': 'HOURS'},
+        },
+        '7DAYS': {
+            'histogram-widget': {'coeff': '+3', 'unit': 'HOURS'},
+            'facet-widget': {'coeff': '+1', 'unit': 'DAYS'},
+        },
+        '1MONTHS': {
+            'histogram-widget': {'coeff': '+12', 'unit': 'HOURS'},
+            'facet-widget': {'coeff': '+5', 'unit': 'DAYS'},
+        },
+        '3MONTHS': {
+            'histogram-widget': {'coeff': '+1', 'unit': 'DAYS'},
+            'facet-widget': {'coeff': '+30', 'unit': 'DAYS'},
+        },
+        '1YEARS': {
+            'histogram-widget': {'coeff': '+3', 'unit': 'DAYS'},
+            'facet-widget': {'coeff': '+12', 'unit': 'MONTHS'},
+        },
+        '2YEARS': {
+            'histogram-widget': {'coeff': '+7', 'unit': 'DAYS'},
+            'facet-widget': {'coeff': '+3', 'unit': 'MONTHS'},
+        },
+        '10YEARS': {
+            'histogram-widget': {'coeff': '+1', 'unit': 'MONTHS'},
+            'facet-widget': {'coeff': '+1', 'unit': 'YEARS'},
         }
-        # ...
     }
     fq_fields = [fq['field'] for fq in query['fqs']]
     time_field = collection['timeFilter'].get('field')
 
     # fqs overrides main time filter
-    if time_field and time_field not in fq_fields:
+    if time_field and time_field not in fq_fields or True:
       if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all': # todo all for chart range? guess based on min
         props['field'] = collection['timeFilter']['field']
         props['from'] = 'NOW-%s' % collection['timeFilter']['value']
@@ -208,17 +231,14 @@ class SolrApi(object):
               'gap': facet['properties']['gap'],              
               'mincount': int(facet['properties']['mincount'])
           }
-          
-          # todo round by gap? 
-          
+
           if timeFilter:
-#            if facet['widgetType'] == 'histogram-widget':
-              keys.update({
-                'start': timeFilter['from'],
-                'end': timeFilter['to'],
-                'gap': timeFilter['gap'][facet['widgetType']], # add a 'auto'
-              })
-              print keys
+            gap = timeFilter['gap'][facet['widgetType']]
+            keys.update({
+              'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},
+              'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': gap['unit']},
+              'gap': '%(coeff)s%(unit)s/%(unit)s' % gap, # add a 'auto'
+            })
 
           params += (
              ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),

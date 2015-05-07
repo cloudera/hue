@@ -119,17 +119,20 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
 
     <span data-bind="visible: collection.timeFilter.type() == 'rolling'">
-      <select data-bind="value: collection.timeFilter.value" class="input-small"  style="margin-left:10px">
+      <select data-bind="value: collection.timeFilter.value" class="input-medium"  style="margin-left:10px">
         <option value="all">${ _('All') }</option>
-        <option value="5MINUTES/MINUTES">${ _('Last 5 Minutes') }</option>
-        <option value="15MINUTES/MINUTES">Last 15 Minutes</option>
-        <option value="1HOURS/MINUTES">Last 1 Hour</option>
-        <option value="1DAYS/DAYS">Last day</option>
-        <option value="2DAYS/DAYS">Last 2 days</option>
-        <option value="7DAYS/DAYS">Last Week</option>
-        <option value="6MONTHS/MONTHS">Last 6 Months</option>
-        <option value="1YEARS/YEARS">Last Year</option>
-        <option value="2YEARS/YEARS">Last 2 Years</option>
+        <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
+        <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
+        <option value="1HOURS">${ _('Past 1 Hour') }</option>
+        <option value="12HOURS">${ _('Past 12 Hours') }</option>
+        <option value="1DAYS">${ _('Past day') }</option>
+        <option value="2DAYS">${ _('Past 2 days') }</option>
+        <option value="7DAYS">${ _('Past 7 days') }</option>
+        <option value="1MONTHS">${ _('Past 1 Month') }</option>
+        <option value="3MONTHS">${ _('Past 3 Months') }</option>
+        <option value="1YEARS">${ _('Past Year') }</option>
+        <option value="2YEARS">${ _('Past 2 Years') }</option>
+        <option value="10YEARS">${ _('Past 10 Years') }</option>
       </select>      
     </span>
     
