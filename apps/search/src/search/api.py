@@ -101,8 +101,12 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
           mktime(start_ts.timetuple())
       ) / SLOTS
 
-      if difference < 1:
+      if difference < 2:
         gap = '+1SECONDS'
+      elif difference < 5:
+        gap = '+5SECONDS'        
+      elif difference < 30:
+        gap = '+30SECONDS' 
       elif difference < 100:
         gap = '+1MINUTES'
       elif difference < 60 * 5:
@@ -149,8 +153,8 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     pass
 
 def _round_date_range(tm):
-  start = tm - timedelta(minutes=tm.minute, seconds=tm.second, microseconds=tm.microsecond)
-  end = start + timedelta(minutes=60)
+  start = tm - timedelta(seconds=tm.second, microseconds=tm.microsecond)
+  end = start + timedelta(seconds=60)
   return start, end
 
 def _round_number_range(n):
