@@ -75,7 +75,7 @@ class SolrApi(object):
     else:
       return '%(aggregate)s(%(field)s)' % props
 
-  def _get_range_borders(self, collection):
+  def _get_range_borders(self, collection, query):
     props = {}
     GAPS = {
         '5MINUTES/MINUTES': '+3SECONDS',
@@ -83,10 +83,13 @@ class SolrApi(object):
         '1HOURS/HOURS': '+36SECONDS',
         '1DAYS/DAYS': '+15MINUTES',
         '2DAYS/DAYS': '+30MINUTES',
-        '1WEEKS/WEEKS': '+3HOURS',        
+        '7DAYS/DAYS': '+3HOURS',        
     }
-    
-    if collection['timeFilter'].get('field'):
+    fq_fields = [fq['field'] for fq in query['fqs']]
+    time_field = collection['timeFilter'].get('field')
+
+    # fqs overrides top time fq
+    if time_field and time_field not in fq_fields:
       if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all': # todo all for chart range? guess based on min
         props['field'] = collection['timeFilter']['field']
         props['from'] = 'NOW-%s' % collection['timeFilter']['value']
@@ -102,7 +105,7 @@ class SolrApi(object):
   def _get_fq(self, collection, query):
     params = ()
 
-    timeFilter = self._get_range_borders(collection)
+    timeFilter = self._get_range_borders(collection, query)
     if timeFilter:
       params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s}' % timeFilter))),)
 
@@ -171,7 +174,7 @@ class SolrApi(object):
       )
       json_facets = {}
 
-      timeFilter = self._get_range_borders(collection)
+      timeFilter = self._get_range_borders(collection, query)
 
       for facet in collection['facets']:
         if facet['type'] == 'query':
@@ -194,7 +197,7 @@ class SolrApi(object):
               keys.update({
                 'start': timeFilter['from'],
                 'end': timeFilter['to'],
-                'gap': timeFilter['gap'],
+                'gap': timeFilter['gap'], # add a 'auto'
               })
 
           params += (
