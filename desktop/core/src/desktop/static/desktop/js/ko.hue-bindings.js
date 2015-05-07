@@ -217,6 +217,14 @@ ko.bindingHandlers.daterangepicker = {
       label: "1s"
     },
     {
+      value: "+5SECONDS",
+      label: "5s"
+    },
+    {
+      value: "+30SECONDS",
+      label: "30s"
+    },
+    {
       value: "+1MINUTES",
       label: "1m"
     },
