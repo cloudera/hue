@@ -133,8 +133,14 @@ def get_logs(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
+  startFrom = request.POST.get('from')
+  startFrom = int(startFrom) if startFrom else None
+
+  size = request.POST.get('size')
+  size = int(size) if size else None
+
   db = get_api(request.user, snippet)
-  response['logs'] = db.get_log(snippet)
+  response['logs'] = db.get_log(snippet, startFrom=startFrom, size=size)
   response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' else 100
   response['job_urls'] = [{
       'name': job,
