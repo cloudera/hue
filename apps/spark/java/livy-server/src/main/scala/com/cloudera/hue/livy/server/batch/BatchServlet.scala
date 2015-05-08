@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.Logging
 import com.fasterxml.jackson.core.JsonParseException
+import org.json4s.JsonDSL._
 import org.json4s._
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
@@ -76,6 +77,29 @@ class BatchServlet(batchManager: BatchManager)
     }
   }
 
+  get("/:id/state") {
+    val id = params("id").toInt
+
+    batchManager.getBatch(id) match {
+      case None => NotFound("batch not found")
+      case Some(batch) =>
+        ("id", batch.id) ~ ("state", batch.state.toString)
+    }
+  }
+
+  get("/:id/log") {
+    val id = params("id").toInt
+
+    batchManager.getBatch(id) match {
+      case None => NotFound("batch not found")
+      case Some(batch) =>
+        val from = params.get("from").map(_.toInt)
+        val size = params.get("size").map(_.toInt)
+
+        ("id", batch.id) ~ ("log", Serializers.getLogs(batch, from, size))
+    }
+  }
+
   delete("/:id") {
     val id = params("id").toInt
 
@@ -101,13 +125,20 @@ class BatchServlet(batchManager: BatchManager)
 }
 
 private object Serializers {
-  import JsonDSL._
+  import org.json4s.JsonDSL._
 
   def Formats: List[CustomSerializer[_]] = List(BatchSerializer)
 
   def serializeBatch(batch: Batch,
-                     fromOpt: Option[Int],
-                     sizeOpt: Option[Int]): JValue = {
+                     from: Option[Int],
+                     size: Option[Int]): JValue = {
+
+    ("id", batch.id) ~
+      ("state", batch.state.toString) ~
+      ("log", getLogs(batch, from, size))
+  }
+
+  def getLogs(batch: Batch, fromOpt: Option[Int], sizeOpt: Option[Int]): JValue = {
     val lines = batch.lines
 
     val size = sizeOpt.getOrElse(10)
@@ -117,9 +148,7 @@ private object Serializers {
     }
     val until = from + size
 
-    ("id", batch.id) ~
-      ("state", batch.state.toString) ~
-      ("lines", lines.slice(from, until))
+    lines.view(from, until)
   }
 
   case object BatchSerializer extends CustomSerializer[Batch](

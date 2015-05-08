@@ -112,5 +112,13 @@ class JobServerApi(object):
   def get_batch(self, uuid):
     return self._root.get('batches/%s' % uuid)
 
+  def get_batch_status(self, uuid):
+    response = self._root.get('batches/%s/state' % uuid)
+    return response['state']
+
+  def get_batch_log(self, uuid):
+    response = self._root.get('batches/%s/log' % uuid)
+    return response['log']
+
   def delete_batch(self, uuid):
     return self._root.delete('batches/%s' % uuid)
