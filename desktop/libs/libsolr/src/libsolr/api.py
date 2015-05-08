@@ -130,13 +130,13 @@ class SolrApi(object):
 
     time_field = collection['timeFilter'].get('field')
     
-    if time_field:
+    if time_field and collection['timeFilter']['value'] != 'all':
       # fqs overrides main time filter
       fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
       props['time_filter_overrides'] = fq_time_ids
       props['time_field'] = time_field
 
-      if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all': # todo all for chart range? guess based on min
+      if collection['timeFilter']['type'] == 'rolling':
         props['field'] = collection['timeFilter']['field']
         props['from'] = 'NOW-%s' % collection['timeFilter']['value']
         props['to'] = 'NOW'
