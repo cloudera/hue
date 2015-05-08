@@ -447,16 +447,16 @@ class SparkBatchApi():
   def check_status(self, notebook, snippet):
     api = get_spark_api(self.user)
 
-    response = api.get_batch(snippet['result']['handle']['id'])
+    state = api.get_batch_status(snippet['result']['handle']['id'])
     return {
-        'status': response['state'],
+        'status': state,
     }
 
   def get_log(self, snippet):
     api = get_spark_api(self.user)
 
-    response = api.get_batch(snippet['result']['handle']['id'])
-    return '\n'.join(response['lines'])
+    log = api.get_batch_log(snippet['result']['handle']['id'])
+    return '\n'.join(log)
 
   def _progress(self, snippet, logs):
     return 50
