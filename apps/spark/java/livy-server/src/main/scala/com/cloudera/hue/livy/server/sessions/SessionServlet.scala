@@ -67,17 +67,20 @@ class SessionServlet(sessionManager: SessionManager)
 
   post("/") {
     val createSessionRequest = parsedBody.extract[CreateSessionRequest]
-    val sessionFuture = sessionManager.createSession(createSessionRequest.lang, createSessionRequest.proxyUser)
 
-    val rep = sessionFuture.map { case session =>
-      Created(session,
-        headers = Map(
-          "Location" -> url(getSession, "sessionId" -> session.id.toString)
-        )
-      )
+    new AsyncResult {
+      val is = {
+        val sessionFuture = sessionManager.createSession(createSessionRequest.lang, createSessionRequest.proxyUser)
+
+        sessionFuture.map { case session =>
+          Created(session,
+            headers = Map(
+              "Location" -> url(getSession, "sessionId" -> session.id.toString)
+            )
+          )
+        }
+      }
     }
-
-    new AsyncResult { val is = rep }
   }
 
   post("/:sessionId/callback") {
