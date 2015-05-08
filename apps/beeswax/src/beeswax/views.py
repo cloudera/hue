@@ -493,6 +493,8 @@ def view_results(request, id, first_row=0):
       columns = results.data_table.cols()
 
   except Exception, ex:
+    LOG.exception('error fetching results')
+
     fetch_error = True
     error_message, log = expand_exception(ex, db, handle)
 

@@ -723,6 +723,8 @@ class HiveServerClient:
       res = self.call(self._client.GetLog, req)
       return res.log
     except:
+      LOG.exception('server does not support GetLog')
+
       return 'Server does not support GetLog()'
 
 
