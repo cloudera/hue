@@ -148,9 +148,11 @@ from django.utils.translation import ugettext as _
       <li id="jHueTourFlagPlaceholder"></li>
     </ul>
   </div>
-  <a class="brand nav-tooltip pull-left" href="#"><img src="${ static('desktop/art/hue-logo-mini-white.png') }"
-                                                       data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
-                                                       data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/></a>
+  <a class="brand nav-tooltip pull-left" href="#">
+    <img src="${ static('desktop/art/hue-logo-mini-white.png') }"
+       data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"
+       data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }"/>
+  </a>
   <ul class="nav nav-pills pull-left hide" id="visit">
     <li><a title="${_('Visit gethue.com')}" href="http://gethue.com">${_('Fell asleep? Visit us on gethue.com instead!')} <i class="fa fa-external-link-circle"></i></a></li>
   </ul>
@@ -177,25 +179,40 @@ from django.utils.translation import ugettext as _
             ${_('This is your first time logging in.')}
               <strong>${_('You will become Hue superuser.')}</strong>.
             </div>
-            <h3>Sign Up via</h3>
+            <h3>${_('Sign Up via')}</h3>
             <hr/>
         %else:
-            <h3>Sign In via</h3>
+            <h3>${_('Sign In via')}</h3>
             <hr/>
         %endif
             <div id="buttons_group" class="buttons-group">
                 %if socialGoogle:
-                    <span class="btn btn-large btn-primary google"><img src="/liboauth_static/art/icon-gplus.png"><span>Google</span></span>
+                    <span class="btn btn-large btn-primary google">
+                      <img src="${ static('liboauth/art/icon-gplus.png') }">
+                      <span>Google</span>
+                    </span>
                 %endif
                 %if socialFacebook:
-                    <span class="btn btn-large btn-primary facebook"><img src="/liboauth_static/art/icon-fb.png"><span>Facebook</span></span>
+                    <span class="btn btn-large btn-primary facebook">
+                      <img src="${ static('liboauth/art/icon-fb.png') }">
+                      <span>Facebook</span>
+                    </span>
                 %endif
                 %if socialLinkedin:
-                    <span class="btn btn-large btn-primary linkedin"><img src="/liboauth_static/art/icon-linkedin.png"><span>Linkedin</span></span>
+                    <span class="btn btn-large btn-primary linkedin">
+                      <img src="${ static('liboauth/art/icon-linkedin.png') }">
+                      <span>Linkedin</span>
+                    </span>
                 %endif
                 %if socialTwitter:
-                    <span class="btn btn-large btn-primary twitter"><img src="/liboauth_static/art/icon-twitter.png"><span>Twitter</span></span>
+                    <span class="btn btn-large btn-primary twitter">
+                      <img src="${ static('liboauth/art/icon-twitter.png') }">
+                      <span>Twitter</span>
+                    </span>
                 %endif
+                %if not socialGoogle and not socialFacebook and not socialLinkedin and not socialTwitter:
+                  ${ _('The oauth app is not configured with any provider.') }
+                % endif
             </div>
         <input type="hidden" name="next" value="${next}"/>
       </form>
