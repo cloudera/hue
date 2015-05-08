@@ -46,7 +46,7 @@ class AuthenticationForm(AuthAuthenticationForm):
   }
 
   username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), "autofocus": "autofocus"}))
-  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password")}))
+  password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password"), 'autocomplete': 'off'}))
 
   def authenticate(self):
     return super(AuthenticationForm, self).clean()
