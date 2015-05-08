@@ -359,20 +359,10 @@ ${ dashboard.layout_skeleton() }
     <!-- /ko -->
 
     <!-- ko if: type() == 'range' || type() == 'range-up' || (type() == 'nested' && typeof properties.min != "undefined") -->
-      ## <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />      
-      <div class="facet-field-cnt">
-        <span class="spinedit-cnt">
-          <span class="facet-field-label facet-field-label-fixed-width">
-            ${ _('Custom range') }
-          </span>
-          <input type="checkbox"/>
-        </span>
-      </div>
-
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
-      <!-- ko if: properties.isDate() -->
+      <!-- ko if: properties.isDate() && $root.collection.timeFilter.field() != field() -->
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
         <br/>
       <!-- /ko -->
