@@ -129,8 +129,10 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         gap = '+7DAYS'
       elif difference < 3600 * 24 * 40:
         gap = '+1MONTHS'
-      else:
+      elif difference < 3600 * 24 * 40 * 12:
         gap = '+1YEARS'
+      else:
+        gap = '+10YEARS'
 
     properties.update({
       'min': stats_min,

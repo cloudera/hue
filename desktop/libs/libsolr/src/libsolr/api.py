@@ -127,11 +127,15 @@ class SolrApi(object):
             'facet-widget': {'coeff': '+1', 'unit': 'YEARS'},
         }
     }
-    fq_fields = [fq['field'] for fq in query['fqs']]
-    time_field = collection['timeFilter'].get('field')
 
-    # fqs overrides main time filter
-    if time_field and time_field not in fq_fields or True:
+    time_field = collection['timeFilter'].get('field')
+    
+    if time_field:
+      # fqs overrides main time filter
+      fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
+      props['time_filter_overrides'] = fq_time_ids
+      props['time_field'] = time_field
+
       if collection['timeFilter']['type'] == 'rolling' and collection['timeFilter']['value'] != 'all': # todo all for chart range? guess based on min
         props['field'] = collection['timeFilter']['field']
         props['from'] = 'NOW-%s' % collection['timeFilter']['value']
@@ -148,7 +152,7 @@ class SolrApi(object):
     params = ()
 
     timeFilter = self._get_range_borders(collection, query)
-    if timeFilter:
+    if timeFilter and not timeFilter.get('time_filter_overrides'):
       params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s}' % timeFilter))),)
 
     # Merge facets queries on same fields
@@ -232,7 +236,7 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount'])
           }
 
-          if timeFilter:
+          if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
             gap = timeFilter['gap'][facet['widgetType']]
             keys.update({
               'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},

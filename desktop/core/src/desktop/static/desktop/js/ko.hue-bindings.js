@@ -275,6 +275,10 @@ ko.bindingHandlers.daterangepicker = {
     {
       value: "+1YEARS",
       label: "1y"
+    },
+    {
+      value: "+10YEARS",
+      label: "10y"
     }
   ],
   EXTRA_INTERVAL_OPTIONS: [],
@@ -616,7 +620,7 @@ ko.bindingHandlers.daterangepicker = {
         _opts = enableOptions("1DAYS", "7DAYS", "1MONTHS", "6MONTHS");
       }
       if (_calculatedEndDate.diff(_calculatedStartDate, 'months') > 12) {
-        _opts = enableOptions("7DAYS", "1MONTHS", "6MONTHS", "1YEARS");
+        _opts = enableOptions("7DAYS", "1MONTHS", "6MONTHS", "1YEARS", "10YEARS");
       }
 
       $(".interval-select").html(renderOptions(_opts));
