@@ -20,6 +20,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_GET, require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
@@ -32,6 +33,7 @@ from oozie.decorators import check_document_access_permission
 LOG = logging.getLogger(__name__)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def create_session(request):
@@ -45,6 +47,7 @@ def create_session(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def execute(request):
@@ -59,6 +62,7 @@ def execute(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def check_status(request):
@@ -73,6 +77,7 @@ def check_status(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def fetch_result_data(request):
@@ -89,6 +94,7 @@ def fetch_result_data(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def fetch_result_metadata(request):
@@ -103,6 +109,7 @@ def fetch_result_metadata(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def cancel_statement(request):
@@ -117,6 +124,7 @@ def cancel_statement(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 @api_error_handler
 def get_logs(request):
@@ -137,6 +145,7 @@ def get_logs(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_modify_permission()
 def save_notebook(request):
   response = {'status': -1}
@@ -161,6 +170,7 @@ def save_notebook(request):
   return JsonResponse(response)
 
 
+@require_GET
 @check_document_access_permission()
 def open_notebook(request):
   response = {'status': -1}
@@ -175,6 +185,7 @@ def open_notebook(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 def close_notebook(request):
   response = {'status': -1}
@@ -193,6 +204,7 @@ def close_notebook(request):
   return JsonResponse(response)
 
 
+@require_POST
 @check_document_access_permission()
 def close_statement(request):
   response = {'status': -1}
