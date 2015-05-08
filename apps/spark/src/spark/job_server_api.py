@@ -116,9 +116,18 @@ class JobServerApi(object):
     response = self._root.get('batches/%s/state' % uuid)
     return response['state']
 
-  def get_batch_log(self, uuid):
-    response = self._root.get('batches/%s/log' % uuid)
-    return response['log']
+  def get_batch_log(self, uuid, startFrom=None, size=None):
+    params = {}
+
+    if startFrom is not None:
+      params['from'] = startFrom
+
+    if size is not None:
+      params['size'] = size
+
+    response = self._root.get('batches/%s/log' % uuid, params=params)
+
+    return '\n'.join(response['log'])
 
   def delete_batch(self, uuid):
     return self._root.delete('batches/%s' % uuid)

@@ -68,6 +68,7 @@ var Result = function (snippet, result) {
   self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
   self.data.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
+  self.logLines = 0;
   self.errors = ko.observable('');
   self.hasSomeResults = ko.computed(function () {
     return self.hasResultset() && self.data().length > 0; // status() == 'available'
@@ -487,10 +488,20 @@ var Snippet = function (vm, notebook, snippet) {
   self.getLogs = function () {
     $.post("/spark/api/get_logs", {
       notebook: ko.mapping.toJSON(notebook.getContext()),
-      snippet: ko.mapping.toJSON(self.getContext())
+      snippet: ko.mapping.toJSON(self.getContext()),
+      from: self.result.logLines
     }, function (data) {
       if (data.status == 0) {
-        self.result.logs(data.logs); // Way to append?
+        if (data.logs.length > 0) {
+          var logs = data.logs.split("\n");
+          self.result.logLines += logs.length;
+          var oldLogs = self.result.logs();
+          if (oldLogs === "") {
+            self.result.logs(data.logs);
+          } else {
+            self.result.logs(oldLogs + "\n" + data.logs);
+          }
+        }
         self.progress(data.progress);
       } else {
         self._ajax_error(data);

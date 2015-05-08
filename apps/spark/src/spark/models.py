@@ -215,11 +215,11 @@ class HS2Api():
     return {'status': 'canceled'}
 
   @query_error_handler
-  def get_log(self, snippet):
+  def get_log(self, snippet, startFrom=None, size=None):
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
-    return db.get_log(handle)
+    return db.get_log(handle, start_over=startFrom == 0)
 
   def download(self, notebook, snippet, format):
     try:
@@ -398,7 +398,7 @@ class SparkApi():
 
     return {'status': 'canceled'}
 
-  def get_log(self, snippet):
+  def get_log(self, snippet, startFrom=0, size=None):
     return 'Not available'
 
   def _progress(self, snippet, logs):
@@ -452,11 +452,10 @@ class SparkBatchApi():
         'status': state,
     }
 
-  def get_log(self, snippet):
+  def get_log(self, snippet, startFrom=0, size=None):
     api = get_spark_api(self.user)
 
-    log = api.get_batch_log(snippet['result']['handle']['id'])
-    return '\n'.join(log)
+    return api.get_batch_log(snippet['result']['handle']['id'], startFrom=startFrom, size=size)
 
   def _progress(self, snippet, logs):
     return 50

@@ -141,7 +141,7 @@ private object Serializers {
   def getLogs(batch: Batch, fromOpt: Option[Int], sizeOpt: Option[Int]): JValue = {
     val lines = batch.lines
 
-    val size = sizeOpt.getOrElse(10)
+    val size = sizeOpt.getOrElse(100)
     var from = fromOpt.getOrElse(-1)
     if (from < 0) {
       from = math.min(0, lines.length - size)
