@@ -227,6 +227,8 @@ class HS2Api():
       handle = self._get_handle(snippet)
       return data_export.download(handle, format, db)
     except Exception, e:
+      LOG.exception('error downloading notebook')
+
       if not hasattr(e, 'message') or not e.message:
         message = e
       else:

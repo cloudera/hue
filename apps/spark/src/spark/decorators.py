@@ -80,9 +80,11 @@ def api_error_handler(func):
     except QueryExpired, e:
       response['status'] = -3
     except QueryError, e:
+      LOG.exception('error running %s' % func)
       response['status'] = 1
       response['message'] = force_unicode(str(e))
     except Exception, e:
+      LOG.exception('error running %s' % func)
       response['status'] = -1
       response['message'] = force_unicode(str(e))
     finally:
