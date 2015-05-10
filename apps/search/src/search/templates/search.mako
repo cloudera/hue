@@ -79,7 +79,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
         <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
       </label>
-      
+
       <span data-bind="template: {name: 'time-filter'}"></span>
     <!-- /ko -->
   </form>
@@ -133,9 +133,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <option value="1YEARS">${ _('Past Year') }</option>
         <option value="2YEARS">${ _('Past 2 Years') }</option>
         <option value="10YEARS">${ _('Past 10 Years') }</option>
-      </select>      
+      </select>
     </span>
-    
+
     <span data-bind="visible: collection.timeFilter.type() == 'fixed'">
       Start date/time <input type="text" data-bind="collection.timeFilter.from"></input>
       End date/time <input type="text" data-bind="collection.timeFilter.to"></input>
@@ -144,8 +144,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <button class="btn">
       <i class="fa fa-calendar"></i>
     </button>
-    
-    <span>  
+
+    <span>
       <a data-bind="style: { fontWeight: collection.timeFilter.type() == 'rolling' ? 'bold' : '' }, click: function() {collection.timeFilter.type('rolling'); }">Rolling</a> |
       <a data-bind="style: { fontWeight: collection.timeFilter.type() == 'fixed' ? 'bold' : '' }, click: function() {collection.timeFilter.type('fixed'); }">Fixed</a>
     </span>
@@ -855,7 +855,7 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
     <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle' }">
-      </span>      
+      </span>
     </div>
 
     <div style="padding-bottom: 10px; text-align: right; padding-right: 20px" data-bind="visible: counts().length > 0">
