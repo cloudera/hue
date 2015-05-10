@@ -104,9 +104,9 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       if difference < 2:
         gap = '+1SECONDS'
       elif difference < 5:
-        gap = '+5SECONDS'        
+        gap = '+5SECONDS'
       elif difference < 30:
-        gap = '+30SECONDS' 
+        gap = '+30SECONDS'
       elif difference < 100:
         gap = '+1MINUTES'
       elif difference < 60 * 5:

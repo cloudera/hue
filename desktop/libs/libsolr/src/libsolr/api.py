@@ -129,7 +129,7 @@ class SolrApi(object):
     }
 
     time_field = collection['timeFilter'].get('field')
-    
+
     if time_field and collection['timeFilter']['value'] != 'all':
       # fqs overrides main time filter
       fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
@@ -145,7 +145,7 @@ class SolrApi(object):
         props['field'] = collection['timeFilter']['field']
         props['from'] = collection['timeFilter']['from']
         props['to'] = collection['timeFilter']['to']
-            
+
     return props
 
   def _get_fq(self, collection, query):
@@ -153,7 +153,7 @@ class SolrApi(object):
 
     timeFilter = self._get_range_borders(collection, query)
     if timeFilter and not timeFilter.get('time_filter_overrides'):
-      params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s}' % timeFilter))),)
+      params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s]' % timeFilter))),)
 
     # Merge facets queries on same fields
     grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
@@ -232,7 +232,7 @@ class SolrApi(object):
               'key': '%(field)s-%(id)s' % facet,
               'start': facet['properties']['start'],
               'end': facet['properties']['end'],
-              'gap': facet['properties']['gap'],              
+              'gap': facet['properties']['gap'],
               'mincount': int(facet['properties']['mincount'])
           }
 
@@ -299,6 +299,7 @@ class SolrApi(object):
           json_facets[facet['id']] = _f
         elif facet['type'] == 'function':
           json_facets[facet['id']] = self._get_aggregate_function(facet)
+          json_facets['processEmpty'] = True
         elif facet['type'] == 'pivot':
           if facet['properties']['facets'] or facet['widgetType'] == 'map-widget':
             fields = facet['field']
