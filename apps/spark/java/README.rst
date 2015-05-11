@@ -6,9 +6,11 @@ remote Spark Shell running locally or from inside YARN.
 
 Interactive Spark Scala, Python and batch jar/py submission are supported.
 
-Livy is used for powering the Spark Notebook of Hue, which you can see the
+Livy is used for powering the `Spark Notebook`_ of `Hue 3.8`_, which you can see the
 `implementation here`_.
 
+.. _Spark Notebook: http://gethue.com/new-notebook-application-for-spark-sql/
+.. _Hue 3.8: http://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
 .. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
 
 
