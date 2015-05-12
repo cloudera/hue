@@ -526,11 +526,11 @@ ${ dashboard.layout_skeleton() }
           </a>
           <strong>${_('Field Name')}</strong>
         </div>
-        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields" style="max-height: 230px; overflow-y: auto; padding-left: 4px">
-          <div style="margin-bottom: 3px">
+        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields">
+          <div style="margin-bottom: 3px; white-space: nowrap">
+            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr:{'title': '${ _('Click to analyze field') } ' + name()}"></i>
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
-            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn"></div>
-            <i class="fa fa-question-circle pull-right muted pointer analysis" title="${ _('Click to analyse field') }" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }"></i>
+            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right: 10px"></div>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
