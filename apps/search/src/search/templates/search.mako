@@ -1005,15 +1005,50 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <!-- ko if: $root.collection.getFacetById($parent.id()) -->
-    <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(),
-      isPivot: true,
-      fqs: $root.query.fqs,
-      transformer: pivotChartDataTransformer,
-      onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
-      onClick: function(d) {
-        $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
-      },
-      onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }" />
+      <!-- ko if: dimension() == 1 -->
+        <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
+          fqs: $root.query.fqs,
+          transformer: ($data.type == 'range-up' ? barChartRangeUpDataTransformer : barChartDataTransformer),
+          onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
+          onClick: function(d) {
+            if (d.obj.field != undefined) {
+              if ($data.type == 'range-up') {
+                viewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: d.obj.is_up});
+              } else {
+                viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+              }
+            } else {
+              viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
+            }
+          },
+          onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+        />
+      <!-- /ko -->
+
+      <!-- ko if: dimension() == 2 -->
+        <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(),
+          isPivot: true,
+          fqs: $root.query.fqs,
+          transformer: pivotChartDataTransformer,
+          onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
+          onClick: function(d) {
+            $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
+          },
+          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+        />      
+      <!-- /ko -->
+      
+      <!-- ko if: dimension() == 3 -->
+      <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
+        type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
+        fqs: $root.query.fqs,
+        onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+        onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
+        onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+        onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+      <!-- /ko -->      
+      
     <!-- /ko -->
   </div>
   <!-- /ko -->

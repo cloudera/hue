@@ -509,7 +509,7 @@ class HiveServer2Dbms(object):
     return self.execute_and_watch(query, query_history=query_history)
 
 
-  def execute_and_watch(self, query, design=None, query_history=None):
+  def execute_and_watch(self, query, design=None):
     """
     Run query and return a QueryHistory object in order to see its progress on a Web page.
     """
