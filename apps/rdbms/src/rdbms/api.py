@@ -44,6 +44,8 @@ class ResultEncoder(json.JSONEncoder):
   def default(self, obj):
     if isinstance(obj, datetime.datetime):
       return obj.strftime('%Y-%m-%d %H:%M:%S %Z')
+    elif isinstance(obj, datetime.date):
+      return obj.strftime('%Y-%m-%d %Z')
     return super(ResultEncoder, self).default(obj)
 
 
