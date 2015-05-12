@@ -269,11 +269,13 @@ ${ dashboard.layout_skeleton() }
   <div class="facet-field-tile">
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title">${ _('Settings') }</span>
+      <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: $root.isRetrievingResults()"></i><!-- <![endif]-->
+      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $root.isRetrievingResults()"/><![endif]-->
     </div>
 
     <div class="facet-field-cnt" data-bind="visible: properties.canRange">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Type') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet" data-loading-text="...">
+      <a href="javascript: void(0)" title="${ _('Toggle how to group the values') }" data-bind="click: $root.collection.toggleRangeFacet">
         <i class="fa" data-bind="css: { 'fa-arrows-h': type() == 'range', 'fa-circle': type() == 'field', 'fa-level-up': type() == 'range-up' }, attr: { title: type() == 'field' ? 'Range' : type() == 'range-up' ? 'Range and up' : 'Term' }"></i>
         <span data-bind="visible: type() == 'range'">${_('range')}</span>
         <span data-bind="visible: type() == 'range-up'">${_('range & up')}</span>
@@ -283,7 +285,7 @@ ${ dashboard.layout_skeleton() }
 
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width">${ _('Sorting') }</span>
-      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet" data-loading-text="...">
+      <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
         <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
         <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
         <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
@@ -453,7 +455,7 @@ ${ dashboard.layout_skeleton() }
               <!-- ko if: ! selected -->
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                 <div class="hellip">
-                  <a class="pointer" data-bind="text: is_single_unit_gap ? from : from + ' - ' + to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }, attr: {'title': (is_single_unit_gap ? from : from + ' - ' + to) + ' (' + $data.value + ')'}"></a>
+                  <a class="pointer" data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }, attr: {'title': ($data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to) + ' (' + $data.value + ')'}"></a>
                   <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
                 </div>
               <!-- /ko -->
