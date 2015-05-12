@@ -525,3 +525,10 @@ em {
   letter-spacing: .1em;
   line-height: 1.45;
 }
+
+.fields-list {
+  max-height: 230px;
+  max-width: 400px;
+  overflow-y: auto;
+  padding-left: 4px;
+}
