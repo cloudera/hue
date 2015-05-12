@@ -1946,3 +1946,7 @@ form.form-inline .modal-header .close {
 div.navigator ul.dropdown-menu {
   overflow-y: auto;
 }
+
+div.navigator > ul > li.oozie > ul.dropdown-menu {
+  overflow-y: visible;
+}

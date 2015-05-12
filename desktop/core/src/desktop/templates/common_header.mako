@@ -455,7 +455,7 @@ from django.utils.translation import ugettext as _
          <li><a href="/${apps[data_apps[0]].display_name}">${apps[data_apps[0]].nice_name}</a></li>
        % endif
        % if 'oozie' in apps:
-       <li class="dropdown">
+       <li class="dropdown oozie">
          <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Workflows <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
