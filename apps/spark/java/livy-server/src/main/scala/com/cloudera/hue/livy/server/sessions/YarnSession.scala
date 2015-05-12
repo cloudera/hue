@@ -86,8 +86,10 @@ private class YarnSession(id: Int,
     super.stop().andThen {
       case _ =>
         try {
-          val job_ = Await.result(job, Duration(1, TimeUnit.SECONDS))
-          job_.waitForFinish(10000)
+          val job_ = Await.result(job, Duration(10, TimeUnit.SECONDS))
+          job_.waitForFinish(10000).getOrElse {
+            job_.stop()
+          }
         } catch {
           case e: Throwable =>
             _state = Error()
