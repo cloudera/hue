@@ -811,7 +811,6 @@ var Collection = function (vm, collection) {
       vm.query.removeFilter(ko.mapping.fromJS({'id': facet_field.id})); // Reset filter query
     }
 
-    $(event.target).button('loading');
     vm.search();
   };
 
@@ -826,7 +825,6 @@ var Collection = function (vm, collection) {
        facet_field.type('field')
      }
 
-    $(event.target).button('loading');
     vm.search();
   };
 
