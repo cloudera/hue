@@ -19,14 +19,16 @@ import json
 import logging
 import time
 
+from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
+from beeswax.api import autocomplete
+from hadoop.cluster import get_defaultfs
 from libsentry.api import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
-from hadoop.cluster import get_defaultfs
 
-from beeswax.api import autocomplete
+from security.views import _has_impersonation_perm
 
 
 LOG = logging.getLogger(__name__)
@@ -42,13 +44,14 @@ def fetch_hive_path(request):
   if '/' in path:
     database, table = path.split('/')
 
-  resp = autocomplete(request, database, table)
-
   if database and request.GET['doas'] != request.user.username:
     request.GET = request.GET.copy()
-    request.GET['doas'] = request.GET['doas']
+    if _has_impersonation_perm(request.user):
+      request.GET['doas'] = request.GET['doas']
+    else:
+      del request.GET['doas']
 
-    resp = autocomplete(request, database, table)
+  resp = autocomplete(request, database, table)
 
   return resp
 
@@ -284,7 +287,10 @@ def list_sentry_privileges_by_authorizable(request):
   result = {'status': -1, 'message': 'Error'}
 
   try:
-    groups = [request.POST['groupName']] if request.POST['groupName'] else None
+    groups = [request.POST['groupName']] if request.POST['groupName'] else None    
+    if _has_impersonation_perm(request.user) and request.POST.get('doas') and request.POST.get('doas') != request.user.username:
+      groups = User.objects.get(username=request.POST.get('doas')).groups.values_list('name', flat=True)
+
     authorizableSet = [json.loads(request.POST['authorizableHierarchy'])]
 
     _privileges = []

@@ -1074,6 +1074,7 @@ var HiveViewModel = function (initial) {
       data: {
         groupName: $('#selectedGroup').val(),
         roleSet: ko.mapping.toJSON({all: true, roles: []}),
+        doas: self.doAs(),
         authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path))
       },
       success: function (data) {
