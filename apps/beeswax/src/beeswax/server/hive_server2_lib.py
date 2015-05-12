@@ -631,9 +631,9 @@ class HiveServerClient:
 
     if self.query_server['server_name'] == 'impala':
       # Impala does not supported extended
-      query = 'DESCRIBE %s.%s' % (database, table_name)
+      query = 'DESCRIBE `%s`.`%s`' % (database, table_name)
     else:
-      query = 'DESCRIBE EXTENDED %s.%s' % (database, table_name)
+      query = 'DESCRIBE EXTENDED `%s`.`%s`' % (database, table_name)
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
