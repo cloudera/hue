@@ -632,6 +632,7 @@ var Collection = function (vm, collection) {
     });
     return _fields;
   });
+
   self.template.fieldsNames = ko.computed(function () {
     return $.map(self.template.fieldsAttributes(), function(field) {
       return field.name();
@@ -1000,6 +1001,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           counts: [],
           label: '',
           field: '',
+          dimension: 1,
           extraSeries: []
       });
     }
@@ -1177,6 +1179,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             facet.counts(new_facet.counts);
             facet.label(new_facet.label);
             facet.field(new_facet.field);
+            facet.dimension(new_facet.dimension);
             facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
             facet.hash(_hash);
             facet.has_data(true);
