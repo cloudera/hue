@@ -141,6 +141,12 @@ ${ layout.menubar(section='hive') }
       <div id="edit" class="mainSection card card-small">
         <h1 class="card-heading simple">
           ${ _('Database and Table privileges') }
+          <div id="help-content" class="hide">
+            ${ _('Check the') } <a href="http://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/#howto" target="_blank">${ _('documentation!') }</a>
+          </div>
+          <div data-bind="visible: ! $root.is_sentry_admin" class="pull-right" rel="tooltip" data-original-title="${ _('Click to see some Help') }" data-placement="top">
+            <i class="fa fa-question-circle help" style="cursor: pointer"></i>
+          </div>
         </h1>
 
         <div class="card-body">
@@ -233,6 +239,9 @@ ${ layout.menubar(section='hive') }
       <div id="roles" class="mainSection hide card card-small">
         <h1 class="card-heading simple">
           ${ _('Roles') }
+          <div data-bind="visible: ! $root.is_sentry_admin" class="pull-right" rel="tooltip" data-original-title="${ _('Click to see some Help') }" data-placement="top">
+            <i class="fa fa-question-circle help" style="cursor: pointer"></i>
+          </div>
         </h1>
 
         <div class="card-body">
@@ -563,6 +572,13 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       viewModel.init(_initialPath);
       $("#path").val(_initialPath);
 
+      $(".help").popover({
+        'title': "${ _('Looking for edit permissions?') }",
+        'content': $("#help-content").html(),
+        'trigger': 'click',
+        'placement': 'left',
+        'html': true
+      });
 
       function setPathFromAutocomplete(path){
         if (path.lastIndexOf(".") == path.length -1){
