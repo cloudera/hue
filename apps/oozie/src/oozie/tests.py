@@ -3270,14 +3270,13 @@ class TestDashboard(OozieMockBase):
     assert_true('Completed' in response.content, response.content)
 
     response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json")
+    assert_true(len(json.loads(response.content)['jobs']) == 0)
+
+    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json&status=RUNNING&status=PREP&status=SUSPENDED")
     for wf_id in MockOozieApi.WORKFLOW_IDS:
       assert_true(wf_id in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json&type=running")
-    for wf_id in MockOozieApi.WORKFLOW_IDS:
-      assert_true(wf_id in response.content, response.content)
-
-    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json&type=completed")
+    response = self.c.get(reverse('oozie:list_oozie_workflows') + "?format=json&status=KILLED&status=FAILED")
     for wf_id in MockOozieApi.WORKFLOW_IDS:
       assert_true(wf_id in response.content, response.content)
 
@@ -3371,7 +3370,7 @@ class TestDashboard(OozieMockBase):
 
 
   def test_workflows_permissions(self):
-    response = self.c.get(reverse('oozie:list_oozie_workflows') + '?format=json')
+    response = self.c.get(reverse('oozie:list_oozie_workflows') + '?format=json&status=SUCCEEDED')
     assert_true('WordCount1' in response.content, response.content)
 
     # Rerun
@@ -3383,7 +3382,7 @@ class TestDashboard(OozieMockBase):
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
     grant_access("not_me", "not_me", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_workflows') + '?format=json')
+    response = client_not_me.get(reverse('oozie:list_oozie_workflows') + '?format=json&status=SUCCEEDED')
     assert_false('WordCount1' in response.content, response.content)
 
     # Rerun
@@ -3394,7 +3393,7 @@ class TestDashboard(OozieMockBase):
     # Add read only access
     add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_workflows')+"?format=json")
+    response = client_not_me.get(reverse('oozie:list_oozie_workflows')+"?format=json&status=SUCCEEDED")
     assert_true('WordCount1' in response.content, response.content)
 
     # Rerun
