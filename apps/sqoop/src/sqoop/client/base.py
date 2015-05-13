@@ -191,7 +191,7 @@ class SqoopClient(object):
     return job
 
   def delete_job(self, job):
-    resp_dict = self._root.delete('%s/job/%s' % (API_VERSION, job.name), headers=self.headers)
+    resp_dict = self._root.delete('%s/job/%s' % (API_VERSION, job.id), headers=self.headers)
     return None
 
   def get_job_status(self, job):
