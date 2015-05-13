@@ -211,7 +211,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 
 
-  <div id="documentMoveModal" class="modal fade">
+  <div id="documentMoveModal" class="modal fade hide">
     <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Move to a project')}</h3>
