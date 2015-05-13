@@ -283,8 +283,11 @@ class Submission(object):
     if hasattr(self.job, 'nodes'):
       for node in self.job.nodes:
         jar_path = node.data['properties'].get('jar_path')
-        if jar_path and not jar_path.startswith(lib_path):
-          files.append(jar_path)
+        if jar_path:
+          if not jar_path.startswith('/'): # If workspace relative path
+            jar_path = self.fs.join(self.job.deployment_dir, jar_path)
+          if not jar_path.startswith(lib_path): # If not already in lib
+            files.append(jar_path)
 
     # Copy the jar files to the workspace lib
     if files:
@@ -292,7 +295,7 @@ class Submission(object):
         LOG.debug("Updating %s" % jar_file)
         jar_lib_path = self.fs.join(lib_path, self.fs.basename(jar_file))
         # Refresh if needed
-        if self.fs.exists(jar_lib_path):
+        if self.fs.exists(jar_lib_path) and self.fs.exists(jar_file):
           stat_src = self.fs.stats(jar_file)
           stat_dest = self.fs.stats(jar_lib_path)
           if stat_src.fileId != stat_dest.fileId:
