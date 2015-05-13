@@ -54,12 +54,10 @@ class SolrApi(object):
       self._client.set_kerberos_auth()
     self._root = resource.Resource(self._client)
 
-
   def _get_params(self):
     if self.security_enabled:
       return (('doAs', self._user ),)
     return (('user.name', DEFAULT_USER), ('doAs', self._user),)
-
 
   def _get_q(self, query):
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
@@ -80,50 +78,62 @@ class SolrApi(object):
     GAPS = {
         '5MINUTES': {
             'histogram-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
+            'bucket-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
             'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'}, # ~10 slots
         },
         '30MINUTES': {
             'histogram-widget': {'coeff': '+20', 'unit': 'SECONDS'},
+            'bucket-widget': {'coeff': '+20', 'unit': 'SECONDS'},
             'facet-widget': {'coeff': '+5', 'unit': 'MINUTES'},
         },
         '1HOURS': {
             'histogram-widget': {'coeff': '+30', 'unit': 'SECONDS'},
+            'bucket-widget': {'coeff': '+30', 'unit': 'SECONDS'},
             'facet-widget': {'coeff': '+10', 'unit': 'MINUTES'},
         },
         '12HOURS': {
             'histogram-widget': {'coeff': '+7', 'unit': 'MINUTES'},
+            'bucket-widget': {'coeff': '+7', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+1', 'unit': 'HOURS'},
         },
         '1DAYS': {
             'histogram-widget': {'coeff': '+15', 'unit': 'MINUTES'},
+            'bucket-widget': {'coeff': '+15', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+3', 'unit': 'HOURS'},
         },
         '2DAYS': {
             'histogram-widget': {'coeff': '+30', 'unit': 'MINUTES'},
+            'bucket-widget': {'coeff': '+30', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+6', 'unit': 'HOURS'},
         },
         '7DAYS': {
             'histogram-widget': {'coeff': '+3', 'unit': 'HOURS'},
+            'bucket-widget': {'coeff': '+3', 'unit': 'HOURS'},
             'facet-widget': {'coeff': '+1', 'unit': 'DAYS'},
         },
         '1MONTHS': {
             'histogram-widget': {'coeff': '+12', 'unit': 'HOURS'},
+            'bucket-widget': {'coeff': '+12', 'unit': 'HOURS'},
             'facet-widget': {'coeff': '+5', 'unit': 'DAYS'},
         },
         '3MONTHS': {
             'histogram-widget': {'coeff': '+1', 'unit': 'DAYS'},
+            'bucket-widget': {'coeff': '+1', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+30', 'unit': 'DAYS'},
         },
         '1YEARS': {
             'histogram-widget': {'coeff': '+3', 'unit': 'DAYS'},
+            'bucket-widget': {'coeff': '+3', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+12', 'unit': 'MONTHS'},
         },
         '2YEARS': {
             'histogram-widget': {'coeff': '+7', 'unit': 'DAYS'},
+            'bucket-widget': {'coeff': '+7', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+3', 'unit': 'MONTHS'},
         },
         '10YEARS': {
             'histogram-widget': {'coeff': '+1', 'unit': 'MONTHS'},
+            'bucket-widget': {'coeff': '+1', 'unit': 'MONTHS'},
             'facet-widget': {'coeff': '+1', 'unit': 'YEARS'},
         }
     }
@@ -147,6 +157,14 @@ class SolrApi(object):
         props['to'] = collection['timeFilter']['to']
 
     return props
+
+  def _get_time_filter_query(self, timeFilter, facet):
+      gap = timeFilter['gap'][facet['widgetType']]
+      return {
+        'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},
+        'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': gap['unit']},
+        'gap': '%(coeff)s%(unit)s/%(unit)s' % gap, # add a 'auto'
+      }    
 
   def _get_fq(self, collection, query):
     params = ()
@@ -237,12 +255,7 @@ class SolrApi(object):
           }
 
           if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'histogram-widget'):
-            gap = timeFilter['gap'][facet['widgetType']]
-            keys.update({
-              'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},
-              'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': gap['unit']},
-              'gap': '%(coeff)s%(unit)s/%(unit)s' % gap, # add a 'auto'
-            })
+            keys.update(self._get_time_filter_query(timeFilter, facet))
 
           params += (
              ('facet.range', '{!key=%(key)s ex=%(id)s f.%(field)s.facet.range.start=%(start)s f.%(field)s.facet.range.end=%(end)s f.%(field)s.facet.range.gap=%(gap)s f.%(field)s.facet.mincount=%(mincount)s}%(field)s' % keys),
@@ -272,6 +285,8 @@ class SolrApi(object):
                 'end': facet['properties']['end'],
                 'gap': facet['properties']['gap'],
             })
+            if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
+              _f.update(self._get_time_filter_query(timeFilter, facet))
           else:
             _f.update({
                 'type': 'terms',
@@ -284,7 +299,9 @@ class SolrApi(object):
               _f['facet'] = {
                   'd2': {
                       'type': 'terms',
-                      'field': '%(field)s' % facet['properties']['facets'][0]
+                      'field': '%(field)s' % facet['properties']['facets'][0],
+                      'limit': int(facet['properties']['facets'][0].get('limit', 10)),
+                      'mincount': int(facet['properties']['facets'][0]['mincount'])
                   }
               }
               if len(facet['properties']['facets']) > 1: # Get 3rd dimension calculation

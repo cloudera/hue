@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import collections
 import itertools
 import json
 import logging
@@ -603,7 +604,10 @@ def pairwise2(field, fq_filter, iterable):
   a, b = itertools.tee(iterable)
   for element in a:
     pairs.append({
-        'cat': field, 'value': element, 'count': next(a), 'selected': element in selected_values,
+        'cat': field,
+        'value': element,
+        'count': next(a),
+        'selected': element in selected_values,
         'exclude': all([f['exclude'] for f in fq_filter if f['value'] == element])
     })
   return pairs
@@ -743,27 +747,36 @@ def augment_solr_response(response, collection, query):
       elif category == 'nested' and name in response['facets']:
         value = response['facets'][name]
         collection_facet = get_facet_field(category, name, collection['facets'])
-        print collection_facet
+        extraSeries = []
         counts = response['facets'][name]['buckets']
-        print counts
 
+        # Date range
         if collection_facet['properties']['isDate']:
           dimension = 3
-          end = 1
-          counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
-          counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, end, collection_facet)
+          # Single dimension or dimension 2 with analytics
+          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
+            counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
+            counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
+          else:
+            # Dimension 1 with counts and 2 with analytics
+            _series = collections.defaultdict(list)
+            for f in counts:
+              for bucket in (f['d2']['buckets'] if 'd2' in f else []):
+                _series[bucket['val']].append(f['val'])
+                _series[bucket['val']].append(bucket['d2'] if 'd2' in bucket else bucket['count'])
+            for name, val in _series.iteritems():
+              _c = range_pair(facet['field'], name, selected_values.get(facet['id'], []), val, 1, collection_facet)
+              extraSeries.append({'counts': _c, 'label': name})
+            counts = []
         elif not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
+          # Single dimension or dimension 2 with analytics
           dimension = 1
-          # counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
-          # [{u'count': 5, u'val': u'CT'}, {u'count': 5, u'val': u'NJ'}, {u'count': 5, u'val': u'NY'}]
           counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
           counts = pairwise2(facet['field'], selected_values.get(facet['id'], []), counts)
         else:
+          # Dimension 1 with counts and 2 with analytics
           dimension = 2
-          counts = _augment_stats_2d(name, facet, response['facets'][name]['buckets'], selected_values)
-          print counts
-
-        print dimension
+          counts = _augment_stats_2d(name, facet, counts, selected_values)
 
         if collection_facet['properties']['sort'] == 'asc':
           counts.reverse()
@@ -774,7 +787,7 @@ def augment_solr_response(response, collection, query):
           'type': category,
           'label': collection_facet['label'],
           'counts': counts,
-          'extraSeries': [], # unused?
+          'extraSeries': extraSeries,
           'dimension': dimension
         }
 
