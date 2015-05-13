@@ -744,17 +744,20 @@ def augment_solr_response(response, collection, query):
         value = response['facets'][name]
         collection_facet = get_facet_field(category, name, collection['facets'])
         print collection_facet
+        counts = response['facets'][name]['buckets']
+        print counts
 
-        if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
+        if collection_facet['properties']['isDate']:
+          dimension = 3
+          end = 1
+          counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
+          counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, end, collection_facet)
+        elif not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
           dimension = 1
-          counts = response['facets'][name]['buckets']
-          print counts
           # counts":["0",17430,"1000",1949,"2000",671,"3000",404,"4000",243,"5000",165],"gap":1000,"start":0,"end":6000}
           # [{u'count': 5, u'val': u'CT'}, {u'count': 5, u'val': u'NJ'}, {u'count': 5, u'val': u'NY'}]
           counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
-          end = 1
           counts = pairwise2(facet['field'], selected_values.get(facet['id'], []), counts)
-          #counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, end, collection_facet)
         else:
           dimension = 2
           counts = _augment_stats_2d(name, facet, response['facets'][name]['buckets'], selected_values)
@@ -771,6 +774,7 @@ def augment_solr_response(response, collection, query):
           'type': category,
           'label': collection_facet['label'],
           'counts': counts,
+          'extraSeries': [], # unused?
           'dimension': dimension
         }
 

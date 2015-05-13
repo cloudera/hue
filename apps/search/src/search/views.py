@@ -136,11 +136,11 @@ def search(request):
       try:
         response['error'] = json.loads(e.message)['error']['msg']
       except:
-        response['error'] = force_unicode(str(e))
+        response['error'] = force_unicode(e)
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-      response['error'] = force_unicode(str(e))
+      response['error'] = force_unicode(e)
   else:
     response['error'] = _('There is no collection to search.')
 
@@ -507,6 +507,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
       properties['facets'] = []
       properties['scope'] = 'stack'
+      properties['timelineChartType'] = 'bar'
 
   if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
     properties['mincount'] = 1
