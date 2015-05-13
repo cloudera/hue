@@ -24,9 +24,11 @@ from nose.tools import assert_equal, assert_true, assert_not_equal
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
-from liboozie.submission2 import Submission
-from oozie.tests import OozieMockBase
 from desktop.lib.django_test_util import make_logged_in_client
+from oozie.models2 import Node
+from oozie.tests import OozieMockBase
+
+from liboozie.submission2 import Submission
 
 
 LOG = logging.getLogger(__name__)
@@ -59,19 +61,15 @@ def test_copy_files():
     cluster.fs.create(jar_3)
     cluster.fs.create(jar_4)
 
-    class MockNode():
-      def __init__(self, jar_path):
-        self.jar_path = jar_path
-
     class MockJob():
       XML_FILE_NAME = 'workflow.xml'
 
       def __init__(self):
-        self.node_list = [
-            MockNode(jar_1),
-            MockNode(jar_2),
-            MockNode(jar_3),
-            MockNode(jar_4),
+        self.nodes = [
+            Node({'id': '1', 'type': 'mapreduce', 'properties': {'jar_path': jar_1}}),
+            Node({'id': '2', 'type': 'mapreduce', 'properties': {'jar_path': jar_2}}),
+            Node({'id': '3', 'type': 'java', 'properties': {'jar_path': jar_3}}),
+            Node({'id': '4', 'type': 'java', 'properties': {'jar_path': jar_4}})
         ]
 
     submission = Submission(user, job=MockJob(), fs=cluster.fs, jt=cluster.jt)
