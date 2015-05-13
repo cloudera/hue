@@ -280,10 +280,11 @@ class Submission(object):
     # List jar files
     files = []
     lib_path = self.fs.join(deployment_dir, 'lib')
-    if hasattr(self.job, 'node_list'):
-      for node in self.job.node_list:
-        if hasattr(node, 'jar_path') and not node.jar_path.startswith(lib_path):
-          files.append(node.jar_path)
+    if hasattr(self.job, 'nodes'):
+      for node in self.job.nodes:
+        jar_path = node.data['properties'].get('jar_path')
+        if jar_path and not jar_path.startswith(lib_path):
+          files.append(jar_path)
 
     # Copy the jar files to the workspace lib
     if files:
