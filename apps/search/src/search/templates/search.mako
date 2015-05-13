@@ -257,7 +257,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
                     draggable: {data: draggableBucket(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Histogram Chart')}" rel="tooltip" data-placement="top">
+         title="${_('Chart')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableChart() ? 'move' : 'default' }">
                        <i class="hcha hcha-bar-chart"></i>
          </a>
