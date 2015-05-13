@@ -954,6 +954,21 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
+      <!-- ko if: properties.isDate -->
+        <span class="facet-field-label">${ _('Chart Type') }</span>
+        <select class="input-small" data-bind="options: $root.timelineChartTypes,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.timelineChartType">
+        </select>&nbsp;
+        <span class="facet-field-label">${ _('Interval') }</span>
+        <select class="input-small" data-bind="options: $root.intervalOptions,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.gap">
+        </select>&nbsp;
+      <!-- /ko -->
+    
       <!-- ko if: properties.canRange -->
         <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
           <span class="facet-field-label">${ _('Zoom') }</span>
