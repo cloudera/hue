@@ -98,7 +98,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </tr>
       </tbody>
     </table>
-
+    <span class="btn-toolbar" style="float:right;">
+      <a class="btn btn-running-pagination btn-running-prev" data-value='Previous' disabled='disabled'>${ _('Previous') }</a>
+      <a class="btn btn-running-pagination btn-running-next" data-value='Next'>${ _('Next') }</a>
+    </span>
   </div>
 
   <div>
@@ -196,11 +199,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   }
 
   var refreshRunning;
+  var runningTableOffset = 1;
+  var PAGE_SIZE = 50;
 
   $(document).ready(function () {
     var runningTable = $("#running-table").dataTable({
-      "sPaginationType":"bootstrap",
-      "iDisplayLength":50,
+      "bPaginate": false,
+      "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
@@ -224,12 +229,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
         "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
         "sZeroRecords":"${_('No matching records')}",
-        "oPaginate":{
-          "sFirst":"${_('First')}",
-          "sLast":"${_('Last')}",
-          "sNext":"${_('Next')}",
-          "sPrevious":"${_('Previous')}"
-        }
       },
       "fnDrawCallback":function (oSettings) {
         $("a[data-row-selector='true']").jHueRowSelector();
@@ -238,7 +237,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     var completedTable = $("#completed-table").dataTable({
       "sPaginationType":"bootstrap",
-      "iDisplayLength":50,
+      "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
       "aoColumns":[
@@ -286,7 +285,20 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     });
 
 
+    $("a.btn-running-pagination").click(function () {
+      if ($.attr(this, "disabled") == null) {
+        var btnText = $(this).data('value');
+        if (btnText == 'Previous') {
+          runningTableOffset -= PAGE_SIZE;
+        } else if (btnText == 'Next') {
+          runningTableOffset += PAGE_SIZE;
+        }
+        refreshRunning();
+      }
+    });
+
     $("a.btn-status").click(function () {
+      refreshPagination();
       $(this).toggleClass("active");
       refreshRunning();
       refreshCompleted();
@@ -299,6 +311,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     });
 
     $("a.btn-date").click(function () {
+      refreshPagination();
       $("a.btn-date").not(this).removeClass("active");
       $(this).toggleClass("active");
       refreshRunning();
@@ -308,6 +321,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (hash != "" && hash.indexOf("=") > -1) {
       $("a.btn-date[data-value='" + hash.split("=")[1] + "']").click();
+    }
+
+    function refreshPagination() {
+      runningTableOffset = 1;
     }
 
     function drawTable() {
@@ -386,7 +403,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     var numRunning = 0;
 
     refreshRunning = function () {
-      $.getJSON(window.location.pathname + "?format=json" + getStatuses('running') + getDaysFilter(), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running') + getDaysFilter(), function (data) {
         if (data.jobs) {
           var nNodes = runningTable.fnGetNodes();
 
@@ -445,10 +462,34 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           refreshCompleted();
         }
         numRunning = data.jobs.length;
+        refreshPaginationButtons("running", data.total_jobs);
 
-        runningTable.fnDraw();
         window.setTimeout(refreshRunning, 5000);
       });
+    }
+
+    function refreshPaginationButtons(tableName, totalJobs) {
+      var prevBtn = $("a.btn-running-prev");
+      var nextBtn = $("a.btn-running-next");
+      var offset = runningTableOffset;
+
+      if (tableName == 'completed') {
+        // TBD
+        prevBtn = $("a.btn-completed-prev");
+        nextBtn = $("a.btn-completed-next");
+        offset = completedTableOffset;
+      }
+
+      if(offset == 1 || !totalJobs) {
+        prevBtn.attr("disabled", 'true');
+      } else {
+        prevBtn.removeAttr("disabled");
+      }
+      if (totalJobs <= (offset + PAGE_SIZE)  || !totalJobs) {
+        nextBtn.attr("disabled", 'true');
+      } else if (totalJobs > offset + PAGE_SIZE) {
+        nextBtn.removeAttr("disabled");
+      }
     }
 
     function getParentImage(parentUrl) {
