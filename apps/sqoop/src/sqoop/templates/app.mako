@@ -337,6 +337,8 @@ ${ commonheader(None, "sqoop", user) | n,unicode }
 <h4 style="display: inline-block">
   <i class="fa fa-download"></i>&nbsp;
 
+  <span data-bind="text: name" class="muted"></span>
+
   <!-- ko if: fromLabel() && toLabel() -->
   <span data-bind="text: fromLabel"></span>
   <span>${_(' to ')}</span>
