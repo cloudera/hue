@@ -172,15 +172,23 @@ def list_oozie_workflows(request):
     if request.GET.get('startcreatedtime'):
       kwargs['filters'].extend([('startcreatedtime', request.GET.get('startcreatedtime'))])
 
+    if request.GET.get('offset'):
+      kwargs['offset'] = request.GET.get('offset')
+
     json_jobs = []
+    total_jobs = 0
     if request.GET.getlist('status'):
       kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
-      json_jobs = oozie_api.get_workflows(**kwargs).jobs
+      wf_list = oozie_api.get_workflows(**kwargs)
+      json_jobs = wf_list.jobs
+      total_jobs = wf_list.total
 
     if request.GET.get('type') == 'progress':
       json_jobs = [oozie_api.get_job(job.id) for job in json_jobs]
 
-    return JsonResponse(massaged_oozie_jobs_for_json(json_jobs, request.user, just_sla), encoder=JSONEncoderForHTML)
+    response = massaged_oozie_jobs_for_json(json_jobs, request.user, just_sla)
+    response['total_jobs'] = total_jobs
+    return JsonResponse(response, encoder=JSONEncoderForHTML)
 
   return render('dashboard/list_oozie_workflows.mako', request, {
     'user': request.user,

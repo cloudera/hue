@@ -62,7 +62,7 @@ REMOTE_SAMPLE_DIR = Config(
 
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
-  default=100,
+  default=50,
   type=int,
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
 )
