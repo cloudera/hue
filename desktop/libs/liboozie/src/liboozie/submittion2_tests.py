@@ -53,23 +53,32 @@ def test_copy_files():
     jar_1 = '%s/udf1.jar' % prefix
     jar_2 = '%s/lib/udf2.jar' % prefix
     jar_3 = '%s/udf3.jar' % deployment_dir
-    jar_4 = '%s/lib/udf4.jar' % deployment_dir # Never move
+    jar_4 = '%s/lib/udf4.jar' % deployment_dir # Doesn't move
+    jar_5 = 'udf5.jar'
+    jar_6 = 'lib/udf6.jar' # Doesn't move
 
     cluster.fs.mkdir(prefix)
     cluster.fs.create(jar_1)
     cluster.fs.create(jar_2)
     cluster.fs.create(jar_3)
     cluster.fs.create(jar_4)
+    cluster.fs.create(deployment_dir + '/' + jar_5)
+    cluster.fs.create(deployment_dir + '/' + jar_6)
 
     class MockJob():
       XML_FILE_NAME = 'workflow.xml'
 
       def __init__(self):
+        self.deployment_dir = deployment_dir
         self.nodes = [
             Node({'id': '1', 'type': 'mapreduce', 'properties': {'jar_path': jar_1}}),
             Node({'id': '2', 'type': 'mapreduce', 'properties': {'jar_path': jar_2}}),
             Node({'id': '3', 'type': 'java', 'properties': {'jar_path': jar_3}}),
-            Node({'id': '4', 'type': 'java', 'properties': {'jar_path': jar_4}})
+            Node({'id': '4', 'type': 'java', 'properties': {'jar_path': jar_4}}),
+
+            # Workspace relative paths
+            Node({'id': '5', 'type': 'java', 'properties': {'jar_path': jar_5}}),
+            Node({'id': '6', 'type': 'java', 'properties': {'jar_path': jar_6}})
         ]
 
     submission = Submission(user, job=MockJob(), fs=cluster.fs, jt=cluster.jt)
@@ -85,7 +94,10 @@ def test_copy_files():
     assert_true(cluster.fs.exists(jar_2))
     assert_true(cluster.fs.exists(jar_3))
     assert_true(cluster.fs.exists(jar_4))
+    assert_true(cluster.fs.exists(deployment_dir + '/' + jar_5))
+    assert_true(cluster.fs.exists(deployment_dir + '/' + jar_6))
 
+    # Lib
     deployment_dir = deployment_dir + '/lib'
     external_deployment_dir = external_deployment_dir + '/lib'
 
@@ -97,16 +109,22 @@ def test_copy_files():
     assert_true(cluster.fs.exists(deployment_dir + '/udf2.jar'), list_dir_workspace)
     assert_true(cluster.fs.exists(deployment_dir + '/udf3.jar'), list_dir_workspace)
     assert_true(cluster.fs.exists(deployment_dir + '/udf4.jar'), list_dir_workspace)
+    assert_true(cluster.fs.exists(deployment_dir + '/udf5.jar'), list_dir_workspace)
+    assert_true(cluster.fs.exists(deployment_dir + '/udf6.jar'), list_dir_workspace)
 
     assert_true(cluster.fs.exists(external_deployment_dir + '/udf1.jar'), list_dir_deployement)
     assert_true(cluster.fs.exists(external_deployment_dir + '/udf2.jar'), list_dir_deployement)
     assert_true(cluster.fs.exists(external_deployment_dir + '/udf3.jar'), list_dir_deployement)
     assert_true(cluster.fs.exists(external_deployment_dir + '/udf4.jar'), list_dir_deployement)
+    assert_true(cluster.fs.exists(external_deployment_dir + '/udf5.jar'), list_dir_deployement)
+    assert_true(cluster.fs.exists(external_deployment_dir + '/udf6.jar'), list_dir_deployement)
 
     stats_udf1 = cluster.fs.stats(deployment_dir + '/udf1.jar')
     stats_udf2 = cluster.fs.stats(deployment_dir + '/udf2.jar')
     stats_udf3 = cluster.fs.stats(deployment_dir + '/udf3.jar')
     stats_udf4 = cluster.fs.stats(deployment_dir + '/udf4.jar')
+    stats_udf5 = cluster.fs.stats(deployment_dir + '/udf5.jar')
+    stats_udf6 = cluster.fs.stats(deployment_dir + '/udf6.jar')
 
     submission._copy_files('%s/workspace' % prefix, "<xml>My XML</xml>", {'prop1': 'val1'})
 
@@ -114,6 +132,8 @@ def test_copy_files():
     assert_not_equal(stats_udf2['fileId'], cluster.fs.stats(deployment_dir + '/udf2.jar')['fileId'])
     assert_not_equal(stats_udf3['fileId'], cluster.fs.stats(deployment_dir + '/udf3.jar')['fileId'])
     assert_equal(stats_udf4['fileId'], cluster.fs.stats(deployment_dir + '/udf4.jar')['fileId'])
+    assert_not_equal(stats_udf5['fileId'], cluster.fs.stats(deployment_dir + '/udf5.jar')['fileId'])
+    assert_equal(stats_udf6['fileId'], cluster.fs.stats(deployment_dir + '/udf6.jar')['fileId'])
 
   finally:
     try:
