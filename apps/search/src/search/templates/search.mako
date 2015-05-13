@@ -32,34 +32,32 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 
   SLIDER_LABELS = {
-    STEP: "${_('Increment')}",
+    STEP: "${_('Increment')}"
   }
 </script>
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
-    <button type="button" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+    <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
-    </button>
+    </a>
     % if is_owner:
-    <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
+    <a class="btn pointer" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-save"></i>
-    </button>
+    </a>
     % endif
-    <button type="button" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
+    <a class="btn pointer" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
         data-bind="css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-cog"></i>
-    </button>
+    </a>
+    &nbsp;
+    <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;</span>
 
-    <span style="padding-left:85px" data-bind="visible: columns().length == 0"></span>
-
-    &nbsp;&nbsp;&nbsp;
-
-    <button type="button" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
+    <a class="btn pointer" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
       <i class="fa fa-link"></i>
-    </button>
+    </a>
 
-    &nbsp;&nbsp;&nbsp;
+    <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;&nbsp;</span>
 
     <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
@@ -79,8 +77,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
         <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
       </label>
-
-      <span data-bind="template: {name: 'time-filter'}"></span>
     <!-- /ko -->
   </form>
 
@@ -108,49 +104,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
 
-      <span data-bind="template: {name: 'time-filter'}"></span>
     </div>
   </form>
 </div>
-
-
-<script type="text/html" id="time-filter">
-  <span data-bind="visible: $root.availableDateFields().length > 0">
-    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
-
-    <span data-bind="visible: collection.timeFilter.type() == 'rolling'">
-      <select data-bind="value: collection.timeFilter.value" class="input-medium"  style="margin-left:10px">
-        <option value="all">${ _('All') }</option>
-        <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
-        <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
-        <option value="1HOURS">${ _('Past 1 Hour') }</option>
-        <option value="12HOURS">${ _('Past 12 Hours') }</option>
-        <option value="1DAYS">${ _('Past day') }</option>
-        <option value="2DAYS">${ _('Past 2 days') }</option>
-        <option value="7DAYS">${ _('Past 7 days') }</option>
-        <option value="1MONTHS">${ _('Past 1 Month') }</option>
-        <option value="3MONTHS">${ _('Past 3 Months') }</option>
-        <option value="1YEARS">${ _('Past Year') }</option>
-        <option value="2YEARS">${ _('Past 2 Years') }</option>
-        <option value="10YEARS">${ _('Past 10 Years') }</option>
-      </select>
-    </span>
-
-    <span data-bind="visible: collection.timeFilter.type() == 'fixed'">
-      Start date/time <input type="text" data-bind="collection.timeFilter.from"></input>
-      End date/time <input type="text" data-bind="collection.timeFilter.to"></input>
-    </span>
-
-    <button class="btn">
-      <i class="fa fa-calendar"></i>
-    </button>
-
-    <span>
-      <a data-bind="style: { fontWeight: collection.timeFilter.type() == 'rolling' ? 'bold' : '' }, click: function() {collection.timeFilter.type('rolling'); }">Rolling</a> |
-      <a data-bind="style: { fontWeight: collection.timeFilter.type() == 'fixed' ? 'bold' : '' }, click: function() {collection.timeFilter.type('fixed'); }">Fixed</a>
-    </span>
-  </span>
-</script>
 
 
 <%dashboard:layout_toolbar>
@@ -1605,26 +1561,102 @@ ${ dashboard.layout_skeleton() }
 </div>
 
 <div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
+  <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <div style="float: left; margin-right: 30px; text-align: center; line-height: 28px">
-      <!-- ko if: $root.initial.inited() -->
-      ${ _('Solr index') }
-      <select data-bind="options: $root.initial.collections, value: $root.collection.name" style="margin-bottom: 0; margin-right: 20px">
-      </select>
-      <!-- /ko -->
-      ${ _('Description') } <input type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
+    <div class="row-fluid">
+      <div class="span6">
+        <form class="form-horizontal">
+          <fieldset>
+            <legend><i class="fa fa-cogs"></i> ${ _('General settings') }</legend>
+            <!-- ko if: $root.initial.inited() -->
+            <div class="control-group">
+              <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
+              <div class="controls">
+                <select id="settingssolrindex" data-bind="options: $root.initial.collections, value: $root.collection.name"></select>
+              </div>
+            </div>
+            <!-- /ko -->
+            <div class="control-group">
+              <label class="control-label" for="settingsdescription">${ _('Description') }</label>
+              <div class="controls">
+                <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" data-bind="checked: $root.collection.enabled" /> ${ _('Dashboard visible to everybody') }
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <div class="span6">
+        <form class="form-horizontal">
+          <fieldset>
+            <legend><i class="fa fa-calendar"></i> ${ _('Time settings') }</legend>
+
+            <!-- ko if: $root.availableDateFields().length > 0 -->
+            <div class="control-group">
+              <label class="control-label" for="settingstimefield">${ _('Date/time field') }</label>
+              <div class="controls">
+                <select id="settingstimefield" data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name'" class="input-medium"></select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="settingstimetype">${ _('Type') }</label>
+              <div class="controls">
+                <label class="radio inline"><input type="radio" name="settingstimetype" value="rolling" data-bind="checked: collection.timeFilter.type" /> ${ _('Rolling') }</label>
+                <label class="radio inline"><input type="radio" name="settingstimetype" value="fixed" data-bind="checked: collection.timeFilter.type" /> ${ _('Fixed') }</label>
+              </div>
+            </div>
+            <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'rolling'">
+              <label class="control-label" for="settingstimeinterval">${ _('Interval') }</label>
+              <div class="controls">
+                <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium">
+                  <option value="all">${ _('All') }</option>
+                  <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
+                  <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
+                  <option value="1HOURS">${ _('Past 1 Hour') }</option>
+                  <option value="12HOURS">${ _('Past 12 Hours') }</option>
+                  <option value="1DAYS">${ _('Past day') }</option>
+                  <option value="2DAYS">${ _('Past 2 days') }</option>
+                  <option value="7DAYS">${ _('Past 7 days') }</option>
+                  <option value="1MONTHS">${ _('Past 1 Month') }</option>
+                  <option value="3MONTHS">${ _('Past 3 Months') }</option>
+                  <option value="1YEARS">${ _('Past Year') }</option>
+                  <option value="2YEARS">${ _('Past 2 Years') }</option>
+                  <option value="10YEARS">${ _('Past 10 Years') }</option>
+                </select>
+              </div>
+            </div>
+            <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
+              <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
+              <div class="controls">
+                <input id="settingstimestart" type="text" data-bind="collection.timeFilter.from" />
+              </div>
+            </div>
+            <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
+              <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
+              <div class="controls">
+                <input id="settingstimeend" type="text" data-bind="collection.timeFilter.to" />
+              </div>
+            </div>
+            <!-- /ko -->
+            <div class="control-group">
+              <div class="controls">
+                <label class="checkbox">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+
+      </div>
     </div>
-    <div style="float: left;margin-right: 30px;">
-    <label class="checkbox" style="margin-top: 6px">
-      ${ _('Dashboard visible to everybody') } <input type="checkbox" data-bind="checked: $root.collection.enabled" style="margin-left: 0; margin-right: 4px"/>
-    </label>
-    </div>
-    <div style="float: left;margin-right: 30px;">
-    <label class="checkbox">
-      <input type="checkbox"  style="margin-left: 0; margin-right: 4px;margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
-    </label>
-    </div>
+
   </div>
 </div>
 
