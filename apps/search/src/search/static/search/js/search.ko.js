@@ -884,6 +884,7 @@ var Collection = function (vm, collection) {
 
   self.translateSelectedField = function (index, direction) {
     var array = self.template.fieldsSelected();
+    vm.resultsHash = '';
 
     if (direction == 'left') {
       self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
@@ -1173,7 +1174,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
         $.each(data.normalized_facets, function (index, new_facet) {
           var facet = self.getFacetFromQuery(new_facet.id);
-          var _hash = ko.mapping.toJSON(new_facet.counts);
+          var _hash = ko.mapping.toJSON(new_facet);
 
           if (! facet.has_data() || facet.hash() != _hash) {
             facet.counts(new_facet.counts);
