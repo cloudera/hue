@@ -68,12 +68,12 @@ class SolrApi(object):
         'field': facet['field'],
         'aggregate': facet['properties']['aggregate'] if 'properties' in facet else facet['aggregate']
     }
+
     if props['aggregate'] == 'median':
       return 'percentile(%(field)s,50)' % props
     else:
       return '%(aggregate)s(%(field)s)' % props
 
-    props = {}
   def _get_range_borders(self, collection, query):
     props = {}
     GAPS = {
@@ -598,6 +598,7 @@ class SolrApi(object):
 
       params += tuple([('stats.field', field) for field in fields])
       response = self._root.get('%(core)s/select' % {'core': core}, params=params)
+
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
