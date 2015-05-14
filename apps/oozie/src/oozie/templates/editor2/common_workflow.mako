@@ -393,7 +393,7 @@
     </h6>
     <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
       <li>
-        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
+        <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz,jar', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
         <span data-bind='template: { name: "common-fs-link", data: { path: name(), with_label: false} }'></span>
         <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
@@ -1016,7 +1016,7 @@
         </h6>
         <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
           <li>
-            <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
+            <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz,jar', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }"/>
             <span data-bind='template: { name: "common-fs-link", data: { path: name(), with_label: false} }'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
               <i class="fa fa-minus"></i>
