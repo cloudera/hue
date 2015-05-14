@@ -117,7 +117,10 @@ public class ThriftPluginServer implements Configurable, Runnable {
       server = new SanerThreadPoolServer(
         processorFactory, transport,
         transportFactory, transportFactory,
-        new TBinaryProtocol.Factory(), new TBinaryProtocol.Factory(), options);
+        // 10MB maximum request size
+        new TBinaryProtocol.Factory(true, true, 10*1024*1024),
+        new TBinaryProtocol.Factory(),
+        options);
     }
 
     Thread t = new Thread(this);
