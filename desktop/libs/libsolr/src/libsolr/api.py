@@ -73,6 +73,7 @@ class SolrApi(object):
     else:
       return '%(aggregate)s(%(field)s)' % props
 
+    props = {}
   def _get_range_borders(self, collection, query):
     props = {}
     GAPS = {
@@ -164,12 +165,14 @@ class SolrApi(object):
         'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},
         'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': gap['unit']},
         'gap': '%(coeff)s%(unit)s/%(unit)s' % gap, # add a 'auto'
-      }    
+      }
 
   def _get_fq(self, collection, query):
     params = ()
+    timeFilter = {}
 
-    timeFilter = self._get_range_borders(collection, query)
+    if collection:
+      timeFilter = self._get_range_borders(collection, query)
     if timeFilter and not timeFilter.get('time_filter_overrides'):
       params += (('fq', urllib.unquote(utf_quoter('%(field)s:[%(from)s TO %(to)s]' % timeFilter))),)
 
@@ -588,7 +591,7 @@ class SolrApi(object):
       )
 
       if query is not None:
-        params += self._get_fq(query)
+        params += self._get_fq(None, query)
 
       if facet:
         params += (('stats.facet', facet),)
