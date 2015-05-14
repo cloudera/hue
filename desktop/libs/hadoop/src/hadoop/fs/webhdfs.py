@@ -865,7 +865,7 @@ def test_fs_configuration(fs_config):
   try:
     statbuf = fs.stats('/')
     if statbuf.user != DEFAULT_HDFS_SUPERUSER:
-      return [(fs_config.WEBHDFS_URL, _("Filesystem root '/' should be owned by 'hdfs'"))]
+      return [(fs_config.WEBHDFS_URL, _("Filesystem root '/' should be owned by '%s'") % DEFAULT_HDFS_SUPERUSER)]
   except Exception, ex:
     LOG.info("%s -- Validation error: %s" % (fs, ex))
     return [(fs_config.WEBHDFS_URL, _('Failed to access filesystem root'))]
@@ -876,8 +876,7 @@ def test_fs_configuration(fs_config):
     fs.create(tmpname)
   except Exception, ex:
     LOG.info("%s -- Validation error: %s" % (fs, ex))
-    return [(fs_config.WEBHDFS_URL,
-            _('Failed to create temporary file "%s"') % tmpname)]
+    return [(fs_config.WEBHDFS_URL, _('Failed to create temporary file "%s"') % tmpname)]
 
   # Check superuser has super power
   try:
@@ -887,13 +886,12 @@ def test_fs_configuration(fs_config):
       LOG.info("%s -- Validation error: %s" % (fs, ex))
       return [(fs_config.WEBHDFS_URL,
               'Failed to chown file. Please make sure that the filesystem root '
-              'is owned by the cluster superuser ("hdfs" in most cases).')]
+              'is owned by the cluster superuser "%s".') % DEFAULT_HDFS_SUPERUSER]
   finally:
     try:
       fs.remove(tmpname)
     except Exception, ex:
       LOG.error("Failed to remove '%s': %s" % (tmpname, ex))
-      return [(fs_config.WEBHDFS_URL,
-              _('Failed to remove temporary file "%s"') % tmpname)]
+      return [(fs_config.WEBHDFS_URL, _('Failed to remove temporary file "%s"') % tmpname)]
 
-  return [ ]
+  return []
