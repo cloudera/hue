@@ -79,6 +79,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       start = re.sub('\.\d\d?\d?Z$', 'Z', start)
       try:
         start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
+        start_ts.strftime('%Y-%m-%dT%H:%M:%SZ') # Check for dates before 1900
       except Exception, e:
         LOG.error('Bad date: %s' % e)
         start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
@@ -90,6 +91,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
       end = re.sub('\.\d\d?\d?Z$', 'Z', end)
       try:
         end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
+        end_ts.strftime('%Y-%m-%dT%H:%M:%SZ') # Check for dates before 1900
       except Exception, e:
         LOG.error('Bad date: %s' % e)
         end_ts = datetime.strptime('2050-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
