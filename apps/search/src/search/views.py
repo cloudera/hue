@@ -298,7 +298,7 @@ def query_suggest(request, collection_id, query=""):
     result['message'] = response
     result['status'] = 0
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -318,7 +318,7 @@ def index_fields_dynamic(request):
                                           for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
     result['status'] = 0
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -344,7 +344,7 @@ def get_document(request):
       result['status'] = 1
 
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -366,7 +366,7 @@ def get_stats(request):
     result['message'] = ''
 
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
     if 'not currently supported' in result['message']:
       result['status'] = 1
       result['message'] = _('This field does not support stats')
@@ -398,7 +398,7 @@ def get_terms(request):
     result['message'] = ''
 
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
     if 'not currently supported' in result['message']:
       result['status'] = 1
       result['message'] = _('This field does not support stats')
@@ -448,7 +448,7 @@ def get_timeline(request):
     result['status'] = 0
     result['message'] = ''
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -469,7 +469,7 @@ def new_facet(request):
     result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
     result['status'] = 0
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -550,7 +550,7 @@ def get_range_facet(request):
     result['status'] = 0
 
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -568,7 +568,7 @@ def get_collection(request):
     result['status'] = 0
 
   except Exception, e:
-    result['message'] = unicode(str(e), "utf8")
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
@@ -586,7 +586,7 @@ def get_collections(request):
       result['status'] = 0
       result['collection'] = [json.loads(request.POST.get('collection'))['name']]
     else:
-      result['message'] = unicode(str(e), "utf8")
+      result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 
