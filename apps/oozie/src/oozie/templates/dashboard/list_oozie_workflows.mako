@@ -99,7 +99,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </tbody>
     </table>
 
-    <div class="pagination dataTables_paginate" style="margin-top: -20px">
+    <div class="pagination dataTables_paginate" style="margin-top: -50px">
       <ul>
         <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="running"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
         <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="running">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
@@ -136,6 +136,13 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </tr>
       </tbody>
      </table>
+
+     <div class="pagination dataTables_paginate" style="margin-top: -30px">
+      <ul>
+        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="completed"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
+        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="completed">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+      </ul>
+    </div>
    </div>
     </p>
   </div>
@@ -203,7 +210,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   }
 
   var refreshRunning;
-  var runningTableOffset = 1;
+  var runningTableOffset = 1, completedTableOffset = 1;
   var PAGE_SIZE = 50;
 
   $(document).ready(function () {
@@ -240,7 +247,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     });
 
     var completedTable = $("#completed-table").dataTable({
-      "sPaginationType":"bootstrap",
+      "bPaginate": false,
       "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
       "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
@@ -262,13 +269,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
         "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
         "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":"${_('No matching records')}",
-        "oPaginate":{
-          "sFirst":"${_('First')}",
-          "sLast":"${_('Last')}",
-          "sNext":"${_('Next')}",
-          "sPrevious":"${_('Previous')}"
-        }
+        "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
         $("a[data-row-selector='true']").jHueRowSelector();
@@ -302,6 +303,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           runningTableOffset += _additionalOffset;
           refreshRunning();
         }
+        else {
+          completedTableOffset += _additionalOffset;
+          refreshCompleted();
+        }
       }
     });
 
@@ -333,6 +338,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     function refreshPagination() {
       runningTableOffset = 1;
+      completedTableOffset = 1;
     }
 
     function drawTable() {
@@ -482,7 +488,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
       var offset = runningTableOffset;
       if (tableName == 'completed') {
-        //offset = completedTableOffset;
+        offset = completedTableOffset;
       }
 
       if (offset == 1 || !totalJobs) {
@@ -518,7 +524,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
 
     function refreshCompleted() {
-      $.getJSON(window.location.pathname + "?format=json" + getStatuses('completed') + getDaysFilter(), function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed') + getDaysFilter(), function (data) {
         completedTable.fnClearTable();
         $(data.jobs).each(function (iWf, item) {
           var wf = new Workflow(item);
@@ -538,6 +544,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           }
         });
         completedTable.fnDraw();
+
+        refreshPaginationButtons("completed", data.total_jobs);
       });
     }
 
