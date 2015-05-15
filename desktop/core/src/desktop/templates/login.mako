@@ -139,9 +139,8 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
   }
 
   .well {
-    border: 1px solid #D8D8D8;
-    border-radius: 3px 3px 3px 3px;
-    background-color: #F7F7F7;
+    border: none; 
+    background-color: #FFF;
   }
 
   .footer {
@@ -191,7 +190,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     <div class="login-content center">
       <div id="logo"></div>
 
-      <form method="POST" action="${action}" class="well">
+      <form method="POST" action="${action}" class="well login-content">
         ${ csrf_token(request) | n,unicode }
         %if first_login_ever:
           <h3>${_('Create your Hue account')}</h3>
