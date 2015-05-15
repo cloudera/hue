@@ -201,6 +201,8 @@
       clonedTableVisibleContainer.scrollLeft($(this).scrollLeft());
     });
 
+    clonedTableVisibleContainer.scrollLeft($(plugin.element).parent().scrollLeft());
+
     $(plugin.element).parent().data("w", clonedTableVisibleContainer.width());
 
     window.setInterval(function () {
