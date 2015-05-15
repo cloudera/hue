@@ -1272,6 +1272,7 @@ $(document).ready(function () {
   };
 
   $("#expandResults").on("click", function(){
+    $("#resultTablejHueTableExtenderClonedContainer").remove();
     if ($(this).find("i").hasClass("fa-expand")){
       $(this).find("i").removeClass("fa-expand").addClass("fa-compress");
       $(this).parent().parent().addClass("fullscreen");
