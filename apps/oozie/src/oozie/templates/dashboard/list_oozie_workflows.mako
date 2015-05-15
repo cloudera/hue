@@ -98,10 +98,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         </tr>
       </tbody>
     </table>
-    <span class="btn-toolbar" style="float:right;">
-      <a class="btn btn-running-pagination btn-running-prev" data-value='Previous' disabled='disabled'>${ _('Previous') }</a>
-      <a class="btn btn-running-pagination btn-running-next" data-value='Next'>${ _('Next') }</a>
-    </span>
+
+    <div class="pagination dataTables_paginate" style="margin-top: -20px">
+      <ul>
+        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="running"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
+        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="running">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+      </ul>
+    </div>
+
   </div>
 
   <div>
@@ -285,15 +289,19 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     });
 
 
-    $("a.btn-running-pagination").click(function () {
-      if ($.attr(this, "disabled") == null) {
-        var btnText = $(this).data('value');
-        if (btnText == 'Previous') {
-          runningTableOffset -= PAGE_SIZE;
-        } else if (btnText == 'Next') {
-          runningTableOffset += PAGE_SIZE;
+    $("a.btn-pagination").on("click", function () {
+      if (!$(this).parent().hasClass("disabled")) {
+        var _additionalOffset = 0;
+        if ($(this).data("value") == "prev") {
+          _additionalOffset = -PAGE_SIZE;
         }
-        refreshRunning();
+        else {
+          _additionalOffset = PAGE_SIZE;
+        }
+        if ($(this).data("table") == "running") {
+          runningTableOffset += _additionalOffset;
+          refreshRunning();
+        }
       }
     });
 
@@ -469,26 +477,25 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
 
     function refreshPaginationButtons(tableName, totalJobs) {
-      var prevBtn = $("a.btn-running-prev");
-      var nextBtn = $("a.btn-running-next");
+      var prevBtn = $("a.btn-pagination[data-table='"+ tableName + "'][data-value='prev']");
+      var nextBtn = $("a.btn-pagination[data-table='"+ tableName + "'][data-value='next']");
+
       var offset = runningTableOffset;
-
       if (tableName == 'completed') {
-        // TBD
-        prevBtn = $("a.btn-completed-prev");
-        nextBtn = $("a.btn-completed-next");
-        offset = completedTableOffset;
+        //offset = completedTableOffset;
       }
 
-      if(offset == 1 || !totalJobs) {
-        prevBtn.attr("disabled", 'true');
-      } else {
-        prevBtn.removeAttr("disabled");
+      if (offset == 1 || !totalJobs) {
+        prevBtn.parent().addClass("disabled");
       }
-      if (totalJobs <= (offset + PAGE_SIZE)  || !totalJobs) {
-        nextBtn.attr("disabled", 'true');
-      } else if (totalJobs > offset + PAGE_SIZE) {
-        nextBtn.removeAttr("disabled");
+      else {
+        prevBtn.parent().removeClass("disabled");
+      }
+      if (totalJobs <= (offset + PAGE_SIZE) || !totalJobs) {
+        nextBtn.parent().addClass("disabled");
+      }
+      else if (totalJobs > offset + PAGE_SIZE) {
+        nextBtn.parent().removeClass("disabled");
       }
     }
 
