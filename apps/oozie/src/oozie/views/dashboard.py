@@ -555,8 +555,12 @@ def list_oozie_sla(request):
 
     return HttpResponse(json.dumps({'oozie_slas': massaged_slas}), content_type="text/json")
 
+  configuration = oozie_api.get_configuration()
+  show_slas_hint = 'org.apache.oozie.sla.service.SLAService' not in configuration.get('oozie.services.ext', '')
+
   return render('dashboard/list_oozie_sla.mako', request, {
-    'oozie_slas': oozie_slas
+    'oozie_slas': oozie_slas,
+    'show_slas_hint': show_slas_hint
   })
 
 

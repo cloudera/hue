@@ -57,97 +57,110 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
 <div class="container-fluid">
   <div class="card card-small">
-    <h1 class="card-heading simple">
-    <div class="pull-left" style="margin-right: 20px;margin-top: 2px">${_('Search')}</div>
-    <form class="form-inline" id="searchForm" method="GET" action="." style="margin-bottom: 4px">
-      <label>
-        ${_('Name or Id')}
-        <input type="text" name="job_name" class="searchFilter input-xlarge search-query" placeholder="${_('Job Name or Id (required)')}">
-      </label>
-      <span style="padding-left:25px">
-        <label class="label-with-margin">
-          ${ _('Start') }
-          <input type="text" name="start_0" class="input-small date" value="" placeholder="${_('Date in GMT')}"  data-bind="enable: useDates">
-          <input type="text" name="start_1" class="input-small time" value="" data-bind="enable: useDates">
-        </label>
+    % if show_slas_hint:
+      <div class="card-body">
+        <p>
+          <div class="search-something center empty-wrapper">
+            <a href="http://gethue.com/hadoop-tutorial-monitor-and-get-alerts-for-your-workflows-with-the-oozie-slas/" target="_blank" title="${ _('Click to learn more') }">
+              <i class="fa fa-exclamation"></i>
+            </a>
+            <h1>${_('Oozie is not setup to create SLAs')}</h1>
+            <br/>
+          </div>
+        </p>
+      </div>
+    % else:
+      <h1 class="card-heading simple">
+      <div class="pull-left" style="margin-right: 20px;margin-top: 2px">${_('Search')}</div>
+      <form class="form-inline" id="searchForm" method="GET" action="." style="margin-bottom: 4px">
         <label>
-          ${ _('End') }
-          <input type="text" name="end_0" class="input-small date" value="" placeholder="${_('Date in GMT')}" data-bind="enable: useDates">
-          <input type="text" name="end_1" class="input-small time" value="" data-bind="enable: useDates">
+          ${_('Name or Id')}
+          <input type="text" name="job_name" class="searchFilter input-xlarge search-query" placeholder="${_('Job Name or Id (required)')}">
         </label>
-      </span>
-      <label class="checkbox label-with-margin">
-        <input type="checkbox" name="useDates" class="searchFilter" data-bind="checked: useDates, click: performSearch()">
-        ${ _('Date filter') }
-      </label>
-    </form>
-    </h1>
-    <div class="card-body">
-      <p>
-        <div class="loader hide" style="text-align: center;margin-top: 20px">
-          <!--[if lte IE 9]>
+        <span style="padding-left:25px">
+          <label class="label-with-margin">
+            ${ _('Start') }
+            <input type="text" name="start_0" class="input-small date" value="" placeholder="${_('Date in GMT')}"  data-bind="enable: useDates">
+            <input type="text" name="start_1" class="input-small time" value="" data-bind="enable: useDates">
+          </label>
+          <label>
+            ${ _('End') }
+            <input type="text" name="end_0" class="input-small date" value="" placeholder="${_('Date in GMT')}" data-bind="enable: useDates">
+            <input type="text" name="end_1" class="input-small time" value="" data-bind="enable: useDates">
+          </label>
+        </span>
+        <label class="checkbox label-with-margin">
+          <input type="checkbox" name="useDates" class="searchFilter" data-bind="checked: useDates, click: performSearch()">
+          ${ _('Date filter') }
+        </label>
+      </form>
+      </h1>
+      <div class="card-body">
+        <p>
+          <div class="loader hide" style="text-align: center;margin-top: 20px">
+            <!--[if lte IE 9]>
               <img src="${ static('desktop/art/spinner-big.gif') }" />
-          <![endif]-->
-          <!--[if !IE]> -->
-            <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
-          <!-- <![endif]-->
-        </div>
+            <![endif]-->
+            <!--[if !IE]> -->
+              <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
+            <!-- <![endif]-->
+          </div>
 
-        <div class="search-something center empty-wrapper">
-          <i class="fa fa-search"></i>
-          <h1>${_('Use the form above to search for SLAs.')}</h1>
-          <br/>
-        </div>
+          <div class="search-something center empty-wrapper">
+            <i class="fa fa-search"></i>
+            <h1>${_('Use the form above to search for SLAs.')}</h1>
+            <br/>
+          </div>
 
-        <div class="no-results center empty-wrapper hide">
-          <i class="fa fa-frown-o"></i>
-          <h1>${_('The server returned no results.')}</h1>
-          <br/>
-        </div>
+          <div class="no-results center empty-wrapper hide">
+            <i class="fa fa-frown-o"></i>
+            <h1>${_('The server returned no results.')}</h1>
+            <br/>
+          </div>
 
-        <div class="results hide">
-          <ul class="nav nav-tabs">
-            <li class="active"><a href="#slaListTab" data-toggle="tab">${ _('List') }</a></li>
-            <li><a href="#chartTab" data-toggle="tab">${ _('Chart') }</a></li>
-          </ul>
+         <div class="results hide">
+           <ul class="nav nav-tabs">
+             <li class="active"><a href="#slaListTab" data-toggle="tab">${ _('List') }</a></li>
+             <li><a href="#chartTab" data-toggle="tab">${ _('Chart') }</a></li>
+           </ul>
 
-          <div class="tab-content" style="padding-bottom:200px">
-            <div class="tab-pane active" id="slaListTab">
-              <div class="tabbable">
-                <div class="tab-content">
-                  <table id="slaTable" class="table table-striped table-condensed">
-                    <thead>
-                      <th>${_('Status')}</th>
-                      <th>${_('Name')}</th>
-                      <th>${_('Type')}</th>
-                      <th>${_('ID')}</th>
-                      <th>${_('Nominal Time')}</th>
-                      <th>${_('Expected Start')}</th>
-                      <th>${_('Actual Start')}</th>
-                      <th>${_('Expected End')}</th>
-                      <th>${_('Actual End')}</th>
-                      <th>${_('Expected Duration')}</th>
-                      <th>${_('Actual Duration')}</th>
-                      <th>${_('Job Status')}</th>
-                      <th>${_('User')}</th>
-                      <th>${_('Last Modified')}</th>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+           <div class="tab-content" style="padding-bottom:200px">
+             <div class="tab-pane active" id="slaListTab">
+               <div class="tabbable">
+                 <div class="tab-content">
+                   <table id="slaTable" class="table table-striped table-condensed">
+                     <thead>
+                       <th>${_('Status')}</th>
+                       <th>${_('Name')}</th>
+                       <th>${_('Type')}</th>
+                       <th>${_('ID')}</th>
+                       <th>${_('Nominal Time')}</th>
+                       <th>${_('Expected Start')}</th>
+                       <th>${_('Actual Start')}</th>
+                       <th>${_('Expected End')}</th>
+                       <th>${_('Actual End')}</th>
+                       <th>${_('Expected Duration')}</th>
+                       <th>${_('Actual Duration')}</th>
+                       <th>${_('Job Status')}</th>
+                       <th>${_('User')}</th>
+                       <th>${_('Last Modified')}</th>
+                     </thead>
+                     <tbody>
+                     </tbody>
+                   </table>
+                 </div>
+               </div>
+             </div>
 
-            </div>
-
-            <div class="tab-pane" id="chartTab" style="padding-left: 20px">
-              <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
-              <div id="slaChart"></div>
+             <div class="tab-pane" id="chartTab" style="padding-left: 20px">
+               <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
+               <div id="slaChart"></div>
+             </div>
             </div>
           </div>
-        </div>
-      </p>
-    </div>
+        </p>
+      </div>
+    % endif
   </div>
 </div>
 
