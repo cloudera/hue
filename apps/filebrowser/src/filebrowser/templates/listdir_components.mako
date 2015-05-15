@@ -991,6 +991,7 @@ from django.utils.translation import ugettext as _
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
           self.targetPageNum(1);
+          self.searchQuery("");
           self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + stripHashes(file.path));
           location.hash = stripHashes(file.path);
         } else {

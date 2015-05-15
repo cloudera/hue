@@ -283,19 +283,27 @@ ${ layout.menubar(section='oozie', dashboard=True) }
       % endfor
     % endfor
 
+    function filterTables(search) {
+      _metadataTable.fnFilter(search);
+      $.each(instrumentationTables, function(index, item){
+        item.fnFilter(search);
+      });
+      $.each(metricsTables, function(index, item){
+        item.fnFilter(search);
+      });
+    }
 
-    $(".searchFilter").keyup(function(){
-        _metadataTable.fnFilter($(this).val());
-        $.each(instrumentationTables, function(index, item){
-          item.fnFilter($(".searchFilter").val());
-        });
-        $.each(metricsTables, function(index, item){
-          item.fnFilter($(".searchFilter").val());
-        });
+    $(".searchFilter").on("keyup", function(){
+      filterTables($(this).val());
     });
 
     $(".dataTables_wrapper").css("min-height","0");
     $(".dataTables_filter").hide();
+
+    $(".nav-tabs a[data-toggle='tab']").on("show", function (e) {
+      $(".searchFilter").val("");
+      filterTables("");
+    });
   });
 </script>
 
