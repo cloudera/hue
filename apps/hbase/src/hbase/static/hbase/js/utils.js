@@ -155,15 +155,13 @@ function launchModal(modal, data) {
 }
 
 function editCell($data) {
-  if ($data.parent.canWrite()) {
-    if ($data.value().length > 146) {
-      launchModal('cell_edit_modal',{
-        content: $data,
-        mime: detectMimeType($data.value())
-      });
-    } else {
-      $data.editing(true);
-    }
+  if ($data.value().length > 146) {
+    launchModal('cell_edit_modal',{
+      content: $data,
+      mime: detectMimeType($data.value())
+    });
+  } else {
+    $data.editing(true);
   }
 }
 
