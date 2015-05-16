@@ -271,42 +271,58 @@ def describe_partitions(request, database, table):
 
   partitions = db.get_partitions(database, table_obj, max_parts=None)
 
-  return render("describe_partitions.mako", request,
-      {'breadcrumbs': [
-        {
+  return render("describe_partitions.mako", request, {
+    'breadcrumbs': [{
           'name': database,
           'url': reverse('metastore:show_tables', kwargs={'database': database})
-        },
-        {
+        }, {
           'name': table,
           'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
-        },
-        {
+        },{
           'name': 'partitions',
           'url': reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
         },
       ],
-      'database': database, 'table': table_obj, 'partitions': partitions, 'request': request})
+      'database': database, 'table': table_obj, 'partitions': partitions, 'request': request
+  })
 
 
-def analyze_table(request, database, table, column=None):
+def analyze_table(request, database, table, columns=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
 
   response = {'status': -1, 'message': '', 'redirect': ''}
 
-  if request.POST:
-    if column is None:
+  if request.method == "POST":
+    if columns is not None:
       query_history = db.analyze_table(database, table)
-      response['redirect'] = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + \
-                                     '?on_success_url=' + reverse('metastore:describe_table',
-                                                                  kwargs={'database': database, 'table': table.name})
-      response['status'] = 0
     else:
-      response['message'] = _('Column analysis not supportet yet')
+      query_history = db.analyze_table_columns(database, table)
+
+    response['watch_url'] = reverse('beeswax:api_watch_query_refresh_json', kwargs={'id': query_history.id})
+    response['status'] = 0
   else:
-    response['message'] = _('A POST request is required')
+    response['message'] = _('A POST request is required.')
+
+  return JsonResponse(response)
+
+
+def get_table_stats(request, database, table, column=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
+  response = {'status': -1, 'message': '', 'redirect': ''}
+
+  if column is not None:
+    stats = db.get_table_columns_stats(database, table, column)
+  else:
+    table = db.get_table(database, table)
+    stats = table.stats
+
+  response['stats'] = stats
+  response['status'] = 0
 
   return JsonResponse(response)
 

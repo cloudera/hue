@@ -1177,9 +1177,16 @@ $(document).ready(function () {
             var _table = $("<li>");
             var _metastoreLink = "";
             % if has_metastore:
-              _metastoreLink = "<i class='fa fa-eye' title='" + "${ _('View in Metastore Browser') }" + "'></i>";
+              _metastoreLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
             % endif
-            _table.html("<a href='javascript:void(0)' class='pull-right' style='padding-right:5px'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a><a href='/metastore/table/" + viewModel.database() + "/" + table + "' target='_blank' class='pull-right hide'>" + _metastoreLink + "</a><div><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul></div>");
+            _table.html("<a href='javascript:void(0)' class='pull-right' style='padding-right:5px'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a>" +
+            "<a id='stats-analysis' href='javascript:void(0)' class='pull-right'>" + _metastoreLink + "</a>" +
+
+          "<div id='stats-analysis-content' class='hide'>" +
+            "todo" +
+          "</div>" +
+
+            "<div><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul></div>");
 
             _table.data("table", table).attr("id", "navigatorTables_" + table);
             _table.find("a:eq(2)").on("click", function () {
@@ -2355,11 +2362,18 @@ $(document).ready(function () {
     });
   });
 
-  // Help.
   $("#help").popover({
     'title': "${_('Did you know?')}",
     'content': $("#help-content").html(),
     'trigger': 'hover',
+    'placement': 'left',
+    'html': true
+  });
+
+  $("#stats-analysis").popover({
+    'title': "${_('Did you know?')}",
+    'content': $("#stats-analysis-content").html(),
+    'trigger': 'click',
     'placement': 'left',
     'html': true
   });
@@ -2604,6 +2618,10 @@ $(document).ready(function () {
     '*': function () {
       routie('query');
     }
+  });
+
+  $('#stats-analysis').click(function() {
+// todo
   });
 });
 
