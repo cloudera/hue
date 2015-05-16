@@ -124,7 +124,19 @@ class HiveServerTable(Table):
     rows = self.describe
     col_row_index = 2
     end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
-    return rows[col_row_index + end_cols_index + 1:]
+    return [{
+          'col_name': prop['col_name'].strip() if prop['col_name'] else prop['col_name'],
+          'data_type': prop['data_type'].strip() if prop['data_type'] else prop['data_type'],
+          'comment': prop['comment'].strip() if prop['comment'] else prop['comment']
+        } for prop in rows[col_row_index + end_cols_index + 1:]
+    ]
+
+  @property
+  def stats(self):
+    rows = self.properties
+    col_row_index = map(itemgetter('col_name'), rows).index('Table Parameters:') + 1
+    end_cols_index = map(itemgetter('data_type'), rows[col_row_index:]).index(None)
+    return rows[col_row_index:][:end_cols_index]
 
 
 class HiveServerTRowSet2:

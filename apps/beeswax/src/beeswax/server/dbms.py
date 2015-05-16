@@ -199,16 +199,31 @@ class HiveServer2Dbms(object):
         return result
 
 
-  def analyze_table_table(self, database, table):
-    hql = 'analyze table `%(database)s.%(table_name)` compute statistics' % {'database': database, 'table_name': table.name}
-    query = hql_query(hql, database)
+  def analyze_table(self, database, table):
+    hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS' % {'database': database, 'table': table}
 
-    return self.execute_query(query)
+    return self.execute_statement(hql)
 
 
-  def analyze_table_column(self):
-    # analyze table <table_name> partition <part_name> compute statistics for columns <col_name1>, <col_name2>...
-    pass
+  def analyze_table_columns(self, database, table):
+    hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS FOR COLUMNS' % {'database': database, 'table': table}
+
+    return self.execute_statement(hql)
+
+
+  def get_table_columns_stats(self, database, table, column):
+    hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` %(column)s' % {'database': database, 'table': table, 'column': column}
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+    if handle:
+      result = self.fetch(handle, rows=100)
+      self.close(handle)
+      return [col for table in result.rows() for col in table]
+    else:
+      return []
+
 
   def drop_table(self, database, table):
     if table.is_view:
@@ -263,7 +278,7 @@ class HiveServer2Dbms(object):
       try:
         hql = "INVALIDATE METADATA %s.%s" % (database, table,)
         query = hql_query(hql, database, query_type=QUERY_TYPES[1])
-  
+
         handle = self.execute_and_wait(query, timeout_sec=10.0)
       except Exception, e:
         LOG.warn('Refresh tables cache out of sync: %s' % smart_str(e))

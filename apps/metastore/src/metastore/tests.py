@@ -57,6 +57,7 @@ def _make_query(client, query, submission_type="Execute",
 
   return res
 
+
 class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   requires_hadoop = True
 
@@ -248,3 +249,33 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
     check(client, [200, 302]) # Ok
+
+
+  def test_analyze_table_and_read_statistics(self):
+    # No stats
+    resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test'}))
+    stats = json.loads(resp.content)['stats']
+    assert_equal('COLUMN_STATS_ACCURATE', stats[0]['data_type'], resp.content)
+
+    resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    stats = json.loads(resp.content)['stats']
+    assert_equal(["foo", "int", "", "", "", "", "", "", "", "", "from deserializer"], stats[-11:])
+
+    # Compute stats
+    response = self.client.post(reverse("metastore:analyze_table", kwargs={'database': 'default', 'table': 'test'}), follow=True)
+    response = wait_for_query_to_finish(self.client, response, max=60.0)
+    assert_true(response, response)
+
+    response = self.client.post(reverse("metastore:analyze_table", kwargs={'database': 'default', 'table': 'test', 'columns': True}), follow=True)
+    response = wait_for_query_to_finish(self.client, response, max=60.0)
+    assert_true(response, response)
+
+    # Retrieve stats
+    resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test'}))
+    stats = json.loads(resp.content)['stats']
+    assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows']), resp.content)
+    assert_true(any([stat for stat in stats if stat['comment'] == '256']), resp.content)
+
+    resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    stats = json.loads(resp.content)['stats']
+    assert_equal(["foo", "int", "0", "255", "0", "180", "", "", "", "", "from deserializer"], stats[-11:])
