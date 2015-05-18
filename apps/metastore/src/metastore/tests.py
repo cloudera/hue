@@ -279,3 +279,13 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
     stats = json.loads(resp.content)['stats']
     assert_equal(["foo", "int", "0", "255", "0", "180", "", "", "", "", "from deserializer"], stats[2])
+
+
+  def test_get_top_terms(self):
+    resp = self.client.get(reverse("metastore:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    terms = json.loads(resp.content)['terms']
+    assert_equal([[255, 1], [254, 1], [253, 1], [252, 1]], terms[:4])
+
+    resp = self.client.get(reverse("metastore:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo', 'prefix': '10'}))
+    terms = json.loads(resp.content)['terms']
+    assert_equal([[109, 1], [108, 1], [107, 1], [106, 1]], terms[:4])

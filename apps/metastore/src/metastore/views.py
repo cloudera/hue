@@ -252,11 +252,11 @@ def load_table(request, database, table):
 
   if response['status'] == -1:
     popup = render('popups/load_data.mako', request, {
-                     'table': table,
-                     'load_form': load_form,
-                     'database': database,
-                     'app_name': 'beeswax'
-                 }, force_template=True).content
+           'table': table,
+           'load_form': load_form,
+           'database': database,
+           'app_name': 'beeswax'
+       }, force_template=True).content
     response['data'] = popup
 
   return JsonResponse(response)
@@ -322,6 +322,21 @@ def get_table_stats(request, database, table, column=None):
     stats = table.stats
 
   response['stats'] = stats
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+def get_top_terms(request, database, table, column, prefix=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
+  response = {'status': -1, 'message': '', 'redirect': ''}
+
+  terms = db.get_top_terms(database, table, column, prefix=prefix)
+
+  response['terms'] = terms
   response['status'] = 0
 
   return JsonResponse(response)

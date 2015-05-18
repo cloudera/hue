@@ -225,6 +225,27 @@ class HiveServer2Dbms(object):
       return []
 
 
+  def get_top_terms(self, database, table, column, limit=30, prefix=None):
+    limit = max(limit, 100)
+    prefix_match = ''
+    if prefix:
+      prefix_match = "WHERE %(column)s LIKE '%(prefix)s%%'" % {'column': column, 'prefix': prefix}
+
+    hql = 'SELECT %(column)s, COUNT(*) AS ct FROM `%(database)s`.`%(table)s` %(prefix_match)s GROUP BY %(column)s ORDER BY ct DESC LIMIT %(limit)s' % {
+        'database': database, 'table': table, 'column': column, 'prefix_match': prefix_match, 'limit': limit,
+    }
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=60.0) # Hive is very slow
+
+    if handle:
+      result = self.fetch(handle, rows=limit)
+      self.close(handle)
+      return list(result.rows())
+    else:
+      return []
+
+
   def drop_table(self, database, table):
     if table.is_view:
       hql = "DROP VIEW `%s.%s`" % (database, table.name,)
