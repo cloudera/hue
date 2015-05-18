@@ -725,7 +725,9 @@ ${layout.menubar(section='query')}
 <div id="tableAnalysis" class="popover mega-popover right">
   <div class="arrow"></div>
   <h3 class="popover-title" style="text-align: left">
-    <a class="pull-right pointer close-popover"><i class="fa fa-times"></i></a>
+    <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
+    <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
+    <span class="pull-right stats-warning muted" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
     <strong class="table-name"></strong> ${ _(' table analysis') }
   </h3>
   <div class="popover-content" style="text-align: left"></div>
@@ -978,6 +980,9 @@ ${ commonshare() | n,unicode }
     max-width: 1200px;
   }
 
+  .tooltip {
+    z-index: 10001;
+  }
 
 </style>
 
@@ -1275,33 +1280,10 @@ $(document).ready(function () {
             _table.find("a.table-stats").on("click", function () {
               var _link = $(this);
               var statsUrl = "/metastore/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
-              $.ajax({
-                url: statsUrl,
-                data: {},
-                beforeSend: function (xhr) {
-                  xhr.setRequestHeader("X-Requested-With", "Hue");
-                },
-                dataType: "json",
-                success: function (data) {
-                  if (data && data.status == 0){
-                    var _stats = "<table class='table table-striped'>";
-                    data.stats.forEach(function(item){
-                      _stats += "<tr><th>" + item.data_type + "</th><td>" + item.comment + "</td></tr>";
-                    });
-                    _stats += "</table>"
-                    $("#tableAnalysis .table-name").text(_table.data("table"));
-                    $("#tableAnalysis .popover-content").html(_stats);
-                    $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
-                  }
-                  else {
-                    $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
-                  }
-                },
-                error: function (e) {
-                  if (e.status == 500) {
-                    $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
-                  }
-                }
+              $("#tableAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+              $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+              showTableStats(statsUrl, _table.data("table"), function(){
+                $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
               });
             });
             _table.appendTo($("#navigatorTables"));
@@ -1319,6 +1301,57 @@ $(document).ready(function () {
       });
     }
   };
+
+  $("#tableAnalysis .stats-refresh").on("click", function(){
+    showTableStats($("#tableAnalysis .stats-refresh").data("startUrl"), $("#tableAnalysis .stats-refresh").data("tableName"));
+  });
+
+  function showTableStats(statsUrl, tableName, callback) {
+    $("#tableAnalysis .stats-refresh").data("startUrl", statsUrl);
+    $("#tableAnalysis .stats-refresh").data("tableName", tableName);
+    $("#tableAnalysis .popover-content").css("opacity", ".5");
+    $.ajax({
+      url: statsUrl,
+      data: {},
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-Requested-With", "Hue");
+      },
+      dataType: "json",
+      success: function (data) {
+        if (data && data.status == 0){
+          var _stats = "<table class='table table-striped'>";
+          data.stats.forEach(function(item){
+            _stats += "<tr><th>" + item.data_type + "</th><td>" + item.comment + "</td></tr>";
+            if (item.data_type == "COLUMN_STATS_ACCURATE"){
+              if (item.comment == "false"){
+                $("#tableAnalysis .stats-warning").show();
+              }
+              else {
+                $("#tableAnalysis .stats-warning").hide();
+              }
+            }
+          });
+          _stats += "</table>"
+          $("#tableAnalysis .table-name").text(tableName);
+          $("#tableAnalysis .popover-content").html(_stats);
+          $("#tableAnalysis .popover-content").css("opacity", "1");
+          if (callback){
+            callback();
+          }
+        }
+        else {
+          $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
+          $("#tableAnalysis").hide();
+        }
+      },
+      error: function (e) {
+        if (e.status == 500) {
+          $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
+          $("#tableAnalysis").hide();
+        }
+      }
+    });
+  }
 
   $("#expandResults").on("click", function(){
     $("#resultTablejHueTableExtenderClonedContainer").remove();
