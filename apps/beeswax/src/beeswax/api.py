@@ -628,3 +628,58 @@ def get_query_form(request):
   query_form.query.fields['database'].choices = databases # Could not do it in the form
 
   return query_form
+
+
+def analyze_table(request, database, table, columns=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
+  response = {'status': -1, 'message': '', 'redirect': ''}
+
+  if request.method == "POST":
+    if columns is not None:
+      query_history = db.analyze_table(database, table)
+    else:
+      query_history = db.analyze_table_columns(database, table)
+
+    response['watch_url'] = reverse('beeswax:api_watch_query_refresh_json', kwargs={'id': query_history.id})
+    response['status'] = 0
+  else:
+    response['message'] = _('A POST request is required.')
+
+  return JsonResponse(response)
+
+
+def get_table_stats(request, database, table, column=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
+  response = {'status': -1, 'message': '', 'redirect': ''}
+
+  if column is not None:
+    stats = db.get_table_columns_stats(database, table, column)
+  else:
+    table = db.get_table(database, table)
+    stats = table.stats
+
+  response['stats'] = stats
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+def get_top_terms(request, database, table, column, prefix=None):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+  db = dbms.get(request.user, query_server)
+
+  response = {'status': -1, 'message': '', 'redirect': ''}
+
+  terms = db.get_top_terms(database, table, column, prefix=prefix, limit=int(request.GET.get('limit', 30)))
+
+  response['terms'] = terms
+  response['status'] = 0
+
+  return JsonResponse(response)

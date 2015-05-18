@@ -200,19 +200,48 @@ class HiveServer2Dbms(object):
 
 
   def analyze_table(self, database, table):
-    hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS' % {'database': database, 'table': table}
+    if self.server_name == 'impala':
+      hql = 'COMPUTE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
+    else:
+      hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS' % {'database': database, 'table': table}
 
     return self.execute_statement(hql)
 
 
   def analyze_table_columns(self, database, table):
-    hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS FOR COLUMNS' % {'database': database, 'table': table}
+    if self.server_name == 'impala':
+      hql = 'COMPUTE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
+    else:
+      hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS FOR COLUMNS' % {'database': database, 'table': table}
 
     return self.execute_statement(hql)
 
 
+  def get_table_stats(self, database, table):
+    stats = []
+
+    if self.server_name == 'impala':
+      hql = 'SHOW TABLE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
+
+      query = hql_query(hql)
+      handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+      if handle:
+        result = self.fetch(handle, rows=100)
+        self.close(handle)
+        stats = list(result.rows())
+    else:
+      table = self.get_table(database, table)
+      stats = table.stats
+
+    return stats
+
+
   def get_table_columns_stats(self, database, table, column):
-    hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` %(column)s' % {'database': database, 'table': table, 'column': column}
+    if self.server_name == 'impala':
+      hql = 'SHOW COLUMN STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
+    else:
+      hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` %(column)s' % {'database': database, 'table': table, 'column': column}
 
     query = hql_query(hql)
     handle = self.execute_and_wait(query, timeout_sec=5.0)
@@ -220,16 +249,40 @@ class HiveServer2Dbms(object):
     if handle:
       result = self.fetch(handle, rows=100)
       self.close(handle)
-      return list(result.rows())
+      data = list(result.rows())
+
+      if self.server_name == 'impala':
+        data = [col for col in data if col[0] == column][0]
+        return [
+            {'col_name': data[0]},
+            {'data_type': data[1]},
+            {'distinct_count': data[2]},
+            {'num_nulls': data[3]},
+            {'max_col_len': data[4]},
+            {'avg_col_len': data[5]},
+        ]
+      else:
+        return [
+            {'col_name': data[2][0]},
+            {'data_type': data[2][1]},
+            {'min': data[2][2]},
+            {'max': data[2][3]},
+            {'num_nulls': data[2][4]},
+            {'distinct_count': data[2][5]},
+            {'avg_col_len': data[2][6]},
+            {'max_col_len': data[2][7]},
+            {'num_trues': data[2][8]},
+            {'num_falses': data[2][9]}
+        ]
     else:
       return []
 
 
   def get_top_terms(self, database, table, column, limit=30, prefix=None):
-    limit = max(limit, 100)
+    limit = min(limit, 100)
     prefix_match = ''
     if prefix:
-      prefix_match = "WHERE %(column)s LIKE '%(prefix)s%%'" % {'column': column, 'prefix': prefix}
+      prefix_match = "WHERE CAST(%(column)s AS STRING) LIKE '%(prefix)s%%'" % {'column': column, 'prefix': prefix}
 
     hql = 'SELECT %(column)s, COUNT(*) AS ct FROM `%(database)s`.`%(table)s` %(prefix_match)s GROUP BY %(column)s ORDER BY ct DESC LIMIT %(limit)s' % {
         'database': database, 'table': table, 'column': column, 'prefix_match': prefix_match, 'limit': limit,
