@@ -259,7 +259,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
     stats = json.loads(resp.content)['stats']
-    assert_equal(["foo", "int", "", "", "", "", "", "", "", "", "from deserializer"], stats[-11:])
+    assert_equal(["foo", "int", "", "", "", "", "", "", "", "", "from deserializer"], stats[2])
 
     # Compute stats
     response = self.client.post(reverse("metastore:analyze_table", kwargs={'database': 'default', 'table': 'test'}), follow=True)
@@ -278,4 +278,4 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     resp = self.client.get(reverse('metastore:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
     stats = json.loads(resp.content)['stats']
-    assert_equal(["foo", "int", "0", "255", "0", "180", "", "", "", "", "from deserializer"], stats[-11:])
+    assert_equal(["foo", "int", "0", "255", "0", "180", "", "", "", "", "from deserializer"], stats[2])

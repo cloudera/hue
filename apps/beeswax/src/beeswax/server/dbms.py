@@ -220,7 +220,7 @@ class HiveServer2Dbms(object):
     if handle:
       result = self.fetch(handle, rows=100)
       self.close(handle)
-      return [col for table in result.rows() for col in table]
+      return list(result.rows())
     else:
       return []
 
