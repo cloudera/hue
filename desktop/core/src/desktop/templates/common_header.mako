@@ -515,10 +515,10 @@ from django.utils.translation import ugettext as _
                % if 'indexer' in apps or 'search' in apps:
                  <li class="divider"></li>
                  % if 'search' in apps:
-                 <li><a href="${ url('search:new_search') }"><i class="fa fa-plus"></i> ${ _('Dashboard') }</a></li>
+                 <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
                  % endif
                  % if 'indexer' in apps:
-                 <li><a href="${ url('indexer:collections') }"><i class="fa fa-database"></i> ${ _('Indexes') }</a></li>
+                 <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
                  % endif
                % endif
              </ul>
