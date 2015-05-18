@@ -211,6 +211,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
   var refreshRunning;
   var runningTableOffset = 1, completedTableOffset = 1;
+  var totalRunningJobs = 0, totalCompletedJobs = 0;
   var PAGE_SIZE = 50;
 
   $(document).ready(function () {
@@ -235,14 +236,20 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         [ 0, "desc" ]
       ],
       "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":"${_('No matching records')}",
+        "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
         $("a[data-row-selector='true']").jHueRowSelector();
+      },
+      "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
+        if (iTotal == 0) {
+          return '${_("Showing 0 to 0 of ")}' + totalRunningJobs + '${_(" entries")}';
+        }
+        var text =' ${_("Showing ")}' + runningTableOffset + '${_(" to ")}' + (runningTableOffset + iEnd - 1) + '${_(" of ")}' + totalRunningJobs;
+        if (iEnd != iTotal) { // when filter button is selected
+          return text + '${_(" (filtered from ")}' + iMax + '${_(" entries)")}';
+        }
+        return text;
       }
     });
 
@@ -265,14 +272,20 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         [ 0, "desc" ]
       ],
       "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
         "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
         $("a[data-row-selector='true']").jHueRowSelector();
+      },
+      "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
+        if (iTotal == 0) {
+          return '${_("Showing 0 to 0 of ")}' + totalCompletedJobs + '${_(" entries")}';
+        }
+        var text =' ${_("Showing ")}' + completedTableOffset + '${_(" to ")}' + (completedTableOffset + iEnd - 1) + '${_(" of ")}' + totalCompletedJobs;
+        if (iEnd != iTotal) { // when filter button is selected
+          return text + '${_(" (filtered from ")}' + iMax + '${_(" entries)")}';
+        }
+        return text;
       }
     });
 
@@ -419,6 +432,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running') + getDaysFilter(), function (data) {
         if (data.jobs) {
+          totalRunningJobs = data.total_jobs;
+          refreshPaginationButtons("running", totalRunningJobs);
+
           var nNodes = runningTable.fnGetNodes();
 
           // check for zombie nodes
@@ -476,7 +492,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           refreshCompleted();
         }
         numRunning = data.jobs.length;
-        refreshPaginationButtons("running", data.total_jobs);
 
         window.setTimeout(refreshRunning, 5000);
       });
@@ -525,6 +540,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     function refreshCompleted() {
       $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed') + getDaysFilter(), function (data) {
+        if(data.jobs) {
+          totalCompletedJobs = data.total_jobs;
+          refreshPaginationButtons("completed", totalCompletedJobs);
+        }
         completedTable.fnClearTable();
         $(data.jobs).each(function (iWf, item) {
           var wf = new Workflow(item);
@@ -544,8 +563,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
           }
         });
         completedTable.fnDraw();
-
-        refreshPaginationButtons("completed", data.total_jobs);
       });
     }
 
