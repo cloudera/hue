@@ -16,24 +16,24 @@
 
 var utils = {
   //take an element with mustache templates as content and re-render
-  renderElement:function(element,data) {
+  renderElement: function (element, data) {
     element.html(Mustache.render(element.html(), data));
   },
-  renderElements:function(selector,data) {
-    if(selector == null || typeof(selector) == "undefined")
+  renderElements: function (selector, data) {
+    if (selector == null || typeof(selector) == "undefined")
       selector = '';
-    $(selector).each(function() {
+    $(selector).each(function () {
       utils._renderElement(this);
     });
   },
-  renderPage:function(page_selector,data) {
-    return utils.renderElements('.' + PAGE_TEMPLATE_PREFIX + page_selector,data);
+  renderPage: function (page_selector, data) {
+    return utils.renderElements('.' + PAGE_TEMPLATE_PREFIX + page_selector, data);
   },
-  setTitle:function(title) {
+  setTitle: function (title) {
     $('.page-title').text(title);
     return this;
   },
-  getTitle:function() {
+  getTitle: function () {
     return $('.page-title').text();
   }
 }
@@ -42,22 +42,22 @@ var utils = {
 function hashToArray(hash) {
   var keys = Object.keys(hash);
   var output = [];
-  for(var i=0;i<keys.length;i++) {
-    output.push({'key':keys[i],'value':hash[keys[i]]});
+  for (var i = 0; i < keys.length; i++) {
+    output.push({'key': keys[i], 'value': hash[keys[i]]});
   }
   return output;
 }
 
 function stringHashColor(str) {
   var r = 0, g = 0, b = 0, a = 0;
-  for(var i=0;i<str.length;i++) {
+  for (var i = 0; i < str.length; i++) {
     var c = str.charCodeAt(i);
     a += c;
     r += Math.floor(Math.abs(Math.sin(c)) * a);
     g += Math.floor(Math.abs(Math.cos(c)) * a);
     b += Math.floor(Math.abs(Math.tan(c)) * a);
   }
-    return 'rgb('+(r%190)+','+(g%190)+','+(b%190)+')'; //always keep values under 180, to keep it darker
+  return 'rgb(' + (r % 190) + ',' + (g % 190) + ',' + (b % 190) + ')'; //always keep values under 180, to keep it darker
 }
 
 function scrollTo(posY) {
@@ -65,9 +65,10 @@ function scrollTo(posY) {
 }
 
 function lockClickOrigin(func, origin) {
-  return function(target, ev) {
-    if(origin != ev.target)
-      return function(){};
+  return function (target, ev) {
+    if (origin != ev.target)
+      return function () {
+      };
     return func(target, ev);
   };
 }
@@ -75,7 +76,7 @@ function lockClickOrigin(func, origin) {
 function confirm(title, text, callback) {
   var modal = $('#confirm-modal');
   ko.cleanNode(modal[0]);
-  modal.attr('data-bind','template: {name: "confirm_template"}');
+  modal.attr('data-bind', 'template: {name: "confirm_template"}');
   ko.applyBindings({
     title: title,
     text: text
@@ -85,47 +86,50 @@ function confirm(title, text, callback) {
 }
 
 function launchModal(modal, data) {
-  var element = $('#'+modal);
+  var element = $('#' + modal);
   ko.cleanNode(element[0]);
-  element.attr('data-bind','template: {name: "' + modal + '_template"}');
+  element.attr('data-bind', 'template: {name: "' + modal + '_template"}');
   ko.applyBindings(data, element[0]);
   element.is('.ajaxSubmit') ? element.submit(bindSubmit) : '';
-  switch(modal) {
+  switch (modal) {
     case 'cell_edit_modal':
-      if(data.mime.split('/')[0] == 'text') {
+      if (data.mime.split('/')[0] == 'text') {
         var target = document.getElementById('codemirror_target');
         var mime = data.mime;
-        if(mime == "text/json") {
+        if (mime == "text/json") {
           mime = {name: "javascript", json: true};
         }
-            var cm = CodeMirror.fromTextArea(target, {
-              mode: mime,
-              tabMode: 'indent',
-              lineNumbers: true
-            });
-            setTimeout(function(){cm.refresh()}, 401); //CM invis bug workaround
-            element.find('input[type=submit]').click(function() {
-              cm.save();
-            });
-          }
-          app.focusModel(data.content);
+        var cm = CodeMirror.fromTextArea(target, {
+          mode: mime,
+          tabMode: 'indent',
+          lineNumbers: true,
+          readOnly: $(target).is(":disabled")
+        });
+        setTimeout(function () {
+          cm.refresh()
+        }, 401); //CM invis bug workaround
+        element.find('input[type=submit]').click(function () {
+          cm.save();
+        });
+      }
+      app.focusModel(data.content);
       data.content.history.reload();
 
-      if(data.content.parent) {
+      if (data.content.parent) {
         var path = '/hbase/api/putUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"/"' + data.content.parent.row + '"/"' + data.content.name + '"';
         var uploader = new qq.FileUploaderBasic({
           button: document.getElementById("file-upload-btn"),
           action: path,
           fileFieldLabel: 'hbase_file',
           multiple: false,
-          onComplete:function (id, fileName, response) {
+          onComplete: function (id, fileName, response) {
             data.content.reload();
           }
         });
       }
       break;
     case 'new_row_modal':
-      $('a.action_addColumnValue').click(function() {
+      $('a.action_addColumnValue').click(function () {
         $(this).parent().find("ul").append("<li><input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"family:column_name\"/> <input type=\"text\" name=\"column_values\" class=\"ignore\" placeholder = \"cell_value\"/></li>")
       });
       break;
@@ -135,28 +139,28 @@ function launchModal(modal, data) {
         action: '',
         fileFieldLabel: 'hbase_file',
         multiple: false,
-        onComplete:function (id, fileName, response) {
-          if(response.status == null) {
+        onComplete: function (id, fileName, response) {
+          if (response.status == null) {
             data.reload();
             element.modal('hide');
           } else {
             $(document).trigger("error", $(response.response).find('div.alert strong').text());
           }
         },
-        onSubmit: function() {
+        onSubmit: function () {
           uploader._handler._options.action = '/hbase/api/putUpload/"' + app.cluster() + '"/"' + app.views.tabledata.name() + '"/' + prepForTransport(data.row) + '/"' + element.find('#new_column_name').val() + '"';
         }
       });
       break;
   }
-  if(!element.hasClass('in'))
+  if (!element.hasClass('in'))
     element.modal('show');
   logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
 }
 
 function editCell($data) {
   if ($data.value().length > 146) {
-    launchModal('cell_edit_modal',{
+    launchModal('cell_edit_modal', {
       content: $data,
       mime: detectMimeType($data.value())
     });
@@ -168,51 +172,56 @@ function editCell($data) {
 function parseXML(xml) {
   var parser, xmlDoc;
   if (window.DOMParser) {
-     parser = new DOMParser();
-      xmlDoc = parser.parseFromString(xml,"text/xml");
+    parser = new DOMParser();
+    xmlDoc = parser.parseFromString(xml, "text/xml");
   }
   else {
     xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
     xmlDoc.async = false;
     xmlDoc.loadXML(xml);
-    }
-    return new XMLSerializer().serializeToString(xmlDoc);
+  }
+  return new XMLSerializer().serializeToString(xmlDoc);
 }
 
 function detectMimeType(data) {
   var MIME_TESTS = {
-    'text/plain':function(data){return !data;},
-    'type/int':function(data){return !isNaN(parseInt(data));},
-    'text/json':function(data) {
+    'text/plain': function (data) {
+      return !data;
+    },
+    'type/int': function (data) {
+      return !isNaN(parseInt(data));
+    },
+    'text/json': function (data) {
       try {
         return JSON.parse(data);
       }
-      catch(err){}
+      catch (err) {
+      }
     },
-    'text/xml':function(data) {
+    'text/xml': function (data) {
       return parseXML(data).indexOf('parsererror') == -1;
     }
   }
   var keys = Object.keys(MIME_TESTS);
-  for(var i=0;i<keys.length;i++) {
-    if(MIME_TESTS[keys[i]](data))
+  for (var i = 0; i < keys.length; i++) {
+    if (MIME_TESTS[keys[i]](data))
       return keys[i];
   }
   //images
-  var types = ['image/png','image/gif','image/jpg','application/pdf']
-  var b64 = ['iVBORw','R0lG','/9j/','JVBERi']
+  var types = ['image/png', 'image/gif', 'image/jpg', 'application/pdf']
+  var b64 = ['iVBORw', 'R0lG', '/9j/', 'JVBERi']
   try {
     var decoded = atob(data).toLowerCase().trim();
-    for(var i=0;i<types.length;i++) {
+    for (var i = 0; i < types.length; i++) {
       var location = decoded.indexOf(types[i].split('/')[1]);
-      if(location >= 0 && location<10) //stupid guess
+      if (location >= 0 && location < 10) //stupid guess
         return types[i];
     }
   }
-  catch(error) {
+  catch (error) {
   }
-  for(var i=0;i<types.length;i++) {
-    if(data.indexOf(b64[i]) >= 0 && data.indexOf(b64[i]) <= 10)
+  for (var i = 0; i < types.length; i++) {
+    if (data.indexOf(b64[i]) >= 0 && data.indexOf(b64[i]) <= 10)
       return types[i];
   }
   return 'type/null';
@@ -230,15 +239,15 @@ function formatTimestamp(timestamp) {
 
 function resetElements() {
   $(window).unbind('scroll');
-  $(window).scroll(function(e) {
-    $(".subnav.sticky").each(function() {
+  $(window).scroll(function (e) {
+    $(".subnav.sticky").each(function () {
       var padder = $(this).data('padder'), top = $(this).position().top + (padder ? window.scrollY : 0);
-      if(padder && top <= padder.position().top) {
+      if (padder && top <= padder.position().top) {
         $(this).removeClass('subnav-fixed').data('padder').remove();
         $(this).removeData('padder');
       }
-      else if(!padder && top <= window.scrollY + $('.navbar').outerHeight()) {
-        $(this).addClass('subnav-fixed').data('padder',$('<div></div>').insertBefore($(this)).css('height',$(this).outerHeight()));
+      else if (!padder && top <= window.scrollY + $('.navbar').outerHeight()) {
+        $(this).addClass('subnav-fixed').data('padder', $('<div></div>').insertBefore($(this)).css('height', $(this).outerHeight()));
       }
     });
   });
@@ -251,8 +260,8 @@ function resetSearch() {
 };
 
 function prepForTransport(value) {
-  value = value.replace(/\"/g,'\\\"').replace(/\//g,'\\/');
-  if(isNaN(parseInt(value)) && value.trim() != '')
+  value = value.replace(/\"/g, '\\\"').replace(/\//g, '\\/');
+  if (isNaN(parseInt(value)) && value.trim() != '')
     value = '"' + value + '"';
   return encodeURIComponent(value);
 };
@@ -268,20 +277,20 @@ function logGA(postfix) {
 };
 
 function table_search(value) {
-  routie(app.cluster() + '/' + app.views.tabledata.name() +'/query/' + value);
+  routie(app.cluster() + '/' + app.views.tabledata.name() + '/query/' + value);
 }
 
 function getEditablePosition(contentEditable, trimWhitespaceNodes) {
   var el = contentEditable;
-  if(window.getSelection().getRangeAt(0).startContainer == el) //raw reference for FF fix
+  if (window.getSelection().getRangeAt(0).startContainer == el) //raw reference for FF fix
     return 0;
   var index = window.getSelection().getRangeAt(0).startOffset; //ff
   var cur_node = window.getSelection().getRangeAt(0).startContainer; //ff
-  while(cur_node != null && cur_node != el) {
+  while (cur_node != null && cur_node != el) {
     var cur_sib = cur_node.previousSibling || cur_node.previousElementSibling;
-    while(cur_sib != null) {
+    while (cur_sib != null) {
       var val = $(cur_sib).text() || cur_sib.nodeValue;
-      if(typeof val !== "undefined" && val != null) {
+      if (typeof val !== "undefined" && val != null) {
         index += trimWhitespaceNodes ? val.length : val.length;
       }
       cur_sib = cur_sib.previousSibling;
@@ -291,16 +300,16 @@ function getEditablePosition(contentEditable, trimWhitespaceNodes) {
   return index;
 };
 
-function setCursor(node, pos, trimWhitespaceNodes){
+function setCursor(node, pos, trimWhitespaceNodes) {
   var sel = window.getSelection();
   var range = document.createRange();
   node = function selectNode(node) {
     var nodes = node.childNodes;
-    if(pos > 0) {
-      for(var i=0; i<nodes.length; i++) {
+    if (pos > 0) {
+      for (var i = 0; i < nodes.length; i++) {
         var val = trimWhitespaceNodes ? nodes[i].nodeValue.trim() : nodes[i].nodeValue;
-        if(val) {
-          if(val.length >= pos) {
+        if (val) {
+          if (val.length >= pos) {
             return nodes[i];
           } else {
             pos -= val.length;
@@ -319,13 +328,14 @@ function setCursor(node, pos, trimWhitespaceNodes){
     sel.removeAllRanges();
     sel.addRange(range);
     return range;
-  } catch (err) { }
+  } catch (err) {
+  }
 }
 
 function pullFromRenderer(str, renderer) {
   try {
     return str.match(renderer.select)[0].match(renderer.tag)[0];
-  } catch (e){
+  } catch (e) {
     return "";
   }
 }
@@ -333,30 +343,31 @@ function pullFromRenderer(str, renderer) {
 window.selectIndex = null;
 var fallback = typeof window.getSelection === "undefined";
 ko.bindingHandlers.editableText = {
-  init: function(element, valueAccessor, allBindingsAccessor) {
-    $(element).on('keydown', function() {
-      setTimeout(function() {
+  init: function (element, valueAccessor, allBindingsAccessor) {
+    $(element).on('keydown', function () {
+      setTimeout(function () {
         var modelValue = valueAccessor();
         var elementValue = $(element).text();
         if (ko.isWriteableObservable(modelValue) && elementValue != modelValue()) {
-          if(!fallback)
+          if (!fallback)
             window.selectIndex = getEditablePosition(element); //firefox does some tricky predictive stuff here
           modelValue(elementValue);
         }
         else { //handle non-observable one-way binding
-            var allBindings = allBindingsAccessor();
-            if (allBindings['_ko_property_writers'] && allBindings['_ko_property_writers'].htmlValue) allBindings['_ko_property_writers'].htmlValue(elementValue);
-        }}, 1);
-      });
+          var allBindings = allBindingsAccessor();
+          if (allBindings['_ko_property_writers'] && allBindings['_ko_property_writers'].htmlValue) allBindings['_ko_property_writers'].htmlValue(elementValue);
+        }
+      }, 1);
+    });
   },
-  update: function(element, valueAccessor) {
+  update: function (element, valueAccessor) {
     var value = ko.utils.unwrapObservable(valueAccessor()) || "";
-    if(value.trim() == "" && !app.search.focused()) {
+    if (value.trim() == "" && !app.search.focused()) {
       app.search.doBlur();
     } else {
-      if(!fallback) {
+      if (!fallback) {
         element.innerHTML = app.search.render(value, searchRenderers);
-        if(window.selectIndex != null) {
+        if (window.selectIndex != null) {
           setCursor(element, window.selectIndex);
         }
       }

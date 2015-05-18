@@ -15,12 +15,12 @@
 // limitations under the License.
 
 var Router = {
-  go: function(page) {
-    if(!Views.render(page))
+  go: function (page) {
+    if (!Views.render(page))
       return history.back();
     return page;
   },
-  setTable: function(cluster, table) {
+  setTable: function (cluster, table) {
     Router.setCluster(cluster);
     app.pageTitle(cluster + ' / ' + table);
     app.views.tabledata.name(table);
@@ -32,28 +32,28 @@ var Router = {
       fileFieldLabel: 'hbase_file',
       multiple: false,
       onComplete: function (id, fileName, response) {
-        if(response.response != null)
+        if (response.response != null)
           $(document).trigger("error", $(response.response).find('.alert strong').text());
         else
           app.views.tabledata.reload();
       }
     });
   },
-  setCluster: function(cluster) {
+  setCluster: function (cluster) {
     app.cluster(cluster);
   }
 }
 
 var Views = {
-  render:function(view) {
+  render: function (view) {
     page = $('.hbase-page#hbase-page-' + view);
-    if(!page)
+    if (!page)
       return false;
     $('.hbase-page.active').removeClass('active');
     page.addClass('active');
     return page;
   },
-  displayError:function(error) {
+  displayError: function (error) {
     console.log(error);
   }
 }
