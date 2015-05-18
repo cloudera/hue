@@ -721,6 +721,16 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
+
+<div id="tableAnalysis" class="popover mega-popover right">
+  <div class="arrow"></div>
+  <h3 class="popover-title" style="text-align: left">
+    <a class="pull-right pointer close-popover"><i class="fa fa-times"></i></a>
+    <strong class="table-name"></strong> ${ _(' table analysis') }
+  </h3>
+  <div class="popover-content" style="text-align: left"></div>
+</div>
+
 ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
@@ -964,6 +974,11 @@ ${ commonshare() | n,unicode }
     color: #DDD;
   }
 
+  .mega-popover {
+    max-width: 1200px;
+  }
+
+
 </style>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
@@ -1175,28 +1190,22 @@ $(document).ready(function () {
         $(data.split(" ")).each(function (cnt, table) {
           if ($.trim(table) != "") {
             var _table = $("<li>");
-            var _metastoreLink = "";
+            var _statsLink = "";
             % if has_metastore:
-              _metastoreLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
+              _statsLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
             % endif
-            _table.html("<a href='javascript:void(0)' class='pull-right' style='padding-right:5px'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a>" +
-            "<a id='stats-analysis' href='javascript:void(0)' class='pull-right'>" + _metastoreLink + "</a>" +
-
-          "<div id='stats-analysis-content' class='hide'>" +
-            "todo" +
-          "</div>" +
-
-            "<div><a href='javascript:void(0)' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul></div>");
+            _table.html("<a href='javascript:void(0)' class='preview-data pull-right' style='padding-right:5px'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a>" +
+            "<a href='javascript:void(0)' class='table-stats pull-right'>" + _statsLink + "</a>" +
+            "<div><a href='javascript:void(0)' class='show-columns' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul></div>");
 
             _table.data("table", table).attr("id", "navigatorTables_" + table);
-            _table.find("a:eq(2)").on("click", function () {
+            _table.find("a.show-columns").on("click", function () {
               if (_table.find("li").length > 0){
                 _table.find("ul").empty();
               }
               else {
                 _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
                 hac_getTableColumns(viewModel.database(), table, "", function (plain_columns, extended_columns) {
-                  _table.find("a:eq(1)").removeClass("hide");
                   _table.find("ul").empty();
                   _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
                   $(extended_columns).each(function (iCnt, col) {
@@ -1230,12 +1239,12 @@ $(document).ready(function () {
                 });
               }
             });
-            _table.find("a:eq(2)").on("dblclick", function () {
+            _table.find("a.table-link").on("dblclick", function () {
               codeMirror.replaceSelection($.trim(table) + ' ');
               codeMirror.setSelection(codeMirror.getCursor());
               codeMirror.focus();
             });
-            _table.find("a:eq(0)").on("click", function () {
+            _table.find("a.preview-data").on("click", function () {
               var tableUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table");
               $("#navigatorQuicklook").find(".tableName").text(table);
               $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.database() + "/" + table);
@@ -1261,6 +1270,39 @@ $(document).ready(function () {
                 }
               });
               $("#navigatorQuicklook").modal("show");
+            });
+
+            _table.find("a.table-stats").on("click", function () {
+              var _link = $(this);
+              var statsUrl = "/metastore/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
+              $.ajax({
+                url: statsUrl,
+                data: {},
+                beforeSend: function (xhr) {
+                  xhr.setRequestHeader("X-Requested-With", "Hue");
+                },
+                dataType: "json",
+                success: function (data) {
+                  if (data && data.status == 0){
+                    var _stats = "<table class='table table-striped'>";
+                    data.stats.forEach(function(item){
+                      _stats += "<tr><th>" + item.data_type + "</th><td>" + item.comment + "</td></tr>";
+                    });
+                    _stats += "</table>"
+                    $("#tableAnalysis .table-name").text(_table.data("table"));
+                    $("#tableAnalysis .popover-content").html(_stats);
+                    $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+                  }
+                  else {
+                    $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
+                  }
+                },
+                error: function (e) {
+                  if (e.status == 500) {
+                    $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
+                  }
+                }
+              });
             });
             _table.appendTo($("#navigatorTables"));
           }
@@ -1350,6 +1392,10 @@ $(document).ready(function () {
     _t.find(".columnSelected").removeClass("columnSelected");
     _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
     $("a[href='#results']").click();
+  });
+
+  $(document).on("click", ".close-popover", function () {
+    $("#tableAnalysis").hide();
   });
 
   $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
