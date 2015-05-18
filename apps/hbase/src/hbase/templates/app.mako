@@ -97,7 +97,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             % endif
             <a class="corner-btn btn" data-bind="event: { mousedown: function(){launchModal('cell_edit_modal', {content:$data, mime: detectMimeType($data.value())})} }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
             <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
-            <textarea data-bind="visible: !$data.isLoading() && $data.editing(), disable: ! canWrite, hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
+            <textarea data-bind="visible: !$data.isLoading() && $data.editing(), disable: ! app.views.tabledata.canWrite(), hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
             <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $data.isLoading() " />
           </div>
         </li>
@@ -407,7 +407,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </script>
 
     <script id="cell_text_template" type="text/html">
-      <textarea id="codemirror_target" data-bind="text: $data.content.value" data-use-post="true"></textarea>
+      <textarea id="codemirror_target" data-bind="text: $data.content.value, disable: ! app.views.tabledata.canWrite()" data-use-post="true"></textarea>
     </script>
 
     <script id="cell_application_template" type="text/html">
@@ -415,7 +415,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </script>
 
     <script id="cell_type_template" type="text/html">
-      <textarea style="width:100%; height: 450px;" data-bind="text: $data.content.value, disable: ! canWrite" data-use-post="true"></textarea>
+      <textarea style="width:100%; height: 450px;" data-bind="text: $data.content.value, disable: ! app.views.tabledata.canWrite()" data-use-post="true"></textarea>
     </script>
   </div>
 
