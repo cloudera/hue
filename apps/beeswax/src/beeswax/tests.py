@@ -1647,18 +1647,18 @@ for x in sys.stdin:
     resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
     stats = json.loads(resp.content)['stats']
     assert_equal([
-          {u'col_name': u'foo'},
-          {u'data_type': u'int'},
-          {u'min': u'0'},
-          {u'max': u'255'},
-          {u'num_nulls': u'0'},
-          {u'distinct_count': u'180'},          
-          {u'avg_col_len': u''},
-          {u'max_col_len': u''},
-          {u'num_trues': u''},
-          {u'num_falses': u''}
-        ],
-        stats
+        {u'col_name': u'foo'},
+        {u'data_type': u'int'},
+        {u'min': u'0'},
+        {u'max': u'255'},
+        {u'num_nulls': u'0'},
+        {u'distinct_count': u'180'},          
+        {u'avg_col_len': u''},
+        {u'max_col_len': u''},
+        {u'num_trues': u''},
+        {u'num_falses': u''}
+      ],
+      stats
     )
 
 

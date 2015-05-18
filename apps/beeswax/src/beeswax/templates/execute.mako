@@ -1279,7 +1279,7 @@ $(document).ready(function () {
 
             _table.find("a.table-stats").on("click", function () {
               var _link = $(this);
-              var statsUrl = "/metastore/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
+              var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
               $("#tableAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
               $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
               showTableStats(statsUrl, _table.data("table"), function(){
@@ -2449,14 +2449,6 @@ $(document).ready(function () {
     'html': true
   });
 
-  $("#stats-analysis").popover({
-    'title': "${_('Did you know?')}",
-    'content': $("#stats-analysis-content").html(),
-    'trigger': 'click',
-    'placement': 'left',
-    'html': true
-  });
-
   $("#hdfs-directory-help").popover({
     'title': "${_('Did you know?')}",
     'content': $("#hdfs-directory-help-content").html(),
@@ -2697,10 +2689,6 @@ $(document).ready(function () {
     '*': function () {
       routie('query');
     }
-  });
-
-  $('#stats-analysis').click(function() {
-// todo
   });
 });
 
