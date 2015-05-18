@@ -75,4 +75,7 @@ urlpatterns += patterns(
   url(r'^api/watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
 
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
+  url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', 'analyze_table', name='analyze_table'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', 'get_table_stats', name='get_table_stats'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/terms/(?P<column>\w+)/(?P<prefix>\w+)?$', 'get_top_terms', name='get_top_terms'),
 )

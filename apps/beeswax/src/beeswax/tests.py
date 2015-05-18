@@ -1567,6 +1567,7 @@ for x in sys.stdin:
     assert_true('<th>foo</th>' in resp.content, resp.content)
     assert_true([0, '0x0'] in resp.context['sample'], resp.context['sample'])
 
+
   def test_redacting_queries(self):
     c = make_logged_in_client()
 
@@ -1603,6 +1604,77 @@ for x in sys.stdin:
       assert_false(history.is_redacted)
     finally:
       redaction.global_redaction_engine.policies = old_policies
+
+
+  def test_analyze_table_and_read_statistics(self):
+    # No stats
+    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test'}))
+    stats = json.loads(resp.content)['stats']
+    assert_equal('COLUMN_STATS_ACCURATE', stats[0]['data_type'], resp.content)
+
+    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    stats = json.loads(resp.content)['stats']
+    assert_equal([
+          {u'col_name': u'foo'},
+          {u'data_type': u'int'},
+          {u'min': u''},
+          {u'max': u''},
+          {u'num_nulls': u''},
+          {u'distinct_count': u''},
+          {u'avg_col_len': u''},
+          {u'max_col_len': u''},
+          {u'num_trues': u''},
+          {u'num_falses': u''}
+        ],
+        stats
+    )
+
+    # Compute stats
+    response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': 'default', 'table': 'test'}), follow=True)
+    response = wait_for_query_to_finish(self.client, response, max=60.0)
+    assert_true(response, response)
+
+    response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': 'default', 'table': 'test', 'columns': True}), follow=True)
+    response = wait_for_query_to_finish(self.client, response, max=60.0)
+    assert_true(response, response)
+
+    # Retrieve stats
+    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test'}))
+    stats = json.loads(resp.content)['stats']
+    assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows']), resp.content)
+    assert_true(any([stat for stat in stats if stat['comment'] == '256']), resp.content)
+
+    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    stats = json.loads(resp.content)['stats']
+    assert_equal([
+          {u'col_name': u'foo'},
+          {u'data_type': u'int'},
+          {u'min': u'0'},
+          {u'max': u'255'},
+          {u'num_nulls': u'0'},
+          {u'distinct_count': u'180'},          
+          {u'avg_col_len': u''},
+          {u'max_col_len': u''},
+          {u'num_trues': u''},
+          {u'num_falses': u''}
+        ],
+        stats
+    )
+
+
+  def test_get_top_terms(self):
+    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    terms = json.loads(resp.content)['terms']
+    assert_equal([[255, 1], [254, 1], [253, 1], [252, 1]], terms[:4])
+
+    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo', 'prefix': '10'}))
+    terms = json.loads(resp.content)['terms']
+    assert_equal([[109, 1], [108, 1], [107, 1], [106, 1]], terms[:4])
+
+    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo', 'prefix': '10'}) + '?limit=2')
+    terms = json.loads(resp.content)['terms']
+    assert_equal([[109, 1], [108, 1]], terms)
+
 
 
 def test_import_gzip_reader():

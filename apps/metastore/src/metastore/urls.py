@@ -30,9 +30,4 @@ urlpatterns = patterns('metastore.views',
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/load$', 'load_table', name='load_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/read$', 'read_table', name='read_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions/(?P<partition_id>\w+)$', 'read_partition', name='read_partition'),
-
-  # API
-  url(r'^analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', 'analyze_table', name='analyze_table'),
-  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', 'get_table_stats', name='get_table_stats'),
-  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/terms/(?P<column>\w+)/(?P<prefix>\w+)?$', 'get_top_terms', name='get_top_terms'),
 )
