@@ -36,17 +36,17 @@ object SessionManager {
   val GC_PERIOD = 1000 * 60 * 60
 }
 
-class SessionManager(factory: SessionFactory) extends Logging {
+class SessionManager(factory: InteractiveSessionFactory) extends Logging {
 
   private implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
   private[this] val _idCounter = new AtomicInteger()
-  private[this] val sessions = new ConcurrentHashMap[Int, Session]()
+  private[this] val sessions = new ConcurrentHashMap[Int, InteractiveSession]()
 
   private val garbageCollector = new GarbageCollector(this)
   garbageCollector.start()
 
-  def get(sessionId: Int): Option[Session] = {
+  def get(sessionId: Int): Option[InteractiveSession] = {
     Option(sessions.get(sessionId))
   }
 
@@ -58,11 +58,11 @@ class SessionManager(factory: SessionFactory) extends Logging {
     sessions.keys
   }
 
-  def createSession(kind: Kind, proxyUser: Option[String] = None): Future[Session] = {
+  def createSession(kind: Kind, proxyUser: Option[String] = None): Future[InteractiveSession] = {
     val id = _idCounter.getAndIncrement
     val session = factory.createSession(id, kind, proxyUser = proxyUser)
 
-    session.map({ case(session: Session) =>
+    session.map({ case(session: InteractiveSession) =>
       info("created session %s" format session.id)
       sessions.put(session.id, session)
       session
@@ -81,7 +81,7 @@ class SessionManager(factory: SessionFactory) extends Logging {
     }
   }
 
-  def delete(session: Session): Future[Unit] = {
+  def delete(session: InteractiveSession): Future[Unit] = {
     session.stop().map { case _ =>
         sessions.remove(session.id)
         Unit
@@ -89,7 +89,7 @@ class SessionManager(factory: SessionFactory) extends Logging {
   }
 
   def collectGarbage() = {
-    def expired(session: Session): Boolean = {
+    def expired(session: InteractiveSession): Boolean = {
       System.currentTimeMillis() - session.lastActivity > SessionManager.TIMEOUT
     }
 

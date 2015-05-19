@@ -16,17 +16,27 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.server.interactive.ProcessSession
-import com.cloudera.hue.livy.sessions.Spark
-import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
+import com.cloudera.hue.livy.sessions.Kind
+import com.cloudera.hue.livy.yarn.Client
 
-class ProcessSessionSpec extends BaseSessionSpec with FunSpecLike with Matchers with BeforeAndAfter {
+import scala.concurrent.{Future, ExecutionContext}
 
-  val livyConf = new LivyConf()
-  livyConf.set("livy.repl.driverClassPath", sys.props("java.class.path"))
+class InteractiveSessionYarnFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
 
-  def createSession() = ProcessSession.create(livyConf, 0, Spark())
-}
+   implicit def executor: ExecutionContext = ExecutionContext.global
+
+   val client = new Client(livyConf)
+
+   override def createSession(id: Int, kind: Kind, proxyUser: Option[String] = None): Future[InteractiveSession] = {
+     Future {
+       InteractiveSessionYarn.create(livyConf, client, id, kind, proxyUser)
+     }
+   }
+
+   override def close(): Unit = {
+     client.close()
+   }
+ }

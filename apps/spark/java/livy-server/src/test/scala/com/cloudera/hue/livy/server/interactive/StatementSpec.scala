@@ -18,13 +18,12 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.interactive.Statement
-import org.json4s.JsonAST.{JArray, JString}
+import org.json4s.JsonAST.JString
 import org.json4s.{DefaultFormats, Extraction}
-import org.scalatest.{Matchers, FunSpec}
+import org.scalatest.{FunSpec, Matchers}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}

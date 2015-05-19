@@ -32,9 +32,9 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-class WebSession(val id: Int,
+class InteractiveWebSession(val id: Int,
                  val kind: Kind,
-                 val proxyUser: Option[String]) extends Session with Logging {
+                 val proxyUser: Option[String]) extends InteractiveSession with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats

@@ -28,24 +28,24 @@ import com.cloudera.hue.livy.sessions.{Kind, PySpark, Spark, State}
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
-object ThreadSession {
+object InteractiveSessionThread {
   val LIVY_HOME = System.getenv("LIVY_HOME")
   val LIVY_REPL = LIVY_HOME + "/bin/livy-repl"
 
-  def create(id: Int, kind: Kind): Session = {
+  def create(id: Int, kind: Kind): InteractiveSession = {
     val session = kind match {
       case Spark() =>
         SparkSession.create()
       case PySpark() =>
         PythonSession.createPySpark()
     }
-    new ThreadSession(id, kind, session)
+    new InteractiveSessionThread(id, kind, session)
   }
 }
 
-private class ThreadSession(val id: Int,
+private class InteractiveSessionThread(val id: Int,
                             val kind: Kind,
-                            session: com.cloudera.hue.livy.repl.Session) extends Session {
+                            session: com.cloudera.hue.livy.repl.Session) extends InteractiveSession {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 

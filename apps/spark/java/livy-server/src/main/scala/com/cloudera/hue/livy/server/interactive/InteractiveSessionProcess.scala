@@ -32,15 +32,15 @@ import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.io.Source
 
-object ProcessSession extends Logging {
+object InteractiveSessionProcess extends Logging {
 
   val CONF_LIVY_REPL_JAR = "livy.repl.jar"
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def create(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String] = None): Session = {
+  def create(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String] = None): InteractiveSession = {
     val process = startProcess(livyConf, id, kind, proxyUser)
-    new ProcessSession(id, kind, proxyUser, process)
+    new InteractiveSessionProcess(id, kind, proxyUser, process)
   }
 
   // Loop until we've started a process with a valid port.
@@ -73,10 +73,10 @@ object ProcessSession extends Logging {
   }
 }
 
-private class ProcessSession(id: Int,
+private class InteractiveSessionProcess(id: Int,
                              kind: Kind,
                              proxyUser: Option[String],
-                             process: Process) extends WebSession(id, kind, proxyUser) {
+                             process: Process) extends InteractiveWebSession(id, kind, proxyUser) {
 
   val stdoutThread = new Thread {
     override def run() = {

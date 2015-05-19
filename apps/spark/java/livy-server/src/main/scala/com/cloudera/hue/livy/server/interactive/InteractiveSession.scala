@@ -28,13 +28,13 @@ import com.cloudera.hue.livy.sessions.{Kind, State}
 import scala.concurrent._
 import scala.concurrent.duration.Duration
 
-object Session {
+object InteractiveSession {
   class SessionFailedToStart(msg: String) extends Exception(msg)
 
   class StatementNotFound extends Exception
 }
 
-trait Session {
+trait InteractiveSession {
   def id: Int
 
   def kind: Kind

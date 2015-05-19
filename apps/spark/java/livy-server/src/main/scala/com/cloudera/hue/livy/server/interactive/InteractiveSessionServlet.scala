@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import Session.SessionFailedToStart
+import InteractiveSession.SessionFailedToStart
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonAST.JString
@@ -34,9 +34,9 @@ import org.scalatra.json.JacksonJsonSupport
 import scala.concurrent._
 import scala.concurrent.duration._
 
-object SessionServlet extends Logging
+object InteractiveSessionServlet extends Logging
 
-class SessionServlet(sessionManager: SessionManager)
+class InteractiveSessionServlet(sessionManager: SessionManager)
   extends ScalatraServlet
   with FutureSupport
   with MethodOverride
@@ -139,7 +139,7 @@ class SessionServlet(sessionManager: SessionManager)
 
     sessionManager.get(sessionId) match {
       case None => NotFound("Session not found")
-      case Some(session: Session) =>
+      case Some(session: InteractiveSession) =>
         val from = params.get("from").map(_.toInt).getOrElse(0)
         val size = params.get("size").map(_.toInt).getOrElse(session.statements.length)
 
@@ -191,7 +191,7 @@ class SessionServlet(sessionManager: SessionManager)
     case e: SessionFailedToStart => InternalServerError(e.getMessage)
     case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
     case e =>
-      SessionServlet.error("internal error", e)
+      InteractiveSessionServlet.error("internal error", e)
       InternalServerError(e.toString)
   }
 }
@@ -212,7 +212,7 @@ private object Serializers {
 
   private def serializeStatementState(state: Statement.State) = JString(state.toString)
 
-  def serializeSession(session: Session): JValue = {
+  def serializeSession(session: InteractiveSession): JValue = {
     ("id", session.id) ~
       ("state", serializeSessionState(session.state)) ~
       ("kind", serializeSessionKind(session.kind)) ~
@@ -232,11 +232,11 @@ private object Serializers {
       ("output" -> output)
   }
 
-  case object SessionSerializer extends CustomSerializer[Session](implicit formats => ( {
+  case object SessionSerializer extends CustomSerializer[InteractiveSession](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case session: Session =>
+    case session: InteractiveSession =>
       serializeSession(session)
   }
     )
