@@ -23,6 +23,7 @@ import java.util.concurrent.TimeoutException
 
 import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.server.Session
 import com.cloudera.hue.livy.sessions.{Kind, State}
 
 import scala.concurrent._
@@ -34,16 +35,12 @@ object InteractiveSession {
   class StatementNotFound extends Exception
 }
 
-trait InteractiveSession {
-  def id: Int
-
+trait InteractiveSession extends Session {
   def kind: Kind
 
   def proxyUser: Option[String]
 
   def lastActivity: Long
-
-  def state: State
 
   def url: Option[URL]
 

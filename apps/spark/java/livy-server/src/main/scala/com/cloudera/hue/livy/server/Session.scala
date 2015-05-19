@@ -16,22 +16,12 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.server
 
-sealed trait State
+import com.cloudera.hue.livy.sessions.State
 
-case class Starting() extends State {
-  override def toString = "starting"
-}
+trait Session {
+  def id: Int
 
-case class Running() extends State {
-  override def toString = "running"
-}
-
-case class Error() extends State {
-  override def toString = "error"
-}
-
-case class Success() extends State {
-  override def toString = "success"
+  def state: State
 }

@@ -32,6 +32,10 @@ case class Idle() extends State {
   override def toString = "idle"
 }
 
+case class Running() extends State {
+  override def toString = "running"
+}
+
 case class Busy() extends State {
   override def toString = "busy"
 }
@@ -46,4 +50,8 @@ case class ShuttingDown() extends State {
 
 case class Dead() extends State {
   override def toString = "dead"
+}
+
+case class Success() extends State {
+  override def toString = "success"
 }

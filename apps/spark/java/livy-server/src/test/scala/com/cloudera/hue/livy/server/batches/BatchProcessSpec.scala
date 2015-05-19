@@ -22,8 +22,9 @@ import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.sessions.Success
 import com.cloudera.hue.livy.{LivyConf, Utils}
-import com.cloudera.hue.livy.server.batch.{Success, CreateBatchRequest, BatchProcess}
+import com.cloudera.hue.livy.server.batch.{CreateBatchRequest, BatchProcess}
 import org.scalatest.{ShouldMatchers, BeforeAndAfterAll, FunSpec}
 
 import scala.concurrent.duration.Duration

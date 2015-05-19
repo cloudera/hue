@@ -18,13 +18,11 @@
 
 package com.cloudera.hue.livy.server.batch
 
+import com.cloudera.hue.livy.server.Session
+
 import scala.concurrent.Future
 
-abstract class Batch {
-  def id: Int
-
-  def state: State
-
+trait Batch extends Session {
   def lines: IndexedSeq[String]
 
   def stop(): Future[Unit]
