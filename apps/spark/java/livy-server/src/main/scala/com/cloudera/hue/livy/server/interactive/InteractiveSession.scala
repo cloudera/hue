@@ -52,8 +52,6 @@ trait InteractiveSession extends Session {
 
   def interrupt(): Future[Unit]
 
-  def stop(): Future[Unit]
-
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
   final def waitForStateChange(oldState: State, atMost: Duration) = {

@@ -20,8 +20,12 @@ package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.sessions.State
 
+import scala.concurrent.Future
+
 trait Session {
   def id: Int
 
   def state: State
+
+  def stop(): Future[Unit]
 }
