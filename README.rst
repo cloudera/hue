@@ -85,6 +85,7 @@ your system:
       * openldap-dev / libldap2-dev
       * python-dev
       * python-setuptools
+      * libgmp3-dev
 
     CentOS/RHEL:
       * ant
@@ -105,12 +106,14 @@ your system:
       * python-devel
       * sqlite-devel
       * openssl-devel (for version 7+)
+      * gmp-devel
 
     MacOS:
       * Xcode command line tools
       * Oracle's JDK 1.7+
       * maven (Homebrew)
       * mysql (Homebrew)
+      * gmp (Homebrew)
 
 
 File Layout
