@@ -46,3 +46,7 @@
 .sampleTable td, .sampleTable th {
   white-space: nowrap;
 }
+
+.mega-popover {
+  max-width: 1200px;
+}

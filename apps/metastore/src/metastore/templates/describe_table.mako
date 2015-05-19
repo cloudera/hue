@@ -36,11 +36,18 @@ ${ components.menubar() }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 
-<%def name="column_table(cols)">
-  <table class="table table-striped table-condensed sampleTable">
+<%def name="column_table(cols, withStats=False)">
+  <table class="table table-striped table-condensed sampleTable
+  %if withStats:
+  skip-extender
+  %endif
+  ">
     <thead>
       <tr>
-        <th>&nbsp;</th>
+        %if withStats:
+          <th width="10">&nbsp;</th>
+        %endif
+        <th width="10">&nbsp;</th>
         <th>${_('Name')}</th>
         <th>${_('Type')}</th>
         <th>${_('Comment')}</th>
@@ -49,6 +56,9 @@ ${ components.menubar() }
     <tbody>
       % for column in cols:
         <tr>
+          %if withStats:
+            <td class="row-selector-exclude"><a href="javascript:void(0)" data-column="${ column.name }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+          %endif
           <td>${ loop.index }</td>
           <td title="${ _("Scroll to the column") }">
             <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
@@ -91,7 +101,7 @@ ${ components.menubar() }
             % endif
 
             <ul class="nav nav-tabs">
-              <li class="active"><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+              <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
               % if table.partition_keys:
               <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
               % endif
@@ -102,8 +112,8 @@ ${ components.menubar() }
             </ul>
 
             <div class="tab-content">
-              <div class="active tab-pane" id="columns">
-                ${ column_table(table.cols) }
+              <div class="tab-pane" id="columns">
+                ${ column_table(table.cols, True) }
               </div>
 
               % if table.partition_keys:
@@ -205,24 +215,18 @@ ${ components.menubar() }
 <div id="import-data-modal" class="modal hide fade"></div>
 </div>
 
+<div id="columnAnalysis" class="popover mega-popover right">
+  <div class="arrow"></div>
+  <h3 class="popover-title" style="text-align: left">
+    <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
+    <strong class="column-name"></strong> ${ _(' column analysis') }
+  </h3>
+  <div class="popover-content" style="text-align: left"></div>
+</div>
+
+
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
-    $(".datatables").dataTable({
-      "bPaginate": false,
-      "bLengthChange": false,
-      "bInfo": false,
-      "bFilter": false,
-      "oLanguage": {
-        "sEmptyTable": "${_('No data available')}",
-        "sZeroRecords": "${_('No matching records')}",
-      },
-      "aoColumns": [
-        { "sWidth" : "10px" },
-        null,
-        null,
-        { "bSortable": false }
-      ],
-    });
 
     $(".column-selector").on("click", function () {
       var _t = $("#sample");
@@ -248,15 +252,23 @@ ${ components.menubar() }
         "bInfo": false,
         "bFilter": false,
         "fnInitComplete": function () {
-          $(".sampleTable").parent().jHueTableScroller();
-          $(".sampleTable").jHueTableExtender({
-            hintElement: "#jumpToColumnAlert",
-            fixedHeader: true
-          });
+          $(this).parent().jHueTableScroller();
+          if ($(this).hasClass("skip-extender")){
+            $(this).jHueTableExtender({
+              includeNavigator: false,
+              fixedHeader: true
+            });
+          }
+          else {
+            $(this).jHueTableExtender({
+              hintElement: "#jumpToColumnAlert",
+              fixedHeader: true
+            });
+          }
         },
         "oLanguage": {
           "sEmptyTable": "${_('No data available')}",
-          "sZeroRecords": "${_('No matching records')}",
+          "sZeroRecords": "${_('No matching records')}"
         }
       });
     });
@@ -270,7 +282,53 @@ ${ components.menubar() }
     });
 
     // convert link text to URLs in comment column (Columns tab)
-    hue.text2Url(document.querySelectorAll('.datatables td:last-child'));
+    hue.text2Url(document.querySelectorAll('.sampleTable td:last-child'));
+
+    $('a[data-toggle="tab"]:eq(0)').click();
+
+    $("a[data-column]").on("click", function(){
+      var _link = $(this);
+      var _col = _link.data("column");
+      var statsUrl = "/impala/api/table/${database}/${table.name}/stats/" + _col;
+      $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+      $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+      $.ajax({
+        url: statsUrl,
+        data: {},
+        beforeSend: function (xhr) {
+          xhr.setRequestHeader("X-Requested-With", "Hue");
+        },
+        dataType: "json",
+        success: function (data) {
+          if (data && data.status == 0){
+            var _stats = "<table class='table table-striped'>";
+            data.stats.forEach(function(item){
+              _stats += "<tr><th>" + Object.keys(item)[0] + "</th><td>" + item[Object.keys(item)[0]] + "</td></tr>";
+            });
+            _stats += "</table>"
+            $("#columnAnalysis .column-name").text(_col);
+            $("#columnAnalysis .popover-content").html(_stats);
+            $("#columnAnalysis .popover-content").css("opacity", "1");
+            $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+          }
+          else {
+            $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
+            $("#columnAnalysis").hide();
+          }
+        },
+        error: function (e) {
+          if (e.status == 500) {
+            $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
+            $("#columnAnalysis").hide();
+          }
+        }
+      });
+    });
+
+    $(document).on("click", ".close-popover", function () {
+      $("#columnAnalysis").hide();
+    });
+
   });
 </script>
 
