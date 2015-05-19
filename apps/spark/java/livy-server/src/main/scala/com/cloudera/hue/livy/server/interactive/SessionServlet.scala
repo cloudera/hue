@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.sessions
+package com.cloudera.hue.livy.server.interactive
 
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.sessions.Session.SessionFailedToStart
+import Session.SessionFailedToStart
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonAST.JString

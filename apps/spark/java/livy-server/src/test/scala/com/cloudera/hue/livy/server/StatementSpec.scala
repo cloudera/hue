@@ -21,7 +21,7 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.sessions.Statement
+import com.cloudera.hue.livy.server.interactive.Statement
 import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{Matchers, FunSpec}

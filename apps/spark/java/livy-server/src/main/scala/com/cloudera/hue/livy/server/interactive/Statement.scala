@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.sessions
+package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import org.json4s.JValue
