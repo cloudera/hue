@@ -50,11 +50,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         data-bind="css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-cog"></i>
     </a>
-    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"
-        data-bind="css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-calendar"></i>
-    </a>
-    &nbsp;
     <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;</span>
 
     <a class="btn pointer" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
@@ -82,6 +77,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
       </label>
     <!-- /ko -->
+
+    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
+    <span data-bind="template: {name: 'time-filter'}"></span>
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
@@ -102,11 +100,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
       <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
 
-      <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px">
+      <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
+
+      <span data-bind="template: {name: 'time-filter'}"></span>
 
     </div>
   </form>
@@ -928,7 +928,7 @@ ${ dashboard.layout_skeleton() }
                        value: properties.gap">
         </select>&nbsp;
       <!-- /ko -->
-    
+
       <!-- ko if: properties.canRange -->
         <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
           <span class="facet-field-label">${ _('Zoom') }</span>
@@ -1011,9 +1011,9 @@ ${ dashboard.layout_skeleton() }
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
           onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
-        />      
+        />
       <!-- /ko -->
-      
+
       <!-- ko if: dimension() == 3 -->
       <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
         type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
@@ -1022,8 +1022,8 @@ ${ dashboard.layout_skeleton() }
         onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
         onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
         onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
-      <!-- /ko -->      
-      
+      <!-- /ko -->
+
     <!-- /ko -->
   </div>
   <!-- /ko -->
@@ -1601,6 +1601,38 @@ ${ dashboard.layout_skeleton() }
   </div>
 </div>
 
+
+<script type="text/html" id="time-filter">
+  <span data-bind="visible: $root.availableDateFields().length > 0" >
+    <span data-bind="template: {name: 'time-filter-select'}"></span>
+
+    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"
+        data-bind="css: {'btn': true}">
+      <i class="fa fa-calendar"></i>
+    </a>
+  </span>
+</script>
+
+
+<script type="text/html" id="time-filter-select">
+  <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium">
+    <option value="all">${ _('All') }</option>
+    <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
+    <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
+    <option value="1HOURS">${ _('Past 1 Hour') }</option>
+    <option value="12HOURS">${ _('Past 12 Hours') }</option>
+    <option value="1DAYS">${ _('Past day') }</option>
+    <option value="2DAYS">${ _('Past 2 days') }</option>
+    <option value="7DAYS">${ _('Past 7 days') }</option>
+    <option value="1MONTHS">${ _('Past 1 Month') }</option>
+    <option value="3MONTHS">${ _('Past 3 Months') }</option>
+    <option value="1YEARS">${ _('Past Year') }</option>
+    <option value="2YEARS">${ _('Past 2 Years') }</option>
+    <option value="10YEARS">${ _('Past 10 Years') }</option>
+  </select>
+</script>
+
+
 <div id="timeSettingsDemiModal" class="demi-modal hide" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
@@ -1610,60 +1642,47 @@ ${ dashboard.layout_skeleton() }
           <fieldset>
             <legend><i class="fa fa-calendar"></i> ${ _('Time settings') }</legend>
 
-            <!-- ko if: $root.availableDateFields().length > 0 -->
-            <div class="control-group">
-              <label class="control-label" for="settingstimefield">${ _('Date/time field') }</label>
-              <div class="controls">
-                <select id="settingstimefield" data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name'" class="input-medium"></select>
+            <span data-bind="visible: $root.availableDateFields().length > 0">
+              <div class="control-group">
+                <label class="control-label" for="settingstimefield">${ _('Date/time field') }</label>
+                <div class="controls">
+                  <select id="settingstimefield" data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name'" class="input-medium"></select>
+                </div>
               </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="settingstimetype">${ _('Type') }</label>
-              <div class="controls">
-                <label class="radio inline"><input type="radio" name="settingstimetype" value="rolling" data-bind="checked: collection.timeFilter.type" /> ${ _('Rolling') }</label>
-                <label class="radio inline"><input type="radio" name="settingstimetype" value="fixed" data-bind="checked: collection.timeFilter.type" /> ${ _('Fixed') }</label>
+              <div class="control-group">
+                <label class="control-label" for="settingstimetype">${ _('Type') }</label>
+                <div class="controls">
+                  <label class="radio inline"><input type="radio" name="settingstimetype" value="rolling" data-bind="checked: collection.timeFilter.type" /> ${ _('Rolling') }</label>
+                  <label class="radio inline"><input type="radio" name="settingstimetype" value="fixed" data-bind="checked: collection.timeFilter.type" /> ${ _('Fixed') }</label>
+                </div>
               </div>
-            </div>
-            <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'rolling'">
-              <label class="control-label" for="settingstimeinterval">${ _('Interval') }</label>
-              <div class="controls">
-                <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium">
-                  <option value="all">${ _('All') }</option>
-                  <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
-                  <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
-                  <option value="1HOURS">${ _('Past 1 Hour') }</option>
-                  <option value="12HOURS">${ _('Past 12 Hours') }</option>
-                  <option value="1DAYS">${ _('Past day') }</option>
-                  <option value="2DAYS">${ _('Past 2 days') }</option>
-                  <option value="7DAYS">${ _('Past 7 days') }</option>
-                  <option value="1MONTHS">${ _('Past 1 Month') }</option>
-                  <option value="3MONTHS">${ _('Past 3 Months') }</option>
-                  <option value="1YEARS">${ _('Past Year') }</option>
-                  <option value="2YEARS">${ _('Past 2 Years') }</option>
-                  <option value="10YEARS">${ _('Past 10 Years') }</option>
-                </select>
+              <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'rolling'">
+                <label class="control-label" for="settingstimeinterval">${ _('Interval') }</label>
+                <div class="controls">
+                  <span data-bind="template: {name: 'time-filter-select'}"></span>
+                </div>
               </div>
-            </div>
-            <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
-              <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
-              <div class="controls">
-                <input id="settingstimestart" type="text" data-bind="collection.timeFilter.from" />
+              <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
+                <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
+                <div class="controls">
+                  <input id="settingstimestart" type="text" data-bind="collection.timeFilter.from" />
+                </div>
               </div>
-            </div>
-            <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
-              <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
-              <div class="controls">
-                <input id="settingstimeend" type="text" data-bind="collection.timeFilter.to" />
+              <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
+                <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
+                <div class="controls">
+                  <input id="settingstimeend" type="text" data-bind="collection.timeFilter.to" />
+                </div>
               </div>
-            </div>
-            <div class="control-group">
-              <div class="controls">
-                <label class="checkbox">
-                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
-                </label>
+              <div class="control-group">
+                <div class="controls">
+                  <label class="checkbox">
+                    <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+                  </label>
+                </div>
               </div>
-            </div>
-            <!-- /ko -->
+            </span>
+
             <!-- ko if: $root.availableDateFields().length == 0 -->
               <label class="checkbox">
                   <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
