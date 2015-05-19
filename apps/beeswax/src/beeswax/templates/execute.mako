@@ -733,6 +733,16 @@ ${layout.menubar(section='query')}
   <div class="popover-content" style="text-align: left"></div>
 </div>
 
+<div id="columnAnalysis" class="popover mega-popover right">
+  <div class="arrow"></div>
+  <h3 class="popover-title" style="text-align: left">
+    <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
+    <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
+    <strong class="column-name"></strong> ${ _(' column analysis') }
+  </h3>
+  <div class="popover-content" style="text-align: left"></div>
+</div>
+
 ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
@@ -756,6 +766,8 @@ ${ commonshare() | n,unicode }
 <link href="${ static('desktop/ext/css/bootstrap-editable.css') }" rel="stylesheet">
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+
+<script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <style type="text/css">
   h1 {
@@ -1201,7 +1213,7 @@ $(document).ready(function () {
             % endif
             _table.html("<a href='javascript:void(0)' class='preview-data pull-right' style='padding-right:5px'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a>" +
             "<a href='javascript:void(0)' class='table-stats pull-right'>" + _statsLink + "</a>" +
-            "<div><a href='javascript:void(0)' class='show-columns' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled'></ul></div>");
+            "<div><a href='javascript:void(0)' class='show-columns' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled' style='overflow-x: auto'></ul></div>");
 
             _table.data("table", table).attr("id", "navigatorTables_" + table);
             _table.find("a.show-columns").on("click", function () {
@@ -1233,12 +1245,26 @@ $(document).ready(function () {
                       return escapeOutput(title);
                     };
 
-                    _column.html("<a href='javascript:void(0)' style='padding-left:10px' title='" + getTitle() + "'><i class='fa fa-columns'></i> " + col.name + (col.type != "" ? " (" + truncateOutput({ name: col.name, type: col.type}) + ")" : "") + "</a>");
+                    var _colStatsLink = "";
+                    % if has_metastore:
+                      _colStatsLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
+                    % endif
+
+                    _column.html("<a href='javascript:void(0)' style='padding-left:10px' title='" + getTitle() + "'><i class='fa fa-columns'></i> " + col.name + (col.type != "" ? " (" + truncateOutput({ name: col.name, type: col.type}) + ")" : "") + "</a> <a class='pointer col-stats'>" + _colStatsLink + "</a>");
                     _column.appendTo(_table.find("ul"));
                     _column.on("dblclick", function () {
                       codeMirror.replaceSelection($.trim(col.name) + ', ');
                       codeMirror.setSelection(codeMirror.getCursor());
                       codeMirror.focus();
+                    });
+                    _column.find("a.col-stats").on("click", function () {
+                      var _link = $(this);
+                      var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/" + col.name;
+                      $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+                      $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+                      showColumnStats(statsUrl, col.name, function () {
+                        $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+                      });
                     });
                   });
                 });
@@ -1301,57 +1327,6 @@ $(document).ready(function () {
       });
     }
   };
-
-  $("#tableAnalysis .stats-refresh").on("click", function(){
-    showTableStats($("#tableAnalysis .stats-refresh").data("startUrl"), $("#tableAnalysis .stats-refresh").data("tableName"));
-  });
-
-  function showTableStats(statsUrl, tableName, callback) {
-    $("#tableAnalysis .stats-refresh").data("startUrl", statsUrl);
-    $("#tableAnalysis .stats-refresh").data("tableName", tableName);
-    $("#tableAnalysis .popover-content").css("opacity", ".5");
-    $.ajax({
-      url: statsUrl,
-      data: {},
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      dataType: "json",
-      success: function (data) {
-        if (data && data.status == 0){
-          var _stats = "<table class='table table-striped'>";
-          data.stats.forEach(function(item){
-            _stats += "<tr><th>" + item.data_type + "</th><td>" + item.comment + "</td></tr>";
-            if (item.data_type == "COLUMN_STATS_ACCURATE"){
-              if (item.comment == "false"){
-                $("#tableAnalysis .stats-warning").show();
-              }
-              else {
-                $("#tableAnalysis .stats-warning").hide();
-              }
-            }
-          });
-          _stats += "</table>"
-          $("#tableAnalysis .table-name").text(tableName);
-          $("#tableAnalysis .popover-content").html(_stats);
-          $("#tableAnalysis .popover-content").css("opacity", "1");
-          if (callback){
-            callback();
-          }
-        }
-        else {
-          $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
-          $("#tableAnalysis").hide();
-        }
-      },
-      error: function (e) {
-        if (e.status == 500) {
-          $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
-          $("#tableAnalysis").hide();
-        }
-      }
-    });
-  }
 
   $("#expandResults").on("click", function(){
     $("#resultTablejHueTableExtenderClonedContainer").remove();
@@ -1427,8 +1402,12 @@ $(document).ready(function () {
     $("a[href='#results']").click();
   });
 
-  $(document).on("click", ".close-popover", function () {
+  $(document).on("click", "#tableAnalysis .close-popover", function () {
     $("#tableAnalysis").hide();
+  });
+
+  $(document).on("click", "#columnAnalysis .close-popover", function () {
+    $("#columnAnalysis").hide();
   });
 
   $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
