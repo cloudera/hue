@@ -98,7 +98,11 @@ class SessionManager(factory: InteractiveSessionFactory) extends Logging {
 }
 
 case class CreateInteractiveRequest(kind: Kind,
-                                    proxyUser: Option[String] = None)
+                                    proxyUser: Option[String] = None,
+                                    driverMemory: Option[String] = None,
+                                    driverCores: Option[Int] = None,
+                                    executorMemory: Option[String] = None,
+                                    executorCores: Option[Int] = None)
 
 class SessionNotFound extends Exception
 

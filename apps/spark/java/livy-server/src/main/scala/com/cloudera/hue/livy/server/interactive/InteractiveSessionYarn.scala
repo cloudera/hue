@@ -46,6 +46,10 @@ object InteractiveSessionYarn {
     builder.className("com.cloudera.hue.livy.repl.Main")
     builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
     createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
+    createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
+    createInteractiveRequest.driverCores.foreach(builder.driverCores)
+    createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
+    createInteractiveRequest.executorCores.foreach(builder.executorCores)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(redirect = true)
