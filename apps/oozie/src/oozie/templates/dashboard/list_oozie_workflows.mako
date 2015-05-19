@@ -30,7 +30,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 <div class="container-fluid">
   <div class="card card-small">
-  <div class="card-body">
+  <div class="card-body" style="padding-bottom: 20px">
   <p>
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
@@ -99,7 +99,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </tbody>
     </table>
 
-    <div class="pagination dataTables_paginate" style="margin-top: -50px">
+    <span class="running-info" style="padding-left: 4px"></span>
+
+    <div class="pagination dataTables_paginate">
       <ul>
         <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="running"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
         <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="running">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
@@ -137,7 +139,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </tbody>
      </table>
 
-     <div class="pagination dataTables_paginate" style="margin-top: -30px">
+     <span class="completed-info" style="padding-left: 4px"></span>
+
+     <div class="pagination dataTables_paginate">
       <ul>
         <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="completed"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
         <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="completed">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
@@ -215,11 +219,28 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   var PAGE_SIZE = 50;
 
   $(document).ready(function () {
+
+    function showTableInfo(oSettings, table, tableOffset, totalJobs) {
+      var _disp = oSettings.fnRecordsDisplay();
+      var _tot = oSettings.fnRecordsTotal();
+      var _text = "";
+      if (_tot == 0) {
+        _text = '${_("Showing 0 to 0 of ")}' + totalJobs + '${_(" entries")}';
+      }
+      else {
+        _text = ' ${_("Showing ")}' + tableOffset + '${_(" to ")}' + (tableOffset + oSettings.fnDisplayEnd() - 1) + '${_(" of ")}' + totalJobs;
+        if (_disp != _tot) { // when filter button is selected
+          _text += '${_(" (filtered from ")}' + _tot + '${_(" entries)")}';
+        }
+      }
+      $(table).text(_text);
+    }
+
     var runningTable = $("#running-table").dataTable({
       "bPaginate": false,
       "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
-      "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
+      "sDom":"<'row'r>t<'row'<'span6'><''p>>",
       "aoColumns":[
         { "bSortable":false },
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
@@ -239,17 +260,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
+        showTableInfo(oSettings, ".running-info", runningTableOffset, totalRunningJobs);
         $("a[data-row-selector='true']").jHueRowSelector();
-      },
-      "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-        if (iTotal == 0) {
-          return '${_("Showing 0 to 0 of ")}' + totalRunningJobs + '${_(" entries")}';
-        }
-        var text =' ${_("Showing ")}' + runningTableOffset + '${_(" to ")}' + (runningTableOffset + iEnd - 1) + '${_(" of ")}' + totalRunningJobs;
-        if (iEnd != iTotal) { // when filter button is selected
-          return text + '${_(" (filtered from ")}' + iMax + '${_(" entries)")}';
-        }
-        return text;
       }
     });
 
@@ -257,7 +269,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       "bPaginate": false,
       "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
-      "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
+      "sDom":"<'row'r>t<'row'<'span6'><''p>>",
       "aoColumns":[
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
@@ -275,17 +287,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
+        showTableInfo(oSettings, ".completed-info", completedTableOffset, totalCompletedJobs);
         $("a[data-row-selector='true']").jHueRowSelector();
-      },
-      "fnInfoCallback": function( oSettings, iStart, iEnd, iMax, iTotal, sPre ) {
-        if (iTotal == 0) {
-          return '${_("Showing 0 to 0 of ")}' + totalCompletedJobs + '${_(" entries")}';
-        }
-        var text =' ${_("Showing ")}' + completedTableOffset + '${_(" to ")}' + (completedTableOffset + iEnd - 1) + '${_(" of ")}' + totalCompletedJobs;
-        if (iEnd != iTotal) { // when filter button is selected
-          return text + '${_(" (filtered from ")}' + iMax + '${_(" entries)")}';
-        }
-        return text;
       }
     });
 
@@ -431,7 +434,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     refreshRunning = function () {
       $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running') + getDaysFilter(), function (data) {
-        if (data.jobs) {
+        if (data.jobs.length > 0) {
           totalRunningJobs = data.total_jobs;
           refreshPaginationButtons("running", totalRunningJobs);
 
@@ -540,7 +543,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
     function refreshCompleted() {
       $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed') + getDaysFilter(), function (data) {
-        if(data.jobs) {
+        if(data.jobs.length > 0) {
           totalCompletedJobs = data.total_jobs;
           refreshPaginationButtons("completed", totalCompletedJobs);
         }
