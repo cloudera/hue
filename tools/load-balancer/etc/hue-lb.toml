@@ -7,6 +7,7 @@ password = "admin"
 config_file = "var/nginx-hue.conf"
 config_template = "etc/nginx-hue.conf.in"
 server_template = "etc/nginx-hue-server.conf.in"
+alias_file = "var/nginx-alias.conf"
 
 [haproxy]
 config_file = "var/haproxy-hue.conf"

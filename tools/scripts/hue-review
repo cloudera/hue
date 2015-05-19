@@ -17,4 +17,11 @@ REVIEWER=$2;
 SUMMARY=$3;
 shift 3;
 
-exec $RBT post -o --description="$(git whatchanged $REVLIST)" --target-groups=hue --target-people="$REVIEWER" --summary="$SUMMARY" $REVLIST $@
+exec $RBT post \
+	-o \
+	--description="$(git whatchanged $REVLIST)" \
+	--target-groups=hue \
+	--target-people="$REVIEWER" \
+	--summary="$SUMMARY" \
+	$REVLIST \
+	$@
