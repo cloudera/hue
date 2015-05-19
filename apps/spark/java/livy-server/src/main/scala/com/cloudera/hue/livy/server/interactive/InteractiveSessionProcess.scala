@@ -45,6 +45,11 @@ object InteractiveSessionProcess extends Logging {
 
     val builder = new SparkSubmitProcessBuilder(livyConf)
 
+    createInteractiveRequest.driverCores.foreach(builder.driverCores)
+    createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
+    createInteractiveRequest.executorCores.foreach(builder.executorCores)
+    createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
+
     builder.className("com.cloudera.hue.livy.repl.Main")
 
     sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
