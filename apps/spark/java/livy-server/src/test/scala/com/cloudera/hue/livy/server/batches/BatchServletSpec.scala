@@ -53,9 +53,9 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
     script
   }
 
-  val batchFactory = new BatchProcessFactory(new LivyConf())
+  val batchFactory = new BatchSessionProcessFactory(new LivyConf())
   val batchManager = new BatchManager(batchFactory)
-  val servlet = new BatchServlet(batchManager)
+  val servlet = new BatchSessionServlet(batchManager)
 
   addServlet(servlet, "/*")
 
@@ -89,7 +89,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
 
       // Wait for the process to finish.
       {
-        val batch: Batch = batchManager.getBatch(0).get
+        val batch: BatchSession = batchManager.getBatch(0).get
         Utils.waitUntil({ () =>
           batch.state == Success()
         }, Duration(10, TimeUnit.SECONDS))

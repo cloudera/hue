@@ -27,9 +27,9 @@ import org.scalatra.json.JacksonJsonSupport
 
 import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
 
-object BatchServlet extends Logging
+object BatchSessionServlet extends Logging
 
-class BatchServlet(batchManager: BatchManager)
+class BatchSessionServlet(batchManager: BatchManager)
   extends ScalatraServlet
   with FutureSupport
   with MethodOverride
@@ -119,7 +119,7 @@ class BatchServlet(batchManager: BatchManager)
     case e: JsonParseException => BadRequest(e.getMessage)
     case e: MappingException => BadRequest(e.getMessage)
     case e =>
-      BatchServlet.error("internal error", e)
+      BatchSessionServlet.error("internal error", e)
       InternalServerError(e.toString)
   }
 }
@@ -129,7 +129,7 @@ private object Serializers {
 
   def Formats: List[CustomSerializer[_]] = List(BatchSerializer)
 
-  def serializeBatch(batch: Batch,
+  def serializeBatch(batch: BatchSession,
                      from: Option[Int],
                      size: Option[Int]): JValue = {
 
@@ -138,7 +138,7 @@ private object Serializers {
       ("log", getLogs(batch, from, size))
   }
 
-  def getLogs(batch: Batch, fromOpt: Option[Int], sizeOpt: Option[Int]): JValue = {
+  def getLogs(batch: BatchSession, fromOpt: Option[Int], sizeOpt: Option[Int]): JValue = {
     val lines = batch.lines
 
     val size = sizeOpt.getOrElse(100)
@@ -151,12 +151,12 @@ private object Serializers {
     lines.view(from, until)
   }
 
-  case object BatchSerializer extends CustomSerializer[Batch](
+  case object BatchSerializer extends CustomSerializer[BatchSession](
     implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case batch: Batch =>
+    case batch: BatchSession =>
       serializeBatch(batch, None, None)
   }
     )

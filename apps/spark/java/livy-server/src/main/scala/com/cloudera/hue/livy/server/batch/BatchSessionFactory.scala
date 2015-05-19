@@ -18,13 +18,6 @@
 
 package com.cloudera.hue.livy.server.batch
 
-import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.yarn.Client
-
-class BatchYarnFactory(livyConf: LivyConf) extends BatchFactory {
-
-  val client = new Client(livyConf)
-
-  def create(id: Int, createBatchRequest: CreateBatchRequest): Batch =
-    BatchYarn(livyConf, client, id, createBatchRequest)
+abstract class BatchSessionFactory {
+  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession
 }
