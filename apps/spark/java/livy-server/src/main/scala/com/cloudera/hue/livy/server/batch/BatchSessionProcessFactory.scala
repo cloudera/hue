@@ -18,12 +18,9 @@
 
 package com.cloudera.hue.livy.server.batch
 
-import com.cloudera.hue.livy.server.Session
+import com.cloudera.hue.livy.LivyConf
 
-import scala.concurrent.Future
-
-trait Batch extends Session {
-  def lines: IndexedSeq[String]
-
-  def stop(): Future[Unit]
+class BatchSessionProcessFactory(livyConf: LivyConf) extends BatchSessionFactory {
+  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
+    BatchSessionProcess(livyConf, id, createBatchRequest)
 }

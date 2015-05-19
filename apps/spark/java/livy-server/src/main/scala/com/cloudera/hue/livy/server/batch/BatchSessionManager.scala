@@ -24,15 +24,15 @@ import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
-class BatchManager(batchFactory: BatchFactory) {
+class BatchManager(batchFactory: BatchSessionFactory) {
   private[this] val _idCounter = new AtomicInteger()
-  private[this] val _batches = new ConcurrentHashMap[Int, Batch]
+  private[this] val _batches = new ConcurrentHashMap[Int, BatchSession]
 
-  def getBatch(id: Int): Option[Batch] = Option(_batches.get(id))
+  def getBatch(id: Int): Option[BatchSession] = Option(_batches.get(id))
 
-  def getBatches: Array[Batch] = _batches.values().iterator().toArray
+  def getBatches: Array[BatchSession] = _batches.values().iterator().toArray
 
-  def createBatch(createBatchRequest: CreateBatchRequest): Batch = {
+  def createBatch(createBatchRequest: CreateBatchRequest): BatchSession = {
     val id = _idCounter.getAndIncrement
     val batch = batchFactory.create(id, createBatchRequest)
     _batches.put(id, batch)
@@ -40,11 +40,11 @@ class BatchManager(batchFactory: BatchFactory) {
     batch
   }
 
-  def remove(id: Int): Option[Batch] = {
+  def remove(id: Int): Option[BatchSession] = {
     Option(_batches.remove(id))
   }
 
-  def delete(batch: Batch): Future[Unit] = {
+  def delete(batch: BatchSession): Future[Unit] = {
     _batches.remove(batch.id)
     batch.stop()
   }

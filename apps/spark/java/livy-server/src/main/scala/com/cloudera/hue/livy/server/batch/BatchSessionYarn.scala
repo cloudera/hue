@@ -20,23 +20,35 @@ package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
 
-import com.cloudera.hue.livy.sessions.{Success, Running, State}
+import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
-import com.cloudera.hue.livy.{LivyConf, LineBufferedProcess}
+import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.yarn._
 
-import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
+import scala.Error
+import scala.annotation.tailrec
+import scala.concurrent.{ExecutionContextExecutor, ExecutionContext, Future}
+import scala.util
 
-object BatchProcess {
-  def apply(livyConf: LivyConf, id: Int, createBatchRequest: CreateBatchRequest): Batch = {
+object BatchSessionYarn {
+
+  implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+
+  def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): BatchSession = {
     val builder = sparkBuilder(livyConf, createBatchRequest)
 
-    val process = builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args)
-    new BatchProcess(id, new LineBufferedProcess(process))
+    val process = new LineBufferedProcess(builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args))
+    val job = Future {
+      client.getJobFromProcess(process)
+    }
+    new BatchSessionYarn(id, process, job)
   }
 
   private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
     val builder = SparkSubmitProcessBuilder(livyConf)
+
+    builder.master("yarn-cluster")
 
     createBatchRequest.className.foreach(builder.className)
     createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
@@ -49,42 +61,57 @@ object BatchProcess {
     createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
 
     builder.redirectOutput(Redirect.PIPE)
+    builder.redirectErrorStream(true)
 
     builder
   }
 }
 
-private class BatchProcess(val id: Int,
-                           process: LineBufferedProcess) extends Batch {
-  protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFuture: Future[Job]) extends BatchSession {
 
-  private[this] var isAlive = true
+  implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  override def state: State = {
-    if (isAlive) {
-      try {
-        process.exitValue()
-      } catch {
-        case e: IllegalThreadStateException => return Running()
+  private var _state: State = Starting()
+
+  private var _jobThread: Thread = _
+
+  jobFuture.onComplete {
+    case util.Failure(_) => _state = Error()
+    case util.Success(job) =>
+      _state = Running()
+
+      _jobThread = new Thread {
+        override def run(): Unit = {
+          @tailrec
+          def aux(): Unit = {
+            if (_state == Running()) {
+              Thread.sleep(5000)
+              job.getStatus match {
+                case Client.SuccessfulFinish() =>
+                  _state = Success()
+                case Client.UnsuccessfulFinish() =>
+                  _state = Error()
+                case _ => aux()
+              }
+            }
+          }
+
+          aux()
+        }
       }
+      _jobThread.setDaemon(true)
+      _jobThread.start()
+  }
 
-      destroyProcess()
+  override def state: State = _state
+
+  override def stop(): Future[Unit] = {
+    jobFuture.map { job =>
+      job.stop()
+      _state = Success()
+      ()
     }
-
-    Success()
   }
 
   override def lines: IndexedSeq[String] = process.inputLines
-
-  override def stop(): Future[Unit] = {
-    Future {
-      destroyProcess()
-    }
-  }
-
-  private def destroyProcess() = {
-    process.destroy()
-    process.waitFor()
-    isAlive = false
-  }
 }

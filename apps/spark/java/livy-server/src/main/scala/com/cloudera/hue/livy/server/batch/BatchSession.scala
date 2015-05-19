@@ -18,6 +18,12 @@
 
 package com.cloudera.hue.livy.server.batch
 
-abstract class BatchFactory {
-  def create(id: Int, createBatchRequest: CreateBatchRequest): Batch
+import com.cloudera.hue.livy.server.Session
+
+import scala.concurrent.Future
+
+trait BatchSession extends Session {
+  def lines: IndexedSeq[String]
+
+  def stop(): Future[Unit]
 }
