@@ -19,7 +19,7 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.server.sessions.ProcessSession
+import com.cloudera.hue.livy.server.interactive.ProcessSession
 import com.cloudera.hue.livy.sessions.Spark
 import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
 

@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.server
 
-import com.cloudera.hue.livy.server.sessions.ThreadSession
+import com.cloudera.hue.livy.server.interactive.ThreadSession
 import com.cloudera.hue.livy.sessions.Spark
 import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
 

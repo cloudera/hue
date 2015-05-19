@@ -22,7 +22,7 @@ import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.sessions._
+import com.cloudera.hue.livy.server.interactive._
 import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JArray, JObject}
 import org.json4s.jackson.JsonMethods._

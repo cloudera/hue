@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.sessions
+package com.cloudera.hue.livy.server.interactive
 
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL

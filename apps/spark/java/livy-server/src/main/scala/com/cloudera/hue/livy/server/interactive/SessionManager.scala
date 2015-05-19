@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.sessions
+package com.cloudera.hue.livy.server.interactive
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
