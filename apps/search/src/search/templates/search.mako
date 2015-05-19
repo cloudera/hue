@@ -46,9 +46,13 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       <i class="fa fa-save"></i>
     </a>
     % endif
-    <a class="btn pointer" title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
+    <a class="btn pointer" title="${ _('General Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
         data-bind="css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-cog"></i>
+    </a>
+    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"
+        data-bind="css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-calendar"></i>
     </a>
     &nbsp;
     <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;</span>
@@ -1564,7 +1568,7 @@ ${ dashboard.layout_skeleton() }
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
     <div class="row-fluid">
-      <div class="span6">
+      <div class="span12">
         <form class="form-horizontal">
           <fieldset>
             <legend><i class="fa fa-cogs"></i> ${ _('General settings') }</legend>
@@ -1592,7 +1596,16 @@ ${ dashboard.layout_skeleton() }
           </fieldset>
         </form>
       </div>
-      <div class="span6">
+    </div>
+
+  </div>
+</div>
+
+<div id="timeSettingsDemiModal" class="demi-modal hide" data-backdrop="false">
+  <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span12">
         <form class="form-horizontal">
           <fieldset>
             <legend><i class="fa fa-calendar"></i> ${ _('Time settings') }</legend>
@@ -1643,7 +1656,6 @@ ${ dashboard.layout_skeleton() }
                 <input id="settingstimeend" type="text" data-bind="collection.timeFilter.to" />
               </div>
             </div>
-            <!-- /ko -->
             <div class="control-group">
               <div class="controls">
                 <label class="checkbox">
@@ -1651,6 +1663,12 @@ ${ dashboard.layout_skeleton() }
                 </label>
               </div>
             </div>
+            <!-- /ko -->
+            <!-- ko if: $root.availableDateFields().length == 0 -->
+              <label class="checkbox">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+                </label>
+            <!-- /ko -->
           </fieldset>
         </form>
 
