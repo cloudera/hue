@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.interactive
 
 import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.interactive._
 import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JArray, JObject}
 import org.json4s.jackson.JsonMethods._
@@ -31,9 +30,9 @@ import org.scalatra.test.scalatest.ScalatraSuite
 
 import scala.concurrent.Future
 
-class SessionServletSpec extends ScalatraSuite with FunSpecLike {
+class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
 
-  class MockSession(val id: Int) extends Session {
+  class MockInteractiveSession(val id: Int) extends InteractiveSession {
     var _state: State = Idle()
 
     var _idCounter = new AtomicInteger()
@@ -70,14 +69,14 @@ class SessionServletSpec extends ScalatraSuite with FunSpecLike {
     override def interrupt(): Future[Unit] = ???
   }
 
-  class MockSessionFactory() extends SessionFactory {
-    override def createSession(id: Int, kind: Kind, proxyUser: Option[String]): Future[Session] = {
-      Future.successful(new MockSession(id))
+  class MockInteractiveSessionFactory() extends InteractiveSessionFactory {
+    override def createSession(id: Int, kind: Kind, proxyUser: Option[String]): Future[InteractiveSession] = {
+      Future.successful(new MockInteractiveSession(id))
     }
   }
 
-  val sessionManager = new SessionManager(new MockSessionFactory())
-  val servlet = new SessionServlet(sessionManager)
+  val sessionManager = new SessionManager(new MockInteractiveSessionFactory())
+  val servlet = new InteractiveSessionServlet(sessionManager)
 
   addServlet(servlet, "/*")
 

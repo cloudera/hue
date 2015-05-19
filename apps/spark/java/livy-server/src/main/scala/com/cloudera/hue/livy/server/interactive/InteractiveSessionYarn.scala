@@ -30,13 +30,13 @@ import com.cloudera.hue.livy.yarn.{Client, Job}
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
 
-object YarnSession {
+object InteractiveSessionYarn {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
   private val CONF_LIVY_JAR = "livy.yarn.jar"
   private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  def create(livyConf: LivyConf, client: Client, id: Int, kind: Kind, proxyUser: Option[String] = None): Session = {
+  def create(livyConf: LivyConf, client: Client, id: Int, kind: Kind, proxyUser: Option[String] = None): InteractiveSession = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 
@@ -62,7 +62,7 @@ object YarnSession {
       job
     }
 
-    new YarnSession(id, kind, proxyUser, job)
+    new InteractiveSessionYarn(id, kind, proxyUser, job)
   }
 
   private def livyJar(livyConf: LivyConf) = {
@@ -74,10 +74,10 @@ object YarnSession {
   }
 }
 
-private class YarnSession(id: Int,
+private class InteractiveSessionYarn(id: Int,
                           kind: Kind,
                           proxyUser: Option[String],
-                          job: Future[Job]) extends WebSession(id, kind, proxyUser) {
+                          job: Future[Job]) extends InteractiveWebSession(id, kind, proxyUser) {
   job.onFailure { case _ =>
     _state = Error()
   }

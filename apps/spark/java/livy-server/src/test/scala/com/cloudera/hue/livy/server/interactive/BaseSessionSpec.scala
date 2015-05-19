@@ -16,13 +16,12 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.interactive
 
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.interactive.Session
-import com.cloudera.hue.livy.sessions.{Starting, Idle}
+import com.cloudera.hue.livy.sessions.{Idle, Starting}
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
@@ -33,9 +32,9 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
 
   implicit val formats = DefaultFormats
 
-  var session: Session = null
+  var session: InteractiveSession = null
 
-  def createSession(): Session
+  def createSession(): InteractiveSession
 
   before {
     session = createSession()

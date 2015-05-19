@@ -16,13 +16,20 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.interactive
 
-import com.cloudera.hue.livy.server.interactive.ThreadSession
-import com.cloudera.hue.livy.sessions.Spark
-import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
+import com.cloudera.hue.livy.LivyConf
+import com.cloudera.hue.livy.sessions.Kind
 
-class ThreadSessionSpec extends BaseSessionSpec with FunSpecLike with Matchers with BeforeAndAfter {
+import scala.concurrent.{Future, ExecutionContext}
 
-  def createSession() = ThreadSession.create(0, Spark())
-}
+class InteractiveSessionThreadFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
+
+   implicit def executor: ExecutionContext = ExecutionContext.global
+
+   override def createSession(id: Int, kind: Kind, proxyUser: Option[String] = None): Future[InteractiveSession] = {
+     Future {
+       InteractiveSessionThread.create(id, kind)
+     }
+   }
+ }
