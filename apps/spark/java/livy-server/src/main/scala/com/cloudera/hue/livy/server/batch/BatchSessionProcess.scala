@@ -74,7 +74,7 @@ private class BatchSessionProcess(val id: Int,
     Success()
   }
 
-  override def lines: IndexedSeq[String] = process.inputLines
+  override def logLines(): IndexedSeq[String] = process.inputLines
 
   override def stop(): Future[Unit] = {
     Future {

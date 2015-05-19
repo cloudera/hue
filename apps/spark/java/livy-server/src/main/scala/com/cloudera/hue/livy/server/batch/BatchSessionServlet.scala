@@ -139,7 +139,7 @@ private object Serializers {
   }
 
   def getLogs(batch: BatchSession, fromOpt: Option[Int], sizeOpt: Option[Int]): JValue = {
-    val lines = batch.lines
+    val lines = batch.logLines()
 
     val size = sizeOpt.getOrElse(100)
     var from = fromOpt.getOrElse(-1)
