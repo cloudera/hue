@@ -224,14 +224,14 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       var _disp = oSettings.fnRecordsDisplay();
       var _tot = oSettings.fnRecordsTotal();
       var _text = "";
-      if (_tot == 0) {
+      if (_disp == 0) {
         _text = '${_("Showing 0 to 0 of ")}' + totalJobs + '${_(" entries")}';
       }
       else {
         _text = ' ${_("Showing ")}' + tableOffset + '${_(" to ")}' + (tableOffset + oSettings.fnDisplayEnd() - 1) + '${_(" of ")}' + totalJobs;
-        if (_disp != _tot) { // when filter button is selected
+      }
+      if (_disp != _tot) { // when filter button is selected
           _text += '${_(" (filtered from ")}' + _tot + '${_(" entries)")}';
-        }
       }
       $(table).text(_text);
     }
