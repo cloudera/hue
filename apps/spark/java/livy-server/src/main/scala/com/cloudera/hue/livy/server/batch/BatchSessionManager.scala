@@ -55,6 +55,7 @@ class BatchManager(batchFactory: BatchSessionFactory) {
 }
 
 case class CreateBatchRequest(file: String,
+                              proxyUser: Option[String] = None,
                               args: List[String] = List(),
                               className: Option[String] = None,
                               jars: List[String] = List(),
