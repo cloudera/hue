@@ -219,11 +219,13 @@ ${ components.menubar() }
   <div class="arrow"></div>
   <h3 class="popover-title" style="text-align: left">
     <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
+    <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
     <strong class="column-name"></strong> ${ _(' column analysis') }
   </h3>
   <div class="popover-content" style="text-align: left"></div>
 </div>
 
+<script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
@@ -286,47 +288,23 @@ ${ components.menubar() }
 
     $('a[data-toggle="tab"]:eq(0)').click();
 
-    $("a[data-column]").on("click", function(){
+    $("a[data-column]").on("click", function () {
       var _link = $(this);
       var _col = _link.data("column");
-      var statsUrl = "/impala/api/table/${database}/${table.name}/stats/" + _col;
+      var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
       $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
-      $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
-      $.ajax({
-        url: statsUrl,
-        data: {},
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("X-Requested-With", "Hue");
-        },
-        dataType: "json",
-        success: function (data) {
-          if (data && data.status == 0){
-            var _stats = "<table class='table table-striped'>";
-            data.stats.forEach(function(item){
-              _stats += "<tr><th>" + Object.keys(item)[0] + "</th><td>" + item[Object.keys(item)[0]] + "</td></tr>";
-            });
-            _stats += "</table>"
-            $("#columnAnalysis .column-name").text(_col);
-            $("#columnAnalysis .popover-content").html(_stats);
-            $("#columnAnalysis .popover-content").css("opacity", "1");
-            $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
-          }
-          else {
-            $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
-            $("#columnAnalysis").hide();
-          }
-        },
-        error: function (e) {
-          if (e.status == 500) {
-            $(document).trigger("error", "${ _('There was a problem loading the table stats.') }");
-            $("#columnAnalysis").hide();
-          }
-        }
+      $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+      showColumnStats(statsUrl, _col, function () {
+        $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
       });
     });
 
-    $(document).on("click", ".close-popover", function () {
+    $(document).on("click", "#columnAnalysis .close-popover", function () {
       $("#columnAnalysis").hide();
+    });
+
+    $("#columnAnalysis .stats-refresh").on("click", function () {
+      showColumnStats($("#columnAnalysis .stats-refresh").data("startUrl"), $("#columnAnalysis .stats-refresh").data("columnName"));
     });
 
   });
