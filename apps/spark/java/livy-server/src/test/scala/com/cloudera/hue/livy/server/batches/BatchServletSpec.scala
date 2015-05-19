@@ -22,6 +22,7 @@ import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.sessions.Success
 import com.cloudera.hue.livy.{LivyConf, Utils}
 import com.cloudera.hue.livy.server.batch._
 import org.json4s.JsonAST.{JArray, JInt, JObject, JString}

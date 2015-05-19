@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
 
+import com.cloudera.hue.livy.sessions.{Success, Running, State}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
 import com.cloudera.hue.livy.{LivyConf, LineBufferedProcess}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder

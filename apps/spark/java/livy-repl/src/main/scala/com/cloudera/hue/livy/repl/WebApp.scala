@@ -50,9 +50,11 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
       case Starting() => "starting"
       case Idle() => "idle"
       case Busy() => "busy"
+      case Running() => "running"
       case Error() => "error"
       case ShuttingDown() => "shutting_down"
       case Dead() => "dead"
+      case Success() => "success"
     }
     Map("state" -> state)
   }

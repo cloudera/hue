@@ -20,11 +20,13 @@ package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
 
+import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.yarn._
 
+import scala.Error
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContextExecutor, ExecutionContext, Future}
 import scala.util

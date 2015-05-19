@@ -118,7 +118,7 @@ class InteractiveWebSession(val id: Int,
             waitForStateChange(Starting(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case Busy() =>
+        case Busy() | Running() =>
           Future {
             waitForStateChange(Busy(), Duration(10, TimeUnit.SECONDS))
             stop()
@@ -128,7 +128,7 @@ class InteractiveWebSession(val id: Int,
             waitForStateChange(ShuttingDown(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case Error() | Dead() =>
+        case Error() | Dead() | Success() =>
           Future.successful(Unit)
       }
     }
