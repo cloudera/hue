@@ -50,6 +50,7 @@ object BatchSessionYarn {
 
     builder.master("yarn-cluster")
 
+    createBatchRequest.proxyUser.foreach(builder.proxyUser)
     createBatchRequest.className.foreach(builder.className)
     createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
     createBatchRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)

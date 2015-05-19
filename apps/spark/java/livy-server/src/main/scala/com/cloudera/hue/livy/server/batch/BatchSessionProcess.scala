@@ -47,6 +47,7 @@ object BatchSessionProcess {
     createBatchRequest.executorMemory.foreach(builder.executorMemory)
     createBatchRequest.executorCores.foreach(builder.executorCores)
     createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
+    createBatchRequest.proxyUser.foreach(builder.proxyUser)
 
     builder.redirectOutput(Redirect.PIPE)
 
