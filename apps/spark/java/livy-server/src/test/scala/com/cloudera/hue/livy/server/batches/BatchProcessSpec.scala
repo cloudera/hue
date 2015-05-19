@@ -60,7 +60,7 @@ class BatchProcessSpec
         batch.state == Success()
       }, Duration(10, TimeUnit.SECONDS))
 
-      batch.lines should contain("hello world")
+      batch.logLines() should contain("hello world")
     }
   }
 }

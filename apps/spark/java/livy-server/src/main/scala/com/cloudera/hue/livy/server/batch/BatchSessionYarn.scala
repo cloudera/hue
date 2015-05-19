@@ -113,5 +113,5 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
     }
   }
 
-  override def lines: IndexedSeq[String] = process.inputLines
+  override def logLines(): IndexedSeq[String] = process.inputLines
 }
