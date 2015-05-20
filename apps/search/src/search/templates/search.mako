@@ -78,8 +78,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </label>
     <!-- /ko -->
 
-    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
-    <span data-bind="template: {name: 'time-filter'}"></span>
+    <!-- ko if: columns().length > 0 -->
+      <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
+      <span data-bind="template: {name: 'time-filter'}"></span>
+    <!-- /ko -->
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
@@ -1605,9 +1607,7 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="time-filter">
   <span data-bind="visible: $root.availableDateFields().length > 0" >
     <span data-bind="template: {name: 'time-filter-select'}"></span>
-
-    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"
-        data-bind="css: {'btn': true}">
+    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
       <i class="fa fa-calendar"></i>
     </a>
   </span>
@@ -1615,7 +1615,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="time-filter-select">
-  <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium">
+  <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium" style="margin-right: 4px">
     <option value="all">${ _('All') }</option>
     <option value="5MINUTES">${ _('Past 5 Minutes') }</option>
     <option value="30MINUTES">${ _('Past 30 Minutes') }</option>
