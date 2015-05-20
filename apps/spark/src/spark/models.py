@@ -278,7 +278,7 @@ class SparkApi():
 
   def create_session(self, lang='scala'):
     api = get_spark_api(self.user)
-    response = api.create_session(lang=lang)
+    response = api.create_session(kind=lang)
 
     status = api.get_session(response['id'])
     count = 0
