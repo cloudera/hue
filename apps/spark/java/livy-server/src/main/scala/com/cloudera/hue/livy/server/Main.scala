@@ -18,13 +18,16 @@
 
 package com.cloudera.hue.livy.server
 
+import java.io.IOException
+import java.nio.file.Path
 import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy.server.batch.{BatchSessionProcessFactory, BatchSessionServlet, BatchManager, BatchSessionYarnFactory}
 import com.cloudera.hue.livy.server.interactive._
-import com.cloudera.hue.livy.{Utils, Logging, LivyConf, WebServer}
+import com.cloudera.hue.livy._
 import org.scalatra._
 import org.scalatra.servlet.ScalatraListener
+import org.slf4j.LoggerFactory
 
 object Main {
 
@@ -32,6 +35,7 @@ object Main {
   val THREAD_SESSION = "thread"
   val PROCESS_SESSION = "process"
   val YARN_SESSION = "yarn"
+  lazy val logger = LoggerFactory.getLogger(this.getClass)
 
   def main(args: Array[String]): Unit = {
     val livyConf = new LivyConf()
@@ -39,6 +43,9 @@ object Main {
 
     val host = livyConf.get("livy.server.host", "0.0.0.0")
     val port = livyConf.getInt("livy.server.port", 8998)
+
+    // Make sure the `spark-submit` program exists, otherwise much of livy won't work.
+    testSparkSubmit(livyConf)
 
     val server = new WebServer(host, port)
 
@@ -56,6 +63,55 @@ object Main {
 
       // Make sure to close all our outstanding http requests.
       dispatch.Http.shutdown()
+    }
+  }
+
+  /**
+   * Test that the configured `spark-submit` executable exists.
+   *
+   * @param livyConf
+   */
+  private def testSparkSubmit(livyConf: LivyConf) = {
+    try {
+      // Ignore the version for now.
+      sparkSubmitVersion(livyConf) match {
+        case version @ "1.3.0" | "1.3.1" =>
+          logger.info(f"Using spark-submit version $version")
+        case version =>
+          logger.warn(f"Warning, livy has not been tested with spark-submit version $version")
+      }
+    } catch {
+      case e: IOException =>
+        System.err.println("Failed to run spark-submit executable: " + e.toString)
+        System.exit(1)
+    }
+  }
+
+  /**
+   * Return the version of the configured `spark-submit` version.
+   *
+   * @param livyConf
+   * @return the version
+   */
+  private def sparkSubmitVersion(livyConf: LivyConf): String = {
+    val sparkSubmit = livyConf.sparkSubmit()
+    val pb = new ProcessBuilder(sparkSubmit, "--version")
+    pb.redirectErrorStream(true)
+    pb.redirectInput(ProcessBuilder.Redirect.PIPE)
+
+    val process = new LineBufferedProcess(pb.start())
+    val exitCode = process.waitFor()
+    val output = process.inputIterator.mkString("\n")
+
+    if (exitCode != 1) {
+      throw new IOException(f"spark-submit had an unexpected exit [$exitCode]:\n$output]")
+    }
+
+    val regex = """version (.*)""".r.unanchored
+
+    output match {
+      case regex(version) => version
+      case _ => throw new IOException(f"Unable to determing spark-submit version:\n$output")
     }
   }
 }
