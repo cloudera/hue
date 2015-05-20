@@ -24,6 +24,7 @@ import scala.collection.JavaConverters._
 
 object LivyConf {
   val SESSION_FACTORY_KEY = "livy.server.session.factory"
+  val SPARK_SUBMIT_KEY = "livy.server.spark-submit"
 
   sealed trait SessionKind
   case class Thread() extends SessionKind
@@ -89,6 +90,8 @@ class LivyConf(loadDefaults: Boolean) {
 
   /** Return if the configuration includes this setting */
   def contains(key: String): Boolean = settings.containsKey(key)
+
+  def sparkSubmit(): String = getOption(SPARK_SUBMIT_KEY).getOrElse("spark-submit")
 
   def sessionKind(): SessionKind = getOption(SESSION_FACTORY_KEY).getOrElse("process") match {
     case "process" => Process()
