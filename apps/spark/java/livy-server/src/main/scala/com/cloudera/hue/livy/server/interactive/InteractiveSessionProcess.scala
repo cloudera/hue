@@ -21,14 +21,11 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
-import com.cloudera.hue.livy.sessions.Kind
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.AbsolutePath
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
-import scala.collection.JavaConversions._
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.Future
 import scala.io.Source
 
@@ -38,13 +35,13 @@ object InteractiveSessionProcess extends Logging {
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def create(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String] = None): InteractiveSession = {
-    val process = startProcess(livyConf, id, kind, proxyUser)
-    new InteractiveSessionProcess(id, kind, proxyUser, process)
+  def create(livyConf: LivyConf, id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+    val process = startProcess(livyConf, id, createInteractiveRequest)
+    new InteractiveSessionProcess(id, createInteractiveRequest, process)
   }
 
   // Loop until we've started a process with a valid port.
-  private def startProcess(livyConf: LivyConf, id: Int, kind: Kind, proxyUser: Option[String]): Process = {
+  private def startProcess(livyConf: LivyConf, id: Int, createInteractiveRequest: CreateInteractiveRequest): Process = {
 
     val builder = new SparkSubmitProcessBuilder(livyConf)
 
@@ -52,7 +49,7 @@ object InteractiveSessionProcess extends Logging {
 
     sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
     livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach(builder.driverClassPath)
-    proxyUser.foreach(builder.proxyUser)
+    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
 
     livyConf.getOption(CONF_LIVY_REPL_CALLBACK_URL).foreach { case callbackUrl =>
       builder.env("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
@@ -63,7 +60,7 @@ object InteractiveSessionProcess extends Logging {
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectError(Redirect.INHERIT)
 
-    builder.start(AbsolutePath(livyJar(livyConf)), List(kind.toString))
+    builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
   }
 
   private def livyJar(conf: LivyConf): String = {
@@ -74,9 +71,8 @@ object InteractiveSessionProcess extends Logging {
 }
 
 private class InteractiveSessionProcess(id: Int,
-                             kind: Kind,
-                             proxyUser: Option[String],
-                             process: Process) extends InteractiveWebSession(id, kind, proxyUser) {
+                                        createInteractiveRequest: CreateInteractiveRequest,
+                                        process: Process) extends InteractiveWebSession(id, createInteractiveRequest) {
 
   val stdoutThread = new Thread {
     override def run() = {

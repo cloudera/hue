@@ -21,14 +21,14 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.sessions.Error
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.AbsolutePath
-import com.cloudera.hue.livy.{LineBufferedProcess, Utils, LivyConf}
-import com.cloudera.hue.livy.sessions.{Kind, Error}
 import com.cloudera.hue.livy.yarn.{Client, Job}
+import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf, Utils}
 
-import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 
 object InteractiveSessionYarn {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
@@ -36,7 +36,7 @@ object InteractiveSessionYarn {
   private val CONF_LIVY_JAR = "livy.yarn.jar"
   private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  def create(livyConf: LivyConf, client: Client, id: Int, kind: Kind, proxyUser: Option[String] = None): InteractiveSession = {
+  def create(livyConf: LivyConf, client: Client, id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 
@@ -45,12 +45,12 @@ object InteractiveSessionYarn {
     builder.master("yarn-cluster")
     builder.className("com.cloudera.hue.livy.repl.Main")
     builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
-    proxyUser.foreach(builder.proxyUser)
+    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(redirect = true)
 
-    val process = builder.start(AbsolutePath(livyJar(livyConf)), List(kind.toString))
+    val process = builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
 
     val job = Future {
       val proc = new LineBufferedProcess(process)
@@ -62,7 +62,7 @@ object InteractiveSessionYarn {
       job
     }
 
-    new InteractiveSessionYarn(id, kind, proxyUser, job)
+    new InteractiveSessionYarn(id, createInteractiveRequest, job)
   }
 
   private def livyJar(livyConf: LivyConf) = {
@@ -75,9 +75,8 @@ object InteractiveSessionYarn {
 }
 
 private class InteractiveSessionYarn(id: Int,
-                          kind: Kind,
-                          proxyUser: Option[String],
-                          job: Future[Job]) extends InteractiveWebSession(id, kind, proxyUser) {
+                                     createInteractiveRequest: CreateInteractiveRequest,
+                                     job: Future[Job]) extends InteractiveWebSession(id, createInteractiveRequest) {
   job.onFailure { case _ =>
     _state = Error()
   }

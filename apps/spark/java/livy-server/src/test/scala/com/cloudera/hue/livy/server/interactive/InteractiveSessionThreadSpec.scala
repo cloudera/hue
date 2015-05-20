@@ -18,11 +18,10 @@
 
 package com.cloudera.hue.livy.server.interactive
 
-import com.cloudera.hue.livy.server.interactive.BaseSessionSpec
 import com.cloudera.hue.livy.sessions.Spark
 import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
 
 class InteractiveSessionThreadSpec extends BaseSessionSpec with FunSpecLike with Matchers with BeforeAndAfter {
 
-  def createSession() = InteractiveSessionThread.create(0, Spark())
+  def createSession() = InteractiveSessionThread.create(0, CreateInteractiveRequest(kind = Spark()))
 }
