@@ -78,10 +78,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </label>
     <!-- /ko -->
 
-    <!-- ko if: columns().length > 0 -->
-      <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing" class="input-medium"></select>
-      <span data-bind="template: {name: 'time-filter'}"></span>
-    <!-- /ko -->
+    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
+    <span data-bind="template: {name: 'time-filter'}"></span>
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
