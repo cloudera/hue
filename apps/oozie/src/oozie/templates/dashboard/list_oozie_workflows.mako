@@ -515,10 +515,10 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       else {
         prevBtn.parent().removeClass("disabled");
       }
-      if (totalJobs <= (offset + PAGE_SIZE) || !totalJobs) {
+      if (totalJobs < (offset + PAGE_SIZE) || !totalJobs) {
         nextBtn.parent().addClass("disabled");
       }
-      else if (totalJobs > offset + PAGE_SIZE) {
+      else if (totalJobs >= offset + PAGE_SIZE) {
         nextBtn.parent().removeClass("disabled");
       }
     }

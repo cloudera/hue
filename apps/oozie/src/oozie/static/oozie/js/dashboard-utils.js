@@ -46,7 +46,6 @@ function emptyStringIfNull(obj) {
 }
 
 var PersistedButtonsFilters = function (oSettings, aData, iDataIndex) {
-  var urlHashes = "";
 
   var submittedBtn = $("a.btn-submitted.active");
   var submittedByFilter = true;
