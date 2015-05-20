@@ -99,10 +99,14 @@ class SessionManager(factory: InteractiveSessionFactory) extends Logging {
 
 case class CreateInteractiveRequest(kind: Kind,
                                     proxyUser: Option[String] = None,
+                                    jars: List[String] = List(),
+                                    pyFiles: List[String] = List(),
+                                    files: List[String] = List(),
                                     driverMemory: Option[String] = None,
                                     driverCores: Option[Int] = None,
                                     executorMemory: Option[String] = None,
-                                    executorCores: Option[Int] = None)
+                                    executorCores: Option[Int] = None,
+                                    archives: List[String] = List())
 
 class SessionNotFound extends Exception
 

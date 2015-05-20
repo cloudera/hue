@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.sessions.Error
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.AbsolutePath
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
 import com.cloudera.hue.livy.yarn.{Client, Job}
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf, Utils}
 
@@ -45,11 +45,15 @@ object InteractiveSessionYarn {
     builder.master("yarn-cluster")
     builder.className("com.cloudera.hue.livy.repl.Main")
     builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
-    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
-    createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
+    createInteractiveRequest.archives.map(RelativePath).foreach(builder.archive)
     createInteractiveRequest.driverCores.foreach(builder.driverCores)
-    createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
+    createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
     createInteractiveRequest.executorCores.foreach(builder.executorCores)
+    createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
+    createInteractiveRequest.files.map(RelativePath).foreach(builder.file)
+    createInteractiveRequest.jars.map(RelativePath).foreach(builder.jar)
+    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
+    createInteractiveRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(redirect = true)

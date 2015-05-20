@@ -22,7 +22,7 @@ import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.AbsolutePath
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
@@ -45,16 +45,19 @@ object InteractiveSessionProcess extends Logging {
 
     val builder = new SparkSubmitProcessBuilder(livyConf)
 
+    builder.className("com.cloudera.hue.livy.repl.Main")
+    createInteractiveRequest.archives.map(RelativePath).foreach(builder.archive)
     createInteractiveRequest.driverCores.foreach(builder.driverCores)
     createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
     createInteractiveRequest.executorCores.foreach(builder.executorCores)
     createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
-
-    builder.className("com.cloudera.hue.livy.repl.Main")
+    createInteractiveRequest.files.map(RelativePath).foreach(builder.file)
+    createInteractiveRequest.jars.map(RelativePath).foreach(builder.jar)
+    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
+    createInteractiveRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
 
     sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
     livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach(builder.driverClassPath)
-    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
 
     livyConf.getOption(CONF_LIVY_REPL_CALLBACK_URL).foreach { case callbackUrl =>
       builder.env("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
