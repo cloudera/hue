@@ -1,4 +1,19 @@
 #!/bin/bash
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 #
 #Cleans up old oozie workflow and beeswax savedqueries to
 #prevent the DB from getting too large.
@@ -54,19 +69,17 @@ log.info('HUE_CONF_DIR: ${HUE_CONF_DIR}')
 log.info("Cleaning up anything in the Hue tables oozie*, desktop* and beeswax* older than ${KEEP_DAYS} old")
 
 savedQuerys = SavedQuery.objects.filter(is_auto=True, mtime__lte=date.today() - timedelta(days=keepDays))
-count = len(savedQuerys)
-log.info("SavedQuery count is: %s" % count)
+log.info("SavedQuery count is: %s" % savedQuerys.count())
 savedQuerys.delete()
-savedQuerys = SavedQuery.objects.filter(is_auto=True, mtime__lte=date.today() - timedelta(days=keepDays))
-count = len(savedQuerys)
-log.info("SavedQuery new count is: %s" % count)
+log.info("SavedQuery new count is: %s" % savedQuerys.count())
 
-totalWorkflows = len(Workflow.objects.filter(is_trashed=True, last_modified__lte=date.today() - timedelta(days=keepDays)))
+workflows = Workflow.objects.filter(is_trashed=True, last_modified__lte=date.today() - timedelta(days=keepDays))
+totalWorkflows = workflows.count()
 loopCount = 1
 maxCount = 1000
 log.info("workflows left: %s" % totalWorkflows)
 log.info("Looping through workflows")
-for w in Workflow.objects.filter(is_trashed=True, last_modified__lte=date.today() - timedelta(days=keepDays)):
+for w in workflows:
    w.delete(skip_trash=True)
    loopCount += 1
    if (loopCount == maxCount):
