@@ -70,7 +70,7 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
   }
 
   class MockInteractiveSessionFactory() extends InteractiveSessionFactory {
-    override def createSession(id: Int, kind: Kind, proxyUser: Option[String]): Future[InteractiveSession] = {
+    override def createSession(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
       Future.successful(new MockInteractiveSession(id))
     }
   }

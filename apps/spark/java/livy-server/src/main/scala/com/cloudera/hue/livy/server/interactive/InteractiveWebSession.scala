@@ -28,13 +28,10 @@ import dispatch._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats}
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-class InteractiveWebSession(val id: Int,
-                 val kind: Kind,
-                 val proxyUser: Option[String]) extends InteractiveSession with Logging {
+class InteractiveWebSession(val id: Int, createInteractiveRequest: CreateInteractiveRequest) extends InteractiveSession with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats
@@ -46,6 +43,10 @@ class InteractiveWebSession(val id: Int,
 
   private[this] var _executedStatements = 0
   private[this] var _statements = IndexedSeq[Statement]()
+
+  override def kind = createInteractiveRequest.kind
+
+  override def proxyUser = createInteractiveRequest.proxyUser
 
   override def url: Option[URL] = _url
 

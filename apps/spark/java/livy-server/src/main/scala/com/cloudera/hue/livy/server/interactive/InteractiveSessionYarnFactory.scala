@@ -19,10 +19,9 @@
 package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions.Kind
 import com.cloudera.hue.livy.yarn.Client
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 class InteractiveSessionYarnFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
 
@@ -30,9 +29,9 @@ class InteractiveSessionYarnFactory(livyConf: LivyConf) extends InteractiveSessi
 
    val client = new Client(livyConf)
 
-   override def createSession(id: Int, kind: Kind, proxyUser: Option[String] = None): Future[InteractiveSession] = {
+   override def createSession(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
      Future {
-       InteractiveSessionYarn.create(livyConf, client, id, kind, proxyUser)
+       InteractiveSessionYarn.create(livyConf, client, id, createInteractiveRequest)
      }
    }
 

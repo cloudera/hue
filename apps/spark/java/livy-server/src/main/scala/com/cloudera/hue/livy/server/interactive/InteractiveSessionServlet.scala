@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import InteractiveSession.SessionFailedToStart
+import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonAST.JString
@@ -66,11 +66,11 @@ class InteractiveSessionServlet(sessionManager: SessionManager)
   }
 
   post("/") {
-    val createSessionRequest = parsedBody.extract[CreateSessionRequest]
+    val createInteractiveRequest = parsedBody.extract[CreateInteractiveRequest]
 
     new AsyncResult {
       val is = {
-        val sessionFuture = sessionManager.createSession(createSessionRequest.lang, createSessionRequest.proxyUser)
+        val sessionFuture = sessionManager.createSession(createInteractiveRequest)
 
         sessionFuture.map { case session =>
           Created(session,
@@ -196,7 +196,6 @@ class InteractiveSessionServlet(sessionManager: SessionManager)
   }
 }
 
-private case class CreateSessionRequest(lang: Kind, proxyUser: Option[String])
 private case class CallbackRequest(url: String)
 
 private object Serializers {

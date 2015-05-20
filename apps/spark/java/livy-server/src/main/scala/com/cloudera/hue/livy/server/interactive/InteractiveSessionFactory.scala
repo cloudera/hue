@@ -18,14 +18,10 @@
 
 package com.cloudera.hue.livy.server.interactive
 
-import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions.Kind
-import com.cloudera.hue.livy.yarn.Client
-
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 trait InteractiveSessionFactory {
-  def createSession(id: Int, kind: Kind, proxyUser: Option[String] = None): Future[InteractiveSession]
+  def createSession(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession]
 
   def close(): Unit = {}
 }

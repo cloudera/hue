@@ -58,9 +58,9 @@ class SessionManager(factory: InteractiveSessionFactory) extends Logging {
     sessions.keys
   }
 
-  def createSession(kind: Kind, proxyUser: Option[String] = None): Future[InteractiveSession] = {
+  def createSession(createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
     val id = _idCounter.getAndIncrement
-    val session = factory.createSession(id, kind, proxyUser = proxyUser)
+    val session = factory.createSession(id, createInteractiveRequest)
 
     session.map({ case(session: InteractiveSession) =>
       info("created session %s" format session.id)
@@ -96,6 +96,9 @@ class SessionManager(factory: InteractiveSessionFactory) extends Logging {
     sessions.values.filter(expired).foreach(delete)
   }
 }
+
+case class CreateInteractiveRequest(kind: Kind,
+                                    proxyUser: Option[String] = None)
 
 class SessionNotFound extends Exception
 
