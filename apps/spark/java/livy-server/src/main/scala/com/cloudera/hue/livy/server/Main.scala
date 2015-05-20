@@ -74,10 +74,11 @@ object Main {
   private def testSparkSubmit(livyConf: LivyConf) = {
     try {
       // Ignore the version for now.
-      sparkSubmitVersion(livyConf) match {
-        case version @ "1.3.0" | "1.3.1" =>
+      val version = sparkSubmitVersion(livyConf)
+      version match {
+        case "1.3.0" | "1.3.1" =>
           logger.info(f"Using spark-submit version $version")
-        case version =>
+        case _ =>
           logger.warn(f"Warning, livy has not been tested with spark-submit version $version")
       }
     } catch {
