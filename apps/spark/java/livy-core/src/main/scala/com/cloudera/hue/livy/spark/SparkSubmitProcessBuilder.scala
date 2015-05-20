@@ -42,7 +42,7 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
 
   private[this] val fsRoot = livyConf.filesystemRoot()
 
-  private[this] var _executable: Path = AbsolutePath("spark-submit")
+  private[this] var _executable: Path = AbsolutePath(livyConf.sparkSubmit())
   private[this] var _master: Option[String] = None
   private[this] var _deployMode: Option[String] = None
   private[this] var _className: Option[String] = None
