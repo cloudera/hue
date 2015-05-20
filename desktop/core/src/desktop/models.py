@@ -284,7 +284,7 @@ class DocumentManager(models.Manager):
           if job.owner.username == SAMPLE_USERNAME:
             job.doc.get().share_to_default()
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error syncing oozie')
 
     try:
       with transaction.atomic():
@@ -304,7 +304,7 @@ class DocumentManager(models.Manager):
           if job.owner.username == SAMPLE_USERNAME:
             job.doc.get().share_to_default()
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error syncing beeswax')
 
     try:
       with transaction.atomic():
@@ -322,7 +322,7 @@ class DocumentManager(models.Manager):
           if job.owner.username == SAMPLE_USERNAME:
             job.doc.get().share_to_default()
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error syncing pig')
 
     try:
       with transaction.atomic():
@@ -343,7 +343,7 @@ class DocumentManager(models.Manager):
             Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
             dashboard.save()
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error syncing search')
 
     try:
       with transaction.atomic():
@@ -372,7 +372,7 @@ class DocumentManager(models.Manager):
             tag = DocumentTag.objects.get_example_tag(user=job.owner)
             doc.tags.add(tag)
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error syncing Document2')
 
 
     # Make sure doc have at least a tag
@@ -381,7 +381,7 @@ class DocumentManager(models.Manager):
         default_tag = DocumentTag.objects.get_default_tag(doc.owner)
         doc.tags.add(default_tag)
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error adding at least one tag to docs')
 
     # For now remove the default tag from the examples
     try:
@@ -389,7 +389,7 @@ class DocumentManager(models.Manager):
         default_tag = DocumentTag.objects.get_default_tag(doc.owner)
         doc.tags.remove(default_tag)
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error removing default tags')
 
     # Delete documents with no object
     try:
@@ -397,7 +397,7 @@ class DocumentManager(models.Manager):
         if doc.content_type is None or doc.content_object is None:
           doc.delete()
     except Exception, e:
-      LOG.warn(force_unicode(e))
+      LOG.exception('error removing documents with no objects')
 
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
