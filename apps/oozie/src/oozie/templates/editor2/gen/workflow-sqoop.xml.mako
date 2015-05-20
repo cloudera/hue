@@ -32,7 +32,7 @@
             <command>${ node['properties']['command'] }</command>
             % endif
 
-            % for param in node['properties']['parameters']:
+            % for param in node['properties']['arguments']:
               <arg>${ param['value'] }</arg>
             % endfor
 
