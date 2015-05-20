@@ -27,7 +27,6 @@ object LivyConf {
   val SPARK_SUBMIT_KEY = "livy.server.spark-submit"
 
   sealed trait SessionKind
-  case class Thread() extends SessionKind
   case class Process() extends SessionKind
   case class Yarn() extends SessionKind
 }
@@ -95,14 +94,13 @@ class LivyConf(loadDefaults: Boolean) {
 
   def sessionKind(): SessionKind = getOption(SESSION_FACTORY_KEY).getOrElse("process") match {
     case "process" => Process()
-    case "thread" => Thread()
     case "yarn" => Yarn()
     case kind => throw new IllegalStateException(f"unknown kind $kind")
   }
 
   /** Return the filesystem root. Defaults to the local filesystem. */
   def filesystemRoot(): String = sessionKind() match {
-    case Process() | Thread() => "file://"
+    case Process() => "file://"
     case Yarn() => "hdfs://"
   }
 }
