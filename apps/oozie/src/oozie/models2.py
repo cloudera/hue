@@ -364,6 +364,10 @@ class Node():
     if 'sla' not in self.data['properties']:
       self.data['properties']['sla'] = Workflow.SLA_DEFAULT
 
+    # Backward compatibility
+    if self.data['type'] == 'sqoop' and 'arguments' not in self.data['properties']:
+      self.data['properties']['arguments'] = self.data['properties']['parameters']
+
   def get_template_name(self):
     return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
 
@@ -726,8 +730,8 @@ class SqoopAction(Action):
           'help_text': _('The full %(type)s command. Either put it here or split it by spaces and insert the parts as multiple parameters below.') % {'type': TYPE},
           'type': 'textarea'
      },
-     'parameters': {
-          'name': 'parameters',
+     'arguments': {
+          'name': 'arguments',
           'label': _('Arguments'),
           'value': [],
           'help_text': _('If no command is specified, split the command by spaces and insert the %(type)s parameters '

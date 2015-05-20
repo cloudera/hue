@@ -900,7 +900,7 @@
         <textarea data-bind="value: properties.command" class="input-xlarge" style="resize:both"></textarea>
 
         <div class="row-fluid">
-          <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
+          <div class="span6" data-bind="template: { name: 'common-properties-arguments' }"></div>
           <div class="span6" data-bind="template: { name: 'common-properties-files' }"></div>
         </div>
       </div>
