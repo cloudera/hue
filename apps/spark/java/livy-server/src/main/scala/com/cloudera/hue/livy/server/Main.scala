@@ -32,7 +32,6 @@ import org.slf4j.LoggerFactory
 object Main {
 
   val SESSION_KIND = "livy-server.session.kind"
-  val THREAD_SESSION = "thread"
   val PROCESS_SESSION = "process"
   val YARN_SESSION = "yarn"
   lazy val logger = LoggerFactory.getLogger(this.getClass)
@@ -136,8 +135,6 @@ class ScalatraBootstrap extends LifeCycle with Logging {
     info(f"Using $sessionFactoryKind sessions")
 
     val (sessionFactory, batchFactory) = sessionFactoryKind match {
-      case LivyConf.Thread() =>
-        (new InteractiveSessionProcessFactory(livyConf), new BatchSessionProcessFactory(livyConf) )
       case LivyConf.Process() =>
         (new InteractiveSessionProcessFactory(livyConf), new BatchSessionProcessFactory(livyConf))
       case LivyConf.Yarn() =>
