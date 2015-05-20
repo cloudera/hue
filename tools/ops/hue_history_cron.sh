@@ -82,7 +82,7 @@ log.info("Looping through workflows")
 for w in workflows:
    w.delete(skip_trash=True)
    loopCount += 1
-   if (loopCount == maxCount):
+   if loopCount == maxCount:
       totalWorkflows = totalWorkflows - maxCount
       loopCount = 1
       log.info("workflows left: %s" % totalWorkflows)
