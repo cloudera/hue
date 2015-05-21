@@ -3286,15 +3286,15 @@ class TestDashboard(OozieMockBase):
     assert_true('Running' in response.content, response.content)
     assert_true('Completed' in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&type=running")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&type=completed")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
@@ -3427,20 +3427,20 @@ class TestDashboard(OozieMockBase):
 
 
   def test_coordinators_permissions(self):
-    response = self.c.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators')+"?format=json&status=SUCCEEDED")
     assert_true('DailyWordCount1' in response.content, response.content)
 
     # Login as someone else
     client_not_me = make_logged_in_client(username='not_me', is_superuser=False, groupname='test', recreate=True)
     grant_access("not_me", "not_me", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinators')+"?format=json&status=SUCCEEDED")
     assert_false('DailyWordCount1' in response.content, response.content)
 
     # Add read only access
     add_permission("not_me", "dashboard_jobs_access", "dashboard_jobs_access", "oozie")
 
-    response = client_not_me.get(reverse('oozie:list_oozie_coordinators')+"?format=json")
+    response = client_not_me.get(reverse('oozie:list_oozie_coordinators')+"?format=json&status=SUCCEEDED")
     assert_true('DailyWordCount1' in response.content, response.content)
 
 
