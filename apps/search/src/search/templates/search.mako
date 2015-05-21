@@ -1773,7 +1773,7 @@ $(document).ready(function () {
   });
 
   $(document).on("shownAnalysis", function(){
-    var _fieldElement = $(".field-selector").filter(function(){ return $(this).text().toLowerCase() === viewModel.fieldAnalysesName();}).parent();
+    var _fieldElement = $(".field-selector").filter(function(){ return $(this).text().toLowerCase() === viewModel.fieldAnalysesName().toLowerCase();}).parent();
     $("#fieldAnalysis").show().css("top", _fieldElement.position().top - $("#fieldAnalysis").outerHeight()/2 + _fieldElement.outerHeight()/2).css("left", _fieldElement.position().left + _fieldElement.outerWidth());
   });
 });
