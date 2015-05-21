@@ -31,7 +31,7 @@ import org.json4s.{DefaultFormats, Formats}
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-class InteractiveWebSession(val id: Int, createInteractiveRequest: CreateInteractiveRequest) extends InteractiveSession with Logging {
+abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: CreateInteractiveRequest) extends InteractiveSession with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats

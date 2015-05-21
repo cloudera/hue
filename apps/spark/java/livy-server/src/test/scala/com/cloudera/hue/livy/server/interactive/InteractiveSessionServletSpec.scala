@@ -40,6 +40,8 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
 
     override def kind: Kind = Spark()
 
+    override def logLines() = IndexedSeq()
+
     override def state = _state
 
     override def stop(): Future[Unit] = ???
