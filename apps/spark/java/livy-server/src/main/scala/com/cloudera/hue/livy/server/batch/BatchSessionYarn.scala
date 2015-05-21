@@ -38,7 +38,7 @@ object BatchSessionYarn {
   def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): BatchSession = {
     val builder = sparkBuilder(livyConf, createBatchRequest)
 
-    val process = new LineBufferedProcess(builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args))
+    val process = builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args)
     val job = Future {
       client.getJobFromProcess(process)
     }

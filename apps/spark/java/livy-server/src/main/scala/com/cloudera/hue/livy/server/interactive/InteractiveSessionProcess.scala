@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
@@ -41,7 +41,7 @@ object InteractiveSessionProcess extends Logging {
   }
 
   // Loop until we've started a process with a valid port.
-  private def startProcess(livyConf: LivyConf, id: Int, createInteractiveRequest: CreateInteractiveRequest): Process = {
+  private def startProcess(livyConf: LivyConf, id: Int, createInteractiveRequest: CreateInteractiveRequest): SparkProcess = {
 
     val builder = new SparkSubmitProcessBuilder(livyConf)
 
@@ -80,13 +80,13 @@ object InteractiveSessionProcess extends Logging {
 
 private class InteractiveSessionProcess(id: Int,
                                         createInteractiveRequest: CreateInteractiveRequest,
-                                        process: Process) extends InteractiveWebSession(id, createInteractiveRequest) {
+                                        process: SparkProcess) extends InteractiveWebSession(id, createInteractiveRequest) {
 
   val stdoutThread = new Thread {
     override def run() = {
       val regex = """Starting livy-repl on (https?://.*)""".r
 
-      val lines = Source.fromInputStream(process.getInputStream).getLines()
+      val lines = process.inputIterator
 
       // Loop until we find the ip address to talk to livy-repl.
       @tailrec
