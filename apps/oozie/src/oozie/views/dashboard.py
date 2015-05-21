@@ -240,16 +240,24 @@ def list_oozie_bundles(request):
   oozie_api = get_oozie(request.user)
 
   if request.GET.get('format') == 'json':
-    if request.GET.get('type') in ('running', 'progress'):
-      kwargs['filters'].extend([('status', status) for status in BundleWorkflow.RUNNING_STATUSES])
-    elif request.GET.get('type') == 'completed':
-      kwargs['filters'].extend([('status', status) for status in BundleWorkflow.FINISHED_STATUSES])
+    if request.GET.get('offset'):
+      kwargs['offset'] = request.GET.get('offset')
 
-    json_jobs = oozie_api.get_bundles(**kwargs).jobs
+    json_jobs = []
+    total_jobs = 0
+    if request.GET.getlist('status'):
+      kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
+      bundle_list = oozie_api.get_bundles(**kwargs)
+      json_jobs = bundle_list.jobs
+      total_jobs = bundle_list.total
+
     if request.GET.get('type') == 'progress':
-      json_jobs = [oozie_api.get_bundle(job.id) for job in json_jobs]
+      json_jobs = [oozie_api.get_coordinator(job.id) for job in json_jobs]
 
-    return HttpResponse(json.dumps(massaged_oozie_jobs_for_json(json_jobs, request.user)).replace('\\\\', '\\'), content_type="application/json")
+    response = massaged_oozie_jobs_for_json(json_jobs, request.user)
+    response['total_jobs'] = total_jobs
+    return JsonResponse(response, encoder=JSONEncoderForHTML)
+
 
   return render('dashboard/list_oozie_bundles.mako', request, {
     'jobs': [],

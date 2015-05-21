@@ -29,7 +29,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
 <div class="container-fluid">
   <div class="card card-small">
-  <div class="card-body">
+  <div class="card-body" style="padding-bottom: 20px">
   <p>
   <form>
     <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
@@ -55,7 +55,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
       <span class="btn-group" style="float:left;">
         <a class="btn btn-status btn-success" data-value='SUCCEEDED'>${ _('Succeeded') }</a>
         <a class="btn btn-status btn-warning" data-value='RUNNING'>${ _('Running') }</a>
-        <a class="btn btn-status btn-danger disable-feedback" data-value='KILLED'>${ _('Killed') }</a>
+        <a class="btn btn-status btn-danger disable-feedback" data-value='ERROR'>${ _('Error') }</a>
       </span>
     </span>
   </form>
@@ -88,6 +88,16 @@ ${layout.menubar(section='bundles', dashboard=True)}
         </tr>
       </tbody>
     </table>
+
+    <span class="running-info" style="padding-left: 4px"></span>
+
+    <div class="pagination dataTables_paginate">
+      <ul>
+        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="running"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
+        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="running">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+      </ul>
+    </div>
+
   </div>
 
   <div>
@@ -114,6 +124,16 @@ ${layout.menubar(section='bundles', dashboard=True)}
         </tr>
       </tbody>
      </table>
+
+     <span class="completed-info" style="padding-left: 4px"></span>
+
+     <div class="pagination dataTables_paginate">
+      <ul>
+        <li class="prev"><a href="javascript:void(0)" class="btn-pagination" data-value="prev" data-table="completed"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
+        <li class="next"><a href="javascript:void(0)" class="btn-pagination" data-value="next" data-table="completed">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+      </ul>
+     </div>
+
    </div>
   </p>
   </div>
@@ -162,13 +182,33 @@ ${layout.menubar(section='bundles', dashboard=True)}
   }
 
   var refreshRunning;
+  var runningTableOffset = 1, completedTableOffset = 1;
+  var totalRunningJobs = 0, totalCompletedJobs = 0;
+  var PAGE_SIZE = 50;
 
   $(document).ready(function () {
+
+    function showTableInfo(oSettings, table, tableOffset, totalJobs) {
+      var _disp = oSettings.fnRecordsDisplay();
+      var _tot = oSettings.fnRecordsTotal();
+      var _text = "";
+      if (_disp == 0) {
+        _text = '${_("Showing 0 to 0 of ")}' + totalJobs + '${_(" entries")}';
+      }
+      else {
+        _text = ' ${_("Showing ")}' + tableOffset + '${_(" to ")}' + (tableOffset + oSettings.fnDisplayEnd() - 1) + '${_(" of ")}' + totalJobs;
+      }
+      if (_disp != _tot) { // when filter button is selected
+          _text += '${_(" (filtered from ")}' + _tot + '${_(" entries)")}';
+      }
+      $(table).text(_text);
+    }
+
     var runningTable = $("#running-table").dataTable({
-      "sPaginationType":"bootstrap",
-      "iDisplayLength":50,
+      "bPaginate": false,
+      "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
-      "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
+      "sDom":"<'row'r>t<'row'<'span6'><''p>>",
       "aoColumns":[
         { "bSortable":false },
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
@@ -183,28 +223,19 @@ ${layout.menubar(section='bundles', dashboard=True)}
         [ 5, "desc" ]
       ],
       "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":"${_('No matching records')}",
-        "oPaginate":{
-          "sFirst":"${_('First')}",
-          "sLast":"${_('Last')}",
-          "sNext":"${_('Next')}",
-          "sPrevious":"${_('Previous')}"
-        }
+        "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
+        showTableInfo(oSettings, ".running-info", runningTableOffset, totalRunningJobs);
         $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
 
     var completedTable = $("#completed-table").dataTable({
-      "sPaginationType":"bootstrap",
-      "iDisplayLength":50,
+      "bPaginate": false,
+      "iDisplayLength":PAGE_SIZE,
       "bLengthChange":false,
-      "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
+      "sDom":"<'row'r>t<'row'<'span6'><''p>>",
       "aoColumns":[
         { "sSortDataType":"dom-sort-value", "sType":"numeric" },
         null,
@@ -217,19 +248,10 @@ ${layout.menubar(section='bundles', dashboard=True)}
         [ 4, "desc" ]
       ],
       "oLanguage":{
-        "sEmptyTable":"${_('No data available')}",
-        "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
-        "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
-        "sInfoFiltered":"${_('(filtered from _MAX_ total entries)')}",
-        "sZeroRecords":"${_('No matching records')}",
-        "oPaginate":{
-          "sFirst":"${_('First')}",
-          "sLast":"${_('Last')}",
-          "sNext":"${_('Next')}",
-          "sPrevious":"${_('Previous')}"
-        }
+        "sZeroRecords":"${_('No matching records')}"
       },
       "fnDrawCallback":function (oSettings) {
+        showTableInfo(oSettings, ".completed-info", completedTableOffset, totalCompletedJobs);
         $("a[data-row-selector='true']").jHueRowSelector();
       }
     });
@@ -252,13 +274,35 @@ ${layout.menubar(section='bundles', dashboard=True)}
       window.location.hash = hash;
     });
 
+    $("a.btn-pagination").on("click", function () {
+      if (!$(this).parent().hasClass("disabled")) {
+        var _additionalOffset = 0;
+        if ($(this).data("value") == "prev") {
+          _additionalOffset = -PAGE_SIZE;
+        }
+        else {
+          _additionalOffset = PAGE_SIZE;
+        }
+        if ($(this).data("table") == "running") {
+          runningTableOffset += _additionalOffset;
+          refreshRunning();
+        }
+        else {
+          completedTableOffset += _additionalOffset;
+          refreshCompleted();
+        }
+      }
+    });
 
     $("a.btn-status").click(function () {
+      refreshPagination();
       $(this).toggleClass("active");
-      drawTable();
+      refreshRunning();
+      refreshCompleted();
     });
 
     $("a.btn-date").click(function () {
+      refreshPagination();
       $("a.btn-date").not(this).removeClass("active");
       $(this).toggleClass("active");
       drawTable();
@@ -267,6 +311,11 @@ ${layout.menubar(section='bundles', dashboard=True)}
     var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
     if (hash != "" && hash.indexOf("=") > -1) {
       $("a.btn-date[data-value='" + hash.split("=")[1] + "']").click();
+    }
+
+    function refreshPagination() {
+      runningTableOffset = 1;
+      completedTableOffset = 1;
     }
 
     function drawTable() {
@@ -280,9 +329,29 @@ ${layout.menubar(section='bundles', dashboard=True)}
       window.location.hash = hash;
     }
 
+    function getStatuses(type) {
+      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED'] : ['SUCCEEDED', 'KILLED', 'FAILED'];
+      var btnStatuses = [];
+      var statusBtns = $("a.btn-status.active");
+      $.each(statusBtns, function () {
+        val = $(this).data('value');
+        if (val == 'SUCCEEDED') {
+          btnStatuses = btnStatuses.concat(['SUCCEEDED']);
+        } else if (val == 'RUNNING') {
+          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED']);
+        } else if (val == 'ERROR') {
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED']);
+        }
+      });
+      if (btnStatuses.length > 0) {
+        selectedStatuses = $.makeArray($(selectedStatuses).filter(btnStatuses));
+      }
+      return selectedStatuses.length > 0 ? ('&status=' + selectedStatuses.join('&status=')) : '';
+    }
+
     $.fn.dataTableExt.sErrMode = "throw";
 
-    $.fn.dataTableExt.afnFiltering.push(PersistedButtonsFilters); // from dashboard-utils.js
+    $.fn.dataTableExt.afnFiltering.push(DateButtonsFilters); // from dashboard-utils.js
 
     $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
@@ -314,8 +383,12 @@ ${layout.menubar(section='bundles', dashboard=True)}
     var numRunning = 0;
 
     refreshRunning = function () {
-      $.getJSON(window.location.pathname + "?format=json&type=running", function (data) {
-        if (data.jobs) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running'), function (data) {
+        // Refresh pagination buttons
+        totalRunningJobs = data.total_jobs;
+        refreshPaginationButtons("running", totalRunningJobs);
+
+        if (data.jobs.length > 0) {
           var nNodes = runningTable.fnGetNodes();
 
           // check for zombie nodes
@@ -379,8 +452,33 @@ ${layout.menubar(section='bundles', dashboard=True)}
       });
     }
 
+    function refreshPaginationButtons(tableName, totalJobs) {
+      var prevBtn = $("a.btn-pagination[data-table='"+ tableName + "'][data-value='prev']");
+      var nextBtn = $("a.btn-pagination[data-table='"+ tableName + "'][data-value='next']");
+      var offset = runningTableOffset;
+      if (tableName == 'completed') {
+        offset = completedTableOffset;
+      }
+      if (offset == 1 || !totalJobs) {
+        prevBtn.parent().addClass("disabled");
+      }
+      else {
+        prevBtn.parent().removeClass("disabled");
+      }
+      if (totalJobs < (offset + PAGE_SIZE) || !totalJobs) {
+        nextBtn.parent().addClass("disabled");
+      }
+      else if (totalJobs >= offset + PAGE_SIZE) {
+        nextBtn.parent().removeClass("disabled");
+      }
+    }
+
     function refreshCompleted() {
-      $.getJSON(window.location.pathname + "?format=json&type=completed", function (data) {
+      $.getJSON(window.location.pathname + "?format=json&offset=" + completedTableOffset + getStatuses('completed'), function (data) {
+        // Refresh pagination buttons
+        totalCompletedJobs = data.total_jobs;
+        refreshPaginationButtons("completed", totalCompletedJobs);
+
         completedTable.fnClearTable();
         $(data.jobs).each(function (iWf, item) {
           var bundle = new Bundle(item);
@@ -403,7 +501,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     }
 
     function refreshProgress() {
-      $.getJSON(window.location.pathname + "?format=json&type=progress", function (data) {
+      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running'), function (data) {
         var nNodes = runningTable.fnGetNodes();
         $(data.jobs).each(function (iWf, item) {
             var bundle = new Bundle(item);
