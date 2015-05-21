@@ -323,7 +323,7 @@ ${ dashboard.layout_skeleton() }
       <!-- ko ifnot: properties.isDate() -->
         <div class="slider-cnt" data-bind="slider: {start: properties.min, end: properties.max, gap: properties.initial_gap, min: properties.initial_start, max: properties.initial_end, properties: properties, labels: SLIDER_LABELS}"></div>
       <!-- /ko -->
-      <!-- ko if: properties.isDate() && $root.collection.timeFilter.field() != field() -->
+      <!-- ko if: properties.isDate() && $root.collection.timeFilter && $root.collection.timeFilter.field && $root.collection.timeFilter.field() != field() -->
         <div data-bind="daterangepicker: {start: properties.start, end: properties.end, gap: properties.initial_gap, relatedgap: properties.gap, min: properties.min, max: properties.max}"></div>
         <br/>
       <!-- /ko -->
@@ -423,7 +423,7 @@ ${ dashboard.layout_skeleton() }
                 <!-- ko if: ! $data.selected -->
                   <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                   <div class="hellip">
-                    <a class="pointer" data-bind="text: $data.value, click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
+                    <a class="pointer" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
                     <span class="pointer counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
                   </div>
                 <!-- /ko -->
@@ -432,7 +432,7 @@ ${ dashboard.layout_skeleton() }
                     <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
                     <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                     <div class="hellip">
-                      <strong data-bind="text: $data.value"></strong>
+                      <strong data-bind="html: prettifyDate($data.value), attr: {'title': $data.value}"></strong>
                     </div>
                   </span>
                 <!-- /ko -->
@@ -462,7 +462,7 @@ ${ dashboard.layout_skeleton() }
               <!-- ko if: ! selected -->
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                 <div class="hellip">
-                  <a class="pointer" data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to, click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }, attr: {'title': ($data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to) + ' (' + $data.value + ')'}"></a>
+                  <a class="pointer" data-bind="html: $data.is_single_unit_gap ? prettifyDate($data.from, $parent, $data.to) : prettifyDateRange($data.from, $data.to, $parent, false), click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }, attr: {'title': ($data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to) + ' (' + $data.value + ')'}"></a>
                   <span class="pointer counter" data-bind="text: ' (' + $data.value + ')', click: function(){ $root.query.selectRangeFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field}) }"></span>
                 </div>
               <!-- /ko -->
@@ -471,7 +471,7 @@ ${ dashboard.layout_skeleton() }
                   <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
                   <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                   <div class="hellip">
-                    <strong data-bind="text: $data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to"></strong>
+                    <strong data-bind="html: $data.is_single_unit_gap ? prettifyDate($data.from, $parent, $data.to) : prettifyDateRange($data.from, $data.to, $parent, false), attr: {'title': ($data.is_single_unit_gap ? $data.from : $data.from + ' - ' + $data.to) + ' (' + $data.value + ')'}"></strong>
                   </div>
                 </span>
               <!-- /ko -->
@@ -484,7 +484,7 @@ ${ dashboard.layout_skeleton() }
               <!-- ko if: ! selected -->
                 <a class="exclude pointer" data-bind="click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, 'exclude': true, is_up: $data.is_up}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                 <div class="hellip">
-                  <a class="pointer" data-bind="text: $data.from + ($data.is_up ? ' & Up' : ' & Less'), click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }, attr: {'title': $data.from + ($data.is_up ? ' & Up' : ' & Less') + ' (' + $data.total_counts + ')'}"></a>
+                  <a class="pointer" data-bind="html: prettifyDate($data.from, $parent) + ($data.is_up ? ' & Up' : ' & Less'), click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }, attr: {'title': $data.from + ($data.is_up ? ' & Up' : ' & Less') + ' (' + $data.total_counts + ')'}"></a>
                   <span class="pointer counter" data-bind="text: ' (' + $data.total_counts + ')', click: function(){ $root.query.selectRangeUpFacet({count: $data.value, widget_id: $parent.id(), from: $data.from, to: $data.to, cat: $data.field, is_up: $data.is_up}) }"></span>
                 </div>
               <!-- /ko -->
@@ -493,7 +493,7 @@ ${ dashboard.layout_skeleton() }
                   <a class="include pointer" data-bind="visible: ! exclude"><i class="fa fa-times"></i></a>
                   <a class="include pointer" data-bind="visible: exclude"><i class="fa fa-plus"></i></a>
                   <div class="hellip">
-                    <strong data-bind="text: $data.from + ($data.is_up ? ' & Up' : ' & Less')"></strong>
+                    <strong data-bind="html: prettifyDate($data.from, $parent) + ($data.is_up ? ' & Up' : ' & Less')"></strong>
                   </div>
                 </span>
               <!-- /ko -->
@@ -1276,12 +1276,12 @@ ${ dashboard.layout_skeleton() }
       <div class="content">
         <strong>${_('selected')}</strong>
         <span data-bind="foreach: $data.filter">
-          <span class="label label-info" style="margin-left: 4px" data-bind="visible: ! $data.exclude(), text: $data.value()"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="visible: ! $data.exclude(), html: prettifyDate($data.value()), attr: {'title': $data.value()}"></span>
         </span>
         <br/>
         <strong>${_('excluded')}</strong>
         <span data-bind="foreach: $data.filter">
-          <span class="label label-important" style="margin-left: 4px" data-bind="visible: $data.exclude(), text: $data.value()"></span>
+          <span class="label label-important" style="margin-left: 4px" data-bind="visible: $data.exclude(), html: prettifyDate($data.value()), attr: {'title': $data.value()}"></span>
         </span>
       </div>
     </div>
@@ -1302,13 +1302,12 @@ ${ dashboard.layout_skeleton() }
           <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && ! f.exclude() }).length > 0 -->
           <span class="label label-info">
             <!-- ko if: $parent.type() == 'range' -->
-              <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
-              <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+              <span data-bind="html: prettifyDateRange($data.from(), $data.to(), null, true), attr: {'title': $data.from() + ' -> ' + $data.to()}"></span>
             <!-- /ko -->
 
             <!-- ko if: $parent.type() == 'range-up' -->
               <strong data-bind="visible: ! $parent.is_up()">${ _('Until') }</strong>
-              <span data-bind="text: $data.from"></span>
+              <span data-bind="html: prettifyDate($data.from()), attr: {'title': $data.from()}"></span>
               <strong data-bind="visible: $parent.is_up()"> & Up</strong>
             <!-- /ko -->
           </span>
@@ -1319,8 +1318,7 @@ ${ dashboard.layout_skeleton() }
         <span data-bind="foreach: $data.properties" style="font-weight: normal" class="excluded">
           <!-- ko if: $.grep($parent.filter(), function(f) { return f.value() == $data.from() && f.exclude() }).length > 0 -->
           <span class="label label-important">
-            <strong>${_('from')}</strong> <span data-bind="text: $data.from"></span>
-            <strong>${_('to')}</strong> <span data-bind="text: $data.to"></span>
+            <span data-bind="html: prettifyDateRange($data.from(), $data.to(), null, true), attr: {'title': $data.from() + ' -> ' + $data.to()}"></span>
           </span>
           <!-- /ko -->
         </span>
@@ -1744,6 +1742,7 @@ ${ dashboard.import_layout() }
 <script src="${ static('desktop/ext/js/shortcut.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 
 <script src="${ static('search/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -1788,6 +1787,89 @@ function getHitOption(value){
   }
   return '';
 }
+
+function prettifyDate(from, widget, to) {
+  if (typeof from == "undefined" || $.isNumeric(from)) {
+    return from;
+  }
+  if (typeof to != "undefined" && !$.isNumeric(to)) {
+    return prettifyDateRange(from, to, widget);
+  }
+  var _mFrom = moment(from);
+  if (_mFrom.isValid()) {
+    var _format = "YYYY-MM-DD HH:mm:ss";
+    var _minMaxDiff = 0;
+    if (widget && widget.properties && widget.properties.min && widget.properties.min()) {
+      _minMaxDiff = moment(widget.properties.max()).diff(moment(widget.properties.min()), 'seconds');
+      if (moment(widget.properties.max()).seconds() == 0 && moment(widget.properties.min()).seconds() == 0) {
+        _format = _format.substring(0, 16); // gets rid of :00 seconds
+      }
+    }
+    _format = getFormat(_format, _minMaxDiff, widget);
+
+    return _mFrom.utc().format(_format);
+  }
+  else {
+    return from;
+  }
+}
+
+function prettifyDateRange(from, to, widget, withCommon) {
+  if (typeof from == "undefined" || $.isNumeric(from)) {
+    return from + " - " + to;
+  }
+  var _mFrom = moment(from);
+  var _mTo = moment(to);
+  if (_mFrom.isValid() && _mTo.isValid()) {
+    var _mFromFormatted = _mFrom.utc().format("YYYY-MM-DD HH:mm:ss");
+    var _mToFormatted = _mTo.utc().format("YYYY-MM-DD HH:mm:ss");
+    var _lastEqual = _mFromFormatted.length - 1;
+    for (var i = _mFromFormatted.length - 1; i >= 0; i--) {
+      if (_mFromFormatted[i] == _mToFormatted[i] && (_mFromFormatted[i] == "0" || _mFromFormatted[i] == ":")) {
+        _lastEqual = i;
+      }
+      else break;
+    }
+
+    var _minMaxDiff = moment(to).diff(moment(from), 'seconds');
+    var _format = "YYYY-MM-DD HH:mm:ss".substr(0, _lastEqual);
+    var _formatWithCommon = _format.substring(10, _format.length);
+    var _common = "YYYY-MM-DD";
+    if (widget && widget.properties && widget.properties.min && widget.properties.min()) {
+      _minMaxDiff = moment(widget.properties.max()).diff(moment(widget.properties.min()), 'seconds');
+    }
+    _format = getFormat(_format, _minMaxDiff, widget);
+
+    return ((_common != "" && withCommon) ? _mFrom.utc().format(_common) + "&nbsp;" : "") + _mFrom.utc().format(withCommon ? _formatWithCommon : _format) + " <i class='fa fa-long-arrow-right'></i> " + _mTo.utc().format(withCommon ? _formatWithCommon : _format);
+  }
+  else {
+    return from + " - " + to;
+  }
+}
+
+function getFormat(format, minMaxDiff, widget) {
+  var _hasWidget = widget && widget.properties && widget.properties.min && widget.properties.min();
+  if (minMaxDiff > 0 && minMaxDiff <= 86400) { // max 1 day
+    if (_hasWidget && moment(widget.properties.max()).date() != moment(widget.properties.min()).date()) {
+      format = format.substring(5, format.length);
+    }
+    else {
+      format = format.substring(10, format.length);
+    }
+  }
+  if (minMaxDiff > 86400 && minMaxDiff <= 2592000) { // max 1 month
+    format = format.substring(8, format.length);
+  }
+  if (minMaxDiff > 2592000 && minMaxDiff <= 22464000) { //360 days
+    format = format.substring(5, format.length);
+  }
+
+  if (format.indexOf("MM") == 0) {
+    format = "MMM " + format.substr(3);
+  }
+  return format;
+}
+
 
 var lastWindowScrollPosition = 0;
 
@@ -2216,6 +2298,14 @@ $(document).ready(function () {
     var _fieldElement = $(".field-selector").filter(function(){ return $(this).text().toLowerCase() === viewModel.fieldAnalysesName().toLowerCase();}).parent();
     $("#fieldAnalysis").show().css("top", _fieldElement.position().top - $("#fieldAnalysis").outerHeight()/2 + _fieldElement.outerHeight()/2).css("left", _fieldElement.position().left + _fieldElement.outerWidth());
   });
+
+  % if is_owner:
+  $(window).bind("keydown", "ctrl+s alt+s meta+s", function(e){
+    e.preventDefault();
+    viewModel.save();
+    return false;
+  });
+  % endif
 });
 
   function showShareModal() {
