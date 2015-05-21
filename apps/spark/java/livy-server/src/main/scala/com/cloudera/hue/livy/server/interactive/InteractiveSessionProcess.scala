@@ -118,6 +118,8 @@ private class InteractiveSessionProcess(id: Int,
   stdoutThread.setDaemon(true)
   stdoutThread.start()
 
+  override def logLines() = process.inputLines
+
   override def stop(): Future[Unit] = {
     super.stop() andThen { case r =>
       // Make sure the process is reaped.

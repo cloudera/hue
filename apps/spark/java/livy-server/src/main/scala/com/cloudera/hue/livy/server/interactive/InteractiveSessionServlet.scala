@@ -27,6 +27,7 @@ import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailed
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonAST.JString
+import org.json4s.JsonDSL._
 import org.json4s._
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
@@ -134,6 +135,23 @@ class InteractiveSessionServlet(sessionManager: SessionManager)
     new AsyncResult() { val is = for { _ <- future } yield NoContent() }
   }
 
+  get("/:sessionId/log") {
+    val sessionId = params("sessionId").toInt
+
+    sessionManager.get(sessionId) match {
+      case None => NotFound("Session not found")
+      case Some(session: InteractiveSession) =>
+        val from = params.get("from").map(_.toInt)
+        val size = params.get("size").map(_.toInt)
+        val (from_, total, logLines) = Serializers.getLogs(session, from, size)
+
+        ("id", session.id) ~
+          ("from", from_) ~
+          ("total", total) ~
+          ("log", logLines)
+    }
+  }
+
   get("/:sessionId/statements") {
     val sessionId = params("sessionId").toInt
 
@@ -215,7 +233,21 @@ private object Serializers {
     ("id", session.id) ~
       ("state", serializeSessionState(session.state)) ~
       ("kind", serializeSessionKind(session.kind)) ~
-      ("proxyUser", session.proxyUser)
+      ("proxyUser", session.proxyUser) ~
+      ("log", getLogs(session, None, Some(10))._3)
+  }
+  
+  def getLogs(session: InteractiveSession, fromOpt: Option[Int], sizeOpt: Option[Int]) = {
+    val lines = session.logLines()
+
+    val size = sizeOpt.getOrElse(100)
+    var from = fromOpt.getOrElse(-1)
+    if (from < 0) {
+      from = math.min(0, lines.length - size)
+    }
+    val until = from + size
+
+    (from, lines.length, lines.view(from, until))
   }
 
   def serializeStatement(statement: Statement, from: Option[Int], size: Option[Int]): JValue = {

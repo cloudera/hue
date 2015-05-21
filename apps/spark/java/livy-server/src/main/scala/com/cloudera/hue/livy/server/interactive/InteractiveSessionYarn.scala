@@ -22,7 +22,7 @@ import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.sessions.Error
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
 import com.cloudera.hue.livy.yarn.{Client, Job}
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf, Utils}
@@ -63,16 +63,7 @@ object InteractiveSessionYarn {
 
     val process = builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
 
-    val job = Future {
-      val job = client.getJobFromProcess(process)
-
-      // We don't need the process anymore.
-      process.destroy()
-
-      job
-    }
-
-    new InteractiveSessionYarn(id, createInteractiveRequest, job)
+    new InteractiveSessionYarn(id, client, process, createInteractiveRequest)
   }
 
   private def livyJar(livyConf: LivyConf) = {
@@ -85,13 +76,26 @@ object InteractiveSessionYarn {
 }
 
 private class InteractiveSessionYarn(id: Int,
-                                     createInteractiveRequest: CreateInteractiveRequest,
-                                     job: Future[Job]) extends InteractiveWebSession(id, createInteractiveRequest) {
+                                     client: Client,
+                                     process: SparkProcess,
+                                     createInteractiveRequest: CreateInteractiveRequest)
+  extends InteractiveWebSession(id, createInteractiveRequest) {
+
+  private val job = Future {
+    val job = client.getJobFromProcess(process)
+
+    job
+  }
+
   job.onFailure { case _ =>
     _state = Error()
   }
 
+  override def logLines() = process.inputLines
+
   override def stop(): Future[Unit] = {
+    process.destroy()
+
     super.stop().andThen {
       case _ =>
         try {

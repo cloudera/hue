@@ -69,11 +69,7 @@ class BatchSessionServlet(batchManager: BatchManager)
 
     batchManager.getBatch(id) match {
       case None => NotFound("batch not found")
-      case Some(batch) =>
-        val from = params.get("from").map(_.toInt)
-        val size = params.get("size").map(_.toInt)
-
-        Serializers.serializeBatch(batch, from, size)
+      case Some(batch) => Serializers.serializeBatch(batch)
     }
   }
 
@@ -95,8 +91,12 @@ class BatchSessionServlet(batchManager: BatchManager)
       case Some(batch) =>
         val from = params.get("from").map(_.toInt)
         val size = params.get("size").map(_.toInt)
+        val (from_, total, logLines) = Serializers.getLogs(batch, from, size)
 
-        ("id", batch.id) ~ ("log", Serializers.getLogs(batch, from, size))
+        ("id", batch.id) ~
+          ("from", from_) ~
+          ("total", total) ~
+          ("log", logLines)
     }
   }
 
@@ -129,16 +129,13 @@ private object Serializers {
 
   def Formats: List[CustomSerializer[_]] = List(BatchSerializer)
 
-  def serializeBatch(batch: BatchSession,
-                     from: Option[Int],
-                     size: Option[Int]): JValue = {
-
+  def serializeBatch(batch: BatchSession): JValue = {
     ("id", batch.id) ~
       ("state", batch.state.toString) ~
-      ("log", getLogs(batch, from, size))
+      ("log", getLogs(batch, None, Some(10))._3)
   }
 
-  def getLogs(batch: BatchSession, fromOpt: Option[Int], sizeOpt: Option[Int]): JValue = {
+  def getLogs(batch: BatchSession, fromOpt: Option[Int], sizeOpt: Option[Int]) = {
     val lines = batch.logLines()
 
     val size = sizeOpt.getOrElse(100)
@@ -148,7 +145,7 @@ private object Serializers {
     }
     val until = from + size
 
-    lines.view(from, until)
+    (from, lines.length, lines.view(from, until))
   }
 
   case object BatchSerializer extends CustomSerializer[BatchSession](
@@ -156,8 +153,7 @@ private object Serializers {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case batch: BatchSession =>
-      serializeBatch(batch, None, None)
+    case batch: BatchSession => serializeBatch(batch)
   }
     )
   )
