@@ -630,6 +630,21 @@ ko.bindingHandlers.daterangepicker = {
   }
 }
 
+ko.bindingHandlers.oneClickSelect = {
+  init: function (element) {
+    $(element).click(function() {
+      if (document.selection) {
+        var range = document.body.createTextRange();
+        range.moveToElementText(element);
+        range.select();
+      } else if (window.getSelection) {
+        var range = document.createRange();
+        range.selectNode(element);
+        window.getSelection().addRange(range);
+      }
+    });
+  }
+};
 
 ko.bindingHandlers.augmenthtml = {
   render: function (element, valueAccessor, allBindingsAccessor, viewModel) {
