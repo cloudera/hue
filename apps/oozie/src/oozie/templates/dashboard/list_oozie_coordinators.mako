@@ -388,26 +388,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
       return selectedStatuses.length > 0 ? ('&status=' + selectedStatuses.join('&status=')) : '';
     }
 
-    var CoordinatorButtonsFilters = function (oSettings, aData, iDataIndex) {
-      var dateBtn = $("a.btn-date.active");
-      var dateFilter = true;
-      if (dateBtn.length > 0) {
-        var minAge = new Date() - parseInt(dateBtn.attr("data-value")) * 1000 * 60 * 60 * 24;
-        var _dateColumn = aData[1];
-        if (typeof $(_dateColumn).attr("data-type") == "undefined" || $(_dateColumn).attr("data-type") == "status") {
-          _dateColumn = aData[0];
-        }
-        if (typeof _dateColumn == "string") {
-          _dateColumn = $(_dateColumn).attr("data-sort-value");
-        }
-        dateFilter = _dateColumn * 1000 >= minAge;
-      }
-      return dateFilter;
-    }
-
     $.fn.dataTableExt.sErrMode = "throw";
 
-    $.fn.dataTableExt.afnFiltering.push(CoordinatorButtonsFilters);
+    $.fn.dataTableExt.afnFiltering.push(DateButtonsFilters); // from dashboard-utils.js
 
     $(document).on("click", ".confirmationModal", function () {
       var _this = $(this);
