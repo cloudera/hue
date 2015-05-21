@@ -32,7 +32,7 @@ object BatchSessionProcess {
     val builder = sparkBuilder(livyConf, createBatchRequest)
 
     val process = builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args)
-    new BatchSessionProcess(id, new LineBufferedProcess(process))
+    new BatchSessionProcess(id, process)
   }
 
   private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {

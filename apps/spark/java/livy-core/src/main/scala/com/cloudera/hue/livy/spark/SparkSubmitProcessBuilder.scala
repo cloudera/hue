@@ -216,7 +216,7 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def start(file: Path, args: Traversable[String]): Process = {
+  def start(file: Path, args: Traversable[String]): SparkProcess = {
     var args_ = ArrayBuffer(fromPath(_executable))
 
     def addOpt(option: String, value: Option[String]): Unit = {
@@ -268,7 +268,7 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     _redirectError.foreach(pb.redirectError)
     _redirectErrorStream.foreach(pb.redirectErrorStream)
 
-    pb.start()
+    SparkProcess(pb.start())
   }
 
   private def fromPath(path: Path) = path match {

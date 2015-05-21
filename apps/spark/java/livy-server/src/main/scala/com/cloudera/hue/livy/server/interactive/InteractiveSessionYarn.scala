@@ -36,7 +36,10 @@ object InteractiveSessionYarn {
   private val CONF_LIVY_JAR = "livy.yarn.jar"
   private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  def create(livyConf: LivyConf, client: Client, id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+  def create(livyConf: LivyConf,
+             client: Client,
+             id: Int,
+             createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 
@@ -61,11 +64,10 @@ object InteractiveSessionYarn {
     val process = builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
 
     val job = Future {
-      val proc = new LineBufferedProcess(process)
-      val job = client.getJobFromProcess(proc)
+      val job = client.getJobFromProcess(process)
 
       // We don't need the process anymore.
-      proc.destroy()
+      process.destroy()
 
       job
     }
