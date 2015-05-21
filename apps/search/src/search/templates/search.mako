@@ -1663,13 +1663,13 @@ ${ dashboard.layout_skeleton() }
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
                 <label class="control-label" for="settingstimestart">${ _('Start date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimestart" type="text" data-bind="collection.timeFilter.from" />
+                  <input id="settingstimestart" type="text" data-bind="value: collection.timeFilter.from, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
                 </div>
               </div>
               <div class="control-group" data-bind="visible: collection.timeFilter.type() == 'fixed'">
                 <label class="control-label" for="settingstimeend">${ _('End date/time') }</label>
                 <div class="controls">
-                  <input id="settingstimeend" type="text" data-bind="collection.timeFilter.to" />
+                  <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
                 </div>
               </div>
               <div class="control-group">

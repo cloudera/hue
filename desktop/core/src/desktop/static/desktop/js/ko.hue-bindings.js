@@ -1291,45 +1291,43 @@ function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdf
 }
 
 ko.bindingHandlers.datepicker = {
-    init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
-      var DATE_FORMAT = "YYYY-MM-DD";
-      var TIME_FORMAT = "HH:mm:ss";
-      var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
-      var _el = $(element);
-      var options = ko.unwrap(valueAccessor());
-      _el.datepicker({
-        format: DATE_FORMAT.toLowerCase()
-      }).on("changeDate", function () {
-        allBindings().value(_el.val());
-      });
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var _el = $(element);
+    var _options = ko.unwrap(valueAccessor());
+    _el.datepicker({
+      format: "yyyy-mm-dd"
+    }).on("changeDate", function (e) {
+      setDate(e.date);
+    }).on("hide", function (e) {
+      setDate(e.date);
+    });
 
+    function setDate(d) {
+      if (_options.momentFormat) {
+        _el.val(moment(d).utc().format(_options.momentFormat));
+      }
+      allBindings().value(_el.val());
     }
+  }
 }
 
 
 ko.bindingHandlers.timepicker = {
-    init: function(element, valueAccessor, allBindings, viewModel, bindingContext){
-      var DATE_FORMAT = "YYYY-MM-DD";
-      var TIME_FORMAT = "HH:mm:ss";
-      var DATETIME_FORMAT = DATE_FORMAT + " " + TIME_FORMAT;
-      var _el = $(element);
-      var options = ko.unwrap(valueAccessor());
-
-      _el.timepicker({
-        minuteStep: 1,
-        showSeconds: false,
-        showMeridian: false,
-        defaultTime: false
-      });
-
-      _el.on("change", function () {
-        if (_el.val().substr(-1) != "Z") {
-          _el.val(_el.val() + "Z");
-          _el.trigger("change");
-        }
-      });
-
-    }
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var _el = $(element);
+    _el.timepicker({
+      minuteStep: 1,
+      showSeconds: false,
+      showMeridian: false,
+      defaultTime: false
+    });
+    _el.on("change", function () {
+      if (_el.val().substr(-1) != "Z") {
+        _el.val(_el.val() + "Z");
+        _el.trigger("change");
+      }
+    });
+  }
 }
 
 
