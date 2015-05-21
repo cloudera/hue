@@ -532,3 +532,7 @@ em {
   overflow-y: auto;
   padding-left: 4px;
 }
+
+.datepicker {
+  z-index: 1051;
+}
