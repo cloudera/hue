@@ -100,6 +100,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script src="${ static('desktop/js/nv.d3.scatterChart.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/ko.charts.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }"> type="text/javascript" charset="utf-8"</script>
 
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -138,9 +139,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
            <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
              <i class="fa fa-eraser fa-fw"></i> ${ _('Clear all results') }
            </a>
-        </li>
-      </ul>
-    </div>
+         </li>
+         <li>
+           <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
+             <i class="fa fa-file-text-o fa-fw"></i> ${ _('Display all Notebook content') }
+           </a>
+         </li>
+       </ul>
+     </div>
 
    &nbsp;&nbsp;&nbsp;
 
@@ -189,6 +195,19 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     <!-- /ko -->
   </div>
 
+</div>
+
+<div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
+  <div class="modal-header">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <h3>${_('All Notebook content')}</h3>
+  </div>
+  <div class="modal-body">
+    <pre data-bind="oneClickSelect, text: combinedContent"></pre>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
 </div>
 
 

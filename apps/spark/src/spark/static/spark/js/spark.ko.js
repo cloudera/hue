@@ -651,6 +651,25 @@ function EditorViewModel(notebooks, options) {
 
   self.notebooks = ko.observableArray();
   self.selectedNotebook = ko.observable();
+  self.combinedContent = ko.observable();
+
+  self.displayCombinedContent = function () {
+    if (!self.selectedNotebook()) {
+      self.combinedContent('');
+    } else {
+      var statements = '';
+      $.each(self.selectedNotebook().snippets(), function (index, snippet) {
+        if (snippet.statement()) {
+          if (statements) {
+            statements += '\n\n';
+          }
+          statements += snippet.statement();
+        }
+      });
+      self.combinedContent(statements);
+    }
+    $("#combinedContentModal").modal("show");
+  };
 
   self.isEditing = ko.observable(false);
   self.isEditing.subscribe(function (newVal) {
