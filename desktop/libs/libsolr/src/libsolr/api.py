@@ -141,7 +141,7 @@ class SolrApi(object):
 
     time_field = collection['timeFilter'].get('field')
 
-    if time_field and collection['timeFilter']['value'] != 'all':
+    if time_field and (collection['timeFilter']['value'] != 'all' or collection['timeFilter']['type'] == 'fixed'):
       # fqs overrides main time filter
       fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
       props['time_filter_overrides'] = fq_time_ids

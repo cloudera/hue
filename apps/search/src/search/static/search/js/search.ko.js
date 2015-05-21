@@ -406,6 +406,23 @@ var Collection = function (vm, collection) {
   self.timeFilter.value.subscribe(function () {
     vm.search();
   });
+  self.timeFilter.type.subscribe(function (val) {
+    if (val == 'fixed' && self.timeFilter.from().length == 0) {
+      $.ajax({
+        type: "POST",
+        url: "/search/get_range_facet",
+        data: {
+          collection: ko.mapping.toJSON(self),
+          facet: ko.mapping.toJSON({widgetType: 'facet-widget', field: self.timeFilter.field()}),
+          action: 'get_range'
+        },
+        success: function (data) {
+          self.timeFilter.from(data.properties.start);
+          self.timeFilter.to(data.properties.end);
+        }
+      });
+    }
+  });
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
@@ -993,7 +1010,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.results = ko.observableArray([]);
   self.resultsHash = '';
   self.norm_facets = {};
-  self.getFacetFromQuery = function (facet_id) {	
+  self.getFacetFromQuery = function (facet_id) {
     if (! (facet_id in self.norm_facets)) {
       self.norm_facets[facet_id] = ko.mapping.fromJS({
           id: facet_id,
@@ -1156,6 +1173,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     $.each(self.fieldAnalyses(), function (index, analyse) { // Invalidate stats analysis
       analyse.stats.data.removeAll();
     });
+
     if (self.getFieldAnalysis()) {
       self.getFieldAnalysis().update();
     }
@@ -1254,8 +1272,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     )
     .done(function() {
       if (arguments[0] instanceof Array) { // If multi queries
-    	var histograms = self.collection.getHistogramFacets();
-    	for(var h = 0; h < histograms.length; h++){ // Do not use $.each here
+        var histograms = self.collection.getHistogramFacets();
+        for(var h = 0; h < histograms.length; h++){ // Do not use $.each here
           var histoFacetId = histograms[h].id();
           var histoFacet = self.getFacetFromQuery(histoFacetId);
           var _series = [];

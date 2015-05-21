@@ -79,7 +79,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <!-- /ko -->
 
     <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
-    <span data-bind="template: {name: 'time-filter'}"></span>
+    <span data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+    <span data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
@@ -106,8 +107,8 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
 
-      <span data-bind="template: {name: 'time-filter'}"></span>
-
+      <span data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+      <span data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
     </div>
   </form>
 </div>
@@ -1612,6 +1613,17 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
+<script type="text/html" id="time-fixed-filter">
+  <span data-bind="visible: $root.availableDateFields().length > 0" >
+    <span data-bind="text: $root.collection.timeFilter.from" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"></span>
+    <span data-bind="text: $root.collection.timeFilter.to" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"></span>    
+    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
+      <i class="fa fa-calendar"></i>
+    </a>    
+  </span>
+</script>
+
+
 <script type="text/html" id="time-filter-select">
   <select id="settingstimeinterval" data-bind="value: collection.timeFilter.value" class="input-medium" style="margin-right: 4px">
     <option value="all">${ _('All') }</option>
@@ -1683,8 +1695,8 @@ ${ dashboard.layout_skeleton() }
 
             <!-- ko if: $root.availableDateFields().length == 0 -->
               <label class="checkbox">
-                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
-                </label>
+                <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+              </label>
             <!-- /ko -->
           </fieldset>
         </form>
