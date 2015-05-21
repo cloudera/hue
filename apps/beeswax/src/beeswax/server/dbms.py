@@ -146,7 +146,7 @@ class HiveServer2Dbms(object):
 
 
   def select_star_from(self, database, table):
-    hql = "SELECT * FROM `%s.%s` %s" % (database, table.name, self._get_browse_limit_clause(table))
+    hql = "SELECT * FROM `%s`.`%s` %s" % (database, table.name, self._get_browse_limit_clause(table))
     return self.execute_statement(hql)
 
 
@@ -215,9 +215,9 @@ class HiveServer2Dbms(object):
 
   def drop_table(self, database, table):
     if table.is_view:
-      hql = "DROP VIEW `%s.%s`" % (database, table.name,)
+      hql = "DROP VIEW `%s`.`%s`" % (database, table.name,)
     else:
-      hql = "DROP TABLE `%s.%s`" % (database, table.name,)
+      hql = "DROP TABLE `%s`.`%s`" % (database, table.name,)
 
     return self.execute_statement(hql)
 
@@ -228,7 +228,7 @@ class HiveServer2Dbms(object):
     if form.cleaned_data['overwrite']:
       hql += " OVERWRITE"
     hql += " INTO TABLE "
-    hql += "`%s.%s`" % (database, table.name,)
+    hql += "`%s`.`%s`" % (database, table.name,)
     if form.partition_columns:
       hql += " PARTITION ("
       vals = []
@@ -249,9 +249,9 @@ class HiveServer2Dbms(object):
 
     for table in tables:
       if table.is_view:
-        hql.append("DROP VIEW `%s.%s`" % (database, table.name,))
+        hql.append("DROP VIEW `%s`.`%s`" % (database, table.name,))
       else:
-        hql.append("DROP TABLE `%s.%s`" % (database, table.name,))
+        hql.append("DROP TABLE `%s`.`%s`" % (database, table.name,))
     query = hql_query(';'.join(hql), database)
     design.data = query.dumps()
     design.save()
@@ -264,7 +264,7 @@ class HiveServer2Dbms(object):
 
     for table in tables:
       try:
-        hql = "INVALIDATE METADATA %s.%s" % (database, table,)
+        hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table,)
         query = hql_query(hql, database, query_type=QUERY_TYPES[1])
   
         handle = self.execute_and_wait(query, timeout_sec=10.0)
@@ -500,7 +500,7 @@ class HiveServer2Dbms(object):
     for idx, key in enumerate(partitions[partition_id].values):
       partition_query += (idx > 0 and " AND " or "") + table.partition_keys[idx].name + "='%s'" % key
 
-    hql = "SELECT * FROM `%s.%s` WHERE %s" % (db_name, table_name, partition_query)
+    hql = "SELECT * FROM `%s`.`%s` WHERE %s" % (db_name, table_name, partition_query)
 
     return self.execute_statement(hql)
 

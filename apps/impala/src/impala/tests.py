@@ -24,6 +24,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -182,6 +183,15 @@ class TestImpalaIntegration:
     json_response = json.loads(response.content)
     assert_true('MERGING-EXCHANGE' in json_response['explanation'], json_response)
     assert_true('SCAN HDFS' in json_response['explanation'], json_response)
+
+  def test_get_table_sample(self):
+    client = make_logged_in_client()
+
+    resp = client.get(reverse('impala:describe_table', kwargs={'database': self.DATABASE, 'table': 'tweets'}) + '?sample=true')
+
+    assert_equal(resp.status_code, 200)
+    assert_true('531091827' in resp.content, resp.content) # We are getting one or two random rows
+    assert_true(len(resp.context['sample']) > 0, resp.context['sample'])
 
 
 # Could be refactored with SavedQuery.create_empty()
