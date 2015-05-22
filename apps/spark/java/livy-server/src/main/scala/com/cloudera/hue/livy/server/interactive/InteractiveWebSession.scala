@@ -25,9 +25,11 @@ import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
 import dispatch._
+import org.json4s.JsonAST.JNull
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats, JValue}
 
+import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
@@ -71,22 +73,41 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
       _state = Busy()
       touchLastActivity()
 
-      var req = (svc / "execute").setContentType("application/json", "UTF-8")
-      req = req << write(content)
+      val req = (svc / "execute").setContentType("application/json", "UTF-8") << write(content)
 
       val future = Http(req OK as.json4s.Json).map { case resp: JValue =>
-        synchronized {
-          transition(Idle())
-          resp \ "result"
+        resp \ "result" match {
+          case JNull =>
+            // The result isn't ready yet. Loop until it is.
+            val id = (resp \ "id").extract[Int]
+            waitForStatement(id)
+          case result =>
+            transition(Idle())
+            result
         }
       }
 
-      var statement = new Statement(_executedStatements, content, future)
+      val statement = new Statement(_executedStatements, content, future)
 
       _executedStatements += 1
       _statements = _statements :+ statement
 
       statement
+    }
+  }
+
+  @tailrec
+  private def waitForStatement(id: Int): JValue = {
+    val req = (svc / "history" / id).setContentType("application/json", "UTF-8")
+    val resp = Await.result(Http(req OK as.json4s.Json), Duration.Inf)
+
+    resp \ "result" match {
+      case JNull =>
+        Thread.sleep(1000)
+        waitForStatement(id)
+      case result =>
+        transition(Idle())
+        result
     }
   }
 
