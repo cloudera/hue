@@ -30,11 +30,9 @@ trait Session {
 
   def state: State
 
-  def execute(code: String): Future[JValue]
+  def execute(code: String): Statement
 
-  def history(): Seq[JValue]
-
-  def history(id: Int): Option[JValue]
+  def history: IndexedSeq[Statement]
 
   def close(): Unit
 
@@ -44,3 +42,5 @@ trait Session {
     Utils.waitUntil({ () => state != oldState }, atMost)
   }
 }
+
+case class Statement(id: Int, result: Future[JValue])

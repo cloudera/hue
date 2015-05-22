@@ -31,7 +31,10 @@ class SparkSessionSpec extends BaseSessionSpec {
 
   describe("A spark session") {
     it("should execute `1 + 2` == 3") {
-      val result = Await.result(session.execute("1 + 2"), Duration.Inf)
+      val statement = session.execute("1 + 2")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
         "execution_count" -> 0,
@@ -44,7 +47,10 @@ class SparkSessionSpec extends BaseSessionSpec {
     }
 
     it("should execute `x = 1`, then `y = 2`, then `x + y`") {
-      var result = Await.result(session.execute("val x = 1"), Duration.Inf)
+      var statement = session.execute("val x = 1")
+      statement.id should equal (0)
+
+      var result = Await.result(statement.result, Duration.Inf)
       var expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
         "execution_count" -> 0,
@@ -55,7 +61,10 @@ class SparkSessionSpec extends BaseSessionSpec {
 
       result should equal (expectedResult)
 
-      result = Await.result(session.execute("val y = 2"), Duration.Inf)
+      statement = session.execute("val y = 2")
+      statement.id should equal (1)
+
+      result = Await.result(statement.result, Duration.Inf)
       expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
         "execution_count" -> 1,
@@ -66,7 +75,10 @@ class SparkSessionSpec extends BaseSessionSpec {
 
       result should equal (expectedResult)
 
-      result = Await.result(session.execute("x + y"), Duration.Inf)
+      statement = session.execute("x + y")
+      statement.id should equal (2)
+
+      result = Await.result(statement.result, Duration.Inf)
       expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
         "execution_count" -> 2,
@@ -79,7 +91,10 @@ class SparkSessionSpec extends BaseSessionSpec {
     }
 
     it("should capture stdout") {
-      val result = Await.result(session.execute("""println("Hello World")"""), Duration.Inf)
+      val statement = session.execute("""println("Hello World")""")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
         "execution_count" -> 0,
@@ -92,7 +107,10 @@ class SparkSessionSpec extends BaseSessionSpec {
     }
 
     it("should report an error if accessing an unknown variable") {
-      val result = Await.result(session.execute("""x"""), Duration.Inf)
+      val statement = session.execute("""x""")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
         "status" -> "error",
         "execution_count" -> 0,
@@ -107,7 +125,10 @@ class SparkSessionSpec extends BaseSessionSpec {
     }
 
     it("should report an error if exception is thrown") {
-      val result = Await.result(session.execute("""throw new Exception()"""), Duration.Inf)
+      val statement = session.execute("""throw new Exception()""")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
       val resultMap = result.extract[Map[String, JValue]]
 
       // Manually extract the values since the line numbers in the exception could change.
@@ -119,7 +140,10 @@ class SparkSessionSpec extends BaseSessionSpec {
     }
 
     it("should access the spark context") {
-      val result = Await.result(session.execute("""sc"""), Duration.Inf)
+      val statement = session.execute("""sc""")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
       val resultMap = result.extract[Map[String, JValue]]
 
       // Manually extract the values since the line numbers in the exception could change.
@@ -131,10 +155,13 @@ class SparkSessionSpec extends BaseSessionSpec {
     }
 
     it("should execute spark commands") {
-      val result = Await.result(session.execute(
+      val statement = session.execute(
         """
           |sc.parallelize(0 to 1).map{i => i+1}.collect
-          |""".stripMargin), Duration.Inf)
+          |""".stripMargin)
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
 
       val expectedResult = Extraction.decompose(Map(
         "status" -> "ok",

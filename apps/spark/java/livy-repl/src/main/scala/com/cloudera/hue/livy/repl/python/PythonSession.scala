@@ -19,11 +19,10 @@
 package com.cloudera.hue.livy.repl.python
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.repl.{Interpreter, Session}
+import com.cloudera.hue.livy.repl.{Interpreter, Session, Statement}
 import com.cloudera.hue.livy.sessions._
 import org.json4s.JValue
 
-import scala.collection.mutable.ArrayBuffer
 import scala.concurrent._
 
 object PythonSession {
@@ -35,30 +34,19 @@ object PythonSession {
 private class PythonSession(interpreter: Interpreter) extends Session with Logging {
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
-  private var _history = ArrayBuffer[JValue]()
+  private var _history = IndexedSeq[Statement]()
 
   override def kind = PySpark()
 
   override def state = interpreter.state
 
-  override def history(): Seq[JValue] = _history
+  override def history: IndexedSeq[Statement] = _history
 
-  override def history(id: Int): Option[JValue] = {
-    if (id < _history.length) {
-      Some(_history(id))
-    } else {
-      None
-    }
-  }
-
-  override def execute(code: String): Future[JValue] = {
-    val future = interpreter.execute(code)
-    future.onSuccess { case result =>
-      synchronized {
-        _history += result
-      }
-    }
-    future
+  override def execute(code: String): Statement = synchronized {
+    val result = interpreter.execute(code)
+    val statement = Statement(_history.length, result)
+    _history :+= statement
+    statement
   }
 
   override def close(): Unit = interpreter.close()

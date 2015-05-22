@@ -22,9 +22,10 @@ import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
-import org.json4s.{DefaultFormats, Extraction, JValue}
-import org.scalatest.{FunSpecLike, BeforeAndAfter}
+import org.json4s.{DefaultFormats, Extraction}
+import org.scalatest.{BeforeAndAfter, FunSpecLike}
 import org.scalatra.test.scalatest.ScalatraSuite
+
 import _root_.scala.concurrent.Future
 
 class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
@@ -33,24 +34,24 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
 
   class MockSession extends Session {
     var _state: State = Idle()
-    var _history = List[JValue]()
+    var _history = IndexedSeq[Statement]()
 
     override def kind: Kind = Spark()
 
     override def state = _state
 
-    override def execute(code: String): Future[JValue] = {
+    override def execute(code: String): Statement = {
       val rep = render(Map("hi" -> "there"))
-      Future.successful(rep)
+      val statement = Statement(0, Future.successful(rep))
+      _history :+= statement
+      statement
     }
 
     override def close(): Unit = {
       _state = Dead()
     }
 
-    override def history(): Seq[JValue] = _history
-
-    override def history(id: Int): Option[JValue] = _history.lift(id)
+    override def history: IndexedSeq[Statement] = _history
   }
 
   val session = new MockSession
@@ -81,24 +82,32 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
       get("/history") {
         status should equal (200)
         header("Content-Type") should include("application/json")
-        parse(body) should equal (JArray(List()))
+        parse(body) should equal (
+          ("from", 0) ~
+            ("total", 0) ~
+            ("statements", JArray(List())))
       }
     }
 
     it("GET /history with history should return something") {
-      val history = Extraction.decompose(Map("data" -> Map("text/plain" -> "1")))
-      session._history = List(history)
+      val history = Extraction.decompose(Map(
+          "data" -> Map("text/plain" -> "1")
+      ))
+      session._history = IndexedSeq(Statement(0, Future.successful(history)))
 
       get("/history") {
         status should equal (200)
         header("Content-Type") should include("application/json")
-        parse(body) should equal (JArray(List(history)))
+        parse(body) should equal (
+          ("from", 0) ~
+            ("total", 1) ~
+            ("statements", JArray(List( ("id", 0) ~ ("result", history)))))
       }
     }
   }
 
   after {
     session._state = Idle()
-    session._history = List()
+    session._history = IndexedSeq()
   }
 }
