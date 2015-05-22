@@ -34,6 +34,7 @@ DEFAULT_USER = DEFAULT_USER.get()
 API_VERSION = 'v1' # Overridden to v2 for SLA
 
 _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
+ACTIONS_PER_PAGE = 50
 
 
 def get_oozie(user, api_version=API_VERSION):
@@ -142,9 +143,10 @@ class OozieApi(object):
     wf = Workflow(self, resp)
     return wf
 
-  def get_coordinator(self, jobid):
+  def get_coordinator(self, jobid, actions_offset=1):
     params = self._get_params()
-    params.update({'len': -1})
+    params.update({'offset': actions_offset})
+    params.update({'len': ACTIONS_PER_PAGE})
     params.update({'order': 'desc'})
     resp = self._root.get('job/%s' % (jobid,), params)
     return Coordinator(self, resp)
