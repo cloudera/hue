@@ -200,15 +200,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tbody data-bind="template: { name: 'calendarTemplate', foreach: filteredActions}" >
                 </tbody>
                 <tfoot>
-                  <tr>
-                    <td data-bind="visible: !isLoading() && paginate()" colspan="10">
-                      <br/>
-                      <div class="alert">
-                        ${ _('There are older actions to be shown:') }
-                        <a class="btn" href="${ oozie_coordinator.get_absolute_url() }?show_all_actions=true">${ _('Expand') }</a>
-                      </div>
-                    </td>
-                  </tr>
                   <tr data-bind="visible: isLoading()">
                     <td colspan="2" class="left">
                       <img src="${ static('desktop/art/spinner.gif') }" />
@@ -223,6 +214,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </tr>
                 </tfoot>
               </table>
+
+              <div class="pagination dataTables_paginate">
+                <ul>
+                  <li class="prev"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="prev" data-table="calendar"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
+                  <li class="next"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="next" data-table="calendar">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+                </ul>
+              </div>
             </div>
 
             <script id="calendarTemplate" type="text/html">
@@ -278,6 +276,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 </tr>
                 </tfoot>
               </table>
+
+              <div class="pagination dataTables_paginate">
+                <ul>
+                  <li class="prev"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="prev" data-table="actions"><i class="fa fa-long-arrow-left"></i> ${ _('Previous') }</a></li>
+                  <li class="next"><a href="javascript:void(0)" class="btn-actions-pagination" data-value="next" data-table="actions">${ _('Next') } <i class="fa fa-long-arrow-right"></i></a></li>
+                </ul>
+              </div>
             </div>
 
             <script id="actionTemplate" type="text/html">
@@ -445,10 +450,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return new Action(action);
     });
 
-    this.paginate = ko.computed(function(){
-      return self.actions().length >= ${ MAX_COORD_ACTIONS } && ${ "false" if show_all_actions else 'true' | n,unicode };
-    });
-
     this.allSelected = ko.observable(false);
 
     this.filter = ko.observableArray([]);
@@ -592,6 +593,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     TOOLTIP_ADDON: "${_('click for the SLA dashboard')}"
   }
   var slaTable;
+  var PAGE_SIZE = 50;
+  var actionTableOffset = 1;
+
 
   $(document).ready(function(){
     $("a[data-row-selector='true']").jHueRowSelector();
@@ -643,6 +647,19 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         }, 100)
       }
       % endif
+    });
+
+    $("a.btn-actions-pagination").on("click", function () {
+      if (!$(this).parent().hasClass("disabled")) {
+        var _additionalOffset = 0;
+        if ($(this).data("value") == "prev") {
+          actionTableOffset -= PAGE_SIZE;
+        }
+        else {
+          actionTableOffset += PAGE_SIZE;
+        }
+        refreshView();
+      }
     });
 
     $(".confirmationModal").click(function(){
@@ -732,14 +749,42 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       });
     }
 
+    function refreshActionPaginationButtons(totalJobs) {
+      var prevBtnActions = $("a.btn-actions-pagination[data-table='actions'][data-value='prev']");
+      var nextBtnActions = $("a.btn-actions-pagination[data-table='actions'][data-value='next']");
+      var prevBtnCalendar = $("a.btn-actions-pagination[data-table='calendar'][data-value='prev']");
+      var nextBtnCalendar = $("a.btn-actions-pagination[data-table='calendar'][data-value='next']");
+
+      if (actionTableOffset == 1 || !totalJobs) {
+        prevBtnActions.parent().addClass("disabled");
+        prevBtnCalendar.parent().addClass("disabled");
+      }
+      else {
+        prevBtnActions.parent().removeClass("disabled");
+        prevBtnCalendar.parent().removeClass("disabled");
+      }
+      if (totalJobs < (actionTableOffset + PAGE_SIZE) || !totalJobs) {
+        nextBtnActions.parent().addClass("disabled");
+        nextBtnCalendar.parent().addClass("disabled");
+      }
+      else if (totalJobs >= actionTableOffset + PAGE_SIZE) {
+        nextBtnActions.parent().removeClass("disabled");
+        nextBtnCalendar.parent().removeClass("disabled");
+      }
+    }
+
     function refreshView() {
-      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "${ "&show_all_actions=true" if show_all_actions else '' | n,unicode }", function (data) {
+      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "&offset=" + actionTableOffset, function (data) {
         viewModel.isLoading(false);
         if (data != null && data.actions){
           viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
             return new Action(action);
           }));
         }
+
+        // Refresh actions pagination
+        totalActions = data.total_actions;
+        refreshActionPaginationButtons(totalActions);
 
         $("#status span").attr("class", "label").addClass(getStatusClass(data.status)).text(data.status);
 

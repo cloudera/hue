@@ -486,7 +486,8 @@ class Coordinator(Job):
     'timeUnit',
     'timeZone',
     'user',
-    'bundleId'
+    'bundleId',
+    'total'
   ]
   ACTION = CoordinatorAction
   RUNNING_STATUSES = set(['PREP', 'RUNNING', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR'])

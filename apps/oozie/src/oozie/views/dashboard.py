@@ -65,7 +65,6 @@ def get_workflow():
 
 
 LOG = logging.getLogger(__name__)
-MAX_COORD_ACTIONS = 250
 
 
 """
@@ -384,7 +383,8 @@ def list_oozie_workflow(request, job_id):
 
 @show_oozie_error
 def list_oozie_coordinator(request, job_id):
-  oozie_coordinator = check_job_access_permission(request, job_id)
+  actions_offset = request.GET.get('offset', 1)
+  oozie_coordinator = check_job_access_permission(request, job_id, actions_offset)
 
   # Cross reference the submission history (if any)
   coordinator = get_history().get_coordinator_from_config(oozie_coordinator.conf_dict)
@@ -400,12 +400,8 @@ def list_oozie_coordinator(request, job_id):
     except:
       LOG.exception("Ignoring error getting oozie bundle for job_id=%s", job_id)
 
-  show_all_actions = request.GET.get('show_all_actions') == 'true'
-
   if request.GET.get('format') == 'json':
     actions = massaged_coordinator_actions_for_json(oozie_coordinator, oozie_bundle)
-    if not show_all_actions:
-      actions = actions[:MAX_COORD_ACTIONS]
 
     return_obj = {
       'id': oozie_coordinator.id,
@@ -414,7 +410,7 @@ def list_oozie_coordinator(request, job_id):
       'nextTime': format_time(oozie_coordinator.nextMaterializedTime),
       'endTime': format_time(oozie_coordinator.endTime),
       'actions': actions,
-      'show_all_actions': show_all_actions
+      'total_actions': oozie_coordinator.total
     }
     return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
 
@@ -436,8 +432,6 @@ def list_oozie_coordinator(request, job_id):
     'coordinator': coordinator,
     'oozie_bundle': oozie_bundle,
     'has_job_edition_permission': has_job_edition_permission,
-    'show_all_actions': show_all_actions,
-    'MAX_COORD_ACTIONS': MAX_COORD_ACTIONS,
     'enable_cron_scheduling': enable_cron_scheduling,
     'update_endtime_form': update_endtime_form,
   })
@@ -984,7 +978,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
   return { 'jobs': jobs }
 
 
-def check_job_access_permission(request, job_id):
+def check_job_access_permission(request, job_id, actions_offset=1):
   """
   Decorator ensuring that the user has access to the job submitted to Oozie.
 
@@ -1003,7 +997,10 @@ def check_job_access_permission(request, job_id):
       get_job = oozie_api.get_bundle
 
     try:
-      oozie_job = get_job(job_id)
+      if job_id.endswith('C'):
+        oozie_job = get_job(job_id, actions_offset)
+      else:
+        oozie_job = get_job(job_id)
     except RestException, ex:
       msg = _("Error accessing Oozie job %s.") % (job_id,)
       LOG.exception(msg)
