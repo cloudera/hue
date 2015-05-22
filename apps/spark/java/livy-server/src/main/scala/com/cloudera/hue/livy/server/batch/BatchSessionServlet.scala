@@ -141,7 +141,7 @@ private object Serializers {
     val size = sizeOpt.getOrElse(100)
     var from = fromOpt.getOrElse(-1)
     if (from < 0) {
-      from = math.min(0, lines.length - size)
+      from = math.max(0, lines.length - size)
     }
     val until = from + size
 
