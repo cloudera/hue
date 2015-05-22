@@ -27,7 +27,7 @@ import _root_.scala.concurrent.duration.Duration
 
 class PythonSessionSpec extends BaseSessionSpec {
 
-  override def createSession() = PythonSession.createPySpark()
+  override def createSession() = PythonSession.create()
 
   describe("A python session") {
     it("should execute `1 + 2` == 3") {

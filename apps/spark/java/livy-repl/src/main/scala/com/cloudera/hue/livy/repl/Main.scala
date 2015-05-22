@@ -102,7 +102,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
   override def init(context: ServletContext): Unit = {
     session = context.getInitParameter(Main.SESSION_KIND) match {
-      case Main.PYSPARK_SESSION | Main.PYTHON_SESSION => PythonSession.createPySpark()
+      case Main.PYSPARK_SESSION | Main.PYTHON_SESSION => PythonSession.create()
       case Main.SPARK_SESSION | Main.SCALA_SESSION => SparkSession.create()
     }
 
