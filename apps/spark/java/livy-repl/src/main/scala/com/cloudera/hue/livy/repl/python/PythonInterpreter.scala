@@ -227,8 +227,13 @@ private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
               case None =>
             }
 
-            process.getInputStream.close()
-            process.getOutputStream.close()
+            // Ignore IO errors, such as if the stream is already closed.
+            try {
+              process.getInputStream.close()
+              process.getOutputStream.close()
+            } catch {
+              case _: IOException =>
+            }
 
             try {
               process.destroy()
