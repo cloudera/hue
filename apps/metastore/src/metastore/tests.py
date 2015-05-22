@@ -188,16 +188,16 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     self.client.post("/metastore/table/default/test/load", dict(path="/tmp/foo", overwrite=True), follow=True)
     query = QueryHistory.objects.latest('id')
 
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default.test`", query.query)
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default`.`test`", query.query)
 
     resp = self.client.post("/metastore/table/default/test/load", dict(path="/tmp/foo", overwrite=False), follow=True)
     query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test`", query.query)
+    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default`.`test`", query.query)
 
     # Try it with partitions
     resp = self.client.post("/metastore/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"), follow=True)
     query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace(query.query, "LOAD DATA INPATH '/tmp/foo' INTO TABLE `default.test_partitions` PARTITION (baz='alpha', boom='beta')")
+    assert_equal_mod_whitespace(query.query, "LOAD DATA INPATH '/tmp/foo' INTO TABLE `default`.`test_partitions` PARTITION (baz='alpha', boom='beta')")
 
 
   def test_has_write_access_frontend(self):
