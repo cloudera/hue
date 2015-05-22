@@ -95,12 +95,22 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         }, Duration(10, TimeUnit.SECONDS))
       }
 
-      get("/0?from=0&size=1000") {
+      get("/0") {
         status should equal (200)
         header("Content-Type") should include("application/json")
         val parsedBody = parse(body)
         parsedBody \ "id" should equal (JInt(0))
         parsedBody \ "state" should equal (JString("success"))
+
+        val batch = batchManager.getBatch(0)
+        batch should be (defined)
+      }
+
+      get("/0/log?size=1000") {
+        status should equal (200)
+        header("Content-Type") should include("application/json")
+        val parsedBody = parse(body)
+        parsedBody \ "id" should equal (JInt(0))
         (parsedBody \ "log").extract[List[String]] should contain ("hello world")
 
         val batch = batchManager.getBatch(0)
