@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.repl.scala
 
-import com.cloudera.hue.livy.repl.Session
+import com.cloudera.hue.livy.repl.{Statement, Session}
 import com.cloudera.hue.livy.repl.scala.interpreter._
 import com.cloudera.hue.livy.sessions._
 import org.json4s.jackson.JsonMethods._
@@ -37,7 +37,7 @@ private class SparkSession extends Session {
 
   implicit val formats = DefaultFormats
 
-  private var _history = new mutable.ArrayBuffer[JValue]
+  private var _history = IndexedSeq[Statement]()
   private val interpreter = new Interpreter()
   interpreter.start()
 
@@ -52,18 +52,10 @@ private class SparkSession extends Session {
     case Interpreter.ShutDown() => Dead()
   }
 
-  override def history(): Seq[JValue] = _history
+  override def history: IndexedSeq[Statement] = _history
 
-  override def history(id: Int): Option[JValue] = synchronized {
-    if (id < _history.length) {
-      Some(_history(id))
-    } else {
-      None
-    }
-  }
-
-  override def execute(code: String): Future[JValue] = {
-    Future {
+  override def execute(code: String): Statement = synchronized {
+    val result = Future {
       val content = interpreter.execute(code) match {
         case ExecuteComplete(executeCount, output) =>
           Map(
@@ -89,12 +81,12 @@ private class SparkSession extends Session {
           )
       }
 
-      val jsonContent = parse(write(content))
-
-      _history += jsonContent
-
-      jsonContent
+      parse(write(content))
     }
+
+    val statement = Statement(_history.length, result)
+    _history :+= statement
+    statement
   }
 
   override def close(): Unit = {

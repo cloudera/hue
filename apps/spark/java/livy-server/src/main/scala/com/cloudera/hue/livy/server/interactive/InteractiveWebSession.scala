@@ -26,7 +26,7 @@ import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
 import dispatch._
 import org.json4s.jackson.Serialization.write
-import org.json4s.{DefaultFormats, Formats}
+import org.json4s.{DefaultFormats, Formats, JValue}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
@@ -74,10 +74,10 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
       var req = (svc / "execute").setContentType("application/json", "UTF-8")
       req = req << write(content)
 
-      val future = Http(req OK as.json4s.Json).map { case (resp) =>
+      val future = Http(req OK as.json4s.Json).map { case resp: JValue =>
         synchronized {
           transition(Idle())
-          resp
+          resp \ "result"
         }
       }
 
