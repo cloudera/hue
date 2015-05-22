@@ -20,9 +20,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>com.cloudera.cdh</groupId>
+    <artifactId>cdh-root</artifactId>
+    <version>5.5.0-SNAPSHOT</version>
+  </parent>
+
   <groupId>com.cloudera.hue</groupId>
   <artifactId>hue-parent</artifactId>
-  <version>3.8.0-SNAPSHOT</version>
+  <version>3.8.0-cdh5.5.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Hue Maven Parent POM</name>
@@ -37,9 +43,9 @@
   </licenses>
 
   <properties>
-    <hadoop-mr1.version>2.6.0-mr1-cdh5.5.0-SNAPSHOT</hadoop-mr1.version>
-    <hadoop.version>2.6.0-cdh5.5.0-SNAPSHOT</hadoop.version>
-    <spark.version>1.3.0-cdh5.5.0-SNAPSHOT</spark.version>
+    <hadoop-mr1.version>${cdh.mr1.version}</hadoop-mr1.version>
+    <hadoop.version>${cdh.hadoop.version}</hadoop.version>
+    <spark.version>${cdh.spark.version}</spark.version>
     <slf4j.version>1.6.1</slf4j.version>
     <commons-logging.version>1.0.4</commons-logging.version>
     <thrift.version>0.9.0</thrift.version>
