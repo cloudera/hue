@@ -1018,6 +1018,8 @@ var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/view
 var HIVE_AUTOCOMPLETE_USER = "${ user }";
 var HIVE_AUTOCOMPLETE_APP = "${app_name}";
 
+var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
+
 var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   if (data != null && data.error && typeof resetNavigator != "undefined") {
     resetNavigator();
@@ -1260,9 +1262,10 @@ $(document).ready(function () {
                     _column.find("a.col-stats").on("click", function () {
                       var _link = $(this);
                       var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/" + col.name;
+                      var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/" + col.name;
                       $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
                       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-                      showColumnStats(statsUrl, col.name, function () {
+                      showColumnStats(statsUrl, refreshUrl, col.name, STATS_PROBLEMS, function () {
                         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
                       });
                     });
@@ -1306,9 +1309,10 @@ $(document).ready(function () {
             _table.find("a.table-stats").on("click", function () {
               var _link = $(this);
               var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
+              var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/";
               $("#tableAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
               $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
-              showTableStats(statsUrl, _table.data("table"), function(){
+              showTableStats(statsUrl, refreshUrl, _table.data("table"), STATS_PROBLEMS, function(){
                 $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
               });
             });

@@ -36,18 +36,18 @@ ${ components.menubar() }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 
-<%def name="column_table(cols, withStats=False)">
-  <table class="table table-striped table-condensed sampleTable
+<%def name="column_table(cols, id, withStats=False)">
+  <table id="${id}" class="table table-striped table-condensed sampleTable
   %if withStats:
   skip-extender
   %endif
   ">
     <thead>
       <tr>
+        <th width="1%">&nbsp;</th>
         %if withStats:
-          <th width="10">&nbsp;</th>
+          <th width="1%" class="no-sort">&nbsp;</th>
         %endif
-        <th width="10">&nbsp;</th>
         <th>${_('Name')}</th>
         <th>${_('Type')}</th>
         <th>${_('Comment')}</th>
@@ -56,10 +56,10 @@ ${ components.menubar() }
     <tbody>
       % for column in cols:
         <tr>
+          <td>${ loop.index }</td>
           %if withStats:
             <td class="row-selector-exclude"><a href="javascript:void(0)" data-column="${ column.name }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
           %endif
-          <td>${ loop.index }</td>
           <td title="${ _("Scroll to the column") }">
             <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
           </td>
@@ -113,12 +113,12 @@ ${ components.menubar() }
 
             <div class="tab-content">
               <div class="tab-pane" id="columns">
-                ${ column_table(table.cols, True) }
+                ${ column_table(table.cols, "columnTable", True) }
               </div>
 
               % if table.partition_keys:
               <div class="tab-pane" id="partitionColumns">
-                ${ column_table(table.partition_keys) }
+                ${ column_table(table.partition_keys, "partitionTable") }
               </div>
               % endif
 
@@ -156,6 +156,13 @@ ${ components.menubar() }
                   % endfor
                   </tbody>
                 </table>
+                <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
+                  <button type="button" class="close" data-dismiss="alert">&times;</button>
+                  <strong>${_('Did you know?')}</strong>
+                  <ul>
+                    <li>${ _('If the sample contains a large number of columns, click a row to select a column to jump to') }</li>
+                  </ul>
+                </div>
               % endif
               </div>
               % endif
@@ -228,6 +235,8 @@ ${ components.menubar() }
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
+  var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
+
   $(document).ready(function () {
 
     $(".column-selector").on("click", function () {
@@ -248,31 +257,47 @@ ${ components.menubar() }
     % endif
 
     $('a[data-toggle="tab"]').on('shown', function () {
-      $(".sampleTable").not('.initialized').addClass('initialized').dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bInfo": false,
-        "bFilter": false,
-        "fnInitComplete": function () {
-          $(this).parent().jHueTableScroller();
-          if ($(this).hasClass("skip-extender")){
-            $(this).jHueTableExtender({
-              includeNavigator: false,
-              fixedHeader: true
-            });
-          }
-          else {
-            $(this).jHueTableExtender({
-              hintElement: "#jumpToColumnAlert",
-              fixedHeader: true
-            });
-          }
-        },
-        "oLanguage": {
-          "sEmptyTable": "${_('No data available')}",
-          "sZeroRecords": "${_('No matching records')}"
+      var sortables = [];
+      $(".sampleTable").not('.initialized').each(function () {
+        var _id = $(this).attr("id");
+        if (sortables[_id] === undefined) {
+          sortables[_id] = [];
         }
+        $('#' + _id + ' thead th').each(function () {
+          if ($(this).hasClass('no-sort')) {
+            sortables[_id].push({
+              "bSortable": false
+            });
+          } else {
+            sortables[_id].push(null);
+          }
+        });
       });
+
+      for (var id in sortables) {
+        $("#" + id).addClass("initialized");
+        $("#" + id).dataTable({
+          "aoColumns": sortables[id],
+          "bPaginate": false,
+          "bLengthChange": false,
+          "bInfo": false,
+          "bFilter": false,
+          "bAutoWidth": false,
+          "fnInitComplete": function () {
+            $(this).parent().jHueTableScroller();
+            if (! $(this).hasClass("skip-extender")) {
+              $(this).jHueTableExtender({
+                hintElement: "#jumpToColumnAlert",
+                fixedHeader: true
+              });
+            }
+          },
+          "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}"
+          }
+        });
+      }
     });
 
     $("#import-data-btn").click(function () {
@@ -292,19 +317,16 @@ ${ components.menubar() }
       var _link = $(this);
       var _col = _link.data("column");
       var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
+      var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/stats/" + _col;
       $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-      showColumnStats(statsUrl, _col, function () {
+      showColumnStats(statsUrl, refreshUrl, _col, STATS_PROBLEMS, function () {
         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
       });
     });
 
     $(document).on("click", "#columnAnalysis .close-popover", function () {
       $("#columnAnalysis").hide();
-    });
-
-    $("#columnAnalysis .stats-refresh").on("click", function () {
-      showColumnStats($("#columnAnalysis .stats-refresh").data("startUrl"), $("#columnAnalysis .stats-refresh").data("columnName"));
     });
 
   });
