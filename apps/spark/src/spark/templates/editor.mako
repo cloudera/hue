@@ -163,7 +163,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
     &nbsp;&nbsp;&nbsp;
 
-    <a class="btn" href="${ url('spark:new') }" title="${ _('Brand New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+    <a class="btn" href="${ url('spark:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
 
