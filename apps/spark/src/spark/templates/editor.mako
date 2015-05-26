@@ -402,7 +402,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <a data-bind="visible: status() == 'loading'" class="btn btn-disabled codeMirror-overlaybtn" title="${ _('Creating session') }">
               <i class="fa fa-spinner fa-spin"></i>
             </a>
-            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="btn btn-primary disable-feedback codeMirror-overlaybtn pointer">
+            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback codeMirror-overlaybtn pointer">
               <i class="fa fa-play"></i>
             </a>
             <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback codeMirror-overlaybtn pointer">
@@ -681,10 +681,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </div>
 
           <br/>
-
-          <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="btn btn-primary disable-feedback pointer">
-            <i class="fa fa-play"></i>
-          </a>
+          <div style="height: 32px;">
+            <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="run-button btn btn-primary disable-feedback pointer">
+              <i class="fa fa-play"></i>
+            </a>
+          </div>
         </div>
       <!-- /ko -->
 
@@ -1067,6 +1068,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }
 
       var options = $.extend(valueAccessor(), {
+        lineNumbers: false,
         extraKeys: {
           "Ctrl-Space": function (cm) {
             $(document.body).on("contextmenu", function (e) {

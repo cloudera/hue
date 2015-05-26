@@ -30,10 +30,11 @@
 }
 
 .CodeMirror {
-  border: 1px solid #EEE;
-  border-top: none;
-  border-bottom: none;
   height: auto;
+}
+
+.card .card-heading.simple {
+  border: none;
 }
 
 .add-snippet {
@@ -263,6 +264,17 @@ h1.empty {
   background-color: #F0F0F0;
 }
 
+.editor:hover .run-button {
+    display: inherit;
+}
+
+.snippet-body:hover .run-button {
+    display: inline-block;
+}
+
+.run-button {
+    display: none;
+}
 .chart-icon {
   width: 15px;
   text-align: center;
