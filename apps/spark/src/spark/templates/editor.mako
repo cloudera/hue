@@ -127,7 +127,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
 
-     <div class="btn-group" data-bind="visible: isEditing">
+     <div class="btn-group">
        <a class="btn dropdown-toggle" data-toggle="dropdown">
          <i class="fa fa-check-square-o"></i>
          <i class="fa fa-caret-down"></i>
