@@ -417,7 +417,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
   </div>
 </div>
 
-<div id="chooseWorkflowDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="chooseWorkflowDemiModal" class="demi-modal fade" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 10px;text-align: center">
@@ -440,6 +440,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       </div>
     </div>
   </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
 <div id="settingsModal" class="modal hide fade">

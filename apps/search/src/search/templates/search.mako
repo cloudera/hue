@@ -1544,7 +1544,7 @@ ${ dashboard.layout_skeleton() }
 </div>
 
 
-<div id="addFacetDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="addFacetDemiModal" class="demi-modal fade" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
     <div style="float: left; margin-right: 10px;text-align: center">
@@ -1563,9 +1563,10 @@ ${ dashboard.layout_skeleton() }
       </div>
     </div>
   </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
-<div id="settingsDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="settingsDemiModal" class="demi-modal fade" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
     <div class="row-fluid">
@@ -1600,6 +1601,7 @@ ${ dashboard.layout_skeleton() }
     </div>
 
   </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
 
@@ -1643,7 +1645,7 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
-<div id="timeSettingsDemiModal" class="demi-modal hide" data-backdrop="false">
+<div id="timeSettingsDemiModal" class="demi-modal fade" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
     <div class="row-fluid">
@@ -1705,6 +1707,7 @@ ${ dashboard.layout_skeleton() }
     </div>
 
   </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
 <div id="fieldAnalysis" class="popover mega-popover right">
