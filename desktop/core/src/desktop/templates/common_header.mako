@@ -406,7 +406,7 @@ from django.utils.translation import ugettext as _
          query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
        %>
        % if query_apps[1] > 1:
-       <li class="dropdown">
+       <li class="dropdown oozie">
          <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Query Editors <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
@@ -425,7 +425,13 @@ from django.utils.translation import ugettext as _
              <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
            % endif
            % if 'spark' in apps:
-             <li><a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark (beta)')}</a></li>
+             <li class="dropdown-submenu">
+               <a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark (beta)')}</a>
+               <ul class="dropdown-menu">
+                 <li><a href="${ url('spark:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
+                 <li><a href="${ url('spark:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
+               </ul>
+             </li>
            % endif
          </ul>
        </li>
