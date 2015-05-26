@@ -63,35 +63,50 @@ ${ components.menubar() }
             % endif
           </%def>
         </%actionbar:render>
-
+        <div style="padding-left: 10px; padding-right: 10px">
           <table class="table table-condensed datatables" data-tablescroller-disable="true">
-          <thead>
-            <tr>
-              <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
-              <th>${_('Table Name')}</th>
-            </tr>
-          </thead>
-          <tbody>
-          % for table in tables:
-            <tr>
-              <td data-row-selector-exclude="true" width="1%">
-                <div class="hueCheckbox tableCheck fa"
-                     data-view-url="${ url('metastore:describe_table', database=database, table=table) }"
-                     data-browse-url="${ url('metastore:read_table', database=database, table=table) }"
-                     data-drop-name="${ table }"
-                     data-row-selector-exclude="true"></div>
-              </td>
-              <td>
-                <a href="${ url('metastore:describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
-              </td>
-            </tr>
-          % endfor
-          </tbody>
-        </table>
+            <thead>
+              <tr>
+                <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
+                <th>&nbsp;</th>
+                <th>${_('Table Name')}</th>
+              </tr>
+            </thead>
+            <tbody>
+            % for table in tables:
+              <tr>
+                <td data-row-selector-exclude="true" width="1%">
+                  <div class="hueCheckbox tableCheck fa"
+                       data-view-url="${ url('metastore:describe_table', database=database, table=table) }"
+                       data-browse-url="${ url('metastore:read_table', database=database, table=table) }"
+                       data-drop-name="${ table }"
+                       data-row-selector-exclude="true"></div>
+                </td>
+                <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="${ table }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+                <td>
+                  <a href="${ url('metastore:describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
+                </td>
+              </tr>
+            % endfor
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<div id="tableAnalysis" class="popover mega-popover right">
+  <div class="arrow"></div>
+  <h3 class="popover-title" style="text-align: left">
+    <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
+    <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
+    <span class="pull-right stats-warning muted" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
+    <strong class="table-name"></strong> ${ _(' table analysis') }
+  </h3>
+  <div class="popover-content" style="text-align: left"></div>
+</div>
+
 
 <div id="dropTable" class="modal hide fade">
   <form id="dropTableForm" action="${ url('metastore:drop_table', database=database) }" method="POST">
@@ -113,8 +128,11 @@ ${ components.menubar() }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
+  var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
+
   $(document).ready(function () {
     var viewModel = {
       availableTables: ko.observableArray(${ tables_json | n }),
@@ -131,6 +149,7 @@ ${ components.menubar() }
       "bFilter": true,
       "aoColumns": [
         {"bSortable": false, "sWidth": "1%" },
+        {"bSortable": false, "sWidth": "1%" },
         null
       ],
       "oLanguage": {
@@ -144,6 +163,21 @@ ${ components.menubar() }
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    $("a[data-table]").on("click", function () {
+      var _link = $(this);
+      var statsUrl = "/beeswax/api/table/${database}/" + _link.data("table") + "/stats/";
+      var refreshUrl = "/beeswax/api/analyze/${database}/" + _link.data("table") + "/";
+      $("#tableAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+      $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+      showTableStats(statsUrl, refreshUrl, _link.data("table"), STATS_PROBLEMS, function(){
+        $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+      });
+    });
+
+    $(document).on("click", "#tableAnalysis .close-popover", function () {
+      $("#tableAnalysis").hide();
+    });
 
     $("#id_database").chosen({
       disable_search_threshold: 5,
