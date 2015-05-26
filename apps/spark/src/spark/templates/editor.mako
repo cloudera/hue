@@ -1159,8 +1159,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           }
           if (editor.lineCount() >= 30){
             editor.setSize("100%", "400px");
-            snippet.codemirrorSize(400);
           }
+          snippet.codemirrorSize($(editor.getWrapperElement()).height());
           redrawFixedHeaders();
         }, 400);
       });
@@ -1693,6 +1693,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           $(".jHueTableExtenderClonedContainer").show();
           draggableHelper($(this), e, ui, true);
           redrawFixedHeaders();
+          ui.helper.first().removeAttr("style");
         },
         containment: [0, minY, 4000, minY + 400]
       }
