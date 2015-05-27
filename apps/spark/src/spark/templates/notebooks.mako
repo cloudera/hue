@@ -50,7 +50,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
         </a>
 
         <a data-bind="click: function() { atLeastOneSelected() ? exportDocuments() : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
-          <i class="fa fa-upload"></i> ${ _('Export') }
+          <i class="fa fa-download"></i> ${ _('Export') }
         </a>
       </div>
     </%def>
@@ -58,7 +58,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
     <%def name="creation()">
       <a href="${ url('spark:new') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
       <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
-        <i class="fa fa-download"></i> ${ _('Import') }
+        <i class="fa fa-upload"></i> ${ _('Import') }
       </a>
     </%def>
   </%actionbar:render>
@@ -124,16 +124,32 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
   </form>
 </div>
 
-<div id="import-documents" class="modal hide fade">
+<div id="import-documents" class="modal hide fade fileupload-modal">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal" data-clear="fileupload">&times;</a>
+    <h3>${_('Import documents')}</h3>
+  </div>
   <form method="POST" action="/desktop/api2/doc/import" style="display: inline" enctype="multipart/form-data">
-    ${ csrf_token(request) | n,unicode }
-    <input type="file" name="documents" accept="application/json"/>
-    <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
-    </br>
-    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
-    <input type="submit" class="btn btn-danger" value="${ _('Import') }"/>
+    <div class="modal-body form-inline">
+      <div class="pull-right">
+        <a href="#" class="btn" data-dismiss="modal" data-clear="fileupload">${ _('Cancel') }</a>
+        <input type="submit" class="btn btn-danger" value="${ _('Import') }"/>
+      </div>
+      <div class="fileupload fileupload-new" data-provides="fileupload">
+        <span class="btn btn-file" style="line-height: 29px">
+          <span class="fileupload-new">${ _('Select file') }</span>
+          <span class="fileupload-exists">${ _('Change') }</span>
+          <input type="file" name="documents" accept="application/json" />
+        </span>
+        &nbsp;&nbsp;<span class="fileupload-preview"></span>
+          <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
+      </div>
+      ${ csrf_token(request) | n,unicode }
+      <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
+    </div>
   </form>
 </div>
+
 
 
 </div>
@@ -146,6 +162,9 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
+
+<script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }" type="text/javascript" charset="utf-8"></script>
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-fileupload.css') }">
 
 
 <script type="text/javascript" charset="utf-8">
