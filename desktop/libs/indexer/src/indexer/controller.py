@@ -136,12 +136,9 @@ class CollectionManagerController(object):
       # Create instance directory.
       solrctl_path = get_solrctl_path()
 
-      process = subprocess.Popen([solrctl_path, "instancedir", "--create", name, solr_config_path],
+      process = subprocess.Popen([solrctl_path, "--zk", conf.SOLR_ZK_ENSEMBLE.get(), "instancedir", "--create", name, solr_config_path],
                                  stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 env={
-                                   'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
-                                 })
+                                 stderr=subprocess.PIPE)
       status = process.wait()
 
       # Don't want directories laying around
@@ -155,12 +152,9 @@ class CollectionManagerController(object):
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
         # Delete instance directory if we couldn't create a collection.
-        process = subprocess.Popen([solrctl_path, "instancedir", "--delete", name],
+        process = subprocess.Popen([solrctl_path, "--zk", conf.SOLR_ZK_ENSEMBLE.get(), "instancedir", "--delete", name],
                                    stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE,
-                                   env={
-                                     'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
-                                   })
+                                   stderr=subprocess.PIPE)
         if process.wait() != 0:
           LOG.error("Cloud not delete collection.\nOutput: %s\nError: %s" % process.communicate())
         raise PopupException(_('Could not create collection. Check error logs for more info.'))
@@ -192,12 +186,10 @@ class CollectionManagerController(object):
       # Delete instance directory.
       solrctl_path = get_solrctl_path()
 
-      process = subprocess.Popen([solrctl_path, "instancedir", "--delete", name],
+      process = subprocess.Popen([solrctl_path, "--zk", conf.SOLR_ZK_ENSEMBLE.get(), "instancedir", "--delete", name],
                                  stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE,
-                                 env={
-                                   'SOLR_ZK_ENSEMBLE': conf.SOLR_ZK_ENSEMBLE.get()
-                                 })
+                                 stderr=subprocess.PIPE
+                                 )
       if process.wait() != 0:
         LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
         raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
