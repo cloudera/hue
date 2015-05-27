@@ -1963,3 +1963,26 @@ div.navigator ul.dropdown-menu {
 div.navigator > ul > li.oozie > ul.dropdown-menu {
   overflow-y: visible;
 }
+
+.mega-popover {
+  max-width: 1200px;
+}
+
+.mega-popover .content {
+  height: 300px;
+  overflow-y: scroll;
+}
+
+.mega-popover .popover-content {
+  min-height: 360px;
+  min-width: 440px;
+  max-width: 660px;
+}
+
+.mega-popover input[type="text"] {
+  border-radius: 20px;
+  margin: 0;
+  min-height: 26px;
+  padding-left: 12px;
+  width: 130px;
+}

@@ -21,15 +21,18 @@ function showStats(options) {
     $("#tableAnalysis .stats-refresh").data("refreshUrl", options.refreshUrl);
     $("#tableAnalysis .stats-refresh").data("tableName", options.tableName);
     $("#tableAnalysis .stats-refresh").data("isTable", true);
-    $("#tableAnalysis .popover-content").css("opacity", ".5");
+    $("#tableAnalysisStats .content").css("opacity", ".5");
   }
   else {
     $("#tableAnalysis").hide();
     $("#columnAnalysis .stats-refresh").data("startUrl", options.statsUrl);
     $("#columnAnalysis .stats-refresh").data("refreshUrl", options.refreshUrl);
+    $("#columnAnalysis .stats-refresh").data("termsUrl", options.termsUrl);
     $("#columnAnalysis .stats-refresh").data("columnName", options.columnName);
+    $("#columnAnalysis .stats-refresh").data("errorLabel", options.errorLabel);
     $("#columnAnalysis .stats-refresh").data("isTable", false);
-    $("#columnAnalysis .popover-content").css("opacity", ".5");
+    $("#columnAnalysisStats .content").css("opacity", ".5");
+    $("#columnAnalysisTerms .content").css("opacity", ".5");
   }
   $.ajax({
     url: options.statsUrl,
@@ -55,8 +58,8 @@ function showStats(options) {
           });
           _stats += "</table>"
           $("#tableAnalysis .table-name").text(options.tableName);
-          $("#tableAnalysis .popover-content").html(_stats);
-          $("#tableAnalysis .popover-content").css("opacity", "1");
+          $("#tableAnalysisStats .content").html(_stats);
+          $("#tableAnalysisStats .content").css("opacity", "1");
         }
         else {
           data.stats.forEach(function (item) {
@@ -64,11 +67,53 @@ function showStats(options) {
           });
           _stats += "</table>"
           $("#columnAnalysis .column-name").text(options.columnName);
-          $("#columnAnalysis .popover-content").html(_stats);
-          $("#columnAnalysis .popover-content").css("opacity", "1");
+          $("#columnAnalysisStats .content").html(_stats);
+          $("#columnAnalysisStats .content").css("opacity", "1");
         }
         if (options.callback) {
           options.callback();
+        }
+      }
+      else {
+        $(document).trigger("error", options.errorLabel);
+        $("#tableAnalysis").hide();
+        $("#columnAnalysis").hide();
+      }
+    },
+    error: function (e) {
+      if (e.status == 500) {
+        $(document).trigger("error", options.errorLabel);
+        $("#tableAnalysis").hide();
+        $("#columnAnalysis").hide();
+      }
+    }
+  });
+  loadTerms(options);
+}
+
+function loadTerms(options) {
+  $.ajax({
+    url: options.termsUrl,
+    data: {},
+    beforeSend: function (xhr) {
+      xhr.setRequestHeader("X-Requested-With", "Hue");
+    },
+    dataType: "json",
+    success: function (data) {
+      if (data && data.status == 0) {
+        if (data.terms.length > 0){
+          $("#columnAnalysisTerms .alert").addClass("hide");
+          var _terms = "<table class='table table-striped'>";
+          data.terms.forEach(function(item){
+            _terms += "<tr><th>" + item[0] + "</th><td width='1%'>" + item[1] + "</td></tr>";
+          });
+          _terms += "</table>"
+          $("#columnAnalysisTerms .content").html(_terms);
+          $("#columnAnalysisTerms .content").css("opacity", "1");
+        }
+        else {
+          $("#columnAnalysisTerms .alert").removeClass("hide");
+          $("#columnAnalysisTerms .content").html("");
         }
       }
       else {
@@ -98,11 +143,12 @@ function showTableStats(statsUrl, refreshUrl, tableName, errorLabel, callback) {
   });
 }
 
-function showColumnStats(statsUrl, refreshUrl, columnName, errorLabel, callback) {
+function showColumnStats(statsUrl, refreshUrl, termsUrl, columnName, errorLabel, callback) {
   showStats({
     isTable: false,
     statsUrl: statsUrl,
     refreshUrl: refreshUrl,
+    termsUrl: termsUrl,
     columnName: columnName,
     errorLabel: errorLabel,
     callback: callback
@@ -118,13 +164,13 @@ function refreshLoop(el){
     }
     else {
       $(el).removeClass("fa-spin");
-      $(el).parents(".popover").find(".popover-content").css("opacity", "1");
+      $(el).parents(".popover").find(".content").css("opacity", "1");
       if (data.isSuccess){
         if (el.data("isTable")){
-          showTableStats($(el).data("startUrl"), $(el).data("tableName"));
+          showTableStats($(el).data("startUrl"), $(el).data("refreshUrl"), $(el).data("tableName"), $(el).data("errorLabel"));
         }
         else {
-          showColumnStats($(el).data("startUrl"), $(el).data("columnName"));
+          showColumnStats($(el).data("startUrl"), $(el).data("refreshUrl"), $(el).data("termsUrl"), $(el).data("columnName"), $(el).data("errorLabel"));
         }
       }
       else {
@@ -136,11 +182,12 @@ function refreshLoop(el){
 
 $(document).ready(function () {
   $(".stats-refresh").on("click", function () {
+    $("#columnAnalysis .filter input").val("");
     var _this = $(this);
-    _this.parents(".popover").find(".popover-content").css("opacity", ".5");
+    _this.parents(".popover").find(".content").css("opacity", ".5");
     if (_this.hasClass("fa-spin")){
       _this.removeClass("fa-spin");
-      _this.parents(".popover").find(".popover-content").css("opacity", "1");
+      _this.parents(".popover").find(".content").css("opacity", "1");
       window.clearTimeout(_this.data("refreshTimeout"));
     }
     else {
@@ -154,5 +201,12 @@ $(document).ready(function () {
         }
       });
     }
+  });
+  $("#columnAnalysis .filter input").jHueDelayedInput(function(){
+    $("#columnAnalysisTerms .content").css("opacity", ".5");
+    loadTerms({
+      errorLabel: $("#columnAnalysis .stats-refresh").data("errorLabel"),
+      termsUrl: $("#columnAnalysis .stats-refresh").data("termsUrl") + $("#columnAnalysis .filter input").val()
+    });
   });
 });

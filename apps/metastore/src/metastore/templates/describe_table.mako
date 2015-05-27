@@ -229,7 +229,24 @@ ${ components.menubar() }
     <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
     <strong class="column-name"></strong> ${ _(' column analysis') }
   </h3>
-  <div class="popover-content" style="text-align: left"></div>
+  <div class="popover-content">
+    <div class="pull-right hide filter">
+      <input id="columnAnalysisTermsFilter" type="text" placeholder="${ _('Prefix filter...') }"/>
+    </div>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
+      <li><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
+        <div class="content"></div>
+      </div>
+      <div class="tab-pane" id="columnAnalysisTerms" style="text-align: left">
+        <div class="alert">${ _('There are no terms to be shown') }</div>
+        <div class="content"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
@@ -256,7 +273,7 @@ ${ components.menubar() }
         });
     % endif
 
-    $('a[data-toggle="tab"]').on('shown', function () {
+    $('a[data-toggle="tab"]').on('shown', function (e) {
       var sortables = [];
       $(".sampleTable").not('.initialized').each(function () {
         var _id = $(this).attr("id");
@@ -298,6 +315,12 @@ ${ components.menubar() }
           }
         });
       }
+      if ($(e.target).attr("href") == "#columnAnalysisTerms") {
+        $("#columnAnalysis .filter").removeClass("hide");
+      }
+      if ($(e.target).attr("href") == "#columnAnalysisStats") {
+        $("#columnAnalysis .filter").addClass("hide");
+      }
     });
 
     $("#import-data-btn").click(function () {
@@ -317,10 +340,11 @@ ${ components.menubar() }
       var _link = $(this);
       var _col = _link.data("column");
       var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
-      var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/stats/" + _col;
-      $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+      var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/" + _col;
+      var termsUrl = "/beeswax/api/table/${database}/${table.name}/terms/" + _col + "/";
+      $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-      showColumnStats(statsUrl, refreshUrl, _col, STATS_PROBLEMS, function () {
+      showColumnStats(statsUrl, refreshUrl, termsUrl, _col, STATS_PROBLEMS, function () {
         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
       });
     });

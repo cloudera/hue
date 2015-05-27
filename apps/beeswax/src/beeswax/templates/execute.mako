@@ -730,7 +730,11 @@ ${layout.menubar(section='query')}
     <span class="pull-right stats-warning muted" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
     <strong class="table-name"></strong> ${ _(' table analysis') }
   </h3>
-  <div class="popover-content" style="text-align: left"></div>
+  <div class="popover-content">
+    <div id="tableAnalysisStats">
+      <div class="content"></div>
+    </div>
+  </div>
 </div>
 
 <div id="columnAnalysis" class="popover mega-popover right">
@@ -740,7 +744,24 @@ ${layout.menubar(section='query')}
     <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
     <strong class="column-name"></strong> ${ _(' column analysis') }
   </h3>
-  <div class="popover-content" style="text-align: left"></div>
+  <div class="popover-content">
+    <div class="pull-right hide filter">
+      <input id="columnAnalysisTermsFilter" type="text" placeholder="${ _('Prefix filter...') }"/>
+    </div>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
+      <li><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
+        <div class="content"></div>
+      </div>
+      <div class="tab-pane" id="columnAnalysisTerms" style="text-align: left">
+        <div class="alert">${ _('There are no terms to be shown') }</div>
+        <div class="content"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 ${ commonshare() | n,unicode }
@@ -986,10 +1007,6 @@ ${ commonshare() | n,unicode }
   #saveResultsModal i.fa-spinner {
     font-size: 60px;
     color: #DDD;
-  }
-
-  .mega-popover {
-    max-width: 1200px;
   }
 
   .tooltip {
@@ -1263,9 +1280,11 @@ $(document).ready(function () {
                       var _link = $(this);
                       var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/" + col.name;
                       var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/" + col.name;
-                      $("#columnAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+                      var termsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/terms/" + col.name + "/";
+                      $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
+                      $("#columnAnalysisTerms .content").html("<i class='fa fa-spinner fa-spin'></i>");
                       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-                      showColumnStats(statsUrl, refreshUrl, col.name, STATS_PROBLEMS, function () {
+                      showColumnStats(statsUrl, refreshUrl, termsUrl, col.name, STATS_PROBLEMS, function () {
                         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
                       });
                     });
@@ -1310,7 +1329,7 @@ $(document).ready(function () {
               var _link = $(this);
               var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
               var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/";
-              $("#tableAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+              $("#tableAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
               $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
               showTableStats(statsUrl, refreshUrl, _table.data("table"), STATS_PROBLEMS, function(){
                 $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
@@ -1442,6 +1461,12 @@ $(document).ready(function () {
       }
     } else {
       reinitializeTable();
+    }
+    if ($(e.target).attr("href") == "#columnAnalysisTerms") {
+      $("#columnAnalysis .filter").removeClass("hide");
+    }
+    if ($(e.target).attr("href") == "#columnAnalysisStats") {
+      $("#columnAnalysis .filter").addClass("hide");
     }
     return e;
   });
