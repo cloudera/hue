@@ -42,7 +42,7 @@ from django.utils.translation import ugettext as _
         <span class="btn btn-file" style="line-height: 29px">
           <span class="fileupload-new">${ _('Select file') }</span>
           <span class="fileupload-exists">${ _('Change') }</span>
-          <input type="file" name="documents" accept="application/json" />
+          <input type="file" name="documents" accept=".json" />
         </span>
         &nbsp;&nbsp;<span class="fileupload-preview"></span>
           <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
