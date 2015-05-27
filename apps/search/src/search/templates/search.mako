@@ -52,7 +52,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     </a>
     <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;</span>
 
-    <a class="btn pointer" title="${ _('Share') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
+    <a class="btn pointer" title="${ _('Share search definition') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
       <i class="fa fa-link"></i>
     </a>
 
@@ -1530,10 +1530,10 @@ ${ dashboard.layout_skeleton() }
 <div id="shareModal" class="modal hide" data-backdrop="true">
   <div class="modal-header">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <h3>${_('Share this dashboard')}</h3>
+    <h3>${_('Share this dashboard definition')}</h3>
   </div>
   <div class="modal-body">
-    <p>${_('The following URL will show the current dashboard and the applied filters.')}</p>
+    <p>${_('The following URL will show the current dashboard and its applied filters.')}</p>
     <input type="text" style="width: 540px" />
   </div>
   <div class="modal-footer">
@@ -1584,13 +1584,6 @@ ${ dashboard.layout_skeleton() }
               <label class="control-label" for="settingsdescription">${ _('Description') }</label>
               <div class="controls">
                 <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
-              </div>
-            </div>
-            <div class="control-group">
-              <div class="controls">
-                <label class="checkbox">
-                  <input type="checkbox" data-bind="checked: $root.collection.enabled" /> ${ _('Dashboard visible to everybody') }
-                </label>
               </div>
             </div>
           </fieldset>

@@ -474,13 +474,13 @@ class Document(models.Model):
     if self.can_read(user):
       return True
     else:
-      raise exception_class(_('Only superusers and %s are allowed to read this document.') % user)
+      raise exception_class(_("Document does not exist or you don't have the permission to access it."))
 
   def can_write_or_exception(self, user, exception_class=PopupException):
     if self.can_write(user):
       return True
     else:
-      raise exception_class(_('Only superusers and %s are allowed to write this document.') % user)
+      raise exception_class(_("Document does not exist or you don't have the permission to access it."))
 
   def copy(self, name=None, owner=None):
     copy_doc = self
@@ -744,7 +744,8 @@ class Document2(models.Model):
       'type': self.type,
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
-      'isSelected': False
+      'isSelected': False,
+      'absoluteUrl': self.get_absolute_url()
     }
 
   def can_read_or_exception(self, user):
