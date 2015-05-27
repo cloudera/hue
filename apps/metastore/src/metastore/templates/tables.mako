@@ -104,7 +104,11 @@ ${ components.menubar() }
     <span class="pull-right stats-warning muted" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
     <strong class="table-name"></strong> ${ _(' table analysis') }
   </h3>
-  <div class="popover-content" style="text-align: left"></div>
+  <div class="popover-content">
+    <div class="tab-pane active" id="tableAnalysisStats">
+      <div class="content"></div>
+    </div>
+  </div>
 </div>
 
 
@@ -168,7 +172,7 @@ ${ components.menubar() }
       var _link = $(this);
       var statsUrl = "/beeswax/api/table/${database}/" + _link.data("table") + "/stats/";
       var refreshUrl = "/beeswax/api/analyze/${database}/" + _link.data("table") + "/";
-      $("#tableAnalysis .popover-content").html("<i class='fa fa-spinner fa-spin'></i>");
+      $("#tableAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
       $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
       showTableStats(statsUrl, refreshUrl, _link.data("table"), STATS_PROBLEMS, function(){
         $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
