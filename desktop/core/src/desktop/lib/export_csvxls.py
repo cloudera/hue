@@ -98,6 +98,8 @@ def make_response(generator, format, name, encoding=None):
     content_type = 'application/csv'
   elif format == 'xls':
     content_type = 'application/xls'
+  elif format == 'json':
+    content_type = 'application/json'
   else:
     raise Exception("Unknown format: %s" % format)
 
