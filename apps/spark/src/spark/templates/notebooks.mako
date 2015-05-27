@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -117,39 +117,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
   </form>
 </div>
 
-<div id="export-documents" class="modal hide">
-  <form method="POST" action="/desktop/api2/doc/export" style="display: inline">
-    ${ csrf_token(request) | n,unicode }
-    <input type="hidden" name="documents"/>
-  </form>
-</div>
-
-<div id="import-documents" class="modal hide fade fileupload-modal">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal" data-clear="fileupload">&times;</a>
-    <h3>${_('Import documents')}</h3>
-  </div>
-  <form method="POST" action="/desktop/api2/doc/import" style="display: inline" enctype="multipart/form-data">
-    <div class="modal-body form-inline">
-      <div class="pull-right">
-        <a href="#" class="btn" data-dismiss="modal" data-clear="fileupload">${ _('Cancel') }</a>
-        <input type="submit" class="btn btn-danger" value="${ _('Import') }"/>
-      </div>
-      <div class="fileupload fileupload-new" data-provides="fileupload">
-        <span class="btn btn-file" style="line-height: 29px">
-          <span class="fileupload-new">${ _('Select file') }</span>
-          <span class="fileupload-exists">${ _('Change') }</span>
-          <input type="file" name="documents" accept="application/json" />
-        </span>
-        &nbsp;&nbsp;<span class="fileupload-preview"></span>
-          <a href="#" class="fileupload-exists" data-clear="fileupload"><i class="fa fa-times"></i></a>
-      </div>
-      ${ csrf_token(request) | n,unicode }
-      <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
-    </div>
-  </form>
-</div>
-
+${ commonimportexport(request) | n,unicode }
 
 
 </div>
@@ -162,10 +130,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
-
-<script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }" type="text/javascript" charset="utf-8"></script>
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-fileupload.css') }">
-
 
 <script type="text/javascript" charset="utf-8">
   var Editor = function () {
