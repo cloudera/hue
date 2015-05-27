@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, commonshare
   from django.utils.translation import ugettext as _
 %>
 
@@ -25,6 +25,9 @@
 ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 <link rel="stylesheet" href="${ static('search/css/admin.css') }">
+
+
+<div id="editor">
 
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
@@ -45,12 +48,23 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
       </%def>
 
       <%def name="actions()">
-        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
-        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}"><i class="fa fa-times"></i> ${_('Delete')}</a>
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
+          <i class="fa fa-files-o"></i> ${_('Copy')}
+        </a>
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
+          <i class="fa fa-times"></i> ${_('Delete')}
+        </a>
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function(e){ $root.oneSelected() ? prepareShareModal(e) : void(0) },
+          attr: {'data-original-title': '${ _("Share") } ' + name},
+          css: {'disabled': ! $root.oneSelected(), 'btn': true}">
+          <i class="fa fa-users"></i> ${ _('Share') }
+        </a>
       </%def>
 
       <%def name="creation()">
-        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }">
+          <i class="fa fa-plus-circle"></i> ${ _('Create') }
+        </a>
       </%def>
     </%actionbar:render>
 
@@ -122,9 +136,18 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   </div>
 </div>
 
+
+</div>
+
+
+${ commonshare() | n,unicode }
+
+
 <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('search/js/collections.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/share.vm.js') }"></script>
+
 
 <script>
   var appProperties = {
@@ -136,8 +159,10 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   }
 
   var viewModel = new SearchCollectionsModel(appProperties);
+  ko.applyBindings(viewModel, $("#editor")[0]);
 
-  ko.applyBindings(viewModel);
+  shareViewModel = initSharing("#documentShareModal");
+  shareViewModel.setDocId(-1);
 
   $(document).ready(function () {
     viewModel.updateCollections();
@@ -182,6 +207,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
     $(document).on("confirmDelete", function () {
       $("#deleteModal").modal('show');
     });
+
+    prepareShareModal = function() {
+      shareViewModel.setDocId(viewModel.selectedCollections()[0].doc1_id());
+      openShareModal();
+    };
   });
 </script>
 

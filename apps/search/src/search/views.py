@@ -42,6 +42,7 @@ from search.search_controller import SearchController
 LOG = logging.getLogger(__name__)
 
 
+
 def index(request):
   hue_collections = SearchController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
@@ -50,7 +51,8 @@ def index(request):
     return admin_collections(request, True)
 
   try:
-    collection_doc = hue_collections.get(id=collection_id)
+    collection_doc = Document2.objects.get(id=collection_id)
+    collection_doc.doc.get().can_read_or_exception(request.user)
     collection = Collection2(request.user, document=collection_doc)
   except Exception, e:
     raise PopupException(e, title=_("Dashboard does not exist or you don't have the permission to access it."))
@@ -61,7 +63,7 @@ def index(request):
     'collection': collection,
     'query': query,
     'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
-    'is_owner': request.user == collection_doc.owner
+    'is_owner': collection_doc.doc.get().can_write(request.user)
   })
 
 
@@ -242,14 +244,8 @@ def admin_collections(request, is_redirect=False):
   if request.GET.get('format') == 'json':
     collections = []
     for collection in existing_hue_collections:
-      massaged_collection = {
-        'id': collection.id,
-        'name': collection.name,
-        'description': collection.description,
-        'absoluteUrl': collection.get_absolute_url(),
-        'owner': collection.owner and collection.owner.username,
-        'isOwner': collection.owner == request.user or request.user.is_superuser
-      }
+      massaged_collection = collection.to_dict()
+      massaged_collection['isOwner'] = collection.doc.get().can_write(request.user)
       collections.append(massaged_collection)
     return JsonResponse(collections, safe=False)
 

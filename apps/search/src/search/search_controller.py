@@ -19,11 +19,9 @@
 import logging
 import uuid
 
-from django.contrib.auth.models import User
 from django.db.models import Q
-from django.utils.translation import ugettext as _
 
-from desktop.models import Document2, SAMPLE_USERNAME
+from desktop.models import Document2, Document, SAMPLE_USERNAME
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
@@ -41,19 +39,21 @@ class SearchController(object):
     self.user = user
 
   def get_search_collections(self):
-    if self.user.is_superuser:
-      return Document2.objects.filter(type='search-dashboard').order_by('-id')
-    else:
-      return Document2.objects.filter(type='search-dashboard').filter(owner=self.user).order_by('-id')
+    return [d.content_object for d in Document.objects.get_docs(self.user, Document2, extra='search-dashboard').order_by('-id')]
 
   def get_shared_search_collections(self):
-    return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user) | Q(owner__in=User.objects.filter(is_superuser=True)) | Q(owner__username=SAMPLE_USERNAME)).order_by('-id')
+    # Those are the ones appearing in the menu
+    docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username=SAMPLE_USERNAME), extra='search-dashboard')
+
+    return [d.content_object for d in docs.order_by('-id')]
 
   def get_owner_search_collections(self):
     if self.user.is_superuser:
-      return Document2.objects.filter(type='search-dashboard')
+      docs = Document.objects.filter(extra='search-dashboard')
     else:
-      return Document2.objects.filter(type='search-dashboard').filter(Q(owner=self.user))
+      docs = Document.objects.filter(extra='search-dashboard', owner=self.user)
+
+    return [d.content_object for d in docs.order_by('-id')]
 
   def get_icon(self, name):
     if name == 'Twitter':
@@ -68,10 +68,11 @@ class SearchController(object):
   def delete_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
-      for doc2 in self.get_owner_search_collections().filter(id__in=collection_ids):
-        doc = doc2.doc.get()
-        doc.delete()
-        doc2.delete()
+      for doc2 in self.get_owner_search_collections():
+        if doc2.id in collection_ids:
+          doc = doc2.doc.get()
+          doc.delete()
+          doc2.delete()
       result['status'] = 0
     except Exception, e:
       LOG.warn('Error deleting collection: %s' % e)
@@ -82,30 +83,30 @@ class SearchController(object):
   def copy_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
     try:
-      for collection in self.get_shared_search_collections().filter(id__in=collection_ids):
-        doc2 = Document2.objects.get(type='search-dashboard', id=collection.id)
+      for doc2 in self.get_shared_search_collections():
+        if doc2.id in collection_ids:
+          name = doc2.name + '-copy'
+          copy_doc = doc2.doc.get().copy(name=name, owner=self.user)
 
-        name = doc2.name + '-copy'
-        copy_doc = doc2.doc.get().copy(name=name, owner=self.user)
+          doc2.pk = None
+          doc2.id = None
+          doc2.uuid = str(uuid.uuid4())
+          doc2.name = name
+          doc2.owner = self.user
+          doc2.save()
 
-        doc2.pk = None
-        doc2.id = None
-        doc2.uuid = str(uuid.uuid4())
-        doc2.name = name
-        doc2.owner = self.user
-        doc2.save()
+          doc2.doc.all().delete()
+          doc2.doc.add(copy_doc)
+          doc2.save()
 
-        doc2.doc.all().delete()
-        doc2.doc.add(copy_doc)
-        doc2.save()
+          copy = Collection2(self.user, document=doc2)
+          copy.data['collection']['label'] = name
 
-        copy = Collection2(document=doc2)
-        copy['collection']['label'] = name
-
-        doc2.update_data({'collection': copy['collection']})
-        doc2.save()
+          doc2.update_data({'collection': copy.data['collection']})
+          doc2.save()
       result['status'] = 0
     except Exception, e:
+      print e
       LOG.warn('Error copying collection: %s' % e)
       result['message'] = unicode(str(e), "utf8")
 

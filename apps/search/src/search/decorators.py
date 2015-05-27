@@ -22,9 +22,7 @@ from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-
-from search.models import Collection
-from search.search_controller import SearchController
+from desktop.models import Document2
 
 
 LOG = logging.getLogger(__name__)
@@ -37,8 +35,9 @@ def allow_viewer_only(view_func):
 
     if collection_json['id']:
       try:
-        SearchController(request.user).get_search_collections().get(id=collection_json['id'])
-      except Collection.DoesNotExist:
+        doc2 = Document2.objects.get(id=collection_json['id'])
+        doc2.doc.get().can_read_or_exception(request.user)
+      except Document2.DoesNotExist:
         message = _("Dashboard does not exist or you don't have the permission to access it.")
         raise PopupException(message)
 
@@ -53,13 +52,11 @@ def allow_owner_only(view_func):
 
     if collection_json['id']:
       try:
-        collection = Collection.objects.get(id=collection_json['id'])
-
-        if collection.owner != request.user and not request.user.is_superuser:
-          message = _("Permission denied. You are not an Administrator.")
-          raise PopupException(message)
-      except Collection.DoesNotExist:
-        pass
+        doc2 = Document2.objects.get(id=collection_json['id'])
+        doc2.doc.get().can_write_or_exception(request.user)
+      except Document2.DoesNotExist:
+        message = _("Dashboard does not exist or you don't have the permission to access it.")
+        raise PopupException(message)
 
     return view_func(request, *args, **kwargs)
   return wraps(view_func)(decorate)

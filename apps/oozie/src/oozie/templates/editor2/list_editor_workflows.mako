@@ -213,7 +213,7 @@ ${ commonshare() | n,unicode }
     };
 
     self.prepareShareModal = function() {
-     shareViewModel.setDocId(self.selectedJobs()[0].doc1_id());
+      shareViewModel.setDocId(self.selectedJobs()[0].doc1_id());
       openShareModal();
     };
   }
