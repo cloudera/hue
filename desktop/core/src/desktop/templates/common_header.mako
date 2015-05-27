@@ -522,6 +522,7 @@ from django.utils.translation import ugettext as _
                  <li class="divider"></li>
                  % if 'search' in apps:
                  <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
+                 <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i> ${ _('Dashboards') }</a></li>
                  % endif
                  % if 'indexer' in apps:
                  <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>

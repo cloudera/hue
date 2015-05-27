@@ -79,6 +79,9 @@ class Notebook():
 
     return _data
 
+  def get_str(self):
+    return '\n\n'.join([snippet['statement_raw'] for snippet in self.get_data()['snippets']])
+
 
 def get_api(user, snippet):
   if snippet['type'] in ('hive', 'impala', 'spark-sql'):

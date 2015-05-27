@@ -49,15 +49,21 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
 
+        <a data-bind="click: function() { atLeastOneSelected() ? exportDocuments() : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+          <i class="fa fa-upload"></i> ${ _('Export') }
+        </a>
       </div>
     </%def>
 
     <%def name="creation()">
       <a href="${ url('spark:new') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
+        <i class="fa fa-download"></i> ${ _('Import') }
+      </a>
     </%def>
   </%actionbar:render>
 
-       
+
   <table id="notebookTable" class="table datatables">
     <thead>
       <tr>
@@ -71,7 +77,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
     <tbody data-bind="foreach: { data: jobs }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>          
+          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <a data-bind="attr: { 'href': '${ url('spark:editor') }?notebook=' + id() }" data-row-selector="true"></a>
         </td>
         <td data-bind="text: name"></td>
@@ -108,6 +114,24 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
+  </form>
+</div>
+
+<div id="export-documents" class="modal hide">
+  <form method="POST" action="/desktop/api2/doc/export" style="display: inline">
+    ${ csrf_token(request) | n,unicode }
+    <input type="hidden" name="documents"/>
+  </form>
+</div>
+
+<div id="import-documents" class="modal hide fade">
+  <form method="POST" action="/desktop/api2/doc/import" style="display: inline" enctype="multipart/form-data">
+    ${ csrf_token(request) | n,unicode }
+    <input type="file" name="documents" accept="application/json"/>
+    <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
+    </br>
+    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <input type="submit" class="btn btn-danger" value="${ _('Import') }"/>
   </form>
 </div>
 
@@ -176,8 +200,13 @@ ${ commonshare() | n,unicode }
       });
     };
 
+    self.exportDocuments = function() {
+      $('#export-documents').find('input[name=\'documents\']').val(ko.mapping.toJSON($.map(self.selectedJobs(), function(doc) { return doc.id(); })));
+      $('#export-documents').find('form').submit();
+    };
+
     self.prepareShareModal = function() {
-     shareViewModel.setDocId(self.selectedJobs()[0].doc1_id());
+      shareViewModel.setDocId(self.selectedJobs()[0].doc1_id());
       openShareModal();
     };
   }
