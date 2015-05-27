@@ -103,11 +103,17 @@ function loadTerms(options) {
       if (data && data.status == 0) {
         if (data.terms.length > 0){
           $("#columnAnalysisTerms .alert").addClass("hide");
-          var _terms = "<table class='table table-striped'>";
+          var _terms = '<table class="table table-striped">';
           data.terms.forEach(function(item){
-            _terms += "<tr><th>" + item[0] + "</th><td width='1%'>" + item[1] + "</td></tr>";
+            _terms += '<tr><td>' + item[0] + '</td>';
+            _terms += '<td style="width: 40px">';
+            _terms += '<div class="progress">';
+            _terms += '<div class="bar-label" data-bind="text:val.count">' + item[1] + '</div>';
+            _terms += '<div class="bar bar-info" style="margin-top: -20px; width: ' + ((parseFloat(item[1]) / parseFloat(data.terms[0][1])) * 100) + '%"></div>';
+            _terms += '</div>';
+            _terms += '</td></tr>';
           });
-          _terms += "</table>"
+          _terms += '</table>';
           $("#columnAnalysisTerms .content").html(_terms);
           $("#columnAnalysisTerms .content").css("opacity", "1");
         }
