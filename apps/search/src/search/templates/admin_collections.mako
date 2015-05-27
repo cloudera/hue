@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
 %>
 
@@ -51,13 +51,19 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
           <i class="fa fa-files-o"></i> ${_('Copy')}
         </a>
+
         <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
           <i class="fa fa-times"></i> ${_('Delete')}
         </a>
-        <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function(e){ $root.oneSelected() ? prepareShareModal(e) : void(0) },
+
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ $root.oneSelected() ? prepareShareModal(e) : void(0) },
           attr: {'data-original-title': '${ _("Share") } ' + name},
           css: {'disabled': ! $root.oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
+        </a>
+
+        <a data-bind="click: function() { atLeastOneSelected() ? exportDocuments() : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+          <i class="fa fa-download"></i> ${ _('Export') }
         </a>
       </%def>
 
@@ -65,12 +71,18 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }">
           <i class="fa fa-plus-circle"></i> ${ _('Create') }
         </a>
+        <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
+          <i class="fa fa-upload"></i> ${ _('Import') }
+        </a>
       </%def>
     </%actionbar:render>
 
     <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
       <div class="span10 offset1 center importBtn pointer">
-        <a href="${ url('search:new_search') }"><i class="fa fa-plus-circle waiting"></i></a>
+        <a href="${ url('search:new_search') }">
+          <i class="fa fa-plus-circle waiting"></i>
+        </a>
+
         <h1 class="emptyMessage">
           ${ _('There are currently no dashboards defined.') }<br/>
           <a href="${ url('search:new_search') }">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
@@ -141,6 +153,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 
 
 ${ commonshare() | n,unicode }
+${ commonimportexport(request) | n,unicode }
 
 
 <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -207,6 +220,11 @@ ${ commonshare() | n,unicode }
     $(document).on("confirmDelete", function () {
       $("#deleteModal").modal('show');
     });
+
+    self.exportDocuments = function() {
+      $('#export-documents').find('input[name=\'documents\']').val(ko.mapping.toJSON($.map(viewModel.selectedCollections(), function(doc) { return doc.id(); })));
+      $('#export-documents').find('form').submit();
+    };
 
     prepareShareModal = function() {
       shareViewModel.setDocId(viewModel.selectedCollections()[0].doc1_id());
