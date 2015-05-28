@@ -406,6 +406,12 @@ var Collection = function (vm, collection) {
   self.timeFilter.value.subscribe(function () {
     vm.search();
   });
+  self.timeFilter.from.subscribe(function () {
+    vm.search();
+  });  
+  self.timeFilter.to.subscribe(function () {
+    vm.search();
+  });
   self.timeFilter.type.subscribe(function (val) {
     if (val == 'fixed' && self.timeFilter.from().length == 0) {
       $.ajax({
@@ -421,6 +427,8 @@ var Collection = function (vm, collection) {
           self.timeFilter.to(data.properties.end);
         }
       });
+    } else {
+      vm.search();
     }
   });
   self.template = ko.mapping.fromJS(collection.template);
