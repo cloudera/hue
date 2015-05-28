@@ -82,7 +82,7 @@ def export_documents(request):
 
   # If non admin, only export documents the user owns
   docs = Document2.objects
-  if request.user.is_superuser:
+  if not request.user.is_superuser:
     docs = docs.filter(owner=request.user)
   docs = docs.filter(id__in=selection).order_by('-id')
   doc_ids = docs.values_list('id', flat=True)
@@ -109,11 +109,11 @@ def export_documents(request):
     zfile.close()
     response = HttpResponse(content_type="application/zip")
     response["Content-Length"] = len(f.getvalue())
-    response['Content-Disposition'] = 'attachment; filename="hue.zip"'
+    response['Content-Disposition'] = 'attachment; filename="hue-documents.zip"'
     response.write(f.getvalue())
     return response
   else:
-    return make_response(f.getvalue(), 'json', 'hue')
+    return make_response(f.getvalue(), 'json', 'hue-documents')
 
 
 
