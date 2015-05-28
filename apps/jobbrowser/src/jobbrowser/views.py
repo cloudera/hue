@@ -358,7 +358,6 @@ def tasks(request, job):
   jt = get_api(request.user, request.jt)
 
   task_list = jt.get_tasks(job.jobId, **filters)
-  page = jt.paginate_task(task_list, pagenum)
 
   filter_params = copy_query_dict(request.GET, ('tasktype', 'taskstate', 'tasktext')).urlencode()
 
@@ -366,7 +365,7 @@ def tasks(request, job):
     'request': request,
     'filter_params': filter_params,
     'job': job,
-    'page': page,
+    'task_list': task_list,
     'tasktype': ttypes,
     'taskstate': tstates,
     'tasktext': ttext

@@ -61,71 +61,90 @@ ${ comps.menubar() }
           />
         </form>
       </p>
-    </div>
 
-    % if not page.object_list:
-    <p>${_('There were no tasks that match your search criteria.')}</p>
-    % else:
-    <table class="datatables table table-condensed">
-      <thead>
-        <tr>
-          <th>${_('Logs')}</th>
-          <th>${_('Task ID')}</th>
-          <th>${_('Type')}</th>
-          <th>${_('Progress')}</th>
-          <th>${_('Status')}</th>
-          <th>${_('State')}</th>
-          <th>${_('Start Time')}</th>
-          <th>${_('End Time')}</th>
-          <th>${_('View Attempts')}</th>
-        </tr>
-      </thead>
-      <tbody>
-      %for t in page.object_list:
-        <tr>
-          <td data-row-selector-exclude="true">
-              %if t.taskAttemptIds:
-              <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
-              %endif
-          </td>
-          <td>${t.taskId_short}</td>
-          <td>${t.taskType}</td>
-          <td>
-            <div class="bar">${ "%d" % (t.progress * 100) }%</div>
-          </td>
-          <td>
-            <a href="${ url('jobbrowser.views.tasks', job=job.jobId) }?${ get_state_link(request, 'taskstate', t.state.lower()) }"
-               title="${ _('Show only %(state)s tasks') % dict(state=t.state.lower()) }"
-               class="${ t.state.lower() }">${ t.state.lower() }
-            </a>
-          </td>
-          <td>${t.mostRecentState}</td>
-          <td>${t.execStartTimeFormatted}</td>
-          <td>${t.execFinishTimeFormatted}</td>
-          <td><a href="${ url('jobbrowser.views.single_task', job=job.jobId, taskid=t.taskId) }" data-row-selector="true">${_('Attempts')}</a></td>
-        </tr>
-      %endfor
-      </tbody>
-    </table>
-    %endif
+      <table class="datatables table table-condensed" id="all_tasks">
+        <thead>
+          <tr>
+            <th>${_('Logs')}</th>
+            <th>${_('Task ID')}</th>
+            <th>${_('Type')}</th>
+            <th>${_('Progress')}</th>
+            <th>${_('Status')}</th>
+            <th>${_('State')}</th>
+            <th>${_('Start Time')}</th>
+            <th>${_('End Time')}</th>
+            <th>${_('View Attempts')}</th>
+          </tr>
+        </thead>
+        <tbody>
+        %for t in task_list:
+          <tr>
+            <td data-row-selector-exclude="true">
+                %if t.taskAttemptIds:
+                <a href="${ url('jobbrowser.views.single_task_attempt_logs', job=t.jobId, taskid=t.taskId, attemptid=t.taskAttemptIds[-1]) }" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>
+                %endif
+            </td>
+            <td>${t.taskId_short}</td>
+            <td>${t.taskType}</td>
+            <td>
+              <div class="bar">${ "%d" % (t.progress * 100) }%</div>
+            </td>
+            <td>
+              <a href="${ url('jobbrowser.views.tasks', job=job.jobId) }?${ get_state_link(request, 'taskstate', t.state.lower()) }"
+                 title="${ _('Show only %(state)s tasks') % dict(state=t.state.lower()) }"
+                 class="${ t.state.lower() }">${ t.state.lower() }
+              </a>
+            </td>
+            <td>${t.mostRecentState}</td>
+            <td>${t.execStartTimeFormatted}</td>
+            <td>${t.execFinishTimeFormatted}</td>
+            <td><a href="${ url('jobbrowser.views.single_task', job=job.jobId, taskid=t.taskId) }" data-row-selector="true">${_('Attempts')}</a></td>
+          </tr>
+        %endfor
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
+<script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
-        $(".datatables").dataTable({
-            "bPaginate": false,
+        $("#all_tasks").dataTable({
+            "sPaginationType":"bootstrap",
+            "iDisplayLength":100,
             "bLengthChange": false,
+            "sDom":"<'row'r>t<'row'<'span6'i><''p>>",
             "bFilter": false,
-            "bInfo": false,
             "aaSorting": [[ 1, "asc" ]],
+            "aoColumns":[
+              { "bSortable":false },
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              { "bSortable":false }
+            ],
             "oLanguage": {
-                "sEmptyTable": "${_('No data available')}",
-                "sZeroRecords": "${_('No matching records')}",
+              "sEmptyTable": "${_('No data available')}",
+              "sZeroRecords": "${_('No matching records')}",
+              "sInfo":"${_('Showing _START_ to _END_ of _TOTAL_ entries')}",
+              "sInfoEmpty":"${_('Showing 0 to 0 of 0 entries')}",
+              "oPaginate":{
+                "sFirst":"${_('First')}",
+                "sLast":"${_('Last')}",
+                "sNext":"${_('Next')}",
+                "sPrevious":"${_('Previous')}"
+              }
+            },
+            "fnDrawCallback":function (oSettings) {
+              $("a[data-row-selector='true']").jHueRowSelector();
             }
         });
-
-        $("a[data-row-selector='true']").jHueRowSelector();
     });
 </script>
 
