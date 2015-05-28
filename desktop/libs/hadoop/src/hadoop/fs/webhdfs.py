@@ -117,7 +117,7 @@ class WebHdfs(Hdfs):
 
   @classmethod
   def is_sentry_managed(cls, path):
-    prefixes = get_nn_sentry_prefixes().split(',')
+    prefixes = get_nn_sentry_prefixes()
 
     return any([path == p or path.startswith(p + '/') for p in prefixes if p])
 
