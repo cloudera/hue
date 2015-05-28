@@ -107,9 +107,9 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
 
-      <span data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
-      <span data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
     </div>
+    <span data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+    <span data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
   </form>
 </div>
 
@@ -1616,9 +1616,11 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="time-fixed-filter">
-  <span data-bind="visible: $root.availableDateFields().length > 0" >
-    <span data-bind="text: $root.collection.timeFilter.from" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"></span>
-    <span data-bind="text: $root.collection.timeFilter.to" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal"></span>    
+  <span data-bind="visible: $root.availableDateFields().length > 0" class="muted" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
+    &nbsp;<span data-bind="text: moment($root.collection.timeFilter.from()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
+    <i class="fa fa-long-arrow-right"></i>
+    <span data-bind="text: moment($root.collection.timeFilter.to()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
+    &nbsp;
     <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
       <i class="fa fa-calendar"></i>
     </a>    
