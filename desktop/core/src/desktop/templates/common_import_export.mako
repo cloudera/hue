@@ -30,7 +30,7 @@ from django.utils.translation import ugettext as _
 <div id="import-documents" class="modal hide fade fileupload-modal">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal" data-clear="fileupload">&times;</a>
-    <h3>${_('Import documents')}</h3>
+    <h3>${_('Import Hue documents')}</h3>
   </div>
   <form method="POST" action="/desktop/api2/doc/import" style="display: inline" enctype="multipart/form-data">
     <div class="modal-body form-inline">
@@ -40,7 +40,7 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="fileupload fileupload-new" data-provides="fileupload">
         <span class="btn btn-file" style="line-height: 29px">
-          <span class="fileupload-new">${ _('Select file') }</span>
+          <span class="fileupload-new">${ _('Select json file') }</span>
           <span class="fileupload-exists">${ _('Change') }</span>
           <input type="file" name="documents" accept=".json" />
         </span>
