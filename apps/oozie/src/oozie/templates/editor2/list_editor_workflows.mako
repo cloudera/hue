@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="../actionbar.mako" />
@@ -59,11 +59,18 @@ ${ layout.menubar(section='workflows', is_editor=True) }
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
 
+        <a data-bind="click: function() { atLeastOneSelected() ? exportDocuments() : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+          <i class="fa fa-download"></i> ${ _('Export') }
+        </a>
       </div>
     </%def>
 
     <%def name="creation()">
       <a href="${ url('oozie:new_workflow') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+
+      <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
+        <i class="fa fa-upload"></i> ${ _('Import') }
+      </a>
     </%def>
   </%actionbar:render>
 
@@ -130,6 +137,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
 
 
 ${ commonshare() | n,unicode }
+${ commonimportexport(request) | n,unicode }
 
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
@@ -210,6 +218,11 @@ ${ commonshare() | n,unicode }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+    };
+
+    self.exportDocuments = function() {
+      $('#export-documents').find('input[name=\'documents\']').val(ko.mapping.toJSON($.map(viewModel.selectedJobs(), function(doc) { return doc.id(); })));
+      $('#export-documents').find('form').submit();
     };
 
     self.prepareShareModal = function() {
