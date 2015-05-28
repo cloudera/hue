@@ -27,9 +27,9 @@ LOG = logging.getLogger(__name__)
 
 _HDFS_SITE_DICT = None
 
-
 _CNF_NN_PERMISSIONS_UMASK_MODE = 'fs.permissions.umask-mode'
-_CNF_NN_SENTRY_PREFIX = 'sentry.authorization-provider.hdfs-path-prefixes'
+_CNF_NN_SENTRY_PREFIXES = 'sentry.authorization-provider.hdfs-path-prefixes' # Deprecated
+_CNF_NN_SENTRY_PATH_PREFIXES = 'sentry.hdfs.integration.path.prefixes'
 _CNF_NN_PERMISSIONS_SUPERGROUP = 'dfs.permissions.superusergroup'
 
 
@@ -51,8 +51,18 @@ def get_umask_mode():
 
   return int(umask, 8)
 
+
 def get_nn_sentry_prefixes():
-  return get_conf().get(_CNF_NN_SENTRY_PREFIX, '')
+  prefixes = set()
+
+  if get_conf().get(_CNF_NN_SENTRY_PREFIXES, ''):
+    prefixes |= set(get_conf().get(_CNF_NN_SENTRY_PREFIXES, '').split(','))
+
+  if get_conf().get(_CNF_NN_SENTRY_PATH_PREFIXES, ''):
+    prefixes |= set(get_conf().get(_CNF_NN_SENTRY_PATH_PREFIXES, '').split(','))
+
+  return list(prefixes)
+
 
 def get_supergroup():
   return get_conf().get(_CNF_NN_PERMISSIONS_SUPERGROUP, 'supergroup')
