@@ -145,7 +145,10 @@ def import_documents(request):
   f.flush()
 
   stdout = StringIO.StringIO()
-  management.call_command('loaddata', f.name, stdout=stdout)
+  try:
+    management.call_command('loaddata', f.name, stdout=stdout)
+  except Exception, e:
+    return JsonResponse({'message': smart_str(e)})
 
   Document.objects.sync()
 
