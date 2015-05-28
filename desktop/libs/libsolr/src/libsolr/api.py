@@ -30,6 +30,8 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
+from search.api import _compute_range_facet
+import re
 
 
 LOG = logging.getLogger(__name__)
@@ -152,14 +154,27 @@ class SolrApi(object):
         props['from'] = 'NOW-%s' % collection['timeFilter']['value']
         props['to'] = 'NOW'
         props['gap'] = GAPS.get(collection['timeFilter']['value'])
-      elif collection['timeFilter']['type'] == 'fixed' and collection['timeFilter']['from'] and collection['timeFilter']['to']:
+      elif collection['timeFilter']['type'] == 'fixed':
         props['field'] = collection['timeFilter']['field']
         props['from'] = collection['timeFilter']['from']
         props['to'] = collection['timeFilter']['to']
+        props['fixed'] = True
 
     return props
 
   def _get_time_filter_query(self, timeFilter, facet):
+    if 'fixed' in timeFilter:
+      props = {}
+      stat_facet = {'min': timeFilter['from'], 'max': timeFilter['to']}
+      _compute_range_facet(facet['widgetType'], stat_facet, props, stat_facet['min'], stat_facet['max'])
+      gap = props['gap']
+      unit = re.split('\d+', gap)[1]
+      return {
+        'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': unit},
+        'end': '%(to)s/%(unit)s' % {'to': timeFilter['to'], 'unit': unit},
+        'gap': '%(gap)s' % props, # add a 'auto'
+      }
+    else:
       gap = timeFilter['gap'][facet['widgetType']]
       return {
         'start': '%(from)s/%(unit)s' % {'from': timeFilter['from'], 'unit': gap['unit']},

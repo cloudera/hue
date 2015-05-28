@@ -33,8 +33,20 @@ LOG = logging.getLogger(__name__)
 def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
 
+
 def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
   try:
+    stats_json = solr_api.stats(collection['name'], [facet_field])
+    stat_facet = stats_json['stats']['stats_fields'][facet_field]
+
+    _compute_range_facet(widget_type, stat_facet, properties, start, end, gap)
+  except Exception, e:
+    print e
+    # stats not supported on all the fields, like text
+    pass
+  
+def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=None, gap=None):
+
     if widget_type == 'pie-widget':
       SLOTS = 5
     elif widget_type == 'facet-widget':
@@ -42,8 +54,6 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     else:
       SLOTS = 100
 
-    stats_json = solr_api.stats(collection['name'], [facet_field])
-    stat_facet = stats_json['stats']['stats_fields'][facet_field]
     is_date = False
 
     if isinstance(stat_facet['min'], numbers.Number):
@@ -151,10 +161,6 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
         'timelineChartType': 'bar'
       })
 
-  except Exception, e:
-    print e
-    # stats not supported on all the fields, like text
-    pass
 
 def _round_date_range(tm):
   start = tm - timedelta(seconds=tm.second, microseconds=tm.microsecond)
