@@ -1311,6 +1311,10 @@ ko.bindingHandlers.datepicker = {
     var _options = ko.unwrap(valueAccessor());
     _el.datepicker({
       format: "yyyy-mm-dd"
+    }).on("show", function (e) {
+      if (_options.momentFormat) {
+        _el.datepicker("setValue", moment(_el.val()).utc().format("YYYY-MM-DD"));
+      }
     }).on("changeDate", function (e) {
       setDate(e.date);
     }).on("hide", function (e) {
