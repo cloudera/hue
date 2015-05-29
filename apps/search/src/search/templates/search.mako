@@ -1831,7 +1831,13 @@ function prettifyDateRange(from, to, widget, withCommon) {
     if (widget && widget.properties && widget.properties.min && widget.properties.min()) {
       _minMaxDiff = moment(widget.properties.max()).diff(moment(widget.properties.min()), 'seconds');
     }
-    _format = getFormat(_format, _minMaxDiff, widget);
+    if (withCommon && _mTo.diff(_mFrom, 'days') >= 365){
+      withCommon = false;
+      _format = _common;
+    }
+    else {
+      _format = getFormat(_format, _minMaxDiff, widget);
+    }
 
     return ((_common != "" && withCommon) ? _mFrom.utc().format(_common) + "&nbsp;" : "") + _mFrom.utc().format(withCommon ? _formatWithCommon : _format) + " <i class='fa fa-long-arrow-right'></i> " + _mTo.utc().format(withCommon ? _formatWithCommon : _format);
   }
@@ -1855,6 +1861,9 @@ function getFormat(format, minMaxDiff, widget) {
   }
   if (minMaxDiff > 2592000 && minMaxDiff <= 22464000) { //360 days
     format = format.substring(5, format.length);
+  }
+  if (minMaxDiff > 22464000){
+    format = format.substr(0, 10);
   }
 
   if (format.indexOf("MM") == 0) {
