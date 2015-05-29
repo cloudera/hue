@@ -50,6 +50,10 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         data-bind="css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-cog"></i>
     </a>
+    <a class="btn pointer" title="${ _('Query Definitions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#qdefinitionsDemiModal"
+        data-bind="css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-bookmark-o"></i>
+    </a>
     <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;</span>
 
     <a class="btn pointer" title="${ _('Share search definition') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
@@ -1595,6 +1599,38 @@ ${ dashboard.layout_skeleton() }
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
+<div id="qdefinitionsDemiModal" class="demi-modal fade" data-backdrop="false">
+  <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span12">
+        <form class="form-horizontal">
+          <fieldset>
+            <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }</legend>
+            <div class="control-group" data-bind="foreach: $root.collection.qdefinitions">
+              <label class="control-label" for="settingsdescription">${ _('Definition') }</label>
+              <div class="controls">
+                <span data-bind="text: ko.mapping.toJSON(name)"></span>
+                <span data-bind="text: ko.mapping.toJSON(data), click: $root.collection.loadQDefinition"></span>
+                <a href="javascript: void(0)" data-bind="click: $root.collection.removeQDefinition">
+                  <i class="fa fa-times"></i>
+                </a>
+              </div>
+              </br>
+            </div>
+          </fieldset>
+
+          <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition">
+            <i class="fa fa-plus"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+</div>
+
 
 <script type="text/html" id="time-filter">
   <span data-bind="visible: $root.availableDateFields().length > 0" >
@@ -2239,7 +2275,8 @@ $(document).ready(function () {
     {
       value: "bar",
       label: "${ _('Bars')}"
-  }]);
+    }
+  ]);
 
   ko.applyBindings(viewModel);
 

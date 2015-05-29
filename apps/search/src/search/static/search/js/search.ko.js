@@ -524,6 +524,7 @@ var Collection = function (vm, collection) {
   self.template.rows.extend({rateLimit: {timeout: 1500, method: "notifyWhenChangesStop"}});
 
   self.fields = ko.mapping.fromJS(collection.fields);
+  self.qdefinitions = ko.mapping.fromJS(collection.qdefinitions);
 
   self.availableFacetFields = ko.computed(function() {
     return self.fields();
@@ -531,6 +532,37 @@ var Collection = function (vm, collection) {
 
   self.selectedDocument = ko.observable({});
 
+  self.addQDefinition = function() {
+    self.qdefinitions.push(
+      ko.mapping.fromJS({
+        'name': 'new name',
+        'id': UUID(),
+        'data': ko.mapping.toJSON(vm.query)
+      })
+    );
+  };
+
+  self.removeQDefinition = function (qdef) {
+    $.each(self.qdefinitions(), function (index, qdefinition) {
+      if (qdefinition.id() == qdef.id()) {
+        self.qdefinitions.remove(qdefinition);
+        return false;
+      }
+    });
+  }
+  
+  self.loadQDefinition = function(qdefinition) {
+	var qdef = ko.mapping.fromJSON(qdefinition.data());
+
+	vm.query.uuid(qdef.uuid());
+	vm.query.qs(qdef.qs());
+	vm.query.fqs(qdef.fqs());
+	vm.query.start(qdef.start());
+	vm.query.selectedMultiq(qdef.selectedMultiq());
+
+	vm.search();
+  }
+ 
   self.addFacet = function (facet_json) {
     self.removeFacet(function(){return facet_json.widget_id});
     logGA('add_facet/' + facet_json.widgetType);

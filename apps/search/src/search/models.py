@@ -502,6 +502,9 @@ class Collection2(object):
         properties['facets'] = []
         properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
 
+    if 'qdefinitions' not in props['collection']:
+      props['collection']['qdefinitions'] = []
+
     return json.dumps(props)
 
   def get_default(self, user, name):
