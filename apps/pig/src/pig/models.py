@@ -84,6 +84,12 @@ class PigScript(Document):
     return ('org.apache.hcatalog.pig.HCatStorer' in script or 'org.apache.hcatalog.pig.HCatLoader' in script) or \
         ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script) # New classes
 
+  @property
+  def use_hbase(self):
+    script = self.dict['script']
+    return 'org.apache.pig.backend.hadoop.hbase.HBaseStorage' in script
+
+
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)

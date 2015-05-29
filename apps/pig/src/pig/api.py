@@ -110,7 +110,10 @@ class OozieApi(object):
     )
 
     if pig_script.use_hcatalog and self.oozie_api.security_enabled:
-      action.credentials = [{'name': 'hcat', 'value': True}]
+      action.credentials.append([{'name': 'hcat', 'value': True}])
+      action.save()
+    if pig_script.use_hbase and self.oozie_api.security_enabled:
+      action.credentials.append([{'name': 'hbase', 'value': True}])
       action.save()
 
     action.add_node(workflow.end)
