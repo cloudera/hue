@@ -61,7 +61,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     &nbsp;&nbsp;&nbsp;
 
-    <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit">
+    <a title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: validateAndSave, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit">
       <i class="fa fa-fw fa-save"></i>
     </a>
 
@@ -547,8 +547,33 @@ ${ dashboard.import_bindings() }
     $(document).trigger("drawArrows");
   }
 
+  function validateAndSave() {
+    validateFields();
+    viewModel.save();
+  }
+
+  function validateFields() {
+    var _hasErrors = false;
+    $("[validate]").each(function () {
+      if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
+        $(this).addClass("with-errors");
+        //$(this).next(".btn").addClass("btn-danger");
+        _hasErrors = true;
+      }
+      else {
+        $(this).removeClass("with-errors");
+        //$(this).next(".btn").removeClass("btn-danger");
+      }
+    });
+    viewModel.isInvalid(_hasErrors);
+  }
+
   $(document).ready(function(){
     renderChangeables();
+
+    $(document).on("viewmodelHasChanged", function () {
+      validateFields();
+    });
 
     $("#exposeOverlay").on("click", exposeOverlayClickHandler);
 

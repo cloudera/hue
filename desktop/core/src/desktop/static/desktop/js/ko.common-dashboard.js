@@ -291,6 +291,7 @@ function ChangeTracker(objectToTrack, hashFunction) {
 
   var result = {
     somethingHasChanged: ko.dependentObservable(function () {
+      $(document).trigger("viewmodelHasChanged");
       return hashFunction(objectToTrack) != lastCleanState()
     }),
     markCurrentStateAsClean: function () {
