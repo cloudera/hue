@@ -1826,6 +1826,9 @@ function prettifyDateRange(from, to, widget, withCommon) {
 
     var _minMaxDiff = moment(to).diff(moment(from), 'seconds');
     var _format = "YYYY-MM-DD HH:mm:ss".substr(0, _lastEqual);
+    if (_format.length == 13){
+      _format += ":mm"; // hours without minutes are weird
+    }
     var _formatWithCommon = _format.substring(10, _format.length);
     var _common = "YYYY-MM-DD";
     if (widget && widget.properties && widget.properties.min && widget.properties.min()) {
@@ -1839,7 +1842,7 @@ function prettifyDateRange(from, to, widget, withCommon) {
       _format = getFormat(_format, _minMaxDiff, widget);
     }
 
-    return ((_common != "" && withCommon) ? _mFrom.utc().format(_common) + "&nbsp;" : "") + _mFrom.utc().format(withCommon ? _formatWithCommon : _format) + " <i class='fa fa-long-arrow-right'></i> " + _mTo.utc().format(withCommon ? _formatWithCommon : _format);
+    return ((_common != "" && withCommon) ? _mFrom.utc().format(_common) + "&nbsp;" : "") + _mFrom.utc().format(withCommon ? _formatWithCommon : _format) + " <i class='fa fa-long-arrow-right'></i> " + ((_common != "" && withCommon) ? _mTo.utc().format(_common) + "&nbsp;" : "") + _mTo.utc().format(withCommon ? _formatWithCommon : _format);
   }
   else {
     return from + " - " + to;
@@ -1856,10 +1859,7 @@ function getFormat(format, minMaxDiff, widget) {
       format = format.substring(10, format.length);
     }
   }
-  if (minMaxDiff > 86400 && minMaxDiff <= 2592000) { // max 1 month
-    format = format.substring(8, format.length);
-  }
-  if (minMaxDiff > 2592000 && minMaxDiff <= 22464000) { //360 days
+  if (minMaxDiff > 86400 && minMaxDiff <= 22464000) { // max 360 days
     format = format.substring(5, format.length);
   }
   if (minMaxDiff > 22464000){
