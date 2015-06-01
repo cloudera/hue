@@ -379,8 +379,8 @@ class SolrApi(object):
     params += (
       ('hl', 'true'),
       ('hl.fl', '*'),
-      ('hl.snippets', 3),
-      ('hl.fragsize', 0),
+      ('hl.snippets', 5),
+      ('hl.fragsize', 1000),
     )
 
     if collection['template']['fieldsSelected']:
