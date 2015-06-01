@@ -474,6 +474,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   };
   self.isSaving = ko.observable(false);
 
+  self.isInvalid = ko.observable(false);
   self.isRunning = ko.observable(false);
 
   self.newAction = ko.observable();

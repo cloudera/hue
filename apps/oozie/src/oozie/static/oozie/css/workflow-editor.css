@@ -285,3 +285,16 @@ ul.unstyled li {
 .widget-running {
   opacity: .5;
 }
+
+.airy {
+  margin-bottom: 3px;
+}
+
+.widget-label {
+  display: inline-block;
+  width: 80px;
+}
+
+.widget-label-large {
+  width: 90px;
+}
