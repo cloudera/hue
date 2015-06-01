@@ -1608,13 +1608,10 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="time-fixed-filter">
   <span data-bind="visible: $root.availableDateFields().length > 0" class="muted" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal" style="cursor:pointer">
-    &nbsp;<span data-bind="text: moment($root.collection.timeFilter.from()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
+    &nbsp;
+    <span data-bind="text: moment($root.collection.timeFilter.from()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
     <i class="fa fa-long-arrow-right"></i>
     <span data-bind="text: moment($root.collection.timeFilter.to()).utc().format('YYYY-MM-DD HH:mm:SS')"></span>
-    &nbsp;
-    <a class="btn pointer" title="${ _('Time Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#timeSettingsDemiModal">
-      <i class="fa fa-calendar"></i>
-    </a>    
   </span>
 </script>
 
@@ -2308,6 +2305,11 @@ $(document).ready(function () {
     return false;
   });
   % endif
+  $(window).bind("keydown", "esc", function () {
+    if ($(".demi-modal.fade.in").length > 0) {
+      $(".demi-modal.fade.in .demi-modal-chevron").click();
+    }
+  });
 });
 
   function showShareModal() {

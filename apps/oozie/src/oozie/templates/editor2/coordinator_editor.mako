@@ -536,6 +536,8 @@ ${ dashboard.import_bindings() }
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
+
 
 <script type="text/javascript">
   ${ utils.slaGlobal() }
@@ -654,6 +656,11 @@ ${ dashboard.import_bindings() }
   $(document).ready(function() {
     $("#chooseWorkflowDemiModal").modal({
       show: false
+    });
+    $(window).bind("keydown", "esc", function () {
+      if ($(".demi-modal.fade.in").length > 0) {
+        $(".demi-modal.fade.in .demi-modal-chevron").click();
+      }
     });
   });
 </script>
