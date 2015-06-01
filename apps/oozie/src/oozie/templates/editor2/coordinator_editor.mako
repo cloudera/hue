@@ -297,9 +297,9 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                   <span data-bind="visible: dataset_variable().length == 0">
                     e.g. /data/${'$'}{YEAR}/${'$'}{MONTH}/${'$'}{DAY}
                   </span>
-                  <span data-bind="visible: dataset_variable().length > 0">
+                  <span data-bind="visible: dataset_variable().length > 0 && instance_choice() != 'range'">
                     ${ _('Will convert to') }
-                    <a target="_blank" data-bind="text: convertVariables(dataset_variable()), attr: {'href': '/filebrowser/view' + convertVariables(dataset_variable())}"></a>
+                    <a target="_blank" data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice()), attr: {'href': '/filebrowser/view' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice())}"></a>
                   </span>
                   </a>
                 </span>
@@ -572,9 +572,48 @@ ${ dashboard.import_bindings() }
     return (value < 10 ? '0':'') + value;
   }
 
-  function convertVariables(path) {
+  function convertDatasetVariables(path, hasSameStart, customStart, hasSameFrequency, customFrequencyUnit, startInstance, instanceChoice) {
     var _startDate = moment(viewModel.coordinator.start_date.value()).utc();
-    if (_startDate.isValid()){
+    if (!hasSameStart) {
+      _startDate = moment(customStart).utc();
+    }
+
+    var _startDiffObj = {
+      qty: 0,
+      freq: "minutes"
+    };
+    if (startInstance != 0 && instanceChoice == "single") {
+      _startDiffObj.qty = startInstance;
+      if (hasSameFrequency) {
+        var _freqs = $.trim(viewModel.coordinator.properties.cron_frequency()).split(" ");
+        if (_freqs.length >= 5) {
+          if (_freqs[_freqs.length - 1] == "*") {
+            _startDiffObj.freq = "years";
+          }
+          if (_freqs[_freqs.length - 2] == "*") {
+            _startDiffObj.freq = "months";
+          }
+          if (_freqs[_freqs.length - 3] == "*") {
+            _startDiffObj.freq = "days";
+          }
+          if (_freqs[_freqs.length - 4] == "*") {
+            _startDiffObj.freq = "hours";
+          }
+          if (_freqs[_freqs.length - 5] == "*") {
+            _startDiffObj.freq = "minutes";
+          }
+        }
+        else {
+          _startDiffObj.qty = 0;
+        }
+      }
+      else {
+        _startDiffObj.freq = customFrequencyUnit;
+      }
+    }
+
+    if (_startDate.isValid()) {
+      _startDate = _startDate.add(_startDiffObj.qty, _startDiffObj.freq);
       path = path.replace(/\${'$'}{YEAR}/gi, _startDate.year());
       path = path.replace(/\${'$'}{MONTH}/gi, zeroPadding((_startDate.month() + 1)));
       path = path.replace(/\${'$'}{DAY}/gi, zeroPadding(_startDate.date()));
