@@ -65,7 +65,7 @@ nv.models.growingDiscreteBarChart = function() {
   //------------------------------------------------------------
 
   var showTooltip = function(e, offsetElement) {
-    var left = e.pos[0] + ( offsetElement.offsetLeft || 0 ),
+    var left = e.e.clientX,
         top = e.pos[1] + ( offsetElement.offsetTop || 0),
         x = xAxis.tickFormat()(discretebar.x()(e.point, e.pointIndex)),
         y = yAxis.tickFormat()(discretebar.y()(e.point, e.pointIndex)),
