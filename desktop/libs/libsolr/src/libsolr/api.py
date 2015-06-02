@@ -212,6 +212,7 @@ class SolrApi(object):
               value = values[fields.index(field)]
               exclude = '-' if _filter['exclude'] else ''
               if value is not None and ' ' in smart_str(value):
+                value = smart_str(value).replace('"', '\\"')
                 f.append('%s%s:"%s"' % (exclude, field, value))
               else:
                 f.append('%s{!field f=%s}%s' % (exclude, field, value))
