@@ -512,3 +512,12 @@ em {
 .datepicker {
   z-index: 1051;
 }
+
+.qdefinitions {
+  margin-top: 5px;
+}
+
+.qdefinitions li {
+  display: inline;
+  margin-right: 10px;
+}

@@ -121,6 +121,11 @@
 
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
+    <!-- ko if: $root.additionalInfo && $root.additionalInfo() != "" -->
+    <div class="row-fluid">
+      <div class="card card-additional card-home span12" data-bind="html: $root.additionalInfo"></div>
+    </div>
+    <!-- /ko -->
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
     </div>
     <div class="clearfix"></div>

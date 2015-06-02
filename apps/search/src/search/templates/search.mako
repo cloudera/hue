@@ -1607,22 +1607,31 @@ ${ dashboard.layout_skeleton() }
         <form class="form-horizontal">
           <fieldset>
             <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }</legend>
-            <div class="control-group" data-bind="foreach: $root.collection.qdefinitions">
-              <label class="control-label" for="settingsdescription">${ _('Definition') }</label>
+            <div class="control-group">
+              <label class="control-label" for="newqname">${ _('New defition') }</label>
               <div class="controls">
-                <span data-bind="text: ko.mapping.toJSON(name)"></span>
-                <span data-bind="text: ko.mapping.toJSON(data), click: $root.collection.loadQDefinition"></span>
-                <a href="javascript: void(0)" data-bind="click: $root.collection.removeQDefinition">
-                  <i class="fa fa-times"></i>
-                </a>
+                <div class="input-append">
+                  <input id="newqname" type="text" class="input-xlarge" data-bind="value: $root.collection.newQDefinitionName" style="margin-bottom: 0" placeholder="${ _('Name') }" />
+                  <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition">
+                    <i class="fa fa-plus"></i>
+                  </a>
+                </div>
               </div>
-              </br>
+            </div>
+            <div class="control-group" data-bind="visible: $root.collection.qdefinitions().length > 0">
+              <label class="control-label" for="settingsdescription">${ _('Saved definitions') }</label>
+              <div class="controls">
+                <ul class="unstyled airy qdefinitions" data-bind="foreach: $root.collection.qdefinitions">
+                  <li>
+                    <span class="badge badge-info badge-left pointer">
+                      <i class="fa fa-bookmark"></i> <span data-bind="text: name, attr:{'title': ko.mapping.toJSON(data, null, 2)}, click: $root.collection.loadQDefinition"></span>
+                    </span><span class="badge badge-right trash-share" data-bind="click: $root.collection.removeQDefinition"> <i class="fa fa-times"></i></span></li>
+                  </li>
+                </ul>
+              </div>
             </div>
           </fieldset>
 
-          <button title="${ _('Click on this button to add the field') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition">
-            <i class="fa fa-plus"></i>
-          </button>
         </form>
       </div>
     </div>

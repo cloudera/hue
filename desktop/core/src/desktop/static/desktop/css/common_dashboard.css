@@ -48,7 +48,7 @@
   background-color: #FFF;
 }
 
-.card-column {
+.card-column, .card-additional {
   border: none;
 }
 
@@ -435,4 +435,9 @@ body.modal-open {
 .logs-icon {
   font-size: 20px;
   margin-right: 17px;
+}
+
+.card-additional {
+  padding: 10px;
+  margin-bottom: 10px;
 }
