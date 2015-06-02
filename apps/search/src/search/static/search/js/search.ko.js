@@ -532,14 +532,17 @@ var Collection = function (vm, collection) {
 
   self.selectedDocument = ko.observable({});
 
-  self.addQDefinition = function() {
+  self.newQDefinitionName = ko.observable("");
+
+  self.addQDefinition = function () {
     self.qdefinitions.push(
-      ko.mapping.fromJS({
-        'name': 'new name',
-        'id': UUID(),
-        'data': ko.mapping.toJSON(vm.query)
-      })
+        ko.mapping.fromJS({
+          'name': self.newQDefinitionName(),
+          'id': UUID(),
+          'data': ko.mapping.toJSON(vm.query)
+        })
     );
+    self.newQDefinitionName("");
   };
 
   self.removeQDefinition = function (qdef) {
@@ -550,17 +553,18 @@ var Collection = function (vm, collection) {
       }
     });
   }
-  
-  self.loadQDefinition = function(qdefinition) {
-	var qdef = ko.mapping.fromJSON(qdefinition.data());
 
-	vm.query.uuid(qdef.uuid());
-	vm.query.qs(qdef.qs());
-	vm.query.fqs(qdef.fqs());
-	vm.query.start(qdef.start());
-	vm.query.selectedMultiq(qdef.selectedMultiq());
+  self.loadQDefinition = function (qdefinition) {
+    var qdef = ko.mapping.fromJSON(qdefinition.data());
 
-	vm.search();
+    vm.query.uuid(qdef.uuid());
+    vm.query.qs(qdef.qs());
+    vm.query.fqs(qdef.fqs());
+    vm.query.start(qdef.start());
+    vm.query.selectedMultiq(qdef.selectedMultiq());
+
+    vm.additionalInfo("<div class='center'><strong>" + qdefinition.name() + "</strong></div>");
+    vm.search();
   }
  
   self.addFacet = function (facet_json) {
@@ -1046,6 +1050,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.initial = new NewTemplate(self, initial_json);
 
   // UI
+  self.additionalInfo = ko.observable("");
   self.response = ko.observable({});
   self.results = ko.observableArray([]);
   self.resultsHash = '';
