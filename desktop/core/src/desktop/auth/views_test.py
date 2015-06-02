@@ -151,7 +151,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
-    assert_equal('LDAP1', User.objects.all()[0].username)
+    assert_equal('ldap1', User.objects.all()[0].username)
 
     self.c.logout()
 
@@ -161,7 +161,7 @@ class TestLdapLogin(PseudoHdfsTestBase):
     })
     assert_equal(302, response.status_code, "Expected ok redirect status.")
     assert_equal(1, len(User.objects.all()))
-    assert_equal('LDAP1', User.objects.all()[0].username)
+    assert_equal('ldap1', User.objects.all()[0].username)
 
   def test_login_force_lower_case(self):
     self.reset.append(conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))

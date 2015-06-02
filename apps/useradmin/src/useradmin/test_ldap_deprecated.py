@@ -427,14 +427,14 @@ def test_useradmin_ldap_user_integration():
     # Test lower case
     User.objects.filter(username__iexact='Rock').delete()
     import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
-    assert_true(User.objects.filter(username='Rock').exists())
-    assert_false(User.objects.filter(username='rock').exists())
+    assert_false(User.objects.filter(username='Rock').exists())
+    assert_true(User.objects.filter(username='rock').exists())
 
     done.append(desktop.conf.LDAP.FORCE_USERNAME_LOWERCASE.set_for_testing(True))
 
     import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
-    assert_true(User.objects.filter(username='Rock').exists())
-    assert_false(User.objects.filter(username='rock').exists())
+    assert_false(User.objects.filter(username='Rock').exists())
+    assert_true(User.objects.filter(username='rock').exists())
 
     User.objects.filter(username='Rock').delete()
     import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'Rock', sync_groups=False, import_by_dn=False)
