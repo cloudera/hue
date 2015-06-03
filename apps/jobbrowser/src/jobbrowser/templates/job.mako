@@ -528,18 +528,18 @@ $(document).ready(function () {
     $("#jobStatus").html('<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="fa fa-briefcase fa fa-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>');
     var _title = "";
     if (job.desiredMaps > 0) {
-      $("#jobMaps").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>'));
+      $("#jobMaps").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>'));
       _title += "M " + job.mapsPercentComplete + "%";
     }
     else {
-      $("#jobMaps").html('${_('N/A')}');
+      $("#jobMaps").html('${_('0/0')}');
     }
     if (job.desiredReduces > 0) {
-      $("#jobReduces").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.isMR2 ? job.reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>'));
+      $("#jobReduces").html((job.isRetired ? '${_('N/A')}' : '<div class="progress" style="width:100px" title="' + (job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + job.reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.reducesPercentComplete + '%"></div></div>'));
       _title += " R " + job.reducesPercentComplete + "%";;
     }
     else {
-      $("#jobReduces").html('${_('N/A')}');
+      $("#jobReduces").html('${_('0/0')}');
     }
     if (_title != ""){
       $.jHueTitleUpdater.set(_title);
