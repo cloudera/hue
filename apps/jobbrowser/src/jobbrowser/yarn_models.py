@@ -140,6 +140,22 @@ class Job(object):
 
     self._fixup()
 
+    # Set MAPS/REDUCES completion percentage
+    if hasattr(self, 'mapsTotal'):
+      self.desiredMaps = self.mapsTotal
+      if self.desiredMaps == 0:
+        self.maps_percent_complete = 0
+      else:
+        self.maps_percent_complete = int(round(float(self.finishedMaps) / self.desiredMaps * 100))
+
+    if hasattr(self, 'reducesTotal'):
+      self.desiredReduces = self.reducesTotal
+      if self.desiredReduces == 0:
+        self.reduces_percent_complete = 0
+      else:
+        self.reduces_percent_complete = int(round(float(self.finishedReduces) / self.desiredReduces * 100))
+
+
   def _fixup(self):
     jobid = self.id
 
@@ -154,9 +170,9 @@ class Job(object):
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'finishedMaps', self.mapsCompleted)
-    setattr(self, 'desiredMaps', None)
+    setattr(self, 'desiredMaps', 0)
     setattr(self, 'finishedReduces', self.reducesCompleted)
-    setattr(self, 'desiredReduces', None)
+    setattr(self, 'desiredReduces', 0)
     setattr(self, 'applicationType', 'MR2')
 
   def kill(self):
@@ -220,9 +236,9 @@ class KilledJob(Job):
 
   def _fixup(self):
     if not hasattr(self, 'mapsCompleted'):
-      setattr(self, 'mapsCompleted', 1)
+      setattr(self, 'mapsCompleted', 0)
     if not hasattr(self, 'reducesCompleted'):
-      setattr(self, 'reducesCompleted', 1)
+      setattr(self, 'reducesCompleted', 0)
 
   @property
   def counters(self):
