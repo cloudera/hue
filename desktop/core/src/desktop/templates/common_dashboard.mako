@@ -121,9 +121,16 @@
 
 <div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
   <div class="container-fluid">
-    <!-- ko if: $root.additionalInfo && $root.additionalInfo() != "" -->
+    <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">
-      <div class="card card-additional card-home span12" data-bind="html: $root.additionalInfo"></div>
+      <div class="card card-additional card-home span12">
+        <a class="pointer pull-right" data-bind="click: $root.collection.unloadQDefinition"><i class="fa fa-times"></i></a>
+        <strong data-bind="editable: $root.selectedQDefinition().name, editableOptions: {enabled: true, placement: 'right'}"></strong>
+        <!-- ko if: $root.selectedQDefinition().hasChanged() -->
+        &nbsp;&nbsp;
+        <a class="pointer" data-bind="click: $root.collection.reloadQDefinition" title="${ _('Reload this definition') }"><i class="fa fa-undo"></i></a> <a class="pointer" data-bind="click: $root.collection.updateQDefinition" title="${ _('Update the definition') }"><i class="fa fa-save"></i></a>
+        <!-- /ko -->
+      </div>
     </div>
     <!-- /ko -->
     <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
