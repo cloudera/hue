@@ -54,11 +54,6 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
         data-bind="css: {'btn': true}, visible: columns().length != 0">
       <i class="fa fa-bookmark-o"></i>
     </a>
-    <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;</span>
-
-    <a class="btn pointer" title="${ _('Share search definition') }" rel="tooltip" data-placement="bottom" data-bind="click: showShareModal, css: {'btn': true}, visible: columns().length != 0, enable: $root.collection.id() != null">
-      <i class="fa fa-link"></i>
-    </a>
 
     <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;&nbsp;</span>
 
@@ -1531,21 +1526,6 @@ ${ dashboard.layout_skeleton() }
   </table>
 </script>
 
-<div id="shareModal" class="modal hide" data-backdrop="true">
-  <div class="modal-header">
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <h3>${_('Share this dashboard definition')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>${_('The following URL will show the current dashboard and its applied filters.')}</p>
-    <input type="text" style="width: 540px" />
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
-  </div>
-</div>
-
-
 <div id="addFacetDemiModal" class="demi-modal fade" data-backdrop="false">
   <div class="modal-body">
     <a href="javascript: void(0)" data-dismiss="modal" data-bind="click: addFacetDemiModalFieldCancel" class="pull-right"><i class="fa fa-times"></i></a>
@@ -1604,30 +1584,30 @@ ${ dashboard.layout_skeleton() }
   <div class="modal-body">
     <div class="row-fluid">
       <div class="span12">
-        <form class="form-horizontal">
+        <form class="form-inline">
           <fieldset>
-            <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }</legend>
-            <div class="control-group">
-              <label class="control-label" for="newqname">${ _('New defition') }</label>
-              <div class="controls">
-                <div class="input-append">
-                  <input id="newqname" type="text" class="input-xlarge" data-bind="value: $root.collection.newQDefinitionName" style="margin-bottom: 0" placeholder="${ _('Name') }" />
-                  <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition">
-                    <i class="fa fa-plus"></i>
-                  </a>
-                </div>
+            <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }
+              <div class="input-append" style="margin-left: 30px; margin-top: 4px">
+                <input id="newqname" type="text" class="input-xxlarge" data-bind="value: $root.collection.newQDefinitionName, valueUpdate:'afterkeydown'" style="margin-bottom: 0" placeholder="${ _('Add current query as...') }" />
+                <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css:{'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">
+                  <i class="fa fa-plus"></i>
+                </a>
               </div>
-            </div>
-            <div class="control-group" data-bind="visible: $root.collection.qdefinitions().length > 0">
-              <label class="control-label" for="settingsdescription">${ _('Saved definitions') }</label>
+            </legend>
+            <div class="control-group" data-bind="visible: $root.collection.qdefinitions().length > 0" style="margin-top: 0">
               <div class="controls">
                 <ul class="unstyled airy qdefinitions" data-bind="foreach: $root.collection.qdefinitions">
                   <li>
                     <span class="badge badge-info badge-left pointer">
-                      <i class="fa fa-bookmark"></i> <span data-bind="text: name, attr:{'title': ko.mapping.toJSON(data, null, 2)}, click: $root.collection.loadQDefinition"></span>
+                      <span data-bind="text: name, attr:{'title': ko.mapping.toJSON(data, null, 2)}, click: $root.collection.loadQDefinition"></span>
                     </span><span class="badge badge-right trash-share" data-bind="click: $root.collection.removeQDefinition"> <i class="fa fa-times"></i></span></li>
                   </li>
                 </ul>
+              </div>
+            </div>
+            <div class="control-group" data-bind="visible: $root.collection.qdefinitions().length == 0">
+              <div class="controls">
+                <h4>${ _('There are currently no query definitions.') }</h4>
               </div>
             </div>
           </fieldset>
@@ -2356,37 +2336,28 @@ $(document).ready(function () {
       $(".demi-modal.fade.in .demi-modal-chevron").click();
     }
   });
-});
 
-  function showShareModal() {
-    if (window.location.search.indexOf("collection") == -1 && window.location.hash.indexOf("collection") == -1) {
-      $(document).trigger("error", "${_('The current collection must be saved to be shared.')}");
+  $("#newqname").bind("keydown", "return", function (e) {
+    e.preventDefault();
+    viewModel.collection.addQDefinition();
+  });
+
+  $(document).on("loadedQDefinition", function() {
+    if ($(".demi-modal.fade.in").length > 0) {
+      $(".demi-modal.fade.in .demi-modal-chevron").click();
     }
-    else {
-      $("#shareModal input[type='text']").on("focus", function () {
-        this.select();
-      });
-      if (!window.location.origin) {
-        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ":" + window.location.port: "");
-      }
-      var _search = window.location.search;
-      var _pathname = window.location.pathname;
-      if (_pathname.indexOf("${ url('search:new_search') }") > -1) {
-        _pathname = "${ url('search:index') }";
-      }
-      if (_search == "" && window.location.hash.indexOf("collection") > -1) {
-        _search = "?" + window.location.hash.substr(1);
-      }
+  });
 
-      if (_search != "") {
-        $("#shareModal input[type='text']").val(window.location.origin + _pathname + _search + "#" + LZString.compressToBase64(ko.mapping.toJSON(viewModel.query))).focus();
-        $("#shareModal").modal("show");
-      }
-      else {
-        $(document).trigger("error", "${_('The current collection cannot be shared.')}");
+  if (window.location.hash != "") {
+    if (window.location.hash.indexOf("q=") > -1) {
+      var _qdef = viewModel.collection.getQDefinition(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "").split("=")[1]);
+      if (_qdef != null){
+        viewModel.collection.loadQDefinition(_qdef);
       }
     }
   }
+});
+
 
   function toggleGridFieldsSelection() {
     if (viewModel.collection.template.fields().length > 0) {

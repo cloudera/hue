@@ -54,6 +54,11 @@ var Query = function (vm, query) {
 
   self.uuid = ko.observable(typeof query.uuid != "undefined" && query.uuid != null ? query.uuid : UUID());
   self.qs = ko.mapping.fromJS(query.qs);
+  self.qs.subscribe(function(){
+    if (vm.selectedQDefinition() != null){
+      vm.selectedQDefinition().hasChanged(true);
+    }
+  });
   self.fqs = ko.mapping.fromJS(query.fqs);
   self.start = ko.mapping.fromJS(query.start);
 
@@ -98,10 +103,16 @@ var Query = function (vm, query) {
 
   self.addQ = function (data) {
     self.qs.push(ko.mapping.fromJS({'q': ''}));
+    if (vm.selectedQDefinition() != null) {
+      vm.selectedQDefinition().hasChanged(true);
+    }
   };
 
   self.removeQ = function (query) {
     self.qs.remove(query);
+    if (vm.selectedQDefinition() != null){
+      vm.selectedQDefinition().hasChanged(true);
+    }
   };
 
   self.selectedMultiq.subscribe(function () { // To keep below the computed objects!
@@ -132,6 +143,10 @@ var Query = function (vm, query) {
           }
         }
       });
+    }
+
+    if (vm.selectedQDefinition() != null){
+      vm.selectedQDefinition().hasChanged(true);
     }
 
     self.start(0);
@@ -196,6 +211,10 @@ var Query = function (vm, query) {
       }
     }
 
+    if (vm.selectedQDefinition() != null){
+      vm.selectedQDefinition().hasChanged(true);
+    }
+
     self.start(0);
     if (data.no_refresh == undefined) {
       vm.search();
@@ -251,6 +270,10 @@ var Query = function (vm, query) {
       if (fq.filter().length == 0) {
         self.removeFilter(ko.mapping.fromJS({'id': data.widget_id}));
       }
+    }
+
+    if (vm.selectedQDefinition() != null){
+      vm.selectedQDefinition().hasChanged(true);
     }
 
     self.start(0);
@@ -535,14 +558,16 @@ var Collection = function (vm, collection) {
   self.newQDefinitionName = ko.observable("");
 
   self.addQDefinition = function () {
-    self.qdefinitions.push(
-        ko.mapping.fromJS({
-          'name': self.newQDefinitionName(),
-          'id': UUID(),
-          'data': ko.mapping.toJSON(vm.query)
-        })
-    );
-    self.newQDefinitionName("");
+    if ($.trim(self.newQDefinitionName()) != "") {
+      var _def = ko.mapping.fromJS({
+        'name': $.trim(self.newQDefinitionName()),
+        'id': UUID(),
+        'data': ko.mapping.toJSON(vm.query)
+      });
+      self.qdefinitions.push(_def);
+      self.loadQDefinition(_def);
+      self.newQDefinitionName("");
+    }
   };
 
   self.removeQDefinition = function (qdef) {
@@ -556,15 +581,53 @@ var Collection = function (vm, collection) {
 
   self.loadQDefinition = function (qdefinition) {
     var qdef = ko.mapping.fromJSON(qdefinition.data());
-
     vm.query.uuid(qdef.uuid());
     vm.query.qs(qdef.qs());
     vm.query.fqs(qdef.fqs());
     vm.query.start(qdef.start());
     vm.query.selectedMultiq(qdef.selectedMultiq());
 
-    vm.additionalInfo("<div class='center'><strong>" + qdefinition.name() + "</strong></div>");
+    qdefinition.hasChanged = ko.observable(false);
+    vm.selectedQDefinition(qdefinition);
     vm.search();
+    $(document).trigger("loadedQDefinition");
+  }
+
+  self.reloadQDefinition = function () {
+    self.loadQDefinition(vm.selectedQDefinition());
+    vm.selectedQDefinition().hasChanged(false);
+  }
+
+  self.updateQDefinition = function () {
+    for (var i = 0; i < self.qdefinitions().length; i++) {
+      if (self.qdefinitions()[i].id() == vm.selectedQDefinition().id()) {
+        self.qdefinitions()[i].data(ko.mapping.toJSON(vm.query));
+        break;
+      }
+    }
+    vm.selectedQDefinition().hasChanged(false);
+  }
+
+  self.unloadQDefinition = function () {
+    vm.selectedQDefinition(null);
+    vm.query.uuid(null);
+    vm.query.qs([
+      {
+        q: ""
+      }
+    ]);
+    vm.query.fqs([]);
+    vm.query.start(0);
+    vm.query.selectedMultiq([]);
+  }
+
+  self.getQDefinition = function (qDefID) {
+    for (var i = 0; i < self.qdefinitions().length; i++) {
+      if (self.qdefinitions()[i].id() == qDefID) {
+        return self.qdefinitions()[i];
+      }
+    }
+    return null;
   }
  
   self.addFacet = function (facet_json) {
@@ -1050,7 +1113,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.initial = new NewTemplate(self, initial_json);
 
   // UI
-  self.additionalInfo = ko.observable("");
+  self.selectedQDefinition = ko.observable();
   self.response = ko.observable({});
   self.results = ko.observableArray([]);
   self.resultsHash = '';
@@ -1188,6 +1251,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     $(".jHueNotify").hide();
     logGA('search');
     self.isRetrievingResults(true);
+
+    if (self.selectedQDefinition() != null) {
+      var _prop = ko.mapping.fromJSON(self.selectedQDefinition().data());
+      if (ko.toJSON(_prop.qs()) != ko.mapping.toJSON(self.query.qs())
+          || ko.toJSON(_prop.selectedMultiq()) != ko.mapping.toJSON(self.query.selectedMultiq())) {
+        self.selectedQDefinition().hasChanged(true);
+      }
+    }
 
     // Multi queries
     var multiQs = [];
