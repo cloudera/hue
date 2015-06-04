@@ -48,9 +48,12 @@ def zkensemble():
   except:
     pass
 
-  from search.conf import SOLR_URL
-  parsed = urlparse(SOLR_URL.get())
-  return "%s:2181/solr" % (parsed.hostname or 'localhost')
+  try:
+    from search.conf import SOLR_URL
+    parsed = urlparse(SOLR_URL.get())
+    return "%s:2181/solr" % (parsed.hostname or 'localhost')
+  except:
+    pass
 
 
 
