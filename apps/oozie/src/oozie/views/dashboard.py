@@ -389,7 +389,8 @@ def list_oozie_coordinator(request, job_id):
   # Cross reference the submission history (if any)
   coordinator = get_history().get_coordinator_from_config(oozie_coordinator.conf_dict)
   try:
-    coordinator = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
+    if not ENABLE_V2.get():
+      coordinator = get_history().objects.get(oozie_job_id=job_id).job.get_full_node()
   except:
     LOG.exception("Ignoring error getting oozie job coordinator for job_id=%s", job_id)
 
