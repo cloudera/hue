@@ -611,7 +611,6 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         user.groups.remove(group)
       user.groups.add(*new_groups)
       Group.objects.filter(group__in=remove_groups_filtered).delete()
-#      remove_ldap_groups.delete()
 
   return imported_users
 
