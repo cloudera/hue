@@ -32,6 +32,7 @@ from django.core import urlresolvers
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
+from desktop import appmanager
 from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
@@ -105,7 +106,8 @@ def list_designs(request):
     return render("designs.mako", request, {
       'currentuser': request.user,
       'owner': owner,
-      'name': name
+      'name': name,
+      'apps': appmanager.get_apps_dict()
     })
 
 
