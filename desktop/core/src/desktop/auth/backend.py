@@ -455,7 +455,7 @@ class LdapBackend(object):
 
   def import_groups(self, server, user):
     connection = ldap_access.get_connection_from_server(server)
-    import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False)
+    import_ldap_users(connection, user.username, sync_groups=True, import_by_dn=False, server=server)
 
   @classmethod
   def manages_passwords_externally(cls):
