@@ -108,7 +108,8 @@ def jobs(request):
 
   if request.GET.get('format') == 'json':
     try:
-      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired)
+      # Limit number of jobs to be 10,000
+      jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired, limit=10000)
     except Exception, ex:
       ex_message = str(ex)
       if 'Connection refused' in ex_message or 'standby RM' in ex_message:
