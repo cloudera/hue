@@ -227,6 +227,8 @@ class YarnApi(JobBrowserApi):
       filters['user'] = kwargs['username']
     if kwargs['state'] and kwargs['state'] != 'all':
       filters['finalStatus'] = state_filters[kwargs['state']]
+    if kwargs.get('limit'):
+      filters['limit'] = kwargs['limit']
 
     json = self.resource_manager_api.apps(**filters)
     if type(json) == str and 'This is standby RM' in json:
