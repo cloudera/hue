@@ -544,7 +544,7 @@ var cron_i18n = {
     error2: '${_('Bad number of elements')}',
     error3: '${_('The jquery_element should be set into jqCron settings')}',
     error4: '${_('Unrecognized expression')}',
-    weekdays: ['${_('monday')}', '${_('tuesday')}', '${_('wednesday')}', '${_('thursday')}', '${_('friday')}', '${_('saturday')}', '${_('sunday')}'],
+    weekdays: ['${_('sunday')}', '${_('monday')}', '${_('tuesday')}', '${_('wednesday')}', '${_('thursday')}', '${_('friday')}', '${_('saturday')}'],
     months: ['${_('january')}', '${_('february')}', '${_('march')}', '${_('april')}', '${_('may')}', '${_('june')}', '${_('july')}', '${_('august')}', '${_('september')}', '${_('october')}', '${_('november')}', '${_('december')}']
 }
 function renderCrons() {
