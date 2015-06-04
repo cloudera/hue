@@ -522,7 +522,7 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   __groups_lock.release()
 
 
-def _import_ldap_users(connection, username_pattern, sync_groups=False, import_by_dn=False):
+def _import_ldap_users(connection, username_pattern, sync_groups=False, import_by_dn=False, server=None):
   """
   Import a user from LDAP. If import_by_dn is true, this will import the user by
   the distinguished name, rather than the configured username attribute.
@@ -532,10 +532,10 @@ def _import_ldap_users(connection, username_pattern, sync_groups=False, import_b
     LOG.warn("Could not get LDAP details for users with pattern %s" % username_pattern)
     return None
 
-  return _import_ldap_users_info(connection, user_info, sync_groups, import_by_dn)
+  return _import_ldap_users_info(connection, user_info, sync_groups, import_by_dn, server)
 
 
-def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_dn=False):
+def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_dn=False, server=None):
   """
   Import user_info found through ldap_access.find_users.
   """
@@ -570,27 +570,48 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
     imported_users.append(user)
 
     # sync groups
-    if sync_groups and 'groups' in ldap_info:
+    if sync_groups:
       old_groups = set(user.groups.all())
       new_groups = set()
-      # Skip if 'memberOf' or 'isMemberOf' are not set
-      for group_dn in ldap_info['groups']:
-        group_ldap_info = connection.find_groups(group_dn, find_by_dn=True, scope=ldap.SCOPE_BASE)
+      current_ldap_groups = set()
+
+      if 'groups' in ldap_info:
+        # Skip if 'memberOf' or 'isMemberOf' are not set
+        for group_dn in ldap_info['groups']:
+          group_ldap_info = connection.find_groups(group_dn, find_by_dn=True, scope=ldap.SCOPE_BASE)
+          for group_info in group_ldap_info:
+            if Group.objects.filter(name=group_info['name']).exists():
+              # Add only if user isn't part of group.
+              current_ldap_groups.add(Group.objects.get(name=group_info['name']))
+              if not user.groups.filter(name=group_info['name']).exists():
+                groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
+                if groups:
+                  new_groups.update(groups)
+      else:
+        # If 'memberOf' or 'isMemberOf' are not set, then might be posixAccount
+        ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
+        group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
+        group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
+        find_groups_filter = "(&(" + group_filter + ")(" + group_member_attr + "=" + ldap_info['username'] + "))"
+        group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
         for group_info in group_ldap_info:
-          # Add only if user isn't part of group.
-          if not user.groups.filter(name=group_info['name']).exists():
-            groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=True)
-            if groups:
-              new_groups.update(groups)
+          if Group.objects.filter(name=group_info['name']).exists():
+              # Add only if user isn't part of group.
+            current_ldap_groups.add(Group.objects.get(name=group_info['name']))
+            if not user.groups.filter(name=group_info['name']).exists():
+              groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
+              if groups:
+                new_groups.update(groups)
 
       # Remove out of date groups
-      remove_groups = old_groups - new_groups
+      remove_groups = old_groups - current_ldap_groups
       remove_ldap_groups = LdapGroup.objects.filter(group__in=remove_groups)
       remove_groups_filtered = [ldapgroup.group for ldapgroup in remove_ldap_groups]
-      user.groups.filter(group__in=remove_groups_filtered).delete()
+      for group in remove_groups_filtered:
+        user.groups.remove(group)
       user.groups.add(*new_groups)
       Group.objects.filter(group__in=remove_groups_filtered).delete()
-      remove_ldap_groups.delete()
+#      remove_ldap_groups.delete()
 
   return imported_users
 
@@ -832,8 +853,8 @@ def _import_ldap_groups(connection, groupname_pattern, import_members=False, rec
                                       import_by_dn=import_by_dn)
 
 
-def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn):
-  return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn)
+def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server):
+  return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server)
 
 
 def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn):
