@@ -116,12 +116,16 @@ ${ commonheader(None, "jobsub", user) | n,unicode }
             <li>
               <a href="#new-design/hive" class="new-node-link" title="${_('Create Hive design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Hive</a>
             </li>
+            % if 'pig' in apps:
             <li>
               <a href="#new-design/pig" class="new-node-link" title="${_('Create Pig design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Pig</a>
             </li>
+            % endif
+            % if 'sqoop' in apps:
             <li>
               <a href="#new-design/sqoop" class="new-node-link" title="${_('Create Sqoop design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Sqoop</a>
             </li>
+            % endif
             <li>
               <a href="#new-design/fs" class="new-node-link" title="${_('Create Fs design')}" rel="tooltip"><i class="fa fa-plus-circle"></i> Fs</a>
             </li>
