@@ -27,6 +27,12 @@
 <%def name="credentials(credentials)">${ ' cred="%s"' % ','.join(credentials) if credentials else '' | n,unicode }</%def>
 
 
+<%def name="retry_max(retry)">${ ' retry-max="%(value)s"' % retry[0] if retry else '' | n,unicode }</%def>
+
+
+<%def name="retry_interval(retry)">${ ' retry-interval="%(value)s"' % retry[0] if retry else '' | n,unicode }</%def>
+
+
 <%def name="prepares(prepares)">
         % if prepares:
             <prepare>

@@ -21,7 +21,7 @@
 
 <%namespace name="common" file="workflow-common.xml.mako" />
 
-    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }>
+    <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }${ common.retry_max(node['properties']['retry_max']) }${ common.retry_interval(node['properties']['retry_interval']) }>
         <fs>
             % for param in node['properties']['deletes']:
               <delete path='${ smart_path(param['value'], mapping) }'/>

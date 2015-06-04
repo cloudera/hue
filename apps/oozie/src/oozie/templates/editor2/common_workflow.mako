@@ -402,6 +402,32 @@
     </ul>
     <em data-bind="visible: properties.archives().length == 0">${ _('No archives defined.') }</em>
     <!-- /ko -->
+
+
+    <h6>${ _('Retry ') }</h6>
+    <a class="pointer" data-bind="click: function(){ properties.retry_max.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }, visible: properties.retry_max().length < 1">
+      ${ _('Max') } <i class="fa fa-plus"></i>
+    </a>
+    <a class="pointer" data-bind="click: function(){ properties.retry_interval.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }, visible: properties.retry_interval().length < 1">
+      ${ _('Interval') } <i class="fa fa-plus"></i>
+    </a>
+
+    <ul data-bind="visible: properties.retry_max().length > 0, foreach: properties.retry_max" class="unstyled">
+      <li>
+        ${ _('Max') } <input type="number" data-bind="value: value" placeholder="${ _('Number of times, default is 3') }"/>
+        <a href="#" data-bind="click: function(){ $parent.properties.retry_max.remove(this); $(document).trigger('drawArrows') }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
+    <ul data-bind="visible: properties.retry_interval().length > 0, foreach: properties.retry_interval" class="unstyled">
+      <li>
+        ${ _('Interval') } <input type="number" class="small" data-bind="value: value" placeholder="${ _('Wait time in minutes, default is 10') }"/>
+        <a href="#" data-bind="click: function(){ $parent.properties.retry_interval.remove(this); $(document).trigger('drawArrows') }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
   </div>
 </script>
 

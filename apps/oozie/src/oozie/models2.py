@@ -166,6 +166,13 @@ class Workflow(Job):
     if 'show_arrows' not in _data['workflow']['properties']:
       _data['workflow']['properties']['show_arrows'] = True
 
+    for node in _data['workflow']['nodes']:
+      if 'credentials' in node['properties']: # If node is an Action
+        if 'retry_max' not in node['properties']:
+          node['properties']['retry_max'] = []
+        if 'retry_interval' not in node['properties']:
+          node['properties']['retry_interval'] = []
+
     return _data
 
   def to_xml(self, mapping=None):
