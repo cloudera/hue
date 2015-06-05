@@ -587,34 +587,23 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
       new_groups = set()
       current_ldap_groups = set()
 
-      if 'groups' in ldap_info:
-        # Skip if 'memberOf' or 'isMemberOf' are not set
-        for group_dn in ldap_info['groups']:
-          group_ldap_info = connection.find_groups(group_dn, find_by_dn=True, scope=ldap.SCOPE_BASE)
-          for group_info in group_ldap_info:
-            if Group.objects.filter(name=group_info['name']).exists():
-              # Add only if user isn't part of group.
-              current_ldap_groups.add(Group.objects.get(name=group_info['name']))
-              if not user.groups.filter(name=group_info['name']).exists():
-                groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
-                if groups:
-                  new_groups.update(groups)
-      else:
-        # If 'memberOf' or 'isMemberOf' are not set, then might be posixAccount
-        ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
-        group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
-        group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
-        find_groups_filter = "(&(" + group_filter + ")(" + group_member_attr + "=" + ldap_info['username'] + "))"
-        group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
-        for group_info in group_ldap_info:
-          if Group.objects.filter(name=group_info['name']).exists():
-              # Add only if user isn't part of group.
-            current_ldap_groups.add(Group.objects.get(name=group_info['name']))
-            if not user.groups.filter(name=group_info['name']).exists():
-              groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
-              if groups:
-                new_groups.update(groups)
-
+      # If 'memberOf' or 'isMemberOf' are not set, then might be posixAccount
+      ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
+      group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
+      group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
+      # Search for groups based on group_member_attr=username and group_member_attr=dn
+      # covers AD, Standard Ldap and posixAcount/posixGroup
+      find_groups_filter = "(&(" + group_filter + ")(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+                           group_member_attr + "=" + ldap_info['dn'] + ")))"
+      group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
+      for group_info in group_ldap_info:
+        if Group.objects.filter(name=group_info['name']).exists():
+        # Add only if user isn't part of group.
+          current_ldap_groups.add(Group.objects.get(name=group_info['name']))
+          if not user.groups.filter(name=group_info['name']).exists():
+            groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
+            if groups:
+              new_groups.update(groups)
       # Remove out of date groups
       remove_groups = old_groups - current_ldap_groups
       remove_ldap_groups = LdapGroup.objects.filter(group__in=remove_groups)
