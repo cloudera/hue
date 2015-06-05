@@ -183,9 +183,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   % endif
                 </div>
                 <span class="btn-group pull-right" style="margin-right: 20px">
-                  <a class="btn btn-status btn-success" data-value="success" data-bind="click: function () { setFilter('succeeded'); }">${ _('Succeeded') }</a>
-                  <a class="btn btn-status btn-warning" data-value="warning" data-bind="click: function () { setFilter('running'); }">${ _('Running') }</a>
-                  <a class="btn btn-status btn-danger disable-feedback" data-value="important" data-bind="click: function () { setFilter('failed'); }">${ _('Failed') }</a>
+                  <a class="btn btn-status btn-success" data-table="calendar" data-value="SUCCEEDED">${ _('Succeeded') }</a>
+                  <a class="btn btn-status btn-warning" data-table="calendar" data-value="RUNNING">${ _('Running') }</a>
+                  <a class="btn btn-status btn-danger disable-feedback" data-table="calendar" data-value="ERROR">${ _('Error') }</a>
                 </span>
               </div>
 
@@ -237,6 +237,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 
             <div class="tab-pane" id="actions">
+              <span class="btn-group pull-right" style="margin-right: 20px;margin-bottom:20px">
+                <a class="btn btn-status btn-success" data-table="actions" data-value="SUCCEEDED">${ _('Succeeded') }</a>
+                <a class="btn btn-status btn-warning" data-table="actions" data-value="RUNNING">${ _('Running') }</a>
+                <a class="btn btn-status btn-danger disable-feedback" data-table="actions" data-value="ERROR">${ _('Error') }</a>
+              </span>
               <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
                 <thead>
                 <tr>
@@ -531,27 +536,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       }
     });
 
-    this.setFilter = function (filter) {
-      if (! Array.isArray(self.filter())) {
-        self.filter([]);
-      }
-
-      // checks to see if a button is toggled
-      if ($.inArray(filter, self.filter()) !== -1) {
-        // remove if already in array due to toggling of filter
-        self.filter.splice(self.filter.indexOf(filter), 1);
-        self.clearSelections(filter);
-        self.allSelected(false);
-      } else {
-        self.filter.push(filter)
-        self.select(filter);
-      }
-
-      if (self.selectedActions().length === self.actions().length) {
-        self.allSelected(true);
-      }
-    };
-
     this.filteredActions = ko.computed(function () {
       var filter = self.filter(),
         actions = [],
@@ -649,6 +633,17 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       % endif
     });
 
+    $("a.btn-status").click(function () {
+      var val = $(this).data("value")
+      var btnCalendar = $("a.btn-status[data-table='calendar'][data-value='"+ val + "']");
+      var btnAction = $("a.btn-status[data-table='actions'][data-value='"+ val + "']");
+
+      refreshActionsPagination();
+      btnCalendar.toggleClass("active");
+      btnAction.toggleClass("active");
+      refreshView();
+    });
+
     $("a.btn-actions-pagination").on("click", function () {
       if (!$(this).parent().hasClass("disabled")) {
         var _additionalOffset = 0;
@@ -729,6 +724,30 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       });
     });
 
+    function refreshActionsPagination() {
+      actionTableOffset = 1;
+    }
+
+    function getFilteredStatuses(type) {
+      var selectedStatuses = '';
+      var btnStatuses = [];
+      $.each($("a.btn-status.active[data-table='calendar']"), function () {
+        val = $(this).data('value');
+        if (val == 'SUCCEEDED') {
+          btnStatuses = btnStatuses.concat(['SUCCEEDED']);
+        } else if (val == 'RUNNING') {
+          btnStatuses = btnStatuses.concat(['RUNNING', 'READY', 'SUBMITTED', 'SUSPENDED', 'WAITING']);
+        } else if (val == 'ERROR') {
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'TIMEDOUT', 'IGNORED', 'SKIPPED']);
+        }
+      });
+
+      $.each(btnStatuses, function (iStatus, status) {
+        selectedStatuses += '&status=' + status;
+      });
+      return selectedStatuses;
+    }
+
     resizeLogs();
     refreshView();
     refreshLogs();
@@ -774,13 +793,24 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     }
 
     function refreshView() {
-      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "&offset=" + actionTableOffset, function (data) {
+      $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "&offset=" + actionTableOffset + getFilteredStatuses(), function (data) {
         viewModel.isLoading(false);
+
+        // Getting selected status from previous action list
+        updatedActionList = [];
         if (data != null && data.actions){
-          viewModel.actions(ko.utils.arrayMap(data.actions, function (action) {
-            return new Action(action);
-          }));
+          var prevActions = viewModel.actions();
+          $(data.actions).each(function (iAction, action) {
+            var actionItem = new Action(action);
+            $(prevActions).each(function (iPrev, prev) {
+              if (prev.id == actionItem.id) {
+                actionItem.selected(prev.selected());
+              }
+            });
+            updatedActionList.push(actionItem);
+          });
         }
+        viewModel.actions(updatedActionList);
 
         // Refresh actions pagination
         totalActions = data.total_actions;
