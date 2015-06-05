@@ -148,7 +148,7 @@ class MockOozieApi:
     else:
       return OozieWorkflow(self, {'id': job_id, 'actions': []})
 
-  def get_coordinator(self, job_id, action_offset=1):
+  def get_coordinator(self, job_id, **kwargs):
     if job_id in MockOozieApi.COORDINATOR_DICT:
       return OozieCoordinator(self, MockOozieApi.COORDINATOR_DICT[job_id])
     else:

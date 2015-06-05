@@ -383,8 +383,12 @@ def list_oozie_workflow(request, job_id):
 
 @show_oozie_error
 def list_oozie_coordinator(request, job_id):
-  actions_offset = request.GET.get('offset', 1)
-  oozie_coordinator = check_job_access_permission(request, job_id, actions_offset)
+  kwargs = {'cnt': 50, 'filters': []}
+  kwargs['offset'] = request.GET.get('offset', 1)
+  if request.GET.getlist('status'):
+      kwargs['filters'].extend([('status', status) for status in request.GET.getlist('status')])
+
+  oozie_coordinator = check_job_access_permission(request, job_id, **kwargs)
 
   # Cross reference the submission history (if any)
   coordinator = get_history().get_coordinator_from_config(oozie_coordinator.conf_dict)
@@ -979,7 +983,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
   return { 'jobs': jobs }
 
 
-def check_job_access_permission(request, job_id, actions_offset=1):
+def check_job_access_permission(request, job_id, **kwargs):
   """
   Decorator ensuring that the user has access to the job submitted to Oozie.
 
@@ -999,7 +1003,7 @@ def check_job_access_permission(request, job_id, actions_offset=1):
 
     try:
       if job_id.endswith('C'):
-        oozie_job = get_job(job_id, actions_offset)
+        oozie_job = get_job(job_id, **kwargs)
       else:
         oozie_job = get_job(job_id)
     except RestException, ex:

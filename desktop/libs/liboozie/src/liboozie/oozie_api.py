@@ -34,7 +34,6 @@ DEFAULT_USER = DEFAULT_USER.get()
 API_VERSION = 'v1' # Overridden to v2 for SLA
 
 _XML_CONTENT_TYPE = 'application/xml;charset=UTF-8'
-ACTIONS_PER_PAGE = 50
 
 
 def get_oozie(user, api_version=API_VERSION):
@@ -143,11 +142,23 @@ class OozieApi(object):
     wf = Workflow(self, resp)
     return wf
 
-  def get_coordinator(self, jobid, actions_offset=1):
+  def get_coordinator(self, jobid, offset=None, cnt=None, filters=None):
     params = self._get_params()
-    params.update({'offset': actions_offset})
-    params.update({'len': ACTIONS_PER_PAGE})
+    if offset is not None:
+      params['offset'] = str(offset)
+    if cnt is not None:
+      params['len'] = str(cnt)
+    if filters is None:
+      filters = {}
     params.update({'order': 'desc'})
+
+    filter_list = []
+    for key, val in filters:
+      if key not in OozieApi.VALID_JOB_FILTERS:
+        raise ValueError('"%s" is not a valid filter for selecting jobs' % (key,))
+      filter_list.append('%s=%s' % (key, val))
+    params['filter'] = ';'.join(filter_list)
+
     resp = self._root.get('job/%s' % (jobid,), params)
     return Coordinator(self, resp)
 
