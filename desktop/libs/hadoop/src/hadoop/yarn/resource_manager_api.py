@@ -83,19 +83,15 @@ class ResourceManagerApi(object):
     return self._security_enabled
 
   def cluster(self, **kwargs):
-    return self._root.get('cluster', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
     return self._execute(self._root.get, 'cluster', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def apps(self, **kwargs):
-    return self._root.get('cluster/apps', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
     return self._execute(self._root.get, 'cluster/apps', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def app(self, app_id):
-    return self._root.get('cluster/apps/%(app_id)s' % {'app_id': app_id}, headers={'Accept': _JSON_CONTENT_TYPE})
     return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def kill(self, app_id):
-    return self._root.put('cluster/apps/%(app_id)s/state' % {'app_id': app_id}, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
     return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
 
   def _execute(self, function, *args, **kwargs):
