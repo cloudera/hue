@@ -250,6 +250,7 @@
 
 <%def name="import_charts()">
   <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.markercluster.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
@@ -257,6 +258,7 @@
   <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
