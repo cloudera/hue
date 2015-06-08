@@ -192,7 +192,7 @@ ${layout.menubar(section='groups')}
       viewModel.chosenUsers.removeAll();
 
       $(".hueCheckbox[checked='checked']").each(function (index) {
-        viewModel.chosenUsers.push($(this).data("name"));
+        viewModel.chosenUsers.push($(this).data("name").toString()); // needed for numeric group names
       });
 
       $("#deleteGroup").modal("show");
