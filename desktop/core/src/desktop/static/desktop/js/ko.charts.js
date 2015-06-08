@@ -370,7 +370,7 @@ ko.bindingHandlers.leafletMapChart = {
             }).addTo(_map);
           }
 
-          var _markers = [];
+          var _clusterGroup = L.markerClusterGroup();
           _data.forEach(function (item) {
             if (item && item.lng != null && item.lat != null) {
               var _addMarker = false;
@@ -384,17 +384,17 @@ ko.bindingHandlers.leafletMapChart = {
                 }
               }
               if (_addMarker) {
-                var _marker = L.marker([item.lat, item.lng]).addTo(_map);
+                var _marker = L.marker([item.lat, item.lng]);
                 if (item.label != null) {
                   _marker.bindPopup(item.label);
                 }
-                _markers.push(_marker);
+                _clusterGroup.addLayer(_marker);
               }
             }
           });
 
-          _map.markers = new L.featureGroup(_markers);
-          _map.fitBounds(_map.markers.getBounds());
+          _map.addLayer(_clusterGroup);
+          _map.fitBounds(_clusterGroup.getBounds());
 
 
           if (_options.onComplete != null) {

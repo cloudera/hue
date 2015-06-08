@@ -72,6 +72,7 @@ ${layout.menubar(section='query')}
   }
 </style>
 <link href="${ static('desktop/ext/css/leaflet.css') }" rel="stylesheet">
+<link href="${ static('desktop/ext/css/leaflet.markercluster.css') }" rel="stylesheet">
 
 <div class="container-fluid">
   <div id="expand"><i class="fa fa-chevron-right" style="color: #FFFFFF"></i></div>
@@ -341,6 +342,7 @@ ${layout.menubar(section='query')}
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.categories.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.blueprint.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
