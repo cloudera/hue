@@ -1986,3 +1986,7 @@ div.navigator > ul > li.oozie > ul.dropdown-menu {
   padding-left: 12px;
   width: 130px;
 }
+
+.inline-block {
+  display: inline-block;
+}
