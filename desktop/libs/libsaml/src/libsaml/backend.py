@@ -17,6 +17,9 @@
 """
 See desktop/auth/backend.py
 """
+
+from __future__ import absolute_import
+
 import logging
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.models import User
@@ -24,8 +27,8 @@ from djangosaml2.backends import Saml2Backend as _Saml2Backend
 from djangosaml2.views import logout as saml_logout
 from desktop.auth.backend import rewrite_user
 from libsaml import conf
+from libsaml import metrics
 from useradmin.models import get_profile, get_default_user_group, UserProfile
-
 
 LOG = logging.getLogger(__name__)
 
@@ -34,6 +37,12 @@ class SAML2Backend(_Saml2Backend):
   """
   Wrapper around djangosaml2 backend.
   """
+
+  @metrics.saml2_authentication_time
+  def authenticate(self, *args, **kwargs):
+    return super(SAML2Backend, self).authenticate(*args, **kwargs)
+
+
   def update_user(self, user, attributes, attribute_mapping, force_save=False):
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False

@@ -18,6 +18,7 @@
 All Hue metrics should be defined in the APP/metrics.py file so they are discoverable.
 """
 
+import functools
 import pyformance
 
 
@@ -53,7 +54,7 @@ class MetricsRegistry(object):
 
   def timer(self, name, **kwargs):
     self._schemas.append(MetricDefinition('timer', name, **kwargs))
-    return self._registry.timer(name)
+    return Timer(self._registry.timer(name))
 
   def dump_metrics(self):
     return self._registry.dump_metrics()
@@ -72,6 +73,27 @@ class MetricDefinition(object):
     self.numerator = numerator
     self.denominator = denominator
     self.context = context
+
+
+class Timer(object):
+  """
+  Wrapper around the pyformance Timer object to allow it to be used in an
+  annotation.
+  """
+
+  def __init__(self, timer):
+    self._timer = timer
+
+  def __call__(self, fn, *args, **kwargs):
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+      with self._timer.time():
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+  def __getattr__(self, *args, **kwargs):
+    return getattr(self._timer, *args, **kwargs)
 
 
 _global_registry = MetricsRegistry()

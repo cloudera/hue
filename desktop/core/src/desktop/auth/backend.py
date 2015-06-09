@@ -33,6 +33,7 @@ from django.contrib.auth.models import User
 import django.contrib.auth.backends
 import logging
 import desktop.conf
+from desktop import metrics
 from django.utils.importlib import import_module
 from django.core.exceptions import ImproperlyConfigured
 from useradmin.models import get_profile, get_default_user_group, UserProfile
@@ -200,6 +201,7 @@ class OAuthBackend(DesktopBackendBase):
   build/env/bin/pip install httplib2
   """
 
+  @metrics.oauth_authentication_time
   def authenticate(self, access_token):
     username = access_token['screen_name']
     password = access_token['oauth_token_secret']
@@ -286,6 +288,8 @@ class PamBackend(DesktopBackendBase):
   Authentication backend that uses PAM to authenticate logins. The first user to
   login will become the superuser.
   """
+
+  @metrics.pam_authentication_time
   def check_auth(self, username, password):
     if pam.authenticate(username, password, desktop.conf.AUTH.PAM_SERVICE.get()):
       is_super = False
@@ -403,6 +407,7 @@ class LdapBackend(object):
     else:
       self.add_ldap_config(desktop.conf.LDAP)
 
+  @metrics.ldap_authentication_time
   def authenticate(self, username=None, password=None, server=None):
     self.add_ldap_config_for_server(server)
 
@@ -472,6 +477,8 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   the KRB5_KTNAME environment variable to point to another location
   (e.g. /etc/hue/hue.keytab).
   """
+
+  @metrics.spnego_authentication_time
   def authenticate(self, username=None):
     username = self.clean_username(username)
     is_super = False

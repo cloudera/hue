@@ -30,6 +30,7 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
+from desktop import metrics
 from desktop.auth.backend import DesktopBackendBase
 from desktop.auth.backend import rewrite_user
 from useradmin.models import get_profile, get_default_user_group, UserProfile
@@ -47,6 +48,7 @@ LOG = logging.getLogger(__name__)
 
 class OAuthBackend(DesktopBackendBase):
 
+  @metrics.oauth_authentication_time
   def authenticate(self, access_token):
     username = access_token['screen_name']
     password = access_token['oauth_token_secret']
