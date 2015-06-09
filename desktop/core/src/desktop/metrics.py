@@ -155,3 +155,29 @@ def user_logged_in_handler(sender, **kwargs):
 @receiver(user_logged_out)
 def user_logged_out_handler(sender, **kwargs):
   logged_in_users.dec()
+
+# ------------------------------------------------------------------------------
+
+ldap_authentication_time = global_registry().timer(
+    name='desktop.auth.ldap.authentication-time',
+    label='LDAP Authentication time',
+    description='Time taken to authenticate a user with LDAP',
+)
+
+oauth_authentication_time = global_registry().timer(
+    name='desktop.auth.oauth.authentication-time',
+    label='OAUTH Authentication time',
+    description='Time taken to authenticate a user with OAUTH',
+)
+
+pam_authentication_time = global_registry().timer(
+    name='desktop.auth.pam.authentication-time',
+    label='PAM Authentication time',
+    description='Time taken to authenticate a user with PAM',
+)
+
+spnego_authentication_time = global_registry().timer(
+    name='desktop.auth.spnego.authentication-time',
+    label='SPNEGO Authentication time',
+    description='Time taken to authenticate a user with SPNEGO',
+)

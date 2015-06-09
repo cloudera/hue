@@ -17,6 +17,8 @@
 """
 See desktop/auth/backend.py
 """
+from __future__ import absolute_import
+
 import logging
 import sys
 from django.contrib.auth import logout as auth_logout
@@ -25,6 +27,7 @@ from django_openid_auth.auth import OpenIDBackend as _OpenIDBackend
 from desktop.auth.backend import rewrite_user
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 
+from libopenid import metrics
 
 LOG = logging.getLogger(__name__)
 
@@ -33,6 +36,11 @@ class OpenIDBackend(_OpenIDBackend):
   """
   Wrapper around openid backend.
   """
+
+  @metrics.openid_authentication_time
+  def authenticate(self, *args, **kwargs):
+    return super(OpenIDBackend, self).authenticate(*args, **kwargs)
+
   def update_user_details(self, user, details, openid_response):
     # Do this check up here, because the auth call creates a django user upon first login per user
     is_super = False
