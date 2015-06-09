@@ -308,6 +308,22 @@ em {
   border-radius: 0 0 3px 3px;
 }
 
+.filter-box:hover {
+  opacity: 1!important;
+}
+
+.filter-box:hover .title, .filter-box:hover .content {
+  border: 1px solid #d8d8d8!important;
+}
+
+.filter-box:hover .title {
+  border-bottom: none!important;
+}
+
+.filter-box:hover .content {
+  border-top: none!important;
+}
+
 .field-selector {
   display: inline-block;
   margin-left: 3px;
@@ -520,4 +536,15 @@ em {
 .qdefinitions li {
   display: inline;
   margin-right: 10px;
+}
+
+.hit-options {
+  width: 100px;
+}
+
+.hit-title {
+  float:left;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

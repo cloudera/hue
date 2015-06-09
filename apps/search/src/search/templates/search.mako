@@ -372,9 +372,14 @@ ${ dashboard.layout_skeleton() }
         </div>
 
         <!-- ko if: type() == 'nested' -->
-          <span class="facet-field-label">${ _('Metric') }</span>
-          <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate">
-          </select>
+        <div class="facet-field-cnt">
+          <span class="spinedit-cnt">
+            <span class="facet-field-label facet-field-label-fixed-width">
+              ${ _('Metric') }
+            </span>
+            <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate"></select>
+          </span>
+        </div>
         <!-- /ko -->
 
         <div class="facet-field-cnt">
@@ -908,66 +913,35 @@ ${ dashboard.layout_skeleton() }
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="visible: $root.isEditing, with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
-      <span data-bind="template: { name: 'facet-toggle' }">
-      </span>
-    </div>
-
     <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <!-- ko if: properties.isDate -->
-        <span class="facet-field-label">${ _('Chart Type') }</span>
-        <select class="input-small" data-bind="options: $root.timelineChartTypes,
-                       optionsText: 'label',
-                       optionsValue: 'value',
-                       value: properties.timelineChartType">
-        </select>&nbsp;
-        <span class="facet-field-label">${ _('Interval') }</span>
-        <select class="input-small" data-bind="options: $root.intervalOptions,
-                       optionsText: 'label',
-                       optionsValue: 'value',
-                       value: properties.gap">
-        </select>&nbsp;
-      <!-- /ko -->
-
-      <!-- ko if: properties.canRange -->
-        <div style="padding-bottom: 10px; text-align: right; padding-right: 20px">
-          <span class="facet-field-label">${ _('Zoom') }</span>
-          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
-        </div>
-      <!-- /ko -->
-
-      <div class="dimensions-header margin-bottom-10" data-bind="visible: $root.isEditing() && properties.facets().length > 0">
-        <span class="muted">${ _('Selected dimensions') }</span>
-      </div>
-
-      <div data-bind="foreach: properties.facets, visible: $root.isEditing">
+      <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
         <div class="filter-box">
           <div class="title">
             <a data-bind="click: function() { $root.collection.removePivotFacetValue({'pivot_facet': $parent, 'value': $data}); }" class="pull-right" href="javascript:void(0)">
               <i class="fa fa-times"></i>
             </a>
-            <span data-bind="text: field"></span>
-            &nbsp;
+            <div class="hit-title" data-bind="text: field, attr: {'title': field}"></div>
+            <div class="clearfix"></div>
           </div>
 
           <div class="content">
             <div class="facet-field-cnt">
               <span class="facet-field-label">${ _('Metric') }</span>
-              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate"></select>
+              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: aggregate" class="hit-options"></select>
             </div>
 
-            <div class="facet-field-cnt">
+            <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
               <span class="spinedit-cnt">
-                <span class="facet-field-label facet-field-label-fixed-width">
+                <span class="facet-field-label">
                   ${ _('Limit') }
                 </span>
                 <input type="text" class="input-medium" data-bind="spinedit: limit"/>
               </span>
             </div>
 
-            <div class="facet-field-cnt">
+            <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
               <span class="spinedit-cnt">
-                <span class="facet-field-label facet-field-label-fixed-width">
+                <span class="facet-field-label">
                   ${ _('Min Count') }
                 </span>
                 <input type="text" class="input-medium" data-bind="spinedit: mincount"/>
@@ -975,6 +949,82 @@ ${ dashboard.layout_skeleton() }
             </div>
           </div>
         </div>
+      </span>
+      <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 2" style="opacity: 0.7">
+        <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
+          <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
+            <i class="fa fa-plus"></i> ${ _('Add') }
+          </a>
+          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
+          <div class="clearfix"></div>
+        </div>
+        <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Metric') }
+              </span>
+              <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: properties.facets_form.aggregate" class="hit-options"></select>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Limit') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.limit"/>
+            </span>
+          </div>
+
+          <div class="facet-field-cnt">
+            <span class="spinedit-cnt">
+              <span class="facet-field-label">
+                ${ _('Min Count') }
+              </span>
+              <input type="text" class="input-medium" data-bind="spinedit: properties.facets_form.mincount"/>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="pull-right" style="margin-top: 40px">
+
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Sorting') }</span>
+          <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
+            <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+            <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
+            <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
+          </a>
+        </div>
+
+
+      <!-- ko if: properties.isDate -->
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Chart Type') }</span>
+          <select class="input-small" data-bind="options: $root.timelineChartTypes,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.timelineChartType">
+          </select>
+        </div>
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Interval') }</span>
+          <select class="input-small" data-bind="options: $root.intervalOptions,
+                         optionsText: 'label',
+                         optionsValue: 'value',
+                         value: properties.gap">
+          </select>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: properties.canRange -->
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Zoom') }</span>
+          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+        </div>
+      <!-- /ko -->
       </div>
       <div class="clearfix"></div>
     </div>

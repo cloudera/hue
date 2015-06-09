@@ -527,6 +527,15 @@ var Collection = function (vm, collection) {
 
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
+
+    if (typeof facet.properties.facets != 'undefined') {
+      $.each(facet.properties.facets(), function (pivotIndex, pivotFacet) {
+        pivotFacet.aggregate.subscribe(function () {
+          vm.search();
+        });
+      });
+    }
+
     facet.properties.limit.subscribe(function () {
       vm.search();
     });
