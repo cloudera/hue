@@ -39,9 +39,7 @@ def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
 
   query = Document.objects.get_docs(user) \
-      .exclude(tags__in=[history_tag]). \
-      select_related('owner', 'content_type') \
-      .prefetch_related('tags','documentpermission_set')
+      .exclude(tags__in=[history_tag])
 
   # Work around Oracle not supporting SELECT DISTINCT with the CLOB type.
   if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
@@ -53,9 +51,13 @@ def _get_docs(user):
 
   if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
     ids = [doc.id for doc in docs]
-    return Document.objects.filter(id__in=ids).defer(None)
-  else:
-    return docs
+    docs = Document.objects.filter(id__in=ids).defer(None)
+
+  docs = docs \
+      .select_related('owner', 'content_type') \
+      .prefetch_related('tags', 'documentpermission_set')
+
+  return docs
 
 
 def massaged_tags_for_json(docs, user):
