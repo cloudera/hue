@@ -575,13 +575,14 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
       new_groups = set()
       current_ldap_groups = set()
 
-      # If 'memberOf' or 'isMemberOf' are not set, then might be posixAccount
       ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
       group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
       group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
       # Search for groups based on group_member_attr=username and group_member_attr=dn
       # covers AD, Standard Ldap and posixAcount/posixGroup
-      find_groups_filter = "(&(" + group_filter + ")(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+      if not group_filter.startswith('('):
+        group_filter = '(' + group_filter + ')'
+      find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
                            group_member_attr + "=" + ldap_info['dn'] + ")))"
       group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
       for group_info in group_ldap_info:
@@ -841,7 +842,7 @@ def _import_ldap_groups(connection, groupname_pattern, import_members=False, rec
                                       import_by_dn=import_by_dn)
 
 
-def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server):
+def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server=None):
   return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server)
 
 
