@@ -15,10 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Load the signal handlers
-import desktop.signal_handlers
+import signal
 
-from desktop.supervisor import DjangoCommandSupervisee
+from desktop.lib.thread_util import dump_traceback
 
-SUPERVISOR_SPEC = DjangoCommandSupervisee(
-  "runcpserver", drop_root=False)
+def dump_threads_on_sigquit(signum, frame):
+  """Dump out the threads to stderr"""
+  dump_traceback()
+
+signal.signal(signal.SIGUSR1, dump_threads_on_sigquit)
