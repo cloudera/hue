@@ -59,6 +59,7 @@ object BatchSessionYarn {
     createBatchRequest.driverCores.foreach(builder.driverCores)
     createBatchRequest.executorMemory.foreach(builder.executorMemory)
     createBatchRequest.executorCores.foreach(builder.executorCores)
+    createBatchRequest.numExecutors.foreach(builder.numExecutors)
     createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
 
     builder.redirectOutput(Redirect.PIPE)
