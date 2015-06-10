@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import sys
 import socket
 
@@ -22,6 +23,8 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from impala.settings import NICE_NAME
+
+LOG = logging.getLogger(__name__)
 
 
 SERVER_HOST = Config(
@@ -131,6 +134,9 @@ def config_validator(user):
       server = dbms.get(user, query_server)
       server.get_databases()
   except:
-    res.append((NICE_NAME, _("No available Impalad to send queries to.")))
+    msg = "No available Impalad to send queries to."
+    LOG.exception(msg)
+
+    res.append((NICE_NAME, _(msg)))
 
   return res
