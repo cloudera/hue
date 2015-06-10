@@ -23,6 +23,8 @@ import os
 
 DEFAULT_NN_HTTP_PORT = 50070
 
+LOG = logging.getLogger(__name__)
+
 def find_file_recursive(desired_glob, root):
   def f():
     for dirpath, dirnames, filenames in os.walk(root):
@@ -211,6 +213,7 @@ def test_yarn_configurations():
     api.apps()
   except Exception, e:
     msg = 'Failed to contact Resource Manager at %s: %s' % (url, e)
+    LOG.exception(msg)
     result.append(('Resource Manager', msg))
 
   return result

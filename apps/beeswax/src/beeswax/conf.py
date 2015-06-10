@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os.path
 import sys
 import beeswax.hive_site
@@ -24,6 +25,8 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from beeswax.settings import NICE_NAME
+
+LOG = logging.getLogger(__name__)
 
 
 HIVE_SERVER_HOST = Config(
@@ -141,7 +144,10 @@ def config_validator(user):
       server = dbms.get(user)
       server.get_databases()
   except:
-    res.append((NICE_NAME, _("The application won't work without a running HiveServer2.")))
+    msg = "The application won't work without a running HiveServer2."
+    LOG.exception(msg)
+
+    res.append((NICE_NAME, _(msg)))
 
   try:
     from hadoop import cluster
@@ -149,6 +155,9 @@ def config_validator(user):
     fs = cluster.get_hdfs()
     fs.stats(warehouse)
   except Exception:
-    return [(NICE_NAME, _('Failed to access Hive warehouse: %s') % warehouse)]
+    msg = 'Failed to access Hive warehouse: %s'
+    LOG.exception(msg % warehouse)
+
+    return [(NICE_NAME, _(msg) % warehouse)]
 
   return res
