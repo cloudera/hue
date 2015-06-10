@@ -285,7 +285,7 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
   private def fromPath(path: Path) = path match {
     case AbsolutePath(p) => p
     case RelativePath(p) =>
-      if (p.startsWith("hdfs://")) {
+      if (p.startsWith("hdfs://") || p.startsWith("file://")) {
         p
       } else {
         fsRoot + "/" + p
