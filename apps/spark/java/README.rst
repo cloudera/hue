@@ -255,6 +255,7 @@ Request Body
 | pyFiles        | files to be placed on the PYTHONPATH             | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
 | files          | files to be placed in executor working directory | list of paths   |
+|                | (Add local path as "file:///etc/...")            |                 |
 +----------------+--------------------------------------------------+-----------------+
 | driverMemory   | memory for driver                                | string          |
 +----------------+--------------------------------------------------+-----------------+
@@ -263,6 +264,8 @@ Request Body
 | executorMemory | memory for executor                              | string          |
 +----------------+--------------------------------------------------+-----------------+
 | executorCores  | number of cores used by executor                 | int             |
++----------------+--------------------------------------------------+-----------------+
+| numExecutors   | number of executor                               | int             |
 +----------------+--------------------------------------------------+-----------------+
 | archives       |                                                  | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
@@ -412,6 +415,7 @@ Batch
 | pyFiles        | files to be placed on the PYTHONPATH             | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
 | files          | files to be placed in executor working directory | list of paths   |
+|                | (Add local path as  "file:///etc/...")           |                 |
 +----------------+--------------------------------------------------+-----------------+
 | driverMemory   | memory for driver                                | string          |
 +----------------+--------------------------------------------------+-----------------+
@@ -420,6 +424,8 @@ Batch
 | executorMemory | memory for executor                              | string          |
 +----------------+--------------------------------------------------+-----------------+
 | executorCores  | number of cores used by executor                 | int             |
++----------------+--------------------------------------------------+-----------------+
+| numExecutors   | number of executor                               | int             |
 +----------------+--------------------------------------------------+-----------------+
 | archives       |                                                  | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
