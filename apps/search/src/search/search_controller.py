@@ -106,8 +106,7 @@ class SearchController(object):
           doc2.save()
       result['status'] = 0
     except Exception, e:
-      print e
-      LOG.warn('Error copying collection: %s' % e)
+      LOG.exception('Error copying collection')
       result['message'] = unicode(str(e), "utf8")
 
     return result
@@ -128,12 +127,12 @@ class SearchController(object):
     try:
       indexes = self.get_solr_collection().keys()
     except:
-      pass
+      LOG.exception('failed to get indexes')
 
     try:
       indexes += SolrApi(SOLR_URL.get(), self.user).aliases().keys()
     except:
-      pass
+      LOG.exception('failed to get index aliases')
 
     if show_all or not indexes:
       return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()

@@ -138,6 +138,7 @@ def search(request):
       try:
         response['error'] = json.loads(e.message)['error']['msg']
       except:
+        LOG.exception('failed to parse json response')
         response['error'] = force_unicode(e)
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
