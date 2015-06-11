@@ -42,6 +42,22 @@ from views import snappy_installed
 LOG = logging.getLogger(__name__)
 
 
+def cleanup_tree(cluster, path):
+  try:
+    cluster.fs.rmtree(path)
+  except:
+    # Don't let cleanup errors mask earlier failures
+    LOG.exception('failed to cleanup %s' % path)
+
+
+def cleanup_file(cluster, path):
+  try:
+    cluster.fs.remove(path)
+  except:
+    # Don't let cleanup errors mask earlier failures
+    LOG.exception('failed to cleanup %s' % path)
+
+
 @attr('requires_hadoop')
 def test_remove():
   cluster = pseudo_hdfs4.shared_cluster()
@@ -74,10 +90,7 @@ def test_remove():
     assert_false(cluster.fs.exists(PATH_3))
 
   finally:
-    try:
-      cluster.fs.rmtree(prefix)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, prefix)
 
 
 @attr('requires_hadoop')
@@ -128,10 +141,7 @@ def test_move():
     assert_true(cluster.fs.exists(SUB_PATH2_3))
 
   finally:
-    try:
-      cluster.fs.rmtree(prefix)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, prefix)
 
 
 @attr('requires_hadoop')
@@ -182,10 +192,7 @@ def test_copy():
     assert_true(cluster.fs.exists(SUB_PATH2_3))
 
   finally:
-    try:
-      cluster.fs.rmtree(prefix)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, prefix)
 
 
 @attr('requires_hadoop')
@@ -215,10 +222,7 @@ def test_mkdir_singledir():
     assert_equal(dir_listing[2]['name'], success_path)
 
   finally:
-    try:
-      cluster.fs.rmtree(prefix)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, prefix)
 
 
 @attr('requires_hadoop')
@@ -249,10 +253,7 @@ def test_touch():
     assert_equal(file_listing[2]['name'], success_path)
 
   finally:
-    try:
-      cluster.fs.rmtree(prefix)
-    except:
-      pass
+    cleanup_tree(cluster, prefix)
 
 
 @attr('requires_hadoop')
@@ -304,12 +305,9 @@ def test_chmod():
     assert_equal(041777, int(cluster.fs.stats(PATH_3)["mode"]))
 
   finally:
-    try:
-      cluster.fs.rmtree(PATH)     # Clean up
-      cluster.fs.rmtree(PATH_2)     # Clean up
-      cluster.fs.rmtree(PATH_3)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, PATH)
+    cleanup_tree(cluster, PATH_2)
+    cleanup_tree(cluster, PATH_3)
 
 
 @attr('requires_hadoop')
@@ -349,10 +347,7 @@ def test_chmod_sticky():
     assert_equal(False, mode[-1])
 
   finally:
-    try:
-      cluster.fs.rmtree(PATH)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, PATH)
 
 
 @attr('requires_hadoop')
@@ -496,7 +491,8 @@ def test_listdir():
     try:
       cluster.fs.do_as_superuser(cluster.fs.rmtree, prefix)
     except:
-      pass      # Don't let cleanup errors mask earlier failures
+      # Don't let cleanup errors mask earlier failures
+      LOG.exception('failed to cleanup %s' % prefix)
 
 
 @attr('requires_hadoop')
@@ -569,10 +565,7 @@ def test_listdir_sort_and_filter():
     listing = c.get('/filebrowser/view' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context['files']
     assert_equal(['..', '.', '1'], [ f['name'] for f in listing ])
   finally:
-    try:
-      cluster.fs.rmtree(BASE)
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, BASE)
 
 
 @attr('requires_hadoop')
@@ -638,10 +631,7 @@ def test_view_snappy_compressed():
   finally:
     for done in finish:
       done()
-    try:
-      cluster.fs.rmtree('/test-snappy-avro-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, '/test-snappy-avro-filebrowser/')
 
 
 @attr('requires_hadoop')
@@ -697,10 +687,7 @@ def test_view_snappy_compressed_avro():
   finally:
     for done in finish:
       done()
-    try:
-      cluster.fs.rmtree('/test-snappy-avro-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, '/test-snappy-avro-filebrowser/')
 
 
 @attr('requires_hadoop')
@@ -759,10 +746,7 @@ def test_view_avro():
     assert_true('Failed to decompress' in response.context['message'])
 
   finally:
-    try:
-      cluster.fs.rmtree('/test-avro-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, '/test-avro-filebrowser/')
 
 
 @attr('requires_hadoop')
@@ -788,10 +772,7 @@ def test_view_parquet():
     assert_true('FRANCE' in response.context['view']['contents'])
 
   finally:
-    try:
-      cluster.fs.rmtree('/test-parquet-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, '/test-parquet-filebrowser/')
 
 
 @attr('requires_hadoop')
@@ -838,10 +819,7 @@ def test_view_gz():
     assert_true("Failed to decompress" in response.context['message'])
 
   finally:
-    try:
-      cluster.fs.rmtree('/test-gz-filebrowser/')
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
+    cleanup_tree(cluster, '/test-gz-filebrowser/')
 
 
 @attr('requires_hadoop')
@@ -943,10 +921,7 @@ def view_helper(cluster, encoding, content):
     assert_equal(response.context['view']['contents'],
                  unicode(bytestring[0:8], encoding, errors='replace'))
   finally:
-    try:
-      cluster.fs.remove(filename)
-    except Exception, ex:
-      LOG.error('Failed to cleanup %s: %s' % (filename, ex))
+    cleanup_file(cluster, filename)
 
 
 @attr('requires_hadoop')
@@ -977,10 +952,7 @@ def test_edit_i18n():
     pass_2 = pass_1 + u'세상'
     edit_helper(cluster, 'johab', pass_1, pass_2)
   finally:
-    try:
-      cluster.fs.rmtree('/test-filebrowser/')
-    except Exception, ex:
-      LOG.error('Failed to remove tree /test-filebrowser: %s' % (ex,))
+    cleanup_tree(cluster, '/test-filebrowser/')
 
 
 def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
@@ -1033,10 +1005,7 @@ def edit_helper(cluster, encoding, contents_pass_1, contents_pass_2):
 
     # TODO(todd) add test for maintaining ownership/permissions
   finally:
-    try:
-      cluster.fs.remove(filename)
-    except Exception, ex:
-      LOG.error('Failed to remove %s: %s' % (smart_str(filename), ex))
+    cleanup_file(cluster, filename)
 
 
 @attr('requires_hadoop')
@@ -1097,10 +1066,7 @@ def test_upload_file():
       # StopFutureHandlers() does not seem to work in test mode as it continues to MemoryFileUploadHandler after perm issue and so fails.
       pass
   finally:
-    try:
-      cluster.fs.remove(HDFS_DEST_DIR)
-    except Exception, ex:
-      pass
+    cleanup_file(HDFS_DEST_DIR)
 
 @attr('requires_hadoop')
 def test_upload_zip():
@@ -1137,10 +1103,7 @@ def test_upload_zip():
     assert_equal(0, response['status'], response)
     assert_true(cluster.fs.exists(HDFS_ZIP_FILE))
   finally:
-    try:
-      cluster.fs.remove(HDFS_DEST_DIR)
-    except:
-      pass
+    cleanup_file(HDFS_DEST_DIR)
 
 @attr('requires_hadoop')
 def test_upload_tgz():
@@ -1178,10 +1141,7 @@ def test_upload_tgz():
     assert_equal(0, response['status'], response)
     assert_true(cluster.fs.exists(HDFS_TGZ_FILE))
   finally:
-    try:
-      cluster.fs.remove(HDFS_DEST_DIR)
-    except:
-      pass
+    cleanup_file(cluster, HDFS_DEST_DIR)
 
 @attr('requires_hadoop')
 def test_upload_bz2():
@@ -1219,10 +1179,7 @@ def test_upload_bz2():
     assert_equal(0, response['status'], response)
     assert_true(cluster.fs.exists(HDFS_BZ2_FILE))
   finally:
-    try:
-      cluster.fs.remove(HDFS_DEST_DIR)
-    except:
-      pass
+    cleanup_file(cluster, HDFS_DEST_DIR)
 
 def test_location_to_url():
   assert_equal('/filebrowser/view/var/lib/hadoop-hdfs', location_to_url('/var/lib/hadoop-hdfs', False))
@@ -1265,8 +1222,4 @@ def test_trash():
     response = c.get('/filebrowser/view/user/test?default_to_trash', follow=True)
     assert_true(any(['.Trash' in page for page, code in response.redirect_chain]), response.redirect_chain)
   finally:
-    try:
-      cluster.fs.rmtree(prefix)     # Clean up
-    except:
-      pass      # Don't let cleanup errors mask earlier failures
-
+    cleanup_tree(cluster, prefix)
