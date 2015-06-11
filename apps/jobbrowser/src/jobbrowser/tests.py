@@ -132,7 +132,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       # Remove user home directories.
       self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, self.home_dir)
     except:
-      pass
+      LOG.exception('failed to teardown %s' self.home_dir)
     self.cluster.fs.setuser(self.prev_user)
 
   def create_design(self):
@@ -186,7 +186,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       self.cluster.fs.mkdir(INPUT_DIR)
       self.cluster.fs.rmtree(OUTPUT_DIR)
     except:
-      pass
+      LOG.exception('failed to teardown tests')
 
     response = self.client.post(reverse('jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
         'name': ['test_failed_jobs-1'],

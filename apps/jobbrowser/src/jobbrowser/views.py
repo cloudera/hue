@@ -296,7 +296,7 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
       debug_info += '\nHTML Response: %s' % response
       LOGGER.error(debug_info)
     except:
-      pass
+      LOGGER.exception('failed to create debug info')
 
   response = {'log': LinkJobLogs._make_hdfs_links(log), 'debug': debug_info}
 
