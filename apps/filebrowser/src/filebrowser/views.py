@@ -717,7 +717,7 @@ def _read_avro(fhandle, path, offset, length, stats):
 
         contents = "".join(contents_list)
     except:
-        logging.warn("Could not read avro file at %s" % path, exc_info=True)
+        logging.exception("Could not read avro file at %s" % path)
         raise PopupException(_("Failed to read Avro file."))
     return contents
 
@@ -729,7 +729,7 @@ def _read_parquet(fhandle, path, offset, length, stats):
         dumped_data.seek(offset)
         return dumped_data.read()
     except:
-        logging.warn("Could not read parquet file at %s" % path, exc_info=True)
+        logging.exception("Could not read parquet file at %s" % path)
         raise PopupException(_("Failed to read Parquet file."))
 
 
@@ -740,7 +740,7 @@ def _read_gzip(fhandle, path, offset, length, stats):
     try:
         contents = GzipFile('', 'r', 0, StringIO(fhandle.read())).read(length)
     except:
-        logging.warn("Could not decompress file at %s" % path, exc_info=True)
+        logging.exception("Could not decompress file at %s" % path)
         raise PopupException(_("Failed to decompress file."))
     return contents
 
@@ -751,7 +751,7 @@ def _read_simple(fhandle, path, offset, length, stats):
         fhandle.seek(offset)
         contents = fhandle.read(length)
     except:
-        logging.warn("Could not read file at %s" % path, exc_info=True)
+        logging.exception("Could not read file at %s" % path)
         raise PopupException(_("Failed to read file."))
     return contents
 
@@ -777,6 +777,7 @@ def detect_snappy(contents):
         import snappy
         return snappy.isValidCompressed(contents)
     except:
+        logging.exception('failed to detect snappy')
         return False
 
 
@@ -792,7 +793,10 @@ def snappy_installed():
     try:
         import snappy
         return True
+    except ImportError:
+        return False
     except:
+        logging.exception('failed to verify if snappy is installed')
         return False
 
 
