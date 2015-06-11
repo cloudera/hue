@@ -53,6 +53,7 @@ def api_router(request, url): # On split, deserialize anything
     try:
       return json.loads(re.sub(r'(?:\")([0-9]+)(?:\")', r'\1', str(raw)))
     except:
+      LOG.exception('failed to parse input as json')
       return raw
 
   def deserialize(data):
@@ -84,6 +85,7 @@ def api_dump(response):
       json.dumps(data)
       return data
     except:
+      LOG.exception('Failed to dump data as JSON')
       cleaned = {}
       lim = [0]
       if isinstance(data, str): # Not JSON dumpable, meaning some sort of bytestring or byte data
