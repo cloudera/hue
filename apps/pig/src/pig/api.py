@@ -212,6 +212,7 @@ class OozieApi(object):
           logs, workflow_action, is_really_done = self.get_log(request, job)
           progress = workflow_action[0]['progress']
         except:
+          LOG.exception('failed to get progress')
           progress = 0
       else:
         progress = 100
@@ -254,6 +255,7 @@ def get_progress(job, log):
     try:
       return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
     except:
+      LOG.exception('failed to get progress')
       return 0
 
 
