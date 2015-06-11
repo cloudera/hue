@@ -56,6 +56,8 @@
         <scalatra.version>2.3.0</scalatra.version>
         <dispatch.version>0.11.2</dispatch.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <httpclient.version>4.5</httpclient.version>
+        <httpcore.version>4.4.1</httpcore.version>
     </properties>
 
     <modules>
@@ -208,6 +210,18 @@
                 <groupId>net.databinder.dispatch</groupId>
                 <artifactId>dispatch-json4s-jackson_${scala.binary.version}</artifactId>
                 <version>${dispatch.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>${httpcore.version}</version>
             </dependency>
 
         </dependencies>
