@@ -772,6 +772,14 @@ var Collection = function (vm, collection) {
     });
   });
 
+  self.template.sortedFieldsNames = ko.computed(function () {
+    return $.map(self.template.fieldsAttributes(), function (field) {
+      return field.name();
+    }).sort(function (a, b) {
+      return a.toLowerCase().localeCompare(b.toLowerCase());
+    });
+  });
+
   self.getTemplateField = function (name) {
     var _field = null;
     $.each(self.template.fields(), function (index, field) {
