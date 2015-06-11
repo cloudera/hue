@@ -127,14 +127,17 @@ class LdapConnection(object):
       try:
         self.ldap_handle.simple_bind_s(bind_user, bind_password)
       except:
-        raise RuntimeError("Failed to bind to LDAP server as user %s" %
-            bind_user)
+        msg = "Failed to bind to LDAP server as user %s" % bind_user
+        LOG.exception(msg)
+        raise RuntimeError(msg)
     else:
       try:
         # Do anonymous bind
         self.ldap_handle.simple_bind_s('','')
       except:
-        raise RuntimeError("Failed to bind to LDAP server anonymously")
+        msg = "Failed to bind to LDAP server anonymously"
+        LOG.exception(msg)
+        raise RuntimeError(msg)
 
   def _get_search_params(self, name, attr, find_by_dn=False):
     """

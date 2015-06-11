@@ -163,7 +163,7 @@ def create_profile_for_user(user):
     p.save()
     return p
   except:
-    LOG.debug("Failed to automatically create user profile.", exc_info=True)
+    LOG.exception("Failed to automatically create user profile.")
     return None
 
 class LdapGroup(models.Model):
@@ -236,6 +236,7 @@ def update_app_permissions(**kwargs):
       for dp in HuePermission.objects.all():
         current.setdefault(dp.app, {})[dp.action] = dp
     except:
+      LOG.exception('failed to get permissions')
       return
 
     updated = 0
