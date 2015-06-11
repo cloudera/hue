@@ -369,7 +369,7 @@ class Attempt:
           debug_info += '\nHTML Response: %s' % response
           LOGGER.error(debug_info)
         except:
-          pass
+          LOG.exception('failed to build debug info')
 
       logs.append(log)
 

@@ -234,7 +234,7 @@ class Job(JobLinkage):
   def get_task(self, id):
     try:
       return self.task_map[id]
-    except:
+    except KeyError:
       return JobLinkage.get_task(self, id)
 
   def filter_tasks(self, task_types=None, task_states=None, task_text=None):
@@ -568,6 +568,7 @@ class LinkJobLogs(object):
     try:
       return '<a href="%s" target="_blank">%s</a>' % (location_to_url(match.group(0), strict=False), match.group(0))
     except:
+      LOGGER.exception('failed to replace hdfs links: %s' % (match.groups(),))
       return match.group(0)
 
   @classmethod
@@ -575,6 +576,7 @@ class LinkJobLogs(object):
     try:
       return '<a href="%s" target="_blank">%s</a>' % (reverse('jobbrowser.views.single_job', kwargs={'job': match.group(0)}), match.group(0))
     except:
+      LOGGER.exception('failed to replace mr links: %s' % (match.groups(),))
       return match.group(0)
 
 
