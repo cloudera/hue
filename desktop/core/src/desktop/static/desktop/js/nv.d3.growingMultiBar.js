@@ -99,14 +99,15 @@ nv.models.growingMultiBar = function() {
           var posBase = 0, negBase = 0;
           data.map(function(d) {
             var f = d.values[i]
-            f.size = Math.abs(f.y);
-            if (f.y<0)  {
-              f.y1 = negBase;
-              negBase = negBase - f.size;
-            } else
-            {
-              f.y1 = f.size + posBase;
-              posBase = posBase + f.size;
+            if (typeof f != 'undefined') {
+              f.size = Math.abs(f.y);
+              if (f.y < 0) {
+                f.y1 = negBase;
+                negBase = negBase - f.size;
+              } else {
+                f.y1 = f.size + posBase;
+                posBase = posBase + f.size;
+              }
             }
           });
         });
