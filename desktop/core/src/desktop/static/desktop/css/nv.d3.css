@@ -29,11 +29,29 @@ Overrides nvd3 classes
 }
 
 .nvd3 .selected {
-  stroke-width: 2!important;
+  stroke-width: 2 !important;
   stroke-dasharray: 5;
-  stroke-opacity: 1!important;
+  stroke-opacity: 1 !important;
 }
 
 .nvd3 .selected > rect {
-  stroke-opacity: 1!important;
+  stroke-opacity: 1 !important;
+}
+
+svg {
+  display: block;
+  width: auto;
+  height: auto;
+}
+
+svg:not(.leaflet-zoom-animated) {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  display: block;
+  width: 100%;
+  height: 100%
 }
