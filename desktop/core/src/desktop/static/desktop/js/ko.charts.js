@@ -370,7 +370,12 @@ ko.bindingHandlers.leafletMapChart = {
             }).addTo(_map);
           }
 
-          var _clusterGroup = L.markerClusterGroup();
+          var _clusterGroup = L.markerClusterGroup({
+            maxClusterRadius: 10,
+            polygonOptions: {
+              weight: 1.5
+            }
+          });
           _data.forEach(function (item) {
             if (item && item.lng != null && item.lat != null) {
               var _addMarker = false;
