@@ -386,6 +386,7 @@ def _readfields(lines, delimiters):
     try:
       fields_list = _get_rows(lines, delimiter)
     except:
+      LOG.exception('failed to get rows')
       fields_list = [line.split(delimiter) for line in lines if line]
 
     score = score_delim(fields_list)

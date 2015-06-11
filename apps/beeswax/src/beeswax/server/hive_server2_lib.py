@@ -84,6 +84,7 @@ class HiveServerTable(Table):
     try:
       return [PartitionKeyCompatible(row['col_name'], row['data_type'], row['comment']) for row in self._get_partition_column()]
     except:
+      LOG.exception('failed to get partition keys')
       return []
 
   @property
@@ -94,6 +95,7 @@ class HiveServerTable(Table):
       if rows:
         return rows[0]['data_type']
     except:
+      LOG.exception('failed to get path location')
       return None
 
   @property
@@ -104,6 +106,7 @@ class HiveServerTable(Table):
       end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
     except:
+      LOG.exception('failed to extract columns')
       return rows
 
   def _get_partition_column(self):
@@ -113,6 +116,7 @@ class HiveServerTable(Table):
       end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index]
     except:
+      LOG.exception('failed to get partition column')
       return []
 
   @property
@@ -285,6 +289,8 @@ class HiveServerTTableSchema:
     try:
       return HiveServerTRowSet(self.columns, self.schema).cols(('col_name', 'data_type', 'comment'))
     except:
+      LOG.exception('failed to get columns')
+
       # Impala API is different
       cols = HiveServerTRowSet(self.columns, self.schema).cols(('name', 'type', 'comment'))
       for col in cols:

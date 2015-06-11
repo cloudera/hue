@@ -15,12 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.core.management.base import BaseCommand
-
+import logging
 from datetime import datetime,  timedelta
+
+from django.core.management.base import BaseCommand
 
 from beeswax.models import Session
 from beeswax.server import dbms
+
+
+LOG = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -56,6 +60,7 @@ class Command(BaseCommand):
     try:
       beeswax.conf.HIVE_CONF_DIR.set_for_testing(os.environ['HIVE_CONF_DIR'])
     except:
+      LOG.exception('failed to lookup HIVE_CONF_DIR in environment')
       self.stdout.write('Did you export HIVE_CONF_DIR=/etc/hive/conf?\n')
       raise
 
