@@ -290,7 +290,7 @@ class SubWorkflowForm(forms.ModelForm):
     try:
       return Workflow.objects.get(id=int(self.cleaned_data.get('sub_workflow')))
     except:
-      LOG.debug('The sub-workflow could not be found.', exc_info=True)
+      LOG.exception('The sub-workflow could not be found.')
       return None
 
 

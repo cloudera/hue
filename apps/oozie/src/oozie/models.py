@@ -312,7 +312,8 @@ class WorkflowManager(models.Manager):
     try:
       workflow.coordinator_set.update(workflow=None) # In Django 1.3 could do ON DELETE set NULL
     except:
-      pass
+      LOG.exception('failed to destroy workflow')
+
     workflow.save()
     workflow.delete(skip_trash=True)
 

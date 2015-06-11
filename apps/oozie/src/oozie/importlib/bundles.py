@@ -113,6 +113,8 @@ def import_bundle_root(bundle, bundle_definition_root, metadata=None):
     bundle.schema_version = schema_version
     bundle.save()
   except:
+    LOG.exception('failed to import bundle')
+
     # There was an error importing the bundle so delete every thing associated with it.
     bundle.delete(skip_trash=True)
     raise
