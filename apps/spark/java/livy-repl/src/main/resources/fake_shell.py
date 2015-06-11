@@ -8,7 +8,7 @@ import sys
 import traceback
 
 logging.basicConfig()
-logger = logging.getLogger('fake_shell')
+LOG = logging.getLogger('fake_shell')
 
 global_dict = {}
 
@@ -34,7 +34,7 @@ def execute_reply_ok(data):
     })
 
 def execute_reply_error(exc_type, exc_value, tb):
-    logger.error('execute_reply', exc_info=True)
+    LOG.error('execute_reply', exc_info=True)
     return execute_reply('error', {
         'ename': unicode(exc_type.__name__),
         'evalue': unicode(exc_value),
@@ -57,6 +57,8 @@ def execute(code):
             code = compile(mod, '<stdin>', 'single')
             exec code in global_dict
     except:
+        # We don't need to log the exception because we're just executing user
+        # code and passing the error along.
         return execute_reply_error(*sys.exc_info())
 
     stdout = fake_stdout.getvalue()
@@ -285,25 +287,25 @@ try:
         try:
             msg = json.loads(line)
         except ValueError:
-            logger.error('failed to parse message', exc_info=True)
+            LOG.error('failed to parse message', exc_info=True)
             continue
 
         try:
             msg_type = msg['msg_type']
         except KeyError:
-            logger.error('missing message type', exc_info=True)
+            LOG.error('missing message type', exc_info=True)
             continue
 
         try:
             content = msg['content']
         except KeyError:
-            logger.error('missing content', exc_info=True)
+            LOG.error('missing content', exc_info=True)
             continue
 
         try:
             handler = msg_type_router[msg_type]
         except KeyError:
-            logger.error('unknown message type: %s', msg_type)
+            LOG.error('unknown message type: %s', msg_type)
             continue
 
         response = handler(content)
