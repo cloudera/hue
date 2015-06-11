@@ -45,8 +45,8 @@ def app(request):
   try:
     autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
   except:
-    pass
-  
+    LOG.exception('failed to find autocomplete base url')
+
   return render('app.mako', request, {
     'autocomplete_base_url': autocomplete_base_url,
   })
@@ -198,6 +198,7 @@ def delete(request):
       pig_script.doc.all().delete()
       pig_script.delete()
     except:
+      LOG.exception('failed to delete pig script')
       None
 
   response = {
