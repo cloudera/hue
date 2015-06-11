@@ -119,7 +119,8 @@ class RedactionRule(object):
     return \
         isinstance(other, self.__class__) and \
         self.trigger == other.trigger and \
-        self.regex == other.regex and \
+        self.regex.pattern == other.regex.pattern and \
+        self.regex.flags == other.regex.flags and \
         self.replace == other.replace
 
   def __ne__(self, other):
