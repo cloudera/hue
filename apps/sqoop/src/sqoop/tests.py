@@ -126,6 +126,7 @@ class TestSqoopClientLinks(TestSqoopServerBase):
       assert_true(link3.id)
       assert_equal(link3.name, link3.name)
     except:
+      LOG.exception('failed to test link')
       self.client.delete_link(link3)
 
   def test_get_links(self):
