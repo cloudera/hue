@@ -49,7 +49,7 @@ def editor(request):
   try:
     autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
   except:
-    pass
+    LOG.exception('failed to get autocomplete base url')
 
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
