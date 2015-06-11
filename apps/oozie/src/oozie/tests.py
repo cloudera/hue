@@ -2529,7 +2529,7 @@ class TestPermissions(OozieBase):
     try:
       self.wf.delete(skip_trash=True)
     except:
-      pass
+      LOG.exception('failed to tear down tests')
 
   def test_workflow_permissions(self):
     raise SkipTest
@@ -2946,7 +2946,7 @@ class TestEditorWithOozie(OozieBase):
     try:
       self.wf.delete(skip_trash=True)
     except:
-      pass
+      LOG.exception('failed to tear down tests')
 
 
   def test_create_workflow(self):
@@ -3122,7 +3122,7 @@ class TestDashboardWithOozie(OozieBase):
     try:
       self.wf.delete(skip_trash=True)
     except:
-      pass
+      LOG.exception('failed to tear down tests')
 
   def test_submit_external_workflow(self):
     # Check popup and reading workflow.xml and job.properties
@@ -3377,7 +3377,7 @@ class TestDashboard(OozieMockBase):
       self.c.get(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'kill']))
       assert False
     except:
-      pass
+      LOG.exception('failed to get oozie job')
 
     response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'kill']))
     data = json.loads(response.content)
@@ -3537,6 +3537,7 @@ class TestDashboard(OozieMockBase):
       assert_true(response.context['workflow_graph'] is None)
       assert_equal(Document.objects.available_docs(Workflow, self.user).count(), workflow_count)
     except:
+      LOG.exception('failed to test workflow status graph')
       finish()
 
   def test_list_oozie_sla(self):

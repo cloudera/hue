@@ -23,6 +23,7 @@
 
 
 <%!
+  import logging
   import posixpath
   import time
 
@@ -32,6 +33,8 @@
   from desktop.lib.view_util import format_duration_in_millis
   from hadoop.fs.hadoopfs import Hdfs
   from liboozie.utils import format_time
+
+  LOG = logging.getLogger(__name__)
 %>
 
 
@@ -71,6 +74,7 @@
     try:
       return format_time(python_date)
     except:
+      LOG.exception('failed to format time: %s' % python_date)
       return '%s %s' % (date(python_date), dtime(python_date).replace("p.m.","PM").replace("a.m.","AM"))
   %>
 </%def>

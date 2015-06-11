@@ -1055,6 +1055,7 @@ def _submitted_manually(job, user):
   try:
     job = get_job(parent_id)
   except:
+    LOG.exception('failed to get job')
     return True
 
   return _submitted_manually(job, user)
