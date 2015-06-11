@@ -1461,15 +1461,15 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px;" class="leaflet-align">
       <span class="facet-field-label">${_('Latitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Longitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Label')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedFieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
     </div>
 
     <div data-bind="leafletMapChart: {visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
