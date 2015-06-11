@@ -490,6 +490,7 @@ class HiveServer2Dbms(object):
     try:
       self.cancel_operation(handle)
     except:
+      LOG.exception('failed to cancel operation')
       self.close_operation(handle)
     return None
 

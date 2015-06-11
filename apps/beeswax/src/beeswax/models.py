@@ -343,6 +343,7 @@ class SavedQuery(models.Model):
     try:
       return make_query_context('design', self.id)
     except:
+      LOG.exception('failed to make query context')
       return ""
 
   def get_absolute_url(self):
