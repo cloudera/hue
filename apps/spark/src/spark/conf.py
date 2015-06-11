@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import logging
 import os
 import sys
 
@@ -23,6 +24,9 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.lib.conf import Config, coerce_bool
 from spark.settings import NICE_NAME
+
+
+LOG = logging.getLogger(__name__)
 
 
 def coerce_json(j):
@@ -89,7 +93,7 @@ def get_spark_status(user):
       get_api(user).get_status()
       status = 'OK'
   except:
-    pass
+    LOG.exception('failed to get spark status')
 
   return status
 
