@@ -730,8 +730,8 @@ ${ commonshare() | n,unicode }
 
 <div class="bottomAlert alert"></div>
 
-<script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('pig/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('pig/js/pig.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }" type="text/javascript" charset="utf-8"></script>
