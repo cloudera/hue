@@ -255,7 +255,6 @@ Request Body
 | pyFiles        | files to be placed on the PYTHONPATH             | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
 | files          | files to be placed in executor working directory | list of paths   |
-|                | (Add local path as "file:///etc/...")            |                 |
 +----------------+--------------------------------------------------+-----------------+
 | driverMemory   | memory for driver                                | string          |
 +----------------+--------------------------------------------------+-----------------+
@@ -415,7 +414,6 @@ Batch
 | pyFiles        | files to be placed on the PYTHONPATH             | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
 | files          | files to be placed in executor working directory | list of paths   |
-|                | (Add local path as  "file:///etc/...")           |                 |
 +----------------+--------------------------------------------------+-----------------+
 | driverMemory   | memory for driver                                | string          |
 +----------------+--------------------------------------------------+-----------------+
