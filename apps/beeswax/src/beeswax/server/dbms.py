@@ -116,8 +116,17 @@ class HiveServer2Dbms(object):
     return self.client.get_table(database, table_name)
 
 
-  def get_tables(self, database='default', table_names='.*'):
-    return self.client.get_tables(database, table_names)
+  def get_tables(self, database='default', table_names='*'):
+      hql = "SHOW TABLES IN %s '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
+      query = hql_query(hql)
+      handle = self.execute_and_wait(query, timeout_sec=15.0)
+
+      if handle:
+        result = self.fetch(handle, rows=5000)
+        self.close(handle)
+        return [name for table in result.rows() for name in table]
+      else:
+        return []
 
 
   def get_databases(self):
