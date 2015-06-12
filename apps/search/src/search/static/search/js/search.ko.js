@@ -527,15 +527,6 @@ var Collection = function (vm, collection) {
 
   self.facets = ko.mapping.fromJS(collection.facets);
   $.each(self.facets(), function (index, facet) {
-
-    if (typeof facet.properties.facets != 'undefined') {
-      $.each(facet.properties.facets(), function (pivotIndex, pivotFacet) {
-        pivotFacet.aggregate.subscribe(function () {
-          vm.search();
-        });
-      });
-    }
-
     facet.properties.limit.subscribe(function () {
       vm.search();
     });
@@ -549,7 +540,17 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
+    if (typeof facet.properties.facets != 'undefined') {
+      $.each(facet.properties.facets(), function (index, pivotFacet) {
+        if (pivotFacet.aggregate) {
+          pivotFacet.aggregate.subscribe(function () {
+            vm.search();
+          });
+        }
+      });
+    }
   });
+
   self.template.rows.subscribe(function() {
     vm.search();
   });
