@@ -139,7 +139,7 @@ def test_copy_files():
     try:
       cluster.fs.rmtree(prefix)
     except:
-      pass
+      LOG.exception('failed to remove %s' % prefix)
 
 
 class MockFs():

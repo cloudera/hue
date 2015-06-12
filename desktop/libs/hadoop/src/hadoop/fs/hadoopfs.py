@@ -293,7 +293,7 @@ class Hdfs(object):
             chunk = src.read(chunk_size)
           LOG.info(_('Copied %s -> %s.') % (local_src, remote_dst))
         except:
-          LOG.error(_('Copying %s -> %s failed.') % (local_src, remote_dst))
+          LOG.exception(_('Copying %s -> %s failed.') % (local_src, remote_dst))
           raise
       finally:
         src.close()

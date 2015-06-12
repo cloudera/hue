@@ -41,6 +41,8 @@ import desktop.lib.thrift_util
 from desktop.lib import django_mako
 from desktop.lib.json_utils import JSONEncoderForHTML
 
+LOG = logging.getLogger(__name__)
+
 # Values for template_lib parameter
 DJANGO = 'django'
 MAKO = 'mako'
@@ -327,6 +329,7 @@ def get_app_nice_name(app_name):
   try:
     return desktop.appmanager.get_desktop_module(app_name).settings.NICE_NAME
   except:
+    LOG.exception('failed to get nice name for app %s' % app_name)
     return app_name
 
 class TruncatingModel(models.Model):

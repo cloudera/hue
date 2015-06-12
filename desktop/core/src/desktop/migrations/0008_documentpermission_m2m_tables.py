@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import logging
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import connection, models
 
+LOG = logging.getLogger(__name__)
 
 class Migration(SchemaMigration):
 
@@ -29,7 +31,7 @@ class Migration(SchemaMigration):
             # Only want to make sure that these tables exist.
             # The previous migration should create these tables,
             # but it has been refactored to do so.
-            pass
+            LOG.exception('failed to create tables')
 
     def backwards(self, orm):
         pass

@@ -132,6 +132,7 @@ def get_field_types(field_list, iterations=3):
     try:
       parse(value)
     except:
+      LOG.exception('failed to parse value %s' % value)
       raise ValueError()
 
   def test_int(value):
@@ -309,10 +310,12 @@ def field_values_from_log(fh, fields=[ {'name': 'message', 'type': 'text_general
     try:
       timestamp_key = next(iter(filter(lambda field: field['type'] in DATE_FIELD_TYPES, fields)))['name']
     except:
+      LOG.exception('failed to get timestamp key')
       timestamp_key = None
     try:
       message_key = next(iter(filter(lambda field: field['type'] in TEXT_FIELD_TYPES, fields)))['name']
     except:
+      LOG.exception('failed to get message key')
       message_key = None
 
   def value_generator(buf):

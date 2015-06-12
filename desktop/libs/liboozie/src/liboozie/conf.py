@@ -15,11 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import sys
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.conf import Config, coerce_bool, validate_path
+
+LOG = logging.getLogger(__name__)
 
 
 OOZIE_URL = Config(
@@ -56,7 +59,7 @@ def get_oozie_status(user):
     if not 'test' in sys.argv: # Avoid tests hanging
       status = str(get_oozie(user).get_oozie_status())
   except:
-    pass
+    LOG.exception('failed to get oozie status')
 
   return status
 

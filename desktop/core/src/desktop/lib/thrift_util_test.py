@@ -22,6 +22,8 @@ import threading
 import time
 import unittest
 
+LOG = logging.getLogger(__name__)
+
 gen_py_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "gen-py"))
 if not gen_py_path in sys.path:
   sys.path.insert(1, gen_py_path)
@@ -78,6 +80,7 @@ class SimpleThriftServer(object):
                                        TBinaryProtocolFactory())
       server.serve()
     except:
+      LOG.exception('failed to start thrift server')
       sys.exit(1)
 
   def _ensure_online(self):
@@ -92,6 +95,7 @@ class SimpleThriftServer(object):
         ping_s.close()
         return
       except:
+        LOG.exception('failed to connect to child server')
         _, status = os.waitpid(self.pid, os.WNOHANG)
         if status != 0:
           logging.info("SimpleThriftServer child process exited with %s" % (status,))

@@ -20,6 +20,7 @@ import os
 
 from pytz import timezone, datetime
 
+LOG = logging.getLogger(__name__)
 
 class Formatter(logging.Formatter):
   def formatTime(self, record, datefmt=None):
@@ -27,9 +28,11 @@ class Formatter(logging.Formatter):
       tz = timezone(os.environ['TZ'])
       ct = datetime.datetime.fromtimestamp(record.created, tz=tz)
     except:
+      LOG.exception('failed to format time')
       try:
         ct = datetime.datetime.fromtimestamp(record.created)
       except:
+        LOG.exception('failed to format time')
         # Fallback to original.
         return super(Formatter, self).formatTime(record, datefmt=datefmt)
 
