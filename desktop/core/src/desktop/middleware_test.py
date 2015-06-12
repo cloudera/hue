@@ -99,7 +99,7 @@ def test_audit_logging_middleware_enable():
     reset()
     try:
       os.remove(log_tmp)
-    except:
+    except OSError:
       pass
 
 def test_audit_logging_middleware_disable():

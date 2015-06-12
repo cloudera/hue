@@ -1111,8 +1111,6 @@ class SSL_fileobject(CP_fileobject):
                     # The client is talking HTTP to an HTTPS server.
                     raise NoSSLError()
                 raise FatalSSLAlert(*e.args)
-            except:
-                raise
             
             if time.time() - start > self.ssl_timeout:
                 raise socket.timeout("timed out")
@@ -1596,12 +1594,16 @@ class CherryPyWSGIServer(object):
             # AF_UNIX socket
             
             # So we can reuse the socket...
-            try: os.unlink(self.bind_addr)
-            except: pass
+            try:
+              os.unlink(self.bind_addr)
+            except IOError:
+              pass
             
             # So everyone can access the socket...
-            try: os.chmod(self.bind_addr, 0777)
-            except: pass
+            try:
+              os.chmod(self.bind_addr, 0777)
+            except IOError:
+              pass
             
             info = [(socket.AF_UNIX, socket.SOCK_STREAM, 0, "", self.bind_addr)]
         else:

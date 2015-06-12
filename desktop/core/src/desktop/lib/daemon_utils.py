@@ -41,14 +41,14 @@ def get_uid_gid(username, groupname=None):
   """
   try:
     uid, default_grp = pwd.getpwnam(username)[2:4]
-  except:
+  except KeyError:
     raise KeyError("Couldn't get user id for user %s" % (username,))
   if groupname is None:
     gid = default_grp
   else:
     try:
       gid = grp.getgrnam(groupname)[2]
-    except:
+    except KeyError:
       raise KeyError("Couldn't get group id for group %s" % (groupname,))
   return (uid, gid)
 

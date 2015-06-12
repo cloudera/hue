@@ -190,7 +190,7 @@ def shutdown(sups):
   for pid in CHILD_PIDS:
     try:
       os.kill(pid, signal.SIGINT)
-    except:
+    except OSError:
       pass
 
   LOG.warn("Waiting for children to exit for %d seconds..." % WAIT_FOR_DEATH)
@@ -209,7 +209,7 @@ def shutdown(sups):
     for pid in CHILD_PIDS:
       try:
         os.kill(pid, signal.SIGKILL)
-      except:
+      except OSError:
         pass
 
   sys.exit(1)
@@ -274,13 +274,13 @@ def drop_privileges():
 
   try:
     pw = pwd.getpwnam(SETUID_USER)
-  except:
+  except KeyError:
     print >>sys.stderr, "[ERROR] Couldn't get user information for user " + SETUID_USER
     raise
 
   try:
     gr = grp.getgrnam(SETGID_GROUP)
-  except:
+  except KeyError:
     print >>sys.stderr, "[ERROR] Couldn't get group information for group " + SETGID_GROUP
     raise
 
