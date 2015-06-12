@@ -234,7 +234,7 @@ def default_from_email():
   if _default_from_email is None:
     try:
       fqdn = socket.getfqdn()
-    except:
+    except IOError:
       fqdn = 'localhost'
     _default_from_email = "hue@" + fqdn
   return _default_from_email

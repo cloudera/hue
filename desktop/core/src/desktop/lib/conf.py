@@ -613,10 +613,11 @@ def coerce_bool(value):
   if isinstance(value, bool):
     return value
 
-  try:
+  if isinstance(value, basestring):
     upper = value.upper()
-  except:
+  else:
     upper = value
+
   if upper in ("FALSE", "0", "NO", "OFF", "NAY", "", None):
     return False
   if upper in ("TRUE", "1", "YES", "ON", "YEA"):

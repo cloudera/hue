@@ -57,7 +57,7 @@ def get_fqdn(hostname_or_ip):
   # Get hostname
   try:
     fqdn = socket.gethostbyaddr(hostname_or_ip)[0]
-  except:
+  except IOError:
     fqdn = hostname_or_ip
 
   if fqdn == 'localhost':
