@@ -62,6 +62,7 @@ def load_augmentation_class():
     LOG.info("Augmenting users with class: %s" % (klass,))
     return klass
   except:
+    LOG.exception('failed to augment class')
     raise ImproperlyConfigured("Could not find user_augmentation_class: %s" % (class_name,))
 
 _user_augmentation_class = None

@@ -21,7 +21,7 @@ Misc helper functions
 
 try:
   from cStringIO import StringIO
-except:
+except ImportError:
   from StringIO import StringIO
 
 import logging

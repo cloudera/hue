@@ -39,7 +39,7 @@ def do_overwrite_save(fs, path, data, encoding):
             try:
                 fs.remove(path_dest)
             except:
-                pass
+                logger.exception('failed to remove %s' % path_dest)
             raise e
 
     _do_overwrite(fs, path, copy_data)
@@ -74,13 +74,13 @@ def _do_overwrite(fs, path, copy_data):
     try:
         fs.do_as_superuser(fs.chmod, path_dest, stat_module.S_IMODE(cur_stats['mode']))
     except:
-        logging.warn("Could not chmod new file %s to match old file %s" % (path_dest, path), exc_info=True)
+        logging.exception("Could not chmod new file %s to match old file %s" % (path_dest, path))
         # but not the end of the world - keep going
 
     try:
         fs.do_as_superuser(fs.chown, path_dest, cur_stats['user'], cur_stats['group'])
     except:
-        logging.warn("Could not chown new file %s to match old file %s" % (path_dest, path), exc_info=True)
+        logging.exception("Could not chown new file %s to match old file %s" % (path_dest, path))
         # but not the end of the world - keep going
 
     # Now delete the old - nothing we can do here to recover

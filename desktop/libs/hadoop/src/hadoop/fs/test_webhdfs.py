@@ -46,7 +46,7 @@ class WebhdfsTests(unittest.TestCase):
     try:
       self.cluster.fs.purge_trash()
     except:
-      LOG.error('Could not clean up trash.')
+      LOG.exception('Could not clean up trash.')
 
   def test_webhdfs(self):
     """

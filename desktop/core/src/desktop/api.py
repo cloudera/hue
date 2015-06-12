@@ -175,6 +175,7 @@ def massaged_documents_for_json(documents, user):
     try:
       url = document.content_object.get_absolute_url()
     except:
+      LOG.exception('failed to get absolute url')
       # If app of document is disabled
       url = ''
     docs[document.id] = massage_doc_for_json(document, user, url)

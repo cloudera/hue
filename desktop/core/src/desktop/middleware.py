@@ -438,6 +438,7 @@ class HtmlValidationMiddleware(object):
       fn = urlresolvers.resolve(request.path)[0]
       fn_name = '%s.%s' % (fn.__module__, fn.__name__)
     except:
+      LOG.exception('failed to resolve url')
       fn_name = '<unresolved_url>'
 
     # Write the two versions of html out for offline debugging

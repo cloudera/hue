@@ -16,9 +16,12 @@
 # limitations under the License.
 
 import json
+import logging
 
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
+
+LOG = logging.getLogger(__name__)
 
 
 class PermissionDeniedException(StructuredException):
@@ -38,5 +41,7 @@ class WebHdfsException(RestException):
       self.server_exc = json_body['exception']
       self._message = "%s: %s" % (self.server_exc, json_body['message'])
     except:
+      LOG.exception('failed to parse remote exception')
+
       # Don't mask the original exception
       self.server_exc = None

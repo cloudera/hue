@@ -1,10 +1,13 @@
 # encoding: utf-8
+import logging
 import datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import connection, models
 
 from desktop.models import Document
+
+LOG = logging.getLogger(__name__)
 
 class Migration(SchemaMigration):
 
@@ -85,7 +88,7 @@ class Migration(SchemaMigration):
             # Removing M2M table for field groups on 'DocumentPermission'
             db.delete_table('desktop_documentpermission_groups')
         except:
-            pass
+            LOG.exception('failed to delete tables')
 
         # Remove new m2m fields
         try:
@@ -95,7 +98,7 @@ class Migration(SchemaMigration):
             # Removing M2M table for field groups on 'DocumentPermission'
             db.delete_table('documentpermission_groups')
         except:
-            pass
+            LOG.exception('failed to delete tables')
 
         # Deleting model 'DocumentTag'
         db.delete_table('desktop_documenttag')
