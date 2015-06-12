@@ -1066,7 +1066,7 @@ def test_upload_file():
       # StopFutureHandlers() does not seem to work in test mode as it continues to MemoryFileUploadHandler after perm issue and so fails.
       pass
   finally:
-    cleanup_file(HDFS_DEST_DIR)
+    cleanup_file(cluster, HDFS_DEST_DIR)
 
 @attr('requires_hadoop')
 def test_upload_zip():
@@ -1103,7 +1103,7 @@ def test_upload_zip():
     assert_equal(0, response['status'], response)
     assert_true(cluster.fs.exists(HDFS_ZIP_FILE))
   finally:
-    cleanup_file(HDFS_DEST_DIR)
+    cleanup_file(cluster, HDFS_DEST_DIR)
 
 @attr('requires_hadoop')
 def test_upload_tgz():
