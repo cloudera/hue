@@ -41,7 +41,7 @@ import liboauth.conf
 try:
   import oauth2 as oauth
 except:
-  pass
+  oauth = None
 
 
 LOG = logging.getLogger(__name__)
@@ -91,6 +91,7 @@ class OAuthBackend(DesktopBackendBase):
 
   @classmethod
   def handleAuthenticationRequest(self, request):
+    assert oauth is not None
  
     if 'oauth_verifier' in request.GET:
         social = 'twitter'
@@ -188,6 +189,7 @@ class OAuthBackend(DesktopBackendBase):
 
   @classmethod
   def handleLoginRequest(self, request):
+    assert oauth is not None
     
     redirect_uri = 'http://' + request.get_host() + '/oauth/social_login/oauth_authenticated'
     response_type = "code"

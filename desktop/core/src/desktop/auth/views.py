@@ -19,7 +19,7 @@
 try:
   import oauth2 as oauth
 except:
-  pass
+  oauth = None
 
 import cgi
 import datetime
@@ -178,6 +178,8 @@ def _profile_dict(user):
 
 @login_notrequired
 def oauth_login(request):
+  assert oauth is not None
+
   consumer = oauth.Consumer(OAUTH.CONSUMER_KEY.get(), OAUTH.CONSUMER_SECRET.get())
   client = oauth.Client(consumer)
   resp, content = client.request(OAUTH.REQUEST_TOKEN_URL.get(), "POST", body=urllib.urlencode({

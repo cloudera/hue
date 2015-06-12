@@ -18,7 +18,7 @@
 try:
   import oauth2 as oauth
 except:
-  pass
+  oauth = None
  
 import logging
 import urllib
