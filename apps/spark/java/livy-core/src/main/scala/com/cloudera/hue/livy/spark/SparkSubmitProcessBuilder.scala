@@ -181,6 +181,16 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
+
+  def numExecutors(numExecutors: Int): SparkSubmitProcessBuilder = {
+    this.numExecutors(numExecutors.toString)
+  }
+
+  def numExecutors(numExecutors: String): SparkSubmitProcessBuilder = {
+    _numExecutors = Some(numExecutors)
+    this
+  }
+
   def queue(queue: String): SparkSubmitProcessBuilder = {
     _queue = Some(queue)
     this
@@ -249,6 +259,7 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     addOpt("--proxy-user", _proxyUser)
     addOpt("--driver-cores", _driverCores)
     addOpt("--executor-cores", _executorCores)
+    addOpt("--num-executors", _numExecutors)
     addOpt("--queue", _queue)
     addList("--archives", _archives.map(fromPath))
 
