@@ -26,6 +26,7 @@ import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
+import org.apache.hadoop.fs.Path
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext
@@ -51,6 +52,11 @@ class Client(livyConf: LivyConf) extends Logging {
 
   private[this] val yarnConf = new YarnConfiguration()
   private[this] val yarnClient = YarnClient.createYarnClient()
+  val path = new Path(sys.env("HADOOP_CONF_DIR") + YarnConfiguration.YARN_SITE_CONFIGURATION_FILE)
+  yarnConf.addResource(path)
+  val rm_address = yarnConf.get(YarnConfiguration.RM_ADDRESS)
+  info(s"Resource Manager address: $rm_address")
+
   yarnClient.init(yarnConf)
   yarnClient.start()
 
