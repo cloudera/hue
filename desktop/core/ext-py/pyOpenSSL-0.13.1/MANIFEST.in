@@ -1,7 +1,0 @@
-recursive-include       OpenSSL     *.h
-include     LICENSE ChangeLog INSTALL README TODO MANIFEST.in OpenSSL/RATIONALE
-include     doc/pyOpenSSL.tex doc/Makefile
-recursive-include   doc/tools   *
-recursive-include   examples    *
-recursive-include   rpm         *
-global-exclude  *.pyc
