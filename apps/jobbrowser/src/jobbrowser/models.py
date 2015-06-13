@@ -36,7 +36,7 @@ import hadoop.api.jobtracker.ttypes as ttypes
 from desktop.lib.exceptions_renderable import PopupException
 
 from django.utils.translation import ugettext as _
-
+from jobbrowser.conf import DISABLE_KILLING_JOBS
 
 LOGGER = logging.getLogger(__name__)
 
@@ -55,6 +55,20 @@ def get_acls(job):
   else:
     return job.full_job_conf
 
+def can_kill_job(self, user):
+  if DISABLE_KILLING_JOBS.get():
+    return False
+
+  if self.status.lower() not in ('running', 'pending', 'accepted'):
+    return False
+
+  if user.is_superuser:
+    return True
+
+  if can_modify_job(user.username, self):
+    return True
+
+  return user.username == self.user
 
 class JobLinkage(object):
   """

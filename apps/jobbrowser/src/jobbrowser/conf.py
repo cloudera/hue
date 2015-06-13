@@ -25,3 +25,10 @@ SHARE_JOBS = Config(
   type=coerce_bool,
   help=_('Share submitted jobs information with all users. If set to false, '
        'submitted jobs are visible only to the owner and administrators.'))
+
+DISABLE_KILLING_JOBS = Config(
+  key='disable_killing_jobs',
+  default=False,
+  type=coerce_bool,
+  help=_('Disable the job kill button for all users in the job browser.'))
+

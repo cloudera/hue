@@ -43,9 +43,10 @@ from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundE
 from hadoop.yarn.clients import get_log_client
 import hadoop.yarn.resource_manager_api as resource_manager_api
 
-from jobbrowser import conf
+from jobbrowser.conf import SHARE_JOBS
+from jobbrowser.conf import DISABLE_KILLING_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
-from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs
+from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs, can_kill_job
 from jobbrowser.yarn_models import Application
 
 import urllib2
@@ -75,7 +76,7 @@ def check_job_permission(view_func):
     except Exception, e:
       raise PopupException(_('Could not find job %s.') % jobid, detail=e)
 
-    if not conf.SHARE_JOBS.get() and not request.user.is_superuser \
+    if not SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
       raise PopupException(_("You don't have permission to access job %(id)s.") % {'id': jobid})
     kwargs['job'] = job
@@ -166,7 +167,7 @@ def massage_job_for_json(job, request):
     'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or '',
-    'canKill': job.status.lower() in ('running', 'pending', 'accepted') and (request.user.is_superuser or request.user.username == job.user or can_modify_job(request.user.username, job)),
+    'canKill': can_kill_job(job, request.user),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
   }
   return job
