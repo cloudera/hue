@@ -329,7 +329,7 @@
 <script type="text/html" id="start-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px;">
-    <div class="big-icon" title="${ _('It is where we start!') }"><i class="fa fa-flag-o"></i></div>
+    <div class="big-icon" title="${ _('It is where we start!') }"><i class="fa fa-dot-circle-o"></i></div>
   </div>
   <!-- /ko -->
 </script>
@@ -414,7 +414,7 @@
 
     <ul data-bind="visible: properties.retry_max().length > 0, foreach: properties.retry_max" class="unstyled">
       <li>
-        ${ _('Max') } <input type="number" data-bind="value: value" placeholder="${ _('Number of times, default is 3') }"/>
+        ${ _('Max') } <input type="number" data-bind="value: value, attr: { placeholder: $root.workflow_properties.retry_max.help_text }"/>
         <a href="#" data-bind="click: function(){ $parent.properties.retry_max.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
@@ -422,7 +422,7 @@
     </ul>
     <ul data-bind="visible: properties.retry_interval().length > 0, foreach: properties.retry_interval" class="unstyled">
       <li>
-        ${ _('Interval') } <input type="number" class="small" data-bind="value: value" placeholder="${ _('Wait time in minutes, default is 10') }"/>
+        ${ _('Interval') } <input type="number" class="small" data-bind="value: value, attr: { placeholder: $root.workflow_properties.retry_interval.help_text }"/>
         <a href="#" data-bind="click: function(){ $parent.properties.retry_interval.remove(this); $(document).trigger('drawArrows') }">
           <i class="fa fa-minus"></i>
         </a>
