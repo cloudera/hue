@@ -817,10 +817,15 @@ ${ commonshare() | n,unicode }
   }
 
   function addResults(viewModel, dataTable, index, pageSize) {
-    $.each(viewModel.rows.slice(index, index+pageSize), function(row_index, row) {
+    $.each(viewModel.rows.slice(index, index + pageSize), function (row_index, row) {
       var ordered_row = [];
-      $.each(viewModel.columns(), function(col_index, col) {
-        ordered_row.push(row[col]);
+      $.each(viewModel.columns(), function (col_index, col) {
+        if (col_index == 0) {
+          ordered_row.push(index + row_index);
+        }
+        else {
+          ordered_row.push(row[col]);
+        }
       });
       dataTable.fnAddData(ordered_row);
     });
