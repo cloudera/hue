@@ -79,7 +79,10 @@ function RdbmsViewModel() {
   self.updateResults = function(results) {
     var rows = [];
     self.columns.removeAll();  // Needed for datatables to refresh properly.
-    self.columns(results.columns);
+    if (results.columns != null) {
+      results.columns.unshift("");
+    }
+    self.columns(results.columns ? results.columns : []);
     self.rows.removeAll();
     self.rows(results.rows);
   };

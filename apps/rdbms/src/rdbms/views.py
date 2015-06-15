@@ -72,7 +72,7 @@ def execute_query(request, design_id=None, query_history_id=None):
 
   return render('execute.mako', request, {
     'action': action,
-    'doc_id': json.dumps(design.id and design.doc.get().id),
+    'doc_id': json.dumps(design.id and design.doc.get().id or -1),
     'design': design,
     'autocomplete_base_url': reverse('rdbms:api_autocomplete_databases', kwargs={}),
     'can_edit_name': design.id and not design.is_auto,
