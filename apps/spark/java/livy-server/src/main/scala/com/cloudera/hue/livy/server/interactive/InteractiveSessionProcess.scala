@@ -66,7 +66,7 @@ object InteractiveSessionProcess extends Logging {
     builder.env("LIVY_PORT", "0")
 
     builder.redirectOutput(Redirect.PIPE)
-    builder.redirectError(Redirect.INHERIT)
+    builder.redirectErrorStream(true)
 
     builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
   }
