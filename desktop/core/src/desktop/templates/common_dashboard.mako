@@ -25,14 +25,16 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="import_layout()">
+<%def name="import_layout(with_deferred=False)">
   <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
   <script src="${ static('desktop/js/ko.common-dashboard.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout.mapping-2.3.2.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
+  %if with_deferred:
   <script src="${ static('desktop/ext/js/knockout-deferred-updates.min.js') }" type="text/javascript" charset="utf-8"></script>
+  %endif
 </%def>
 
 <%def name="layout_toolbar()">
