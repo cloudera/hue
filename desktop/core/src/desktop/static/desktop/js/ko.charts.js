@@ -375,6 +375,44 @@ ko.bindingHandlers.leafletMapChart = {
             }).addTo(_map);
           }
 
+          if (_options.showMoveCheckbox) {
+            var _command = L.control({
+              position: "topright"
+            });
+
+            _command.onAdd = function (map) {
+              var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar");
+              div.innerHTML = '<label class="checkbox"><input id="command' + $(element).parents(".card-widget").attr("id") + '" type="checkbox"/> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</label>';
+              return div;
+            };
+
+            _command.addTo(_map);
+
+            if (_options.onRegionChange == null) {
+              _options.onRegionChange = function () {
+              };
+            }
+
+            var _onRegionChange = function () {
+            };
+
+            $("#command" + $(element).parents(".card-widget").attr("id")).on("change", function () {
+              if ($(this).is(":checked")) {
+                if (_options.onRegionChange != null) {
+                  _onRegionChange = _options.onRegionChange;
+                }
+              }
+              else {
+                _onRegionChange = function () {
+                };
+              }
+            });
+
+            _map.on("moveend", function () {
+              _onRegionChange(_map.getBounds());
+            });
+          }
+
           var _clusterGroup = L.markerClusterGroup({
             maxClusterRadius: 10,
             polygonOptions: {
@@ -405,6 +443,10 @@ ko.bindingHandlers.leafletMapChart = {
 
           _map.addLayer(_clusterGroup);
           _map.fitBounds(_clusterGroup.getBounds());
+
+          if (_options.onComplete != null) {
+            _options.onComplete();
+          }
         }
         catch (err) {
           $.jHueNotify.error(err.message);

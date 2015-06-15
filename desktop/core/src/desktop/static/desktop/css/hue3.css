@@ -2035,3 +2035,12 @@ pre {
 .hover-actions-3rd > a:hover {
   color: #338bb8;
 }
+
+.leaflet-search-command {
+  padding: 4px;
+  background-color: #FFF;
+}
+
+.leaflet-search-command input, .leaflet-search-command label {
+  margin-bottom: 0;
+}
