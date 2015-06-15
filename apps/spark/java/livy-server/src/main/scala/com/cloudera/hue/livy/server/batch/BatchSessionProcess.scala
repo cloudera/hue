@@ -51,6 +51,7 @@ object BatchSessionProcess {
     createBatchRequest.proxyUser.foreach(builder.proxyUser)
 
     builder.redirectOutput(Redirect.PIPE)
+    builder.redirectErrorStream(true)
 
     builder
   }

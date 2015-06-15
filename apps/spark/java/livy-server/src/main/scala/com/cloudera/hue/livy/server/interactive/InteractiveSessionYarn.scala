@@ -59,7 +59,7 @@ object InteractiveSessionYarn {
     createInteractiveRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
 
     builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(redirect = true)
+    builder.redirectErrorStream(true)
 
     val process = builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
 
