@@ -1797,7 +1797,7 @@ ${ dashboard.layout_skeleton() }
 
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-${ dashboard.import_layout() }
+${ dashboard.import_layout(True) }
 
 <script src="${ static('search/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('search/js/lzstring.min.js') }" type="text/javascript" charset="utf-8"></script>
