@@ -168,7 +168,7 @@ class Workflow(Job):
 
     for node in _data['workflow']['nodes']:
       if 'credentials' in node['properties']: # If node is an Action
-        if 'retry_max' not in node['properties']:
+        if 'retry_max' not in node['properties']: # When displaying a workflow
           node['properties']['retry_max'] = []
         if 'retry_interval' not in node['properties']:
           node['properties']['retry_interval'] = []
@@ -370,6 +370,10 @@ class Node():
       self.data['properties']['archives'] = []
     if 'sla' not in self.data['properties']:
       self.data['properties']['sla'] = Workflow.SLA_DEFAULT
+    if 'retry_max' not in self.data['properties']:
+      self.data['properties']['retry_max'] = []
+    if 'retry_interval' not in self.data['properties']:
+      self.data['properties']['retry_interval'] = []
 
     # Backward compatibility
     if self.data['type'] == 'sqoop' and 'arguments' not in self.data['properties']:
