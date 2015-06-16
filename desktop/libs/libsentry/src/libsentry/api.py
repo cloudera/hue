@@ -261,7 +261,7 @@ def _get_server_properties():
             from zookeeper.conf import CLUSTERS
             sasl_server_principal = CLUSTERS.get()['default'].PRINCIPAL_NAME.get()
           except Exception, e:
-            LOG.error("Could not get principal name from ZooKeeper app config: %s. Using 'zookeeper' as principal name." % e)
+            LOG.warn("Could not get principal name from ZooKeeper app config: %s. Using 'zookeeper' as principal name." % e)
             sasl_server_principal = 'zookeeper'
         else:
           sasl_server_principal = None

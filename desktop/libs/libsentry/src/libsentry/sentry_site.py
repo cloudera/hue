@@ -38,7 +38,7 @@ _CONF_SENTRY_SERVER_ADMIN_GROUP = 'sentry.service.admin.group'
 
 _CONF_SENTRY_SERVER_HA_ENABLED = 'sentry.ha.enabled'
 _CONF_SENTRY_SERVER_HA_HAS_SECURITY = 'sentry.ha.zookeeper.security'
-_CONF_SENTRY_SERVER_HA_ZOOKEEPER_ADDRESSES = 'sentry.ha.zookeeper.security.quorum'
+_CONF_SENTRY_SERVER_HA_ZOOKEEPER_ADDRESSES = 'sentry.ha.zookeeper.quorum'
 _CONF_SENTRY_SERVER_HA_ZOOKEEPER_NAMESPACE = 'sentry.ha.zookeeper.namespace'
 
 
