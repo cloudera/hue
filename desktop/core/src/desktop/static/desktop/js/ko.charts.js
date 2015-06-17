@@ -303,6 +303,20 @@ ko.bindingHandlers.leafletMapChart = {
     var _options = valueAccessor();
     var _data = _options.transformer(valueAccessor().datum);
 
+    function toggleVisibility() {
+      if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
+        $(element).show();
+        $(element).siblings(".leaflet-nodata").remove();
+      }
+      else {
+        $(element).hide();
+        if ((_options.visible != null && _options.visible) && !_options.isLoading) {
+          $(element).siblings(".leaflet-nodata").remove();
+          $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text("No Data Available."));
+        }
+      }
+    }
+
     if ($(element).data("mapData") == null || $(element).data("mapData") != ko.toJSON(_data) || _options.forceRedraw) {
 
       $(element).data("mapData", ko.toJSON(_data));
@@ -342,17 +356,8 @@ ko.bindingHandlers.leafletMapChart = {
           $(element).height(300);
         }
       }
-      if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
-        $(element).show();
-        $(element).siblings(".leaflet-nodata").remove();
-      }
-      else {
-        $(element).hide();
-        if ((_options.visible != null && _options.visible) && !_options.isLoading){
-          $(element).siblings(".leaflet-nodata").remove();
-          $(element).before($("<div>").addClass("leaflet-nodata").css({ "textAlign": "center", "fontSize": "18px", "fontWeight": 700, "marginTop": "20px"}).text("No Data Available."));
-        }
-      }
+
+      toggleVisibility();
 
       var _map = null;
       if (element._map != null) {
@@ -400,18 +405,18 @@ ko.bindingHandlers.leafletMapChart = {
 
           _map.addLayer(_clusterGroup);
           _map.fitBounds(_clusterGroup.getBounds());
-
-
-          if (_options.onComplete != null) {
-            _options.onComplete();
-          }
         }
         catch (err) {
           $.jHueNotify.error(err.message);
         }
       }
       element._map = _map;
-
+      if (_options.onComplete != null) {
+        _options.onComplete();
+      }
+    }
+    else {
+      toggleVisibility();
     }
   }
 };
