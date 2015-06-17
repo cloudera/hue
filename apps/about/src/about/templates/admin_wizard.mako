@@ -238,7 +238,7 @@ ${ header.menubar() }
           <span class="muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</span>
           % if not user.is_authenticated():
             <br/>
-            <a href="${ reverse('desktop.auth.views.dt_login') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
+            <a href="${ reverse('desktop.views.home') }" class="btn btn-primary" style="margin-top: 50px;margin-bottom: 20px"><i class="fa fa-sign-in"></i> ${ _('Sign in now!') }</a>
           % endif
         </p>
        </div>
