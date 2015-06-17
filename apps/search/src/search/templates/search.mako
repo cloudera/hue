@@ -1570,7 +1570,7 @@ ${ dashboard.layout_skeleton() }
 
     <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
-      onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); console.log(getSolrURL(bounds)) },
+      onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); },
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
   </div>
@@ -2661,10 +2661,6 @@ $(document).ready(function () {
     if (! viewModel.collection.idField()) {
       $(document).trigger("warn", "${ _('Result highlighting is unavailable: the collection does not have an index field') }");
     }
-  }
-
-  function getSolrURL(bounds){
-    return 'http://localhost:8983/solr/logs4_shard1_replica1/select?q=*%3A*&rows=1&wt=json&indent=true&facet=true&facet.heatmap=location_srpt&facet.heatmap.geom=["'+ bounds._southWest.lng + ' ' + bounds._southWest.lat +'" TO "'+ bounds._northEast.lng + ' ' + bounds._northEast.lat +'"]';
   }
 </script>
 
