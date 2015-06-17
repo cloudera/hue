@@ -100,17 +100,27 @@ def manage_oozie_jobs(request, job_id, action):
 
   try:
     oozie_api = get_oozie(request.user)
+    params = None
+
     if action == 'change':
-      end_time = 'endtime=%s' % (request.POST.get('end_time'))
-      response['data'] = oozie_api.job_control(job_id, action, parameters={'value': end_time})
-    else:
-      response['data'] = oozie_api.job_control(job_id, action)
+      params = {'value': 'endtime=%s' % (request.POST.get('end_time'))}
+    elif action == 'ignore':
+      oozie_api = get_oozie(request.user, api_version="v2")
+      params = {
+        'type': 'action',
+        'scope': ','.join(job.aggreate(request.POST.get('actions').split())),
+      }
+
+    response['data'] = oozie_api.job_control(job_id, action, parameters=params)
 
     response['status'] = 0
     if 'notification' in request.POST:
       request.info(_(request.POST.get('notification')))
   except RestException, ex:
-    msg = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex.message)
+    ex_message = ex.message
+    if ex._headers.get('oozie-error-message'):
+      ex_message = ex._headers.get('oozie-error-message')
+    msg = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex_message)
     LOG.exception(msg)
 
     response['data'] = msg
