@@ -2196,11 +2196,24 @@ function mapChartDataTransformer(data) {
     item.values = item.pivot ? item.pivot[0].fq_values : item.fq_values;
     item.counts = item.pivot ? item.pivot[0].count : item.count; // unused yet
     item.is2d = item.pivot ? true : false; // unused yet
-    _data.push({
-      label: data.scope == "world" ? HueGeo.getISOAlpha3(item.value) : item.value,
-      value: item.pivot ? item.pivot[0].fq_values : item.count,
-      obj: item
-    });
+    if (item.value != null && item.value != "" && item.value.length < 4) {
+      var _label = data.scope == "world" ? HueGeo.getISOAlpha3(item.value) : item.value.toUpperCase();
+      var _found = false;
+      for (var i = 0; i < _data.length; i++) { // we group lower and upper cases together
+        if (_data[i].label == _label) {
+          _data[i].value += item.pivot ? item.pivot[0].fq_values : item.count;
+          _found = true;
+          break;
+        }
+      }
+      if (!_found) {
+        _data.push({
+          label: _label,
+          value: item.pivot ? item.pivot[0].fq_values : item.count,
+          obj: item
+        });
+      }
+    }
   });
   return _data;
 }

@@ -541,7 +541,7 @@ ko.bindingHandlers.mapChart = {
         var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
         if (_place != null) {
           _mapdata[_place] = {
-            fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item).idx : (Math.floor(item.value / _chunk) - 1)),
+            fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item).idx : (Math.ceil(item.value / _chunk) - 1)),
             id: _place,
             cat: item.obj.cat,
             value: item.obj.values ? item.obj.values : item.obj.value,
