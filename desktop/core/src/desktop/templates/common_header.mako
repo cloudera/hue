@@ -192,15 +192,9 @@ from django.utils.translation import ugettext as _
   <script type="text/javascript" charset="utf-8">
 
     //Add CSRF Token to all XHR Requests
-    var csrftoken = $.cookie('csrftoken');
-    function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
-      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-
     var xrhsend = XMLHttpRequest.prototype.send;
     XMLHttpRequest.prototype.send = function (data) {
-      this.setRequestHeader('X-CSRFToken', csrftoken);
+      this.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'));
       return xrhsend.apply(this, arguments);
     }
 
