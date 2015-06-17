@@ -599,6 +599,9 @@ var Collection = function (vm, collection) {
 
     qdefinition.hasChanged = ko.observable(false);
     vm.selectedQDefinition(qdefinition);
+    if (window.location.hash.indexOf("collection") == -1){
+      window.location.hash = "q=" + qdef.uuid();
+    }
     vm.search();
     $(document).trigger("loadedQDefinition");
   }
@@ -633,7 +636,8 @@ var Collection = function (vm, collection) {
 
   self.getQDefinition = function (qDefID) {
     for (var i = 0; i < self.qdefinitions().length; i++) {
-      if (self.qdefinitions()[i].id() == qDefID) {
+      var qdef = ko.mapping.fromJSON(self.qdefinitions()[i].data());
+      if (qdef.uuid() == qDefID) {
         return self.qdefinitions()[i];
       }
     }
