@@ -24,7 +24,7 @@
         <groupId>com.cloudera.hue.livy</groupId>
         <artifactId>livy-main</artifactId>
         <relativePath>../pom.xml</relativePath>
-        <version>3.7.0-cdh5.4.2.1</version>
+        <version>3.7.0-cdh5.4.2</version>
     </parent>
 
     <artifactId>livy-server_2.10</artifactId>
