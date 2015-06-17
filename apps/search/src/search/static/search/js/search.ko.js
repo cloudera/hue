@@ -802,12 +802,18 @@ var Collection = function (vm, collection) {
   self.template.fieldsNames = ko.computed(function () {
     return $.map(self.template.fieldsAttributes(), function(field) {
       return field.name();
+    }).sort(function (a, b) {
+      return a.toLowerCase().localeCompare(b.toLowerCase());
     });
   });
 
-  self.template.sortedFieldsNames = ko.computed(function () {
-    return $.map(self.template.fieldsAttributes(), function (field) {
-      return field.name();
+  self.template.sortedGeogFieldsNames = ko.computed(function () {
+    return $.map(
+      $.grep(self.availableFacetFields(), function(field) {
+        return FLOAT_TYPES.indexOf(field.type()) != -1 || GEO_TYPES.indexOf(field.type()) != -1 || field.type().match(/rpt$/);
+      }),
+      function (field) {
+        return field.name();
     }).sort(function (a, b) {
       return a.toLowerCase().localeCompare(b.toLowerCase());
     });
@@ -1146,6 +1152,8 @@ var NewTemplate = function (vm, initial) {
 
 var DATE_TYPES = ['date', 'tdate'];
 var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat', 'double', 'tdouble'];
+var FLOAT_TYPES = ['float', 'tfloat', 'double', 'tdouble'];
+var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 
 var RANGE_SELECTABLE_WIDGETS = ['histogram-widget', 'bar-widget', 'line-widget'];
 
