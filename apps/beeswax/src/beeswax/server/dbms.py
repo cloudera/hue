@@ -570,14 +570,11 @@ class HiveServer2Dbms(object):
     return self.client.close(handle)
 
 
-  def get_partitions(self, db_name, table, max_parts=None):
+  def get_partitions(self, db_name, table, max_parts=None, reverse_sort=True):
     if max_parts is None or max_parts > BROWSE_PARTITIONED_TABLE_LIMIT.get():
       max_parts = BROWSE_PARTITIONED_TABLE_LIMIT.get()
 
-    # DB name not supported in SHOW PARTITIONS
-    self.use(db_name)
-
-    return self.client.get_partitions(db_name, table.name, max_parts)
+    return self.client.get_partitions(db_name, table.name, max_parts, reverse_sort)
 
   def get_partition(self, db_name, table_name, partition_id):
     table = self.get_table(db_name, table_name)
