@@ -746,7 +746,7 @@ class HiveServerClient:
       return 'Server does not support GetLog()'
 
 
-  def get_partitions(self, database, table_name, max_parts):
+  def get_partitions(self, database, table_name, max_parts, reverse_sort=True):
     table = self.get_table(database, table_name)
 
     if max_parts is None or max_parts <= 0:
@@ -755,7 +755,12 @@ class HiveServerClient:
       max_rows = 1000 if max_parts <= 250 else max_parts
 
     partitionTable = self.execute_query_statement('SHOW PARTITIONS %s.%s' % (database, table_name), max_rows=max_rows)
-    return [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
+    partitions = [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
+
+    if reverse_sort:
+      partitions.reverse()
+
+    return partitions
 
 
   def _get_query_configuration(self, query):
@@ -975,8 +980,8 @@ class HiveServerClientCompatible(object):
   def get_partition(self, *args, **kwargs): raise NotImplementedError()
 
 
-  def get_partitions(self, database, table_name, max_parts):
-    return self._client.get_partitions(database, table_name, max_parts)
+  def get_partitions(self, database, table_name, max_parts, reverse_sort=True):
+    return self._client.get_partitions(database, table_name, max_parts, reverse_sort)
 
 
   def alter_partition(self, db_name, tbl_name, new_part): raise NotImplementedError()

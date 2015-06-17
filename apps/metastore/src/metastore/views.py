@@ -269,7 +269,9 @@ def describe_partitions(request, database, table):
   if not table_obj.partition_keys:
     raise PopupException(_("Table '%(table)s' is not partitioned.") % {'table': table})
 
-  partitions = db.get_partitions(database, table_obj, max_parts=None)
+  reverse_sort = request.REQUEST.get("sort", "desc").lower() == "desc"
+
+  partitions = db.get_partitions(database, table_obj, max_parts=None, reverse_sort=reverse_sort)
 
   return render("describe_partitions.mako", request, {
     'breadcrumbs': [{

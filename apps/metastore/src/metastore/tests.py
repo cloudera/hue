@@ -112,10 +112,11 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
   def test_describe_partitions(self):
     response = self.client.get("/metastore/table/default/test_partitions")
-    assert_true("Show Partitions (1)" in response.content, response.content)
+    assert_true("Show Partitions (2)" in response.content, response.content)
 
     response = self.client.get("/metastore/table/default/test_partitions/partitions", follow=True)
     assert_true("baz_one" in response.content)
+    assert_true("baz_two" in response.content)
     assert_true("boom_two" in response.content)
     # Breadcrumbs
     assert_true("default" in response.content)
