@@ -99,7 +99,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   <div id="rerun-coord-modal" class="modal hide"></div>
                   <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
-                     data-confirmation-message="${ _('Are you sure you\'d like to suspend this job?') }"
+                     data-confirmation-header="${ _('Are you sure you\'d like to suspend this job?') }"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
                        hide
@@ -109,7 +109,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </button>
                   <button title="${ _('Resume the coordinator') }" id="resume-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
-                     data-confirmation-message="${ _('Are you sure you\'d like to resume this job?') }"
+                     data-confirmation-header="${ _('Are you sure you\'d like to resume this job?') }"
                      class="btn btn-small confirmationModal
                      % if oozie_coordinator.is_running():
                        hide
@@ -119,7 +119,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </button>
                   <button title="${ _('Edit End Time') }" id="edit-endtime-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='change') }"
-                     data-confirmation-message="${ _('Update End Time') }"
+                     data-confirmation-header="${ _('Update End Time') }"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
                        hide
@@ -139,7 +139,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                     href="javascript:void(0)"
                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
                     data-message="${ _('The coordinator was killed!') }"
-                    data-confirmation-message="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
+                    data-confirmation-header="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
                       ${_('Kill')}
                   </button>
                 </li>
@@ -173,13 +173,24 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <div class="pull-left">
                   <input type="text" data-bind="textInput: searchFilter, value: searchFilter,  valueUpdate: 'input'" class="input-xlarge search-query" placeholder="${_('Filter results')}">
                   % if has_job_edition_permission(oozie_coordinator, user):
-                      <button data-bind="enable: selectedActions().length > 0" class="btn btn-primary rerun-btn action-button"
-                         % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
-                           disabled="disabled"
-                         % endif
-                        data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
-                        <i class="fa fa-refresh"></i> ${ _('Rerun') }
-                      </button>
+                      <div id="coord-actions" data-bind="enable: selectedActions().length > 0" class="btn-group" style="vertical-align: middle">
+                        <button data-bind="enable: selectedActions().length > 0" class="btn btn-primary rerun-btn"
+                           % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
+                             disabled="disabled"
+                           % endif
+                          data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
+                          <i class="fa fa-refresh"></i> ${ _('Rerun') }
+                        </button>
+                        <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"
+                          data-bind="enable: selectedActions().length > 0">
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu"> <li data-bind="enable: selectedActions().length > 0">
+                            <a href='#' class="ignore-btn confirmationModal" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='ignore') }"
+                                data-confirmation-body="${ _('Are you sure you want to ignore the action(s)?')}"
+                                data-confirmation-header="${ _('Note: You can only ignore a FAILED, KILLED or TIMEDOUT action' )}" > ${ _('Ignore') } </a></li>
+                        </ul>
+                      </div>
                   % endif
                 </div>
                 <span class="btn-group pull-right" style="margin-right: 20px">
@@ -387,10 +398,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="message"></h3>
+    <h3 class="confirmation_header"></h3>
   </div>
   <div id="update-endtime" class="span10">
     ${ utils.render_field_no_popover(update_endtime_form['end'], show_label=False) }
+  </div>
+  <div class="modal-body">
+      <p class="confirmation_body"></p>
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -576,7 +590,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     ACTUAL_END: "${_('Actual End')}",
     TOOLTIP_ADDON: "${_('click for the SLA dashboard')}"
   }
-  var slaTable;
+  var slaTable, refreshViewTimer;
   var PAGE_SIZE = 50;
   var actionTableOffset = 1;
 
@@ -659,7 +673,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
     $(".confirmationModal").click(function(){
       var _this = $(this);
-      $("#confirmation .message").text(_this.attr("data-confirmation-message"));
+      $("#confirmation .confirmation_header").text(_this.attr("data-confirmation-header"));
+      if (_this.hasClass("ignore-btn")) {
+        $("#confirmation .confirmation_body").text(_this.attr("data-confirmation-body"));
+      }
       $("#confirmation").modal("show");
 
       if (_this.attr("id") == "edit-endtime-btn") {
@@ -668,6 +685,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         $("#update-endtime").hide();
       }
 
+      $("#confirmation a.btn-danger").unbind();
       $("#confirmation a.btn-danger").click(function() {
         _this.trigger('confirmation');
         $(this).attr("data-loading-text", $(this).text() + " ...");
@@ -685,12 +703,16 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         params['end_time'] = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(),
                                         IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
       }
+      else if ($(this).hasClass("ignore-btn")) {
+        params['actions'] = viewModel.selectedActions().join(' ');
+      }
 
       $.post($(this).attr("data-url"), params,
         function(response) {
           if (response['status'] != 0) {
             $(document).trigger("error", "${ _('Problem: ') }" + response['data']);
             $("#confirmation a.btn-danger").button("reset");
+            $("#confirmation").modal("hide");
           } else {
             window.location.reload();
           }
@@ -849,7 +871,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
-        window.setTimeout(refreshView, 5000);
+
+        window.clearTimeout(refreshViewTimer);
+        refreshViewTimer = window.setTimeout(refreshView, 5000);
       });
     }
 

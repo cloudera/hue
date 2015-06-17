@@ -160,7 +160,7 @@ class MockOozieApi:
   def get_action(self, action_id):
     return WorkflowAction(MockOozieApi.WORKFLOW_ACTION)
 
-  def job_control(self, job_id, action):
+  def job_control(self, job_id, action, parameters=None):
     return 'Done'
 
   def get_job_definition(self, jobid):
@@ -3384,6 +3384,24 @@ class TestDashboard(OozieMockBase):
       LOG.exception('failed to get oozie job')
 
     response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'kill']))
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'suspend']))
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'resume']))
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
+    params = {'end_time': u'12:00 AM'}
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'change']), params)
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
+    params = {'actions': '1 2 3'}
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'ignore']), params)
     data = json.loads(response.content)
     assert_equal(0, data['status'])
 
