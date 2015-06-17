@@ -1443,6 +1443,33 @@ ${ dashboard.layout_skeleton() }
       </div>
     </div>
     <!-- /ko -->
+
+    <!-- ko if: $data.type() == 'map' -->
+    <div class="filter-box">
+      <div class="title">
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); $root.query.removeFilter($data); $root.search() }">
+          <i class="fa fa-times"></i>
+        </a>
+        <span data-bind="text: $data.lat"></span>, <span data-bind="text: $data.lon"></span>
+        &nbsp;
+      </div>
+      <div class="content">
+        <strong>${_('selected')}</strong>
+        <span class="label label-info">
+          [
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_sw, attr: {'title': '${ _('Latitude South West') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_sw, attr: {'title': '${ _('Longitude South West') }'"></span>
+          ]
+          ${ _("TO") } 
+          [
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_ne, attr: {'title': '${ _('Latitude North East') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_ne, attr: {'title': '${ _('Longitude North East') }'"></span>
+          ]
+        </span>
+      </div>
+    </div>
+    <!-- /ko -->    
+    
   </div>
   <div class="clearfix"></div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
@@ -1543,7 +1570,7 @@ ${ dashboard.layout_skeleton() }
 
     <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
-      onRegionChange: function(bounds){ alert(ko.toJSON(bounds, null, 2)); alert(getSolrURL(bounds)) },
+      onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); console.log(getSolrURL(bounds)) },
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
   </div>

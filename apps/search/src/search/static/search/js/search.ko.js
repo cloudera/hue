@@ -211,7 +211,7 @@ var Query = function (vm, query) {
       }
     }
 
-    if (vm.selectedQDefinition() != null){
+    if (vm.selectedQDefinition() != null) {
       vm.selectedQDefinition().hasChanged(true);
     }
 
@@ -282,6 +282,32 @@ var Query = function (vm, query) {
     }
   };
 
+  self.selectMapRegionFacet = function (data) {
+    self.removeFilter(ko.mapping.fromJS({'id': data.widget_id, 'dontZoomOut': true}));
+
+    console.log(ko.mapping.toJSON(data));
+    
+      self.fqs.push(ko.mapping.fromJS({
+          'id': data.widget_id,
+          'field': data.lat,
+          'lat': data.lat,
+          'lon': data.lon,
+          'filter': [{'exclude': false, 'value': data.bounds}],
+          'type': 'map',
+          'properties': {
+              'lat_sw': data.bounds._southWest.lat, 'lon_sw': data.bounds._southWest.lng,
+              'lat_ne': data.bounds._northEast.lat, 'lon_ne': data.bounds._northEast.lng
+          }
+      }));
+
+    if (vm.selectedQDefinition() != null) {
+      vm.selectedQDefinition().hasChanged(true);
+    }
+
+    self.start(0);
+    vm.search();
+  };
+  
   function getFilterByField(field) {
     var _fq = null;
     $.each(self.fqs(), function (index, fq) {

@@ -225,6 +225,12 @@ class SolrApi(object):
         params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
                                                           for field, f in zip(fq['filter'], fq['properties'])])),)
+      elif fq['type'] == 'map':
+        _keys = fq.copy()
+        _keys.update(fq['properties'])
+        params += (('fq', '{!tag=%(id)s}' % fq + urllib.unquote(
+                    utf_quoter('%(lat)s:[%(lat_sw)s TO %(lat_ne)s} %(lon)s:[%(lon_sw)s TO %(lon_ne)s}' % _keys))),)
+
     return params
 
   def query(self, collection, query):
