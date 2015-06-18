@@ -99,7 +99,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   <div id="rerun-coord-modal" class="modal hide"></div>
                   <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
-                     data-confirmation-header="${ _('Are you sure you\'d like to suspend this job?') }"
+                     data-confirmation-header="${ _('Are you sure you want to suspend this job?') }"
+                     data-confirmation-footer="normal"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
                        hide
@@ -109,7 +110,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </button>
                   <button title="${ _('Resume the coordinator') }" id="resume-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
-                     data-confirmation-header="${ _('Are you sure you\'d like to resume this job?') }"
+                     data-confirmation-header="${ _('Are you sure you want to resume this job?') }"
+                     data-confirmation-footer="normal"
                      class="btn btn-small confirmationModal
                      % if oozie_coordinator.is_running():
                        hide
@@ -120,6 +122,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   <button title="${ _('Edit End Time') }" id="edit-endtime-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='change') }"
                      data-confirmation-header="${ _('Update End Time') }"
+                     data-confirmation-footer="update"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
                        hide
@@ -139,7 +142,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                     href="javascript:void(0)"
                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
                     data-message="${ _('The coordinator was killed!') }"
-                    data-confirmation-header="${ _('Are you sure you\'d like to kill this job?') }" style="margin-bottom: 5px">
+                    data-confirmation-footer="danger"
+                    data-confirmation-header="${ _('Are you sure you want to kill this job?') }" style="margin-bottom: 5px">
                       ${_('Kill')}
                   </button>
                 </li>
@@ -188,6 +192,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                         <ul class="dropdown-menu"> <li data-bind="enable: selectedActions().length > 0">
                             <a href='#' class="ignore-btn confirmationModal" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='ignore') }"
                                 data-confirmation-body="${ _('Are you sure you want to ignore the action(s)?')}"
+                                data-confirmation-footer="normal"
                                 data-confirmation-header="${ _('Note: You can only ignore a FAILED, KILLED or TIMEDOUT action' )}" > ${ _('Ignore') } </a></li>
                         </ul>
                       </div>
@@ -406,9 +411,17 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
   <div class="modal-body">
       <p class="confirmation_body"></p>
   </div>
-  <div class="modal-footer">
+  <div class="modal-footer danger hide">
     <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
+    <a class="btn btn-danger btn-confirm disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
+  </div>
+  <div class="modal-footer normal hide">
+    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-primary btn-confirm disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
+  </div>
+  <div class="modal-footer update hide">
+    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a class="btn btn-primary btn-confirm disable-feedback" href="javascript:void(0);">${_('Update')}</a>
   </div>
 </div>
 
@@ -671,12 +684,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       }
     });
 
-    $(".confirmationModal").click(function(){
+    $(".confirmationModal").click(function () {
       var _this = $(this);
       $("#confirmation .confirmation_header").text(_this.attr("data-confirmation-header"));
       if (_this.hasClass("ignore-btn")) {
         $("#confirmation .confirmation_body").text(_this.attr("data-confirmation-body"));
       }
+      $("#confirmation .modal-footer:not(." + _this.attr("data-confirmation-footer") + ")").addClass("hide");
+      $("#confirmation .modal-footer." + _this.attr("data-confirmation-footer")).removeClass("hide");
       $("#confirmation").modal("show");
 
       if (_this.attr("id") == "edit-endtime-btn") {
@@ -685,15 +700,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         $("#update-endtime").hide();
       }
 
-      $("#confirmation a.btn-danger").unbind();
-      $("#confirmation a.btn-danger").click(function() {
+      $("#confirmation a.btn-confirm").unbind();
+      $("#confirmation a.btn-confirm").click(function () {
         _this.trigger('confirmation');
         $(this).attr("data-loading-text", $(this).text() + " ...");
         $(this).button("loading");
       });
     });
 
-    $(".confirmationModal").bind('confirmation', function() {
+    $(".confirmationModal").bind('confirmation', function () {
       var _this = this;
       var IN_DATETIME_FORMAT = "MM/DD/YYYY hh:mm A";
       var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
@@ -701,46 +716,46 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       var params = { 'notification': $(_this).attr("data-message") };
       if ($(this).attr("id") == "edit-endtime-btn") {
         params['end_time'] = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(),
-                                        IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
+            IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
       }
       else if ($(this).hasClass("ignore-btn")) {
         params['actions'] = viewModel.selectedActions().join(' ');
       }
 
       $.post($(this).attr("data-url"), params,
-        function(response) {
-          if (response['status'] != 0) {
-            $(document).trigger("error", "${ _('Problem: ') }" + response['data']);
-            $("#confirmation a.btn-danger").button("reset");
-            $("#confirmation").modal("hide");
-          } else {
-            window.location.reload();
+          function (response) {
+            if (response['status'] != 0) {
+              $(document).trigger("error", "${ _('Problem: ') }" + response['data']);
+              $("#confirmation a.btn-confirm").button("reset");
+              $("#confirmation").modal("hide");
+            } else {
+              window.location.reload();
+            }
           }
-        }
       );
       return false;
     });
 
-    $("#suspend-btn").bind('confirmation', function() {
+    $("#suspend-btn").bind('confirmation', function () {
       var _this = this;
       $.post($(this).data("url"),
-        { 'notification': $(this).data("message") },
-        function(response) {
-          if (response['status'] != 0) {
-            $(document).trigger("error", "${ _('Error: ') }" + response['data']);
-            $("#confirmation a.btn-danger").button("reset");
-          } else {
-            window.location.reload();
+          { 'notification': $(this).data("message") },
+          function (response) {
+            if (response['status'] != 0) {
+              $(document).trigger("error", "${ _('Error: ') }" + response['data']);
+              $("#confirmation a.btn-confirm").button("reset");
+            } else {
+              window.location.reload();
+            }
           }
-        }
       );
       return false;
     });
 
-    $('#rerun-btn, .rerun-btn').click(function() {
+    $('#rerun-btn, .rerun-btn').click(function () {
       var _action = $(this).data("rerun-url");
 
-      $.get(_action, function(response) {
+      $.get(_action, function (response) {
         $('#rerun-coord-modal').html(response);
         $('#rerun-coord-modal').modal('show');
       });
