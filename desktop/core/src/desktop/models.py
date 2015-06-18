@@ -673,8 +673,9 @@ class DocumentPermission(models.Model):
 
 
   objects = DocumentPermissionManager()
-  unique_together = ('doc', 'perms')
 
+  class Meta:
+    unique_together = ('doc', 'perms')
 
 
 class Document2Manager(models.Manager):
