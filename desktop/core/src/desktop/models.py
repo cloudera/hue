@@ -421,7 +421,9 @@ class Document(models.Model):
   content_object = generic.GenericForeignKey('content_type', 'object_id')
 
   objects = DocumentManager()
-  unique_together = ('content_type', 'object_id')
+
+  class Meta:
+    unique_together = ('content_type', 'object_id')
 
   def __unicode__(self):
     return force_unicode('%s %s %s') % (self.content_type, self.name, self.owner)
