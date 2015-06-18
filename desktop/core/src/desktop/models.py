@@ -254,23 +254,31 @@ class DocumentManager(models.Manager):
 
   def sync(self):
 
+    def find_jobs_with_no_doc(model):
+      return model.objects.filter(doc__isnull=True)
+
     try:
       with transaction.atomic():
         from oozie.models import Workflow, Coordinator, Bundle
 
-        for job in list(chain(Workflow.objects.all(), Coordinator.objects.all(), Bundle.objects.all())):
-          if not job.doc.exists():
-            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
-            tag = DocumentTag.objects.get_example_tag(user=job.owner)
-            doc.tags.add(tag)
-            if job.is_trashed:
-              doc.send_to_trash()
-            if job.is_shared:
-              doc.share_to_default()
-            if hasattr(job, 'managed'):
-              if not job.managed:
-                doc.extra = 'jobsub'
-                doc.save()
+        for job in chain(
+            find_jobs_with_no_doc(Workflow),
+            find_jobs_with_no_doc(Coordinator),
+            find_jobs_with_no_doc(Bundle)):
+          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
+          doc.tags.add(tag)
+
+          if job.is_trashed:
+            doc.send_to_trash()
+
+          if job.is_shared:
+            doc.share_to_default()
+
+          if hasattr(job, 'managed'):
+            if not job.managed:
+              doc.extra = 'jobsub'
+              doc.save()
     except Exception, e:
       LOG.exception('error syncing oozie')
 
@@ -278,13 +286,12 @@ class DocumentManager(models.Manager):
       with transaction.atomic():
         from beeswax.models import SavedQuery
 
-        for job in SavedQuery.objects.all():
-          if not job.doc.exists():
-            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
-            tag = DocumentTag.objects.get_example_tag(user=job.owner)
-            doc.tags.add(tag)
-            if job.is_trashed:
-              doc.send_to_trash()
+        for job in find_jobs_with_no_doc(SavedQuery):
+          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
+          doc.tags.add(tag)
+          if job.is_trashed:
+            doc.send_to_trash()
     except Exception, e:
       LOG.exception('error syncing beeswax')
 
@@ -292,11 +299,10 @@ class DocumentManager(models.Manager):
       with transaction.atomic():
         from pig.models import PigScript
 
-        for job in PigScript.objects.all():
-          if not job.doc.exists():
-            doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-            tag = DocumentTag.objects.get_example_tag(user=job.owner)
-            doc.tags.add(tag)
+        for job in find_jobs_with_no_doc(PigScript):
+          doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
+          doc.tags.add(tag)
     except Exception, e:
       LOG.exception('error syncing pig')
 
@@ -323,21 +329,20 @@ class DocumentManager(models.Manager):
 
     try:
       with transaction.atomic():
-        for job in Document2.objects.all():
-          if not job.doc.exists():
-            if job.type == 'oozie-workflow2':
-              extra = 'workflow2'
-            elif job.type == 'oozie-coordinator2':
-              extra = 'coordinator2'
-            elif job.type == 'oozie-bundle2':
-              extra = 'bundle2'
-            elif job.type == 'notebook':
-              extra = 'notebook'
-            elif job.type == 'search-dashboard':
-              extra = 'search-dashboard'
-            else:
-              extra = ''
-            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
+        for job in find_jobs_with_no_doc(Document2):
+          if job.type == 'oozie-workflow2':
+            extra = 'workflow2'
+          elif job.type == 'oozie-coordinator2':
+            extra = 'coordinator2'
+          elif job.type == 'oozie-bundle2':
+            extra = 'bundle2'
+          elif job.type == 'notebook':
+            extra = 'notebook'
+          elif job.type == 'search-dashboard':
+            extra = 'search-dashboard'
+          else:
+            extra = ''
+          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
     except Exception, e:
       LOG.exception('error syncing Document2')
 
