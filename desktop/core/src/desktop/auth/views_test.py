@@ -30,6 +30,7 @@ from hadoop import pseudo_hdfs4
 
 from useradmin import ldap_access
 from useradmin.tests import LdapTestConnection
+from useradmin.views import import_ldap_groups
 
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
@@ -208,6 +209,9 @@ class TestLdapLogin(PseudoHdfsTestBase):
   def test_import_groups_on_login(self):
     self.reset.append(conf.LDAP.SYNC_GROUPS_ON_LOGIN.set_for_testing(True))
     ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+    # Make sure LDAP groups exist or they won't sync
+    import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+    import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
 
     response = self.c.post('/accounts/login/', {
       'username': "curly",

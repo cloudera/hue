@@ -46,6 +46,9 @@ def test_useradmin_ldap_user_group_membership_sync():
 
   # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
   ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+  # Make sure LDAP groups exist or they won't sync
+  import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+  import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
 
   try:
     # Import curly who is part of TestUsers and Test Administrators
@@ -406,6 +409,9 @@ def test_useradmin_ldap_user_integration():
     assert_equal(get_profile(hue_user).creation_method, str(UserProfile.CreationMethod.HUE))
     assert_equal(hue_user.first_name, 'Different')
 
+    # Make sure LDAP groups exist or they won't sync
+    import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'TestUsers', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
+    import_ldap_groups(ldap_access.CACHED_LDAP_CONN, 'Test Administrators', import_members=False, import_members_recursive=False, sync_users=False, import_by_dn=False)
     # Try importing a user and sync groups
     import_ldap_users(ldap_access.CACHED_LDAP_CONN, 'curly', sync_groups=True, import_by_dn=False)
     curly = User.objects.get(username='curly')
