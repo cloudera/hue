@@ -706,7 +706,9 @@ class Document2(models.Model):
   doc = generic.GenericRelation(Document, related_name='doc_doc') # Compatibility with Hue 3
 
   objects = Document2Manager()
-  unique_together = ('uuid', 'version', 'is_history')
+
+  class Meta:
+    unique_together = ('uuid', 'version', 'is_history')
 
   def natural_key(self):
     return (self.uuid, self.version, self.is_history)
