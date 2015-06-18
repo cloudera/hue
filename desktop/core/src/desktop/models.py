@@ -662,7 +662,7 @@ class DocumentPermission(models.Model):
 
   users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission_users')
   groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission_groups')
-  perms = models.TextField(default=READ_PERM, choices=( # one perm
+  perms = models.CharField(default=READ_PERM, max_length=10, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
   ))
