@@ -129,7 +129,6 @@ class Job(models.Model):
   data = models.TextField(blank=True, default=json.dumps({}))  # e.g. data=json.dumps({'sla': [python data], ...})
 
   objects = JobManager()
-  unique_together = ('owner', 'name')
 
   def delete(self, skip_trash=False, *args, **kwargs):
     if skip_trash:
@@ -642,8 +641,6 @@ class Node(models.Model):
   workflow = models.ForeignKey(Workflow)
   children = models.ManyToManyField('self', related_name='parents', symmetrical=False, through=Link)
   data = models.TextField(blank=True, default=json.dumps({}))
-
-  unique_together = ('workflow', 'name')
 
   def get_full_node(self):
     if self.node_type == Mapreduce.node_type:
@@ -1677,7 +1674,6 @@ class Dataset(models.Model):
                                help_text=_t('Optional: Shift the frequency for gettting past/future end dates or enter verbatim the Oozie end instance.'))
 
   objects = DatasetManager()
-  unique_together = ('coordinator', 'name')
 
   def __unicode__(self):
     return '%s' % (self.name,)
@@ -1731,8 +1727,6 @@ class DataInput(models.Model):
                                  help_text=_t('The pattern of the input data we want to process.'))
   coordinator = models.ForeignKey(Coordinator)
 
-  unique_together = ('coordinator', 'name')
-
 
 class DataOutput(models.Model):
   name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name of an output variable in the workflow'),
@@ -1740,8 +1734,6 @@ class DataOutput(models.Model):
   dataset = models.OneToOneField(Dataset, verbose_name=_t('The dataset representing the format of the data output.'),
                                  help_text=_t('The pattern of the output data we want to generate.'))
   coordinator = models.ForeignKey(Coordinator)
-
-  unique_together = ('coordinator', 'name')
 
 
 class BundledCoordinator(models.Model):
