@@ -399,13 +399,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
-            <a data-bind="visible: status() == 'loading'" class="btn btn-disabled codeMirror-overlaybtn" title="${ _('Creating session') }">
+            <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn codeMirror-overlaybtn" title="${ _('Creating session') }">
               <i class="fa fa-spinner fa-spin"></i>
             </a>
-            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback codeMirror-overlaybtn pointer">
+            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn codeMirror-overlaybtn pointer">
               <i class="fa fa-play"></i>
             </a>
-            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback codeMirror-overlaybtn pointer">
+            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn codeMirror-overlaybtn pointer">
               <i class="fa fa-stop"></i>
             </a>
             <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
@@ -659,39 +659,50 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               <td><input type="text" class="input-xxlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
             </tr>
             <tr>
-              <td style="vertical-align: top; padding-top: 10px">${_('Arguments')}</td>
+              <td style="vertical-align: top" data-bind="style: {'paddingTop': properties.arguments().length > 0 ? '10px' : '4px'}">${_('Arguments')}</td>
               <td>
-                <ul data-bind="foreach: properties.arguments" class="unstyled">
+                <ul data-bind="sortable: properties.arguments, visible: properties.arguments().length > 0" class="unstyled">
                   <li style="margin-bottom: 4px">
-                    <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
+                    <div class="input-append">
+                      <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
+                      <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+                    </div>
+
                     <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
                       <i class="fa fa-minus"></i>
                     </a>
                   </li>
                 </ul>
                 <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
-                  <i class="fa fa-plus"></i> ${ _('Add argument') }
+                  <i class="fa fa-plus"></i> ${ _('Argument') }
                 </a>
               </td>
             </tr>
           </table>
-
-          <div class="pull-right">
-            <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
-          </div>
-
-          <br/>
-          <div style="height: 32px;">
-            <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="run-button btn btn-primary disable-feedback pointer">
+          <div style="height: 31px;">
+            <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="run-button btn btn-primary disable-feedback pointer spark-btn">
               <i class="fa fa-play"></i>
             </a>
+            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback pointer spark-btn">
+              <i class="fa fa-stop"></i>
+            </a>
           </div>
+
+          <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
+            <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
+          </div>
+
+          <div class="pull-right" style="padding-top: 10px;">
+            <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+          </div>
+          <div class="clearfix"></div>
+
         </div>
       <!-- /ko -->
 
       <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
-        <pre data-bind="visible: result.logs().length == 0" class="logs">${ _('Loading...') }</pre>
-        <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs"></pre>
+        <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+        <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs logs-bigger"></pre>
       </div>
 
       <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
