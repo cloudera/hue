@@ -141,7 +141,7 @@ def get_logs(request):
 
   db = get_api(request.user, snippet)
   response['logs'] = db.get_log(snippet, startFrom=startFrom, size=size)
-  response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' else 100
+  response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['job_urls'] = [{
       'name': job,
       'url': reverse('jobbrowser.views.single_job', kwargs={'job': job})

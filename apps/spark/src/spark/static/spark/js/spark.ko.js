@@ -326,6 +326,7 @@ var Snippet = function (vm, notebook, snippet) {
 
     self.status('running');
     self.result.clear();
+    self.result.logLines = 0;
     self.progress(0);
 
     if (self.result.fetchedOnce()) {
@@ -433,6 +434,9 @@ var Snippet = function (vm, notebook, snippet) {
         else if (self.status() == 'available') {
           self.fetchResult(100);
           self.progress(100);
+        }
+        else if (self.status() == 'success') {
+          self.progress(99);
         }
       } else {
         self._ajax_error(data);
