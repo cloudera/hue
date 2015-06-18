@@ -1990,3 +1990,9 @@ div.navigator > ul > li.oozie > ul.dropdown-menu {
 .inline-block {
   display: inline-block;
 }
+
+pre {
+  border: none;
+  border-left: 5px solid #DDD;
+  border-radius: 0;
+}
