@@ -160,7 +160,9 @@ class DocumentTag(models.Model):
   RESERVED = (DEFAULT, TRASH, HISTORY, EXAMPLE)
 
   objects = DocumentTagManager()
-  unique_together = ('owner', 'tag')
+
+  class Meta:
+    unique_together = ('owner', 'tag')
 
 
   def __unicode__(self):
