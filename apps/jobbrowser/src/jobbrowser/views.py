@@ -159,14 +159,14 @@ def massage_job_for_json(job, request):
     'finishedReduces': job.finishedReduces,
     'reducesPercentComplete': int(job.reduces_percent_complete) if job.reduces_percent_complete else '',
     'jobFile': hasattr(job, 'jobFile') and job.jobFile or '',
-    'launchTimeMs': hasattr(job, 'launchTimeMs') and job.launchTimeMs or '',
+    'launchTimeMs': hasattr(job, 'launchTimeMs') and job.launchTimeMs or 0,
     'launchTimeFormatted': hasattr(job, 'launchTimeFormatted') and job.launchTimeFormatted or '',
-    'startTimeMs': hasattr(job, 'startTimeMs') and job.startTimeMs or '',
+    'startTimeMs': hasattr(job, 'startTimeMs') and job.startTimeMs or 0,
     'startTimeFormatted': hasattr(job, 'startTimeFormatted') and job.startTimeFormatted or '',
-    'finishTimeMs': hasattr(job, 'finishTimeMs') and job.finishTimeMs or '',
+    'finishTimeMs': hasattr(job, 'finishTimeMs') and job.finishTimeMs or 0,
     'finishTimeFormatted': hasattr(job, 'finishTimeFormatted') and job.finishTimeFormatted or '',
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
-    'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or '',
+    'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user),
     'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
   }
