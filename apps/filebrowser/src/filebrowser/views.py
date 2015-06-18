@@ -171,8 +171,9 @@ def view(request, path):
         msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
-        if request.user.is_superuser and not request.user == request.fs.superuser:
-            msg += _(' Note: You are a Hue admin but not a HDFS superuser (which is "%(superuser)s").') % {'superuser': request.fs.superuser}
+        if request.user.is_superuser and not _is_hdfs_superuser(request):
+            msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
+                % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
         if request.is_ajax():
           exception = {
             'error': msg
