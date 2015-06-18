@@ -365,7 +365,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
         <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp($data.content.timestamp)"></span></small></h3>
+        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp($data.content.timestamp)"></span></small></h3>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
