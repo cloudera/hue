@@ -89,7 +89,7 @@ class LdapTestConnection(object):
       data = [self._instance.users.get(username) for username in usernames]
     return data
 
-  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
+  def find_groups(self, groupname_pattern, search_attr=None, group_name_attr=None, group_member_attr=None, group_filter=None, find_by_dn=False, scope=ldap.SCOPE_SUBTREE):
     """ Return all groups in the system with parents and children """
     if find_by_dn:
       data = filter(lambda attrs: attrs['dn'] == groupname_pattern, self._instance.groups.values())
