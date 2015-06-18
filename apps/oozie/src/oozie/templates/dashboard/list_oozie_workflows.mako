@@ -213,7 +213,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
   }
 
-  var refreshRunning;
+  var refreshRunning, runningTimeout, progressTimeout, jobProgressMap = {};
   var runningTableOffset = 1, completedTableOffset = 1;
   var totalRunningJobs = 0, totalCompletedJobs = 0;
   var PAGE_SIZE = 50;
@@ -318,6 +318,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         if ($(this).data("table") == "running") {
           runningTableOffset += _additionalOffset;
           refreshRunning();
+          refreshProgress();
         }
         else {
           completedTableOffset += _additionalOffset;
@@ -331,6 +332,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       $(this).toggleClass("active");
       refreshRunning();
       refreshCompleted();
+      refreshProgress();
     });
 
     $("a.btn-submitted").click(function () {
@@ -345,6 +347,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       $(this).toggleClass("active");
       refreshRunning();
       refreshCompleted();
+      refreshProgress();
     });
 
     var hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
@@ -355,6 +358,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     function refreshPagination() {
       runningTableOffset = 1;
       completedTableOffset = 1;
+
+      // Clear select-all
+      $(".hueCheckbox").removeClass("fa-check");
     }
 
     function drawTable() {
@@ -387,7 +393,6 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       if (btnStatuses.length > 0) {
         selectedStatuses = $.makeArray($(selectedStatuses).filter(btnStatuses));
       }
-
       return selectedStatuses.length > 0 ? ('&status=' + selectedStatuses.join('&status=')) : '';
     }
 
@@ -433,6 +438,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     var numRunning = 0;
 
     refreshRunning = function () {
+      window.clearTimeout(runningTimeout);
       $.getJSON(window.location.pathname + "?format=json&offset=" + runningTableOffset + getStatuses('running') + getDaysFilter(), function (data) {
         if (data.jobs.length > 0) {
           totalRunningJobs = data.total_jobs;
@@ -440,51 +446,46 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
           var nNodes = runningTable.fnGetNodes();
 
-          // check for zombie nodes
-          $(nNodes).each(function (iNode, node) {
-            var nodeFound = false;
-            $(data.jobs).each(function (iWf, currentItem) {
-              if ($(node).children("td").eq(7).text() == currentItem.id) {
-                nodeFound = true;
-              }
-            });
-            if (!nodeFound) {
-              runningTable.fnDeleteRow(node);
-              runningTable.fnDraw();
-            }
+          // Find previously selected jobs
+          var _ids = [];
+          $(".hueCheckbox.fa-check:not(.select-all)").each(function(){
+            _ids.push($(this).parents("tr").find("a[data-row-selector='true']").text());
           });
+          runningTable.fnClearTable();
 
           $(data.jobs).each(function (iWf, item) {
             var wf = new Workflow(item);
-            var foundRow = null;
-            $(nNodes).each(function (iNode, node) {
-              if ($(node).children("td").eq(7).text() == wf.id) {
-                foundRow = node;
-              }
-            });
-            if (foundRow == null) {
-              if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(wf.status) > -1) {
-                try {
-                  runningTable.fnAddData([
-                    wf.canEdit ? '<div class="hueCheckbox fa" data-row-selector-exclude="true"></div>':'',
-                    '<span data-sort-value="'+ wf.createdInMillis +'" data-type="date">' + emptyStringIfNull(wf.created) + '</span>',
-                    '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>',
-                    wf.appName,
-                    '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>',
-                    wf.user,
-                    '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeFormatted) + '</span>',
-                    '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
-                    wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>',
-                    wf.submittedManually
-                  ]);
-                }
-                catch (error) {
-                  $(document).trigger("error", error);
-                }
-              }
+
+            // Restore previously selected jobs
+            var foundRow = _ids.indexOf(wf.id) != -1;
+
+            var checkboxSelected = "";
+            if (foundRow) {
+              checkboxSelected = "fa-check";
             }
-            else {
-              runningTable.fnUpdate('<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>', foundRow, 2, false);
+            var progressColumn = '<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>';
+            if (wf.id in jobProgressMap) {
+              progressColumn = '<div class="progress"><div class="' + jobProgressMap[wf.id]["progressClass"] + '" style="width:' + jobProgressMap[wf.id]["progress"] + '%">' + jobProgressMap[wf.id]["progress"] + '%</div></div>';
+            }
+
+            if (['RUNNING', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'STARTED', 'FINISHING'].indexOf(wf.status) > -1) {
+              try {
+                runningTable.fnAddData([
+                  wf.canEdit ? '<div class="hueCheckbox fa ' + checkboxSelected + '" data-row-selector-exclude="true"></div>':'',
+                  '<span data-sort-value="'+ wf.createdInMillis +'" data-type="date">' + emptyStringIfNull(wf.created) + '</span>',
+                  '<span class="' + wf.statusClass + '" data-type="status">' + wf.status + '</span>',
+                  wf.appName,
+                  progressColumn,
+                  wf.user,
+                  '<span data-sort-value="'+ wf.lastModTimeInMillis +'">' + emptyStringIfNull(wf.lastModTimeFormatted) + '</span>',
+                  '<a href="' + wf.absoluteUrl + '" data-row-selector="true">' + wf.id + '</a>',
+                  wf.parentUrl == '' ? '' : '<div style="text-align:center"><a href="' + wf.parentUrl + '" style="text-align:center"><img src="' + getParentImage(wf.parentUrl) + '" class="app-icon"/></a></div>',
+                  wf.submittedManually
+                ]);
+              }
+              catch (error) {
+                $(document).trigger("error", error);
+              }
             }
           });
         }
@@ -496,7 +497,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         }
         numRunning = data.jobs.length;
 
-        window.setTimeout(refreshRunning, 5000);
+        runningTable.fnDraw();
+        runningTimeout = window.setTimeout(refreshRunning, 5000);
       });
     }
 
@@ -570,11 +572,15 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
 
     function refreshProgress() {
-      $.getJSON(window.location.pathname + "?format=json&type=progress" + getStatuses('running') + getDaysFilter(), function (data) {
+      window.clearTimeout(progressTimeout);
+      $.getJSON(window.location.pathname + "?format=json&type=progress&offset=" + runningTableOffset + getStatuses('running') + getDaysFilter(), function (data) {
         var nNodes = runningTable.fnGetNodes();
         $(data.jobs).each(function (iWf, item) {
             var wf = new Workflow(item);
             var foundRow = null;
+
+            // Remember job progress info
+            jobProgressMap[wf.id] = {"progressClass": wf.progressClass, "progress": wf.progress};
             $(nNodes).each(function (iNode, node) {
               if ($(node).children("td").eq(7).text() == wf.id) {
                 foundRow = node;
@@ -590,7 +596,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
               }
             }
           });
-        window.setTimeout(refreshProgress, 20000);
+        progressTimeout = window.setTimeout(refreshProgress, 20000);
       });
     }
 
