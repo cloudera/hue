@@ -14,31 +14,30 @@ class Migration(SchemaMigration):
         # As opposed to Document1, we can't just delete Document2 documents if
         # there is a duplication because it actually holds data. So instead
         # we'll just find duplications and emit a better error message.
-        with transaction.atomic():
-            duplicated_records = Document2.objects \
-                .values('uuid', 'version', 'is_history') \
-                .annotate(id_count=models.Count('id')) \
-                .filter(id_count__gt=1)
+        duplicated_records = Document2.objects \
+            .values('uuid', 'version', 'is_history') \
+            .annotate(id_count=models.Count('id')) \
+            .filter(id_count__gt=1)
 
-            duplicated_records = list(duplicated_records)
-            duplicated_ids = []
+        duplicated_records = list(duplicated_records)
+        duplicated_ids = []
 
-            for record in duplicated_records:
-                docs = Document2.objects \
-                    .values_list('id', flat=True) \
-                    .filter(
-                        uuid=record['uuid'],
-                        version=record['version'],
-                        is_history=record['is_history'],
-                    )
+        for record in duplicated_records:
+            docs = Document2.objects \
+                .values_list('id', flat=True) \
+                .filter(
+                    uuid=record['uuid'],
+                    version=record['version'],
+                    is_history=record['is_history'],
+                )
 
-                duplicated_ids.extend(docs)
+            duplicated_ids.extend(docs)
 
-            if duplicated_records:
-                msg = 'Found duplicated Document2 records! %s. ' \
-                    'This will require manual merging of the records' % duplicated_ids
-                logging.error(msg)
-                raise RuntimeError(msg)
+        if duplicated_records:
+            msg = 'Found duplicated Document2 records! %s. ' \
+                'This will require manual merging of the records' % duplicated_ids
+            logging.error(msg)
+            raise RuntimeError(msg)
 
         # Adding unique constraint on 'Document2', fields ['uuid', 'version', 'is_history']
         db.create_unique(u'desktop_document2', ['uuid', 'version', 'is_history'])

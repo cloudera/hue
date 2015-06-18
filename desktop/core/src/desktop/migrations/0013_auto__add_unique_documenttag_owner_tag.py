@@ -14,26 +14,25 @@ class Migration(SchemaMigration):
         # If there are duplicated document tags, we'll have an error when we
         # try to create this index. So to protect against that, we should
         # delete those documents before we create the index.
-        with transaction.atomic():
-            duplicated_records = DocumentTag.objects \
-                .values('owner_id', 'tag') \
-                .annotate(id_count=models.Count('id')) \
-                .filter(id_count__gt=1)
+        duplicated_records = DocumentTag.objects \
+            .values('owner_id', 'tag') \
+            .annotate(id_count=models.Count('id')) \
+            .filter(id_count__gt=1)
 
-            # Delete all but the first document.
-            for record in duplicated_records:
-                docs = DocumentTag.objects \
-                    .values_list('id', flat=True) \
-                    .filter(
-                        owner_id=record['owner_id'],
-                        tag=record['tag'],
-                    )[1:]
+        # Delete all but the first document.
+        for record in duplicated_records:
+            docs = DocumentTag.objects \
+                .values_list('id', flat=True) \
+                .filter(
+                    owner_id=record['owner_id'],
+                    tag=record['tag'],
+                )[1:]
 
-                docs = list(docs)
+            docs = list(docs)
 
-                logging.warn('Deleting tags %s' % docs)
+            logging.warn('Deleting tags %s' % docs)
 
-                DocumentTag.objects.filter(id__in=docs).delete()
+            DocumentTag.objects.filter(id__in=docs).delete()
 
         # Adding unique constraint on 'DocumentTag', fields ['owner', 'tag']
         db.create_unique(u'desktop_documenttag', ['owner_id', 'tag'])
