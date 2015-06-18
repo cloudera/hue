@@ -173,7 +173,7 @@
   cursor: default;
 }
 
-.dropdown-menu {
+.history > .dropdown-menu {
   left: inherit;
   right: 0;
 }
