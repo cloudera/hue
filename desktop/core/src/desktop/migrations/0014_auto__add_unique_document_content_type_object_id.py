@@ -1,13 +1,40 @@
 # -*- coding: utf-8 -*-
+import logging
 from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
-from django.db import models
+from django.db import models, transaction
+
+from desktop.models import Document
 
 
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # If there are duplicated documents, we'll have an error when we try to
+        # create this index. So to protect against that, we should delete those
+        # documents before we create the index.
+        with transaction.atomic():
+            duplicated_records = Document.objects \
+                .values('content_type_id', 'object_id') \
+                .annotate(id_count=models.Count('id')) \
+                .filter(id_count__gt=1)
+
+            # Delete all but the first document.
+            for record in duplicated_records:
+                docs = Document.objects \
+                    .values_list('id', flat=True) \
+                    .filter(
+                        content_type_id=record['content_type_id'],
+                        object_id=record['object_id'],
+                    )[1:]
+
+                docs = list(docs)
+
+                logging.warn('Deleting documents %s' % docs)
+
+                Document.objects.filter(id__in=docs).delete()
+
         # Adding unique constraint on 'Document', fields ['content_type', 'object_id']
         db.create_unique(u'desktop_document', ['content_type_id', 'object_id'])
 
