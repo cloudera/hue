@@ -72,15 +72,7 @@ class DocumentTagManager(models.Manager):
       return tag
 
   def _get_tag(self, user, name):
-    try:
-      tag, created = DocumentTag.objects.get_or_create(owner=user, tag=name)
-    except DocumentTag.MultipleObjectsReturned, ex:
-      # We can delete duplicate tags of a user
-      dups = DocumentTag.objects.filter(owner=user, tag=name)
-      tag = dups[0]
-      for dup in dups[1:]:
-        LOG.warn('Deleting duplicate %s' % dup)
-        dup.delete()
+    tag, created = DocumentTag.objects.get_or_create(owner=user, tag=name)
     return tag
 
   def get_default_tag(self, user):
@@ -267,10 +259,6 @@ class DocumentManager(models.Manager):
         from oozie.models import Workflow, Coordinator, Bundle
 
         for job in list(chain(Workflow.objects.all(), Coordinator.objects.all(), Bundle.objects.all())):
-          if job.doc.count() > 1:
-            LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
-            job.doc.all().delete()
-
           if not job.doc.exists():
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
             tag = DocumentTag.objects.get_example_tag(user=job.owner)
@@ -293,10 +281,6 @@ class DocumentManager(models.Manager):
         from beeswax.models import SavedQuery
 
         for job in SavedQuery.objects.all():
-          if job.doc.count() > 1:
-            LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
-            job.doc.all().delete()
-
           if not job.doc.exists():
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
             tag = DocumentTag.objects.get_example_tag(user=job.owner)
@@ -313,10 +297,6 @@ class DocumentManager(models.Manager):
         from pig.models import PigScript
 
         for job in PigScript.objects.all():
-          if job.doc.count() > 1:
-            LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
-            job.doc.all().delete()
-
           if not job.doc.exists():
             doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
             tag = DocumentTag.objects.get_example_tag(user=job.owner)
@@ -350,10 +330,6 @@ class DocumentManager(models.Manager):
     try:
       with transaction.atomic():
         for job in Document2.objects.all():
-          if job.doc.count() > 1:
-            LOG.warn('Deleting duplicate document %s for %s' % (job.doc.all(), job))
-            job.doc.all().delete()
-
           if not job.doc.exists():
             if job.type == 'oozie-workflow2':
               extra = 'workflow2'
@@ -646,15 +622,7 @@ class DocumentPermissionManager(models.Manager):
       perm.delete()
 
   def list(self, document, perm='read'):
-    try:
-      perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=perm)
-    except DocumentPermission.MultipleObjectsReturned:
-      # We can delete duplicate perms of a document
-      dups = DocumentPermission.objects.filter(doc=document, perms=perm)
-      perm = dups[0]
-      for dup in dups[1:]:
-        LOG.warn('Deleting duplicate %s' % dup)
-        dup.delete()
+    perm, created = DocumentPermission.objects.get_or_create(doc=document, perms=perm)
     return perm
 
 
