@@ -76,7 +76,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           % endif
         </span>
         <span class="smartview-row-controls pull-right">
-          <button class="btn" data-bind="click: $data.toggleSelectedCollapse, enable: $data.selected().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i data-bind="css: { 'fa': true, 'fa-compress': !$data.isCollapsed(), 'fa-expand': $data.isCollapsed() }"></i></button>
+          <button class="btn" data-bind="click: $data.toggleSelectedCollapse, css: {'disabled' : $data.selected().length === 0 && !$data.isCollapsed() }, clickBubble: false" data-toggle="tooltip" title="${_('Toggle Collapse Selected')}"><i data-bind="css: { 'fa': true, 'fa-compress': !$data.isCollapsed(), 'fa-expand': $data.isCollapsed() }"></i></button>
           <button class="btn" data-bind="click: $data.toggleSelectAllVisible, enable: $data.displayedItems().length > 0, clickBubble: false" data-toggle="tooltip" title="${_('Select All Visible')}"><i class="fa fa-check-square-o"></i></button>
           <input type="text" placeholder="${('Filter Column Names/Family')}" data-bind="value: $data.searchQuery, valueUpdate: $data.items().length < 100 ? 'afterkeydown' : 'change', clickBubble: false"/>
           ${sortBtn('$data.sortDropDown')}
