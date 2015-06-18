@@ -66,8 +66,8 @@ class Application(object):
       finishTime = self.finishedTime
     setattr(self, 'durationInMillis', finishTime - self.startedTime)
     setattr(self, 'startTimeMs', self.startedTime)
-    setattr(self, 'startTimeFormatted',  format_unixtime_ms(self.startedTime))
-    setattr(self, 'finishTimeFormatted',  format_unixtime_ms(finishTime))
+    setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startedTime))
+    setattr(self, 'finishTimeFormatted', format_unixtime_ms(finishTime))
     setattr(self, 'finishedMaps', None)
     setattr(self, 'desiredMaps', None)
     setattr(self, 'finishedReduces', None)
