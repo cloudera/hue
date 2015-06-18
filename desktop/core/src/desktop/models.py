@@ -271,8 +271,6 @@ class DocumentManager(models.Manager):
               if not job.managed:
                 doc.extra = 'jobsub'
                 doc.save()
-          if job.owner.username == SAMPLE_USERNAME:
-            job.doc.get().share_to_default()
     except Exception, e:
       LOG.exception('error syncing oozie')
 
@@ -287,8 +285,6 @@ class DocumentManager(models.Manager):
             doc.tags.add(tag)
             if job.is_trashed:
               doc.send_to_trash()
-          if job.owner.username == SAMPLE_USERNAME:
-            job.doc.get().share_to_default()
     except Exception, e:
       LOG.exception('error syncing beeswax')
 
@@ -301,8 +297,6 @@ class DocumentManager(models.Manager):
             doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
             tag = DocumentTag.objects.get_example_tag(user=job.owner)
             doc.tags.add(tag)
-          if job.owner.username == SAMPLE_USERNAME:
-            job.doc.get().share_to_default()
     except Exception, e:
       LOG.exception('error syncing pig')
 
@@ -344,11 +338,6 @@ class DocumentManager(models.Manager):
             else:
               extra = ''
             doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
-          if job.owner.username == SAMPLE_USERNAME:
-            doc = job.doc.get()
-            doc.share_to_default()
-            tag = DocumentTag.objects.get_example_tag(user=job.owner)
-            doc.tags.add(tag)
     except Exception, e:
       LOG.exception('error syncing Document2')
 
@@ -360,6 +349,19 @@ class DocumentManager(models.Manager):
         doc.tags.add(default_tag)
     except Exception, e:
       LOG.exception('error adding at least one tag to docs')
+
+    # Make sure all the sample user documents are shared.
+    try:
+      with translation.atomic():
+        for doc in Document.objects.filter(owner__username=SAMPLE_USERNAME):
+          doc.share_to_default()
+
+          tag = DocumentTag.objects.get_example_tag(user=job.owner)
+          doc.tags.add(tag)
+
+          doc.save()
+    except Exception, e:
+      LOG.exception('error sharing sample user documents')
 
     # For now remove the default tag from the examples
     try:
