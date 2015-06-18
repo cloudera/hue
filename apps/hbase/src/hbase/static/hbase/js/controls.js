@@ -65,6 +65,19 @@ var DataTableViewModel = function (options) {
   self.name = ko.observable(options.name);
   self.searchQuery.subscribe(function (value) {
     self._table.fnFilter(value);
+    for(var i = 0; i < self.items().length; i++) {
+      self.items()[i].isVisible(false);
+    }
+    var visibleRows = self._table.find("tbody > tr");
+    for (var i = 0; i < visibleRows.length; i++) {
+      var boundData = ko.dataFor(visibleRows[i]);
+      // Elements that were once filtered out by datatable search does not update when shown again, re-binding fixes this.
+      ko.cleanNode(visibleRows[i]);
+      ko.applyBindings(boundData, visibleRows[i]);
+      if (ko.isObservable(boundData.isVisible)) {
+        ko.dataFor(visibleRows[i]).isVisible(true);
+      }
+    }
   });
   self.columns = ko.observableArray(options.columns);
   self._el = $('table[data-datasource="' + options.el + '"]');

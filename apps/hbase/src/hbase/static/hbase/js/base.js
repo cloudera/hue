@@ -31,19 +31,41 @@ var ListViewModel = function (options) {
   self.canWrite = ko.observable(options.canWrite);
   self.items = ko.observableArray(options.items);
   self.sortDropDown = new SortDropDownView({sortFields: options.sortFields, target: self.items});
-  self.selectAll = function () {
-    for (t = 0; t < self.items().length; t++)
-      self.items()[t].isSelected(true);
+
+  self.selectAllVisible = function () {
+    $.each(self.items(), function(index, item) {
+      item.isSelected(item.isVisible());
+    });
     return self;
   };
+
   self.deselectAll = function () {
-    for (q = 0; q < self.items().length; q++)
-      self.items()[q].isSelected(false);
+    $.each(self.items(), function(index, item) {
+      item.isSelected(false);
+    });
     return self;
   };
+
+  self.searchQuery = ko.observable("");
+
+  self.allVisibleSelected = ko.computed(function() {
+    if (self.items().length === 0) {
+      return false;
+    }
+    var hasVisibleItems = false;
+    for (var i = 0; i < self.items().length; i++) {
+      if (!self.items()[i].isSelected() && self.items()[i].isVisible()) {
+        return false
+      }
+      hasVisibleItems = hasVisibleItems || self.items()[i].isVisible();
+    }
+    return hasVisibleItems;
+  }, self);
+
   self.toggleSelectAll = function () {
-    if (self.selected().length != self.items().length)
-      return self.selectAll();
+    if (!self.allVisibleSelected()) {
+      return self.selectAllVisible();
+    }
     return self.deselectAll();
   };
   self.selected = function () {
@@ -119,9 +141,11 @@ var ListViewModel = function (options) {
         callback();
       self.sortDropDown.sort();
       self.isLoading(false);
+      if (self.searchQuery()) {
+        self._table.fnFilter(self.searchQuery());
+      }
     }]);
   };
-  self.searchQuery = ko.observable("");
   self.isLoading = ko.observable(false);
   self.isReLoading = ko.observable(false);
   self.droppedTables = [];
@@ -132,6 +156,7 @@ var DataRow = function (options) {
   ko.utils.extend(self, options); //applies options on itself
   BaseModel.apply(self, [options]);
 
+  self.isVisible = ko.observable(true);
   self.isSelected = ko.observable(false);
   self.select = function () {
     self.isSelected(!self.isSelected());
