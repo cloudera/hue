@@ -355,7 +355,7 @@ class DocumentManager(models.Manager):
         for doc in Document.objects.filter(owner__username=SAMPLE_USERNAME):
           doc.share_to_default()
 
-          tag = DocumentTag.objects.get_example_tag(user=job.owner)
+          tag = DocumentTag.objects.get_example_tag(user=doc.owner)
           doc.tags.add(tag)
 
           doc.save()
