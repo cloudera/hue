@@ -169,8 +169,9 @@ def copy(request):
   })
   script_copy.save()
 
-  copy_doc = pig_script.doc.get().copy(name=name, owner=owner)
-  script_copy.doc.add(copy_doc)
+  copy_doc = Document.objects.link(script_copy,
+      owner=copy.owner,
+      name=copy.name)
 
   response = {
     'id': script_copy.id,

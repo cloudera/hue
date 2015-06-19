@@ -357,7 +357,7 @@ class DocumentManager(models.Manager):
 
     # Make sure all the sample user documents are shared.
     try:
-      with translation.atomic():
+      with transaction.atomic():
         for doc in Document.objects.filter(owner__username=SAMPLE_USERNAME):
           doc.share_to_default()
 

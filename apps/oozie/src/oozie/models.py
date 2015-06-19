@@ -359,8 +359,6 @@ class Workflow(Job):
     else:
       owner = self.owner
 
-    copy_doc = self.doc.get().copy(name=name, owner=owner)
-
     copy = self
     copy.pk = None
     copy.id = None
@@ -368,6 +366,11 @@ class Workflow(Job):
     copy.deployment_dir = ''
     copy.owner = owner
     copy.save()
+
+    copy_doc = Document.objects.link(copy,
+        owner=copy.owner,
+        name=copy.name,
+        description=copy.description)
 
     copy.doc.all().delete()
     copy.doc.add(copy_doc)
@@ -1445,8 +1448,6 @@ class Coordinator(Job):
     else:
       owner = self.owner
 
-    copy_doc = self.doc.get().copy(name=name, owner=owner)
-
     copy = self
     copy.pk = None
     copy.id = None
@@ -1454,6 +1455,11 @@ class Coordinator(Job):
     copy.deployment_dir = ''
     copy.owner = owner
     copy.save()
+
+    copy_doc = Document.objects.link(copy,
+        owner=copy.owner,
+        name=copy.name,
+        description=copy.description)
 
     copy.doc.all().delete()
     copy.doc.add(copy_doc)
@@ -1781,8 +1787,6 @@ class Bundle(Job):
     else:
       owner = self.owner
 
-    copy_doc = self.doc.get().copy(name=name, owner=owner)
-
     copy = self
     copy.pk = None
     copy.id = None
@@ -1790,6 +1794,11 @@ class Bundle(Job):
     copy.deployment_dir = ''
     copy.owner = owner
     copy.save()
+
+    copy_doc = Document.objects.link(copy,
+        owner=copy.owner,
+        name=copy.name,
+        description=copy.description)
 
     copy.doc.all().delete()
     copy.doc.add(copy_doc)

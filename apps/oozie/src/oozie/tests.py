@@ -45,7 +45,7 @@ from liboozie.types import WorkflowList, Workflow as OozieWorkflow, Coordinator 
   Bundle as OozieBundle, CoordinatorList, WorkflowAction, BundleList
 
 from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
-from oozie.models import Workflow, Node, Kill, Link, Job, Coordinator, History,\
+from oozie.models import Dataset, Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.models2 import _get_hiveserver2_url
 from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink
@@ -1694,8 +1694,10 @@ class TestEditor(OozieMockBase):
                           u'create-timezone': [u'America/Los_Angeles'], u'create-done_flag': [u''],
                           u'create-description': [u'']})
 
+    dataset = Dataset.objects.filter(coordinator=coord).order_by('-id')[0]
+
     self.c.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'output']),
-                         {u'output-name': [u'output_dir'], u'output-dataset': [u'2']})
+                         {u'output-name': [u'output_dir'], u'output-dataset': [dataset.id]})
 
     assert_true(
 """<coordinator-app name="MyCoord"
@@ -1775,7 +1777,9 @@ class TestEditor(OozieMockBase):
     coord = create_coordinator(self.wf, self.c, self.user)
     create_dataset(coord, self.c)
 
-    response = self.c.post(reverse('oozie:edit_coordinator_dataset', args=[1]), {
+    dataset = Dataset.objects.get(coordinator=coord)
+
+    response = self.c.post(reverse('oozie:edit_coordinator_dataset', args=[dataset.id]), {
                         u'edit-name': [u'MyDataset'], u'edit-frequency_number': [u'1'], u'edit-frequency_unit': [u'days'],
                         u'edit-uri': [u'/data/${YEAR}${MONTH}${DAY}'],
                         u'edit-start_0': [u'07/01/2012'], u'edit-start_1': [u'12:00 AM'],
@@ -3800,8 +3804,9 @@ def create_dataset(coord, client):
 
 
 def create_coordinator_data(coord, client):
+  dataset = Dataset.objects.get(coordinator=coord)
   response = client.post(reverse('oozie:create_coordinator_data', args=[coord.id, 'input']),
-                         {u'input-name': [u'input_dir'], u'input-dataset': [u'1']})
+                         {u'input-name': [u'input_dir'], u'input-dataset': [dataset.id]})
   data = json.loads(response.content)
   assert_equal(0, data['status'], data['data'])
 
