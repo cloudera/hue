@@ -2227,6 +2227,9 @@ $(document).on('error.query', function () {
     var firstPos = err.toLowerCase().indexOf("line");
     if (firstPos > -1) {
       selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
+      if (codeMirror.getSelection()) {
+        selectedLine += codeMirror.getCursor(true).line;
+      }
       errorWidgets.push(
         codeMirror.addLineWidget(
           selectedLine - 1,
