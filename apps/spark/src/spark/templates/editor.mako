@@ -1848,18 +1848,30 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       }, 100);
     });
 
+    $(document).on("puma", function (e, snippet) {
+      forceChartDraws();
+    });
+
     function forceChartDraws() {
       viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
           if (snippet.result.data().length > 0) {
-            var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-            window.setTimeout(function () {
-              var _dt = createDatatable(_el, snippet);
-              _dt.fnClearTable();
-              _dt.fnAddData(snippet.result.data());
-              resizeToggleLeftPanel(snippet);
-              $(document).trigger("forceChartDraw", snippet);
-            }, 200);
+            var _elCheckerInterval = -1;
+            _elCheckerInterval = window.setInterval(function () {
+              var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+              if ($("#snippet_" + snippet.id()).find(".resultTable").length > 0) {
+                try {
+                  var _dt = createDatatable(_el, snippet);
+                  _dt.fnClearTable();
+                  _dt.fnAddData(snippet.result.data());
+                  resizeToggleLeftPanel(snippet);
+                  $(document).trigger("forceChartDraw", snippet);
+                  window.clearInterval(_elCheckerInterval);
+                }
+                catch (e) {
+                }
+              }
+            }, 200)
           }
         });
       });

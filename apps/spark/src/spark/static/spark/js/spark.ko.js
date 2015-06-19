@@ -222,7 +222,7 @@ var Snippet = function (vm, notebook, snippet) {
   });
 
   self.errorsKlass = ko.computed(function () {
-    return self.resultsKlass + " alert alert-error";
+    return self.resultsKlass() + " alert alert-error";
   });
 
   self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
