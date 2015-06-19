@@ -26,9 +26,11 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
+from libzookeeper.conf import ENSEMBLE
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer import conf, utils
+from indexer.conf import SOLRCTL_PATH, CORE_INSTANCE_DIR
+from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 
 
 LOG = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
 
 
 def get_solrctl_path():
-  solrctl_path = conf.SOLRCTL_PATH.get()
+  solrctl_path = SOLRCTL_PATH.get()
   if solrctl_path is None:
     LOG.error("Could not find solrctl executable")
     raise PopupException(_('Could not find solrctl executable'))
@@ -131,12 +133,12 @@ class CollectionManagerController(object):
       # solrcloud mode
 
       # Need to remove path afterwards
-      tmp_path, solr_config_path = utils.copy_configs(fields, unique_key_field, df, True)
+      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
 
       # Create instance directory.
       solrctl_path = get_solrctl_path()
 
-      process = subprocess.Popen([solrctl_path, "--zk", conf.SOLR_ZK_ENSEMBLE.get(), "instancedir", "--create", name, solr_config_path],
+      process = subprocess.Popen([solrctl_path, "--zk", ENSEMBLE.get(), "instancedir", "--create", name, solr_config_path],
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
       status = process.wait()
@@ -147,12 +149,12 @@ class CollectionManagerController(object):
       if status != 0:
         LOG.error("Could not create instance directory.\nOutput: %s\nError: %s" % process.communicate())
         raise PopupException(_('Could not create instance directory. '
-                               'Check if solr_zk_ensemble and solrctl_path are correct in Hue config [indexer].'))
+                               'Check if [libzookeeper]ensemble and [indexer]solrctl_path are correct in Hue config.'))
 
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
         # Delete instance directory if we couldn't create a collection.
-        process = subprocess.Popen([solrctl_path, "--zk", conf.SOLR_ZK_ENSEMBLE.get(), "instancedir", "--delete", name],
+        process = subprocess.Popen([solrctl_path, "--zk", ENSEMBLE.get(), "instancedir", "--delete", name],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         if process.wait() != 0:
@@ -161,10 +163,10 @@ class CollectionManagerController(object):
     else:
       # Non-solrcloud mode
       # Create instance directory locally.
-      instancedir = os.path.join(conf.CORE_INSTANCE_DIR.get(), name)
+      instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
       if os.path.exists(instancedir):
         raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
-      tmp_path, solr_config_path = utils.copy_configs(fields, unique_key_field, df, False)
+      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
       shutil.move(solr_config_path, instancedir)
       shutil.rmtree(tmp_path)
 
@@ -186,7 +188,7 @@ class CollectionManagerController(object):
       # Delete instance directory.
       solrctl_path = get_solrctl_path()
 
-      process = subprocess.Popen([solrctl_path, "--zk", conf.SOLR_ZK_ENSEMBLE.get(), "instancedir", "--delete", name],
+      process = subprocess.Popen([solrctl_path, "--zk", ENSEMBLE.get(), "instancedir", "--delete", name],
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE
                                  )
@@ -232,10 +234,10 @@ class CollectionManagerController(object):
         fh = fs.open(path)
         if data_type == 'log':
           # Transform to JSON then update
-          data = json.dumps([value for value in utils.field_values_from_log(fh, fields)])
+          data = json.dumps([value for value in field_values_from_log(fh, fields)])
           content_type = 'json'
         elif data_type == 'separated':
-          data = json.dumps([value for value in utils.field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)], indent=2)
+          data = json.dumps([value for value in field_values_from_separated_file(fh, kwargs.get('separator', ','), kwargs.get('quote_character', '"'), fields)], indent=2)
           content_type = 'json'
         else:
           raise PopupException(_('Could not update index. Unknown type %s') % data_type)

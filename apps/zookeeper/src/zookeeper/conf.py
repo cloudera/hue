@@ -25,6 +25,7 @@ def coerce_string(value):
     return value
 
 
+# Used only for ZooKeeper app proeprties, ZooKeeper specific properties should come from libzookeeper
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
   help="One entry for each Zookeeper cluster",
