@@ -634,8 +634,8 @@ class ConnectionHandler(object):
 
     def _authenticate_with_sasl(self, host, timeout):
         saslc = sasl.Client()
-        saslc.setAttr('host', host)
-        saslc.setAttr('service', self.sasl_server_principal)
+        saslc.setAttr('host', str(host))
+        saslc.setAttr('service', str(self.sasl_server_principal))
         saslc.init()
 
         ret, chosen_mech, initial_response = saslc.start('GSSAPI')
