@@ -187,9 +187,12 @@ def clone_design(request, design_id):
 
   copy = design.clone(request.user)
   copy.save()
-  copy_doc = design.doc.get().copy(owner=request.user)
-  copy.doc.all().delete()
-  copy.doc.add(copy_doc)
+
+  copy_doc = Document.objects.link(copy,
+      owner=copy.owner,
+      name=copy.name,
+      description=copy.desc,
+      extra=copy.type)
 
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
 

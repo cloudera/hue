@@ -86,7 +86,6 @@ class SearchController(object):
       for doc2 in self.get_shared_search_collections():
         if doc2.id in collection_ids:
           name = doc2.name + '-copy'
-          copy_doc = doc2.doc.get().copy(name=name, owner=self.user)
 
           doc2.pk = None
           doc2.id = None
@@ -95,9 +94,10 @@ class SearchController(object):
           doc2.owner = self.user
           doc2.save()
 
-          doc2.doc.all().delete()
-          doc2.doc.add(copy_doc)
-          doc2.save()
+          copy_doc = Document.objects.link(doc2,
+              owner=copy.owner,
+              name=copy.name,
+              description=copy.description)
 
           copy = Collection2(self.user, document=doc2)
           copy.data['collection']['label'] = name

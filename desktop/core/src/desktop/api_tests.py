@@ -81,9 +81,6 @@ class TestDocModelTags():
     tag_id = self.add_tag(tag_name)
     assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
 
-    DocumentTag.objects.create(owner=self.user, tag=tag_name)
-    assert_equal(n + 2, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
-
     tag_id = DocumentTag.objects.tag(self.user, doc.id, tag_name=tag_name)
     assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
 

@@ -100,7 +100,6 @@ def copy(request):
 
   for notebook in notebooks:
     doc2 = Document2.objects.get(uuid=notebook['uuid'])
-    copy_doc = doc2.doc.get().copy(owner=request.user)
 
     doc2.pk = None
     doc2.id = None
@@ -108,9 +107,10 @@ def copy(request):
     doc2.owner = request.user
     doc2.save()
 
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
-    doc2.save()
+    copy_doc = Document.objects.link(doc2,
+        owner=copy.owner,
+        name=copy.name,
+        description=copy.description)
 
   return JsonResponse({})
 
