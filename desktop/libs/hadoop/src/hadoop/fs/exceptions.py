@@ -37,11 +37,14 @@ class WebHdfsException(RestException):
     RestException.__init__(self, error)
 
     try:
-      json_body = json.loads(self._message)['RemoteException']
-      self.server_exc = json_body['exception']
-      self._message = "%s: %s" % (self.server_exc, json_body['message'])
-    except:
-      LOG.exception('failed to parse remote exception')
+      json_body = json.loads(self._message)
+    except ValueError:
+      pass
+    else:
+      remote_exception = json_body.get('RemoteException', {})
+      exception = remote_exception.get('exception')
+      message = remote_exception.get('message', '')
 
-      # Don't mask the original exception
-      self.server_exc = None
+      if exception:
+        self.server_exc = exception
+        self._message = "%s: %s" % (self.server_exc, message)
