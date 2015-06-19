@@ -255,7 +255,7 @@ class DocumentManager(models.Manager):
   def sync(self):
 
     def find_jobs_with_no_doc(model):
-      return model.objects.filter(doc__isnull=True)
+      return model.objects.filter(doc__isnull=True).select_related('owner')
 
     try:
       with transaction.atomic():
