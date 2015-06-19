@@ -984,9 +984,6 @@
   # Location of the solrctl binary.
   ## solrctl_path=/usr/bin/solrctl
 
-  # Zookeeper ensemble.
-  ## solr_zk_ensemble=localhost:2181/solr
-
 
 ###########################################################################
 # Settings to configure Job Designer
@@ -1009,6 +1006,7 @@
   # Share submitted jobs information with all users. If set to false,
   # submitted jobs are visible only to the owner and administrators.
   ## share_jobs=true
+
 
 
 ###########################################################################
@@ -1074,3 +1072,16 @@
 
   # Sentry configuration directory, where sentry-site.xml is located.
   ## sentry_conf_dir=/etc/sentry/conf
+
+
+###########################################################################
+# Settings to configure the ZooKeeper Lib
+###########################################################################
+
+[libzookeeper]
+  # ZooKeeper ensemble. Comma separated list of Host/Port.
+  # e.g. localhost:2181,localhost:2182,localhost:2183
+  ## ensemble=localhost:2181
+
+  # Name of Kerberos principal when using security.
+  ## principal_name=zookeeper

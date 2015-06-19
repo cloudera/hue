@@ -48,7 +48,8 @@ APPS := core \
 	libs/liboauth \
 	libs/libsolr \
 	libs/libsentry \
-	libs/indexer
+	libs/indexer \
+	libs/libzookeeper
 
 .PHONY: default
 default:: hue syncdb

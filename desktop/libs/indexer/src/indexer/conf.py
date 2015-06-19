@@ -23,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config
 
 
+
 def solrctl():
   """
   solrctl path
@@ -79,7 +80,8 @@ SOLRCTL_PATH = Config(
   type=str,
   dynamic_default=solrctl)
 
-SOLR_ZK_ENSEMBLE  = Config(
+# Deprecated
+SOLR_ZK_ENSEMBLE = Config(
   key="solr_zk_ensemble",
   help=_t("Zookeeper ensemble."),
   type=str,
