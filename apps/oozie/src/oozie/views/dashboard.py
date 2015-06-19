@@ -120,10 +120,10 @@ def manage_oozie_jobs(request, job_id, action):
     ex_message = ex.message
     if ex._headers.get('oozie-error-message'):
       ex_message = ex._headers.get('oozie-error-message')
-    msg = _("Error performing %s on Oozie job %s: %s.") % (action, job_id, ex_message)
+    msg = "Error performing %s on Oozie job %s: %s." % (action, job_id, ex_message)
     LOG.exception(msg)
 
-    response['data'] = msg
+    response['data'] = _(msg)
 
   return JsonResponse(response)
 

@@ -173,42 +173,41 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
           <div class="tab-content" style="min-height:200px">
             <div class="tab-pane active" id="calendar">
-              <div class="clearfix" style="margin-bottom: 1em;">
-                <div class="pull-left">
-                  <input type="text" data-bind="textInput: searchFilter, value: searchFilter,  valueUpdate: 'input'" class="input-xlarge search-query" placeholder="${_('Filter results')}">
-                  % if has_job_edition_permission(oozie_coordinator, user):
-                      <div id="coord-actions" data-bind="enable: selectedActions().length > 0" class="btn-group" style="vertical-align: middle">
-                        <button data-bind="enable: selectedActions().length > 0" class="btn btn-primary rerun-btn"
-                           % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
-                             disabled="disabled"
-                           % endif
-                          data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
-                          <i class="fa fa-refresh"></i> ${ _('Rerun') }
-                        </button>
-                        <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"
-                          data-bind="enable: selectedActions().length > 0">
-                          <span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu"> <li data-bind="enable: selectedActions().length > 0">
-                            <a href='#' class="ignore-btn confirmationModal" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='ignore') }"
-                                data-confirmation-body="${ _('Are you sure you want to ignore the action(s)?')}"
-                                data-confirmation-footer="normal"
-                                data-confirmation-header="${ _('Note: You can only ignore a FAILED, KILLED or TIMEDOUT action' )}" > ${ _('Ignore') } </a></li>
-                        </ul>
-                      </div>
-                  % endif
-                </div>
-                <span class="btn-group pull-right" style="margin-right: 20px">
-                  <a class="btn btn-status btn-success" data-table="calendar" data-value="SUCCEEDED">${ _('Succeeded') }</a>
-                  <a class="btn btn-status btn-warning" data-table="calendar" data-value="RUNNING">${ _('Running') }</a>
-                  <a class="btn btn-status btn-danger disable-feedback" data-table="calendar" data-value="ERROR">${ _('Error') }</a>
-                </span>
+              <div class="pull-left">
+                <input type="text" data-bind="textInput: searchFilter, value: searchFilter,  valueUpdate: 'input'" class="input-xlarge search-query" placeholder="${_('Filter results')}">
+                % if has_job_edition_permission(oozie_coordinator, user):
+                    <div id="coord-actions" data-bind="enable: selectedActions().length > 0" class="btn-group" style="vertical-align: middle">
+                      <button data-bind="enable: selectedActions().length > 0" class="btn btn-primary rerun-btn"
+                         % if oozie_coordinator.is_running() or oozie_coordinator.status in ('KILLED', 'FAILED'):
+                           disabled="disabled"
+                         % endif
+                        data-rerun-url="${ url('oozie:rerun_oozie_coord', job_id=oozie_coordinator.id, app_path=oozie_coordinator.coordJobPath) }">
+                        <i class="fa fa-refresh"></i> ${ _('Rerun') }
+                      </button>
+                      <button id="trash-btn-caret" class="btn toolbarBtn dropdown-toggle" data-toggle="dropdown"
+                        data-bind="enable: selectedActions().length > 0">
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu"> <li data-bind="enable: selectedActions().length > 0">
+                          <a href='#' class="ignore-btn confirmationModal" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='ignore') }"
+                              data-confirmation-body="${ _('Are you sure you want to ignore the action(s)?')}"
+                              data-confirmation-footer="normal"
+                              data-confirmation-header="${ _('Note: You can only ignore a FAILED, KILLED or TIMEDOUT action' )}" > ${ _('Ignore') } </a></li>
+                      </ul>
+                    </div>
+                % endif
               </div>
+              <div class="btn-group pull-right" style="margin-right: 20px">
+                <a class="btn btn-status btn-success" data-table="calendar" data-value="SUCCEEDED">${ _('Succeeded') }</a>
+                <a class="btn btn-status btn-warning" data-table="calendar" data-value="RUNNING">${ _('Running') }</a>
+                <a class="btn btn-status btn-danger disable-feedback" data-table="calendar" data-value="ERROR">${ _('Error') }</a>
+              </div>
+              <div class="clearfix"></div>
 
-              <table class="table table-striped table-condensed">
+              <table class="table table-striped table-condensed margin-top-10">
                 <thead>
                 <tr>
-                  <th width="3%"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
+                  <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
                   <th width="200">${ _('Day') }</th>
                   <th>${ _('Comment') }</th>
                 </tr>
@@ -221,7 +220,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                       <img src="${ static('desktop/art/spinner.gif') }" />
                     </td>
                   </tr>
-                  <tr data-bind="visible: actions().length == 0 && !isLoading()">
+                  <tr data-bind="visible: filteredActions().length == 0 && !isLoading()">
                     <td colspan="3">
                       <div class="alert">
                         ${ _('There are no actions to be shown.') }
@@ -253,33 +252,37 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 
             <div class="tab-pane" id="actions">
-              <span class="btn-group pull-right" style="margin-right: 20px;margin-bottom:20px">
+              <div class="pull-left">
+                <input type="text" data-bind="textInput: searchFilter, value: searchFilter,  valueUpdate: 'input'" class="input-xlarge search-query" placeholder="${_('Filter results')}">
+              </div>
+              <div class="btn-group pull-right" style="margin-right: 20px;">
                 <a class="btn btn-status btn-success" data-table="actions" data-value="SUCCEEDED">${ _('Succeeded') }</a>
                 <a class="btn btn-status btn-warning" data-table="actions" data-value="RUNNING">${ _('Running') }</a>
                 <a class="btn btn-status btn-danger disable-feedback" data-table="actions" data-value="ERROR">${ _('Error') }</a>
-              </span>
-              <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+              </div>
+              <div class="clearfix"></div>
+              <table class="table table-striped table-condensed margin-top-10" cellpadding="0" cellspacing="0">
                 <thead>
                 <tr>
-                  <th>${ _('Number') }</th>
-                  <th>${ _('Nominal Time') }</th>
+                  <th width="1%">${ _('Number') }</th>
+                  <th width="14%">${ _('Nominal Time') }</th>
 
-                  <th>${ _('Type') }</th>
-                  <th>${ _('Status') }</th>
+                  <th width="5%">${ _('Type') }</th>
+                  <th width="5%">${ _('Status') }</th>
 
-                  <th>${ _('Error Code') }</th>
-                  <th>${ _('Error Message') }</th>
-                  <th>${ _('Missing Dependencies') }</th>
+                  <th width="5%">${ _('Error Code') }</th>
+                  <th width="14%">${ _('Error Message') }</th>
+                  <th width="10%">${ _('Missing Dependencies') }</th>
 
-                  <th>${ _('Created Time') }</th>
-                  <th>${ _('Last Modified') }</th>
+                  <th width="10%">${ _('Created Time') }</th>
+                  <th width="10%">${ _('Last Modified') }</th>
 
-                  <th>${ _('Id') }</th>
-                  <th>${ _('External Id') }</th>
+                  <th width="13%">${ _('Id') }</th>
+                  <th width="13%">${ _('External Id') }</th>
                 </tr>
                 </thead>
 
-                <tbody data-bind="template: {name: 'actionTemplate', foreach: actions}">
+                <tbody data-bind="template: {name: 'actionTemplate', foreach: filteredActions}">
                 </tbody>
 
                 <tfoot>
@@ -288,7 +291,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                     <img src="${ static('desktop/art/spinner.gif') }" />
                   </td>
                 </tr>
-                <tr data-bind="visible: !isLoading() && actions().length == 0">
+                <tr data-bind="visible: !isLoading() && filteredActions().length == 0">
                   <td colspan="11">
                     <div class="alert">
                       ${ _('There are no actions to be shown.') }
@@ -830,6 +833,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     }
 
     function refreshView() {
+      window.clearTimeout(refreshViewTimer);
       $.getJSON("${ oozie_coordinator.get_absolute_url(oozie_bundle=oozie_bundle, format='json') }" + "&offset=" + actionTableOffset + getFilteredStatuses(), function (data) {
         viewModel.isLoading(false);
 
@@ -887,7 +891,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
           return;
         }
 
-        window.clearTimeout(refreshViewTimer);
         refreshViewTimer = window.setTimeout(refreshView, 5000);
       });
     }
