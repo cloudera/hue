@@ -73,7 +73,8 @@ class Migration(SchemaMigration):
             ))
             db.create_unique('desktop_document_tags', ['document_id', 'documenttag_id'])
 
-        Document.objects.sync()
+        if not db.dry_run:
+            Document.objects.sync()
 
     def backwards(self, orm):
 
