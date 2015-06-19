@@ -469,24 +469,6 @@ class Document(models.Model):
     else:
       raise exception_class(_("Document does not exist or you don't have the permission to access it."))
 
-  def copy(self, name=None, owner=None):
-    copy_doc = self
-
-    copy_doc.pk = None
-    copy_doc.id = None
-    if name is not None:
-      copy_doc.name = name
-    if owner is not None:
-      copy_doc.owner = owner
-    copy_doc.save()
-
-    # Don't copy tags
-    default_tag = DocumentTag.objects.get_default_tag(copy_doc.owner)
-    tags = [default_tag]
-    copy_doc.tags.add(*tags)
-
-    return copy_doc
-
   @property
   def icon(self):
     apps = appmanager.get_apps_dict()
