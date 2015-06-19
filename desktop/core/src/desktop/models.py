@@ -266,8 +266,6 @@ class DocumentManager(models.Manager):
             find_jobs_with_no_doc(Coordinator),
             find_jobs_with_no_doc(Bundle)):
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
-          tag = DocumentTag.objects.get_example_tag(user=job.owner)
-          doc.tags.add(tag)
 
           if job.is_trashed:
             doc.send_to_trash()
@@ -288,8 +286,6 @@ class DocumentManager(models.Manager):
 
         for job in find_jobs_with_no_doc(SavedQuery):
           doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
-          tag = DocumentTag.objects.get_example_tag(user=job.owner)
-          doc.tags.add(tag)
           if job.is_trashed:
             doc.send_to_trash()
     except Exception, e:
@@ -300,9 +296,7 @@ class DocumentManager(models.Manager):
         from pig.models import PigScript
 
         for job in find_jobs_with_no_doc(PigScript):
-          doc = Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
-          tag = DocumentTag.objects.get_example_tag(user=job.owner)
-          doc.tags.add(tag)
+          Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
     except Exception, e:
       LOG.exception('error syncing pig')
 
