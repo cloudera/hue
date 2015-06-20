@@ -392,6 +392,7 @@ class DocumentManager(models.Manager):
       #
       # Note we're counting `content_type__name` to force the join.
       docs = Document.objects \
+          .values('id') \
           .annotate(content_type_count=models.Count('content_type__name')) \
           .filter(content_type_count=0)
 
