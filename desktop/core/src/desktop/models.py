@@ -27,7 +27,7 @@ from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
-from django.db import models, transaction
+from django.db import connection, models, transaction
 from django.db.models import Q
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -370,13 +370,70 @@ class DocumentManager(models.Manager):
     except Exception, e:
       LOG.exception('error removing default tags')
 
-    # Delete documents with no object
-    try:
-      for doc in Document.objects.all():
-        if doc.content_type is None or doc.content_object is None:
-          doc.delete()
-    except Exception, e:
-      LOG.exception('error removing documents with no objects')
+    # ------------------------------------------------------------------------
+
+    LOG.info('Looking for documents that have no object')
+
+    # Delete documents with no object.
+    with transaction.atomic():
+      # First, delete all the documents that don't have a content type
+      docs = Document.objects.filter(content_type=None)
+
+      if docs:
+        LOG.info('Deleting %s doc(s) that do not have a content type' % docs.count())
+        docs.delete()
+
+      # Next, it's possible that there are documents pointing at a non-existing
+      # content_type. We need to do a left join to find these records, but we
+      # can't do this directly in django. To get around writing wrap sql (which
+      # might not be portable), we'll use an aggregate to count up all the
+      # associated content_types, and delete the documents that have a count of
+      # zero.
+      #
+      # Note we're counting `content_type__name` to force the join.
+      docs = Document.objects \
+          .annotate(content_type_count=models.Count('content_type__name')) \
+          .filter(content_type_count=0)
+
+      if docs:
+        LOG.info('Deleting %s doc(s) that have invalid content types' % docs.count())
+        docs.delete()
+
+      # Finally we need to delete documents with no associated content object.
+      # This is tricky because of our use of generic foreign keys. So to do
+      # this a bit more efficiently, we'll start with a query of all the
+      # documents, then step through each content type and and filter out all
+      # the documents it's referencing from our document query. Messy, but it
+      # works.
+
+      docs = Document.objects.all()
+
+      table_names = connection.introspection.table_names()
+
+      for content_type in ContentType.objects.all():
+        model_class = content_type.model_class()
+
+        # Ignore any types that don't have a model.
+        if model_class is None:
+          continue
+
+        # Ignore types that don't have a table yet.
+        if model_class._meta.db_table not in table_names:
+          continue
+
+        # Ignore classes that don't have a 'doc'.
+        if not hasattr(model_class, 'doc'):
+          continue
+
+        # First create a query that grabs all the document ids for this type.
+        docs_from_content = model_class.objects.values('doc__id')
+
+        # Next, filter these from our document query.
+        docs = docs.exclude(id__in=docs_from_content)
+
+      if docs.exists():
+        LOG.info('Deleting %s documents' % docs.count())
+        docs.delete()
 
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
