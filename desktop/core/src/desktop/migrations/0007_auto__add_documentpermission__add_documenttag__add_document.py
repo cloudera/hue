@@ -13,6 +13,12 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
 
+        # On SQLite, database transactions (which are used by
+        # `Document.objects.sync`) requires autocommit to be turned on. South
+        # however doesn't enable this by default.
+        if connection.vendor == 'sqlite':
+            connection.set_autocommit(True)
+
         # Adding model 'Document'
         if 'desktop_document' not in connection.introspection.table_names():
             db.create_table('desktop_document', (
