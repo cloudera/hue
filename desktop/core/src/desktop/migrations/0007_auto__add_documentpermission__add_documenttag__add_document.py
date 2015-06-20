@@ -17,6 +17,7 @@ class Migration(SchemaMigration):
         # `Document.objects.sync`) requires autocommit to be turned on. South
         # however doesn't enable this by default.
         if connection.vendor == 'sqlite':
+            autocommit = connection.get_autocommit()
             connection.set_autocommit(True)
 
         # Adding model 'Document'
@@ -81,6 +82,9 @@ class Migration(SchemaMigration):
 
         if not db.dry_run:
             Document.objects.sync()
+
+        if connection.vendor == 'sqlite':
+            connection.set_autocommit(autocommit)
 
     def backwards(self, orm):
 
