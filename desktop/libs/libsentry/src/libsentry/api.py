@@ -250,11 +250,11 @@ def _get_client(username):
 def _get_server_properties():
   global _api_cache
 
-  if _api_cache is None:
+  if not _api_cache: # If we need to refresh the list or if previously no servers were up 
     _api_cache_lock.acquire()
 
     try:
-      if _api_cache is None:
+      if not _api_cache:
 
         if get_sentry_server_ha_has_security():
           try:
