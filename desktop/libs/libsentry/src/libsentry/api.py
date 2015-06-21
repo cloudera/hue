@@ -21,10 +21,11 @@ import random
 import threading
 import time
 
+from kazoo.client import KazooClient
+
 from desktop.lib.exceptions_renderable import PopupException
 from django.utils.translation import ugettext as _
-
-from kazoo.client import KazooClient
+from libzookeper.conf import PRINCIPAL_NAME
 
 from libsentry.client import SentryClient
 from libsentry.conf import HOSTNAME, PORT
@@ -244,9 +245,6 @@ def _get_client(username):
   return SentryClient(server['hostname'], server['port'], username)
 
 
-# To move to a libzookeeper with decorator
-
-
 def _get_server_properties():
   global _api_cache
 
@@ -257,12 +255,8 @@ def _get_server_properties():
       if not _api_cache:
 
         if get_sentry_server_ha_has_security():
-          try:
-            from zookeeper.conf import CLUSTERS
-            sasl_server_principal = CLUSTERS.get()['default'].PRINCIPAL_NAME.get()
-          except Exception, e:
-            LOG.warn("Could not get principal name from ZooKeeper app config: %s. Using 'zookeeper' as principal name." % e)
-            sasl_server_principal = 'zookeeper'
+          sasl_server_principal = PRINCIPAL_NAME.get()
+          LOG.info("Using %s for ZooKeeper  principal name" % sasl_server_principal)
         else:
           sasl_server_principal = None
 
