@@ -21,11 +21,11 @@ import random
 import threading
 import time
 
-from kazoo.client import KazooClient
+from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from django.utils.translation import ugettext as _
-from libzookeper.conf import PRINCIPAL_NAME
+from libzookeeper.conf import PRINCIPAL_NAME
+from libzookeeper.models import get_children_data
 
 from libsentry.client import SentryClient
 from libsentry.conf import HOSTNAME, PORT
@@ -254,26 +254,12 @@ def _get_server_properties():
     try:
       if not _api_cache:
 
-        if get_sentry_server_ha_has_security():
-          sasl_server_principal = PRINCIPAL_NAME.get()
-          LOG.info("Using %s for ZooKeeper  principal name" % sasl_server_principal)
-        else:
-          sasl_server_principal = None
-
-        zk = KazooClient(hosts=get_sentry_server_ha_zookeeper_quorum(), read_only=True, sasl_server_principal=sasl_server_principal)
-
-        zk.start()
-
         servers = []
-        namespace = get_sentry_server_ha_zookeeper_namespace()
+        sentry_servers = get_children_data(ensemble=get_sentry_server_ha_zookeeper_quorum(), namespace=get_sentry_server_ha_zookeeper_namespace())
 
-        children = zk.get_children("/%s/sentry-service/sentry-service/" % namespace)
-        for node in children:
-          data, stat = zk.get("/%s/sentry-service/sentry-service/%s" % (namespace, node))
+        for data in sentry_servers:
           server = json.loads(data.decode("utf-8"))
           servers.append({'hostname': server['address'], 'port': server['sslPort'] if server['sslPort'] else server['port']})
-
-        zk.stop()
 
         _api_cache = servers
     finally:
