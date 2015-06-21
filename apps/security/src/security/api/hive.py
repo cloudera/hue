@@ -155,7 +155,7 @@ def create_role(request):
 
     api.create_sentry_role(role['name'])
 
-    privileges = [privilege for privilege in role['privileges'] if privilege['status'] != 'deleted']
+    privileges = [privilege for privilege in role['privileges'] if privilege['status'] not in ('deleted', 'alreadydeleted')]
     result['privileges'] = _hive_add_privileges(request.user, role, privileges)
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
 
