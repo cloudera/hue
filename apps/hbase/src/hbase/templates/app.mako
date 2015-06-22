@@ -95,7 +95,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             % if can_write:
               <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="fa fa-trash-o"></i></a>
             % endif
-            <a class="corner-btn btn" data-bind="event: { mousedown: function(){launchModal('cell_edit_modal', {content:$data, mime: detectMimeType($data.value())})} }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
+            <a class="corner-btn btn" data-bind="event: { mousedown: function(){ showFullEditor($data) } }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
             <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
             <textarea data-bind="visible: !$data.isLoading() && $data.editing(), disable: ! app.views.tabledata.canWrite(), hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
             <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $data.isLoading() " />
@@ -365,7 +365,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
         <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(content.timestamp)"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp($data.content.timestamp)"></span></small></h3>
+        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(timestamp())"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp(timestamp())"></span></small></h3>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
@@ -382,8 +382,9 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             <div class="span3">
               <ul class="nav nav-list cell-history">
                 <li class="nav-header">${_('Cell History:')}</li>
+                <li data-bind="css: { 'active': showingCurrent }"><a data-bind="click: switchToCurrent()" class="pointer">${_('Current Version')}<span data-bind="if: (originalValue !== value() && showingCurrent()) || (originalValue !== currentValue() && !showingCurrent())"> (${_('Edited')})</span></a></li>
                 <!-- ko foreach: $data.content.history.items() -->
-                  <li data-bind="css: { 'active': $data.timestamp == $parent.content.timestamp }"><a data-bind="click: $parent.content.history.pickHistory.bind(null, $data), text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
+                  <li data-bind="css: { 'active': $data.timestamp == $parent.timestamp() }"><a data-bind="click: function() { $root.switchToHistorical($data) }, text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
                 <!-- /ko -->
                 <li data-bind="visible: $data.content.history.loading()"><img src="${ static('desktop/art/spinner.gif') }" /></li>
               </ul>
@@ -391,31 +392,35 @@ ${ commonheader(None, "hbase", user) | n,unicode }
           </div>
         </div>
       </div>
-      <div class="modal-footer" data-bind="if: ! $data.readonly">
-        % if can_write:
+      <div class="modal-footer">
+        <!-- ko if: showingCurrent -->
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <a id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
           <input data-bind="visible: mime.split('/')[0].toLowerCase() != 'application' && mime.split('/')[0].toLowerCase() != 'image'" type="submit" class="btn btn-primary" value="${_('Save')}">
-        % else:
-          <button class="btn" data-dismiss="modal" aria-hidden="true">${_('OK')}</button>
-        % endif
+        <!-- /ko -->
+        <!-- ko ifnot: showingCurrent -->
+          <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+          <input type="submit" class="btn btn-primary" value="${_('Revert')}">
+        <!-- /ko -->
       </div>
     </script>
 
     <script id="cell_image_template" type="text/html">
-      <img data-bind="attr: {src: 'data:image/' + $data.mime + ';base64,' + $data.content.value()}"/>
+      <img data-bind="attr: {src: 'data:image/' + $data.mime + ';base64,' + value()}"/>
+      <input type="hidden" data-bind="value: value"/>
     </script>
 
     <script id="cell_text_template" type="text/html">
-      <textarea id="codemirror_target" data-bind="text: $data.content.value, disable: ! app.views.tabledata.canWrite()" data-use-post="true"></textarea>
+      <textarea id="codemirror_target" data-bind="text: value, disable: !showingCurrent()" data-use-post="true"></textarea>
     </script>
 
     <script id="cell_application_template" type="text/html">
-      <iframe width="100%" height="100%" data-bind="attr: {src: 'data:' + $data.mime + ';base64,' + $data.content.value()}"></iframe>
+      <iframe width="100%" height="100%" data-bind="attr: {src: 'data:' + $data.mime + ';base64,' + value()}"></iframe>
+      <input type="hidden" data-bind="value: value"/>
     </script>
 
     <script id="cell_type_template" type="text/html">
-      <textarea style="width:100%; height: 450px;" data-bind="text: $data.content.value, disable: ! app.views.tabledata.canWrite()" data-use-post="true"></textarea>
+      <textarea style="width:100%; height: 450px;" data-bind="textInput: value, disable: !showingCurrent()" data-use-post="true"></textarea>
     </script>
   </div>
 
