@@ -29,7 +29,7 @@
     % endif
   </global>
   % endif
-  % if wf.credentials:
+  % if wf.credentials and mapping.get('security_enabled'):
   <credentials>
     % for cred_type in wf.credentials:
     <%
