@@ -105,6 +105,21 @@ function launchModal(modal, data) {
           lineNumbers: true,
           readOnly: $(target).is(":disabled")
         });
+        data.codeMirror = cm;
+
+        var updateTimeout = 0;
+        cm.on("change", function(cm) {
+          clearTimeout(updateTimeout);
+          updateTimeout = setTimeout(function () {
+            data.value(cm.getValue());
+          }, 100);
+        });
+
+        data.showingCurrent.subscribe(function(showingCurrent) {
+          cm.options.readOnly = ! showingCurrent;
+          cm.refresh();
+        });
+
         setTimeout(function () {
           cm.refresh()
         }, 401); //CM invis bug workaround
@@ -124,6 +139,7 @@ function launchModal(modal, data) {
           multiple: false,
           onComplete: function (id, fileName, response) {
             data.content.reload();
+            data.value(data.content.value);
           }
         });
       }
@@ -158,12 +174,49 @@ function launchModal(modal, data) {
   logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
 }
 
+function showFullEditor(cellContent) {
+  var currentValue = ko.isObservable(cellContent.value) ? cellContent.value() : cellContent.value;
+  launchModal('cell_edit_modal', {
+    originalValue: currentValue,
+    currentValue: ko.observable(currentValue),
+    value: ko.observable(currentValue),
+    showingCurrent: ko.observable(true),
+    readOnly: ko.observable(false),
+    timestamp: ko.observable(cellContent.timestamp),
+    content: cellContent,
+    mime: detectMimeType(currentValue),
+
+    updateCodeMirror: function() {
+      if (this.codeMirror) {
+        this.codeMirror.setValue(this.value());
+        this.codeMirror.refresh()
+      }
+    },
+
+    switchToHistorical: function(item) {
+      if (this.showingCurrent()) {
+        this.currentValue(this.value());
+      }
+      this.value(item.value);
+      this.updateCodeMirror();
+      this.showingCurrent(false);
+      this.timestamp(item.timestamp)
+    },
+
+    switchToCurrent: function() {
+      if (!this.showingCurrent()) {
+        this.value(this.currentValue());
+        this.showingCurrent(true);
+        this.timestamp(this.content.timestamp);
+        this.updateCodeMirror();
+      }
+    }
+  });
+}
+
 function editCell($data) {
   if ($data.value().length > 146) {
-    launchModal('cell_edit_modal', {
-      content: $data,
-      mime: detectMimeType($data.value())
-    });
+    showFullEditor($data);
   } else {
     $data.editing(true);
   }
