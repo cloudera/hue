@@ -15,12 +15,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
+import os
+
+from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config
+from hadoop import cluster
+from sqoop.settings import NICE_NAME
 
 
 SERVER_URL = Config(
   key="server_url",
   default='http://localhost:12000/sqoop',
   help=_t("The sqoop server URL."))
+
+SQOOP_CONF_DIR = Config(
+  key="sqoop_conf_dir",
+  default='/etc/sqoop2/conf',
+  help=_t("Path to Sqoop2 configuration directory."))
+
+
+def config_validator(user):
+  res = []
+
+  yarn_cluster = cluster.get_cluster_conf_for_job_submission()
+
+  if yarn_cluster.SECURITY_ENABLED.get() and not os.path.exists(SQOOP_CONF_DIR.get()):
+    res.append((NICE_NAME, _t("The app won't work without a valid %s property.") % SQOOP_CONF_DIR.grab_key))
+
+  return res

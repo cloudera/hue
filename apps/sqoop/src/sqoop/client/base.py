@@ -15,23 +15,20 @@
 # limitations under the License.
 
 import logging
-import posixpath
-import threading
 import time
 import json
 
-from django.utils.translation import ugettext as _
 
-from desktop.conf import TIME_ZONE
 from desktop.lib.rest.http_client import HttpClient
 
-from link import Link
-from job import Job
-from connector import Connector
-from driver import Driver
-from exception import SqoopException
-from submission import Submission, SqoopSubmissionException
-from resource import SqoopResource
+from sqoop.client.link import Link
+from sqoop.client.job import Job
+from sqoop.client.connector import Connector
+from sqoop.client.driver import Driver
+from sqoop.client.exception import SqoopException
+from sqoop.client.submission import Submission, SqoopSubmissionException
+from sqoop.client.resource import SqoopResource
+from sqoop.sqoop_properties import has_sqoop_has_security
 
 
 LOG = logging.getLogger(__name__)
@@ -53,8 +50,12 @@ class SqoopClient(object):
     self._language = language
     self._username = username
 
+    if has_sqoop_has_security():
+      self._client.set_kerberos_auth()
+    self._security_enabled = has_sqoop_has_security()
+
   def __str__(self):
-    return "SqoopClient at %s" % self._url
+    return "SqoopClient at %s with security %s" % (self._url, self._security_enabled)
 
   @property
   def url(self):
