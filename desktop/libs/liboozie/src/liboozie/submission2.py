@@ -61,6 +61,8 @@ class Submission(object):
     else:
       self.properties = {}
 
+    self.properties['security_enabled'] = self.api.security_enabled
+
   def __str__(self):
     if self.oozie_id:
       res = "Submission for job '%s'." % (self.oozie_id,)
