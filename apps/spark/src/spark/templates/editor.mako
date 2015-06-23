@@ -251,14 +251,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script type="text/html" id="notebook">
   <div class="row-fluid">
     <div class="span2 assist-container" data-bind="visible: $root.isAssistVisible, css:{'span2': $root.isAssistVisible, 'hidden': !$root.isAssistVisible()}, event: { mouseover: function(){ $('.assist-hover').show(); }, mouseout: function(){ $('.assist-hover').hide(); } }">
-      <div class="assist">
+      <div class="span2 assist">
         <a title="${_('Toggle Assist')}" class="pull-right pointer assist-hover" style="margin:3px; margin-top:9px; display:none" data-bind="click: $root.toggleAssist">
           <i class="fa fa-chevron-left"></i>
         </a>
         <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right pointer assist-hover" style="margin:3px; margin-top:9px; display:none" data-bind="click: reloadAssist">
           <i class="fa fa-refresh"></i>
         </a>
-        <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
+        <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF; margin-bottom: 1px;">
           <li class="nav-header">${_('database')}</li>
         </ul>
         <!-- ko if: $root.assistContent && $root.assistContent().mainObjects().length > 0 -->
@@ -1309,7 +1309,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   }
 
   function resizeAssist() {
-    $(".assist").width($(".assist").parents(".span2").width());
     $(".assist").parents(".span2").height($(".assist").height() + 100);
     $(".assist-main").height($(window).height() - 230);
   }
@@ -1688,8 +1687,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     }
 
   $(document).ready(function () {
-    resizeAssist();
-
     var initialResizePosition = 100;
 
     function getDraggableOptions(minY) {
