@@ -194,17 +194,19 @@ def open_notebook(request):
 @require_POST
 @check_document_access_permission()
 def close_notebook(request):
-  response = {'status': -1}
+  response = {'status': -1, 'result': []}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
 
-  response['status'] = 0
   for snippet in notebook['snippets']:
     try:
-      if snippet['result']['handle']:
-        get_api(request.user, snippet).close(snippet)
+      response['result'].append(get_api(request.user, snippet).close(notebook, snippet))
     except QueryExpired:
       pass
+    except Exception, e:
+      LOG.exception('Error closing session %s' % e.message)
+
+  response['status'] = 0
   response['message'] = _('Notebook closed !')
 
   return JsonResponse(response)
@@ -219,9 +221,11 @@ def close_statement(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['result'] = get_api(request.user, snippet).close(snippet)
+    response['result'] = get_api(request.user, snippet).close(notebook, snippet)
   except QueryExpired:
     pass
+
   response['status'] = 0
+  response['message'] = _('Statement closed !')
 
   return JsonResponse(response)

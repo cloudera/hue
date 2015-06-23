@@ -104,6 +104,9 @@ class JobServerApi(object):
   def cancel(self, session):
     return self._root.post('sessions/%s/interrupt' % session)
 
+  def close(self, uuid):
+    return self._root.delete('sessions/%s' % uuid)
+
   def get_batches(self):
     return self._root.get('batches')
 
@@ -131,5 +134,5 @@ class JobServerApi(object):
 
     return '\n'.join(response['log'])
 
-  def delete_batch(self, uuid):
+  def close_batch(self, uuid):
     return self._root.delete('batches/%s' % uuid)
