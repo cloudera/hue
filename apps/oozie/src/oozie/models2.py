@@ -390,7 +390,8 @@ class Action(object):
 
   @classmethod
   def get_fields(cls):
-    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', Workflow.SLA_DEFAULT), ('credentials', [])]
+    credentials = [cls.DEFAULT_CREDENTIALS] if hasattr(cls, 'DEFAULT_CREDENTIALS') else []
+    return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', Workflow.SLA_DEFAULT), ('credentials', credentials)]
 
 
 class StartNode(Action):
@@ -585,6 +586,7 @@ class JavaAction(Action):
 
 class HiveAction(Action):
   TYPE = 'hive'
+  DEFAULT_CREDENTIALS = 'hcat'
   FIELDS = {
      'script_path': {
           'name': 'script_path',
@@ -669,6 +671,7 @@ def _get_hiveserver2_url():
 
 class HiveServer2Action(Action):
   TYPE = 'hive2'
+  DEFAULT_CREDENTIALS = 'hive2'
   FIELDS = {
      'script_path': {
           'name': 'script_path',
