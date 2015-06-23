@@ -408,10 +408,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn codeMirror-overlaybtn pointer">
               <i class="fa fa-stop"></i>
             </a>
-            <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
+            <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF;">
               <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
             </div>
-            <div class="resize-panel center"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
           </div>
         </div>
 
@@ -1135,16 +1134,10 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       element.editor = editor;
       $("#snippet_" + options.id).data("editor", editor);
       editor.setValue(allBindingsAccessor().value());
-      editor.setSize("100%", snippet.codemirrorSize());
       var wrapperElement = $(editor.getWrapperElement());
 
       var _changeTimeout = -1;
       editor.on("change", function () {
-        if (editor.lineCount() >= 30){
-          editor.setSize("100%", "400px");
-          snippet.codemirrorSize(400);
-          redrawFixedHeaders();
-        }
         window.clearTimeout(_changeTimeout);
         _changeTimeout = window.setTimeout(function(){
           allBindingsAccessor().value(editor.getValue());
@@ -1162,20 +1155,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         if (editor.getValue() == ""){
           editor.setValue(viewModel.snippetPlaceholders[snippet.type()]);
         }
-      });
-
-      $(editor.getWrapperElement()).on("paste", function(){
-        var _previousLineCount = editor.lineCount();
-        window.setTimeout(function(){
-          if (editor.lineCount() > _previousLineCount) {
-            editor.setSize("100%", "auto");
-          }
-          if (editor.lineCount() >= 30){
-            editor.setSize("100%", "400px");
-          }
-          snippet.codemirrorSize($(editor.getWrapperElement()).height());
-          redrawFixedHeaders();
-        }, 400);
       });
 
       ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
