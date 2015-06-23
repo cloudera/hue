@@ -247,6 +247,18 @@ var Snippet = function (vm, notebook, snippet) {
     $(document).trigger("toggleLeftPanel", self);
   };
 
+  self.codeVisible = ko.observable(typeof snippet.codeVisible != "undefined" && snippet.codeVisible != null ? snippet.codeVisible : true);
+
+  // We need to refresh codemirror the first time it's shown if it's initially hidden otherwise it'll be blank
+  if (!self.codeVisible()) {
+    var subscription = self.codeVisible.subscribe(function(newVal) {
+      if (newVal) {
+        $(document).trigger("refreshCodeMirror", self);
+        subscription.dispose();
+      }
+    });
+  }
+
   self.expand = function () {
     self.size(self.size() + 1);
     $("#snippet_" + self.id()).trigger("resize");

@@ -202,6 +202,14 @@
   outline: none;
 }
 
+.snippet-actions {
+    display: none;
+}
+
+.snippet-container:hover .snippet-actions {
+    display: inline-block;
+}
+
 .text-snippet h2 {
   padding-left: 0 !important;
 }
@@ -268,17 +276,6 @@ h1.empty {
   background-color: #F0F0F0;
 }
 
-.editor:hover .run-button {
-    display: inherit;
-}
-
-.snippet-body:hover .run-button {
-    display: inline-block;
-}
-
-.run-button {
-    display: none;
-}
 .chart-icon {
   width: 15px;
   text-align: center;
