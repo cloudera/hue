@@ -160,26 +160,28 @@ class TestSubmission(OozieMockBase):
   def test_get_properties(self):
     submission = Submission(self.user, fs=MockFs())
 
-    assert_equal({}, submission.properties)
+    assert_equal({'security_enabled': False}, submission.properties)
 
     submission._update_properties('curacao:8032', '/deployment_dir')
 
     assert_equal({
         'jobTracker': 'curacao:8032',
-        'nameNode': 'hdfs://curacao:8020'
+        'nameNode': 'hdfs://curacao:8020',
+        'security_enabled': False
       }, submission.properties)
 
 
   def test_get_logical_properties(self):
     submission = Submission(self.user, fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
 
-    assert_equal({}, submission.properties)
+    assert_equal({'security_enabled': False}, submission.properties)
 
     submission._update_properties('curacao:8032', '/deployment_dir')
 
     assert_equal({
         'jobTracker': 'jtname',
-        'nameNode': 'fsname'
+        'nameNode': 'fsname',
+        'security_enabled': False
       }, submission.properties)
 
 
@@ -192,7 +194,8 @@ class TestSubmission(OozieMockBase):
         'user.name': 'hue',
         'test.1': 'http://localhost/test?test1=test&test2=test',
         'nameNode': 'hdfs://curacao:8020',
-        'jobTracker': 'jtaddress'
+        'jobTracker': 'jtaddress',
+        'security_enabled': False
       }
 
       final_properties = properties.copy()
