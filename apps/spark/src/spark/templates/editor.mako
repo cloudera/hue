@@ -355,7 +355,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
 <script type="text/html" id="snippet">
-  <div class="row-fluid">
+  <div class="snippet-container row-fluid">
     <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
       <h2 class="card-heading simple" data-bind="visible: $root.isEditing() || (! $root.isEditing() && type() != 'text')">
@@ -382,15 +382,16 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-        <div class="inline pull-right">
-          <a href="javascript:void(0)" data-bind="visible: $root.isEditing, click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
+        <div class="snippet-actions inline pull-right">
+          <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
 
       <!-- ko if: ['text', 'jar', 'py'].indexOf(type()) == -1  -->
       <div class="snippet-body">
         <div class="row-fluid">
-          <div data-bind="css: editorKlass">
+          <div data-bind="css: editorKlass, verticalSlide: codeVisible">
             <div data-bind="foreach: variables">
               <div>
                 <span data-bind="text: name"></span>
@@ -399,22 +400,22 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             </div>
             <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
             </textarea>
-            <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn codeMirror-overlaybtn" title="${ _('Creating session') }">
-              <i class="fa fa-spinner fa-spin"></i>
-            </a>
-            <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn codeMirror-overlaybtn pointer">
-              <i class="fa fa-play"></i>
-            </a>
-            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn codeMirror-overlaybtn pointer">
-              <i class="fa fa-stop"></i>
-            </a>
-            <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF;">
-              <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
-            </div>
+          </div>
+          <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF; width: 100%">
+            <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
           </div>
         </div>
 
-        <div style="padding-top: 10px;">
+        <div style="padding-top: 10px; height: 29px;">
+          <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn" title="${ _('Creating session') }">
+            <i class="fa fa-spinner fa-spin"></i>
+          </a>
+          <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
+            <i class="fa fa-play"></i>
+          </a>
+          <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
+            <i class="fa fa-stop"></i>
+          </a>
           <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
             <i class="fa fa-th"></i>
           </button>
@@ -499,7 +500,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
 
         <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
-          <div class="row-fluid" style="max-height: 400px; margin-top: 50px">
+          <div class="row-fluid" style="max-height: 400px; margin: 10px 0;">
             <pre data-bind="text: result.data()[0][1]">
             </pre>
           </div>
@@ -643,8 +644,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       <!-- /ko -->
 
       <!-- ko if: type() == 'jar' || type() == 'py'-->
-        <div class="snippet-body" style="padding: 10px">
-          <table class="airy">
+        <div class="snippet-body">
+          <table class="airy" data-bind="verticalSlide: codeVisible">
             <tr data-bind="visible: type() =='jar'">
               <td>${_('Path')}</td>
               <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
@@ -812,6 +813,23 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       activeCodemirrorEditor.focus();
     }
   }
+
+  ko.bindingHandlers.verticalSlide = {
+    init: function(element, valueAccessor) {
+      if (ko.utils.unwrapObservable(valueAccessor())) {
+        $(element).show();
+      } else {
+        $(element).hide();
+      }
+    },
+    update: function(element, valueAccessor) {
+      if (ko.utils.unwrapObservable(valueAccessor())) {
+        $(element).slideDown('fast');
+      } else {
+        $(element).slideUp('fast');
+      }
+    }
+  };
 
   ko.bindingHandlers.codemirror = {
     init: function (element, valueAccessor, allBindingsAccessor, snippet) {
@@ -1821,6 +1839,14 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       window.setTimeout(function () {
         snippet.chartX.notifySubscribers();
         snippet.chartX.valueHasMutated();
+      }, 100);
+    });
+
+    $(document).on("refreshCodeMirror", function (e, snippet) {
+      window.setTimeout(function () {
+        $("#snippet_" + snippet.id()).find(".CodeMirror").each(function() {
+          $(this)[0].CodeMirror.refresh();
+        });
       }, 100);
     });
 
