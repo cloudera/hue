@@ -18,7 +18,7 @@
 import logging
 import os
 
-from pytz import timezone, datetime
+from pytz import UnknownTimeZoneError, datetime, timezone
 
 LOG = logging.getLogger(__name__)
 
@@ -26,15 +26,16 @@ class Formatter(logging.Formatter):
   def formatTime(self, record, datefmt=None):
     try:
       tz = timezone(os.environ['TZ'])
+    except (KeyError, UnknownTimeZoneError):
+      tz = None
+
+    try:
       ct = datetime.datetime.fromtimestamp(record.created, tz=tz)
-    except:
-      LOG.exception('failed to format time')
-      try:
-        ct = datetime.datetime.fromtimestamp(record.created)
-      except:
-        LOG.exception('failed to format time')
-        # Fallback to original.
-        return super(Formatter, self).formatTime(record, datefmt=datefmt)
+    except (OverflowError, TypeError, ValueError):
+      LOG.exception('failed to format time: timestamp=%s tz=%s' % (record.created, tz))
+
+      # Fallback to original.
+      return super(Formatter, self).formatTime(record, datefmt=datefmt)
 
     if datefmt:
       s = ct.strftime(datefmt)
