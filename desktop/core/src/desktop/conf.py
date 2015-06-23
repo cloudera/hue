@@ -931,6 +931,11 @@ def validate_mysql_storage():
             FROM information_schema.tables
             WHERE table_schema=DATABASE()''')
 
+        # Promote InnoDB storage engine
+        if innodb_table_count != total_table_count:
+          res.append(('PREFERRED_STORAGE_ENGINE', unicode(_('''We recommend MySQL InnoDB engine over
+                                                        MyISAM which does not support transactions.'''))))
+
         if innodb_table_count != 0 and innodb_table_count != total_table_count:
           res.append(('MYSQL_STORAGE_ENGINE', unicode(_('''All tables in the database must be of the same
                                                         storage engine type (preferably InnoDB).'''))))
