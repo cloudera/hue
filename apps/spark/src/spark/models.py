@@ -407,8 +407,18 @@ class SparkApi():
   def _progress(self, snippet, logs):
     return 50
 
-  def close(self, snippet):
-    pass
+  def close(self, notebook, snippet):
+    api = get_spark_api(self.user)
+    session = _get_snippet_session(notebook, snippet)
+
+    if session['id'] is not None:
+      api.close(session['id'])
+      return {
+        'session': session['id'],
+        'status': 'closed'
+      }
+    else:
+      return {'status': 'skipped'}
 
   def _get_jobs(self, log):
     return []
@@ -459,6 +469,19 @@ class SparkBatchApi():
     api = get_spark_api(self.user)
 
     return api.get_batch_log(snippet['result']['handle']['id'], startFrom=startFrom, size=size)
+
+  def close(self, snippet):
+    api = get_spark_api(self.user)
+
+    session_id = snippet['result']['handle']['id']
+    if session_id is not None:
+      api.close_batch(session_id)
+      return {
+        'session': session_id,
+        'status': 'closed'
+      }
+    else:
+      return {'status': 'skipped'}
 
   def _progress(self, snippet, logs):
     return 50
