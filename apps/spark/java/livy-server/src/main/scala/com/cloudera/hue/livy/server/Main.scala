@@ -118,7 +118,7 @@ object Main {
 
 class ScalatraBootstrap extends LifeCycle with Logging {
 
-  var sessionManager: SessionManager = null
+  var sessionManager: InteractiveSessionManager = null
   var batchManager: BatchManager = null
 
   override def init(context: ServletContext): Unit = {
@@ -141,7 +141,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
         (new InteractiveSessionYarnFactory(livyConf), new BatchSessionYarnFactory(livyConf))
     }
 
-    sessionManager = new SessionManager(sessionFactory)
+    sessionManager = new InteractiveSessionManager(sessionFactory)
     batchManager = new BatchManager(batchFactory)
 
     context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")

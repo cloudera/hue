@@ -18,6 +18,9 @@
 
 package com.cloudera.hue.livy.server.batch
 
-abstract class BatchSessionFactory {
-  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession
+import com.cloudera.hue.livy.server.SessionFactory
+
+abstract class BatchSessionFactory
+  extends SessionFactory[BatchSession, CreateBatchRequest]
+{
 }

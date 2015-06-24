@@ -21,10 +21,12 @@ package com.cloudera.hue.livy.server.batch
 import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.yarn.Client
 
+import scala.concurrent.Future
+
 class BatchSessionYarnFactory(livyConf: LivyConf) extends BatchSessionFactory {
 
   val client = new Client(livyConf)
 
-  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
-    BatchSessionYarn(livyConf, client, id, createBatchRequest)
+  def create(id: Int, createBatchRequest: CreateBatchRequest): Future[BatchSession] =
+    Future.successful(BatchSessionYarn(livyConf, client, id, createBatchRequest))
 }

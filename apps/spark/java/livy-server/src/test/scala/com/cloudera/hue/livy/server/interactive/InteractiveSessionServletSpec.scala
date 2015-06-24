@@ -76,12 +76,12 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
   }
 
   class MockInteractiveSessionFactory() extends InteractiveSessionFactory {
-    override def createSession(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
+    override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
       Future.successful(new MockInteractiveSession(id))
     }
   }
 
-  val sessionManager = new SessionManager(new MockInteractiveSessionFactory())
+  val sessionManager = new InteractiveSessionManager(new MockInteractiveSessionFactory())
   val servlet = new InteractiveSessionServlet(sessionManager)
 
   addServlet(servlet, "/*")

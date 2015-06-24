@@ -16,19 +16,13 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.server
 
-import com.cloudera.hue.livy.LivyConf
+import scala.concurrent.Future
 
-import scala.concurrent.{ExecutionContext, Future}
+abstract class SessionFactory[S <: Session, C] {
 
-class InteractiveSessionProcessFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
+  def create(id: Int, createRequest: C): Future[S]
 
-   implicit def executor: ExecutionContext = ExecutionContext.global
-
-   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
-     Future {
-       InteractiveSessionProcess.create(livyConf, id, createInteractiveRequest)
-     }
-   }
- }
+  def close(): Unit = {}
+}

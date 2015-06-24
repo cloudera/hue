@@ -18,40 +18,11 @@
 
 package com.cloudera.hue.livy.server.batch
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
+import com.cloudera.hue.livy.server.SessionManager
 
-import scala.collection.JavaConversions._
-import scala.concurrent.Future
-
-class BatchManager(batchFactory: BatchSessionFactory) {
-  private[this] val _idCounter = new AtomicInteger()
-  private[this] val _batches = new ConcurrentHashMap[Int, BatchSession]
-
-  def getBatch(id: Int): Option[BatchSession] = Option(_batches.get(id))
-
-  def getBatches: Array[BatchSession] = _batches.values().iterator().toArray
-
-  def createBatch(createBatchRequest: CreateBatchRequest): BatchSession = {
-    val id = _idCounter.getAndIncrement
-    val batch = batchFactory.create(id, createBatchRequest)
-    _batches.put(id, batch)
-
-    batch
-  }
-
-  def remove(id: Int): Option[BatchSession] = {
-    Option(_batches.remove(id))
-  }
-
-  def delete(batch: BatchSession): Future[Unit] = {
-    _batches.remove(batch.id)
-    batch.stop()
-  }
-
-  def shutdown() = {
-
-  }
+class BatchManager(batchFactory: BatchSessionFactory)
+  extends SessionManager[BatchSession, CreateBatchRequest](batchFactory)
+{
 }
 
 case class CreateBatchRequest(file: String,
