@@ -22,6 +22,7 @@ import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions.Success
 import com.cloudera.hue.livy.{LivyConf, Utils}
 import com.cloudera.hue.livy.server.batch._
@@ -54,7 +55,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
   }
 
   val batchFactory = new BatchSessionProcessFactory(new LivyConf())
-  val batchManager = new BatchManager(batchFactory)
+  val batchManager = new SessionManager(batchFactory)
   val servlet = new BatchSessionServlet(batchManager)
 
   addServlet(servlet, "/*")

@@ -64,7 +64,7 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
     dispatch.url(url.toString)
   }
 
-  override def lastActivity: Long = _lastActivity
+  override def lastActivity: Option[Long] = Some(_lastActivity)
 
   override def state: State = _state
 

@@ -16,20 +16,19 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.server.batch
 
-import com.cloudera.hue.livy.sessions.State
-
-import scala.concurrent.Future
-
-trait Session {
-  def id: Int
-
-  def lastActivity: Option[Long] = None
-
-  def state: State
-
-  def stop(): Future[Unit]
-
-  def logLines(): IndexedSeq[String]
-}
+case class CreateBatchRequest(
+    file: String,
+    proxyUser: Option[String] = None,
+    args: List[String] = List(),
+    className: Option[String] = None,
+    jars: List[String] = List(),
+    pyFiles: List[String] = List(),
+    files: List[String] = List(),
+    driverMemory: Option[String] = None,
+    driverCores: Option[Int] = None,
+    executorMemory: Option[String] = None,
+    executorCores: Option[Int] = None,
+    numExecutors: Option[Int] = None,
+    archives: List[String] = List())

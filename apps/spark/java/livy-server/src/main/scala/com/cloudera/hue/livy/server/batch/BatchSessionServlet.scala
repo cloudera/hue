@@ -19,6 +19,7 @@
 package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.server.SessionManager
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonDSL._
 import org.json4s._
@@ -29,7 +30,7 @@ import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
 
 object BatchSessionServlet extends Logging
 
-class BatchSessionServlet(batchManager: BatchManager)
+class BatchSessionServlet(batchManager: SessionManager[BatchSession, CreateBatchRequest])
   extends ScalatraServlet
   with FutureSupport
   with MethodOverride

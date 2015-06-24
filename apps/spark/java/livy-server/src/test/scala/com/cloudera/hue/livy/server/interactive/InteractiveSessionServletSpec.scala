@@ -22,6 +22,7 @@ import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions._
 import org.json4s.{DefaultFormats, Formats}
 import org.json4s.JsonAST.{JInt, JArray, JObject, JString}
@@ -52,8 +53,6 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
 
     override def url_=(url: URL): Unit = ???
 
-    override def lastActivity: Long = ???
-
     override def executeStatement(executeRequest: ExecuteRequest): Statement = {
       val id = _idCounter.getAndIncrement
       val statement = new Statement(
@@ -81,7 +80,7 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
     }
   }
 
-  val sessionManager = new InteractiveSessionManager(new MockInteractiveSessionFactory())
+  val sessionManager = new SessionManager(new MockInteractiveSessionFactory())
   val servlet = new InteractiveSessionServlet(sessionManager)
 
   addServlet(servlet, "/*")

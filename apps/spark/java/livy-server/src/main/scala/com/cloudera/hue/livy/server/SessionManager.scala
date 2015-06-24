@@ -26,19 +26,32 @@ import com.cloudera.hue.livy.Logging
 import scala.collection.JavaConversions._
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
-  extends Logging
-{
+object SessionManager {
+  // Time in milliseconds; TODO: make configurable
+  val TIMEOUT = 60000
+
+  // Time in milliseconds; TODO: make configurable
+  val GC_PERIOD = 1000 * 60 * 60
+}
+
+class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
+  extends Logging {
+
+  import SessionManager._
+
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   protected[this] val _idCounter = new AtomicInteger()
   protected[this] val _sessions = new ConcurrentHashMap[Int, S]()
 
+  private val garbageCollector = new GarbageCollector
+  garbageCollector.start()
+
   def create(createRequest: C): Future[S] = {
     val id = _idCounter.getAndIncrement
     val session: Future[S] = factory.create(id, createRequest)
 
-    session.map({ case(session) =>
+    session.map({ case (session) =>
       info("created session %s" format session.id)
       _sessions.put(session.id, session)
       session
@@ -59,7 +72,7 @@ abstract class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
   def delete(session: S): Future[Unit] = {
     session.stop().map { case _ =>
       _sessions.remove(session.id)
-        Unit
+      Unit
     }
   }
 
@@ -68,4 +81,31 @@ abstract class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
   }
 
   def shutdown(): Unit = {}
+
+  def collectGarbage() = {
+    def expired(session: Session): Boolean = {
+      session.lastActivity match {
+        case Some(lastActivity) => System.currentTimeMillis() - lastActivity > TIMEOUT
+        case None => false
+      }
+    }
+
+    all().filter(expired).foreach(delete)
+  }
+
+  private class GarbageCollector extends Thread {
+
+    private var finished = false
+
+    override def run(): Unit = {
+      while (!finished) {
+        collectGarbage()
+        Thread.sleep(SessionManager.GC_PERIOD)
+      }
+    }
+
+    def shutdown(): Unit = {
+      finished = true
+    }
+  }
 }

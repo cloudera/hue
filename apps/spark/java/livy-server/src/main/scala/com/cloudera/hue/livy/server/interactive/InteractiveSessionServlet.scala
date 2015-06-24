@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.SessionServlet
+import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
 import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
@@ -37,7 +37,7 @@ import scala.concurrent.duration._
 
 object InteractiveSessionServlet extends Logging
 
-class InteractiveSessionServlet(sessionManager: InteractiveSessionManager)
+class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSession, CreateInteractiveRequest])
   extends SessionServlet(sessionManager)
 {
   override protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.Formats
