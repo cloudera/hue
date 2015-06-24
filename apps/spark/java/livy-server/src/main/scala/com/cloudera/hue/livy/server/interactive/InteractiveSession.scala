@@ -40,7 +40,7 @@ trait InteractiveSession extends Session {
 
   def proxyUser: Option[String]
 
-  def lastActivity: Long
+  override def lastActivity: Option[Long]
 
   def url: Option[URL]
 

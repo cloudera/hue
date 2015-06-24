@@ -19,12 +19,11 @@
 package com.cloudera.hue.livy.server
 
 import java.io.IOException
-import java.nio.file.Path
 import javax.servlet.ServletContext
 
-import com.cloudera.hue.livy.server.batch.{BatchSessionProcessFactory, BatchSessionServlet, BatchManager, BatchSessionYarnFactory}
-import com.cloudera.hue.livy.server.interactive._
 import com.cloudera.hue.livy._
+import com.cloudera.hue.livy.server.batch._
+import com.cloudera.hue.livy.server.interactive._
 import org.scalatra._
 import org.scalatra.servlet.ScalatraListener
 import org.slf4j.LoggerFactory
@@ -118,8 +117,8 @@ object Main {
 
 class ScalatraBootstrap extends LifeCycle with Logging {
 
-  var sessionManager: InteractiveSessionManager = null
-  var batchManager: BatchManager = null
+  var sessionManager: SessionManager[InteractiveSession, CreateInteractiveRequest] = null
+  var batchManager: SessionManager[BatchSession, CreateBatchRequest] = null
 
   override def init(context: ServletContext): Unit = {
     val livyConf = new LivyConf()
@@ -141,8 +140,8 @@ class ScalatraBootstrap extends LifeCycle with Logging {
         (new InteractiveSessionYarnFactory(livyConf), new BatchSessionYarnFactory(livyConf))
     }
 
-    sessionManager = new InteractiveSessionManager(sessionFactory)
-    batchManager = new BatchManager(batchFactory)
+    sessionManager = new SessionManager(sessionFactory)
+    batchManager = new SessionManager(batchFactory)
 
     context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")
     context.mount(new BatchSessionServlet(batchManager), "/batches/*")
