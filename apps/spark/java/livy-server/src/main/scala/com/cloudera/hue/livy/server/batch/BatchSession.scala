@@ -21,5 +21,4 @@ package com.cloudera.hue.livy.server.batch
 import com.cloudera.hue.livy.server.Session
 
 trait BatchSession extends Session {
-  def logLines(): IndexedSeq[String]
 }

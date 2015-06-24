@@ -42,8 +42,6 @@ trait InteractiveSession extends Session {
 
   def lastActivity: Long
 
-  def logLines(): IndexedSeq[String]
-
   def url: Option[URL]
 
   def url_=(url: URL)

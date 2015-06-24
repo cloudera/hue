@@ -28,4 +28,6 @@ trait Session {
   def state: State
 
   def stop(): Future[Unit]
+
+  def logLines(): IndexedSeq[String]
 }
