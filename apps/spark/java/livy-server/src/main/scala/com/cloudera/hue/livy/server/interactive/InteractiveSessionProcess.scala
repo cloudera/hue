@@ -51,6 +51,7 @@ object InteractiveSessionProcess extends Logging {
     createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
     createInteractiveRequest.executorCores.foreach(builder.executorCores)
     createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
+    createInteractiveRequest.numExecutors.foreach(builder.numExecutors)
     createInteractiveRequest.files.map(RelativePath).foreach(builder.file)
     createInteractiveRequest.jars.map(RelativePath).foreach(builder.jar)
     createInteractiveRequest.proxyUser.foreach(builder.proxyUser)

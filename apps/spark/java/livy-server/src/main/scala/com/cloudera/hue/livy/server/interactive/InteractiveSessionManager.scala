@@ -106,6 +106,7 @@ case class CreateInteractiveRequest(kind: Kind,
                                     driverCores: Option[Int] = None,
                                     executorMemory: Option[String] = None,
                                     executorCores: Option[Int] = None,
+                                    numExecutors: Option[Int] = None,
                                     archives: List[String] = List())
 
 class SessionNotFound extends Exception
