@@ -117,22 +117,25 @@ class InteractiveSessionServlet(sessionManager: SessionManager)
       case Some(session) =>
         val future = for {
           _ <- session.interrupt()
-        } yield Accepted()
+        } yield Ok(Map("msg" -> "interrupted"))
 
         // FIXME: this is silently eating exceptions.
-        new AsyncResult() { val is = for { _ <- future } yield NoContent() }
+        new AsyncResult() { val is = future }
       case None => NotFound("Session not found")
     }
   }
 
   delete("/:sessionId") {
     val sessionId = params("sessionId").toInt
+    sessionManager.get(sessionId) match {
+      case Some(session) =>
+        val future = for {
+          _ <- sessionManager.delete(session)
+        } yield Ok(Map("msg" -> "deleted"))
 
-    val future = for {
-      _ <- sessionManager.delete(sessionId)
-    } yield Accepted()
-
-    new AsyncResult() { val is = for { _ <- future } yield NoContent() }
+        new AsyncResult { val is = future }
+      case None => NotFound("Session not found")
+    }
   }
 
   get("/:sessionId/log") {

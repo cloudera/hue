@@ -23,14 +23,18 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
-import org.json4s.JsonAST.{JArray, JObject}
+import org.json4s.{DefaultFormats, Formats}
+import org.json4s.JsonAST.{JInt, JArray, JObject, JString}
 import org.json4s.jackson.JsonMethods._
+import org.json4s.jackson.Serialization.write
 import org.scalatest.FunSpecLike
 import org.scalatra.test.scalatest.ScalatraSuite
 
 import scala.concurrent.Future
 
 class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
+
+  protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.SessionFormats
 
   class MockInteractiveSession(val id: Int) extends InteractiveSession {
     var _state: State = Idle()
@@ -44,7 +48,7 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
 
     override def state = _state
 
-    override def stop(): Future[Unit] = ???
+    override def stop(): Future[Unit] = Future.successful(())
 
     override def url_=(url: URL): Unit = ???
 
@@ -82,14 +86,49 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
 
   addServlet(servlet, "/*")
 
-  describe("For /sessions") {
-    it("GET / should return the sessions") {
-      get("/") {
-        status should equal (200)
-        header("Content-Type") should include("application/json")
-        val parsedBody = parse(body)
-        parsedBody \ "sessions" should equal (JArray(List()))
-      }
+  it("should setup and tear down an interactive session") {
+    get("/") {
+      status should equal(200)
+      header("Content-Type") should include("application/json")
+      val parsedBody = parse(body)
+      parsedBody \ "sessions" should equal(JArray(List()))
+    }
+
+    val createInteractiveRequest = write(CreateInteractiveRequest(
+      kind = Spark()
+    ))
+
+    post("/", body = createInteractiveRequest, headers = Map("Content-Type" -> "application/json")) {
+      status should equal (201)
+      header("Content-Type") should include("application/json")
+
+      header("Location") should equal("/0")
+      val parsedBody = parse(body)
+      parsedBody \ "id" should equal (JInt(0))
+
+      val session = sessionManager.get(0)
+      session should be (defined)
+    }
+
+    get("/0") {
+      status should equal (200)
+      header("Content-Type") should include("application/json")
+      val parsedBody = parse(body)
+      parsedBody \ "id" should equal (JInt(0))
+      parsedBody \ "state" should equal (JString("idle"))
+
+      val batch = sessionManager.get(0)
+      batch should be (defined)
+    }
+
+    delete("/0") {
+      status should equal (200)
+      header("Content-Type") should include("application/json")
+      val parsedBody = parse(body)
+      parsedBody should equal (JObject(("msg", JString("deleted"))))
+
+      val session = sessionManager.get(0)
+      session should not be defined
     }
   }
 
