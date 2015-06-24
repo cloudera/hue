@@ -18,17 +18,15 @@
 
 package com.cloudera.hue.livy.server.interactive
 
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicInteger
-
 import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions.Kind
 
 import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
 
-object SessionManager {
+object InteractiveSessionManager {
   // Time in milliseconds; TODO: make configurable
   val TIMEOUT = 60000
 
@@ -36,64 +34,41 @@ object SessionManager {
   val GC_PERIOD = 1000 * 60 * 60
 }
 
-class SessionManager(factory: InteractiveSessionFactory) extends Logging {
+class InteractiveSessionManager(factory: InteractiveSessionFactory)
+  extends SessionManager[InteractiveSession, CreateInteractiveRequest](factory)
+  with Logging
+{
+  import InteractiveSessionManager._
 
   private implicit def executor: ExecutionContextExecutor = ExecutionContext.global
-
-  private[this] val _idCounter = new AtomicInteger()
-  private[this] val sessions = new ConcurrentHashMap[Int, InteractiveSession]()
 
   private val garbageCollector = new GarbageCollector(this)
   garbageCollector.start()
 
-  def get(sessionId: Int): Option[InteractiveSession] = {
-    Option(sessions.get(sessionId))
-  }
-
-  def getSessions = {
-    sessions.values
-  }
-
   def getSessionIds = {
-    sessions.keys
+    _sessions.keys
   }
 
-  def createSession(createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
-    val id = _idCounter.getAndIncrement
-    val session = factory.createSession(id, createInteractiveRequest)
-
-    session.map({ case(session: InteractiveSession) =>
-      info("created session %s" format session.id)
-      sessions.put(session.id, session)
-      session
-    })
-  }
-
-  def shutdown(): Unit = {
-    Await.result(Future.sequence(sessions.values.map(delete)), Duration.Inf)
+  override def shutdown(): Unit = {
+    Await.result(Future.sequence(all().map(delete)), Duration.Inf)
     garbageCollector.shutdown()
   }
 
-  def delete(sessionId: Int): Future[Unit] = {
+  /*
+  override def delete(sessionId: Int): Future[Unit] = {
     get(sessionId) match {
       case Some(session) => delete(session)
       case None => Future.successful(Unit)
     }
   }
-
-  def delete(session: InteractiveSession): Future[Unit] = {
-    session.stop().map { case _ =>
-        sessions.remove(session.id)
-        Unit
-    }
-  }
+  */
 
   def collectGarbage() = {
     def expired(session: InteractiveSession): Boolean = {
-      System.currentTimeMillis() - session.lastActivity > SessionManager.TIMEOUT
+      System.currentTimeMillis() - session.lastActivity > TIMEOUT
     }
 
-    sessions.values.filter(expired).foreach(delete)
+    all().filter(expired).foreach(delete)
   }
 }
 
@@ -111,14 +86,14 @@ case class CreateInteractiveRequest(kind: Kind,
 
 class SessionNotFound extends Exception
 
-private class GarbageCollector(sessionManager: SessionManager) extends Thread {
+private class GarbageCollector(sessionManager: InteractiveSessionManager) extends Thread {
 
   private var finished = false
 
   override def run(): Unit = {
     while (!finished) {
       sessionManager.collectGarbage()
-      Thread.sleep(SessionManager.GC_PERIOD)
+      Thread.sleep(InteractiveSessionManager.GC_PERIOD)
     }
   }
 

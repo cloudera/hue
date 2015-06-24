@@ -45,7 +45,7 @@ class BatchSessionServlet(batchManager: BatchManager)
 
   get("/") {
     Map(
-      "batches" -> batchManager.getBatches
+      "batches" -> batchManager.all()
     )
   }
 
@@ -53,21 +53,18 @@ class BatchSessionServlet(batchManager: BatchManager)
     val createBatchRequest = parsedBody.extract[CreateBatchRequest]
 
     new AsyncResult {
-      val is = Future {
-        val batch = batchManager.createBatch(createBatchRequest)
-        Created(batch,
-          headers = Map(
-            "Location" -> url(getBatch, "id" -> batch.id.toString)
-          )
+      val is = for {
+        batch <- batchManager.create(createBatchRequest)
+      } yield Created(batch,
+          headers = Map("Location" -> url(getBatch, "id" -> batch.id.toString))
         )
-      }
     }
   }
 
   val getBatch = get("/:id") {
     val id = params("id").toInt
 
-    batchManager.getBatch(id) match {
+    batchManager.get(id) match {
       case None => NotFound("batch not found")
       case Some(batch) => Serializers.serializeBatch(batch)
     }
@@ -76,7 +73,7 @@ class BatchSessionServlet(batchManager: BatchManager)
   get("/:id/state") {
     val id = params("id").toInt
 
-    batchManager.getBatch(id) match {
+    batchManager.get(id) match {
       case None => NotFound("batch not found")
       case Some(batch) =>
         ("id", batch.id) ~ ("state", batch.state.toString)
@@ -86,7 +83,7 @@ class BatchSessionServlet(batchManager: BatchManager)
   get("/:id/log") {
     val id = params("id").toInt
 
-    batchManager.getBatch(id) match {
+    batchManager.get(id) match {
       case None => NotFound("batch not found")
       case Some(batch) =>
         val from = params.get("from").map(_.toInt)

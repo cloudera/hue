@@ -16,19 +16,26 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.server
 
-import com.cloudera.hue.livy.LivyConf
+import org.json4s.{DefaultFormats, Formats}
+import org.scalatra.json.JacksonJsonSupport
+import org.scalatra.{FutureSupport, MethodOverride, ScalatraServlet, UrlGeneratorSupport}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-class InteractiveSessionProcessFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
+abstract class SessionServlet[S <: Session, C](sessionManager: SessionManager[S, C])
+  extends ScalatraServlet
+  with FutureSupport
+  with MethodOverride
+  with JacksonJsonSupport
+  with UrlGeneratorSupport
+{
+  override protected implicit def executor: ExecutionContext = ExecutionContext.global
 
-   implicit def executor: ExecutionContext = ExecutionContext.global
+  override protected implicit def jsonFormats: Formats = DefaultFormats
 
-   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
-     Future {
-       InteractiveSessionProcess.create(livyConf, id, createInteractiveRequest)
-     }
-   }
- }
+  before() {
+    contentType = formats("json")
+  }
+}

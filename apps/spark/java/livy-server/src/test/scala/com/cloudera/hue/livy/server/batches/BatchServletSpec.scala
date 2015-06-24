@@ -83,13 +83,13 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         val parsedBody = parse(body)
         parsedBody \ "id" should equal (JInt(0))
 
-        val batch = batchManager.getBatch(0)
+        val batch = batchManager.get(0)
         batch should be (defined)
       }
 
       // Wait for the process to finish.
       {
-        val batch: BatchSession = batchManager.getBatch(0).get
+        val batch: BatchSession = batchManager.get(0).get
         Utils.waitUntil({ () =>
           batch.state == Success()
         }, Duration(10, TimeUnit.SECONDS))
@@ -102,7 +102,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         parsedBody \ "id" should equal (JInt(0))
         parsedBody \ "state" should equal (JString("success"))
 
-        val batch = batchManager.getBatch(0)
+        val batch = batchManager.get(0)
         batch should be (defined)
       }
 
@@ -113,7 +113,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         parsedBody \ "id" should equal (JInt(0))
         (parsedBody \ "log").extract[List[String]] should contain ("hello world")
 
-        val batch = batchManager.getBatch(0)
+        val batch = batchManager.get(0)
         batch should be (defined)
       }
 
@@ -123,7 +123,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         val parsedBody = parse(body)
         parsedBody should equal (JObject(("msg", JString("deleted"))))
 
-        val batch = batchManager.getBatch(0)
+        val batch = batchManager.get(0)
         batch should not be defined
       }
     }

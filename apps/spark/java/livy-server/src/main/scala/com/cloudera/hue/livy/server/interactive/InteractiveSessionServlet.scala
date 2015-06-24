@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.server.SessionServlet
 import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
@@ -30,30 +31,20 @@ import org.json4s.JsonAST.JString
 import org.json4s.JsonDSL._
 import org.json4s._
 import org.scalatra._
-import org.scalatra.json.JacksonJsonSupport
 
 import scala.concurrent._
 import scala.concurrent.duration._
 
 object InteractiveSessionServlet extends Logging
 
-class InteractiveSessionServlet(sessionManager: SessionManager)
-  extends ScalatraServlet
-  with FutureSupport
-  with MethodOverride
-  with JacksonJsonSupport
-  with UrlGeneratorSupport
+class InteractiveSessionServlet(sessionManager: InteractiveSessionManager)
+  extends SessionServlet(sessionManager)
 {
-  override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.Formats
-
-  before() {
-    contentType = formats("json")
-  }
 
   get("/") {
     Map(
-      "sessions" -> sessionManager.getSessions
+      "sessions" -> sessionManager.all
     )
   }
 
@@ -71,7 +62,7 @@ class InteractiveSessionServlet(sessionManager: SessionManager)
 
     new AsyncResult {
       val is = {
-        val sessionFuture = sessionManager.createSession(createInteractiveRequest)
+        val sessionFuture = sessionManager.create(createInteractiveRequest)
 
         sessionFuture.map { case session =>
           Created(session,
