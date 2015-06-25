@@ -20,7 +20,6 @@ import os
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config
-from hadoop import cluster
 from sqoop.settings import NICE_NAME
 
 
@@ -38,6 +37,7 @@ SQOOP_CONF_DIR = Config(
 def config_validator(user):
   res = []
 
+  from hadoop import cluster # Avoid dependencies conflicts
   yarn_cluster = cluster.get_cluster_conf_for_job_submission()
 
   if yarn_cluster.SECURITY_ENABLED.get() and not os.path.exists(SQOOP_CONF_DIR.get()):
