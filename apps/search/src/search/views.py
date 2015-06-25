@@ -173,9 +173,11 @@ def save(request):
         'collection': collection,
         'layout': layout
     })
-    dashboard_doc.name = collection['label']
-    dashboard_doc.description = collection['description']
+    dashboard_doc1 = dashboard_doc.doc.get()
+    dashboard_doc.name = dashboard_doc1.name = collection['label']
+    dashboard_doc.description = dashboard_doc1.description = collection['description']
     dashboard_doc.save()
+    dashboard_doc1.save()
 
     response['status'] = 0
     response['id'] = dashboard_doc.id
