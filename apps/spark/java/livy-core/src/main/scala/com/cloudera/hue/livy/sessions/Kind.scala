@@ -18,6 +18,9 @@
 
 package com.cloudera.hue.livy.sessions
 
+import org.json4s.CustomSerializer
+import org.json4s.JsonAST.JString
+
 sealed trait Kind
 case class Spark() extends Kind {
   override def toString = "spark"
@@ -26,3 +29,12 @@ case class Spark() extends Kind {
 case class PySpark() extends Kind {
   override def toString = "pyspark"
 }
+
+case object SessionKindSerializer extends CustomSerializer[Kind](implicit formats => ( {
+  case JString("spark") | JString("scala") => Spark()
+  case JString("pyspark") | JString("python") => PySpark()
+}, {
+  case kind: Kind => JString(kind.toString)
+}
+  )
+)

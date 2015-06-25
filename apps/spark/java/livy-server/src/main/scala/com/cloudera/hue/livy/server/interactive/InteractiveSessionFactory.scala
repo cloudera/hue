@@ -19,8 +19,17 @@
 package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.server.SessionFactory
+import com.cloudera.hue.livy.sessions.SessionKindSerializer
+import org.json4s.{DefaultFormats, Formats, JValue}
 
-trait InteractiveSessionFactory
-  extends SessionFactory[InteractiveSession, CreateInteractiveRequest]
-{
+import scala.concurrent.Future
+
+trait InteractiveSessionFactory extends SessionFactory[InteractiveSession] {
+
+  override protected implicit def jsonFormats: Formats = DefaultFormats ++ List(SessionKindSerializer)
+
+  override def create(id: Int, createRequest: JValue) =
+    create(id, createRequest.extract[CreateInteractiveRequest])
+
+  def create(id: Int, createRequest: CreateInteractiveRequest): Future[InteractiveSession]
 }

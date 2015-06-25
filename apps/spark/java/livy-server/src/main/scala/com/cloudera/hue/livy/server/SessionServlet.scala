@@ -18,13 +18,19 @@
 
 package com.cloudera.hue.livy.server
 
-import org.json4s.{DefaultFormats, Formats}
+import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
+import com.fasterxml.jackson.core.JsonParseException
+import org.json4s.JsonDSL._
+import org.json4s.{MappingException, DefaultFormats, Formats, JValue}
+import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
-import org.scalatra.{FutureSupport, MethodOverride, ScalatraServlet, UrlGeneratorSupport}
 
 import scala.concurrent.ExecutionContext
 
-abstract class SessionServlet[S <: Session, C](sessionManager: SessionManager[S, C])
+object SessionServlet extends Logging
+
+abstract class SessionServlet[S <: Session](sessionManager: SessionManager[S])
   extends ScalatraServlet
   with FutureSupport
   with MethodOverride
@@ -35,7 +41,94 @@ abstract class SessionServlet[S <: Session, C](sessionManager: SessionManager[S,
 
   override protected implicit def jsonFormats: Formats = DefaultFormats
 
+  protected def serializeSession(session: S): JValue
+
   before() {
     contentType = formats("json")
+  }
+
+  get("/") {
+    val sessions = sessionManager.all().map(serializeSession)
+    Map("sessions" -> sessions)
+  }
+
+  val getSession = get("/:id") {
+    val id = params("id").toInt
+
+    sessionManager.get(id) match {
+      case None => NotFound("session not found")
+      case Some(session) => serializeSession(session)
+    }
+  }
+
+  get("/:id/state") {
+    val id = params("id").toInt
+
+    sessionManager.get(id) match {
+      case None => NotFound("batch not found")
+      case Some(batch) =>
+        ("id", batch.id) ~ ("state", batch.state.toString)
+    }
+  }
+
+  get("/:id/log") {
+    val id = params("id").toInt
+
+    sessionManager.get(id) match {
+      case None => NotFound("session not found")
+      case Some(session) =>
+        val from = params.get("from").map(_.toInt)
+        val size = params.get("size").map(_.toInt)
+        val (from_, total, logLines) = serializeLogs(session, from, size)
+
+        ("id", session.id) ~
+          ("from", from_) ~
+          ("total", total) ~
+          ("log", logLines)
+    }
+  }
+
+  delete("/:id") {
+    val id = params("id").toInt
+
+    sessionManager.delete(id) match {
+      case None => NotFound("session not found")
+      case Some(future) => new AsyncResult {
+        val is = future.map { case () => Ok(Map("msg" -> "deleted")) }
+      }
+    }
+  }
+
+  post("/") {
+    new AsyncResult {
+      val is = for {
+        session <- sessionManager.create(parsedBody)
+      } yield Created(session,
+          headers = Map("Location" -> url(getSession, "id" -> session.id.toString))
+        )
+    }
+  }
+
+  error {
+    case e: JsonParseException => BadRequest(e.getMessage)
+    case e: MappingException => BadRequest(e.getMessage)
+    case e: SessionFailedToStart => InternalServerError(e.getMessage)
+    case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
+    case e =>
+      SessionServlet.error("internal error", e)
+      InternalServerError(e.toString)
+  }
+
+  private def serializeLogs(session: S, fromOpt: Option[Int], sizeOpt: Option[Int]) = {
+    val lines = session.logLines()
+
+    val size = sizeOpt.getOrElse(100)
+    var from = fromOpt.getOrElse(-1)
+    if (from < 0) {
+      from = math.max(0, lines.length - size)
+    }
+    val until = from + size
+
+    (from, lines.length, lines.view(from, until))
   }
 }

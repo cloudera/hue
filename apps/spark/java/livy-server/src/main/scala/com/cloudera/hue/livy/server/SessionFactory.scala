@@ -18,11 +18,15 @@
 
 package com.cloudera.hue.livy.server
 
+import org.json4s.{DefaultFormats, Formats, JValue}
+
 import scala.concurrent.Future
 
-abstract class SessionFactory[S <: Session, C] {
+abstract class SessionFactory[S <: Session] {
 
-  def create(id: Int, createRequest: C): Future[S]
+  protected implicit def jsonFormats: Formats = DefaultFormats
+
+  def create(id: Int, createRequest: JValue): Future[S]
 
   def close(): Unit = {}
 }

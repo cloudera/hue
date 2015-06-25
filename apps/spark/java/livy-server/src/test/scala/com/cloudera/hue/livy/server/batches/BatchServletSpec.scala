@@ -70,7 +70,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
         status should equal (200)
         header("Content-Type") should include("application/json")
         val parsedBody = parse(body)
-        parsedBody \ "batches" should equal (JArray(List()))
+        parsedBody \ "sessions" should equal (JArray(List()))
       }
 
       val createBatchRequest = write(CreateBatchRequest(
