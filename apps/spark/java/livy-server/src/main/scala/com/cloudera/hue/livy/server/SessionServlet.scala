@@ -48,8 +48,16 @@ abstract class SessionServlet[S <: Session](sessionManager: SessionManager[S])
   }
 
   get("/") {
-    val sessions = sessionManager.all().map(serializeSession)
-    Map("sessions" -> sessions)
+    val from = params.get("from").map(_.toInt).getOrElse(0)
+    val size = params.get("size").map(_.toInt).getOrElse(100)
+
+    val sessions = sessionManager.all()
+
+    Map(
+      "from" -> from,
+      "total" -> sessionManager.size(),
+      "sessions" -> sessions.view(from, from + size).map(serializeSession)
+    )
   }
 
   val getSession = get("/:id") {
