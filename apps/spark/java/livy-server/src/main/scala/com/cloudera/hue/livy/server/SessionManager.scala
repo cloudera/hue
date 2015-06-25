@@ -18,13 +18,12 @@
 
 package com.cloudera.hue.livy.server
 
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.Logging
 import org.json4s.JValue
 
-import scala.collection.convert.decorateAsScala._
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 object SessionManager {
@@ -43,12 +42,12 @@ class SessionManager[S <: Session](factory: SessionFactory[S])
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   protected[this] val _idCounter = new AtomicInteger()
-  protected[this] val _sessions = new ConcurrentHashMap[Int, S]().asScala
+  protected[this] val _sessions = mutable.Map[Int, S]()
 
   private val garbageCollector = new GarbageCollector
   garbageCollector.start()
 
-  def create(createRequest: JValue): Future[S] = {
+  def create(createRequest: JValue): Future[S] = synchronized {
     val id = _idCounter.getAndIncrement
     val session: Future[S] = factory.create(id, createRequest)
 
@@ -61,6 +60,8 @@ class SessionManager[S <: Session](factory: SessionFactory[S])
 
   def get(id: Int): Option[S] = _sessions.get(id)
 
+  def size(): Int = _sessions.size
+
   def all(): Iterable[S] = _sessions.values
 
   def delete(id: Int): Option[Future[Unit]] = {
@@ -69,13 +70,12 @@ class SessionManager[S <: Session](factory: SessionFactory[S])
 
   def delete(session: S): Future[Unit] = {
     session.stop().map { case _ =>
-      _sessions.remove(session.id)
+      synchronized {
+        _sessions.remove(session.id)
+      }
+
       Unit
     }
-  }
-
-  def remove(id: Int): Option[S] = {
-    _sessions.remove(id)
   }
 
   def shutdown(): Unit = {}
