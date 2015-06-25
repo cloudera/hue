@@ -217,13 +217,15 @@ def save_workflow(request):
 
   workflow_doc.update_data({'workflow': workflow})
   workflow_doc.update_data({'layout': layout})
-  workflow_doc.name = workflow['name']
-  workflow_doc.description = workflow['properties']['description']
+  workflow_doc1 = workflow_doc.doc.get()
+  workflow_doc.name = workflow_doc1.name = workflow['name']
+  workflow_doc.description = workflow_doc1.description = workflow['properties']['description']
   workflow_doc.save()
+  workflow_doc1.save()
 
   response['status'] = 0
   response['id'] = workflow_doc.id
-  response['doc1_id'] = workflow_doc.doc.get().id
+  response['doc1_id'] = workflow_doc1.id
   response['message'] = _('Page saved !')
 
   return JsonResponse(response)
@@ -502,10 +504,12 @@ def save_coordinator(request):
       doc.doc.get().can_read_or_exception(request.user)
     coordinator_doc.dependencies = dependencies
 
+  coordinator_doc1 = coordinator_doc.doc.get()
   coordinator_doc.update_data(coordinator_data)
-  coordinator_doc.name = coordinator_data['name']
-  coordinator_doc.description = coordinator_data['properties']['description']
+  coordinator_doc.name = coordinator_doc1.name = coordinator_data['name']
+  coordinator_doc.description = coordinator_doc1.description = coordinator_data['properties']['description']
   coordinator_doc.save()
+  coordinator_doc1.save()
 
   response['status'] = 0
   response['id'] = coordinator_doc.id
@@ -654,10 +658,12 @@ def save_bundle(request):
       doc.doc.get().can_read_or_exception(request.user)
     bundle_doc.dependencies = dependencies
 
+  bundle_doc1 = bundle_doc.doc.get()
   bundle_doc.update_data(bundle_data)
-  bundle_doc.name = bundle_data['name']
-  bundle_doc.description = bundle_data['properties']['description']
+  bundle_doc.name = bundle_doc1.name = bundle_data['name']
+  bundle_doc.description = bundle_doc1.description = bundle_data['properties']['description']
   bundle_doc.save()
+  bundle_doc1.save()
 
   response['status'] = 0
   response['id'] = bundle_doc.id
