@@ -39,9 +39,16 @@ LOG = logging.getLogger(__name__)
 def create_session(request):
   response = {'status': -1}
 
+  notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'])
+  session = [session for session in notebook['sessions'] if snippet['type'] == session['type']]
+  if any(session):
+    properties = session[0]['properties']
+  else:
+    properties = None
+
+  response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'], properties=properties)
   response['status'] = 0
 
   return JsonResponse(response)

@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import logging
 import re
 import time
 
@@ -32,6 +33,9 @@ from beeswax.views import _parse_out_hadoop_jobs
 
 from spark.job_server_api import get_api as get_spark_api
 from spark.data_export import download as spark_download
+
+
+LOG = logging.getLogger(__name__)
 
 
 # To move to Editor API
@@ -103,7 +107,7 @@ class TextApi():
   def __init__(self, user):
     self.user = user
 
-  def create_session(self, lang):
+  def create_session(self, lang, properties=None):
     return {
         'type': lang,
         'id': None
@@ -144,7 +148,7 @@ class HS2Api():
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
 
-  def create_session(self, lang):
+  def create_session(self, lang, properties=None):
     return {
         'type': lang,
         'id': None # Real one at some point
@@ -279,8 +283,14 @@ class SparkApi():
   def __init__(self, user):
     self.user = user
 
-  def create_session(self, lang='scala'):
+  def create_session(self, lang='scala', properties=None):
+    if properties is None:
+      settings = { 
+          'executor-memory': '1G' # Some props only in YARN mode
+      }
+
     api = get_spark_api(self.user)
+    print 'TODO: we should use the settings %s for creating the new sessions' % settings
     response = api.create_session(kind=lang)
 
     status = api.get_session(response['id'])
@@ -296,7 +306,8 @@ class SparkApi():
 
     return {
         'type': lang,
-        'id': response['id']
+        'id': response['id'],
+        'properties': settings
     }
 
   def execute(self, notebook, snippet):
@@ -432,7 +443,7 @@ class SparkBatchApi():
   def __init__(self, user):
     self.user = user
 
-  def create_session(self, lang):
+  def create_session(self, lang, properties=None):
     return {
         'type': lang,
         'id': None

@@ -128,52 +128,57 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
 
-     <div class="btn-group">
-       <a class="btn dropdown-toggle" data-toggle="dropdown">
-         <i class="fa fa-check-square-o"></i>
-         <i class="fa fa-caret-down"></i>
-       </a>
-       <ul class="dropdown-menu">
-         <li>
-           <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-             <i class="fa fa-play fa-fw"></i> ${ _('Execute all snippets') }
-           </a>
-         </li>
-         <li>
-           <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-             <i class="fa fa-eraser fa-fw"></i> ${ _('Clear all results') }
-           </a>
-         </li>
-         <li>
-           <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
-             <i class="fa fa-file-text-o fa-fw"></i> ${ _('Display all Notebook content') }
-           </a>
-         </li>
-       </ul>
-     </div>
+    <div class="btn-group">
+      <a class="btn dropdown-toggle" data-toggle="dropdown">
+        <i class="fa fa-check-square-o"></i>
+        <i class="fa fa-caret-down"></i>
+      </a>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+            <i class="fa fa-play fa-fw"></i> ${ _('Execute all snippets') }
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+            <i class="fa fa-eraser fa-fw"></i> ${ _('Clear all results') }
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
+            <i class="fa fa-file-text-o fa-fw"></i> ${ _('Display all Notebook content') }
+          </a>
+        </li>
+      </ul>
+   </div>
 
    &nbsp;&nbsp;&nbsp;
 
-    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-      <i class="fa fa-pencil"></i>
-    </a>
+   <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+     <i class="fa fa-pencil"></i>
+   </a>
 
-    &nbsp;&nbsp;&nbsp;
+   <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal"
+       data-bind="css: {'btn': true}">
+     <i class="fa fa-cloud"></i>
+   </a>
 
-    <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
-        data-bind="click: saveNotebook, css: {'btn': true}">
-      <i class="fa fa-save"></i>
-    </a>
+   &nbsp;&nbsp;&nbsp;
 
-    &nbsp;&nbsp;&nbsp;
+   <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
+      data-bind="click: saveNotebook, css: {'btn': true}">
+     <i class="fa fa-save"></i>
+   </a>
 
-    <a class="btn" href="${ url('spark:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-file-o"></i>
-    </a>
+   &nbsp;&nbsp;&nbsp;
 
-    <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i>
-    </a>
+   <a class="btn" href="${ url('spark:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+     <i class="fa fa-file-o"></i>
+   </a>
+
+   <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+     <i class="fa fa-tags"></i>
+   </a>
   </div>
 
 
@@ -666,6 +671,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         ${ _('Loading...') }
       </div>
     </div>
+
+    <span data-bind="text: ko.mapping.toJSON(properties)"></span>
+
   </div>
 </script>
 
@@ -694,6 +702,33 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 </div>
 
+
+<div id="sessionsDemiModal" class="demi-modal fade" data-backdrop="false">
+  <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
+  <div class="modal-body">
+    <div class="row-fluid">
+      <div class="span12">
+        <!-- ko if: $root.selectedNotebook() -->
+        <form class="form-horizontal">
+          <fieldset>
+            <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
+            
+            <div class="control-group" data-bind="foreach: $root.selectedNotebook().sessions">
+              <label class="control-label">${ _('Content') }</label>
+              <div class="controls">
+                <span data-bind="text: ko.mapping.toJSON($data)"></span>
+              </div>
+            </div>
+            </br>
+          </fieldset>
+        </form>
+        <!-- /ko -->
+      </div>
+    </div>
+
+  </div>
+  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+</div>
 
 
 ${ koComponents.assistPanel() }

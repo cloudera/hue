@@ -313,6 +313,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.create_session = function (callback) {
     self.status('loading');
     $.post("/spark/api/create_session", {
+      notebook: ko.mapping.toJSON(notebook.getContext()),
       snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
@@ -597,8 +598,15 @@ var Notebook = function (vm, notebook) {
       properties['py_file'] = '';
       properties['class'] = '';
       properties['arguments'] = [];
+    } else if (self.selectedSnippet() == 'hive') {
+      properties['settings'] = [];
+      properties['files'] = [];
+    } else if (self.selectedSnippet() == 'pig') {
+      properties['parameters'] = [];
+      properties['hadoop_properties'] = [];
+      properties['files'] = [];
     }
-
+	
     var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), properties: properties, result: {}});
     self.snippets.push(_snippet);
 
