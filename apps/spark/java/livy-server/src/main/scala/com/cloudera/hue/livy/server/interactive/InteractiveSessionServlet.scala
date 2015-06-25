@@ -37,43 +37,12 @@ import scala.concurrent.duration._
 
 object InteractiveSessionServlet extends Logging
 
-class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSession, CreateInteractiveRequest])
+class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSession])
   extends SessionServlet(sessionManager)
 {
   override protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.Formats
 
-  get("/") {
-    Map(
-      "sessions" -> sessionManager.all
-    )
-  }
-
-  val getSession = get("/:sessionId") {
-    val sessionId = params("sessionId").toInt
-
-    sessionManager.get(sessionId) match {
-      case Some(session) => session
-      case None => NotFound("Session not found")
-    }
-  }
-
-  post("/") {
-    val createInteractiveRequest = parsedBody.extract[CreateInteractiveRequest]
-
-    new AsyncResult {
-      val is = {
-        val sessionFuture = sessionManager.create(createInteractiveRequest)
-
-        sessionFuture.map { case session =>
-          Created(session,
-            headers = Map(
-              "Location" -> url(getSession, "sessionId" -> session.id.toString)
-            )
-          )
-        }
-      }
-    }
-  }
+  override protected def serializeSession(session: InteractiveSession) = Serializers.serializeSession(session)
 
   post("/:sessionId/callback") {
     val sessionId = params("sessionId").toInt
@@ -113,36 +82,6 @@ class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSessio
         // FIXME: this is silently eating exceptions.
         new AsyncResult() { val is = future }
       case None => NotFound("Session not found")
-    }
-  }
-
-  delete("/:sessionId") {
-    val sessionId = params("sessionId").toInt
-    sessionManager.get(sessionId) match {
-      case Some(session) =>
-        val future = for {
-          _ <- sessionManager.delete(session)
-        } yield Ok(Map("msg" -> "deleted"))
-
-        new AsyncResult { val is = future }
-      case None => NotFound("Session not found")
-    }
-  }
-
-  get("/:sessionId/log") {
-    val sessionId = params("sessionId").toInt
-
-    sessionManager.get(sessionId) match {
-      case None => NotFound("Session not found")
-      case Some(session: InteractiveSession) =>
-        val from = params.get("from").map(_.toInt)
-        val size = params.get("size").map(_.toInt)
-        val (from_, total, logLines) = Serializers.getLogs(session, from, size)
-
-        ("id", session.id) ~
-          ("from", from_) ~
-          ("total", total) ~
-          ("log", logLines)
     }
   }
 
@@ -195,16 +134,6 @@ class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSessio
               "statementId" -> statement.id.toString)))
       case None => NotFound("Session not found")
     }
-  }
-
-  error {
-    case e: JsonParseException => BadRequest(e.getMessage)
-    case e: MappingException => BadRequest(e.getMessage)
-    case e: SessionFailedToStart => InternalServerError(e.getMessage)
-    case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
-    case e =>
-      InteractiveSessionServlet.error("internal error", e)
-      InternalServerError(e.toString)
   }
 }
 
@@ -263,15 +192,6 @@ private object Serializers {
   }, {
     case session: InteractiveSession =>
       serializeSession(session)
-  }
-    )
-  )
-
-  case object SessionKindSerializer extends CustomSerializer[Kind](implicit formats => ( {
-    case JString("spark") | JString("scala") => Spark()
-    case JString("pyspark") | JString("python") => PySpark()
-  }, {
-    case kind: Kind => serializeSessionKind(kind)
   }
     )
   )

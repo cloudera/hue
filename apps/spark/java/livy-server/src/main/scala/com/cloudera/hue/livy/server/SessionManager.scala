@@ -22,8 +22,9 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.Logging
+import org.json4s.JValue
 
-import scala.collection.JavaConversions._
+import scala.collection.convert.decorateAsScala._
 import scala.concurrent.{ExecutionContext, Future}
 
 object SessionManager {
@@ -34,7 +35,7 @@ object SessionManager {
   val GC_PERIOD = 1000 * 60 * 60
 }
 
-class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
+class SessionManager[S <: Session](factory: SessionFactory[S])
   extends Logging {
 
   import SessionManager._
@@ -42,12 +43,12 @@ class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   protected[this] val _idCounter = new AtomicInteger()
-  protected[this] val _sessions = new ConcurrentHashMap[Int, S]()
+  protected[this] val _sessions = new ConcurrentHashMap[Int, S]().asScala
 
   private val garbageCollector = new GarbageCollector
   garbageCollector.start()
 
-  def create(createRequest: C): Future[S] = {
+  def create(createRequest: JValue): Future[S] = {
     val id = _idCounter.getAndIncrement
     val session: Future[S] = factory.create(id, createRequest)
 
@@ -58,15 +59,12 @@ class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
     })
   }
 
-  def get(id: Int): Option[S] = Option(_sessions.get(id))
+  def get(id: Int): Option[S] = _sessions.get(id)
 
-  def all(): Seq[S] = _sessions.values().toSeq
+  def all(): Iterable[S] = _sessions.values
 
-  def delete(id: Int): Future[Unit] = {
-    get(id) match {
-      case Some(session) => delete(session)
-      case None => Future.successful(())
-    }
+  def delete(id: Int): Option[Future[Unit]] = {
+    get(id).map(delete)
   }
 
   def delete(session: S): Future[Unit] = {
@@ -77,7 +75,7 @@ class SessionManager[S <: Session, C](factory: SessionFactory[S, C])
   }
 
   def remove(id: Int): Option[S] = {
-    Option(_sessions.remove(id))
+    _sessions.remove(id)
   }
 
   def shutdown(): Unit = {}

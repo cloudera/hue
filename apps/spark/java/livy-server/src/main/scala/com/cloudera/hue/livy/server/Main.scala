@@ -117,8 +117,8 @@ object Main {
 
 class ScalatraBootstrap extends LifeCycle with Logging {
 
-  var sessionManager: SessionManager[InteractiveSession, CreateInteractiveRequest] = null
-  var batchManager: SessionManager[BatchSession, CreateBatchRequest] = null
+  var sessionManager: SessionManager[InteractiveSession] = null
+  var batchManager: SessionManager[BatchSession] = null
 
   override def init(context: ServletContext): Unit = {
     val livyConf = new LivyConf()

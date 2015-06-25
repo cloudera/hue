@@ -19,107 +19,21 @@
 package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.server.SessionManager
-import com.fasterxml.jackson.core.JsonParseException
-import org.json4s.JsonDSL._
+import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
 import org.json4s._
-import org.scalatra._
-import org.scalatra.json.JacksonJsonSupport
 
-import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
 object BatchSessionServlet extends Logging
 
-class BatchSessionServlet(batchManager: SessionManager[BatchSession, CreateBatchRequest])
-  extends ScalatraServlet
-  with FutureSupport
-  with MethodOverride
-  with JacksonJsonSupport
-  with UrlGeneratorSupport
+class BatchSessionServlet(batchManager: SessionManager[BatchSession])
+  extends SessionServlet[BatchSession](batchManager)
 {
   override protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   override protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.Formats
 
-  before() {
-    contentType = formats("json")
-  }
+  override protected def serializeSession(session: BatchSession) = Serializers.serializeBatch(session)
 
-  get("/") {
-    Map(
-      "batches" -> batchManager.all()
-    )
-  }
-
-  post("/") {
-    val createBatchRequest = parsedBody.extract[CreateBatchRequest]
-
-    new AsyncResult {
-      val is = for {
-        batch <- batchManager.create(createBatchRequest)
-      } yield Created(batch,
-          headers = Map("Location" -> url(getBatch, "id" -> batch.id.toString))
-        )
-    }
-  }
-
-  val getBatch = get("/:id") {
-    val id = params("id").toInt
-
-    batchManager.get(id) match {
-      case None => NotFound("batch not found")
-      case Some(batch) => Serializers.serializeBatch(batch)
-    }
-  }
-
-  get("/:id/state") {
-    val id = params("id").toInt
-
-    batchManager.get(id) match {
-      case None => NotFound("batch not found")
-      case Some(batch) =>
-        ("id", batch.id) ~ ("state", batch.state.toString)
-    }
-  }
-
-  get("/:id/log") {
-    val id = params("id").toInt
-
-    batchManager.get(id) match {
-      case None => NotFound("batch not found")
-      case Some(batch) =>
-        val from = params.get("from").map(_.toInt)
-        val size = params.get("size").map(_.toInt)
-        val (from_, total, logLines) = Serializers.getLogs(batch, from, size)
-
-        ("id", batch.id) ~
-          ("from", from_) ~
-          ("total", total) ~
-          ("log", logLines)
-    }
-  }
-
-  delete("/:id") {
-    val id = params("id").toInt
-
-    batchManager.remove(id) match {
-      case None => NotFound("batch not found")
-      case Some(batch) =>
-        new AsyncResult {
-          val is = batch.stop().map { case () =>
-            batchManager.delete(batch)
-            Ok(Map("msg" -> "deleted"))
-          }
-        }
-    }
-  }
-
-  error {
-    case e: JsonParseException => BadRequest(e.getMessage)
-    case e: MappingException => BadRequest(e.getMessage)
-    case e =>
-      BatchSessionServlet.error("internal error", e)
-      InternalServerError(e.toString)
-  }
 }
 
 private object Serializers {
