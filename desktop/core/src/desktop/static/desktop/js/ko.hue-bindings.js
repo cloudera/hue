@@ -60,6 +60,15 @@ ko.extenders.numeric = function (target, precision) {
   return result;
 };
 
+ko.bindingHandlers.numericTextInput = {
+  init: function (element, valueAccessor, allBindings) {
+    var bindingOptions = ko.unwrap(valueAccessor());
+    var numericValue = ko.observable(bindingOptions.value()).extend({ numeric: bindingOptions.precision });
+    numericValue.subscribe(function(newValue) { bindingOptions.value(newValue) });
+    ko.bindingHandlers.textInput.init(element, function() { return numericValue }, allBindings);
+  }
+};
+
 ko.bindingHandlers.freshereditor = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     var _el = $(element);

@@ -714,7 +714,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Cores')}</label>
               <div class="controls">
-                <input class="input-small" type="text" data-bind="textInput: executor_cores" />
+                <input class="input-small" type="text" data-bind="numericTextInput: { value: executor_cores, precision: 0 }" />
               </div>
             </div>
             <div class="control-group" style="float: left;">
@@ -726,13 +726,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Count')}</label>
               <div class="controls">
-                <input class="input-small" type="text" data-bind="textInput: executor_count" />
+                <input class="input-small" type="text" data-bind="numericTextInput: { value: executor_count, precision: 0 }" />
               </div>
             </div>
             <div class="control-group cl" style="float: left; clear: left;">
               <label class="control-label">${_('Driver Cores')}</label>
               <div class="controls">
-                <input class="input-small" type="text" data-bind="textInput: driver_cores" />
+                <input class="input-small" type="text" data-bind="numericTextInput: { value: driver_cores, precision: 0 }" />
               </div>
             </div>
             <div class="control-group" style="float: left;">
