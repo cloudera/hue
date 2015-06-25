@@ -20,8 +20,6 @@ import os
 
 from pytz import UnknownTimeZoneError, datetime, timezone
 
-LOG = logging.getLogger(__name__)
-
 class Formatter(logging.Formatter):
   def formatTime(self, record, datefmt=None):
     try:
@@ -32,8 +30,6 @@ class Formatter(logging.Formatter):
     try:
       ct = datetime.datetime.fromtimestamp(record.created, tz=tz)
     except (OverflowError, TypeError, ValueError):
-      LOG.exception('failed to format time: timestamp=%s tz=%s' % (record.created, tz))
-
       # Fallback to original.
       return super(Formatter, self).formatTime(record, datefmt=datefmt)
 
