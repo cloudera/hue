@@ -164,10 +164,12 @@ def save_notebook(request):
     notebook_doc = Document2.objects.create(name=notebook['name'], type='notebook', owner=request.user)
     Document.objects.link(notebook_doc, owner=notebook_doc.owner, name=notebook_doc.name, description=notebook_doc.description, extra='notebook')
 
+  notebook_doc1 = notebook_doc.doc.get()
   notebook_doc.update_data(notebook)
-  notebook_doc.name = notebook['name']
-  notebook_doc.description = notebook['description']
+  notebook_doc.name = notebook_doc1.name = notebook['name']
+  notebook_doc.description = notebook_doc1.description = notebook['description']
   notebook_doc.save()
+  notebook_doc1.save()
 
   response['status'] = 0
   response['id'] = notebook_doc.id
