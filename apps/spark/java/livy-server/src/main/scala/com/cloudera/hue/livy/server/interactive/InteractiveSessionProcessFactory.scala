@@ -26,9 +26,7 @@ class InteractiveSessionProcessFactory(livyConf: LivyConf) extends InteractiveSe
 
    implicit def executor: ExecutionContext = ExecutionContext.global
 
-   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
-     Future {
-       InteractiveSessionProcess.create(livyConf, id, createInteractiveRequest)
-     }
+   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+     InteractiveSessionProcess.create(livyConf, id, createInteractiveRequest)
    }
  }

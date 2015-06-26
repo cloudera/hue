@@ -26,7 +26,7 @@ abstract class SessionFactory[S <: Session] {
 
   protected implicit def jsonFormats: Formats = DefaultFormats
 
-  def create(id: Int, createRequest: JValue): Future[S]
+  def create(id: Int, createRequest: JValue): S
 
   def close(): Unit = {}
 }

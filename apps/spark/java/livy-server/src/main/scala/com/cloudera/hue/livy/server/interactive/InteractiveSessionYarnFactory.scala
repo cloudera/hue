@@ -29,10 +29,8 @@ class InteractiveSessionYarnFactory(livyConf: LivyConf) extends InteractiveSessi
 
    val client = new Client(livyConf)
 
-   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
-     Future {
-       InteractiveSessionYarn.create(livyConf, client, id, createInteractiveRequest)
-     }
+   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+     InteractiveSessionYarn.create(livyConf, client, id, createInteractiveRequest)
    }
 
    override def close(): Unit = {

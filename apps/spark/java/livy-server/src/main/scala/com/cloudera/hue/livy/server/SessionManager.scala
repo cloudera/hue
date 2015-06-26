@@ -47,15 +47,16 @@ class SessionManager[S <: Session](factory: SessionFactory[S])
   private val garbageCollector = new GarbageCollector
   garbageCollector.start()
 
-  def create(createRequest: JValue): Future[S] = synchronized {
+  def create(createRequest: JValue): S = {
     val id = _idCounter.getAndIncrement
-    val session: Future[S] = factory.create(id, createRequest)
+    val session: S = factory.create(id, createRequest)
 
-    session.map({ case (session) =>
-      info("created session %s" format session.id)
+    info("created session %s" format session.id)
+
+    synchronized {
       _sessions.put(session.id, session)
       session
-    })
+    }
   }
 
   def get(id: Int): Option[S] = _sessions.get(id)

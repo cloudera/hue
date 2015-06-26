@@ -31,5 +31,5 @@ trait InteractiveSessionFactory extends SessionFactory[InteractiveSession] {
   override def create(id: Int, createRequest: JValue) =
     create(id, createRequest.extract[CreateInteractiveRequest])
 
-  def create(id: Int, createRequest: CreateInteractiveRequest): Future[InteractiveSession]
+  def create(id: Int, createRequest: CreateInteractiveRequest): InteractiveSession
 }

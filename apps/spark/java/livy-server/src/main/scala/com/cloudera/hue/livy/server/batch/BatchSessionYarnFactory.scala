@@ -27,6 +27,6 @@ class BatchSessionYarnFactory(livyConf: LivyConf) extends BatchSessionFactory {
 
   val client = new Client(livyConf)
 
-  def create(id: Int, createBatchRequest: CreateBatchRequest): Future[BatchSession] =
-    Future.successful(BatchSessionYarn(livyConf, client, id, createBatchRequest))
+  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
+    BatchSessionYarn(livyConf, client, id, createBatchRequest)
 }

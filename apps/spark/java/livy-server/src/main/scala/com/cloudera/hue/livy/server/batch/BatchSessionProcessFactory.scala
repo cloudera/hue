@@ -25,6 +25,6 @@ import scala.concurrent.Future
 class BatchSessionProcessFactory(livyConf: LivyConf)
   extends BatchSessionFactory
 {
-  override def create(id: Int, createBatchRequest: CreateBatchRequest): Future[BatchSession] =
-    Future.successful(BatchSessionProcess(livyConf, id, createBatchRequest))
+  override def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
+    BatchSessionProcess(livyConf, id, createBatchRequest)
 }

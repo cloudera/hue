@@ -27,5 +27,5 @@ abstract class BatchSessionFactory extends SessionFactory[BatchSession] {
   override def create(id: Int, createRequest: JValue) =
     create(id, createRequest.extract[CreateBatchRequest])
 
-  def create(id: Int, createRequest: CreateBatchRequest): Future[BatchSession]
+  def create(id: Int, createRequest: CreateBatchRequest): BatchSession
 }
