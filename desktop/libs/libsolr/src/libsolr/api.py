@@ -229,7 +229,7 @@ class SolrApi(object):
         _keys = fq.copy()
         _keys.update(fq['properties'])
         params += (('fq', '{!tag=%(id)s}' % fq + urllib.unquote(
-                    utf_quoter('%(lat)s:[%(lat_sw)s TO %(lat_ne)s} %(lon)s:[%(lon_sw)s TO %(lon_ne)s}' % _keys))),)
+                    utf_quoter('%(lat)s:[%(lat_sw)s TO %(lat_ne)s} AND %(lon)s:[%(lon_sw)s TO %(lon_ne)s}' % _keys))),)
 
     return params
 
