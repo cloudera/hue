@@ -4,7 +4,12 @@ Welcome to Livy, the REST Spark Server
 Livy is an open source REST interface (in **Beta**) for interacting with a
 remote Spark Shell running locally or from inside YARN.
 
-Interactive Spark Scala, Python and batch jar/py submission are supported.
+* Interactive Spark Scala, Python shells
+* Batch submissions in Scala, Java, Python
+* Multi users can submit to the same server with their own credentials in YARN mode (impersonation support)
+* Can be used for submitting jobs from anywhere with REST
+* Does not require any code change to your programs
+
 
 Livy is used for powering the `Spark Notebook`_ of `Hue 3.8`_, which you can see the
 `implementation here`_.
