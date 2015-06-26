@@ -83,8 +83,9 @@ class JobServerApi(object):
   def get_status(self):
     return self._root.get('sessions')
 
-  def create_session(self, **kwargs):
-    return self._root.post('sessions', data=json.dumps(kwargs), contenttype='application/json')
+  def create_session(self, **properties):
+    properties['proxyUser'] = self.user
+    return self._root.post('sessions', data=json.dumps(properties), contenttype='application/json')
 
   def get_session(self, uuid):
     return self._root.get('sessions/%s' % uuid)
@@ -107,6 +108,7 @@ class JobServerApi(object):
     return self._root.get('batches')
 
   def submit_batch(self, properties):
+    properties['proxyUser'] = self.user
     return self._root.post('batches', data=json.dumps(properties), contenttype=_JSON_CONTENT_TYPE)
 
   def get_batch(self, uuid):
