@@ -45,7 +45,7 @@ from liboozie.submittion import Submission
 from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
-from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateEndTimeForm
+from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateCoordinatorForm
 from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
@@ -103,7 +103,13 @@ def manage_oozie_jobs(request, job_id, action):
     params = None
 
     if action == 'change':
-      params = {'value': 'endtime=%s' % (request.POST.get('end_time'))}
+      pause_time_val = request.POST.get('pause_time')
+      if request.POST.get('clear_pause_time') == 'true':
+        pause_time_val = ''
+
+      params = {'value': 'endtime=%s' % (request.POST.get('end_time')) + ';'
+                            'pausetime=%s' % (pause_time_val) + ';'
+                            'concurrency=%s' % (request.POST.get('concurrency'))}
     elif action == 'ignore':
       oozie_api = get_oozie(request.user, api_version="v2")
       params = {
@@ -439,7 +445,7 @@ def list_oozie_coordinator(request, job_id):
     oozie_slas = oozie_api.get_oozie_slas(**params)
 
   enable_cron_scheduling = ENABLE_CRON_SCHEDULING.get()
-  update_endtime_form = UpdateEndTimeForm()
+  update_coord_form = UpdateCoordinatorForm(oozie_coordinator=oozie_coordinator)
 
   return render('dashboard/list_oozie_coordinator.mako', request, {
     'oozie_coordinator': oozie_coordinator,
@@ -448,7 +454,7 @@ def list_oozie_coordinator(request, job_id):
     'oozie_bundle': oozie_bundle,
     'has_job_edition_permission': has_job_edition_permission,
     'enable_cron_scheduling': enable_cron_scheduling,
-    'update_endtime_form': update_endtime_form,
+    'update_coord_form': update_coord_form,
   })
 
 
@@ -965,6 +971,8 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'nextMaterializedTimeInMillis': hasattr(job, 'nextMaterializedTime') and job.nextMaterializedTime and time.mktime(job.nextMaterializedTime) or 0,
         'timeOut': hasattr(job, 'timeOut') and job.timeOut or None,
         'endTime': job.endTime and format_time(job.endTime) or None,
+        'pauseTime': hasattr(job, 'pauseTime') and job.pauseTime and format_time(job.endTime) or None,
+        'concurrency': hasattr(job, 'concurrency') and job.concurrency or None,
         'endTimeInMillis': job.endTime and time.mktime(job.endTime) or 0,
         'status': job.status,
         'isRunning': job.is_running(),

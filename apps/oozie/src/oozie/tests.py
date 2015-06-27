@@ -3395,13 +3395,14 @@ class TestDashboard(OozieMockBase):
     data = json.loads(response.content)
     assert_equal(0, data['status'])
 
-    params = {'end_time': u'12:00 AM'}
-    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'change']), params)
+    params = {'actions': '1 2 3'}
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'ignore']), params)
     data = json.loads(response.content)
     assert_equal(0, data['status'])
 
-    params = {'actions': '1 2 3'}
-    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'ignore']), params)
+    params = {'end_time': u'Mon, 30 Jul 2012 22:35:48 GMT', 'pause_time': u'Mon, 30 Jul 2012 22:35:48 GMT',
+              'concurrency': '1', 'clear_pause_time': 'True'}
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[MockOozieApi.COORDINATOR_IDS[0], 'change']), params)
     data = json.loads(response.content)
     assert_equal(0, data['status'])
 

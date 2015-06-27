@@ -119,9 +119,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                      " style="margin-bottom: 5px">
                     ${ _('Resume') }
                   </button>
-                  <button title="${ _('Edit End Time') }" id="edit-endtime-btn"
+                  <button title="${ _('Update Coordinator Job properties') }" id="edit-coord-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='change') }"
-                     data-confirmation-header="${ _('Update End Time') }"
+                     data-message="${ _('Successfully updated Coordinator Job Properties') }"
+                     data-confirmation-header="${ _('Update Coordinator Job Properties') }"
                      data-confirmation-footer="update"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
@@ -190,6 +191,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                       </button>
                       <ul class="dropdown-menu"> <li data-bind="enable: selectedActions().length > 0">
                           <a href='#' class="ignore-btn confirmationModal" data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='ignore') }"
+                              data-message="${ _('Successfully ignored selected action(s)') }"
                               data-confirmation-body="${ _('Are you sure you want to ignore the action(s)?')}"
                               data-confirmation-footer="normal"
                               data-confirmation-header="${ _('Note: You can only ignore a FAILED, KILLED or TIMEDOUT action' )}" > ${ _('Ignore') } </a></li>
@@ -340,6 +342,16 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                     <td>${ _('End time') }</td>
                     <td>${ utils.format_time(oozie_coordinator.endTime) }</td>
                   </tr>
+                  % if oozie_coordinator.pauseTime:
+                  <tr>
+                    <td>${ _('Pause time') }</td>
+                    <td>${ utils.format_time(oozie_coordinator.pauseTime) }</td>
+                  </tr>
+                  %endif
+                  <tr>
+                    <td>${ _('Concurrency') }</td>
+                    <td>${ oozie_coordinator.concurrency }</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -408,8 +420,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     <a href="#" class="close" data-dismiss="modal">&times;</a>
     <h3 class="confirmation_header"></h3>
   </div>
-  <div id="update-endtime" class="span10">
-    ${ utils.render_field_no_popover(update_endtime_form['end'], show_label=False) }
+  <div id="update-coord" class="span10">
+    ${ utils.render_field_no_popover(update_coord_form['endTime'], show_label=True) }
+    ${ utils.render_field_no_popover(update_coord_form['pauseTime'], show_label=True) }
+    ${ utils.render_field_no_popover(update_coord_form['clearPauseTime'], show_label=True) }
+    ${ utils.render_field_no_popover(update_coord_form['concurrency'], show_label=True) }
   </div>
   <div class="modal-body">
       <p class="confirmation_body"></p>
@@ -697,10 +712,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       $("#confirmation .modal-footer." + _this.attr("data-confirmation-footer")).removeClass("hide");
       $("#confirmation").modal("show");
 
-      if (_this.attr("id") == "edit-endtime-btn") {
-        $("#update-endtime").show();
+      if (_this.attr("id") == "edit-coord-btn") {
+        $("#update-coord").show();
       } else {
-        $("#update-endtime").hide();
+        $("#update-coord").hide();
       }
 
       $("#confirmation a.btn-confirm").unbind();
@@ -717,9 +732,17 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
 
       var params = { 'notification': $(_this).attr("data-message") };
-      if ($(this).attr("id") == "edit-endtime-btn") {
-        params['end_time'] = moment($("input[name='end_0']").val() + " " + $("input[name='end_1']").val(),
+      if ($(this).attr("id") == "edit-coord-btn") {
+        params['end_time'] = moment($("input[name='endTime_0']").val() + " " + $("input[name='endTime_1']").val(),
             IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
+        if ($("input[name='pauseTime_0']").val() && $("input[name='pauseTime_1']").val()) {
+          params['pause_time'] = moment($("input[name='pauseTime_0']").val() + " " + $("input[name='pauseTime_1']").val(),
+                                            IN_DATETIME_FORMAT).format(OUT_DATETIME_FORMAT);
+        } else {
+          params['pause_time'] = ''
+        }
+        params['clear_pause_time'] = $("input[name='clearPauseTime']").is(':checked')
+        params['concurrency'] = $("input[name='concurrency']").val()
       }
       else if ($(this).hasClass("ignore-btn")) {
         params['actions'] = viewModel.selectedActions().join(' ');
