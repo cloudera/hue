@@ -17,6 +17,7 @@
 
 import logging
 from datetime import datetime,  timedelta
+from time import mktime, struct_time
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -526,13 +527,28 @@ class BundleForm(forms.ModelForm):
       'schema_version': forms.widgets.HiddenInput(),
     }
 
-class UpdateEndTimeForm(forms.Form):
-  end = forms.SplitDateTimeField(input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
-                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small', 'id': 'update_endtime'},
+class UpdateCoordinatorForm(forms.Form):
+  endTime = forms.SplitDateTimeField(label='End Time', input_time_formats=[TIME_FORMAT], required=False, initial=datetime.today() + timedelta(days=3),
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fa fa-calendar', 'id': 'update_endtime'},
                                                             date_format=DATE_FORMAT, time_format=TIME_FORMAT))
 
+  pauseTime = forms.SplitDateTimeField(label='Pause Time', input_time_formats=[TIME_FORMAT], required=False, initial=None,
+                                 widget=SplitDateTimeWidget(attrs={'class': 'input-small fa fa-calendar', 'id': 'update_pausetime'},
+                                                            date_format=DATE_FORMAT, time_format=TIME_FORMAT))
+
+  clearPauseTime = forms.BooleanField(label='Clear Pause Time', initial=False)
+
+  concurrency = forms.IntegerField(label='Concurrency', initial=1)
+
   def __init__(self, *args, **kwargs):
-    super(UpdateEndTimeForm, self).__init__(*args, **kwargs)
+    oozie_coordinator = kwargs.pop('oozie_coordinator')
+    super(UpdateCoordinatorForm, self).__init__(*args, **kwargs)
+
+    self.fields['endTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.endTime))
+    if type(oozie_coordinator.pauseTime) == struct_time:
+      self.fields['pauseTime'].initial = datetime.fromtimestamp(mktime(oozie_coordinator.pauseTime))
+    self.fields['concurrency'].initial = oozie_coordinator.concurrency
+
 
 
 def design_form_by_type(node_type, user, workflow):

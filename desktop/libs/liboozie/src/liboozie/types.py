@@ -501,6 +501,10 @@ class Coordinator(Job):
     else:
       self.nextMaterializedTime = self.startTime
 
+    if self.pauseTime:
+      self.pauseTime = parse_timestamp(self.pauseTime)
+
+
     # For when listing/mixing all the jobs together
     self.id = self.coordJobId
     self.appName = self.coordJobName
