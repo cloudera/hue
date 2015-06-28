@@ -709,8 +709,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           <fieldset>
             <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
             <!-- ko foreach: sessions -->
-            <h4 data-bind="text: $root.getSnippetName($data.type())" style="clear:left;"></h4>
-            <!-- ko with: properties -->
+            <!-- ko with: $data.properties -->
+            <h4 data-bind="text: $root.getSnippetName($parent.type())" style="clear:left;"></h4>
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Cores')}</label>
               <div class="controls">
