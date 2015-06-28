@@ -158,8 +158,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
      <i class="fa fa-pencil"></i>
    </a>
 
-   <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal"
-       data-bind="css: {'btn': true}">
+   <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
      <i class="fa fa-cloud"></i>
    </a>
 
@@ -671,9 +670,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         ${ _('Loading...') }
       </div>
     </div>
-
-    <span data-bind="text: ko.mapping.toJSON(properties)"></span>
-
   </div>
 </script>
 
@@ -708,17 +704,48 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <div class="modal-body">
     <div class="row-fluid">
       <div class="span12">
-        <!-- ko if: $root.selectedNotebook() -->
+        <!-- ko with: $root.selectedNotebook() -->
         <form class="form-horizontal">
           <fieldset>
             <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
-            
-            <div class="control-group" data-bind="foreach: $root.selectedNotebook().sessions">
-              <label class="control-label">${ _('Content') }</label>
+            <!-- ko foreach: sessions -->
+            <h4 data-bind="text: $root.getSnippetName($data.type())" style="clear:left;"></h4>
+            <!-- ko with: properties -->
+            <div class="control-group" style="float: left;">
+              <label class="control-label">${_('Executor Cores')}</label>
               <div class="controls">
-                <span data-bind="text: ko.mapping.toJSON($data)"></span>
+                <input class="input-small" type="text" data-bind="textInput: executor_cores" />
               </div>
             </div>
+            <div class="control-group" style="float: left;">
+              <label class="control-label">${_('Executor Memory')}</label>
+              <div class="controls">
+                <input class="input-small" type="text" data-bind="textInput: executor_memory" />
+              </div>
+            </div>
+            <div class="control-group" style="float: left;">
+              <label class="control-label">${_('Executor Count')}</label>
+              <div class="controls">
+                <input class="input-small" type="text" data-bind="textInput: executor_count" />
+              </div>
+            </div>
+            <div class="control-group cl" style="float: left; clear: left;">
+              <label class="control-label">${_('Driver Cores')}</label>
+              <div class="controls">
+                <input class="input-small" type="text" data-bind="textInput: driver_cores" />
+              </div>
+            </div>
+            <div class="control-group" style="float: left;">
+              <label class="control-label">${_('Driver Memory')}</label>
+              <div class="controls">
+                <input class="input-small" type="text" data-bind="textInput: driver_memory" />
+              </div>
+            </div>
+            <a style="float: right;" class="btn pointer" title="${ _('Restart Session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($parent) }">
+              ${ _('Restart Session') }
+            </a>
+            <!-- /ko -->
+            <!-- /ko -->
             </br>
           </fieldset>
         </form>

@@ -310,7 +310,7 @@ var Snippet = function (vm, notebook, snippet) {
     }
   };
 
-  self.create_session = function (callback) {
+  self.create_session = function (callback, errorCallback) {
     self.status('loading');
     $.post("/spark/api/create_session", {
       notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -326,9 +326,15 @@ var Snippet = function (vm, notebook, snippet) {
       else {
         self.status('failed');
         $(document).trigger("error", data.message);
+        if (errorCallback) {
+          errorCallback();
+        }
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+      if (errorCallback) {
+        errorCallback();
+      }
     });
   };
 
@@ -564,6 +570,28 @@ var Notebook = function (vm, notebook) {
     return _s;
   };
 
+  self.restartSession = function (session) {
+    var snippetsOfType = $.grep(self.snippets(), function (snippet) {
+      return snippet.type() == session.type();
+    });
+
+    if (snippetsOfType.length > 0) {
+      var setSnippetStatus = function (status) {
+        $.each(snippetsOfType, function (index, snippet) {
+          snippet.status(status);
+        });
+      };
+      setSnippetStatus('loading');
+      var successCallback = function() {
+        setSnippetStatus('ready');
+      };
+      var failCallback = function() {
+        setSnippetStatus('failed');
+      };
+      snippetsOfType[0].create_session(successCallback, failCallback);
+    }
+  };
+
   self.addSession = function (session) {
     var toRemove = []
     $.each(self.sessions(), function (index, s) {
@@ -710,6 +738,16 @@ function EditorViewModel(notebooks, options) {
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
   self.snippetPlaceholders = options.snippet_placeholders;
+
+  self.getSnippetName = function(snippetType)  {
+    var availableSnippets = self.availableSnippets();
+    for (var i = 0; i < availableSnippets.length; i++) {
+      if (availableSnippets[i].type() === snippetType) {
+        return availableSnippets[i].name();
+      }
+    }
+    return '';
+  };
 
   self.init = function () {
     $.each(notebooks, function (index, notebook) {

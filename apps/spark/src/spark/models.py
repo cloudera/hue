@@ -286,7 +286,11 @@ class SparkApi():
   def create_session(self, lang='scala', properties=None):
     if properties is None:
       settings = { 
-          'executor-memory': '1G' # Some props only in YARN mode
+          'executor_cores': 1, # Some props only in YARN mode
+          'executor_count': 1,
+          'executor_memory': '1G',
+          'driver_cores': 1,
+          'driver_memory': '1G'
       }
 
     api = get_spark_api(self.user)
