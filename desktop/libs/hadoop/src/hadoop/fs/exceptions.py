@@ -35,6 +35,7 @@ class PermissionDeniedException(StructuredException):
 class WebHdfsException(RestException):
   def __init__(self, error):
     RestException.__init__(self, error)
+    self.server_exc = None
 
     try:
       json_body = json.loads(self._message)
