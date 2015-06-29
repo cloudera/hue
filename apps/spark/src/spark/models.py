@@ -291,6 +291,9 @@ class SparkApi():
       count += 1
       time.sleep(1)
 
+    if status['state'] != 'idle':
+      raise QueryError('\n'.join(status['log']))
+
     return {
         'type': lang,
         'id': response['id']
