@@ -594,6 +594,11 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
       # covers AD, Standard Ldap and posixAcount/posixGroup
       if not group_filter.startswith('('):
         group_filter = '(' + group_filter + ')'
+
+      # Sanitizing the DN before using in a Search filter
+      sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
+      sanitized_dn = sanitized_dn.replace(r'\5c,', r'\2c')
+
       find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
                            group_member_attr + "=" + ldap_info['dn'] + ")))"
       group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
