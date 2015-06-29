@@ -99,7 +99,7 @@ class Migration(SchemaMigration):
         'jobsub.ooziejavaaction': {
             'Meta': {'object_name': 'OozieJavaAction', '_ormbases': ['jobsub.OozieAction']},
             'archives': ('django.db.models.fields.CharField', [], {'default': "'[]'", 'max_length': '512'}),
-            'args': ('django.db.models.fields.CharField', [], {'max_length': '4096', 'blank': 'True'}),
+            'args': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'files': ('django.db.models.fields.CharField', [], {'default': "'[]'", 'max_length': '512'}),
             'jar_path': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
             'java_opts': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
