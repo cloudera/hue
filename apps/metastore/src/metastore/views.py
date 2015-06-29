@@ -31,6 +31,7 @@ from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
+from filebrowser.views import location_to_url
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 
@@ -217,16 +218,6 @@ def read_table(request, database, table):
     raise PopupException(_('Cannot read table'), detail=e)
 
 
-def read_partition(request, database, table, partition_id):
-  db = dbms.get(request.user)
-  try:
-    partition = db.get_partition(database, table, int(partition_id))
-    url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': partition.id}) + '?on_success_url=&context=table:%s:%s' % (table, database)
-    return redirect(url)
-  except Exception, e:
-    raise PopupException(_('Cannot read table'), detail=e)
-
-
 @check_has_write_access_permission
 def load_table(request, database, table):
   db = dbms.get(request.user)
@@ -287,6 +278,26 @@ def describe_partitions(request, database, table):
       ],
       'database': database, 'table': table_obj, 'partitions': partitions, 'request': request
   })
+
+
+def browse_partition(request, database, table, partition_id):
+  db = dbms.get(request.user)
+  try:
+    partition_table = db.describe_partition(database, table, int(partition_id))
+    uri_path = location_to_url(partition_table.path_location)
+    return redirect(uri_path)
+  except Exception, e:
+    raise PopupException(_('Cannot browse partition'), detail=e.message)
+
+
+def read_partition(request, database, table, partition_id):
+  db = dbms.get(request.user)
+  try:
+    partition = db.get_partition(database, table, int(partition_id))
+    url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': partition.id}) + '?on_success_url=&context=table:%s:%s' % (table, database)
+    return redirect(url)
+  except Exception, e:
+    raise PopupException(_('Cannot read partition'), detail=e.message)
 
 
 def has_write_access(user):

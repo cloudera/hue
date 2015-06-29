@@ -45,23 +45,14 @@ ${ components.menubar() }
           % for field in table.partition_keys:
               <th>${field.name}</th>
           % endfor
-            <th>${_('Path')}</th>
+              <th>${_('Location')}</th>
           </tr>
           % for partition_id, partition in enumerate(partitions):
             <tr>
             % for idx, key in enumerate(partition.values):
                 <td><a href="${ url('metastore:read_partition', database=database, table=table.name, partition_id=partition_id) }" data-row-selector="true">${key}</a></td>
             % endfor
-            <% location = location_to_url(partition.sd.location) %>
-            % if url:
-                <td data-row-selector-exclude="true">
-                  <a href="${location}">${partition.sd.location}</a>
-                </td>
-            % else:
-                <td>
-                ${partition.sd.location}
-                </td>
-            % endif
+                <td><a href="${ url('metastore:browse_partition', database=database, table=table.name, partition_id=partition_id) }"><i class="fa fa-share-square-o"></i> ${_('View Partition Files')}</a></td>
             </tr>
           % endfor
           </table>

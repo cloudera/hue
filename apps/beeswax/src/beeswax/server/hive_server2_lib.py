@@ -603,14 +603,18 @@ class HiveServerClient:
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
 
-  def get_table(self, database, table_name):
+  def get_table(self, database, table_name, partition_spec=None):
     req = TGetTablesReq(schemaName=database, tableName=table_name)
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
-    query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
+    if partition_spec:
+      query = 'DESCRIBE FORMATTED `%s`.`%s` PARTITION(%s)' % (database, table_name, partition_spec)
+    else:
+      query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
+
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
@@ -754,7 +758,8 @@ class HiveServerClient:
     else:
       max_rows = 1000 if max_parts <= 250 else max_parts
 
-    partitionTable = self.execute_query_statement('SHOW PARTITIONS %s.%s' % (database, table_name), max_rows=max_rows)
+    partitionTable = self.execute_query_statement('SHOW PARTITIONS `%s`.`%s`' % (database, table_name), max_rows=max_rows)
+
     partitions = [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
 
     if reverse_sort:
@@ -825,10 +830,12 @@ class PartitionKeyCompatible:
 
 class PartitionValueCompatible:
 
-  def __init__(self, partition, table):
+  def __init__(self, partition, table, properties=None):
+    if properties is None:
+      properties = {}
     # Parses: ['datehour=2013022516'] or ['month=2011-07/dt=2011-07-01/hr=12']
     self.values = [val.split('=')[1] for part in partition for val in part.split('/')]
-    self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition)),})
+    self.sd = type('Sd', (object,), properties,)
 
 
 class ExplainCompatible:
@@ -943,8 +950,8 @@ class HiveServerClientCompatible(object):
     return tables
 
 
-  def get_table(self, database, table_name):
-    table = self._client.get_table(database, table_name)
+  def get_table(self, database, table_name, partition_spec=None):
+    table = self._client.get_table(database, table_name, partition_spec)
     return HiveServerTableCompatible(table)
 
 
