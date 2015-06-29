@@ -11,33 +11,64 @@ from desktop.models import Document2
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # As opposed to Document1, we can't just delete Document2 documents if
-        # there is a duplication because it actually holds data. So instead
-        # we'll just find duplications and emit a better error message.
+        # Unfortunately before this change it was possible to have multiple
+        # documents that shared the same (uuid, version, is_history). However,
+        # as opposed to before we can't just delete the records as Document2
+        # documents contain user data. So instead what we'll do is identify
+        # what's the most recent document, and manipulate the other document
+        # version numbers to be negative. This keeps the duplicates linked
+        # together.
+
+        # We'll start off by first finding all the duplicate documents.
+        # Ideally we'd do this in one pass, but Django's aggregates don't seem
+        # to support doing a GROUP BY without grouping all the selected fields
+        # together. So we'll do this in a few phases. First we'll just find the
+        # duplicates.
+        #
+        # Note we reset the `order_by` to make sure that if a default ordering
+        # is ever added, it's never included in the group by.
         duplicated_records = Document2.objects \
             .values('uuid', 'version', 'is_history') \
             .annotate(id_count=models.Count('id')) \
-            .filter(id_count__gt=1)
-
-        duplicated_records = list(duplicated_records)
-        duplicated_ids = []
+            .filter(id_count__gt=1) \
+            .order_by()
 
         for record in duplicated_records:
+            # We found some duplicates, now actually fetch the duplicated
+            # documents for these values.
             docs = Document2.objects \
-                .values_list('id', flat=True) \
                 .filter(
                     uuid=record['uuid'],
                     version=record['version'],
                     is_history=record['is_history'],
-                )
+                ) \
+                .order_by('-version', '-last_modified')
 
-            duplicated_ids.extend(docs)
+            # Grab all but the first document, which we're preserving as the
+            # current version.
+            docs = list(docs[1:])
 
-        if duplicated_records:
-            msg = 'Found duplicated Document2 records! %s. ' \
-                'This will require manual merging of the records' % duplicated_ids
-            logging.error(msg)
-            raise RuntimeError(msg)
+            logging.warn('Modifying version number of these duplicated docs %s' %
+                [doc.id for doc in docs])
+
+            # Update all these document's version numbers. To be safe, we want
+            # to give them a unique negative number so there's no collision and
+            # also so they're easily discoverable.
+            version = Document2.objects \
+                .values_list('version') \
+                .filter(uuid=record['uuid']) \
+                .earliest('version')[0]
+
+            version = min(0, version) - 1
+
+            # Finally, update the version numbers.
+            for doc in docs:
+              doc.version = version
+
+              if not db.dry_run:
+                doc.save()
+
+              version -= 1
 
         # Adding unique constraint on 'Document2', fields ['uuid', 'version', 'is_history']
         db.create_unique(u'desktop_document2', ['uuid', 'version', 'is_history'])
