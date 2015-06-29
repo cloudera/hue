@@ -356,6 +356,12 @@ class BeeswaxSampleProvider(object):
     """ % (data_file % 1,)
     make_query(cls.client, LOAD_DATA, wait=True, local=False)
 
+    # Insert additional partition data into "test_partitions" table
+    ADD_PARTITION = """
+      ALTER TABLE test_partitions ADD PARTITION(baz='baz_two', boom='boom_two') LOCATION '/tmp/beeswax/baz_two/boom_two'
+    """
+    make_query(cls.client, ADD_PARTITION, wait=True, local=False)
+
     # Create a bunch of other tables
     CREATE_TABLE = """
       CREATE TABLE `%(name)s` (foo INT, bar STRING)
@@ -369,14 +375,6 @@ class BeeswaxSampleProvider(object):
     table_info = dict(name='test', comment='Test table')
     cls._make_data_file(data_file % 2)
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
-
-    # Insert additional partition data into "test_partitions" table
-    INSERT_PARTITION_DATA = """
-      INSERT INTO TABLE test_partitions
-      PARTITION(baz='baz_two', boom='boom_two')
-      SELECT foo, bar FROM test
-    """
-    make_query(cls.client, INSERT_PARTITION_DATA, wait=True, local=False)
 
     # Create a "test_utf8" table.
     table_info = dict(name='test_utf8', comment=cls.get_i18n_table_comment())
