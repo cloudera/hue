@@ -114,7 +114,7 @@ class Migration(SchemaMigration):
             'doc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['desktop.Document']"}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'db_index': 'True', 'to': u"orm['auth.Group']", 'db_table': "'documentpermission_groups'", 'symmetrical': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'perms': ('django.db.models.fields.CharField', [], {'default': "'read'", 'max_length': '5'}),
+            'perms': ('django.db.models.fields.CharField', [], {'default': "'read'", 'max_length': '10'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'db_index': 'True', 'to': u"orm['auth.User']", 'db_table': "'documentpermission_users'", 'symmetrical': 'False'})
         },
         u'desktop.documenttag': {
