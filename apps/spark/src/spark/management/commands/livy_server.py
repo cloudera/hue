@@ -69,6 +69,11 @@ class Command(NoArgsCommand):
     if livy_yarn_jar:
       args.append("-Dlivy.yarn.jar=" + livy_yarn_jar)
 
+    if spark.conf.LIVY_IMPERSONATION_ENABLED.get():
+      args.append("-Dlivy.impersonation.enabled=true")
+    else:
+      args.append("-Dlivy.impersonation.enabled=false")
+
     args.append("com.cloudera.hue.livy.server.Main")
 
     LOG.info("Executing %r (%r) (%r)" % (args[0], args, env))
