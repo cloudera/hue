@@ -255,7 +255,7 @@ class SavedQuery(models.Model):
   owner = models.ForeignKey(User, db_index=True)
   # Data is a json of dictionary. See the beeswax.design module.
   data = models.TextField(max_length=65536)
-  name = models.CharField(max_length=64)
+  name = models.CharField(max_length=80)
   desc = models.TextField(max_length=1024)
   mtime = models.DateTimeField(auto_now=True)
   # An auto design is a place-holder for things users submit but not saved.
