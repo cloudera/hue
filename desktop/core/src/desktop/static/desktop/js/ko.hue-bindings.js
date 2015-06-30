@@ -1369,3 +1369,42 @@ ko.bindingHandlers.textSqueezer = {
 ko.toJSONObject = function (koObj) {
   return JSON.parse(ko.toJSON(koObj));
 }
+
+ko.bindingHandlers.aceEditor = {
+    init: function (element, valueAccessor) {
+      var _el = $(element);
+      var _options = ko.unwrap(valueAccessor());
+      var _onBlur = _options.onBlur || function () {};
+      var _onChange = _options.onChange || function () {};
+      _el.text(_options.value());
+      ace.require("ace/ext/language_tools");
+      var editor = ace.edit(element);
+      editor.session.setMode(_options.mode());
+      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/clouds");
+      editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: true,
+        showGutter: false
+      });
+      editor.on("blur", function () {
+        _options.value(editor.getValue());
+        _onBlur(editor);
+      });
+      editor.on("change", function () {
+        _onChange(editor);
+      });
+      editor.$blockScrolling = Infinity
+      element.editor = editor;
+      element.editor.originalCompleters = editor.completers;
+    },
+    update: function (element, valueAccessor) {
+      var _options = ko.unwrap(valueAccessor());
+      if (element.editor) {
+        element.editor.completers = element.editor.originalCompleters.slice();
+        _options.extraCompleters().forEach(function (complete) {
+          element.editor.completers.push(complete);
+        });
+      }
+    }
+  }
