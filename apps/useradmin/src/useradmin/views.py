@@ -229,7 +229,7 @@ def edit_user(request, username=None):
         try:
           ensure_home_directory(request.fs, instance.username)
         except (IOError, WebHdfsException), e:
-          request.error(_('Cannot make home directory for user %s.' % instance.username))
+          request.error(_('Cannot make home directory for user %s.') % instance.username)
       if request.user.is_superuser:
         return redirect(reverse(list_users))
       else:
@@ -342,7 +342,7 @@ def add_ldap_users(request):
           try:
             ensure_home_directory(request.fs, user.username)
           except (IOError, WebHdfsException), e:
-            request.error(_("Cannot make home directory for user %s." % user.username))
+            request.error(_("Cannot make home directory for user %s.") % user.username)
 
       if not users:
         errors = form._errors.setdefault('username_pattern', ErrorList())
@@ -375,6 +375,7 @@ def add_ldap_groups(request):
       import_by_dn = form.cleaned_data['dn']
       import_members = form.cleaned_data['import_members']
       import_members_recursive = form.cleaned_data['import_members_recursive']
+      is_ensuring_home_directories = form.cleaned_data['ensure_home_directories']
       server = form.cleaned_data.get('server')
       try:
         connection = ldap_access.get_connection_from_server(server)
@@ -384,6 +385,17 @@ def add_ldap_groups(request):
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
       except AssertionError, e:
         raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
+
+      unique_users = set()
+      if is_ensuring_home_directories:
+        for group in groups:
+          for user in group.user_set.all():
+            unique_users.add(user)
+        for user in unique_users:
+          try:
+            ensure_home_directory(request.fs, user.username)
+          except (IOError, WebHdfsException), e:
+            raise PopupException(_("Exception creating home directory for LDAP user %s in group %s.") % (user, group), detail=e)
 
       if groups:
         return redirect(reverse(list_groups))
