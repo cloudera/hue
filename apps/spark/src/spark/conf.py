@@ -74,6 +74,12 @@ LIVY_YARN_JAR = Config(
   help=_t("Path to livy-assembly.jar inside HDFS"),
   private=True)
 
+LIVY_IMPERSONATION_ENABLED = Config(
+  key="livy_impersonation_enabled",
+  help=_t("Use impersonation when submitting livy jobs"),
+  default=True,
+  type=coerce_bool)
+
 START_LIVY_SERVER = Config(
   key="start_livy_server",
   help=_t("Experimental option to launch livy"),

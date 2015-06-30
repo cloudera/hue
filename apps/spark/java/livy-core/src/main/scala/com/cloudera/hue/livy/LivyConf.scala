@@ -25,6 +25,7 @@ import scala.collection.JavaConverters._
 object LivyConf {
   val SESSION_FACTORY_KEY = "livy.server.session.factory"
   val SPARK_SUBMIT_KEY = "livy.server.spark-submit"
+  val IMPERSONATION_ENABLED_KEY = "livy.impersonation.enabled"
 
   sealed trait SessionKind
   case class Process() extends SessionKind
@@ -83,6 +84,9 @@ class LivyConf(loadDefaults: Boolean) {
 
   /** Get a parameter as an Option */
   def getOption(key: String): Option[String] = Option(settings.get(key))
+
+  /** Get a parameter as a Boolean */
+  def getBoolean(key: String, default: Boolean) = getOption(key).map(_.toBoolean).getOrElse(default)
 
   /** Get a parameter as an Int */
   def getInt(key: String, default: Int) = getOption(key).map(_.toInt).getOrElse(default)

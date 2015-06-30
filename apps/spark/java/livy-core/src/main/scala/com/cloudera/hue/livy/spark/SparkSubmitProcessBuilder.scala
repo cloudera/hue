@@ -256,7 +256,11 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     addList("--driver-class-path", _driverClassPath)
     addOpt("--driver-cores", _driverCores)
     addOpt("--executor-memory", _executorMemory)
-    addOpt("--proxy-user", _proxyUser)
+
+    if (livyConf.getBoolean(LivyConf.IMPERSONATION_ENABLED_KEY, true)) {
+      addOpt("--proxy-user", _proxyUser)
+    }
+
     addOpt("--driver-cores", _driverCores)
     addOpt("--executor-cores", _executorCores)
     addOpt("--num-executors", _numExecutors)
