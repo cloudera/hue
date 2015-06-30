@@ -215,7 +215,7 @@ class HS2Api():
 
     handle = self._get_handle(snippet)
     db.cancel_operation(handle)
-    return {'status': 'canceled'}
+    return {'status': 0}
 
   @query_error_handler
   def get_log(self, snippet, startFrom=None, size=None):
@@ -263,9 +263,9 @@ class HS2Api():
 
       handle = self._get_handle(snippet)
       db.close_operation(handle)
-      return {'status': 'closed'}
+      return {'status': 0}
     else:
-      return {'status': 'skipped'}
+      return {'status': -1}  # skipped
 
   def _get_jobs(self, log):
     return _parse_out_hadoop_jobs(log)
@@ -402,7 +402,7 @@ class SparkApi():
     session = _get_snippet_session(notebook, snippet)
     response = api.cancel(session['id'])
 
-    return {'status': 'canceled'}
+    return {'status': 0}
 
   def get_log(self, snippet, startFrom=0, size=None):
     return 'Not available'
@@ -418,10 +418,10 @@ class SparkApi():
       api.close(session['id'])
       return {
         'session': session['id'],
-        'status': 'closed'
+        'status': 0
       }
     else:
-      return {'status': 'skipped'}
+      return {'status': -1}
 
   def _get_jobs(self, log):
     return []
@@ -481,10 +481,14 @@ class SparkBatchApi():
       api.close_batch(session_id)
       return {
         'session': session_id,
-        'status': 'closed'
+        'status': 0
       }
     else:
-      return {'status': 'skipped'}
+      return {'status': -1}  # skipped
+
+  def cancel(self, notebook, snippet):
+    # Batch jobs do not support interruption, so close session instead.
+    return self.close(snippet)
 
   def _progress(self, snippet, logs):
     return 50
