@@ -116,8 +116,9 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     response = self.client.get("/metastore/table/default/test_partitions/partitions", follow=True)
     assert_true("baz_one" in response.content)
-    assert_true("baz_two" in response.content)
     assert_true("boom_two" in response.content)
+    assert_true("baz_foo" in response.content)
+    assert_true("boom_bar" in response.content)
     # Breadcrumbs
     assert_true("default" in response.content)
     assert_true("test_partitions" in response.content)
@@ -138,21 +139,16 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       finish()
 
   def test_read_partitions(self):
-    response = self.client.get("/metastore/table/default/test_partitions/partitions/1/read", follow=True)
+    response = self.client.get("/metastore/table/default/test_partitions/partitions/0/read", follow=True)
     response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     results = fetch_query_result_data(self.client, response)
     assert_true(len(results['results']) > 0, results)
 
   def test_browse_partition(self):
-    response = self.client.get("/metastore/table/default/test_partitions/partitions/0/browse", follow=True)
-    filebrowser_path = reverse("filebrowser.views.view", kwargs={'path': '/tmp/beeswax/baz_two/boom_two'})
+    response = self.client.get("/metastore/table/default/test_partitions/partitions/1/browse", follow=True)
+    filebrowser_path = reverse("filebrowser.views.view", kwargs={'path': '/tmp/beeswax/baz_foo/boom_bar'})
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
-
-  def test_describe_partition(self):
-    response = self.client.get("/metastore/table/default/test_partitions/partitions/0")
-    assert_true("Location" in response.content, response.content)
-    assert_true("/tmp/beeswax/baz_two/boom_two" in response.content, response.content)
 
   def test_drop_multi_tables(self):
     hql = """
