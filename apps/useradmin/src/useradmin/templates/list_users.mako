@@ -41,7 +41,9 @@ ${layout.menubar(section='users')}
       </%def>
       <%def name="creation()">
         %if user.is_superuser:
-            <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
+            % if not is_ldap_setup:
+                <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
+            %endif
 
             % if is_ldap_setup:
             <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i
