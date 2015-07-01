@@ -192,7 +192,7 @@ class HiveServer2Dbms(object):
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
       partition_query = ""
       if table.partition_keys:
-        partitions = self.get_partitions(database, table, 1)
+        partitions = self.get_partitions(database, table, partition_spec=None, max_parts=1)
         partition_query = 'WHERE ' + ' AND '.join(["%s='%s'" % (table.partition_keys[idx].name, key) for idx, key in enumerate(partitions[0].values)])
       hql = "SELECT * FROM `%s`.`%s` %s LIMIT %s" % (database, table.name, partition_query, limit)
       query = hql_query(hql)
@@ -575,16 +575,16 @@ class HiveServer2Dbms(object):
     return self.client.close(handle)
 
 
-  def get_partitions(self, db_name, table, max_parts=None, reverse_sort=True):
+  def get_partitions(self, db_name, table, partition_spec=None, max_parts=None, reverse_sort=True):
     if max_parts is None or max_parts > BROWSE_PARTITIONED_TABLE_LIMIT.get():
       max_parts = BROWSE_PARTITIONED_TABLE_LIMIT.get()
 
-    return self.client.get_partitions(db_name, table.name, max_parts, reverse_sort)
+    return self.client.get_partitions(db_name, table.name, partition_spec, max_parts, reverse_sort)
 
 
   def get_partition(self, db_name, table_name, partition_id):
     table = self.get_table(db_name, table_name)
-    partitions = self.get_partitions(db_name, table, max_parts=None)
+    partitions = self.get_partitions(db_name, table, partition_spec=None, max_parts=None)
 
     partition_query = ""
     for idx, key in enumerate(partitions[partition_id].values):
@@ -597,7 +597,7 @@ class HiveServer2Dbms(object):
 
   def describe_partition(self, db_name, table_name, partition_id):
     table = self.get_table(db_name, table_name)
-    partitions = self.get_partitions(db_name, table, max_parts=None)
+    partitions = self.get_partitions(db_name, table, partition_spec=None, max_parts=None)
 
     parts = ["%s='%s'" % (table.partition_keys[idx].name, key) for idx, key in enumerate(partitions[partition_id].values)]
     partition_spec = ','.join(parts)

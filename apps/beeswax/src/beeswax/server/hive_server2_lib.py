@@ -757,7 +757,7 @@ class HiveServerClient:
       return 'Server does not support GetLog()'
 
 
-  def get_partitions(self, database, table_name, max_parts, reverse_sort=True):
+  def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True):
     table = self.get_table(database, table_name)
 
     if max_parts is None or max_parts <= 0:
@@ -765,9 +765,13 @@ class HiveServerClient:
     else:
       max_rows = 1000 if max_parts <= 250 else max_parts
 
-    partitionTable = self.execute_query_statement('SHOW PARTITIONS `%s`.`%s`' % (database, table_name), max_rows=max_rows)
+    query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
+    if partition_spec:
+      query += ' PARTITION(%s)' % partition_spec
 
-    partitions = [PartitionValueCompatible(partition, table) for partition in partitionTable.rows()][-max_parts:]
+    partition_table = self.execute_query_statement(query, max_rows=max_rows)
+
+    partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()][-max_parts:]
 
     if reverse_sort:
       partitions.reverse()
@@ -994,8 +998,8 @@ class HiveServerClientCompatible(object):
   def get_partition(self, *args, **kwargs): raise NotImplementedError()
 
 
-  def get_partitions(self, database, table_name, max_parts, reverse_sort=True):
-    return self._client.get_partitions(database, table_name, max_parts, reverse_sort)
+  def get_partitions(self, database, table_name, partition_spec, max_parts, reverse_sort=True):
+    return self._client.get_partitions(database, table_name, partition_spec, max_parts, reverse_sort)
 
 
   def alter_partition(self, db_name, tbl_name, new_part): raise NotImplementedError()
