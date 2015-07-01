@@ -2413,6 +2413,36 @@ class TestWithMockedServer(object):
       redaction.global_redaction_engine.policies = old_policies
 
 
+  def test_search_designs(self):
+    # Create 20 (DEFAULT_PAGE_SIZE) queries to fill page 1, plus a target query for page 2
+    page_1 = []
+    for i in xrange(1, 21):
+      response = _make_query(self.client, 'SELECT', submission_type='Save', name='My Name %d' % i, desc='My Description')
+      content = json.loads(response.content)
+      query_id = content['design_id']
+      page_1.append(query_id)
+
+    response = _make_query(self.client, 'SELECT', submission_type='Save', name='Test Search Design', desc='My Test Search Design')
+    content = json.loads(response.content)
+    query_id = content['design_id']
+    page_2 = [query_id]
+
+    resp = self.client.get(reverse('beeswax:list_designs') + '?text=Test+Search+Design')
+    ids_page = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(0, sum([query_id in ids_page for query_id in page_1]))
+    assert_equal(1, sum([query_id in ids_page for query_id in page_2]))
+
+    # Trash all designs and test search trashed designs
+    ids = page_1 + page_2
+    self.client.post(reverse('beeswax:delete_design'), {u'skipTrash': [u'false'], u'designs_selection': ids})
+    SavedQuery.objects.filter(id__in=ids)
+
+    resp = self.client.get(reverse('beeswax:list_trashed_designs') + '?text=Test+Search+Design')
+    ids_page = set([query.id for query in resp.context['page'].object_list])
+    assert_equal(0, sum([query_id in ids_page for query_id in page_1]))
+    assert_equal(1, sum([query_id in ids_page for query_id in page_2]))
+
+
 class TestDesign():
 
   def test_hql_resource(self):

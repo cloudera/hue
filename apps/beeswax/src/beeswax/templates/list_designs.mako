@@ -47,7 +47,9 @@ ${ layout.menubar(section='saved queries') }
     %>
     <%actionbar:render>
       <%def name="search()">
-        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for %s') % noun }">
+        <form id="searchQueryForm" action="${ url(app_name + ':list_designs') }" method="GET" class="inline">
+          <input id="filterInput" type="text" name="text" class="input-xlarge search-query" value="${ filter_params.get(prefix + 'text', '') }" placeholder="${_('Search for %s') % noun }" />
+        </form>
       </%def>
 
       <%def name="actions()">
@@ -178,11 +180,7 @@ ${ layout.menubar(section='saved queries') }
         "sEmptyTable":"${_('No data available')}",
         "sZeroRecords":"${_('No matching records')}",
       },
-      "bStateSave": true
-    });
-
-    $("#filterInput").keyup(function () {
-      savedQueries.fnFilter($(this).val());
+      "bStateSave": false
     });
 
     $(".selectAll").click(function () {
@@ -259,6 +257,17 @@ ${ layout.menubar(section='saved queries') }
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    var _searchInputValue = $("#filterInput").val();
+
+    $("#filterInput").jHueDelayedInput(function(){
+      if ($("#filterInput").val() != _searchInputValue){
+        $("#searchQueryForm").submit();
+      }
+    });
+
+    $("#filterInput").focus();
+    $("#filterInput").val(_searchInputValue); // set caret at the end of the field
   });
 </script>
 
