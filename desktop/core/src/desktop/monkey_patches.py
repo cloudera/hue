@@ -20,9 +20,6 @@ import re
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 
-from django.db.backends import BaseDatabaseWrapper
-from django.db.backends.util import CursorWrapper
-
 from desktop.lib.django_util import get_username_re_rule
 
 
@@ -45,7 +42,3 @@ def monkey_patch_username_validator():
 
 
 monkey_patch_username_validator()
-
-
-def disable_database_logging():
-  BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
