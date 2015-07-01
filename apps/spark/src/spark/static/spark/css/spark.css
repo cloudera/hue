@@ -218,6 +218,15 @@
   margin-left: 0;
 }
 
+.assist-action {
+  display: none;
+  margin: 9px 3px 3px 3px;
+}
+
+.assist-container:hover .assist-action {
+  display: inline-block;
+}
+
 .show-assist {
   position: fixed;
   top: 80px;

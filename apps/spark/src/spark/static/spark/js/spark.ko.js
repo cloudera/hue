@@ -695,11 +695,7 @@ function EditorViewModel(notebooks, options) {
 
   self.isAssistAvailable = ko.observable(true);
 
-  self.isAssistVisible = ko.observable(options.assistVisible);
-  self.toggleAssist = function () {
-    self.isAssistVisible(!self.isAssistVisible());
-    $(document).trigger("toggleAssist");
-  };
+  self.isAssistVisible = ko.observable(false);
 
   self.assistContent = ko.observable();
   self.assistSelectedMainObject = ko.observable();

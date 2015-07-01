@@ -19,6 +19,7 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="koComponents" file="/ko_components.mako" />
 
 ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
@@ -214,7 +215,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </div>
 
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible() && $root.isAssistAvailable(), click: $root.toggleAssist">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible() && $root.isAssistAvailable(), click: function() { $root.isAssistVisible(! $root.isAssistVisible()) }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
@@ -230,65 +231,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 </div>
 
-<div id="assistQuickLook" class="modal hide fade">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Data sample for')} <span class="tableName"></span></h3>
-    </div>
-    <div class="modal-body" style="min-height: 100px">
-      <div class="loader">
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-      </div>
-      <div class="sample"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
-    </div>
-  </div>
-
-
 <script type="text/html" id="notebook">
   <div class="row-fluid">
-    <div class="span2 assist-container" data-bind="visible: $root.isAssistVisible, css:{'span2': $root.isAssistVisible, 'hidden': !$root.isAssistVisible()}, event: { mouseover: function(){ $('.assist-hover').show(); }, mouseout: function(){ $('.assist-hover').hide(); } }">
-      <div class="span2 assist">
-        <a title="${_('Toggle Assist')}" class="pull-right pointer assist-hover" style="margin:3px; margin-top:9px; display:none" data-bind="click: $root.toggleAssist">
-          <i class="fa fa-chevron-left"></i>
-        </a>
-        <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right pointer assist-hover" style="margin:3px; margin-top:9px; display:none" data-bind="click: reloadAssist">
-          <i class="fa fa-refresh"></i>
-        </a>
-        <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF; margin-bottom: 1px;">
-          <li class="nav-header">${_('database')}</li>
-        </ul>
-        <!-- ko if: $root.assistContent && $root.assistContent().mainObjects().length > 0 -->
-          <select data-bind="options: $root.assistContent().mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: $root.assistSelectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
-          <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px" data-bind="value: $root.assistContent().filter, valueUpdate: 'afterkeydown'" />
-          <div data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
-          <ul data-bind="visible: Object.keys($root.assistContent().firstLevelObjects()).length > 0, foreach: $root.assistContent().filteredFirstLevelObjects()" class="unstyled assist-main">
-            <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-              <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: showTablePreview" style="display: none; position: absolute; right: 10px; margin-left: auto; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
-              <a href="javascript:void(0)" data-bind="click: loadAssistSecondLevel, event: { 'dblclick': function(){ addToActiveCodemirror($data); } }"><span data-bind="text: $data"></span></a>
-
-              <div data-bind="visible: $root.assistContent().firstLevelObjects()[$data].loaded() && $root.assistContent().firstLevelObjects()[$data].open()">
-                <ul data-bind="visible: $root.assistContent().firstLevelObjects()[$data].items().length > 0, foreach: $root.assistContent().firstLevelObjects()[$data].items()" class="unstyled">
-                  <li><a data-bind="attr: {'title': secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: truncateSecondLevel($data), event: { 'dblclick': function(){ addToActiveCodemirror($data.name +', '); } }"></span></a></li>
-                </ul>
-              </div>
-            </li>
-          </ul>
-        <!-- /ko -->
-
-        <div id="navigatorLoader" class="center" data-bind="visible: $root.assistContent().isLoading">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </div>
-
-        <div class="center" data-bind="visible: $root.assistContent().hasErrors">
-          ${ _('The database list cannot be loaded.') }
-        </div>
-      </div>
-    </div>
+    <assist-panel params="assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, totalStorageId: 'sparkAssistVisible'"></assist-panel>
     <div data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': ! $root.isAssistVisible()}">
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
@@ -751,6 +696,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 
 
+${ koComponents.assistPanel() }
+
 <script type="text/javascript" charset="utf-8">
 
   var assist = new Assist({
@@ -806,13 +753,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
   var activeCodemirrorEditor = null;
 
-  function addToActiveCodemirror(text) {
+  huePubSub.subscribe('assist.dblClickItem', function addToActiveCodemirror(text) {
     if (activeCodemirrorEditor != null){
       activeCodemirrorEditor.replaceSelection(text);
       activeCodemirrorEditor.setSelection(activeCodemirrorEditor.getCursor());
       activeCodemirrorEditor.focus();
     }
-  }
+  });
 
   ko.bindingHandlers.verticalSlide = {
     init: function(element, valueAccessor) {
@@ -979,7 +926,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
                 if (_aliases[_foundTable]) {
                   _foundTable = _aliases[_foundTable];
                 }
-                assist.getData(viewModel.assistContent().selectedMainObject() + "/" + _foundTable);
+                assist.getData(assist.selectedMainObject() + "/" + _foundTable);
               }
             }
           }
@@ -1022,7 +969,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               _table = _aliases[_table];
             }
 
-            assist.getData(viewModel.assistContent().selectedMainObject() + "/" + _table);
+            assist.getData(assist.selectedMainObject() + "/" + _table);
 
           }
 
@@ -1091,7 +1038,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               }
             }
           }
-          assist.getData(viewModel.assistContent().selectedMainObject());
+          assist.getData(assist.selectedMainObject());
         }
       }
 
@@ -1182,12 +1129,8 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   };
 
   var options = ${ options_json | n,unicode };
-  $.extend(options, {
-    assistVisible: $.totalStorage("sparkAssistVisible") != null ? $.totalStorage("sparkAssistVisible") : false
-  });
 
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, options);
-  viewModel.assistContent(assist);
   ko.applyBindings(viewModel);
   viewModel.init();
 
@@ -1244,70 +1187,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       viewModel.assistContent().isLoading(false);
     }
     assist.getData(viewModel.assistContent().selectedMainObject(), force);
-  }
-
-  function loadAssistMain(force) {
-    assist.options.onDataReceived = function (data) {
-      if (data.databases) {
-        viewModel.assistContent().mainObjects(data.databases);
-        if (force) {
-          loadAssistFirstLevel(force);
-        }
-        else if (viewModel.assistContent().mainObjects().length > 0 && !viewModel.assistContent().selectedMainObject()) {
-          viewModel.assistContent().selectedMainObject(viewModel.assistContent().mainObjects()[0]);
-          viewModel.assistSelectedMainObject(viewModel.assistContent().selectedMainObject());
-          loadAssistFirstLevel();
-        }
-      }
-    }
-    assist.options.onError = function (error) {
-      viewModel.assistContent().isLoading(false);
-    }
-    assist.getData(null, force);
-  }
-
-  if (assist.options.baseURL != ""){
-    loadAssistMain();
-  }
-  else {
-    viewModel.isAssistVisible(false);
-    viewModel.isAssistAvailable(false);
-  }
-
-  function reloadAssist() {
-    loadAssistMain(true);
-  }
-
-  function needsTruncation(level) {
-    return (level.name.length + level.type.length) > 20;
-  }
-
-  function secondLevelTitle(level) {
-    var _title = "";
-
-    if (level.comment && needsTruncation(level)) {
-      _title = level.name + " (" + level.type + "): " + level.comment;
-    } else if (needsTruncation(level)) {
-      _title = level.name + " (" + level.type + ")";
-    } else if (level.comment) {
-      _title = level.comment;
-    }
-    return _title;
-  }
-
-  function truncateSecondLevel(level) {
-    var escapeString = function (str) {
-      return $("<span>").text(str).html().trim()
-    }
-    if (needsTruncation(level)) {
-      return escapeString(level.name + " (" + level.type + ")").substr(0, 20) + "&hellip;";
-    }
-    return escapeString(level.name + " (" + level.type + ")");
-  }
-
-  function resizeAssist() {
-    $(".assist").parents(".span2").height($(".assist").height() + 100);
-    $(".assist-main").height($(window).height() - 230);
   }
 
   function createDatatable(el, snippet) {
@@ -1642,34 +1521,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     return _datum;
   }
 
-
-  function showTablePreview(table) {
-    var tableUrl = "/beeswax/api/table/" + viewModel.assistContent().selectedMainObject() + "/" + table;
-    $("#assistQuickLook").find(".tableName").text(table);
-    $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.assistContent().selectedMainObject() + "/" + table);
-    $("#assistQuickLook").find(".sample").empty("");
-    $("#assistQuickLook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
-    $.ajax({
-      url: tableUrl,
-      data: {"sample": true},
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      dataType: "html",
-      success: function (data) {
-        $("#assistQuickLook").find(".loader").hide();
-        $("#assistQuickLook").find(".sample").html(data);
-      },
-      error: function (e) {
-        if (e.status == 500) {
-          $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
-          $("#assistQuickLook").modal("hide");
-        }
-      }
-    });
-    $("#assistQuickLook").modal("show");
-  }
-
   function redrawFixedHeaders() {
       viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
@@ -1725,11 +1576,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       if (_handle.length > 0){
         _handle.draggable(getDraggableOptions(_handle.offset().top));
       }
-    });
-
-    $(document).on("toggleAssist", function(){
-      $.totalStorage("sparkAssistVisible", viewModel.isAssistVisible());
-      resizeAssist();
     });
 
     $(document).on("toggleLeftPanel", function(e, snippet){
@@ -1889,7 +1735,6 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
     $(window).on("resize", function(){
       window.clearTimeout(_resizeTimeout);
       _resizeTimeout = window.setTimeout(function(){
-        resizeAssist();
         forceChartDraws();
       }, 200);
     });
