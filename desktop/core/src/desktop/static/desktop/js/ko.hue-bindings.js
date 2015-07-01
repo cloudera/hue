@@ -1488,35 +1488,102 @@ ko.bindingHandlers.aceEditor = {
       var _options = ko.unwrap(valueAccessor());
       var _onBlur = _options.onBlur || function () {};
       var _onChange = _options.onChange || function () {};
+      var _onAfterExec = _options.onAfterExec || function () {};
       _el.text(_options.value());
-      ace.require("ace/ext/language_tools");
-      var editor = ace.edit(element);
+      var editor = ace.edit(_el.attr("id"));
       editor.session.setMode(_options.mode());
-      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/clouds");
-      editor.setOptions({
+      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+
+      var _editorOptions = {
         enableBasicAutocompletion: true,
         enableSnippets: true,
         enableLiveAutocompletion: true,
-        showGutter: false
-      });
+        showGutter: true,
+        showLineNumbers: false
+      }
+
+      var _extraOptions = $.totalStorage("hue.ace.options") || {};
+      $.extend( _editorOptions, _options.editorOptions || _extraOptions);
+
+      editor.setOptions(_editorOptions);
       editor.on("blur", function () {
         _options.value(editor.getValue());
         _onBlur(editor);
       });
-      editor.on("change", function () {
-        _onChange(editor);
+      editor.on("change", function (e) {
+        editor.clearErrors();
+        _onChange(e, editor, valueAccessor);
       });
+
+      editor.commands.on("afterExec", function(e) {
+
+        // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
+        if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
+          var _textBefore = editor.getTextBeforeCursor();
+          if ((e.args == "'" && _textBefore.toUpperCase().indexOf("LOAD ") > -1 && _textBefore.toUpperCase().indexOf("LOAD ") == _textBefore.toUpperCase().length - 5)
+              || _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6){
+            editor.disableAutocomplete();
+            var _btn = editor.showFileButton();
+            _btn.on("click", function(e){
+              e.preventDefault();
+              if ($(".filechooser-content").data("spinner") == null){
+                $(".filechooser-content").data("spinner", $(".filechooser-content").html());
+              }
+              else {
+                $(".filechooser-content").html($(".filechooser-content").data("spinner"));
+              }
+              $(".filechooser-content").jHueFileChooser({
+                onFileChoose: function (filePath) {
+                  editor.session.insert(editor.getCursorPosition(), filePath);
+                  editor.hideFileButton();
+                  editor.enableAutocomplete();
+                  $(".filechooser").hide();
+                },
+                selectFolder: false,
+                createFolder: false
+              });
+              $(".filechooser").css({ "top": $(e.currentTarget).position().top, "left": $(e.currentTarget).position().left}).show();
+            });
+          }
+          else {
+            editor.hideFileButton();
+            editor.enableAutocomplete();
+          }
+          if (e.args != "'" && _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6) {
+            editor.hideFileButton();
+            editor.enableAutocomplete();
+          }
+        }
+
+        _onAfterExec(e, editor, valueAccessor);
+      });
+
       editor.$blockScrolling = Infinity
-      element.editor = editor;
-      element.editor.originalCompleters = editor.completers;
+      element.originalCompleters = editor.completers;
+      _options.ace(editor);
     },
     update: function (element, valueAccessor) {
       var _options = ko.unwrap(valueAccessor());
-      if (element.editor) {
-        element.editor.completers = element.editor.originalCompleters.slice();
-        _options.extraCompleters().forEach(function (complete) {
-          element.editor.completers.push(complete);
-        });
+      if (_options.ace()) {
+        var _editor = _options.ace();
+        _editor.completers = element.originalCompleters.slice();
+        if (_options.extraCompleters().length > 0) {
+          _options.extraCompleters().forEach(function (complete) {
+            _editor.completers.push(complete);
+          });
+          _editor.execCommand("startAutocomplete");
+        }
+        _editor.clearErrors();
+        if (_options.errors().length > 0){
+          _options.errors().forEach(function(err){
+            _editor.addError(err.message, err.line);
+            if (err.line == _editor.getCursorPosition().row){
+              window.setTimeout(function(){
+                $(element).find(".ace_active-line").remove();
+              }, 100)
+            }
+          });
+        }
       }
     }
   }

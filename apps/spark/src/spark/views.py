@@ -112,6 +112,9 @@ def notebooks(request):
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
   })
 
+def ace(request):
+  return render('ace.mako', request, {})
+
 
 @check_document_modify_permission()
 def delete(request):
