@@ -394,6 +394,12 @@ if desktop.conf.MEMORY_PROFILER.get():
   MEMORY_PROFILER = hpy()
   MEMORY_PROFILER.setrelheap()
 
+
 if not desktop.conf.DATABASE_LOGGING.get():
-  from desktop.monkey_patches import disable_database_logging
+  def disable_database_logging():
+    from django.db.backends import BaseDatabaseWrapper
+    from django.db.backends.util import CursorWrapper
+
+    BaseDatabaseWrapper.make_debug_cursor = lambda self, cursor: CursorWrapper(cursor, self)
+
   disable_database_logging()
