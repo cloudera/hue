@@ -711,38 +711,48 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <!-- ko foreach: sessions -->
             <!-- ko with: $data.properties -->
             <h4 data-bind="text: $root.getSnippetName($parent.type())" style="clear:left;"></h4>
+            <!-- ko if: executor_cores -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Cores')}</label>
               <div class="controls">
                 <input class="input-small" type="text" data-bind="numericTextInput: { value: executor_cores, precision: 0 }" />
               </div>
             </div>
+            <!-- /ko -->
+            <!-- ko if: executor_memory -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Memory')}</label>
               <div class="controls">
                 <jvm-memory-input params="value: executor_memory" />
               </div>
             </div>
+            <!-- /ko -->
+            <!-- ko if: executor_count -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Count')}</label>
               <div class="controls">
                 <input class="input-small" type="text" data-bind="numericTextInput: { value: executor_count, precision: 0 }" />
               </div>
             </div>
+            <!-- /ko -->
+            <!-- ko if: driver_cores -->
             <div class="control-group cl" style="float: left; clear: left;">
               <label class="control-label">${_('Driver Cores')}</label>
               <div class="controls">
                 <input class="input-small" type="text" data-bind="numericTextInput: { value: driver_cores, precision: 0 }" />
               </div>
             </div>
+            <!-- /ko -->
+            <!-- ko if: driver_memory -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Driver Memory')}</label>
               <div class="controls">
                 <jvm-memory-input params="value: driver_memory" />
               </div>
             </div>
+            <!-- /ko -->
             <a style="float: right;" class="btn pointer" title="${ _('Restart Session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($parent) }">
-              ${ _('Restart Session') }
+              <i class="fa fa-refresh"></i> ${ _('Session') }
             </a>
             <!-- /ko -->
             <!-- /ko -->
