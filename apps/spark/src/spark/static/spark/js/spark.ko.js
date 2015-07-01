@@ -85,7 +85,7 @@ var Result = function (snippet, result) {
         handle: self.handle
     };
   }
-  
+
   if (typeof result.handle != "undefined" && result.handle != null) {
     $.each(result.handle, function (key, val) {
       self.handle()[key] = val;
@@ -313,7 +313,7 @@ var Snippet = function (vm, notebook, snippet) {
       result: self.result.getContext()
     };
   }
-  
+
   self._ajax_error = function (data, callback) {
     if (data.status == -2) {
       self.create_session(callback);
@@ -604,6 +604,9 @@ var Notebook = function (vm, notebook) {
           snippet.status(status);
         });
       };
+
+      self.closeSession(session);
+
       setSnippetStatus('loading');
       var successCallback = function() {
         setSnippetStatus('ready');
@@ -683,6 +686,8 @@ var Notebook = function (vm, notebook) {
     else {
       _snippet.status('ready');
     }
+
+    logGA('/add_snippet/' + self.selectedSnippet());
     $(document).trigger("snippetAdded", _snippet);
   };
 
@@ -730,6 +735,21 @@ var Notebook = function (vm, notebook) {
     $.each(self.snippets(), function (index, snippet) {
       snippet.result.clear();
       snippet.status('ready');
+    });
+  };
+
+  self.closeSession = function (session) {
+    $.post("/spark/api/close_session", {
+      session: ko.mapping.toJSON(session)
+    }, function (data) {
+      if (data.status == 0) {
+        notebook.sessions.remove(session);
+      }
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
     });
   };
 }
@@ -821,6 +841,6 @@ function EditorViewModel(notebooks, options) {
 
 function logGA(page) {
   if (typeof trackOnGA == 'function') {
-    trackOnGA('editor/' + page);
+    trackOnGA('notebook/' + page);
   }
 }

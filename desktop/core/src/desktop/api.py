@@ -21,8 +21,6 @@ import time
 
 from collections import defaultdict
 
-from django.core.urlresolvers import reverse
-
 from django.utils import html
 from django.utils.translation import ugettext as _
 

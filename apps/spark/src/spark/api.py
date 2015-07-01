@@ -57,6 +57,20 @@ def create_session(request):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
+def close_session(request):
+  response = {'status': -1}
+
+  session = json.loads(request.POST.get('session', '{}'))
+
+  response['session'] = get_api(request.user, {'type': session['type']}).close_session(session=session)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
 def execute(request):
   response = {'status': -1}
 
@@ -207,9 +221,9 @@ def close_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
 
-  for snippet in notebook['snippets']:
+  for session in notebook['sessions']:
     try:
-      response['result'].append(get_api(request.user, snippet).close(notebook, snippet))
+      response['result'].append(get_api(request.user, session).close_session(session))
     except QueryExpired:
       pass
     except Exception, e:

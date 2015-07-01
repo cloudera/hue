@@ -102,7 +102,7 @@ def _get_snippet_session(notebook, snippet):
   return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0]
 
 
-class TextApi():
+class Api(object):
 
   def __init__(self, user):
     self.user = user
@@ -112,6 +112,16 @@ class TextApi():
         'type': lang,
         'id': None
     }
+
+  def close_session(self, session):
+    pass
+
+
+# Text
+
+class TextApi(Api):
+
+  pass
 
 
 # HS2
@@ -129,10 +139,7 @@ def query_error_handler(func):
   return decorator
 
 
-class HS2Api():
-
-  def __init__(self, user):
-    self.user = user
+class HS2Api(Api):
 
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
@@ -277,15 +284,11 @@ class HS2Api():
 
 # Spark
 
-
-class SparkApi():
-
-  def __init__(self, user):
-    self.user = user
+class SparkApi(Api):
 
   def create_session(self, lang='scala', properties=None):
     if properties is None:
-      settings = { 
+      properties = {
           'executor_cores': 1, # Some props only in YARN mode
           'executor_count': 1,
           'executor_memory': '1G',
@@ -294,7 +297,7 @@ class SparkApi():
       }
 
     api = get_spark_api(self.user)
-    print 'TODO: we should use the settings %s for creating the new sessions' % settings
+    print 'TODO: we should use the settings %s for creating the new sessions' % properties
     response = api.create_session(kind=lang)
 
     status = api.get_session(response['id'])
@@ -311,7 +314,7 @@ class SparkApi():
     return {
         'type': lang,
         'id': response['id'],
-        'properties': settings
+        'properties': properties
     }
 
   def execute(self, notebook, snippet):
@@ -425,9 +428,11 @@ class SparkApi():
   def _progress(self, snippet, logs):
     return 50
 
-  def close(self, notebook, snippet):
+  def close(self, notebook, snippet): # Individual statements cannot be closed
+    pass
+
+  def close_session(self, session):
     api = get_spark_api(self.user)
-    session = _get_snippet_session(notebook, snippet)
 
     if session['id'] is not None:
       api.close(session['id'])
@@ -442,10 +447,7 @@ class SparkApi():
     return []
 
 
-class SparkBatchApi():
-
-  def __init__(self, user):
-    self.user = user
+class SparkBatchApi(Api):
 
   def create_session(self, lang, properties=None):
     return {

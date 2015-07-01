@@ -44,6 +44,7 @@ urlpatterns = patterns('spark.views',
 # APIs
 urlpatterns += patterns('spark.api',
   url(r'^api/create_session$', 'create_session', name='create_session'),
+  url(r'^api/close_session$', 'close_session', name='close_session'),
   url(r'^api/execute$', 'execute', name='execute'),
   url(r'^api/check_status$', 'check_status', name='check_status'),
   url(r'^api/fetch_result_data$', 'fetch_result_data', name='fetch_result_data'),
