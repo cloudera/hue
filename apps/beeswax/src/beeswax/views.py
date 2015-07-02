@@ -646,7 +646,6 @@ def query_done_cb(request, server_id):
 """
 Utils
 """
-
 def massage_columns_for_json(cols):
   massaged_cols = []
   for column in cols:

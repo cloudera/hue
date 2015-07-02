@@ -39,7 +39,7 @@ from beeswax.conf import USE_GET_LOG_API
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
-                          safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
+                          safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           _parse_out_hadoop_jobs
 
 
@@ -81,7 +81,7 @@ def error_handler(view_fn):
 
 
 @error_handler
-def autocomplete(request, database=None, table=None):
+def autocomplete(request, database=None, table=None, column=None, nested=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   do_as = request.user
@@ -95,11 +95,25 @@ def autocomplete(request, database=None, table=None):
       response['databases'] = db.get_databases()
     elif table is None:
       response['tables'] = db.get_tables(database=database)
-    else:
+    elif column is None:
       t = db.get_table(database, table)
       response['hdfs_link'] = t.hdfs_link
       response['columns'] = [column.name for column in t.cols]
       response['extended_columns'] = massage_columns_for_json(t.cols)
+    else:
+      if app_name == 'beeswax':
+        if nested is None:  # autocomplete column
+          t = db.get_table(database, table)
+          current = db.get_column(database, table, column)
+          extended_type, simple_type = _get_column_type_by_name(t.cols, column)
+        else:  # autocomplete nested data type
+          current, extended_type, simple_type = _get_nested_describe_and_types(db, database, table, column, nested)
+
+        response['extended_type'] = extended_type
+        response['type'] = simple_type
+
+        inner_type = _get_complex_inner_type(current, extended_type, simple_type)
+        response.update(inner_type)
   except TTransportException, tx:
     response['code'] = 503
     response['error'] = tx.message
@@ -683,3 +697,82 @@ def get_top_terms(request, database, table, column, prefix=None):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+"""
+Utils
+"""
+def _get_simple_data_type(type_string=None):
+  if type_string:
+    pattern = re.compile('^([a-z]+)(<.+>)?$', re.IGNORECASE)
+    match = re.search(pattern, type_string)
+    return match.group(1)
+  return None
+
+
+def _get_column_type_by_name(columns, column_name):
+  full_type = simple_type = None
+
+  for column in columns:
+    if column.name == column_name:
+      full_type = column.type
+      simple_type = _get_simple_data_type(column.type)
+
+  return full_type, simple_type
+
+
+def _extract_nested_type(type_string, token):
+  full_type = simple_type = None
+
+  if token == '$elem$':
+    full_type = re.search(r"array<(.+)>$", type_string).group(1)
+  elif token == '$key$':
+    full_type = re.search(r"map<(\w+),.+>$", type_string).group(1)
+  elif token == '$value$':
+    full_type= re.search(r"map<\w+,(.+)>$", type_string).group(1)
+
+  if full_type:
+    simple_type = _get_simple_data_type(full_type)
+
+  return full_type, simple_type
+
+
+def _get_parent_describe_and_types(db, database, table, column, nested_tokens):
+  parent_token = nested_tokens[-2] if len(nested_tokens) > 1 else column
+  parent = db.get_column(database, table, column, nested_tokens[:-1])
+  extended_type, simple_type = _get_column_type_by_name(parent.cols, parent_token)
+
+  return parent, extended_type, simple_type
+
+
+def _get_nested_describe_and_types(db, database, table, column, nested):
+  nested_tokens = nested.strip('/').split('/')
+  last_token = nested_tokens[-1]
+  parent, parent_type, parent_simple_type = _get_parent_describe_and_types(db, database, table, column, nested_tokens)
+  current = db.get_column(database, table, column, nested_tokens)
+
+  if last_token in ('$elem$', '$key$', '$value$'):  # ARRAY and MAP types must be parsed from parent_type
+    extended_type, simple_type = _extract_nested_type(parent_type, last_token)
+  else:  # STRUCT or primitive type must be looked up from parent DESCRIBE table
+    extended_type, simple_type = _get_column_type_by_name(parent.cols, last_token)
+
+  return current, extended_type, simple_type
+
+
+def _get_complex_inner_type(current, extended_type, simple_type):
+  inner_type = {}
+
+  # Add nested fields to response
+  if simple_type == 'array':
+    full, short = _extract_nested_type(extended_type, '$elem$')
+    inner_type['elem'] = {'extended_type': full, 'type': short}
+  elif simple_type == 'map':
+    full, short = _extract_nested_type(extended_type, '$key$')
+    inner_type['key'] = {'extended_type': full, 'type': short}
+    full, short = _extract_nested_type(extended_type, '$value$')
+    inner_type['value'] = {'extended_type': full, 'type': short}
+  elif simple_type == 'struct':
+    inner_type['extended_fields'] = massage_columns_for_json(current.cols)
+    inner_type['fields'] = [column.name for column in current.cols]
+
+  return inner_type

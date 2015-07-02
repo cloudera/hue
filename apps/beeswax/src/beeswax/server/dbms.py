@@ -117,25 +117,30 @@ class HiveServer2Dbms(object):
     self.server_type = server_type
     self.server_name = self.client.query_server['server_name']
 
+
+  def get_databases(self):
+    return self.client.get_databases()
+
+
+  def get_tables(self, database='default', table_names='*'):
+    hql = "SHOW TABLES IN %s '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=15.0)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+      self.close(handle)
+      return [name for table in result.rows() for name in table]
+    else:
+      return []
+
+
   def get_table(self, database, table_name):
     return self.client.get_table(database, table_name)
 
 
-  def get_tables(self, database='default', table_names='*'):
-      hql = "SHOW TABLES IN %s '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
-      query = hql_query(hql)
-      handle = self.execute_and_wait(query, timeout_sec=15.0)
-
-      if handle:
-        result = self.fetch(handle, rows=5000)
-        self.close(handle)
-        return [name for table in result.rows() for name in table]
-      else:
-        return []
-
-
-  def get_databases(self):
-    return self.client.get_databases()
+  def get_column(self, database, table_name, column_name, nested_tokens=None):
+    return self.client.get_table(database, table_name, column_name=column_name, nested_tokens=nested_tokens)
 
 
   def execute_query(self, query, design):
@@ -597,7 +602,7 @@ class HiveServer2Dbms(object):
     parts = ["%s='%s'" % (table.partition_keys[idx].name, key) for idx, key in enumerate(partitions[partition_id].values)]
     partition_spec = ','.join(parts)
 
-    describe_table = self.client.get_table(db_name, table_name, partition_spec)
+    describe_table = self.client.get_table(db_name, table_name, partition_spec=partition_spec)
 
     return describe_table
 

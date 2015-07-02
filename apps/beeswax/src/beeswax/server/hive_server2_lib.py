@@ -101,10 +101,12 @@ class HiveServerTable(Table):
   @property
   def cols(self):
     rows = self.describe
+    col_row_index = 2
     try:
-      col_row_index = 2
       end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
+    except ValueError:  # DESCRIBE on columns and nested columns does not contain add'l rows beyond cols
+      return rows[col_row_index:]
     except:
       LOG.exception('failed to extract columns')
       return rows
@@ -603,17 +605,22 @@ class HiveServerClient:
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
 
-  def get_table(self, database, table_name, partition_spec=None):
+  def get_table(self, database, table_name, column_name=None, nested_tokens=None, partition_spec=None):
     req = TGetTablesReq(schemaName=database, tableName=table_name)
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
-    if partition_spec:
-      query = 'DESCRIBE FORMATTED `%s`.`%s` PARTITION(%s)' % (database, table_name, partition_spec)
+    if column_name and nested_tokens:  # DESCRIBE on nested types cannot accept database name
+      nested_spec = '.'.join('`%s`' % token for token in nested_tokens)
+      query = 'DESCRIBE FORMATTED `%s`.`%s`.%s' % (table_name, column_name, nested_spec)
     else:
       query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
+      if column_name:
+        query += ' `%s`' % column_name
+      elif partition_spec:
+        query += ' PARTITION(%s)' % partition_spec
 
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
@@ -787,8 +794,8 @@ class HiveServerTableCompatible(HiveServerTable):
   def cols(self):
     return [
         type('Col', (object,), {
-          'name': col.get('col_name', '').strip(),
-          'type': col.get('data_type', '').strip(),
+          'name': col.get('col_name', '').strip() if col.get('col_name') else '',
+          'type': col.get('data_type', '').strip() if col.get('data_type') else '',
           'comment': col.get('comment', '').strip() if col.get('comment') else ''
         }) for col in HiveServerTable.cols.fget(self)
   ]
@@ -950,8 +957,8 @@ class HiveServerClientCompatible(object):
     return tables
 
 
-  def get_table(self, database, table_name, partition_spec=None):
-    table = self._client.get_table(database, table_name, partition_spec)
+  def get_table(self, database, table_name, column_name=None, nested_tokens=None, partition_spec=None):
+    table = self._client.get_table(database, table_name, column_name, nested_tokens, partition_spec)
     return HiveServerTableCompatible(table)
 
 
