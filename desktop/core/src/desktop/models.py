@@ -521,6 +521,32 @@ class Document(models.Model):
     else:
       raise exception_class(_("Document does not exist or you don't have the permission to access it."))
 
+  def copy(self, content_object, **kwargs):
+    if content_object:
+      copy_doc = self
+
+      for k, v in kwargs.iteritems():
+        if hasattr(copy_doc, k):
+          setattr(copy_doc, k, v)
+
+      copy_doc.pk = None
+      copy_doc.id = None
+
+      copy_doc = Document.objects.link(content_object,
+                                       owner=copy_doc.owner,
+                                       name=copy_doc.name,
+                                       description=copy_doc.description,
+                                       extra=copy_doc.extra)
+
+      # Update reverse Document relation to new copy
+      if content_object.doc.get():
+        content_object.doc.get().delete()
+      content_object.doc.add(copy_doc)
+
+      return copy_doc
+    else:
+      raise PopupException(_("Document copy method requires a content_object argument."))
+
   @property
   def icon(self):
     apps = appmanager.get_apps_dict()
@@ -729,6 +755,20 @@ class Document2(models.Model):
     data_python = json.loads(self.data)
 
     return data_python
+
+  def copy(self, **kwargs):
+    copy_doc = self
+
+    for k, v in kwargs.iteritems():
+      if hasattr(copy_doc, k):
+        setattr(copy_doc, k, v)
+
+    copy_doc.pk = None
+    copy_doc.id = None
+    copy_doc.uuid = str(uuid.uuid4())
+    copy_doc.save()
+
+    return copy_doc
 
   def update_data(self, post_data):
     data_dict = self.data_dict

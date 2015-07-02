@@ -49,7 +49,7 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document
+from desktop.models import Document, Document2
 from desktop.views import check_config, home
 from pig.models import PigScript
 
@@ -126,7 +126,6 @@ def test_home():
   assert_equal([], tags['mine'][0]['docs'], tags)
   assert_equal([], tags['trash']['docs'], tags)
   assert_equal([], tags['history']['docs'], tags) # We currently don't fetch [doc.id]
-
 
 def test_skip_wizard():
   c = make_logged_in_client() # is_superuser
@@ -855,3 +854,65 @@ class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
   def test_password_script_raises_exception(self):
     self.run_test_password_script_raises_exception()
+
+
+class TestDocument(object):
+
+  def setUp(self):
+    make_logged_in_client(username="test_doc", groupname="test_doc", recreate=True, is_superuser=False)
+    user = User.objects.get(username="test_doc")
+
+    # Get count of existing Document objects
+    self.doc2_count = Document2.objects.count()
+    self.doc1_count = Document.objects.count()
+
+    self.document2 = Document2.objects.create(name='Test Document2',
+                                              type='search-dashboard',
+                                              owner=user,
+                                              description='Test Document2')
+    self.document = Document.objects.link(content_object=self.document2,
+                                          owner=user,
+                                          name='Test Document',
+                                          description='Test Document',
+                                          extra='test')
+    self.document.save()
+    self.document2.doc.add(self.document)
+
+  def tearDown(self):
+    # Get any Doc2 objects that were created and delete them, Doc1 child objects will be deleted in turn
+    test_docs = Document2.objects.filter(name__contains='Test Document2')
+    test_docs.delete()
+
+  def test_document_create(self):
+    assert_equal(Document2.objects.count(), self.doc2_count + 1)
+    assert_equal(Document.objects.count(), self.doc1_count + 1)
+    assert_equal(Document2.objects.get(name='Test Document2').id, self.document2.id)
+    assert_equal(Document.objects.get(name='Test Document').id, self.document.id)
+
+  def test_document_copy(self):
+    name = 'Test Document2 Copy'
+    doc2 = self.document2.copy(name=name)
+
+    # Test that copying a Document2 object creates another object
+    assert_equal(Document2.objects.count(), self.doc2_count + 2)
+    assert_equal(Document.objects.count(), self.doc1_count + 1)
+
+    # Test that the content object is not pointing to the same object
+    assert_not_equal(self.document2.doc, doc2.doc)
+
+    # Test that copying enables attribute overrides
+    assert_equal(Document2.objects.filter(name=name).count(), 1)
+    assert_equal(doc2.description, self.document2.description)
+
+    doc = self.document.copy(doc2, name=name)
+
+    # Test that copying a Document object creates another Document2 and Document object
+    assert_equal(Document2.objects.count(), self.doc2_count + 2)
+    assert_equal(Document.objects.count(), self.doc1_count + 2)
+
+    # Test that the content object is not pointing to the same object
+    assert_not_equal(self.document.content_object, doc.content_object)
+
+    # Test that copying enables attribute overrides
+    assert_equal(Document.objects.filter(name=name).count(), 1)
+    assert_equal(doc.description, self.document.description)

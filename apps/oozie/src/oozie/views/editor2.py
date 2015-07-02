@@ -17,7 +17,6 @@
 
 import json
 import logging
-import uuid
 
 from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
@@ -151,20 +150,12 @@ def copy_workflow(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-workflow2', id=job['id'])
+    doc = doc2.doc.get()
 
     name = doc2.name + '-copy'
-    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+    doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc2.pk = None
-    doc2.id = None
-    doc2.uuid = str(uuid.uuid4())
-    doc2.name = name
-    doc2.owner = request.user
-    doc2.save()
-
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
-    doc2.save()
+    doc.copy(content_object=doc2, name=name)
 
     workflow = Workflow(document=doc2)
     workflow.update_name(name)
@@ -461,19 +452,12 @@ def copy_coordinator(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-coordinator2', id=job['id'])
+    doc = doc2.doc.get()
 
     name = doc2.name + '-copy'
-    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+    doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc2.pk = None
-    doc2.id = None
-    doc2.uuid = str(uuid.uuid4())
-    doc2.name = name
-    doc2.owner = request.user
-    doc2.save()
-
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
+    doc.copy(content_object=doc2, name=name)
 
     coordinator_data = Coordinator(document=doc2).get_data_for_json()
     coordinator_data['name'] = name
@@ -681,19 +665,12 @@ def copy_bundle(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-bundle2', id=job['id'])
+    doc = doc2.doc.get()
 
     name = doc2.name + '-copy'
-    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+    doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc2.pk = None
-    doc2.id = None
-    doc2.uuid = str(uuid.uuid4())
-    doc2.name = name
-    doc2.owner = request.user
-    doc2.save()
-
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
+    doc.copy(content_object=doc2, name=name)
 
     bundle_data = Bundle(document=doc2).get_data_for_json()
     bundle_data['name'] = name

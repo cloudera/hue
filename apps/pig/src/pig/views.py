@@ -148,7 +148,8 @@ def copy(request):
     raise PopupException(_('POST request required.'))
 
   pig_script = PigScript.objects.get(id=request.POST.get('id'))
-  pig_script.doc.get().can_edit_or_exception(request.user)
+  doc = pig_script.doc.get()
+  doc.can_edit_or_exception(request.user)
 
   existing_script_data = pig_script.dict
 
@@ -169,9 +170,7 @@ def copy(request):
   })
   script_copy.save()
 
-  copy_doc = Document.objects.link(script_copy,
-      owner=copy.owner,
-      name=copy.name)
+  copy_doc = doc.copy(content_object=script_copy, name=name, owner=owner)
 
   response = {
     'id': script_copy.id,

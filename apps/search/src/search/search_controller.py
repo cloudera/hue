@@ -85,24 +85,18 @@ class SearchController(object):
     try:
       for doc2 in self.get_shared_search_collections():
         if doc2.id in collection_ids:
+          doc2 = Document2.objects.get(uuid=notebook['uuid'])
+          doc = doc2.doc.get()
+
           name = doc2.name + '-copy'
+          doc2 = doc2.copy(name=name, owner=request.user)
 
-          doc2.pk = None
-          doc2.id = None
-          doc2.uuid = str(uuid.uuid4())
-          doc2.name = name
-          doc2.owner = self.user
-          doc2.save()
+          doc.copy(content_object=doc2, name=name)
 
-          copy_doc = Document.objects.link(doc2,
-              owner=copy.owner,
-              name=copy.name,
-              description=copy.description)
+          collection = Collection2(self.user, document=doc2)
+          collection.data['collection']['label'] = name
 
-          copy = Collection2(self.user, document=doc2)
-          copy.data['collection']['label'] = name
-
-          doc2.update_data({'collection': copy.data['collection']})
+          doc2.update_data({'collection': collection.data['collection']})
           doc2.save()
       result['status'] = 0
     except Exception, e:
