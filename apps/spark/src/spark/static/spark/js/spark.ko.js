@@ -248,6 +248,7 @@ var Snippet = function (vm, notebook, snippet) {
   };
 
   self.codeVisible = ko.observable(typeof snippet.codeVisible != "undefined" && snippet.codeVisible != null ? snippet.codeVisible : true);
+  self.settingsVisible = ko.observable(typeof snippet.settingsVisible != "undefined" && snippet.settingsVisible != null ? snippet.settingsVisible : false);
 
   // We need to refresh codemirror the first time it's shown if it's initially hidden otherwise it'll be blank
   if (!self.codeVisible()) {
@@ -619,12 +620,14 @@ var Notebook = function (vm, notebook) {
   };
 
   self.newSnippet = function () {
-	var properties = {}
+  	var properties = {};
 
-    if (self.selectedSnippet() == 'jar' || self.selectedSnippet() == 'py') {
+    if (self.selectedSnippet() == 'jar') {
       properties['app_jar'] = '';
-      properties['py_file'] = '';
       properties['class'] = '';
+      properties['arguments'] = [];
+    } else if (self.selectedSnippet() == 'py') {
+      properties['py_file'] = '';
       properties['arguments'] = [];
     } else if (self.selectedSnippet() == 'hive') {
       properties['settings'] = [];
@@ -635,7 +638,12 @@ var Notebook = function (vm, notebook) {
       properties['files'] = [];
     }
 	
-    var _snippet = new Snippet(vm, self, {type: self.selectedSnippet(), properties: properties, result: {}});
+    var _snippet = new Snippet(vm, self, {
+      type: self.selectedSnippet(),
+      settingsVisible: self.selectedSnippet() == 'jar' || self.selectedSnippet() == 'py',
+      properties: properties,
+      result: {}
+    });
     self.snippets.push(_snippet);
 
     if (self.getSession(self.selectedSnippet()) == null) {

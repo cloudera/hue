@@ -333,14 +333,25 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
         <div class="snippet-actions inline pull-right">
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0"><i class="fa fa-cog"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-trash"></i></a>
         </div>
       </h2>
 
-      <div class="snippet-body">
-        <!-- ko template: { if: ['text', 'jar', 'py'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
-        <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
-        <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+      <div>
+        <div style="float: left; width: 50%">
+          <div class="snippet-body" style="position: relative; z-index: 90;">
+            <!-- ko template: { if: ['text', 'jar', 'py'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+          </div>
+        </div>
+
+        <div style="float: left; width: 50%">
+          <!-- ko template: 'snippet-settings' --><!-- /ko -->
+        </div>
+
+        <div class="clearfix"></div>
       </div>
 
       <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
@@ -365,6 +376,65 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
     </div>
   </div>
+</script>
+
+<script type="text/html" id="snippet-settings">
+  <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
+    <div class="snippet-settings-header">
+      <a href="javascript: void(0)" class="pull-right" style="margin-right: 10px" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-times"></i></a>
+      <h4><i class="fa fa-cog"></i> Settings</h4>
+    </div>
+    <div class="snippet-settings-body">
+      <table class="airy">
+        <tbody>
+          <!-- ko if: typeof properties.app_jar != 'undefined' && type() == 'jar' -->
+          <tr>
+            <td>${_('Path')}</td>
+            <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
+          </tr>
+          <!-- /ko -->
+          <!-- ko if: typeof properties.class != 'undefined' && type() == 'jar' -->
+          <tr>
+            <td>${_('Class')}</td>
+            <td><input type="text" class="input-xxlarge" data-bind="value: properties.class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
+          </tr>
+          <!-- /ko -->
+          <!-- ko if: typeof properties.py_file != 'undefined' && type() == 'py' -->
+          <tr>
+            <td>${_('Path')}</td>
+            <td><input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/></td>
+          </tr>
+          <!-- /ko -->
+          <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'settings-list-input', data: { values: properties.arguments, placeholder: '${ _('e.g. -foo=bar') }', label: '${_('Arguments')}', addLabel: '${_('Argument')}' } }--><!-- /ko -->
+          <!-- ko template: { if: typeof properties.files != 'undefined', name: 'settings-list-input', data: { values: properties.files, placeholder: '${ _('e.g. file.dat') }', label: '${_('Files')}', addLabel: '${_('File')}' } }--><!-- /ko -->
+          <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'settings-list-input', data: { values: properties.settings, placeholder: '${ _('e.g. foo') }', label: '${_('Settings')}', addLabel: '${_('Setting')}' } }--><!-- /ko -->
+        </tbody>
+      </table>
+    </div>
+    <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
+  </div>
+</script>
+
+<script type="text/html" id="settings-list-input">
+  <tr>
+    <td style="vertical-align: top" data-bind="style: {'paddingTop': values().length > 0 ? '10px' : '4px'}, text: label"></td>
+    <td>
+      <ul data-bind="sortable: values, visible: values().length" class="unstyled">
+        <li style="margin-bottom: 4px">
+          <div class="input-append">
+            <input type="text" data-bind="textInput: value, valueUpdate:'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
+            <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          </div>
+          <a href="#" data-bind="click: function(){ $parent.values.remove(this); }">
+            <i class="fa fa-minus"></i>
+          </a>
+        </li>
+      </ul>
+      <a class="pointer" data-bind="click: function(){ values.push({ value: ko.observable('') }) }">
+        <i class="fa fa-plus"></i> <!-- ko text: addLabel --><!-- /ko -->
+      </a>
+    </td>
+  </tr>
 </script>
 
 <script type="text/html" id="code-editor-snippet-body">
@@ -526,43 +596,17 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </script>
 
 <script type="text/html" id="executable-snippet-body">
-  <table class="airy" data-bind="verticalSlide: codeVisible">
-    <tr data-bind="visible: type() =='jar'">
-      <td>${_('Path')}</td>
-      <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
-    </tr>
-    <tr data-bind="visible: type() =='py'">
-      <td>${_('Path')}</td>
-      <td><input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/></td>
-    </tr>
-    <tr data-bind="visible: type() =='jar'">
-      <td>${_('Class')}</td>
-      <td><input type="text" class="input-xxlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
-    </tr>
-    <tr>
-      <td style="vertical-align: top" data-bind="style: {'paddingTop': properties.arguments().length > 0 ? '10px' : '4px'}">${_('Arguments')}</td>
-      <td>
-        <ul data-bind="sortable: properties.arguments, visible: properties.arguments().length > 0" class="unstyled">
-          <li style="margin-bottom: 4px">
-            <div class="input-append">
-              <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
-              <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
-            </div>
-
-            <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
-              <i class="fa fa-minus"></i>
-            </a>
-          </li>
-        </ul>
-        <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
-          <i class="fa fa-plus"></i> ${ _('Argument') }
-        </a>
-      </td>
-    </tr>
-  </table>
+  <div data-bind="verticalSlide: codeVisible" style="padding:10px;">
+    <!-- ko if: type() == 'jar' -->
+    <p><span data-bind="visible: properties.app_jar() == '' || properties.app_jar() == null" style="font-style: italic;">${ _('Path not set') }</span><span style="font-weight: bold;" data-bind="text: properties.app_jar"></span></p>
+    <p><span data-bind="visible: properties.class() == '' || properties.class() == null" style="font-style: italic;">${ _('Class not set') }</span><span style="font-weight: bold;" data-bind="text: properties.class"></span></p>
+    <!-- /ko -->
+    <!-- ko if: type() == 'py'-->
+    <p><span data-bind="visible: properties.py_file() == '' || properties.py_file() == null" style="font-style: italic;">${ _('Path not set') }</span><span style="font-weight: bold;" data-bind="text: properties.py_file"></span></p>
+    <!-- /ko -->
+  </div>
 
   <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
-
 </script>
 
 <script type="text/html" id="snippet-footer-actions">
