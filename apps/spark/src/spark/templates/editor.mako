@@ -337,317 +337,11 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         </div>
       </h2>
 
-      <!-- ko if: ['text', 'jar', 'py'].indexOf(type()) == -1  -->
       <div class="snippet-body">
-        <div class="row-fluid">
-          <div data-bind="css: editorKlass, verticalSlide: codeVisible">
-            <div data-bind="foreach: variables">
-              <div>
-                <span data-bind="text: name"></span>
-                <input type="text" data-bind="value: value" />
-              </div>
-            </div>
-            <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }">
-            </textarea>
-          </div>
-          <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF; width: 100%">
-            <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
-          </div>
-        </div>
-
-        <div style="padding-top: 10px; height: 29px;">
-          <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn" title="${ _('Creating session') }">
-            <i class="fa fa-spinner fa-spin"></i>
-          </a>
-          <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
-            <i class="fa fa-play"></i>
-          </a>
-          <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
-            <i class="fa fa-stop"></i>
-          </a>
-          <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
-            <i class="fa fa-th"></i>
-          </button>
-          <div class="btn-group" data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
-            <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
-              <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-              <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
-              <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
-              <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
-              <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
-              <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
-            </button>
-            <button class="btn dropdown-toggle" data-bind="visible: result.type() == 'table', css: {'active': $data.showChart}" data-toggle="dropdown">
-              <i class="fa fa-caret-down"></i>
-            </button>
-            <ul class="dropdown-menu">
-              <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
-                  <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-                  <i class="hcha hcha-line-chart"></i> ${_('Lines')}
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-                  <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-                  <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-                  <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
-                </a>
-              </li>
-              <li>
-                <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-                  <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          <div class="pull-right">
-            <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
-
-            &nbsp;
-
-            <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
-              ${ csrf_token(request) | n,unicode }
-              <input type="hidden" name="notebook"/>
-              <input type="hidden" name="snippet"/>
-              <input type="hidden" name="format" class="download-format"/>
-
-              <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
-                <a class="btn dropdown-toggle" data-toggle="dropdown">
-                  <i class="fa fa-download"></i>
-                  <i class="fa fa-caret-down"></i>
-                </a>
-                <ul class="dropdown-menu pull-right">
-                  <li>
-                    <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
-                      <i class="fa fa-file-o"></i> ${ _('CSV') }
-                    </a>
-                  </li>
-                  <li>
-                    <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
-                      <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </form>
-
-          </div>
-        </div>
-
-        <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
-          <div class="row-fluid" style="max-height: 400px; margin: 10px 0;">
-            <pre data-bind="text: result.data()[0][1]">
-            </pre>
-          </div>
-        <!-- /ko -->
-
-        <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
-          <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
-            <ul class="nav nav-list" style="border: none; background-color: #FFF">
-              <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
-              </a>
-            </ul>
-            <ul class="unstyled" data-bind="foreach: result.meta">
-              <li data-bind="visible: name != ''">
-                <input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" />
-                <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a>
-              </li>
-            </ul>
-          </div>
-          <div data-bind="css: {'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
-            <div data-bind="attr: { 'id': 'toggleLeftPanelGrid' + id()}, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel" class="toggle-left-panel">
-              <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isLeftPanelVisible()">
-                <i class="fa fa-chevron-right"></i>
-              </a>
-              <a title="${_('Hide')}" class="pointer" data-bind="visible: isLeftPanelVisible()">
-                <i class="fa fa-chevron-left"></i>
-              </a>
-            </div>
-            <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }">
-              <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="true">
-                <thead>
-                  <tr data-bind="foreach: result.meta">
-                    <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div class="row-fluid" data-bind="visible: status() != 'ready' && showChart()" style="max-height: 400px; margin-top: 4px">
-          <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
-            <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel">
-              <a title="${_('Hide settings')}" class="pointer">
-                <i class="fa fa-chevron-left"></i>
-              </a>
-            </div>
-            <div>
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-                <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
-                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
-                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
-                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
-              </ul>
-              <div data-bind="visible: chartType() != ''">
-                <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
-              </div>
-
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-                <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
-                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('value')}</li>
-                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
-                <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
-              </ul>
-
-              <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
-                <ul class="unstyled" data-bind="foreach: result.cleanedNumericMeta">
-                  <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
-                </ul>
-              </div>
-              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
-              </div>
-
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
-                <li class="nav-header">${_('label')}</li>
-              </ul>
-              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
-                <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
-              </div>
-
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <li class="nav-header">${_('scatter group')}</li>
-              </ul>
-              <div data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <select data-bind="options: result.cleanedMeta, value: chartScatterGroup, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterGroup}" class="input-medium"></select>
-              </div>
-
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <li class="nav-header">${_('scatter size')}</li>
-              </ul>
-              <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
-              </div>
-
-              <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <li class="nav-header">${_('sorting')}</li>
-              </ul>
-              <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
-                <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
-                <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
-                <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
-              </div>
-            </div>
-          </div>
-          <div data-bind="css:{'span10 chart-container': isLeftPanelVisible, 'span12 nomargin chart-container': !isLeftPanelVisible()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }">
-
-            <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isLeftPanelVisible(), click: toggleLeftPanel, attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}">
-              <a title="${_('Show settings')}" class="pointer">
-                <i class="fa fa-chevron-right"></i>
-              </a>
-            </div>
-
-            <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
-                  transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
-
-            <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
-                  transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
-
-            <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
-
-            <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
-
-            <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
-
-            <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
-                  transformer: scatterChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
-          </div>
-        </div>
+        <!-- ko template: { if: ['text', 'jar', 'py'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+        <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+        <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
       </div>
-      <!-- /ko -->
-
-      <!-- ko if: type() == 'text' -->
-        <div class="snippet-body">
-          <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
-        </div>
-      <!-- /ko -->
-
-      <!-- ko if: type() == 'jar' || type() == 'py'-->
-        <div class="snippet-body">
-          <table class="airy" data-bind="verticalSlide: codeVisible">
-            <tr data-bind="visible: type() =='jar'">
-              <td>${_('Path')}</td>
-              <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
-            </tr>
-            <tr data-bind="visible: type() =='py'">
-              <td>${_('Path')}</td>
-              <td><input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/></td>
-            </tr>
-            <tr data-bind="visible: type() =='jar'">
-              <td>${_('Class')}</td>
-              <td><input type="text" class="input-xxlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
-            </tr>
-            <tr>
-              <td style="vertical-align: top" data-bind="style: {'paddingTop': properties.arguments().length > 0 ? '10px' : '4px'}">${_('Arguments')}</td>
-              <td>
-                <ul data-bind="sortable: properties.arguments, visible: properties.arguments().length > 0" class="unstyled">
-                  <li style="margin-bottom: 4px">
-                    <div class="input-append">
-                      <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
-                      <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
-                    </div>
-
-                    <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
-                      <i class="fa fa-minus"></i>
-                    </a>
-                  </li>
-                </ul>
-                <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
-                  <i class="fa fa-plus"></i> ${ _('Argument') }
-                </a>
-              </td>
-            </tr>
-          </table>
-          <div style="height: 31px;">
-            <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="run-button btn btn-primary disable-feedback pointer spark-btn">
-              <i class="fa fa-play"></i>
-            </a>
-            <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback pointer spark-btn">
-              <i class="fa fa-stop"></i>
-            </a>
-          </div>
-
-          <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
-            <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
-          </div>
-
-          <div class="pull-right" style="padding-top: 10px;">
-            <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
-          </div>
-          <div class="clearfix"></div>
-
-        </div>
-      <!-- /ko -->
 
       <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
         <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
@@ -673,6 +367,309 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 </script>
 
+<script type="text/html" id="code-editor-snippet-body">
+  <div class="row-fluid">
+    <div data-bind="css: editorKlass, verticalSlide: codeVisible">
+      <div data-bind="foreach: variables">
+        <div>
+          <span data-bind="text: name"></span>
+          <input type="text" data-bind="value: value" />
+        </div>
+      </div>
+      <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
+    </div>
+    <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF; width: 100%">
+      <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
+    </div>
+  </div>
+
+  <div style="padding-top: 10px; height: 29px;">
+    <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn" title="${ _('Creating session') }">
+      <i class="fa fa-spinner fa-spin"></i>
+    </a>
+    <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
+      <i class="fa fa-play"></i>
+    </a>
+    <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
+      <i class="fa fa-stop"></i>
+    </a>
+    <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
+      <i class="fa fa-th"></i>
+    </button>
+    <div class="btn-group" data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
+      <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
+        <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+        <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
+        <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
+        <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+        <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+        <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
+      </button>
+      <button class="btn dropdown-toggle" data-bind="visible: result.type() == 'table', css: {'active': $data.showChart}" data-toggle="dropdown">
+        <i class="fa fa-caret-down"></i>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
+            <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+            <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+            <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+            <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+            <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+            <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="pull-right">
+      <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+
+      &nbsp;
+
+      <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
+        ${ csrf_token(request) | n,unicode }
+        <input type="hidden" name="notebook"/>
+        <input type="hidden" name="snippet"/>
+        <input type="hidden" name="format" class="download-format"/>
+
+        <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
+          <a class="btn dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-download"></i>
+            <i class="fa fa-caret-down"></i>
+          </a>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
+                <i class="fa fa-file-o"></i> ${ _('CSV') }
+              </a>
+            </li>
+            <li>
+              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
+                <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
+              </a>
+            </li>
+          </ul>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
+  <div class="row-fluid" style="max-height: 400px; margin: 10px 0;">
+            <pre data-bind="text: result.data()[0][1]">
+            </pre>
+  </div>
+  <!-- /ko -->
+
+  <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
+    <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
+      <ul class="nav nav-list" style="border: none; background-color: #FFF">
+        <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
+        </a>
+      </ul>
+      <ul class="unstyled" data-bind="foreach: result.meta">
+        <li data-bind="visible: name != ''">
+          <input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" />
+          <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a>
+        </li>
+      </ul>
+    </div>
+    <div data-bind="css: {'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
+      <div data-bind="attr: { 'id': 'toggleLeftPanelGrid' + id()}, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel" class="toggle-left-panel">
+        <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isLeftPanelVisible()">
+          <i class="fa fa-chevron-right"></i>
+        </a>
+        <a title="${_('Hide')}" class="pointer" data-bind="visible: isLeftPanelVisible()">
+          <i class="fa fa-chevron-left"></i>
+        </a>
+      </div>
+      <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }">
+        <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="true">
+          <thead>
+          <tr data-bind="foreach: result.meta">
+            <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
+          </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="row-fluid" data-bind="visible: status() != 'ready' && showChart()" style="max-height: 400px; margin-top: 4px">
+    <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
+      <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel">
+        <a title="${_('Hide settings')}" class="pointer">
+          <i class="fa fa-chevron-left"></i>
+        </a>
+      </div>
+      <div>
+        <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+          <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
+          <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
+          <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
+          <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
+        </ul>
+        <div data-bind="visible: chartType() != ''">
+          <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
+        </div>
+
+        <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+          <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
+          <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('value')}</li>
+          <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
+          <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
+        </ul>
+
+        <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
+          <ul class="unstyled" data-bind="foreach: result.cleanedNumericMeta">
+            <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
+          </ul>
+        </div>
+        <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
+        </div>
+
+        <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
+          <li class="nav-header">${_('label')}</li>
+        </ul>
+        <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
+          <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
+        </div>
+
+        <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <li class="nav-header">${_('scatter group')}</li>
+        </ul>
+        <div data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <select data-bind="options: result.cleanedMeta, value: chartScatterGroup, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterGroup}" class="input-medium"></select>
+        </div>
+
+        <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <li class="nav-header">${_('scatter size')}</li>
+        </ul>
+        <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
+        </div>
+
+        <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <li class="nav-header">${_('sorting')}</li>
+        </ul>
+        <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
+          <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
+          <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
+          <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+        </div>
+      </div>
+    </div>
+    <div data-bind="css:{'span10 chart-container': isLeftPanelVisible, 'span12 nomargin chart-container': !isLeftPanelVisible()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }">
+
+      <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isLeftPanelVisible(), click: toggleLeftPanel, attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}">
+        <a title="${_('Show settings')}" class="pointer">
+          <i class="fa fa-chevron-right"></i>
+        </a>
+      </div>
+
+      <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
+                  transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+
+      <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+                  transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+
+      <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                  transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+
+      <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                  transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+
+      <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                  transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
+
+      <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                  transformer: scatterChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="text-snippet-body">
+  <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
+</script>
+
+<script type="text/html" id="executable-snippet-body">
+  <table class="airy" data-bind="verticalSlide: codeVisible">
+    <tr data-bind="visible: type() =='jar'">
+      <td>${_('Path')}</td>
+      <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
+    </tr>
+    <tr data-bind="visible: type() =='py'">
+      <td>${_('Path')}</td>
+      <td><input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/></td>
+    </tr>
+    <tr data-bind="visible: type() =='jar'">
+      <td>${_('Class')}</td>
+      <td><input type="text" class="input-xxlarge" data-bind="value: properties.class, visible: type() =='jar'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
+    </tr>
+    <tr>
+      <td style="vertical-align: top" data-bind="style: {'paddingTop': properties.arguments().length > 0 ? '10px' : '4px'}">${_('Arguments')}</td>
+      <td>
+        <ul data-bind="sortable: properties.arguments, visible: properties.arguments().length > 0" class="unstyled">
+          <li style="margin-bottom: 4px">
+            <div class="input-append">
+              <input type="text" data-bind="value: value" placeholder="${ _('e.g. 1000, market') }"/>
+              <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+            </div>
+
+            <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); }">
+              <i class="fa fa-minus"></i>
+            </a>
+          </li>
+        </ul>
+        <a class="pointer" data-bind="click: function(){ $data.properties.arguments.push({'value': ''}); }">
+          <i class="fa fa-plus"></i> ${ _('Argument') }
+        </a>
+      </td>
+    </tr>
+  </table>
+  <div style="height: 31px;">
+    <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="run-button btn btn-primary disable-feedback pointer spark-btn">
+      <i class="fa fa-play"></i>
+    </a>
+    <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback pointer spark-btn">
+      <i class="fa fa-stop"></i>
+    </a>
+  </div>
+
+  <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
+    <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
+  </div>
+
+  <div class="pull-right" style="padding-top: 10px;">
+    <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+  </div>
+  <div class="clearfix"></div>
+</script>
 
 <script type="text/html" id="snippet-log">
   <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></strong>
