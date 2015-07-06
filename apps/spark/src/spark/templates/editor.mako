@@ -378,103 +378,9 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </div>
       <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
     </div>
-    <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF; width: 100%">
-      <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
-    </div>
   </div>
 
-  <div style="padding-top: 10px; height: 29px;">
-    <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn" title="${ _('Creating session') }">
-      <i class="fa fa-spinner fa-spin"></i>
-    </a>
-    <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
-      <i class="fa fa-play"></i>
-    </a>
-    <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
-      <i class="fa fa-stop"></i>
-    </a>
-    <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
-      <i class="fa fa-th"></i>
-    </button>
-    <div class="btn-group" data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
-      <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
-        <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-        <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
-        <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
-        <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
-        <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
-        <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
-      </button>
-      <button class="btn dropdown-toggle" data-bind="visible: result.type() == 'table', css: {'active': $data.showChart}" data-toggle="dropdown">
-        <i class="fa fa-caret-down"></i>
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
-            <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-            <i class="hcha hcha-line-chart"></i> ${_('Lines')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-            <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-            <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-            <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-            <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
-          </a>
-        </li>
-      </ul>
-    </div>
-
-    <div class="pull-right">
-      <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
-
-      &nbsp;
-
-      <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
-        ${ csrf_token(request) | n,unicode }
-        <input type="hidden" name="notebook"/>
-        <input type="hidden" name="snippet"/>
-        <input type="hidden" name="format" class="download-format"/>
-
-        <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
-          <a class="btn dropdown-toggle" data-toggle="dropdown">
-            <i class="fa fa-download"></i>
-            <i class="fa fa-caret-down"></i>
-          </a>
-          <ul class="dropdown-menu pull-right">
-            <li>
-              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
-                <i class="fa fa-file-o"></i> ${ _('CSV') }
-              </a>
-            </li>
-            <li>
-              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
-                <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
-              </a>
-            </li>
-          </ul>
-        </div>
-      </form>
-
-    </div>
-  </div>
+  <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
 
   <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
   <div class="row-fluid" style="max-height: 400px; margin: 10px 0;">
@@ -652,23 +558,110 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
       </td>
     </tr>
   </table>
-  <div style="height: 31px;">
-    <a title="${ _('Submit') }" data-bind="click: execute, visible: status() != 'running'" class="run-button btn btn-primary disable-feedback pointer spark-btn">
-      <i class="fa fa-play"></i>
-    </a>
-    <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback pointer spark-btn">
-      <i class="fa fa-stop"></i>
-    </a>
-  </div>
 
-  <div class="progress progress-striped active" data-bind="css: {'progress-neutral': progress() == 0 && result.errors().length == 0, 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px">
+  <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
+
+</script>
+
+<script type="text/html" id="snippet-footer-actions">
+  <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF; width: 100%">
     <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
   </div>
 
-  <div class="pull-right" style="padding-top: 10px;">
-    <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+  <div class="snippet-footer-actions-bar">
+    <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn" title="${ _('Creating session') }">
+      <i class="fa fa-spinner fa-spin"></i>
+    </a>
+    <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
+      <i class="fa fa-play"></i>
+    </a>
+    <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
+      <i class="fa fa-stop"></i>
+    </a>
+    <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
+      <i class="fa fa-th"></i>
+    </button>
+
+    <div class="btn-group" data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
+      <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
+        <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+        <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
+        <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
+        <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+        <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+        <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
+      </button>
+
+      <button class="btn dropdown-toggle" data-bind="visible: result.type() == 'table', css: {'active': $data.showChart}" data-toggle="dropdown">
+        <i class="fa fa-caret-down"></i>
+      </button>
+
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
+            <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+            <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+            <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+            <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+            <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+            <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="pull-right">
+      <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+
+      &nbsp;
+
+      <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
+        ${ csrf_token(request) | n,unicode }
+        <input type="hidden" name="notebook"/>
+        <input type="hidden" name="snippet"/>
+        <input type="hidden" name="format" class="download-format"/>
+
+        <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
+          <a class="btn dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-download"></i>
+            <i class="fa fa-caret-down"></i>
+          </a>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
+                <i class="fa fa-file-o"></i> ${ _('CSV') }
+              </a>
+            </li>
+            <li>
+              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
+                <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
+              </a>
+            </li>
+          </ul>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="clearfix"></div>
 </script>
 
 <script type="text/html" id="snippet-log">
