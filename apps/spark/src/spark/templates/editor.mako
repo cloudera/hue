@@ -381,11 +381,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 
   <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
+  <!-- ko template: 'snippet-results' --><!-- /ko -->
+</script>
 
+<script type="text/html" id="snippet-results">
   <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
   <div class="row-fluid" style="max-height: 400px; margin: 10px 0;">
-            <pre data-bind="text: result.data()[0][1]">
-            </pre>
+    <pre data-bind="text: result.data()[0][1]"></pre>
   </div>
   <!-- /ko -->
 
