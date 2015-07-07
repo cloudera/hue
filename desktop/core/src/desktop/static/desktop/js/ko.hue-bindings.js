@@ -38,15 +38,20 @@ ko.bindingHandlers.fadeVisible = {
 };
 
 
-ko.extenders.numeric = function (target, precision) {
+ko.extenders.numeric = function (target, config) {
+  var precision = typeof config.precision === 'undefined' ? config : config.precision;
+  var roundingMultiplier = Math.pow(10, precision);
+
   var result = ko.computed({
     read: target,
     write: function (newValue) {
       var current = target(),
-          roundingMultiplier = Math.pow(10, precision),
           newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
           valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
 
+      if (newValue === '' && config.allowEmpty) {
+        valueToWrite = newValue;
+      }
       if (valueToWrite !== current) {
         target(valueToWrite);
       } else {
@@ -63,7 +68,7 @@ ko.extenders.numeric = function (target, precision) {
 ko.bindingHandlers.numericTextInput = {
   init: function (element, valueAccessor, allBindings) {
     var bindingOptions = ko.unwrap(valueAccessor());
-    var numericValue = ko.observable(bindingOptions.value()).extend({ numeric: bindingOptions.precision });
+    var numericValue = ko.observable(bindingOptions.value()).extend({ numeric: { precision: bindingOptions.precision, allowEmpty: typeof bindingOptions.allowEmpty !== 'undefined' && bindingOptions.allowEmpty } });
     numericValue.subscribe(function(newValue) { bindingOptions.value(newValue) });
     ko.bindingHandlers.textInput.init(element, function() { return numericValue }, allBindings);
   }
