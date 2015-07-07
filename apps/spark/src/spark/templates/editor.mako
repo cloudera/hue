@@ -334,7 +334,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
         <div class="snippet-actions inline pull-right">
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0"><i class="fa fa-cog"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-trash"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
 
@@ -381,44 +381,55 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <script type="text/html" id="snippet-settings">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
-      <a href="javascript: void(0)" class="pull-right" style="margin-right: 10px" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-times"></i></a>
       <h4><i class="fa fa-cog"></i> Settings</h4>
     </div>
     <div class="snippet-settings-body">
-      <table class="airy">
-        <tbody>
-          <!-- ko if: typeof properties.app_jar != 'undefined' && type() == 'jar' -->
-          <tr>
-            <td>${_('Path')}</td>
-            <td><input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/></td>
-          </tr>
-          <!-- /ko -->
-          <!-- ko if: typeof properties.class != 'undefined' && type() == 'jar' -->
-          <tr>
-            <td>${_('Class')}</td>
-            <td><input type="text" class="input-xxlarge" data-bind="value: properties.class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/></td>
-          </tr>
-          <!-- /ko -->
-          <!-- ko if: typeof properties.py_file != 'undefined' && type() == 'py' -->
-          <tr>
-            <td>${_('Path')}</td>
-            <td><input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/></td>
-          </tr>
-          <!-- /ko -->
-          <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'settings-list-input', data: { values: properties.arguments, placeholder: '${ _('e.g. -foo=bar') }', label: '${_('Arguments')}', addLabel: '${_('Argument')}' } }--><!-- /ko -->
-          <!-- ko template: { if: typeof properties.files != 'undefined', name: 'settings-list-input', data: { values: properties.files, placeholder: '${ _('e.g. file.dat') }', label: '${_('Files')}', addLabel: '${_('File')}' } }--><!-- /ko -->
-          <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'settings-list-input', data: { values: properties.settings, placeholder: '${ _('e.g. foo') }', label: '${_('Settings')}', addLabel: '${_('Setting')}' } }--><!-- /ko -->
-        </tbody>
-      </table>
+      <form class="form-horizontal">
+        <!-- ko if: typeof properties.driver_cores != 'undefined' -->
+        <div class="control-group" style="float: left;">
+          <label class="control-label">${_('Driver Cores')}</label>
+          <div class="controls">
+            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.driver_cores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }"/>
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof properties.executor_cores != 'undefined' -->
+        <div class="control-group" style="float: left;">
+          <label class="control-label">${_('Executor Cores')}</label>
+          <div class="controls">
+            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.executor_cores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores per executor (Default: 1)') }"/>
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof properties.num_executors != 'undefined' -->
+        <div class="control-group" style="float: left;">
+          <label class="control-label">${_('Executors')}</label>
+          <div class="controls">
+            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.num_executors, precision: 1, allowEmpty: true}, valueUpdate:'afterkeydown'" title="${ _('Number of executors to launch (Default: 2)') }"/>
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof properties.queue != 'undefined' -->
+        <div class="control-group" style="float: left;">
+          <label class="control-label">${_('Queue')}</label>
+          <div class="controls">
+            <input type="text" class="input-small" data-bind="textInput: properties.queue, valueUpdate:'afterkeydown'" title="${ _('The YARN queue to submit to (Default: default)') }"/>
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'settings-list-input', data: { values: properties.archives, placeholder: '${ _('e.g. archive.dat') }', label: '${_('Archives')}', addLabel: '${_('Archive')}' } }--><!-- /ko -->
+        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'settings-list-input', data: { values: properties.files, placeholder: '${ _('e.g. file.dat') }', label: '${_('Files')}', addLabel: '${_('File')}' } }--><!-- /ko -->
+        <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'settings-list-input', data: { values: properties.settings, placeholder: '${ _('e.g. foo') }', label: '${_('Settings')}', addLabel: '${_('Setting')}' } }--><!-- /ko -->
+      </form>
     </div>
     <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
   </div>
 </script>
 
 <script type="text/html" id="settings-list-input">
-  <tr>
-    <td style="vertical-align: top" data-bind="style: {'paddingTop': values().length > 0 ? '10px' : '4px'}, text: label"></td>
-    <td>
+  <div class="control-group" style="float: left;">
+    <label class="control-label" data-bind="text: label"></label>
+    <div class="controls">
       <ul data-bind="sortable: values, visible: values().length" class="unstyled">
         <li style="margin-bottom: 4px">
           <div class="input-append">
@@ -430,11 +441,13 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
           </a>
         </li>
       </ul>
-      <a class="pointer" data-bind="click: function(){ values.push({ value: ko.observable('') }) }">
-        <i class="fa fa-plus"></i> <!-- ko text: addLabel --><!-- /ko -->
-      </a>
-    </td>
-  </tr>
+      <div style="min-width: 280px; margin-top: 5px;">
+        <a class="pointer" style="min-width: 280px;" data-bind="click: function(){ values.push({ value: ko.observable('') }) }">
+          <i class="fa fa-plus"></i> <!-- ko text: addLabel --><!-- /ko -->
+        </a>
+      </div>
+    </div>
+  </div>
 </script>
 
 <script type="text/html" id="code-editor-snippet-body">
@@ -597,13 +610,31 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 
 <script type="text/html" id="executable-snippet-body">
   <div data-bind="verticalSlide: codeVisible" style="padding:10px;">
-    <!-- ko if: type() == 'jar' -->
-    <p><span data-bind="visible: properties.app_jar() == '' || properties.app_jar() == null" style="font-style: italic;">${ _('Path not set') }</span><span style="font-weight: bold;" data-bind="text: properties.app_jar"></span></p>
-    <p><span data-bind="visible: properties.class() == '' || properties.class() == null" style="font-style: italic;">${ _('Class not set') }</span><span style="font-weight: bold;" data-bind="text: properties.class"></span></p>
-    <!-- /ko -->
-    <!-- ko if: type() == 'py'-->
-    <p><span data-bind="visible: properties.py_file() == '' || properties.py_file() == null" style="font-style: italic;">${ _('Path not set') }</span><span style="font-weight: bold;" data-bind="text: properties.py_file"></span></p>
-    <!-- /ko -->
+    <form class="form-horizontal">
+      <!-- ko if: type() == 'jar' -->
+      <div class="control-group">
+        <label class="control-label">${_('Path')}</label>
+        <div class="controls">
+          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${_('Class')}</label>
+        <div class="controls">
+          <input type="text" class="input-xxlarge" data-bind="value: properties.class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- ko if: type() == 'py'-->
+      <div class="control-group">
+        <label class="control-label">${_('Path')}</label>
+        <div class="controls">
+          <input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'settings-list-input', data: { values: properties.arguments, placeholder: '${ _('e.g. -foo=bar') }', label: '${_('Arguments')}', addLabel: '${_('Argument')}' } }--><!-- /ko -->
+    </form>
   </div>
 
   <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
@@ -747,7 +778,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
             <!-- ko foreach: sessions -->
             <!-- ko with: $data.properties -->
             <h4 data-bind="text: $root.getSnippetName($parent.type())" style="clear:left;"></h4>
-            <!-- ko if: executor_cores -->
+            <!-- ko if: typeof executor_cores !== 'undefined' -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Cores')}</label>
               <div class="controls">
@@ -755,7 +786,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </div>
             </div>
             <!-- /ko -->
-            <!-- ko if: executor_memory -->
+            <!-- ko if: typeof executor_memory !== 'undefined' -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Memory')}</label>
               <div class="controls">
@@ -763,7 +794,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </div>
             </div>
             <!-- /ko -->
-            <!-- ko if: executor_count -->
+            <!-- ko if: typeof executor_count !== 'undefined' -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Executor Count')}</label>
               <div class="controls">
@@ -771,7 +802,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </div>
             </div>
             <!-- /ko -->
-            <!-- ko if: driver_cores -->
+            <!-- ko if: typeof driver_cores !== 'undefined' -->
             <div class="control-group cl" style="float: left; clear: left;">
               <label class="control-label">${_('Driver Cores')}</label>
               <div class="controls">
@@ -779,7 +810,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
               </div>
             </div>
             <!-- /ko -->
-            <!-- ko if: driver_memory -->
+            <!-- ko if: typeof driver_memory !== 'undefined' -->
             <div class="control-group" style="float: left;">
               <label class="control-label">${_('Driver Memory')}</label>
               <div class="controls">

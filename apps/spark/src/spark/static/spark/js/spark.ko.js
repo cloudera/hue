@@ -622,13 +622,23 @@ var Notebook = function (vm, notebook) {
   self.newSnippet = function () {
   	var properties = {};
 
+    var addYarnProperties = function() {
+      properties['driver_cores'] = '';
+      properties['executor_cores'] = '';
+      properties['num_executors'] = '';
+      properties['queue'] = '';
+      properties['archives'] = [];
+    };
+
     if (self.selectedSnippet() == 'jar') {
       properties['app_jar'] = '';
       properties['class'] = '';
       properties['arguments'] = [];
+      addYarnProperties();
     } else if (self.selectedSnippet() == 'py') {
       properties['py_file'] = '';
       properties['arguments'] = [];
+      addYarnProperties();
     } else if (self.selectedSnippet() == 'hive') {
       properties['settings'] = [];
       properties['files'] = [];
@@ -640,7 +650,6 @@ var Notebook = function (vm, notebook) {
 	
     var _snippet = new Snippet(vm, self, {
       type: self.selectedSnippet(),
-      settingsVisible: self.selectedSnippet() == 'jar' || self.selectedSnippet() == 'py',
       properties: properties,
       result: {}
     });
