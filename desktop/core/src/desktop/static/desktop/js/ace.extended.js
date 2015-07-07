@@ -30,7 +30,12 @@ try {
 
     editor.getTextBeforeCursor = function (separator) {
       var _r = new AceRange(0, 0, this.getCursorPosition().row, this.getCursorPosition().column);
-      return this.session.getTextRange(_r);
+      return separator ? this.session.getTextRange(_r).split(separator).pop() : this.session.getTextRange(_r);
+    }
+
+    editor.getTextAfterCursor = function (separator) {
+      var _r = new AceRange(this.getCursorPosition().row, this.getCursorPosition().column, this.session.getLength(), this.session.getRowLength(this.session.getLength()));
+      return separator ? this.session.getTextRange(_r).split(separator).shift() : this.session.getTextRange(_r);
     }
 
     editor.getCursorScreenPosition = function () {

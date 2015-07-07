@@ -1515,17 +1515,16 @@ ko.bindingHandlers.aceEditor = {
         _onChange(e, editor, valueAccessor);
       });
 
-      editor.commands.on("afterExec", function(e) {
-
+      editor.container.addEventListener("keydown", function(e){
         // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
-        if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
+        if (editor.session.getMode().$id = "ace/mode/pig" && e.keyCode) {
           var _textBefore = editor.getTextBeforeCursor();
-          if ((e.args == "'" && _textBefore.toUpperCase().indexOf("LOAD ") > -1 && _textBefore.toUpperCase().indexOf("LOAD ") == _textBefore.toUpperCase().length - 5)
+          if ((e.keyCode == 222 && _textBefore.toUpperCase().indexOf("LOAD ") > -1 && _textBefore.toUpperCase().indexOf("LOAD ") == _textBefore.toUpperCase().length - 5)
               || _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6){
             editor.disableAutocomplete();
             var _btn = editor.showFileButton();
-            _btn.on("click", function(e){
-              e.preventDefault();
+            _btn.on("click", function(ie){
+              ie.preventDefault();
               if ($(".filechooser-content").data("spinner") == null){
                 $(".filechooser-content").data("spinner", $(".filechooser-content").html());
               }
@@ -1542,19 +1541,21 @@ ko.bindingHandlers.aceEditor = {
                 selectFolder: false,
                 createFolder: false
               });
-              $(".filechooser").css({ "top": $(e.currentTarget).position().top, "left": $(e.currentTarget).position().left}).show();
+              $(".filechooser").css({ "top": $(ie.currentTarget).position().top, "left": $(ie.currentTarget).position().left}).show();
             });
           }
           else {
             editor.hideFileButton();
             editor.enableAutocomplete();
           }
-          if (e.args != "'" && _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6) {
+          if (e.keyCode != 222 && _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6) {
             editor.hideFileButton();
             editor.enableAutocomplete();
           }
         }
+      }, true);
 
+      editor.commands.on("afterExec", function(e) {
         _onAfterExec(e, editor, valueAccessor);
       });
 
