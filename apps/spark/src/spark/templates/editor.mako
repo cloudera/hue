@@ -646,7 +646,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   </div>
 
   <div class="snippet-footer-actions-bar">
-    <a data-bind="visible: status() == 'loading'" class="btn btn-disabled spark-btn" title="${ _('Creating session') }">
+    <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
     <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
