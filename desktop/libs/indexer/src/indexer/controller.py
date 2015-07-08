@@ -48,6 +48,10 @@ def get_solrctl_path():
   return solrctl_path
 
 
+def get_solr_ensemble():
+  return '%s/solr' % ENSEMBLE.get()
+
+
 class CollectionManagerController(object):
   """
   Glue the models to the views.
@@ -138,7 +142,7 @@ class CollectionManagerController(object):
       # Create instance directory.
       solrctl_path = get_solrctl_path()
 
-      process = subprocess.Popen([solrctl_path, "--zk", ENSEMBLE.get(), "instancedir", "--create", name, solr_config_path],
+      process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--create", name, solr_config_path],
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE)
       status = process.wait()
@@ -154,7 +158,7 @@ class CollectionManagerController(object):
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
         # Delete instance directory if we couldn't create a collection.
-        process = subprocess.Popen([solrctl_path, "--zk", ENSEMBLE.get(), "instancedir", "--delete", name],
+        process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--delete", name],
                                    stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE)
         if process.wait() != 0:
@@ -188,7 +192,7 @@ class CollectionManagerController(object):
       # Delete instance directory.
       solrctl_path = get_solrctl_path()
 
-      process = subprocess.Popen([solrctl_path, "--zk", ENSEMBLE.get(), "instancedir", "--delete", name],
+      process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--delete", name],
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE
                                  )
