@@ -111,14 +111,19 @@ class RedactionRule(object):
 
   def __repr__(self):
     return 'RedactionRule(%r, %r, %r)' % (
-        self.trigger,
+        self.trigger.pattern if self.trigger else None,
         self.regex.pattern,
         self.replace)
 
   def __eq__(self, other):
+    if not isinstance(other, self.__class__):
+      return False
+
+    self_trigger = self.trigger.pattern if self.trigger else None
+    other_trigger = other.trigger.pattern if other.trigger else None
+
     return \
-        isinstance(other, self.__class__) and \
-        self.trigger == other.trigger and \
+        self_trigger == other_trigger and \
         self.regex.pattern == other.regex.pattern and \
         self.regex.flags == other.regex.flags and \
         self.replace == other.replace
