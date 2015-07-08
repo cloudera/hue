@@ -1515,58 +1515,18 @@ ko.bindingHandlers.aceEditor = {
         _onChange(e, editor, valueAccessor);
       });
 
-      editor.container.addEventListener("keydown", function(e){
-        // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
-        if (editor.session.getMode().$id = "ace/mode/pig" && e.keyCode) {
-          var _textBefore = editor.getTextBeforeCursor();
-          if ((e.keyCode == 222 && _textBefore.toUpperCase().indexOf("LOAD ") > -1 && _textBefore.toUpperCase().indexOf("LOAD ") == _textBefore.toUpperCase().length - 5)
-              || _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6){
-            editor.disableAutocomplete();
-            var _btn = editor.showFileButton();
-            _btn.on("click", function(ie){
-              ie.preventDefault();
-              if ($(".filechooser-content").data("spinner") == null){
-                $(".filechooser-content").data("spinner", $(".filechooser-content").html());
-              }
-              else {
-                $(".filechooser-content").html($(".filechooser-content").data("spinner"));
-              }
-              $(".filechooser-content").jHueFileChooser({
-                onFileChoose: function (filePath) {
-                  editor.session.insert(editor.getCursorPosition(), filePath);
-                  editor.hideFileButton();
-                  editor.enableAutocomplete();
-                  $(".filechooser").hide();
-                },
-                selectFolder: false,
-                createFolder: false
-              });
-              $(".filechooser").css({ "top": $(ie.currentTarget).position().top, "left": $(ie.currentTarget).position().left}).show();
-            });
-          }
-          else {
-            editor.hideFileButton();
-            editor.enableAutocomplete();
-          }
-          if (e.keyCode != 222 && _textBefore.toUpperCase().indexOf("LOAD '") > -1 && _textBefore.toUpperCase().indexOf("LOAD '") == _textBefore.toUpperCase().length - 6) {
-            editor.hideFileButton();
-            editor.enableAutocomplete();
-          }
-        }
-      }, true);
-
       editor.commands.on("afterExec", function(e) {
         _onAfterExec(e, editor, valueAccessor);
       });
 
       editor.$blockScrolling = Infinity
       element.originalCompleters = editor.completers;
-      _options.ace(editor);
+      _options.aceInstance(editor);
     },
     update: function (element, valueAccessor) {
       var _options = ko.unwrap(valueAccessor());
-      if (_options.ace()) {
-        var _editor = _options.ace();
+      if (_options.aceInstance()) {
+        var _editor = _options.aceInstance();
         _editor.completers = element.originalCompleters.slice();
         if (_options.extraCompleters().length > 0) {
           _options.extraCompleters().forEach(function (complete) {

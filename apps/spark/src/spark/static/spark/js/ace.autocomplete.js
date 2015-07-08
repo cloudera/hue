@@ -14,8 +14,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function() {
-
   var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
 
   var hasExpired = function(timestamp){
@@ -53,7 +51,7 @@
         type: "GET",
         url: _url + "?" + Math.random(),
         success: options.onDataReceived,
-        async: options.sync == "undefined"
+        async: typeof options.sync == "undefined"
       });
     }
   };
@@ -115,16 +113,16 @@
               self.errorHandler(data);
             }
             else {
-              $.totalStorage(getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-              $.totalStorage(getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-              $.totalStorage(getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
+              $.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
+              $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
+              $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
             }
           }
         });
       }
     }
     else {
-      self.jsoncalls({
+      self.jsonCalls({
         database: databaseName,
         table: tableName,
         onDataReceived: function (data) {
@@ -203,7 +201,9 @@
   Autocomplete.prototype.getDatabases = function (callback) {
     var self = this;
     if ($.totalStorage(self.getTotalStorageUserPrefix() + 'databases') != null) {
-      callback($.totalStorage(self.getTotalStorageUserPrefix() + 'databases'));
+      if (callback) {
+        callback($.totalStorage(self.getTotalStorageUserPrefix() + 'databases'));
+      }
       if ($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases') == null || hasExpired($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases'))){
         this.jsonCalls({
           onDataReceived: function (data) {
@@ -234,7 +234,9 @@
             if (data.databases) {
               $.totalStorage(self.getTotalStorageUserPrefix() + 'databases', data.databases);
               $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
-              callback($.totalStorage(self.getTotalStorageUserPrefix() + 'databases'));
+              if (callback) {
+                callback($.totalStorage(self.getTotalStorageUserPrefix() + 'databases'));
+              }
             }
           }
         }
@@ -254,7 +256,6 @@
       }
     }
   }
-})();
 
 
 
