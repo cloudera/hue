@@ -325,7 +325,7 @@ from django.utils.translation import ugettext as _
   <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Uploading to:')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
+      <h3>${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
     </div>
     <div class="modal-body form-inline">
       <div id="fileUploader" class="uploader">
@@ -341,8 +341,7 @@ from django.utils.translation import ugettext as _
   <div id="uploadArchiveModal" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Uploading to:')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
-      <p>${_('The file will then be extracted in the path specified above.')}</p>
+      <h3>${_('Upload and extract in')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
     </div>
     <div class="modal-body form-inline">
       <div id="archiveUploader" class="uploader">
@@ -507,6 +506,7 @@ from django.utils.translation import ugettext as _
 
   <script charset="utf-8">
     var _dragged;
+    var _dropzone;
 
     ko.bindingHandlers.drag = {
       init: function(element, valueAccessor, allBindingsAccessor, viewModel) {
@@ -1263,9 +1263,9 @@ from django.utils.translation import ugettext as _
         var uploader = new qq.FileUploader({
           element:document.getElementById("fileUploader"),
           action:action,
-          template:'<div class="qq-uploader">' +
-                  '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
-                  '<div class="qq-upload-button">${_('Select files')}</div>' +
+          template:'<div class="qq-uploader" style="margin-left: 10px">' +
+                  '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
+                  '<div class="qq-upload-button">${_('Select files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
                   '<ul class="qq-upload-list"></ul>' +
                   '</div>',
           fileTemplate:'<li>' +
@@ -1313,9 +1313,9 @@ from django.utils.translation import ugettext as _
         var uploader = new qq.FileUploader({
           element:document.getElementById("archiveUploader"),
           action:"/filebrowser/upload/archive",
-          template:'<div class="qq-uploader">' +
-                  '<div class="qq-upload-drop-area"><span>${_('Drop files here to upload')}</span></div>' +
-                  '<div class="qq-upload-button">${_('Upload an Archive')}</div>' +
+          template:'<div class="qq-uploader" style="margin-left: 10px">' +
+                  '<div class="qq-upload-drop-area"><span>${_('Drop the archives here to upload and extract them')}</span></div>' +
+                  '<div class="qq-upload-button">${_('Select ZIP, TGZ or BZ2 files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
                   '<ul class="qq-upload-list"></ul>' +
                   '</div>',
           fileTemplate:'<li>' +
@@ -1445,7 +1445,7 @@ from django.utils.translation import ugettext as _
         $('.card').on('dragenter', function (e) {
           e.preventDefault();
 
-          if (_isExternalFile) {
+          if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && !($("#uploadArchiveModal").is(":visible"))) {
             showHoverMsg("${_('Drop files here to upload')}");
           }
         });
@@ -1471,7 +1471,6 @@ from django.utils.translation import ugettext as _
           }
         });
 
-        var _dropzone;
         $(document).on('currPathLoaded', function (e, ops) {
           try {
             _dropzone.destroy();
@@ -1884,6 +1883,21 @@ from django.utils.translation import ugettext as _
         } else {
           resetActionbar();
         }
+      });
+
+      $("#uploadFileModal").on("shown", function(){
+        _dropzone.disable();
+      });
+      $("#uploadFileModal").on("hidden", function(){
+        _dropzone.enable();
+        $(".qq-upload-drop-area").hide();
+      });
+      $("#uploadArchiveModal").on("shown", function(){
+        _dropzone.disable();
+      });
+      $("#uploadArchiveModal").on("hidden", function(){
+        _dropzone.enable();
+        $(".qq-upload-drop-area").hide();
       });
     });
   </script>

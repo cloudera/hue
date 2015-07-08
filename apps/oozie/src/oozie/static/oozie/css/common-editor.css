@@ -118,6 +118,10 @@ input[type="text"].filechooser-input.input-xlarge {
   box-shadow: none;
 }
 
+.qq-upload-button-focus {
+  outline: none;
+}
+
 ul.with-margin li {
   margin-bottom: 4px;
 }
