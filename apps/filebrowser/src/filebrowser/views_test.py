@@ -23,6 +23,7 @@ import re
 import urlparse
 from avro import schema, datafile, io
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
@@ -30,7 +31,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop import pseudo_hdfs4
 from filebrowser.views import location_to_url
 
@@ -61,12 +62,15 @@ def cleanup_file(cluster, path):
 @attr('requires_hadoop')
 def test_remove():
   cluster = pseudo_hdfs4.shared_cluster()
+  prefix = cluster.fs_prefix + '/test-delete'
 
   try:
-    c = make_logged_in_client(cluster.superuser)
-    cluster.fs.setuser(cluster.superuser)
+    c = make_logged_in_client(is_superuser=False)
+    grant_access('test', 'test', 'filebrowser')
+    add_to_group('test')
+    user = User.objects.get(username='test')
+    cluster.fs.setuser('test')
 
-    prefix = '/test-delete'
     PATH_1 = '/%s/1' % prefix
     PATH_2 = '/%s/2' % prefix
     PATH_3 = '/%s/3' % prefix

@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import atexit
 import getpass
 import logging
@@ -31,6 +30,7 @@ import time
 from desktop.lib.python_util import find_unused_port
 
 import hadoop
+from hadoop import cluster
 from hadoop.mini_cluster import write_config
 from hadoop.job_tracker import LiveJobTracker
 from desktop.lib.paths import get_run_root
@@ -45,6 +45,25 @@ STARTUP_DEADLINE = 60.0
 CLEANUP_TMP_DIR = os.environ.get('MINI_CLUSTER_CLEANUP', 'true')
 
 
+def _get_fs_prefix(fs):
+  prefix = '/tmp/hue_tests_%s' % str(time.time())
+  fs.mkdir(prefix, 0777)
+  return prefix
+
+
+class LiveHdfs():
+  def __init__(self):
+    self.fs = cluster.get_hdfs('default')
+    # Assumes /tmp exists and is 1777
+
+    self.fs_prefix = _get_fs_prefix(self.fs)
+    LOG.info('Using %s as FS root' % self.fs_prefix)
+
+    # Might need more
+    self.fs.do_as_user('test', self.fs.create_home_dir, '/user/test')
+    self.fs.do_as_user('hue', self.fs.create_home_dir, '/user/hue')
+
+
 class PseudoHdfs4(object):
   """Run HDFS and MR2 locally, in pseudo-distributed mode"""
 
@@ -52,6 +71,7 @@ class PseudoHdfs4(object):
     self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_')
     os.chmod(self._tmpdir, 0755)
     self._superuser = getpass.getuser()
+    self.fs_prefix = None
 
     self._fs = None
     self._jt = None
@@ -262,6 +282,8 @@ class PseudoHdfs4(object):
 
     self.fs.do_as_user('test', self.fs.create_home_dir, '/user/test')
     self.fs.do_as_user('hue', self.fs.create_home_dir, '/user/hue')
+
+    self.fs_prefix = _get_fs_prefix(self.fs)
 
 
   def _start_mr2(self, env):
@@ -512,37 +534,41 @@ def shared_cluster():
   global _shared_cluster
 
   if _shared_cluster is None:
-    cluster = PseudoHdfs4()
-    atexit.register(cluster.stop)
+    if os.environ.get('LIVE_CLUSTER', 'false').lower() == 'true':
+      cluster = LiveHdfs()
+    else:
+      cluster = PseudoHdfs4()
+      atexit.register(cluster.stop)
 
-    try:
-      cluster.start()
-    except Exception, ex:
-      LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
+      try:
+        cluster.start()
+      except Exception, ex:
+        LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
 
-    fqdn = socket.getfqdn()
-    webhdfs_url = "http://%s:%s/webhdfs/v1" % (fqdn, cluster.dfs_http_port,)
+      fqdn = socket.getfqdn()
+      webhdfs_url = "http://%s:%s/webhdfs/v1" % (fqdn, cluster.dfs_http_port,)
 
-    closers = [
-      hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
-      hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
+      closers = [
+        hadoop.conf.HDFS_CLUSTERS['default'].FS_DEFAULTFS.set_for_testing(cluster.fs_default_name),
+        hadoop.conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing(webhdfs_url),
 
-      hadoop.conf.YARN_CLUSTERS['default'].HOST.set_for_testing(fqdn),
-      hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
+        hadoop.conf.YARN_CLUSTERS['default'].HOST.set_for_testing(fqdn),
+        hadoop.conf.YARN_CLUSTERS['default'].PORT.set_for_testing(cluster._rm_port),
 
-      hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-      hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
-      hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
-    ]
+        hadoop.conf.YARN_CLUSTERS['default'].RESOURCE_MANAGER_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
+        hadoop.conf.YARN_CLUSTERS['default'].PROXY_API_URL.set_for_testing('http://%s:%s' % (cluster._fqdn, cluster._rm_webapp_port,)),
+        hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
+      ]
 
-    old = hadoop.cluster.clear_caches()
+      old = hadoop.cluster.clear_caches()
 
-    def restore_config():
-      hadoop.cluster.restore_caches(old)
-      for x in closers:
-        x()
+      def restore_config():
+        hadoop.cluster.restore_caches(old)
+        for x in closers:
+          x()
 
-    cluster.shutdown_hook = restore_config
+      cluster.shutdown_hook = restore_config
+
     _shared_cluster = cluster
 
   return _shared_cluster
