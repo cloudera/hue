@@ -143,7 +143,7 @@ CHERRYPY_SERVER_THREADS = Config(
 SECRET_KEY = Config(
   key="secret_key",
   help=_("Used in hashing algorithms for sessions."),
-  default="")
+  default=None)
 
 SECRET_KEY_SCRIPT = Config(
   key="secret_key_script",
@@ -280,7 +280,7 @@ SMTP = ConfigSection(
       help=_("The password for the SMTP user."),
       type=str,
       private=True,
-      default=""
+      default=None,
     ),
 
     PASSWORD_SCRIPT = Config(
@@ -335,14 +335,14 @@ DATABASE = ConfigSection(
       help=_('Database password.'),
       private=True,
       type=str,
-      default='',
+      default=None,
     ),
     PASSWORD_SCRIPT=Config(
       key='password_script',
       help=_('Execute this script to produce the database password. This will be used when `password` is not set.'),
       private=True,
       type=coerce_password_from_script,
-      default='',
+      default=None,
     ),
     HOST=Config(
       key='host',
@@ -963,7 +963,7 @@ def config_validator(user):
   from desktop.lib import i18n
 
   res = []
-  if not SECRET_KEY.get():
+  if not get_secret_key():
     res.append((SECRET_KEY, unicode(_("Secret key should be configured as a random string. All sessions will be lost on restart"))))
 
   # Validate SSL setup

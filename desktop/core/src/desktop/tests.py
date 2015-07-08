@@ -699,7 +699,6 @@ class BaseTestPasswordConfig(object):
   @nottest
   def run_test_read_password_from_script(self):
     resets = [
-      self.get_config_password().set_for_testing(None),
       self.get_config_password_script().set_for_testing(self.SCRIPT)
     ]
 
@@ -725,7 +724,6 @@ class BaseTestPasswordConfig(object):
   @nottest
   def run_test_password_script_raises_exception(self):
     resets = [
-      self.get_config_password().set_for_testing(None),
       self.get_config_password_script().set_for_testing(
           '%s -c "import sys; sys.exit(1)"' % sys.executable
       ),
@@ -738,7 +736,6 @@ class BaseTestPasswordConfig(object):
         reset()
 
     resets = [
-      self.get_config_password().set_for_testing(None),
       self.get_config_password_script().set_for_testing('/does-not-exist')
     ]
 
