@@ -387,7 +387,7 @@ def add_ldap_groups(request):
         raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       unique_users = set()
-      if is_ensuring_home_directories:
+      if is_ensuring_home_directories and groups:
         for group in groups:
           for user in group.user_set.all():
             unique_users.add(user)
