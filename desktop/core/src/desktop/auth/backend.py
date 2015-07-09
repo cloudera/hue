@@ -366,7 +366,7 @@ class LdapBackend(object):
         setattr(self._backend.settings, 'BIND_DN', bind_dn)
 
         bind_password = ldap_config.BIND_PASSWORD.get()
-        if bind_password is None:
+        if not bind_password:
           password = ldap_config.BIND_PASSWORD_SCRIPT.get()
         setattr(self._backend.settings, 'BIND_PASSWORD', bind_password)
 

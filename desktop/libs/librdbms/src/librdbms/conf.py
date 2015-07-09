@@ -112,7 +112,7 @@ def get_database_password(name):
   """
 
   password = DATABASES[name].PASSWORD.get()
-  if password is None:
+  if not password:
     password = DATABASES[name].PASSWORD_SCRIPT.get()
 
   return password
