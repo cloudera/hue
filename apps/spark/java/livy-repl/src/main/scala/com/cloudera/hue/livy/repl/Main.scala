@@ -125,7 +125,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
     info(s"Notifying $callbackUrl that we're up")
 
     Future {
-      session.waitForStateChange(Starting(), Duration(10, TimeUnit.SECONDS))
+      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
 
       // Wait for our url to be discovered.
       val replUrl = waitForReplUrl()
