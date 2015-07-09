@@ -122,31 +122,13 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
 
   def test_query_with_error(self):
     # Creating a table "again" should not work; error should be displayed.
-    response = _make_query(self.client, "CREATE TABLE test (foo INT)", wait=True)
+    response = _make_query(self.client, "CREATE TABLE test (foo INT)", database=self.db_name, wait=True)
     content = json.loads(response.content)
     assert_true("AlreadyExistsException" in content.get('message'), content)
 
-  def test_configuration(self):
-    # No HS2 API
-    raise SkipTest
-
-    params = {'server': 'default'}
-
-    response = self.client.post("/beeswax/configuration", params)
-    response_verbose = self.client.post("/beeswax/configuration?include_hadoop=true", params)
-
-    assert_true("hive.exec.scratchdir" in response.content)
-    assert_true("hive.exec.scratchdir" in response_verbose.content)
-
-    assert_true("javax.jdo.option.ConnectionPassword**********" in response_verbose.content)
-    assert_true("javax.jdo.option.ConnectionPassword**********" in response_verbose.content)
-
-    assert_false("tasktracker.http.threads" in response.content)
-    assert_true("tasktracker.http.threads" in response_verbose.content)
-    assert_true("A base for other temporary directories" in response_verbose.content)
-
   def test_query_with_resource(self):
-    script = self.cluster.fs.open("/square.py", "w")
+    udf = self.cluster.fs_prefix + "/square.py"
+    script = self.cluster.fs.open(udf, "w")
     script.write(
       """#!/usr/bin/python
 import sys
@@ -158,7 +140,7 @@ for x in sys.stdin:
 
     response = _make_query(self.client,
       "SELECT TRANSFORM (foo) USING 'python square.py' AS b FROM test",
-      resources=[("FILE", "/square.py")], local=False)
+      resources=[("FILE", udf)], local=False, database=self.db_name)
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     content = fetch_query_result_data(self.client, response)
     assert_equal([['0'], ['1'], ['4'], ['9']], content["results"][0:4])
@@ -166,7 +148,7 @@ for x in sys.stdin:
   def test_query_with_setting(self):
     response = _make_query(self.client, "CREATE TABLE test2 AS SELECT foo+1 FROM test WHERE foo=4",
       settings=[("mapred.job.name", "test_query_with_setting"),
-        ("hive.exec.compress.output", "true")], local=False) # Run on MR, because that's how we check it worked.
+        ("hive.exec.compress.output", "true")], local=False, database=self.db_name) # Run on MR, because that's how we check it worked.
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     # Check that we actually got a compressed output
     files = self.cluster.fs.listdir("/user/hive/warehouse/test2")
@@ -203,16 +185,19 @@ for x in sys.stdin:
 
   def test_basic_flow(self):
     # Minimal server operation
-    assert_equal(['default', 'other_db'], self.db.get_databases())
+    databases = self.db.get_databases()
+    assert_true('default' in databases, databases)
+    assert_true(self.db_name in databases, databases)
+    assert_true('%s_other' % self.db_name in databases, databases)
 
     # Use GROUP BY to trigger MR job
     QUERY = """
-      SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
-    """
-    response = _make_query(self.client, QUERY, local=False)
+      SELECT MIN(foo), MAX(foo), SUM(foo) FROM %(db)s.test;
+    """ % {'db': self.db_name}
+    response = _make_query(self.client, QUERY, local=False, database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content)
-    # Check that we report this query as "running". (This query takes a while.)
+    # Check that we report this query as "running" (this query should take a little while).
     self._verify_query_state(beeswax.models.QueryHistory.STATE.running)
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
@@ -226,7 +211,7 @@ for x in sys.stdin:
     QUERY = """
       SELECT * FROM test
     """
-    response = _make_query(self.client, QUERY, name='select star', local=False)
+    response = _make_query(self.client, QUERY, name='select star', local=False, database=self.db_name)
     response = wait_for_query_to_finish(self.client, response)
     content = fetch_query_result_data(self.client, response)
 

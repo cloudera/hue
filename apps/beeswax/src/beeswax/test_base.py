@@ -39,6 +39,7 @@ import beeswax.conf
 
 from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
+from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 
 
 HIVE_SERVER_TEST_PORT = find_unused_port()
@@ -86,60 +87,69 @@ def _start_server(cluster):
   return subprocess.Popen(args=args, env=env, cwd=cluster._tmpdir, stdin=subprocess.PIPE)
 
 
-def get_shared_beeswax_server():
+def get_shared_beeswax_server(db_name='default'):
   global _SHARED_HIVE_SERVER
   global _SHARED_HIVE_SERVER_CLOSER
   if _SHARED_HIVE_SERVER is None:
 
     cluster = pseudo_hdfs4.shared_cluster()
 
-    HIVE_CONF = cluster.hadoop_conf_dir
-    finish = (
-      beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
-      beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
-      beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
-      beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
-    )
+    if is_live_cluster():
+      def s():
+        pass
+    else:
+      HIVE_CONF = cluster.hadoop_conf_dir
+      finish = (
+        beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
+        beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
+        beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
+        beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
+      )
 
-    default_xml = """<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+      default_xml = """<?xml version="1.0"?>
+  <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
-<configuration>
+  <configuration>
 
-<property>
-  <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:derby:;databaseName=%(root)s/metastore_db;create=true</value>
-  <description>JDBC connect string for a JDBC metastore</description>
-</property>
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:derby:;databaseName=%(root)s/metastore_db;create=true</value>
+    <description>JDBC connect string for a JDBC metastore</description>
+  </property>
 
- <property>
-   <name>hive.server2.enable.impersonation</name>
-   <value>false</value>
- </property>
+   <property>
+     <name>hive.server2.enable.impersonation</name>
+     <value>false</value>
+   </property>
 
-<property>
-  <name>hive.querylog.location</name>
-  <value>%(querylog)s</value>
-</property>
+  <property>
+    <name>hive.querylog.location</name>
+    <value>%(querylog)s</value>
+  </property>
 
-</configuration>
-""" % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
+  </configuration>
+  """ % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
 
-    file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
+      file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
 
-    global _SHARED_HIVE_SERVER_PROCESS
+      global _SHARED_HIVE_SERVER_PROCESS
 
-    if _SHARED_HIVE_SERVER_PROCESS is None:
-      p = _start_server(cluster)
-      LOG.info("started")
-      cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
+      if _SHARED_HIVE_SERVER_PROCESS is None:
+        p = _start_server(cluster)
+        LOG.info("started")
+        cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
 
-      _SHARED_HIVE_SERVER_PROCESS = p
-      def kill():
-        LOG.info("Killing server (pid %d)." % p.pid)
-        os.kill(p.pid, 9)
-        p.wait()
-      atexit.register(kill)
+        _SHARED_HIVE_SERVER_PROCESS = p
+        def kill():
+          LOG.info("Killing server (pid %d)." % p.pid)
+          os.kill(p.pid, 9)
+          p.wait()
+        atexit.register(kill)
+
+      def s():
+        for f in finish:
+          f()
+        cluster.stop()
 
       start = time.time()
       started = False
@@ -156,16 +166,11 @@ def get_shared_beeswax_server():
           started = True
           break
         except Exception, e:
-          LOG.info('HiveServer2 server status not started yet after: %s' % e)
+          LOG.info('HiveServer2 server could not be found after: %s' % e)
           time.sleep(sleep)
 
       if not started:
         raise Exception("Server took too long to come up.")
-
-    def s():
-      for f in finish:
-        f()
-      cluster.stop()
 
     _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER = cluster, s
 
@@ -319,11 +324,32 @@ class BeeswaxSampleProvider(object):
   """
   @classmethod
   def setup_class(cls):
-    cls.cluster, shutdown = get_shared_beeswax_server()
+    cls.db_name = get_db_prefix(name='hive')
+    cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
     cls.client = make_logged_in_client()
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()
+
+  @classmethod
+  def teardown_class(cls):
+    if is_live_cluster():
+      # Delete test DB and tables
+      client = make_logged_in_client()
+      user = User.objects.get(username='test')
+      query_server = get_query_server_config()
+      db = dbms.get(user, query_server)
+      tables = db.get_tables(database=cls.db_name)
+      for table in tables:
+        make_query(client, 'DROP TABLE `%(db)s`.`%(table)s`' % {'db': cls.db_name, 'table': table}, wait=True)
+      make_query(client, 'DROP VIEW `%(db)s`.`myview`' % {'db': cls.db_name}, wait=True)
+      make_query(client, 'DROP DATABASE %(db)s' % {'db': cls.db_name}, wait=True)
+      make_query(client, 'DROP DATABASE %(db)s_other' % {'db': cls.db_name}, wait=True)
+
+      # Check the cleanup
+      databases = db.get_databases()
+      assert_false(cls.db_name in databases)
+      assert_false('%(db)s_other' % {'db': cls.db_name} in databases)
 
   @classmethod
   def init_beeswax_db(cls):
@@ -334,37 +360,38 @@ class BeeswaxSampleProvider(object):
     if _INITIALIZED:
       return
 
-    make_query(cls.client, 'CREATE DATABASE other_db', wait=True)
+    make_query(cls.client, 'CREATE DATABASE %(db)s' % {'db': cls.db_name}, wait=True)
+    make_query(cls.client, 'CREATE DATABASE %(db)s_other' % {'db': cls.db_name}, wait=True)
 
-    data_file = u'/tmp/beeswax/sample_data_échantillon_%d.tsv'
+    data_file = cls.cluster.fs_prefix + u'/beeswax/sample_data_échantillon_%d.tsv'
 
     # Create a "test_partitions" table.
     CREATE_PARTITIONED_TABLE = """
-      CREATE TABLE test_partitions (foo INT, bar STRING)
+      CREATE TABLE `%(db)s`.`test_partitions` (foo INT, bar STRING)
       PARTITIONED BY (baz STRING, boom STRING)
       ROW FORMAT DELIMITED
         FIELDS TERMINATED BY '\t'
         LINES TERMINATED BY '\n'
-    """
+    """ % {'db': cls.db_name}
     make_query(cls.client, CREATE_PARTITIONED_TABLE, wait=True)
     cls._make_data_file(data_file % 1)
 
     LOAD_DATA = """
-      LOAD DATA INPATH '%s'
-      OVERWRITE INTO TABLE test_partitions
+      LOAD DATA INPATH '%(data_file)s'
+      OVERWRITE INTO TABLE `%(db)s`.`test_partitions`
       PARTITION (baz='baz_one', boom='boom_two')
-    """ % (data_file % 1,)
+    """ % {'db': cls.db_name, 'data_file': data_file % 1}
     make_query(cls.client, LOAD_DATA, wait=True, local=False)
 
     # Insert additional partition data into "test_partitions" table
     ADD_PARTITION = """
-      ALTER TABLE test_partitions ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '/tmp/beeswax/baz_foo/boom_bar'
-    """
+      ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '/tmp/beeswax/baz_foo/boom_bar'
+    """ % {'db': cls.db_name}
     make_query(cls.client, ADD_PARTITION, wait=True, local=False)
 
     # Create a bunch of other tables
     CREATE_TABLE = """
-      CREATE TABLE `%(name)s` (foo INT, bar STRING)
+      CREATE TABLE `%(db)s`.`%(name)s` (foo INT, bar STRING)
       COMMENT "%(comment)s"
       ROW FORMAT DELIMITED
         FIELDS TERMINATED BY '\t'
@@ -372,22 +399,22 @@ class BeeswaxSampleProvider(object):
     """
 
     # Create a "test" table.
-    table_info = dict(name='test', comment='Test table')
+    table_info = {'db': cls.db_name, 'name': 'test', 'comment': 'Test table'}
     cls._make_data_file(data_file % 2)
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
 
     # Create a "test_utf8" table.
-    table_info = dict(name='test_utf8', comment=cls.get_i18n_table_comment())
+    table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}
     cls._make_i18n_data_file(data_file % 3, 'utf-8')
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
 
     # Create a "test_latin1" table.
-    table_info = dict(name='test_latin1', comment=cls.get_i18n_table_comment())
+    table_info = {'db': cls.db_name, 'name': 'test_latin1', 'comment': cls.get_i18n_table_comment()}
     cls._make_i18n_data_file(data_file % 4, 'latin1')
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
 
     # Create a "myview" view.
-    make_query(cls.client, "CREATE VIEW myview (foo, bar) as SELECT * FROM test", wait=True)
+    make_query(cls.client, "CREATE VIEW `%(db)s`.`myview` (foo, bar) as SELECT * FROM `%(db)s`.`test`" % {'db': cls.db_name}, wait=True)
 
     _INITIALIZED = True
 
@@ -399,9 +426,9 @@ class BeeswaxSampleProvider(object):
   def _make_table(cls, table_name, create_ddl, filename):
     make_query(cls.client, create_ddl, wait=True)
     LOAD_DATA = """
-      LOAD DATA INPATH '%s' OVERWRITE INTO TABLE %s
-    """ % (filename, table_name)
-    make_query(cls.client, LOAD_DATA, wait=True, local=False)
+      LOAD DATA INPATH '%(filename)s' OVERWRITE INTO TABLE `%(db)s`.`%(table_name)s`
+    """ % {'filename': filename, 'table_name': table_name, 'db': cls.db_name}
+    make_query(cls.client, LOAD_DATA, wait=True, local=False, database=cls.db_name)
 
   @classmethod
   def _make_data_file(cls, filename):

@@ -39,9 +39,7 @@ from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode
 from views import snappy_installed
 
-
 LOG = logging.getLogger(__name__)
-
 
 def cleanup_tree(cluster, path):
   try:
@@ -50,7 +48,6 @@ def cleanup_tree(cluster, path):
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
-
 def cleanup_file(cluster, path):
   try:
     cluster.fs.remove(path)
@@ -58,8 +55,8 @@ def cleanup_file(cluster, path):
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
-
 class TestFileBrowserWithHadoop(object):
+  requires_hadoop = True
 
   def setUp(self):
     self.c = make_logged_in_client(username='test', is_superuser=False)
@@ -73,9 +70,9 @@ class TestFileBrowserWithHadoop(object):
 
   def tearDown(self):
     cleanup_tree(self.cluster, self.prefix)
+    assert_false(self.cluster.fs.exists(self.prefix))
     self.cluster.fs.setuser('test')
 
-  @attr('requires_hadoop')
   def test_remove(self):
     prefix = self.prefix + '/test-delete'
 
@@ -102,7 +99,6 @@ class TestFileBrowserWithHadoop(object):
     assert_false(self.cluster.fs.exists(PATH_3))
 
 
-  @attr('requires_hadoop')
   def test_move(self):
     prefix = self.cluster.fs_prefix + '/test-move'
 
@@ -145,7 +141,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(SUB_PATH2_3))
 
 
-  @attr('requires_hadoop')
   def test_copy(self):
     prefix = self.cluster.fs_prefix + '/test-copy'
 
@@ -188,7 +183,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(SUB_PATH2_3))
 
 
-  @attr('requires_hadoop')
   def test_mkdir_singledir(self):
     prefix = self.cluster.fs_prefix + '/test-filebrowser-mkdir'
 
@@ -212,7 +206,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(dir_listing[2]['name'], success_path)
 
 
-  @attr('requires_hadoop')
   def test_touch(self):
     prefix = self.cluster.fs_prefix + '/test-filebrowser-touch'
 
@@ -236,7 +229,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(file_listing[2]['name'], success_path)
 
 
-  @attr('requires_hadoop')
   def test_chmod(self):
     prefix = self.cluster.fs_prefix + '/test_chmod'
 
@@ -281,7 +273,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(041777, int(self.cluster.fs.stats(PATH_3)["mode"]))
 
 
-  @attr('requires_hadoop')
   def test_chmod_sticky(self):
     prefix = self.cluster.fs_prefix + '/test_chmod_sticky'
 
@@ -314,7 +305,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(False, mode[-1])
 
 
-  @attr('requires_hadoop')
   def test_chown(self):
     prefix = self.cluster.fs_prefix + '/test_chown'
     self.cluster.fs.mkdir(prefix)
@@ -356,7 +346,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal("y", self.cluster.fs.stats(PATH_3)["group"])
 
 
-  @attr('requires_hadoop')
   def test_rename(self):
     prefix = self.cluster.fs_prefix + '/test_rename'
     self.cluster.fs.mkdir(prefix)
@@ -374,7 +363,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(PREFIX + NEW_NAME))
 
 
-  @attr('requires_hadoop')
   def test_listdir(self):
     # Delete user's home if there's already something there
     home = self.cluster.fs.do_as_user('test', self.cluster.fs.get_home_dir)
@@ -444,7 +432,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal('%s/test_dir' % home, response.context['path'])
 
 
-  @attr('requires_hadoop')
   def test_listdir_sort_and_filter(self):
     prefix = self.cluster.fs_prefix + '/test_rename'
     self.cluster.fs.mkdir(prefix)
@@ -514,7 +501,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(['..', '.', '1'], [ f['name'] for f in listing ])
 
 
-  @attr('requires_hadoop')
   def test_chooser(self):
     prefix = self.cluster.fs_prefix + '/test_chooser'
     self.cluster.fs.mkdir(prefix)
@@ -527,7 +513,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal('/', dic['path'])
 
 
-  @attr('requires_hadoop')
   def test_view_snappy_compressed(self):
     if not snappy_installed():
       raise SkipTest
@@ -575,7 +560,6 @@ class TestFileBrowserWithHadoop(object):
         done()
 
 
-  @attr('requires_hadoop')
   def test_view_snappy_compressed_avro(self):
     if not snappy_installed():
       raise SkipTest
@@ -625,7 +609,6 @@ class TestFileBrowserWithHadoop(object):
         done()
 
 
-  @attr('requires_hadoop')
   def test_view_avro(self):
     prefix = self.cluster.fs_prefix + '/test_view_avro'
     self.cluster.fs.mkdir(prefix)
@@ -675,7 +658,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true('Failed to decompress' in response.context['message'])
 
 
-  @attr('requires_hadoop')
   def test_view_parquet(self):
     prefix = self.cluster.fs_prefix + '/test_view_parquet'
     self.cluster.fs.mkdir(prefix)
@@ -692,7 +674,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true('FRANCE' in response.context['view']['contents'])
 
 
-  @attr('requires_hadoop')
   def test_view_gz(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
     self.cluster.fs.mkdir(prefix)
@@ -730,7 +711,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true("Failed to decompress" in response.context['message'])
 
 
-  @attr('requires_hadoop')
   def test_view_i18n(self):
     # Test viewing files in different encodings
     content = u'pt-Olá en-hello ch-你好 ko-안녕 ru-Здравствуйте'
@@ -753,7 +733,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal("http://testserver/filebrowser/view/user/test", response["location"])
 
 
-  @attr('requires_hadoop')
   def test_view_access(self):
     prefix = self.cluster.fs_prefix
     NO_PERM_DIR = prefix + '/test-no-perm'
@@ -768,7 +747,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true('Cannot access' in response.context['message'])
 
 
-  @attr('requires_hadoop')
   def test_index(self):
     HOME_DIR = '/user/test'
     NO_HOME_DIR = '/user/no_home'
@@ -788,7 +766,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(None, response.context['home_directory'])
 
 
-  @attr('requires_hadoop')
   def test_edit_i18n(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
     self.cluster.fs.mkdir(prefix)
@@ -815,7 +792,6 @@ class TestFileBrowserWithHadoop(object):
     edit_i18n_helper(self.c, self.cluster, 'johab', pass_1, pass_2)
 
 
-  @attr('requires_hadoop')
   def test_upload_file(self):
     prefix = self.cluster.fs_prefix + '/test_upload_file'
     self.cluster.fs.mkdir(prefix)
@@ -870,7 +846,6 @@ class TestFileBrowserWithHadoop(object):
       pass
 
 
-  @attr('requires_hadoop')
   def test_upload_zip(self):
     prefix = self.cluster.fs_prefix + '/test_upload_zip'
     self.cluster.fs.mkdir(prefix)
@@ -902,7 +877,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
 
 
-  @attr('requires_hadoop')
   def test_upload_tgz(self):
     prefix = self.cluster.fs_prefix + '/test_upload_tgz'
     self.cluster.fs.mkdir(prefix)
@@ -935,7 +909,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(HDFS_TGZ_FILE))
 
 
-  @attr('requires_hadoop')
   def test_upload_bz2(self):
     prefix = self.cluster.fs_prefix + '/test_upload_bz2'
 
@@ -965,7 +938,6 @@ class TestFileBrowserWithHadoop(object):
     assert_true(self.cluster.fs.exists(HDFS_BZ2_FILE))
 
 
-  @attr('requires_hadoop')
   def test_trash(self):
     prefix = self.cluster.fs_prefix + '/test_trash'
     self.cluster.fs.mkdir(prefix)
@@ -996,7 +968,6 @@ class TestFileBrowserWithHadoop(object):
     response = self.c.get('/filebrowser/view/user/test?default_to_trash', follow=True)
     assert_true(any(['.Trash' in page for page, code in response.redirect_chain]), response.redirect_chain)
 
-
 def view_i18n_helper(c, cluster, encoding, content):
   """
   Write the content in the given encoding directly into the filesystem.
@@ -1019,7 +990,6 @@ def view_i18n_helper(c, cluster, encoding, content):
                  unicode(bytestring[0:8], encoding, errors='replace'))
   finally:
     cleanup_file(cluster, filename)
-
 
 def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
   """
@@ -1071,7 +1041,6 @@ def edit_i18n_helper(c, cluster, encoding, contents_pass_1, contents_pass_2):
     # TODO(todd) add test for maintaining ownership/permissions
   finally:
     cleanup_file(cluster, filename)
-
 
 def test_location_to_url():
   assert_equal('/filebrowser/view/var/lib/hadoop-hdfs', location_to_url('/var/lib/hadoop-hdfs', False))

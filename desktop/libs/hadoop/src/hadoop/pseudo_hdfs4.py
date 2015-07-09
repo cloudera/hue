@@ -45,7 +45,7 @@ STARTUP_DEADLINE = 60.0
 CLEANUP_TMP_DIR = os.environ.get('MINI_CLUSTER_CLEANUP', 'true')
 
 
-def is_live_cluser():
+def is_live_cluster():
   return os.environ.get('LIVE_CLUSTER', 'false').lower() == 'true'
 
 def get_fs_prefix(fs):
@@ -53,8 +53,8 @@ def get_fs_prefix(fs):
   fs.mkdir(prefix, 0777)
   return prefix
 
-def get_db_prefix():
-  return 'hue_test__%s' % str(time.time()).replace('.', '')
+def get_db_prefix(name='hive'):
+  return 'hue_test_%s_%s' % (name, str(time.time()).replace('.', ''))
 
 
 class LiveHdfs():
@@ -544,7 +544,7 @@ def shared_cluster():
   global _shared_cluster
 
   if _shared_cluster is None:
-    if is_live_cluser():
+    if is_live_cluster():
       cluster = LiveHdfs()
     else:
       cluster = PseudoHdfs4()

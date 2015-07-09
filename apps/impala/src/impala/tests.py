@@ -36,7 +36,7 @@ from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
 from beeswax.tests import _make_query
-from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluser
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
 from impala.conf import SERVER_HOST
 
@@ -103,21 +103,22 @@ class TestMockedImpala:
 
 class TestImpalaIntegration:
 
-  def setUp(self):
-    self.finish = []
+  @classmethod
+  def setup_class(cls):
+    cls.finish = []
 
     # We need a real Impala cluster currently
-    if (not 'impala' in sys.argv and not os.environ.get('TEST_IMPALAD_HOST')) or not is_live_cluser():
+    if (not 'impala' in sys.argv and not os.environ.get('TEST_IMPALAD_HOST')) or not is_live_cluster():
       raise SkipTest
 
     if os.environ.get('TEST_IMPALAD_HOST'):
-      self.finish.append(SERVER_HOST.set_for_testing(os.environ.get('TEST_IMPALAD_HOST')))
+      cls.finish.append(SERVER_HOST.set_for_testing(os.environ.get('TEST_IMPALAD_HOST')))
 
-    self.client = make_logged_in_client()
-    self.user = User.objects.get(username='test')
+    cls.client = make_logged_in_client()
+    cls.user = User.objects.get(username='test')
     add_to_group('test')
-    self.db = dbms.get(self.user, get_query_server_config(name='impala'))
-    self.DATABASE = get_db_prefix()
+    cls.db = dbms.get(cls.user, get_query_server_config(name='impala'))
+    cls.DATABASE = get_db_prefix(name='impala')
 
     hql = """
       USE default;
@@ -126,10 +127,10 @@ class TestImpalaIntegration:
       CREATE DATABASE %(db)s;
 
       USE %(db)s;
-    """ % {'db': self.DATABASE}
+    """ % {'db': cls.DATABASE}
 
-    resp = _make_query(self.client, hql, database='default', local=False, server_name='impala')
-    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
+    resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
 
     hql = """
       CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
@@ -141,23 +142,26 @@ class TestImpalaIntegration:
       INSERT INTO TABLE tweets VALUES (5, "531091827949309000", "i think @WWERollins was robbed of the IC title match this week on RAW also i wonder if he will get a rematch i hope so @WWE");
     """
 
-    resp = _make_query(self.client, hql, database=self.DATABASE, local=False, server_name='impala')
-    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    resp = _make_query(cls.client, hql, database=cls.DATABASE, local=False, server_name='impala')
+    resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
 
-  def tearDown(self):
-    try:
-      # We need to drop tables before dropping the database
-      hql = """
-      USE default;
-      DROP TABLE IF EXISTS %(db)s.tweets;
-      DROP DATABASE %(db)s;
-      """ % {'db': self.DATABASE}
-      resp = _make_query(self.client, hql, database='default', local=False, server_name='impala')
-      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
-    except Exception, e:
-      LOG.exception('Problem deleting Impala integration test DB')
+  @classmethod
+  def teardown_class(cls):
+    # We need to drop tables before dropping the database
+    hql = """
+    USE default;
+    DROP TABLE IF EXISTS %(db)s.tweets;
+    DROP DATABASE %(db)s;
+    """ % {'db': cls.DATABASE}
+    resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
+    resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
 
-    for f in self.finish:
+    # Check the cleanup
+    databases = db.get_databases()
+    assert_false(cls.db_name in databases)
+    assert_false('%(db)s_other' % {'db': cls.db_name} in databases)
+
+    for f in cls.finish:
       f()
 
   def test_basic_flow(self):
