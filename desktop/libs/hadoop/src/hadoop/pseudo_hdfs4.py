@@ -63,6 +63,10 @@ class LiveHdfs():
     self.fs.do_as_user('test', self.fs.create_home_dir, '/user/test')
     self.fs.do_as_user('hue', self.fs.create_home_dir, '/user/hue')
 
+  @property
+  def superuser(self):
+    return self.fs.superuser
+
 
 class PseudoHdfs4(object):
   """Run HDFS and MR2 locally, in pseudo-distributed mode"""
