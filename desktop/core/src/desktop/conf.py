@@ -143,14 +143,14 @@ CHERRYPY_SERVER_THREADS = Config(
 SECRET_KEY = Config(
   key="secret_key",
   help=_("Used in hashing algorithms for sessions."),
-  default=None)
+  default="")
 
 SECRET_KEY_SCRIPT = Config(
   key="secret_key_script",
   help=_("Execute this script to produce the Django secret key. This will be used when `secret_key` is not set."),
   type=coerce_password_from_script,
   private=True,
-  default=None)
+  default="")
 
 USER_ACCESS_HISTORY_SIZE = Config(
   key="user_access_history_size",
@@ -280,7 +280,7 @@ SMTP = ConfigSection(
       help=_("The password for the SMTP user."),
       type=str,
       private=True,
-      default=None,
+      default="",
     ),
 
     PASSWORD_SCRIPT = Config(
@@ -288,7 +288,7 @@ SMTP = ConfigSection(
       help=_("Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."),
       type=coerce_password_from_script,
       private=True,
-      default=None,
+      default="",
     ),
 
     USE_TLS = Config(
@@ -335,14 +335,14 @@ DATABASE = ConfigSection(
       help=_('Database password.'),
       private=True,
       type=str,
-      default=None,
+      default="",
     ),
     PASSWORD_SCRIPT=Config(
       key='password_script',
       help=_('Execute this script to produce the database password. This will be used when `password` is not set.'),
       private=True,
       type=coerce_password_from_script,
-      default=None,
+      default="",
     ),
     HOST=Config(
       key='host',
@@ -998,7 +998,7 @@ def get_redaction_policy():
 
 def get_secret_key():
   secret_key = SECRET_KEY.get()
-  if secret_key is None:
+  if not secret_key:
     secret_key = SECRET_KEY_SCRIPT.get()
 
   return secret_key
@@ -1006,7 +1006,7 @@ def get_secret_key():
 
 def get_ssl_password():
   password = SSL_PASSWORD.get()
-  if password is None:
+  if not password:
     password = SSL_PASSWORD_SCRIPT.get()
 
   return password
@@ -1014,7 +1014,7 @@ def get_ssl_password():
 
 def get_database_password():
   password = DATABASE.PASSWORD.get()
-  if password is None:
+  if not password:
     password = DATABASE.PASSWORD_SCRIPT.get()
 
   return password
@@ -1022,7 +1022,7 @@ def get_database_password():
 
 def get_smtp_password():
   password = SMTP.PASSWORD.get()
-  if password is None:
+  if not password:
     password = SMTP.PASSWORD_SCRIPT.get()
 
   return password
@@ -1030,7 +1030,7 @@ def get_smtp_password():
 
 def get_ldap_password():
   password = LDAP_PASSWORD.get()
-  if password is None:
+  if not password:
     password = LDAP_PASSWORD_SCRIPT.get()
 
   return password
@@ -1038,7 +1038,7 @@ def get_ldap_password():
 
 def get_ldap_bind_password(ldap_config):
   password = ldap_config.BIND_PASSWORD.get()
-  if password is None:
+  if not password:
     password = ldap_config.BIND_PASSWORD_SCRIPT.get()
 
   return password
