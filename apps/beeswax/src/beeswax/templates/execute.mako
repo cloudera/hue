@@ -1163,10 +1163,6 @@ $(document).ready(function () {
     });
   };
 
-  $(document).on("click", "#recentQueries code", function(){
-    codeMirror.setValue($(this).text());
-  });
-
   renderRecent();
 
   $("#navigatorQuicklook").modal({
