@@ -45,10 +45,16 @@ STARTUP_DEADLINE = 60.0
 CLEANUP_TMP_DIR = os.environ.get('MINI_CLUSTER_CLEANUP', 'true')
 
 
-def _get_fs_prefix(fs):
+def is_live_cluser():
+  return os.environ.get('LIVE_CLUSTER', 'false').lower() == 'true'
+
+def get_fs_prefix(fs):
   prefix = '/tmp/hue_tests_%s' % str(time.time())
   fs.mkdir(prefix, 0777)
   return prefix
+
+def get_db_prefix():
+  return 'hue_test__%s' % str(time.time()).replace('.', '')
 
 
 class LiveHdfs():
@@ -56,7 +62,7 @@ class LiveHdfs():
     self.fs = cluster.get_hdfs('default')
     # Assumes /tmp exists and is 1777
 
-    self.fs_prefix = _get_fs_prefix(self.fs)
+    self.fs_prefix = get_fs_prefix(self.fs)
     LOG.info('Using %s as FS root' % self.fs_prefix)
 
     # Might need more
@@ -287,7 +293,7 @@ class PseudoHdfs4(object):
     self.fs.do_as_user('test', self.fs.create_home_dir, '/user/test')
     self.fs.do_as_user('hue', self.fs.create_home_dir, '/user/hue')
 
-    self.fs_prefix = _get_fs_prefix(self.fs)
+    self.fs_prefix = get_fs_prefix(self.fs)
 
 
   def _start_mr2(self, env):
@@ -538,7 +544,7 @@ def shared_cluster():
   global _shared_cluster
 
   if _shared_cluster is None:
-    if os.environ.get('LIVE_CLUSTER', 'false').lower() == 'true':
+    if is_live_cluser():
       cluster = LiveHdfs()
     else:
       cluster = PseudoHdfs4()

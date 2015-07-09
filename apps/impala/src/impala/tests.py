@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import logging
 import os
 import re
 import sys
@@ -35,8 +36,13 @@ from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
 from beeswax.tests import _make_query
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluser
 
 from impala.conf import SERVER_HOST
+
+
+LOG = logging.getLogger(__name__)
+
 
 
 class MockDbms:
@@ -96,13 +102,12 @@ class TestMockedImpala:
 
 
 class TestImpalaIntegration:
-  DATABASE = 'test_hue_impala'
 
   def setUp(self):
     self.finish = []
 
     # We need a real Impala cluster currently
-    if not 'impala' in sys.argv and not os.environ.get('TEST_IMPALAD_HOST'):
+    if (not 'impala' in sys.argv and not os.environ.get('TEST_IMPALAD_HOST')) or not is_live_cluser():
       raise SkipTest
 
     if os.environ.get('TEST_IMPALAD_HOST'):
@@ -112,6 +117,7 @@ class TestImpalaIntegration:
     self.user = User.objects.get(username='test')
     add_to_group('test')
     self.db = dbms.get(self.user, get_query_server_config(name='impala'))
+    self.DATABASE = get_db_prefix()
 
     hql = """
       USE default;
@@ -138,9 +144,21 @@ class TestImpalaIntegration:
     resp = _make_query(self.client, hql, database=self.DATABASE, local=False, server_name='impala')
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-    def tearDown(self):
-      for f in self.finish:
-        f()
+  def tearDown(self):
+    try:
+      # We need to drop tables before dropping the database
+      hql = """
+      USE default;
+      DROP TABLE IF EXISTS %(db)s.tweets;
+      DROP DATABASE %(db)s;
+      """ % {'db': self.DATABASE}
+      resp = _make_query(self.client, hql, database='default', local=False, server_name='impala')
+      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    except Exception, e:
+      LOG.exception('Problem deleting Impala integration test DB')
+
+    for f in self.finish:
+      f()
 
   def test_basic_flow(self):
     dbs = self.db.get_databases()
