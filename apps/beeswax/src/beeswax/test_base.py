@@ -98,83 +98,89 @@ def get_shared_beeswax_server(db_name='default'):
       def s():
         pass
     else:
-      HIVE_CONF = cluster.hadoop_conf_dir
-      finish = (
-        beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
-        beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
-        beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
-        beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
-      )
+      s = _start_mini_hs2(cluster)
 
-      default_xml = """<?xml version="1.0"?>
-  <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+    start = time.time()
+    started = False
+    sleep = 1
 
-  <configuration>
+    make_logged_in_client()
+    user = User.objects.get(username='test')
+    query_server = get_query_server_config()
+    db = dbms.get(user, query_server)
 
-  <property>
-    <name>javax.jdo.option.ConnectionURL</name>
-    <value>jdbc:derby:;databaseName=%(root)s/metastore_db;create=true</value>
-    <description>JDBC connect string for a JDBC metastore</description>
-  </property>
+    while not started and time.time() - start <= 30:
+      try:
+        db.open_session(user)
+        started = True
+        break
+      except Exception, e:
+        LOG.info('HiveServer2 server could not be found after: %s' % e)
+        time.sleep(sleep)
 
-   <property>
-     <name>hive.server2.enable.impersonation</name>
-     <value>false</value>
-   </property>
-
-  <property>
-    <name>hive.querylog.location</name>
-    <value>%(querylog)s</value>
-  </property>
-
-  </configuration>
-  """ % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
-
-      file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
-
-      global _SHARED_HIVE_SERVER_PROCESS
-
-      if _SHARED_HIVE_SERVER_PROCESS is None:
-        p = _start_server(cluster)
-        LOG.info("started")
-        cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
-
-        _SHARED_HIVE_SERVER_PROCESS = p
-        def kill():
-          LOG.info("Killing server (pid %d)." % p.pid)
-          os.kill(p.pid, 9)
-          p.wait()
-        atexit.register(kill)
-
-      def s():
-        for f in finish:
-          f()
-        cluster.stop()
-
-      start = time.time()
-      started = False
-      sleep = 1
-
-      make_logged_in_client()
-      user = User.objects.get(username='test')
-      query_server = get_query_server_config()
-      db = dbms.get(user, query_server)
-
-      while not started and time.time() - start <= 30:
-        try:
-          db.open_session(user)
-          started = True
-          break
-        except Exception, e:
-          LOG.info('HiveServer2 server could not be found after: %s' % e)
-          time.sleep(sleep)
-
-      if not started:
-        raise Exception("Server took too long to come up.")
+    if not started:
+      raise Exception("Server took too long to come up.")
 
     _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER = cluster, s
 
   return _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER
+
+
+def _start_mini_hs2(cluster):
+  HIVE_CONF = cluster.hadoop_conf_dir
+  finish = (
+     beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
+     beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
+     beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
+     beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
+   )
+
+  default_xml = """<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+
+<property>
+ <name>javax.jdo.option.ConnectionURL</name>
+ <value>jdbc:derby:;databaseName=%(root)s/metastore_db;create=true</value>
+ <description>JDBC connect string for a JDBC metastore</description>
+</property>
+
+<property>
+  <name>hive.server2.enable.impersonation</name>
+  <value>false</value>
+</property>
+
+<property>
+ <name>hive.querylog.location</name>
+ <value>%(querylog)s</value>
+</property>
+
+</configuration>
+""" % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
+
+  file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
+
+  global _SHARED_HIVE_SERVER_PROCESS
+
+  if _SHARED_HIVE_SERVER_PROCESS is None:
+    p = _start_server(cluster)
+    LOG.info("started")
+    cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
+
+    _SHARED_HIVE_SERVER_PROCESS = p
+    def kill():
+      LOG.info("Killing server (pid %d)." % p.pid)
+      os.kill(p.pid, 9)
+      p.wait()
+    atexit.register(kill)
+
+  def s():
+    for f in finish:
+      f()
+    cluster.stop()
+
+  return s
 
 
 def wait_for_query_to_finish(client, response, max=30.0):
@@ -339,12 +345,13 @@ class BeeswaxSampleProvider(object):
       user = User.objects.get(username='test')
       query_server = get_query_server_config()
       db = dbms.get(user, query_server)
-      tables = db.get_tables(database=cls.db_name)
-      for table in tables:
-        make_query(client, 'DROP TABLE `%(db)s`.`%(table)s`' % {'db': cls.db_name, 'table': table}, wait=True)
-      make_query(client, 'DROP VIEW `%(db)s`.`myview`' % {'db': cls.db_name}, wait=True)
-      make_query(client, 'DROP DATABASE %(db)s' % {'db': cls.db_name}, wait=True)
-      make_query(client, 'DROP DATABASE %(db)s_other' % {'db': cls.db_name}, wait=True)
+
+      for db_name in [cls.db_name, '%s_other' % cls.db_name]:
+        tables = db.get_tables(database=db_name)
+        for table in tables:
+          make_query(client, 'DROP TABLE IF EXISTS `%(db)s`.`%(table)s`' % {'db': db_name, 'table': table}, wait=True)
+        make_query(client, 'DROP VIEW IF EXISTS `%(db)s`.`myview`' % {'db': db_name}, wait=True)
+        make_query(client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
 
       # Check the cleanup
       databases = db.get_databases()
@@ -424,7 +431,7 @@ class BeeswaxSampleProvider(object):
 
   @classmethod
   def _make_table(cls, table_name, create_ddl, filename):
-    make_query(cls.client, create_ddl, wait=True)
+    make_query(cls.client, create_ddl, wait=True, database=cls.db_name)
     LOAD_DATA = """
       LOAD DATA INPATH '%(filename)s' OVERWRITE INTO TABLE `%(db)s`.`%(table_name)s`
     """ % {'filename': filename, 'table_name': table_name, 'db': cls.db_name}

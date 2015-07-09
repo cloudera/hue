@@ -109,6 +109,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     add_to_group('test')
     self.db = dbms.get(self.user, get_query_server_config())
 
+
   def _verify_query_state(self, state):
     """
     Verify the state of the latest query.
@@ -120,11 +121,13 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     assert_equal(beeswax.models.QueryHistory.STATE[last_state], state)
     return history.id
 
+
   def test_query_with_error(self):
     # Creating a table "again" should not work; error should be displayed.
     response = _make_query(self.client, "CREATE TABLE test (foo INT)", database=self.db_name, wait=True)
     content = json.loads(response.content)
     assert_true("AlreadyExistsException" in content.get('message'), content)
+
 
   def test_query_with_resource(self):
     udf = self.cluster.fs_prefix + "/square.py"
@@ -145,13 +148,15 @@ for x in sys.stdin:
     content = fetch_query_result_data(self.client, response)
     assert_equal([['0'], ['1'], ['4'], ['9']], content["results"][0:4])
 
+
   def test_query_with_setting(self):
-    response = _make_query(self.client, "CREATE TABLE test2 AS SELECT foo+1 FROM test WHERE foo=4",
+    table_name = 'test_query_with_setting'
+    response = _make_query(self.client, "CREATE TABLE `%(db)s`.`%(table_name)s` AS SELECT foo+1 FROM test WHERE foo=4" % {'db': self.db_name, 'table_name': table_name},
       settings=[("mapred.job.name", "test_query_with_setting"),
         ("hive.exec.compress.output", "true")], local=False, database=self.db_name) # Run on MR, because that's how we check it worked.
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     # Check that we actually got a compressed output
-    files = self.cluster.fs.listdir("/user/hive/warehouse/test2")
+    files = self.cluster.fs.listdir("/user/hive/warehouse/%(db)s.db/%(table_name)s" % {'db': self.db_name, 'table_name': table_name})
     assert_true(len(files) >= 1, files)
     assert_true(files[0].endswith(".deflate"), files[0])
 
@@ -164,11 +169,12 @@ for x in sys.stdin:
       [ x.profile for x in self.cluster.jt.all_jobs().jobs
         if x.profile.name == "test_query_with_setting" ][0].user)
 
+
   def test_lazy_query_status_update(self):
     QUERY = """
       SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
     """
-    wait_for_query_to_finish(self.client, _make_query(self.client, QUERY, local=False), max=180.0)
+    wait_for_query_to_finish(self.client, _make_query(self.client, QUERY, local=False, database=self.db_name), max=180.0)
     self._verify_query_state(beeswax.models.QueryHistory.STATE.available)
 
     # Make sure expired query states are lazily updated.
@@ -192,8 +198,8 @@ for x in sys.stdin:
 
     # Use GROUP BY to trigger MR job
     QUERY = """
-      SELECT MIN(foo), MAX(foo), SUM(foo) FROM %(db)s.test;
-    """ % {'db': self.db_name}
+      SELECT MIN(foo), MAX(foo), SUM(foo) FROM test;
+    """
     response = _make_query(self.client, QUERY, local=False, database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content)
@@ -230,12 +236,13 @@ for x in sys.stdin:
     # Header line plus data lines...
     assert_equal(257, ''.join(response.streaming_content).count("\n"))
 
+
   def test_result_escaping(self):
     # Check for XSS and NULL display
     QUERY = """
       SELECT 'abc', 1.0, 1=1, 1, 1/0, '<a>lala</a>lulu', 'some   spaces' from test LIMIT 3;
     """
-    response = _make_query(self.client, QUERY, local=False)
+    response = _make_query(self.client, QUERY, local=False, database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content)
 
@@ -247,6 +254,7 @@ for x in sys.stdin:
         [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu', 'some&nbsp;&nbsp;&nbsp;spaces'],
         [u'abc', 1.0, True, 1, u'NULL', u'&lt;a&gt;lala&lt;/a&gt;lulu', 'some&nbsp;&nbsp;&nbsp;spaces'],
       ], content["results"], content)
+
 
   def test_result_nullification(self):
     QUERY = """
@@ -260,7 +268,7 @@ for x in sys.stdin:
       (5), (5), (5), (5), (5), (5), (5), (5),
       (6), (6), (6), (6), (6), (6), (6), (6);
     """
-    response = _make_query(self.client, QUERY, local=False)
+    response = _make_query(self.client, QUERY, local=False, database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content)
 
@@ -270,7 +278,7 @@ for x in sys.stdin:
     QUERY = """
       SELECT * FROM test_result_nullification;
     """
-    response = _make_query(self.client, QUERY, local=False)
+    response = _make_query(self.client, QUERY, local=False, database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content)
 
@@ -286,13 +294,14 @@ for x in sys.stdin:
         [6], [6], [6], [6], [6], [6], [6], [6]
       ], content["results"], content)
 
+
   def test_query_with_udf(self):
     """
     Testing query with udf
     """
     response = _make_query(self.client, "SELECT my_sqrt(foo), my_float(foo) FROM test where foo=4 GROUP BY foo", # Force MR job with GROUP BY
       udfs=[('my_sqrt', 'org.apache.hadoop.hive.ql.udf.UDFSqrt'),
-            ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')], local=False)
+            ('my_float', 'org.apache.hadoop.hive.ql.udf.UDFToFloat')], local=False, database=self.db_name)
     response = wait_for_query_to_finish(self.client, response, max=60.0)
     content = fetch_query_result_data(self.client, response)
 
@@ -303,15 +312,17 @@ for x in sys.stdin:
     # Test job extraction while we're at it
     assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
+
   def test_query_with_remote_udf(self):
     """
     UDF is on HDFS.  This was implemented as part of HIVE-1157.
     """
-    # Can't figure out what's going wrong right now :(
+    # BeeswaxTest.jar is gone
     raise SkipTest
 
     src = file(os.path.join(os.path.dirname(__file__), "..", "..", "java-lib", "BeeswaxTest.jar"))
-    dest = self.cluster.fs.open("/tmp/hive1157.jar", "w")
+    udf = self.cluster.fs_prefix + "hive1157.jar"
+    dest = self.cluster.fs.open(udf, "w")
     shutil.copyfileobj(src, dest)
     dest.close()
     src.close()
@@ -319,24 +330,26 @@ for x in sys.stdin:
     # Beware that this doesn't work with mapred.job.tracker=local :/
     response = _make_query(self.client, "SELECT cube(foo) FROM test WHERE foo=4",
       udfs=[('cube', 'com.cloudera.beeswax.CubeSampleUDF')],
-      resources=[('JAR', '/tmp/hive1157.jar')], local=False)
+      resources=[('JAR', udf)], local=False, database=self.db_name)
     response = wait_for_query_to_finish(self.client, response, max=60.0)
     assert_equal(["64"], response.context["results"][0])
 
+
   def test_query_with_simple_errors(self):
     hql = "SELECT KITTENS ARE TASTY"
-    resp = _make_query(self.client, hql, name='tasty kittens', wait=False, local=False)
+    resp = _make_query(self.client, hql, name='tasty kittens', wait=False, local=False, database=self.db_name)
     assert_true("ParseException line" in json.loads(resp.content)["message"])
 
     # Watch page will fail as operationHandle=None
-    query_id = self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
+    self._verify_query_state(beeswax.models.QueryHistory.STATE.failed)
+
 
   def test_sync_query_exec(self):
     # Execute Query Synchronously, set fetch size and fetch results
     # verify the size of resultset,
     hql = """
-      SELECT foo FROM test;
-    """
+      SELECT foo FROM `%(db)s`.`test`;
+    """ % {'db': self.db_name}
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
 
@@ -346,20 +359,22 @@ for x in sys.stdin:
 
     self.db.close(handle)
 
+
   def test_sync_query_error(self):
     # We don't use synchronous queries anywhere.
     # It used to call BeeswaxService.executeAndWait()
     raise SkipTest
     # Execute incorrect Query , verify the error code and sqlstate
     hql = """
-      SELECT FROM zzzzz
-    """
+      SELECT FROM `%(db)s`.`zzzzz`
+    """ % {'db': self.db_name}
     query = hql_query(hql)
     try:
       self.db.execute_and_wait(query)
     except QueryServerException, bex:
       assert_equal(bex.errorCode, 40000)
       assert_equal(bex.SQLState, "42000")
+
 
   def test_fetch_configuration(self):
     class MockClient:
@@ -405,14 +420,14 @@ for x in sys.stdin:
 
 
   def test_parameterization(self):
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False)
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", is_parameterized=False, database=self.db_name)
     content = json.loads(response.content)
     # Assert no parameterization was offered
     assert_true('watch_url' in content, content)
 
     data = {
       'query-query': "SELECT foo FROM test WHERE foo='$x' and bar='$y'",
-      'query-database': "default"
+      'query-database': self.db_name
     }
     response = self.client.post(reverse('beeswax:api_parameters'), data)
     content = json.loads(response.content)
@@ -422,7 +437,7 @@ for x in sys.stdin:
       ], content['parameters'], content)
 
     # Now fill it out
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', '1'), ('y', '2')])
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', '1'), ('y', '2')], database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content, content)
     query_history = QueryHistory.get(content['id'])
@@ -431,41 +446,45 @@ for x in sys.stdin:
     assert_equal("SELECT foo FROM test WHERE foo='1' and bar='2'", query_history.query)
 
     # Check that error handling is reasonable
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', "'_this_is_not SQL "), ('y', '2')])
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", params=[('x', "'_this_is_not SQL "), ('y', '2')], database=self.db_name)
     content = json.loads(response.content)
     assert_true("FAILED: ParseException" in content.get('message'), content)
 
     # Check multi DB with a non default DB
-    response = _make_query(self.client, "CREATE TABLE test (foo INT, bar STRING)", database='other_db')
+    other_db = '%s_other' % self.db_name
+    response = _make_query(self.client, "CREATE TABLE test (foo INT, bar STRING)", database=other_db)
     response = wait_for_query_to_finish(self.client, response)
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database='other_db')
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database=other_db)
 
-    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database='other_db',
+    response = _make_query(self.client, "SELECT foo FROM test WHERE foo='$x' and bar='$y'", database=other_db,
                            params=[('x', '1'), ('y', '2')])
     content = json.loads(response.content)
     assert_true('watch_url' in content, content)
     query_history = QueryHistory.get(content['id'])
-    assert_equal('other_db', query_history.design.get_design().query['database'])
+    assert_equal(other_db, query_history.design.get_design().query['database'])
+
 
   def test_explain_query(self):
     c = self.client
-    response = _make_query(c, "SELECT KITTENS ARE TASTY", submission_type="Explain")
+    response = _make_query(c, "SELECT KITTENS ARE TASTY", submission_type="Explain", database=self.db_name)
     assert_true("ParseException line" in json.loads(response.content)["message"])
-    CREATE_TABLE = "CREATE TABLE test_explain (foo INT, bar STRING);"
-    response = _make_query(c, CREATE_TABLE)
+    CREATE_TABLE = "CREATE TABLE `%(db)s`.`test_explain` (foo INT, bar STRING);" % {'db': self.db_name}
+    response = _make_query(c, CREATE_TABLE, database=self.db_name)
     wait_for_query_to_finish(c, response)
 
-    response = _make_query(c, "SELECT SUM(foo) FROM test_explain", submission_type="Explain")
+    response = _make_query(c, "SELECT SUM(foo) FROM `%(db)s`.`test_explain`" % {'db': self.db_name}, submission_type="Explain") # Need to prefix database in Explain
     explanation = json.loads(response.content)['explanation']
     assert_true('STAGE DEPENDENCIES:' in explanation, explanation)
     assert_true('STAGE PLANS:' in explanation, explanation)
 
+
   def test_explain_query_i18n(self):
-    query = u"SELECT foo FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
+    query = u"SELECT foo FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
     response = _make_query(self.client, query, submission_type="Explain")
     explanation = json.loads(response.content)['explanation']
     assert_true('STAGE DEPENDENCIES:' in explanation, explanation)
     assert_true('STAGE PLANS:' in explanation, explanation)
+
 
   def test_query_i18n(self):
     # Test fails because HIVE_PLAN cannot be found and raises FileNotFoundException
@@ -473,21 +492,22 @@ for x in sys.stdin:
     raise SkipTest
 
     # Selecting from utf-8 table should get correct result
-    query = u"SELECT * FROM test_utf8 WHERE bar='%s'" % (unichr(200),)
-    response = _make_query(self.client, query, wait=True)
+    query = u"SELECT * FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
+    response = _make_query(self.client, query, wait=True, database=self.db_name)
     assert_equal(["200", unichr(200)], response.context["results"][0], "selecting from utf-8 table should get correct result")
 
     csv = get_csv(self.client, response)
     assert_equal('"200","%s"' % (unichr(200).encode('utf-8'),), csv.split()[1])
 
     # Selecting from latin1 table should not blow up
-    query = u"SELECT * FROM test_latin1 WHERE bar='%s'" % (unichr(200),)
-    response = _make_query(self.client, query, wait=True)
+    query = u"SELECT * FROM `%(db)s`.`test_latin1` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
+    response = _make_query(self.client, query, wait=True, database=self.db_name)
     assert_true('results' in response.context, "selecting from latin1 table should not blow up")
 
     # Describe table should be fine with non-ascii comment
-    response = self.client.get('/beeswax/table/default/test_utf8')
+    response = self.client.get('/beeswax/table/%(db)s/test_utf8' % {'db': self.db_name})
     assert_equal(response.context['table'].parameters['comment'], self.get_i18n_table_comment())
+
 
   def _parallel_query_helper(self, i, result_holder, lock, num_tasks):
     client = make_logged_in_client()
@@ -503,6 +523,7 @@ for x in sys.stdin:
     except Exception, e:
       LOG.exception("Saw exception in child thread: %s" % e)
 
+
   def test_multiple_statements_no_result_set(self):
     hql = """
       CREATE TABLE test_multiple_statements_1 (a int);
@@ -511,7 +532,7 @@ for x in sys.stdin:
       DROP TABLE test_multiple_statements_2;
     """
 
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     content = json.loads(resp.content)
@@ -522,13 +543,14 @@ for x in sys.stdin:
     content = json.loads(resp.content)
     assert_equal('DROP TABLE test_multiple_statements_2', query_history.get_current_statement(), content)
 
+
   def test_multiple_statements_with_result_set(self):
     hql = """
       SELECT foo FROM test;
       SELECT count(*) FROM test;
     """
 
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
 
     content = json.loads(resp.content)
     assert_true('watch_url' in content, content)
@@ -544,6 +566,7 @@ for x in sys.stdin:
     content = json.loads(resp.content)
     assert_equal('SELECT count(*) FROM test', content.get('statement'), content)
 
+
   def test_multiple_statements_various_queries(self):
     hql = """
       CREATE TABLE test_multiple_statements_2 (a int);
@@ -551,7 +574,7 @@ for x in sys.stdin:
       SELECT foo FROM test;
     """
 
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
 
     content = json.loads(resp.content)
     assert_equal('CREATE TABLE test_multiple_statements_2 (a int)', content.get('statement'), content)
@@ -570,7 +593,7 @@ for x in sys.stdin:
       select * from test
     """
 
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
 
     # First statement
     content = json.loads(resp.content)
@@ -590,13 +613,14 @@ for x in sys.stdin:
     content = fetch_query_result_data(self.client, resp)
     assert_true([0, u'0x0'] in content.get('results'), content)
 
+
   def test_multiple_statements_with_error(self):
     hql = """
       show tables;
       select * from
     """
 
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
 
     content = json.loads(resp.content)
     watch_url = content['watch_url']
@@ -653,9 +677,10 @@ for x in sys.stdin:
       answer = [ int(data.strip('"')) for data in csv.split()[1:] ]
       assert_equal( [ i + 1, i + 2 ], answer)
 
+
   def test_data_export_limit_clause(self):
     limit = 3
-    hql = 'SELECT foo FROM test limit %d' % (limit,)
+    hql = 'SELECT foo FROM `%(db)s`.`test` limit %(limit)d' % {'limit': limit, 'db': self.db_name}
     query = hql_query(hql)
 
     handle = self.db.execute_and_wait(query)
@@ -664,8 +689,9 @@ for x in sys.stdin:
     csv_content = ''.join(csv_resp.streaming_content)
     assert_equal(len(csv_content.strip().split('\n')), limit + 1)
 
+
   def test_query_done_cb(self):
-    hql = 'SELECT * FROM test'
+    hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
     query = hql_query(hql)
     query._data_dict['query']['email_notify'] = False
     query_history = self.db.execute_and_watch(query)
@@ -683,13 +709,13 @@ for x in sys.stdin:
     response = self.client.get('/beeswax/query_cb/done/blahblahblah')
     assert_true('QueryHistory matching query does not exist' in response.content, response.content)
 
+
   def test_data_export(self):
-    hql = 'SELECT * FROM test'
+    hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
     query = hql_query(hql)
     dataset = tablib.Dataset()
 
     # Get the result in xls.
-
     handle = self.db.execute_and_wait(query)
     xls_resp = download(handle, 'xls', self.db)
 
@@ -700,24 +726,28 @@ for x in sys.stdin:
     # Get the result in csv.
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
+
     csv_resp = download(handle, 'csv', self.db)
     csv_content = ''.join(csv_resp.streaming_content)
     assert_equal(csv_content.replace('.0', ''), dataset.csv.replace('.0', ''))
 
+
   def test_data_upload(self):
-    hql = 'SELECT * FROM test'
+    hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
     query = hql_query(hql)
 
     handle = self.db.execute_and_wait(query)
-    upload('/tmp/test_data_upload.csv', handle, self.user, self.db, self.cluster.fs)
+    csv_file = self.cluster.fs_prefix + '/test_data_upload.csv'
+    upload(csv_file, handle, self.user, self.db, self.cluster.fs)
 
-    assert_true(self.cluster.fs.exists('/tmp/test_data_upload.csv'))
+    assert_true(self.cluster.fs.exists(csv_file))
+
 
   def test_designs(self):
     cli = self.client
 
     # An auto hql design should be created, and it should ignore the given name and desc
-    _make_query(self.client, 'SELECT bogus FROM test', name='mydesign', desc='hyatt')
+    _make_query(self.client, 'SELECT bogus FROM test', name='mydesign', desc='hyatt', database=self.db_name)
     resp = cli.get('/beeswax/list_designs')
     n_designs = len(resp.context['page'].object_list)
 
@@ -741,7 +771,7 @@ for x in sys.stdin:
     assert_true('SELECT bogus FROM test' in content['design']['query'], content)
 
     # Make a valid auto hql design
-    resp = _make_query(self.client, 'SELECT * FROM test')
+    resp = _make_query(self.client, 'SELECT * FROM test', database=self.db_name)
     wait_for_query_to_finish(self.client, resp, max=60.0)
 
     resp = cli.get('/beeswax/list_designs')
@@ -750,7 +780,8 @@ for x in sys.stdin:
 
     # Test explicit save and use another DB
     query = 'MORE BOGUS JUNKS FROM test'
-    resp = _make_query(self.client, query, name='rubbish', submission_type='Save', database='other_db')
+    other_db = '%s_other' % self.db_name
+    resp = _make_query(self.client, query, name='rubbish', submission_type='Save', database=other_db)
     content = json.loads(resp.content)
     assert_equal(0, content['status'])
     assert_true('design_id' in content, content)
@@ -766,7 +797,7 @@ for x in sys.stdin:
     content = json.loads(resp.content)
     assert_true(query in content['design']['query'], content)
     assert_equal('', content['design']['desc'], content)
-    assert_equal('other_db', content['design']['database'], content)
+    assert_equal(other_db, content['design']['database'], content)
 
     # Clone the rubbish design
     len_before = len(beeswax.models.SavedQuery.objects.filter(name__contains='rubbish'))
@@ -882,9 +913,9 @@ for x in sys.stdin:
 
   def test_my_queries(self):
     # Explicit save a design
-    _make_query(self.client, "select noHQL", name='my rubbish kuery', submission_type='Save')
+    _make_query(self.client, "select noHQL", name='my rubbish kuery', submission_type='Save', database=self.db_name)
     # Run something
-    _make_query(self.client, "Even More Bogus Junk")
+    _make_query(self.client, "Even More Bogus Junk", database=self.db_name)
     resp = self.client.get('/beeswax/my_queries')
     assert_true('my rubbish kuery' in resp.content, resp.content)
     assert_true('Even More Bogus Junk' in resp.content)
@@ -936,20 +967,20 @@ for x in sys.stdin:
 
       return resp
 
-    TARGET_DIR_ROOT = '/tmp/beeswax.test_save_directory_results'
+    TARGET_DIR_ROOT = self.cluster.fs_prefix + '/beeswax.test_save_directory_results'
 
     # Already existing dir
     if not self.cluster.fs.exists(TARGET_DIR_ROOT):
       self.cluster.fs.mkdir(TARGET_DIR_ROOT)
       self.cluster.fs.chown(TARGET_DIR_ROOT, user='test')
     hql = "SELECT * FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_DIR_ROOT, verify=False)
     assert_true('Directory already exists' in resp.content, resp.content)
 
     # SELECT *. (Result dir is same as table dir.)
     hql = "SELECT * FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/1', verify=False)
     resp = self.client.get(resp.success_url)
     # Success and went to FB
@@ -957,14 +988,14 @@ for x in sys.stdin:
 
     # SELECT columns. (Result dir is in /tmp.)
     hql = "SELECT foo, bar FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/2')
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 
     # Partition tables
     hql = "SELECT * FROM test_partitions"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_DIR_ROOT + '/3', verify=False)
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
@@ -1004,27 +1035,27 @@ for x in sys.stdin:
 
       return resp
 
-    TARGET_FILE = '/tmp/beeswax.test_save_file_results'
+    TARGET_FILE = self.cluster.fs_prefix + '/beeswax.test_save_file_results'
     if self.cluster.fs.exists(TARGET_FILE):
       self.cluster.fs.rmtree(TARGET_FILE)
 
     # SELECT columns. (Result dir is in /tmp.)
     hql = "SELECT foo, bar FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_FILE)
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
 
     # overwrite = false
     hql = "SELECT foo, bar FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_FILE, overwrite=False, verify=False)
     assert_true('-3' in resp.content, resp.content)
     assert_true('already exists' in resp.content)
 
     # Partition tables
     hql = "SELECT * FROM test_partitions"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     resp = save_and_verify(resp, TARGET_FILE, verify=False)
     resp = self.client.get(resp.success_url)
     assert_true('File Browser' in resp.content, resp.content)
@@ -1046,7 +1077,7 @@ for x in sys.stdin:
       wait_for_query_to_finish(self.client, resp, max=120)
 
       # Check that data is right. The SELECT may not give us the whole table.
-      resp = _make_query(self.client, 'SELECT * FROM %s' % target_tbl, wait=True, local=False)
+      resp = _make_query(self.client, 'SELECT * FROM %s' % target_tbl, wait=True, local=False, database=self.db_name)
       content = fetch_query_result_data(self.client, resp)
       for i in xrange(90):
         assert_equal([i, '0x%x' % (i,)], content['results'][i])
@@ -1055,18 +1086,20 @@ for x in sys.stdin:
 
     # SELECT *. (Result dir is same as table dir.)
     hql = "SELECT * FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     save_and_verify(resp, TARGET_TBL_ROOT + '_1')
 
     # SELECT columns. (Result dir is in /tmp.)
     hql = "SELECT foo, bar FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     save_and_verify(resp, TARGET_TBL_ROOT + '_2')
 
     # Save to another DB
     hql = "SELECT * FROM test"
-    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0)
-    save_and_verify(resp, 'other_db.' + TARGET_TBL_ROOT)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
+    other_db = '%s_other' % self.db_name
+    save_and_verify(resp, other_db + '.' + TARGET_TBL_ROOT)
+
 
   def test_install_examples(self):
     assert_true(not beeswax.models.MetaInstall.get().installed_example)
@@ -1101,10 +1134,10 @@ for x in sys.stdin:
     NOT TESTED/DONE: Validation checks for the inputs.
     """
     # Make sure we get a form
-    resp = self.client.get("/beeswax/create/create_table/default")
+    resp = self.client.get("/beeswax/create/create_table/%s" % self.db_name)
     assert_true("Field terminator" in resp.content)
     # Make a submission
-    resp = self.client.post("/beeswax/create/create_table/default", {
+    resp = self.client.post("/beeswax/create/create_table/%s" % self.db_name, {
       'table-name': 'my_table',
       'table-comment': 'Yo>>>>dude',  # Make sure escaping is sort of ok.
       'table-row_format': 'Delimited',
@@ -1123,38 +1156,39 @@ for x in sys.stdin:
     }, follow=True)
 
     # Ensure we can see table.
-    response = self.client.get("/metastore/table/default/my_table")
+    response = self.client.get("/metastore/table/%s/my_table" % self.db_name)
     assert_true("my_col" in response.content)
 
 
   def test_create_table_timestamp(self):
     # Check form
-    response = self.client.get('/beeswax/create/create_table/default')
+    response = self.client.get('/beeswax/create/create_table/%s' % self.db_name)
     assert_true('<option value="timestamp">timestamp</option>' in response.content, response.content)
 
     # Check creation
-    filename = '/tmp/timestamp_data'
+    filename = self.cluster.fs_prefix + '/timestamp_data'
 
     # Bad format
     self._make_custom_data_file(filename, [0, 0, 0])
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/metastore/table/default/timestamp_invalid_data")
+    response = self.client.get("/metastore/table/%s/timestamp_invalid_data" % self.db_name)
     assert_true('NULL' in response.content, response.content)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/metastore/table/default/timestamp_valid_data")
+    response = self.client.get("/metastore/table/%s/timestamp_valid_data" % self.db_name)
     assert_true('2012-01-01&nbsp;10:11:30' in response.content, response.content)
+
 
   def test_partitioned_create_table(self):
     # Make sure we get a form
-    resp = self.client.get("/beeswax/create/create_table/default")
+    resp = self.client.get("/beeswax/create/create_table/%s" % self.db_name)
     assert_true("Field terminator" in resp.content)
     # Make a submission
-    resp = self.client.post("/beeswax/create/create_table/default", {
+    resp = self.client.post("/beeswax/create/create_table/%s" % self.db_name, {
       'table-name': 'my_table2',
       'table-row_format': 'Delimited',
       'table-field_terminator_0': r'\001',
@@ -1176,7 +1210,7 @@ for x in sys.stdin:
     history = QueryHistory.objects.latest('id')
 
     assert_equal_mod_whitespace("""
-        CREATE TABLE `default.my_table2`
+        CREATE TABLE `%s.my_table2`
         (
          `my_col` string
         )
@@ -1189,14 +1223,14 @@ for x in sys.stdin:
           COLLECTION ITEMS TERMINATED BY '\\002'
           MAP KEYS TERMINATED BY '\\003'
           STORED AS TextFile
-    """, history.query)
+    """ % self.db_name, history.query)
 
 
   def test_create_table_dependencies(self):
     """
     Test field dependency in the create table form
     """
-    resp = self.client.post("/beeswax/create/create_table/default", {
+    resp = self.client.post("/beeswax/create/create_table/%s" % self.db_name, {
       'table-name': 'my_table',
       'table-row_format': 'SerDe',
       # Missing SerDe fields!
@@ -1252,37 +1286,37 @@ for x in sys.stdin:
       f = self.cluster.fs.open(filename, "w")
       f.write(data)
       f.close()
-      self.cluster.fs.do_as_superuser(self.cluster.fs.chown, filename, 'test', 'test')
+      #self.cluster.fs.do_as_superuser(self.cluster.fs.chown, filename, 'test', 'test')
 
-    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
+    #self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
-    write_file('/tmp/spacé.dat'.decode('utf-8'), RAW_FIELDS, ' ')
-    write_file('/tmp/tab.dat', RAW_FIELDS, '\t')
-    write_file('/tmp/comma.dat', RAW_FIELDS, ',')
-    write_file('/tmp/pipes.dat', RAW_FIELDS, '|')
-    write_file('/tmp/comma.dat.gz', RAW_FIELDS, ',', do_gzip=True)
-    write_file('/tmp/comma.csv', CSV_FIELDS, ',')
+    write_file(self.cluster.fs_prefix + '/spacé.dat'.decode('utf-8'), RAW_FIELDS, ' ')
+    write_file(self.cluster.fs_prefix + '/tab.dat', RAW_FIELDS, '\t')
+    write_file(self.cluster.fs_prefix + '/comma.dat', RAW_FIELDS, ',')
+    write_file(self.cluster.fs_prefix + '/pipes.dat', RAW_FIELDS, '|')
+    write_file(self.cluster.fs_prefix + '/comma.dat.gz', RAW_FIELDS, ',', do_gzip=True)
+    write_file(self.cluster.fs_prefix + '/comma.csv', CSV_FIELDS, ',')
 
     # Test auto delim selection
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_file': 'on',
-      'path': '/tmp/comma.dat',
+      'path': self.cluster.fs_prefix + '/comma.dat',
       'name': 'test_create_import',
     })
     assert_equal(resp.context['fields_list'], RAW_FIELDS)
 
     # Test same with gzip
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_file': 'on',
-      'path': '/tmp/comma.dat.gz',
+      'path': self.cluster.fs_prefix + '/comma.dat.gz',
       'name': 'test_create_import',
     })
     assert_equal(resp.context['fields_list'], RAW_FIELDS)
 
     # Make sure space works
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_preview': 'on',
-      'path': '/tmp/spacé.dat',
+      'path': self.cluster.fs_prefix + '/spacé.dat',
       'name': 'test_create_import',
       'delimiter_0': ' ',
       'delimiter_1': '',
@@ -1291,9 +1325,9 @@ for x in sys.stdin:
     assert_equal(len(resp.context['fields_list'][0]), 4)
 
     # Make sure custom delimiters work
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_preview': 'on',
-      'path': '/tmp/pipes.dat',
+      'path': self.cluster.fs_prefix + '/pipes.dat',
       'name': 'test_create_import',
       'delimiter_0': '__other__',
       'delimiter_1': '|',
@@ -1302,9 +1336,9 @@ for x in sys.stdin:
     assert_equal(len(resp.context['fields_list'][0]), 3)
 
     # Make sure quoted CSV works
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_preview': 'on',
-      'path': '/tmp/comma.csv',
+      'path': self.cluster.fs_prefix + '/comma.csv',
       'name': 'test_create_import_csv',
       'delimiter_0': '__other__',
       'delimiter_1': ',',
@@ -1317,9 +1351,9 @@ for x in sys.stdin:
     ] )
 
     # Test column definition
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_delim': 'on',
-      'path': '/tmp/comma.dat.gz',
+      'path': self.cluster.fs_prefix + '/comma.dat.gz',
       'name': 'test_create_import',
       'delimiter_0': ',',
       'delimiter_1': '',
@@ -1329,9 +1363,9 @@ for x in sys.stdin:
     assert_equal(len(resp.context['column_formset'].forms), 3)
 
     # Test table creation and data loading
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_create': 'on',
-      'path': '/tmp/comma.dat.gz',
+      'path': self.cluster.fs_prefix + '/comma.dat.gz',
       'name': 'test_create_import',
       'delimiter_0': ',',
       'delimiter_1': '',
@@ -1389,9 +1423,9 @@ for x in sys.stdin:
     assert_true("sp&nbsp;ace" in resp.content, resp.content)
 
     # Test table creation and data loading and removing header
-    resp = self.client.post('/beeswax/create/import_wizard/default', {
+    resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
       'submit_create': 'on',
-      'path': '/tmp/comma.csv',
+      'path': self.cluster.fs_prefix + '/comma.csv',
       'name': 'test_create_import_with_header',
       'delimiter_0': ',',
       'delimiter_1': '',
@@ -1448,14 +1482,14 @@ for x in sys.stdin:
 
 
   def test_select_invalid_data(self):
-    filename = '/tmp/test_select_invalid_data'
+    filename = self.cluster.fs_prefix + '/test_select_invalid_data'
     self._make_custom_data_file(filename, [1, 2, 3, 'NaN', 'INF', '-INF', 'BAD']) # Infinity not supported yet
     self._make_table('test_select_invalid_data', 'CREATE TABLE test_select_invalid_data (timestamp1 DOUBLE)', filename)
 
     hql = """
       SELECT * FROM test_select_invalid_data;
     """
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     content = json.loads(resp.content)
@@ -1468,53 +1502,58 @@ for x in sys.stdin:
 
 
   def test_create_database(self):
-    resp = self.client.post("/beeswax/create/database", {
-      'name': 'my_db',
-      'comment': 'foo',
-      'create': 'Create database',
-      'use_default_location': True,
-    }, follow=True)
-    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
-    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
-    resp = self.client.get("/metastore/databases/")
-    assert_true('my_db' in resp.context['databases'], resp)
+    db_name = self.db_name + '_my_db'
+    db_name_accent = self.db_name + '_credito'
+    try:
+      resp = self.client.post("/beeswax/create/database", {
+        'name': db_name,
+        'comment': 'foo',
+        'create': 'Create database',
+        'use_default_location': True,
+      }, follow=True)
+      resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
+      resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+      resp = self.client.get("/metastore/databases/")
+      assert_true(db_name in resp.context['databases'], resp)
 
-    # Test for accented characters in 'comment'
-    resp = self.client.post("/beeswax/create/database", {
-      'name': 'credito',
-      'comment': 'crédito',
-      'create': 'Create database',
-      'use_default_location': True,
-    }, follow=True)
-    resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
-    resp = wait_for_query_to_finish(self.client, resp, max=180.0)
-    resp = self.client.get("/metastore/databases/")
-    assert_true('credito' in resp.context['databases'], resp)
+      # Test for accented characters in 'comment'
+      resp = self.client.post("/beeswax/create/database", {
+        'name': db_name_accent,
+        'comment': 'crédito',
+        'create': 'Create database',
+        'use_default_location': True,
+      }, follow=True)
+      resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
+      resp = wait_for_query_to_finish(self.client, resp, max=180.0)
+      resp = self.client.get("/metastore/databases/")
+      assert_true(db_name_accent in resp.context['databases'], resp)
+    finally:
+      make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
+      make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name_accent}, wait=True)
+
 
   def test_select_query_server(self):
     c = make_logged_in_client()
-    _make_query(c, 'SELECT bogus FROM test') # Improvement: mock another server
+    _make_query(c, 'SELECT bogus FROM test', database=self.db_name) # Improvement: mock another server
 
     history = beeswax.models.QueryHistory.objects.latest('id')
     assert_equal('beeswax', history.server_name)
     assert_equal(HIVE_SERVER_HOST.get(), history.server_host)
-    assert_equal(HIVE_SERVER_TEST_PORT, history.server_port)
 
     query_server = history.get_query_server_config()
     assert_equal('beeswax', query_server['server_name'])
     assert_equal(get_localhost_name(), query_server['server_host'])
-    assert_equal(HIVE_SERVER_TEST_PORT, query_server['server_port'])
     assert_equal('hiveserver2', query_server['server_type'])
     assert_true(query_server['principal'] is None, query_server['principal']) # No default hive/HOST_@TEST.COM so far
 
 
   def test_select_multi_db(self):
-    response = _make_query(self.client, 'SELECT * FROM test LIMIT 5', local=False, database='default')
+    response = _make_query(self.client, 'SELECT * FROM test LIMIT 5', local=False, database=self.db_name)
     response = wait_for_query_to_finish(self.client, response)
     content = fetch_query_result_data(self.client, response)
     assert_true([0, u'0x0'] in content['results'], content)
 
-    response = _make_query(self.client, 'SHOW TABLES', local=False, database='other_db')
+    response = _make_query(self.client, 'SHOW TABLES', local=False, database='%s_other' % self.db_name)
     response = wait_for_query_to_finish(self.client, response)
     content = fetch_query_result_data(self.client, response)
     assert_true('tab_name' in content['columns'][0]['name'], content)
@@ -1527,7 +1566,7 @@ for x in sys.stdin:
   def test_list_design_pagination(self):
     client = make_logged_in_client()
 
-    _make_query(client, 'SELECT', name='my query history', submission_type='Save')
+    _make_query(client, 'SELECT', name='my query history', submission_type='Save', database=self.db_name)
     design = SavedQuery.objects.get(name='my query history')
 
     for i in range(25):
@@ -1546,7 +1585,7 @@ for x in sys.stdin:
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
-    resp = client.get(reverse('beeswax:describe_table', kwargs={'database': 'default', 'table': 'test'}) + '?sample=true')
+    resp = client.get(reverse('beeswax:describe_table', kwargs={'database': self.db_name, 'table': 'test'}) + '?sample=true')
 
     assert_equal(resp.status_code, 200)
     assert_true('<th>foo</th>' in resp.content, resp.content)
@@ -1570,7 +1609,7 @@ for x in sys.stdin:
       query = 'SELECT "ssn=123-45-6789"'
       expected_query = 'SELECT "ssn=XXX-XX-XXXX"'
 
-      resp = make_query(c, query)
+      resp = make_query(c, query, database=self.db_name)
       content = json.loads(resp.content)
       query_id = content['id']
       history = beeswax.models.QueryHistory.objects.get(pk=query_id)
@@ -1581,7 +1620,7 @@ for x in sys.stdin:
       query = 'SELECT "hello"'
       expected_query = 'SELECT "hello"'
 
-      resp = make_query(c, query)
+      resp = make_query(c, query, database=self.db_name)
       content = json.loads(resp.content)
       query_id = content['id']
       history = beeswax.models.QueryHistory.objects.get(pk=query_id)
@@ -1592,71 +1631,76 @@ for x in sys.stdin:
 
 
   def test_analyze_table_and_read_statistics(self):
-    # No stats
-    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test'}))
-    stats = json.loads(resp.content)['stats']
-    assert_equal('COLUMN_STATS_ACCURATE', stats[0]['data_type'], resp.content)
+    _make_query(self.client, "USE %s" % self.db_name, wait=True) # We need this until Hive 1.2
 
-    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
-    stats = json.loads(resp.content)['stats']
-    assert_equal([
+    try:
+      # No stats
+      resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
+      stats = json.loads(resp.content)['stats']
+      assert_equal('COLUMN_STATS_ACCURATE', stats[0]['data_type'], resp.content)
+
+      resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
+      stats = json.loads(resp.content)['stats']
+      assert_equal([
+            {u'col_name': u'foo'},
+            {u'data_type': u'int'},
+            {u'min': u''},
+            {u'max': u''},
+            {u'num_nulls': u''},
+            {u'distinct_count': u''},
+            {u'avg_col_len': u''},
+            {u'max_col_len': u''},
+            {u'num_trues': u''},
+            {u'num_falses': u''}
+          ],
+          stats
+      )
+
+      # Compute stats
+      response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': self.db_name, 'table': 'test'}), follow=True)
+      response = wait_for_query_to_finish(self.client, response, max=60.0)
+      assert_true(response, response)
+
+      response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': self.db_name, 'table': 'test', 'columns': True}), follow=True)
+      response = wait_for_query_to_finish(self.client, response, max=60.0)
+      assert_true(response, response)
+
+      # Retrieve stats
+      resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test'}))
+      stats = json.loads(resp.content)['stats']
+      assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows']), resp.content)
+      assert_true(any([stat for stat in stats if stat['comment'] == '256']), resp.content)
+
+      resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
+      stats = json.loads(resp.content)['stats']
+      assert_equal([
           {u'col_name': u'foo'},
           {u'data_type': u'int'},
-          {u'min': u''},
-          {u'max': u''},
-          {u'num_nulls': u''},
-          {u'distinct_count': u''},
+          {u'min': u'0'},
+          {u'max': u'255'},
+          {u'num_nulls': u'0'},
+          {u'distinct_count': u'180'},
           {u'avg_col_len': u''},
           {u'max_col_len': u''},
           {u'num_trues': u''},
           {u'num_falses': u''}
         ],
         stats
-    )
-
-    # Compute stats
-    response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': 'default', 'table': 'test'}), follow=True)
-    response = wait_for_query_to_finish(self.client, response, max=60.0)
-    assert_true(response, response)
-
-    response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': 'default', 'table': 'test', 'columns': True}), follow=True)
-    response = wait_for_query_to_finish(self.client, response, max=60.0)
-    assert_true(response, response)
-
-    # Retrieve stats
-    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test'}))
-    stats = json.loads(resp.content)['stats']
-    assert_true(any([stat for stat in stats if stat['data_type'] == 'numRows']), resp.content)
-    assert_true(any([stat for stat in stats if stat['comment'] == '256']), resp.content)
-
-    resp = self.client.get(reverse('beeswax:get_table_stats', kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
-    stats = json.loads(resp.content)['stats']
-    assert_equal([
-        {u'col_name': u'foo'},
-        {u'data_type': u'int'},
-        {u'min': u'0'},
-        {u'max': u'255'},
-        {u'num_nulls': u'0'},
-        {u'distinct_count': u'180'},          
-        {u'avg_col_len': u''},
-        {u'max_col_len': u''},
-        {u'num_trues': u''},
-        {u'num_falses': u''}
-      ],
-      stats
-    )
+      )
+    finally:
+      _make_query(self.client, "USE default", wait=True)
 
 
   def test_get_top_terms(self):
-    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo'}))
+    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
     terms = json.loads(resp.content)['terms']
     assert_equal([[255, 1], [254, 1], [253, 1], [252, 1]], terms[:4])
 
-    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo', 'prefix': '10'}))
+    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}))
     terms = json.loads(resp.content)['terms']
     assert_equal([[109, 1], [108, 1], [107, 1], [106, 1]], terms[:4])
 
-    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': 'default', 'table': 'test', 'column': 'foo', 'prefix': '10'}) + '?limit=2')
+    resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}) + '?limit=2')
     terms = json.loads(resp.content)['terms']
     assert_equal([[109, 1], [108, 1]], terms)
 
@@ -1751,6 +1795,7 @@ def test_history_page():
   grant_access('test_who', 'test_who', 'test_who')
   do_view('q-user=test_who', 0)
   do_view('q-user=:all')
+
 
 def teststrip_trailing_semicolon():
   # Note that there are two queries (both an execute and an explain) scattered
