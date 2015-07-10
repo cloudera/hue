@@ -55,6 +55,7 @@ def cleanup_file(cluster, path):
     # Don't let cleanup errors mask earlier failures
     LOG.exception('failed to cleanup %s' % path)
 
+
 class TestFileBrowserWithHadoop(object):
   requires_hadoop = True
 
@@ -67,6 +68,7 @@ class TestFileBrowserWithHadoop(object):
     self.cluster = pseudo_hdfs4.shared_cluster()
     self.cluster.fs.setuser('test')
     self.prefix = self.cluster.fs_prefix + '/filebrowser'
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
   def tearDown(self):
     cleanup_tree(self.cluster, self.prefix)

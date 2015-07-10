@@ -39,12 +39,15 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db import transaction
 
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.conf import LDAP_USERNAME, LDAP_PASSWORD
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
+from hadoop.fs.hadoopfs import Hdfs
 
 import desktop.conf as desktop_conf
 
@@ -57,7 +60,7 @@ from beeswax import conf, hive_site
 from beeswax.conf import HIVE_SERVER_HOST
 from beeswax.views import collapse_whitespace, _save_design
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
-  HIVE_SERVER_TEST_PORT, fetch_query_result_data
+  fetch_query_result_data
 from beeswax.design import hql_query, strip_trailing_semicolon
 from beeswax.data_export import upload, download
 from beeswax.models import SavedQuery, QueryHistory, HQL, HIVE_SERVER2
@@ -69,11 +72,9 @@ from beeswax.server.hive_server2_lib import HiveServerClient,\
 from beeswax.test_base import BeeswaxSampleProvider
 from beeswax.hive_site import get_metastore
 
-from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import LDAP_USERNAME, LDAP_PASSWORD
-
 
 LOG = logging.getLogger(__name__)
+
 
 def _make_query(client, query, submission_type="Execute",
                 udfs=None, settings=None, resources=[],
@@ -108,7 +109,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     self.user = User.objects.get(username='test')
     add_to_group('test')
     self.db = dbms.get(self.user, get_query_server_config())
-
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
   def _verify_query_state(self, state):
     """
@@ -156,7 +157,10 @@ for x in sys.stdin:
         ("hive.exec.compress.output", "true")], local=False, database=self.db_name) # Run on MR, because that's how we check it worked.
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     # Check that we actually got a compressed output
-    files = self.cluster.fs.listdir("/user/hive/warehouse/%(db)s.db/%(table_name)s" % {'db': self.db_name, 'table_name': table_name})
+    table = self.db.get_table(database=self.db_name, table_name=table_name)
+    hdfs_loc = Hdfs.urlsplit(table.path_location)
+
+    files = self.cluster.fs.listdir(hdfs_loc[2])
     assert_true(len(files) >= 1, files)
     assert_true(files[0].endswith(".deflate"), files[0])
 
@@ -1261,7 +1265,6 @@ for x in sys.stdin:
 
 
   def test_create_table_import(self):
-    """Test create table wizard"""
     RAW_FIELDS = [
       ['ta\tb', 'nada', 'sp ace'],
       ['f\too', 'bar', 'fred'],
