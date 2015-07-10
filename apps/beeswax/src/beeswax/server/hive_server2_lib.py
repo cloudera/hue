@@ -586,7 +586,7 @@ class HiveServerClient:
     req = TGetSchemasReq()
     res = self.call(self._client.GetSchemas, req)
 
-    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
+    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
     self.close_operation(res.operationHandle)
 
     col = 'TABLE_SCHEM'
