@@ -392,8 +392,8 @@ class BeeswaxSampleProvider(object):
 
     # Insert additional partition data into "test_partitions" table
     ADD_PARTITION = """
-      ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '/tmp/beeswax/baz_foo/boom_bar'
-    """ % {'db': cls.db_name}
+      ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '%(fs_prefix)s/baz_foo/boom_bar'
+    """ % {'db': cls.db_name, 'fs_prefix': cls.cluster.fs_prefix}
     make_query(cls.client, ADD_PARTITION, wait=True, local=False)
 
     # Create a bunch of other tables

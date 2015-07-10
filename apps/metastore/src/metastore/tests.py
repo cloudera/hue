@@ -68,22 +68,22 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   def test_basic_flow(self):
     # Default database should exist
     response = self.client.get("/metastore/databases")
-    assert_true("default" in response.context["databases"])
+    assert_true(self.db_name in response.context["databases"])
 
     # Table should have been created
     response = self.client.get("/metastore/tables/")
-    assert_true("test" in response.context["tables"])
+    assert_equal(200, response.status_code)
 
     # Switch databases
-    response = self.client.get("/metastore/tables/default")
+    response = self.client.get("/metastore/tables/%s" % self.db_name)
     assert_true("test" in response.context["tables"])
 
     # Should default to "default" database
     response = self.client.get("/metastore/tables/not_there")
-    assert_true("test" in response.context["tables"])
+    assert_equal(200, response.status_code)
 
     # And have detail
-    response = self.client.get("/metastore/table/default/test")
+    response = self.client.get("/metastore/table/%s/test" % self.db_name)
     assert_true("foo" in response.content)
     assert_true("SerDe Library" in response.content, response.content)
 
@@ -91,7 +91,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     history_cnt = verify_history(self.client, fragment='test')
 
     # Show table data.
-    response = self.client.get("/metastore/table/default/test/read", follow=True)
+    response = self.client.get("/metastore/table/%s/test/read" % self.db_name, follow=True)
     response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     # Note that it may not return all rows at once. But we expect at least 10.
@@ -101,53 +101,53 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(verify_history(self.client, fragment='test'), history_cnt, 'Implicit queries should not be saved in the history')
 
   def test_describe_view(self):
-    resp = self.client.get('/metastore/table/default/myview')
+    resp = self.client.get('/metastore/table/%s/myview' % self.db_name)
     assert_equal(None, resp.context['sample'])
     assert_true(resp.context['table'].is_view)
     assert_true("View" in resp.content)
     assert_true("Drop View" in resp.content)
     # Breadcrumbs
-    assert_true("default" in resp.content)
+    assert_true(self.db_name in resp.content)
     assert_true("myview" in resp.content)
 
   def test_describe_partitions(self):
-    response = self.client.get("/metastore/table/default/test_partitions")
+    response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
     assert_true("Show Partitions (2)" in response.content, response.content)
 
-    response = self.client.get("/metastore/table/default/test_partitions/partitions", follow=True)
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name, follow=True)
     assert_true("baz_one" in response.content)
     assert_true("boom_two" in response.content)
     assert_true("baz_foo" in response.content)
     assert_true("boom_bar" in response.content)
     # Breadcrumbs
-    assert_true("default" in response.content)
+    assert_true(self.db_name in response.content)
     assert_true("test_partitions" in response.content)
     assert_true("partitions" in response.content)
 
     # Not partitioned
-    response = self.client.get("/metastore/table/default/test/partitions", follow=True)
+    response = self.client.get("/metastore/table/%s/test/partitions" % self.db_name, follow=True)
     assert_true("is not partitioned." in response.content)
 
   def test_describe_partitioned_table_with_limit(self):
     # Limit to 90
     finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
     try:
-      response = self.client.get("/metastore/table/default/test_partitions")
+      response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
       assert_true("0x%x" % 89 in response.content, response.content)
       assert_false("0x%x" % 90 in response.content, response.content)
     finally:
       finish()
 
   def test_read_partitions(self):
-    response = self.client.get("/metastore/table/default/test_partitions/partitions/0/read", follow=True)
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions/0/read" % self.db_name, follow=True)
     response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     results = fetch_query_result_data(self.client, response)
     assert_true(len(results['results']) > 0, results)
 
   def test_browse_partition(self):
-    response = self.client.get("/metastore/table/default/test_partitions/partitions/1/browse", follow=True)
-    filebrowser_path = reverse("filebrowser.views.view", kwargs={'path': '/tmp/beeswax/baz_foo/boom_bar'})
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions/1/browse" % self.db_name, follow=True)
+    filebrowser_path = reverse("filebrowser.views.view", kwargs={'path': '%s/baz_foo/boom_bar' % self.cluster.fs_prefix})
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
 
   def test_drop_multi_tables(self):
@@ -156,30 +156,39 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       CREATE TABLE test_drop_2 (a int);
       CREATE TABLE test_drop_3 (a int);
     """
-    resp = _make_query(self.client, hql)
+    resp = _make_query(self.client, hql, database=self.db_name)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     # Drop them
-    resp = self.client.get('/metastore/tables/drop/default', follow=True)
+    resp = self.client.get('/metastore/tables/drop/%s' % self.db_name, follow=True)
     assert_true('want to delete' in resp.content, resp.content)
-    resp = self.client.post('/metastore/tables/drop/default', {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
+    resp = self.client.post('/metastore/tables/drop/%s' % self.db_name, {u'table_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
     assert_equal(resp.status_code, 302)
 
 
   def test_drop_multi_databases(self):
-    hql = """
-      CREATE DATABASE test_drop_1;
-      CREATE DATABASE test_drop_2;
-      CREATE DATABASE test_drop_3;
-    """
-    resp = _make_query(self.client, hql)
-    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    db1 = '%s_test_drop_1' % self.db_name
+    db2 = '%s_test_drop_2' % self.db_name
+    db3 = '%s_test_drop_3' % self.db_name
 
-    # Drop them
-    resp = self.client.get('/metastore/databases/drop', follow=True)
-    assert_true('want to delete' in resp.content, resp.content)
-    resp = self.client.post('/metastore/databases/drop', {u'database_selection': [u'test_drop_1', u'test_drop_2', u'test_drop_3']})
-    assert_equal(resp.status_code, 302)
+    try:
+      hql = """
+        CREATE DATABASE %(db1)s;
+        CREATE DATABASE %(db2)s;
+        CREATE DATABASE %(db3)s;
+      """ % {'db1': db1, 'db2': db2, 'db3': db3}
+      resp = _make_query(self.client, hql)
+      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+      # Drop them
+      resp = self.client.get('/metastore/databases/drop', follow=True)
+      assert_true('want to delete' in resp.content, resp.content)
+      resp = self.client.post('/metastore/databases/drop', {u'database_selection': [db1, db2, db3]})
+      assert_equal(resp.status_code, 302)
+    finally:
+      make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db1}, wait=True)
+      make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db2}, wait=True)
+      make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db3}, wait=True)
 
 
   def test_load_data(self):
@@ -189,23 +198,25 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     about whether a table is partitioned.
     """
     # Check that view works
-    resp = self.client.get("/metastore/table/default/test/load", follow=True)
+    resp = self.client.get("/metastore/table/%s/test/load" % self.db_name, follow=True)
     assert_true('Path' in resp.content)
 
+    data_path = '%(prefix)s/tmp/foo' % {'prefix': self.cluster.fs_prefix}
+
     # Try the submission
-    self.client.post("/metastore/table/default/test/load", dict(path="/tmp/foo", overwrite=True), follow=True)
+    self.client.post("/metastore/table/%s/test/load" % self.db_name, {'path': data_path, 'overwrite': True}, follow=True)
     query = QueryHistory.objects.latest('id')
 
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' OVERWRITE INTO TABLE `default`.`test`", query.query)
+    assert_equal_mod_whitespace("LOAD DATA INPATH '%(data_path)s' OVERWRITE INTO TABLE `%(db)s`.`test`" % {'data_path': data_path, 'db': self.db_name}, query.query)
 
-    resp = self.client.post("/metastore/table/default/test/load", dict(path="/tmp/foo", overwrite=False), follow=True)
+    resp = self.client.post("/metastore/table/%s/test/load" % self.db_name, {'path': data_path, 'overwrite': False}, follow=True)
     query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace("LOAD DATA INPATH '/tmp/foo' INTO TABLE `default`.`test`", query.query)
+    assert_equal_mod_whitespace("LOAD DATA INPATH '%(data_path)s' INTO TABLE `%(db)s`.`test`" % {'data_path': data_path, 'db': self.db_name}, query.query)
 
     # Try it with partitions
-    resp = self.client.post("/metastore/table/default/test_partitions/load", dict(path="/tmp/foo", partition_0="alpha", partition_1="beta"), follow=True)
+    resp = self.client.post("/metastore/table/%s/test_partitions/load" % self.db_name, {'path': data_path, 'partition_0': "alpha", 'partition_1': "beta"}, follow=True)
     query = QueryHistory.objects.latest('id')
-    assert_equal_mod_whitespace(query.query, "LOAD DATA INPATH '/tmp/foo' INTO TABLE `default`.`test_partitions` PARTITION (baz='alpha', boom='beta')")
+    assert_equal_mod_whitespace(query.query, "LOAD DATA INPATH '%(data_path)s' INTO TABLE `%(db)s`.`test_partitions` PARTITION (baz='alpha', boom='beta')" % {'data_path': data_path, 'db': self.db_name})
 
 
   def test_has_write_access_frontend(self):
@@ -238,14 +249,14 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     grant_access("write_access_backend", "write_access_backend", "beeswax")
     user = User.objects.get(username='write_access_backend')
 
-    resp = _make_query(client, 'CREATE TABLE test_perm_1 (a int);') # Only fails if we were using Sentry and won't allow SELECT to user
+    resp = _make_query(client, 'CREATE TABLE test_perm_1 (a int);', database=self.db_name) # Only fails if we were using Sentry and won't allow SELECT to user
     resp = wait_for_query_to_finish(client, resp, max=30.0)
 
     def check(client, http_codes):
-      resp = client.get('/metastore/tables/drop/default')
+      resp = client.get('/metastore/tables/drop/%s' % self.db_name)
       assert_true(resp.status_code in http_codes, resp.content)
 
-      resp = client.post('/metastore/tables/drop/default', {u'table_selection': [u'test_perm_1']})
+      resp = client.post('/metastore/tables/drop/%s' % self.db_name, {u'table_selection': [u'test_perm_1']})
       assert_true(resp.status_code in http_codes, resp.content)
 
     check(client, [301]) # Denied
