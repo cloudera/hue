@@ -43,7 +43,7 @@ def create_session(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   session = [session for session in notebook['sessions'] if snippet['type'] == session['type']]
-  if any(session):
+  if any(session) and 'properties' in session[0]:
     properties = session[0]['properties']
   else:
     properties = None
