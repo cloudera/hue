@@ -34,7 +34,12 @@ ${layout.menubar(section='saved queries')}
 
     <%actionbar:render>
       <%def name="search()">
-        <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for query')}">
+        <form id="searchQueryForm" action="${ url(app_name + ':list_trashed_designs') }" method="GET">
+          <input id="filterInput" type="text" name="text" class="input-xlarge search-query" value="${ filter_params.get(prefix + 'text', '') }" placeholder="${_('Search for query')}" />
+          <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
+            <i class="fa fa-search"></i>
+          </button>
+        </form>
       </%def>
 
       <%def name="actions()">
@@ -154,11 +159,7 @@ ${layout.menubar(section='saved queries')}
         "sEmptyTable":"${_('No data available')}",
         "sZeroRecords":"${_('No matching records')}",
       },
-      "bStateSave": true
-    });
-
-    $("#filterInput").keyup(function () {
-      savedQueries.fnFilter($(this).val());
+      "bStateSave": false
     });
 
     $(".selectAll").click(function () {

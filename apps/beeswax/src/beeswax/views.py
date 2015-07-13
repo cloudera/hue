@@ -221,11 +221,17 @@ def list_designs(request):
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_query[ prefix + 'type' ] = app_name
+  # Get search filter input if any
+  search_filter = request.GET.get('text', None)
+  if search_filter is not None:
+    querydict_query[ prefix + 'text' ] = search_filter
+
   page, filter_params = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   return render('list_designs.mako', request, {
     'page': page,
     'filter_params': filter_params,
+    'prefix': prefix,
     'user': request.user,
     'designs_json': json.dumps([query.id for query in page.object_list])
   })
@@ -242,15 +248,20 @@ def list_trashed_designs(request):
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_query[ prefix + 'type' ] = app_name
+  # Get search filter input if any
+  search_filter = request.GET.get('text', None)
+  if search_filter is not None:
+    querydict_query[ prefix + 'text' ] = search_filter
+
   page, filter_params = _list_designs(user, querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
 
   return render('list_trashed_designs.mako', request, {
     'page': page,
     'filter_params': filter_params,
+    'prefix': prefix,
     'user': request.user,
     'designs_json': json.dumps([query.id for query in page.object_list])
   })
-
 
 
 def my_queries(request):
@@ -840,7 +851,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
   page = paginator.page(pagenum)
 
   # We need to pass the parameters back to the template to generate links
-  keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort') ]
+  keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort', 'text') ]
   filter_params = copy_query_dict(querydict, keys_to_copy)
 
   return page, filter_params
