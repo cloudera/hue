@@ -834,47 +834,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
-<template id="jvm-memory-input-template">
-  <input type="text" class="input-small" data-bind="textInput: value" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
-</template>
-
-<script type="text/javascript" charset="utf-8">
-  (function() {
-    var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
-    var UNITS = { 'MB' : 'M', 'GB' : 'G' };
-
-    function JvmMemoryInputViewModel(params) {
-      this.valueObservable = params.value;
-      this.units = Object.keys(UNITS);
-      this.selectedUnit = ko.observable();
-      this.value = ko.observable().extend({ 'numeric' : 0 });
-
-      var match = JVM_MEM_PATTERN.exec(this.valueObservable());
-      if (match.length === 3) {
-        this.value(match[1]);
-        this.selectedUnit(match[2] === 'M' ? 'MB' : 'GB');
-      }
-
-      this.value.subscribe(this.updateValueObservable, this);
-      this.selectedUnit.subscribe(this.updateValueObservable, this);
-    }
-
-    JvmMemoryInputViewModel.prototype.updateValueObservable = function() {
-      if (isNaN(this.value()) || this.value() === '') {
-        this.valueObservable(undefined);
-      } else {
-        this.valueObservable(this.value() + UNITS[this.selectedUnit()]);
-      }
-    };
-
-    ko.components.register('jvm-memory-input', {
-      viewModel: JvmMemoryInputViewModel,
-      template: { element: 'jvm-memory-input-template' }
-    });
-  }());
-</script>
-
-
+${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
