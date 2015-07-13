@@ -432,3 +432,16 @@ input[type="text"].filechooser-input {
 table.airy tr td {
   padding: 4px;
 }
+
+.ace-editor {
+  height: 200px;
+}
+
+.ace-filechooser {
+  position: absolute;
+  display: none;
+  z-index: 20000;
+  background-color: #FFFFFF;
+  padding: 10px;
+  min-width: 350px;
+}

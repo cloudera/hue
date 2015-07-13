@@ -15,6 +15,10 @@
 // limitations under the License.
 
 
+var SPARK_MAPPING = {
+  ignore: ["ace"]
+}
+
 var Result = function (snippet, result) {
   var self = this;
 
@@ -109,6 +113,14 @@ var TYPE_EDITOR_MAP = {
   'pig': 'text/x-pig'
 }
 
+var TYPE_ACE_EDITOR_MAP = {
+  'hive': 'ace/mode/hive',
+  'impala': 'ace/mode/impala',
+  'python': 'ace/mode/python',
+  'scala': 'ace/mode/scala',
+  'pig': 'ace/mode/pig'
+}
+
 var Snippet = function (vm, notebook, snippet) {
   var self = this;
 
@@ -116,6 +128,13 @@ var Snippet = function (vm, notebook, snippet) {
   self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
   self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
+
+  //Ace stuff
+  self.aceEditorMode = ko.observable(TYPE_ACE_EDITOR_MAP[self.type()]);
+  self.ace = ko.observable(null);
+  self.completers = ko.observableArray([]);
+  self.errors = ko.observableArray([]);
+
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : vm.snippetPlaceholders[self.type()]);
   self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
   // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
@@ -425,7 +444,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.fetchResultMetadata = function () {
     $.post("/spark/api/fetch_result_metadata", {
       notebook: ko.mapping.toJSON(notebook.getContext()),
-      snippet: ko.mapping.toJSON(self.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
         self.result.meta(data.result.meta);
@@ -681,7 +700,7 @@ var Notebook = function (vm, notebook) {
 
   self.save = function () {
     $.post("/spark/api/notebook/save", {
-      "notebook": ko.mapping.toJSON(self)
+      "notebook": ko.mapping.toJSON(self, SPARK_MAPPING)
     }, function (data) {
       if (data.status == 0) {
         self.id(data.id);
@@ -700,7 +719,7 @@ var Notebook = function (vm, notebook) {
 
   self.close = function () {
     $.post("/spark/api/notebook/close", {
-      "notebook": ko.mapping.toJSON(self)
+      "notebook": ko.mapping.toJSON(self, SPARK_MAPPING)
     });
   };
 

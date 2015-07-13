@@ -1483,68 +1483,256 @@ ko.toJSONObject = function (koObj) {
 }
 
 ko.bindingHandlers.aceEditor = {
-    init: function (element, valueAccessor) {
-      var _el = $(element);
-      var _options = ko.unwrap(valueAccessor());
-      var _onBlur = _options.onBlur || function () {};
-      var _onChange = _options.onChange || function () {};
-      var _onAfterExec = _options.onAfterExec || function () {};
-      _el.text(_options.value());
-      var editor = ace.edit(_el.attr("id"));
-      editor.session.setMode(_options.mode());
-      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+  init: function (element, valueAccessor) {
+    var $el = $(element);
+    var options = ko.unwrap(valueAccessor());
+    var onFocus = options.onFocus || function () {};
+    var onBlur = options.onBlur || function () {};
+    var onChange = options.onChange || function () {};
+    var onCopy = options.onCopy || function () {};
+    var onPaste = options.onPaste || function () {};
+    var onAfterExec = options.onAfterExec || function () {};
+    var autocompleter = options.autocompleter || null;
 
-      var _editorOptions = {
-        enableBasicAutocompletion: true,
-        enableSnippets: true,
-        enableLiveAutocompletion: true,
-        showGutter: true,
-        showLineNumbers: false
+    $el.text(options.value());
+
+    var editor = ace.edit($el.attr("id"));
+    editor.session.setMode(options.mode());
+    editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+
+    var editorOptions = {
+      enableBasicAutocompletion: true,
+      enableSnippets: true,
+      enableLiveAutocompletion: true,
+      showGutter: true,
+      showLineNumbers: false
+    }
+
+    if (editor.getValue() == "" && options.placeholder) {
+      editor.setValue(options.placeholder);
+    }
+
+    var _extraOptions = $.totalStorage("hue.ace.options") || {};
+    $.extend(editorOptions, options.editorOptions || _extraOptions);
+
+    editor.setOptions(editorOptions);
+    editor.on("focus", function () {
+      if (options.placeholder && editor.getValue() == options.placeholder) {
+        editor.setValue("");
       }
+      onFocus(editor);
+    });
+    editor.on("blur", function () {
+      options.value(editor.getValue());
+      if (editor.getValue() == "" && options.placeholder) {
+        editor.setValue(options.placeholder);
+      }
+      onBlur(editor);
+    });
+    editor.on("copy", function () {
+      onCopy(editor);
+    });
+    editor.on("paste", function () {
+      onPaste(editor);
+    });
 
-      var _extraOptions = $.totalStorage("hue.ace.options") || {};
-      $.extend( _editorOptions, _options.editorOptions || _extraOptions);
-
-      editor.setOptions(_editorOptions);
-      editor.on("blur", function () {
-        _options.value(editor.getValue());
-        _onBlur(editor);
-      });
-      editor.on("change", function (e) {
-        editor.clearErrors();
-        _onChange(e, editor, valueAccessor);
-      });
-
-      editor.commands.on("afterExec", function(e) {
-        _onAfterExec(e, editor, valueAccessor);
-      });
-
-      editor.$blockScrolling = Infinity
-      element.originalCompleters = editor.completers;
-      _options.aceInstance(editor);
-    },
-    update: function (element, valueAccessor) {
-      var _options = ko.unwrap(valueAccessor());
-      if (_options.aceInstance()) {
-        var _editor = _options.aceInstance();
-        _editor.completers = element.originalCompleters.slice();
-        if (_options.extraCompleters().length > 0) {
-          _options.extraCompleters().forEach(function (complete) {
-            _editor.completers.push(complete);
-          });
-          _editor.execCommand("startAutocomplete");
-        }
-        _editor.clearErrors();
-        if (_options.errors().length > 0){
-          _options.errors().forEach(function(err){
-            _editor.addError(err.message, err.line);
-            if (err.line == _editor.getCursorPosition().row){
-              window.setTimeout(function(){
-                $(element).find(".ace_active-line").remove();
-              }, 100)
-            }
-          });
+    function newCompleter(items) {
+      return {
+        getCompletions: function (editor, session, pos, prefix, callback) {
+          callback(null, items);
         }
       }
     }
+
+    function fieldsAutocomplete(editor, valueAccessor) {
+      try {
+        var before = editor.getTextBeforeCursor(";");
+        var after = editor.getTextAfterCursor(";");
+        var statement = before + after;
+        var foundTable = "";
+        if (before.substr(-1) == ".") { // gets the table alias
+          foundTable = before.split(" ").pop().slice(0, -1);
+        }
+        else { // gets the standard table
+          var from = statement.toUpperCase().indexOf("FROM");
+          if (from > -1) {
+            var match = statement.toUpperCase().substring(from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
+            var to = statement.length;
+            if (match) {
+              to = match.index;
+            }
+            var found = statement.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+          }
+
+          for (var i = 0; i < found.length; i++) {
+            if ($.trim(found[i]) != "" && foundTable == "") {
+              foundTable = $.trim(found[i]).split(" ")[0];
+            }
+          }
+        }
+
+        if (foundTable != "") {
+          if (valueAccessor().autocompleter != null) {
+            editor.showSpinner();
+            // fill up with fields
+            valueAccessor().autocompleter.getTableColumns(valueAccessor().autocompleter.getDatabase(), foundTable, statement, function (data) {
+              var fieldNames = data.split(" ");
+              var fields = [];
+              fieldNames.forEach(function (fld) {
+                if (fld != "") {
+                  fields.push({value: fld, score: (fld == "*") ? 1001 : 1000, meta: "column"});
+                }
+              });
+              valueAccessor().extraCompleters([newCompleter(fields)]);
+              editor.hideSpinner();
+            });
+          }
+        }
+      }
+      catch (e) {
+      }
+    }
+
+    editor.on("change", function (e) {
+      editor.clearErrors();
+      options.extraCompleters([]);
+      editor.session.getMode().$id = valueAccessor().mode();
+
+      var before = editor.getTextBeforeCursor(";");
+      var beforeU = before.toUpperCase();
+      var after = editor.getTextAfterCursor(";");
+      var afterU = after.toUpperCase();
+      if (editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
+        if ($.trim(before).substr(-1) != ".") {
+          if ((beforeU.indexOf(" FROM ") > -1 || beforeU.indexOf(" TABLE ") > -1 || beforeU.indexOf(" STATS ") > -1) && beforeU.indexOf(" ON ") == -1 && beforeU.indexOf(" ORDER BY ") == -1 && beforeU.indexOf(" WHERE ") == -1 ||
+              beforeU.indexOf("REFRESH") > -1 || beforeU.indexOf("METADATA") > -1 || beforeU.indexOf("DESCRIBE") > -1) {
+            editor.showSpinner();
+            options.extraCompleters([]);
+            if (autocompleter != null) {
+              autocompleter.getTables(autocompleter.getDatabase(), function (data) {
+                var tableNames = data.split(" ");
+                var tables = [];
+                tableNames.forEach(function (tbl) {
+                  if (tbl != "") {
+                    tables.push({value: tbl, score: 1000, meta: "table"});
+                  }
+                });
+                options.extraCompleters([newCompleter(tables)]);
+                editor.hideSpinner();
+              });
+
+            }
+            else {
+              console.error("A valid instance of Autocomplete is missing. Please set it on the 'autocompleter' options of the binding.");
+            }
+          }
+          if (beforeU.indexOf("SELECT") > -1 && beforeU.indexOf(" FROM ") == -1) {
+            if (afterU.indexOf("FROM ") > -1) {
+              fieldsAutocomplete(editor, valueAccessor);
+            }
+            else {
+              editor.showSpinner();
+              options.extraCompleters([]);
+              if (autocompleter != null) {
+                autocompleter.getTables(autocompleter.getDatabase(), function (data) {
+                  var fromKeyword = "from";
+                  if (before.indexOf("SELECT") > -1) {
+                    fromKeyword = fromKeyword.toUpperCase();
+                  }
+                  var tableNames = data.split(" ");
+                  var tables = [];
+                  tableNames.forEach(function (tbl) {
+                    if (tbl != "") {
+                      tables.push({value: "* " + fromKeyword + " " + tbl, score: 1000, meta: "* table"});
+                    }
+                  });
+                  options.extraCompleters([newCompleter(tables)]);
+                  editor.hideSpinner();
+                });
+              }
+            }
+          }
+          else {
+            if ((beforeU.indexOf("WHERE") > -1 || beforeU.indexOf("ORDER BY") > -1) && beforeU.match(/ ON| LIMIT| GROUP| SORT/) == null) {
+              fieldsAutocomplete(editor, valueAccessor);
+            }
+          }
+        }
+      }
+      onChange(e, editor, valueAccessor);
+    });
+
+    editor.commands.on("afterExec", function (e) {
+      editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
+      if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
+        fieldsAutocomplete(editor, valueAccessor);
+      }
+      // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
+      if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
+        var textBefore = editor.getTextBeforeCursor();
+        if ((e.args == "'" && textBefore.toUpperCase().indexOf("LOAD ") > -1 && textBefore.toUpperCase().indexOf("LOAD ") == textBefore.toUpperCase().length - 5)
+            || textBefore.toUpperCase().indexOf("LOAD '") > -1 && textBefore.toUpperCase().indexOf("LOAD '") == textBefore.toUpperCase().length - 6) {
+          editor.disableAutocomplete();
+          var btn = editor.showFileButton();
+          btn.on("click", function (ie) {
+            ie.preventDefault();
+            if ($(".ace-filechooser-content").data("spinner") == null) {
+              $(".ace-filechooser-content").data("spinner", $(".ace-filechooser-content").html());
+            }
+            else {
+              $(".ace-filechooser-content").html($(".ace-filechooser-content").data("spinner"));
+            }
+            $(".ace-filechooser-content").jHueFileChooser({
+              onFileChoose: function (filePath) {
+                editor.session.insert(editor.getCursorPosition(), filePath + "'");
+                editor.hideFileButton();
+                editor.enableAutocomplete();
+                $(".ace-filechooser").hide();
+              },
+              selectFolder: false,
+              createFolder: false
+            });
+            $(".ace-filechooser").css({ "top": $(ie.currentTarget).position().top, "left": $(ie.currentTarget).position().left}).show();
+          });
+        }
+        else {
+          editor.hideFileButton();
+          editor.enableAutocomplete();
+        }
+        if (e.args != "'" && textBefore.toUpperCase().indexOf("LOAD '") > -1 && textBefore.toUpperCase().indexOf("LOAD '") == textBefore.toUpperCase().length - 6) {
+          editor.hideFileButton();
+          editor.enableAutocomplete();
+        }
+      }
+      onAfterExec(e, editor, valueAccessor);
+    });
+
+    editor.$blockScrolling = Infinity
+    element.originalCompleters = editor.completers;
+    options.aceInstance(editor);
+  },
+  update: function (element, valueAccessor) {
+    var options = ko.unwrap(valueAccessor());
+    if (options.aceInstance()) {
+      var editor = options.aceInstance();
+      editor.completers = element.originalCompleters.slice();
+      if (options.extraCompleters().length > 0) {
+        options.extraCompleters().forEach(function (complete) {
+          editor.completers.push(complete);
+        });
+        editor.execCommand("startAutocomplete");
+      }
+      editor.clearErrors();
+      if (options.errors().length > 0) {
+        options.errors().forEach(function (err) {
+          editor.addError(err.message, err.line);
+          if (err.line == editor.getCursorPosition().row) {
+            window.setTimeout(function () {
+              $(element).find(".ace_active-line").remove();
+            }, 100)
+          }
+        });
+      }
+    }
   }
+}

@@ -134,6 +134,20 @@ from django.utils.translation import ugettext as _
           return escapeString(level.name + " (" + level.type + ")");
         };
 
+<<<<<<< HEAD
+=======
+        function resizeAssist() {
+          $(".assist").parents(".span2").height($(".assist").height() + 100);
+          $(".assist-main").height($(window).height() - 230);
+        }
+
+        var _resizeTimeout = -1;
+        $(window).on("resize", function(){
+          window.clearTimeout(_resizeTimeout);
+          _resizeTimeout = window.setTimeout(resizeAssist, 200);
+        });
+
+>>>>>>> [spark] Integrate AceEditor
         self.loadAssistMain = function(force) {
           self.assist.options.onDataReceived = function (data) {
             if (data.databases) {
@@ -152,8 +166,9 @@ from django.utils.translation import ugettext as _
           };
           self.assist.getData(null, force);
 
-          self.assist.selectedMainObject.subscribe(function() {
+          self.assist.selectedMainObject.subscribe(function(value) {
             self.loadAssistFirstLevel();
+            huePubSub.publish('assist.mainObjectChange', value);
           });
         };
 

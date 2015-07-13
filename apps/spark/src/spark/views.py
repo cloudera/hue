@@ -55,10 +55,10 @@ def notebook(request):
       'options_json': json.dumps({
           'languages': LANGUAGES.get(),
           'snippet_placeholders' : {
-              'scala': _('Example: 1 + 1, or press CTRL + space'),
-              'python': _('Example: 1 + 1, or press CTRL + space'),
-              'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),
-              'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
+              'scala': _('/** Example: 1 + 1, or press CTRL + space */'),
+              'python': _('# Example: 1 + 1, or press CTRL + space'),
+              'impala': _('-- Example: SELECT * FROM tablename, or press CTRL + space'),
+              'hive': _('-- Example: SELECT * FROM tablename, or press CTRL + space'),
               'text': _('<h2>This is a text snippet</h2>Type your text here')
           }
       }),
@@ -111,9 +111,6 @@ def notebooks(request):
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
   })
-
-def ace(request):
-  return render('ace.mako', request, {})
 
 
 @check_document_modify_permission()

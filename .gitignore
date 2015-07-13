@@ -100,3 +100,6 @@ apps/logs
 
 # Static files
 /static
+
+# Node Modules
+node_modules/

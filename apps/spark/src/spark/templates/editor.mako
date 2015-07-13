@@ -113,6 +113,12 @@ ${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
 <![endif]-->
 <script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script src="${ static('desktop/js/ace/ace.js') }"></script>
+<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+<script src="${ static('desktop/js/ace.extended.js') }"></script>
+<script src="${ static('spark/js/ace.autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+
+
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
@@ -123,7 +129,6 @@ ${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
   }
 % endif
 </style>
-
 
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
@@ -449,8 +454,8 @@ ${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
           <input type="text" data-bind="value: value" />
         </div>
       </div>
-      <textarea data-bind="value: statement_raw, codemirror: { 'id': id(), 'viewportMargin': Infinity, 'lineNumbers': true, 'indentUnit': 0, 'matchBrackets': true, 'mode': editorMode(), 'enter': execute }"></textarea>
-    </div>
+      <div class="ace-editor" data-bind="attr: {id: id()}, aceEditor: {value: statement_raw, aceInstance: ace, mode: aceEditorMode, extraCompleters: completers, errors: errors, autocompleter: aceAutocomplete, placeholder: $root.snippetPlaceholders[type()] }"></div>
+      </div>
   </div>
 
   <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
@@ -756,6 +761,17 @@ ${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
 </div>
 
 
+
+<div class="ace-filechooser">
+  <a class="pointer pull-right" data-bind="click: function(){ $('.filechooser').hide(); }"><i class="fa fa-times"></i></a>
+  <div class="ace-filechooser-content">
+    <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+  </div>
+</div>
+
+
+
 <div id="sessionsDemiModal" class="demi-modal fade" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
   <div class="modal-body">
@@ -829,6 +845,13 @@ ${ koComponents.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
 
+  var aceAutocomplete = new Autocomplete({
+    autocompleteBaseURL: "${ autocomplete_base_url | n,unicode }",
+    autocompleteApp: "beeswax",
+    autocompleteUser: "${user}",
+    autocompleteFailsQuietlyOn: [500] // error codes from beeswax/views.py - autocomplete
+  });
+
   var assist = new Assist({
     app: "beeswax",
     user: "${user}",
@@ -888,6 +911,10 @@ ${ koComponents.assistPanel() }
       activeCodemirrorEditor.setSelection(activeCodemirrorEditor.getCursor());
       activeCodemirrorEditor.focus();
     }
+  });
+
+  huePubSub.subscribe('assist.mainObjectChange', function (db) {
+    aceAutocomplete.setDatabase(db);
   });
 
   ko.bindingHandlers.verticalSlide = {
