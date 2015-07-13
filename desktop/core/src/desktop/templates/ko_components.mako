@@ -23,22 +23,6 @@ from django.utils.translation import ugettext as _
 <%def name="assistPanel()">
   <template id="assist-panel-template">
     <div class="assist-container" data-bind="visible: isAssistVisible() && isAssistAvailable(), css:{'span2': isAssistVisible(), 'hidden': !isAssistVisible() }">
-      <div id="assistQuickLook" class="modal hide fade">
-        <div class="modal-header">
-          <a href="#" class="close" data-dismiss="modal">&times;</a>
-          <h3>${_('Data sample for')} <span class="tableName"></span></h3>
-        </div>
-        <div class="modal-body" style="min-height: 100px">
-          <div class="loader">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-          </div>
-          <div class="sample"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
-        </div>
-      </div>
       <div class="span2 assist">
 
         <a title="${_('Toggle Assist')}" class="pull-right pointer assist-action" data-bind="click: toggleAssist">
@@ -77,6 +61,24 @@ from django.utils.translation import ugettext as _
           ${ _('The database list cannot be loaded.') }
         </div>
       </div>
+
+      <div id="assistQuickLook" class="modal hide fade">
+        <div class="modal-header">
+          <a href="#" class="close" data-dismiss="modal">&times;</a>
+          <h3>${_('Data sample for')} <span class="tableName"></span></h3>
+        </div>
+        <div class="modal-body" style="min-height: 100px">
+          <div class="loader">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
+            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+          </div>
+          <div class="sample"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
+        </div>
+      </div>
+
     </div>
   </template>
 
