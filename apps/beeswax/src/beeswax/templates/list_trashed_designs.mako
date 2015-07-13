@@ -34,11 +34,8 @@ ${layout.menubar(section='saved queries')}
 
     <%actionbar:render>
       <%def name="search()">
-        <form id="searchQueryForm" action="${ url(app_name + ':list_trashed_designs') }" method="GET">
+        <form id="searchQueryForm" action="${ url(app_name + ':list_trashed_designs') }" method="GET" class="inline">
           <input id="filterInput" type="text" name="text" class="input-xlarge search-query" value="${ filter_params.get(prefix + 'text', '') }" placeholder="${_('Search for query')}" />
-          <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
-            <i class="fa fa-search"></i>
-          </button>
         </form>
       </%def>
 
@@ -233,6 +230,17 @@ ${layout.menubar(section='saved queries')}
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    var _searchInputValue = $("#filterInput").val();
+
+    $("#filterInput").jHueDelayedInput(function(){
+      if ($("#filterInput").val() != _searchInputValue){
+        $("#searchQueryForm").submit();
+      }
+    });
+
+    $("#filterInput").focus();
+    $("#filterInput").val(_searchInputValue); // set caret at the end of the field
   });
 </script>
 
