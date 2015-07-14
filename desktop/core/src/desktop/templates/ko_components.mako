@@ -136,6 +136,7 @@ from django.utils.translation import ugettext as _
           $(".assist-main").height($(window).height() - 230);
         }
 
+        var _resizeTimeout = -1;
         $(window).on("resize", function(){
           window.clearTimeout(_resizeTimeout);
           _resizeTimeout = window.setTimeout(resizeAssist, 200);
