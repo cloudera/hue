@@ -1179,6 +1179,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.columns = ko.observable([]);
   loadLayout(self, collection_json.layout);
 
+  self.additionalMustache = null;
+
   self.isEditing = ko.observable(false);
   self.toggleEditing = function () {
     self.isEditing(! self.isEditing());
@@ -1398,6 +1400,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               $.each(data.response.docs, function (index, item) {
                 // fix the fields that contain dots in the name
                 addTemplateFunctions(item);
+                if (self.additionalMustache != null && typeof self.additionalMustache == "function"){
+                  self.additionalMustache(item);
+                }
                 _docs.push(Mustache.render(_mustacheTmpl, item));
               });
               self.results(_docs);
