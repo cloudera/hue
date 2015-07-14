@@ -42,8 +42,8 @@ import desktop.log.log_buffer
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json,\
   _get_docs
 from desktop.lib import django_mako
-from desktop.lib.conf import GLOBAL_CONFIG
-from desktop.lib.django_util import login_notrequired, render_json, render
+from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
+from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
@@ -431,7 +431,16 @@ def _get_config_errors(request, cache=True):
         continue
 
       try:
-        error_list.extend(validator(request.user))
+        for confvar, error in validator(request.user):
+          error = {
+            'name': confvar.get_fully_qualifying_key() if isinstance(confvar, BoundConfig) else confvar,
+            'message': error,
+          }
+
+          if isinstance(confvar, BoundConfig):
+            error['value'] = confvar.get_fully_qualifying_key()
+
+          error_list.append(error)
       except Exception, ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
     _CONFIG_ERROR_LIST = error_list
@@ -443,12 +452,15 @@ def check_config(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
-  conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
-  return render('check_config.mako', request, {
-                  'error_list': _get_config_errors(request, cache=False),
-                  'conf_dir': conf_dir
-              },
-              force_template=True)
+  context = {
+    'conf_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
+    'error_list': _get_config_errors(request, cache=False),
+  }
+
+  if request.GET.get('format') == 'json':
+    return JsonResponse()
+  else:
+    return render('check_config.mako', request, context, force_template=True)
 
 
 def check_config_ajax(request):

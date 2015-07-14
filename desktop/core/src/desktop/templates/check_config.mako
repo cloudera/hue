@@ -24,23 +24,19 @@ from django.utils.translation import ugettext as _
       <div class="alert alert-warn">${_('Potential misconfiguration detected. Fix and restart Hue.')}</div>
       <br/>
         <table class="table table-striped">
-      % for confvar, error in error_list:
+      % for error in error_list:
         <tr>
             <td width="15%">
                 <code>
-                % if isinstance(confvar, str):
-                  ${confvar | n}
-                % else:
-                  ${confvar.get_fully_qualifying_key()}
-                % endif
+                ${error['name'] | n}
               </code>
             </td>
             <td>
               ## Doesn't make sense to print the value of a BoundContainer
-              % if type(confvar) is BoundConfig:
-                ${_('Current value:')} <code>${confvar.get()}</code><br/>
+              % if 'value' in error:
+                ${_('Current value:')} <code>${error['value']}</code><br/>
               % endif
-              ${error | n}
+              ${error['message'] | n}
             </td>
         </tr>
       % endfor
