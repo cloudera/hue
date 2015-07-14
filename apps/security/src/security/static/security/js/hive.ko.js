@@ -756,7 +756,7 @@ var HiveViewModel = function (initial) {
   self.isLoadingPrivileges = ko.observable(true);
   self.isApplyingBulk = ko.observable(false);
 
-  self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE']);
+  self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE', 'COLUMN']);
   self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL']);
 
   self.privilegeFilter = ko.observable("");

@@ -105,15 +105,17 @@ class SentryClient(object):
     return self.client.drop_sentry_role(request)
 
 
-  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
     privilege = TSentryPrivilege(**tSentryPrivilege)
-    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
+    privileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
+    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege, privileges=privileges)
     return self.client.alter_sentry_role_grant_privilege(request)
 
 
-  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
     privilege = TSentryPrivilege(**tSentryPrivilege)
-    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
+    privileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
+    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege, privileges=privileges)
     return self.client.alter_sentry_role_revoke_privilege(request)
 
 
