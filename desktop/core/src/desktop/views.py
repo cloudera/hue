@@ -438,7 +438,7 @@ def _get_config_errors(request, cache=True):
           }
 
           if isinstance(confvar, BoundConfig):
-            error['value'] = confvar.get_fully_qualifying_key()
+            error['value'] = confvar.get()
 
           error_list.append(error)
       except Exception, ex:
@@ -458,7 +458,7 @@ def check_config(request):
   }
 
   if request.GET.get('format') == 'json':
-    return JsonResponse()
+    return JsonResponse(context)
   else:
     return render('check_config.mako', request, context, force_template=True)
 
