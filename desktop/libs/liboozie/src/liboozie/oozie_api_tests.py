@@ -30,12 +30,14 @@ from nose.tools import assert_equal, assert_true
 from desktop.lib.paths import get_run_root
 from hadoop import pseudo_hdfs4
 from hadoop.mini_cluster import write_config
+from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import OOZIE_URL
 
 
 _oozie_lock = threading.Lock()
+
 
 LOG = logging.getLogger(__name__)
 
@@ -179,30 +181,40 @@ class OozieServerProvider(object):
 
     try:
       if not OozieServerProvider.is_oozie_running:
-        LOG.info('\nStarting a Mini Oozie. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
-        LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
-
-        finish = (
-          OOZIE_URL.set_for_testing("http://%s:%s/oozie" % (socket.getfqdn(), OozieServerProvider.OOZIE_TEST_PORT)),
-        )
-
-        # Setup
         cluster = pseudo_hdfs4.shared_cluster()
-        cls._setup_sharelib()
-        cls._reset_oozie(cluster)
 
-        p = cls._start_oozie(cluster)
+        if is_live_cluster():
+          def shutdown():
+            pass
+        else:
+          LOG.info('\nStarting a Mini Oozie. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
+          LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
+  
+          finish = (
+            OOZIE_URL.set_for_testing("http://%s:%s/oozie" % (socket.getfqdn(), OozieServerProvider.OOZIE_TEST_PORT)),
+          )
+  
+          # Setup          
+          cls._setup_sharelib()
+          cls._reset_oozie(cluster)
+  
+          p = cls._start_oozie(cluster)
+  
+          def kill():
+            LOG.info("Killing Oozie server (pid %d)." % p.pid)
+            os.kill(p.pid, 9)
+            p.wait()
+          atexit.register(kill)
 
-        def kill():
-          LOG.info("Killing Oozie server (pid %d)." % p.pid)
-          os.kill(p.pid, 9)
-          p.wait()
-        atexit.register(kill)
+          def shutdown():
+            for f in finish:
+              f()
+            cluster.stop()
 
         start = time.time()
         started = False
         sleep = 0.01
-
+          
         while not started and time.time() - start < 30.0:
           status = None
           try:
@@ -218,15 +230,11 @@ class OozieServerProvider(object):
             time.sleep(sleep)
             sleep *= 2
             pass
+
         if not started:
           raise Exception("Oozie server took too long to come up.")
 
         OozieServerProvider.is_oozie_running = True
-
-        def shutdown():
-          for f in finish:
-            f()
-          cluster.stop()
         callback = shutdown
     finally:
       _oozie_lock.release()
@@ -242,4 +250,7 @@ class TestMiniOozie(OozieServerProvider):
 
     assert_equal(get_oozie(user).get_oozie_status()['systemMode'], 'NORMAL')
 
-    assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))
+    if is_live_cluster():
+      assert_true(self.cluster.fs.exists('/user/oozie/share/lib'))
+    else:
+      assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))  
