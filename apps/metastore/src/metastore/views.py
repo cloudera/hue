@@ -283,7 +283,11 @@ def describe_partitions(request, database, table):
           'url': reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
         },
       ],
-      'database': database, 'table': table_obj, 'partitions': partitions, 'request': request
+      'database': database,
+      'table': table_obj,
+      'partitions': partitions,
+      'partition_names_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
+      'request': request
   })
 
 

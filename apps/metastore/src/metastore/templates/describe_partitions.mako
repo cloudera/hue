@@ -37,6 +37,20 @@ ${ components.menubar() }
     <div class="span9">
       <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
+          <div id="partition-filter" class="card-body">
+            ${ _('Filter by ') }
+            <div data-bind="foreach: filters">
+              <select data-bind="options: $root.columns"></select>
+              <input type="text" data-bind="value: value"></input>
+              <a href="javascript: void(0)" data-bind="click: $root.removeFilter">
+                <i class="fa fa-minus"></i>
+              </a>
+            </div>
+
+            <a href="javascript: void(0)" data-bind="click: addFilter">
+              <i class="fa fa-plus"></i> ${ _('Add ') }
+            </a>
+          <div>
           <div class="card-body">
             <p>
           % if partitions:
@@ -68,7 +82,29 @@ ${ components.menubar() }
 
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
+  var PartitionFilterViewModel = function (partitions_json) {
+    var self = this;
+
+    self.filters = ko.observableArray([]);
+
+    self.columns = ko.mapping.fromJS(partitions_json);
+
+    self.addFilter = function() {
+      self.filters.push(ko.mapping.fromJS({'column': '', 'value': ''}));
+    }
+
+    self.removeFilter = function(data) {
+      self.filters.remove(data);
+    }
+  };
+
+  var viewModel = new PartitionFilterViewModel(${ partition_names_json | n,unicode });
+  ko.applyBindings(viewModel, $("#partition-filter")[0]);
+
   $(document).ready(function () {
     $("a[data-row-selector='true']").jHueRowSelector();
   });
