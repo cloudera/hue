@@ -505,26 +505,33 @@
 
 <script type="text/html" id="common-action-transition">
   <!-- ko if: children().length == 2 -->
-  OK -->
+  <div>
+  OK <i class="fa fa-long-arrow-right"></i>
   <select data-bind="options: $root.workflow.nodeIds,
       optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
       value: children()[0]['to']
       ">
   </select>
-  <br/>
-  KO -->
+  </div>
+  <div class="margin-top-10">
+  KO <i class="fa fa-long-arrow-right"></i>
   <select data-bind="options: $root.workflow.nodeIds,
      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
    value: children()[1]['error']
      ">
   </select>
+  </div>
   <!-- /ko -->
 </script>
 
 
 <script type="text/html" id="common-action-credentials">
   <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
-  <select data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, options: $root.credentials, selectedOptions: properties.credentials" size="5" multiple="true"></select>
+  <ul data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, foreach: $root.credentials" class="unstyled">
+    <li>
+      <label class="checkbox"><input type="checkbox" data-bind="checkedValue: $data, checked: $parent.properties.credentials" /> <span data-bind="text: $data"></span></label>
+    </li>
+  </ul>
 
   <em data-bind="visible: properties.credentials && properties.credentials.indexOf('hbase') != -1">
     ${ _('Requires hbase-site.xml in job path') }
