@@ -129,7 +129,7 @@ virtual-env: $(BLD_DIR_ENV)/stamp
 $(BLD_DIR_ENV)/stamp:
 	@echo "--- Creating virtual environment at $(BLD_DIR_ENV)"
 	$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) \
-		$(VIRTUALENV_OPTS) --no-site-packages $(BLD_DIR_ENV)
+		$(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
 	@touch $@
 	@echo "--- $(BLD_DIR_ENV) ready"
 
