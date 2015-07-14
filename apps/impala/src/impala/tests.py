@@ -44,7 +44,6 @@ from impala.conf import SERVER_HOST
 LOG = logging.getLogger(__name__)
 
 
-
 class MockDbms:
   def get_databases(self):
     return ['db1', 'db2']
