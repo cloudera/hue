@@ -17,9 +17,9 @@
 
 import json
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false
 
-from django.utils.unittest.case import SkipTest
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
@@ -54,9 +54,9 @@ class TestIndexerWithSolr:
   def setup_class(cls):
 
     if not is_live_cluster():
-      raise SkipTest
+      raise SkipTest()
 
-    cls.client = make_logged_in_client()
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
     add_to_group('test')
     grant_access("test", "test", "indexer")

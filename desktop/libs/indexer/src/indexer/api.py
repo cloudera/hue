@@ -20,7 +20,6 @@ import json
 import logging
 import re
 
-from django.utils.decorators import available_attrs
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse

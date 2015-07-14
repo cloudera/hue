@@ -332,7 +332,7 @@ class BeeswaxSampleProvider(object):
   def setup_class(cls):
     cls.db_name = get_db_prefix(name='hive')
     cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
-    cls.client = make_logged_in_client()
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()
