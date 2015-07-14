@@ -92,9 +92,7 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges=None):
-    if tSentryPrivileges is None:
-      tSentryPrivileges = []
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege=None, tSentryPrivileges=None):
     response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege, tSentryPrivileges)
 
     if response.status.value == 0:
@@ -103,9 +101,7 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges=None):
-    if tSentryPrivileges is None:
-      tSentryPrivileges = []
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege=None, tSentryPrivileges=None):
     response = self.client.alter_sentry_role_revoke_privilege(roleName, tSentryPrivilege, tSentryPrivileges)
 
     if response.status.value == 0:
@@ -210,7 +206,7 @@ class SentryApi(object):
         'action': 'ALL' if privilege.action == '*' else privilege.action.upper(),
         'timestamp': privilege.createTime,
         'grantOption': privilege.grantOption == 1,
-        'columnName': privilege.columnName,
+        'column': privilege.columnName,
     }
 
 

@@ -106,16 +106,24 @@ class SentryClient(object):
 
 
   def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
-    privilege = TSentryPrivilege(**tSentryPrivilege)
-    privileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
-    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege, privileges=privileges)
+    if tSentryPrivilege is not None:
+      tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
+
+    if tSentryPrivileges is not None:
+      tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
+
+    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
     return self.client.alter_sentry_role_grant_privilege(request)
 
 
   def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
-    privilege = TSentryPrivilege(**tSentryPrivilege)
-    privileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
-    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege, privileges=privileges)
+    if tSentryPrivilege is not None:
+      tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
+
+    if tSentryPrivileges is not None:
+      tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
+
+    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
     return self.client.alter_sentry_role_revoke_privilege(request)
 
 

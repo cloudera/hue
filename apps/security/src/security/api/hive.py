@@ -101,6 +101,7 @@ def _to_sentry_privilege(privilege):
       'serverName': privilege['serverName'],
       'dbName': privilege['dbName'],
       'tableName': privilege['tableName'],
+      'columnName': privilege['columnName'],
       'URI': _massage_uri(privilege['URI']),
       'action': privilege['action'],
       'createTime': privilege['timestamp'],
@@ -123,6 +124,7 @@ def _hive_add_privileges(user, role, privileges):
             'action': privilege.get('action'),
             'scope': privilege.get('privilegeScope'),
             'table': privilege.get('tableName'),
+            'column': privilege.get('columnName'),
             'URI': privilege.get('URI'),
             'server': privilege.get('serverName'),
             'grantOption': privilege.get('grantOption') == 1
@@ -345,6 +347,7 @@ def bulk_add_privileges(request):
     privileges = [privilege for privilege in privileges if privilege['status'] == '']
 
     for path in [path['path'] for path in checkedPaths]:
+      # TODO: check how it goes with column
       if '.' in path:
         db, table = path.split('.')
       else:

@@ -106,6 +106,9 @@ ${ layout.menubar(section='hive') }
       <span data-bind="visible: tableName">
         <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
       </span>
+      <span data-bind="visible: columnName">
+        <i class="fa fa-long-arrow-right"></i> column=<span data-bind="text: columnName"></span>
+      </span>
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->

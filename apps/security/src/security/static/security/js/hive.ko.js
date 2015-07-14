@@ -51,6 +51,12 @@ var Privilege = function (vm, privilege) {
       self.status('modified');
     }
   });
+  self.columnName = ko.observable(typeof privilege.columnName != "undefined" && privilege.columnName != null ? privilege.columnName : "");
+  self.columnName.subscribe(function () {
+    if (self.status() == '') {
+      self.status('modified');
+    }
+  });
   self.URI = ko.observable(typeof privilege.URI != "undefined" && privilege.URI != null ? privilege.URI : "");
   self.URI.subscribe(function () {
     if (self.status() == '') {
@@ -101,6 +107,8 @@ var Privilege = function (vm, privilege) {
       return 'TABLE';
     } else if (self.dbName().length > 0) {
       return 'DATABASE';
+    } else if (self.columnName().length > 0) {
+      return 'COLUMN';
     } else {
       return 'SERVER';
     }
@@ -204,7 +212,7 @@ var Role = function (vm, role) {
 
   self.addPrivilege = function () {
     if (vm.getSectionHash() == 'edit') {
-      self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true, 'dbName': vm.assist.db(), 'tableName': vm.assist.table()}));
+      self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true, 'dbName': vm.assist.db(), 'tableName': vm.assist.table(), 'columnName': vm.assist.column()}));
     } else {
       self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
     }
@@ -335,6 +343,10 @@ var Assist = function (vm, initial) {
     var table = self.path().split(/[.]/)[1];
     return table ? table : null;
   });
+  self.column = ko.computed(function () {
+    var column = self.path().split(/[.]/)[2];
+    return column ? column : null;
+  });  
   self.privileges = ko.observableArray();
   self.roles = ko.observableArray();
   self.isDiffMode = ko.observable(false);
@@ -991,6 +1003,7 @@ var HiveViewModel = function (initial) {
       'serverName': privilege.server,
       'dbName': privilege.database,
       'tableName': privilege.table,
+      'columnName': privilege.column,
       'URI': privilege.URI,
       'action': privilege.action,
       'timestamp': privilege.timestamp,
