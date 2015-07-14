@@ -37,7 +37,7 @@ ${ components.menubar() }
     <div class="span9">
       <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
-          <div id="partition-filter" class="card-body">
+          <form id="partition-filter" class="card-body" data-bind="submit: filter">
             ${ _('Filter by ') }
             <div data-bind="foreach: filters">
               <select data-bind="options: $root.columns"></select>
@@ -50,7 +50,12 @@ ${ components.menubar() }
             <a href="javascript: void(0)" data-bind="click: addFilter">
               <i class="fa fa-plus"></i> ${ _('Add ') }
             </a>
-          <div>
+            
+            ${ _('Sort') } <input type="checkbox" data-bind="checked: sortDesc"></input>
+            
+            <button type="submit">Filter</button>            
+          <form>
+
           <div class="card-body">
             <p>
           % if partitions:
@@ -86,10 +91,11 @@ ${ components.menubar() }
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  var PartitionFilterViewModel = function (partitions_json) {
+  var PartitionFilterViewModel = function (partitions_json, form_data_json) {
     var self = this;
 
-    self.filters = ko.observableArray([]);
+    self.sortDesc = ko.mapping.fromJS(typeof form_data_json != "undefined" && form_data_json != null ? form_data_json.sortDesc : true)
+    self.filters = ko.mapping.fromJS(typeof form_data_json != "undefined" && form_data_json != null ? form_data_json.filters : [])
 
     self.columns = ko.mapping.fromJS(partitions_json);
 
@@ -100,9 +106,13 @@ ${ components.menubar() }
     self.removeFilter = function(data) {
       self.filters.remove(data);
     }
+    
+    self.filter = function(data) {
+      // jsonnify sortDesc, filter into some hidden form attribute
+    }
   };
 
-  var viewModel = new PartitionFilterViewModel(${ partition_names_json | n,unicode });
+  var viewModel = new PartitionFilterViewModel(${ partition_names_json | n,unicode }, ${ form_data_json | n,unicode });
   ko.applyBindings(viewModel, $("#partition-filter")[0]);
 
   $(document).ready(function () {

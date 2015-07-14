@@ -263,11 +263,14 @@ def describe_partitions(request, database, table):
 
   reverse_sort = request.REQUEST.get("sort", "desc").lower() == "desc"
 
-  partition_filters = {}
-  for part in table_obj.partition_keys:
-    if request.REQUEST.get(part.name):
-      partition_filters[part.name] = request.REQUEST.get(part.name)
-  partition_spec = ','.join(["%s='%s'" % (k, v) for k, v in partition_filters.items()])
+  if request.method == "POST":
+    partition_filters = {}
+    for part in table_obj.partition_keys:
+      if request.REQUEST.get(part.name):
+        partition_filters[part.name] = request.REQUEST.get(part.name)
+    partition_spec = ','.join(["%s='%s'" % (k, v) for k, v in partition_filters.items()])
+  else:
+    partition_spec = ''
 
   partitions = db.get_partitions(database, table_obj, partition_spec, max_parts=None, reverse_sort=reverse_sort)
 
@@ -287,6 +290,7 @@ def describe_partitions(request, database, table):
       'table': table_obj,
       'partitions': partitions,
       'partition_names_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
+      'form_data_json': json.dumps({'sortDesc': True, 'filters': []}),
       'request': request
   })
 
