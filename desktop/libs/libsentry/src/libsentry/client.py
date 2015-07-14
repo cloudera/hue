@@ -24,7 +24,7 @@ from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPri
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
     TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest, \
-    TListSentryPrivilegesByAuthRequest
+    TListSentryPrivilegesByAuthRequest, TSentryConfigValueRequest
 
 from libsentry.sentry_site import get_sentry_server_authentication,\
   get_sentry_server_principal
@@ -182,3 +182,9 @@ class SentryClient(object):
     request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
     return self.client.list_sentry_privileges_by_authorizable(request)
 
+
+  def get_sentry_config_value(self, propertyName, defaultValue=None):
+    requestorUserName = self.username # Not available in Sentry API
+
+    request = TSentryConfigValueRequest(propertyName=propertyName, defaultValue=defaultValue)
+    return self.client.get_sentry_config_value(request)
