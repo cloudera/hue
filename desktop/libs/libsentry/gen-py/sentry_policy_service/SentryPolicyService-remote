@@ -35,6 +35,7 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print '  TDropPrivilegesResponse drop_sentry_privilege(TDropPrivilegesRequest request)'
   print '  TRenamePrivilegesResponse rename_sentry_privilege(TRenamePrivilegesRequest request)'
   print '  TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(TListSentryPrivilegesByAuthRequest request)'
+  print '  TSentryConfigValueResponse get_sentry_config_value(TSentryConfigValueRequest request)'
   print ''
   sys.exit(0)
 
@@ -157,6 +158,12 @@ elif cmd == 'list_sentry_privileges_by_authorizable':
     print 'list_sentry_privileges_by_authorizable requires 1 args'
     sys.exit(1)
   pp.pprint(client.list_sentry_privileges_by_authorizable(eval(args[0]),))
+
+elif cmd == 'get_sentry_config_value':
+  if len(args) != 1:
+    print 'get_sentry_config_value requires 1 args'
+    sys.exit(1)
+  pp.pprint(client.get_sentry_config_value(eval(args[0]),))
 
 else:
   print 'Unrecognized method %s' % cmd

@@ -25,6 +25,7 @@ namespace php sentry.service.thrift
 namespace cpp Apache.Sentry.Service.Thrift
 
 const i32 TSENTRY_SERVICE_V1 = 1;
+const i32 TSENTRY_SERVICE_V2 = 1;
 
 const i32 TSENTRY_STATUS_OK = 0;
 const i32 TSENTRY_STATUS_ALREADY_EXISTS = 1;

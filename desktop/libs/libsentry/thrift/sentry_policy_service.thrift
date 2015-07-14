@@ -22,7 +22,7 @@
 # Thrift Service that the MetaStore is built on
 #
 
-#include "share/fb303/if/fb303.thrift"
+# include "share/fb303/if/fb303.thrift"
 include "sentry_common_service.thrift"
 
 namespace java org.apache.sentry.provider.db.service.thrift
@@ -49,6 +49,7 @@ struct TSentryPrivilege {
 7: required string action = "",
 8: optional i64 createTime, # Set on server side
 9: optional TSentryGrantOption grantOption = TSentryGrantOption.FALSE
+10: optional string columnName = "",
 }
 
 # TODO can this be deleted? it's not adding value to TAlterSentryRoleAddGroupsRequest
@@ -104,11 +105,13 @@ struct TAlterSentryRoleGrantPrivilegeRequest {
 1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName,
-5: required TSentryPrivilege privilege
+5: optional TSentryPrivilege privilege,
+6: optional set<TSentryPrivilege> privileges
 }
 struct TAlterSentryRoleGrantPrivilegeResponse {
 1: required sentry_common_service.TSentryResponseStatus status
 2: optional TSentryPrivilege privilege
+3: optional set<TSentryPrivilege> privileges
 }
 
 # REVOKE ... ON ... FROM ROLE ...
@@ -116,7 +119,8 @@ struct TAlterSentryRoleRevokePrivilegeRequest {
 1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName,
-5: required TSentryPrivilege privilege
+5: optional TSentryPrivilege privilege,
+6: optional set<TSentryPrivilege> privileges
 }
 struct TAlterSentryRoleRevokePrivilegeResponse {
 1: required sentry_common_service.TSentryResponseStatus status
@@ -144,6 +148,7 @@ struct TSentryAuthorizable {
 2: optional string uri,
 3: optional string db,
 4: optional string table,
+5: optional string column,
 }
 
 # SHOW GRANT
@@ -216,6 +221,17 @@ struct TListSentryPrivilegesByAuthResponse {
 2: optional map<TSentryAuthorizable, TSentryPrivilegeMap> privilegesMapByAuth # will not be set in case of an error
 }
 
+# Obtain a config value from the Sentry service
+struct TSentryConfigValueRequest {
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+2: required string propertyName, # Config attribute to obtain
+3: optional string defaultValue # Value if propertyName not found
+}
+struct TSentryConfigValueResponse {
+1: required sentry_common_service.TSentryResponseStatus status
+2: optional string value
+}
+
 service SentryPolicyService
 {
   TCreateSentryRoleResponse create_sentry_role(1:TCreateSentryRoleRequest request)
@@ -239,4 +255,6 @@ service SentryPolicyService
  TRenamePrivilegesResponse rename_sentry_privilege(1:TRenamePrivilegesRequest request);
 
  TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(1:TListSentryPrivilegesByAuthRequest request);
+
+ TSentryConfigValueResponse get_sentry_config_value(1:TSentryConfigValueRequest request)
 }
