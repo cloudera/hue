@@ -961,7 +961,7 @@ ko.bindingHandlers.typeahead = {
       _options.minLength = 0;
     }
 
-    elem.typeahead(_options);
+    element.typeahead = elem.typeahead(_options);
 
     if (valueAccessor.triggerOnFocus) {
       elem.on('focus', function () {
@@ -980,13 +980,31 @@ ko.bindingHandlers.typeahead = {
   },
   update: function (element, valueAccessor) {
     var elem = $(element);
-    var value = valueAccessor();
-    if (typeof value.target == "function") {
-      elem.val(value.target());
+    var valueAccessor = valueAccessor();
+    if (typeof valueAccessor.target == "function") {
+      elem.val(valueAccessor.target());
     }
     else {
-      elem.val(value.target);
+      elem.val(valueAccessor.target);
     }
+    if (valueAccessor.forceUpdateSource) {
+      element.typeahead.data('typeahead').source = function () {
+        var _source = ko.utils.unwrapObservable(valueAccessor.source);
+        if (valueAccessor.extraKeywords) {
+          _source = _source.concat(valueAccessor.extraKeywords.split(" "))
+        }
+
+        if (valueAccessor.sourceSuffix && _source) {
+          var _tmp = [];
+          _source.forEach(function(item){
+            _tmp.push(item + valueAccessor.sourceSuffix);
+          });
+          _source = _tmp;
+        }
+        return _source;
+      }
+    }
+
   }
 };
 

@@ -24,7 +24,7 @@
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
 
-<div class="container-fluid">
+<div class="container-fluid" id="partitions">
   <div class="row-fluid">
     <div class="span3">
       <div class="sidebar-nav card-small">
@@ -37,50 +37,52 @@ ${ components.menubar() }
     <div class="span9">
       <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
-          <form id="partition-filter" class="card-body" data-bind="submit: filter">
-            ${ _('Filter by ') }
+
+        <div class="card-body">
+          <div data-bind="visible: filters().length > 0">
             <div data-bind="foreach: filters">
-              <select data-bind="options: $root.columns"></select>
-              <input type="text" data-bind="value: value"></input>
-              <a href="javascript: void(0)" data-bind="click: $root.removeFilter">
-                <i class="fa fa-minus"></i>
+                <div class="filter-box">
+                  <a href="javascript:void(0)" class="pull-right" data-bind="click: $root.removeFilter">
+                    <i class="fa fa-times"></i>
+                  </a>
+                  <select class="input-small" data-bind="options: $root.keys, value: column"></select>
+                  &nbsp;
+                  <input class="input-small" type="text" data-bind="value: value, typeahead: { target: value, source: $root.typeaheadValues(column), triggerOnFocus: true, forceUpdateSource: true}" placeholder="${ _('Value to filter...') }" />
+              </div>
+            </div>
+            <div class="pull-left" style="margin-top: 4px; margin-bottom: 10px">
+              <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter">
+                <i class="fa fa-plus"></i> ${ _('Add') }
               </a>
+              <label class="checkbox inline pulled">${ _('Sort Desc') } <input type="checkbox" data-bind="checked: sortDesc" /></label>
+              <button class="btn" data-bind="click: filter"><i class="fa fa-filter"></i> ${ _('Filter') }</button>
             </div>
+          </div>
+          <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter, visible: values().length > 0 && filters().length == 0" style="margin-bottom: 20px; margin-left: 14px">
+            <i class="fa fa-plus"></i> ${ _('Add a filter') }
+          </a>
+          <div class="clearfix"></div>
 
-            <a href="javascript: void(0)" data-bind="click: addFilter">
-              <i class="fa fa-plus"></i> ${ _('Add ') }
-            </a>
-            
-            ${ _('Sort') } <input type="checkbox" data-bind="checked: sortDesc"></input>
-            
-            <button type="submit">Filter</button>            
-          <form>
 
-          <div class="card-body">
-            <p>
-          % if partitions:
-          <table class="table table-striped table-condensed datatables">
-          <tr>
-          % for field in table.partition_keys:
-              <th>${field.name}</th>
-          % endfor
-              <th>${_('Location')}</th>
-          </tr>
-          % for partition_id, partition in enumerate(partitions):
+          <table class="table table-striped table-condensed datatables" data-bind="visible: values().length > 0, style:{'opacity': isLoading() ? '.5': '1' }">
             <tr>
-            % for idx, key in enumerate(partition.values):
-                <td><a href="${ url('metastore:read_partition', database=database, table=table.name, partition_id=partition_id) }" data-row-selector="true">${key}</a></td>
-            % endfor
-                <td><a href="${ url('metastore:browse_partition', database=database, table=table.name, partition_id=partition_id) }"><i class="fa fa-share-square-o"></i> ${_('View Partition Files')}</a></td>
+              <!-- ko foreach: keys -->
+              <th data-bind="text: $data"></th>
+              <!-- /ko -->
+              <th>${_('Location')}</th>
             </tr>
-          % endfor
+            <!-- ko foreach: values -->
+            <tr>
+              <!-- ko foreach: $data.columns -->
+              <td><a data-bind="attr:{'href': $parent.readUrl},text:$data"></a></td>
+              <!-- /ko -->
+              <td><a data-bind="attr:{'href': browseUrl}"><i class="fa fa-share-square-o"></i> ${_('View Partition Files')}</a></td>
+            </tr>
+            <!-- /ko -->
           </table>
-          % else:
-              <div class="alert">${_('The table %s has no partitions.' % table.name)}</div>
-          % endif
-              </p>
-            </div>
+          <div class="alert" data-bind="visible: values().length == 0">${_('The table %s has no partitions.' % table.name)}</div>
         </div>
+      </div>
     </div>
   </div>
 </div>
@@ -89,31 +91,67 @@ ${ components.menubar() }
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  var PartitionFilterViewModel = function (partitions_json, form_data_json) {
+  var PartitionFilterViewModel = function (partition_keys_json, partition_values_json) {
     var self = this;
 
-    self.sortDesc = ko.mapping.fromJS(typeof form_data_json != "undefined" && form_data_json != null ? form_data_json.sortDesc : true)
-    self.filters = ko.mapping.fromJS(typeof form_data_json != "undefined" && form_data_json != null ? form_data_json.filters : [])
+    self.isLoading = ko.observable(false);
 
-    self.columns = ko.mapping.fromJS(partitions_json);
+    self.sortDesc = ko.observable(true);
+    self.filters = ko.observableArray([])
 
-    self.addFilter = function() {
+    self.keys = ko.observableArray(partition_keys_json);
+    self.values = ko.observableArray(partition_values_json);
+
+    self.typeaheadValues = function (column) {
+      var _vals = [];
+      self.values().forEach(function (row) {
+        var _cell = row.columns[self.keys().indexOf(column())];
+        if (_vals.indexOf(_cell) == -1) {
+          _vals.push(_cell);
+        }
+      });
+      return _vals
+    }
+
+    self.addFilter = function () {
       self.filters.push(ko.mapping.fromJS({'column': '', 'value': ''}));
     }
 
-    self.removeFilter = function(data) {
+    self.removeFilter = function (data) {
       self.filters.remove(data);
+      if (self.filters().length == 0){
+        self.sortDesc(true);
+        self.filter();
+      }
     }
-    
-    self.filter = function(data) {
-      // jsonnify sortDesc, filter into some hidden form attribute
+
+    self.filter = function () {
+      self.isLoading(true);
+      var _filters = JSON.parse(ko.toJSON(self.filters));
+      var _postData = {};
+      _filters.forEach(function (filter) {
+        _postData[filter.column] = filter.value;
+      });
+      _postData["sort"] = viewModel.sortDesc() ? "desc" : "asc";
+
+      $.ajax({
+        type: "POST",
+        url: "/metastore/table/default/blog/partitions",
+        data: _postData,
+        success: function (data) {
+          self.values(data.partition_values_json);
+          self.isLoading(false);
+        },
+        dataType: "json"
+      });
     }
   };
 
-  var viewModel = new PartitionFilterViewModel(${ partition_names_json | n,unicode }, ${ form_data_json | n,unicode });
-  ko.applyBindings(viewModel, $("#partition-filter")[0]);
+  var viewModel = new PartitionFilterViewModel(${ partition_keys_json | n,unicode }, ${ partition_values_json | n,unicode });
+  ko.applyBindings(viewModel, $("#partitions")[0]);
 
   $(document).ready(function () {
     $("a[data-row-selector='true']").jHueRowSelector();

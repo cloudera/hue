@@ -274,25 +274,41 @@ def describe_partitions(request, database, table):
 
   partitions = db.get_partitions(database, table_obj, partition_spec, max_parts=None, reverse_sort=reverse_sort)
 
-  return render("describe_partitions.mako", request, {
-    'breadcrumbs': [{
-          'name': database,
-          'url': reverse('metastore:show_tables', kwargs={'database': database})
-        }, {
-          'name': table,
-          'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
-        },{
-          'name': 'partitions',
-          'url': reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
-        },
-      ],
-      'database': database,
-      'table': table_obj,
-      'partitions': partitions,
-      'partition_names_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
-      'form_data_json': json.dumps({'sortDesc': True, 'filters': []}),
-      'request': request
-  })
+  massaged_partitions = []
+  for id, partition in enumerate(partitions):
+    massaged_partitions.append({
+      'id': id,
+      'columns': partition.values,
+      'readUrl': reverse('metastore:read_partition', kwargs={'database': database, 'table': table_obj.name, 'partition_id':id}),
+      'browseUrl': reverse('metastore:browse_partition', kwargs={'database': database, 'table': table_obj.name, 'partition_id':id})
+    })
+
+  if request.method == "POST":
+    return JsonResponse({
+      'partition_keys_json': [partition.name for partition in table_obj.partition_keys],
+      'partition_values_json': massaged_partitions,
+    })
+  else:
+    return render("describe_partitions.mako", request, {
+      'breadcrumbs': [{
+            'name': database,
+            'url': reverse('metastore:show_tables', kwargs={'database': database})
+          }, {
+            'name': table,
+            'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
+          },{
+            'name': 'partitions',
+            'url': reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
+          },
+        ],
+        'database': database,
+        'table': table_obj,
+        'partitions': partitions,
+        'partition_keys_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
+        'partition_values_json': json.dumps(massaged_partitions),
+        'request': request
+    })
+
 
 
 def browse_partition(request, database, table, partition_id):

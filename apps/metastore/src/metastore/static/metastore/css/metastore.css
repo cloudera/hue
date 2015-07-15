@@ -46,3 +46,40 @@
 .sampleTable td, .sampleTable th {
   white-space: nowrap;
 }
+
+h2.card-heading {
+  border-bottom: 1px solid #e5e5e5!important;
+  font-size: 12px!important;
+  font-weight: bold!important;
+}
+
+.filter-box {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 4px;
+  background-color: #F5F5F5;
+}
+
+.filter-box a.pull-right {
+  margin: 4px;
+}
+
+.filter-box select, .filter-box input {
+  margin-bottom: 0;
+}
+
+.add-filter {
+  margin: 5px;
+  float: left;
+}
+
+.checkbox.inline.pulled {
+  margin-right: 10px;
+  padding-top: 1px;
+}
+
+.checkbox.inline.pulled input {
+  margin-left: 0;
+  margin-right: 4px;
+}
