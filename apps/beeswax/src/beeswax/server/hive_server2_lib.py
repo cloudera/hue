@@ -771,12 +771,12 @@ class HiveServerClient:
 
     partition_table = self.execute_query_statement(query, max_rows=max_rows)
 
-    partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()][-max_parts:]
+    partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
 
     if reverse_sort:
       partitions.reverse()
 
-    return partitions
+    return partitions[-max_parts:]
 
 
   def _get_query_configuration(self, query):
