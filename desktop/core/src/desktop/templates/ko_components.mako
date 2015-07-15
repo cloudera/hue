@@ -23,16 +23,18 @@ from django.utils.translation import ugettext as _
 <%def name="assistPanel()">
   <script type="text/html" id="assist-panel-template">
     <div>
-      <div>
+      <div style="position: relative;">
         <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px;">
           <li class="nav-header">${_('database')}</li>
         </ul>
-        <a title="${_('Toggle Assist')}" class="pull-right pointer assist-action" data-bind="click: toggleAssist">
-          <i class="fa fa-chevron-left"></i>
-        </a>
-        <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right pointer assist-action" data-bind="click: reloadAssist">
-          <i class="fa fa-refresh"></i>
-        </a>
+        <div style="position: absolute; right: 0px; background-color: #FFF;">
+          <a title="${_('Toggle Assist')}" class="pull-right pointer assist-action" data-bind="click: toggleAssist">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+          <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right pointer assist-action" data-bind="click: reloadAssist">
+            <i class="fa fa-refresh"></i>
+          </a>
+        </div>
       </div>
       <!-- ko if: assist.mainObjects().length > 0 -->
       <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
@@ -40,8 +42,10 @@ from django.utils.translation import ugettext as _
 
       <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
       <ul data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()" class="unstyled assist-main">
-        <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-          <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: $parent.showTablePreview" style="float:right; display: none; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}"></i></a>
+        <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }" style="position:relative;">
+          <div class="table-actions" data-bind="attr: {'id': 'assistHover_' + $data}" style="position:absolute; right: 0; display: none; padding-left:3px; background-color: #FFF">
+            <a href="javascript:void(0)" data-bind="click: $parent.showTablePreview"  class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}"></i></a>
+          </div>
           <a href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); } }"><span data-bind="text: $data"></span></a>
           <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
             <ul data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()" class="unstyled">
@@ -226,6 +230,11 @@ from django.utils.translation import ugettext as _
           self.isAssistVisible(false);
           self.isAssistAvailable(false);
         }
+
+        var $assistMain = $(".assist-main");
+        $assistMain.scroll(function() {
+          $assistMain.find(".table-actions").css('right', -$assistMain.scrollLeft() + 'px');
+        });
       }
 
       ko.components.register('assist-panel', {

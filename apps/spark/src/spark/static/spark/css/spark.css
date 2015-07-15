@@ -43,6 +43,20 @@ body {
   overflow: auto;
 }
 
+.resize {
+  height: 100%;
+  width: 0.5%;
+  cursor: ew-resize;
+  float: left;
+}
+
+.resize-bar {
+  height: 100%;
+  width: 2px;
+  background-color: #F1F1F1;
+  float:left;
+}
+
 .right-panel {
   float: right;
   height: 100%;

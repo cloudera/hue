@@ -227,17 +227,18 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 <div class="main-content">
   <div class="vertical-full container-fluid">
     <div class="vertical-full tab-content" data-bind="foreach: notebooks">
-      <div class="vertical-full tab-pane row-fluid" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
+      <div class="vertical-full tab-pane row-fluid resize-container" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
       </div>
     </div>
   </div>
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), css:{'span2': $root.isAssistVisible(), 'hidden': !$root.isAssistVisible() }">
+  <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), style: { 'width': $root.leftPanelWidth() + '%' }">
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, totalStorageId: 'sparkAssistVisible' }}"></div>
   </div>
-  <div class="right-panel" data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': ! $root.isAssistVisible()}">
+  <div class="resize" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), draggable: { axis: 'x', limits: { min: 2, max: 98 },horizontalPercent: $root.leftPanelWidth, container: '.resize-container' }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="right-panel" data-bind="style: { 'width': $root.isAssistVisible() ? (99.5 - $root.leftPanelWidth()) + '%' : '100%' }">
     <div>
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
