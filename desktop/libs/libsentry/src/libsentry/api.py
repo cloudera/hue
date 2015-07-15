@@ -24,12 +24,11 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from libzookeeper.conf import PRINCIPAL_NAME
 from libzookeeper.models import get_children_data
 
 from libsentry.client import SentryClient
 from libsentry.conf import HOSTNAME, PORT
-from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_has_security, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
+from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
 
 
 LOG = logging.getLogger(__name__)
