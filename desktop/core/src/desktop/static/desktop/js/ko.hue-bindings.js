@@ -642,7 +642,30 @@ ko.bindingHandlers.daterangepicker = {
       matchIntervals(true);
     }
   }
-}
+};
+
+ko.bindingHandlers.draggable = {
+  init: function (element, valueAccessor) {
+    var options = valueAccessor();
+    var $container = $(options.container);
+
+    var dragTimeout = -1;
+    var onDrag = function(event, ui) {
+      window.clearTimeout(dragTimeout);
+      dragTimeout = window.setTimeout(function () {
+        var percentage = ((ui.offset.left - $container.position().left) / $container.width()) * 100;
+        options.horizontalPercent(Math.max(Math.min(percentage, options.limits.max), options.limits.min));
+      }, 100);
+    };
+
+    $(element).draggable({
+      axis: options.axis,
+      containment: $container,
+      drag: onDrag,
+      helper: 'clone'
+    });
+  }
+};
 
 ko.bindingHandlers.oneClickSelect = {
   init: function (element) {
