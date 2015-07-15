@@ -16,11 +16,24 @@
 # limitations under the License.
 
 from kazoo.client import KazooClient
+
+from hadoop import cluster
+from desktop.lib.exceptions_renderable import PopupException
+
 from libzookeeper.conf import PRINCIPAL_NAME
 
 
 def get_children_data(ensemble, namespace, read_only=True):
-  zk = KazooClient(hosts=ensemble, read_only=read_only, sasl_server_principal=PRINCIPAL_NAME.get())
+  hdfs = cluster.get_hdfs()
+  if hdfs is None:
+    raise PopupException(_('No [hdfs] configured in hue.ini.'))
+
+  if hdfs.security_enabled:
+    sasl_server_principal = PRINCIPAL_NAME.get()
+  else:
+    sasl_server_principal = None
+
+  zk = KazooClient(hosts=ensemble, read_only=read_only, sasl_server_principal=sasl_server_principal)
 
   zk.start()
 
@@ -33,5 +46,5 @@ def get_children_data(ensemble, namespace, read_only=True):
     children_data.append(data)
 
   zk.stop()
-  
+
   return children_data
