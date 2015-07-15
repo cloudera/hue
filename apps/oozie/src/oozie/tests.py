@@ -333,7 +333,10 @@ class OozieBase(OozieServerProvider):
     if _INITIALIZED:
       return
 
+    reset = ENABLE_V2.set_for_testing(True) # Somewhere this is reseted
     self.c.post(reverse('oozie:install_examples'))
+    reset()
+
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
     _INITIALIZED = True

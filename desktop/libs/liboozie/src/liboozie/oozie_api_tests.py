@@ -189,17 +189,17 @@ class OozieServerProvider(object):
         else:
           LOG.info('\nStarting a Mini Oozie. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
           LOG.info('See https://issues.cloudera.org/browse/HUE-861\n')
-  
+
           finish = (
             OOZIE_URL.set_for_testing("http://%s:%s/oozie" % (socket.getfqdn(), OozieServerProvider.OOZIE_TEST_PORT)),
           )
-  
-          # Setup          
+
+          # Setup
           cls._setup_sharelib()
           cls._reset_oozie(cluster)
-  
+
           p = cls._start_oozie(cluster)
-  
+
           def kill():
             LOG.info("Killing Oozie server (pid %d)." % p.pid)
             os.kill(p.pid, 9)
@@ -214,7 +214,7 @@ class OozieServerProvider(object):
         start = time.time()
         started = False
         sleep = 0.01
-          
+
         while not started and time.time() - start < 30.0:
           status = None
           try:
@@ -253,4 +253,4 @@ class TestMiniOozie(OozieServerProvider):
     if is_live_cluster():
       assert_true(self.cluster.fs.exists('/user/oozie/share/lib'))
     else:
-      assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))  
+      assert_true(self.cluster.fs.exists('/user/%(user)s/share/lib' % {'user': user}))

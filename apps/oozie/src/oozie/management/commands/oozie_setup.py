@@ -41,11 +41,14 @@ LOG = logging.getLogger(__name__)
 class Command(NoArgsCommand):
 
   def _import_workflows(self, directory, managed=True):
+
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'workflow.zip')) as fp:
           workflow_xml, metadata = Workflow.decompress(fp)
+
         workflow_root = etree.fromstring(workflow_xml)
+
         try:
           Workflow.objects.get(name=workflow_root.get('name'), managed=managed)
         except Workflow.DoesNotExist:
@@ -61,11 +64,14 @@ class Command(NoArgsCommand):
           workflow.doc.all().delete() # Delete doc as it messes up the example sharing
 
   def _import_coordinators(self, directory):
+
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'coordinator.zip')) as fp:
           coordinator_xml, metadata = Coordinator.decompress(fp)
+
         coordinator_root = etree.fromstring(coordinator_xml)
+
         try:
           Coordinator.objects.get(name=coordinator_root.get('name'))
         except Coordinator.DoesNotExist:
@@ -77,11 +83,15 @@ class Command(NoArgsCommand):
           import_coordinator_root(coordinator=coordinator, coordinator_definition_root=coordinator_root, metadata=metadata)
 
   def _import_bundles(self, directory):
+
     for example_directory_name in os.listdir(directory):
+
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'bundle.zip')) as fp:
           bundle_xml, metadata = Bundle.decompress(fp)
+
         bundle_root = etree.fromstring(bundle_xml)
+
         try:
           Bundle.objects.get(name=bundle_root.get('name'))
         except Bundle.DoesNotExist:
