@@ -433,7 +433,7 @@ def _get_config_errors(request, cache=True):
       try:
         for confvar, error in validator(request.user):
           error = {
-            'name': confvar.get_fully_qualifying_key() if isinstance(confvar, BoundConfig) else confvar,
+            'name': confvar if isinstance(confvar, str) else confvar.get_fully_qualifying_key(),
             'message': error,
           }
 
