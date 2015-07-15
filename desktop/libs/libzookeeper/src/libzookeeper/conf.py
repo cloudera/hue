@@ -19,7 +19,7 @@ import logging
 
 from urlparse import urlparse
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+from desktop.lib.conf import Config
 
 
 LOG = logging.getLogger(__name__)
