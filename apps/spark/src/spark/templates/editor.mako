@@ -224,21 +224,21 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
 </a>
 
 
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
-        <div class="tab-content" data-bind="foreach: notebooks">
-          <div class="tab-pane" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
-          </div>
-        </div>
+<div class="main-content">
+  <div class="vertical-full container-fluid">
+    <div class="vertical-full tab-content" data-bind="foreach: notebooks">
+      <div class="vertical-full tab-pane row-fluid" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
+      </div>
     </div>
   </div>
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="row-fluid">
-    <assist-panel params="assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, totalStorageId: 'sparkAssistVisible'"></assist-panel>
-    <div data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': ! $root.isAssistVisible()}">
+  <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), css:{'span2': $root.isAssistVisible(), 'hidden': !$root.isAssistVisible() }">
+    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, totalStorageId: 'sparkAssistVisible' }}"></div>
+  </div>
+  <div class="right-panel" data-bind="css:{'span10': $root.isAssistVisible, 'span12 nomargin': ! $root.isAssistVisible()}">
+    <div>
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
         sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,

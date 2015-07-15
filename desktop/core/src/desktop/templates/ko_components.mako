@@ -22,44 +22,43 @@ from django.utils.translation import ugettext as _
 
 <%def name="assistPanel()">
   <script type="text/html" id="assist-panel-template">
-    <div class="assist-container" data-bind="visible: isAssistVisible() && isAssistAvailable(), css:{'span2': isAssistVisible(), 'hidden': !isAssistVisible() }">
-      <div class="span2 assist">
-
+    <div>
+      <div>
+        <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px;">
+          <li class="nav-header">${_('database')}</li>
+        </ul>
         <a title="${_('Toggle Assist')}" class="pull-right pointer assist-action" data-bind="click: toggleAssist">
           <i class="fa fa-chevron-left"></i>
         </a>
         <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right pointer assist-action" data-bind="click: reloadAssist">
           <i class="fa fa-refresh"></i>
         </a>
-        <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF; margin-bottom: 1px;">
-          <li class="nav-header">${_('database')}</li>
-        </ul>
-        <!-- ko if: assist.mainObjects().length > 0 -->
-        <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
-        <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/>
+      </div>
+      <!-- ko if: assist.mainObjects().length > 0 -->
+      <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+      <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/>
 
-        <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
-        <ul data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()" class="unstyled assist-main">
-          <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-            <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: $parent.showTablePreview" style="display: none; position: absolute; right: 10px; margin-left: auto; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
-            <a href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); } }"><span data-bind="text: $data"></span></a>
-            <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
-              <ul data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()" class="unstyled">
-                <li><a data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a></li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-        <!-- /ko -->
+      <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
+      <ul data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()" class="unstyled assist-main">
+        <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
+          <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: $parent.showTablePreview" style="float:right; display: none; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}"></i></a>
+          <a href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); } }"><span data-bind="text: $data"></span></a>
+          <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
+            <ul data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()" class="unstyled">
+              <li><a data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a></li>
+            </ul>
+          </div>
+        </li>
+      </ul>
+      <!-- /ko -->
 
-        <div id="navigatorLoader" class="center"  data-bind="visible: assist.isLoading">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </div>
+      <div id="navigatorLoader" class="center"  data-bind="visible: assist.isLoading">
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      </div>
 
-        <div class="center" data-bind="visible: assist.hasErrors">
-          ${ _('The database list cannot be loaded.') }
-        </div>
+      <div class="center" data-bind="visible: assist.hasErrors">
+        ${ _('The database list cannot be loaded.') }
       </div>
 
       <div id="assistQuickLook" class="modal hide fade">
@@ -130,17 +129,6 @@ from django.utils.translation import ugettext as _
           }
           return escapeString(level.name + " (" + level.type + ")");
         };
-
-        function resizeAssist() {
-          $(".assist").parents(".span2").height($(".assist").height() + 100);
-          $(".assist-main").height($(window).height() - 230);
-        }
-
-        var _resizeTimeout = -1;
-        $(window).on("resize", function(){
-          window.clearTimeout(_resizeTimeout);
-          _resizeTimeout = window.setTimeout(resizeAssist, 200);
-        });
 
         self.loadAssistMain = function(force) {
           self.assist.options.onDataReceived = function (data) {

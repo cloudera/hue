@@ -16,6 +16,39 @@
  limitations under the License.
 */
 
+html {
+  height: 100%;
+}
+body {
+  height:100%;
+  margin: 0;
+  padding: 0;
+}
+
+.vertical-full {
+  height:100%;
+}
+
+.main-content {
+  height: auto;
+  width: 100%;
+  position: absolute;
+  top: 70px;
+  bottom: 0;
+}
+
+.left-panel {
+  float: left;
+  height: 100%;
+  overflow: auto;
+}
+
+.right-panel {
+  float: right;
+  height: 100%;
+  overflow: auto;
+}
+
 .question {
   margin: 10px;
 }
@@ -192,7 +225,6 @@
 
 .assist {
   padding: 8px;
-  position: fixed;
 }
 
 .assist-main {
@@ -264,6 +296,7 @@
   -moz-border-radius-bottomright: 3px;
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
+  z-index: 1000;
 }
 
 .show-assist:hover {
