@@ -648,6 +648,8 @@ ko.bindingHandlers.draggable = {
   init: function (element, valueAccessor) {
     var options = valueAccessor();
     var $container = $(options.container);
+    var $element = $(element);
+    var throttle = typeof options.throttle != "undefined" ? options.throttle : 20;
 
     var dragTimeout = -1;
     var onDrag = function(event, ui) {
@@ -655,15 +657,23 @@ ko.bindingHandlers.draggable = {
       dragTimeout = window.setTimeout(function () {
         var percentage = ((ui.offset.left - $container.position().left) / $container.width()) * 100;
         options.horizontalPercent(Math.max(Math.min(percentage, options.limits.max), options.limits.min));
-      }, 100);
+      }, throttle);
+      window.setTimeout(function() { $element.css('left', '') }, 1);
     };
 
-    $(element).draggable({
+    var draggableOptions = {
       axis: options.axis,
       containment: $container,
       drag: onDrag,
-      helper: 'clone'
-    });
+      start: onDrag,
+      stop: onDrag
+    };
+
+    if (typeof options.clone == "undefined" || options.clone ) {
+      draggableOptions.helper = 'clone';
+    }
+
+    $element.draggable(draggableOptions);
   }
 };
 

@@ -31,9 +31,9 @@ ${layout.menubar(section='query')}
 <div id="temporaryPlaceholder"></div>
 <div id="beeswax-execute">
   <div id="query-editor" class="container-fluid hide section">
-  <div class="row-fluid">
+  <div class="row-fluid resize-container">
 
-  <div class="span2" id="navigator">
+  <div id="navigator" style="float:left;" data-bind="style: { 'width': ($root.leftPanelWidth()  - 0.5) + '%' }">
     <ul class="nav nav-tabs" style="margin-bottom: 0">
       <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${_('Assist')}</a></li>
       <li><a href="#settingsTab" data-toggle="tab" class="sidetab">${_('Settings')} <span data-bind="visible:design.settings.values().length + design.fileResources.values().length + design.functions.values().length > 0, text: design.settings.values().length + design.fileResources.values().length + design.functions.values().length" class="badge badge-info">12</span></a></li>
@@ -202,8 +202,8 @@ ${layout.menubar(section='query')}
       </div>
     </div>
   </div>
-
-  <div id="querySide" class="span10">
+  <div class="resize" data-bind="draggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', clone: false }"><div class="resize-bar" style="margin-left: 0.5%"><i class="fa fa-ellipsis-v"></i></div></div>
+  <div id="querySide"  style="float:right; margin-left: 0;" data-bind="style: { 'width': (99 - $root.leftPanelWidth()) + '%' }">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }
     </div>
@@ -771,6 +771,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 
@@ -793,6 +794,17 @@ ${ commonshare() | n,unicode }
 <style type="text/css">
   h1 {
     margin-bottom: 5px;
+  }
+
+  .resize {
+    float: left;
+    padding-left: 7px;
+  }
+
+  .resize-bar {
+    top: 50%;
+    position: relative;
+    cursor: ew-resize;
   }
 
   #chooseFile, #chooseFolder, #choosePath {
@@ -1188,6 +1200,7 @@ $(document).ready(function () {
   });
 
   resizeNavigator = function () {
+    $(".resize").css("height", ($(window).height() - 150) + "px");
     $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
     $("#navigatorTables").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
   };
@@ -2851,6 +2864,8 @@ ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
 shareViewModel = initSharing("#documentShareModal");
 shareViewModel.setDocId(${doc_id});
+
+viewModel.leftPanelWidth.subscribe(placeResizePanelHandle);
 
 % if not beeswax_conf.USE_GET_LOG_API.get() and app_name != 'impala':
   viewModel.shouldAppendLogs = true;
