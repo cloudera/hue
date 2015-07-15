@@ -16,21 +16,19 @@
 # limitations under the License.
 
 import atexit
-# import getpass
 import logging
 import os
-import shutil
 import socket
 import subprocess
 import threading
 import time
 
 from django.conf import settings
-
-# from nose.tools import assert_equal, assert_true
+from nose.plugins.skip import SkipTest
 
 from desktop.lib.paths import get_run_root
 from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from sqoop.client import SqoopClient
 from sqoop.conf import SERVER_URL
@@ -54,6 +52,10 @@ class SqoopServerProvider(object):
 
   @classmethod
   def setup_class(cls):
+
+    if not is_live_cluster():
+      raise SkipTest()
+
     cls.cluster = pseudo_hdfs4.shared_cluster()
     cls.client, callback = cls.get_shared_server()
     cls.shutdown = [callback]
@@ -123,24 +125,27 @@ class SqoopServerProvider(object):
     service_lock.acquire()
 
     if not SqoopServerProvider.is_running:
-      LOG.info('\nStarting a Mini Sqoop. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
-
-      finish = (
-        SERVER_URL.set_for_testing("http://%s:%s/sqoop" % (socket.getfqdn(), SqoopServerProvider.TEST_PORT)),
-      )
-
       # Setup
       cluster = pseudo_hdfs4.shared_cluster()
 
-      p = cls.start(cluster)
+      if is_live_cluster():
+        finish = ()
+      else:
+        LOG.info('\nStarting a Mini Sqoop. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
 
-      def kill():
-        with open(os.path.join(cluster._tmpdir, 'sqoop/sqoop.pid'), 'r') as pidfile:
-          pid = pidfile.read()
-          LOG.info("Killing Sqoop server (pid %s)." % pid)
-          os.kill(int(pid), 9)
-          p.wait()
-      atexit.register(kill)
+        finish = (
+          SERVER_URL.set_for_testing("http://%s:%s/sqoop" % (socket.getfqdn(), SqoopServerProvider.TEST_PORT)),
+        )
+
+        p = cls.start(cluster)
+
+        def kill():
+          with open(os.path.join(cluster._tmpdir, 'sqoop/sqoop.pid'), 'r') as pidfile:
+            pid = pidfile.read()
+            LOG.info("Killing Sqoop server (pid %s)." % pid)
+            os.kill(int(pid), 9)
+            p.wait()
+        atexit.register(kill)
 
       start = time.time()
       started = False
@@ -149,7 +154,6 @@ class SqoopServerProvider(object):
       client = SqoopClient(SERVER_URL.get(), username, language)
 
       while not started and time.time() - start < 60.0:
-        status = None
         try:
           LOG.info('Check Sqoop status...')
           version = client.get_version()
@@ -163,6 +167,7 @@ class SqoopServerProvider(object):
           time.sleep(sleep)
           sleep *= 2
           pass
+
       if not started:
         service_lock.release()
         raise Exception("Sqoop server took too long to come up.")
@@ -174,7 +179,6 @@ class SqoopServerProvider(object):
       callback = shutdown
 
       SqoopServerProvider.is_running = True
-
     else:
       client = SqoopClient(SERVER_URL.get(), username, language)
 

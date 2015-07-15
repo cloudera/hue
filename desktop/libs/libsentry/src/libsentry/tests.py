@@ -29,6 +29,7 @@ from libsentry.client import SentryClient
 
 
 class TestWithSentry:
+  requires_hadoop = True
 
   @classmethod
   def setup_class(cls):

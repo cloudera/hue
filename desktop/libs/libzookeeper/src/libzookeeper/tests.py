@@ -29,6 +29,7 @@ from libzookeeper.conf import zkensemble
 
 
 class TestWithZooKeeper:
+  requires_hadoop = True
 
   @classmethod
   def setup_class(cls):
