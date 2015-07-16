@@ -82,33 +82,31 @@ var Privilege = function (vm, privilege) {
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
-      if (self.tableName().length > 0) {
+      if (self.columnName().length > 0) {
+        return self.dbName() + "." + self.tableName() + "." + self.columnName();
+      } else if (self.tableName().length > 0) {
         return self.dbName() + "." + self.tableName();
       } else {
         return self.dbName();
       }
     },
     write: function (value) {
-      var lastSpacePos = value.lastIndexOf(".");
-      if (lastSpacePos > 0) {
-        this.dbName(value.substring(0, lastSpacePos));
-        this.tableName(value.substring(lastSpacePos + 1));
-      } else {
-        this.dbName(value);
-        this.tableName('');
-      }
+      var _parts = value.split(".");
+      this.dbName(_parts[0]);
+      this.tableName(_parts.length > 1 ? _parts[1] : "");
+      this.columnName(_parts.length > 2 ? _parts[2] : "");
     },
     owner: self
   });
   self.privilegeScope = ko.computed(function () {
     if (self.privilegeType() == 'uri') {
       return 'URI';
+    } else if (self.columnName().length > 0) {
+      return 'COLUMN';
     } else if (self.tableName().length > 0) {
       return 'TABLE';
     } else if (self.dbName().length > 0) {
       return 'DATABASE';
-    } else if (self.columnName().length > 0) {
-      return 'COLUMN';
     } else {
       return 'SERVER';
     }
@@ -457,7 +455,7 @@ var Assist = function (vm, initial) {
   }
 
   self.addColumns = function (path, columns, skipLoading) {
-    var _branch = self.growingTree();
+    var _branch = self.growingTree().nodes[0];
     _branch.nodes.forEach(function (node) {
       if (node.path == path.split(".")[0]) {
 
@@ -733,10 +731,10 @@ var Assist = function (vm, initial) {
           else if (data.tables && data.tables.length > 0) {
             self.addTables(_originalPath, data.tables, _hasCallback);
           }
+          else if (data.columns && data.columns.length > 0) {
+            self.addColumns(_originalPath, data.columns, _hasCallback);
+          }
           self.isLoadingTree(false);
-          //else if (data.columns && data.columns.length > 0) {
-            //self.addColumns(_originalPath, data.columns, _hasCallback);
-          //}
 
           if (_hasCallback) {
             loadCallback(data);

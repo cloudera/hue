@@ -1200,7 +1200,6 @@ ko.bindingHandlers.hivechooser = {
     });
 
     self.jHueHiveAutocomplete({
-      skipColumns: true,
       showOnFocus: true,
       home: "/",
       onPathChange: function (path) {
