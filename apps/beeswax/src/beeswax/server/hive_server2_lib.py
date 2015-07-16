@@ -776,7 +776,7 @@ class HiveServerClient:
     if reverse_sort:
       partitions.reverse()
 
-    return partitions[-max_parts:]
+    return partitions[:max_parts]
 
 
   def _get_query_configuration(self, query):

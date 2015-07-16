@@ -3,27 +3,19 @@
 Welcome to the repository for Hue
 =================================
 
-Hue is an open source Web interface for analyzing data with Apache Hadoop: `gethue.com
+Hue is an open source Web interface for analyzing data with any Apache Hadoop: `gethue.com
 <http://gethue.com>`_ 
 
 .. image:: docs/images/hue-screen.png
 
 It features:
 
-      * File Browser for accessing HDFS
-      * Hive Editor for developing and running Hive queries
-      * Search App for querying, exploring, visualizing data and dashboards with Solr
-      * Impala App for executing interactive SQL queries
-      * Spark Editor and Dashboard
-      * Pig Editor for submitting Pig scripts
-      * Oozie Editor and Dashboard for submitting and monitoring workflows, coordinators and bundles
-      * HBase Browser for visualizing, querying and modifying HBase tables
-      * Metastore Browser for accessing Hive metadata and HCatalog
-      * Job Browser for accessing MapReduce jobs (MR1/MR2-YARN)
-      * Job Designer for creating MapReduce/Streaming/Java jobs
-      * A Sqoop 2 Editor and Dashboard
-      * A ZooKeeper Browser and Editor
-      * A DB Query Editor for MySql, PostGres, Sqlite and Oracle
+      * SQL Editors for Hive, Impala, MySql, PostGres, Sqlite and Oracle
+      * Dynamic search dashboards for Solr
+      * Spark Notebooks
+      * Browsers for YARN, HDFS, Hive table Metastore, HBase, ZooKeeper
+      * Pig Editor, Sqoop2, Oozie workflows Editors and Dashboards
+      * Wizards to import data into Hadoop
 
 On top of that, a SDK is available for creating new apps integrated with Hadoop.
 
@@ -118,8 +110,8 @@ your system:
 
 File Layout
 ===========
-The Hue "framework" is in ``desktop``. ``/core/`` contains the Web components and
-``desktop/libs/`` the API for talking to Hadoop.
+The Hue "framework" is in ``desktop/core/`` and contains the Web components.
+``desktop/libs/`` is the API for talking to various Hadoop services.
 The installable apps live in ``apps/``.  Please place third-party dependencies in the app's ext-py/
 directory.
 
