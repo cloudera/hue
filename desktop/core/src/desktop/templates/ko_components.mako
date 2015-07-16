@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 %>
 
 <%def name="assistPanel()">
-  <template id="assist-panel-template">
+  <script type="text/html" id="assist-panel-template">
     <div class="assist-container" data-bind="visible: isAssistVisible() && isAssistAvailable(), css:{'span2': isAssistVisible(), 'hidden': !isAssistVisible() }">
       <div class="span2 assist">
 
@@ -80,7 +80,7 @@ from django.utils.translation import ugettext as _
       </div>
 
     </div>
-  </template>
+  </script>
 
   <script type="text/javascript" charset="utf-8">
     (function() {
@@ -249,9 +249,9 @@ from django.utils.translation import ugettext as _
 </%def>
 
 <%def name="jvmMemoryInput()">
-  <template id="jvm-memory-input-template">
+  <script type="text/html" id="jvm-memory-input-template">
     <input type="text" class="input-small" data-bind="textInput: value" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
-  </template>
+  </script>
 
   <script type="text/javascript" charset="utf-8">
     (function() {
