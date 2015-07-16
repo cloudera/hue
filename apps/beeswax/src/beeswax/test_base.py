@@ -28,18 +28,18 @@ from nose.tools import assert_true, assert_false
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
 from desktop.lib.python_util import find_unused_port
 from desktop.lib.security_util import get_localhost_name
+from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 
 import beeswax.conf
 
 from beeswax.server.dbms import get_query_server_config
 from beeswax.server import dbms
-from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 
 
 HIVE_SERVER_TEST_PORT = find_unused_port()
@@ -333,6 +333,8 @@ class BeeswaxSampleProvider(object):
     cls.db_name = get_db_prefix(name='hive')
     cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
     cls.client = make_logged_in_client(username='test', is_superuser=False)
+    add_to_group('test')
+    grant_access("test", "test", "beeswax")
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()

@@ -334,8 +334,10 @@ class OozieBase(OozieServerProvider):
       return
 
     reset = ENABLE_V2.set_for_testing(True) # Somewhere this is reseted
-    self.c.post(reverse('oozie:install_examples'))
-    reset()
+    try:
+      self.c.post(reverse('oozie:install_examples'))
+    finally:
+      reset()
 
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
