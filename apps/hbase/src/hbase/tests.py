@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 import shutil
 import tempfile
@@ -24,11 +25,14 @@ from nose.tools import assert_true, assert_equal
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access
+from desktop.lib.test_utils import grant_access, add_to_group
 
 from hbase.api import HbaseApi
 from hbase.conf import HBASE_CONF_DIR
 from hbase.hbase_site import get_server_authentication, get_server_principal, get_conf, reset, _CNF_HBASE_IMPERSONATION_ENABLED, is_impersonation_enabled
+from hadoop.pseudo_hdfs4 import is_live_cluster
+from nose.plugins.skip import SkipTest
+from django.core.urlresolvers import reverse
 
 
 def test_security_plain():
@@ -161,3 +165,24 @@ class MockProtocol():
   def get_headers(self):
     return self.trans._TBufferedTransport__trans.headers
 
+
+
+class TestIntegrationWithHBase:
+
+  @classmethod
+  def setup_class(cls):
+
+    if not is_live_cluster():
+      raise SkipTest()
+
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
+    cls.user = User.objects.get(username='test')
+    add_to_group('test')
+    grant_access("test", "test", "indexer")
+
+
+  def test_list_tables(self):
+    resp = self.client.post('/hbase/api/getTableList/Cluster')
+    content = json.loads(resp.content)
+
+    assert_true('data' in content, content)

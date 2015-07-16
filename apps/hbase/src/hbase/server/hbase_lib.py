@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import logging
-import os
 
 from thrift import Thrift
 from thrift.transport.TSocket import TSocket
