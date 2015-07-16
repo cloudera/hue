@@ -24,11 +24,10 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from libzookeeper.models import get_children_data
-
 from libsentry.client import SentryClient
 from libsentry.conf import HOSTNAME, PORT
 from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
+from libzookeeper.models import ZookeeperClient
 
 
 LOG = logging.getLogger(__name__)
@@ -254,13 +253,16 @@ def _get_server_properties():
       if not _api_cache:
 
         servers = []
-        sentry_servers = get_children_data(ensemble=get_sentry_server_ha_zookeeper_quorum(), namespace=get_sentry_server_ha_zookeeper_namespace())
+        client = ZookeeperClient(hosts=get_sentry_server_ha_zookeeper_quorum())
+        sentry_servers = client.get_children_data(namespace=get_sentry_server_ha_zookeeper_namespace())
 
         for data in sentry_servers:
           server = json.loads(data.decode("utf-8"))
           servers.append({'hostname': server['address'], 'port': server['sslPort'] if server['sslPort'] else server['port']})
 
         _api_cache = servers
+    except Exception, e:
+      raise PopupException(_('Error in retrieving Sentry server properties from Zookeeper.'), detail=e)
     finally:
       _api_cache_lock.release()
 

@@ -20,16 +20,16 @@ import json
 import logging
 import os
 import shutil
-import subprocess
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
 from libzookeeper.conf import ENSEMBLE
+from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.conf import SOLRCTL_PATH, CORE_INSTANCE_DIR
+from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 
 
@@ -37,15 +37,7 @@ LOG = logging.getLogger(__name__)
 MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
-
-
-def get_solrctl_path():
-  solrctl_path = SOLRCTL_PATH.get()
-  if solrctl_path is None:
-    LOG.error("Could not find solrctl executable")
-    raise PopupException(_('Could not find solrctl executable'))
-
-  return solrctl_path
+ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 
 
 def get_solr_ensemble():
@@ -139,31 +131,25 @@ class CollectionManagerController(object):
       # Need to remove path afterwards
       tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
 
-      # Create instance directory.
-      solrctl_path = get_solrctl_path()
-
-      process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--create", name, solr_config_path],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
-      status = process.wait()
+      zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
+      root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+      config_root_path = '%s/%s' % (solr_config_path, 'conf')
+      try:
+        zc.copy_path(root_node, config_root_path)
+      except Exception, e:
+        zc.delete_path(root_node)
+        raise PopupException(_('Error in copying Solr configurations.'), detail=e)
 
       # Don't want directories laying around
       shutil.rmtree(tmp_path)
 
-      if status != 0:
-        LOG.error("Could not create instance directory.\nOutput: %s\nError: %s" % process.communicate())
-        raise PopupException(_('Could not create instance directory. '
-                               'Check if [libzookeeper]ensemble and [indexer]solrctl_path are correct in Hue config.'))
-
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
         # Delete instance directory if we couldn't create a collection.
-        process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--delete", name],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        if process.wait() != 0:
-          LOG.error("Cloud not delete collection.\nOutput: %s\nError: %s" % process.communicate())
-        raise PopupException(_('Could not create collection. Check error logs for more info.'))
+        try:
+          zc.delete_path(root_node)
+        except Exception, e:
+          raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
     else:
       # Non-solrcloud mode
       # Create instance directory locally.
@@ -190,15 +176,14 @@ class CollectionManagerController(object):
 
     if api.remove_collection(name):
       # Delete instance directory.
-      solrctl_path = get_solrctl_path()
-
-      process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--delete", name],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE
-                                 )
-      if process.wait() != 0:
-        LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
-        raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
+      try:
+        root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+        zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
+        zc.delete_path(root_node)
+      except Exception, e:
+        # Re-create collection so that we don't have an orphan config
+        api.add_collection(name)
+        raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
     else:
       raise PopupException(_('Could not remove collection. Check error logs for more info.'))
 
