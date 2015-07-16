@@ -3173,6 +3173,10 @@ my_prop_not_filtered=10
     }, follow=True)
     assert_true(response.context['oozie_workflow'], response.content)
 
+    # Clean-up
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[response.context['oozie_workflow'].id, 'kill']))
+    data = json.loads(response.content)
+    assert_equal(0, data.get('status'), data)
 
   def test_oozie_not_running_message(self):
     raise SkipTest # Not reseting the oozie url for some reason
