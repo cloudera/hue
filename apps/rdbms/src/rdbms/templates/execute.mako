@@ -26,8 +26,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 <div id="rdbms-query-editor">
   <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span2" id="navigator">
+    <div class="row-fluid resize-container">
+      <div id="navigator" style="float:left;" data-bind="style: { 'width': ($root.leftPanelWidth()  - 0.5) + '%' }">
         <ul class="nav nav-tabs" style="margin-bottom: 0">
           <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${ _('Assist') }</a></li>
         </ul>
@@ -66,8 +66,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 
       </div>
-
-      <div class="span10">
+      <div class="resize" data-bind="draggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', clone: false }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div style="float:right; margin-left: 0;" data-bind="style: { 'width': (99 - $root.leftPanelWidth()) + '%' }">
         <div id="query">
           <div class="card card-small">
             <div style="margin-bottom: 10px">
@@ -203,6 +203,17 @@ ${ commonshare() | n,unicode }
     margin-bottom: 5px;
   }
 
+  .resize {
+    float: left;
+    padding-left: 7px;
+  }
+
+  .resize-bar {
+    top: 50%;
+    position: relative;
+    cursor: ew-resize;
+  }
+
   #filechooser {
     min-height: 100px;
     overflow-y: auto;
@@ -325,8 +336,10 @@ ${ commonshare() | n,unicode }
 
 </style>
 
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('rdbms/js/rdbms.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
@@ -375,6 +388,11 @@ ${ commonshare() | n,unicode }
     var winWidth = $(window).width();
     var winHeight = $(window).height();
 
+    var resizeNavigator = function() {
+      $("#navigatorTables").css("max-height", ($(window).height() - 380) + "px").css("overflow-y", "auto");
+      $(".resize").css("height", ($(window).height() - 110) + "px");
+    }
+
     $(window).on("resize", function () {
       window.clearTimeout(resizeTimeout);
       resizeTimeout = window.setTimeout(function () {
@@ -383,10 +401,11 @@ ${ commonshare() | n,unicode }
           codeMirror.setSize("95%", 100);
           winWidth = $(window).width();
           winHeight = $(window).height();
-          $("#navigatorTables").css("max-height", ($(window).height() - 340) + "px").css("overflow-y", "auto");
+          resizeNavigator();
         }
       }, 200);
     });
+    resizeNavigator();
 
     var queryEditor = $("#queryField")[0];
 

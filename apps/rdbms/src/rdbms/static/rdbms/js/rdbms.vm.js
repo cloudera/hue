@@ -33,6 +33,11 @@ function RdbmsViewModel() {
   self.columns = ko.observableArray();
   self.resultsEmpty = ko.observable(false);
   self.isExecuting = ko.observable(false);
+  self.leftPanelWidth = ko.observable($.totalStorage('rdbmsLeftPanelWidth') != null ? $.totalStorage('rdbmsLeftPanelWidth') : 20);
+
+  self.leftPanelWidth.subscribe(function(newValue) {
+    $.totalStorage('rdbmsLeftPanelWidth', newValue);
+  });
 
   self.server = ko.computed({
     'read': function() {
