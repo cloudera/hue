@@ -65,6 +65,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     user = User.objects.get(username='test')
     self.db = dbms.get(user, get_query_server_config())
 
+    add_permission("test", "test", "write", "metastore")
+
   def test_basic_flow(self):
     # Default database should exist
     response = self.client.get("/metastore/databases")
