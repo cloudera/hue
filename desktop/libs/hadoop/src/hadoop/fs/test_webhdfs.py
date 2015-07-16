@@ -38,33 +38,33 @@ class WebhdfsTests(unittest.TestCase):
   @classmethod
   def setUpClass(cls):
     cls.cluster = pseudo_hdfs4.shared_cluster()
+    cls.prefix = cls.cluster.fs_prefix + '/WebhdfsTests'
+
+    cls.cluster.fs.setuser('test')
+    cls.cluster.fs.mkdir(cls.prefix)
+    cls.cluster.fs.chmod(cls.prefix, 01777)
 
   def setUp(self):
-    self.cluster.fs.setuser(self.cluster.superuser)
-
-  def tearDown(self):
-    try:
-      self.cluster.fs.purge_trash()
-    except:
-      LOG.exception('Could not clean up trash.')
+    self.cluster.fs.setuser('test')
 
   def test_webhdfs(self):
     """
     Minimal tests for a few basic file system operations.
     """
     fs = self.cluster.fs
-    f = fs.open("/fortest.txt", "w")
+    test_file = self.prefix + "/fortest.txt"
+    f = fs.open(test_file, "w")
     try:
       f.write("hello")
       f.close()
-      assert_equals("hello", fs.open("/fortest.txt").read())
-      assert_equals(5, fs.stats("/fortest.txt")["size"])
-      assert_true(fs.isfile("/fortest.txt"))
+      assert_equals("hello", fs.open(test_file).read())
+      assert_equals(5, fs.stats(test_file)["size"])
+      assert_true(fs.isfile(test_file))
       assert_false(fs.isfile("/"))
       assert_true(fs.isdir("/"))
-      assert_false(fs.isdir("/fortest.txt"))
+      assert_false(fs.isdir(test_file))
     finally:
-      fs.remove("/fortest.txt")
+      fs.remove(test_file)
 
   def test_webhdfs_functions(self):
     """
@@ -73,19 +73,20 @@ class WebhdfsTests(unittest.TestCase):
     fs = self.cluster.fs
 
     # Create home dir
-    fs.create_home_dir("/user/test")
-    assert_true(fs.isdir("/user/test"))
-    fs.rmtree("/user/test")
+    fs.create_home_dir("/user/test_webhdfs")
+    assert_true(fs.isdir("/user/test_webhdfs"))
+    fs.do_as_superuser(fs.rmtree, "/user/test_webhdfs")
 
   def test_seek(self):
     """Test for DESKTOP-293 - ensure seek works in python2.4"""
     fs = self.cluster.fs
-    f = fs.open("/fortest.txt", "w")
+    test_file = self.prefix + "/fortest.txt"
+    f = fs.open(test_file, "w")
     try:
       f.write("hello")
       f.close()
 
-      f = fs.open("/fortest.txt", "r")
+      f = fs.open(test_file, "r")
       f.seek(0, posixfile.SEEK_SET)
       assert_equals("he", f.read(2))
       f.seek(1, posixfile.SEEK_SET)
@@ -96,20 +97,21 @@ class WebhdfsTests(unittest.TestCase):
       f.seek(2, posixfile.SEEK_CUR)
       assert_equals("ll", f.read(2))
     finally:
-      fs.remove("/fortest.txt")
+      fs.remove(test_file)
 
   def test_seek_across_blocks(self):
     """Makes a file with a lot of blocks, seeks around"""
     fs = self.cluster.fs
-    fs.create("/fortest-blocks.txt", replication=1, blocksize=1024)
-    f = fs.open("/fortest-blocks.txt", "w")
+    test_file = self.prefix + "/fortest-blocks.txt"
+    fs.create(test_file, replication=1, blocksize=1024**2)
+    f = fs.open(test_file, "w")
     try:
-      data = "abcdefghijklmnopqrstuvwxyz" * 3000
+      data = "abcdefghijklmnopqrstuvwxyz" * 30 * 1024**2
       f.write(data)
       f.close()
 
       for i in xrange(1, 10):
-        f = fs.open("/fortest-blocks.txt", "r")
+        f = fs.open(test_file, "r")
 
         for j in xrange(1, 100):
           offset = random.randint(0, len(data) - 1)
@@ -118,28 +120,27 @@ class WebhdfsTests(unittest.TestCase):
         f.close()
 
     finally:
-      fs.remove("/fortest-blocks.txt")
+      fs.remove(test_file)
 
   def test_exceptions(self):
     """
     Tests that appropriate exceptions are raised.
     """
     fs = self.cluster.fs
-    f = fs.open("/for_exception_test.txt", "w")
+    test_file = self.prefix + "/for_exception_test.txt"
+    f = fs.open(test_file, "w")
     f.write("foo")
     f.close()
-    fs.chmod("/for_exception_test.txt", 0400)
+    fs.chmod(test_file, 0400)
     fs.setuser("notsuperuser")
-    f = fs.open("/for_exception_test.txt")
+    f = fs.open(test_file)
 
     assert_raises(WebHdfsException, f.read)
-    assert_raises(IOError, fs.open, "/test/doesnotexist.txt")
-
 
   def test_umask(self):
     fs = self.cluster.fs
 
-    prefix = '/tmp/test_umask'
+    prefix = self.prefix + '/test_umask'
     fs_umask = fs._umask
     fs._umask = 01022
 
@@ -179,7 +180,7 @@ class WebhdfsTests(unittest.TestCase):
   def test_umask_overriden(self):
     fs = self.cluster.fs
 
-    prefix = '/tmp/test_umask_overriden'
+    prefix = self.prefix + '/test_umask_overriden'
     fs_umask = fs._umask
     fs._umask = 01022
 
@@ -199,7 +200,7 @@ class WebhdfsTests(unittest.TestCase):
   def test_umask_without_sticky(self):
     fs = self.cluster.fs
 
-    prefix = '/tmp/test_umask_without_sticky'
+    prefix = self.prefix + '/test_umask_without_sticky'
     fs_umask = fs._umask
     fs._umask = 022
 
@@ -219,26 +220,23 @@ class WebhdfsTests(unittest.TestCase):
   def test_copy_remote_dir(self):
     fs = self.cluster.fs
 
-    src_dir = '/copy_remote_dir'
+    src_dir = self.prefix + '/copy_remote_dir'
     fs.mkdir(src_dir)
-    f1 = fs.open("/copy_remote_dir/test_one.txt", "w")
+    f1 = fs.open(src_dir + "/test_one.txt", "w")
     f1.write("foo")
     f1.close()
-    f2 = fs.open("/copy_remote_dir/test_two.txt", "w")
+    f2 = fs.open(src_dir + "/test_two.txt", "w")
     f2.write("bar")
     f2.close()
 
     new_owner = 'testcopy'
-    new_owner_home = '/user/testcopy'
-    new_owner_dir = new_owner_home + '/test-copy'
-    fs.mkdir(new_owner_home)
-    fs.chown(new_owner_home, new_owner, new_owner)
+    new_owner_dir = self.prefix  + '/' + new_owner + '/test-copy'
 
     fs.copy_remote_dir(src_dir, new_owner_dir, dir_mode=0755, owner=new_owner)
 
     dir_stat = fs.stats(new_owner_dir)
     assert_equals(new_owner, dir_stat.user)
-    assert_equals(new_owner, dir_stat.group)
+    # assert_equals(new_owner, dir_stat.group) We inherit supergroup now
     assert_equals('40755', '%o' % dir_stat.mode)
 
     src_stat = fs.listdir_stats(src_dir)
@@ -251,7 +249,7 @@ class WebhdfsTests(unittest.TestCase):
 
     for stat in dest_stat:
       assert_equals('testcopy', stat.user)
-      assert_equals('testcopy', stat.group)
+      # assert_equals('testcopy', stat.group) We inherit supergroup now
       assert_equals('100644', '%o' % stat.mode)
 
   def test_two_files_open(self):
@@ -261,8 +259,8 @@ class WebhdfsTests(unittest.TestCase):
     hang, all is good.
     """
     fs = self.cluster.fs
-    f1 = fs.open("/test_one.txt", "w")
-    f2 = fs.open("/test_two.txt", "w")
+    f1 = fs.open(self.prefix + "/test_one.txt", "w")
+    f2 = fs.open(self.prefix + "/test_two.txt", "w")
     f1.write("foo")
     f2.write("bar")
     f1.close()
@@ -295,7 +293,7 @@ class WebhdfsTests(unittest.TestCase):
       assertion(name in listing, "%s should be in %s" % (name, listing))
 
     name = u'''pt-Olá_ch-你好_ko-안녕_ru-Здравствуйте%20,.<>~`!@#$%^&()_-+='"'''
-    prefix = '/tmp/i18n'
+    prefix = self.prefix + '/tmp/i18n'
     dir_path = '%s/%s' % (prefix, name)
     file_path = '%s/%s' % (dir_path, name)
 
@@ -342,12 +340,13 @@ class WebhdfsTests(unittest.TestCase):
   def test_chmod(self):
     # Create a test directory with
     # a subdirectory and a few files.
-    dir1 = '/test'
+    dir1 = self.prefix + '/test_chmod'
     subdir1 = dir1 + '/test1'
     file1 = subdir1 + '/test1.txt'
     fs = self.cluster.fs
 
     try:
+      fs.setuser(fs.superuser)
       fs.mkdir(subdir1)
       f = fs.open(file1, "w")
       f.write("hello")
@@ -371,19 +370,19 @@ class WebhdfsTests(unittest.TestCase):
       assert_equals(041444, fs.stats(subdir1).mode)
       assert_equals(0101444, fs.stats(file1).mode)
     finally:
-      try:
-        fs.rmtree(dir1)
-      finally:
-        pass
+      fs.rmtree(dir1, skip_trash=True)
+      fs.setuser('test')
 
   def test_chown(self):
     # Create a test directory with
     # a subdirectory and a few files.
-    dir1 = '/test'
+    dir1 = self.prefix + '/test_chown'
     subdir1 = dir1 + '/test1'
     file1 = subdir1 + '/test1.txt'
     fs = self.cluster.fs
+
     try:
+      fs.setuser(fs.superuser)
       fs.mkdir(subdir1)
       f = fs.open(file1, "w")
       f.write("hello")
@@ -407,10 +406,8 @@ class WebhdfsTests(unittest.TestCase):
       assert_equals('test', fs.stats(subdir1).user)
       assert_equals('test', fs.stats(file1).user)
     finally:
-      try:
-        fs.rmtree(dir1)
-      finally:
-        pass
+      fs.rmtree(dir1, skip_trash=True)
+      fs.setuser('test')
 
   def test_trash_and_restore(self):
     PATH = self.cluster.fs.join(self.cluster.fs.get_home_dir(), 'trash_test')
