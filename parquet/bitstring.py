@@ -16,5 +16,5 @@ class BitString(object):
 		except AttributeError:
 			if key < 0 or key >= length:
 				raise IndexError()
-			byte_index, bit_offset = divmod(self.offset + key), 8)
+			byte_index, bit_offset = (divmod(self.offset + key), 8)
 			return self.bytes[byte_index] & SINGLE_BIT_MASK[bit_offset]
