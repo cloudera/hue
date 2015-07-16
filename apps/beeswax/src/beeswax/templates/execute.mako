@@ -853,6 +853,17 @@ ${ commonshare() | n,unicode }
     background-color: #F0F0F0;
   }
 
+  .table-actions {
+    position: absolute;
+    right: 0;
+    padding-left: 3px;
+    background-color: #FFF;
+  }
+
+  .preview-data {
+    margin-right: 5px;
+  }
+
   .remove {
     float: right;
   }
@@ -879,13 +890,8 @@ ${ commonshare() | n,unicode }
   }
 
   #navigatorTables {
+    position: relative;
     margin: 4px;
-  }
-
-  #navigatorTables li div {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   #navigatorSearch, #navigatorNoTables {
@@ -1223,8 +1229,13 @@ $(document).ready(function () {
   };
 
   renderNavigator = function () {
-    $("#navigatorTables").empty();
+    var $navigatorTables = $("#navigatorTables");
+    $navigatorTables.empty();
     $("#navigatorLoader").show();
+
+    $navigatorTables.scroll(function() {
+      $navigatorTables.find(".table-actions").css('right', -$navigatorTables.scrollLeft() + 'px');
+    });
 
     if (! viewModel.database()) {
       $("#navigatorLoader").html("${_('No databases or tables found.')}");
@@ -1239,9 +1250,16 @@ $(document).ready(function () {
             % if has_metastore:
               _statsLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
             % endif
-            _table.html("<a href='javascript:void(0)' class='preview-data pull-right' style='padding-right:5px'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "' style='margin-left:5px'></i></a>" +
-            "<a href='javascript:void(0)' class='table-stats pull-right'>" + _statsLink + "</a>" +
-            "<div><a href='javascript:void(0)' class='show-columns' title='" + table + "'><i class='fa fa-table'></i> " + table + "</a><ul class='unstyled' style='overflow-x: auto'></ul></div>");
+            _table.html("<div class='table-actions' style='display:none;'><a href='javascript:void(0)' class='preview-data'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "'></i></a>" +
+            "<a href='javascript:void(0)' class='table-stats'>" + _statsLink + "</a></div>" +
+            "<div><a href='javascript:void(0)' class='show-columns' title='" + table + "'>" + table + "</a><ul class='unstyled' style='overflow-x: auto'></ul></div>");
+
+            var tableActions = _table.find('.table-actions');
+            _table.hover(function () {
+              tableActions.show();
+            }, function () {
+              tableActions.hide();
+            });
 
             _table.data("table", table).attr("id", "navigatorTables_" + table);
             _table.find("a.show-columns").on("click", function () {
@@ -1278,7 +1296,7 @@ $(document).ready(function () {
                       _colStatsLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
                     % endif
 
-                    _column.html("<a href='javascript:void(0)' style='padding-left:10px' title='" + getTitle() + "'><i class='fa fa-columns'></i> " + col.name + (col.type != "" ? " (" + truncateOutput({ name: col.name, type: col.type}) + ")" : "") + "</a> <a class='pointer col-stats'>" + _colStatsLink + "</a>");
+                    _column.html("<a href='javascript:void(0)' style='padding-left:10px' title='" + getTitle() + "'>" + col.name + (col.type != "" ? " (" + truncateOutput({ name: col.name, type: col.type}) + ")" : "") + "</a> <a class='pointer col-stats'>" + _colStatsLink + "</a>");
                     _column.appendTo(_table.find("ul"));
                     _column.on("dblclick", function () {
                       codeMirror.replaceSelection($.trim(col.name) + ', ');
