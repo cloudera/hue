@@ -250,6 +250,11 @@ def default_database_options():
     return {}
 
 
+def default_secure_cookie():
+  """Enable secure cookies if HTTPS is enabled."""
+  return is_https_enabled()
+
+
 SMTP = ConfigSection(
   key='smtp',
   help=_('Configuration options for connecting to an external SMTP server.'),
@@ -380,7 +385,7 @@ SESSION = ConfigSection(
       key='secure',
       help=_("The cookie containing the users' session ID will be secure. This should only be enabled with HTTPS."),
       type=coerce_bool,
-      default=False,
+      dynamic_default=default_secure_cookie,
     ),
     HTTP_ONLY=Config(
       key='http_only',

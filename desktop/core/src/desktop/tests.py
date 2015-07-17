@@ -916,3 +916,53 @@ class TestDocument(object):
     # Test that copying enables attribute overrides
     assert_equal(Document.objects.filter(name=name).count(), 1)
     assert_equal(doc.description, self.document.description)
+
+
+def test_session_secure_cookie():
+  resets = [
+    desktop.conf.SSL_CERTIFICATE.set_for_testing('cert.pem'),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing('key.pem'),
+    desktop.conf.SESSION.SECURE.set_for_testing(False),
+  ]
+  try:
+    assert_true(desktop.conf.is_https_enabled())
+    assert_false(desktop.conf.SESSION.SECURE.get())
+  finally:
+    for reset in resets:
+      reset()
+
+  resets = [
+    desktop.conf.SSL_CERTIFICATE.set_for_testing('cert.pem'),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing('key.pem'),
+    desktop.conf.SESSION.SECURE.set_for_testing(True),
+  ]
+  try:
+    assert_true(desktop.conf.is_https_enabled())
+    assert_true(desktop.conf.SESSION.SECURE.get())
+  finally:
+    for reset in resets:
+      reset()
+
+  resets = [
+    desktop.conf.SSL_CERTIFICATE.set_for_testing('cert.pem'),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing('key.pem'),
+    desktop.conf.SESSION.SECURE.set_for_testing(present=False),
+  ]
+  try:
+    assert_true(desktop.conf.is_https_enabled())
+    assert_true(desktop.conf.SESSION.SECURE.get())
+  finally:
+    for reset in resets:
+      reset()
+
+  resets = [
+    desktop.conf.SSL_CERTIFICATE.set_for_testing(present=None),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(present=None),
+    desktop.conf.SESSION.SECURE.set_for_testing(present=False),
+  ]
+  try:
+    assert_false(desktop.conf.is_https_enabled())
+    assert_false(desktop.conf.SESSION.SECURE.get())
+  finally:
+    for reset in resets:
+      reset()
