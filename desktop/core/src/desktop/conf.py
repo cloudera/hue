@@ -386,7 +386,7 @@ SESSION = ConfigSection(
       key='http_only',
       help=_("The cookie containing the users' session ID will use the HTTP only flag."),
       type=coerce_bool,
-      default=False
+      default=True,
     ),
     EXPIRE_AT_BROWSER_CLOSE=Config(
       key='expire_at_browser_close',
