@@ -644,7 +644,7 @@ ko.bindingHandlers.daterangepicker = {
   }
 };
 
-ko.bindingHandlers.draggable = {
+ko.bindingHandlers.splitDraggable = {
   init: function (element, valueAccessor) {
     var options = valueAccessor();
     var $container = $(options.container);
@@ -652,6 +652,7 @@ ko.bindingHandlers.draggable = {
     var throttle = typeof options.throttle != "undefined" ? options.throttle : 20;
 
     var dragTimeout = -1;
+    var onStop = options.onStop || function() {};
     var onDrag = function(event, ui) {
       window.clearTimeout(dragTimeout);
       dragTimeout = window.setTimeout(function () {
@@ -666,13 +667,13 @@ ko.bindingHandlers.draggable = {
       containment: $container,
       drag: onDrag,
       start: onDrag,
-      stop: onDrag
+      stop: function(event, ui) {
+        onDrag(event, ui);
+        onStop(event, ui);
+      }
     };
 
-    if (typeof options.clone == "undefined" || options.clone ) {
-      draggableOptions.helper = 'clone';
-    }
-
+    draggableOptions.opacity = 0.01;
     $element.draggable(draggableOptions);
   }
 };

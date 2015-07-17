@@ -66,7 +66,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 
       </div>
-      <div class="resize" data-bind="draggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', clone: false }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div class="resize" data-bind="splitDraggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', onStop: function(){ window.setTimeout(reinitializeTableExtenders, 100); }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
       <div style="float:right; margin-left: 0;" data-bind="style: { 'width': (99 - $root.leftPanelWidth()) + '%' }">
         <div id="query">
           <div class="card card-small">

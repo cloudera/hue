@@ -202,7 +202,7 @@ ${layout.menubar(section='query')}
       </div>
     </div>
   </div>
-  <div class="resize" data-bind="draggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', clone: false }"><div class="resize-bar" style="margin-left: 0.5%"><i class="fa fa-ellipsis-v"></i></div></div>
+  <div class="resize" data-bind="splitDraggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', onStop: function(){ window.setTimeout(reinitializeTableExtenders, 100); }  }"><div class="resize-bar" style="margin-left: 0.5%"><i class="fa fa-ellipsis-v"></i></div></div>
   <div id="querySide"  style="float:right; margin-left: 0;" data-bind="style: { 'width': (99 - $root.leftPanelWidth()) + '%' }">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }

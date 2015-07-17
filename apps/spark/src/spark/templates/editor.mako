@@ -237,7 +237,7 @@ ${ commonheader(_('Query'), app_name, user, "68px") | n,unicode }
   <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), style: { 'width': $root.leftPanelWidth() + '%' }">
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, totalStorageId: 'sparkAssistVisible' }}"></div>
   </div>
-  <div class="resize" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), draggable: { axis: 'x', limits: { min: 2, max: 98 },horizontalPercent: $root.leftPanelWidth, container: '.resize-container' }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resize" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), splitDraggable: { axis: 'x', limits: { min: 2, max: 98 },horizontalPercent: $root.leftPanelWidth, container: '.resize-container', onStop: function(){ window.setTimeout(redrawFixedHeaders, 100); } }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="style: { 'width': $root.isAssistVisible() ? (99.5 - $root.leftPanelWidth()) + '%' : '100%' }">
     <div>
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
