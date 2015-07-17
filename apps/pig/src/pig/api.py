@@ -255,7 +255,6 @@ def get_progress(job, log):
     try:
       return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
     except:
-      LOG.exception('failed to get progress')
       return 0
 
 

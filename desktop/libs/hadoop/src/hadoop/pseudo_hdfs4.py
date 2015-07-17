@@ -64,6 +64,7 @@ class LiveHdfs():
   def __init__(self):
     self.fs = cluster.get_hdfs('default')
     # Assumes /tmp exists and is 1777
+    self.jt = None # Deprecated
 
     self.fs_prefix = get_fs_prefix(self.fs)
     LOG.info('Using %s as FS root' % self.fs_prefix)

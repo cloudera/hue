@@ -138,13 +138,13 @@ class TestWithHadoop(OozieBase):
     self.user = User.objects.get(username='test')
     self.c.post(reverse('pig:install_examples'))
 
-  def test_create_workflow(self):
-    cluster = pseudo_hdfs4.shared_cluster()
-    api = OozieApi(cluster.fs, cluster.jt, self.user)
+    self.cluster = pseudo_hdfs4.shared_cluster()
+    self.api = OozieApi(self.cluster.fs, self.cluster.jt, self.user)
 
+  def test_create_workflow(self):
     xattrs = {
       'parameters': [
-        {'name': 'output', 'value': '/tmp'},
+        {'name': 'output', 'value': self.cluster.fs_prefix + '/test_pig_script_workflow'},
         {'name': '-param', 'value': 'input=/data'}, # Alternative way for params
         {'name': '-optimizer_off', 'value': 'SplitFilter'},
         {'name': '-v', 'value': ''},
@@ -160,15 +160,17 @@ class TestWithHadoop(OozieBase):
     }
 
     pig_script = create_script(self.user, xattrs)
+
+    output_path = self.cluster.fs_prefix + '/test_pig_script_2'
     params = json.dumps([
-      {'name': 'output', 'value': '/tmp2'},
+      {'name': 'output', 'value': output_path},
     ])
 
-    workflow = api._create_workflow(pig_script, params)
+    workflow = self.api._create_workflow(pig_script, params)
     pig_action = workflow.start.get_child('to').get_full_node()
 
     assert_equal([
-        {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'output=/tmp2'},
+        {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'output=%s' % output_path},
         {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'input=/data'},
         {u'type': u'argument', u'value': u'-optimizer_off'}, {u'type': u'argument', u'value': u'SplitFilter'},
         {u'type': u'argument', u'value': u'-v'},
@@ -203,6 +205,9 @@ class TestWithHadoop(OozieBase):
 
     if response['workflow']['status'] != expected_status:
       msg = "[%d] %s took more than %d to complete or %s: %s" % (time.time(), job_id, timeout, response['workflow']['status'], logs)
+
+      self.api.stop(job_id)
+
       raise Exception(msg)
 
     return pig_script_id
@@ -219,7 +224,7 @@ class TestWithHadoop(OozieBase):
       'parameters': json.dumps(script_dict['parameters']),
       'resources': json.dumps(script_dict['resources']),
       'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
-      'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
+      'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_submit'}]),
     }
 
     response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
@@ -239,7 +244,7 @@ class TestWithHadoop(OozieBase):
       'parameters': json.dumps(script_dict['parameters']),
       'resources': json.dumps(script_dict['resources']),
       'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
-      'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
+      'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_stop'}]),
     }
 
     submit_response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
