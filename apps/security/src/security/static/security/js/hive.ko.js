@@ -344,7 +344,7 @@ var Assist = function (vm, initial) {
   self.column = ko.computed(function () {
     var column = self.path().split(/[.]/)[2];
     return column ? column : null;
-  });  
+  });
   self.privileges = ko.observableArray();
   self.roles = ko.observableArray();
   self.isDiffMode = ko.observable(false);
@@ -701,11 +701,11 @@ var Assist = function (vm, initial) {
   }
 
   self.fetchHivePath = function (optionalPath, loadCallback) {
-    self.isLoadingTree(true);
-
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
 
     if (_originalPath.split(".").length < 3) {
+      self.isLoadingTree(true);
+
       var _path = _originalPath.replace('.', '/');
       var request = {
         url: '/security/api/hive/fetch_hive_path',
@@ -734,6 +734,7 @@ var Assist = function (vm, initial) {
           else if (data.columns && data.columns.length > 0) {
             self.addColumns(_originalPath, data.columns, _hasCallback);
           }
+
           self.isLoadingTree(false);
 
           if (_hasCallback) {
@@ -1018,13 +1019,15 @@ var HiveViewModel = function (initial) {
       return {
         'server': self.assist.server(),
         'db': paths[0] ? paths[0] : null,
-        'table': paths[1] ? paths[1] : null
+        'table': paths[1] ? paths[1] : null,
+        'column': paths[2] ? paths[2] : null
       }
     } else {
       return {
         'server': self.assist.server(),
         'db': self.assist.db(),
-        'table': self.assist.table()
+        'table': self.assist.table(),
+        'column': self.assist.column(),
       }
     }
   }

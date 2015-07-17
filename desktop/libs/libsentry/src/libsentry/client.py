@@ -194,7 +194,7 @@ class SentryClient(object):
 
 
   def get_sentry_config_value(self, propertyName, defaultValue=None):
-    requestorUserName = self.username # Not available in Sentry API
+    # Note there is no requestorUserName in Sentry API
 
     request = TSentryConfigValueRequest(propertyName=propertyName, defaultValue=defaultValue)
     return self.client.get_sentry_config_value(request)

@@ -30,7 +30,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 
 from libsentry import api
-from security.api.hive import _massage_uri
+from security.api.hive import _massage_uri, _get_splitted_path
 
 
 def mocked_get_api(user):
@@ -121,3 +121,10 @@ class TestUtils(object):
       assert_equal('file:///data', _massage_uri('file:///data'))
     finally:
       finish()
+
+  def test_get_splitted_path(self):
+    assert_equal(('', '', ''), _get_splitted_path(''))
+    assert_equal(('db', '', ''), _get_splitted_path('db'))
+    assert_equal(('db', 'table', ''), _get_splitted_path('db.table'))
+    assert_equal(('db', 'table', 'column'), _get_splitted_path('db.table.column'))
+    assert_equal(('db', 'table', 'column'), _get_splitted_path('db.table.column.blah'))

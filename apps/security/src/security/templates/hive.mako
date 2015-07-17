@@ -483,6 +483,11 @@ ${ layout.menubar(section='hive') }
             <i class="fa fa-long-arrow-right muted"></i>
             <i class="fa fa-table muted"></i>
             <span data-bind="text: path.split('.')[1]"></span>
+            <span data-bind="visible: path.split('.')[2]">
+              <i class="fa fa-long-arrow-right muted"></i>
+              <i class="fa fa-columns muted"></i>
+              <span data-bind="text: path.split('.')[2]"></span>
+            </span>
           </li>
           <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break">
             <i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span>
