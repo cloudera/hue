@@ -244,7 +244,7 @@
 
           if (! _isSkipColumns){
             $(_iterable).each(function (cnt, item) {
-              _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
+              _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
             });
 
             $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);

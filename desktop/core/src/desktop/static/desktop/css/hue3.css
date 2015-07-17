@@ -1996,3 +1996,7 @@ pre {
   border-left: 5px solid #DDD;
   border-radius: 0;
 }
+
+.hiveAutocompleteItem {
+  white-space: nowrap;
+}
