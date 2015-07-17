@@ -17,7 +17,6 @@
 
 import json
 import logging
-import uuid
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -37,7 +36,7 @@ LOG = logging.getLogger(__name__)
 
 
 @check_document_access_permission()
-def editor(request):
+def notebook(request):
   notebook_id = request.GET.get('notebook')
 
   if notebook_id:
@@ -51,7 +50,7 @@ def editor(request):
   except:
     LOG.exception('failed to get autocomplete base url')
 
-  return render('editor.mako', request, {
+  return render('notebook.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
           'languages': LANGUAGES.get(),
@@ -68,7 +67,7 @@ def editor(request):
 
 
 def new(request):
-  return editor(request)
+  return notebook(request)
 
 
 def notebooks(request):

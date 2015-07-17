@@ -783,7 +783,7 @@ class Document2(models.Model):
     elif self.type == 'oozie-bundle2':
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
     elif self.type == 'notebook':
-      return reverse('spark:editor') + '?notebook=' + str(self.id)
+      return reverse('spark:notebook') + '?notebook=' + str(self.id)
     elif self.type == 'search-dashboard':
       return reverse('search:index') + '?collection=' + str(self.id)
     else:
