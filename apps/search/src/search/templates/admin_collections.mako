@@ -41,11 +41,11 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
   <div class="card card-home card-small">
     <%actionbar:render>
       <%def name="search()">
-        <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
+        <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && ! isLoading()">
       </%def>
 
       <%def name="actions()">
-        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': selectedCollections().length == 0}"><i class="fa fa-files-o"></i> ${_('Copy')}</a>
         <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.markManyForDeletion, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}"><i class="fa fa-times"></i> ${_('Delete')}</a>
       </%def>
 
