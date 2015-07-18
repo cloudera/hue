@@ -151,7 +151,7 @@ var SearchCollectionsModel = function (props) {
   };
 
   self.copyCollections = function (collections) {
-    if (self.atLeastOneSelected()){
+    if (self.selectedCollections().length > 0){
       $(document).trigger("copying");
       $.post(self.COPY_URL, {
           collections: ko.mapping.toJSON(self.selectedCollections())
