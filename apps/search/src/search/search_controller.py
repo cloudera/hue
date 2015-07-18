@@ -85,13 +85,13 @@ class SearchController(object):
     try:
       for doc2 in self.get_shared_search_collections():
         if doc2.id in collection_ids:
-          doc2 = Document2.objects.get(uuid=notebook['uuid'])
+          doc2 = Document2.objects.get(uuid=doc2.uuid)
           doc = doc2.doc.get()
 
           name = doc2.name + '-copy'
-          doc2 = doc2.copy(name=name, owner=request.user)
+          doc2 = doc2.copy(name=name, owner=self.user)
 
-          doc.copy(content_object=doc2, name=name)
+          doc.copy(content_object=doc2, name=name, owner=self.user)
 
           collection = Collection2(self.user, document=doc2)
           collection.data['collection']['label'] = name
