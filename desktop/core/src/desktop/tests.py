@@ -859,8 +859,11 @@ class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 class TestDocument(object):
 
   def setUp(self):
-    make_logged_in_client(username="test_doc", groupname="test_doc", recreate=True, is_superuser=False)
-    user = User.objects.get(username="test_doc")
+    make_logged_in_client(username="original_owner", groupname="test_doc", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="original_owner")
+
+    make_logged_in_client(username="copy_owner", groupname="test_doc", recreate=True, is_superuser=False)
+    self.copy_user = User.objects.get(username="copy_owner")
 
     # Get count of existing Document objects
     self.doc2_count = Document2.objects.count()
@@ -868,10 +871,10 @@ class TestDocument(object):
 
     self.document2 = Document2.objects.create(name='Test Document2',
                                               type='search-dashboard',
-                                              owner=user,
+                                              owner=self.user,
                                               description='Test Document2')
     self.document = Document.objects.link(content_object=self.document2,
-                                          owner=user,
+                                          owner=self.user,
                                           name='Test Document',
                                           description='Test Document',
                                           extra='test')
@@ -891,7 +894,7 @@ class TestDocument(object):
 
   def test_document_copy(self):
     name = 'Test Document2 Copy'
-    doc2 = self.document2.copy(name=name)
+    doc2 = self.document2.copy(name=name, owner=self.copy_user, description=self.document2.description)
 
     # Test that copying a Document2 object creates another object
     assert_equal(Document2.objects.count(), self.doc2_count + 2)
@@ -900,11 +903,14 @@ class TestDocument(object):
     # Test that the content object is not pointing to the same object
     assert_not_equal(self.document2.doc, doc2.doc)
 
+    # Test that the owner is attributed to the new user
+    assert_equal(doc2.owner, self.copy_user)
+
     # Test that copying enables attribute overrides
     assert_equal(Document2.objects.filter(name=name).count(), 1)
     assert_equal(doc2.description, self.document2.description)
 
-    doc = self.document.copy(doc2, name=name)
+    doc = self.document.copy(doc2, name=name, owner=self.copy_user, description=self.document2.description)
 
     # Test that copying a Document object creates another Document2 and Document object
     assert_equal(Document2.objects.count(), self.doc2_count + 2)
@@ -912,6 +918,9 @@ class TestDocument(object):
 
     # Test that the content object is not pointing to the same object
     assert_not_equal(self.document.content_object, doc.content_object)
+
+    # Test that the owner is attributed to the new user
+    assert_equal(doc.owner, self.copy_user)
 
     # Test that copying enables attribute overrides
     assert_equal(Document.objects.filter(name=name).count(), 1)

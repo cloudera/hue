@@ -149,7 +149,11 @@ def copy(request):
 
   pig_script = PigScript.objects.get(id=request.POST.get('id'))
   doc = pig_script.doc.get()
-  doc.can_edit_or_exception(request.user)
+
+  try:
+    doc.can_read_or_exception(request.user)
+  except Exception, e:
+    raise PopupException(e)
 
   existing_script_data = pig_script.dict
 

@@ -139,7 +139,7 @@ def copy(request):
     name = doc2.name + '-copy'
     doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc.copy(content_object=doc2, name=name)
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
   return JsonResponse({})
 

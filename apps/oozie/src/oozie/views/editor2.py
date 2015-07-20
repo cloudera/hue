@@ -155,7 +155,7 @@ def copy_workflow(request):
     name = doc2.name + '-copy'
     doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc.copy(content_object=doc2, name=name)
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
     workflow = Workflow(document=doc2)
     workflow.update_name(name)
@@ -457,7 +457,7 @@ def copy_coordinator(request):
     name = doc2.name + '-copy'
     doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc.copy(content_object=doc2, name=name)
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
     coordinator_data = Coordinator(document=doc2).get_data_for_json()
     coordinator_data['name'] = name
@@ -670,7 +670,7 @@ def copy_bundle(request):
     name = doc2.name + '-copy'
     doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc.copy(content_object=doc2, name=name)
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
     bundle_data = Bundle(document=doc2).get_data_for_json()
     bundle_data['name'] = name

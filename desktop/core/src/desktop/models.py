@@ -521,16 +521,16 @@ class Document(models.Model):
     else:
       raise exception_class(_("Document does not exist or you don't have the permission to access it."))
 
-  def copy(self, content_object, **kwargs):
+  def copy(self, content_object, name, owner, description=None):
     if content_object:
       copy_doc = self
 
-      for k, v in kwargs.iteritems():
-        if hasattr(copy_doc, k):
-          setattr(copy_doc, k, v)
-
       copy_doc.pk = None
       copy_doc.id = None
+      copy_doc.name = name
+      copy_doc.owner = owner
+      if description:
+        copy_doc.description = description
 
       copy_doc = Document.objects.link(content_object,
                                        owner=copy_doc.owner,
@@ -756,16 +756,16 @@ class Document2(models.Model):
 
     return data_python
 
-  def copy(self, **kwargs):
+  def copy(self, name, owner, description=None):
     copy_doc = self
-
-    for k, v in kwargs.iteritems():
-      if hasattr(copy_doc, k):
-        setattr(copy_doc, k, v)
 
     copy_doc.pk = None
     copy_doc.id = None
-    copy_doc.uuid = str(uuid.uuid4())
+    copy_doc.uuid = uuid_default()
+    copy_doc.name = name
+    copy_doc.owner = owner
+    if description:
+      copy_doc.description = description
     copy_doc.save()
 
     return copy_doc
