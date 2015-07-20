@@ -256,16 +256,28 @@ ${ components.menubar() }
 
   $(document).ready(function () {
 
-    $(".column-selector").on("click", function () {
+    function selectColumn(col) {
       var _t = $("#sample");
-      var _text = $.trim($(this).text().split("(")[0]);
       var _col = _t.find("th").filter(function() {
-        return $.trim($(this).text()) == _text;
+        return $.trim($(this).text()) == col;
       });
       _t.find(".columnSelected").removeClass("columnSelected");
       _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
       $("a[href='#sample']").click();
+
+    }
+
+    $(".column-selector").on("click", function () {
+      selectColumn($.trim($(this).text().split("(")[0]));
     });
+
+    if (window.location.hash != "") {
+      if (window.location.hash.indexOf("col=") > -1) {
+        window.setTimeout(function(){
+          selectColumn(window.location.hash.split("=")[1]);
+        }, 200)
+      }
+    }
 
     % if has_write_access:
         $.getJSON("${ url('metastore:drop_table', database=database) }", function (data) {

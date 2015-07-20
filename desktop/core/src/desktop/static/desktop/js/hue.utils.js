@@ -189,6 +189,13 @@ var huePubSub = (function () {
         }
       };
     },
+    subscribeOnce: function (topic, listener) {
+      var ephemeral = this.subscribe(topic, function(){
+        listener.apply(arguments);
+        ephemeral.remove();
+      });
+
+    },
     publish: function (topic, info) {
       if (! hOP.call(topics, topic)) {
         return;

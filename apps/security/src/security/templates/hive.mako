@@ -95,19 +95,22 @@ ${ layout.menubar(section='hive') }
     <!-- ko if: grantOption -->
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
+    <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
+      <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px"><i class="fa fa-external-link"></i></a>
+    </span>
     <br/>
 
     server=<span data-bind="text: serverName"></span>
 
     <!-- ko if: privilegeType() == 'db' -->
       <span data-bind="visible: dbName">
-        <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
+        <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }"><span data-bind="text: dbName"></span></a>
       </span>
       <span data-bind="visible: tableName">
-        <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
+        <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName()) }"><span data-bind="text: tableName"></span></a>
       </span>
       <span data-bind="visible: columnName">
-        <i class="fa fa-long-arrow-right"></i> column=<span data-bind="text: columnName"></span>
+        <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }"><span data-bind="text: columnName"></span></a>
       </span>
     <!-- /ko -->
 
@@ -163,7 +166,7 @@ ${ layout.menubar(section='hive') }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
-                  <a data-bind="attr: { href: '/metastore/table/' + $root.assist.path().replace('.', '/') }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
@@ -670,7 +673,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       showMainSection(viewModel.getSectionHash());
 
-      $(document).on("show.role", function(e, role) {
+      $(document).on("show.mainSection", function(){
+        showMainSection(viewModel.getSectionHash());
+      });
+
+      $(document).on("show.role", function(role) {
         if (typeof role != "undefined" && role.name != null){
           $("#bulkActionsModal").modal("hide");
           showMainSection("roles");

@@ -98,7 +98,20 @@ var Privilege = function (vm, privilege) {
     },
     owner: self
   });
-  self.privilegeScope = ko.computed(function () {
+
+  self.metastorePath = ko.computed(function(){
+    if (self.columnName().length > 0) {
+      return '/metastore/table/' + self.dbName() + "/" + self.tableName() + "#col=" + self.columnName();
+    } else if (self.tableName().length > 0) {
+      return '/metastore/table/' + self.dbName() + "/" + self.tableName();
+    } else if (self.dbName().length > 0) {
+      return '/metastore/tables/' + self.dbName();
+    } else {
+      return '';
+    }
+  });
+
+  function getPrivilegeScope() {
     if (self.privilegeType() == 'uri') {
       return 'URI';
     } else if (self.columnName().length > 0) {
@@ -110,6 +123,24 @@ var Privilege = function (vm, privilege) {
     } else {
       return 'SERVER';
     }
+  }
+
+  self.privilegeScope = ko.observable(typeof privilege.privilegeScope != "undefined" ? privilege.privilegeScope : getPrivilegeScope());
+
+  self.privilegeType.subscribe(function(newVal){
+    self.privilegeScope(getPrivilegeScope());
+  });
+
+  self.columnName.subscribe(function(newVal){
+    self.privilegeScope(getPrivilegeScope());
+  });
+
+  self.tableName.subscribe(function(newVal){
+    self.privilegeScope(getPrivilegeScope());
+  });
+
+  self.dbName.subscribe(function(newVal){
+    self.privilegeScope(getPrivilegeScope());
   });
 
   self.remove = function (privilege) {
@@ -344,6 +375,17 @@ var Assist = function (vm, initial) {
   self.column = ko.computed(function () {
     var column = self.path().split(/[.]/)[2];
     return column ? column : null;
+  });
+  self.metastorePath = ko.computed(function(){
+    if (self.column()) {
+      return '/metastore/table/' + self.db() + "/" + self.table() + "#col=" + self.column();
+    } else if (self.table()) {
+      return '/metastore/table/' + self.db() + "/" + self.table();
+    } else if (self.db()) {
+      return '/metastore/tables/' + self.db();
+    } else {
+      return '/metastore/databases';
+    }
   });
   self.privileges = ko.observableArray();
   self.roles = ko.observableArray();
@@ -703,7 +745,7 @@ var Assist = function (vm, initial) {
   self.fetchHivePath = function (optionalPath, loadCallback) {
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
 
-    if (_originalPath.split(".").length < 3) {
+    if (_originalPath.split(".").length < 4) {
       self.isLoadingTree(true);
 
       var _path = _originalPath.replace('.', '/');
@@ -1255,6 +1297,14 @@ var HiveViewModel = function (initial) {
       }
     }
     return "edit";
+  }
+
+  self.linkToBrowse = function (path) {
+    self.assist.path(path);
+    $(document).trigger("changed.path");
+    self.assist.loadParents();
+    self.updateSectionHash("edit");
+    $(document).trigger("show.mainSection");
   }
 };
 
