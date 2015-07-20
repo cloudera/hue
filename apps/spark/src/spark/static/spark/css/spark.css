@@ -37,28 +37,32 @@ body {
   bottom: 0;
 }
 
+.panel-container {
+  position: relative;
+}
+
 .left-panel {
-  float: left;
+  position: absolute;
   height: 100%;
   overflow: auto;
 }
 
-.resize {
+.resizer {
+  position: absolute;
   height: 100%;
-  width: 0.5%;
+  width: 2px;
   cursor: ew-resize;
-  float: left;
 }
 
 .resize-bar {
+  position: absolute;
   height: 100%;
   width: 2px;
   background-color: #F1F1F1;
-  float:left;
 }
 
 .right-panel {
-  float: right;
+  position: absolute;
   height: 100%;
   overflow: auto;
 }

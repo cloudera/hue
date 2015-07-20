@@ -750,12 +750,6 @@ function EditorViewModel(notebooks, options) {
 
   self.isAssistVisible = ko.observable(false);
 
-  self.leftPanelWidth = ko.observable($.totalStorage('sparkLeftPanelWidth') != null ? $.totalStorage('sparkLeftPanelWidth') : 20);
-
-  self.leftPanelWidth.subscribe(function(newValue) {
-    $.totalStorage('sparkLeftPanelWidth', newValue);
-  });
-
   self.assistContent = ko.observable();
   self.assistSelectedMainObject = ko.observable();
 
