@@ -358,7 +358,7 @@ Response
 The `Session`_.
 
 
-DELETE /sessions/{batchId}
+DELETE /sessions/{sessionId}
 -------------------------
 
 Kill the `Session`_ job.
