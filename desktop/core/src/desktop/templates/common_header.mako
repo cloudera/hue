@@ -41,13 +41,13 @@ from django.utils.translation import ugettext as _
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue ${get_nice_name(current_app, section)} ${get_title(title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
   <meta name="description" content="">
   <meta name="author" content="">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
