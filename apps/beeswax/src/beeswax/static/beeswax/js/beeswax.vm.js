@@ -90,12 +90,6 @@ function BeeswaxViewModel(server) {
   self.chartSorting = ko.observable("none");
   self.chartData = ko.observableArray();
 
-  self.leftPanelWidth = ko.observable($.totalStorage('besswaxLeftPanelWidth') != null ? $.totalStorage('besswaxLeftPanelWidth') : 20);
-
-  self.leftPanelWidth.subscribe(function(newValue) {
-    $.totalStorage('besswaxLeftPanelWidth', newValue);
-  });
-
   self.server = ko.observable(server);
   self.databases = ko.observableArray();
   self.selectedDatabase = ko.observable(0);

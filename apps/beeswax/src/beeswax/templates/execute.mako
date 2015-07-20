@@ -31,9 +31,8 @@ ${layout.menubar(section='query')}
 <div id="temporaryPlaceholder"></div>
 <div id="beeswax-execute">
   <div id="query-editor" class="container-fluid hide section">
-  <div class="row-fluid resize-container">
-
-  <div id="navigator" style="float:left;" data-bind="style: { 'width': ($root.leftPanelWidth()  - 0.5) + '%' }">
+  <div class="panel-container">
+  <div class="left-panel" id="navigator">
     <ul class="nav nav-tabs" style="margin-bottom: 0">
       <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${_('Assist')}</a></li>
       <li><a href="#settingsTab" data-toggle="tab" class="sidetab">${_('Settings')} <span data-bind="visible:design.settings.values().length + design.fileResources.values().length + design.functions.values().length > 0, text: design.settings.values().length + design.fileResources.values().length + design.functions.values().length" class="badge badge-info">12</span></a></li>
@@ -202,8 +201,8 @@ ${layout.menubar(section='query')}
       </div>
     </div>
   </div>
-  <div class="resize" data-bind="splitDraggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', onStop: function(){ window.setTimeout(reinitializeTableExtenders, 100); }  }"><div class="resize-bar" style="margin-left: 0.5%"><i class="fa fa-ellipsis-v"></i></div></div>
-  <div id="querySide"  style="float:right; margin-left: 0;" data-bind="style: { 'width': (99 - $root.leftPanelWidth()) + '%' }">
+  <div class="resizer" data-bind="splitDraggable : { totalStorageRatioId: 'beeswaxLeftPanelRatio', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+  <div class="right-panel" id="querySide">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }
     </div>
@@ -483,8 +482,6 @@ ${layout.menubar(section='query')}
       </div>
     </div>
   </div>
-
-
   </div>
   </div>
 
@@ -796,15 +793,30 @@ ${ commonshare() | n,unicode }
     margin-bottom: 5px;
   }
 
-  .resize {
-    float: left;
-    padding-left: 7px;
+  .panel-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .left-panel {
+    position: absolute;
+  }
+
+  .resizer {
+    position: absolute;
+    width: 20px;
+    text-align: center;
+    z-index: 1000;
   }
 
   .resize-bar {
     top: 50%;
     position: relative;
     cursor: ew-resize;
+  }
+
+  .right-panel {
+    position: absolute;
   }
 
   #chooseFile, #chooseFolder, #choosePath {
@@ -1081,6 +1093,16 @@ var truncateOutput = function (obj) {
   return escapeOutput(type) + suffix;
 };
 
+var reinitTimeout = -1;
+
+function onPanelPosition() {
+  placeResizePanelHandle();
+  window.clearTimeout(reinitTimeout);
+  reinitTimeout = window.setTimeout(function () {
+    reinitializeTableExtenders();
+  }, 50);
+}
+
 function placeResizePanelHandle() {
   // dynamically positioning the resize panel handle since IE doesn't play well with styles.
   $("#resizePanel a").css("left", $("#resizePanel").position().left + $("#resizePanel").width()/2 - 8);
@@ -1206,7 +1228,7 @@ $(document).ready(function () {
   });
 
   resizeNavigator = function () {
-    $(".resize").css("height", ($(window).height() - 150) + "px");
+    $(".resizer").css("height", ($(window).height() - 150) + "px");
     $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
     $("#navigatorTables").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
   };
@@ -2592,9 +2614,6 @@ $(document).ready(function () {
     $('#queryContainer').show();
     $('#resizePanel').show();
     $('a[href="#query"]').parent().show();
-    if (!$('#querySide').hasClass('span10')) {
-      $('#querySide').addClass('span10');
-    }
   }
 
   function watchPageComponents() {
@@ -2604,9 +2623,6 @@ $(document).ready(function () {
     $('#resizePanel').hide();
     $('a[href="#query"]').parent().hide();
     $('a[href="#recentTab"]').parent().hide();
-    if ($('#querySide').hasClass('span10')) {
-      $('#querySide').removeClass('span10');
-    }
   }
 
   function queryPage() {
@@ -2874,8 +2890,6 @@ ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
 shareViewModel = initSharing("#documentShareModal");
 shareViewModel.setDocId(${doc_id});
-
-viewModel.leftPanelWidth.subscribe(placeResizePanelHandle);
 
 % if not beeswax_conf.USE_GET_LOG_API.get() and app_name != 'impala':
   viewModel.shouldAppendLogs = true;
