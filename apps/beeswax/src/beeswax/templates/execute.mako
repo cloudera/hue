@@ -2405,19 +2405,6 @@ function createNewQuery() {
   location.href="${ url(app_name + ':execute_query') }";
 }
 
-function checkLastDatabase(server, database) {
-  var key = "hueBeeswaxLastDatabase-" + server;
-  if (database != $.totalStorage(key)) {
-    $.totalStorage(key, database);
-  }
-}
-
-function getLastDatabase(server) {
-  var key = "hueBeeswaxLastDatabase-" + server;
-  return $.totalStorage(key);
-}
-
-
 // Server error handling.
 $(document).on('server.error', function (e, data) {
   $(document).trigger('error', "${_('Server error occurred: ')}" + data.message ? data.message : data.error);
@@ -2809,7 +2796,12 @@ function getDatabases(callback){
         viewModel.database($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"));
       }
       else {
-        $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", null);
+        if ($.inArray("default", viewModel.databases()) > -1){
+          viewModel.database("default");
+        }
+        else {
+          $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", null);
+        }
       }
       var _waitForNavigatorInit = -1;
       _waitForNavigatorInit = window.setInterval(function () {
