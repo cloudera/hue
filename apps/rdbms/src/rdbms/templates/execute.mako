@@ -26,8 +26,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 <div id="rdbms-query-editor">
   <div class="container-fluid">
-    <div class="row-fluid resize-container">
-      <div id="navigator" style="float:left;" data-bind="style: { 'width': ($root.leftPanelWidth()  - 0.5) + '%' }">
+    <div class="panel-container">
+      <div class="left-panel" id="navigator">
         <ul class="nav nav-tabs" style="margin-bottom: 0">
           <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${ _('Assist') }</a></li>
         </ul>
@@ -66,8 +66,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 
       </div>
-      <div class="resize" data-bind="splitDraggable: { axis: 'x', limits: { min: 10, max: 80 }, throttle: 5, horizontalPercent: $root.leftPanelWidth, container: '.resize-container', onStop: function(){ window.setTimeout(reinitializeTableExtenders, 100); }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
-      <div style="float:right; margin-left: 0;" data-bind="style: { 'width': (99 - $root.leftPanelWidth()) + '%' }">
+      <div class="resizer" data-bind="splitDraggable : { totalStorageRatioId: 'beeswaxLeftPanelRatio' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div class="right-panel">
         <div id="query">
           <div class="card card-small">
             <div style="margin-bottom: 10px">
@@ -161,7 +161,6 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -203,15 +202,30 @@ ${ commonshare() | n,unicode }
     margin-bottom: 5px;
   }
 
-  .resize {
-    float: left;
-    padding-left: 7px;
+  .panel-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .left-panel {
+    position: absolute;
+  }
+
+  .resizer {
+    position: absolute;
+    width: 20px;
+    text-align: center;
+    z-index: 1000;
   }
 
   .resize-bar {
     top: 50%;
     position: relative;
     cursor: ew-resize;
+  }
+
+  .right-panel {
+    position: absolute;
   }
 
   #filechooser {
@@ -390,7 +404,7 @@ ${ commonshare() | n,unicode }
 
     var resizeNavigator = function() {
       $("#navigatorTables").css("max-height", ($(window).height() - 380) + "px").css("overflow-y", "auto");
-      $(".resize").css("height", ($(window).height() - 110) + "px");
+      $(".resizer").css("height", ($(window).height() - 110) + "px");
     }
 
     $(window).on("resize", function () {
