@@ -646,35 +646,82 @@ ko.bindingHandlers.daterangepicker = {
 
 ko.bindingHandlers.splitDraggable = {
   init: function (element, valueAccessor) {
-    var options = valueAccessor();
-    var $container = $(options.container);
-    var $element = $(element);
-    var throttle = typeof options.throttle != "undefined" ? options.throttle : 20;
+    var options = ko.unwrap(valueAccessor());
+    var leftPanelRatio = $.totalStorage(options.totalStorageRatioId) != null ? $.totalStorage(options.totalStorageRatioId) : 0.25;
+
+    var containerSelector = options.containerSelector || ".panel-container";
+    var leftPanelSelector = options.leftPanelSelector || ".left-panel";
+    var rightPanelSelector = options.rightPanelSelector || ".right-panel";
+
+    var onPosition = options.onPosition || function() {};
+
+    var $resizer = $(element);
+    var $leftPanel = $(leftPanelSelector);
+    var $rightPanel = $(rightPanelSelector);
+    var $container = $(containerSelector);
+
+    var positionPanels = function () {
+      if (ko.isObservable(options.leftPanelVisible) && ! options.leftPanelVisible()) {
+        $rightPanel.css("width", "100%");
+      } else {
+        var totalWidth = $container.width();
+        var leftPanelWidth = Math.round(totalWidth * leftPanelRatio);
+        var rightPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
+        $leftPanel.css("width", leftPanelWidth + "px");
+        $rightPanel.css("width", rightPanelWidth + "px");
+        $resizer.css("left", leftPanelWidth + "px");
+        $rightPanel.css("left", leftPanelWidth + $resizer.width() + "px");
+      }
+      onPosition();
+    };
+
+    if (ko.isObservable(options.leftPanelVisible)) {
+      options.leftPanelVisible.subscribe(positionPanels);
+    }
 
     var dragTimeout = -1;
-    var onStop = options.onStop || function() {};
-    var onDrag = function(event, ui) {
-      window.clearTimeout(dragTimeout);
-      dragTimeout = window.setTimeout(function () {
-        var percentage = ((ui.offset.left - $container.position().left) / $container.width()) * 100;
-        options.horizontalPercent(Math.max(Math.min(percentage, options.limits.max), options.limits.min));
-      }, throttle);
-      window.setTimeout(function() { $element.css('left', '') }, 1);
-    };
-
-    var draggableOptions = {
-      axis: options.axis,
+    $resizer.draggable({
+      axis: "x",
       containment: $container,
-      drag: onDrag,
-      start: onDrag,
-      stop: function(event, ui) {
-        onDrag(event, ui);
-        onStop(event, ui);
-      }
-    };
+      drag: function (event, ui) {
+        ui.position.left = Math.min($container.width() - $container.position().left - 200, Math.max(150, ui.position.left));
 
-    draggableOptions.opacity = 0.01;
-    $element.draggable(draggableOptions);
+        dragTimeout = window.setTimeout(function () {
+          $leftPanel.css("width", ui.position.left + "px");
+          $rightPanel.css("width", $container.width() - ui.position.left - $resizer.width() + "px");
+          $rightPanel.css("left", ui.position.left + $resizer.width());
+          onPosition();
+        }, 10);
+
+      },
+      stop: function () {
+        var totalWidth = $leftPanel.width() + $resizer.width() + $rightPanel.width();
+        leftPanelRatio = $leftPanel.width() / totalWidth;
+        $.totalStorage(options.totalStorageRatioId, leftPanelRatio);
+        positionPanels();
+      }
+    });
+
+
+    var positionTimeout = -1;
+    $(window).resize(function() {
+      window.clearTimeout(positionTimeout);
+      positionTimeout = window.setTimeout(function () {
+        positionPanels()
+      }, 1);
+    });
+
+    function initialPositioning() {
+      if(! $container.is(":visible")) {
+        window.setTimeout(initialPositioning, 50);
+      } else {
+        positionPanels();
+        // Even though the container is visible some slow browsers might not
+        // have rendered the panels
+        window.setTimeout(positionPanels, 100);
+      }
+    }
+    initialPositioning();
   }
 };
 
