@@ -14,7 +14,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.lib.conf import BoundConfig
 from django.utils.translation import ugettext as _
 %>
     ${_('Configuration files located in')} <code style="color: #338BB8">${conf_dir}</code>
