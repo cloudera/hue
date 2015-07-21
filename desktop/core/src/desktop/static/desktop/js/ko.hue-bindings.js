@@ -663,6 +663,7 @@ ko.bindingHandlers.splitDraggable = {
     var positionPanels = function () {
       if (ko.isObservable(options.leftPanelVisible) && ! options.leftPanelVisible()) {
         $rightPanel.css("width", "100%");
+        $rightPanel.css("left", "0");
       } else {
         var totalWidth = $container.width();
         var leftPanelWidth = Math.round(totalWidth * leftPanelRatio);
