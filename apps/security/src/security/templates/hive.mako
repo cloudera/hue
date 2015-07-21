@@ -77,8 +77,7 @@ ${ layout.menubar(section='hive') }
     </div>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced" style="margin-top: 0">
-      <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 6px">
-      <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
+      ${ _('Server') } <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 6px">
     </div>
   <!-- /ko -->
 
