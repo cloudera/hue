@@ -317,7 +317,8 @@ class PooledClient(object):
       return self.__dict__[attr_name]
 
     # Fetch the thrift client from the pool
-    superclient = _connection_pool.get_client(self.conf)
+    superclient = _connection_pool.get_client(self.conf,
+        get_client_timeout=self.conf.timeout_seconds)
 
     # Fetch the attribute. If it's callable, wrap it in a wrapper that re-gets
     # the client.
