@@ -36,8 +36,11 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 </script>
 
-<div class="search-bar">
+<div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }">
+      <i class="fa fa-expand"></i>
+    </a>
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
@@ -262,9 +265,26 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </%def>
 </%dashboard:layout_toolbar>
 
+<div class="player-toolbar" data-bind="visible: $root.isPlayerMode">
+  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
+  <img src="${ static('desktop/art/icon_hue_48.png') }" />
+  <h4 data-bind="text: collection.label"></h4>
+  <form class="form-search" data-bind="submit: searchBtn">
+  <span data-bind="foreach: query.qs">
+    <input data-bind="clearable: q, typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
+    <!-- ko if: $parent.query.qs().length > 1 -->
+    <div class="pointer muted link" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></div>
+    <!-- /ko -->
+  </span>
+  <div class="pointer muted link" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></div>
+  <div class="pointer muted link" data-bind="click: $root.searchBtn"><i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i></div>
+  <!--[if !IE]> --><i class="fa fa-spinner fa-spin muted" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
+  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
+  </form>
+</div>
+
 
 ${ dashboard.layout_skeleton() }
-
 
 <script type="text/html" id="empty-widget">
   ${ _('This is an empty widget.')}
@@ -1825,6 +1845,12 @@ ${ dashboard.import_charts() }
   #emptyDashboardEditing {
     top: 190px!important;
   }
+  .dashboard {
+    margin-top: 20px;
+  }
+  .dashboard.with-top-margin {
+    margin-top: 80px;
+  }
 % endif
 </style>
 
@@ -2349,6 +2375,17 @@ $(document).ready(function () {
           $(".slider-cnt").slider("redraw");
         }
       }, 300);
+    }
+  });
+
+  viewModel.isPlayerMode.subscribe(function(value) {
+    if (value){
+      $(".navigator").hide();
+      $("body").css("paddingTop", "40px");
+    }
+    else {
+      $(".navigator").show();
+      $("body").css("paddingTop", "80px");
     }
   });
 

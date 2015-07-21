@@ -1194,6 +1194,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   });
   self.isSyncingCollections = ko.observable(false);
 
+  self.isPlayerMode = ko.observable(false);
+
   function bareWidgetBuilder(name, type){
     return new Widget({
       size: 12,
