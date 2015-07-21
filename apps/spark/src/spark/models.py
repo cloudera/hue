@@ -288,17 +288,13 @@ class SparkApi(Api):
 
   def create_session(self, lang='scala', properties=None):
     if properties is None:
-      properties = {
-          'executor_cores': 1, # Some props only in YARN mode
-          'executor_count': 1,
-          'executor_memory': '1G',
-          'driver_cores': 1,
-          'driver_memory': '1G'
-      }
+      properties = {'executorMemory': '500M'}
+
+    properties['kind'] = lang
 
     api = get_spark_api(self.user)
-    print 'TODO: we should use the settings %s for creating the new sessions' % properties
-    response = api.create_session(kind=lang)
+
+    response = api.create_session(**properties)
 
     status = api.get_session(response['id'])
     count = 0

@@ -25,7 +25,7 @@ from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 
-from spark.conf import LANGUAGES
+from spark.conf import LANGUAGES, LIVY_SERVER_SESSION_KIND
 from spark.decorators import check_document_access_permission,\
   check_document_modify_permission
 from spark.models import Notebook, get_api
@@ -63,6 +63,7 @@ def notebook(request):
           }
       }),
       'autocomplete_base_url': autocomplete_base_url,
+      'is_yarn_mode': LIVY_SERVER_SESSION_KIND.get()
   })
 
 

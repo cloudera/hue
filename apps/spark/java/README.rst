@@ -225,6 +225,118 @@ Community
 REST API
 ========
 
+GET /sessions
+-------------
+
+Returns all the active interactive sessions.
+
+Response Body
+^^^^^^^^^^^^^
+
++----------+-----------------+------+
+| name     | description     | type |
++==========+=================+======+
+| sessions | `session`_ list | list |
++----------+-----------------+------+
+
+
+POST /sessions
+--------------
+
+Creates a new interative Scala or Python shell in the cluster.
+
+Request Body
+^^^^^^^^^^^^
+
++----------------+--------------------------------------------------+----------------------------+
+| name           | description                                      | type                       |
++================+==================================================+============================+
+| lang           | session kind (scala or python)                   | `session kind`_ (required) |
++----------------+--------------------------------------------------+----------------------------+
+| file           | archive holding the file                         | path (required)            |
++----------------+--------------------------------------------------+----------------------------+
+| args           | command line arguments                           | list of strings            |
++----------------+--------------------------------------------------+----------------------------+
+| className      | application's java/spark main class              | string                     |
++----------------+--------------------------------------------------+----------------------------+
+| jars           | files to be placed on the java classpath         | list of paths              |
++----------------+--------------------------------------------------+----------------------------+
+| pyFiles        | files to be placed on the PYTHONPATH             | list of paths              |
++----------------+--------------------------------------------------+----------------------------+
+| files          | files to be placed in executor working directory | list of paths              |
++----------------+--------------------------------------------------+----------------------------+
+| driverMemory   | memory for driver                                | string                     |
++----------------+--------------------------------------------------+----------------------------+
+| driverCores    | number of cores used by driver                   | int                        |
++----------------+--------------------------------------------------+----------------------------+
+| executorMemory | memory for executor                              | string                     |
++----------------+--------------------------------------------------+----------------------------+
+| executorCores  | number of cores used by executor                 | int                        |
++----------------+--------------------------------------------------+----------------------------+
+| numExecutors   | number of executor                               | int                        |
++----------------+--------------------------------------------------+----------------------------+
+| archives       |                                                  | list of paths              |
++----------------+--------------------------------------------------+----------------------------+
+
+
+Response Body
+^^^^^^^^^^^^^
+
+The created `Session`_.
+
+
+GET /sessions/{sessionId}
+-------------------------
+
+Return the session information
+
+Response
+^^^^^^^^
+
+The `Session`_.
+
+
+DELETE /sessions/{sessionId}
+-------------------------
+
+Kill the `Session`_ job.
+
+
+GET /sessions/{sessionId}/statements
+------------------------------------
+
+Return all the statements in a session.
+
+Response Body
+^^^^^^^^^^^^^
+
++------------+-------------------+------+
+| name       | description       | type |
++============+===================+======+
+| statements | `statement`_ list | list |
++------------+-------------------+------+
+
+
+POST /sessions/{sessionId}/statements
+-------------------------------------
+
+Execute a statement in a session.
+
+Request Body
+^^^^^^^^^^^^
+
++------+---------------------+--------+
+| name | description         | type   |
++======+=====================+========+
+| code | The code to execute | string |
++------+---------------------+--------+
+
+Response Body
+^^^^^^^^^^^^^
+
+The `statement`_ object.
+
+
 GET /batches
 ------------
 
@@ -314,124 +426,8 @@ DELETE /batches/{batchId}
 Kill the `Batch`_ job.
 
 
-GET /sessions
--------------
-
-Returns all the active interactive sessions.
-
-Response Body
-^^^^^^^^^^^^^
-
-+----------+-----------------+------+
-| name     | description     | type |
-+==========+=================+======+
-| sessions | `session`_ list | list |
-+----------+-----------------+------+
-
-
-POST /sessions
---------------
-
-Request Body
-^^^^^^^^^^^^
-
-+------+--------------+----------------------------+
-| name | description  | type                       |
-+======+==============+============================+
-| lang | session kind | `session kind`_ (required) |
-+------+--------------+----------------------------+
-
-Response Body
-^^^^^^^^^^^^^
-
-The created `Session`_.
-
-
-GET /sessions/{sessionId}
--------------------------
-
-Return the session information
-
-Response
-^^^^^^^^
-
-The `Session`_.
-
-
-DELETE /sessions/{sessionId}
--------------------------
-
-Kill the `Session`_ job.
-
-
-GET /sessions/{sessionId}/statements
-------------------------------------
-
-Return all the statements in a session.
-
-Response Body
-^^^^^^^^^^^^^
-
-+------------+-------------------+------+
-| name       | description       | type |
-+============+===================+======+
-| statements | `statement`_ list | list |
-+------------+-------------------+------+
-
-
-POST /sessions/{sessionId}/statements
--------------------------------------
-
-Execute a statement in a session.
-
-Request Body
-^^^^^^^^^^^^
-
-+------+---------------------+--------+
-| name | description         | type   |
-+======+=====================+========+
-| code | The code to execute | string |
-+------+---------------------+--------+
-
-Response Body
-^^^^^^^^^^^^^
-
-The `statement`_ object.
-
-
 REST Objects
 ============
-
-Batch
------
-
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| name           | description                                                                    | type            |
-+================+================================================================================+=================+
-| file           | archive holding the file                                                       | path (required) |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| args           | command line arguments                                                         | list of strings |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| className      | application's java/spark main class                                            | string          |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| jars           | files to be placed on the java classpath                                       | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| pyFiles        | files to be placed on the PYTHONPATH                                           | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| files          | files to be placed in executor working directory                               | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| driverMemory   | memory for driver                                                              | string          |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| driverCores    | number of cores used by driver (YARN mode only)                                | int             |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| executorMemory | memory for executor                                                            | string          |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| executorCores  | number of cores used by executor                                               | int             |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| numExecutors   | number of executors (YARN mode only)                                           | int             |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
 
 Session
 -------
@@ -542,6 +538,37 @@ Statement Output
 |                 |                   | ``application/json``, the value  |
 |                 |                   | will be a JSON value             |
 +-----------------+-------------------+----------------------------------+
+
+Batch
+-----
+
++----------------+--------------------------------------------------------------------------------+-----------------+
+| name           | description                                                                    | type            |
++================+================================================================================+=================+
+| file           | archive holding the file                                                       | path (required) |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| args           | command line arguments                                                         | list of strings |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| className      | application's java/spark main class                                            | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| jars           | files to be placed on the java classpath                                       | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| pyFiles        | files to be placed on the PYTHONPATH                                           | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| files          | files to be placed in executor working directory                               | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| driverMemory   | memory for driver                                                              | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| driverCores    | number of cores used by driver (YARN mode only)                                | int             |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| executorMemory | memory for executor                                                            | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| executorCores  | number of cores used by executor                                               | int             |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| numExecutors   | number of executors (YARN mode only)                                           | int             |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
 
 
 License

@@ -647,10 +647,10 @@ var Notebook = function (vm, notebook) {
   self.newSnippet = function () {
   	var properties = {};
 
-    var addYarnProperties = function() {
-      properties['driver_cores'] = '';
-      properties['executor_cores'] = '';
-      properties['num_executors'] = '';
+    var addSparkYarnProperties = function() {
+      properties['driverCores'] = '';
+      properties['executorCores'] = '';
+      properties['numExecutors'] = '';
       properties['queue'] = '';
       properties['archives'] = [];
     };
@@ -659,15 +659,18 @@ var Notebook = function (vm, notebook) {
       properties['app_jar'] = '';
       properties['class'] = '';
       properties['arguments'] = [];
-      addYarnProperties();
-    } else if (self.selectedSnippet() == 'py') {
+      addSparkYarnProperties();
+    }
+    else if (self.selectedSnippet() == 'py') {
       properties['py_file'] = '';
       properties['arguments'] = [];
-      addYarnProperties();
-    } else if (self.selectedSnippet() == 'hive') {
+      addSparkYarnProperties();
+    }
+    else if (self.selectedSnippet() == 'hive') {
       properties['settings'] = [];
       properties['files'] = [];
-    } else if (self.selectedSnippet() == 'pig') {
+    }
+    else if (self.selectedSnippet() == 'pig') {
       properties['parameters'] = [];
       properties['hadoop_properties'] = [];
       properties['files'] = [];
