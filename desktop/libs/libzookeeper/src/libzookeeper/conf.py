@@ -29,21 +29,26 @@ def zkensemble():
   """
   Try to guess the value if no values are specified.
   """
-  try:
-    # Backward compatibility until Hue 4
-    from zookeeper.conf import CLUSTERS
-    clusters = CLUSTERS.get()
-    if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
-      return '%s' % clusters['default'].HOST_PORTS.get()
-  except:
-    LOG.warn('Could not get zookeeper ensemble from the zookeeper app')
 
-  try:
-    from search.conf import SOLR_URL
-    parsed = urlparse(SOLR_URL.get())
-    return "%s:2181" % (parsed.hostname or 'localhost')
-  except:
-    LOG.warn('Could not get zookeeper ensemble from the search app')
+  from django.conf import settings
+
+  if 'zookeeper' in settings.INSTALLED_APPS:
+    try:
+      # Backward compatibility until Hue 4
+      from zookeeper.conf import CLUSTERS
+      clusters = CLUSTERS.get()
+      if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
+        return '%s' % clusters['default'].HOST_PORTS.get()
+    except:
+      LOG.warn('Could not get zookeeper ensemble from the zookeeper app')
+
+  if 'search' in settings.INSTALLED_APPS:
+    try:
+      from search.conf import SOLR_URL
+      parsed = urlparse(SOLR_URL.get())
+      return "%s:2181" % (parsed.hostname or 'localhost')
+    except:
+      LOG.warn('Could not get zookeeper ensemble from the search app')
 
   return "localhost:2181"
 
