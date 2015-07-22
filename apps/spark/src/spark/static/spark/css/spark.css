@@ -291,12 +291,13 @@ body {
 }
 
 .assist-action {
-  display: none;
-  margin: 9px 3px 3px 3px;
+  margin-left: 3px;
+  opacity:0;
+  transition: opacity 0.4s linear;
 }
 
 .assist-container:hover .assist-action {
-  display: inline-block;
+  opacity:1;
 }
 
 .show-assist {
