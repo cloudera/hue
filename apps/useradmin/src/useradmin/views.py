@@ -397,9 +397,12 @@ def add_ldap_groups(request):
       import_members_recursive = form.cleaned_data['import_members_recursive']
       is_ensuring_home_directories = form.cleaned_data['ensure_home_directories']
       server = form.cleaned_data.get('server')
+
       try:
         connection = ldap_access.get_connection_from_server(server)
-        groups = import_ldap_groups(connection, groupname_pattern, import_members=import_members, import_members_recursive=import_members_recursive, sync_users=True, import_by_dn=import_by_dn)
+        groups = import_ldap_groups(connection, groupname_pattern, import_members=import_members,
+                                    import_members_recursive=import_members_recursive, sync_users=True,
+                                    import_by_dn=import_by_dn)
       except ldap.LDAPError, e:
         LOG.error(_("LDAP Exception: %s") % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
@@ -446,7 +449,9 @@ def sync_ldap_users_groups(request):
       is_ensuring_home_directory = form.cleaned_data['ensure_home_directory']
       server = form.cleaned_data.get('server')
       connection = ldap_access.get_connection_from_server(server)
+
       sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs)
+
       return redirect(reverse(list_users))
   else:
     form = SyncLdapUsersGroupsForm()
@@ -469,6 +474,41 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
       except (IOError, WebHdfsException), e:
         raise PopupException(_("The import may not be complete, sync again."), detail=e)
 
+
+def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server=None):
+  return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server)
+
+
+def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn):
+  return _import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn)
+
+
+def sync_ldap_users(connection):
+  """
+  Syncs LDAP user information. This will not import new
+  users from LDAP. It is also not possible to import both a user and a
+  group at the same time. Each must be a separate operation. If neither a user,
+  nor a group is provided, all users and groups will be synced.
+  """
+  users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
+  for user in users:
+    _import_ldap_users(connection, user.username)
+  return users
+
+
+def sync_ldap_groups(connection):
+  """
+  Syncs LDAP group memberships. This will not import new
+  groups from LDAP. It is also not possible to import both a user and a
+  group at the same time. Each must be a separate operation. If neither a user,
+  nor a group is provided, all users and groups will be synced.
+  """
+  groups = Group.objects.filter(group__in=LdapGroup.objects.all())
+  for group in groups:
+    _import_ldap_groups(connection, group.name)
+  return groups
+
+
 def ensure_home_directory(fs, username):
   """
   Adds a users home directory if it doesn't already exist.
@@ -477,20 +517,6 @@ def ensure_home_directory(fs, username):
   """
   home_dir = '/user/%s' % username
   fs.do_as_user(username, fs.create_home_dir, home_dir)
-
-
-def _check_remove_last_super(user_obj):
-  """Raise an error if we're removing the last superuser"""
-  if not user_obj.is_superuser:
-    return
-
-  # Is there any other active superuser left?
-  all_active_su = User.objects.filter(is_superuser__exact = True,
-                                      is_active__exact = True)
-  num_active_su = all_active_su.count()
-  assert num_active_su >= 1, _("No active superuser configured.")
-  if num_active_su == 1:
-    raise PopupException(_("You cannot remove the last active superuser from the configuration."), error_code=401)
 
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
@@ -554,6 +580,20 @@ def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
   __groups_lock.release()
 
 
+def _check_remove_last_super(user_obj):
+  """Raise an error if we're removing the last superuser"""
+  if not user_obj.is_superuser:
+    return
+
+  # Is there any other active superuser left?
+  all_active_su = User.objects.filter(is_superuser__exact = True,
+                                      is_active__exact = True)
+  num_active_su = all_active_su.count()
+  assert num_active_su >= 1, _("No active superuser configured.")
+  if num_active_su == 1:
+    raise PopupException(_("You cannot remove the last active superuser from the configuration."), error_code=401)
+
+
 def _import_ldap_users(connection, username_pattern, sync_groups=False, import_by_dn=False, server=None):
   """
   Import a user from LDAP. If import_by_dn is true, this will import the user by
@@ -572,72 +612,76 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
   Import user_info found through ldap_access.find_users.
   """
   imported_users = []
+
   for ldap_info in user_info:
     # Extra validation in case import by DN and username has spaces or colons
-    validate_username(ldap_info['username'])
+    try:
+      validate_username(ldap_info['username'])
 
-    user, created = ldap_access.get_or_create_ldap_user(username=ldap_info['username'])
-    profile = get_profile(user)
-    if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
-      # This is a Hue user, and shouldn't be overwritten
-      LOG.warn(_('There was a naming conflict while importing user %(username)s') % {
-        'username': ldap_info['username']
-      })
-      return None
+      user, created = ldap_access.get_or_create_ldap_user(username=ldap_info['username'])
+      profile = get_profile(user)
+      if not created and profile.creation_method == str(UserProfile.CreationMethod.HUE):
+        # This is a Hue user, and shouldn't be overwritten
+        LOG.warn(_('There was a naming conflict while importing user %(username)s') % {
+          'username': ldap_info['username']
+        })
+        return None
 
-    default_group = get_default_user_group()
-    if created and default_group is not None:
-      user.groups.add(default_group)
+      default_group = get_default_user_group()
+      if created and default_group is not None:
+        user.groups.add(default_group)
 
-    if 'first' in ldap_info:
-      user.first_name = ldap_info['first']
-    if 'last' in ldap_info:
-      user.last_name = ldap_info['last']
-    if 'email' in ldap_info:
-      user.email = ldap_info['email']
+      if 'first' in ldap_info:
+        user.first_name = ldap_info['first']
+      if 'last' in ldap_info:
+        user.last_name = ldap_info['last']
+      if 'email' in ldap_info:
+        user.email = ldap_info['email']
 
-    profile.creation_method = UserProfile.CreationMethod.EXTERNAL
-    profile.save()
-    user.save()
-    imported_users.append(user)
+      profile.creation_method = UserProfile.CreationMethod.EXTERNAL
+      profile.save()
+      user.save()
+      imported_users.append(user)
 
-    # sync groups
-    if sync_groups:
-      old_groups = set(user.groups.all())
-      new_groups = set()
-      current_ldap_groups = set()
+      # sync groups
+      if sync_groups:
+        old_groups = set(user.groups.all())
+        new_groups = set()
+        current_ldap_groups = set()
 
-      ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
-      group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
-      group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
-      # Search for groups based on group_member_attr=username and group_member_attr=dn
-      # covers AD, Standard Ldap and posixAcount/posixGroup
-      if not group_filter.startswith('('):
-        group_filter = '(' + group_filter + ')'
+        ldap_config = desktop.conf.LDAP.LDAP_SERVERS.get()[server] if server else desktop.conf.LDAP
+        group_member_attr = ldap_config.GROUPS.GROUP_MEMBER_ATTR.get()
+        group_filter = ldap_config.GROUPS.GROUP_FILTER.get()
+        # Search for groups based on group_member_attr=username and group_member_attr=dn
+        # covers AD, Standard Ldap and posixAcount/posixGroup
+        if not group_filter.startswith('('):
+          group_filter = '(' + group_filter + ')'
 
-      # Sanitizing the DN before using in a Search filter
-      sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
-      sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
+        # Sanitizing the DN before using in a Search filter
+        sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
+        sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
 
-      find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
-                           group_member_attr + "=" + sanitized_dn + ")))"
-      group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
-      for group_info in group_ldap_info:
-        if Group.objects.filter(name=group_info['name']).exists():
-        # Add only if user isn't part of group.
-          current_ldap_groups.add(Group.objects.get(name=group_info['name']))
-          if not user.groups.filter(name=group_info['name']).exists():
-            groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
-            if groups:
-              new_groups.update(groups)
-      # Remove out of date groups
-      remove_groups = old_groups - current_ldap_groups
-      remove_ldap_groups = LdapGroup.objects.filter(group__in=remove_groups)
-      remove_groups_filtered = [ldapgroup.group for ldapgroup in remove_ldap_groups]
-      for group in remove_groups_filtered:
-        user.groups.remove(group)
-      user.groups.add(*new_groups)
-      Group.objects.filter(group__in=remove_groups_filtered).delete()
+        find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+                             group_member_attr + "=" + sanitized_dn + ")))"
+        group_ldap_info = connection.find_groups("*", group_filter=find_groups_filter)
+        for group_info in group_ldap_info:
+          if Group.objects.filter(name=group_info['name']).exists():
+          # Add only if user isn't part of group.
+            current_ldap_groups.add(Group.objects.get(name=group_info['name']))
+            if not user.groups.filter(name=group_info['name']).exists():
+              groups = import_ldap_groups(connection, group_info['dn'], import_members=False, import_members_recursive=False, sync_users=True, import_by_dn=True)
+              if groups:
+                new_groups.update(groups)
+        # Remove out of date groups
+        remove_groups = old_groups - current_ldap_groups
+        remove_ldap_groups = LdapGroup.objects.filter(group__in=remove_groups)
+        remove_groups_filtered = [ldapgroup.group for ldapgroup in remove_ldap_groups]
+        for group in remove_groups_filtered:
+          user.groups.remove(group)
+        user.groups.add(*new_groups)
+        Group.objects.filter(group__in=remove_groups_filtered).delete()
+    except (AssertionError, RuntimeError) as e:
+      LOG.warn('%s: %s' % (ldap_info['username'], e.message))
 
   return imported_users
 
@@ -692,7 +736,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1):
       user = ldap_access.get_ldap_user(username=user_info['username'])
       group.user_set.add(user)
     except User.DoesNotExist:
-      LOG.debug("Synchronizing user %s with group %s failed. User does not exist." % (smart_str(user_info['dn']), smart_str(group.name)))
+      LOG.warn("Synchronizing user %s with group %s failed. User does not exist." % (smart_str(user_info['dn']), smart_str(group.name)))
 
   for group_info in groups_info:
     LOG.debug("Synchronizing group %s" % smart_str(group_info['dn']))
@@ -701,7 +745,7 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1):
       group = Group.objects.get(name=group_info['name'])
       _sync_ldap_members(connection, group, group_info, count+1, max_count)
     except Group.DoesNotExist:
-      LOG.debug("Synchronizing group %s failed. Group does not exist." % smart_str(group.name))
+      LOG.warn("Synchronizing group %s failed. Group does not exist." % smart_str(group.name))
 
   for posix_member in posix_members:
     LOG.debug("Synchronizing posix user %s with group %s" % (smart_str(posix_member), smart_str(group.name)))
@@ -711,10 +755,11 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1):
         user = ldap_access.get_ldap_user(username=user_info['username'])
         group.user_set.add(user)
       except User.DoesNotExist:
-        LOG.debug("Synchronizing posix user %s with group %s failed. User does not exist." % (smart_str(posix_member), smart_str(group.name)))
+        LOG.warn("Synchronizing posix user %s with group %s failed. User does not exist." % (smart_str(posix_member), smart_str(group.name)))
 
 
-def _import_ldap_nested_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False, sync_users=True, import_by_dn=False):
+def _import_ldap_nested_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False,
+                               sync_users=True, import_by_dn=False):
   """
   Import a group from LDAP. If import_members is true, this will also import any
   LDAP users that exist within the group. This will use nested groups logic.
@@ -763,7 +808,8 @@ def _import_ldap_nested_groups(connection, groupname_pattern, import_members=Fal
   return groups
 
 
-def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False, sync_users=True, import_by_dn=False):
+def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False,
+                                     sync_users=True, import_by_dn=False):
   """
   Import a group from LDAP. If import_members is true, this will also import any
   LDAP users that exist within the group. This will use suboordinate group logic.
@@ -858,7 +904,8 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
   return groups
 
 
-def _import_ldap_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False, sync_users=True, import_by_dn=False):
+def _import_ldap_groups(connection, groupname_pattern, import_members=False, recursive_import_members=False,
+                        sync_users=True, import_by_dn=False):
   """
   Import a group from LDAP. If import_members is true, this will also import any
   LDAP users that exist within the group.
@@ -877,37 +924,3 @@ def _import_ldap_groups(connection, groupname_pattern, import_members=False, rec
                                       recursive_import_members=recursive_import_members,
                                       sync_users=sync_users,
                                       import_by_dn=import_by_dn)
-
-
-def import_ldap_users(connection, user_pattern, sync_groups, import_by_dn, server=None):
-  return _import_ldap_users(connection, user_pattern, sync_groups=sync_groups, import_by_dn=import_by_dn, server=server)
-
-
-def import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn):
-  return _import_ldap_groups(connection, group_pattern, import_members, import_members_recursive, sync_users, import_by_dn)
-
-
-def sync_ldap_users(connection):
-  """
-  Syncs LDAP user information. This will not import new
-  users from LDAP. It is also not possible to import both a user and a
-  group at the same time. Each must be a separate operation. If neither a user,
-  nor a group is provided, all users and groups will be synced.
-  """
-  users = User.objects.filter(userprofile__creation_method=str(UserProfile.CreationMethod.EXTERNAL)).all()
-  for user in users:
-    _import_ldap_users(connection, user.username)
-  return users
-
-
-def sync_ldap_groups(connection):
-  """
-  Syncs LDAP group memberships. This will not import new
-  groups from LDAP. It is also not possible to import both a user and a
-  group at the same time. Each must be a separate operation. If neither a user,
-  nor a group is provided, all users and groups will be synced.
-  """
-  groups = Group.objects.filter(group__in=LdapGroup.objects.all())
-  for group in groups:
-    _import_ldap_groups(connection, group.name)
-  return groups
