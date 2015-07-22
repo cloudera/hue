@@ -797,12 +797,28 @@ function EditorViewModel(notebooks, options) {
     $.totalStorage('spark_assist_visible', newValue);
   });
 
-
   self.assistContent = ko.observable();
   self.assistSelectedMainObject = ko.observable();
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
   self.snippetPlaceholders = options.snippet_placeholders;
+ 
+  self.availableSessionProperties = ko.computed(function () { // Only Spark
+    return ko.utils.arrayFilter(options.session_properties, function (item) {
+        return item.name != '' // Could filter out the ones already selected + yarn only or not
+      });
+  });
+  self.selectedSessionProperties = ko.observable();
+  self.getSessionProperties = function(name) {
+    var _prop = null;
+    $.each(options.session_properties, function(index, prop) {
+      if (prop.name == name) {
+        _prop = prop;
+        return;
+      }
+    });console.log(_prop);
+    return _prop;
+  };
 
   self.getSnippetName = function(snippetType)  {
     var availableSnippets = self.availableSnippets();

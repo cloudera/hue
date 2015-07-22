@@ -28,7 +28,7 @@ from desktop.models import Document2, Document
 from spark.conf import LANGUAGES, LIVY_SERVER_SESSION_KIND
 from spark.decorators import check_document_access_permission,\
   check_document_modify_permission
-from spark.models import Notebook, get_api
+from spark.models import Notebook, get_api, SparkApi
 from spark.management.commands.spark_setup import Command
 
 
@@ -60,7 +60,8 @@ def notebook(request):
               'impala': _('-- Example: SELECT * FROM tablename, or press CTRL + space'),
               'hive': _('-- Example: SELECT * FROM tablename, or press CTRL + space'),
               'text': _('<h2>This is a text snippet</h2>Type your text here')
-          }
+          },
+          'session_properties': SparkApi.PROPERTIES
       }),
       'autocomplete_base_url': autocomplete_base_url,
       'is_yarn_mode': LIVY_SERVER_SESSION_KIND.get()

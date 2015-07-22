@@ -777,55 +777,49 @@ from django.utils.translation import ugettext as _
             <p>${ _('There are currently no active sessions.') }</p>
             <!-- /ko -->
             <!-- ko foreach: sessions -->
-            <!-- ko with: $data.properties -->
-            <h4 data-bind="text: $root.getSnippetName($parent.type())" style="clear:left;"></h4>
-            <!-- ko if: typeof executor_cores !== 'undefined' -->
-            <div class="control-group" style="float: left;">
-              <label class="control-label">${_('Executor Cores')}</label>
+            <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
+
+            <!-- ko foreach: properties -->
+            <div class="control-group">
+              <label class="control-label" data-bind="name"></label>
               <div class="controls">
-                <input class="input-small" type="text" data-bind="numericTextInput: { value: executor_cores, precision: 0 }" />
+                <span data-bind="text: name"></span>
+                <!-- ko with: $root.getSessionProperties(name()) -->
+                  <!-- ko if: type == 'jvm' -->
+                    ## problem with ko actually, cf generated code
+                    ## <jvm-memory-input params="value: executorMemory"></jvm>
+                    <input class="input-small" type="text" data-bind="value: $parent.value" />
+                  <!-- /ko -->
+                  <!-- ko if: type == 'number' -->
+                  <input class="input-small" type="text" data-bind="value: $parent.value" />
+                  <!-- /ko -->
+                  <!-- ko if: type == 'string' -->
+                  <input class="input-small" type="text" data-bind="value: $parent.value" />
+                  <!-- /ko -->                  
+                  <!-- ko if: type == 'csv' -->
+                  <input class="input-small" type="text" data-bind="value: $parent.value" />
+                  <!-- /ko -->                  
+                <!-- /ko -->
+                <a href="javascript:void(0)" data-bind="click: function(data) { $parent.properties.remove(data) }">
+                  <i class="fa fa-minus"></i>
+                </a>
               </div>
             </div>
             <!-- /ko -->
-            <!-- ko if: typeof executor_memory !== 'undefined' -->
-            <div class="control-group" style="float: left;">
-              <label class="control-label">${_('Executor Memory')}</label>
-              <div class="controls">
-                <jvm-memory-input params="value: executor_memory" />
-              </div>
-            </div>
-            <!-- /ko -->
-            <!-- ko if: typeof executor_count !== 'undefined' -->
-            <div class="control-group" style="float: left;">
-              <label class="control-label">${_('Executor Count')}</label>
-              <div class="controls">
-                <input class="input-small" type="text" data-bind="numericTextInput: { value: executor_count, precision: 0 }" />
-              </div>
-            </div>
-            <!-- /ko -->
-            <!-- ko if: typeof driver_cores !== 'undefined' -->
-            <div class="control-group cl" style="float: left; clear: left;">
-              <label class="control-label">${_('Driver Cores')}</label>
-              <div class="controls">
-                <input class="input-small" type="text" data-bind="numericTextInput: { value: driver_cores, precision: 0 }" />
-              </div>
-            </div>
-            <!-- /ko -->
-            <!-- ko if: typeof driver_memory !== 'undefined' -->
-            <div class="control-group" style="float: left;">
-              <label class="control-label">${_('Driver Memory')}</label>
-              <div class="controls">
-                <jvm-memory-input params="value: driver_memory" />
-              </div>
-            </div>
-            <!-- /ko -->
+
+            <select data-bind="options: $root.availableSessionProperties,
+                       optionsText: 'nice_name',
+                       optionsValue: 'name',
+                       value: $root.selectedSessionProperties,
+                       optionsCaption: 'Choose...'"></select>
+            <i class="fa fa-plus" data-bind="click: function() { properties.push(ko.mapping.fromJS({'name': $root.selectedSessionProperties(), 'value': ''})); $root.selectedSessionProperties(''); }"></i>
+
             <a style="float: right;" class="btn pointer" title="${ _('Restart session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($parent) }">
               <i class="fa fa-refresh"></i> ${ _('Recreate') }
             </a>
             <a style="float: right;" class="btn pointer" title="${ _('Close session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeSession($parent) }">
               <i class="fa fa-times"></i> ${ _('Close') }
             </a>
-            <!-- /ko -->
             <!-- /ko -->
             </br>
           </fieldset>

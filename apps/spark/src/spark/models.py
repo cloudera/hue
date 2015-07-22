@@ -20,6 +20,8 @@ import logging
 import re
 import time
 
+from django.utils.translation import ugettext as _
+
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
@@ -285,10 +287,22 @@ class HS2Api(Api):
 # Spark
 
 class SparkApi(Api):
+  PROPERTIES = [
+    {'name': 'jars', 'nice_name': _('Jars'), 'default': '', 'type': 'csv', 'is_yarn': False},
+    {'name': 'files', 'nice_name': _('Files'), 'default': '', 'type': 'csv', 'is_yarn': False},
+    {'name': 'pyFiles', 'nice_name': _('pyFiles'), 'default': '', 'type': 'csv', 'is_yarn': False},
+    
+    {'name': 'driverMemory', 'nice_name': _('Driver Memory'), 'default': '1', 'type': 'jvm', 'is_yarn': False},
+    
+    {'name': 'driverCores', 'nice_name': _('Driver Cores'), 'default': '1', 'type': 'number', 'is_yarn': True},
+    {'name': 'executorCores', 'nice_name': _('Executor Cores'), 'default': '1', 'type': 'number', 'is_yarn': True},
+    {'name': 'queue', 'nice_name': _('Queue'), 'default': '1', 'type': 'string', 'is_yarn': True},
+    {'name': 'archives', 'nice_name': _('Archives'), 'default': '', 'type': 'csv', 'is_yarn': True},
+    {'name': 'numExecutors', 'nice_name': _('Executors Numbers'), 'default': '1', 'type': 'number', 'is_yarn': True},    
+  ]
 
   def create_session(self, lang='scala', properties=None):
-    if properties is None:
-      properties = {'executorMemory': '500M'}
+    properties = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
 
     properties['kind'] = lang
 
@@ -310,7 +324,7 @@ class SparkApi(Api):
     return {
         'type': lang,
         'id': response['id'],
-        'properties': properties
+        'properties': []
     }
 
   def execute(self, notebook, snippet):
