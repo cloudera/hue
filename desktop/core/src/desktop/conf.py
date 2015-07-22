@@ -115,6 +115,12 @@ SSL_CACERTS = Config(
   type=str,
   default='/etc/hue/cacerts.pem')
 
+SSL_VALIDATE = Config(
+  key="ssl_validate",
+  help=_('Choose whether Hue should validate certificates received from the server.'),
+  type=coerce_bool,
+  default=True)
+
 LDAP_PASSWORD = Config(
   key="ldap_password",
   help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
@@ -264,6 +270,11 @@ def default_secure_cookie():
 def default_ssl_cacerts():
   """Path to default Certificate Authority certificates"""
   return SSL_CACERTS.get()
+
+
+def default_ssl_validate():
+  """Choose whether Hue should validate certificates received from the server."""
+  return SSL_VALIDATE.get()
 
 
 SMTP = ConfigSection(

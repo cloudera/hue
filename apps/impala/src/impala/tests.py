@@ -252,3 +252,30 @@ def test_ssl_cacerts():
     finally:
       for reset in resets:
         reset()
+
+
+def test_ssl_validate():
+  for desktop_kwargs, conf_kwargs, expected in [
+      ({'present': False}, {'present': False}, True),
+      ({'present': False}, {'data': False}, False),
+      ({'present': False}, {'data': True}, True),
+
+      ({'data': False}, {'present': False}, False),
+      ({'data': False}, {'data': False}, False),
+      ({'data': False}, {'data': True}, True),
+
+      ({'data': True}, {'present': False}, True),
+      ({'data': True}, {'data': False}, False),
+      ({'data': True}, {'data': True}, True),
+      ]:
+    resets = [
+      desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
+      conf.SSL.VALIDATE.set_for_testing(**conf_kwargs),
+    ]
+
+    try:
+      assert_equal(conf.SSL.VALIDATE.get(), expected,
+          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.SSL.VALIDATE.get()))
+    finally:
+      for reset in resets:
+        reset()

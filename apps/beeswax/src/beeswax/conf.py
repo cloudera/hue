@@ -22,7 +22,7 @@ import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.conf import default_ssl_cacerts
+from desktop.conf import default_ssl_cacerts, default_ssl_validate
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from beeswax.settings import NICE_NAME
@@ -129,7 +129,7 @@ SSL = ConfigSection(
       key="validate",
       help=_t("Choose whether Hue should validate certificates received from the server."),
       type=coerce_bool,
-      default=True
+      dynamic_default=default_ssl_validate,
     )
   )
 )
