@@ -739,3 +739,6 @@ def test_ensure_home_directory_sync_ldap_users_groups():
   finally:
     for finish in reset:
       finish()
+
+    if cluster.fs.exists('/user/curly'):
+      cluster.fs.rmtree('/user/curly')

@@ -160,17 +160,18 @@ class LdapTestConnection(object):
                     'posix_person': {'dn': 'uid=posix_person,ou=People,dc=example,dc=com', 'username': 'posix_person', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
                     'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
                     'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-                    'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},}
+                    'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
+                    'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},}
 
       self.groups = {'TestUsers': {
                         'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'TestUsers',
-                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com'],
+                        'members':['uid=moe,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
                         'posix_members':[]},
                       'Test Administrators': {
                         'dn': 'cn=Test Administrators,cn=TestUsers,ou=Groups,dc=example,dc=com',
                         'name':'Test Administrators',
-                        'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com'],
+                        'members':['uid=Rock,ou=People,dc=example,dc=com','uid=lårry,ou=People,dc=example,dc=com','uid=curly,ou=People,dc=example,dc=com','uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com'],
                         'posix_members':[]},
                       'OtherGroup': {
                         'dn': 'cn=OtherGroup,cn=TestUsers,ou=Groups,dc=example,dc=com',
