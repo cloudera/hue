@@ -287,6 +287,11 @@ if os.getenv('DESKTOP_DB_CONFIG'):
     ["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"],
     conn_string.split(':')))
 else:
+  test_name = os.environ.get('DESKTOP_DB_TEST_NAME')
+  logging.debug("DESKTOP_DB_TEST_NAME SET: %s" % test_name)
+  if test_name is None:
+    test_name = get_desktop_root('desktop-test.db')
+
   default_db = {
     "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
     "NAME" : desktop.conf.DATABASE.NAME.get(),
@@ -296,7 +301,7 @@ else:
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
-    "TEST_NAME" : get_desktop_root('desktop-test.db'),
+    "TEST_NAME" : test_name,
     # Wrap each request in a transaction.
     "ATOMIC_REQUESTS" : True,
   }
