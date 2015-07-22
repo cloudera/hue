@@ -20,6 +20,7 @@ import sys
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop.conf import default_ssl_validate
 from desktop.lib.conf import Config, coerce_bool, validate_path
 
 LOG = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ REMOTE_DEPLOYMENT_DIR = Config(
 SSL_CERT_CA_VERIFY=Config(
   key="ssl_cert_ca_verify",
   help="In secure mode (HTTPS), if SSL certificates from Oozie Rest APIs have to be verified against certificate authority",
-  default=True,
+  dynamic_default=default_ssl_validate,
   type=coerce_bool)
 
 

@@ -17,6 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from desktop.conf import default_ssl_validate
 import fnmatch
 import logging
 import os
@@ -71,7 +72,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                               default=False, type=coerce_bool),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
-                  default=True,
+                  dynamic_default=default_ssl_validate,
                   type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
@@ -146,7 +147,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   help="URL of the HistoryServer API"),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
-                  default=True,
+                  dynamic_default=default_ssl_validate,
                   type=coerce_bool)
     )
   )

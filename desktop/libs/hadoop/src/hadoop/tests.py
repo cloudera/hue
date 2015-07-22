@@ -22,6 +22,7 @@ from nose.tools import assert_true, assert_equal, assert_false
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 
+import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
 from hadoop import cluster
 from hadoop import conf
@@ -175,3 +176,57 @@ def test_non_default_cluster():
     for old_conf in reset:
       old_conf()
     cluster.restore_caches(old)
+
+
+def test_hdfs_ssl_validate():
+  for desktop_kwargs, conf_kwargs, expected in [
+      ({'present': False}, {'present': False}, True),
+      ({'present': False}, {'data': False}, False),
+      ({'present': False}, {'data': True}, True),
+
+      ({'data': False}, {'present': False}, False),
+      ({'data': False}, {'data': False}, False),
+      ({'data': False}, {'data': True}, True),
+
+      ({'data': True}, {'present': False}, True),
+      ({'data': True}, {'data': False}, False),
+      ({'data': True}, {'data': True}, True),
+      ]:
+    resets = [
+      desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
+      conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.set_for_testing(**conf_kwargs),
+    ]
+
+    try:
+      assert_equal(conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(), expected,
+          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.HDFS_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get()))
+    finally:
+      for reset in resets:
+        reset()
+
+
+def test_yarn_ssl_validate():
+  for desktop_kwargs, conf_kwargs, expected in [
+      ({'present': False}, {'present': False}, True),
+      ({'present': False}, {'data': False}, False),
+      ({'present': False}, {'data': True}, True),
+
+      ({'data': False}, {'present': False}, False),
+      ({'data': False}, {'data': False}, False),
+      ({'data': False}, {'data': True}, True),
+
+      ({'data': True}, {'present': False}, True),
+      ({'data': True}, {'data': False}, False),
+      ({'data': True}, {'data': True}, True),
+      ]:
+    resets = [
+      desktop_conf.SSL_VALIDATE.set_for_testing(**desktop_kwargs),
+      conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.set_for_testing(**conf_kwargs),
+    ]
+
+    try:
+      assert_equal(conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get(), expected,
+          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.YARN_CLUSTERS['default'].SSL_CERT_CA_VERIFY.get()))
+    finally:
+      for reset in resets:
+        reset()
