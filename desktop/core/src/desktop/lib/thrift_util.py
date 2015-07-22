@@ -184,11 +184,19 @@ class ConnectionPooler(object):
       try:
         if _get_pool_key(conf) not in self.pooldict:
           q = LifoQueue(self.poolsize)
-          self.pooldict[_get_pool_key(conf)] = q
           for i in xrange(self.poolsize):
             client = construct_superclient(conf)
             client.CID = i
             q.put(client, False)
+
+          # Wait until the queue has been filled with connections before adding
+          # it to the pool. This is done last because any exceptions thrown
+          # by the client construction could result in there being no
+          # connections available in this pool. When `get_client` is called next,
+          # it would skip this block because the key has a value, but then it
+          # would deadlock later because there are no connections for it to
+          # fetch from the pool.
+          self.pooldict[_get_pool_key(conf)] = q
       finally:
         self.dictlock.release()
 
