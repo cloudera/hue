@@ -95,10 +95,10 @@ from django.utils.translation import ugettext as _
         self.isAssistVisible = params.isAssistVisible;
         self.isAssistAvailable = params.isAssistAvailable;
 
-        self.isAssistVisible($.totalStorage(params.totalStorageId) != null && $.totalStorage(params.totalStorageId));
+        self.isAssistVisible($.totalStorage(params.appName + '_assist_visible') != null && $.totalStorage(params.appName + '_assist_visible'));
 
         self.isAssistVisible.subscribe(function(newValue) {
-          $.totalStorage(params.totalStorageId, newValue);
+          $.totalStorage(params.appName + '_assist_visible', newValue);
         });
 
         self.toggleAssist = function () {
@@ -142,7 +142,10 @@ from django.utils.translation import ugettext as _
                 self.loadAssistFirstLevel(force);
               }
               else if (self.assist.mainObjects().length > 0 && !self.assist.selectedMainObject()) {
-                if ($.inArray("default", self.assist.mainObjects()) > -1){
+                var lastDb = $.totalStorage(params.appName + '_last_database');
+                if (lastDb != null && $.inArray(lastDb, self.assist.mainObjects()) > -1) {
+                  self.assist.selectedMainObject(lastDb);
+                } else if ($.inArray("default", self.assist.mainObjects()) > -1) {
                   self.assist.selectedMainObject("default");
                 } else {
                   self.assist.selectedMainObject(self.assist.mainObjects()[0]);
@@ -157,6 +160,7 @@ from django.utils.translation import ugettext as _
           self.assist.getData(null, force);
 
           self.assist.selectedMainObject.subscribe(function(value) {
+            $.totalStorage(params.appName + '_last_database', value);
             self.loadAssistFirstLevel();
             huePubSub.publish('assist.mainObjectChange', value);
           });
