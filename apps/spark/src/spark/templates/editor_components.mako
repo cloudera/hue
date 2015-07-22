@@ -231,9 +231,11 @@ from django.utils.translation import ugettext as _
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.snippet-body').slideUp('fast', function(){ $('.sortable-snippets').sortable('refreshPositions') }); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.html($(event.toElement).parents('h2').find('img').outerHTML());_title.appendTo(_par);_par.height(40);_par.width(120);return _par;}},
             dragged: function(widget){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); });}}">
       </div>
+      %if hasattr(caller, "addSnippetHTML"):
+        ${caller.addSnippetHTML()}
+      %endif
     </div>
   </div>
-
 </script>
 
 <script type="text/html" id="snippetIcon">
