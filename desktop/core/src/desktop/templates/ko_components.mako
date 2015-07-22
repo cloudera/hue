@@ -142,7 +142,11 @@ from django.utils.translation import ugettext as _
                 self.loadAssistFirstLevel(force);
               }
               else if (self.assist.mainObjects().length > 0 && !self.assist.selectedMainObject()) {
-                self.assist.selectedMainObject(self.assist.mainObjects()[0]);
+                if ($.inArray("default", self.assist.mainObjects()) > -1){
+                  self.assist.selectedMainObject("default");
+                } else {
+                  self.assist.selectedMainObject(self.assist.mainObjects()[0]);
+                }
                 self.loadAssistFirstLevel();
               }
             }
