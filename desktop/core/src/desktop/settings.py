@@ -394,6 +394,12 @@ SKIP_SOUTH_TESTS = True
 # ticket cache
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
 
+# If Hue is configured to use a CACERTS truststore, make sure that the
+# REQUESTS_CA_BUNDLE is set so that we can use it when we make external requests.
+# This is for the REST calls made by Hue with the requests library.
+if desktop.conf.SSL_CACERTS.get() and os.environ.get('REQUESTS_CA_BUNDLE') is None:
+  os.environ['REQUESTS_CA_BUNDLE'] = desktop.conf.SSL_CACERTS.get()
+
 # Memory
 if desktop.conf.MEMORY_PROFILER.get():
   MEMORY_PROFILER = hpy()
