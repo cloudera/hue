@@ -83,7 +83,7 @@ def test_audit_logging_middleware_enable():
 
     try:
       # Check if we audit correctly
-      response = c.get("/beeswax/")
+      response = c.get("/useradmin/permissions/edit/beeswax/access")
       assert_true('audited' in response, response)
 
       audit = open(log_path).readlines()
@@ -91,7 +91,7 @@ def test_audit_logging_middleware_enable():
         audit_json = json.loads(line)
         audit_record = audit_json.values()[0]
         assert_equal('test_audit_logging', audit_record['user'], audit_record)
-        assert_equal('/beeswax/', audit_record['url'], audit_record)
+        assert_equal('/useradmin/permissions/edit/beeswax/access', audit_record['url'], audit_record)
 
     finally:
       settings.MIDDLEWARE_CLASSES.pop()
