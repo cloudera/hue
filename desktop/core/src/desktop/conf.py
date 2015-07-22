@@ -109,6 +109,12 @@ SSL_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+SSL_CACERTS = Config(
+  key="ssl_cacerts",
+  help=_('Path to default Certificate Authority certificates.'),
+  type=str,
+  default='/etc/hue/cacerts.pem')
+
 LDAP_PASSWORD = Config(
   key="ldap_password",
   help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
@@ -253,6 +259,11 @@ def default_database_options():
 def default_secure_cookie():
   """Enable secure cookies if HTTPS is enabled."""
   return is_https_enabled()
+
+
+def default_ssl_cacerts():
+  """Path to default Certificate Authority certificates"""
+  return SSL_CACERTS.get()
 
 
 SMTP = ConfigSection(

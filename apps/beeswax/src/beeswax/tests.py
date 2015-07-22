@@ -2737,3 +2737,24 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
     'use_sasl': str(use_sasl).lower(),
     'hs2_impersonation': hs2_impersonation,
   }
+
+
+def test_ssl_cacerts():
+  for desktop_kwargs, conf_kwargs, expected in [
+      ({'present': False}, {'present': False}, '/etc/hue/cacerts.pem'),
+      ({'present': False}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
+
+      ({'data': 'global-cacerts.pem'}, {'present': False}, 'global-cacerts.pem'),
+      ({'data': 'global-cacerts.pem'}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
+      ]:
+    resets = [
+      desktop_conf.SSL_CACERTS.set_for_testing(**desktop_kwargs),
+      conf.SSL.CACERTS.set_for_testing(**conf_kwargs),
+    ]
+
+    try:
+      assert_equal(conf.SSL.CACERTS.get(), expected,
+          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.SSL.CACERTS.get()))
+    finally:
+      for reset in resets:
+        reset()

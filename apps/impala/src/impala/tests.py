@@ -21,6 +21,8 @@ import os
 import re
 import sys
 
+import desktop.conf as desktop_conf
+
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
@@ -38,6 +40,7 @@ from beeswax.test_base import get_query_server_config, wait_for_query_to_finish,
 from beeswax.tests import _make_query
 from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
+from impala import conf
 from impala.conf import SERVER_HOST
 
 
@@ -228,3 +231,24 @@ def create_saved_query(app_name, owner):
     Document.objects.link(design, owner=design.owner, extra=design.type, name=design.name, description=design.desc)
 
     return design
+
+
+def test_ssl_cacerts():
+  for desktop_kwargs, conf_kwargs, expected in [
+      ({'present': False}, {'present': False}, '/etc/hue/cacerts.pem'),
+      ({'present': False}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
+
+      ({'data': 'global-cacerts.pem'}, {'present': False}, 'global-cacerts.pem'),
+      ({'data': 'global-cacerts.pem'}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
+      ]:
+    resets = [
+      desktop_conf.SSL_CACERTS.set_for_testing(**desktop_kwargs),
+      conf.SSL.CACERTS.set_for_testing(**conf_kwargs),
+    ]
+
+    try:
+      assert_equal(conf.SSL.CACERTS.get(), expected,
+          'desktop:%s conf:%s expected:%s got:%s' % (desktop_kwargs, conf_kwargs, expected, conf.SSL.CACERTS.get()))
+    finally:
+      for reset in resets:
+        reset()

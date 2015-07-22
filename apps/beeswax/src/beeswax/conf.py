@@ -22,6 +22,7 @@ import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
+from desktop.conf import default_ssl_cacerts
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from beeswax.settings import NICE_NAME
@@ -107,7 +108,7 @@ SSL = ConfigSection(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
-      default="/etc/hue/cacerts.pem"
+      dynamic_default=default_ssl_cacerts,
     ),
 
     KEY = Config(
