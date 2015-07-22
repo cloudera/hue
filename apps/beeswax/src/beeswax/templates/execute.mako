@@ -201,7 +201,7 @@ ${layout.menubar(section='query')}
       </div>
     </div>
   </div>
-  <div class="resizer" data-bind="splitDraggable : { totalStorageRatioId: 'beeswaxLeftPanelRatio', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+  <div class="resizer" data-bind="splitDraggable : { appName: 'beeswax', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
   <div class="right-panel" id="querySide">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }

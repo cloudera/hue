@@ -66,7 +66,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 
       </div>
-      <div class="resizer" data-bind="splitDraggable : { totalStorageRatioId: 'beeswaxLeftPanelRatio' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
       <div class="right-panel">
         <div id="query">
           <div class="card card-small">

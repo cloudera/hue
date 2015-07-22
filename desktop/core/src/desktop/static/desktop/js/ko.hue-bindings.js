@@ -647,7 +647,7 @@ ko.bindingHandlers.daterangepicker = {
 ko.bindingHandlers.splitDraggable = {
   init: function (element, valueAccessor) {
     var options = ko.unwrap(valueAccessor());
-    var leftPanelRatio = $.totalStorage(options.totalStorageRatioId) != null ? $.totalStorage(options.totalStorageRatioId) : 0.25;
+    var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? $.totalStorage(options.appName + "_left_panel_width") : 200;
 
     var containerSelector = options.containerSelector || ".panel-container";
     var leftPanelSelector = options.leftPanelSelector || ".left-panel";
@@ -666,7 +666,7 @@ ko.bindingHandlers.splitDraggable = {
         $rightPanel.css("left", "0");
       } else {
         var totalWidth = $container.width();
-        var leftPanelWidth = Math.round(totalWidth * leftPanelRatio);
+        leftPanelWidth = Math.min(leftPanelWidth, totalWidth - 100);
         var rightPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
         $leftPanel.css("width", leftPanelWidth + "px");
         $rightPanel.css("width", rightPanelWidth + "px");
@@ -689,6 +689,7 @@ ko.bindingHandlers.splitDraggable = {
 
         dragTimeout = window.setTimeout(function () {
           $leftPanel.css("width", ui.position.left + "px");
+          leftPanelWidth = ui.position.left;
           $rightPanel.css("width", $container.width() - ui.position.left - $resizer.width() + "px");
           $rightPanel.css("left", ui.position.left + $resizer.width());
           onPosition();
@@ -696,9 +697,7 @@ ko.bindingHandlers.splitDraggable = {
 
       },
       stop: function () {
-        var totalWidth = $leftPanel.width() + $resizer.width() + $rightPanel.width();
-        leftPanelRatio = $leftPanel.width() / totalWidth;
-        $.totalStorage(options.totalStorageRatioId, leftPanelRatio);
+        $.totalStorage(options.appName + "_left_panel_width", leftPanelWidth);
         positionPanels();
       }
     });

@@ -221,7 +221,7 @@ from django.utils.translation import ugettext as _
   <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable()">
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, totalStorageId: 'sparkAssistVisible' }}"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), splitDraggable : { totalStorageRatioId: 'sparkLeftPanelRatio', leftPanelVisible: $root.isAssistVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isAssistVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel">
     <div>
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
