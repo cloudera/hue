@@ -1379,9 +1379,9 @@ $(document).ready(function () {
               var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
               var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/";
               $("#tableAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
-              $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+              $("#tableAnalysis").show().css("top", _link.offset().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.offset().left + _link.outerWidth());
               showTableStats(statsUrl, refreshUrl, _table.data("table"), STATS_PROBLEMS, function(){
-                $("#tableAnalysis").show().css("top", _link.position().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.position().left + _link.outerWidth());
+                $("#tableAnalysis").show().css("top", _link.offset().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.offset().left + _link.outerWidth());
               });
             });
             _table.appendTo($("#navigatorTables"));
