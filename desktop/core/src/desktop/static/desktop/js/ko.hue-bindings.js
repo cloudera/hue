@@ -1736,4 +1736,38 @@ ko.bindingHandlers.aceEditor = {
       }
     }
   }
-}
+};
+
+ko.bindingHandlers.medium = {
+  init: function (element, valueAccessor, allBindings) {
+    var editor = new MediumEditor($(element), {
+      buttons: ['header1', 'header2', 'bold', 'italic', 'underline', 'quote', 'anchor', 'orderedlist', 'unorderedlist', 'pre', 'outdent', 'indent'],
+      buttonLabels: 'fontawesome',
+      anchorTarget: true,
+      anchorInputPlaceholder: '${ _("Paste or type a link") }',
+      anchorInputCheckboxLabel: '${ _("Open in new window") }',
+      firstHeader: 'h2',
+      secondHeader: 'h3'
+    });
+    $(element).on('blur', function () {
+      allBindings().value($(element).html())
+    });
+  }
+};
+
+ko.bindingHandlers.verticalSlide = {
+  init: function(element, valueAccessor) {
+    if (ko.utils.unwrapObservable(valueAccessor())) {
+      $(element).show();
+    } else {
+      $(element).hide();
+    }
+  },
+  update: function(element, valueAccessor) {
+    if (ko.utils.unwrapObservable(valueAccessor())) {
+      $(element).slideDown('fast');
+    } else {
+      $(element).slideUp('fast');
+    }
+  }
+};

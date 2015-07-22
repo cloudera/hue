@@ -207,3 +207,15 @@ var huePubSub = (function () {
     }
   };
 })();
+
+Number.prototype.toHHMMSS = function () {
+  var _s = this;
+  var _ms = _s % 1000;
+  _s = (_s - _ms) / 1000;
+  var _secs = _s % 60;
+  _s = (_s - _secs) / 60;
+  var _mins = _s % 60;
+  var _hrs = (_s - _mins) / 60;
+
+  return (_hrs > 0 ? _hrs + "h, " : "") + (_mins > 0 ? _mins + "m, " : "") + _secs + "." + _ms + "s";
+}
