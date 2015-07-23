@@ -1492,6 +1492,7 @@ ko.bindingHandlers.aceEditor = {
     var onCopy = options.onCopy || function () {};
     var onPaste = options.onPaste || function () {};
     var onAfterExec = options.onAfterExec || function () {};
+    var onExecute = options.onExecute || function () {};
     var autocompleter = options.autocompleter || null;
 
     $el.text(options.value());
@@ -1660,6 +1661,15 @@ ko.bindingHandlers.aceEditor = {
         }
       }
       onChange(e, editor, valueAccessor);
+    });
+
+    editor.commands.addCommand({
+      name: "execute",
+      bindKey: {win: "Ctrl-Enter", mac: "Command-Enter|Ctrl-Enter"},
+      exec: function() {
+        options.value(editor.getValue());
+        onExecute();
+      }
     });
 
     editor.commands.on("afterExec", function (e) {

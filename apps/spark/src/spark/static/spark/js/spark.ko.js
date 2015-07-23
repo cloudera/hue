@@ -359,6 +359,9 @@ var Snippet = function (vm, notebook, snippet) {
   };
 
   self.execute = function () {
+    if (self.status() == 'running' || self.status() == 'loading') {
+      return;
+    }
     $(document).trigger("executeStarted", self);
     $(".jHueNotify").hide();
     logGA('/execute/' + self.type());

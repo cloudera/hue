@@ -438,7 +438,15 @@ from django.utils.translation import ugettext as _
           <input type="text" data-bind="value: value" />
         </div>
       </div>
-      <div class="ace-editor" data-bind="attr: {id: id()}, aceEditor: {value: statement_raw, aceInstance: ace, mode: aceEditorMode, extraCompleters: completers, errors: errors, autocompleter: aceAutocomplete, placeholder: $root.snippetPlaceholders[type()] }"></div>
+      <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+          value: statement_raw,
+          onExecute: execute,
+          aceInstance: ace,
+          mode: aceEditorMode,
+          extraCompleters: completers,
+          errors: errors,
+          autocompleter: aceAutocomplete,
+          placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>
   </div>
 
