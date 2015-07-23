@@ -697,12 +697,18 @@ class BaseTestPasswordConfig(object):
 
   @nottest
   def run_test_read_password_from_script(self):
+    self._run_test_read_password_from_script_with(present=False)
+    self._run_test_read_password_from_script_with(data=None)
+    self._run_test_read_password_from_script_with(data='')
+
+  def _run_test_read_password_from_script_with(self, **kwargs):
     resets = [
-      self.get_config_password_script().set_for_testing(self.SCRIPT)
+      self.get_config_password().set_for_testing(**kwargs),
+      self.get_config_password_script().set_for_testing(self.SCRIPT),
     ]
 
     try:
-      assert_equal(self.get_password(), ' password from script ')
+      assert_equal(self.get_password(), ' password from script ', 'kwargs: %s' % kwargs)
     finally:
       for reset in resets:
         reset()
@@ -723,6 +729,7 @@ class BaseTestPasswordConfig(object):
   @nottest
   def run_test_password_script_raises_exception(self):
     resets = [
+      self.get_config_password().set_for_testing(present=False),
       self.get_config_password_script().set_for_testing(
           '%s -c "import sys; sys.exit(1)"' % sys.executable
       ),
@@ -735,7 +742,8 @@ class BaseTestPasswordConfig(object):
         reset()
 
     resets = [
-      self.get_config_password_script().set_for_testing('/does-not-exist')
+      self.get_config_password().set_for_testing(present=False),
+      self.get_config_password_script().set_for_testing('/does-not-exist'),
     ]
 
     try:
