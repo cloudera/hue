@@ -104,6 +104,8 @@ def _get_snippet_session(notebook, snippet):
   return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0]
 
 
+# Base API
+
 class Api(object):
 
   def __init__(self, user):
@@ -112,7 +114,8 @@ class Api(object):
   def create_session(self, lang, properties=None):
     return {
         'type': lang,
-        'id': None
+        'id': None,
+        'properties': []
     }
 
   def close_session(self, session):
@@ -160,7 +163,8 @@ class HS2Api(Api):
   def create_session(self, lang, properties=None):
     return {
         'type': lang,
-        'id': None # Real one at some point
+        'id': None, # Real one at some point
+        'properties': []
     }
 
   def execute(self, notebook, snippet):
@@ -485,6 +489,7 @@ class SparkBatchApi(Api):
     return {
         'id': response['id'],
         'has_result_set': True,
+        'properties': []
     }
 
   def check_status(self, notebook, snippet):

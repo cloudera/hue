@@ -777,49 +777,51 @@ from django.utils.translation import ugettext as _
             <p>${ _('There are currently no active sessions.') }</p>
             <!-- /ko -->
             <!-- ko foreach: sessions -->
-            <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
+              <!-- ko if: ['pyspark', 'scala'].indexOf(type()) != -1 -->
+              <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
 
-            <!-- ko foreach: properties -->
-            <div class="control-group">
-              <label class="control-label" data-bind="name"></label>
-              <div class="controls">
-                <span data-bind="text: name"></span>
-                <!-- ko with: $root.getSessionProperties(name()) -->
-                  <!-- ko if: type == 'jvm' -->
-                    ## problem with ko actually, cf generated code
-                    ## <jvm-memory-input params="value: executorMemory"></jvm>
+              <!-- ko foreach: properties -->
+              <div class="control-group">
+                <label class="control-label" data-bind="name"></label>
+                <div class="controls">
+                  <span data-bind="text: name"></span>
+                  <!-- ko with: $root.getSessionProperties(name()) -->
+                    <!-- ko if: type == 'jvm' -->
+                      ## problem with ko actually, cf generated code
+                      ## <jvm-memory-input params="value: executorMemory"></jvm>
+                      <input class="input-small" type="text" data-bind="value: $parent.value" />
+                    <!-- /ko -->
+                    <!-- ko if: type == 'number' -->
                     <input class="input-small" type="text" data-bind="value: $parent.value" />
+                    <!-- /ko -->
+                    <!-- ko if: type == 'string' -->
+                    <input class="input-small" type="text" data-bind="value: $parent.value" />
+                    <!-- /ko -->                  
+                    <!-- ko if: type == 'csv' -->
+                    <input class="input-small" type="text" data-bind="value: $parent.value" />
+                    <!-- /ko -->                  
                   <!-- /ko -->
-                  <!-- ko if: type == 'number' -->
-                  <input class="input-small" type="text" data-bind="value: $parent.value" />
-                  <!-- /ko -->
-                  <!-- ko if: type == 'string' -->
-                  <input class="input-small" type="text" data-bind="value: $parent.value" />
-                  <!-- /ko -->                  
-                  <!-- ko if: type == 'csv' -->
-                  <input class="input-small" type="text" data-bind="value: $parent.value" />
-                  <!-- /ko -->                  
-                <!-- /ko -->
-                <a href="javascript:void(0)" data-bind="click: function(data) { $parent.properties.remove(data) }">
-                  <i class="fa fa-minus"></i>
-                </a>
+                  <a href="javascript:void(0)" data-bind="click: function(data) { $parent.properties.remove(data) }">
+                    <i class="fa fa-minus"></i>
+                  </a>
+                </div>
               </div>
-            </div>
-            <!-- /ko -->
+              <!-- /ko -->
 
-            <select data-bind="options: $root.availableSessionProperties,
+              <select data-bind="options: $root.availableSessionProperties,
                        optionsText: 'nice_name',
                        optionsValue: 'name',
                        value: $root.selectedSessionProperties,
                        optionsCaption: 'Choose...'"></select>
-            <i class="fa fa-plus" data-bind="click: function() { properties.push(ko.mapping.fromJS({'name': $root.selectedSessionProperties(), 'value': ''})); $root.selectedSessionProperties(''); }"></i>
+              <i class="fa fa-plus" data-bind="click: function() { properties.push(ko.mapping.fromJS({'name': $root.selectedSessionProperties(), 'value': ''})); $root.selectedSessionProperties(''); }"></i>
 
-            <a style="float: right;" class="btn pointer" title="${ _('Restart session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($parent) }">
-              <i class="fa fa-refresh"></i> ${ _('Recreate') }
-            </a>
-            <a style="float: right;" class="btn pointer" title="${ _('Close session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeSession($parent) }">
-              <i class="fa fa-times"></i> ${ _('Close') }
-            </a>
+              <a style="float: right;" class="btn pointer" title="${ _('Restart session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($parent) }">
+                <i class="fa fa-refresh"></i> ${ _('Recreate') }
+              </a>
+              <a style="float: right;" class="btn pointer" title="${ _('Close session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeSession($parent) }">
+                <i class="fa fa-times"></i> ${ _('Close') }
+              </a>
+              <!-- /ko -->
             <!-- /ko -->
             </br>
           </fieldset>
