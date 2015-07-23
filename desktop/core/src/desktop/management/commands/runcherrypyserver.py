@@ -16,7 +16,10 @@
 # limitations under the License.
 # a thirdparty project
 
-import sys, logging
+import logging
+import pprint
+import sys
+
 from django.core.management.base import BaseCommand
 
 from desktop import conf
@@ -112,7 +115,9 @@ def runcpserver(argset=[], **kwargs):
         return
 
     # Start the webserver
-    print _('starting server with options %(options)s') % {'options': options}
+    print _('starting server with options:')
+    pprint.pprint(options)
+
     start_server(options)
 
 
