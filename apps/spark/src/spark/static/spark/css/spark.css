@@ -50,7 +50,8 @@ body {
 .resizer {
   position: absolute;
   height: 100%;
-  width: 2px;
+  width: 4px;
+  padding-left:1px;
   cursor: ew-resize;
 }
 
