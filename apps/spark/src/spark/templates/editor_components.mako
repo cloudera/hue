@@ -796,10 +796,10 @@ from django.utils.translation import ugettext as _
                     <!-- /ko -->
                     <!-- ko if: type == 'string' -->
                     <input class="input-small" type="text" data-bind="value: $parent.value" />
-                    <!-- /ko -->                  
+                    <!-- /ko -->
                     <!-- ko if: type == 'csv' -->
                     <input class="input-small" type="text" data-bind="value: $parent.value" />
-                    <!-- /ko -->                  
+                    <!-- /ko -->
                   <!-- /ko -->
                   <a href="javascript:void(0)" data-bind="click: function(data) { $parent.properties.remove(data) }">
                     <i class="fa fa-minus"></i>

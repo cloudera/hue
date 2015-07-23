@@ -40,15 +40,17 @@ def create_session(request):
   response = {'status': -1}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
-  snippet = json.loads(request.POST.get('snippet', '{}'))
+  session = json.loads(request.POST.get('session', '{}'))
 
-  session = [session for session in notebook['sessions'] if snippet['type'] == session['type']]
-  if any(session) and 'properties' in session[0]:
-    properties = session[0]['properties']
-  else:
-    properties = None
+  properties = session.get('properties', [])
 
-  response['session'] = get_api(request.user, snippet).create_session(lang=snippet['type'], properties=properties)
+  # If not properties look for previously used notebook session
+  if not properties:
+    old_session = [_session for _session in notebook['sessions'] if _session['type'] == session['type']]
+    if any(old_session) and 'properties' in old_session[0]:
+      properties = old_session[0]['properties']
+
+  response['session'] = get_api(request.user, session).create_session(lang=session['type'], properties=properties)
   response['status'] = 0
 
   return JsonResponse(response)
