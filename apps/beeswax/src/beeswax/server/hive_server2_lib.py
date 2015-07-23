@@ -143,7 +143,7 @@ class HiveServerTable(Table):
     describe_text = rows[detailed_row_index]['data_type']
     try:
       # LazySimpleSerDe case, also add full next row
-      return describe_text + rows[detailed_row_index + 1]['col_name'] + rows[detailed_row_index + 1]['data_type']
+      return describe_text + rows[detailed_row_index + 1]['col_name'] + rows[detailed_row_index + 1]['data_type'] + rows[detailed_row_index + 1]['comment']
     except:
       return describe_text
 
