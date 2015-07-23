@@ -246,7 +246,7 @@ def close_statement(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['result'] = get_api(request.user, snippet).close(notebook, snippet)
+    response['result'] = get_api(request.user, snippet).close_statement(notebook, snippet)
   except QueryExpired:
     pass
 

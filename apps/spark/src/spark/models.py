@@ -264,7 +264,7 @@ class HS2Api(Api):
       return 50
 
   @query_error_handler
-  def close(self, snippet):
+  def close_statement(self, snippet):
     if snippet['type'] == 'impala':
       from impala import conf as impala_conf
 
@@ -435,7 +435,7 @@ class SparkApi(Api):
   def _progress(self, snippet, logs):
     return 50
 
-  def close(self, notebook, snippet): # Individual statements cannot be closed
+  def close_statement(self, notebook, snippet): # Individual statements cannot be closed
     pass
 
   def close_session(self, session):
@@ -498,7 +498,7 @@ class SparkBatchApi(Api):
 
     return api.get_batch_log(snippet['result']['handle']['id'], startFrom=startFrom, size=size)
 
-  def close(self, snippet):
+  def close_statement(self, snippet):
     api = get_spark_api(self.user)
 
     session_id = snippet['result']['handle']['id']
@@ -512,8 +512,8 @@ class SparkBatchApi(Api):
       return {'status': -1}  # skipped
 
   def cancel(self, notebook, snippet):
-    # Batch jobs do not support interruption, so close session instead.
-    return self.close(snippet)
+    # Batch jobs do not support interruption, so close statement instead.
+    return self.close_statement(snippet)
 
   def _progress(self, snippet, logs):
     return 50
