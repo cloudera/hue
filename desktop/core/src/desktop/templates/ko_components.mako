@@ -85,7 +85,7 @@ from django.utils.translation import ugettext as _
           <i class="assist-action pointer pull-right fa fa-search" data-bind="click: toggleSearch"></i>
         </li>
         <li>
-          <div data-bind="slideVisible: isSearchVisible"><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/></div>
+          <div data-bind="slideVisible: options.isSearchVisible"><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/></div>
           <ul class="assist-tables" data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()">
             <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }" style="position:relative;">
               <div class="table-actions" data-bind="attr: {'id': 'assistHover_' + $data}" style="position:absolute; right: 0; display: none; padding-left:3px; background-color: #FFF">
@@ -138,12 +138,23 @@ from django.utils.translation import ugettext as _
       function AssistPanel(params) {
         var self = this;
 
+        self.options = ko.mapping.fromJS($.extend({
+          isSearchVisible: false,
+          lastSelectedDb: null
+        }, $.totalStorage(params.appName + ".assist.options") || {}));
+
+        $.each(Object.keys(self.options), function (index, key) {
+          if (ko.isObservable(self.options[key])) {
+            self.options[key].subscribe(function() {
+              $.totalStorage(params.appName + ".assist.options", ko.mapping.toJS(self.options))
+            });
+          }
+        });
+
         self.assist = params.assist;
 
-        self.isSearchVisible = ko.observable(false);
-
         self.toggleSearch = function () {
-          self.isSearchVisible(!self.isSearchVisible());
+          self.options.isSearchVisible(!self.options.isSearchVisible());
         };
 
         self.modalItem = ko.observable();
@@ -183,9 +194,8 @@ from django.utils.translation import ugettext as _
                 self.loadAssistFirstLevel(force);
               }
               else if (self.assist.mainObjects().length > 0 && !self.assist.selectedMainObject()) {
-                var lastDb = $.totalStorage(params.appName + '_last_database');
-                if (lastDb != null && $.inArray(lastDb, self.assist.mainObjects()) > -1) {
-                  self.assist.selectedMainObject(lastDb);
+                if (self.options.lastSelectedDb() != null && $.inArray(self.options.lastSelectedDb(), self.assist.mainObjects()) > -1) {
+                  self.assist.selectedMainObject(self.options.lastSelectedDb());
                 } else if ($.inArray("default", self.assist.mainObjects()) > -1) {
                   self.assist.selectedMainObject("default");
                 } else {
@@ -201,7 +211,7 @@ from django.utils.translation import ugettext as _
           self.assist.getData(null, force);
 
           self.assist.selectedMainObject.subscribe(function(value) {
-            $.totalStorage(params.appName + '_last_database', value);
+            self.options.lastSelectedDb(value);
             self.loadAssistFirstLevel();
             huePubSub.publish('assist.mainObjectChange', value);
           });
