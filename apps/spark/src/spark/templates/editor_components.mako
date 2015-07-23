@@ -763,6 +763,9 @@ from django.utils.translation import ugettext as _
         <form class="form-horizontal">
           <fieldset>
             <legend><i class="fa fa-cloud"></i> ${ _('Sessions') }</legend>
+            <!-- ko ifnot: sessions().length -->
+            <p>${ _('There are currently no active sessions.') }</p>
+            <!-- /ko -->
             <!-- ko foreach: sessions -->
             <!-- ko with: $data.properties -->
             <h4 data-bind="text: $root.getSnippetName($parent.type())" style="clear:left;"></h4>
@@ -819,7 +822,7 @@ from django.utils.translation import ugettext as _
     </div>
 
   </div>
-  <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+  <div style="position:absolute; width:100%; bottom: 0;"><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 </%def>
 
