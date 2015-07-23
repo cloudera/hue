@@ -203,7 +203,7 @@ from django.utils.translation import ugettext as _
 </div>
 
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible() && $root.isAssistAvailable(), click: function() { $root.isAssistVisible(! $root.isAssistVisible()) }">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible(), click: function() { $root.isAssistVisible(true) }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
@@ -218,10 +218,13 @@ from django.utils.translation import ugettext as _
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable()">
-    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, isAssistVisible: $root.isAssistVisible, isAssistAvailable: $root.isAssistAvailable, appName: 'spark' }}"></div>
+  <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible()">
+    <a title="${_('Toggle Assist')}" class="pointer assist-action hide-assist" data-bind="click: function() { $root.isAssistVisible(false) }">
+      <i class="fa fa-chevron-left"></i>
+    </a>
+    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isAssistVisible() && $root.isAssistAvailable(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isAssistVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isAssistVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isAssistVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel">
     <div>
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},

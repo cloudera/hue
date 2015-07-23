@@ -765,9 +765,12 @@ function EditorViewModel(notebooks, options) {
     self.isEditing(!self.isEditing());
   };
 
-  self.isAssistAvailable = ko.observable(true);
+  self.isAssistVisible = ko.observable($.totalStorage('spark_assist_visible') != null && $.totalStorage('spark_assist_visible'));
 
-  self.isAssistVisible = ko.observable(false);
+  self.isAssistVisible.subscribe(function(newValue) {
+    $.totalStorage('spark_assist_visible', newValue);
+  });
+
 
   self.assistContent = ko.observable();
   self.assistSelectedMainObject = ko.observable();

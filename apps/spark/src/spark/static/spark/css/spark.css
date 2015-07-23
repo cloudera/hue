@@ -242,6 +242,7 @@ body {
 }
 
 .assist {
+  margin-top: 2px;
   padding: 8px;
 }
 
@@ -293,7 +294,7 @@ body {
 .assist-action {
   margin-left: 3px;
   opacity:0;
-  transition: opacity 0.4s linear;
+  transition: opacity 0.2s linear;
 }
 
 .assist-container:hover .assist-action {
@@ -316,10 +317,18 @@ body {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   z-index: 1000;
+  transition: margin-left 0.2s linear;
 }
 
 .show-assist:hover {
   margin-left: 0;
+}
+
+.hide-assist {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  z-index: 1000;
 }
 
 .logs {

@@ -74,7 +74,6 @@ from django.utils.translation import ugettext as _
     <div style="position: relative;">
       <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width: 100%;">
         <li class="nav-header">${_('database')}
-          <i title="${_('Toggle Assist')}" class="pull-right pointer assist-action fa fa-chevron-left" data-bind="click: toggleAssist"></i>
           <i title="${_('Manually refresh the table list')}" class="pull-right pointer assist-action fa fa-refresh" data-bind="click: reloadAssist"></i>
         </li>
         <!-- ko if: assist.mainObjects().length > 0 -->
@@ -141,19 +140,7 @@ from django.utils.translation import ugettext as _
 
         self.assist = params.assist;
 
-        self.isAssistVisible = params.isAssistVisible;
-        self.isAssistAvailable = params.isAssistAvailable;
         self.isSearchVisible = ko.observable(false);
-
-        self.isAssistVisible($.totalStorage(params.appName + '_assist_visible') != null && $.totalStorage(params.appName + '_assist_visible'));
-
-        self.isAssistVisible.subscribe(function(newValue) {
-          $.totalStorage(params.appName + '_assist_visible', newValue);
-        });
-
-        self.toggleAssist = function () {
-          self.isAssistVisible(!self.isAssistVisible());
-        };
 
         self.toggleSearch = function () {
           self.isSearchVisible(!self.isSearchVisible());
@@ -289,9 +276,6 @@ from django.utils.translation import ugettext as _
 
         if (self.assist.options.baseURL != ""){
           self.loadAssistMain();
-        } else {
-          self.isAssistVisible(false);
-          self.isAssistAvailable(false);
         }
 
         var $assistMain = $(".assist-tables");
