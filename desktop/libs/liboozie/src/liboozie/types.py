@@ -274,6 +274,9 @@ class BundleAction(Action):
 
   def get_progress(self):
     """How much more time before the next action."""
+    if self.lastAction is None:
+      return 0
+      
     next = mktime(parse_timestamp(self.lastAction))
     start = mktime(parse_timestamp(self.startTime))
     end = mktime(parse_timestamp(self.endTime))
