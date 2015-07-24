@@ -115,6 +115,50 @@ from django.utils.translation import ugettext as _
     }
   </style>
 
+  <script type="text/html" id="assist-panel-table-stats">
+    <div class="content">
+      <!-- ko if: statRows().length -->
+      <table class="table table-striped">
+        <tbody data-bind="foreach: statRows">
+          <tr><th data-bind="text: data_type"></th><td data-bind="text: comment"></td></tr>
+        </tbody>
+      </table>
+      <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-panel-column-stats">
+    <div class="pull-right hide filter">
+      <input id="columnAnalysisTermsFilter" type="text" placeholder="${ _('Prefix filter...') }"/>
+    </div>
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
+      <li><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
+    </ul>
+    <div class="tab-content">
+      <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
+        <div class="content">
+          <table class="table table-striped">
+            <tbody data-bind="foreach: statRows">
+              <tr><th data-bind="text: Object.keys($data)[0]"></th><td data-bind="text: $data[Object.keys($data)[0]]"></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tab-pane" id="columnAnalysisTerms" style="text-align: left">
+        <i style="margin: 5px;" data-bind="visible: loadingTerms" class='fa fa-spinner fa-spin'></i>
+        <div class="alert" data-bind="visible: !loadingTerms() && terms().length == 0">${ _('There are no terms to be shown') }</div>
+        <div class="content">
+          <table class="table table-striped">
+            <tbody data-bind="foreach: terms">
+              <tr><td data-bind="text: name"></td><td style="width: 40px"><div class="progress"><div class="bar-label" data-bind="text: count"></div><div class="bar bar-info" style="margin-top: -20px;" data-bind="style: { 'width' : percent + '%' }"></div></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-panel-template">
     <div style="position: relative;">
       <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width: 100%;">
@@ -132,14 +176,20 @@ from django.utils.translation import ugettext as _
         <li>
           <div data-bind="slideVisible: options.isSearchVisible"><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/></div>
           <ul class="assist-tables" data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()">
-            <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }" style="position:relative;">
-              <div class="table-actions" data-bind="attr: {'id': 'assistHover_' + $data}" style="position:absolute; right: 0; display: none; padding-left:3px; background-color: #FFF">
-                <a href="javascript:void(0)" data-bind="click: $parent.showTablePreview"  class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}"></i></a>
+            <li class="assist-table" style="position:relative;">
+              <div class="table-actions">
+                <a href="javascript:void(0)" class="preview-sample" data-bind="click: $parent.showTablePreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+                <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parent.showStats(data, null, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
               </div>
               <a class="assist-table-link" href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); }, text: $data }"><span data-bind="text: $data"></span></a>
               <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
                 <ul class="assist-columns" data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()">
-                  <li><a class="assist-column-link" data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a></li>
+                  <li class="assist-column">
+                    <div class="column-actions">
+                      <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parents[1].showStats($parent, data.name, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+                    </div>
+                    <a class="assist-column-link" data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a>
+                  </li>
                 </ul>
               </div>
             </li>
@@ -176,6 +226,25 @@ from django.utils.translation import ugettext as _
         <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
       </div>
     </div>
+
+    <div id="tableAnalysis" style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="visible: analysisStats() != null, with: analysisStats">
+      <div class="arrow"></div>
+      <h3 class="popover-title" style="text-align: left">
+        <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
+        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
+        <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
+        <!-- ko if: column == null -->
+        <strong class="table-name" data-bind="text: table"></strong> ${ _(' table analysis') }
+        <!-- /ko -->
+        <!-- ko ifnot: column == null -->
+        <strong class="table-name" data-bind="text: column"></strong> ${ _(' column analysis') }
+        <!-- /ko -->
+      </h3>
+      <div class="popover-content">
+        <!-- ko template: {if: column == null, name: 'assist-panel-table-stats' } --><!-- /ko -->
+        <!-- ko template: {ifnot: column == null, name: 'assist-panel-column-stats' } --><!-- /ko -->
+      </div>
+    </div>
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -183,6 +252,7 @@ from django.utils.translation import ugettext as _
       function AssistPanel(params) {
         var self = this;
 
+        self.assistAppName = params.assistAppName || "beeswax";
         self.options = ko.mapping.fromJS($.extend({
           isSearchVisible: false,
           lastSelectedDb: null
@@ -203,6 +273,7 @@ from django.utils.translation import ugettext as _
         };
 
         self.modalItem = ko.observable();
+        self.analysisStats = ko.observable();
 
         self.secondLevelTitle = function(level) {
           var _title = "";
@@ -303,7 +374,7 @@ from django.utils.translation import ugettext as _
         };
 
         self.showTablePreview = function(table) {
-          var tableUrl = "/beeswax/api/table/" + self.assist.selectedMainObject() + "/" + table;
+          var tableUrl = "/" + self.assistAppName + "/api/table/" + self.assist.selectedMainObject() + "/" + table;
           $("#assistQuickLook").find(".tableName").text(table);
           $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + self.assist.selectedMainObject() + "/" + table);
           $("#assistQuickLook").find(".sample").empty("");
@@ -327,6 +398,114 @@ from django.utils.translation import ugettext as _
             }
           });
           $("#assistQuickLook").modal("show");
+        };
+
+        function TableStats (assistAppName, database, table, column) {
+          var self = this;
+
+          self.table = table;
+          self.column = column;
+          self.loading = ko.observable(false);
+          self.loadingTerms = ko.observable(false);
+          self.inaccurate = ko.observable(false);
+          self.statRows = ko.observableArray();
+          self.terms = ko.observableArray();
+
+          self.fetchTerms = function () {
+            self.loadingTerms(true);
+            $.ajax({
+              url: "/" + assistAppName + "/api/table/" + database + "/" + table + "/terms/" + column + "/",
+              data: {},
+              beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-Requested-With", "Hue");
+              },
+              dataType: "json",
+              success: function (data) {
+                if (data && data.status == 0) {
+                  self.terms($.map(data.terms, function (term) {
+                    return {
+                      name: term[0],
+                      count: term[1],
+                      percent: (parseFloat(term[1]) / parseFloat(data.terms[0][1])) * 100
+                    }
+                  }));
+                } else {
+                  $("#tableAnalysis").hide();
+                  $(document).trigger("error", options.errorLabel);
+                }
+              },
+              error: function (e) {
+                if (e.status == 500) {
+                  $("#tableAnalysis").hide();
+                  $(document).trigger("error", options.errorLabel);
+                }
+              },
+              complete: function () {
+                self.loadingTerms(false);
+              }
+            });
+          };
+
+          self.fetchData = function() {
+            self.loading(true);
+            $.ajax({
+              url: "/" + assistAppName + "/api/table/" + database + "/" + table + "/stats/" + (column || ""),
+              data: {},
+              beforeSend: function (xhr) {
+                xhr.setRequestHeader("X-Requested-With", "Hue");
+              },
+              dataType: "json",
+              success: function (data) {
+                if (data && data.status == 0) {
+                  self.statRows(data.stats);
+                  for(var i = 0; i < data.stats.length; i++) {
+                    if (data.stats[i].data_type == "COLUMN_STATS_ACCURATE" && data.stats[i].comment == "false") {
+                      self.inaccurate(true);
+                      break;
+                    }
+                  }
+                } else {
+                  $("#tableAnalysis").hide();
+                  $(document).trigger("error", options.errorLabel);
+                }
+              },
+              error: function (e) {
+                if (e.status == 500) {
+                  $("#tableAnalysis").hide();
+                  $(document).trigger("error", options.errorLabel);
+                }
+              },
+              complete: function () {
+                self.loading(false);
+              }
+            });
+          };
+
+          self.fetchData();
+          if (this.column != null) {
+            self.fetchTerms();
+          }
+        }
+
+        var lastOffset = { top: -1, left: -1 };
+        var $tableAnalysis = $("#tableAnalysis");
+        var refreshPosition = function () {
+          var targetElement = $tableAnalysis.data("targetElement");
+          if (targetElement != null && targetElement.is(":visible")) {
+            if (targetElement != null && (lastOffset.left != targetElement.offset().left || lastOffset.top != targetElement.offset().top)) {
+              lastOffset = targetElement.offset();
+              $tableAnalysis.css("top", lastOffset.top - $tableAnalysis.outerHeight() / 2 + targetElement.outerHeight() / 2).css("left", lastOffset.left + targetElement.outerWidth());
+            }
+          } else {
+            $tableAnalysis.hide();
+          }
+        };
+        window.setInterval(refreshPosition, 200);
+
+        self.showStats = function (table, column, event) {
+          self.analysisStats(new TableStats(self.assistAppName, self.assist.selectedMainObject(), table, column));
+          $("#tableAnalysis").data("targetElement", $(event.target));
+          window.setTimeout(refreshPosition, 20);
         };
 
         if (self.assist.options.baseURL != ""){
