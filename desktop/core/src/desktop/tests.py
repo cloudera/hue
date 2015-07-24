@@ -695,7 +695,6 @@ class BaseTestPasswordConfig(object):
   def get_password(self):
     raise NotImplementedError
 
-  @nottest
   def run_test_read_password_from_script(self):
     self._run_test_read_password_from_script_with(present=False)
     self._run_test_read_password_from_script_with(data=None)
@@ -713,7 +712,6 @@ class BaseTestPasswordConfig(object):
       for reset in resets:
         reset()
 
-  @nottest
   def run_test_config_password_overrides_script_password(self):
     resets = [
       self.get_config_password().set_for_testing(' password from config '),
@@ -726,7 +724,6 @@ class BaseTestPasswordConfig(object):
       for reset in resets:
         reset()
 
-  @nottest
   def run_test_password_script_raises_exception(self):
     resets = [
       self.get_config_password().set_for_testing(present=False),
