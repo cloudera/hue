@@ -77,6 +77,8 @@ class TestLibSolrWithSolr:
 
   def test_query(self):
     collection = Collection2(user=self.user, name='log_analytics_demo')
+    collection = json.loads(collection.get_json(self.user))
+
     query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
-    SolrApi(SOLR_URL.get(), self.user).query(collection, query)
+    SolrApi(SOLR_URL.get(), self.user).query(collection['collection'], query)

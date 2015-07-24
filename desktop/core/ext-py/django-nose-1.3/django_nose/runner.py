@@ -245,8 +245,11 @@ def _foreign_key_ignoring_handle(self, *fixture_labels, **options):
         cursor = connection.cursor()
         cursor.execute('SET foreign_key_checks = 1')
 
-        if commit:
-            connection.close()
+        # NOTE(erickt): This breaks installing Hue examples because we use
+        # loaddata to install the examples, then run Document.objects.sync() to
+        # clean up the database, so we need our connection to be left open.
+        #if commit:
+        #    connection.close()
 
 
 def _skip_create_test_db(self, verbosity=1, autoclobber=False, serialize=True):
