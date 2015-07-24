@@ -73,7 +73,7 @@ def test_ensure_safe_method_middleware():
 
 
 def test_audit_logging_middleware_enable():
-  c = make_logged_in_client(username='test_audit_logging_middleware_enable', is_superuser=False)
+  c = make_logged_in_client(username='test_audit_logging', is_superuser=False)
 
   # Make sure we enable it with a file path
   with tempfile.NamedTemporaryFile("w+t") as log_tmp:
@@ -90,7 +90,7 @@ def test_audit_logging_middleware_enable():
       for line in audit:
         audit_json = json.loads(line)
         audit_record = audit_json.values()[0]
-        assert_equal('test_audit_logging_middleware_enable', audit_record['user'], audit_record)
+        assert_equal('test_audit_logging', audit_record['user'], audit_record)
         assert_equal('/beeswax/', audit_record['url'], audit_record)
 
     finally:
@@ -98,7 +98,7 @@ def test_audit_logging_middleware_enable():
       reset()
 
 def test_audit_logging_middleware_disable():
-  c = make_logged_in_client(username='test_audit_logging_middleware_disable', is_superuser=False)
+  c = make_logged_in_client(username='test_audit_logging', is_superuser=False)
 
   reset = AUDIT_EVENT_LOG_DIR.set_for_testing('')
   try:
