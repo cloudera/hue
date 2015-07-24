@@ -108,7 +108,7 @@ def download_log_view(request):
         tmp = tempfile.NamedTemporaryFile()
         log_tmp = tempfile.NamedTemporaryFile("w+t")
         for l in h.buf:
-          log_tmp.write(smart_str(l) + '\n')
+          log_tmp.write(smart_str(l, errors='replace') + '\n')
         # This is not just for show - w/out flush, we often get truncated logs
         log_tmp.flush()
         t = time.time()
