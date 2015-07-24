@@ -68,6 +68,51 @@ from django.utils.translation import ugettext as _
     .assist-columns > li {
       padding: 6px 5px;
     }
+
+    .assist-column .column-actions,
+    .assist-table .table-actions {
+      opacity: 0;
+      position:absolute;
+      right: 0;
+      padding-left:3px;
+      background-color: #FFF;
+      transition: opacity 0.2s linear, color 0.2s ease;
+    }
+
+    .column-actions > a,
+    .table-actions > a {
+      color: #D1D1D1;
+      transition: color 0.2s ease;
+    }
+
+    .column-actions > a:hover,
+    .table-actions > a:hover {
+      color: #338bb8;
+    }
+
+    .assist-column:hover .column-actions,
+    .assist-table:hover .table-actions {
+      opacity: 1;
+    }
+
+    .table-actions:hover {
+      color: #338bb8;
+    }
+
+    .assist-action {
+      margin-left: 3px;
+      color: #D1D1D1;
+      opacity:0;
+      transition: opacity 0.2s linear, color 0.2s ease;
+    }
+
+    .assist-container:hover .assist-action {
+      opacity:1;
+    }
+
+    .assist-action:hover {
+      color: #338bb8;
+    }
   </style>
 
   <script type="text/html" id="assist-panel-template">

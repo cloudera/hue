@@ -292,16 +292,6 @@ body {
   margin-left: 0;
 }
 
-.assist-action {
-  margin-left: 3px;
-  opacity:0;
-  transition: opacity 0.2s linear;
-}
-
-.assist-container:hover .assist-action {
-  opacity:1;
-}
-
 .show-assist {
   position: fixed;
   top: 80px;
@@ -330,6 +320,14 @@ body {
   top: 2px;
   right: 4px;
   z-index: 1000;
+  color: #D1D1D1;
+  font-size: 12px;
+  transition: margin-right 0.2s linear, color 0.5s ease;
+}
+
+.hide-assist:hover {
+  margin-right: 2px;
+  color: #338bb8;
 }
 
 .logs {

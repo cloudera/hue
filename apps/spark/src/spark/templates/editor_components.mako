@@ -219,7 +219,7 @@ from django.utils.translation import ugettext as _
 
 <script type="text/html" id="notebook">
   <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible()">
-    <a title="${_('Toggle Assist')}" class="pointer assist-action hide-assist" data-bind="click: function() { $root.isAssistVisible(false) }">
+    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isAssistVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
