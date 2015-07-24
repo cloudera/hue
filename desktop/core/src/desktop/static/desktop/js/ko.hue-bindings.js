@@ -698,7 +698,7 @@ ko.bindingHandlers.splitDraggable = {
       },
       stop: function () {
         $.totalStorage(options.appName + "_left_panel_width", leftPanelWidth);
-        positionPanels();
+        window.setTimeout(positionPanels, 100);
       }
     });
 
