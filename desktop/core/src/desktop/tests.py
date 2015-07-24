@@ -695,7 +695,7 @@ class BaseTestPasswordConfig(object):
   def get_password(self):
     raise NotImplementedError
 
-  def run_test_read_password_from_script(self):
+  def test_read_password_from_script(self):
     self._run_test_read_password_from_script_with(present=False)
     self._run_test_read_password_from_script_with(data=None)
     self._run_test_read_password_from_script_with(data='')
@@ -712,7 +712,7 @@ class BaseTestPasswordConfig(object):
       for reset in resets:
         reset()
 
-  def run_test_config_password_overrides_script_password(self):
+  def test_config_password_overrides_script_password(self):
     resets = [
       self.get_config_password().set_for_testing(' password from config '),
       self.get_config_password_script().set_for_testing(self.SCRIPT),
@@ -724,7 +724,7 @@ class BaseTestPasswordConfig(object):
       for reset in resets:
         reset()
 
-  def run_test_password_script_raises_exception(self):
+  def test_password_script_raises_exception(self):
     resets = [
       self.get_config_password().set_for_testing(present=False),
       self.get_config_password_script().set_for_testing(
@@ -761,15 +761,6 @@ class TestSecretKeyConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_secret_key()
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
-
 
 class TestDatabasePasswordConfig(BaseTestPasswordConfig):
 
@@ -782,15 +773,6 @@ class TestDatabasePasswordConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_database_password()
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
-
 
 class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
@@ -802,15 +784,6 @@ class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
   def get_password(self):
     return desktop.conf.get_ldap_password()
-
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
 
 
 class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
@@ -830,15 +803,6 @@ class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_ldap_bind_password(desktop.conf.LDAP.LDAP_SERVERS['test'])
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
-
 
 class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
@@ -850,15 +814,6 @@ class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
   def get_password(self):
     return desktop.conf.get_smtp_password()
-
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
 
 
 class TestDocument(object):

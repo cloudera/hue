@@ -30,8 +30,8 @@ class TestDatabasePasswordConfig(desktop.tests.BaseTestPasswordConfig):
   def get_config_password(self):
     return librdbms.conf.DATABASES['test'].PASSWORD
 
-  def get_config_password_file(self):
-    return librdbms.conf.DATABASES['test'].PASSWORD_FILE
+  def get_config_password_script(self):
+    return librdbms.conf.DATABASES['test'].PASSWORD_SCRIPT
 
   def get_password(self):
     return librdbms.conf.get_database_password('test')
