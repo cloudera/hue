@@ -165,7 +165,9 @@ class TestSubmission(OozieMockBase):
 
   def test_update_properties(self):
     finish = []
+    finish.append(MR_CLUSTERS.set_for_testing({'default': {}}))
     finish.append(MR_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
+    finish.append(YARN_CLUSTERS.set_for_testing({'default': {}}))
     finish.append(YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
     try:
       properties = {
