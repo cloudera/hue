@@ -29,7 +29,29 @@ from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
 from libzookeeper.models import ZookeeperClient
-from libzookeeper.conf import zkensemble
+from libzookeeper.conf import zkensemble, ENSEMBLE
+
+
+class UnitTests():
+
+  def test_get_ensemble(self):
+    clear = ENSEMBLE.set_for_testing('zoo:2181')
+    try:
+      assert_equal('zoo:2181', ENSEMBLE.get())
+    finally:
+      clear()
+
+    clear = ENSEMBLE.set_for_testing('zoo:2181,zoo2:2181')
+    try:
+      assert_equal('zoo:2181,zoo2:2181', ENSEMBLE.get())
+    finally:
+      clear()
+
+    clear = ENSEMBLE.set_for_testing(['zoo:2181', 'zoo2:2181'])
+    try:
+      assert_equal('zoo:2181,zoo2:2181', ENSEMBLE.get())
+    finally:
+      clear()
 
 
 class TestWithZooKeeper:
