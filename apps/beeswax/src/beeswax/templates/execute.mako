@@ -1332,9 +1332,9 @@ $(document).ready(function () {
                       var termsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/terms/" + col.name + "/";
                       $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
                       $("#columnAnalysisTerms .content").html("<i class='fa fa-spinner fa-spin'></i>");
-                      $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+                      $("#columnAnalysis").show().css("top", _link.offset().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.offset().left + _link.outerWidth());
                       showColumnStats(statsUrl, refreshUrl, termsUrl, col.name, STATS_PROBLEMS, function () {
-                        $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+                        $("#columnAnalysis").show().css("top", _link.offset().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.offset().left + _link.outerWidth());
                       });
                     });
                   });
