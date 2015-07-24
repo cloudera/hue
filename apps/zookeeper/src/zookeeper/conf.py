@@ -15,14 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
-
-
-def coerce_string(value):
-  if type(value) == list:
-    return ','.join(value)
-  else:
-    return value
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_string
 
 
 # Used only for ZooKeeper app proeprties, ZooKeeper specific properties should come from libzookeeper

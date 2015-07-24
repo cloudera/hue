@@ -623,6 +623,12 @@ def coerce_bool(value):
     return True
   raise Exception("Could not coerce %r to boolean value" % (value,))
 
+def coerce_string(value):
+  if type(value) == list:
+    return ','.join(value)
+  else:
+    return value
+
 def coerce_csv(value):
   if isinstance(value, str):
     return value.split(',')
