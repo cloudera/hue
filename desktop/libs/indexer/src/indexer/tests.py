@@ -95,7 +95,7 @@ class TestIndexerWithSolr:
   def test_collections_fields(self):
     db = CollectionManagerController(self.user)
 
-    db.get_fields('log_analytics')
+    db.get_fields('log_analytics_demo')
     resp = self.client.post(reverse('indexer:install_examples'))
     content = json.loads(resp.content)
 
