@@ -164,6 +164,9 @@ class SentryApi(object):
   def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
     response = self.client.list_sentry_privileges_by_authorizable(authorizableSet, groups, roleSet)
 
+    if response.status.value != 0:
+      raise SentryException(response)
+
     _privileges = []
 
     for authorizable, roles in response.privilegesMapByAuth.iteritems():
@@ -172,10 +175,7 @@ class SentryApi(object):
         _roles[role] = [self._massage_priviledge(privilege) for privilege in privileges]
       _privileges.append((self._massage_authorizable(authorizable), _roles))
 
-    if response.status.value == 0:
-      return _privileges
-    else:
-      raise SentryException(response)
+    return _privileges
 
   @ha_error_handler
   def drop_sentry_privileges(self, authorizableHierarchy):
