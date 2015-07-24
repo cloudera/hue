@@ -53,15 +53,16 @@ def coerce_port(port):
 
 
 def coerce_password_from_script(script):
-  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
-  password = p.communicate()[0]
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  stdout, stderr = p.communicate()
 
   if p.returncode != 0:
-    raise subprocess.CalledProcessError(p.returncode, script)
+    raise subprocess.CalledProcessError(p.returncode, script,
+      output='stdout: %s\nstderr: %s' % (stdout, stderr))
 
   # whitespace may be significant in the password, but most files have a
   # trailing newline.
-  return password.strip('\n')
+  return stdout.strip('\n')
 
 
 HTTP_HOST = Config(
