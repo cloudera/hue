@@ -114,7 +114,9 @@ def test_tricky_confparse():
 
 def test_config_validator_basic():
   reset = (
+    conf.HDFS_CLUSTERS.set_for_testing({'default': {}}),
     conf.HDFS_CLUSTERS['default'].WEBHDFS_URL.set_for_testing('http://not.the.re:50070/'),
+    conf.MR_CLUSTERS.set_for_testing({'default': {}}),
     conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(70000),
   )
   old = cluster.clear_caches()
@@ -137,10 +139,6 @@ def test_config_validator_more():
   minicluster = pseudo_hdfs4.shared_cluster()
   cli = make_logged_in_client()
 
-  reset = (
-    conf.MR_CLUSTERS["default"].HOST.set_for_testing("localhost"),
-    conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(23),
-  )
   old = cluster.clear_caches()
   try:
     resp = cli.get('/debug/check_config')
@@ -150,8 +148,6 @@ def test_config_validator_more():
     assert_false('Failed to chown' in resp.content)
     assert_false('Failed to delete' in resp.content)
   finally:
-    for old_conf in reset:
-      old_conf()
     cluster.restore_caches(old)
 
 
