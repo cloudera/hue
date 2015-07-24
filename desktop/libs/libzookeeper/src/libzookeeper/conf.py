@@ -19,7 +19,7 @@ import logging
 
 from urlparse import urlparse
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+from desktop.lib.conf import Config, coerce_string
 
 
 LOG = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ ENSEMBLE=Config(
     "ensemble",
     help="ZooKeeper ensemble. Comma separated list of Host/Port, e.g. localhost:2181,localhost:2182,localhost:2183",
     dynamic_default=zkensemble,
-    type=str,
+    type=coerce_string,
 )
 
 PRINCIPAL_NAME=Config(
