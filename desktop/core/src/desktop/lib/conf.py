@@ -246,12 +246,12 @@ class Config(object):
     @throws ValueError if it does not validate correctly.
     """
     if self.required and not present:
-      raise KeyError("Configuration key %s not in configuration!"
-                     % self.key)
+      raise KeyError("Configuration key %s not in configuration!" % self.key)
     if present:
       raw_val = val
     else:
       raw_val = self.default
+
     if coerce_type:
       return self._coerce_type(raw_val, prefix)
     else:
@@ -482,8 +482,7 @@ class UnspecifiedConfigSection(Config):
     print >>out, self.get_presentable_help_text(indent=indent)
     print >>out
     print >>out, indent_str + "  Consists of some number of sections like:"
-    self.each.print_help(out=out,
-                         indent=indent+2)
+    self.each.print_help(out=out, indent=indent+2)
 
 def _configs_from_dir(conf_dir):
   """
@@ -497,8 +496,7 @@ def _configs_from_dir(conf_dir):
     try:
       conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
     except configobj.ConfigObjError, ex:
-      LOG.error("Error in configuration file '%s': %s" %
-                    (os.path.join(conf_dir, filename), ex))
+      LOG.error("Error in configuration file '%s': %s" % (os.path.join(conf_dir, filename), ex))
       raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
     yield conf
@@ -572,9 +570,7 @@ def bind_module_config(mod, conf_data, config_key):
     bind_data = conf_data.get(config_key, {})
 
   members = _bind_module_members(mod, bind_data, section)
-  return ConfigSection(section,
-                       members=members,
-                       help=mod.__doc__)
+  return ConfigSection(section, members=members, help=mod.__doc__)
 
 def initialize(modules, config_dir):
   """
