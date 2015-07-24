@@ -61,14 +61,22 @@ class TestLoginWithHadoop(PseudoHdfsTestBase):
     # Create home directory as a file in order to fail in the home creation later
     cluster = pseudo_hdfs4.shared_cluster()
     fs = cluster.fs
-    assert_false(cluster.fs.exists("/user/foo2"))
-    fs.do_as_superuser(fs.create, "/user/foo2")
+    assert_false(cluster.fs.exists("/user/test-hue-foo2"))
 
-    response = self.c.post('/accounts/login/', dict(username="foo2", password="foo2"), follow=True)
-    assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('/beeswax' in response.content, response.content)
-    # Custom login process should not do 'http-equiv="refresh"' but call the correct view
-    # 'Could not create home directory.' won't show up because the messages are consumed before
+    try:
+      fs.do_as_superuser(fs.create, "/user/test-hue-foo2")
+
+      response = self.c.post('/accounts/login/', {
+        'username': "test-hue-foo2",
+        'password': "test-hue-foo2",
+      }, follow=True)
+
+      assert_equal(200, response.status_code, "Expected ok status.")
+      assert_true('/beeswax' in response.content, response.content)
+      # Custom login process should not do 'http-equiv="refresh"' but call the correct view
+      # 'Could not create home directory.' won't show up because the messages are consumed before
+    finally:
+      fs.do_as_superuser(fs.remove, '/user/test-hue-foo2')
 
 
 class TestLdapLogin(PseudoHdfsTestBase):
@@ -131,17 +139,21 @@ class TestLdapLogin(PseudoHdfsTestBase):
     # Create home directory as a file in order to fail in the home creation later
     cluster = pseudo_hdfs4.shared_cluster()
     fs = cluster.fs
-    assert_false(cluster.fs.exists("/user/ldap2"))
-    fs.do_as_superuser(fs.create, "/user/ldap2")
+    assert_false(cluster.fs.exists("/user/test-hue-ldap2"))
 
-    response = self.c.post('/accounts/login/', {
-        'username': "ldap2",
-        'password': "ldap2"
-    }, follow=True)
-    assert_equal(200, response.status_code, "Expected ok status.")
-    assert_true('/beeswax' in response.content, response.content)
-    # Custom login process should not do 'http-equiv="refresh"' but call the correct view
-    # 'Could not create home directory.' won't show up because the messages are consumed before
+    try:
+      fs.do_as_superuser(fs.create, "/user/test-hue-ldap2")
+
+      response = self.c.post('/accounts/login/', {
+          'username': "test-hue-ldap2",
+          'password': "test-hue-ldap2",
+      }, follow=True)
+      assert_equal(200, response.status_code, "Expected ok status.")
+      assert_true('/beeswax' in response.content, response.content)
+      # Custom login process should not do 'http-equiv="refresh"' but call the correct view
+      # 'Could not create home directory.' won't show up because the messages are consumed before
+    finally:
+      fs.do_as_superuser(fs.remove, '/user/test-hue-ldap2')
 
   def test_login_ignore_case(self):
     self.reset.append(conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
@@ -272,13 +284,13 @@ class TestRemoteUserLogin(object):
 
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO4"})
     assert_equal(200, response.status_code, "Expected ok status.")
-    assert_equal(2, len(User.objects.all()))
+    assert_equal(2, len(User.objects.all().order_by('username')))
     assert_equal('foo4', User.objects.all()[1].username)
 
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "foo4"})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all()))
-    assert_equal('foo4', User.objects.all()[1].username)
+    assert_equal('foo4', User.objects.all().order_by('username')[1].username)
 
   def test_force_lower_case(self):
     self.reset.append( conf.AUTH.FORCE_USERNAME_LOWERCASE.set_for_testing(True) )
@@ -320,7 +332,7 @@ class TestRemoteUserLogin(object):
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "FOO4"})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all()))
-    assert_equal('foo4', User.objects.all()[1].username)
+    assert_equal('foo4', User.objects.all().order_by('username')[1].username)
 
 
 class TestLogin(object):
