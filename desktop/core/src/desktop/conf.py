@@ -515,11 +515,13 @@ AUTH = ConfigSection(
   help=_("Configuration options for user authentication into the web application."),
   members=dict(
     BACKEND=Config("backend",
-                   default="desktop.auth.backend.AllowFirstUserDjangoBackend",
+                   default=["desktop.auth.backend.AllowFirstUserDjangoBackend"],
+                   type=coerce_csv,
                    help=_("Authentication backend.  Common settings are "
                         "django.contrib.auth.backends.ModelBackend (fully Django backend), " +
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
-                        "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). ")),
+                        "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). " +
+                        "Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),

@@ -209,7 +209,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         %endif
 
         <div class="input-prepend
-          % if backend_name == 'OAuthBackend':
+          % if backend_names == ['OAuthBackend']:
             hide
           % endif
         ">
@@ -220,7 +220,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         ${ form['username'].errors | n,unicode }
 
         <div class="input-prepend
-          % if backend_name in ('AllowAllBackend', 'OAuthBackend'):
+          % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
             hide
           % endif
         ">
@@ -273,11 +273,11 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
       }, 1000);
     });
 
-    % if backend_name == 'AllowAllBackend':
+    % if 'AllowAllBackend' in backend_names:
       $('#id_password').val('password');
     % endif
 
-    % if backend_name == 'OAuthBackend':
+    % if backend_names == ['OAuthBackend']:
       $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
       $("input").bind('click', function () {
         window.location.replace('/login/oauth/');

@@ -172,7 +172,8 @@ def delete_group(request):
 
 def require_change_password(self):
   """ Return true if user has never logged in before. """
-  if desktop.conf.AUTH.BACKEND.get() == 'desktop.auth.backend.AllowFirstUserDjangoBackend' and self.first_login and desktop.conf.AUTH.CHANGE_DEFAULT_PASSWORD.get():
+  if 'desktop.auth.backend.AllowFirstUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get() and \
+     self.first_login and desktop.conf.AUTH.CHANGE_DEFAULT_PASSWORD.get():
     return True
 
 

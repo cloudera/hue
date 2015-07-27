@@ -26,8 +26,6 @@ In addition, the User classes they return must support:
  - has_hue_permission(action, app) -> boolean
 Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
-
-In Desktop, only one authentication backend may be specified.
 """
 from django.contrib.auth.models import User
 import django.contrib.auth.backends

@@ -480,7 +480,7 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not 'SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.SpnegoMiddleware' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -588,7 +588,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
   in use.
   """
   def __init__(self):
-    if not 'RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
     self.header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()

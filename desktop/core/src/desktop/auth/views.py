@@ -22,7 +22,6 @@ except:
   oauth = None
 
 import cgi
-import datetime
 import logging
 import urllib
 
@@ -77,16 +76,16 @@ def first_login_ever():
   return False
 
 
-def get_backend_name():
-  return get_backends() and get_backends()[0].__class__.__name__
+def get_backend_names():
+  return get_backends and [backend.__class__.__name__ for backend in get_backends()]
 
 
 @login_notrequired
 def dt_login(request):
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
-  backend_name = get_backend_name()
-  is_active_directory = backend_name == 'LdapBackend' and ( bool(LDAP.NT_DOMAIN.get()) or bool(LDAP.LDAP_SERVERS.get()) )
+  backend_names = get_backend_names()
+  is_active_directory = 'LdapBackend' in backend_names and ( bool(LDAP.NT_DOMAIN.get()) or bool(LDAP.LDAP_SERVERS.get()) )
 
   if is_active_directory:
     UserCreationForm = auth_forms.LdapUserCreationForm
@@ -114,7 +113,7 @@ def dt_login(request):
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
-        if is_first_login_ever or backend_name in ('AllowAllBackend', 'LdapBackend'):
+        if is_first_login_ever or 'AllowAllBackend' in backend_names or 'LdapBackend' in backend_names:
           # Create home directory for first user.
           try:
             ensure_home_directory(request.fs, user.username)
@@ -151,7 +150,7 @@ def dt_login(request):
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
     'login_errors': request.method == 'POST',
-    'backend_name': backend_name,
+    'backend_names': backend_names,
     'active_directory': is_active_directory
   })
 
