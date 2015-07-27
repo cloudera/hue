@@ -227,12 +227,43 @@ from django.utils.translation import ugettext as _
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel">
     <div>
-      <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
-        sortable: { template: 'snippet', data: snippets, isEnabled: $root.isEditing,
-        options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
-            'stop': function(event, ui){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); });},
-            'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.snippet-body').slideUp('fast', function(){ $('.sortable-snippets').sortable('refreshPositions') }); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.html($(event.toElement).parents('h2').find('img').outerHTML());_title.appendTo(_par);_par.height(40);_par.width(120);return _par;}},
-            dragged: function(widget){$('.snippet-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition); });}}">
+      <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
+        sortable: {
+          template: 'snippet',
+          data: snippets,
+          isEnabled: true,
+          options: {
+            'handle': '.move-widget',
+            'axis' : 'y',
+            'opacity': 0.8,
+            'placeholder': 'snippet-move-placeholder',
+            'greedy': true,
+            'stop': function(event, ui) {
+              $('.snippet-body').slideDown('fast', function () { $(window).scrollTop(lastWindowScrollPosition); });
+            },
+            'helper': function(event) {
+              lastWindowScrollPosition = $(window).scrollTop();
+              $('.snippet-body').slideUp('fast', function () {
+                $('.sortable-snippets').sortable('refreshPositions')
+              });
+              var $element = $(event.toElement);
+              var _par = $('<div>')
+                .addClass('card-widget snippet-move-helper')
+                .width($element.parents('.snippet').width());
+              $('<h2>')
+                .addClass('card-heading')
+                .html($element.parents('h2').html())
+                .appendTo(_par)
+                .find('.actions')
+                .removeClass('actions');
+              _par.css('height', '100px');
+              return _par;
+            }
+          },
+          dragged: function (widget) {
+            $('.snippet-body').slideDown('fast', function () { $(window).scrollTop(lastWindowScrollPosition); });
+          }
+        }">
       </div>
       %if hasattr(caller, "addSnippetHTML"):
         ${caller.addSnippetHTML()}
@@ -289,7 +320,6 @@ from django.utils.translation import ugettext as _
       <h2 class="card-heading simple" data-bind="visible: $root.isEditing() || (! $root.isEditing() && type() != 'text')">
 
         <span data-bind="visible: $root.isEditing">
-          <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
           <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
           <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
           &nbsp;
@@ -311,6 +341,7 @@ from django.utils.translation import ugettext as _
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
         <div class="actions inline pull-right">
+          <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0"><i class="fa fa-cog"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>

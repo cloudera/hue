@@ -37,6 +37,19 @@ body {
   bottom: 0;
 }
 
+.snippet-move-placeholder {
+  margin: 10px;
+  height: 100px;
+  background-color: #FAFAFA;
+  border: 2px dotted #CCC;
+}
+
+.snippet-move-helper {
+  margin: 10px;
+  background-color: #FFF;
+  border: 1px solid #F1F1F1;
+}
+
 .panel-container {
   position: relative;
 }
