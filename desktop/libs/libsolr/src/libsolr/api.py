@@ -486,7 +486,7 @@ class SolrApi(object):
       )
 
       response = self._root.post('admin/cores', params=params, contenttype='application/json')
-      if response.get('responseHeader',{}).get('status',-1) == 0:
+      if response.get('responseHeader', {}).get('status', -1) == 0:
         return True
       else:
         LOG.error("Could not create core. Check response:\n%s" % json.dumps(response, indent=2))
@@ -496,6 +496,39 @@ class SolrApi(object):
         LOG.warn("Could not create collection.", exc_info=True)
         return False
       else:
+        raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def create_or_modify_alias(self, name, collections):
+    try:
+      params = self._get_params() + (
+        ('action', 'CREATEALIAS'),
+        ('name', name),
+        ('collections', ','.join(collections)),
+        ('wt', 'json'),
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if response.get('responseHeader', {}).get('status', -1) != 0:
+        msg = _("Could not create or edit alias. Check response:\n%s") % json.dumps(response, indent=2)
+        LOG.error(msg)
+        raise PopupException(msg)
+    except RestException, e:
+        raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def delete_alias(self, name):
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETEALIAS'),
+        ('name', name),
+        ('wt', 'json'),
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if response.get('responseHeader', {}).get('status', -1) != 0:
+        msg = _("Could not delete alias. Check response:\n%s") % json.dumps(response, indent=2)
+        LOG.error(msg)
+        raise PopupException(msg)
+    except RestException, e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
   def remove_collection(self, name, replication=1):

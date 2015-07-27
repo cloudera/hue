@@ -24,10 +24,12 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
+from libsolr.api import SolrApi
+from search.conf import SOLR_URL, SECURITY_ENABLED
 from search.models import Collection
 
-from controller import CollectionManagerController
-from utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
+from indexer.controller import CollectionManagerController
+from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
 
 
 LOG = logging.getLogger(__name__)
@@ -271,5 +273,46 @@ def collections_data(request, collection):
     response['message'] = _('Index imported!')
   else:
     response['message'] = _('Unsupported source %s') % source
+
+  return JsonResponse(response)
+
+
+def create_or_edit_alias(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  response = {'status': -1}
+
+  alias = json.loads(request.POST.get('alias', ''))
+  collections = json.loads(request.POST.get('collections', '[]'))
+
+  api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
+
+  try:
+    api.create_or_modify_alias(alias, collections)
+    response['status'] = 0
+    response['message'] = _('Alias created or modified!')
+  except Exception, e:
+    response['message'] = _('Alias could not be created or modified: %s') % e
+
+  return JsonResponse(response)
+
+
+def delete_alias(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  response = {'status': -1}
+
+  alias = json.loads(request.POST.get('alias', ''))
+
+  api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
+
+  try:
+    api.delete_alias(alias)
+    response['status'] = 0
+    response['message'] = _('Alias deleted!')
+  except Exception, e:
+    response['message'] = _('Alias could not be deleted: %s') % e
 
   return JsonResponse(response)
