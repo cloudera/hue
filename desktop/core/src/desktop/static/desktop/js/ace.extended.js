@@ -20,12 +20,17 @@ try {
   ace.edit = function(el) {
     var editor = ace.originalEdit(el);
 
-    editor.enableAutocomplete = function() {
+    editor.enableAutocomplete = function () {
       editor.setOptions({enableBasicAutocompletion: true, enableLiveAutocompletion: true});
     }
 
-    editor.disableAutocomplete = function() {
+    editor.disableAutocomplete = function () {
       editor.setOptions({enableBasicAutocompletion: false, enableLiveAutocompletion: false});
+    }
+
+    editor.removeTextBeforeCursor = function (length) {
+      var _r = new AceRange(this.getCursorPosition().row, this.getCursorPosition().column - length, this.getCursorPosition().row, this.getCursorPosition().column);
+      editor.getSession().getDocument().remove(_r);
     }
 
     editor.getTextBeforeCursor = function (separator) {

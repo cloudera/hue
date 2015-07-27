@@ -1594,6 +1594,8 @@ ko.bindingHandlers.aceEditor = {
       }
     }
 
+    editor.previousCursorPosition = null;
+
     editor.on("change", function (e) {
       editor.clearErrors();
       options.extraCompleters([]);
@@ -1603,70 +1605,87 @@ ko.bindingHandlers.aceEditor = {
       var beforeU = before.toUpperCase();
       var after = editor.getTextAfterCursor(";");
       var afterU = after.toUpperCase();
-      if (editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
-        if ($.trim(before).substr(-1) != ".") {
-          if ((beforeU.indexOf(" FROM ") > -1 || beforeU.indexOf(" TABLE ") > -1 || beforeU.indexOf(" STATS ") > -1) && beforeU.indexOf(" ON ") == -1 && beforeU.indexOf(" ORDER BY ") == -1 && beforeU.indexOf(" WHERE ") == -1 ||
-              beforeU.indexOf("REFRESH") > -1 || beforeU.indexOf("METADATA") > -1 || beforeU.indexOf("DESCRIBE") > -1) {
-            editor.showSpinner();
-            options.extraCompleters([]);
-            if (autocompleter != null) {
-              autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-                var tableNames = data.split(" ");
-                var tables = [];
-                tableNames.forEach(function (tbl) {
-                  if (tbl != "") {
-                    tables.push({value: tbl, score: 1000, meta: "table"});
-                  }
-                });
-                options.extraCompleters([newCompleter(tables)]);
-                editor.hideSpinner();
-              });
 
-            }
-            else {
-              console.error("A valid instance of Autocomplete is missing. Please set it on the 'autocompleter' options of the binding.");
-            }
+      if (editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
+        if (beforeU.indexOf("SELECT ") > -1 && afterU.indexOf("* FROM ") > -1) {
+          if (editor.previousCursorPosition != null) {
+            window.setTimeout(function () {
+              editor.moveCursorTo(editor.previousCursorPosition.row, editor.previousCursorPosition.column + 1);
+              editor.removeTextBeforeCursor(1);
+              window.setTimeout(function () {
+                editor.execCommand("startAutocomplete");
+                editor.previousCursorPosition = null;
+              }, 100);
+            }, 100);
+            editor.previousCursorPosition = null;
           }
-          if (beforeU.indexOf("SELECT") > -1 && beforeU.indexOf(" FROM ") == -1) {
-            if (afterU.indexOf("FROM ") > -1) {
-              fieldsAutocomplete(editor, valueAccessor);
-            }
-            else {
+        }
+        else {
+          if ($.trim(before).substr(-1) != ".") {
+            if ((beforeU.indexOf(" FROM ") > -1 || beforeU.indexOf(" TABLE ") > -1 || beforeU.indexOf(" STATS ") > -1) && beforeU.indexOf(" ON ") == -1 && beforeU.indexOf(" ORDER BY ") == -1 && beforeU.indexOf(" WHERE ") == -1 ||
+                beforeU.indexOf("REFRESH") > -1 || beforeU.indexOf("METADATA") > -1 || beforeU.indexOf("DESCRIBE") > -1) {
               editor.showSpinner();
               options.extraCompleters([]);
               if (autocompleter != null) {
                 autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-                  var fromKeyword = "from";
-                  if (before.indexOf("SELECT") > -1) {
-                    fromKeyword = fromKeyword.toUpperCase();
-                  }
                   var tableNames = data.split(" ");
                   var tables = [];
                   tableNames.forEach(function (tbl) {
                     if (tbl != "") {
-                      tables.push({value: "* " + fromKeyword + " " + tbl, score: 1000, meta: "* table"});
+                      tables.push({value: tbl, score: 1000, meta: "table"});
                     }
                   });
                   options.extraCompleters([newCompleter(tables)]);
                   editor.hideSpinner();
                 });
+
+              }
+              else {
+                console.error("A valid instance of Autocomplete is missing. Please set it on the 'autocompleter' options of the binding.");
               }
             }
-          }
-          else {
-            if ((beforeU.indexOf("WHERE") > -1 || beforeU.indexOf("ORDER BY") > -1) && beforeU.match(/ ON| LIMIT| GROUP| SORT/) == null) {
-              fieldsAutocomplete(editor, valueAccessor);
+            if (beforeU.indexOf("SELECT") > -1 && beforeU.indexOf(" FROM ") == -1) {
+              if (afterU.indexOf("FROM ") > -1) {
+                fieldsAutocomplete(editor, valueAccessor);
+              }
+              else {
+                editor.showSpinner();
+                options.extraCompleters([]);
+                if (autocompleter != null) {
+                  autocompleter.getTables(autocompleter.getDatabase(), function (data) {
+                    var fromKeyword = "from";
+                    if (before.indexOf("SELECT") > -1) {
+                      fromKeyword = fromKeyword.toUpperCase();
+                    }
+                    var tableNames = data.split(" ");
+                    var tables = [];
+                    tableNames.forEach(function (tbl) {
+                      if (tbl != "") {
+                        tables.push({value: "* " + fromKeyword + " " + tbl, score: 1000, meta: "* table"});
+                      }
+                    });
+                    options.extraCompleters([newCompleter(tables)]);
+                    editor.hideSpinner();
+                  });
+                }
+              }
+            }
+            else {
+              if ((beforeU.indexOf("WHERE") > -1 || beforeU.indexOf("ORDER BY") > -1) && beforeU.match(/ ON| LIMIT| GROUP| SORT/) == null) {
+                fieldsAutocomplete(editor, valueAccessor);
+              }
             }
           }
         }
       }
+      editor.previousCursorPosition = editor.getCursorPosition();
       onChange(e, editor, valueAccessor);
     });
 
     editor.commands.addCommand({
       name: "execute",
       bindKey: {win: "Ctrl-Enter", mac: "Command-Enter|Ctrl-Enter"},
-      exec: function() {
+      exec: function () {
         options.value(editor.getValue());
         onExecute();
       }
@@ -1730,7 +1749,6 @@ ko.bindingHandlers.aceEditor = {
         options.extraCompleters().forEach(function (complete) {
           editor.completers.push(complete);
         });
-        editor.execCommand("startAutocomplete");
       }
       editor.clearErrors();
       if (options.errors().length > 0) {
