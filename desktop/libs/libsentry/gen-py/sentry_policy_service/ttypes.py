@@ -271,7 +271,7 @@ class TCreateSentryRoleRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
   )
@@ -424,7 +424,7 @@ class TDropSentryRoleRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
   )
@@ -578,7 +578,7 @@ class TAlterSentryRoleAddGroupsRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
     None, # 4
@@ -755,7 +755,7 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
     None, # 4
@@ -933,7 +933,7 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
     None, # 4
@@ -1155,7 +1155,7 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
     None, # 4
@@ -1341,7 +1341,7 @@ class TListSentryRolesRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'groupName', None, None, ), # 3
   )
@@ -1723,7 +1723,7 @@ class TListSentryPrivilegesRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     None, # 3
     (4, TType.STRING, 'roleName', None, None, ), # 4
@@ -1910,7 +1910,7 @@ class TDropPrivilegesRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRUCT, 'authorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 3
   )
@@ -2065,7 +2065,7 @@ class TRenamePrivilegesRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRUCT, 'oldAuthorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 3
     (4, TType.STRUCT, 'newAuthorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 4
@@ -2318,7 +2318,7 @@ class TListSentryPrivilegesForProviderRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.SET, 'groups', (TType.STRING,None), None, ), # 2
     (3, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 3
     (4, TType.STRUCT, 'authorizableHierarchy', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 4
@@ -2597,7 +2597,7 @@ class TListSentryPrivilegesByAuthRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.SET, 'authorizableSet', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec)), None, ), # 3
     (4, TType.SET, 'groups', (TType.STRING,None), None, ), # 4
@@ -2814,7 +2814,7 @@ class TSentryConfigValueRequest(object):
 
   thrift_spec = (
     None, # 0
-    (1, TType.I32, 'protocol_version', None, 1, ), # 1
+    (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'propertyName', None, None, ), # 2
     (3, TType.STRING, 'defaultValue', None, None, ), # 3
   )
