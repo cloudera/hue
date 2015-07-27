@@ -57,8 +57,7 @@ def coerce_password_from_script(script):
   stdout, stderr = p.communicate()
 
   if p.returncode != 0:
-    raise subprocess.CalledProcessError(p.returncode, script,
-      output='stdout: %s\nstderr: %s' % (stdout, stderr))
+    raise subprocess.CalledProcessError(p.returncode, script)
 
   # whitespace may be significant in the password, but most files have a
   # trailing newline.
