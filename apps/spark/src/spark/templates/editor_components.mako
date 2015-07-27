@@ -203,7 +203,7 @@ from django.utils.translation import ugettext as _
 </div>
 
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isAssistVisible(), click: function() { $root.isAssistVisible(true) }">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible(), click: function() { $root.isLeftPanelVisible(true) }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
@@ -218,13 +218,13 @@ from django.utils.translation import ugettext as _
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isAssistVisible()">
-    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isAssistVisible(false) }">
+  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible()">
+    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}" style="height:100%"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isAssistVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isAssistVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel">
     <div>
       <div data-bind="css: {'row-fluid row-container sortable-snippets':true, 'is-editing': $root.isEditing},
@@ -464,9 +464,9 @@ from django.utils.translation import ugettext as _
   <!-- /ko -->
 
   <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
-    <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
+    <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
       <ul class="nav nav-list" style="border: none; background-color: #FFF">
-        <li class="nav-header pointer" data-bind="click: toggleLeftPanel" title="${_('Hide columns')}">${_('columns')}</li>
+        <li class="nav-header pointer" data-bind="click: toggleResultSettings" title="${_('Hide columns')}">${_('columns')}</li>
         </a>
       </ul>
       <ul class="unstyled" data-bind="foreach: result.meta">
@@ -476,16 +476,16 @@ from django.utils.translation import ugettext as _
         </li>
       </ul>
     </div>
-    <div data-bind="css: {'span10': isLeftPanelVisible, 'span12 nomargin': !isLeftPanelVisible()}">
-      <div data-bind="attr: { 'id': 'toggleLeftPanelGrid' + id()}, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel" class="toggle-left-panel">
-        <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isLeftPanelVisible()">
+    <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': !isResultSettingsVisible()}">
+      <div data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id()}, event: { mouseover: function(){ $('#toggleResultSettingsGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleResultSettingsGrid' + id()).removeClass('hoverable'); } }, click: toggleResultSettings" class="toggle-result-settings">
+        <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isResultSettingsVisible()">
           <i class="fa fa-chevron-right"></i>
         </a>
-        <a title="${_('Hide')}" class="pointer" data-bind="visible: isLeftPanelVisible()">
+        <a title="${_('Hide')}" class="pointer" data-bind="visible: isResultSettingsVisible">
           <i class="fa fa-chevron-left"></i>
         </a>
       </div>
-      <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleLeftPanelGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleLeftPanelGrid' + id()).removeClass('hoverable'); } }">
+      <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleResultSettingsGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleResultSettingsGrid' + id()).removeClass('hoverable'); } }">
         <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="true">
           <thead>
           <tr data-bind="foreach: result.meta">
@@ -500,8 +500,8 @@ from django.utils.translation import ugettext as _
   </div>
 
   <div class="row-fluid" data-bind="visible: status() != 'ready' && showChart()" style="max-height: 400px; margin-top: 4px">
-    <div data-bind="visible: isLeftPanelVisible, css:{'span2 left-panel': isLeftPanelVisible, 'hidden': ! isLeftPanelVisible()}">
-      <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }, click: toggleLeftPanel">
+    <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
+      <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'toggle-result-settings toggleResultSettingsChart' + id()}, event: { mouseover: function(){ $('.toggleResultSettingsChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleResultSettingsChart' + id()).removeClass('hoverable'); } }, click: toggleResultSettings">
         <a title="${_('Hide settings')}" class="pointer">
           <i class="fa fa-chevron-left"></i>
         </a>
@@ -564,9 +564,9 @@ from django.utils.translation import ugettext as _
         </div>
       </div>
     </div>
-    <div data-bind="css:{'span10 chart-container': isLeftPanelVisible, 'span12 nomargin chart-container': !isLeftPanelVisible()}, event: { mouseover: function(){ $('.toggleLeftPanelChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleLeftPanelChart' + id()).removeClass('hoverable'); } }">
+    <div data-bind="css:{'span10 chart-container': isResultSettingsVisible, 'span12 nomargin chart-container': !isResultSettingsVisible()}, event: { mouseover: function(){ $('.toggleResultSettingsChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleResultSettingsChart' + id()).removeClass('hoverable'); } }">
 
-      <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isLeftPanelVisible(), click: toggleLeftPanel, attr: { 'class': 'toggle-left-panel toggleLeftPanelChart' + id()}">
+      <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isResultSettingsVisible(), click: toggleResultSettings, attr: { 'class': 'toggle-result-settings toggleResultSettingsChart' + id()}">
         <a title="${_('Show settings')}" class="pointer">
           <i class="fa fa-chevron-right"></i>
         </a>
@@ -777,7 +777,7 @@ from django.utils.translation import ugettext as _
             <p>${ _('There are currently no active sessions.') }</p>
             <!-- /ko -->
             <!-- ko foreach: sessions -->
-              <!-- ko if: ['pyspark', 'scala'].indexOf(type()) != -1 -->
+              <!-- ko if: ['pyspark', 'scala'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
 
               <!-- ko foreach: properties -->
@@ -1250,7 +1250,7 @@ from django.utils.translation import ugettext as _
       }
     });
 
-    $(document).on("toggleLeftPanel", function (e, snippet) {
+    $(document).on("toggleResultSettings", function (e, snippet) {
       $("#snippet_" + snippet.id()).find(".chart").trigger("forceUpdate");
       redrawFixedHeaders();
     });
@@ -1275,7 +1275,7 @@ from django.utils.translation import ugettext as _
       }
     });
 
-    function resizeToggleLeftPanel(snippet) {
+    function resizeToggleResultSettings(snippet) {
       var _dtElement;
       if (snippet.showGrid()) {
         _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
@@ -1283,7 +1283,7 @@ from django.utils.translation import ugettext as _
       else {
         _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
       }
-      _dtElement.parents(".snippet-body").find(".toggle-left-panel").css({
+      _dtElement.parents(".snippet-body").find(".toggle-result-settings").css({
         "height": (_dtElement.height() - 30) + "px",
         "line-height": (_dtElement.height() - 30) + "px"
       });
@@ -1307,7 +1307,7 @@ from django.utils.translation import ugettext as _
           _dtElement.animate({opacity: '1'}, 50);
           _dtElement.scrollTop(_dtElement.data("scrollPosition"));
           redrawFixedHeaders();
-          resizeToggleLeftPanel(options.snippet);
+          resizeToggleResultSettings(options.snippet);
         }, 100);
       }
       else {
@@ -1343,13 +1343,13 @@ from django.utils.translation import ugettext as _
 
     $(document).on("gridShown", function (e, snippet) {
       window.setTimeout(function () {
-        resizeToggleLeftPanel(snippet);
+        resizeToggleResultSettings(snippet);
       }, 50);
     });
 
     $(document).on("chartShown", function (e, snippet) {
       window.setTimeout(function () {
-        resizeToggleLeftPanel(snippet);
+        resizeToggleResultSettings(snippet);
       }, 50);
     });
 
@@ -1384,7 +1384,7 @@ from django.utils.translation import ugettext as _
                   var _dt = createDatatable(_el, snippet);
                   _dt.fnClearTable();
                   _dt.fnAddData(snippet.result.data());
-                  resizeToggleLeftPanel(snippet);
+                  resizeToggleResultSettings(snippet);
                   $(document).trigger("forceChartDraw", snippet);
                   window.clearInterval(_elCheckerInterval);
                 }

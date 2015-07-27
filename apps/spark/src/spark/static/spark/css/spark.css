@@ -335,7 +335,7 @@ h1.empty {
   color: #DDD;
 }
 
-.toggle-left-panel {
+.toggle-result-settings {
   float: left;
   padding: 3px;
   margin-top: 31px;
@@ -343,19 +343,19 @@ h1.empty {
   text-align: center;
 }
 
-.toggle-left-panel i {
+.toggle-result-settings i {
   display: none;
 }
 
-.toggle-left-panel.hoverable {
+.toggle-result-settings.hoverable {
   cursor: pointer;
 }
 
-.toggle-left-panel.hoverable i {
+.toggle-result-settings.hoverable i {
   display: inline-block;
 }
 
-.toggle-left-panel.hoverable:hover {
+.toggle-result-settings.hoverable:hover {
   background-color: #F0F0F0;
 }
 
@@ -399,7 +399,7 @@ h1.empty {
 }
 
 @media print {
-  .navigator, .assist-container, .left-panel, a.btn, button, .CodeMirror-gutters, .add-snippet {
+  .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .CodeMirror-gutters, .add-snippet {
     display: none !important;
   }
 

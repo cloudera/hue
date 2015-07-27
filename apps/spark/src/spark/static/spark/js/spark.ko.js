@@ -213,7 +213,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.showChart.subscribe(function (val) {
     if (val) {
       self.showGrid(false);
-      self.isLeftPanelVisible(true);
+      self.isResultSettingsVisible(true);
       $(document).trigger("forceChartDraw", self);
       $(document).trigger("chartShown", self);
     }
@@ -260,10 +260,10 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.tempChartOptions = {};
 
-  self.isLeftPanelVisible = ko.observable(typeof snippet.isLeftPanelVisible != "undefined" && snippet.isLeftPanelVisible != null ? snippet.isLeftPanelVisible : false);
-  self.toggleLeftPanel = function () {
-    self.isLeftPanelVisible(!self.isLeftPanelVisible());
-    $(document).trigger("toggleLeftPanel", self);
+  self.isResultSettingsVisible = ko.observable(typeof snippet.isResultSettingsVisible != "undefined" && snippet.isResultSettingsVisible != null ? snippet.isResultSettingsVisible : false);
+  self.toggleResultSettings = function () {
+    self.isResultSettingsVisible(!self.isResultSettingsVisible());
+    $(document).trigger("toggleResultSettings", self);
   };
 
   self.codeVisible = ko.observable(typeof snippet.codeVisible != "undefined" && snippet.codeVisible != null ? snippet.codeVisible : true);
@@ -779,10 +779,10 @@ function EditorViewModel(notebooks, options) {
     self.isEditing(!self.isEditing());
   };
 
-  self.isAssistVisible = ko.observable($.totalStorage('spark_assist_visible') != null && $.totalStorage('spark_assist_visible'));
+  self.isLeftPanelVisible = ko.observable($.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-  self.isAssistVisible.subscribe(function(newValue) {
-    $.totalStorage('spark_assist_visible', newValue);
+  self.isLeftPanelVisible.subscribe(function(newValue) {
+    $.totalStorage('spark_left_panel_visible', newValue);
   });
 
   self.assistContent = ko.observable();
