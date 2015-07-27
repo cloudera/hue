@@ -486,7 +486,7 @@ from django.utils.translation import ugettext as _
         </a>
       </div>
       <div data-bind="css: resultsKlass, event: { mouseover: function(){ $('#toggleResultSettingsGrid' + id()).addClass('hoverable'); }, mouseout: function(){ $('#toggleResultSettingsGrid' + id()).removeClass('hoverable'); } }">
-        <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="true">
+        <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="false">
           <thead>
           <tr data-bind="foreach: result.meta">
             <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
