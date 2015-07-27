@@ -222,7 +222,7 @@ from django.utils.translation import ugettext as _
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isAssistVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
-    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
+    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}" style="height:100%"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isAssistVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isAssistVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel">
@@ -283,7 +283,7 @@ from django.utils.translation import ugettext as _
 
 
 <script type="text/html" id="snippet">
-  <div class="snippet-container row-fluid">
+  <div class="snippet-container reveals-actions row-fluid">
     <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
       <h2 class="card-heading simple" data-bind="visible: $root.isEditing() || (! $root.isEditing() && type() != 'text')">
@@ -310,7 +310,7 @@ from django.utils.translation import ugettext as _
         </div>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-        <div class="snippet-actions inline pull-right">
+        <div class="actions inline pull-right">
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0"><i class="fa fa-cog"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
@@ -638,9 +638,9 @@ from django.utils.translation import ugettext as _
     <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
-    <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="snippet-actions run-button btn btn-primary disable-feedback spark-btn pointer">
-      <i class="fa fa-play"></i>
-    </a>
+    <div class="actions">
+      <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
+    </div>
     <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
       <i class="fa fa-stop"></i>
     </a>

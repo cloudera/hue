@@ -276,14 +276,6 @@ body {
   height: 29px;
 }
 
-.snippet-actions {
-    display: none;
-}
-
-.snippet-container:hover .snippet-actions {
-    display: inline-block;
-}
-
 .text-snippet h2 {
   padding-left: 0 !important;
 }

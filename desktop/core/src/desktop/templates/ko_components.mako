@@ -56,11 +56,6 @@ from django.utils.translation import ugettext as _
       color: #737373;
     }
 
-    .assist-column-link:hover,
-    .assist-table-link:hover {
-      color: #338bb8;
-    }
-
     .assist-columns {
       margin-left: 0px;
     }
@@ -69,49 +64,11 @@ from django.utils.translation import ugettext as _
       padding: 6px 5px;
     }
 
-    .assist-column .column-actions,
-    .assist-table .table-actions {
-      opacity: 0;
+    .assist-actions  {
       position:absolute;
       right: 0;
       padding-left:3px;
       background-color: #FFF;
-      transition: opacity 0.2s linear, color 0.2s ease;
-    }
-
-    .column-actions > a,
-    .table-actions > a {
-      color: #D1D1D1;
-      transition: color 0.2s ease;
-    }
-
-    .column-actions > a:hover,
-    .table-actions > a:hover {
-      color: #338bb8;
-    }
-
-    .assist-column:hover .column-actions,
-    .assist-table:hover .table-actions {
-      opacity: 1;
-    }
-
-    .table-actions:hover {
-      color: #338bb8;
-    }
-
-    .assist-action {
-      margin-left: 3px;
-      color: #D1D1D1;
-      opacity:0;
-      transition: opacity 0.2s linear, color 0.2s ease;
-    }
-
-    .assist-container:hover .assist-action {
-      opacity:1;
-    }
-
-    .assist-action:hover {
-      color: #338bb8;
     }
   </style>
 
@@ -160,10 +117,12 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div style="position: relative;">
+    <div class="reveals-actions" style="position: relative; height: 100%">
       <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width: 100%;">
         <li class="nav-header">${_('database')}
-          <i title="${_('Manually refresh the table list')}" class="pull-right pointer assist-action fa fa-refresh" data-bind="click: reloadAssist"></i>
+          <div class="pull-right actions">
+            <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" title="${_('Manually refresh the table list')}"></i></a>
+          </div>
         </li>
         <!-- ko if: assist.mainObjects().length > 0 -->
         <li>
@@ -171,21 +130,23 @@ from django.utils.translation import ugettext as _
           <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
         </li>
         <li class="nav-header" style="margin-top:10px;">${_('tables')}
-          <i class="assist-action pointer pull-right fa fa-search" data-bind="click: toggleSearch"></i>
+          <div class="pull-right actions">
+            <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          </div>
         </li>
         <li>
           <div data-bind="slideVisible: options.isSearchVisible"><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/></div>
           <ul class="assist-tables" data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()">
-            <li class="assist-table" style="position:relative;">
-              <div class="table-actions">
-                <a href="javascript:void(0)" class="preview-sample" data-bind="click: $parent.showTablePreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-                <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parent.showStats(data, null, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+            <li class="assist-table reveals-actions-2nd" style="position:relative;">
+              <div class="actions-2nd assist-actions">
+                <a href="javascript:void(0)" data-bind="click: $parent.showTablePreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+                <a href="javascript:void(0)" data-bind="click: function(data, event) { $parent.showStats(data, null, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
               </div>
               <a class="assist-table-link" href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); }, text: $data }"><span data-bind="text: $data"></span></a>
               <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
                 <ul class="assist-columns" data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()">
-                  <li class="assist-column">
-                    <div class="column-actions">
+                  <li class="assist-column reveals-actions-3rd">
+                    <div class="actions-3rd assist-actions">
                       <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parents[1].showStats($parent, data.name, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
                     </div>
                     <a class="assist-column-link" data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a>
