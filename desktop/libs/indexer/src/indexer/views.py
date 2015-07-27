@@ -16,7 +16,6 @@
 # limitations under the License.
 
 import logging
-import json
 
 from django.utils.translation import ugettext as _
 
