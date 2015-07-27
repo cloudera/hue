@@ -869,7 +869,8 @@ from django.utils.translation import ugettext as _
         $(el).jHueTableExtender({
           fixedHeader: true,
           includeNavigator: false,
-          parentId: snippet.id()
+          parentId: 'snippet_' + snippet.id(),
+          clonedContainerPosition: "absolute"
         });
       },
       "aoColumnDefs": [
@@ -895,7 +896,8 @@ from django.utils.translation import ugettext as _
     $(el).jHueTableExtender({
       fixedHeader: true,
       includeNavigator: false,
-      parentId: snippet.id()
+      parentId: 'snippet_' + snippet.id(),
+      clonedContainerPosition: "absolute"
     });
     $(".dataTables_filter").hide();
     var dataTableEl = $(el).parents(".dataTables_wrapper");
@@ -1187,7 +1189,8 @@ from django.utils.translation import ugettext as _
         _el.jHueTableExtender({
           fixedHeader: true,
           includeNavigator: false,
-          parentId: snippet.id()
+          parentId: 'snippet_' + snippet.id(),
+          clonedContainerPosition: "absolute"
         });
       });
     });

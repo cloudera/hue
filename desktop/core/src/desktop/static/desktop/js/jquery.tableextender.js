@@ -191,8 +191,14 @@
     var clonedTableContainer = $("<div>").width($(plugin.element).outerWidth());
     clonedTable.appendTo(clonedTableContainer);
 
-    var clonedTableVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(plugin.element).parent().width()).css("overflow-x", "hidden").css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
-    clonedTableVisibleContainer.css("position", "fixed");
+    var topPosition;
+    if (plugin.options.clonedContainerPosition == 'absolute') {
+      topPosition = $(plugin.element).parent().position().top - $(window).scrollTop();
+    } else {
+      topPosition = $(plugin.element).parent().offset().top - $(window).scrollTop();
+    }
+    var clonedTableVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(plugin.element).parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
+    clonedTableVisibleContainer.css("position", plugin.options.clonedContainerPosition || "fixed");
 
     clonedTableContainer.appendTo(clonedTableVisibleContainer);
     clonedTableVisibleContainer.prependTo($(plugin.element).parent());
