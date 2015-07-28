@@ -225,7 +225,7 @@ from django.utils.translation import ugettext as _
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-  <div class="right-panel">
+  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -1402,8 +1402,15 @@ from django.utils.translation import ugettext as _
       }, 100);
     });
 
-    $(document).on("puma", function (e, snippet) {
-      forceChartDraws();
+    var hideTimeout = -1;
+    $(document).on("hideAutocomplete", function () {
+      window.clearTimeout(hideTimeout);
+      hideTimeout = window.setTimeout(function () {
+        $aceAutocomplete = $(".ace_editor.ace_autocomplete");
+        if ($aceAutocomplete.is(":visible")) {
+          $aceAutocomplete.hide();
+        }
+      }, 100);
     });
 
     function forceChartDraws() {

@@ -68,10 +68,6 @@ ${ koComponents.assistPanel() }
   });
 
 
-  huePubSub.subscribe('assist.dblClickItem', function addToActiveCodemirror(text) {
-    // TODO: set content of Ace editor
-  });
-
   huePubSub.subscribe('assist.mainObjectChange', function (db) {
     aceAutocomplete.setDatabase(db);
   });

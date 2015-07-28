@@ -56,10 +56,6 @@ ${ koComponents.assistPanel() }
     baseURL: "${ autocomplete_base_url | n,unicode }"
   });
 
-  huePubSub.subscribe('assist.dblClickItem', function addToActiveCodemirror(text) {
-    // TODO: set content of Ace editor
-  });
-
   huePubSub.subscribe('assist.mainObjectChange', function (db) {
     aceAutocomplete.setDatabase(db);
   });
