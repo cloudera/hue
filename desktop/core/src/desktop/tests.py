@@ -21,7 +21,6 @@ import logging
 import os
 import subprocess
 import sys
-import tempfile
 import time
 
 import desktop
@@ -39,9 +38,10 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 
+from beeswax.conf import HIVE_SERVER_HOST
+from pig.models import PigScript
 from useradmin.models import GroupPermission
 
-from beeswax.conf import HIVE_SERVER_HOST
 from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
@@ -49,9 +49,8 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document, Document2
+from desktop.models import Document, Document2, get_data_link
 from desktop.views import check_config, home
-from pig.models import PigScript
 
 
 def setup_test_environment():
@@ -935,3 +934,15 @@ def test_session_secure_cookie():
   finally:
     for reset in resets:
       reset()
+
+
+def test_get_data_link():
+  assert_equal(None, get_data_link({}))
+  assert_equal('gethue.com', get_data_link({'type': 'link', 'link': 'gethue.com'}))
+
+  assert_equal('/hbase/#Cluster/document_demo/query/20150527', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}))
+  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
+  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1:c1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
+
+  assert_equal('/filebrowser/view/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
+  assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))

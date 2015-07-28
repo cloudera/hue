@@ -28,8 +28,8 @@ from django.db import models
 from django.utils.html import escape
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-
 from desktop.lib.i18n import smart_unicode, smart_str
+from desktop.models import get_data_link
 
 from libsolr.api import SolrApi
 
@@ -812,7 +812,12 @@ def augment_solr_response(response, collection, query):
       doc[field] = escaped_value
 
     if not query.get('download'):
-      doc['externalLink'] = doc.get('doc-link') in ['hbase', 'hdfs'] and 'doc-link' in doc.keys()
+      link = None
+      if 'link-meta' in doc.keys():
+        meta = json.loads(doc['link-meta'])
+        link = get_data_link(meta)
+
+      doc['externalLink'] = link
       doc['details'] = []
 
   highlighted_fields = response.get('highlighting', {}).keys()

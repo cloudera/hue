@@ -806,3 +806,24 @@ class Document2(models.Model):
 
   def can_read_or_exception(self, user):
     self.doc.get().can_read_or_exception(user)
+
+
+def get_data_link(meta):
+  link = None
+
+  if not meta.get('type'):
+    pass
+  elif meta['type'] == 'hbase':
+    link = '/hbase/#Cluster/%(table)s/query/%(row_key)s' % meta
+    if 'col' in meta:
+      link += '[%(fam)s:%(col)s]' % meta
+    elif 'fam' in meta:
+      link += '[%(fam)s]' % meta
+  elif meta['type'] == 'hdfs':
+    link = '/filebrowser/view%(path)s' % meta # Could add a byte #
+  elif meta['type'] == 'link':
+    link = meta['link']
+  elif meta['type'] == 'hive':
+    link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
+
+  return link

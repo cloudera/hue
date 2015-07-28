@@ -622,7 +622,9 @@ ${ dashboard.layout_skeleton() }
                       <a href="javascript:void(0)" data-bind="click: $root.updateDocument">
                         <i class="fa fa-save" data-bind="visible: showEdit"></i>
                       </a>
-                      <i class="fa fa-external-link" data-bind="visible: externalLink"></i>
+                      <a href="javascript:void(0)" data-bind="attr: { href: externalLink}" target="_blank">
+                        <i class="fa fa-external-link" data-bind="visible: externalLink"></i>
+                      </a>
                       <table>
                         <tbody data-bind="foreach: details">
                           <tr>
