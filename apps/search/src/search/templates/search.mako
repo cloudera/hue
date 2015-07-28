@@ -1871,6 +1871,7 @@ ${ dashboard.import_layout(True) }
 
 <script src="${ static('search/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('search/js/lzstring.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>

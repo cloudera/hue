@@ -365,6 +365,7 @@ var FieldAnalysis = function (vm, field_name) {
       collection: ko.mapping.toJSON(vm.collection),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         if (data.terms != null) {
           $.each(data.terms, function (key, val) {
@@ -379,7 +380,7 @@ var FieldAnalysis = function (vm, field_name) {
         $(document).trigger("error", data.message);
       }
       self.isLoading(false);
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -392,6 +393,7 @@ var FieldAnalysis = function (vm, field_name) {
       query: ko.mapping.toJSON(vm.query),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         if (data.stats.stats.stats_fields[self.name()] != null) {
           $.each(data.stats.stats.stats_fields[self.name()], function (key, val) {
@@ -406,7 +408,7 @@ var FieldAnalysis = function (vm, field_name) {
         $(document).trigger("error", data.message);
       }
       self.isLoading(false);
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -649,12 +651,13 @@ var Collection = function (vm, collection) {
     logGA('add_facet/' + facet_json.widgetType);
 
     $.post("/search/template/new_facet", {
-      "collection": ko.mapping.toJSON(self),
-        "id": facet_json.widget_id,
-        "label": facet_json.name,
-        "field": facet_json.name,
-        "widget_type": facet_json.widgetType
+        collection: ko.mapping.toJSON(self),
+        id: facet_json.widget_id,
+        label: facet_json.name,
+        field: facet_json.name,
+        widget_type: facet_json.widgetType
       }, function (data) {
+        data = JSON.bigdataParse(data);
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
           facet.properties.limit.subscribe(function () {
@@ -675,7 +678,7 @@ var Collection = function (vm, collection) {
         } else {
           $(document).trigger("error", data.message);
         }
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }, "text").fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.addPivotFacetValue = function(facet) {
@@ -857,6 +860,7 @@ var Collection = function (vm, collection) {
     $.post("/search/get_collection", {
         name: self.name()
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         self.idField(data.collection.collection.idField);
         self.template.template(data.collection.collection.template.template);
@@ -871,7 +875,7 @@ var Collection = function (vm, collection) {
 
         self.syncDynamicFields();
       }
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }, "text").fail(function (xhr, textStatus, errorThrown) {});
   };
 
   function diff(A, B) {
@@ -917,6 +921,7 @@ var Collection = function (vm, collection) {
     $.post("/search/get_collection", {
         name: self.name()
       }, function (data) {
+        data = JSON.bigdataParse(data);
         if (data.status == 0) {
           self.idField(data.collection.collection.idField);
           syncArray(self.template.fieldsAttributes, data.collection.collection.template.fieldsAttributes, false);
@@ -924,18 +929,19 @@ var Collection = function (vm, collection) {
         }
         // After sync the dynamic fields
         self.syncDynamicFields()
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }, "text").fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.syncDynamicFields = function () {
     $.post("/search/index/fields/dynamic", {
         name: self.name()
       }, function (data) {
+        data = JSON.bigdataParse(data);
         if (data.status == 0) {
           syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);
           syncArray(self.fields, data.fields, true);
         }
-    }).fail(function (xhr, textStatus, errorThrown) {});
+    }, "text").fail(function (xhr, textStatus, errorThrown) {});
   };
 
   self.toggleSortColumnGridLayout = function (template_field) {
@@ -1086,6 +1092,7 @@ var NewTemplate = function (vm, initial) {
         collection: ko.mapping.toJSON(vm.collection),
         show_all: ko.mapping.toJSON(vm.showCores)
       }, function (data) {
+        data = JSON.bigdataParse(data);
         if (data.status == 0) {
           // Sync new and old names
           $.each(data.collection, function(index, name) {
@@ -1106,7 +1113,7 @@ var NewTemplate = function (vm, initial) {
         else {
           $(document).trigger("error", data.message);
         }
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     }).done(function() {
       vm.isSyncingCollections(false);
@@ -1308,7 +1315,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             facet: ko.mapping.toJSON(facet),
             qdata: ko.mapping.toJSON(qdata),
             multiQ: multiQ
-          }, function (data) {return data});
+          }, function (data) { return JSON.bigdataParse(data); },
+          "text");
       });
     }
 
@@ -1327,6 +1335,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         query: ko.mapping.toJSON(self.query),
         layout: ko.mapping.toJSON(self.columns)
       }, function (data) {
+        data = JSON.bigdataParse(data);
 
         if (typeof callback != undefined && callback != null){
           callback(data);
@@ -1410,7 +1419,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           }
           self.resultsHash = _resultsHash;
         }
-      })
+      }, "text")
       ].concat(multiQs)
     )
     .done(function() {
@@ -1483,6 +1492,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       collection: ko.mapping.toJSON(self.collection),
       id: doc.id
     }, function (data) {
+      data = JSON.bigdataParse(data);
       var details = [];
       doc.details.removeAll();
       if (data.status == 0) {
@@ -1512,7 +1522,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       doc.details(details);
       doc.originalDetails(ko.toJSON(doc.details()));
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -1523,6 +1533,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       document: ko.mapping.toJSON(doc),
       id: doc.id
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         doc.showEdit(false);
         doc.originalDetails(ko.toJSON(doc.details()));
@@ -1530,7 +1541,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       else {
         $(document).trigger("error", data.message);
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -1568,6 +1579,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       collection: ko.mapping.toJSON(self.collection),
       layout: ko.mapping.toJSON(self.columns)
     }, function (data) {
+      data = JSON.bigdataParse(data);
+
       if (data.status == 0) {
         self.collection.id(data.id);
         $(document).trigger("info", data.message);
@@ -1578,7 +1591,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       else {
         $(document).trigger("error", data.message);
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
