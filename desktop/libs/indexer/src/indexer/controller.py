@@ -249,20 +249,24 @@ class CollectionManagerController(object):
       table = db.get_table(database, table)
       hql = "SELECT %s FROM `%s.%s` %s" % (','.join(columns), database, table.name, db._get_browse_limit_clause(table))
       query = dbms.hql_query(hql)
-      handle = db.execute_and_wait(query)
 
-      if handle:
-        result = db.fetch(handle, rows=100)
-        db.close(handle)
+      try:
+        handle = db.execute_and_wait(query)
 
-        dataset = tablib.Dataset()
-        dataset.append(columns)
-        for row in result.rows():
-          dataset.append(row)
+        if handle:
+          result = db.fetch(handle, rows=100)
+          db.close(handle)
 
-        if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
-          raise PopupException(_('Could not update index. Check error logs for more info.'))
-      else:
-        raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
+          dataset = tablib.Dataset()
+          dataset.append(columns)
+          for row in result.rows():
+            dataset.append(row)
+
+          if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
+            raise PopupException(_('Could not update index. Check error logs for more info.'))
+        else:
+          raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
+      except Exception, e:
+        raise PopupException(_('Could not update index.'), detail=e)
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)

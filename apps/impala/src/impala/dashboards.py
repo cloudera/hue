@@ -21,9 +21,9 @@ import json
 
 from math import log
 
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
-from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.models import Document2
 
@@ -57,80 +57,82 @@ def query(request):
     'status': -1,
     'data': {}
   }
-  
-  dashboard = json.loads(request.POST['dashboard'])
-  fqs = json.loads(request.POST['query'])['fqs']
 
-  database = dashboard['properties'][0]['database']
-  table = dashboard['properties'][0]['table']
-  
-  
-  if fqs:
-    filters = ' AND '.join(['%s = %s' % (fq['field'], value) for fq in fqs for value in fq['filter']])
-  else:
-    filters = ''
+  try:
+    dashboard = json.loads(request.POST['dashboard'])
+    fqs = json.loads(request.POST['query'])['fqs']
 
-  if 'facet' in request.POST:
-    facet = json.loads(request.POST.get('facet'))
-    slot = None
+    database = dashboard['properties'][0]['database']
+    table = dashboard['properties'][0]['table']
 
-    if facet['type'] == 'field':
-      template = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s"
-    elif facet['type'] == 'range':
-      slot = (facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit']
-      template = """select cast(%(field)s / %(slot)s AS int) * %(slot)s, count(*) AS top, cast(%(field)s / %(slot)s as int) as s 
-       FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL GROUP BY s ORDER BY s DESC LIMIT %(limit)s"""    
-    else:            
-      # Simple Top
-      template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s"
-    
-    facet = json.loads(request.POST['facet'])
-    hql = template % {
-        'database': database,
-        'table': table,
-        'limit': facet['properties']['limit'],
-        'field': facet['field'],
-        'filters': (' AND ' + filters) if filters else '',
-        'slot': slot
-    }
-    result['id'] = facet['id']
-    result['field'] = facet['field']
-    fields = [fq['field'] for fq in fqs]
-    result['selected'] = facet['field'] in fields
-  else:
-    dashboard['resultsetSelectedFields'] = map(lambda f: '`%s`' % f if f in ('date',) else f, dashboard['resultsetSelectedFields'])
-    fields = ', '.join(dashboard['resultsetSelectedFields']) if dashboard['resultsetSelectedFields'] else '*'
-    hql = "SELECT %(fields)s FROM %(database)s.%(table)s" % {
-        'database': database, 
-        'table': table,
-        'fields': fields
-    }
-    if filters:
-      hql += ' WHERE ' + filters
-    hql += ' LIMIT 100'
+    if fqs:
+      filters = ' AND '.join(['%s = %s' % (fq['field'], value) for fq in fqs for value in fq['filter']])
+    else:
+      filters = ''
 
-  query_server = get_query_server_config(name='impala')
-  db = dbms.get(request.user, query_server=query_server)
-  
-  print hql
-  query = hql_query(hql)  
-  handle = db.execute_and_wait(query, timeout_sec=35.0)
-
-  if handle:
-    data = db.fetch(handle, rows=100)
     if 'facet' in request.POST:
       facet = json.loads(request.POST.get('facet'))
-      result['type'] = facet['type']
-      if facet['type'] == 'top':
-        result['data'] = [{"value": row[0], "count": None, "selected": False, "cat": facet['field']} for row in data.rows()]
-      else:
-        result['data'] = [{"value": row[0], "count": row[1], "selected": False, "cat": facet['field']} for row in data.rows()]
-    else:
-      result['data'] = list(data.rows())
+      slot = None
 
-    result['cols'] = list(data.cols())
-    result['status'] = 0
-    db.close(handle)
+      if facet['type'] == 'field':
+        template = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s"
+      elif facet['type'] == 'range':
+        slot = (facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit']
+        template = """select cast(%(field)s / %(slot)s AS int) * %(slot)s, count(*) AS top, cast(%(field)s / %(slot)s as int) as s
+         FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL GROUP BY s ORDER BY s DESC LIMIT %(limit)s"""
+      else:
+        # Simple Top
+        template = "SELECT DISTINCT %(field)s FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s ORDER BY %(field)s DESC LIMIT %(limit)s"
+
+      facet = json.loads(request.POST['facet'])
+      hql = template % {
+          'database': database,
+          'table': table,
+          'limit': facet['properties']['limit'],
+          'field': facet['field'],
+          'filters': (' AND ' + filters) if filters else '',
+          'slot': slot
+      }
+      result['id'] = facet['id']
+      result['field'] = facet['field']
+      fields = [fq['field'] for fq in fqs]
+      result['selected'] = facet['field'] in fields
+    else:
+      dashboard['resultsetSelectedFields'] = map(lambda f: '`%s`' % f if f in ('date',) else f, dashboard['resultsetSelectedFields'])
+      fields = ', '.join(dashboard['resultsetSelectedFields']) if dashboard['resultsetSelectedFields'] else '*'
+      hql = "SELECT %(fields)s FROM %(database)s.%(table)s" % {
+          'database': database,
+          'table': table,
+          'fields': fields
+      }
+      if filters:
+        hql += ' WHERE ' + filters
+      hql += ' LIMIT 100'
+
+    query_server = get_query_server_config(name='impala')
+    db = dbms.get(request.user, query_server=query_server)
+
+    query = hql_query(hql)
+    handle = db.execute_and_wait(query, timeout_sec=35.0)
+
+    if handle:
+      data = db.fetch(handle, rows=100)
+      if 'facet' in request.POST:
+        facet = json.loads(request.POST.get('facet'))
+        result['type'] = facet['type']
+        if facet['type'] == 'top':
+          result['data'] = [{"value": row[0], "count": None, "selected": False, "cat": facet['field']} for row in data.rows()]
+        else:
+          result['data'] = [{"value": row[0], "count": row[1], "selected": False, "cat": facet['field']} for row in data.rows()]
+      else:
+        result['data'] = list(data.rows())
+
+      result['cols'] = list(data.cols())
+      result['status'] = 0
+      db.close(handle)
+  except Exception, e:
+    LOG.exception(e)
+    result['message'] = force_unicode(e)
 
   return JsonResponse(result)
 

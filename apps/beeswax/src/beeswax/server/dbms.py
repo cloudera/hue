@@ -24,7 +24,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
@@ -125,7 +125,9 @@ class HiveServer2Dbms(object):
   def get_tables(self, database='default', table_names='*'):
     hql = "SHOW TABLES IN `%s` '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
     query = hql_query(hql)
-    handle = self.execute_and_wait(query, timeout_sec=15.0)
+    timeout = SERVER_CONN_TIMEOUT.get()
+
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
 
     if handle:
       result = self.fetch(handle, rows=5000)
@@ -495,10 +497,17 @@ class HiveServer2Dbms(object):
       curr = time.time()
 
     try:
+      msg = "The query timed out after %(timeout)d seconds, canceled query [%(query)s]..." % \
+              {'timeout': timeout_sec, 'query': query.hql_query[:40]}
+      LOG.exception(msg)
       self.cancel_operation(handle)
+      raise QueryServerException(Exception(msg), message=msg)
     except:
-      LOG.exception('failed to cancel operation')
+      msg = "Failed to cancel query [%(query)s]..." % {'query': query.hql_query[:40]}
+      LOG.exception(msg)
       self.close_operation(handle)
+      raise QueryServerException(Exception(msg), message=msg)
+
     return None
 
 

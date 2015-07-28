@@ -105,19 +105,22 @@ def show_tables(request, database=None):
 
   db = dbms.get(request.user)
 
-  databases = db.get_databases()
+  try:
+    databases = db.get_databases()
 
-  if database not in databases:
-    database = 'default'
+    if database not in databases:
+      database = 'default'
 
-  if request.method == 'POST':
-    db_form = DbForm(request.POST, databases=databases)
-    if db_form.is_valid():
-      database = db_form.cleaned_data['database']
-  else:
-    db_form = DbForm(initial={'database': database}, databases=databases)
+    if request.method == 'POST':
+      db_form = DbForm(request.POST, databases=databases)
+      if db_form.is_valid():
+        database = db_form.cleaned_data['database']
+    else:
+      db_form = DbForm(initial={'database': database}, databases=databases)
 
-  tables = db.get_tables(database=database)
+    tables = db.get_tables(database=database)
+  except Exception, e:
+    raise PopupException(_('Failed to retrieve tables for database % s' % database), detail=e)
 
   resp = render("tables.mako", request, {
     'breadcrumbs': [

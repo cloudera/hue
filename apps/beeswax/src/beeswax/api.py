@@ -114,9 +114,9 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
 
         inner_type = _get_complex_inner_type(current, extended_type, simple_type)
         response.update(inner_type)
-  except TTransportException, tx:
+  except (QueryServerException, TTransportException), e:
     response['code'] = 503
-    response['error'] = tx.message
+    response['error'] = e.message
   except Exception, e:
     LOG.warn('Autocomplete data fetching error %s.%s: %s' % (database, table, e))
     response['code'] = 500
@@ -672,14 +672,17 @@ def get_table_stats(request, database, table, column=None):
 
   response = {'status': -1, 'message': '', 'redirect': ''}
 
-  if column is not None:
-    stats = db.get_table_columns_stats(database, table, column)
-  else:
-    table = db.get_table(database, table)
-    stats = table.stats
+  try:
+    if column is not None:
+      stats = db.get_table_columns_stats(database, table, column)
+    else:
+      table = db.get_table(database, table)
+      stats = table.stats
 
-  response['stats'] = stats
-  response['status'] = 0
+    response['stats'] = stats
+    response['status'] = 0
+  except QueryServerException, e:
+    response['message'] = _('Failed to get table stats for table %s.%s: %s' % (database, table, e.message))
 
   return JsonResponse(response)
 
@@ -691,10 +694,13 @@ def get_top_terms(request, database, table, column, prefix=None):
 
   response = {'status': -1, 'message': '', 'redirect': ''}
 
-  terms = db.get_top_terms(database, table, column, prefix=prefix, limit=int(request.GET.get('limit', 30)))
+  try:
+    terms = db.get_top_terms(database, table, column, prefix=prefix, limit=int(request.GET.get('limit', 30)))
 
-  response['terms'] = terms
-  response['status'] = 0
+    response['terms'] = terms
+    response['status'] = 0
+  except QueryServerException, e:
+    response['message'] = _('Failed to get table stats for table %s.%s: %s' % (database, table, e.message))
 
   return JsonResponse(response)
 
