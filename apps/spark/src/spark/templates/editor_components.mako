@@ -246,7 +246,7 @@ from django.utils.translation import ugettext as _
               $('.snippet-body').slideUp('fast', function () {
                 $('.sortable-snippets').sortable('refreshPositions')
               });
-              var $element = $(event.toElement);
+              var $element = $(event.target);
               var _par = $('<div>')
                 .addClass('card-widget snippet-move-helper')
                 .width($element.parents('.snippet').width());
