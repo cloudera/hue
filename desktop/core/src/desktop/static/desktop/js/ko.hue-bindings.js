@@ -647,7 +647,7 @@ ko.bindingHandlers.daterangepicker = {
 ko.bindingHandlers.splitDraggable = {
   init: function (element, valueAccessor) {
     var options = ko.unwrap(valueAccessor());
-    var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? $.totalStorage(options.appName + "_left_panel_width") : 200;
+    var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? $.totalStorage(options.appName + "_left_panel_width") : 250;
 
     var containerSelector = options.containerSelector || ".panel-container";
     var leftPanelSelector = options.leftPanelSelector || ".left-panel";

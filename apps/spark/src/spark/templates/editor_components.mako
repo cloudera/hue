@@ -222,7 +222,7 @@ from django.utils.translation import ugettext as _
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
-    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}" style="height:100%"></div>
+    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel">

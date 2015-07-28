@@ -62,13 +62,19 @@ from django.utils.translation import ugettext as _
 
     .assist-columns > li {
       padding: 6px 5px;
+      white-space: nowrap;
     }
 
     .assist-actions  {
       position:absolute;
-      right: 0;
+      right: 4px;
       padding-left:3px;
       background-color: #FFF;
+    }
+
+    .assist .nav-header {
+      margin-right: 0 !important;
+      padding-right: 4px !important;
     }
   </style>
 
@@ -117,8 +123,8 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div class="reveals-actions" style="position: relative; height: 100%">
-      <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width: 100%;">
+    <div class="reveals-actions" style="position: relative; width:100%">
+      <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
         <li class="nav-header">${_('database')}
           <div class="pull-right hover-actions">
             <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" title="${_('Manually refresh the table list')}"></i></a>
@@ -149,7 +155,7 @@ from django.utils.translation import ugettext as _
                     <div class="hover-actions-3rd assist-actions">
                       <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parents[1].showStats($parent, data.name, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
                     </div>
-                    <a class="assist-column-link" data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a>
+                    <a class="assist-column-link" data-bind="attr: {'title': name + ' (' + type + ')' + (comment ? ' ' + comment : '') }" style="padding-left:10px" href="javascript:void(0)"><span data-bind="text: name + ' (' + type + ')', event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a>
                   </li>
                 </ul>
               </div>
@@ -235,33 +241,6 @@ from django.utils.translation import ugettext as _
 
         self.modalItem = ko.observable();
         self.analysisStats = ko.observable();
-
-        self.secondLevelTitle = function(level) {
-          var _title = "";
-
-          if (level.comment && needsTruncation(level)) {
-            _title = level.name + " (" + level.type + "): " + level.comment;
-          } else if (needsTruncation(level)) {
-            _title = level.name + " (" + level.type + ")";
-          } else if (level.comment) {
-            _title = level.comment;
-          }
-          return _title;
-        };
-
-        var needsTruncation = function(level) {
-          return (level.name.length + level.type.length) > 20;
-        };
-
-        self.truncateSecondLevel = function(level) {
-          var escapeString = function (str) {
-            return $("<span>").text(str).html().trim()
-          };
-          if (needsTruncation(level)) {
-            return escapeString(level.name + " (" + level.type + ")").substr(0, 20) + "&hellip;";
-          }
-          return escapeString(level.name + " (" + level.type + ")");
-        };
 
         self.loadAssistMain = function(force) {
           self.assist.options.onDataReceived = function (data) {
