@@ -110,9 +110,9 @@ from django.utils.translation import ugettext as _
       </div>
       <div class="tab-pane" id="columnAnalysisTerms" style="text-align: left">
         <i style="margin: 5px;" data-bind="visible: loadingTerms" class='fa fa-spinner fa-spin'></i>
-        <div class="alert" data-bind="visible: !loadingTerms() && terms().length == 0">${ _('There are no terms to be shown') }</div>
+        <div class="alert" data-bind="visible: ! loadingTerms() && terms().length == 0">${ _('There are no terms to be shown') }</div>
         <div class="content">
-          <table class="table table-striped">
+          <table class="table table-striped" data-bind="visible: ! loadingTerms()">
             <tbody data-bind="foreach: terms">
               <tr><td data-bind="text: name"></td><td style="width: 40px"><div class="progress"><div class="bar-label" data-bind="text: count"></div><div class="bar bar-info" style="margin-top: -20px;" data-bind="style: { 'width' : percent + '%' }"></div></div></td></tr>
             </tbody>
@@ -126,8 +126,8 @@ from django.utils.translation import ugettext as _
     <div class="reveals-actions" style="position: relative; width:100%">
       <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
         <li class="nav-header">${_('database')}
-          <div class="pull-right hover-actions">
-            <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" title="${_('Manually refresh the table list')}"></i></a>
+          <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
+            <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
           </div>
         </li>
         <!-- ko if: assist.mainObjects().length > 0 -->
@@ -198,6 +198,7 @@ from django.utils.translation import ugettext as _
       <div class="arrow"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
+        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
         <span class="pull-right stats-warning muted" data-bind="visible: inaccurate" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
         <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
@@ -220,6 +221,7 @@ from django.utils.translation import ugettext as _
         var self = this;
 
         self.assistAppName = params.assistAppName || "beeswax";
+        self.reloading = ko.observable(false);
         self.options = ko.mapping.fromJS($.extend({
           isSearchVisible: false,
           lastSelectedDb: null
@@ -244,6 +246,7 @@ from django.utils.translation import ugettext as _
 
         self.loadAssistMain = function(force) {
           self.assist.options.onDataReceived = function (data) {
+            self.reloading(false);
             if (data.databases) {
               self.assist.mainObjects(data.databases);
               if (force) {
@@ -262,6 +265,7 @@ from django.utils.translation import ugettext as _
             }
           };
           self.assist.options.onError = function() {
+            self.reloading(false);
             self.assist.isLoading(false);
           };
           self.assist.getData(null, force);
@@ -310,6 +314,7 @@ from django.utils.translation import ugettext as _
         };
 
         self.reloadAssist = function() {
+          self.reloading(true);
           self.loadAssistMain(true);
         };
 
@@ -346,12 +351,51 @@ from django.utils.translation import ugettext as _
           self.table = table;
           self.column = column;
           self.loading = ko.observable(false);
+          self.refreshing = ko.observable(false);
           self.loadingTerms = ko.observable(false);
           self.inaccurate = ko.observable(false);
           self.statRows = ko.observableArray();
           self.terms = ko.observableArray();
 
+          self.refresh = function () {
+            if (self.refreshing()) {
+              return;
+            }
+            self.refreshing(true);
+
+            var pollRefresh = function (url) {
+              $.post(url, function (data) {
+                if (data.isSuccess) {
+                  self.refreshing(false);
+                  self.fetchData();
+                } else if (data.isFailure) {
+                  $(document).trigger("error", data.message);
+                } else {
+                  window.setTimeout(function () {
+                    pollRefresh(url);
+                  }, 1000)
+                }
+              }).fail(function () {
+                self.refreshing(false);
+                $(document).trigger("error", options.errorLabel);
+              });
+            };
+
+            $.post("/" + assistAppName + "/api/analyze/" + database + "/" + table + "/", function (data) {
+              if (data.status == 0 && data.watch_url) {
+                pollRefresh(data.watch_url);
+              } else {
+                $(document).trigger("error", options.errorLabel);
+              }
+            }).fail(function () {
+              $(document).trigger("error", options.errorLabel);
+            });
+          };
+
           self.fetchTerms = function () {
+            if (this.column == null) {
+              return;
+            }
             self.loadingTerms(true);
             $.ajax({
               url: "/" + assistAppName + "/api/table/" + database + "/" + table + "/terms/" + column + "/",
@@ -419,12 +463,10 @@ from django.utils.translation import ugettext as _
                 self.loading(false);
               }
             });
+            self.fetchTerms();
           };
 
           self.fetchData();
-          if (this.column != null) {
-            self.fetchTerms();
-          }
         }
 
         var lastOffset = { top: -1, left: -1 };
