@@ -254,8 +254,8 @@ from django.utils.translation import ugettext as _
                 .addClass('card-heading')
                 .html($element.parents('h2').html())
                 .appendTo(_par)
-                .find('.actions')
-                .removeClass('actions');
+                .find('.hover-actions')
+                .removeClass('hover-actions');
               _par.css('height', '100px');
               return _par;
             }
@@ -340,7 +340,7 @@ from django.utils.translation import ugettext as _
         </div>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-        <div class="actions inline pull-right">
+        <div class="hover-actions inline pull-right">
           <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0"><i class="fa fa-cog"></i></a>
@@ -669,7 +669,7 @@ from django.utils.translation import ugettext as _
     <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
-    <div class="actions">
+    <div class="hover-actions">
       <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
     </div>
     <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">

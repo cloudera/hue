@@ -120,7 +120,7 @@ from django.utils.translation import ugettext as _
     <div class="reveals-actions" style="position: relative; height: 100%">
       <ul class="nav nav-list" style="float:left; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width: 100%;">
         <li class="nav-header">${_('database')}
-          <div class="pull-right actions">
+          <div class="pull-right hover-actions">
             <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" title="${_('Manually refresh the table list')}"></i></a>
           </div>
         </li>
@@ -130,7 +130,7 @@ from django.utils.translation import ugettext as _
           <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
         </li>
         <li class="nav-header" style="margin-top:10px;">${_('tables')}
-          <div class="pull-right actions">
+          <div class="pull-right hover-actions">
             <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           </div>
         </li>
@@ -138,7 +138,7 @@ from django.utils.translation import ugettext as _
           <div data-bind="slideVisible: options.isSearchVisible"><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/></div>
           <ul class="assist-tables" data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()">
             <li class="assist-table reveals-actions-2nd" style="position:relative;">
-              <div class="actions-2nd assist-actions">
+              <div class="hover-actions-2nd assist-actions">
                 <a href="javascript:void(0)" data-bind="click: $parent.showTablePreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
                 <a href="javascript:void(0)" data-bind="click: function(data, event) { $parent.showStats(data, null, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
               </div>
@@ -146,7 +146,7 @@ from django.utils.translation import ugettext as _
               <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
                 <ul class="assist-columns" data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()">
                   <li class="assist-column reveals-actions-3rd">
-                    <div class="actions-3rd assist-actions">
+                    <div class="hover-actions-3rd assist-actions">
                       <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parents[1].showStats($parent, data.name, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
                     </div>
                     <a class="assist-column-link" data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a>

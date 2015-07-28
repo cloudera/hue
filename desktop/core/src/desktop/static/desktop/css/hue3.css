@@ -2001,29 +2001,29 @@ pre {
   white-space: nowrap;
 }
 
-.reveals-actions:hover .actions,
-.reveals-actions-2nd:hover .actions-2nd,
-.reveals-actions-3rd:hover .actions-3rd {
+.reveals-actions:hover .hover-actions,
+.reveals-actions-2nd:hover .hover-actions-2nd,
+.reveals-actions-3rd:hover .hover-actions-3rd {
   opacity: 1;
 }
 
-.actions,
-.actions-2nd,
-.actions-3rd {
+.hover-actions,
+.hover-actions-2nd,
+.hover-actions-3rd {
   display: inline-block;
   opacity: 0;
   transition: opacity 0.2s linear;
 }
 
-.actions > a,
-.actions-2nd > a,
-.actions-3rd > a {
+.hover-actions > a,
+.hover-actions-2nd > a,
+.hover-actions-3rd > a {
   color: #D1D1D1;
   transition: color 0.2s ease;
 }
 
-.actions > a:hover,
-.actions-2nd > a:hover,
-.actions-3rd > a:hover {
+.hover-actions > a:hover,
+.hover-actions-2nd > a:hover,
+.hover-actions-3rd > a:hover {
   color: #338bb8;
 }
