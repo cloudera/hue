@@ -91,12 +91,12 @@ from django.utils.translation import ugettext as _
   </script>
 
   <script type="text/html" id="assist-panel-column-stats">
-    <div class="pull-right hide filter">
-      <input id="columnAnalysisTermsFilter" type="text" placeholder="${ _('Prefix filter...') }"/>
+    <div class="pull-right filter" data-bind="visible: termsTabActive" style="display:none;">
+      <input type="text" data-bind="textInput: prefixFilter" placeholder="${ _('Prefix filter...') }"/>
     </div>
     <ul class="nav nav-tabs" role="tablist">
-      <li class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
-      <li><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
+      <li data-bind="click: function() { termsTabActive(false) }"class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
+      <li data-bind="click: function() { termsTabActive(true) }"><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
@@ -356,6 +356,12 @@ from django.utils.translation import ugettext as _
           self.inaccurate = ko.observable(false);
           self.statRows = ko.observableArray();
           self.terms = ko.observableArray();
+          self.termsTabActive = ko.observable(false);
+          self.prefixFilter = ko.observable().extend({'throttle': 500});
+
+          self.prefixFilter.subscribe(function(newValue) {
+            self.fetchTerms();
+          });
 
           self.refresh = function () {
             if (self.refreshing()) {
@@ -397,8 +403,13 @@ from django.utils.translation import ugettext as _
               return;
             }
             self.loadingTerms(true);
+            var url = "/" + assistAppName + "/api/table/" + database + "/" + table + "/terms/" + column + "/";
+
+            if (self.prefixFilter()) {
+              url += self.prefixFilter();
+            }
             $.ajax({
-              url: "/" + assistAppName + "/api/table/" + database + "/" + table + "/terms/" + column + "/",
+              url: url,
               data: {},
               beforeSend: function (xhr) {
                 xhr.setRequestHeader("X-Requested-With", "Hue");
