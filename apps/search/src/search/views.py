@@ -349,6 +349,37 @@ def get_document(request):
 
 
 @allow_viewer_only
+def update_document(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    document = json.loads(request.POST.get('document', '{}'))
+    doc_id = request.POST.get('id')
+
+    if document['hasChanged']:
+      edits = {
+          "id": doc_id,
+      }
+      version = None # If there is a version, use it to avoid potential concurrent update conflicts
+
+      for field in document['details']:
+        if field['hasChanged']:
+          edits[field['key']] = {"set": field['value']}
+#        if field['key'] == '_version_': # Commented until HUE-2870
+#          version = field['value']
+
+      if SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version):
+        result['status'] = 0
+        result['message'] = _('Document successfully updated.')
+
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
 def get_stats(request):
   result = {'status': -1, 'message': 'Error'}
 

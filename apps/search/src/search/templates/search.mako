@@ -41,6 +41,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
     <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }">
       <i class="fa fa-expand"></i>
     </a>
+    &nbsp;&nbsp;
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
@@ -615,11 +616,21 @@ ${ dashboard.layout_skeleton() }
                   <!-- /ko -->
                   <!-- ko if: $data.details().length > 0 -->
                     <div class="document-details">
+                      <a href="javascript:void(0)" data-bind="click: function() { showEdit(true); }">
+                        <i class="fa fa-edit" data-bind="visible: ! showEdit()"></i>
+                      </a>
+                      <a href="javascript:void(0)" data-bind="click: $root.updateDocument">
+                        <i class="fa fa-save" data-bind="visible: showEdit"></i>
+                      </a>
+                      <i class="fa fa-external-link" data-bind="visible: externalLink"></i>
                       <table>
                         <tbody data-bind="foreach: details">
                           <tr>
                              <th style="text-align: left; white-space: nowrap; vertical-align:top; padding-right:20px" data-bind="text: key"></th>
-                             <td width="100%" data-bind="text: value"></td>
+                             <td width="100%">
+                               <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+                               <input data-bind="value: value, visible: $parent.showEdit" class="input-xxlarge"></input>
+                             </td>
                           </tr>
                         </tbody>
                       </table>

@@ -1364,9 +1364,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               var leafletmap = {};
               $.each(data.response.docs, function (index, item) {
                 var row = [];
-                var _showDetails = item.showDetails;
+                var _externalLink = item.externalLink;
                 var _details = item.details;
-                delete item["showDetails"];
+                delete item["externalLink"];
                 delete item["details"];
                 var fields = self.collection.template.fieldsSelected();
                 // Display selected fields or whole json document
@@ -1387,8 +1387,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 var doc = {
                   'id': item[self.collection.idField()],
                   'row': row,
-                  'showDetails': ko.observable(_showDetails),
+                  'showEdit': ko.observable(false),
+                  'hasChanged': ko.observable(false),
+                  'externalLink': ko.observable(_externalLink),
                   'details': ko.observableArray(_details),
+                  'showDetails': ko.observable(false),
                   'leafletmap': leafletmap
                 };
                 _docs.push(doc);
@@ -1487,10 +1490,16 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     }, function (data) {
       if (data.status == 0) {
         $.each(data.doc.doc, function(key, val) {
-            doc['details'].push(ko.mapping.fromJS({
+          var _field = ko.mapping.fromJS({
               key: key,
-              value: val
-          }));
+              value: val,
+              hasChanged: false
+          });
+          _field.value.subscribe(function() {
+            doc.hasChanged(true);
+            _field.hasChanged(true);
+          });
+          doc['details'].push(_field);
         });
       }
       else if (data.status == 1) {
@@ -1499,6 +1508,23 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             key: '',
             value: ''
         }));
+      }
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
+  self.updateDocument = function (doc) {
+    $.post("/search/update_document", {
+      collection: ko.mapping.toJSON(self.collection),
+      document: ko.mapping.toJSON(doc),
+      id: doc.id
+    }, function (data) {
+      if (data.status == 0) {
+        doc.showEdit(false);
       }
       else {
         $(document).trigger("error", data.message);

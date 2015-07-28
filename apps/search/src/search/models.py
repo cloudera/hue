@@ -812,7 +812,7 @@ def augment_solr_response(response, collection, query):
       doc[field] = escaped_value
 
     if not query.get('download'):
-      doc['showDetails'] = False
+      doc['externalLink'] = doc.get('doc-link') in ['hbase', 'hdfs'] and 'doc-link' in doc.keys()
       doc['details'] = []
 
   highlighted_fields = response.get('highlighting', {}).keys()

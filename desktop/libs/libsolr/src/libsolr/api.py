@@ -668,24 +668,25 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def update(self, collection_or_core_name, data, content_type='csv'):
+  def update(self, collection_or_core_name, data, content_type='csv', version=None):
     try:
       if content_type == 'csv':
-        params = self._get_params() + (
-          ('wt', 'json'),
-          ('overwrite', 'true'),
-        )
         content_type = 'application/csv'
       elif content_type == 'json':
-        params = self._get_params() + (
-          ('wt', 'json'),
-          ('overwrite', 'true'),
-        )
         content_type = 'application/json'
       else:
         LOG.error("Could not update index for %s. Unsupported content type %s. Allowed content types: csv" % (collection_or_core_name, content_type))
         return False
 
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('overwrite', 'true'),
+      )
+      if version is not None:
+        params += (
+          ('_version_', version),
+          ('versions', 'true')
+        )
       self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
       return True
     except RestException, e:
