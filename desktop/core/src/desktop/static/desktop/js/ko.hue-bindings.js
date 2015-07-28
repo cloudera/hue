@@ -1586,6 +1586,9 @@ ko.bindingHandlers.aceEditor = {
               });
               valueAccessor().extraCompleters([newCompleter(fields)]);
               editor.hideSpinner();
+              window.setTimeout(function () {
+                editor.execCommand("startAutocomplete");
+              }, 100);
             });
           }
         }
@@ -1613,10 +1616,9 @@ ko.bindingHandlers.aceEditor = {
               editor.moveCursorTo(editor.previousCursorPosition.row, editor.previousCursorPosition.column + 1);
               editor.removeTextBeforeCursor(1);
               window.setTimeout(function () {
-                editor.execCommand("startAutocomplete");
                 editor.previousCursorPosition = null;
               }, 100);
-            }, 100);
+            }, 50);
             editor.previousCursorPosition = null;
           }
         }
