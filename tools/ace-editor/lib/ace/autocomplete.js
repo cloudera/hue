@@ -433,8 +433,15 @@ var FilteredList = function(array, filterText) {
 
         this.filterText = str;
         matches = this.filterCompletions(matches, this.filterText);
-        matches = matches.sort(function(a, b) {
-            return b.exactMatch - a.exactMatch || b.score - a.score;
+        matches = matches.sort(function (a, b) {
+          var alpha = 0;
+          if (a.caption > b.caption) {
+            alpha = 1;
+          }
+          if (a.caption < b.caption) {
+            alpha = -1;
+          }
+          return alpha + b.exactMatch - a.exactMatch || alpha + b.score - a.score;
         });
 
         // make unique
