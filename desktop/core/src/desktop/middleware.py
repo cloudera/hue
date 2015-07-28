@@ -480,7 +480,7 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not 'desktop.auth.backend.SpnegoMiddleware' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
