@@ -180,6 +180,9 @@ from django.utils.translation import ugettext as _
     <div id="assistQuickLook" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
+          <i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
+        </a>
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
       <div class="modal-body" style="min-height: 100px">
