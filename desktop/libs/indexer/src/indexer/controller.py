@@ -150,6 +150,7 @@ class CollectionManagerController(object):
           zc.delete_path(root_node)
         except Exception, e:
           raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
+        raise PopupException(_('Could not create collection. Check error logs for more info.'))
     else:
       # Non-solrcloud mode
       # Create instance directory locally.
