@@ -561,7 +561,7 @@ def test_user_admin():
   group = get_default_user_group()
   response = c.get('/useradmin/users/new')
   assert_true(response)
-  assert_true(('<option value="1" selected="selected">%s</option>' % group) in str(response))
+  assert_true(('<option value="%s" selected="selected">%s</option>' % (group.id, group.name)) in str(response))
 
   # Create a new regular user (duplicate name)
   response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
