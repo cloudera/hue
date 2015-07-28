@@ -131,8 +131,7 @@ def get_field_types(field_list, iterations=3):
 
     try:
       parse(value)
-    except:
-      LOG.exception('failed to parse value %s' % value)
+    except OverflowError:
       raise ValueError()
 
   def test_int(value):
