@@ -27,7 +27,7 @@ from datetime import datetime,  timedelta
 from string import Template
 from itertools import chain
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
@@ -540,18 +540,20 @@ class Workflow(Job):
   @classmethod
   def gen_status_graph_from_xml(cls, user, oozie_workflow):
     from oozie.importlib.workflows import import_workflow # Circular dependency
+
     try:
-      workflow = Workflow.objects.new_workflow(user)
-      workflow.save()
-      try:
+      with transaction.atomic():
+        workflow = Workflow.objects.new_workflow(user)
+        workflow.save()
+
         import_workflow(workflow, oozie_workflow.definition)
         graph =  workflow.gen_status_graph(oozie_workflow)
-        return graph, workflow.node_list
-      except Exception, e:
-        LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
-    finally:
-      if workflow.pk is not None:
+        node_list = workflow.node_list
         workflow.delete(skip_trash=True)
+        return graph, node_list
+    except Exception, e:
+      LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
+
     return None, []
 
   def to_xml(self, mapping=None):
