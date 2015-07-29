@@ -395,27 +395,27 @@ from django.utils.translation import ugettext as _
     </div>
     <div class="snippet-settings-body">
       <form class="form-horizontal">
-        <!-- ko if: typeof properties.driver_cores != 'undefined' -->
+        <!-- ko if: typeof properties.driverCores != 'undefined' -->
         <div class="control-group" style="float: left;">
           <label class="control-label">${_('Driver Cores')}</label>
           <div class="controls">
-            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.driver_cores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }"/>
+            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.driverCores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }"/>
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: typeof properties.executor_cores != 'undefined' -->
+        <!-- ko if: typeof properties.executorCores != 'undefined' -->
         <div class="control-group" style="float: left;">
           <label class="control-label">${_('Executor Cores')}</label>
           <div class="controls">
-            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.executor_cores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores per executor (Default: 1)') }"/>
+            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.executorCores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores per executor (Default: 1)') }"/>
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: typeof properties.num_executors != 'undefined' -->
+        <!-- ko if: typeof properties.numExecutors != 'undefined' -->
         <div class="control-group" style="float: left;">
           <label class="control-label">${_('Executors')}</label>
           <div class="controls">
-            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.num_executors, precision: 1, allowEmpty: true}, valueUpdate:'afterkeydown'" title="${ _('Number of executors to launch (Default: 2)') }"/>
+            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.numExecutors, precision: 1, allowEmpty: true}, valueUpdate:'afterkeydown'" title="${ _('Number of executors to launch (Default: 2)') }"/>
           </div>
         </div>
         <!-- /ko -->
