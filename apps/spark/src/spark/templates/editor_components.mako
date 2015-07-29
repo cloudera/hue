@@ -389,9 +389,9 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="property">
-  <div class="reveals-actions spark-property">
-    <label class="control-label" style="width:100px" data-bind="text: label"></label>
-    <div class="controls" style="margin-left:120px">
+  <div class="reveals-actions" data-bind="css: { 'spark-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
+    <label class="control-label" data-bind="text: label, style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }"></label>
+    <div class="controls" style="margin-right:10px;" data-bind="style: { 'margin-left' : typeof inline === 'undefined' || inline ? '140px' : '' }">
       <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
     </div>
     <!-- ko ifnot: typeof remove === "undefined" -->
@@ -417,7 +417,7 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="property-csv">
-  <div data-bind="component: { name: 'csv-list-input', params: { value: value, addLabel: typeof addLabel === 'undefined' ? '' : addLabel, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
+  <div data-bind="component: { name: 'csv-list-input', params: { value: value, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
 </script>
 
 <script type="text/html" id="snippet-settings">
@@ -431,9 +431,9 @@ from django.utils.translation import ugettext as _
         <!-- ko template: { if: typeof properties.executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executor Cores') }', value: properties.executorCores, title: '${ _('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties.numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executors') }', value: properties.numExecutors, title: '${ _('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties.queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _('Queue') }', value: properties.queue, title: '${ _('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Archives') }', value: properties.archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }', addLabel: '${ _('Archive') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Files') }', value: properties.files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }', addLabel: '${ _('File') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties.settings, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. foo') }', addLabel: '${ _('Setting') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Archives') }', value: properties.archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Files') }', value: properties.files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties.settings, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. foo') }'}} --><!-- /ko -->
       </form>
     </div>
     <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
@@ -633,7 +633,7 @@ from django.utils.translation import ugettext as _
         </div>
       </div>
       <!-- /ko -->
-      <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties.arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', addLabel: '${ _('Argument') }' }} --><!-- /ko -->
+      <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties.arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
     </form>
   </div>
 
@@ -790,48 +790,40 @@ from django.utils.translation import ugettext as _
             <!-- ko foreach: sessions -->
               <!-- ko if: ['pyspark', 'scala'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
-
-              <!-- ko foreach: properties -->
-              <div class="control-group">
-                <label class="control-label" data-bind="name"></label>
-                <div class="controls">
-                  <span data-bind="text: name"></span>
-                  <!-- ko with: $root.getSessionProperties(name()) -->
-                    <!-- ko if: type == 'jvm' -->
-                      ## problem with ko actually, cf generated code
-                      ## <jvm-memory-input params="value: executorMemory"></jvm>
-                      <input class="input-small" type="text" data-bind="value: $parent.value" />
-                    <!-- /ko -->
-                    <!-- ko if: type == 'number' -->
-                    <input class="input-small" type="text" data-bind="value: $parent.value" />
-                    <!-- /ko -->
-                    <!-- ko if: type == 'string' -->
-                    <input class="input-small" type="text" data-bind="value: $parent.value" />
-                    <!-- /ko -->
-                    <!-- ko if: type == 'csv' -->
-                    <input class="input-small" type="text" data-bind="value: $parent.value" />
-                    <!-- /ko -->
-                  <!-- /ko -->
-                  <a href="javascript:void(0)" data-bind="click: function(data) { $parent.properties.remove(data) }">
-                    <i class="fa fa-minus"></i>
-                  </a>
-                </div>
+              <div style="display:block; width:100%;">
+                <!-- ko foreach: properties -->
+                  <!-- ko template: {
+                    name: 'property',
+                    data: {
+                      type: $root.getSessionProperties(name()).type,
+                      label: $root.getSessionProperties(name()).nice_name,
+                      value: value,
+                      remove: function () { $parent.properties.remove($data) }
+                    }
+                  } --><!-- /ko -->
+                <!-- /ko -->
               </div>
-              <!-- /ko -->
-
-              <select data-bind="options: $root.availableSessionProperties,
-                       optionsText: 'nice_name',
-                       optionsValue: 'name',
-                       value: $root.selectedSessionProperties,
-                       optionsCaption: 'Choose...'"></select>
-              <i class="fa fa-plus" data-bind="click: function() { properties.push(ko.mapping.fromJS({'name': $root.selectedSessionProperties(), 'value': ''})); $root.selectedSessionProperties(''); }"></i>
-
-              <a style="float: right;" class="btn pointer" title="${ _('Restart session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($parent) }">
-                <i class="fa fa-refresh"></i> ${ _('Recreate') }
-              </a>
-              <a style="float: right;" class="btn pointer" title="${ _('Close session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeSession($parent) }">
-                <i class="fa fa-times"></i> ${ _('Close') }
-              </a>
+              <div style="clear:both; padding-left: 120px;">
+                <!-- ko if: availableNewProperties().length -->
+                <select data-bind="options: availableNewProperties,
+                         optionsText: 'nice_name',
+                         optionsValue: 'name',
+                         value: selectedSessionProperty,
+                         optionsCaption: '${ _('Choose a property...') }'"></select>
+                <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
+                    properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
+                    selectedSessionProperty('');
+                  }" style="margin-left:10px;vertical-align: text-top;">
+                  <i class="fa fa-plus"></i>
+                </a>
+                <!-- /ko -->
+                <a style="float: right;" class="btn pointer" title="${ _('Restart session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }">
+                  <i class="fa fa-refresh"></i> ${ _('Recreate') }
+                </a>
+                <a style="margin-right: 5px; float: right;" class="btn pointer" title="${ _('Close session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeSession($data) }">
+                  <i class="fa fa-times"></i> ${ _('Close') }
+                </a>
+              </div>
               <!-- /ko -->
             <!-- /ko -->
             </br>

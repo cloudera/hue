@@ -540,8 +540,29 @@ var Snippet = function (vm, notebook, snippet) {
       self.progress(0);
     }
   };
-}
+};
 
+var Session = function(vm, session) {
+  var self = this;
+  ko.mapping.fromJS(session, {}, self);
+
+  self.selectedSessionProperty = ko.observable('');
+
+  if (! ko.isObservable(self.properties)) {
+    self.properties = ko.observableArray();
+  }
+
+  this.availableNewProperties = ko.computed(function() {
+    var addedIndex = {};
+    $.each(self.properties(), function(index, property) {
+      addedIndex[property.name()] = true;
+    });
+    var result = $.grep(vm.availableSessionProperties(), function(property) {
+      return ! addedIndex[property.name];
+    });
+    return result;
+  });
+};
 
 var Notebook = function (vm, notebook) {
   var self = this;
@@ -552,7 +573,11 @@ var Notebook = function (vm, notebook) {
   self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable(vm.availableSnippets()[0].type());
-  self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : []);
+  self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : [], {
+    create: function(value) {
+      return new Session(vm, value.data);
+    }
+  });
 
   self.getSession = function (session_type) {
     var _s = null;
@@ -567,7 +592,7 @@ var Notebook = function (vm, notebook) {
 
   self.restartSession = function (session) {
     self.closeSession(session);
-    self.createSession(session);
+    self.createSession({'type': session.type() });
   };
 
   self.addSession = function (session) {
@@ -607,10 +632,10 @@ var Notebook = function (vm, notebook) {
 
     $.post("/spark/api/create_session", {
       notebook: ko.mapping.toJSON(self.getContext()),
-      session: ko.mapping.toJSON(session), // e.g. {'type': 'hive', 'properties': [{'driverCores': '2'}]}
+      session: ko.mapping.toJSON(session) // e.g. {'type': 'hive', 'properties': [{'driverCores': '2'}]}
     }, function (data) {
       if (data.status == 0) {
-        self.addSession(ko.mapping.fromJS(data.session));
+        self.addSession(new Session(vm, data.session));
         $.each(snippets, function(index, snippet) {
           snippet.status('ready');
         });
@@ -793,10 +818,9 @@ function EditorViewModel(notebooks, options) {
 
   self.availableSessionProperties = ko.computed(function () { // Only Spark
     return ko.utils.arrayFilter(options.session_properties, function (item) {
-        return item.name != '' // Could filter out the ones already selected + yarn only or not
+        return item.name != ''; // Could filter out the ones already selected + yarn only or not
       });
   });
-  self.selectedSessionProperties = ko.observable();
   self.getSessionProperties = function(name) {
     var _prop = null;
     $.each(options.session_properties, function(index, prop) {

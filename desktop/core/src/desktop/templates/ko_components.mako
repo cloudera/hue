@@ -524,7 +524,7 @@ from django.utils.translation import ugettext as _
 
 <%def name="jvmMemoryInput()">
   <script type="text/html" id="jvm-memory-input-template">
-    <input type="text" class="input-small" data-bind="textInput: value" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
+    <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 0, allowEmpty: true }" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -536,10 +536,10 @@ from django.utils.translation import ugettext as _
         this.valueObservable = params.value;
         this.units = Object.keys(UNITS);
         this.selectedUnit = ko.observable();
-        this.value = ko.observable().extend({ 'numeric' : 0 });
+        this.value = ko.observable('');
 
         var match = JVM_MEM_PATTERN.exec(this.valueObservable());
-        if (match.length === 3) {
+        if (match && match.length === 3) {
           this.value(match[1]);
           this.selectedUnit(match[2] === 'M' ? 'MB' : 'GB');
         }
