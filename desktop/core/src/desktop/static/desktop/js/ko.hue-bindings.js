@@ -1482,6 +1482,18 @@ ko.toJSONObject = function (koObj) {
   return JSON.parse(ko.toJSON(koObj));
 }
 
+ko.toCleanJSON = function (koObj) {
+  return ko.toJSON(koObj, function (key, value) {
+    if (key == "__ko_mapping__") {
+      return;
+    }
+    else {
+      return value;
+    }
+  });
+}
+
+
 ko.bindingHandlers.aceEditor = {
   init: function (element, valueAccessor) {
     var $el = $(element);

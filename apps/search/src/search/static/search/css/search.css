@@ -249,10 +249,28 @@ em {
   border-bottom: 1px solid #338bb8;
 }
 
-.document-details {
+.document-details-actions {
   background-color: #F6F6F6;
   padding: 10px;
-  border: 1px solid #e5e5e5;
+  margin-top: 8px;
+}
+
+.document-details-actions a {
+  display: table;
+}
+
+.document-details {
+  padding: 10px;
+  border-left: 1px solid #e5e5e5;
+}
+
+.document-details td, .document-details th  {
+  height: 28px;
+  vertical-align: middle;
+}
+
+.document-details tr.readonly:hover {
+  background-color: #F6F6F6;
 }
 
 .result-row:nth-child(even) {
@@ -607,4 +625,10 @@ em {
 
 .player-toolbar .link {
   display: inline-block;
+}
+
+.grid-th {
+  text-align: left;
+  white-space: nowrap;
+  padding-right: 20px;
 }

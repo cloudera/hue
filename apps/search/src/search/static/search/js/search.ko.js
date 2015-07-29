@@ -1391,6 +1391,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   'hasChanged': ko.observable(false),
                   'externalLink': ko.observable(_externalLink),
                   'details': ko.observableArray(_details),
+                  'originalDetails': ko.observable(''),
                   'showDetails': ko.observable(false),
                   'leafletmap': leafletmap
                 };
@@ -1488,7 +1489,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       collection: ko.mapping.toJSON(self.collection),
       id: doc.id
     }, function (data) {
+      var details = [];
+      doc.details.removeAll();
       if (data.status == 0) {
+
         $.each(data.doc.doc, function(key, val) {
           var _field = ko.mapping.fromJS({
               key: key,
@@ -1499,12 +1503,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             doc.hasChanged(true);
             _field.hasChanged(true);
           });
-          doc['details'].push(_field);
+          details.push(_field);
         });
       }
       else if (data.status == 1) {
         $(document).trigger("info", data.message);
-        doc['details'].push(ko.mapping.fromJS({
+        details.push(ko.mapping.fromJS({
             key: '',
             value: ''
         }));
@@ -1512,6 +1516,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       else {
         $(document).trigger("error", data.message);
       }
+      doc.details(details);
+      doc.originalDetails(ko.toJSON(doc.details()));
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
@@ -1525,6 +1531,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     }, function (data) {
       if (data.status == 0) {
         doc.showEdit(false);
+        doc.originalDetails(ko.toJSON(doc.details()));
       }
       else {
         $(document).trigger("error", data.message);

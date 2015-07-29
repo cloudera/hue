@@ -608,30 +608,41 @@ ${ dashboard.layout_skeleton() }
                   <td data-bind="html: $data"></td>
                 <!-- /ko -->
               </tr>
-              <tr data-bind="visible: doc.showDetails">
+              <tr data-bind="visible: doc.showDetails" class="show-details">
                 <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
                   <!-- ko if: $data.details().length == 0 -->
                     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
                     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
                   <!-- /ko -->
                   <!-- ko if: $data.details().length > 0 -->
-                    <div class="document-details">
-                      <a href="javascript:void(0)" data-bind="click: function() { showEdit(true); }">
-                        <i class="fa fa-edit" data-bind="visible: ! showEdit()"></i>
+                    <div class="document-details-actions pull-left">
+                      <a href="javascript:void(0)" data-bind="visible: ! showEdit(), click: function() { showEdit(true); }" title="${ _('Edit this document') }">
+                        <i class="fa fa-edit fa-fw"></i>
                       </a>
-                      <a href="javascript:void(0)" data-bind="click: $root.updateDocument">
-                        <i class="fa fa-save" data-bind="visible: showEdit"></i>
+                      <a href="javascript:void(0)" data-bind="visible: showEdit(), click: function(data, e) { $(e.currentTarget).parent().css('marginTop', '8px'); $root.getDocument($data); showEdit(false); }" title="${ _('Undo changes') }">
+                        <i class="fa fa-undo fa-fw"></i>
                       </a>
-                      <a href="javascript:void(0)" data-bind="attr: { href: externalLink}" target="_blank">
-                        <i class="fa fa-external-link" data-bind="visible: externalLink"></i>
+                      <a href="javascript:void(0)" data-bind="visible: showEdit() && originalDetails() != ko.toJSON(details), click: $root.updateDocument" title="${ _('Update this document') }">
+                        <i class="fa fa-save fa-fw"></i>
                       </a>
+                      <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink}" target="_blank" title="${ _('Show original document') }">
+                        <i class="fa fa-external-link fa-fw"></i>
+                      </a>
+                    </div>
+                    <div class="document-details pull-left">
                       <table>
                         <tbody data-bind="foreach: details">
-                          <tr>
-                             <th style="text-align: left; white-space: nowrap; vertical-align:top; padding-right:20px" data-bind="text: key"></th>
+                          <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
+                             <th class="grid-th" data-bind="text: key"></th>
                              <td width="100%">
                                <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
-                               <input data-bind="value: value, visible: $parent.showEdit" class="input-xxlarge"></input>
+                               <input data-bind="value: value, visible: $parent.showEdit, valueUpdate: 'afterkeydown',
+                               click: function(detail, e){
+                                var target = $(e.currentTarget);
+                                target.parents('.show-details').find('.document-details-actions').animate({
+                                  'marginTop': (target.position().top - target.parents('table').position().top) + 'px'
+                                }, 200)
+                               }" class="input-xxlarge" style="width: 600px" />
                              </td>
                           </tr>
                         </tbody>
