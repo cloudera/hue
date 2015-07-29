@@ -563,3 +563,68 @@ from django.utils.translation import ugettext as _
     }());
   </script>
 </%def>
+
+
+<%def name="csvListInput()">
+  <script type="text/html" id="csv-list-input-template">
+    <ul data-bind="sortable: values, visible: values().length" class="unstyled">
+      <li style="margin-bottom: 4px">
+        <div class="input-append">
+          <input type="text" data-bind="textInput: value, valueUpdate: 'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+        </div>
+        <a href="#" data-bind="click: function(){ $parent.removeValue(this); }">
+          <i class="fa fa-minus"></i>
+        </a>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function() {
+      function CsvListInputViewModel (params) {
+        this.valueObservable = params.value;
+        this.isArray = $.isArray(this.valueObservable());
+        this.placeholder = params.placeholder || '';
+
+        var initialValues = this.isArray ? this.valueObservable() : this.valueObservable().split(",");
+        for (var i = 0; i < initialValues.length; i++) {
+          initialValues[i] = { value: ko.observable(initialValues[i].trim()) };
+          initialValues[i].value.subscribe(this.updateValueObservable, this);
+        }
+        this.values = ko.observableArray(initialValues);
+        this.values.subscribe(this.updateValueObservable, this);
+      }
+
+      CsvListInputViewModel.prototype.addValue = function () {
+        var newValue = { value: ko.observable('') };
+        newValue.value.subscribe(this.updateValueObservable, this);
+        this.values.push(newValue);
+      };
+
+      CsvListInputViewModel.prototype.removeValue = function (valueToRemove) {
+        this.values.remove(valueToRemove);
+      };
+
+      CsvListInputViewModel.prototype.updateValueObservable = function () {
+        var cleanValues = $.map(this.values(), function (item) {
+          return item.value();
+        });
+        cleanValues = $.grep(cleanValues, function (value) {
+          return value;
+        });
+        this.valueObservable(this.isArray ? cleanValues : cleanValues.join(','));
+      };
+
+      ko.components.register('csv-list-input', {
+        viewModel: CsvListInputViewModel,
+        template: { element: 'csv-list-input-template' }
+      });
+    }());
+  </script>
+</%def>
