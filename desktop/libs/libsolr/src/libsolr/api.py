@@ -418,7 +418,7 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
-  def collections(self):
+  def collections(self): # To drop, used in indexer v1
     try:
       params = self._get_params() + (
           ('detail', 'true'),
@@ -429,6 +429,16 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+
+  def collections2(self):
+    try:
+      params = self._get_params() + (
+          ('action', 'LIST'),
+          ('wt', 'json'),
+      )
+      return self._root.get('admin/collections', params=params)['collections']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
 
   def aliases(self):
     try:

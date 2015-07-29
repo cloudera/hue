@@ -20,6 +20,9 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('indexer.views',
   url(r'^$', 'collections', name='collections'),
   url(r'^install_examples$', 'install_examples', name='install_examples'),
+  
+  # V2
+  url(r'^indexes/$', 'indexes', name='indexes'),
 )
 
 urlpatterns += patterns('indexer.api',
@@ -32,6 +35,7 @@ urlpatterns += patterns('indexer.api',
   url(r'^api/collections/(?P<collection>[^/]+)/update/$', 'collections_update', name='api_collections_update'),
   url(r'^api/collections/(?P<collection>[^/]+)/data/$', 'collections_data', name='api_collections_data'),
 
+  # V2
   url(r'^api/alias/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
   url(r'^api/alias/delete/$', 'delete_alias', name='delete_alias')
 )
