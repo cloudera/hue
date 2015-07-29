@@ -1358,10 +1358,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           var _resultsHash = ko.mapping.toJSON(data.response.docs);
 
           if (self.resultsHash != _resultsHash) {
-            if (self.collection.template.isGridLayout()) {
-              // Table view
+
               var _docs = [];
               var leafletmap = {};
+              var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
               $.each(data.response.docs, function (index, item) {
                 var row = [];
                 var _externalLink = item.externalLink;
@@ -1387,6 +1387,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 var doc = {
                   'id': item[self.collection.idField()],
                   'row': row,
+                  'item': ko.mapping.fromJS(item),
                   'showEdit': ko.observable(false),
                   'hasChanged': ko.observable(false),
                   'externalLink': ko.observable(_externalLink),
@@ -1395,24 +1396,17 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   'showDetails': ko.observable(false),
                   'leafletmap': leafletmap
                 };
+                if (!self.collection.template.isGridLayout()) {
+                  // fix the fields that contain dots in the name
+                  addTemplateFunctions(item);
+                  if (self.additionalMustache != null && typeof self.additionalMustache == "function"){
+                    self.additionalMustache(item);
+                  }
+                  doc.content =  Mustache.render(_mustacheTmpl, item);
+                }
                 _docs.push(doc);
               });
               self.results(_docs);
-            }
-            else {
-              // Template view
-              var _docs = [];
-              var _mustacheTmpl = fixTemplateDotsAndFunctionNames(self.collection.template.template());
-              $.each(data.response.docs, function (index, item) {
-                // fix the fields that contain dots in the name
-                addTemplateFunctions(item);
-                if (self.additionalMustache != null && typeof self.additionalMustache == "function"){
-                  self.additionalMustache(item);
-                }
-                _docs.push(Mustache.render(_mustacheTmpl, item));
-              });
-              self.results(_docs);
-            }
           }
           self.resultsHash = _resultsHash;
         }

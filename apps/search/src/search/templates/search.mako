@@ -609,46 +609,8 @@ ${ dashboard.layout_skeleton() }
                 <!-- /ko -->
               </tr>
               <tr data-bind="visible: doc.showDetails" class="show-details">
-                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
-                  <!-- ko if: $data.details().length == 0 -->
-                    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
-                  <!-- /ko -->
-                  <!-- ko if: $data.details().length > 0 -->
-                    <div class="document-details-actions pull-left">
-                      <a href="javascript:void(0)" data-bind="visible: ! showEdit(), click: function() { showEdit(true); }" title="${ _('Edit this document') }">
-                        <i class="fa fa-edit fa-fw"></i>
-                      </a>
-                      <a href="javascript:void(0)" data-bind="visible: showEdit(), click: function(data, e) { $(e.currentTarget).parent().css('marginTop', '8px'); $root.getDocument($data); showEdit(false); }" title="${ _('Undo changes') }">
-                        <i class="fa fa-undo fa-fw"></i>
-                      </a>
-                      <a href="javascript:void(0)" data-bind="visible: showEdit() && originalDetails() != ko.toJSON(details), click: $root.updateDocument" title="${ _('Update this document') }">
-                        <i class="fa fa-save fa-fw"></i>
-                      </a>
-                      <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink}" target="_blank" title="${ _('Show original document') }">
-                        <i class="fa fa-external-link fa-fw"></i>
-                      </a>
-                    </div>
-                    <div class="document-details pull-left">
-                      <table>
-                        <tbody data-bind="foreach: details">
-                          <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
-                             <th class="grid-th" data-bind="text: key"></th>
-                             <td width="100%">
-                               <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
-                               <input data-bind="value: value, visible: $parent.showEdit, valueUpdate: 'afterkeydown',
-                               click: function(detail, e){
-                                var target = $(e.currentTarget);
-                                target.parents('.show-details').find('.document-details-actions').animate({
-                                  'marginTop': (target.position().top - target.parents('table').position().top) + 'px'
-                                }, 200)
-                               }" class="input-xxlarge" style="width: 600px" />
-                             </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  <!-- /ko -->
+                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}" colspan="2">
+                  <span data-bind="template: {name: 'document-details', data: $data}"></span>
                 </td>
               </tr>
             </tbody>
@@ -763,9 +725,30 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
       <!-- /ko -->
 
-      <div id="result-container" data-bind="foreach: $root.results">
-        <div class="result-row" data-bind="html: $data"></div>
-      </div>
+
+      <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+        <thead>
+          <tr>
+            <th style="width: 18px">&nbsp;</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
+          <tr>
+            <td valign="top">
+              <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
+                <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
+              </a>
+            </td>
+            <td><div class="result-row" data-bind="html: content, style: {'marginBottom': doc.showDetails() ? '-20px' : '0px'}"></div></td>
+          </tr>
+          <tr data-bind="visible: doc.showDetails" class="show-details">
+            <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}" colspan="2">
+              <span data-bind="template: {name: 'document-details', data: $data}"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -775,6 +758,48 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 </script>
 
+
+<script type="text/html" id="document-details">
+  <!-- ko if: $data.details().length == 0 -->
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  <!-- /ko -->
+  <!-- ko if: $data.details().length > 0 -->
+    <div class="document-details-actions pull-left">
+      <a href="javascript:void(0)" data-bind="visible: ! showEdit(), click: function() { showEdit(true); }" title="${ _('Edit this document') }">
+        <i class="fa fa-edit fa-fw"></i>
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: showEdit(), click: function(data, e) { $(e.currentTarget).parent().css('marginTop', '8px'); $root.getDocument($data); showEdit(false); }" title="${ _('Undo changes') }">
+        <i class="fa fa-undo fa-fw"></i>
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: showEdit() && originalDetails() != ko.toJSON(details), click: $root.updateDocument" title="${ _('Update this document') }">
+        <i class="fa fa-save fa-fw"></i>
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink}" target="_blank" title="${ _('Show original document') }">
+        <i class="fa fa-external-link fa-fw"></i>
+      </a>
+    </div>
+    <div class="document-details pull-left">
+      <table>
+        <tbody data-bind="foreach: details">
+          <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
+             <th class="grid-th" data-bind="text: key"></th>
+             <td width="100%">
+               <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+               <input data-bind="value: value, visible: $parent.showEdit, valueUpdate: 'afterkeydown',
+               click: function(detail, e){
+                var target = $(e.currentTarget);
+                target.parents('.show-details').find('.document-details-actions').animate({
+                  'marginTop': (target.position().top - target.parents('table').position().top) + 'px'
+                }, 200)
+               }" class="input-xxlarge" style="width: 600px" />
+             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  <!-- /ko -->
+</script>
 
 <script type="text/html" id="result-sorting">
 <th style="width: 18px">&nbsp;</th>
