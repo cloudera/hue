@@ -388,6 +388,38 @@ from django.utils.translation import ugettext as _
   </div>
 </script>
 
+<script type="text/html" id="property">
+  <div class="reveals-actions spark-property">
+    <label class="control-label" style="width:100px" data-bind="text: label"></label>
+    <div class="controls" style="margin-left:120px">
+      <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
+    </div>
+    <!-- ko ifnot: typeof remove === "undefined" -->
+    <div class="hover-actions spark-property-remove">
+      <a href="javascript:void(0)" data-bind="click: remove" title="${ _('Remove') }">
+        <i class="fa fa-times"></i>
+      </a>
+    </div>
+    <!-- /ko -->
+  </div>
+</script>
+
+<script type="text/html" id="property-jvm">
+  <div data-bind="component: { name: 'jvm-memory-input', params: { value: value } }"></div>
+</script>
+
+<script type="text/html" id="property-number">
+  <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown', attr: { 'title': typeof title === 'undefined' ? '' : title }"/>
+</script>
+
+<script type="text/html" id="property-string">
+  <input class="input-small" type="text" data-bind="textInput: value, valueUpdate:'afterkeydown'" />
+</script>
+
+<script type="text/html" id="property-csv">
+  <div data-bind="component: { name: 'csv-list-input', params: { value: value, addLabel: typeof addLabel === 'undefined' ? '' : addLabel, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
+</script>
+
 <script type="text/html" id="snippet-settings">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
@@ -395,68 +427,16 @@ from django.utils.translation import ugettext as _
     </div>
     <div class="snippet-settings-body">
       <form class="form-horizontal">
-        <!-- ko if: typeof properties.driverCores != 'undefined' -->
-        <div class="control-group" style="float: left;">
-          <label class="control-label">${_('Driver Cores')}</label>
-          <div class="controls">
-            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.driverCores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }"/>
-          </div>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: typeof properties.executorCores != 'undefined' -->
-        <div class="control-group" style="float: left;">
-          <label class="control-label">${_('Executor Cores')}</label>
-          <div class="controls">
-            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.executorCores, precision: 1, allowEmpty: true }, valueUpdate:'afterkeydown'" title="${ _('Number of cores per executor (Default: 1)') }"/>
-          </div>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: typeof properties.numExecutors != 'undefined' -->
-        <div class="control-group" style="float: left;">
-          <label class="control-label">${_('Executors')}</label>
-          <div class="controls">
-            <input type="text" class="input-small" data-bind="numericTextInput: { value: properties.numExecutors, precision: 1, allowEmpty: true}, valueUpdate:'afterkeydown'" title="${ _('Number of executors to launch (Default: 2)') }"/>
-          </div>
-        </div>
-        <!-- /ko -->
-        <!-- ko if: typeof properties.queue != 'undefined' -->
-        <div class="control-group" style="float: left;">
-          <label class="control-label">${_('Queue')}</label>
-          <div class="controls">
-            <input type="text" class="input-small" data-bind="textInput: properties.queue, valueUpdate:'afterkeydown'" title="${ _('The YARN queue to submit to (Default: default)') }"/>
-          </div>
-        </div>
-        <!-- /ko -->
-        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'settings-list-input', data: { values: properties.archives, placeholder: '${ _('e.g. archive.dat') }', label: '${_('Archives')}', addLabel: '${_('Archive')}' } }--><!-- /ko -->
-        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'settings-list-input', data: { values: properties.files, placeholder: '${ _('e.g. file.dat') }', label: '${_('Files')}', addLabel: '${_('File')}' } }--><!-- /ko -->
-        <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'settings-list-input', data: { values: properties.settings, placeholder: '${ _('e.g. foo') }', label: '${_('Settings')}', addLabel: '${_('Setting')}' } }--><!-- /ko -->
+        <!-- ko template: { if: typeof properties.driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Driver Cores') }', value: properties.driverCores, title: '${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executor Cores') }', value: properties.executorCores, title: '${ _('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executors') }', value: properties.numExecutors, title: '${ _('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _('Queue') }', value: properties.queue, title: '${ _('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Archives') }', value: properties.archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }', addLabel: '${ _('Archive') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Files') }', value: properties.files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }', addLabel: '${ _('File') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties.settings, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. foo') }', addLabel: '${ _('Setting') }' }} --><!-- /ko -->
       </form>
     </div>
     <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
-  </div>
-</script>
-
-<script type="text/html" id="settings-list-input">
-  <div class="control-group" style="float: left;">
-    <label class="control-label" data-bind="text: label"></label>
-    <div class="controls">
-      <ul data-bind="sortable: values, visible: values().length" class="unstyled">
-        <li style="margin-bottom: 4px">
-          <div class="input-append">
-            <input type="text" data-bind="textInput: value, valueUpdate:'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
-            <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
-          </div>
-          <a href="#" data-bind="click: function(){ $parent.values.remove(this); }">
-            <i class="fa fa-minus"></i>
-          </a>
-        </li>
-      </ul>
-      <div style="min-width: 280px; margin-top: 5px;">
-        <a class="pointer" style="min-width: 280px;" data-bind="click: function(){ values.push({ value: ko.observable('') }) }">
-          <i class="fa fa-plus"></i> <!-- ko text: addLabel --><!-- /ko -->
-        </a>
-      </div>
-    </div>
   </div>
 </script>
 
@@ -653,7 +633,7 @@ from django.utils.translation import ugettext as _
         </div>
       </div>
       <!-- /ko -->
-      <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'settings-list-input', data: { values: properties.arguments, placeholder: '${ _('e.g. -foo=bar') }', label: '${_('Arguments')}', addLabel: '${_('Argument')}' } }--><!-- /ko -->
+      <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties.arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', addLabel: '${ _('Argument') }' }} --><!-- /ko -->
     </form>
   </div>
 

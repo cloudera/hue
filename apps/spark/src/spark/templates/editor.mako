@@ -37,6 +37,7 @@ ${ editorComponents.includes() }
 ${ editorComponents.commonHTML() }
 
 
+${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
 

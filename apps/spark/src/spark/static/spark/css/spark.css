@@ -459,3 +459,18 @@ table.airy tr td {
   padding: 10px;
   min-width: 350px;
 }
+
+.spark-property {
+  display: inline-block;
+  vertical-align: top;
+  padding-top:10px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.spark-property-remove {
+  position: absolute;
+  top: -8px;
+  z-index: 1000;
+  right: 0;
+}

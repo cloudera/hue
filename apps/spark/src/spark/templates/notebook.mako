@@ -48,6 +48,7 @@ ${ editorComponents.includes() }
   </%def>
 </%editorComponents:commonHTML>
 
+${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
 
