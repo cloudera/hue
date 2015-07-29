@@ -405,9 +405,11 @@ class HiveServer2Dbms(object):
     if result_meta.in_tablename:
       self.use(database)
       query = self._get_and_validate_select_query(design, query_history)
-      hql = 'CREATE TABLE %s.%s AS %s' % (target_database, target_table, query)
+      hql = 'CREATE TABLE `%s`.`%s` AS %s' % (target_database, target_table, query)
       query_history = self.execute_statement(hql)
     else:
+      # FYI: this path is dead since moving to HiveServer2
+      #
       # Case 2: The results are in some temporary location
       # Beeswax backward compatibility and optimization
       # 1. Create table
