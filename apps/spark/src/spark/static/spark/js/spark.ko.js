@@ -596,8 +596,44 @@ var Notebook = function (vm, notebook) {
     _snippet.init();
   };
 
+  self.createSession = function (session, callback) {
+    var snippets = $.grep(self.snippets(), function (snippet) {
+       return snippet.type() == session.type;
+    });
+
+    $.each(snippets, function(index, snippet) {
+      snippet.status('loading');
+    });
+
+    $.post("/spark/api/create_session", {
+      notebook: ko.mapping.toJSON(self.getContext()),
+      session: ko.mapping.toJSON(session), // e.g. {'type': 'hive', 'properties': [{'driverCores': '2'}]}
+    }, function (data) {
+      if (data.status == 0) {
+        self.addSession(ko.mapping.fromJS(data.session));
+        $.each(snippets, function(index, snippet) {
+          snippet.status('ready');
+        });
+        if (callback) {
+          setTimeout(callback, 500);
+        }
+      }
+      else {
+        $.each(snippets, function(index, snippet) {
+          snippet.status('failed');
+        });
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $.each(snippets, function(index, snippet) {
+        snippet.status('failed');
+      })
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
   self.newSnippet = function () {
-  	var properties = {};
+    var properties = {};
 
     var addSparkYarnProperties = function() {
       properties['driverCores'] = '';
@@ -690,42 +726,6 @@ var Notebook = function (vm, notebook) {
     $.each(self.snippets(), function (index, snippet) {
       snippet.result.clear();
       snippet.status('ready');
-    });
-  };
-
-  self.createSession = function (session, callback) {
-    var snippets = $.grep(self.snippets(), function (snippet) {
-       return snippet.type() == session.type;
-    });
-
-    $.each(snippets, function(index, snippet) {
-      snippet.status('loading');
-    });
-
-    $.post("/spark/api/create_session", {
-      notebook: ko.mapping.toJSON(self.getContext()),
-      session: ko.mapping.toJSON(session), // e.g. {'type': 'hive', 'properties': [{'driverCores': '2'}]}
-    }, function (data) {
-      if (data.status == 0) {
-        self.addSession(ko.mapping.fromJS(data.session));
-        $.each(snippets, function(index, snippet) {
-          snippet.status('ready');
-        });
-        if (callback) {
-          setTimeout(callback, 500);
-        }
-      }
-      else {
-        $.each(snippets, function(index, snippet) {
-          snippet.status('failed');
-    	});
-        $(document).trigger("error", data.message);
-      }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $.each(snippets, function(index, snippet) {
-        snippet.status('failed');
-      })
-      $(document).trigger("error", xhr.responseText);
     });
   };
 
