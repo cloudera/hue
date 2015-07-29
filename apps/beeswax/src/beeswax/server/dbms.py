@@ -125,7 +125,7 @@ class HiveServer2Dbms(object):
 
 
   def get_tables(self, database='default', table_names='*'):
-      hql = "SHOW TABLES IN %s '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
+      hql = "SHOW TABLES IN `%s` '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
       query = hql_query(hql)
       handle = self.execute_and_wait(query, timeout_sec=15.0)
 
@@ -368,7 +368,7 @@ class HiveServer2Dbms(object):
 
 
   def use(self, database):
-    query = hql_query('USE %s' % database)
+    query = hql_query('USE `%s`' % database)
     return self.client.use(query)
 
 
