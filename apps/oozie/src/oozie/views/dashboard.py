@@ -328,11 +328,7 @@ def list_oozie_workflow(request, job_id):
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
         credentials = Credentials()
-      else:
-        try:
-          Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
-        except Exception, e:
-          LOG.exception(_('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e)))
+      #TODO: For workflows submitted from CLI in https://issues.cloudera.org/browse/HUE-2659
     except:
       LOG.exception("Ignoring error updating Document2 record for job_id=%s", job_id)
   else:

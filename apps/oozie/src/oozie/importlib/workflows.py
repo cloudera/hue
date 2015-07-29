@@ -675,8 +675,6 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
     workflow.save()
   except:
     LOG.exception('failed to import workflow root')
-
-    workflow.delete(skip_trash=True)
     raise
 
 

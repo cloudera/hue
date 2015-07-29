@@ -307,7 +307,7 @@ class Workflow(Job):
       LOG.exception(_("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s") % {
       'namespace': e.namespace,
       'namespaces': e.namespaces
-    })
+      })
     return []
 
 
