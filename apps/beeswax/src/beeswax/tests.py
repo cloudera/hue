@@ -1746,6 +1746,18 @@ for x in sys.stdin:
     assert_true("fields" in json_resp)
     assert_true("extended_fields" in json_resp)
 
+  def test_databases_quote(self):
+    c = self.client
+    db_name = '__%s' % self.db_name
+    _make_query(c, "CREATE DATABASE IF NOT EXISTS `%s`" % db_name, database=self.db_name)
+
+    try:
+      self.db.use(db_name)
+      self.db.get_tables(db_name)
+    finally:
+      self.db.use(self.db_name)
+      _make_query(c, "DROP DATABASE IF EXISTS `%s`" % db_name, database=self.db_name)
+
 
 def test_beeswax_api_get_simple_data_type():
   # Return just the outer type name for complex nested types
