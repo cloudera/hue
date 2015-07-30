@@ -41,6 +41,8 @@ ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
 
+${ editorComponents.commonJS() }
+
 <script type="text/javascript" charset="utf-8">
 
   var aceAutocomplete = new Autocomplete({
@@ -68,7 +70,5 @@ ${ koComponents.assistPanel() }
   viewModel.init();
 
 </script>
-
-${ editorComponents.commonJS() }
 
 ${ commonfooter(messages) | n,unicode }
