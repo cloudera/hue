@@ -366,10 +366,17 @@ from django.utils.translation import ugettext as _
             self.fetchTerms();
           });
 
+          self.termsTabActive.subscribe(function(newValue) {
+            if (self.terms().length == 0 && newValue) {
+              self.fetchTerms();
+            }
+          });
+
           self.refresh = function () {
             if (self.refreshing()) {
               return;
             }
+            var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
             self.refreshing(true);
 
             var pollRefresh = function (url) {
@@ -377,6 +384,9 @@ from django.utils.translation import ugettext as _
                 if (data.isSuccess) {
                   self.refreshing(false);
                   self.fetchData();
+                  if (shouldFetchTerms) {
+                    self.fetchTerms();
+                  }
                 } else if (data.isFailure) {
                   $(document).trigger("error", data.message);
                 } else {
@@ -477,7 +487,6 @@ from django.utils.translation import ugettext as _
                 self.loading(false);
               }
             });
-            self.fetchTerms();
           };
 
           self.fetchData();
