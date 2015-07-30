@@ -201,7 +201,7 @@ ${layout.menubar(section='query')}
       </div>
     </div>
   </div>
-  <div class="resizer" data-bind="splitDraggable : { appName: 'beeswax', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+  <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
   <div class="right-panel" id="querySide">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }
@@ -1058,6 +1058,12 @@ ${ dashboard.import_charts() }
 
 
 <script type="text/javascript" charset="utf-8">
+
+// avoid blinking of the panels
+var leftPanelWidth = $.totalStorage("${app_name}_left_panel_width") != null ? $.totalStorage("${app_name}_left_panel_width") : 250;
+$(".left-panel").css("width", leftPanelWidth + "px");
+$(".right-panel").css("left", leftPanelWidth + 20 + "px");
+
 var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, renderRecent, syncWithHive;
 
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
