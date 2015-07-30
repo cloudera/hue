@@ -47,6 +47,7 @@ from cStringIO import StringIO
 from gzip import GzipFile
 from avro import datafile, io
 
+from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
 from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
@@ -445,7 +446,8 @@ def listdir_paged(request, path):
         'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
         'supergroup': request.fs.supergroup,
-        'is_sentry_managed': request.fs.is_sentry_managed(path)
+        'is_sentry_managed': request.fs.is_sentry_managed(path),
+        'apps': appmanager.get_apps_dict(request.user).keys()
     }
     return render('listdir.mako', request, data)
 

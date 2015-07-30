@@ -1207,10 +1207,14 @@ from django.utils.translation import ugettext as _
       };
 
       self.submitSelected = function() {
-        $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, function (response) {
-          $('#submit-wf-modal').html(response);
-          $('#submit-wf-modal').modal('show');
-        });
+        % if 'oozie' in apps:
+          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, function (response) {
+            $('#submit-wf-modal').html(response);
+            $('#submit-wf-modal').modal('show');
+          });
+        % else:
+          $.jHueNotify.warn("${ _('Submitting is not available as the Oozie app is disabled') }");
+        % endif
       };
 
       self.createDirectory = function (formElement) {
