@@ -38,7 +38,7 @@ from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.conf import USE_GET_LOG_API
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state,\
                           _parse_out_hadoop_jobs
@@ -74,7 +74,6 @@ def error_handler(view_fn):
       if re.search('database is locked|Invalid query handle|not JSON serializable', message, re.IGNORECASE):
         response['status'] = 2 # Frontend will not display this type of error
         LOG.warn('error_handler silencing the exception: %s' % e)
-
       return JsonResponse(response)
   return decorator
 
@@ -99,11 +98,11 @@ def autocomplete(request, database=None, table=None):
       response['hdfs_link'] = t.hdfs_link
       response['columns'] = [column.name for column in t.cols]
       response['extended_columns'] = massage_columns_for_json(t.cols)
-  except TTransportException, tx:
+  except (QueryServerTimeoutException, TTransportException), e:
     response['code'] = 503
     response['error'] = tx.message
   except Exception, e:
-    LOG.warn('Autocomplete data fetching error %s.%s: %s' % (database, table, e))
+    LOG.warn('Autocomplete data fetching error: %s' % e.message)
     response['code'] = 500
     response['error'] = e.message
 
