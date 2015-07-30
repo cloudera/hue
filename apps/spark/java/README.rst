@@ -68,6 +68,7 @@ Livy`_. Then run:
 .. code:: shell
 
     % cd $HUE_HOME/apps/spark/java
+    % export SPARK_HOME=/path/to/where/spark/is/installed
     % mvn test
 
 
@@ -78,6 +79,7 @@ In order to run Livy with local sessions, start the server with:
 
 .. code:: shell
 
+    % export SPARK_HOME=/path/to/where/spark/is/installed
     % ./bin/livy-server
 
 Or with YARN sessions by running:

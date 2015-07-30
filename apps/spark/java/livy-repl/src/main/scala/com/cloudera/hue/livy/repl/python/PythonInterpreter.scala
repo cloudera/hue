@@ -52,7 +52,7 @@ object PythonInterpreter {
     ))
 
     val env = builder.environment()
-    env.put("PYTHONPATH", pythonPath.mkString(File.pathSeparator))
+    env.put("PYTHONPATH", pythonPath)
     env.put("PYTHONUNBUFFERED", "YES")
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
@@ -66,8 +66,12 @@ object PythonInterpreter {
 
   private def pythonPath = {
     val pythonPath = new ArrayBuffer[String]
+    for (sparkHome <- sys.env.get("SPARK_HOME")) {
+      pythonPath += Seq(sparkHome, "python", "lib", "pyspark.zip").mkString(File.separator)
+      pythonPath += Seq(sparkHome, "python", "lib", "py4j-0.8.2.1-src.zip").mkString(File.separator)
+    }
     pythonPath ++= Utils.jarOfClass(classOf[SparkContext])
-    pythonPath
+    pythonPath.mkString(File.pathSeparator)
   }
 
   private def createFakeShell(): File = {
