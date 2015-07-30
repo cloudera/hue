@@ -376,7 +376,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <input type="hidden" data-bind="value: $data.content.parent.row"/>
               <input type="hidden" data-bind="value: $data.content.name"/>
               <!-- /ko -->
-              <!-- ko template: {name: 'cell_' + mime.split('/')[0].toLowerCase() + '_template'} -->
+              <!-- ko template: {name: 'cell_' + mime().split('/')[0].toLowerCase() + '_template'} -->
               <!-- /ko -->
             </div>
             <div class="span3">
@@ -396,7 +396,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
         <!-- ko if: showingCurrent -->
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <a id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
-          <input data-bind="visible: mime.split('/')[0].toLowerCase() != 'application' && mime.split('/')[0].toLowerCase() != 'image'" type="submit" class="btn btn-primary" value="${_('Save')}">
+          <input data-bind="visible: mime().split('/')[0].toLowerCase() != 'application' && mime().split('/')[0].toLowerCase() != 'image'" type="submit" class="btn btn-primary" value="${_('Save')}">
         <!-- /ko -->
         <!-- ko ifnot: showingCurrent -->
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
@@ -406,7 +406,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </script>
 
     <script id="cell_image_template" type="text/html">
-      <img data-bind="attr: {src: 'data:image/' + $data.mime + ';base64,' + value()}"/>
+      <img data-bind="attr: {src: 'data:image/' + $data.mime() + ';base64,' + value()}"/>
       <input type="hidden" data-bind="value: value"/>
     </script>
 
@@ -415,7 +415,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </script>
 
     <script id="cell_application_template" type="text/html">
-      <iframe width="100%" height="100%" data-bind="attr: {src: 'data:' + $data.mime + ';base64,' + value()}"></iframe>
+      <iframe width="100%" height="100%" data-bind="attr: {src: 'data:' + $data.mime() + ';base64,' + value()}"></iframe>
       <input type="hidden" data-bind="value: value"/>
     </script>
 

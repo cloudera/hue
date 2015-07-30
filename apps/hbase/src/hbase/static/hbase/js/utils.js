@@ -93,7 +93,7 @@ function launchModal(modal, data) {
   element.is('.ajaxSubmit') ? element.submit(bindSubmit) : '';
   switch (modal) {
     case 'cell_edit_modal':
-      if (data.mime.split('/')[0] == 'text') {
+      if (data.mime().split('/')[0] == 'text') {
         var target = document.getElementById('codemirror_target');
         var mime = data.mime;
         if (mime == "text/json") {
@@ -138,8 +138,10 @@ function launchModal(modal, data) {
           fileFieldLabel: 'hbase_file',
           multiple: false,
           onComplete: function (id, fileName, response) {
-            data.content.reload();
-            data.value(data.content.value);
+            data.content.reload(function() {
+              data.value(data.content.value());
+              data.mime(detectMimeType(data.value()))
+            });
           }
         });
       }
@@ -184,7 +186,7 @@ function showFullEditor(cellContent) {
     readOnly: ko.observable(false),
     timestamp: ko.observable(cellContent.timestamp),
     content: cellContent,
-    mime: detectMimeType(currentValue),
+    mime: ko.observable(detectMimeType(currentValue)),
 
     updateCodeMirror: function() {
       if (this.codeMirror) {
@@ -198,14 +200,16 @@ function showFullEditor(cellContent) {
         this.currentValue(this.value());
       }
       this.value(item.value);
+      this.mime(detectMimeType(this.value()));
       this.updateCodeMirror();
       this.showingCurrent(false);
-      this.timestamp(item.timestamp)
+      this.timestamp(item.timestamp);
     },
 
     switchToCurrent: function() {
       if (!this.showingCurrent()) {
         this.value(this.currentValue());
+        this.mime(detectMimeType(this.value()));
         this.showingCurrent(true);
         this.timestamp(this.content.timestamp);
         this.updateCodeMirror();
