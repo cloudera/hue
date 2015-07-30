@@ -107,6 +107,13 @@ class QueryServerException(Exception):
     self.message = message
 
 
+class QueryServerTimeoutException(Exception):
+
+  def __init__(self, message=''):
+    super(QueryServerTimeoutException, self).__init__(message)
+    self.message = message
+
+
 class NoSuchObjectException: pass
 
 
@@ -496,19 +503,18 @@ class HiveServer2Dbms(object):
       time.sleep(sleep_interval)
       curr = time.time()
 
+    # Query timed out, so attempt to cancel operation and raise exception
+    msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+    LOG.warning(msg)
     try:
-      msg = "The query timed out after %(timeout)d seconds, canceled query [%(query)s]..." % \
-              {'timeout': timeout_sec, 'query': query.hql_query[:40]}
-      LOG.exception(msg)
       self.cancel_operation(handle)
-      raise QueryServerException(Exception(msg), message=msg)
-    except:
-      msg = "Failed to cancel query [%(query)s]..." % {'query': query.hql_query[:40]}
-      LOG.exception(msg)
+    except Exception, e:
+      msg = "Failed to cancel query."
+      LOG.warning(msg)
       self.close_operation(handle)
-      raise QueryServerException(Exception(msg), message=msg)
+      raise QueryServerException(e, message=msg)
 
-    return None
+    raise QueryServerTimeoutException(message=msg)
 
 
   def execute_next_statement(self, query_history, hql_query):

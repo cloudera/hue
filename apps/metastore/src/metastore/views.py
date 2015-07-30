@@ -120,7 +120,7 @@ def show_tables(request, database=None):
 
     tables = db.get_tables(database=database)
   except Exception, e:
-    raise PopupException(_('Failed to retrieve tables for database % s' % database), detail=e)
+    raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
   resp = render("tables.mako", request, {
     'breadcrumbs': [

@@ -37,7 +37,7 @@ from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.conf import USE_GET_LOG_API
 from beeswax.server import dbms
-from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
+from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           _parse_out_hadoop_jobs
@@ -75,7 +75,6 @@ def error_handler(view_fn):
       if re.search('database is locked|Invalid query handle|not JSON serializable', message, re.IGNORECASE):
         response['status'] = 2 # Frontend will not display this type of error
         LOG.warn('error_handler silencing the exception: %s' % e)
-
       return JsonResponse(response)
   return decorator
 
@@ -114,11 +113,11 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
 
         inner_type = _get_complex_inner_type(current, extended_type, simple_type)
         response.update(inner_type)
-  except (QueryServerException, TTransportException), e:
+  except (QueryServerTimeoutException, TTransportException), e:
     response['code'] = 503
     response['error'] = e.message
   except Exception, e:
-    LOG.warn('Autocomplete data fetching error %s.%s: %s' % (database, table, e))
+    LOG.warn('Autocomplete data fetching error: %s' % e)
     response['code'] = 500
     response['error'] = e.message
 
@@ -644,6 +643,7 @@ def get_query_form(request):
   return query_form
 
 
+@error_handler
 def analyze_table(request, database, table, columns=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
@@ -665,6 +665,7 @@ def analyze_table(request, database, table, columns=None):
   return JsonResponse(response)
 
 
+@error_handler
 def get_table_stats(request, database, table, column=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
@@ -672,21 +673,19 @@ def get_table_stats(request, database, table, column=None):
 
   response = {'status': -1, 'message': '', 'redirect': ''}
 
-  try:
-    if column is not None:
-      stats = db.get_table_columns_stats(database, table, column)
-    else:
-      table = db.get_table(database, table)
-      stats = table.stats
+  if column is not None:
+    stats = db.get_table_columns_stats(database, table, column)
+  else:
+    table = db.get_table(database, table)
+    stats = table.stats
 
-    response['stats'] = stats
-    response['status'] = 0
-  except QueryServerException, e:
-    response['message'] = _('Failed to get table stats for table %s.%s: %s' % (database, table, e.message))
+  response['stats'] = stats
+  response['status'] = 0
 
   return JsonResponse(response)
 
 
+@error_handler
 def get_top_terms(request, database, table, column, prefix=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
@@ -694,13 +693,10 @@ def get_top_terms(request, database, table, column, prefix=None):
 
   response = {'status': -1, 'message': '', 'redirect': ''}
 
-  try:
-    terms = db.get_top_terms(database, table, column, prefix=prefix, limit=int(request.GET.get('limit', 30)))
+  terms = db.get_top_terms(database, table, column, prefix=prefix, limit=int(request.GET.get('limit', 30)))
 
-    response['terms'] = terms
-    response['status'] = 0
-  except QueryServerException, e:
-    response['message'] = _('Failed to get table stats for table %s.%s: %s' % (database, table, e.message))
+  response['terms'] = terms
+  response['status'] = 0
 
   return JsonResponse(response)
 
