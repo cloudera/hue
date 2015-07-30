@@ -123,7 +123,7 @@ class Interpreter {
     result
   }
 
-  def shutdown(): Unit = {
+  def shutdown(): Unit = synchronized {
     _state = Interpreter.ShuttingDown()
 
     if (sparkContext != null) {
