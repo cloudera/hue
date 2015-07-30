@@ -457,7 +457,11 @@ from django.utils.translation import ugettext as _
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
         <div data-bind="visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
-      <td class="left"><i data-bind="click: $root.viewFile, css: { 'fa': true, 'fa-play': $.inArray(name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, 'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered }"></i></td>
+      <td class="left"><i data-bind="click: $root.viewFile, css: { 'fa': true,
+       % if 'oozie' in apps:
+      'fa-play': $.inArray(name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1,
+       % endif
+      'fa-file-o': type == 'file', 'fa-folder': type != 'file', 'fa-folder-open': type != 'file' && hovered }"></i></td>
       <td data-bind="attr: {'title': tooltip}" rel="tooltip">
         <!-- ko if: name == '..' -->
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>

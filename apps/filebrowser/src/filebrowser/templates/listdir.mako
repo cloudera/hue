@@ -91,10 +91,12 @@ ${ fb_components.menubar() }
             </ul>
           </div>
           <!-- /ko -->
+          % if 'oozie' in apps:
           <button class="btn fileToolbarBtn" title="${_('Submit')}"
             data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
             <i class="fa fa-play"></i> ${_('Submit')}
           </button>
+          % endif
         </div>
       </%def>
 
