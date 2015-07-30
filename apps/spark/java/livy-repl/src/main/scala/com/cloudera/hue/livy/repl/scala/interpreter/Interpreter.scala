@@ -92,37 +92,35 @@ class Interpreter {
     constructor.newInstance(settings, out, false: java.lang.Boolean).asInstanceOf[SparkIMain]
   }
 
-  def execute(code: String): ExecuteResponse = {
-    synchronized {
-      executeCount += 1
+  def execute(code: String): ExecuteResponse = synchronized {
+    executeCount += 1
 
-      _state = Interpreter.Busy()
+    _state = Interpreter.Busy()
 
-      val result = scala.Console.withOut(outputStream) {
-        sparkIMain.interpret(code) match {
-          case Results.Success =>
-            val output = outputStream.toString("UTF-8").trim
-            outputStream.reset()
+    val result = scala.Console.withOut(outputStream) {
+      sparkIMain.interpret(code) match {
+        case Results.Success =>
+          val output = outputStream.toString("UTF-8").trim
+          outputStream.reset()
 
-            ExecuteComplete(executeCount - 1, output)
+          ExecuteComplete(executeCount - 1, output)
 
-          case Results.Incomplete =>
-            val output = outputStream.toString("UTF-8").trim
-            outputStream.reset()
+        case Results.Incomplete =>
+          val output = outputStream.toString("UTF-8").trim
+          outputStream.reset()
 
-            ExecuteIncomplete(executeCount - 1, output)
+          ExecuteIncomplete(executeCount - 1, output)
 
-          case Results.Error =>
-            val output = outputStream.toString("UTF-8").trim
-            outputStream.reset()
-            ExecuteError(executeCount - 1, output)
-        }
+        case Results.Error =>
+          val output = outputStream.toString("UTF-8").trim
+          outputStream.reset()
+          ExecuteError(executeCount - 1, output)
       }
-
-      _state = Interpreter.Idle()
-
-      result
     }
+
+    _state = Interpreter.Idle()
+
+    result
   }
 
   def shutdown(): Unit = {
