@@ -380,7 +380,8 @@ def commonheader(title, section, user, padding="90px"):
     'section': section,
     'padding': padding,
     'user': user,
-    'is_demo': desktop.conf.DEMO_ENABLED.get()
+    'is_demo': desktop.conf.DEMO_ENABLED.get(),
+    'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
   })
 
 def commonshare():

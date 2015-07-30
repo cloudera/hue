@@ -103,6 +103,12 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       self.fields['first_name'].widget.attrs['readonly'] = True
       self.fields['last_name'].widget.attrs['readonly'] = True
       self.fields['email'].widget.attrs['readonly'] = True
+      if 'is_active' in self.fields:
+        self.fields['is_active'].widget.attrs['readonly'] = True
+      if 'is_superuser' in self.fields:
+        self.fields['is_superuser'].widget.attrs['readonly'] = True
+      if 'groups' in self.fields:
+        self.fields['groups'].widget.attrs['readonly'] = True
 
   def clean_password(self):
     return self.cleaned_data["password"]
