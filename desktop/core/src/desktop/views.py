@@ -284,6 +284,16 @@ def index(request):
   else:
     return home(request)
 
+def csrf_failure(request, reason=None):
+  """Registered handler for CSRF."""
+  access_warn(request, reason)
+  return render("403_csrf.mako", request, dict(uri=request.build_absolute_uri()), status=403)
+
+def serve_403_error(request, *args, **kwargs):
+  """Registered handler for 403. We just return a simple error"""
+  access_warn(request, "403 access forbidden")
+  return render("403.mako", request, dict(uri=request.build_absolute_uri()), status=403)
+
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
   access_warn(request, "404 not found")

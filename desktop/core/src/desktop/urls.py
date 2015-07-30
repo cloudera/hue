@@ -41,6 +41,7 @@ from desktop import metrics
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
 # Also see http://code.djangoproject.com/ticket/5350
+handler403 = 'desktop.views.serve_403_error'
 handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
 

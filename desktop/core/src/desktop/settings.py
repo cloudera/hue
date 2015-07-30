@@ -218,6 +218,9 @@ FILE_UPLOAD_HANDLERS = (
   'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
 
+# Custom CSRF Failure View
+CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
+
 ############################################################
 # Part 4: Installation of apps
 ############################################################
