@@ -96,9 +96,11 @@ ${ commonheader(None, "hbase", user) | n,unicode }
               <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="fa fa-trash-o"></i></a>
             % endif
             <a class="corner-btn btn" data-bind="event: { mousedown: function(){ showFullEditor($data) } }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
-            <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
-            <textarea data-bind="visible: !$data.isLoading() && $data.editing(), disable: ! app.views.tabledata.canWrite(), hasfocus: $data.editing, value: $data.value, click:function(){}, clickBubble: false"></textarea>
-            <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $data.isLoading() " />
+            <div data-bind="visible: ! isLoading()" style="display: none;">
+              <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
+              <textarea data-bind="visible: editing, hasFocus: editing, disable: ! app.views.tabledata.canWrite(), value: value, click: function() {}, clickBubble: false"></textarea>
+            </div>
+            <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $data.isLoading()" style="display: none;" />
           </div>
         </li>
         <!-- /ko -->
