@@ -599,29 +599,23 @@ class HiveServer2Dbms(object):
     return self.client.get_partitions(db_name, table.name, partition_spec, max_parts, reverse_sort)
 
 
-  def get_partition(self, db_name, table_name, partition_id):
+  def get_partition(self, db_name, table_name, partition_spec):
     table = self.get_table(db_name, table_name)
-    partitions = self.get_partitions(db_name, table, partition_spec=None, max_parts=None)
+    partitions = self.get_partitions(db_name, table, partition_spec=partition_spec, max_parts=None)
 
-    partition_query = ""
-    for idx, key in enumerate(partitions[partition_id].values):
-      partition_query += (idx > 0 and " AND " or "") + table.partition_keys[idx].name + "='%s'" % key
+    if len(partitions) != 1:
+      raise NoSuchObjectException(_("Query did not return exactly one partition result"))
+
+    partition = partitions[0]
+    partition_query = " AND ".join(partition.partition_spec.split(','))
 
     hql = "SELECT * FROM `%s`.`%s` WHERE %s" % (db_name, table_name, partition_query)
 
     return self.execute_statement(hql)
 
 
-  def describe_partition(self, db_name, table_name, partition_id):
-    table = self.get_table(db_name, table_name)
-    partitions = self.get_partitions(db_name, table, partition_spec=None, max_parts=None)
-
-    parts = ["%s='%s'" % (table.partition_keys[idx].name, key) for idx, key in enumerate(partitions[partition_id].values)]
-    partition_spec = ','.join(parts)
-
-    describe_table = self.client.get_table(db_name, table_name, partition_spec=partition_spec)
-
-    return describe_table
+  def describe_partition(self, db_name, table_name, partition_spec):
+    return self.client.get_table(db_name, table_name, partition_spec=partition_spec)
 
 
   def explain(self, query):

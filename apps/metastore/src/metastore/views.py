@@ -17,6 +17,7 @@
 
 import json
 import logging
+import urllib
 
 from django.shortcuts import redirect
 from django.utils.functional import wraps
@@ -278,12 +279,13 @@ def describe_partitions(request, database, table):
   partitions = db.get_partitions(database, table_obj, partition_spec, max_parts=None, reverse_sort=reverse_sort)
 
   massaged_partitions = []
-  for id, partition in enumerate(partitions):
+  for partition in partitions:
     massaged_partitions.append({
-      'id': id,
       'columns': partition.values,
-      'readUrl': reverse('metastore:read_partition', kwargs={'database': database, 'table': table_obj.name, 'partition_id':id}),
-      'browseUrl': reverse('metastore:browse_partition', kwargs={'database': database, 'table': table_obj.name, 'partition_id':id})
+      'readUrl': reverse('metastore:read_partition', kwargs={'database': database, 'table': table_obj.name,
+                                                             'partition_spec': urllib.quote(partition.partition_spec)}),
+      'browseUrl': reverse('metastore:browse_partition', kwargs={'database': database, 'table': table_obj.name,
+                                                                 'partition_spec': urllib.quote(partition.partition_spec)})
     })
 
   if request.method == "POST":
@@ -314,21 +316,23 @@ def describe_partitions(request, database, table):
 
 
 
-def browse_partition(request, database, table, partition_id):
+def browse_partition(request, database, table, partition_spec):
   db = dbms.get(request.user)
   try:
-    partition_table = db.describe_partition(database, table, int(partition_id))
+    decoded_spec = urllib.unquote(partition_spec)
+    partition_table = db.describe_partition(database, table, decoded_spec)
     uri_path = location_to_url(partition_table.path_location)
     return redirect(uri_path)
   except Exception, e:
     raise PopupException(_('Cannot browse partition'), detail=e.message)
 
 
-def read_partition(request, database, table, partition_id):
+def read_partition(request, database, table, partition_spec):
   db = dbms.get(request.user)
   try:
-    partition = db.get_partition(database, table, int(partition_id))
-    url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': partition.id}) + '?on_success_url=&context=table:%s:%s' % (table, database)
+    decoded_spec = urllib.unquote(partition_spec)
+    query = db.get_partition(database, table, decoded_spec)
+    url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query.id}) + '?on_success_url=&context=table:%s:%s' % (table, database)
     return redirect(url)
   except Exception, e:
     raise PopupException(_('Cannot read partition'), detail=e.message)

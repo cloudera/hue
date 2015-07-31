@@ -17,7 +17,7 @@
 # limitations under the License.
 
 import logging
-import json
+import urllib
 
 from nose.tools import assert_true, assert_equal, assert_false
 
@@ -25,9 +25,9 @@ from django.utils.encoding import smart_str
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 
-import hadoop
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from useradmin.models import HuePermission, GroupPermission, group_has_permission
 
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
@@ -141,15 +141,21 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       finish()
 
   def test_read_partitions(self):
-    response = self.client.get("/metastore/table/%s/test_partitions/partitions/0/read" % self.db_name, follow=True)
+    partition_spec = "baz='baz_one',boom='boom_two'"
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions/%s/read" % (self.db_name, partition_spec), follow=True)
     response = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': response.context['query'].id}), follow=True)
     response = wait_for_query_to_finish(self.client, response, max=30.0)
     results = fetch_query_result_data(self.client, response)
     assert_true(len(results['results']) > 0, results)
 
   def test_browse_partition(self):
-    response = self.client.get("/metastore/table/%s/test_partitions/partitions/1/browse" % self.db_name, follow=True)
-    filebrowser_path = reverse("filebrowser.views.view", kwargs={'path': '%s/baz_foo/boom_bar' % self.cluster.fs_prefix})
+    partition_spec = "baz='baz_one',boom='boom_two'"
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions/%s/browse" % (self.db_name, partition_spec), follow=True)
+    if is_live_cluster():
+      path = '/user/hive/warehouse/%s.db/test_partitions/baz=baz_one/boom=boom_two' % self.db_name
+    else:
+      path = '/user/hive/warehouse/test_partitions/baz=baz_one/boom=boom_two'
+    filebrowser_path = urllib.unquote(reverse("filebrowser.views.view", kwargs={'path': path}))
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
 
   def test_drop_multi_tables(self):

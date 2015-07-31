@@ -839,11 +839,14 @@ class PartitionKeyCompatible:
 
 class PartitionValueCompatible:
 
-  def __init__(self, partition, table, properties=None):
+  def __init__(self, partition_row, table, properties=None):
     if properties is None:
       properties = {}
     # Parses: ['datehour=2013022516'] or ['month=2011-07/dt=2011-07-01/hr=12']
-    self.values = [val.split('=')[1] for part in partition for val in part.split('/')]
+    partition = partition_row[0]
+    parts = partition.split('/')
+    self.partition_spec = ','.join(["%s='%s'" % (pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
+    self.values = [pv[1] for pv in [part.split('=') for part in parts]]
     self.sd = type('Sd', (object,), properties,)
 
 
