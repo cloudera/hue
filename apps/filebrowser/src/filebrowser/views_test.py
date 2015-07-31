@@ -20,6 +20,7 @@ import json
 import logging
 import os
 import re
+import tempfile
 import urlparse
 from avro import schema, datafile, io
 
@@ -795,57 +796,61 @@ class TestFileBrowserWithHadoop(object):
 
 
   def test_upload_file(self):
-    prefix = self.cluster.fs_prefix + '/test_upload_file'
-    self.cluster.fs.mkdir(prefix)
+    with tempfile.NamedTemporaryFile() as local_file:
+      local_file.write('01234' * 1024 * 1024)
+      local_file.flush()
 
-    USER_NAME = 'test'
-    HDFS_DEST_DIR = prefix + "/tmp/fb-upload-test"
-    LOCAL_FILE = __file__
-    HDFS_FILE = HDFS_DEST_DIR + '/' + os.path.basename(__file__)
+      prefix = self.cluster.fs_prefix + '/test_upload_file'
+      self.cluster.fs.mkdir(prefix)
 
-    self.cluster.fs.do_as_superuser(self.cluster.fs.mkdir, HDFS_DEST_DIR)
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chown, HDFS_DEST_DIR, USER_NAME, USER_NAME)
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, HDFS_DEST_DIR, 0700)
+      USER_NAME = 'test'
+      HDFS_DEST_DIR = prefix + "/tmp/fb-upload-test"
+      LOCAL_FILE = local_file.name
+      HDFS_FILE = HDFS_DEST_DIR + '/' + os.path.basename(LOCAL_FILE)
 
-    stats = self.cluster.fs.stats(HDFS_DEST_DIR)
-    assert_equal(stats['user'], USER_NAME)
-    assert_equal(stats['group'], USER_NAME)
+      self.cluster.fs.do_as_superuser(self.cluster.fs.mkdir, HDFS_DEST_DIR)
+      self.cluster.fs.do_as_superuser(self.cluster.fs.chown, HDFS_DEST_DIR, USER_NAME, USER_NAME)
+      self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, HDFS_DEST_DIR, 0700)
 
-    # Just upload the current python file
-    resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping
-                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
-    response = json.loads(resp.content)
+      stats = self.cluster.fs.stats(HDFS_DEST_DIR)
+      assert_equal(stats['user'], USER_NAME)
+      assert_equal(stats['group'], USER_NAME)
 
-    assert_equal(0, response['status'], response)
-    stats = self.cluster.fs.stats(HDFS_FILE)
-    assert_equal(stats['user'], USER_NAME)
-    assert_equal(stats['group'], USER_NAME)
+      # Just upload the current python file
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR, # GET param avoids infinite looping
+                         dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+      response = json.loads(resp.content)
 
-    f = self.cluster.fs.open(HDFS_FILE)
-    actual = f.read()
-    expected = file(LOCAL_FILE).read()
-    assert_equal(actual, expected)
+      assert_equal(0, response['status'], response)
+      stats = self.cluster.fs.stats(HDFS_FILE)
+      assert_equal(stats['user'], USER_NAME)
+      assert_equal(stats['group'], USER_NAME)
 
-    # Upload again and so fails because file already exits
-    resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
-                       dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
-    response = json.loads(resp.content)
-    assert_equal(-1, response['status'], response)
-    assert_true('already exists' in response['data'], response)
+      f = self.cluster.fs.open(HDFS_FILE)
+      actual = f.read(1024 * 1024 * 5)
+      expected = file(LOCAL_FILE).read()
+      assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
 
-    # Upload in / and fails because of missing permissions
-    not_me = make_logged_in_client("not_me", is_superuser=False)
-    grant_access("not_me", "not_me", "filebrowser")
-    try:
-      resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+      # Upload again and so fails because file already exits
+      resp = self.c.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
                          dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
       response = json.loads(resp.content)
       assert_equal(-1, response['status'], response)
-      assert_true('Permission denied' in response['data'], response)
-    except AttributeError:
-      # Seems like a Django bug.
-      # StopFutureHandlers() does not seem to work in test mode as it continues to MemoryFileUploadHandler after perm issue and so fails.
-      pass
+      assert_true('already exists' in response['data'], response)
+
+      # Upload in / and fails because of missing permissions
+      not_me = make_logged_in_client("not_me", is_superuser=False)
+      grant_access("not_me", "not_me", "filebrowser")
+      try:
+        resp = not_me.post('/filebrowser/upload/file?dest=%s' % HDFS_DEST_DIR,
+                           dict(dest=HDFS_DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+        response = json.loads(resp.content)
+        assert_equal(-1, response['status'], response)
+        assert_true('Permission denied' in response['data'], response)
+      except AttributeError:
+        # Seems like a Django bug.
+        # StopFutureHandlers() does not seem to work in test mode as it continues to MemoryFileUploadHandler after perm issue and so fails.
+        pass
 
 
   def test_upload_zip(self):
