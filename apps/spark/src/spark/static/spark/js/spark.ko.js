@@ -315,8 +315,13 @@ var Snippet = function (vm, notebook, snippet) {
   }
 
   self._ajaxError = function (data, callback) {
-    if (data.status == -2) {
-      notebook.createSession({'type': self.type()}, callback);
+    if (data.status == -2 || data.status == -1) {
+      var existingSession = notebook.getSession(self.type());
+      if (existingSession) {
+        notebook.restartSession(existingSession, callback);
+      } else {
+        notebook.createSession(new Session(vm, {'type': self.type()}), callback);
+      }
     }
     else if (data.status == -3) {
       self.status('expired');
@@ -548,11 +553,13 @@ var Session = function(vm, session) {
 
   self.selectedSessionProperty = ko.observable('');
 
+  self.restarting = ko.observable(false);
+
   if (! ko.isObservable(self.properties)) {
     self.properties = ko.observableArray();
   }
 
-  this.availableNewProperties = ko.computed(function() {
+  self.availableNewProperties = ko.computed(function() {
     var addedIndex = {};
     $.each(self.properties(), function(index, property) {
       addedIndex[property.name()] = true;
@@ -590,9 +597,34 @@ var Notebook = function (vm, notebook) {
     return _s;
   };
 
-  self.restartSession = function (session) {
-    self.closeSession(session);
-    self.createSession({'type': session.type() });
+  self.restartSession = function (session, callback) {
+    if (session.restarting()) {
+      return;
+    }
+    session.restarting(true);
+    var snippets = $.grep(self.snippets(), function (snippet) {
+      return snippet.type() == session.type();
+    });
+
+    $.each(snippets, function(index, snippet) {
+      snippet.status('loading');
+    });
+
+    var sessionJson = ko.mapping.toJSON(session);
+
+    self.closeSession (session, true, function() {
+      self.createSession(session, function () {
+        $.each(snippets, function(index, snippet) {
+          snippet.status('ready');
+        });
+        session.restarting(false);
+        if (callback) {
+          callback();
+        }
+      }, function () {
+        session.restarting(false);
+      });
+    });
   };
 
   self.addSession = function (session) {
@@ -615,27 +647,40 @@ var Notebook = function (vm, notebook) {
     self.snippets.push(_snippet);
 
     if (self.getSession(_snippet.type()) == null) {
-      self.createSession({'type': _snippet.type()});
+      self.createSession(new Session(vm, {'type': _snippet.type()}));
     }
 
     _snippet.init();
   };
 
-  self.createSession = function (session, callback) {
+  self.createSession = function (session, callback, failCallback) {
     var snippets = $.grep(self.snippets(), function (snippet) {
-       return snippet.type() == session.type;
+       return snippet.type() == session.type();
     });
 
     $.each(snippets, function(index, snippet) {
       snippet.status('loading');
     });
 
+    var fail = function (message) {
+      $.each(snippets, function(index, snippet) {
+        snippet.status('failed');
+      });
+      $(document).trigger("error", message);
+      if (failCallback) {
+        failCallback();
+      }
+    };
+
     $.post("/spark/api/create_session", {
       notebook: ko.mapping.toJSON(self.getContext()),
       session: ko.mapping.toJSON(session) // e.g. {'type': 'hive', 'properties': [{'driverCores': '2'}]}
     }, function (data) {
       if (data.status == 0) {
-        self.addSession(new Session(vm, data.session));
+        ko.mapping.fromJS(data.session, {}, session);
+        if (self.getSession(session.type()) == null) {
+          self.addSession(session);
+        }
         $.each(snippets, function(index, snippet) {
           snippet.status('ready');
         });
@@ -644,16 +689,10 @@ var Notebook = function (vm, notebook) {
         }
       }
       else {
-        $.each(snippets, function(index, snippet) {
-          snippet.status('failed');
-        });
-        $(document).trigger("error", data.message);
+        fail(data.message);
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $.each(snippets, function(index, snippet) {
-        snippet.status('failed');
-      })
-      $(document).trigger("error", xhr.responseText);
+    }).fail(function (xhr) {
+      fail(xhr.responseText);
     });
   };
 
@@ -697,7 +736,7 @@ var Notebook = function (vm, notebook) {
     self.snippets.push(_snippet);
 
     if (self.getSession(_snippet.type()) == null) {
-      self.createSession({'type': _snippet.type()});
+      self.createSession(new Session(vm, {'type': _snippet.type()}));
     }
     else {
       _snippet.status('ready');
@@ -713,7 +752,7 @@ var Notebook = function (vm, notebook) {
        uuid: self.uuid,
        sessions: self.sessions
     };
-  }
+  };
 
   // Init
   if (notebook.snippets) {
@@ -754,21 +793,31 @@ var Notebook = function (vm, notebook) {
     });
   };
 
-  self.closeSession = function (session) {
+  self.closeAndRemoveSession = function (session) {
+    self.closeSession (session, false, function() {
+      self.sessions.remove(session);
+    });
+  };
+
+  self.closeSession = function (session, silent, callback) {
     $.post("/spark/api/close_session", {
       session: ko.mapping.toJSON(session)
     }, function (data) {
-      if (data.status == 0 || data.status == -2) {
-        self.sessions.remove(session);
-      }
-      else {
+      if (!silent && data.status != 0 && data.status != -2) {
         $(document).trigger("error", data.message);
+        return;
       }
-    }).fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
+
+      if (callback) {
+        callback();
+      }
+    }).fail(function (xhr) {
+      if (!silent) {
+        $(document).trigger("error", xhr.responseText);
+      }
     });
   };
-}
+};
 
 
 function EditorViewModel(notebooks, options) {

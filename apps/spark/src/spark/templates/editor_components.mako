@@ -817,10 +817,10 @@ from django.utils.translation import ugettext as _
                   <i class="fa fa-plus"></i>
                 </a>
                 <!-- /ko -->
-                <a style="float: right;" class="btn pointer" title="${ _('Restart session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }">
-                  <i class="fa fa-refresh"></i> ${ _('Recreate') }
+                <a style="float: right;" class="btn pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }">
+                  <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
                 </a>
-                <a style="margin-right: 5px; float: right;" class="btn pointer" title="${ _('Close session') }" data-dismiss="modal" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeSession($data) }">
+                <a style="margin-right: 5px; float: right;" class="btn pointer" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }">
                   <i class="fa fa-times"></i> ${ _('Close') }
                 </a>
               </div>
