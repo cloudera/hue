@@ -287,6 +287,26 @@ em {
   border-bottom: 1px solid #e5e5e5;
 }
 
+#result-container .show-details-icon {
+  text-align: center;
+  height: 8px;
+  padding: 0;
+  line-height: 8px;
+  border-top: 1px solid #FFF;
+}
+
+#result-container .show-details-icon:hover {
+  border-top-color: #DDD;
+}
+
+#result-container .show-details-icon i {
+  color: #D1D1D1;
+}
+
+#result-container .show-details-icon:hover i {
+  color: #338bb8;
+}
+
 .demi-modal {
   min-height: 80px;
 }

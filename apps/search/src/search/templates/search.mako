@@ -598,7 +598,7 @@ ${ dashboard.layout_skeleton() }
               </tr>
             </thead>
             <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
-              <tr class="result-row">
+              <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
                 <td>
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
                     <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
@@ -609,7 +609,8 @@ ${ dashboard.layout_skeleton() }
                 <!-- /ko -->
               </tr>
               <tr data-bind="visible: doc.showDetails" class="show-details">
-                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}" colspan="2">
+                <td>&nbsp;</td>
+                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
                   <span data-bind="template: {name: 'document-details', data: $data}"></span>
                 </td>
               </tr>
@@ -729,21 +730,20 @@ ${ dashboard.layout_skeleton() }
       <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
         <thead>
           <tr>
-            <th style="width: 18px">&nbsp;</th>
             <th>&nbsp;</th>
           </tr>
         </thead>
         <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
+          <tr data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+            <td><div data-bind="html: content" style="margin-bottom: -20px"></div></td>
+          </tr>
           <tr>
-            <td valign="top">
-              <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
-                <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
-              </a>
+            <td class="show-details-icon pointer" data-bind="click: toggleDocDetails">
+              <i class="fa" data-bind="css: {'fa-caret-down' : ! doc.showDetails(), 'fa-caret-up': doc.showDetails()}"></i>
             </td>
-            <td><div class="result-row" data-bind="html: content, style: {'marginBottom': doc.showDetails() ? '-20px' : '0px'}"></div></td>
           </tr>
           <tr data-bind="visible: doc.showDetails" class="show-details">
-            <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}" colspan="2">
+            <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
               <span data-bind="template: {name: 'document-details', data: $data}"></span>
             </td>
           </tr>
