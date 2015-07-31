@@ -709,6 +709,10 @@ class WebHdfs(Hdfs):
 
     # Now talk to the real thing. The redirect url already includes the params.
     client = self._make_client(next_url, self.security_enabled, self.ssl_cert_ca_verify)
+
+    # Make sure to reuse the session in order to preserve the Kerberos cookies.
+    client._session = self._client._session
+
     headers = {'Content-Type': 'application/octet-stream'}
     return resource.Resource(client).invoke(method, data=data, headers=headers)
 
