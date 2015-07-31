@@ -74,7 +74,7 @@ object Main {
       // Ignore the version for now.
       val version = sparkSubmitVersion(livyConf)
       version match {
-        case "1.3.0" | "1.3.1" =>
+        case "1.3.0" | "1.3.1" | "1.4.0" | "1.5.0" =>
           logger.info(f"Using spark-submit version $version")
         case _ =>
           logger.warn(f"Warning, livy has not been tested with spark-submit version $version")
@@ -102,15 +102,11 @@ object Main {
     val exitCode = process.waitFor()
     val output = process.inputIterator.mkString("\n")
 
-    if (exitCode != 1) {
-      throw new IOException(f"spark-submit had an unexpected exit [$exitCode]:\n$output]")
-    }
-
     val regex = """version (.*)""".r.unanchored
 
     output match {
       case regex(version) => version
-      case _ => throw new IOException(f"Unable to determing spark-submit version:\n$output")
+      case _ => throw new IOException(f"Unable to determing spark-submit version [$exitCode]:\n$output")
     }
   }
 }
