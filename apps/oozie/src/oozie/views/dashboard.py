@@ -318,7 +318,7 @@ def list_oozie_workflow(request, job_id):
       if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
 
       if hue_workflow:
-        workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
+        workflow_graph = ''
         full_node_list = hue_workflow.nodes
         workflow_id = hue_workflow.id
         wid = {

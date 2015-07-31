@@ -286,9 +286,6 @@ class Workflow(Job):
       LOG.error(msg)
       raise PopupException(msg)
 
-  def gen_status_graph(self, oozie_workflow):
-    return ''
-
   def get_absolute_url(self):
     return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
 
