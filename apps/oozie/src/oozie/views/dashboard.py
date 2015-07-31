@@ -328,9 +328,12 @@ def list_oozie_workflow(request, job_id):
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
         credentials = Credentials()
-      #TODO: For workflows submitted from CLI in https://issues.cloudera.org/browse/HUE-2659
+      else:
+        # For workflows submitted from CLI or deleted in the editor
+        # Until better parsing in https://issues.cloudera.org/browse/HUE-2659
+        workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
     except:
-      LOG.exception("Ignoring error updating Document2 record for job_id=%s", job_id)
+      LOG.exception("Error generating full page for running workflow %s" % job_id)
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 

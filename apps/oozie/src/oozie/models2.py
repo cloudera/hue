@@ -40,7 +40,6 @@ from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
-from oozie.importlib.workflows import generate_v2_graph_nodes, MalformedWfDefException, InvalidTagWithNamespaceException
 from oozie.utils import utc_datetime_format
 from hadoop.fs.exceptions import WebHdfsException
 
@@ -296,19 +295,6 @@ class Workflow(Job):
   @classmethod
   def get_application_path_key(cls):
     return 'oozie.wf.application.path'
-
-  @classmethod
-  def gen_workflow_data_from_xml(cls, user, oozie_workflow):
-    try:
-      return generate_v2_graph_nodes(oozie_workflow.definition)
-    except MalformedWfDefException, e:
-      LOG.exception(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
-    except InvalidTagWithNamespaceException, e:
-      LOG.exception(_("Tag with namespace %(namespace)s is not valid. Please use one of the following namespaces: %(namespaces)s") % {
-      'namespace': e.namespace,
-      'namespaces': e.namespaces
-      })
-    return []
 
 
 class Node():
