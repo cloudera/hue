@@ -765,7 +765,7 @@ ${ dashboard.layout_skeleton() }
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
   <!-- /ko -->
   <!-- ko if: $data.details().length > 0 -->
-    <div class="document-details-actions pull-left">
+    <div class="document-details-actions pull-left" data-bind="visible: ${ 'true' if can_edit_index else 'false' } || externalLink()">
       <a href="javascript:void(0)" data-bind="visible: ! showEdit(), click: function() { showEdit(true); }" title="${ _('Edit this document') }">
         <i class="fa fa-edit fa-fw"></i>
       </a>

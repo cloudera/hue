@@ -36,7 +36,7 @@ from search.data_export import download as export_download
 from search.decorators import allow_owner_only, allow_viewer_only
 from search.management.commands import search_setup
 from search.models import Collection2, augment_solr_response, augment_solr_exception, pairwise2
-from search.search_controller import SearchController
+from search.search_controller import SearchController, can_edit_index
 
 
 LOG = logging.getLogger(__name__)
@@ -63,7 +63,8 @@ def index(request):
     'collection': collection,
     'query': query,
     'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
-    'is_owner': collection_doc.doc.get().can_write(request.user)
+    'is_owner': collection_doc.doc.get().can_write(request.user),
+    'can_edit_index': can_edit_index(request.user)
   })
 
 
@@ -90,9 +91,10 @@ def new_search(request):
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
                  "drops":["temp"],"klass":"card card-home card-column span10"},
          ],
-         'is_latest': LATEST.get()
+         'is_latest': LATEST.get(),
      }),
-    'is_owner': True
+    'is_owner': True,
+    'can_edit_index': can_edit_index(request.user)
   })
 
 
@@ -118,7 +120,8 @@ def browse(request, name):
          ],
          'is_latest': LATEST.get()
      }),
-     'is_owner': True
+     'is_owner': True,
+     'can_edit_index': can_edit_index(request.user)
   })
 
 
@@ -321,6 +324,10 @@ def get_document(request):
 def update_document(request):
   result = {'status': -1, 'message': 'Error'}
 
+  if not can_edit_index(request.user):
+    result['message'] = _('Permission to edit the document denied')
+    return JsonResponse(result)
+
   try:
     collection = json.loads(request.POST.get('collection', '{}'))
     document = json.loads(request.POST.get('document', '{}'))
@@ -341,6 +348,9 @@ def update_document(request):
       if SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version):
         result['status'] = 0
         result['message'] = _('Document successfully updated.')
+    else:
+      result['status'] = 0
+      result['message'] = _('Document has no modifications to change.')
 
   except Exception, e:
     result['message'] = force_unicode(e)

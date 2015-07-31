@@ -90,6 +90,28 @@ class TestWithMockedSolr(TestSearchBase):
     response = self.c.get(reverse('search:index'))
     assert_true('search' in response.content, response.content)
 
+  def test_update_document(self):
+    # Regular user
+    response = self.c.post(reverse('search:update_document'), {
+        'collection': json.dumps(self._get_collection_param(self.collection)),
+        'document': json.dumps({'hasChanged': False})
+    })
+
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], response.content)
+    assert_true('denied' in data['message'], response.content)
+
+    # Admin
+    c = make_logged_in_client(username='admin', is_superuser=True)
+    response = c.post(reverse('search:update_document'), {
+        'collection': json.dumps(self._get_collection_param(self.collection)),
+        'document': json.dumps({'hasChanged': False})
+    })
+
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], response.content)
+    assert_true('no modifications to change' in data['message'], response.content)
+
   def test_strip_nulls(self):
     response = '{"uid":"1111111","method":"check_user"}\x00'
     response = json.loads(response.replace('\x00', '')) # Does not call real API

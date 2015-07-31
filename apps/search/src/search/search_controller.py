@@ -17,7 +17,6 @@
 # limitations under the License.
 
 import logging
-import uuid
 
 from django.db.models import Q
 
@@ -132,3 +131,7 @@ class SearchController(object):
       return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
     else:
       return indexes
+
+
+def can_edit_index(user):
+  return user.is_superuser
