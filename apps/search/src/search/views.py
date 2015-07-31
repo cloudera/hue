@@ -188,37 +188,6 @@ def save(request):
   return JsonResponse(response)
 
 
-@allow_owner_only
-def save_definition(request):
-  response = {'status': -1}
-
-  collection = json.loads(request.POST.get('collection', '{}')) # id
-  query = json.loads(request.POST.get('query', '{}'))
-
-  query['name'] = 'My def'
-  query['uuid'] = 'uuid'
-  query['name'] = 'My def'
-
-  if collection and query:
-    collection = Collection.objects.get(id=collection['id'])
-
-    if query['id']:
-      definition_doc = Document2.objects.get(id=collection['id'])
-    else:
-      definition_doc = Document2.objects.create(name=query['name'], uuid=query['uuid'], type='search-definition', owner=request.user, dependencies=[collection])
-      #Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
-
-    definition_doc.update_data(query)
-    definition_doc.save()
-    response['status'] = 0
-    response['id'] = definition_doc.id
-    response['message'] = _('Definition saved !')
-  else:
-    response['message'] = _('There is no collection to search.')
-
-  return JsonResponse(response)
-
-
 @allow_viewer_only
 def download(request):
   try:
@@ -366,8 +335,8 @@ def update_document(request):
       for field in document['details']:
         if field['hasChanged']:
           edits[field['key']] = {"set": field['value']}
-#        if field['key'] == '_version_': # Commented until HUE-2870
-#          version = field['value']
+        if field['key'] == '_version_':
+          version = field['value']
 
       if SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version):
         result['status'] = 0
