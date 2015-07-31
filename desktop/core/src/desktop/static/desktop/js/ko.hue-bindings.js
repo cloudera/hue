@@ -1505,8 +1505,11 @@ ko.bindingHandlers.aceEditor = {
       enableBasicAutocompletion: true,
       enableSnippets: true,
       enableLiveAutocompletion: true,
-      showGutter: true,
-      showLineNumbers: false
+      showGutter: false,
+      showLineNumbers: false,
+      showPrintMargin: false,
+      minLines: 6,
+      maxLines: 25
     }
 
     if (editor.getValue() == "" && options.placeholder) {
