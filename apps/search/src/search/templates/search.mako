@@ -1864,6 +1864,7 @@ ${ dashboard.layout_skeleton() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 
+<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout(True) }
@@ -1904,6 +1905,9 @@ ${ dashboard.import_charts() }
 </style>
 
 <script type="text/javascript" charset="utf-8">
+
+JSON.parse = JSON.bigdataParse; // this is to avoid problems with hue Solr IDs
+
 var viewModel;
 
 nv.dev = false;
