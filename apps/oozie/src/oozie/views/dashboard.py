@@ -168,8 +168,8 @@ def show_oozie_error(view_func):
       LOG.exception("Error communicating with Oozie in %s", view_func.__name__)
 
       detail = ex._headers.get('oozie-error-message', ex)
-      if 'Max retries exceeded with url' in str(detail):
-        detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+      if 'Max retries exceeded with url' in str(detail) or 'Connection refused' in str(detail):
+        detail = _('The Oozie server is not running')
       raise PopupException(_('An error occurred with Oozie.'), detail=detail)
   return wraps(view_func)(decorate)
 

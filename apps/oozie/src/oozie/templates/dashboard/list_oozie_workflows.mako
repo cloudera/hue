@@ -499,6 +499,8 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
         runningTable.fnDraw();
         runningTimeout = window.setTimeout(refreshRunning, 5000);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseJSON['detail']);
       });
     }
 

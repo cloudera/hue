@@ -503,6 +503,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         }
         numRunning = data.jobs.length;
         window.setTimeout(refreshRunning, 20000);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseJSON['detail']);
       });
     }
 
