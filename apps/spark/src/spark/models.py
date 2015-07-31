@@ -35,6 +35,7 @@ from beeswax.views import _parse_out_hadoop_jobs
 
 from spark.job_server_api import get_api as get_spark_api
 from spark.data_export import download as spark_download
+from desktop.lib.rest.http_client import RestException
 
 
 LOG = logging.getLogger(__name__)
@@ -442,11 +443,15 @@ class SparkApi(Api):
     api = get_spark_api(self.user)
 
     if session['id'] is not None:
-      api.close(session['id'])
-      return {
-        'session': session['id'],
-        'status': 0
-      }
+      try:
+        api.close(session['id'])
+        return {
+          'session': session['id'],
+          'status': 0
+        }
+      except RestException, e:
+        if e.code == 404 or e.code == 500: # TODO remove the 500
+          raise SessionExpired(e)
     else:
       return {'status': -1}
 

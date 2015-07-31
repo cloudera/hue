@@ -758,8 +758,8 @@ var Notebook = function (vm, notebook) {
     $.post("/spark/api/close_session", {
       session: ko.mapping.toJSON(session)
     }, function (data) {
-      if (data.status == 0) {
-        notebook.sessions.remove(session);
+      if (data.status == 0 || data.status == -2) {
+        self.sessions.remove(session);
       }
       else {
         $(document).trigger("error", data.message);
