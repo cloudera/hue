@@ -700,34 +700,34 @@ def test_list_for_autocomplete():
   response = c1.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   content = json.loads(response.content)
 
-  users = [user['username'] for user in content['users']]
-  groups = [user['name'] for user in content['groups']]
+  users = [smart_unicode(user['username']) for user in content['users']]
+  groups = [smart_unicode(user['name']) for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete2', 'test_list_for_autocomplete3'], users)
-  assert_true('test_list_for_autocomplete' in groups, groups)
-  assert_true('test_list_for_autocomplete_other_group' in groups, groups)
+  assert_equal([u'test_list_for_autocomplete2', u'test_list_for_autocomplete3'], users)
+  assert_true(u'test_list_for_autocomplete' in groups, groups)
+  assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
 
   # c2 is in the same group as c1
   response = c2_same_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   content = json.loads(response.content)
 
-  users = [user['username'] for user in content['users']]
-  groups = [user['name'] for user in content['groups']]
+  users = [smart_unicode(user['username']) for user in content['users']]
+  groups = [smart_unicode(user['name']) for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete3'], users)
-  assert_true('test_list_for_autocomplete' in groups, groups)
-  assert_true('test_list_for_autocomplete_other_group' in groups, groups)
+  assert_equal([u'test_list_for_autocomplete', u'test_list_for_autocomplete3'], users)
+  assert_true(u'test_list_for_autocomplete' in groups, groups)
+  assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
 
   # c3 is alone except for groups
   response = c3_other_group.get(reverse('useradmin.views.list_for_autocomplete'), HTTP_X_REQUESTED_WITH='XMLHttpRequest')
   content = json.loads(response.content)
 
-  users = [user['username'] for user in content['users']]
-  groups = [user['name'] for user in content['groups']]
+  users = [smart_unicode(user['username']) for user in content['users']]
+  groups = [smart_unicode(user['name']) for user in content['groups']]
 
-  assert_equal(['test_list_for_autocomplete', 'test_list_for_autocomplete2'], users)
-  assert_true('test_list_for_autocomplete' in groups, groups)
-  assert_true('test_list_for_autocomplete_other_group' in groups, groups)
+  assert_equal([u'test_list_for_autocomplete', u'test_list_for_autocomplete2'], users)
+  assert_true(u'test_list_for_autocomplete' in groups, groups)
+  assert_true(u'test_list_for_autocomplete_other_group' in groups, groups)
 
 class MockLdapConnection(object):
   def __init__(self, ldap_config, ldap_url, username, password, ldap_cert):
