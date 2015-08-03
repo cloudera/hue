@@ -71,6 +71,10 @@ ${ editorComponents.commonJS() }
     aceAutocomplete.setDatabase(db);
   });
 
+  huePubSub.subscribe('assist.firstLevelChange', function (tables) {
+    aceAutocomplete.setCurrentTables(tables);
+  });
+
   var options = ${ options_json | n,unicode };
 
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, options);

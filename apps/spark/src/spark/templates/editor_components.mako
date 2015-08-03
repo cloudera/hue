@@ -464,6 +464,7 @@ from django.utils.translation import ugettext as _
           extraCompleters: completers,
           errors: errors,
           autocompleter: aceAutocomplete,
+          openIt: '${ _("Double click to open it") }',
           placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>
   </div>

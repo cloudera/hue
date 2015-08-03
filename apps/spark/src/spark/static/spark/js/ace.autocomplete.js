@@ -36,6 +36,7 @@ var hasExpired = function (timestamp) {
 function Autocomplete(options) {
   this.options = options;
   this.currentDB = "";
+  this.currentTables = [];
 }
 
 Autocomplete.prototype.jsonCalls = function (options) {
@@ -264,4 +265,12 @@ Autocomplete.prototype.setDatabase = function (db) {
 
 Autocomplete.prototype.getDatabase = function () {
   return this.currentDB;
+}
+
+Autocomplete.prototype.setCurrentTables = function (tables) {
+  this.currentTables = tables;
+}
+
+Autocomplete.prototype.getCurrentTables = function () {
+  return this.currentTables;
 }

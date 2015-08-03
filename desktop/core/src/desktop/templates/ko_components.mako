@@ -297,6 +297,10 @@ from django.utils.translation import ugettext as _
             self.assist.isLoading(false);
           };
           self.assist.getData(self.assist.selectedMainObject(), force);
+
+          self.assist.firstLevelObjects.subscribe(function(value){
+            huePubSub.publish('assist.firstLevelChange', value);
+          });
         };
 
         self.loadAssistSecondLevel = function(first) {

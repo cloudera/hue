@@ -1689,16 +1689,18 @@ ko.bindingHandlers.aceEditor = {
       editor.setValue(options.placeholder);
     }
 
-    var _extraOptions = $.totalStorage("hue.ace.options") || {};
-    $.extend(editorOptions, options.editorOptions || _extraOptions);
+    var userOptions = $.totalStorage("hue.ace.options") || {};
+    $.extend(editorOptions, options.editorOptions || userOptions);
 
     editor.setOptions(editorOptions);
+
     editor.on("focus", function () {
       if (options.placeholder && editor.getValue() == options.placeholder) {
         editor.setValue("");
       }
       onFocus(editor);
     });
+
     editor.on("blur", function () {
       options.value(editor.getValue());
       if (editor.getValue() == "" && options.placeholder) {
@@ -1706,11 +1708,160 @@ ko.bindingHandlers.aceEditor = {
       }
       onBlur(editor);
     });
+
     editor.on("copy", function () {
       onCopy(editor);
     });
+
     editor.on("paste", function () {
       onPaste(editor);
+    });
+
+    ace.define("huelink", [], function (require, exports, module) {
+      "use strict";
+
+      var Oop = ace.require("ace/lib/oop");
+      var Event = ace.require("ace/lib/event");
+      var Range = ace.require("ace/range").Range;
+      var EventEmitter = ace.require("ace/lib/event_emitter").EventEmitter;
+      var Tooltip = ace.require("ace/tooltip").Tooltip;
+
+      var HueLink = function (editor) {
+        if (editor.hueLink)
+          return;
+        editor.hueLink = this;
+        this.editor = editor;
+        Tooltip.call(this, editor.container);
+
+        this.update = this.update.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseOut = this.onMouseOut.bind(this);
+        this.onClick = this.onClick.bind(this);
+        Event.addListener(editor.renderer.scroller, "mousemove", this.onMouseMove);
+        Event.addListener(editor.renderer.content, "mouseout", this.onMouseOut);
+        Event.addListener(editor.renderer.content, "dblclick", this.onClick);
+      };
+
+      Oop.inherits(HueLink, Tooltip);
+
+      (function () {
+        Oop.implement(this, EventEmitter);
+
+        this.token = {};
+        this.marker = null;
+
+        this.update = function () {
+          this.$timer = null;
+          var editor = this.editor;
+          var renderer = editor.renderer;
+
+          var canvasPos = renderer.scroller.getBoundingClientRect();
+          var offset = (this.x + renderer.scrollLeft - canvasPos.left - renderer.$padding) / renderer.characterWidth;
+          var row = Math.floor((this.y + renderer.scrollTop - canvasPos.top) / renderer.lineHeight);
+          var col = Math.round(offset);
+
+          var screenPos = {row: row, column: col, side: offset - col > 0 ? 1 : -1};
+          var session = editor.session;
+          var docPos = session.screenToDocumentPosition(screenPos.row, screenPos.column);
+
+          var selectionRange = editor.selection.getRange();
+          if (!selectionRange.isEmpty()) {
+            if (selectionRange.start.row <= row && selectionRange.end.row >= row)
+              return this.clear();
+          }
+
+          var line = editor.session.getLine(docPos.row);
+          if (docPos.column == line.length) {
+            var clippedPos = editor.session.documentToScreenPosition(docPos.row, docPos.column);
+            if (clippedPos.column != screenPos.column) {
+              return this.clear();
+            }
+          }
+
+          var token = editor.session.getTokenAt(docPos.row, docPos.column);
+
+          var isMetastoreLink = Object.keys(valueAccessor().autocompleter.getCurrentTables()).indexOf(token.value) > -1;
+
+          if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
+              token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
+              isMetastoreLink) {
+            // add highlight for the clicked token
+            var range = new AceRange(docPos.row, token.start, docPos.row, token.start + token.value.length);
+            editor.session.removeMarker(this.marker);
+            this.marker = editor.session.addMarker(range, 'ace_bracket red');
+            editor.renderer.setCursorStyle("pointer");
+            this.setText(options.openIt);
+            if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
+              $(".ace_tooltip").show();
+              this.show(null, this.x + 10, this.y + 10);
+            }
+            this.link = token;
+            this.isClearable = true
+          }
+          else {
+            this.clear();
+          }
+        };
+
+        this.clear = function () {
+          if (this.isClearable) {
+            $(".ace_tooltip").hide();
+            this.editor.session.removeMarker(this.marker);
+            this.editor.renderer.setCursorStyle("");
+            this.isClearable = false;
+            this.link = null;
+          }
+        };
+
+        this.onClick = function (e) {
+          if (this.link) {
+            this.link.editor = this.editor;
+            this._signal("open", this.link);
+            this.clear()
+          }
+        };
+
+        this.onMouseMove = function (e) {
+          if (this.editor.$mouseHandler.isMousePressed) {
+            if (!this.editor.selection.isEmpty())
+              this.clear();
+            return;
+          }
+          this.x = e.clientX;
+          this.y = e.clientY;
+          this.update();
+        };
+
+        this.onMouseOut = function (e) {
+          Tooltip.prototype.hide();
+          this.clear();
+        };
+
+        this.destroy = function () {
+          this.onMouseOut();
+          Event.removeListener(this.editor.renderer.scroller, "mousemove", this.onMouseMove);
+          Event.removeListener(this.editor.renderer.content, "mouseout", this.onMouseOut);
+          delete this.editor.hueLink;
+        };
+
+      }).call(HueLink.prototype);
+
+      exports.HueLink = HueLink;
+
+    });
+
+    HueLink = ace.require("huelink").HueLink;
+    editor.hueLink = new HueLink(editor);
+    editor.hueLink.on("open", function (token) {
+      if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
+        window.open("/filebrowser/#" + token.value.replace(/'/gi, ""));
+      }
+      else if (token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1) {
+        window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""));
+      }
+      else {
+        window.open("/metastore/table/" + valueAccessor().autocompleter.getDatabase() + "/" + token.value);
+      }
     });
 
     function newCompleter(items) {
