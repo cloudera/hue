@@ -38,6 +38,49 @@ ko.bindingHandlers.fadeVisible = {
 };
 
 
+ko.bindingHandlers.multiCheck = {
+  init: function (element, valueAccessor) {
+    $(element).attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
+
+    var $container = $(ko.unwrap(valueAccessor()));
+    $(element).click(function (e, shouldIgnore) {
+      var $self = $(this);
+      if ($self.data('noMultiCheck')) {
+        $self.data('noMultiCheck', false);
+        return;
+      }
+      var shouldCheck = $self.is(':checked') || ! $self.hasClass('fa-check');
+      if (e.shiftKey && shouldCheck === $container.data('last-clicked-checkbox-state')) {
+        var insideGroup = false;
+        var allCheckboxes = $container.find(":checkbox");
+        if (allCheckboxes.length == 0) {
+          allCheckboxes = $container.find(".hueCheckbox");
+        }
+        for (var i = 0; i < allCheckboxes.length; i++) {
+          var checkbox = allCheckboxes[i];
+          if (checkbox === this || checkbox === $container.data('last-clicked-checkbox')) {
+            if (insideGroup) {
+              break;
+            }
+            insideGroup = true;
+            continue;
+          }
+          if (insideGroup) {
+            var $checkbox = $(checkbox);
+            $checkbox.data('noMultiCheck', true);
+            if (($checkbox.is(':checked') || $checkbox.hasClass('fa-check')) !== shouldCheck) {
+              $checkbox.trigger("click");
+            }
+          }
+        }
+      }
+      $container.data('last-clicked-checkbox', this);
+      $container.data('last-clicked-checkbox-state', shouldCheck);
+    });
+  },
+  update: function() {}
+};
+
 ko.extenders.numeric = function (target, config) {
   var precision = typeof config.precision === 'undefined' ? config : config.precision;
   var roundingMultiplier = Math.pow(10, precision);
