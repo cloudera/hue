@@ -365,6 +365,7 @@ var FieldAnalysis = function (vm, field_name) {
       collection: ko.mapping.toJSON(vm.collection),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         if (data.terms != null) {
           $.each(data.terms, function (key, val) {
@@ -379,7 +380,7 @@ var FieldAnalysis = function (vm, field_name) {
         $(document).trigger("error", data.message);
       }
       self.isLoading(false);
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -392,6 +393,7 @@ var FieldAnalysis = function (vm, field_name) {
       query: ko.mapping.toJSON(vm.query),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
+      data = JSON.bigdataParse(data);
       if (data.status == 0) {
         if (data.stats.stats.stats_fields[self.name()] != null) {
           $.each(data.stats.stats.stats_fields[self.name()], function (key, val) {
@@ -406,7 +408,7 @@ var FieldAnalysis = function (vm, field_name) {
         $(document).trigger("error", data.message);
       }
       self.isLoading(false);
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
@@ -1485,6 +1487,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       collection: ko.mapping.toJSON(self.collection),
       id: doc.id
     }, function (data) {
+      data = JSON.bigdataParse(data);
       var details = [];
       doc.details.removeAll();
       if (data.status == 0) {
@@ -1514,7 +1517,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
       doc.details(details);
       doc.originalDetails(ko.toJSON(doc.details()));
-    }).fail(function (xhr, textStatus, errorThrown) {
+    }, "text").fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
   };
