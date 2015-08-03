@@ -21,7 +21,7 @@ import logging
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
-from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables
+from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node
 
 
 LOG = logging.getLogger(__name__)
@@ -109,3 +109,11 @@ LIMIT $limit"""))
 
     job.update_name('My <...> 1st W$rkflow [With] (Bad) letter$')
     assert_equal('My_______1st_W$rkflow__With___Bad__lette', job.validated_name)
+
+  def test_ignore_dead_fork_link(self):
+    data = {'id': 1, 'type': 'fork', 'children': [{'to': 1, 'id': 1}, {'to': 2, 'id': 2}], 'properties': {}, 'name': 'my-fork'} # to --> 2 does not exist
+    fork = Node(data)
+
+    node_mapping = {1: fork} # Point to ourself
+
+    assert_equal(['<fork', 'name="my-fork">', '<path', 'start="my-fork"', '/>', '</fork>'], fork.to_xml(node_mapping=node_mapping).split())

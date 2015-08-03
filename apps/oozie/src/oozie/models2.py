@@ -311,6 +311,13 @@ class Node():
     if self.data['type'] == 'hive2' and not self.data['properties']['jdbc_url']:
       self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
 
+    if self.data['type'] == 'fork':
+      links = [link for link in self.data['children'] if link['to'] in node_mapping]
+      if len(links) != len(self.data['children']):
+        LOG.warn('Fork has some children links that do not exist, ignoring them: links %s, existing links %s, links %s, existing links %s' \
+                 % (len(links), len(self.data['children']), links, self.data['children']))
+        self.data['children'] = links
+
     data = {
       'node': self.data,
       'mapping': mapping,
