@@ -152,3 +152,12 @@ LIMIT $limit"""))
 
     assert_false("<java-opts>[{u&#39;value&#39;: u&#39;-debug -Da -Db=1&#39;}]</java-opts>" in xml, xml)
     assert_true("<java-opts>-debug -Da -Db=1</java-opts>" in xml, xml)
+
+  def test_ignore_dead_fork_link(self):
+    data = {'id': 1, 'type': 'fork', 'children': [{'to': 1, 'id': 1}, {'to': 2, 'id': 2}], 'properties': {}, 'name': 'my-fork'} # to --> 2 does not exist
+    fork = Node(data)
+
+    node_mapping = {1: fork} # Point to ourself
+
+    assert_equal(['<fork', 'name="my-fork">', '<path', 'start="my-fork"', '/>', '</fork>'], fork.to_xml(node_mapping=node_mapping).split())
+
