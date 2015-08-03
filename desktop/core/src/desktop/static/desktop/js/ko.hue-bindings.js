@@ -37,6 +37,37 @@ ko.bindingHandlers.fadeVisible = {
   }
 };
 
+ko.bindingHandlers.logScroller = {
+  init: function (element, valueAccessor) {
+    var $element = $(element);
+
+    $element.on("scroll", function () {
+      $element.data('lastScrollTop', $element.scrollTop());
+    });
+
+    function autoLogScroll () {
+      var elementHeight = $element.innerHeight();
+      var lastScrollTop = $element.data('lastScrollTop') || 0;
+      var lastScrollHeight = $element.data('lastScrollHeight') || elementHeight;
+
+      var stickToBottom = (lastScrollTop + elementHeight) === lastScrollHeight;
+
+      if (stickToBottom) {
+        $element.scrollTop(element.scrollHeight - $element.height());
+        $element.data('lastScrollTop', $element.scrollTop());
+      }
+
+      $element.data('lastScrollHeight', element.scrollHeight);
+    }
+
+    var logValue = valueAccessor();
+    logValue.subscribe(function () {
+      window.setTimeout(autoLogScroll, 200);
+    });
+
+    autoLogScroll();
+  }
+};
 
 ko.bindingHandlers.multiCheck = {
   init: function (element, valueAccessor) {

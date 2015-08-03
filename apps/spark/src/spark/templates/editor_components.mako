@@ -366,7 +366,7 @@ from django.utils.translation import ugettext as _
 
       <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
         <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs().length > 0, text: result.logs" class="logs logs-bigger"></pre>
+        <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
       </div>
 
       <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
