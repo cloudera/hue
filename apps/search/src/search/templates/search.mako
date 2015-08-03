@@ -1906,8 +1906,6 @@ ${ dashboard.import_charts() }
 
 <script type="text/javascript" charset="utf-8">
 
-JSON.parse = JSON.bigdataParse; // this is to avoid problems with hue Solr IDs
-
 var viewModel;
 
 nv.dev = false;

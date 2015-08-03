@@ -1327,6 +1327,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         query: ko.mapping.toJSON(self.query),
         layout: ko.mapping.toJSON(self.columns)
       }, function (data) {
+        data = JSON.bigdataParse(data);
 
         if (typeof callback != undefined && callback != null){
           callback(data);
@@ -1410,7 +1411,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           }
           self.resultsHash = _resultsHash;
         }
-      })
+      },
+      "text")
       ].concat(multiQs)
     )
     .done(function() {
