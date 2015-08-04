@@ -30,6 +30,9 @@ import re
 # this file has been loaded after `desktop.settings` has been loaded.
 import desktop.monkey_patches
 
+import desktop.lib.metrics.file_reporter
+desktop.lib.metrics.file_reporter.start_file_reporter()
+
 from django.conf import settings
 from django.conf.urls import include, patterns
 from django.conf.urls.static import static
