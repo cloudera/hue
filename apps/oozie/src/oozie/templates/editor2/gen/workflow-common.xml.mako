@@ -34,14 +34,16 @@
 
 
 <%def name="prepares(prepares)">
-        % if prepares:
+        % if prepares and any(p for p in prepares if p['value']):
             <prepare>
                 % for p in sorted(prepares, key=lambda k: k['type']):
                   <%
                     operation = p['type']
                     path = p['value']
                   %>
+                  % if path:
                   <${ operation } path="${ smart_path(path, mapping) }"/>
+                  % endif
                 % endfor
             </prepare>
         % endif

@@ -16,7 +16,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import logging
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
@@ -117,3 +116,50 @@ LIMIT $limit"""))
     node_mapping = {1: fork} # Point to ourself
 
     assert_equal(['<fork', 'name="my-fork">', '<path', 'start="my-fork"', '/>', '</fork>'], fork.to_xml(node_mapping=node_mapping).split())
+
+  def test_action_gen_xml_prepare(self):
+    # Prepare has a value
+    data = {
+        u'properties': {
+            u'files': [], u'job_xml': [], u'parameters': [], u'retry_interval': [], u'retry_max': [], u'job_properties': [], u'arguments': [],
+            u'prepares': [{u'type': u'mkdir', u'value': u'/my_dir'}],
+            u'credentials': [], u'script_path': u'my_pig.pig',
+            u'sla': [{u'key': u'enabled', u'value': False}, {u'key': u'nominal-time', u'value': u'${nominal_time}'}, {u'key': u'should-start', u'value': u''}, {u'key': u'should-end', u'value': u'${30 * MINUTES}'}, {u'key': u'max-duration', u'value': u''}, {u'key': u'alert-events', u'value': u''}, {u'key': u'alert-contact', u'value': u''}, {u'key': u'notification-msg', u'value': u''}, {u'key': u'upstream-apps', u'value': u''}],
+            u'archives': []
+        },
+        u'type': u'pig-widget',
+        u'id': u'c59d1947-7ce0-ef34-22b2-d64b9fc5bf9a',
+        u'name': u'pig-c59d',
+        "children":[{"to": "c59d1947-7ce0-ef34-22b2-d64b9fc5bf9a"}, {"error": "c59d1947-7ce0-ef34-22b2-d64b9fc5bf9a"}]
+    }
+
+    pig_node = Node(data)
+    node_mapping = {"c59d1947-7ce0-ef34-22b2-d64b9fc5bf9a": pig_node}
+
+    xml = pig_node.to_xml(node_mapping=node_mapping)
+    xml = [row.strip() for row in xml.split()]
+
+    assert_true(u'<prepare>' in xml, xml)
+    assert_true(u'<mkdir' in xml, xml)
+    assert_true(u'path="${nameNode}/my_dir"/>' in xml, xml)
+
+    # Prepare has empty value and is skipped
+    pig_node.data['properties']['prepares'] = [{u'type': u'mkdir', u'value': u''}]
+
+    xml = pig_node.to_xml(node_mapping=node_mapping)
+    xml = [row.strip() for row in xml.split()]
+
+    assert_false(u'<prepare>' in xml, xml)
+    assert_false(u'<mkdir' in xml, xml)
+
+    # Prepare has a value and an empty value
+    pig_node.data['properties']['prepares'] = [{u'type': u'mkdir', u'value': u'/my_dir'}, {u'type': u'rm', u'value': u''}]
+
+    xml = pig_node.to_xml(node_mapping=node_mapping)
+    xml = [row.strip() for row in xml.split()]
+
+    assert_true(u'<prepare>' in xml, xml)
+    assert_true(u'<mkdir' in xml, xml)
+    assert_true(u'path="${nameNode}/my_dir"/>' in xml, xml)
+
+    assert_false(u'<rm' in xml, xml)
