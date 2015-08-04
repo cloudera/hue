@@ -283,8 +283,11 @@ def create_or_edit_alias(request):
 
   response = {'status': -1}
 
-  alias = json.loads(request.POST.get('alias', ''))
+  alias = request.POST.get('alias', '')
   collections = json.loads(request.POST.get('collections', '[]'))
+  
+  if collections:
+    collections = [collection['name'] for collection in collections]
 
   api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
 

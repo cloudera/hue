@@ -81,7 +81,10 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 <script type="text/html" id="create-alias">
   <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
    
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
+    <input data-bind="value: alias.name"></input>
+    <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name'" size="5" multiple="true"></select>
+
+    <a href="javascript:void(0)" class="btn" data-bind="click: alias.create">
       <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
     </a>
     <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
@@ -147,13 +150,27 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
-  var AliasVM = function (vm) {
+  var Alias = function (vm) {
     var self = this;
     
-    self.formName = ko.observable(false);
-    self.formCollections = ko.observable(['c1', 'c2']); // todo get collection list
-
     self.showCreateModal = ko.observable(false);
+    
+    self.name = ko.observable('');
+    self.chosenCollections = ko.observableArray();
+    self.availableCollections = ko.computed(function() {
+      return $.grep(vm.jobs(), function(job) { return job.type() == 'collection'; });
+    });
+    
+    self.create = function() {
+      $.post("${ url('indexer:create_or_edit_alias') }", {
+        "alias": self.name,
+        "collections": ko.mapping.toJSON(self.chosenCollections)
+      }, function() {        
+        window.location.reload();
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
   };
   
   var Editor = function () {
@@ -161,7 +178,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
     self.jobs = ko.mapping.fromJS(${ indexes_json | n });
 
-    self.alias = new AliasVM(self);
+    self.alias = new Alias(self);
 
     self.selectedJobs = ko.computed(function() {
       return $.grep(self.jobs(), function(job) { return job.isSelected(); });
@@ -217,10 +234,8 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
         null,
         null,
         null,
-        { "sSortDataType":"dom-sort-value", "sType":"numeric" }
       ],
       "aaSorting":[
-        [4, 'desc'],
         [1, 'asc' ]
       ],
       "oLanguage":{
