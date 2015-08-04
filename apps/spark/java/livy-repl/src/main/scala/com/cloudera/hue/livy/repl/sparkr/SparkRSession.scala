@@ -39,7 +39,7 @@ object SparkRSession {
     env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
     env.put("SPARKR_DRIVER_R", createFakeShell().toString)
 
-    builder.redirectErrorStream(true)
+    builder.redirectError(Redirect.PIPE)
 
     val process = builder.start()
 

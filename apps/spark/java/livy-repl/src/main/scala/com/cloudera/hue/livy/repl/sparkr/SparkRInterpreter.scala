@@ -18,12 +18,15 @@
 
 package com.cloudera.hue.livy.repl.sparkr
 
+import java.util.concurrent.locks.ReentrantLock
+
 import com.cloudera.hue.livy.repl.process.ProcessInterpreter
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{JValue, _}
 
 import scala.annotation.tailrec
+import scala.io.Source
 
 private object SparkRInterpreter {
   val LIVY_END_MARKER = "# ----LIVY_END_OF_COMMAND----"
@@ -37,10 +40,11 @@ private class SparkRInterpreter(process: Process)
 
   implicit val formats = DefaultFormats
 
-  private var executionCount = 0
+  private[this] var executionCount = 0
 
   final override protected def waitUntilReady(): Unit = {
-    readTo("\n> ")
+    sendExecuteRequest("")
+    executionCount = 0
   }
 
   override protected def sendExecuteRequest(commands: String): Option[JValue] = synchronized {
@@ -63,7 +67,7 @@ private class SparkRInterpreter(process: Process)
           "status" -> "ok",
           "execution_count" -> (executionCount - 1),
           "data" -> Map(
-            "text/plain" -> output
+            "text/plain" -> (output + takeErrorLines())
           )
         ))))
       case (false, output) =>
@@ -93,4 +97,38 @@ private class SparkRInterpreter(process: Process)
       }
     }
   }
+
+  private[this] val _lock = new ReentrantLock()
+  private[this] var stderrLines = Seq[String]()
+
+  private def takeErrorLines(): String = {
+    var lines: Seq[String] = null
+    _lock.lock()
+    try {
+      lines = stderrLines
+      stderrLines = Seq[String]()
+    } finally {
+      _lock.unlock()
+    }
+
+    lines.mkString("\n")
+  }
+
+  private[this] val stderrThread = new Thread("sparkr stderr thread") {
+    override def run() = {
+      val lines = Source.fromInputStream(process.getErrorStream).getLines()
+
+      for (line <- lines) {
+        _lock.lock()
+        try {
+          stderrLines :+= line
+        } finally {
+          _lock.unlock()
+        }
+      }
+    }
+  }
+
+  stderrThread.setDaemon(true)
+  stderrThread.start()
 }
