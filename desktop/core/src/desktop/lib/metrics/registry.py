@@ -32,8 +32,12 @@ class MetricsRegistry(object):
   def _register_schema(self, schema):
     self._schemas.append(schema)
 
+  @property
+  def schemas(self):
+    return list(self._schemas)
+
   def counter(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('counter', name, **kwargs))
+    self._schemas.append(MetricDefinition('counter', name, is_counter=True, **kwargs))
     return self._registry.counter(name)
 
   def histogram(self, name, **kwargs):
@@ -61,10 +65,10 @@ class MetricsRegistry(object):
 
 
 class MetricDefinition(object):
-  def __init__(self, metric_type, name, label,
-      description=None,
-      numerator=None,
+  def __init__(self, metric_type, name, label, description, numerator,
       denominator=None,
+      is_counter=False,
+      weighting_metric_name=None,
       context=None):
     self.metric_type = metric_type
     self.name = name
@@ -72,6 +76,8 @@ class MetricDefinition(object):
     self.description = description
     self.numerator = numerator
     self.denominator = denominator
+    self.is_counter = is_counter
+    self.weighting_metric_name = weighting_metric_name
     self.context = context
 
 
