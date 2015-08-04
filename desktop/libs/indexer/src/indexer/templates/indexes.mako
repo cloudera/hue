@@ -34,7 +34,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
     <%def name="actions()">
       <div class="btn-toolbar" style="display: inline; vertical-align: middle">
-        <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteNotebook').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+        <a data-bind="click: function() { atLeastOneSelected() ? $('#deleteIndex').modal('show') : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-times"></i> ${ _('Delete') }
         </a>
       </div>
@@ -51,7 +51,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
   </%actionbar:render>
 
 
-  <table id="notebookTable" class="table datatables">
+  <table id="indexTable" class="table datatables">
     <thead>
       <tr>
         <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
@@ -60,11 +60,11 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
         <th>${ _('Collections') }</th>
       </tr>
     </thead>
-    <tbody data-bind="foreach: { data: jobs }">
+    <tbody data-bind="foreach: { data: indexes }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
           <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
-          ## <a data-bind="attr: { 'href': '${ url('spark:notebook') }?notebook=' + id() }" data-row-selector="true"></a>
+          ## <a data-bind="attr: { 'href': '${ url('spark:index') }?index=' + id() }" data-row-selector="true"></a>
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: type"></td>
@@ -80,7 +80,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
 <script type="text/html" id="create-alias">
   <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
-   
+
     <input data-bind="value: alias.name"></input>
     <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name'" size="5" multiple="true"></select>
 
@@ -95,7 +95,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
 <script type="text/html" id="create-collection">
   <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
-   
+
     <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
       <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
     </a>
@@ -107,7 +107,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
 <script type="text/html" id="create-collection-from-file">
   <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
-   
+
     <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
       <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
     </a>
@@ -127,14 +127,13 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
   <!-- <![endif]-->
 </div>
 
-<div id="submit-notebook-modal" class="modal hide"></div>
 
-<div id="deleteNotebook" class="modal hide fade">
-  <form id="deleteNotebookForm" method="POST" data-bind="submit: delete2">
+<div id="deleteIndex" class="modal hide fade">
+  <form id="deleteIndexForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected notebook(s)?') }</h3>
+      <h3 id="deleteIndexMessage">${ _('Delete the selected index(es)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -152,36 +151,36 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 <script type="text/javascript" charset="utf-8">
   var Alias = function (vm) {
     var self = this;
-    
+
     self.showCreateModal = ko.observable(false);
-    
+
     self.name = ko.observable('');
     self.chosenCollections = ko.observableArray();
     self.availableCollections = ko.computed(function() {
-      return $.grep(vm.jobs(), function(job) { return job.type() == 'collection'; });
+      return $.grep(vm.indexes(), function(index) { return index.type() == 'collection'; });
     });
-    
+
     self.create = function() {
       $.post("${ url('indexer:create_or_edit_alias') }", {
         "alias": self.name,
         "collections": ko.mapping.toJSON(self.chosenCollections)
-      }, function() {        
+      }, function() {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
     }
   };
-  
+
   var Editor = function () {
     var self = this;
 
-    self.jobs = ko.mapping.fromJS(${ indexes_json | n });
+    self.indexes = ko.mapping.fromJS(${ indexes_json | n });
 
     self.alias = new Alias(self);
 
     self.selectedJobs = ko.computed(function() {
-      return $.grep(self.jobs(), function(job) { return job.isSelected(); });
+      return $.grep(self.indexes(), function(index) { return index.isSelected(); });
     });
     self.isLoading = ko.observable(false);
 
@@ -193,14 +192,14 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
     });
     self.allSelected = ko.observable(false);
 
-    self.handleSelect = function(notebook) {
-      notebook.isSelected(! notebook.isSelected());
+    self.handleSelect = function(index) {
+      index.isSelected(! index.isSelected());
     }
 
     self.selectAll = function() {
       self.allSelected(! self.allSelected());
-      ko.utils.arrayForEach(self.jobs(), function (job) {
-        job.isSelected(self.allSelected());
+      ko.utils.arrayForEach(self.indexes(), function (index) {
+        index.isSelected(self.allSelected());
       });
     }
 
@@ -208,10 +207,10 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
     self.delete2 = function() {
       $.post("${ url('spark:delete') }", {
-        "notebooks": ko.mapping.toJSON(self.selectedJobs)
+        "indexes": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
         window.location.reload();
-        $('#deleteNotebook').modal('hide');
+        $('#deleteIndex').modal('hide');
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
@@ -224,7 +223,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
     viewModel = new Editor();
     ko.applyBindings(viewModel);
 
-    var oTable = $("#notebookTable").dataTable({
+    var oTable = $("#indexTable").dataTable({
       "sPaginationType":"bootstrap",
       'iDisplayLength':50,
       "bLengthChange":false,
