@@ -340,10 +340,10 @@ from django.utils.translation import ugettext as _
         </div>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
-        <div class="hover-actions inline pull-right">
+        <div class="hover-actions inline pull-right" style="font-size: 15px;">
           <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0"><i class="fa fa-cog"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -466,15 +466,13 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="snippet-results">
-  <!-- ko if: result.hasSomeResults() && result.type() != 'table' -->
-  <div class="row-fluid" style="max-height: 400px; margin: 10px 0;">
+  <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0;">
     <!-- ko if: result.data().length != 0 -->
     <pre data-bind="text: result.data()[0][1]"></pre>
     <!-- /ko -->
   </div>
-  <!-- /ko -->
 
-  <div class="row-fluid" data-bind="visible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="max-height: 400px; margin-top: 4px">
+  <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="display:none; max-height: 400px; margin-top: 4px">
     <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
       <ul class="nav nav-list" style="border: none; background-color: #FFF">
         <li class="nav-header pointer" data-bind="click: toggleResultSettings" title="${_('Hide columns')}">${_('columns')}</li>
@@ -510,7 +508,7 @@ from django.utils.translation import ugettext as _
     </div>
   </div>
 
-  <div class="row-fluid" data-bind="visible: status() != 'ready' && showChart()" style="max-height: 400px; margin-top: 4px">
+  <div class="row-fluid" data-bind="slideVisible: status() != 'ready' && showChart()" style="display:none; max-height: 400px; margin-top: 4px">
     <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
       <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'toggle-result-settings toggleResultSettingsChart' + id()}, event: { mouseover: function(){ $('.toggleResultSettingsChart' + id()).addClass('hoverable'); }, mouseout: function(){ $('.toggleResultSettingsChart' + id()).removeClass('hoverable'); } }, click: toggleResultSettings">
         <a title="${_('Hide settings')}" class="pointer">
@@ -641,8 +639,13 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="snippet-footer-actions">
-  <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 4px; background-color: #FFF; width: 100%">
-    <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
+  <div class="snippet-progress-container">
+    <div class="progress progress-striped active" data-bind="css: {
+      'progress-warning': progress() > 0 && progress() < 100,
+      'progress-success': progress() == 100,
+      'progress-danger': progress() == 0 && result.errors().length > 0}" style="background-color: #FFF; width: 100%">
+      <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
+    </div>
   </div>
 
   <div class="snippet-footer-actions-bar">
@@ -654,63 +657,65 @@ from django.utils.translation import ugettext as _
     </a>
     <div class="hover-actions">
       <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
-    </div>
-    <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
-      <i class="fa fa-th"></i>
-    </button>
-
-    <div class="btn-group" data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
-      <button class="btn" data-bind="css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
-        <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-        <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
-        <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
-        <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
-        <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
-        <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
-      </button>
-
-      <button class="btn dropdown-toggle" data-bind="visible: result.type() == 'table', css: {'active': $data.showChart}" data-toggle="dropdown">
-        <i class="fa fa-caret-down"></i>
-      </button>
-
-      <ul class="dropdown-menu">
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
-            <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-            <i class="hcha hcha-line-chart"></i> ${_('Lines')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-            <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-            <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-            <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-            <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
-          </a>
-        </li>
-      </ul>
+      <span style="color: #CCC; padding-left: 5px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
     </div>
 
-    <div class="pull-right">
-      <span data-bind="template: { name: 'snippet-log', data: $data }"></span>
+    <div class="pull-right hover-actions" style="padding-top: 8px; font-size: 15px;">
+      <a href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'blue': $data.showGrid}" title="${ _('Grid') }">
+        <i class="fa fa-th"></i>
+      </a>
 
-      &nbsp;
+      <div class="hover-actions hover-dropdown"  data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
+        <a href="javascript: void(0)" data-bind="css: {'blue': $data.showChart}, click: function(){ $data.showChart(true); }">
+          <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+          <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
+          <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
+          <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+          <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+          <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
+        </a>
+
+        <a href="javascript: void(0)" data-bind="visible: result.type() == 'table', css: {'blue': $data.showChart}" data-toggle="dropdown">
+          <i class="fa fa-caret-down"></i>
+        </a>
+
+        <ul class="dropdown-menu pull-right">
+          <li>
+            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
+              <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+              <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+              <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+              <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+              <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+              <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <a href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
+        <i class="fa fa-file-text-o"></i>
+      </a>
 
       <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
         ${ csrf_token(request) | n,unicode }
@@ -718,8 +723,8 @@ from django.utils.translation import ugettext as _
         <input type="hidden" name="snippet"/>
         <input type="hidden" name="format" class="download-format"/>
 
-        <div class="btn-group" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
-          <a class="btn dropdown-toggle" data-toggle="dropdown">
+        <div class="hover-actions hover-dropdown" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
+          <a class="dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-download"></i>
             <i class="fa fa-caret-down"></i>
           </a>
@@ -740,17 +745,6 @@ from django.utils.translation import ugettext as _
     </div>
   </div>
 </script>
-
-<script type="text/html" id="snippet-log">
-  <strong class="muted" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></strong>
-
-  &nbsp;
-
-  <a data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'active': $data.showLogs}" href="javascript:void(0)" class="btn" title="${ _('Show Logs') }">
-    <i class="fa fa-file-text-o"></i>
-  </a>
-</script>
-
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
