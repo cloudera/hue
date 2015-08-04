@@ -285,7 +285,7 @@ def create_or_edit_alias(request):
 
   alias = request.POST.get('alias', '')
   collections = json.loads(request.POST.get('collections', '[]'))
-  
+
   if collections:
     collections = [collection['name'] for collection in collections]
 
