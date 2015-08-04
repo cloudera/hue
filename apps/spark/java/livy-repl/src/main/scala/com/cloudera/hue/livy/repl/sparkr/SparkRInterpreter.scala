@@ -30,7 +30,7 @@ import scala.io.Source
 
 private object SparkRInterpreter {
   val LIVY_END_MARKER = "# ----LIVY_END_OF_COMMAND----"
-  val EXPECTED_OUTPUT = f"\n> $LIVY_END_MARKER"
+  val EXPECTED_OUTPUT = f"> $LIVY_END_MARKER"
 }
 
 private class SparkRInterpreter(process: Process)
@@ -63,11 +63,13 @@ private class SparkRInterpreter(process: Process)
       readTo(EXPECTED_OUTPUT)
     }.last match {
       case (true, output) =>
+        val data = (output + takeErrorLines())
+
         Some(parse(write(Map(
           "status" -> "ok",
           "execution_count" -> (executionCount - 1),
           "data" -> Map(
-            "text/plain" -> (output + takeErrorLines())
+            "text/plain" -> data
           )
         ))))
       case (false, output) =>
@@ -91,7 +93,12 @@ private class SparkRInterpreter(process: Process)
       output.append(char.toChar)
       if (output.endsWith(marker)) {
         val result = output.toString()
-        (true, result.substring(0, result.length - marker.length).stripPrefix("\n"))
+        (
+          true,
+          result.substring(0, result.length - marker.length)
+            .replaceAll("\033\\[[0-9;]*[mG]", "") // Remove any ANSI color codes
+            .stripPrefix("\n")
+            .stripSuffix("\n"))
       } else {
         readTo(marker, output)
       }
