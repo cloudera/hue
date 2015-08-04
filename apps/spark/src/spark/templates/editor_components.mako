@@ -641,7 +641,7 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="snippet-footer-actions">
-  <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 1px; background-color: #FFF; width: 100%">
+  <div class="progress progress-striped active" data-bind="css: { 'progress-warning': progress() > 0 && progress() < 100, 'progress-success': progress() == 100, 'progress-danger': progress() == 0 && result.errors().length > 0}" style="height: 4px; background-color: #FFF; width: 100%">
     <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
   </div>
 
@@ -649,12 +649,12 @@ from django.utils.translation import ugettext as _
     <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
-    <div class="hover-actions">
-      <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
-    </div>
     <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
       <i class="fa fa-stop"></i>
     </a>
+    <div class="hover-actions">
+      <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
+    </div>
     <button data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" href="javascript:void(0)" class="btn" title="${ _('Grid') }">
       <i class="fa fa-th"></i>
     </button>
