@@ -121,7 +121,7 @@
   Plugin.prototype.initQuestionMark = function () {
     var _this = this;
     $("#jHueTourFlag").remove();
-    var _questionMark = $("<a>").attr("id", "jHueTourFlag").html('<i class="fa fa-flag-checkered" style=""></i>');
+    var _questionMark = $("<a>").attr("id", "jHueTourFlag").addClass("pointer").html('<i class="fa fa-flag-checkered" style=""></i>');
     _questionMark.tooltip({
       placement: "bottom",
       title: _this.options.labels.TOOLTIP_TITLE
@@ -211,6 +211,7 @@
       if ($(".popover").position().top <= 0) {
         $(".popover").css("top", "10px");
       }
+
       _closeBtn.prependTo($(".popover-title"));
 
       $(document).on("keyup", function (e) {
@@ -255,7 +256,7 @@
   Plugin.prototype.performOperation = function (operation) {
     var _this = this;
     var _op = operation.toLowerCase();
-    if (_op.indexOf("http:") == 0) {
+    if (_op.indexOf("http:") == 0 || _op.indexOf("https:") == 0) {
       $("#jHueTourRemoteTutorial").attr("disabled", "disabled");
       $("#jHueTourRemoteTutorialBtn").attr("disabled", "disabled");
       $.ajax({
