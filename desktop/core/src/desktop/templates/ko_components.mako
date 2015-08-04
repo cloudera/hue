@@ -579,7 +579,10 @@ from django.utils.translation import ugettext as _
     <ul data-bind="sortable: values, visible: values().length" class="unstyled">
       <li style="margin-bottom: 4px">
         <div class="input-append">
+          <!-- ko ifnot: $parent.inputTemplate -->
           <input type="text" data-bind="textInput: value, valueUpdate: 'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
+          <!-- /ko -->
+          <!-- ko template: { if: $parent.inputTemplate, name: $parent.inputTemplate } --><!-- /ko -->
           <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
         </div>
         <a href="#" data-bind="click: function(){ $parent.removeValue(this); }">
@@ -600,6 +603,7 @@ from django.utils.translation import ugettext as _
         this.valueObservable = params.value;
         this.isArray = $.isArray(this.valueObservable());
         this.placeholder = params.placeholder || '';
+        this.inputTemplate = params.inputTemplate || null;
 
         var initialValues = this.isArray ? this.valueObservable() : this.valueObservable().split(",");
         for (var i = 0; i < initialValues.length; i++) {

@@ -1392,13 +1392,19 @@ ko.bindingHandlers.filechooser = {
       });
     }
 
-    self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor));
+    self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon));
   }
 };
 
 
-function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor) {
-  var _btn = $("<button>").addClass("btn").addClass("fileChooserBtn").text("..").click(function (e) {
+function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon) {
+  var _btn;
+  if (isAddon) {
+    _btn = $("<span>").addClass("add-on muted pointer").text("..");
+  } else {
+    _btn = $("<button>").addClass("btn").addClass("fileChooserBtn").text("..");
+  }
+  _btn.click(function (e) {
     e.preventDefault();
     $("html").addClass("modal-open");
     // check if it's a relative path

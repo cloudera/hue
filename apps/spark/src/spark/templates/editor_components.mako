@@ -420,6 +420,14 @@ from django.utils.translation import ugettext as _
   <div data-bind="component: { name: 'csv-list-input', params: { value: value, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
 </script>
 
+<script type="text/html" id="property-csv-hdfs-files">
+  <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-csv-hdfs-file-input', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
+</script>
+
+<script type="text/html" id="property-csv-hdfs-file-input">
+  <input type="text" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+</script>
+
 <script type="text/html" id="snippet-settings">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
@@ -431,8 +439,8 @@ from django.utils.translation import ugettext as _
         <!-- ko template: { if: typeof properties.executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executor Cores') }', value: properties.executorCores, title: '${ _('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties.numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executors') }', value: properties.numExecutors, title: '${ _('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties.queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _('Queue') }', value: properties.queue, title: '${ _('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Archives') }', value: properties.archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Files') }', value: properties.files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Archives') }', value: properties.archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Files') }', value: properties.files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties.settings, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. foo') }'}} --><!-- /ko -->
       </form>
     </div>
@@ -746,7 +754,7 @@ from django.utils.translation import ugettext as _
   </div>
 </script>
 
-<div id="chooseFile" class="modal hide fade">
+<div id="chooseFile" class="modal hide fade" style="z-index: 10000;">
   <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
       <h3>${_('Choose a file')}</h3>
