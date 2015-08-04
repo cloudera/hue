@@ -351,6 +351,21 @@ SMTP = ConfigSection(
   )
 )
 
+METRICS = ConfigSection(
+  key='metrics',
+  help=_("""Configuration options for metrics"""),
+  members=dict(
+    LOCATION=Config(
+      key='location',
+      help=_('Write metrics to this location'),
+      type=str),
+    COLLECTION_INTERVAL=Config(
+      key='collection_interval',
+      help=_('Time in milliseconds on how frequently to collect metrics'),
+      type=int),
+  )
+)
+
 DATABASE = ConfigSection(
   key='database',
   help=_("""Configuration options for specifying the Desktop Database.
