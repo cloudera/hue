@@ -61,6 +61,8 @@ class TestIndexerWithSolr:
     add_to_group('test')
     grant_access("test", "test", "indexer")
 
+    cls.db = CollectionManagerController(cls.user)
+
     resp = cls.client.post(reverse('indexer:install_examples'))
     content = json.loads(resp.content)
 
@@ -74,31 +76,24 @@ class TestIndexerWithSolr:
     assert_true(CollectionManagerController(self.user).is_solr_cloud_mode())
 
   def test_collection_exists(self):
-    db = CollectionManagerController(self.user)
-    assert_false(db.collection_exists('does_not_exist'))
+    assert_false(self.db.collection_exists('does_not_exist'))
 
   def test_get_collections(self):
-    db = CollectionManagerController(self.user)
-    db.get_collections()
+    self.db.get_collections()
 
-  def test_create_collection(self):
-    db = CollectionManagerController(self.user)
-
+  def test_create_and_delete_collection(self):
     name = get_db_prefix(name='solr') + 'test_create_collection'
-    fields = [{'name': 'my_test', 'type': 'text'}]
+    fields = [{'name': 'id', 'type': 'string'}, {'name': 'my_text', 'type': 'text_en'}]
 
+    # We get exceptions if problems in both case there
     try:
-      db.create_collection(name, fields, unique_key_field='id', df='text')
+      self.db.create_collection(name, fields, unique_key_field='id', df='my_text')
     finally:
-      db.delete_collection(name, core=False)
+      self.db.delete_collection(name, core=False)
 
   def test_collections_fields(self):
-    db = CollectionManagerController(self.user)
+    uniquekey, fields = self.db.get_fields('log_analytics_demo')
+    assert_equal('id', uniquekey)
 
-    db.get_fields('log_analytics_demo')
-    resp = self.client.post(reverse('indexer:install_examples'))
-    content = json.loads(resp.content)
-
-    assert_equal(content.get('status'), 0)
-    assert_equal(content.get('fields'), 0)
-    assert_equal(content.get('unique_key'), 0)
+    assert_true('protocol' in fields, fields)
+    assert_true('country_code3' in fields, fields)
