@@ -155,9 +155,9 @@ class TestImpalaIntegration:
     resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
 
     # Check the cleanup
-    databases = db.get_databases()
-    assert_false(cls.db_name in databases)
-    assert_false('%(db)s_other' % {'db': cls.db_name} in databases)
+    databases = cls.db.get_databases()
+    assert_false(cls.DATABASE in databases)
+    assert_false('%(db)s_other' % {'db': cls.DATABASE} in databases)
 
     for f in cls.finish:
       f()
@@ -174,6 +174,8 @@ class TestImpalaIntegration:
       SELECT * FROM tweets ORDER BY row_num;
     """
     response = _make_query(self.client, QUERY, database=self.DATABASE, local=False, server_name='impala')
+    content = json.loads(response.content)
+    query_history = QueryHistory.get(content['id'])
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
 
@@ -194,6 +196,11 @@ class TestImpalaIntegration:
       results_start_over += content['results']
 
     assert_equal(results_start_over, results)
+
+    # Check cancel query
+    resp = self.client.post(reverse('impala:api_cancel_query', kwargs={'query_history_id': query_history.id}))
+    content = json.loads(resp.content)
+    assert_equal(0, content['status'])
 
   def test_explain(self):
     QUERY = """
