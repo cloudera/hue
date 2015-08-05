@@ -549,6 +549,19 @@ ${ dashboard.import_bindings() }
 
   function validateAndSave() {
     validateFields();
+    if (viewModel.isInvalid() && viewModel.isEditing()) {
+      var $firstElWithErrors = $("[validate].with-errors").eq(0);
+      if (!$firstElWithErrors.is(":visible")) {
+        var widgetId = $firstElWithErrors.parents(".card-widget").attr("id").substr(4);
+        viewModel.getWidgetById(widgetId).ooziePropertiesExpanded(true);
+      }
+      window.setTimeout(function () {
+        $("html,body").animate({
+          "scrollTop": ($firstElWithErrors.offset().top - 150) + "px"
+        }, 500);
+      }, 200);
+    }
+
     viewModel.save();
   }
 
@@ -557,12 +570,10 @@ ${ dashboard.import_bindings() }
     $("[validate]").each(function () {
       if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
         $(this).addClass("with-errors");
-        //$(this).next(".btn").addClass("btn-danger");
         _hasErrors = true;
       }
       else {
         $(this).removeClass("with-errors");
-        //$(this).next(".btn").removeClass("btn-danger");
       }
     });
     viewModel.isInvalid(_hasErrors);
