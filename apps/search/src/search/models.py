@@ -581,8 +581,8 @@ def augment_solr_response(response, collection, query):
     id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
-        if id_field in doc and str(doc[id_field]) in highlighted_fields:
-          highlighting = response['highlighting'][str(doc[id_field])]
+        if id_field in doc and smart_unicode(doc[id_field]) in highlighted_fields:
+          highlighting = response['highlighting'][smart_unicode(doc[id_field])]
 
           if highlighting:
             escaped_highlighting = {}
