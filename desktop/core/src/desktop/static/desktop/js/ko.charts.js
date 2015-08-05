@@ -434,7 +434,7 @@ ko.bindingHandlers.leafletMapChart = {
               if (_addMarker) {
                 var _marker = L.marker([item.lat, item.lng]);
                 if (item.label != null) {
-                  _marker.bindPopup(item.label);
+                  _marker.bindPopup($.isArray(item.label) ? item.label.join("") : item.label);
                 }
                 _clusterGroup.addLayer(_marker);
               }
