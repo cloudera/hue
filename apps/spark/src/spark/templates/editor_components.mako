@@ -317,14 +317,14 @@ from django.utils.translation import ugettext as _
   <div class="snippet-container reveals-actions row-fluid">
     <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
-      <h2 class="card-heading simple" data-bind="visible: $root.isEditing() || (! $root.isEditing() && type() != 'text')">
+      <h2 class="card-heading simple">
 
         <span data-bind="visible: $root.isEditing">
           <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
           <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
           &nbsp;
         </span>
-        <div class="dropdown inline widget-type">
+        <div class="dropdown inline widget-type" data-bind="visible: type() != 'text' || $root.isEditing()">
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
             <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
             <span class="hover-actions-no-transition">
@@ -336,10 +336,13 @@ from django.utils.translation import ugettext as _
           </ul>
         </div>
 
+        <span data-bind="visible: type() == 'text'">&nbsp;</span>
+
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+
         <div class="hover-actions inline pull-right" style="font-size: 15px;">
           <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
         </div>
