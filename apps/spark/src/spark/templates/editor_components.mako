@@ -341,7 +341,7 @@ from django.utils.translation import ugettext as _
           <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
         </div>
       </h2>
 
@@ -772,7 +772,19 @@ from django.utils.translation import ugettext as _
   </div>
 </div>
 
-
+<div id="removeSnippetModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Confirm Remove')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Are you sure you want to remove this snippet?')}</p>
+  </div>
+  <div class="modal-footer" data-bind="with: $root.removeSnippetConfirmation">
+    <a class="btn" data-dismiss="modal" data-bind="click: function() { $root.removeSnippetConfirmation(null); }">${_('No')}</a>
+    <input type="submit" data-dismiss="modal" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); window.setTimeout(redrawFixedHeaders, 100); $root.removeSnippetConfirmation(null); }" />
+  </div>
+</div>
 
 <div id="sessionsDemiModal" class="demi-modal fade" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>

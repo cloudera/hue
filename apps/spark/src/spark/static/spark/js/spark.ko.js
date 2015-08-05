@@ -349,10 +349,6 @@ var Snippet = function (vm, notebook, snippet) {
     self.offset(self.offset() + 1);
   }
 
-  self.remove = function (notebook, snippet) {
-    notebook.snippets.remove(snippet);
-  }
-
   self.checkStatusTimeout = null;
 
   self.getContext = function() {
@@ -872,6 +868,13 @@ function EditorViewModel(notebooks, options) {
   });
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
+  };
+
+  self.removeSnippetConfirmation = ko.observable();
+
+  self.removeSnippet = function (notebook, snippet) {
+    self.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
+    $("#removeSnippetModal").modal("show");
   };
 
   self.isLeftPanelVisible = ko.observable($.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
