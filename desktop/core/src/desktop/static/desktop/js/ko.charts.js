@@ -321,17 +321,6 @@ ko.bindingHandlers.leafletMapChart = {
 
       $(element).data("mapData", ko.toJSON(_data));
 
-      if ($(element).data("map") != null) {
-        try {
-          $(element).data("map").remove();
-        }
-        catch (err) {
-          if (typeof console != "undefined") {
-            console.error(err);
-          }
-        }
-      }
-
       var _hasAtLeastOneLat = false;
       _data.forEach(function (item) {
         if (item.lat != null && $.isNumeric(item.lat)) {
@@ -361,10 +350,16 @@ ko.bindingHandlers.leafletMapChart = {
 
       var _map = null;
       if (element._map != null) {
-        element._leaflet = false;
-        element._map.remove();
-        $(element).removeClass("leaflet-zoom-box-crosshair");
+        _map = element._map;
+        _map.removeLayer(element._markerLayer);
       }
+
+      var _clusterGroup = L.markerClusterGroup({
+        maxClusterRadius: 10,
+        polygonOptions: {
+          weight: 1.5
+        }
+      });
 
       if (_hasAtLeastOneLat && _hasAtLeastOneLng) {
         try {
@@ -374,64 +369,60 @@ ko.bindingHandlers.leafletMapChart = {
             L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
               attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(_map);
-          }
 
-          var _zoomBox = L.control.zoomBox({
-            modal: true
-          });
-          _map.addControl(_zoomBox);
-
-
-          if (_options.showMoveCheckbox) {
-            var _command = L.control({
-              position: "topright"
+            var _zoomBox = L.control.zoomBox({
+              modal: true
             });
+            _map.addControl(_zoomBox);
 
-            _command.onAdd = function (map) {
-              var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar");
-              div.innerHTML = '<label class="checkbox"><input id="command' + $(element).parents(".card-widget").attr("id") + '" type="checkbox"/> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</label>';
-              return div;
-            };
 
-            _command.addTo(_map);
+            if (_options.showMoveCheckbox) {
+              var _command = L.control({
+                position: "topright"
+              });
 
-            if (_options.onRegionChange == null) {
-              _options.onRegionChange = function () {
+              _command.onAdd = function (map) {
+                var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar");
+                div.innerHTML = '<label class="checkbox"><input id="command' + $(element).parents(".card-widget").attr("id") + '" type="checkbox"/> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</label>';
+                return div;
               };
-            }
 
-            var _onRegionChange = function () {
-            };
+              _command.addTo(_map);
 
-            $("#command" + $(element).parents(".card-widget").attr("id")).on("change", function () {
-              if ($(this).is(":checked")) {
-                if (_options.onRegionChange != null) {
-                  _onRegionChange = _options.onRegionChange;
-                }
-              }
-              else {
-                _onRegionChange = function () {
+              if (_options.onRegionChange == null) {
+                _options.onRegionChange = function () {
                 };
               }
-            });
 
-            _map.on("boxzoomend", function (e) {
-              _onRegionChange(e.boxZoomBounds);
-            });
-            _map.on("dragend", function () {
-              _onRegionChange(_map.getBounds());
-            });
-            _map.on("zoomend", function () {
-              _onRegionChange(_map.getBounds());
-            });
-          }
+              var _onRegionChange = function () {
+              };
+              var _fitBounds = true;
 
-          var _clusterGroup = L.markerClusterGroup({
-            maxClusterRadius: 10,
-            polygonOptions: {
-              weight: 1.5
+              $("#command" + $(element).parents(".card-widget").attr("id")).on("change", function () {
+                if ($(this).is(":checked")) {
+                  if (_options.onRegionChange != null) {
+                    _onRegionChange = _options.onRegionChange;
+                    _fitBounds = false;
+                  }
+                }
+                else {
+                  _onRegionChange = function () {
+                  };
+                }
+              });
+
+              _map.on("boxzoomend", function (e) {
+                _onRegionChange(e.boxZoomBounds);
+              });
+              _map.on("dragend", function () {
+                _onRegionChange(_map.getBounds());
+              });
+              _map.on("zoomend", function () {
+                _onRegionChange(_map.getBounds());
+              });
             }
-          });
+
+          }
           _data.forEach(function (item) {
             if (item && item.lng != null && item.lat != null) {
               var _addMarker = false;
@@ -455,7 +446,9 @@ ko.bindingHandlers.leafletMapChart = {
           });
 
           _map.addLayer(_clusterGroup);
-          _map.fitBounds(_clusterGroup.getBounds());
+          if (_fitBounds) {
+            _map.fitBounds(_clusterGroup.getBounds());
+          }
 
           if (_options.onComplete != null) {
             _options.onComplete();
@@ -466,6 +459,7 @@ ko.bindingHandlers.leafletMapChart = {
         }
       }
       element._map = _map;
+      element._markerLayer = _clusterGroup;
       if (_options.onComplete != null) {
         _options.onComplete();
       }
