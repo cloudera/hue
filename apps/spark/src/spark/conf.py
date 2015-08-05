@@ -40,10 +40,11 @@ LANGUAGES = Config(
   default="""[
       {"name": "Scala Shell", "type": "scala"},
       {"name": "PySpark Shell", "type": "python"},
-      {"name": "Jar", "type": "jar"},
-      {"name": "Python", "type": "py"},
+      {"name": "R Shell", "type": "r"},
       {"name": "Impala SQL", "type": "impala"},
       {"name": "Hive SQL", "type": "hive"},
+      {"name": "Jar", "type": "jar"},
+      {"name": "Python", "type": "py"},
       {"name": "Text", "type": "text"}
   ]"""
 )
