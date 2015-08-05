@@ -340,7 +340,7 @@ from django.utils.translation import ugettext as _
         <div class="hover-actions inline pull-right" style="font-size: 15px;">
           <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: Object.keys(ko.mapping.toJS(properties)).length > 0, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
+          <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ remove($parent, $data); window.setTimeout(redrawFixedHeaders, 100);}"><i class="fa fa-times"></i></a>
         </div>
       </h2>
@@ -432,13 +432,13 @@ from django.utils.translation import ugettext as _
     </div>
     <div class="snippet-settings-body">
       <form class="form-horizontal">
-        <!-- ko template: { if: typeof properties.driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Driver Cores') }', value: properties.driverCores, title: '${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executor Cores') }', value: properties.executorCores, title: '${ _('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executors') }', value: properties.numExecutors, title: '${ _('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _('Queue') }', value: properties.queue, title: '${ _('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Archives') }', value: properties.archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Files') }', value: properties.files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties.settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties.settings, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. foo') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Driver Cores') }', value: properties().driverCores, title: '${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executor Cores') }', value: properties().executorCores, title: '${ _('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executors') }', value: properties().numExecutors, title: '${ _('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _('Queue') }', value: properties().queue, title: '${ _('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Archives') }', value: properties().archives, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. archive.dat') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Files') }', value: properties().files, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. file.dat') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties().settings, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. foo') }'}} --><!-- /ko -->
       </form>
     </div>
     <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
@@ -618,13 +618,13 @@ from django.utils.translation import ugettext as _
       <div class="control-group">
         <label class="control-label">${_('Path')}</label>
         <div class="controls">
-          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties.app_jar, valueUpdate:'afterkeydown', filechooser: properties.app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
+          <input type="text" class="input-xxlarge filechooser-input" data-bind="value: properties().app_jar, valueUpdate:'afterkeydown', filechooser: properties().app_jar" placeholder="${ _('Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar') }"/>
         </div>
       </div>
       <div class="control-group">
         <label class="control-label">${_('Class')}</label>
         <div class="controls">
-          <input type="text" class="input-xxlarge" data-bind="value: properties.class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
+          <input type="text" class="input-xxlarge" data-bind="value: properties().class" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
         </div>
       </div>
       <!-- /ko -->
@@ -632,11 +632,11 @@ from django.utils.translation import ugettext as _
       <div class="control-group">
         <label class="control-label">${_('Path')}</label>
         <div class="controls">
-          <input type="text" class="input-xxlarge" data-bind="value: properties.py_file, valueUpdate:'afterkeydown', filechooser: properties.py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/>
+          <input type="text" class="input-xxlarge" data-bind="value: properties().py_file, valueUpdate:'afterkeydown', filechooser: properties().py_file" placeholder="${ _('Path to python file, e.g. script.py') }"/>
         </div>
       </div>
       <!-- /ko -->
-      <!-- ko template: { if: typeof properties.arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties.arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
+      <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties().arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
     </form>
   </div>
 

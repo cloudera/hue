@@ -1591,6 +1591,12 @@ ko.bindingHandlers.aceEditor = {
 
     var editor = ace.edit($el.attr("id"));
     editor.session.setMode(options.mode());
+    if (ko.isObservable(options.mode)) {
+      options.mode.subscribe(function(newValue) {
+        editor.session.setMode(newValue);
+      });
+    }
+
     editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
 
     var editorOptions = {

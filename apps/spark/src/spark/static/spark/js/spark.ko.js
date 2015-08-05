@@ -119,7 +119,40 @@ var TYPE_ACE_EDITOR_MAP = {
   'python': 'ace/mode/python',
   'scala': 'ace/mode/scala',
   'pig': 'ace/mode/pig'
-}
+};
+
+var getDefaultSnippetProperties = function (snippetType) {
+  var properties = {};
+
+  if (snippetType == 'jar' || snippetType == 'py') {
+    properties['driverCores'] = '';
+    properties['executorCores'] = '';
+    properties['numExecutors'] = '';
+    properties['queue'] = '';
+    properties['archives'] = [];
+  };
+
+  if (snippetType == 'jar') {
+    properties['app_jar'] = '';
+    properties['class'] = '';
+    properties['arguments'] = [];
+  }
+  else if (snippetType == 'py') {
+    properties['py_file'] = '';
+    properties['arguments'] = [];
+  }
+  else if (snippetType == 'hive') {
+    properties['settings'] = [];
+    properties['files'] = [];
+  }
+  else if (snippetType == 'pig') {
+    properties['parameters'] = [];
+    properties['hadoop_properties'] = [];
+    properties['files'] = [];
+  }
+
+  return properties;
+};
 
 var Snippet = function (vm, notebook, snippet) {
   var self = this;
@@ -139,7 +172,26 @@ var Snippet = function (vm, notebook, snippet) {
   self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
   // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
-  self.properties = ko.mapping.fromJS(typeof snippet.properties != "undefined" && snippet.properties != null ? snippet.properties : {});
+
+  self.properties = ko.observable(ko.mapping.fromJS(typeof snippet.properties != "undefined" && snippet.properties != null ? snippet.properties : getDefaultSnippetProperties(self.type())));
+  self.hasProperties = ko.computed(function() {
+    return Object.keys(ko.mapping.toJS(self.properties())).length > 0;
+  });
+
+  var previousProperties = {};
+  self.type.subscribe(function(oldValue) {
+    previousProperties[oldValue] = self.properties();
+  }, null, "beforeChange");
+
+  self.type.subscribe(function (newValue) {
+    self.aceEditorMode(TYPE_ACE_EDITOR_MAP[newValue]);
+    if (typeof previousProperties[newValue] != "undefined") {
+      self.properties(previousProperties[newValue]);
+    } else {
+      self.properties(ko.mapping.fromJS(getDefaultSnippetProperties(newValue)));
+    }
+  });
+
   self.variables = ko.observableArray([]);
   self.variableNames = ko.computed(function () {
     var matches = [];
@@ -697,40 +749,9 @@ var Notebook = function (vm, notebook) {
   };
 
   self.newSnippet = function () {
-    var properties = {};
 
-    var addSparkYarnProperties = function() {
-      properties['driverCores'] = '';
-      properties['executorCores'] = '';
-      properties['numExecutors'] = '';
-      properties['queue'] = '';
-      properties['archives'] = [];
-    };
-
-    if (self.selectedSnippet() == 'jar') {
-      properties['app_jar'] = '';
-      properties['class'] = '';
-      properties['arguments'] = [];
-      addSparkYarnProperties();
-    }
-    else if (self.selectedSnippet() == 'py') {
-      properties['py_file'] = '';
-      properties['arguments'] = [];
-      addSparkYarnProperties();
-    }
-    else if (self.selectedSnippet() == 'hive') {
-      properties['settings'] = [];
-      properties['files'] = [];
-    }
-    else if (self.selectedSnippet() == 'pig') {
-      properties['parameters'] = [];
-      properties['hadoop_properties'] = [];
-      properties['files'] = [];
-    }
-	
     var _snippet = new Snippet(vm, self, {
       type: self.selectedSnippet(),
-      properties: properties,
       result: {}
     });
     self.snippets.push(_snippet);
