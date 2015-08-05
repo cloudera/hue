@@ -363,7 +363,6 @@ ko.bindingHandlers.leafletMapChart = {
 
       if (_hasAtLeastOneLat && _hasAtLeastOneLng) {
         try {
-
           if (_map == null) {
             _map = L.map(element);
             L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
@@ -374,7 +373,6 @@ ko.bindingHandlers.leafletMapChart = {
               modal: true
             });
             _map.addControl(_zoomBox);
-
 
             if (_options.showMoveCheckbox) {
               var _command = L.control({
@@ -396,13 +394,11 @@ ko.bindingHandlers.leafletMapChart = {
 
               var _onRegionChange = function () {
               };
-              var _fitBounds = true;
 
               $("#command" + $(element).parents(".card-widget").attr("id")).on("change", function () {
                 if ($(this).is(":checked")) {
                   if (_options.onRegionChange != null) {
                     _onRegionChange = _options.onRegionChange;
-                    _fitBounds = false;
                   }
                 }
                 else {
@@ -446,7 +442,7 @@ ko.bindingHandlers.leafletMapChart = {
           });
 
           _map.addLayer(_clusterGroup);
-          if (_fitBounds) {
+          if (! $("#command" + $(element).parents(".card-widget").attr("id")).is(":checked")) {
             _map.fitBounds(_clusterGroup.getBounds());
           }
 
