@@ -605,7 +605,12 @@ from django.utils.translation import ugettext as _
         this.placeholder = params.placeholder || '';
         this.inputTemplate = params.inputTemplate || null;
 
-        var initialValues = this.isArray ? this.valueObservable() : this.valueObservable().split(",");
+        var initialValues;
+        if (this.isArray) {
+          initialValues = ko.mapping.toJS(this.valueObservable());
+        } else {
+          initialValues = this.valueObservable() != null ? this.valueObservable().split(",") : [];
+        }
         for (var i = 0; i < initialValues.length; i++) {
           initialValues[i] = { value: ko.observable(initialValues[i].trim()) };
           initialValues[i].value.subscribe(this.updateValueObservable, this);

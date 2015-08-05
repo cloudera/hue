@@ -426,7 +426,7 @@ from django.utils.translation import ugettext as _
 <script type="text/html" id="snippet-settings">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
-      <h4><i class="fa fa-cog"></i> Settings</h4>
+      <h4><i class="fa fa-cog"></i> '${ _('Settings') }'</h4>
     </div>
     <div class="snippet-settings-body">
       <form class="form-horizontal">
