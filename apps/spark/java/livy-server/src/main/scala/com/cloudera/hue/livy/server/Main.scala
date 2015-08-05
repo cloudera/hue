@@ -71,12 +71,22 @@ object Main {
    */
   private def testSparkSubmit(livyConf: LivyConf) = {
     try {
-      // Ignore the version for now.
+      val versions_regex = (
+        """^(?:""" +
+          """(1\.3\.0)|""" +
+          """(1\.3\.1)|""" +
+          """(1\.4\.0)|""" +
+          """(1\.4\.1)|""" +
+          """(1\.5\.0)""" +
+        """)(-.*)?"""
+      ).r
+
       val version = sparkSubmitVersion(livyConf)
-      version match {
-        case "1.3.0" | "1.3.1" | "1.4.0" | "1.5.0" =>
+
+      versions_regex.findFirstIn(version) match {
+        case Some(_) =>
           logger.info(f"Using spark-submit version $version")
-        case _ =>
+        case None =>
           logger.warn(f"Warning, livy has not been tested with spark-submit version $version")
       }
     } catch {
