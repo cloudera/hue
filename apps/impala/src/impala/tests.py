@@ -109,12 +109,8 @@ class TestImpalaIntegration:
   def setup_class(cls):
     cls.finish = []
 
-    # We need a real Impala cluster currently
-    if (not 'impala' in sys.argv and not os.environ.get('TEST_IMPALAD_HOST')) or not is_live_cluster():
+    if not is_live_cluster():
       raise SkipTest
-
-    if os.environ.get('TEST_IMPALAD_HOST'):
-      cls.finish.append(SERVER_HOST.set_for_testing(os.environ.get('TEST_IMPALAD_HOST')))
 
     cls.client = make_logged_in_client()
     cls.user = User.objects.get(username='test')

@@ -52,8 +52,6 @@ class Command(BaseCommand):
 
       windmill   Runs windmill tests
 
-      impala [hostname]   Runs Impala tests only against a pre-installed Impalad on hostname.
-
     Common useful extra arguments for nose:
       --nologcapture
       --nocapture (-s)
@@ -87,12 +85,6 @@ class Command(BaseCommand):
 
     if args[0] == "all":
       nose_args = args + all_apps
-    elif args[0] == "impala":
-      if len(args) > 1:
-        from impala.conf import SERVER_HOST
-        SERVER_HOST.set_for_testing(args[1])
-      nose_args = ["specific", "impala"]
-      args = ["specific"]
     elif args[0] == "fast":
       nose_args = args + all_apps + ["-a", "!requires_hadoop"]
     elif args[0] == "windmill":
