@@ -404,7 +404,7 @@ def cancel_query(request, query_history_id):
       query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
       db = dbms.get(request.user, query_history.get_query_server_config())
       db.cancel_operation(query_history.get_handle())
-      _get_query_handle_and_state(query_history)
+      query_history.set_to_expired()
       response['status'] = 0
     except Exception, e:
       response['message'] = unicode(e)
