@@ -29,7 +29,7 @@ import scala.collection.JavaConversions._
 
 object SparkRSession {
   def create(): Session = {
-    val sparkrExec = sys.env.getOrElse("SPARKR_DRIVER_R", "sparkr")
+    val sparkrExec = sys.env.getOrElse("SPARKR_DRIVER_R", "sparkR")
 
     val builder = new ProcessBuilder(Seq(
       sparkrExec
