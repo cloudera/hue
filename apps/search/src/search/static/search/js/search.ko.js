@@ -307,7 +307,7 @@ var Query = function (vm, query) {
     self.start(0);
     vm.search();
   };
-  
+
   function getFilterByField(field) {
     var _fq = null;
     $.each(self.fqs(), function (index, fq) {

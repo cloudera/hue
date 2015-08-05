@@ -1460,7 +1460,7 @@ ${ dashboard.layout_skeleton() }
           <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_sw, attr: {'title': '${ _('Latitude South West') }'"></span>
           <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_sw, attr: {'title': '${ _('Longitude South West') }'"></span>
           ]
-          ${ _("TO") } 
+          ${ _("TO") }
           [
           <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_ne, attr: {'title': '${ _('Latitude North East') }'"></span>
           <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_ne, attr: {'title': '${ _('Longitude North East') }'"></span>
@@ -1468,8 +1468,8 @@ ${ dashboard.layout_skeleton() }
         </span>
       </div>
     </div>
-    <!-- /ko -->    
-    
+    <!-- /ko -->
+
   </div>
   <div class="clearfix"></div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">

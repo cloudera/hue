@@ -304,7 +304,7 @@ ko.bindingHandlers.leafletMapChart = {
     var _data = _options.transformer(valueAccessor().datum);
 
     function toggleVisibility() {
-      if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined") && _data.length > 0) {
+      if (((_options.visible != null && _options.visible) || _options.visible == null || typeof _options == "undefined")) {
         $(element).show();
         $(element).siblings(".leaflet-nodata").remove();
       }
