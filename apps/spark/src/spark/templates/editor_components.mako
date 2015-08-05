@@ -319,11 +319,6 @@ from django.utils.translation import ugettext as _
 
       <h2 class="card-heading simple">
 
-        <span data-bind="visible: $root.isEditing">
-          <a href="javascript:void(0)" data-bind="click: compress, visible: size() > 1"><i class="fa fa-step-backward"></i></a>
-          <a href="javascript:void(0)" data-bind="click: expand, visible: size() < 12"><i class="fa fa-step-forward"></i></a>
-          &nbsp;
-        </span>
         <div class="dropdown inline widget-type" data-bind="visible: type() != 'text' || $root.isEditing()">
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
             <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
@@ -450,7 +445,7 @@ from django.utils.translation import ugettext as _
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid">
-    <div data-bind="css: editorKlass, verticalSlide: codeVisible">
+    <div class="editor span12" data-bind="verticalSlide: codeVisible">
       <div data-bind="foreach: variables">
         <div>
           <span data-bind="text: name"></span>

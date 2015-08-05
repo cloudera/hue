@@ -275,17 +275,11 @@ var Snippet = function (vm, notebook, snippet) {
       self.getLogs();
     }
   });
-  self.size = ko.observable(typeof snippet.size != "undefined" && snippet.size != null ? snippet.size : 12).extend({ numeric: 0 });
-  self.offset = ko.observable(typeof snippet.offset != "undefined" && snippet.offset != null ? snippet.offset : 0).extend({ numeric: 0 });
   self.isLoading = ko.computed(function () {
     return self.status() == "loading";
   });
   self.klass = ko.computed(function () {
     return "snippet card card-widget";
-  });
-
-  self.editorKlass = ko.computed(function () {
-    return "editor span" + self.size() + (self.offset() * 1 > 0 ? " offset" + self.offset() : "");
   });
 
   self.resultsKlass = ko.computed(function () {
@@ -329,24 +323,6 @@ var Snippet = function (vm, notebook, snippet) {
         subscription.dispose();
       }
     });
-  }
-
-  self.expand = function () {
-    self.size(self.size() + 1);
-    $("#snippet_" + self.id()).trigger("resize");
-  }
-
-  self.compress = function () {
-    self.size(self.size() - 1);
-    $("#snippet_" + self.id()).trigger("resize");
-  }
-
-  self.moveLeft = function () {
-    self.offset(self.offset() - 1);
-  }
-
-  self.moveRight = function () {
-    self.offset(self.offset() + 1);
   }
 
   self.checkStatusTimeout = null;
