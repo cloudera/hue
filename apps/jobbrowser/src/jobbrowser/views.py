@@ -168,7 +168,7 @@ def massage_job_for_json(job, request):
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user),
-    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
+    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
   }
   return job
 

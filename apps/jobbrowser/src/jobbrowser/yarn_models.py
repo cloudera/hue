@@ -74,6 +74,10 @@ class Application(object):
     setattr(self, 'desiredReduces', None)
     setattr(self, 'durationFormatted', format_duration_in_millis(self.durationInMillis))
 
+    for attr in ['preemptedResourceVCores', 'vcoreSeconds', 'memorySeconds', 'diagnostics']:
+      if not hasattr(self, attr):
+        setattr(self, attr, 'N/A')
+
     if not hasattr(self, 'acls'):
       setattr(self, 'acls', {})
 
