@@ -65,7 +65,7 @@ abstract class ProcessInterpreter(process: Process)
 
   protected def sendExecuteRequest(request: String): Option[JValue]
 
-  protected def sendShutdownRequest(): Option[JValue]
+  protected def sendShutdownRequest(): Unit = {}
 
   private[this] val thread = new Thread("process interpreter") {
     override def run() = {
@@ -112,11 +112,7 @@ abstract class ProcessInterpreter(process: Process)
           }
 
           try {
-            sendShutdownRequest() match {
-              case Some(rep) =>
-                warn(f"process failed to shut down while returning $rep")
-              case None =>
-            }
+            sendShutdownRequest()
 
             try {
               process.getInputStream.close()
@@ -162,7 +158,7 @@ abstract class ProcessInterpreter(process: Process)
 
     // Give ourselves 10 seconds to tear down the process.
     try {
-      Await.result(future, Duration(60, TimeUnit.SECONDS))
+      Await.result(future, Duration(10, TimeUnit.SECONDS))
     } catch {
       case e: Throwable =>
         // Make sure if there are any problems we make sure we kill the process.

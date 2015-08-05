@@ -18,14 +18,13 @@
 
 package com.cloudera.hue.livy.repl.scala
 
-import com.cloudera.hue.livy.repl.{Statement, Session}
 import com.cloudera.hue.livy.repl.scala.interpreter._
+import com.cloudera.hue.livy.repl.{Session, Statement}
 import com.cloudera.hue.livy.sessions._
+import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
-import org.json4s.{JValue, _}
 
-import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 object SparkSession {

@@ -150,12 +150,13 @@ private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
     }
   }
 
-  override protected def sendShutdownRequest(): Option[JValue] = {
-    val rep = sendRequest(Map(
+  override protected def sendShutdownRequest(): Unit = {
+    sendRequest(Map(
       "msg_type" -> "shutdown_request",
       "content" -> ()
-    ))
-    rep
+    )).foreach { case rep =>
+      warn(f"process failed to shut down while returning $rep")
+    }
   }
 
   private def sendRequest(request: Map[String, Any]): Option[JValue] = {
