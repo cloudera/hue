@@ -325,18 +325,15 @@ from django.utils.translation import ugettext as _
           &nbsp;
         </span>
         <div class="dropdown inline widget-type">
-          <!-- ko if: $root.isEditing() -->
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
             <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
-            <b class="caret" data-bind="visible: $root.isEditing()"></b>
+            <span class="hover-actions-no-transition">
+              <b class="caret"></b>
+            </span>
           </a>
           <ul class="dropdown-menu" data-bind="foreach: $root.availableSnippets">
             <li><a class="pointer" data-bind="click: function(){ $parent.type($data.type()); }, text: name"></a></li>
           </ul>
-          <!-- /ko -->
-          <!-- ko ifnot: $root.isEditing() -->
-          <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
-          <!-- /ko -->
         </div>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>

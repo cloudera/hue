@@ -2003,8 +2003,10 @@ pre {
 }
 
 .reveals-actions:hover .hover-actions,
+.reveals-actions:hover .hover-actions-no-transition,
 .reveals-actions-2nd:hover .hover-actions-2nd,
 .reveals-actions-3rd:hover .hover-actions-3rd {
+  visibility: visible;
   opacity: 1;
 }
 
@@ -2014,6 +2016,11 @@ pre {
   display: inline-block;
   opacity: 0;
   transition: opacity 0.2s linear;
+}
+
+/* Work-around for chrome with element out-transition not firing in .dropdown */
+.hover-actions-no-transition {
+  visibility: hidden;
 }
 
 .hover-actions > a,
