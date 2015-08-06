@@ -104,7 +104,7 @@ takes Scala code:
 
     >>> import json, pprint, requests, textwrap
     >>> host = 'http://localhost:8998'
-    >>> data = {'lang': 'spark'}
+    >>> data = {'kind': 'spark'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
     {u'state': u'starting', u'id': 0, u’kind’: u’spark’}
@@ -184,7 +184,7 @@ pyspark has the exact same API, just with a different initial command:
 
 .. code:: python
 
-    >>> data = {'lang': 'pyspark'}
+    >>> data = {'kind': 'pyspark'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
     {u'id': 1, u'state': u'idle'}
@@ -253,7 +253,7 @@ Request Body
 +----------------+--------------------------------------------------+----------------------------+
 | name           | description                                      | type                       |
 +================+==================================================+============================+
-| lang           | session kind (scala or python)                   | `session kind`_ (required) |
+| kind           | session kind (spark, pyspark, or sparkr)         | `session kind`_ (required) |
 +----------------+--------------------------------------------------+----------------------------+
 | file           | archive holding the file                         | path (required)            |
 +----------------+--------------------------------------------------+----------------------------+
