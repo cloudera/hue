@@ -27,7 +27,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 
 
-from oozie.models2 import Job, Workflow, find_dollar_variables, find_dollar_braced_variables
+from oozie.models2 import Job, Workflow, find_dollar_variables, find_dollar_braced_variables, Node
 
 
 LOG = logging.getLogger(__name__)
@@ -139,3 +139,16 @@ LIMIT $limit"""))
 
     assert_true('parameters' in data['workflow']['nodes'][3]['properties'], wf.data)
     assert_true('arguments' in data['workflow']['nodes'][3]['properties'], wf.data) # New field transparently added
+
+  def test_action_gen_xml_java_opts(self):
+    # Contains java_opts
+    data = {u'name': u'java-fc05', u'properties': {u'files': [], u'job_xml': [], u'jar_path': u'/user/romain/hadoop-mapreduce-examples.jar', u'java_opts': [{u'value': u'-debug -Da -Db=1'}], u'retry_max': [], u'retry_interval': [], u'job_properties': [], u'capture_output': False, u'main_class': u'MyClass', u'arguments': [], u'prepares': [], u'credentials': [], u'sla': [{u'value': False, u'key': u'enabled'}, {u'value': u'${nominal_time}', u'key': u'nominal-time'}, {u'value': u'', u'key': u'should-start'}, {u'value': u'${30 * MINUTES}', u'key': u'should-end'}, {u'value': u'', u'key': u'max-duration'}, {u'value': u'', u'key': u'alert-events'}, {u'value': u'', u'key': u'alert-contact'}, {u'value': u'', u'key': u'notification-msg'}, {u'value': u'', u'key': u'upstream-apps'}], u'archives': []}, u'actionParametersFetched': False, u'id': u'fc05d86f-9f07-7a8d-6256-e6abfa87cf77', u'type': u'java-widget', u'children': [{u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}, {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'}], u'actionParameters': []}
+
+    java_node = Node(data)
+    node_mapping = {"fc05d86f-9f07-7a8d-6256-e6abfa87cf77": java_node, "33430f0f-ebfa-c3ec-f237-3e77efa03d0a": java_node, "17c9c895-5a16-7443-bb81-f34b30b21548": java_node} # Last 2 are actually kill and ok nodes
+
+    xml = java_node.to_xml(node_mapping=node_mapping)
+    xml = [row.strip() for row in xml.split('\n')]
+
+    assert_false("<java-opts>[{u&#39;value&#39;: u&#39;-debug -Da -Db=1&#39;}]</java-opts>" in xml, xml)
+    assert_true("<java-opts>-debug -Da -Db=1</java-opts>" in xml, xml)
