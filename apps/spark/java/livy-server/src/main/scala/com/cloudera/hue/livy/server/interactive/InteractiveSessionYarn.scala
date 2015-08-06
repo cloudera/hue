@@ -81,6 +81,13 @@ private class InteractiveSessionYarn(id: Int,
                                      createInteractiveRequest: CreateInteractiveRequest)
   extends InteractiveWebSession(id, createInteractiveRequest) {
 
+  // Error out the job if the process errors out.
+  Future {
+    if (process.waitFor() != 0) {
+      _state = Error()
+    }
+  }
+
   private val job = Future {
     val job = client.getJobFromProcess(process)
 

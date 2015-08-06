@@ -21,6 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
+import com.cloudera.hue.livy.sessions.Error
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
@@ -119,14 +120,20 @@ private class InteractiveSessionProcess(id: Int,
   stdoutThread.setDaemon(true)
   stdoutThread.start()
 
+  // Error out the job if the process errors out.
+  Future {
+    if (process.waitFor() != 0) {
+      _state = Error()
+    }
+  }
+
   override def logLines() = process.inputLines
 
   override def stop(): Future[Unit] = {
-    super.stop() andThen { case r =>
+    super.stop().andThen { case r =>
       // Make sure the process is reaped.
       process.waitFor()
       stdoutThread.join()
-
       r
     }
   }
