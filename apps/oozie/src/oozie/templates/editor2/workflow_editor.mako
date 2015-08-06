@@ -582,7 +582,7 @@ ${ dashboard.import_bindings() }
   $(document).ready(function(){
     renderChangeables();
 
-    $(document).on("viewmodelHasChanged", function () {
+    $(document).on("blur", "[validate]", function() {
       validateFields();
     });
 
