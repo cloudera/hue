@@ -183,7 +183,7 @@ def _start_mini_hs2(cluster):
   return s
 
 
-def wait_for_query_to_finish(client, response, max=30.0):
+def wait_for_query_to_finish(client, response, max=60.0):
   # Take a async API execute_query() response in input
 
   start = time.time()
@@ -228,7 +228,7 @@ def fetch_query_result_data(client, status_response, n=0, server_name='beeswax')
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, server_name='beeswax', **kwargs):
+               is_parameterized=True, max=60.0, database='default', email_notify=False, params=None, server_name='beeswax', **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -412,15 +412,18 @@ class BeeswaxSampleProvider(object):
     cls._make_data_file(data_file % 2)
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
 
-    # Create a "test_utf8" table.
-    table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}
-    cls._make_i18n_data_file(data_file % 3, 'utf-8')
-    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
+    if is_live_cluster():
+      LOG.warn('HUE-2884: We cannot create Hive UTF8 tables when live cluster testing at the moment')
+    else:
+      # Create a "test_utf8" table.
+      table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}
+      cls._make_i18n_data_file(data_file % 3, 'utf-8')
+      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
 
-    # Create a "test_latin1" table.
-    table_info = {'db': cls.db_name, 'name': 'test_latin1', 'comment': cls.get_i18n_table_comment()}
-    cls._make_i18n_data_file(data_file % 4, 'latin1')
-    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
+      # Create a "test_latin1" table.
+      table_info = {'db': cls.db_name, 'name': 'test_latin1', 'comment': cls.get_i18n_table_comment()}
+      cls._make_i18n_data_file(data_file % 4, 'latin1')
+      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
 
     # Create a "myview" view.
     make_query(cls.client, "CREATE VIEW `%(db)s`.`myview` (foo, bar) as SELECT * FROM `%(db)s`.`test`" % {'db': cls.db_name}, wait=True)

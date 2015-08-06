@@ -484,6 +484,9 @@ for x in sys.stdin:
 
 
   def test_explain_query_i18n(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2884: Skipping test because we cannot guarantee live cluster supports utf8')
+
     query = u"SELECT foo FROM `%(db)s`.`test_utf8` WHERE bar='%(val)s'" % {'val': unichr(200), 'db': self.db_name}
     response = _make_query(self.client, query, submission_type="Explain")
     explanation = json.loads(response.content)['explanation']
