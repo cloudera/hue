@@ -106,6 +106,7 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
           current = db.get_column(database, table, column)
           extended_type, simple_type = _get_column_type_by_name(t.cols, column)
         else:  # autocomplete nested data type
+          db.use(database)  # Need to explicitly select the DB due to https://issues.apache.org/jira/browse/HIVE-11261
           current, extended_type, simple_type = _get_nested_describe_and_types(db, database, table, column, nested)
 
         response['extended_type'] = extended_type
