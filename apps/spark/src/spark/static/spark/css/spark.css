@@ -295,6 +295,7 @@ body {
 .snippet-progress-container {
   height: 4px;
   width: 100%;
+  overflow: hidden;
   padding: 3px;
 }
 

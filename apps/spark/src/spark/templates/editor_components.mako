@@ -647,7 +647,7 @@ from django.utils.translation import ugettext as _
 
 <script type="text/html" id="snippet-footer-actions">
   <div class="snippet-progress-container">
-    <div class="progress progress-striped active" data-bind="css: {
+    <div class="progress progress-striped active" style="height: 0" data-bind="css: {
       'progress-warning': progress() > 0 && progress() < 100,
       'progress-success': progress() == 100,
       'progress-danger': progress() == 0 && result.errors().length > 0}" style="background-color: #FFF; width: 100%">
@@ -1351,7 +1351,7 @@ from django.utils.translation import ugettext as _
       if (options.data == 100) {
         window.setTimeout(function () {
           $("#snippet_" + options.snippet.id()).find(".progress").animate({
-            height: "1px"
+            height: "0"
           }, 100, function () {
             options.snippet.progress(0);
             redrawFixedHeaders();
