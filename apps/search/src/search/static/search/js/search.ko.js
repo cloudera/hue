@@ -624,14 +624,17 @@ var Collection = function (vm, collection) {
     vm.query.fqs(qdef.fqs());
     vm.query.start(qdef.start());
     vm.query.selectedMultiq(qdef.selectedMultiq());
-
     qdefinition.hasChanged = ko.observable(false);
+
     vm.selectedQDefinition(qdefinition);
     if (window.location.hash.indexOf("collection") == -1){
       window.location.hash = "q=" + qdef.uuid();
     }
     vm.search();
     $(document).trigger("loadedQDefinition");
+    window.setTimeout(function () {
+      vm.selectedQDefinition().hasChanged(false);
+    }, 50);
   }
 
   self.reloadQDefinition = function () {
@@ -652,12 +655,9 @@ var Collection = function (vm, collection) {
   self.unloadQDefinition = function () {
     vm.selectedQDefinition(null);
     vm.query.uuid(null);
-    vm.query.qs([
-      {
-        q: ""
-      }
-    ]);
-    vm.query.fqs([]);
+    vm.query.qs.removeAll();
+    vm.query.qs.push(ko.mapping.fromJS({q:""}));
+    vm.query.fqs.removeAll();
     vm.query.start(0);
     vm.query.selectedMultiq([]);
   }
