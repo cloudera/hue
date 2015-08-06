@@ -37,6 +37,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 from desktop.models import Document, Document2
 
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from jobsub.models import OozieDesign, OozieMapreduceAction
 from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
@@ -2221,6 +2222,9 @@ class TestImportWorkflow04(OozieMockBase):
 
 
   def test_import_workflow_decision_complex(self):
+    if is_live_cluster():
+      raise SkipTest()
+
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-decision-complex.xml')
