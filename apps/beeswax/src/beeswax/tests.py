@@ -1735,6 +1735,8 @@ for x in sys.stdin:
     # Autocomplete nested fields for a given column
     resp = self.client.get(reverse("beeswax:api_autocomplete_column", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo'}))
     json_resp = json.loads(resp.content)
+    assert_false('error' in json_resp, 'Failed to autocomplete nested type: %s' % json_resp.get('error'))
+
     assert_equal("array", json_resp['type'])
     assert_equal("array<struct<bar:int,baz:string>>", json_resp['extended_type'])
     assert_true("elem" in json_resp)
@@ -1744,6 +1746,8 @@ for x in sys.stdin:
     # Autcomplete nested fields for a given nested type
     resp = self.client.get(reverse("beeswax:api_autocomplete_nested", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo', 'nested': '$elem$'}))
     json_resp = json.loads(resp.content)
+    assert_false('error' in json_resp, 'Failed to autocomplete nested type: %s' % json_resp.get('error'))
+
     assert_equal("struct", json_resp['type'])
     assert_equal("struct<bar:int,baz:string>", json_resp['extended_type'])
     assert_true("fields" in json_resp)
