@@ -663,7 +663,9 @@ var Notebook = function (vm, notebook) {
     self.snippets.push(_snippet);
 
     if (self.getSession(_snippet.type()) == null) {
-      self.createSession(new Session(vm, {'type': _snippet.type()}));
+      window.setTimeout(function(){
+        self.createSession(new Session(vm, {'type': _snippet.type()}));
+      }, 200);
     }
 
     _snippet.init();
@@ -721,7 +723,9 @@ var Notebook = function (vm, notebook) {
     self.snippets.push(_snippet);
 
     if (self.getSession(_snippet.type()) == null) {
-      self.createSession(new Session(vm, {'type': _snippet.type()}));
+      window.setTimeout(function(){
+        self.createSession(new Session(vm, {'type': _snippet.type()}));
+      }, 200);
     }
     else {
       _snippet.status('ready');
