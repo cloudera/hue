@@ -21,14 +21,13 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
-import com.cloudera.hue.livy.sessions.Error
+import com.cloudera.hue.livy.sessions.{Success, Dead, Error}
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
-import scala.io.Source
 
 object InteractiveSessionProcess extends Logging {
 
@@ -124,6 +123,13 @@ private class InteractiveSessionProcess(id: Int,
   Future {
     if (process.waitFor() != 0) {
       _state = Error()
+    } else {
+      // Set the state to done if the session shut down before contacting us.
+      _state match {
+        case (Dead() | Error() | Success()) =>
+        case _ =>
+          _state = Success()
+      }
     }
   }
 

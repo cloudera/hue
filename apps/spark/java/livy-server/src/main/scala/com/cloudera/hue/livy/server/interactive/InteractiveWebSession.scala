@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.server.interactive
 
-import java.net.URL
+import java.net.{ConnectException, URL}
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy._
@@ -32,6 +32,7 @@ import org.json4s.{DefaultFormats, Formats, JValue}
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
+import scala.util
 
 abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: CreateInteractiveRequest) extends InteractiveSession with Logging {
 
@@ -123,12 +124,18 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
         case Idle() =>
           _state = Busy()
 
-          Http(svc.DELETE OK as.String).map { case rep =>
-            synchronized {
-              _state = Dead()
-            }
+          Http(svc.DELETE OK as.String).either() match {
+            case (Right(_) | Left(_: ConnectException)) =>
+              // Make sure to eat any connection errors because the repl shut down before it sent
+              // out an OK.
+              synchronized {
+                _state = Dead()
+              }
 
-            Unit
+              Future.successful(())
+
+            case Left(t: Throwable) =>
+              Future.failed(t)
           }
         case NotStarted() =>
           Future {
