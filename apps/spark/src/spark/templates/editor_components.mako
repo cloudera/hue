@@ -290,6 +290,10 @@ from django.utils.translation import ugettext as _
   <i class="fa fa-file-code-o snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">python</sup>
   <!-- /ko -->
 
+  <!-- ko if: type() == 'r' -->
+  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">R</sup>
+  <!-- /ko -->
+
   <!-- ko if: type() == 'impala' -->
   <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">impala</sup>
   <!-- /ko -->

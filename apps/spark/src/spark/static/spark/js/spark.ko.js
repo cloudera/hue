@@ -105,20 +105,13 @@ var Result = function (snippet, result) {
   };
 }
 
-var TYPE_EDITOR_MAP = {
-  'hive': 'text/x-hiveql',
-  'impala': 'text/x-impalaql',
-  'python': 'text/x-python',
-  'scala': 'text/x-scala',
-  'pig': 'text/x-pig'
-}
-
 var TYPE_ACE_EDITOR_MAP = {
   'hive': 'ace/mode/hive',
   'impala': 'ace/mode/impala',
   'python': 'ace/mode/python',
   'scala': 'ace/mode/scala',
-  'pig': 'ace/mode/pig'
+  'pig': 'ace/mode/pig',
+  'r': 'ace/mode/r',
 };
 
 var getDefaultSnippetProperties = function (snippetType) {
@@ -160,7 +153,6 @@ var Snippet = function (vm, notebook, snippet) {
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
   self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
   self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
-  self.editorMode = ko.observable(TYPE_EDITOR_MAP[self.type()]);
 
   //Ace stuff
   self.aceEditorMode = ko.observable(TYPE_ACE_EDITOR_MAP[self.type()]);
