@@ -1619,6 +1619,8 @@ for x in sys.stdin:
 
       resp = make_query(c, query, database=self.db_name)
       content = json.loads(resp.content)
+      assert_true('id' in content, 'Query failed: %s' % (content,))
+
       query_id = content['id']
       history = beeswax.models.QueryHistory.objects.get(pk=query_id)
       assert_equal(history.query, expected_query)
@@ -1701,15 +1703,27 @@ for x in sys.stdin:
 
   def test_get_top_terms(self):
     resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
-    terms = json.loads(resp.content)['terms']
+
+    content = json.loads(resp.content)
+    assert_true('terms' in content, 'Failed to get terms: %s' % (content,))
+    terms = content['terms']
+
     assert_equal([[255, 1], [254, 1], [253, 1], [252, 1]], terms[:4])
 
     resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}))
-    terms = json.loads(resp.content)['terms']
+
+    content = json.loads(resp.content)
+    assert_true('terms' in content, 'Failed to get terms: %s' % (content,))
+    terms = content['terms']
+
     assert_equal([[109, 1], [108, 1], [107, 1], [106, 1]], terms[:4])
 
     resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo', 'prefix': '10'}) + '?limit=2')
-    terms = json.loads(resp.content)['terms']
+
+    content = json.loads(resp.content)
+    assert_true('terms' in content, 'Failed to get terms: %s' % (content,))
+    terms = content['terms']
+
     assert_equal([[109, 1], [108, 1]], terms)
 
 
