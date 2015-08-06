@@ -38,11 +38,11 @@ LANGUAGES = Config(
   help=_t("List of available types of snippets."),
   type=coerce_json,
   default="""[
-      {"name": "Scala Shell", "type": "scala"},
-      {"name": "PySpark Shell", "type": "python"},
-      {"name": "R Shell", "type": "r"},
-      {"name": "Impala SQL", "type": "impala"},
-      {"name": "Hive SQL", "type": "hive"},
+      {"name": "Scala", "type": "scala"},
+      {"name": "PySpark", "type": "python"},
+      {"name": "R", "type": "r"},
+      {"name": "Impala", "type": "impala"},
+      {"name": "Hive", "type": "hive"},
       {"name": "Jar", "type": "jar"},
       {"name": "Python", "type": "py"},
       {"name": "Text", "type": "text"}

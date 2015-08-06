@@ -153,8 +153,6 @@ ko.bindingHandlers.radialMenu = {
     var $element = $(element);
     var options = valueAccessor();
 
-    // This binding currently expects each alternative to have an observable
-    // named "type"
     var alternatives = options.alternatives;
     var selected = options.selected; // Will be set before onSelect is called
     var mainAlt = options.mainAlternative; // Alternative for clicking center
@@ -162,6 +160,11 @@ ko.bindingHandlers.radialMenu = {
     var minRadius = options.minRadius || 70;
     var alternativeCss = options.alternativeCss;
     var alternativeSize = options.alternativeSize || 65;
+
+    var selectAttribute = options.selectAttribute;
+    var textRenderer = options.textRenderer || function(item) {
+        return item[selectAttribute]();
+      };
 
     var allAlternatives = $("<div>").hide();
 
@@ -190,12 +193,12 @@ ko.bindingHandlers.radialMenu = {
 
         $.each(alternatives(), function (index, alternative) {
           $("<div>")
-            .text(alternative.type())
+            .text(textRenderer(alternative))
             .addClass(alternativeCss)
             .css("left", radius * Math.cos(currentRad) + iconRadius)
             .css("top", radius * Math.sin(currentRad) + iconRadius)
             .on("click", function () {
-              select(alternative.type());
+              select(alternative[selectAttribute]());
             })
             .on("mouseenter", function () {
               clearTimeout(hideTimeout);
