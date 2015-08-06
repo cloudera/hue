@@ -68,7 +68,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: type"></td>
-        <td data-bind="text: type"></td>
+        <td data-bind="text: collections"></td>
       </tr>
     </tbody>
   </table>

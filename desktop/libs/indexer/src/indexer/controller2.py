@@ -75,11 +75,11 @@ class CollectionController(object):
       if self.is_solr_cloud_mode():
         collections = self.api.collections2()
         for name in collections:
-          indexes.append({'name': name, 'type': 'collection'})
+          indexes.append({'name': name, 'type': 'collection', 'collections': ''})
 
       solr_cores = self.api.cores()
       for name in solr_cores:
-        indexes.append({'name': name, 'type': 'core'})
+        indexes.append({'name': name, 'type': 'core', 'collections': ''})
 
       solr_aliases = self.api.aliases()
       for name in solr_aliases:
