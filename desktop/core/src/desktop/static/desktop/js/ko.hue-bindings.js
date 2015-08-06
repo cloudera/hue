@@ -148,6 +148,78 @@ ko.bindingHandlers.numericTextInput = {
   }
 };
 
+ko.bindingHandlers.radialMenu = {
+  init: function(element, valueAccessor) {
+    var $element = $(element);
+    var options = valueAccessor();
+
+    // This binding currently expects each alternative to have an observable
+    // named "type"
+    var alternatives = options.alternatives;
+    var selected = options.selected; // Will be set before onSelect is called
+    var mainAlt = options.mainAlternative; // Alternative for clicking center
+    var onSelect = options.onSelect || $.noop;
+    var minRadius = options.minRadius || 70;
+    var alternativeCss = options.alternativeCss;
+    var alternativeSize = options.alternativeSize || 65;
+
+    var allAlternatives = $("<div>").hide();
+
+    var hideTimeout = -1;
+    var hideAlternatives = function () {
+      clearTimeout(hideTimeout);
+      hideTimeout = setTimeout(function () {
+        allAlternatives.fadeOut();
+      }, 600);
+    };
+
+    var select = function (selectedValue) {
+      selected(selectedValue);
+      onSelect(selectedValue);
+      clearTimeout(hideTimeout);
+      allAlternatives.fadeOut();
+    };
+
+    if (alternatives().length > 1) {
+      window.setTimeout(function() {
+        var circumference = alternatives().length * alternativeSize;
+        var radius = Math.max(minRadius, circumference / Math.PI / 2);
+        var radIncrements = 2 * Math.PI / alternatives().length;
+        var currentRad = alternatives().length == 2 ? 2 * Math.PI : -0.5 * Math.PI;
+        var iconRadius = $element.find("i").width() / 2;
+
+        $.each(alternatives(), function (index, alternative) {
+          $("<div>")
+            .text(alternative.type())
+            .addClass(alternativeCss)
+            .css("left", radius * Math.cos(currentRad) + iconRadius)
+            .css("top", radius * Math.sin(currentRad) + iconRadius)
+            .on("click", function () {
+              select(alternative.type());
+            })
+            .on("mouseenter", function () {
+              clearTimeout(hideTimeout);
+            })
+            .on("mouseleave", hideAlternatives)
+            .appendTo(allAlternatives);
+          currentRad += radIncrements;
+        });
+        $element.append(allAlternatives);
+      }, 500);
+    }
+
+    $element.find("i")
+      .on("click", function() {
+        select(mainAlt());
+      })
+      .on("mouseenter", function() {
+        clearTimeout(hideTimeout);
+        allAlternatives.fadeIn();
+      })
+      .on("mouseleave", hideAlternatives);
+  }
+};
+
 ko.bindingHandlers.freshereditor = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
     var _el = $(element);

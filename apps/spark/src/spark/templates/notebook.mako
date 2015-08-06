@@ -37,14 +37,11 @@ ${ editorComponents.includes() }
   <%def name="addSnippetHTML()">
     <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
-    <div class="add-snippet pointer" data-bind="click: function(notebook, e){ if (!($(e.target).is('select'))){ newSnippet(); } }">
-      <div class="overlay pointer">
-        <select data-bind="options: $root.availableSnippets, value: selectedSnippet, optionsText: 'name', optionsValue: 'type'" style="width: 115px">
-        </select>
-        <i class="fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
+    <div class="add-snippet">
+      <div class="add-snippet-button pointer" style="position:relative; width:65px; text-align: center;" data-bind="radialMenu: { alternatives: $root.availableSnippets, selected: selectedSnippet, mainAlternative: selectedSnippet, onSelect: newSnippet, alternativeCss: 'add-snippet-alt' }">
+        <i class="add-last-used-snippet fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
       </div>
     </div>
-    <div class="overlay" style="padding-bottom:70px"></div>
   </%def>
 </%editorComponents:commonHTML>
 
@@ -69,7 +66,6 @@ ${ editorComponents.commonJS() }
     failsSilentlyOn: [500], // error codes from beeswax/views.py - autocomplete
     baseURL: "${ autocomplete_base_url | n,unicode }"
   });
-
 
   huePubSub.subscribe('assist.mainObjectChange', function (db) {
     aceAutocomplete.setDatabase(db);
