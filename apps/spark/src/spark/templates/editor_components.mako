@@ -664,16 +664,14 @@ from django.utils.translation import ugettext as _
     </a>
     <div class="hover-actions">
       <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
-      <span style="color: #CCC; padding-left: 5px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
-    </div>
 
-    <div class="pull-right hover-actions" style="padding-top: 8px; font-size: 15px;">
-      <a href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'blue': $data.showGrid}" title="${ _('Grid') }">
-        <i class="fa fa-th"></i>
-      </a>
+      <div style="display: inline-block; margin-left: 15px;">
+        <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
+          <i class="fa fa-th"></i>
+        </a>
 
-      <div class="hover-actions hover-dropdown"  data-bind="visible: result.type() == 'table' && result.hasSomeResults()">
-        <a href="javascript: void(0)" data-bind="css: {'blue': $data.showChart}, click: function(){ $data.showChart(true); }">
+        <div class="btn-group">
+        <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
           <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
           <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
           <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
@@ -681,12 +679,11 @@ from django.utils.translation import ugettext as _
           <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
           <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
         </a>
-
-        <a href="javascript: void(0)" data-bind="visible: result.type() == 'table', css: {'blue': $data.showChart}" data-toggle="dropdown">
+        <a style="min-width: 12px; width: 12px;" class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}">
           <i class="fa fa-caret-down"></i>
         </a>
 
-        <ul class="dropdown-menu pull-right">
+        <ul class="dropdown-menu">
           <li>
             <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
               <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
@@ -718,7 +715,12 @@ from django.utils.translation import ugettext as _
             </a>
           </li>
         </ul>
+        </div>
       </div>
+    </div>
+
+    <div class="pull-right hover-actions" style="padding-top: 8px; font-size: 15px;">
+      <span style="color: #CCC; padding-right: 10px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
 
       <a href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
         <i class="fa fa-file-text-o"></i>
