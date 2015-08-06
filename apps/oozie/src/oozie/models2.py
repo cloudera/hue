@@ -165,6 +165,10 @@ class Workflow(Job):
     if 'show_arrows' not in _data['workflow']['properties']:
       _data['workflow']['properties']['show_arrows'] = True
 
+    for node in _data['workflow']['nodes']:
+      # Backward compatibility
+      _upgrade_sqoop_node(node)
+
     return _data
 
   def to_xml(self, mapping=None):
@@ -351,14 +355,18 @@ class Node():
       self.data['properties']['sla'] = Workflow.SLA_DEFAULT
 
     # Backward compatibility
-    if self.data['type'] == 'sqoop' and 'arguments' not in self.data['properties']:
-      self.data['properties']['arguments'] = self.data['properties']['parameters']
+    _upgrade_sqoop_node(self.data)
 
   def get_template_name(self):
     return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
 
   def find_parameters(self):
     return find_parameters(self) + (find_parameters(self, ['sla']) if self.sla_enabled else [])
+
+
+def _upgrade_sqoop_node(node):
+  if node['type'] in ('sqoop', 'sqoop-widget') and 'arguments' not in node['properties']:
+    node['properties']['arguments'] = node['properties']['parameters']
 
 
 class Action(object):
