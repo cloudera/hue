@@ -48,6 +48,7 @@ from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 from hadoop.fs.hadoopfs import Hdfs
+from hadoop.pseudo_hdfs4 import is_live_cluster
 
 import desktop.conf as desktop_conf
 
