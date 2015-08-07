@@ -29,6 +29,7 @@ from search.conf import SOLR_URL, SECURITY_ENABLED
 from search.models import Collection
 
 from indexer.controller import CollectionManagerController
+from indexer.controller2 import CollectionController
 from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
 
 
@@ -186,7 +187,7 @@ def collections_import(request):
 
   return JsonResponse(response)
 
-
+# Deprecated
 def collections_remove(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
@@ -286,9 +287,6 @@ def create_or_edit_alias(request):
   alias = request.POST.get('alias', '')
   collections = json.loads(request.POST.get('collections', '[]'))
 
-  if collections:
-    collections = [collection['name'] for collection in collections]
-
   api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
 
   try:
@@ -301,21 +299,28 @@ def create_or_edit_alias(request):
   return JsonResponse(response)
 
 
-def delete_alias(request):
+def delete_indexes(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))
 
   response = {'status': -1}
 
-  alias = request.POST.get('alias', '')
+  indexes = json.loads(request.POST.get('indexes', '[]'))
 
-  api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
+  if not indexes:
+    response['message'] = _('No indexes to remove.')
+  else:
+    searcher = CollectionController(request.user)
 
-  try:
-    api.delete_alias(alias)
+    for index in indexes:
+      if index['type'] == 'collection':
+        searcher.delete_collection(index['name'])
+      elif index['type'] == 'alias':
+        searcher.delete_alias(index['name'])
+      else:
+        LOG.warn('We could not delete: %s' % index)
+
     response['status'] = 0
-    response['message'] = _('Alias deleted!')
-  except Exception, e:
-    response['message'] = _('Alias could not be deleted: %s') % e
+    response['message'] = _('Indexes removed!')
 
   return JsonResponse(response)

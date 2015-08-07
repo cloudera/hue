@@ -24,6 +24,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
 from libzookeeper.conf import ENSEMBLE
+from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
 from desktop.lib.i18n import smart_str
@@ -152,20 +153,20 @@ class CollectionController(object):
 #        # Delete instance directory if we couldn't create a collection.
 #        shutil.rmtree(instancedir)
 #        raise PopupException(_('Could not create collection. Check error logs for more info.'))
-#
-#  def delete_collection(self, name, core):
-#    if core:
-#      raise PopupException(_('Cannot remove Solr cores.'))
-#
-#    if self.api.remove_collection(name):
-#      # Delete instance directory.
-#      try:
-#        root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-#        zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
-#        zc.delete_path(root_node)
-#      except Exception, e:
-#        # Re-create collection so that we don't have an orphan config
-#        self.api.add_collection(name)
-#        raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
-#    else:
-#      raise PopupException(_('Could not remove collection. Check error logs for more info.'))
+
+  def delete_collection(self, name):
+    if self.api.remove_collection(name):
+      # Delete instance directory.
+      try:
+        root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+        zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
+        zc.delete_path(root_node)
+      except Exception, e:
+        # Re-create collection so that we don't have an orphan config
+        self.api.add_collection(name)
+        raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
+    else:
+      raise PopupException(_('Could not remove collection. Check error logs for more info.'))
+
+  def delete_alias(self, name):
+    return self.api.delete_alias(name)
