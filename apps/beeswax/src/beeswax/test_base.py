@@ -212,12 +212,7 @@ def wait_for_query_to_finish(client, response, max=60.0):
 
     response = client.get(watch_url, follow=True)
 
-  content = json.loads(response.content)
-
-  if content.get('status') == -1:
-    raise Exception('Query failed: %s' % content.get('message'))
-
-  return response
+  return json.loads(response.content)
 
 
 def is_finished(response):
