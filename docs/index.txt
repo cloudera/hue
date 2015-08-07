@@ -17,6 +17,7 @@ link:sdk/sdk.html[SDK Documentation] to get started.
 Release Notes
 -------------
 
+* August 7, 2015 --- link:release-notes/release-notes-3.9.0.html[Version 3.9.0]
 * April 24, 2015 --- link:release-notes/release-notes-3.8.0.html[Version 3.8.0]
 * October 9, 2014 --- link:release-notes/release-notes-3.7.0.html[Version 3.7.0]
 * May 29, 2014 --- link:release-notes/release-notes-3.6.0.html[Version 3.6.0]
