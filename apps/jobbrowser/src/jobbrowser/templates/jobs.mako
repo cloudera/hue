@@ -65,6 +65,7 @@ ${ components.menubar() }
       <th>${_('Logs')}</th>
       <th>${_('ID')}</th>
       <th>${_('Name')}</th>
+      <th>${_('Application Type')}</th>
       <th>${_('Status')}</th>
       <th>${_('User')}</th>
       <th>${_('Maps')}</th>
@@ -117,6 +118,7 @@ ${ components.menubar() }
       "aoColumns": [
         {"bSortable": false, "sWidth": "20px"},
         {"sWidth": "10%"},
+        null,
         null,
         {"sWidth": "5%"},
         {"sWidth": "5%"},
@@ -234,6 +236,7 @@ ${ components.menubar() }
         job.applicationType != 'SPARK' ? '<a href="' + emptyStringIfNull(job.logs) + '" data-row-selector-exclude="true"><i class="fa fa-tasks"></i></a>' : '',
         '<a href="' + emptyStringIfNull(job.url) + '" title="${_('View this job')}" data-row-selector="true">' + emptyStringIfNull(job.shortId) + '</a>',
         emptyStringIfNull(job.name),
+        emptyStringIfNull(job.applicationType),
         '<span class="label ' + getStatusClass(job.status) + '">' + (job.isRetired && !job.isMR2 ? '<i class="fa fa-briefcase fa fa-white" title="${ _('Retired') }"></i> ' : '') + job.status + '</span>',
         emptyStringIfNull(job.user),
         '<span title="' + emptyStringIfNull(job.mapsPercentComplete) + '">' + (job.isRetired ? '${_('N/A')}' : '<div class="progress" title="' + (job.isMR2 ? job.mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + job.mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + job.mapsPercentComplete + '%"></div></div>') + '</span>',
@@ -249,10 +252,10 @@ ${ components.menubar() }
     function updateJobRow(job, row, finish) {
       var mapsPercentComplete = (finish) ? 100 : job.mapsPercentComplete;
       var reducesPercentComplete = (finish) ? 100 : job.reducesPercentComplete;
-      jobTable.fnUpdate('<span class="label ' + getStatusClass(job.status) + '">' + job.status + '</span>', row, 3, false);
-      jobTable.fnUpdate('<span title="' + emptyStringIfNull(mapsPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + mapsPercentComplete + '%"></div></div></span>', row, 5, false);
-      jobTable.fnUpdate('<span title="' + emptyStringIfNull(reducesPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + reducesPercentComplete + '%"></div></div></span>', row, 6, false);
-      jobTable.fnUpdate('<span title="' + emptyStringIfNull(job.durationMs) + '">' + emptyStringIfNull(job.durationFormatted) + '</span>', row, 9, false);
+      jobTable.fnUpdate('<span class="label ' + getStatusClass(job.status) + '">' + job.status + '</span>', row, 4, false);
+      jobTable.fnUpdate('<span title="' + emptyStringIfNull(mapsPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? mapsPercentComplete : job.finishedMaps + '/' + job.desiredMaps) + '"><div class="bar-label">' + mapsPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + mapsPercentComplete + '%"></div></div></span>', row, 6, false);
+      jobTable.fnUpdate('<span title="' + emptyStringIfNull(reducesPercentComplete) + '"><div class="progress" title="' + (job.isMR2 ? reducesPercentComplete : job.finishedReduces + '/' + job.desiredReduces) + '"><div class="bar-label">' + reducesPercentComplete + '%</div><div class="' + 'bar ' + getStatusClass(job.status, "bar-") + '" style="margin-top:-20px;width:' + reducesPercentComplete + '%"></div></div></span>', row, 7, false);
+      jobTable.fnUpdate('<span title="' + emptyStringIfNull(job.durationMs) + '">' + emptyStringIfNull(job.durationFormatted) + '</span>', row, 10, false);
       var _killCell = "";
       if (job.canKill) {
         _killCell = '<a class="btn btn-small btn-inverse kill" ' +
@@ -263,7 +266,7 @@ ${ components.menubar() }
                 'title="${ _('Kill this job') }" ' +
                 '>${ _('Kill') }</a>';
       }
-      jobTable.fnUpdate(_killCell, row, 11, false);
+      jobTable.fnUpdate(_killCell, row, 12, false);
     }
 
     function callJobDetails(job, finish) {

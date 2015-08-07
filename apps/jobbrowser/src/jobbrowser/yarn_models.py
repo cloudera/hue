@@ -55,6 +55,7 @@ class Application(object):
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', re.sub('(application|job)_', '', self.jobId))
     setattr(self, 'jobName', self.name)
+    setattr(self, 'applicationType', self.applicationType)
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', self.progress)
     setattr(self, 'reduces_percent_complete', self.progress)
