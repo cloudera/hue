@@ -307,7 +307,7 @@ def delete_alias(request):
 
   response = {'status': -1}
 
-  alias = json.loads(request.POST.get('alias', ''))
+  alias = request.POST.get('alias', '')
 
   api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
 
