@@ -73,9 +73,6 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
           <a data-bind="click: $root.alias.edit, visible: type() == 'alias'">
             <i class="fa fa-pencil"></i> ${ _('Edit') }
           </a>
-          <a data-bind="click: $root.alias.delete, visible: type() == 'alias'">
-            <i class="fa fa-times"></i> ${ _('Delete') }
-          </a>
         </td>
       </tr>
     </tbody>
@@ -137,7 +134,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
 
 <div id="deleteIndex" class="modal hide fade">
-  <form id="deleteIndexForm" method="POST" data-bind="submit: delete2">
+  <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -185,16 +182,6 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
       self.showCreateModal(true);
     }
-    
-    self.delete = function(alias) {
-      $.post("${ url('indexer:delete_alias') }", {
-        "alias": alias.name()
-      }, function() {
-        window.location.reload();
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
   };
 
   var Editor = function () {
@@ -230,8 +217,8 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
     self.datatable = null;
 
-    self.delete2 = function() {
-      $.post("${ url('spark:delete') }", {
+    self.deleteIndexes = function() {
+      $.post("${ url('indexer:delete_indexes') }", {
         "indexes": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
         window.location.reload();

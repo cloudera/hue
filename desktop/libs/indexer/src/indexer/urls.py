@@ -37,5 +37,5 @@ urlpatterns += patterns('indexer.api',
 
   # V2
   url(r'^api/alias/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
-  url(r'^api/alias/delete/$', 'delete_alias', name='delete_alias')
+  url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes')
 )
