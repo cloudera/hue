@@ -351,11 +351,15 @@ var Snippet = function (vm, notebook, snippet) {
     }
   };
 
+  self.lastExecuted = 0;
+
   self.execute = function () {
-    if (self.status() == 'running' || self.status() == 'loading') {
+    var now = (new Date()).getTime(); // we don't allow fast clicks
+    if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000) {
       return;
     }
     $(document).trigger("executeStarted", self);
+    self.lastExecuted = now;
     $(".jHueNotify").hide();
     logGA('/execute/' + self.type());
 
