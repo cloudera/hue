@@ -70,9 +70,12 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
         <td data-bind="text: type"></td>
         <td>
           <span data-bind="text: collections"></span>
+          <a data-bind="click: $root.alias.edit, visible: type() == 'alias'">
+            <i class="fa fa-pencil"></i> ${ _('Edit') }
+          </a>
           <a data-bind="click: $root.alias.delete, visible: type() == 'alias'">
             <i class="fa fa-times"></i> ${ _('Delete') }
-          </a>          
+          </a>
         </td>
       </tr>
     </tbody>
@@ -87,10 +90,10 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
   <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
 
     <input data-bind="value: alias.name"></input>
-    <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name'" size="5" multiple="true"></select>
+    <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name', optionsValue: 'name'" size="5" multiple="true"></select>
 
-    <a href="javascript:void(0)" class="btn" data-bind="click: alias.create">
-      <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
+    <a href="javascript:void(0)" class="btn" data-bind="click: alias.create, visible: alias.chosenCollections().length > 0">
+      <i class="fa fa-plus-circle"></i> ${ _('Create or edit') }
     </a>
     <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
       <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
@@ -174,6 +177,13 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });
+    }
+    
+    self.edit = function(alias) {
+      self.name(alias.name());console.log(alias.collections());
+      self.chosenCollections(alias.collections());
+
+      self.showCreateModal(true);
     }
     
     self.delete = function(alias) {
