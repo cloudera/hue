@@ -146,9 +146,11 @@ class JtApi(JobBrowserApi):
   def filter_jobs(self, user, jobs, **kwargs):
     check_permission = not SHARE_JOBS.get() and not user.is_superuser
 
+    limit = kwargs.pop('limit', 10000)
+
     return [Job.from_thriftjob(self.jt, j)
             for j in self._filter_jobs(jobs, **kwargs)
-            if not check_permission or user.is_superuser or j.profile.user == user.username]
+            if not check_permission or user.is_superuser or j.profile.user == user.username][:limit]
 
   def _filter_jobs(self, jobs, username=None, text=None):
     def predicate(job):
