@@ -21,6 +21,7 @@ The complete list and video demos are on link:http://gethue.com/hue-3-9-with-all
 
 
 Spark
+
 * Revamp of Notebook UI
 * Support for closing session and specifying Spark properties
 * Support for Spark 1.3, 1.4, 1.5
@@ -29,6 +30,7 @@ Spark
 * Support for submitting jars or python apps
 
 Search
+
 * Live filtering when moving on the map
 * Refresh only widgets that changed, Live refresh every N seconds
 * Edit document
@@ -46,6 +48,7 @@ Search
 * Preview of nested analytics facets
 
 Stability/performance
+
 * Fix deadlock fetching Thrift clients and waiting for Thrift connections
 * New set of integrations tests
 * Add optional /desktop/debug/check_config JSON response
@@ -55,6 +58,7 @@ Stability/performance
 * Series of Oracles and DB migration fixes
 
 Security
+
 * Explicitly set cipher list to Mozilla recommendation
 * Fix uploading large files to a kerberized HTTPFS
 * Set X-Frame-Options to all responses
@@ -63,6 +67,7 @@ Security
 * Default to using secure session cookies if HTTPS is enabled
 
 SQL
+
 * Table / column statistics and Top terms available in assist
 * Select 'default' as first assist database if available
 * Offer to filter partition on the list of partitions page
@@ -71,10 +76,12 @@ SQL
 * Allow sample on partitioned tables in strict mode
 
 HBase
+
 * Upload binary into cells
 * Allow to empty a cell
 
 Sentry
+
 * Better support of URI scope privilege
 * Support COLUMN scope privilege for finer grain permissions on tables
 * Support HA
@@ -82,12 +89,15 @@ Sentry
 * Support new sentry.hdfs.integration.path.prefixes hdfs-site.xml property
 
 Indexer
+
 * Directly upload configurations without requiring the solrctl command
 
 ZooKeeper
+
 * Creation of a lib for easily pulling or editing ZooKeeper information
 
 Oozie
+
 * Filter dashboard jobs in the backend
 * Integrate the import/export of Workflows, Coordinators and Bundles
 * Paginate Coordinator dashboard tables
@@ -96,11 +106,13 @@ Oozie
 * Series of improvements to the Editor
 
 Pig
+
 * Support %default parameters in the submission popup
 * Do not show %declare parameters in the submission popup
 * Automatically generate hcat auth credentials
 
 Sqoop
+
 * Support Kerberos authentication
 
 
