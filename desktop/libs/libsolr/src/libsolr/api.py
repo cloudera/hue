@@ -442,7 +442,7 @@ class SolrApi(object):
 
   def aliases(self):
     try:
-      params = self._get_params() + (
+      params = self._get_params() + ( # Waiting for SOLR-4968
           ('detail', 'true'),
           ('path', '/aliases.json'),
       )

@@ -75,15 +75,16 @@ class CollectionController(object):
       if self.is_solr_cloud_mode():
         collections = self.api.collections2()
         for name in collections:
-          indexes.append({'name': name, 'type': 'collection', 'collections': ''})
+          indexes.append({'name': name, 'type': 'collection', 'collections': []})
 
       solr_cores = self.api.cores()
       for name in solr_cores:
-        indexes.append({'name': name, 'type': 'core', 'collections': ''})
+        indexes.append({'name': name, 'type': 'core', 'collections': []})
 
       solr_aliases = self.api.aliases()
       for name in solr_aliases:
-        indexes.append({'name': name, 'type': 'alias', 'collections': solr_aliases[name]})
+        collections = solr_aliases[name].split()
+        indexes.append({'name': name, 'type': 'alias', 'collections': collections})
 
     except Exception, e:
       msg = _('Solr server could not be contacted properly: %s') % e
