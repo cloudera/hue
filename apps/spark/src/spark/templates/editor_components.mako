@@ -1276,6 +1276,10 @@ from django.utils.translation import ugettext as _
       redrawFixedHeaders();
     });
 
+    $(document).on("editorSizeChanged", function () {
+      window.setTimeout(redrawFixedHeaders, 50);
+    });
+
     $(document).on("executeStarted", function (e, snippet) {
       var _el = $("#snippet_" + snippet.id()).find(".resultTable");
       $("#snippet_" + snippet.id()).find(".progress").animate({

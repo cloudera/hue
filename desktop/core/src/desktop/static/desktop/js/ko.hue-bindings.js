@@ -1774,11 +1774,17 @@ ko.bindingHandlers.aceEditor = {
     }
 
     editor.previousCursorPosition = null;
+    editor.previousSize = 0;
 
     editor.on("change", function (e) {
       editor.clearErrors();
       options.extraCompleters([]);
       editor.session.getMode().$id = valueAccessor().mode();
+      var currentSize = editor.session.getLength();
+      if (currentSize != editor.previousSize && currentSize >= editorOptions.minLines && currentSize <= editorOptions.maxLines){
+        editor.previousSize = editor.session.getLength();
+        $(document).trigger("editorSizeChanged");
+      }
 
       var before = editor.getTextBeforeCursor(";");
       var beforeU = before.toUpperCase();
