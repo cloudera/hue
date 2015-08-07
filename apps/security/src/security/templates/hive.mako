@@ -35,7 +35,7 @@ ${ layout.menubar(section='hive') }
   <!-- ko ifnot: $root.isApplyingBulk() -->
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
-    <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    <span class="pointer" data-bind="click: addPrivilege, visible: $root.is_sentry_admin" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: function() { $root.list_sentry_privileges_by_authorizable() }, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
