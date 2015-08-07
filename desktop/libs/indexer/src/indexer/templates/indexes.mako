@@ -68,7 +68,12 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: type"></td>
-        <td data-bind="text: collections"></td>
+        <td>
+          <span data-bind="text: collections"></span>
+          <a data-bind="click: $root.alias.delete, visible: type() == 'alias'">
+            <i class="fa fa-times"></i> ${ _('Delete') }
+          </a>          
+        </td>
       </tr>
     </tbody>
   </table>
@@ -164,6 +169,16 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
       $.post("${ url('indexer:create_or_edit_alias') }", {
         "alias": self.name,
         "collections": ko.mapping.toJSON(self.chosenCollections)
+      }, function() {
+        window.location.reload();
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
+    
+    self.delete = function(alias) {
+      $.post("${ url('indexer:delete_alias') }", {
+        "alias": alias.name()
       }, function() {
         window.location.reload();
       }).fail(function (xhr, textStatus, errorThrown) {
