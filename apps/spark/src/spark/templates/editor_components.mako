@@ -275,45 +275,34 @@ from django.utils.translation import ugettext as _
 <script type="text/html" id="snippetIcon">
 
   <!-- ko if: type() == 'text' -->
-  <i class="fa fa-header snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">${ _('Text') }</sup>
+  <i class="fa fa-header snippet-icon"></i>
   <!-- /ko -->
 
   <!-- ko if: type() == 'hive' -->
-  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">hive</sup>
+  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon">
   <!-- /ko -->
 
   <!-- ko if: type() == 'jar' -->
-  <i class="fa fa-file-archive-o snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">jar</sup>
+  <i class="fa fa-file-archive-o snippet-icon"></i>
   <!-- /ko -->
 
   <!-- ko if: type() == 'py' -->
-  <i class="fa fa-file-code-o snippet-icon"></i><sup style="color: #338bb8; margin-left: -2px">python</sup>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'r' -->
-  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">R</sup>
+  <i class="fa fa-file-code-o snippet-icon"></i>
   <!-- /ko -->
 
   <!-- ko if: type() == 'impala' -->
-  <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">impala</sup>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'spark' -->
-  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'pyspark' -->
-  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">pyspark</sup>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'sql' -->
-  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">sql</sup>
+  <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon">
   <!-- /ko -->
 
   <!-- ko if: type() == 'pig' -->
-  <img src="${ static('pig/art/icon_pig_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">pig</sup>
+  <img src="${ static('pig/art/icon_pig_48.png') }" class="snippet-icon">
   <!-- /ko -->
 
+  <!-- ko if: type() == 'r' || type() == 'spark' || type() == 'pyspark' || type() == 'sql' -->
+  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon">
+  <!-- /ko -->
+
+  <sup style="color: #338bb8; margin-left: -2px" data-bind="text: $root.getSnippetName(type())"></sup>
 </script>
 
 
