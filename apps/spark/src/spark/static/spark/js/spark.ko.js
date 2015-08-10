@@ -108,8 +108,8 @@ var Result = function (snippet, result) {
 var TYPE_ACE_EDITOR_MAP = {
   'hive': 'ace/mode/hive',
   'impala': 'ace/mode/impala',
-  'python': 'ace/mode/python',
-  'scala': 'ace/mode/scala',
+  'pyspark': 'ace/mode/python',
+  'spark': 'ace/mode/scala',
   'pig': 'ace/mode/pig',
   'r': 'ace/mode/r',
 };

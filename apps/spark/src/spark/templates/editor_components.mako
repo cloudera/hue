@@ -298,12 +298,12 @@ from django.utils.translation import ugettext as _
   <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">impala</sup>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'scala' -->
+  <!-- ko if: type() == 'spark' -->
   <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">scala</sup>
   <!-- /ko -->
 
-  <!-- ko if: type() == 'python' -->
-  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">python</sup>
+  <!-- ko if: type() == 'pyspark' -->
+  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon"><sup style="color: #338bb8; margin-left: -2px">pyspark</sup>
   <!-- /ko -->
 
   <!-- ko if: type() == 'sql' -->
@@ -803,7 +803,7 @@ from django.utils.translation import ugettext as _
             <p>${ _('There are currently no active sessions.') }</p>
             <!-- /ko -->
             <!-- ko foreach: sessions -->
-              <!-- ko if: ['pyspark', 'scala'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
+              <!-- ko if: ['pyspark', 'spark'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
               <div style="display:block; width:100%;">
                 <!-- ko foreach: properties -->
