@@ -1265,13 +1265,6 @@ from django.utils.translation import ugettext as _
       }
     }
 
-    $(document).on("snippetAdded", function (e, snippet) {
-      var _handle = $("#snippet_" + snippet.id()).find(".resize-panel a");
-      if (_handle.length > 0) {
-        _handle.draggable(getDraggableOptions(_handle.offset().top));
-      }
-    });
-
     $(document).on("toggleResultSettings", function (e, snippet) {
       $("#snippet_" + snippet.id()).find(".chart").trigger("forceUpdate");
       redrawFixedHeaders();

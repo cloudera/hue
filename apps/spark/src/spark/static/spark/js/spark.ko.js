@@ -383,6 +383,10 @@ var Snippet = function (vm, notebook, snippet) {
 
         self.result.hasResultset(data.handle.has_result_set);
         self.checkStatus();
+
+        if (notebook.snippets()[notebook.snippets().length - 1] == self) {
+          notebook.newSnippet();
+        }
       } else {
         self._ajaxError(data, self.execute);
       }
@@ -672,6 +676,8 @@ var Notebook = function (vm, notebook) {
       window.setTimeout(function(){
         self.createSession(new Session(vm, {'type': _snippet.type()}));
       }, 200);
+    } else {
+      _snippet.status('ready');
     }
 
     _snippet.init();
@@ -721,24 +727,21 @@ var Notebook = function (vm, notebook) {
   };
 
   self.newSnippet = function () {
-
-    var _snippet = new Snippet(vm, self, {
+    self.addSnippet({
       type: self.selectedSnippet(),
       result: {}
     });
-    self.snippets.push(_snippet);
 
-    if (self.getSession(_snippet.type()) == null) {
-      window.setTimeout(function(){
-        self.createSession(new Session(vm, {'type': _snippet.type()}));
-      }, 200);
-    }
-    else {
-      _snippet.status('ready');
-    }
+    window.setTimeout(function () {
+      var lastSnippet = self.snippets()[self.snippets().length - 1];
+      if (lastSnippet.ace() != null) {
+        lastSnippet.ace().focus();
+      }
+
+      $(".right-panel").scrollTop($(".right-panel").prop('scrollHeight'));
+    }, 100);
 
     logGA('/add_snippet/' + self.selectedSnippet());
-    $(document).trigger("snippetAdded", _snippet);
   };
 
   self.getContext = function() {
