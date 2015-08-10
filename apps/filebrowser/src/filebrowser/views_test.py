@@ -34,6 +34,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
 from hadoop import pseudo_hdfs4
+from hadoop.conf import UPLOAD_CHUNK_SIZE
 from filebrowser.views import location_to_url
 
 from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
@@ -797,7 +798,9 @@ class TestFileBrowserWithHadoop(object):
 
   def test_upload_file(self):
     with tempfile.NamedTemporaryFile() as local_file:
-      local_file.write('01234' * 1024 * 1024)
+      # Make sure we can upload larger than the UPLOAD chunk size
+      file_size = UPLOAD_CHUNK_SIZE.get() * 2
+      local_file.write('0' * file_size)
       local_file.flush()
 
       prefix = self.cluster.fs_prefix + '/test_upload_file'
@@ -827,7 +830,7 @@ class TestFileBrowserWithHadoop(object):
       assert_equal(stats['group'], USER_NAME)
 
       f = self.cluster.fs.open(HDFS_FILE)
-      actual = f.read(1024 * 1024 * 5)
+      actual = f.read(file_size)
       expected = file(LOCAL_FILE).read()
       assert_equal(actual, expected, 'files do not match: %s != %s' % (len(actual), len(expected)))
 
