@@ -36,6 +36,7 @@ urlpatterns += patterns('indexer.api',
   url(r'^api/collections/(?P<collection>[^/]+)/data/$', 'collections_data', name='api_collections_data'),
 
   # V2
+  url(r'^api/v2/collections/create/$', 'create_collection', name='create_collection'),
   url(r'^api/alias/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
   url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes')
 )
