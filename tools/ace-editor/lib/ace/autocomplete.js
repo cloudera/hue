@@ -422,7 +422,7 @@ var FilteredList = function(array, filterText) {
     this.all = array;
     this.filtered = array;
     this.filterText = filterText || "";
-    this.exactMatch = false;
+    this.exactMatch = true;
 };
 (function(){
     this.setFilter = function(str) {
