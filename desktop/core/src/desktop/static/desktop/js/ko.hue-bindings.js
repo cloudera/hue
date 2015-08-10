@@ -2026,10 +2026,14 @@ ko.bindingHandlers.aceEditor = {
       }
     });
 
+    editor.lastCalledAutocomplete = 0;
+
     editor.commands.on("afterExec", function (e) {
+      var now = (new Date()).getTime();
       editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
-      if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
+      if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && now - editor.lastCalledAutocomplete > 1000 && (e.args == "." || (typeof e.args == "undefined" && e.command != null && e.command.name == "startAutocomplete"))) {
         fieldsAutocomplete(editor, valueAccessor);
+        editor.lastCalledAutocomplete = now;
       }
       // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
       if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
