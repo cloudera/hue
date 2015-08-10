@@ -593,6 +593,36 @@ class HiveServerClient:
     return HiveServerTRowSet(results.results, schema.schema).cols((col,))
 
 
+  def get_database(self, database):
+    if self.query_server['server_name'] == 'impala':
+      raise NotImplementedError(_("Impala has not implemented the 'DESCRIBE DATABASE' command: %(issue_ref)s") % {
+        'issue_ref': "https://issues.cloudera.org/browse/IMPALA-2196"
+      })
+
+    query = 'DESCRIBE DATABASE EXTENDED `%s`' % (database)
+
+    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
+    self.close_operation(operation_handle)
+
+    cols = ('db_name', 'comment', 'location')
+
+    if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
+      raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
+
+    return HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
+
+
+  def get_tables_meta(self, database, table_names):
+    req = TGetTablesReq(schemaName=database, tableName=table_names)
+    res = self.call(self._client.GetTables, req)
+
+    results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
+    self.close_operation(res.operationHandle)
+
+    cols = ('TABLE_NAME', 'TABLE_TYPE', 'REMARKS')
+    return HiveServerTRowSet(results.results, schema.schema).cols(cols)
+
+
   def get_tables(self, database, table_names):
     req = TGetTablesReq(schemaName=database, tableName=table_names)
     res = self.call(self._client.GetTables, req)
@@ -956,6 +986,22 @@ class HiveServerClientCompatible(object):
     return [table[col] for table in self._client.get_databases()]
 
 
+  def get_database(self, database):
+    return self._client.get_database(database)
+
+
+  def get_tables_meta(self, database, table_names):
+    tables = self._client.get_tables_meta(database, table_names)
+    massaged_tables = []
+    for table in tables:
+      massaged_tables.append({
+        'name': table['TABLE_NAME'],
+        'comment': table['REMARKS'],
+        'type': table['TABLE_TYPE'].capitalize()}
+      )
+    return massaged_tables
+
+
   def get_tables(self, database, table_names):
     tables = [table['TABLE_NAME'] for table in self._client.get_tables(database, table_names)]
     tables.sort()
@@ -981,9 +1027,6 @@ class HiveServerClientCompatible(object):
 
 
   def create_database(self, name, description): raise NotImplementedError()
-
-
-  def get_database(self, *args, **kwargs): raise NotImplementedError()
 
 
   def alter_table(self, dbname, tbl_name, new_tbl): raise NotImplementedError()

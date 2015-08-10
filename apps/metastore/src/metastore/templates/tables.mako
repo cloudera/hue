@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
@@ -70,6 +71,8 @@ ${ components.menubar() }
                 <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
                 <th>&nbsp;</th>
                 <th>${_('Table Name')}</th>
+                <th>${_('Comment')}</th>
+                <th>${_('Type')}</th>
               </tr>
             </thead>
             <tbody>
@@ -77,15 +80,17 @@ ${ components.menubar() }
               <tr>
                 <td data-row-selector-exclude="true" width="1%">
                   <div class="hueCheckbox tableCheck fa"
-                       data-view-url="${ url('metastore:describe_table', database=database, table=table) }"
-                       data-browse-url="${ url('metastore:read_table', database=database, table=table) }"
-                       data-drop-name="${ table }"
+                       data-view-url="${ url('metastore:describe_table', database=database, table=table['name']) }"
+                       data-browse-url="${ url('metastore:read_table', database=database, table=table['name']) }"
+                       data-drop-name="${ table['name'] }"
                        data-row-selector-exclude="true"></div>
                 </td>
-                <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="${ table }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+                <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="${ table['name'] }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
                 <td>
-                  <a href="${ url('metastore:describe_table', database=database, table=table) }" data-row-selector="true">${ table }</a>
+                  <a href="${ url('metastore:describe_table', database=database, table=table['name']) }" data-row-selector="true">${ table['name'] }</a>
                 </td>
+                <td>${ smart_unicode(table['comment']) }</td>
+                <td>${ smart_unicode(table['type']) }</td>
               </tr>
             % endfor
             </tbody>
@@ -139,7 +144,7 @@ ${ components.menubar() }
 
   $(document).ready(function () {
     var viewModel = {
-      availableTables: ko.observableArray(${ tables_json | n }),
+      availableTables: ko.observableArray(${ table_names | n }),
       chosenTables: ko.observableArray([])
     };
 
@@ -154,6 +159,8 @@ ${ components.menubar() }
       "aoColumns": [
         {"bSortable": false, "sWidth": "1%" },
         {"bSortable": false, "sWidth": "1%" },
+        null,
+        null,
         null
       ],
       "oLanguage": {

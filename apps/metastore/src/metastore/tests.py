@@ -74,7 +74,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Default database should exist
     response = self.client.get("/metastore/databases")
-    assert_true(self.db_name in response.context["databases"])
+    assert_true('db_name' in response.context["databases"][0])
+    assert_true(self.db_name in response.context["database_names"])
 
     # Table should have been created
     response = self.client.get("/metastore/tables/")
@@ -82,7 +83,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Switch databases
     response = self.client.get("/metastore/tables/%s" % self.db_name)
-    assert_true("test" in response.context["tables"])
+    assert_true('name' in response.context["tables"][0])
+    assert_true("test" in response.context["table_names"])
 
     # Should default to "default" database
     response = self.client.get("/metastore/tables/not_there")

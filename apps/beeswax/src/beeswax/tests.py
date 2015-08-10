@@ -1552,7 +1552,7 @@ for x in sys.stdin:
       resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=180.0)
       resp = self.client.get("/metastore/databases/")
-      assert_true(db_name in resp.context['databases'], resp)
+      assert_true(db_name in resp.context["database_names"], resp)
 
       # Test for accented characters in 'comment'
       resp = self.client.post("/beeswax/create/database", {
@@ -1564,7 +1564,7 @@ for x in sys.stdin:
       resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=180.0)
       resp = self.client.get("/metastore/databases/")
-      assert_true(db_name_accent in resp.context['databases'], resp)
+      assert_true(db_name_accent in resp.context['database_names'], resp)
     finally:
       make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
       make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name_accent}, wait=True)
