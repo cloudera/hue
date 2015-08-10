@@ -64,11 +64,17 @@ Database Views
 
 def databases(request):
   db = dbms.get(request.user)
-  databases = db.get_databases()
+  databases = []
+  database_names = db.get_databases()
+
+  for database in database_names:
+    db_metadata = db.get_database(database)
+    databases.append(db_metadata)
 
   return render("databases.mako", request, {
     'breadcrumbs': [],
     'databases': databases,
+    'database_names': json.dumps(database_names),
     'databases_json': json.dumps(databases),
     'has_write_access': has_write_access(request.user),
   })
@@ -119,7 +125,8 @@ def show_tables(request, database=None):
     else:
       db_form = DbForm(initial={'database': database}, databases=databases)
 
-    tables = db.get_tables(database=database)
+    tables = db.get_tables_meta(database=database)
+    table_names = [table['name'] for table in tables]
   except Exception, e:
     raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
@@ -133,6 +140,7 @@ def show_tables(request, database=None):
     'tables': tables,
     'db_form': db_form,
     'database': database,
+    'table_names': json.dumps(table_names),
     'tables_json': json.dumps(tables),
     'has_write_access': has_write_access(request.user),
   })

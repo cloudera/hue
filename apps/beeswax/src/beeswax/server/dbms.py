@@ -129,6 +129,14 @@ class HiveServer2Dbms(object):
     return self.client.get_databases()
 
 
+  def get_database(self, database):
+    return self.client.get_database(database)
+
+
+  def get_tables_meta(self, database='default', table_names='*'):
+    return self.client.get_tables_meta(database, table_names)
+
+
   def get_tables(self, database='default', table_names='*'):
     hql = "SHOW TABLES IN `%s` '%s'" % (database, table_names) # self.client.get_tables(database, table_names) is too slow
     query = hql_query(hql)

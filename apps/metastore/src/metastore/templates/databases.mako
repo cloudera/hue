@@ -14,6 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
@@ -57,6 +58,7 @@ ${ components.menubar() }
             <tr>
               <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="databaseCheck"></div></th>
               <th>${_('Database Name')}</th>
+              <th>${_('Comment')}</th>
             </tr>
           </thead>
           <tbody>
@@ -64,13 +66,14 @@ ${ components.menubar() }
             <tr>
               <td data-row-selector-exclude="true" width="1%">
                 <div class="hueCheckbox databaseCheck fa"
-                   data-view-url="${ url('metastore:show_tables', database=database) }"
-                   data-drop-name="${ database }"
+                   data-view-url="${ url('metastore:show_tables', database=database['db_name']) }"
+                   data-drop-name="${ database['db_name'] }"
                    data-row-selector-exclude="true"></div>
               </td>
               <td>
-                <a href="${ url('metastore:show_tables', database=database) }" data-row-selector="true">${ database }</a>
+                <a href="${ url('metastore:show_tables', database=database['db_name']) }" data-row-selector="true">${ database['db_name'] }</a>
               </td>
+              <td>${ smart_unicode(database['comment']) }</td>
             </tr>
           % endfor
           </tbody>
@@ -104,7 +107,7 @@ ${ components.menubar() }
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     var viewModel = {
-      availableDatabases: ko.observableArray(${ databases_json | n,unicode }),
+      availableDatabases: ko.observableArray(${ database_names | n,unicode }),
       chosenDatabases: ko.observableArray([])
     };
 
@@ -118,6 +121,7 @@ ${ components.menubar() }
       "bFilter": true,
       "aoColumns": [
         {"bSortable": false, "sWidth": "1%" },
+        null,
         null
       ],
       "oLanguage": {
