@@ -20,7 +20,7 @@
 %>
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
+${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
 
 <div class="container-fluid">
@@ -41,7 +41,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
     </%def>
 
     <%def name="creation()">
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
+      <a href="javascript:void(0)" class="btn" data-bind="click: function() { collection.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create collection') }
       </a>
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
@@ -81,6 +81,22 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
   </div>
 </div>
 
+<!-- ko template: 'create-collection' --><!-- /ko -->
+
+<script type="text/html" id="create-collection">
+  <div class="snippet-settings" data-bind="visible: collection.showCreateModal">
+
+    <input data-bind="value: collection.name"></input>
+
+    <a href="javascript:void(0)" class="btn" data-bind="click: collection.create">
+      <i class="fa fa-plus-circle"></i> ${ _('Create collection') }
+    </a>
+    <a href="javascript:void(0)" class="btn" data-bind="click: function() { collection.showCreateModal(false) }">
+      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
+    </a>
+  </div>
+</script>
+
 <!-- ko template: 'create-alias' --><!-- /ko -->
 
 <script type="text/html" id="create-alias">
@@ -91,18 +107,6 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
     <a href="javascript:void(0)" class="btn" data-bind="click: alias.create, visible: alias.chosenCollections().length > 0">
       <i class="fa fa-plus-circle"></i> ${ _('Create or edit') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
-</script>
-
-<script type="text/html" id="create-collection">
-  <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
     </a>
     <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
       <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
@@ -154,6 +158,24 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
+  var Collection = function () {
+    var self = this;
+
+    self.showCreateModal = ko.observable(false);
+
+    self.name = ko.observable('');
+
+    self.create = function() {
+      $.post("${ url('indexer:create_collection') }", {
+        "name": self.name
+      }, function() {
+        window.location.reload();
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
+  };
+
   var Alias = function (vm) {
     var self = this;
 
@@ -189,6 +211,7 @@ ${ commonheader(_("Solr Indexes"), "spark", user, "60px") | n,unicode }
 
     self.indexes = ko.mapping.fromJS(${ indexes_json | n });
 
+    self.collection = new Collection(self);
     self.alias = new Alias(self);
 
     self.selectedJobs = ko.computed(function() {

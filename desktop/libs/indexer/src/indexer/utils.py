@@ -359,3 +359,13 @@ def fields_from_log(fh):
   fields.append(('message', 'text_general'))
 
   return fields
+
+
+def get_default_fields():
+  """
+  Returns a list of default fields for the Solr schema.xml
+  :return:
+  """
+  default_field = DEFAULT_FIELD
+  default_field.update({'name': 'id', 'type': 'string', 'multiValued': 'false'})
+  return [default_field]

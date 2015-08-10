@@ -16,18 +16,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
+import os
+import shutil
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
+from indexer.conf import CORE_INSTANCE_DIR
+from indexer.utils import copy_configs
 from libsolr.api import SolrApi
 from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
-
-from desktop.lib.i18n import smart_str
 
 
 LOG = logging.getLogger(__name__)
@@ -94,6 +96,49 @@ class CollectionController(object):
 
     return indexes
 
+  def create_collection(self, name, fields, unique_key_field='id', df='text'):
+    """
+    Create solr collection or core and instance dir.
+    Create schema.xml file so that we can set UniqueKey field.
+    """
+    if self.is_solr_cloud_mode():
+      # Need to remove path afterwards
+      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
+
+      zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
+      root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+      config_root_path = '%s/%s' % (solr_config_path, 'conf')
+      try:
+        zc.copy_path(root_node, config_root_path)
+      except Exception, e:
+        zc.delete_path(root_node)
+        raise PopupException(_('Error in copying Solr configurations.'), detail=e)
+
+      # Don't want directories laying around
+      shutil.rmtree(tmp_path)
+
+      if not self.api.create_collection(name):
+        # Delete instance directory if we couldn't create a collection.
+        try:
+          zc.delete_path(root_node)
+        except Exception, e:
+          raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
+    else:  # Non-solrcloud mode
+      # Create instance directory locally.
+      instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
+      if os.path.exists(instancedir):
+        raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
+      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
+      shutil.move(solr_config_path, instancedir)
+      shutil.rmtree(tmp_path)
+
+      if not self.api.create_core(name, instancedir):
+        # Delete instance directory if we couldn't create a collection.
+        shutil.rmtree(instancedir)
+        raise PopupException(_('Could not create collection. Check error logs for more info.'))
+
+    return name
+
 #  def get_fields(self, collection_or_core_name):
 #    try:
 #      field_data = self.api.fields(collection_or_core_name)
@@ -110,49 +155,6 @@ class CollectionController(object):
 #
 #    return uniquekey, fields
 #
-#  def create_collection(self, name, fields, unique_key_field='id', df='text'):
-#    """
-#    Create solr collection or core and instance dir.
-#    Create schema.xml file so that we can set UniqueKey field.
-#    """
-#    if self.is_solr_cloud_mode():
-#      # solrcloud mode
-#
-#      # Need to remove path afterwards
-#      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
-#
-#      zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
-#      root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-#      config_root_path = '%s/%s' % (solr_config_path, 'conf')
-#      try:
-#        zc.copy_path(root_node, config_root_path)
-#      except Exception, e:
-#        zc.delete_path(root_node)
-#        raise PopupException(_('Error in copying Solr configurations.'), detail=e)
-#
-#      # Don't want directories laying around
-#      shutil.rmtree(tmp_path)
-#
-#      if not self.api.create_collection(name):
-#        # Delete instance directory if we couldn't create a collection.
-#        try:
-#          zc.delete_path(root_node)
-#        except Exception, e:
-#          raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
-#    else:
-#      # Non-solrcloud mode
-#      # Create instance directory locally.
-#      instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
-#      if os.path.exists(instancedir):
-#        raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
-#      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
-#      shutil.move(solr_config_path, instancedir)
-#      shutil.rmtree(tmp_path)
-#
-#      if not self.api.create_core(name, instancedir):
-#        # Delete instance directory if we couldn't create a collection.
-#        shutil.rmtree(instancedir)
-#        raise PopupException(_('Could not create collection. Check error logs for more info.'))
 
   def delete_collection(self, name):
     if self.api.remove_collection(name):
