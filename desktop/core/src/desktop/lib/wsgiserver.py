@@ -827,7 +827,15 @@ if not _fileobject_uses_str_type:
                         buf.write(data)
                         del data  # explicit free
                         break
-                    assert n <= left, "recv(%d) returned %d bytes" % (left, n)
+                    # NOTE: (HUE-2893) This was backported from CherryPy PR
+                    # #14, which fixes uploading chunked files with SSL.
+                    elif n > left:
+                        # Could happen with SSL transport. Differ
+                        # extra data read to the next call
+                        buf.write(data[:left])
+                        self._rbuf.write(data[left:])
+                        del data
+                        break
                     buf.write(data)
                     buf_len += n
                     del data  # explicit free
