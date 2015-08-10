@@ -341,8 +341,10 @@ def submit_workflow(request, doc_id):
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
-      job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
-
+      try:
+        job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
+      except Exception, e:
+        raise PopupException(_('Workflow submission failed'), detail=smart_str(e))
       request.info(_('Workflow submitted'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
