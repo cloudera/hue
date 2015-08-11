@@ -82,12 +82,23 @@ private class SparkRInterpreter(process: Process)
   private val plotRegex = (
     "%(" +
       "(?:" +
-        "(?:stripchart)|" +
-        "(?:hist)|" +
+        "(?:bagplot)|" +
+        "(?:barplot)|" +
         "(?:boxplot)|" +
+        "(?:dotchart)|" +
+        "(?:hist)|" +
+        "(?:lines)|" +
+        "(?:pie)|" +
+        "(?:pie3D)|" +
         "(?:plot)|" +
+        "(?:qqline)|" +
         "(?:qqnorm)|" +
-        "(?:qqline)" +
+        "(?:scatterplot)|" +
+        "(?:scatterplot3d)|" +
+        "(?:scatterplot\\.matrix)|" +
+        "(?:splom)|" +
+        "(?:stripchart)|" +
+        "(?:vioplot)" +
       ")" +
       "\\([^;)]*\\)" +
     ")"
