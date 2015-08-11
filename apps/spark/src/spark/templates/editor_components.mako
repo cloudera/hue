@@ -448,14 +448,8 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="code-editor-snippet-body">
-  <div class="row-fluid">
+  <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="verticalSlide: codeVisible">
-      <div data-bind="foreach: variables">
-        <div>
-          <span data-bind="text: name"></span>
-          <input type="text" data-bind="value: value" />
-        </div>
-      </div>
       <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
           value: statement_raw,
           onExecute: execute,
@@ -467,7 +461,17 @@ from django.utils.translation import ugettext as _
           openIt: '${ _("Double click to open it") }',
           placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>
+    <div class="clearfix"></div>
+    <ul data-bind="foreach: variables" class="unstyled inline">
+        <li>
+          <div class="input-prepend margin-top-10">
+            <span class="muted add-on" data-bind="text: name"></span>
+            <input class="input-medium" type="text" placeholder="${ _("Variable value") }" data-bind="value: value">
+          </div>
+        </li>
+      </ul>
   </div>
+  <div class="clearfix"></div>
 
   <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
   <!-- ko template: 'snippet-results' --><!-- /ko -->
