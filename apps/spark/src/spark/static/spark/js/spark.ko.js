@@ -111,7 +111,7 @@ var TYPE_ACE_EDITOR_MAP = {
   'pyspark': 'ace/mode/python',
   'spark': 'ace/mode/scala',
   'pig': 'ace/mode/pig',
-  'r': 'ace/mode/r',
+  'r': 'ace/mode/r'
 };
 
 var getDefaultSnippetProperties = function (snippetType) {
@@ -186,13 +186,11 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.variables = ko.observableArray([]);
   self.variableNames = ko.computed(function () {
-    var matches = [];
-    var myRegexp = /(?:[^\\]\$)([^\d'" ]\w*)/g;
-    var match = myRegexp.exec(self.statement_raw());
+    var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
 
-    while (match != null) {
+    var match, matches = [];
+    while (match = re.exec(self.statement_raw())) {
       matches.push(match[1]);
-      match = myRegexp.exec(self.statement());
     }
     return matches;
   });
@@ -234,7 +232,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.statement = ko.computed(function () {
     var statement = self.statement_raw();
     $.each(self.variables(), function (index, variable) {
-      statement = statement.replace(RegExp("([^\\\\])\\$" + variable.name(), "g"), "$1" + variable.value());
+      statement = statement.replace(RegExp("([^\\\\])?\\${" + variable.name() + "}", "g"), "$1" + variable.value());
     });
     return statement;
   });
@@ -905,6 +903,9 @@ function EditorViewModel(notebooks, options) {
     self.notebooks.push(_n);
     if (_n.snippets().length > 0) {
       _n.selectedSnippet(_n.snippets()[_n.snippets().length - 1].type());
+      _n.snippets().forEach(function(snippet){
+        snippet.statement_raw.valueHasMutated();
+      });
     }
   };
 
