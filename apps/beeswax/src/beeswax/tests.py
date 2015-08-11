@@ -1553,7 +1553,12 @@ for x in sys.stdin:
 
     query_server = history.get_query_server_config()
     assert_equal('beeswax', query_server['server_name'])
-    assert_equal(get_localhost_name(), query_server['server_host'])
+
+    # NOTE: The history server is typically on a different server when live
+    # cluster testing.
+    if not is_live_cluster():
+      assert_equal(get_localhost_name(), query_server['server_host'])
+
     assert_equal('hiveserver2', query_server['server_type'])
     assert_true(query_server['principal'] is None, query_server['principal']) # No default hive/HOST_@TEST.COM so far
 
