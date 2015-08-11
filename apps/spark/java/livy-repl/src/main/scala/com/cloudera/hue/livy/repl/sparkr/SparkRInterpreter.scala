@@ -33,7 +33,7 @@ import scala.io.Source
 private object SparkRInterpreter {
   val LIVY_END_MARKER = "----LIVY_END_OF_COMMAND----"
   val PRINT_MARKER = f"""print("$LIVY_END_MARKER")"""
-  val EXPECTED_OUTPUT = f"""\n$PRINT_MARKER\n[1] "$LIVY_END_MARKER""""
+  val EXPECTED_OUTPUT = f"""$PRINT_MARKER\n[1] "$LIVY_END_MARKER""""
 }
 
 private class SparkRInterpreter(process: Process)

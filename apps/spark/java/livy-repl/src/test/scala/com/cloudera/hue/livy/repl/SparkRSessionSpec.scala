@@ -90,7 +90,7 @@ class SparkRSessionSpec extends BaseSessionSpec {
       result should equal (expectedResult)
     }
 
-    it("should capture stdout") {
+    it("should capture stdout from print") {
       val statement = session.execute("""print('Hello World')""")
       statement.id should equal (0)
 
@@ -100,6 +100,22 @@ class SparkRSessionSpec extends BaseSessionSpec {
         "execution_count" -> 0,
         "data" -> Map(
           "text/plain" -> "[1] \"Hello World\""
+        )
+      ))
+
+      result should equal (expectedResult)
+    }
+
+    it("should capture stdout from cat") {
+      val statement = session.execute("""cat(3)""")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "ok",
+        "execution_count" -> 0,
+        "data" -> Map(
+          "text/plain" -> "3"
         )
       ))
 
