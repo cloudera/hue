@@ -58,6 +58,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <httpclient.version>4.5</httpclient.version>
         <httpcore.version>4.4.1</httpcore.version>
+        <commons-codec.version>1.9</commons-codec.version>
     </properties>
 
     <modules>
@@ -222,6 +223,12 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
                 <version>${httpcore.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
             </dependency>
 
         </dependencies>
