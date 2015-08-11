@@ -399,6 +399,9 @@ class TestAPI(OozieMockBase):
     self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
 
   def test_workflow_save(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
+
     self.setup_simple_workflow()
 
     workflow_dict = workflow_to_dict(self.wf)
@@ -1203,6 +1206,9 @@ class TestEditor(OozieMockBase):
     wf2.delete(skip_trash=True)
 
   def test_workflow_flatten_list(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2899: Needs to make results in a consistent order')
+
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',
                  str(self.wf.node_list))
@@ -2474,6 +2480,10 @@ class TestImportWorkflow04(OozieMockBase):
 
     If an error link cannot be resolved, default to 'kill' node.
     """
+
+    if is_live_cluster():
+      raise SkipTest('HUE-2899: Needs to make results in a consistent order')
+
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-java-different-error-links.xml')
@@ -3112,6 +3122,9 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_oozie_page(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2898: Skipping test until it can be debugged')
+
     response = self.c.get(reverse('oozie:list_oozie_info'))
     assert_true('version' in response.content, response.content)
     assert_true('NORMAL' in response.content, response.content)
