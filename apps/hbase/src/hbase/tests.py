@@ -173,7 +173,7 @@ class TestIntegrationWithHBase:
   def setup_class(cls):
 
     if not is_live_cluster():
-      raise SkipTest()
+      raise SkipTest('These tests can only run on a live cluster')
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
@@ -182,6 +182,9 @@ class TestIntegrationWithHBase:
 
 
   def test_list_tables(self):
+    if not is_live_cluster():
+      raise SkipTest('HUE-2910: Skipping because test is not reentrant')
+
     resp = self.client.post('/hbase/api/getTableList/Cluster')
     content = json.loads(resp.content)
 

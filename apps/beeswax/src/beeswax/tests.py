@@ -753,6 +753,9 @@ for x in sys.stdin:
 
 
   def test_designs(self):
+    if is_live_cluster():
+      raise SkipTests('HUE-2902: Skipping because test is not reentrant')
+
     cli = self.client
 
     # An auto hql design should be created, and it should ignore the given name and desc
