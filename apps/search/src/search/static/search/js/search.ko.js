@@ -291,7 +291,7 @@ var Query = function (vm, query) {
       'lat': data.lat,
       'lon': data.lon,
       'filter': [
-        {'exclude': false, 'value': data.bounds}
+        {'exclude': false, 'value': ko.mapping.toJSON(data.bounds)} // Need common type
       ],
       'type': 'map',
       'properties': {
