@@ -19,6 +19,7 @@
 import ldap
 
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 import desktop.conf
@@ -31,7 +32,7 @@ from django.core.urlresolvers import reverse
 from useradmin.models import LdapGroup, UserProfile
 from useradmin.models import get_profile
 
-from hadoop import pseudo_hdfs4
+from hadoop import pseudo_hdfs4, is_live_cluster
 from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
                   add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 
@@ -175,6 +176,9 @@ def test_useradmin_ldap_suboordinate_group_integration():
 
 
 def test_useradmin_ldap_nested_group_integration():
+  if is_live_cluster():
+    raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
+
   reset_all_users()
   reset_all_groups()
 
@@ -412,6 +416,9 @@ def test_useradmin_ldap_nested_posix_group_integration():
 
 
 def test_useradmin_ldap_user_integration():
+  if is_live_cluster():
+    raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
+
   done = []
 
   # Set to nonsensical value just to force new config usage.
@@ -490,6 +497,9 @@ def test_useradmin_ldap_user_integration():
 
 
 def test_add_ldap_users():
+  if is_live_cluster():
+    raise SkipTests('HUE-2897: Skipping because the DB may not be case sensitive')
+
   done = []
 
   # Set to nonsensical value just to force new config usage.
