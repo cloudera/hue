@@ -26,7 +26,7 @@ from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from hadoop import pseudo_hdfs4
+from hadoop import pseudo_hdfs4, is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.tests import OozieBase
 
@@ -213,6 +213,9 @@ class TestWithHadoop(OozieBase):
     return pig_script_id
 
   def test_submit(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2909: Skipping because test is not reentrant')
+
     script = PigScript.objects.get(id=1100713)
     script_dict = script.dict
 

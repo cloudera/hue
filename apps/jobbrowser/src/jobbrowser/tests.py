@@ -31,6 +31,7 @@ from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.models import Document
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
@@ -174,6 +175,10 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     """
     Test jobs with genuine failure, not just killed
     """
+
+    if is_live_cluster():
+      raise SkipTest('HUE-2902: Skipping because test is not reentrant')
+
     # Create design that will fail because the script file isn't there
     INPUT_DIR = TestJobBrowserWithHadoop.home_dir + '/input'
     OUTPUT_DIR = TestJobBrowserWithHadoop.home_dir + '/output'
