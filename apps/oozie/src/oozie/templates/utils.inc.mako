@@ -598,13 +598,13 @@ function renderCrons() {
 
   $(document).ready(function(){
     $(".bulkToolbarBtn").on("click", function(){
-      $(".btn-toolbar").find(".loader").removeClass("hide");
-      $(".bulkToolbarBtn").hide();
       if ($(this).data("operation") == "kill"){
         bulkOperationConfirmation($(this).data("operation"));
       }
       else {
         bulkOperation($(this).data("operation"));
+        $(".btn-toolbar").find(".loader").removeClass("hide");
+        $(".bulkToolbarBtn").hide();
       }
     });
 
@@ -635,15 +635,14 @@ function renderCrons() {
 
     $("#bulkConfirmation").modal({
       show: false
-    }).on("hidden", function(){
-      $(".btn-toolbar").find(".loader").addClass("hide");
-      $(".bulkToolbarBtn").show();
     });
-
 
     function bulkOperationConfirmation(what){
       $("#bulkConfirmation").modal("show");
+      $("#bulkConfirmation a.btn-danger").off("click");
       $("#bulkConfirmation a.btn-danger").on("click", function(){
+        $(".btn-toolbar").find(".loader").removeClass("hide");
+        $(".bulkToolbarBtn").hide();
         bulkOperation(what);
         $("#bulkConfirmation").modal("hide");
       });
