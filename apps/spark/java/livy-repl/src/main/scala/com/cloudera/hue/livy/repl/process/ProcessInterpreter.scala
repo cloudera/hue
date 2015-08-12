@@ -167,4 +167,22 @@ abstract class ProcessInterpreter(process: Process)
         throw e
     }
   }
+
+
+  private[this] val processWatcherThread = new Thread("process watcher thread") {
+    override def run() = {
+      val exitCode = process.waitFor()
+      if (exitCode != 0) {
+        _state = Error()
+
+        // Give livy-server a moment to see that we've died.
+        Thread.sleep(1000)
+
+        System.exit(1)
+      }
+    }
+  }
+
+  processWatcherThread.setDaemon(true)
+  processWatcherThread.start()
 }

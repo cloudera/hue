@@ -101,19 +101,25 @@ class ScalatraBootstrap extends LifeCycle with Logging {
   var session: Session = null
 
   override def init(context: ServletContext): Unit = {
-    session = context.getInitParameter(Main.SESSION_KIND) match {
-      case Main.PYSPARK_SESSION => PythonSession.create()
-      case Main.SPARK_SESSION => SparkSession.create()
-      case Main.SPARKR_SESSION => SparkRSession.create()
+    try {
+      session = context.getInitParameter(Main.SESSION_KIND) match {
+        case Main.PYSPARK_SESSION => PythonSession.create()
+        case Main.SPARK_SESSION => SparkSession.create()
+        case Main.SPARKR_SESSION => SparkRSession.create()
+      }
+
+      context.mount(new WebApp(session), "/*")
+
+      val callbackUrl = Option(System.getProperty("livy.repl.callback-url"))
+        .orElse(sys.env.get("LIVY_CALLBACK_URL"))
+
+      // See if we want to notify someone that we've started on a url
+      callbackUrl.foreach(notifyCallback)
+    } catch {
+      case e: Throwable =>
+        println(f"Exception thrown when initializing server: $e")
+        sys.exit(1)
     }
-
-    context.mount(new WebApp(session), "/*")
-
-    val callbackUrl = Option(System.getProperty("livy.repl.callback-url"))
-      .orElse(sys.env.get("LIVY_CALLBACK_URL"))
-
-    // See if we want to notify someone that we've started on a url
-    callbackUrl.foreach(notifyCallback)
   }
 
   override def destroy(context: ServletContext): Unit = {
