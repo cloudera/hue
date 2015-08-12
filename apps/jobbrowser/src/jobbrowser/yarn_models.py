@@ -28,6 +28,7 @@ from django.utils.translation import ugettext as _
 from desktop.lib.rest.resource import Resource
 from desktop.lib.view_util import format_duration_in_millis
 
+from hadoop.conf import YARN_CLUSTERS
 from hadoop.yarn.clients import get_log_client
 
 from jobbrowser.models import format_unixtime_ms
@@ -342,10 +343,16 @@ class Attempt:
     attempt = self.task.job.job_attempts['jobAttempt'][-1]
     log_link = attempt['logsLink']
     # Get MR task logs
-    if self.assignedContainerId:
-      log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
-    if hasattr(self, 'nodeHttpAddress'):
-      log_link = log_link.replace(attempt['nodeHttpAddress'].split(':')[0], self.nodeHttpAddress.split(':')[0])
+
+    # Don't hack up the urls if they've been migrated to the job history server.
+    for cluster in YARN_CLUSTERS.get().itervalues():
+      if log_link.startswith(cluster.HISTORY_SERVER_API_URL.get()):
+        break
+    else:
+      if self.assignedContainerId:
+        log_link = log_link.replace(attempt['containerId'], self.assignedContainerId)
+      if hasattr(self, 'nodeHttpAddress'):
+        log_link = log_link.replace(attempt['nodeHttpAddress'].split(':')[0], self.nodeHttpAddress.split(':')[0])
 
     for name in ('stdout', 'stderr', 'syslog'):
       link = '/%s/' % name
