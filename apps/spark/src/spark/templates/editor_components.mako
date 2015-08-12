@@ -368,10 +368,6 @@ from django.utils.translation import ugettext as _
         <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
       </div>
 
-      <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-top: 5px">
-        <span data-bind="text: result.errors"></span>
-      </div>
-
       <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass">
         ${ _('Success.') }
       </div>
@@ -658,6 +654,9 @@ from django.utils.translation import ugettext as _
       'progress-danger': progress() == 0 && result.errors().length > 0}" style="background-color: #FFF; width: 100%">
       <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
     </div>
+  </div>
+  <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-left: 3px">
+    <span data-bind="text: result.errors"></span>
   </div>
 
   <div class="snippet-footer-actions-bar">

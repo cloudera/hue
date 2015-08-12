@@ -501,3 +501,14 @@ table.airy tr td {
   margin: 0 5px;
   position: relative;
 }
+
+.results.alert-error {
+  border: none;
+  margin-top: -3px;
+  background: -moz-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -webkit-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -o-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -ms-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(to right, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f2dede', endColorstr='#00ffffff', GradientType=1)
+}

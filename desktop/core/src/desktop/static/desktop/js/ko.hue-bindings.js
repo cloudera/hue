@@ -1780,23 +1780,28 @@ ko.bindingHandlers.aceEditor = {
 
           var token = editor.session.getTokenAt(docPos.row, docPos.column);
 
-          var isMetastoreLink = Object.keys(valueAccessor().autocompleter.getCurrentTables()).indexOf(token.value) > -1;
+          if (token) {
+            var isMetastoreLink = Object.keys(valueAccessor().autocompleter.getCurrentTables()).indexOf(token.value) > -1;
 
-          if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
-              token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
-              isMetastoreLink) {
-            // add highlight for the clicked token
-            var range = new AceRange(docPos.row, token.start, docPos.row, token.start + token.value.length);
-            editor.session.removeMarker(this.marker);
-            this.marker = editor.session.addMarker(range, 'ace_bracket red');
-            editor.renderer.setCursorStyle("pointer");
-            this.setText(options.openIt);
-            if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
-              $(".ace_tooltip").show();
-              this.show(null, this.x + 10, this.y + 10);
+            if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
+                token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
+                isMetastoreLink) {
+              // add highlight for the clicked token
+              var range = new AceRange(docPos.row, token.start, docPos.row, token.start + token.value.length);
+              editor.session.removeMarker(this.marker);
+              this.marker = editor.session.addMarker(range, 'ace_bracket red');
+              editor.renderer.setCursorStyle("pointer");
+              this.setText(options.openIt);
+              if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
+                $(".ace_tooltip").show();
+                this.show(null, this.x + 10, this.y + 10);
+              }
+              this.link = token;
+              this.isClearable = true
             }
-            this.link = token;
-            this.isClearable = true
+            else {
+              this.clear();
+            }
           }
           else {
             this.clear();
