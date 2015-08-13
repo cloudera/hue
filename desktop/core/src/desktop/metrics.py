@@ -132,7 +132,8 @@ response_time = global_registry().timer(
     name='desktop.requests.aggregate-response-time',
     label='Request aggregate response time',
     description='Time taken to respond to requests',
-    numerator='seconds',
+    numerator='requests',
+    denominator='seconds',
 )
 
 # ------------------------------------------------------------------------------
@@ -177,26 +178,30 @@ ldap_authentication_time = global_registry().timer(
     name='desktop.auth.ldap.authentication-time',
     label='LDAP Authentication time',
     description='Time taken to authenticate a user with LDAP',
-    numerator='seconds',
+    numerator='auths',
+    denominator='seconds',
 )
 
 oauth_authentication_time = global_registry().timer(
     name='desktop.auth.oauth.authentication-time',
     label='OAUTH Authentication time',
     description='Time taken to authenticate a user with OAUTH',
-    numerator='seconds',
+    numerator='auths',
+    denominator='seconds',
 )
 
 pam_authentication_time = global_registry().timer(
     name='desktop.auth.pam.authentication-time',
     label='PAM Authentication time',
     description='Time taken to authenticate a user with PAM',
-    numerator='seconds',
+    numerator='auths',
+    denominator='seconds',
 )
 
 spnego_authentication_time = global_registry().timer(
     name='desktop.auth.spnego.authentication-time',
     label='SPNEGO Authentication time',
     description='Time taken to authenticate a user with SPNEGO',
-    numerator='seconds',
+    numerator='auths',
+    denominator='seconds',
 )
