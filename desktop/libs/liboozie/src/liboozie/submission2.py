@@ -20,6 +20,7 @@ import logging
 import os
 import time
 
+from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -38,6 +39,23 @@ from liboozie.credentials import Credentials
 
 
 LOG = logging.getLogger(__name__)
+
+def submit_dryrun(run_func):
+  def decorate(self, deployment_dir=None):
+    if self.oozie_id is not None:
+      raise Exception(_("Submission already submitted (Oozie job id %s)") % (self.oozie_id,))
+
+    jt_address = cluster.get_cluster_addr_for_job_submission()
+
+    if deployment_dir is None:
+      self._update_properties(jt_address) # Needed as we need to set some properties like Credentials before
+      deployment_dir = self.deploy()
+
+    self._update_properties(jt_address, deployment_dir)
+    if self.properties.get('dryrun'):
+      self.api.dryrun(self.properties)
+    return run_func(self, deployment_dir)
+  return wraps(run_func)(decorate)
 
 
 class Submission(object):
@@ -72,21 +90,12 @@ class Submission(object):
       res += " -- " + self.oozie_id
     return res
 
+  @submit_dryrun
   def run(self, deployment_dir=None):
     """
     Take care of all the actions of submitting a Oozie workflow.
     Returns the oozie job id if all goes well.
     """
-    if self.oozie_id is not None:
-      raise Exception(_("Submission already submitted (Oozie job id %s)") % (self.oozie_id,))
-
-    jt_address = cluster.get_cluster_addr_for_job_submission()
-
-    if deployment_dir is None:
-      self._update_properties(jt_address) # Needed as we need to set some properties like Credentials before
-      deployment_dir = self.deploy()
-
-    self._update_properties(jt_address, deployment_dir)
 
     self.oozie_id = self.api.submit_job(self.properties)
     LOG.info("Submitted: %s" % (self,))

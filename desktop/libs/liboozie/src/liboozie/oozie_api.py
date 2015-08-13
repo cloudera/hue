@@ -250,6 +250,20 @@ class OozieApi(object):
     resp = self._root.post('jobs', params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
     return resp['id']
 
+  def dryrun(self, properties=None):
+    defaults = {
+      'user.name': self.user,
+    }
+
+    if properties is not None:
+      defaults.update(properties)
+
+    properties = defaults
+
+    params = self._get_params()
+    params['action'] = 'dryrun'
+    return self._root.post('jobs', params, data=config_gen(properties), contenttype=_XML_CONTENT_TYPE)
+
   def rerun(self, jobid, properties=None, params=None):
     properties = self._get_oozie_properties(properties)
     if params is None:

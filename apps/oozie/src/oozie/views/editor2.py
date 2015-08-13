@@ -340,6 +340,7 @@ def submit_workflow(request, doc_id):
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
 
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
@@ -357,7 +358,8 @@ def submit_workflow(request, doc_id):
     popup = render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
-                     'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
+                     'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id}),
+                     'show_dryrun': True
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
@@ -542,6 +544,7 @@ def submit_coordinator(request, doc_id):
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       job_id = _submit_coordinator(request, coordinator, mapping)
 
       request.info(_('Coordinator submitted.'))
@@ -556,7 +559,8 @@ def submit_coordinator(request, doc_id):
   popup = render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
-                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id})
+                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
+                 'show_dryrun': True
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)
 
@@ -709,7 +713,8 @@ def submit_bundle(request, doc_id):
   popup = render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
-                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id})
+                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
+                 'show_dryrun': False
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)
 

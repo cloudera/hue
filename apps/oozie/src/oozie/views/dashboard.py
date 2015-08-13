@@ -805,6 +805,7 @@ def submit_external_job(request, application_path):
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       application_name = os.path.basename(application_path)
       application_class = Bundle if application_name == 'bundle.xml' else Coordinator if application_name == 'coordinator.xml' else get_workflow()
       mapping[application_class.get_application_path_key()] = application_path
@@ -834,7 +835,8 @@ def submit_external_job(request, application_path):
   popup = render('editor/submit_job_popup.mako', request, {
                    'params_form': params_form,
                    'name': _('Job'),
-                   'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path})
+                   'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path}),
+                   'show_dryrun': os.path.basename(application_path) != 'bundle.xml'
                  }, force_template=True).content
   return JsonResponse(popup, safe=False)
 
