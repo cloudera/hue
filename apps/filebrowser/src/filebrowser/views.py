@@ -58,6 +58,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.fsutils import do_newfile_save, do_overwrite_save
 
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
+from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
+from filebrowser.conf import SHOW_UPLOAD_BUTTON
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
@@ -235,9 +237,9 @@ def edit(request, path, form=None):
         path=path,
         filename=os.path.basename(path),
         dirname=os.path.dirname(path),
-        breadcrumbs = parse_breadcrumbs(path))
+        breadcrumbs = parse_breadcrumbs(path),
+        show_download_button = SHOW_DOWNLOAD_BUTTON.get())
     return render("edit.mako", request, data)
-
 
 def save_file(request):
     """
@@ -317,7 +319,9 @@ def listdir(request, path, chooser):
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
-        'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0]
+        'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
+        'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
     }
 
     stats = request.fs.listdir_stats(path)
@@ -447,7 +451,9 @@ def listdir_paged(request, path):
         'superuser': request.fs.superuser,
         'supergroup': request.fs.supergroup,
         'is_sentry_managed': request.fs.is_sentry_managed(path),
-        'apps': appmanager.get_apps_dict(request.user).keys()
+        'apps': appmanager.get_apps_dict(request.user).keys(),
+        'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
     }
     return render('listdir.mako', request, data)
 
@@ -618,6 +624,7 @@ def display(request, path):
         data['view']['masked_binary_data'] = is_binary
 
     data['breadcrumbs'] = parse_breadcrumbs(path)
+    data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
 
     return render("display.mako", request, data)
 

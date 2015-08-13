@@ -36,7 +36,7 @@ ${ fb_components.menubar() }
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats) }
+      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, show_download_button) }
     </div>
     <div class="span10">
       <div class="card card-small">

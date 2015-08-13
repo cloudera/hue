@@ -82,7 +82,7 @@ from django.utils.translation import ugettext as _
   </div>
 </%def>
 
-<%def name="file_sidebar(path_enc, dirname_enc, stats, view=None)">
+<%def name="file_sidebar(path_enc, dirname_enc, stats, show_download_button, view=None)">
   <div class="sidebar-nav" style="padding-top: 0">
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
@@ -117,7 +117,9 @@ from django.utils.translation import ugettext as _
         <li><a href="${url('filebrowser.views.view', path=path_enc)}"><i class="fa fa-eye"></i> ${_('View file')}</a></li>
       % endif
 
+      % if show_download_button:
        <li><a href="${url('filebrowser.views.download', path=path_enc)}"><i class="fa fa-download"></i> ${_('Download')}</a></li>
+      % endif
        <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
        <li><a id="refreshBtn" href="#"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
 

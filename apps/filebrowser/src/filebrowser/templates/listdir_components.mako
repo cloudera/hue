@@ -28,11 +28,11 @@ from django.utils.translation import ugettext as _
   ${_table(files, path, current_request_path, 'chooser')}
 </%def>
 
-<%def name="list_table_browser(files, path, current_request_path, cwd_set=True)">
-  ${_table(files, path, current_request_path, 'view')}
+<%def name="list_table_browser(files, path, current_request_path, show_download_button, cwd_set=True)">
+  ${_table(files, path, current_request_path, 'view', show_download_button)}
 </%def>
 
-<%def name="_table(files, path, current_request_path, view)">
+<%def name="_table(files, path, current_request_path, view, show_download_button)">
 
   <link href="${ static('filebrowser/css/listdir_components.css') }" rel="stylesheet" type="text/css">
   <table class="table table-condensed datatables tablescroller-disable">
@@ -413,7 +413,9 @@ from django.utils.translation import ugettext as _
     isCurrentDirSelected().length == 0"><i class="fa fa-random"></i> ${_('Move')}</a></li>
     <li><a href="#" title="${_('Copy')}" data-bind="click: $root.copy, enable: $root.selectedFiles().length > 0 &&
     isCurrentDirSelected().length == 0"><i class="fa fa-files-o"></i> ${_('Copy')}</a></li>
+    % if show_download_button:
     <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
+    % endif
     <li class="divider"></li>
     % if is_fs_superuser:
     <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }">
