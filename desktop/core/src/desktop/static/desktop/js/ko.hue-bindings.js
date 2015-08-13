@@ -1685,27 +1685,40 @@ ko.bindingHandlers.aceEditor = {
       maxLines: 25
     }
 
-    if (editor.getValue() == "" && options.placeholder) {
-      editor.setValue(options.placeholder);
-    }
-
     var userOptions = $.totalStorage("hue.ace.options") || {};
     $.extend(editorOptions, options.editorOptions || userOptions);
 
     editor.setOptions(editorOptions);
 
-    editor.on("focus", function () {
-      if (options.placeholder && editor.getValue() == options.placeholder) {
-        editor.setValue("");
+    var placeHolderElement = null;
+    var placeHolderVisible = false;
+    if (options.placeholder) {
+      placeHolderElement = $("<div>")
+        .text(options.placeholder)
+        .css("margin-left", "6px")
+        .addClass("ace_invisible ace_emptyMessage");
+      if (editor.getValue().length == 0) {
+        placeHolderElement.appendTo(editor.renderer.scroller);
+        placeHolderVisible = true;
       }
+    }
+
+    editor.on("input", function() {
+      if (editor.getValue().length == 0 && !placeHolderVisible) {
+        placeHolderElement.appendTo(editor.renderer.scroller);
+        placeHolderVisible = true;
+      } else if (placeHolderVisible) {
+        placeHolderElement.remove();
+        placeHolderVisible = false;
+      }
+    });
+
+    editor.on("focus", function () {
       onFocus(editor);
     });
 
     editor.on("blur", function () {
       options.value(editor.getValue());
-      if (editor.getValue() == "" && options.placeholder) {
-        editor.setValue(options.placeholder);
-      }
       onBlur(editor);
     });
 
