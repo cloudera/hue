@@ -31,6 +31,20 @@ oop.inherits(Mode, TextMode);
 (function() {
     this.lineCommentStart = "--";
     this.$id = "ace/mode/hive"
+
+    this.getCompletions = function(state, session, pos, prefix) {
+        var keywords = this.$keywordList || this.$createKeywordList();
+        return keywords.map(function (word) {
+            return {
+                ignoreCase: true,
+                name: word,
+                value: word,
+                upperCaseValue: word.toUpperCase(),
+                score: 1,
+                meta: "keyword"
+            };
+        });
+    };
 }).call(Mode.prototype);
 
 exports.Mode = Mode;

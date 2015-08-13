@@ -191,10 +191,13 @@ var Autocomplete = function() {
                     this.editor.session.remove(range);
                 }
             }
-            if (data.snippet)
+            if (data.snippet) {
                 snippetManager.insertSnippet(this.editor, data.snippet);
-            else
+            } else if (data.upperCaseMatch) {
+                this.editor.execCommand("insertstring", data.upperCaseValue);
+            } else {
                 this.editor.execCommand("insertstring", data.value || data);
+            }
         }
         this.detach();
     };
@@ -467,10 +470,15 @@ var FilteredList = function(array, filterText) {
             var penalty = 0;
             var index, distance;
 
-            if (this.exactMatch) {
-                if (needle !== caption.substr(0, needle.length))
+            if (this.exactMatch && item.ignoreCase) {
+                if (upper !== item.upperCaseValue.substr(0, needle.length)) {
                     continue loop;
-            }else{
+                }
+                item.upperCaseMatch = needle === upper;
+                item.caption = item.upperCaseMatch ? item.upperCaseValue : item.value;
+            } else if (this.exactMatch && needle !== caption.substr(0, needle.length)) {
+                continue loop;
+            } else {
                 // caption char iteration is faster in Chrome but slower in Firefox, so lets use indexOf
                 for (var j = 0; j < needle.length; j++) {
                     // TODO add penalty on case mismatch
