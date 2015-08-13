@@ -407,6 +407,10 @@ h1.empty {
   background-color: #DDD;
 }
 
+.text-snippet {
+  padding-left: 4px;
+}
+
 .medium-editor-toolbar-form label {
   min-height: 20px;
 }
@@ -425,6 +429,14 @@ h1.empty {
 
 .medium-toolbar-arrow-under:after {
   top: 40px !important;
+}
+
+.medium-editor-placeholder:after {
+  padding-left: 5px;
+  font-size: 12px !important;
+  font-family: 'Ubuntu Mono', Monaco, Consolas, monospace !important;
+  color: #D1D1D1 !important;
+  font-style: normal !important;
 }
 
 @media print {

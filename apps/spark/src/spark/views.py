@@ -55,12 +55,11 @@ def notebook(request):
       'options_json': json.dumps({
           'languages': LANGUAGES.get(),
           'snippet_placeholders' : {
-              'scala': _('/** Example: 1 + 1, or press CTRL + space */'),
-              'python': _('# Example: 1 + 1, or press CTRL + space'),
-              'impala': _('-- Example: SELECT * FROM tablename, or press CTRL + space'),
-              'hive': _('-- Example: SELECT * FROM tablename, or press CTRL + space'),
-              'text': _('<h2>This is a text snippet</h2>Type your text here'),
-              'r': _('# Example: 1 + 1, or press CTRL + space')
+              'spark': _('Example: 1 + 1, or press CTRL + space'),
+              'pyspark': _('Example: 1 + 1, or press CTRL + space'),
+              'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),
+              'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
+              'r': _('Example: 1 + 1, or press CTRL + space')
           },
           'session_properties': SparkApi.PROPERTIES
       }),

@@ -608,7 +608,7 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="text-snippet-body">
-  <div data-bind="attr:{'id': 'editor_'+id()}, html: statement_raw, value: statement_raw, medium: {}" class="text-snippet"></div>
+  <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
 </script>
 
 <script type="text/html" id="executable-snippet-body">
