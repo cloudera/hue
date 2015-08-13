@@ -33,7 +33,29 @@ import scala.io.Source
 private object SparkRInterpreter {
   val LIVY_END_MARKER = "----LIVY_END_OF_COMMAND----"
   val PRINT_MARKER = f"""print("$LIVY_END_MARKER")"""
-  val EXPECTED_OUTPUT = f"""$PRINT_MARKER\n[1] "$LIVY_END_MARKER""""
+  val EXPECTED_OUTPUT = f"""[1] "$LIVY_END_MARKER""""
+
+  val PLOT_REGEX = (
+    "(" +
+      "(?:bagplot)|" +
+      "(?:barplot)|" +
+      "(?:boxplot)|" +
+      "(?:dotchart)|" +
+      "(?:hist)|" +
+      "(?:lines)|" +
+      "(?:pie)|" +
+      "(?:pie3D)|" +
+      "(?:plot)|" +
+      "(?:qqline)|" +
+      "(?:qqnorm)|" +
+      "(?:scatterplot)|" +
+      "(?:scatterplot3d)|" +
+      "(?:scatterplot\\.matrix)|" +
+      "(?:splom)|" +
+      "(?:stripchart)|" +
+      "(?:vioplot)" +
+    ")"
+    ).r.unanchored
 }
 
 private class SparkRInterpreter(process: Process)
@@ -46,23 +68,46 @@ private class SparkRInterpreter(process: Process)
   private[this] var executionCount = 0
 
   final override protected def waitUntilReady(): Unit = {
-    sendExecuteRequest("")
+    // Set the option to catch and ignore errors instead of halting.
+    sendExecuteRequest("options(error = dump.frames)")
     executionCount = 0
   }
 
-  override protected def sendExecuteRequest(commands: String): Option[JValue] = synchronized {
-    try {
-      commands.split("\n").map { case command =>
-        executionCount += 1
+  override protected def sendExecuteRequest(command: String): Option[JValue] = synchronized {
+    var code = command
 
-        val content = sendSingleExecuteRequest(command)
-        Some(parse(write(
-          Map(
-            "status" -> "ok",
-            "execution_count" -> (executionCount - 1),
-            "data" -> content
-          ))))
-      }.last
+    // Create a image file if this command is trying to plot.
+    val tempFile = PLOT_REGEX.findFirstIn(code).map { case _ =>
+      val tempFile = Files.createTempFile("", ".png")
+      val tempFileString = tempFile.toAbsolutePath
+
+      code = f"""png("$tempFileString")\n$code\ndev.off()"""
+
+      tempFile
+    }
+
+    try {
+      executionCount += 1
+
+      var content = Map(
+        "text/plain" -> (sendRequest(code) + takeErrorLines())
+      )
+
+      // If we rendered anything, pass along the last image.
+      tempFile.foreach { case file =>
+        val bytes = Files.readAllBytes(file)
+        if (bytes.nonEmpty) {
+          val image = Base64.encodeBase64String(bytes)
+          content = content + (("image/png", image))
+        }
+      }
+
+      Some(parse(write(
+        Map(
+          "status" -> "ok",
+          "execution_count" -> (executionCount - 1),
+          "data" -> content
+        ))))
     } catch {
       case e: Error =>
         Some(parse(write(
@@ -76,75 +121,15 @@ private class SparkRInterpreter(process: Process)
         ))))
       case e: Exited =>
         None
+    } finally {
+      tempFile.foreach(Files.delete)
     }
-  }
 
-  private val plotRegex = (
-    "%(" +
-      "(?:" +
-        "(?:bagplot)|" +
-        "(?:barplot)|" +
-        "(?:boxplot)|" +
-        "(?:dotchart)|" +
-        "(?:hist)|" +
-        "(?:lines)|" +
-        "(?:pie)|" +
-        "(?:pie3D)|" +
-        "(?:plot)|" +
-        "(?:qqline)|" +
-        "(?:qqnorm)|" +
-        "(?:scatterplot)|" +
-        "(?:scatterplot3d)|" +
-        "(?:scatterplot\\.matrix)|" +
-        "(?:splom)|" +
-        "(?:stripchart)|" +
-        "(?:vioplot)" +
-      ")" +
-      "\\([^;)]*\\)" +
-    ")"
-  ).r
-
-  private def sendSingleExecuteRequest(command: String) = {
-    if (command.startsWith("%")) {
-      command match {
-        case plotRegex(plotCommand) =>
-          val tempFile = Files.createTempFile("", ".png")
-          try {
-            val tempFileString = tempFile.toAbsolutePath.toString
-
-            val output = Seq(
-              f"""png("$tempFileString")""",
-              f"""$plotCommand""",
-              "dev.off()"
-            ).map { case code =>
-              sendRequest(code)
-            }.mkString("\n")
-
-            // Encode the image as a base64 image.
-            Map(
-              "image/png" -> Base64.encodeBase64String(Files.readAllBytes(tempFile))
-            )
-          } finally {
-            Files.delete(tempFile)
-          }
-        case _ =>
-          throw new Error(f"unknown magic command `$command`")
-      }
-    } else {
-      Map(
-        "text/plain" -> (sendRequest(command) + takeErrorLines())
-      )
-    }
   }
 
   private def sendRequest(code: String): String = {
     stdin.println(code)
     stdin.flush()
-
-    // Skip the line we just entered in.
-    if (!code.isEmpty) {
-      readTo(code)
-    }
 
     stdin.println(PRINT_MARKER)
     stdin.flush()
