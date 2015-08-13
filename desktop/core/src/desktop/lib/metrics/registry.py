@@ -61,7 +61,18 @@ class MetricsRegistry(object):
     return Timer(self._registry.timer(name))
 
   def dump_metrics(self):
-    return self._registry.dump_metrics()
+    metrics = self._registry.dump_metrics()
+
+    # Filter out min and max if there have been no samples.
+    for metric in metrics.itervalues():
+      if metric.get('count') == 0:
+        if 'min' in metric:
+          metric['min'] = 0.0
+
+        if 'max' in metric:
+          metric['max'] = 0.0
+
+    return metrics
 
 
 class MetricDefinition(object):
