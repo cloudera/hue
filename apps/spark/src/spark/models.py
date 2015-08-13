@@ -377,10 +377,15 @@ class SparkApi(Api):
 
     if content['status'] == 'ok':
       data = content['data']
+      images = []
 
       try:
         table = data['application/vnd.livy.table.v1+json']
       except KeyError:
+        try:
+          images = [data['image/png']]
+        except KeyError:
+          images = []
         data = [[data['text/plain']]]
         meta = [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}]
         type = 'text'
@@ -396,6 +401,7 @@ class SparkApi(Api):
 
       return {
           'data': data,
+          'images': images,
           'meta': meta,
           'type': type
       }

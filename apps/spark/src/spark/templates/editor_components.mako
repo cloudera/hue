@@ -474,11 +474,19 @@ from django.utils.translation import ugettext as _
 </script>
 
 <script type="text/html" id="snippet-results">
-  <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0;">
+  <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
     <!-- ko if: result.data().length != 0 -->
-    <pre data-bind="text: result.data()[0][1]"></pre>
+    <pre data-bind="text: result.data()[0][1]" style="margin-bottom: 0"></pre>
+    <!-- /ko -->
+    <!-- ko if: result.images().length != 0 -->
+    <ul class="unstyled results-images" data-bind="foreach: result.images()">
+      <li>
+        <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10" />
+      </li>
+    </ul>
     <!-- /ko -->
   </div>
+
 
   <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() == 'table' && showGrid()" style="display:none; max-height: 400px; margin-top: 4px">
     <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
