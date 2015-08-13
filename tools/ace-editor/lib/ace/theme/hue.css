@@ -16,6 +16,10 @@
  limitations under the License.
 */
 
+.ace_hidden-cursors .ace_cursor {
+  opacity: 0;
+}
+
 .ace-hue .ace_gutter {
   background: #f6f6f6;
   color: #4D4D4C
@@ -50,10 +54,6 @@
 .ace-hue .ace_marker-layer .ace_bracket {
   margin: -1px 0 0 -1px;
   border: 1px solid #D1D1D1
-}
-
-.ace-hue .ace_marker-layer .ace_active-line {
-  background: #EFEFEF
 }
 
 .ace-hue .ace_gutter-active-line {
