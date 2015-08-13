@@ -40,6 +40,7 @@ from django.contrib import admin
 
 from desktop import appmanager
 from desktop import metrics
+from desktop.conf import METRICS
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -109,9 +110,10 @@ dynamic_patterns += patterns('useradmin.views',
 )
 
 # Metrics specific
-dynamic_patterns += patterns('',
-  (r'^desktop/metrics/', include('desktop.lib.metrics.urls'))
-)
+if METRICS.ENABLE_WEB_METRICS.get():
+  dynamic_patterns += patterns('',
+    (r'^desktop/metrics/', include('desktop.lib.metrics.urls'))
+  )
 
 dynamic_patterns += patterns('',
   (r'^admin/', include(admin.site.urls)),
