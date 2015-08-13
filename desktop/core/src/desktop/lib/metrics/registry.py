@@ -41,7 +41,7 @@ class MetricsRegistry(object):
     return self._registry.counter(name)
 
   def histogram(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('histogram', name, **kwargs))
+    self._schemas.append(MetricDefinition('histogram', name, is_counter=True, **kwargs))
     return self._registry.histogram(name)
 
   def gauge(self, name, gauge=None, default=float('nan'), **kwargs):
@@ -53,11 +53,11 @@ class MetricsRegistry(object):
     return self._registry.gauge(name, pyformance.meters.CallbackGauge(callback), default)
 
   def meter(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('meter', name, **kwargs))
+    self._schemas.append(MetricDefinition('meter', name, is_counter=True, **kwargs))
     return self._registry.meter(name)
 
   def timer(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('timer', name, **kwargs))
+    self._schemas.append(MetricDefinition('timer', name, is_counter=True, **kwargs))
     return Timer(self._registry.timer(name))
 
   def dump_metrics(self):
