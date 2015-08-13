@@ -116,7 +116,11 @@ class PthFile(object):
     Create a symlink to the path if it does not already exist.
     """
     with open(self._path, 'w') as _file:
+      # We want the Hue libraries to come before system libraries in
+      # case there is a name collision.
+      _file.write("import sys; sys.__plen = len(sys.path)\n")
       _file.write('\n'.join(sorted(self._entries)))
+      _file.write("\nimport sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; sys.path[0:0]=new\n")
     LOG.info('=== Saved %s' % self._path)
 
   def sync(self, apps):
