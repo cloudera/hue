@@ -16,7 +16,7 @@
 
 
 var SPARK_MAPPING = {
-  ignore: ["ace"]
+  ignore: ["ace", "images"]
 }
 
 var Result = function (snippet, result) {
@@ -71,6 +71,8 @@ var Result = function (snippet, result) {
 
   self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
   self.data.extend({ rateLimit: 50 });
+  self.images = ko.observableArray(typeof result.images != "undefined" && result.images != null ? result.images : []);
+  self.images.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
   self.logLines = 0;
   self.errors = ko.observable('');
@@ -415,6 +417,8 @@ var Snippet = function (vm, notebook, snippet) {
           self.result.data.push(row);
           _tempData.push(row);
         });
+
+        self.result.images(data.result.images);
 
         $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
