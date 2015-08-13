@@ -165,7 +165,7 @@ class SparkRSessionSpec extends BaseSessionSpec {
 
       // Manually extract since sparkr outputs a lot of spark logging information.
       resultMap("status").extract[String] should equal ("ok")
-      resultMap("execution_count").extract[Int] should equal (1)
+      resultMap("execution_count").extract[Int] should equal (0)
 
       val data = resultMap("data").extract[Map[String, JValue]]
       data("text/plain").extract[String] should include ("""  eruptions waiting
