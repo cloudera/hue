@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.repl.scala.interpreter
 
 import java.io._
 
+import org.apache.spark.rdd.RDD
 import org.apache.spark.repl.SparkIMain
 import org.apache.spark.{SparkConf, SparkContext}
 import org.json4s.JsonAST._
@@ -158,62 +159,74 @@ class Interpreter {
   }
 
   private def executeTableMagic(name: String): ExecuteResponse = {
-    sparkIMain.valueOfTerm(name) match {
-      case None =>
-        ExecuteError(executeCount, f"Value $name does not exist")
-      case Some(valueRef) =>
-        // Convert the value into JSON and map it to a table.
-        val rows: List[JValue] = Extraction.decompose(valueRef) match {
-          case JArray(arr) => arr
-          case value => List(value)
+    try {
+      sparkIMain.valueOfTerm(name) match {
+        case None =>
+          ExecuteError(executeCount, f"Value $name does not exist")
+        case Some(obj: RDD[_]) =>
+          extractTableFromJValue(Extraction.decompose(
+            obj.asInstanceOf[RDD[_]].take(10)))
+        case Some(obj) =>
+          extractTableFromJValue(Extraction.decompose(obj))
+      }
+    } catch {
+      case _: Throwable =>
+        ExecuteError(executeCount, "Failed to convert value into a table")
+    }
+  }
+
+  private def extractTableFromJValue(value: JValue) = {
+    // Convert the value into JSON and map it to a table.
+    val rows: List[JValue] = value match {
+      case JArray(arr) => arr
+      case _ => List(value)
+    }
+
+    try {
+      val headers = scala.collection.mutable.Map[String, Map[String, String]]()
+
+      val data = rows.map { case row =>
+        val cols: List[JField] = row match {
+          case JArray(arr: List[JValue]) =>
+            arr.zipWithIndex.map { case (v, index) => JField(index.toString, v) }
+          case JObject(obj) => obj.sortBy(_._1)
+          case value: JValue => List(JField("0", value))
         }
 
-        try {
-          val headers = scala.collection.mutable.Map[String, Map[String, String]]()
+        cols.map { case (name, value) =>
+          val typeName = convertTableType(value)
 
-          val data = rows.map { case row =>
-            val cols: List[JField] = row match {
-              case JArray(arr: List[JValue]) =>
-                arr.zipWithIndex.map { case (v, index) => JField(index.toString, v) }
-              case JObject(obj) => obj.sortBy(_._1)
-              case value: JValue => List(JField("0", value))
-            }
-
-            cols.map { case (name, value) =>
-              val typeName = convertTableType(value)
-
-              headers.get(name) match {
-                case Some(header) =>
-                  if (header.get("type").get != typeName) {
-                    throw new TypesDoNotMatch
-                  }
-                case None =>
-                  headers.put(name, Map(
-                    "name" -> name,
-                    "type" -> typeName
-                  ))
+          headers.get(name) match {
+            case Some(header) =>
+              if (header.get("type").get != typeName) {
+                throw new TypesDoNotMatch
               }
-
-              value
-            }
+            case None =>
+              headers.put(name, Map(
+                "name" -> name,
+                "type" -> typeName
+              ))
           }
 
-          ExecuteMagic(
-            executeCount,
-            Extraction.decompose(Map(
-              "application/vnd.livy.table.v1+json" -> Map(
-                "headers" -> headers.toSeq.sortBy(_._1).map(_._2),
-                "data" -> data
-              )
-            ))
-          )
-        } catch {
-          case _: TypesDoNotMatch =>
-            ExecuteError(
-              executeCount,
-              "table rows have different types"
-            )
+          value
         }
+      }
+
+      ExecuteMagic(
+        executeCount,
+        Extraction.decompose(Map(
+          "application/vnd.livy.table.v1+json" -> Map(
+            "headers" -> headers.toSeq.sortBy(_._1).map(_._2),
+            "data" -> data
+          )
+        ))
+      )
+    } catch {
+      case _: TypesDoNotMatch =>
+        ExecuteError(
+          executeCount,
+          "table rows have different types"
+        )
     }
   }
 
