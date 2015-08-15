@@ -156,9 +156,7 @@ class SparkSessionSpec extends BaseSessionSpec {
 
     it("should execute spark commands") {
       val statement = session.execute(
-        """
-          |sc.parallelize(0 to 1).map{i => i+1}.collect
-          |""".stripMargin)
+        """sc.parallelize(0 to 1).map{i => i+1}.collect""".stripMargin)
       statement.id should equal (0)
 
       val result = Await.result(statement.result, Duration.Inf)
@@ -168,6 +166,29 @@ class SparkSessionSpec extends BaseSessionSpec {
         "execution_count" -> 0,
         "data" -> Map(
           "text/plain" -> "res0: Array[Int] = Array(1, 2)"
+        )
+      ))
+
+      result should equal (expectedResult)
+    }
+
+    it("should do table magic") {
+      val statement = session.execute("val x = List((1, \"a\"), (3, \"b\"))\n%table x")
+      statement.id should equal (0)
+
+      val result = Await.result(statement.result, Duration.Inf)
+
+
+      val expectedResult = Extraction.decompose(Map(
+        "status" -> "ok",
+        "execution_count" -> 1,
+        "data" -> Map(
+          "application/vnd.livy.table.v1+json" -> Map(
+            "headers" -> List(
+              Map("type" -> "BIGINT_TYPE", "name" -> "_1"),
+              Map("type" -> "STRING_TYPE", "name" -> "_2")),
+            "data" -> List(List(1, "a"), List(3, "b"))
+          )
         )
       ))
 

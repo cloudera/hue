@@ -221,7 +221,7 @@ def magic_table(name):
         if isinstance(row, (list, tuple)):
             iterator = enumerate(row)
         else:
-            iterator = row.iteritems()
+            iterator = sorted(row.iteritems())
 
         for name, col in iterator:
             col_type, col = magic_table_convert(col)
