@@ -55,7 +55,7 @@ private class SparkSession extends Session {
 
   override def execute(code: String): Statement = synchronized {
     val result = Future {
-      val content = interpreter.execute(code) match {
+      val response = interpreter.execute(code) match {
         case ExecuteComplete(executeCount, output) =>
           Map(
             "status" -> "ok",
@@ -63,6 +63,12 @@ private class SparkSession extends Session {
             "data" -> Map(
               "text/plain" -> output
             )
+          )
+        case ExecuteMagic(executeCount, content) =>
+          Map(
+            "status" -> "ok",
+            "execution_count" -> executeCount,
+            "data" -> content
           )
         case ExecuteIncomplete(executeCount, output) =>
           Map(
@@ -80,7 +86,7 @@ private class SparkSession extends Session {
           )
       }
 
-      parse(write(content))
+      Extraction.decompose(response)
     }
 
     val statement = Statement(_history.length, result)
