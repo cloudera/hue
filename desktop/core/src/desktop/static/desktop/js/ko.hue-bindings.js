@@ -1672,6 +1672,19 @@ ko.bindingHandlers.aceEditor = {
       });
     }
 
+    if (ko.isObservable(options.errors)) {
+      options.errors.subscribe(function(errors) {
+        editor.clearErrors();
+        if (errors.length > 0) {
+          errors.forEach(function (err) {
+            if (err.line !== null) {
+              editor.addError(err.message, err.line);
+            }
+          });
+        }
+      });
+    }
+
     editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
 
     var editorOptions = {
@@ -2109,17 +2122,6 @@ ko.bindingHandlers.aceEditor = {
       if (options.extraCompleters().length > 0) {
         options.extraCompleters().forEach(function (complete) {
           editor.completers.push(complete);
-        });
-      }
-      editor.clearErrors();
-      if (options.errors().length > 0) {
-        options.errors().forEach(function (err) {
-          editor.addError(err.message, err.line);
-          if (err.line == editor.getCursorPosition().row) {
-            window.setTimeout(function () {
-              $(element).find(".ace_active-line").remove();
-            }, 100)
-          }
         });
       }
     }

@@ -75,7 +75,6 @@ var Result = function (snippet, result) {
   self.images.extend({ rateLimit: 50 });
   self.logs = ko.observable('');
   self.logLines = 0;
-  self.errors = ko.observable('');
   self.hasSomeResults = ko.computed(function () {
     return self.hasResultset() && self.data().length > 0; // status() == 'available'
   });
@@ -101,11 +100,10 @@ var Result = function (snippet, result) {
     self.fetchedOnce(false);
     self.data.removeAll();
     self.logs('');
-    self.errors('');
     self.startTime(new Date());
     self.endTime(new Date());
   };
-}
+};
 
 var TYPE_ACE_EDITOR_MAP = {
   'hive': 'ace/mode/hive',
@@ -125,7 +123,7 @@ var getDefaultSnippetProperties = function (snippetType) {
     properties['numExecutors'] = '';
     properties['queue'] = '';
     properties['archives'] = [];
-  };
+  }
 
   if (snippetType == 'jar') {
     properties['app_jar'] = '';
@@ -148,6 +146,8 @@ var getDefaultSnippetProperties = function (snippetType) {
 
   return properties;
 };
+
+var ERROR_REGEX = /line ([0-9]+)/i;
 
 var Snippet = function (vm, notebook, snippet) {
   var self = this;
@@ -344,7 +344,11 @@ var Snippet = function (vm, notebook, snippet) {
     }
     else if (data.status == 1) {
       self.status('failed');
-      self.result.errors(data.message);
+      var match = ERROR_REGEX.exec(data.message);
+      self.errors.push({
+        message: data.message,
+        line: match === null ? null : parseInt(match[1]) - 1
+      });
     } else {
       $(document).trigger("error", data.message);
       self.status('failed');
@@ -365,6 +369,7 @@ var Snippet = function (vm, notebook, snippet) {
 
     self.status('running');
     self.result.clear();
+    self.errors([]);
     self.result.logLines = 0;
     self.progress(0);
 

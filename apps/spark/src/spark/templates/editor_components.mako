@@ -648,12 +648,14 @@ from django.utils.translation import ugettext as _
     <div class="progress progress-striped active" style="height: 0" data-bind="css: {
       'progress-warning': progress() > 0 && progress() < 100,
       'progress-success': progress() == 100,
-      'progress-danger': progress() == 0 && result.errors().length > 0}" style="background-color: #FFF; width: 100%">
-      <div class="bar" data-bind="style: {'width': (result.errors().length > 0 ? 100 : progress()) + '%'}"></div>
+      'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
+      <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : progress()) + '%'}"></div>
     </div>
   </div>
-  <div data-bind="visible: result.errors().length > 0, css: errorsKlass" style="margin-left: 3px">
-    <span data-bind="text: result.errors"></span>
+  <div data-bind="visible: errors().length > 0, css: errorsKlass" style="margin-left: 3px">
+    <ul data-bind="foreach: errors">
+      <li data-bind="text: message"></li>
+    </ul>
   </div>
 
   <div class="snippet-footer-actions-bar">
@@ -723,7 +725,7 @@ from django.utils.translation import ugettext as _
     <div class="pull-right hover-actions" style="padding-top: 8px; font-size: 15px;">
       <span style="color: #CCC; padding-right: 10px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
 
-      <a href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && result.errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
+      <a href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
         <i class="fa fa-file-text-o"></i>
       </a>
 
