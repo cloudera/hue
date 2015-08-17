@@ -16,30 +16,24 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.repl.scala.interpreter
+package com.cloudera.hue.livy.repl.scala.SparkInterpreter
 
 import java.io._
 
+import com.cloudera.hue.livy.repl.Interpreter
+import com.cloudera.hue.livy.sessions._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.repl.SparkIMain
 import org.apache.spark.{SparkConf, SparkContext}
 import org.json4s.JsonAST._
 import org.json4s.{DefaultFormats, Extraction}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Future, ExecutionContext}
 import scala.tools.nsc.Settings
 import scala.tools.nsc.interpreter.{JPrintWriter, Results}
 
 
-object Interpreter {
-  sealed trait State
-  case class NotStarted() extends State
-  case class Starting() extends State
-  case class Idle() extends State
-  case class Busy() extends State
-  case class ShuttingDown() extends State
-  case class ShutDown() extends State
-
+object SparkInterpreter {
   private val MAGIC_REGEX = "^%(\\w+)\\W*(.*)".r
 }
 
@@ -49,27 +43,28 @@ case class ExecuteIncomplete(executeCount: Int, output: String) extends ExecuteR
 case class ExecuteError(executeCount: Int, output: String) extends ExecuteResponse(executeCount)
 case class ExecuteMagic(executeCount: Int, content: JValue) extends ExecuteResponse(executeCount)
 
-class Interpreter {
-  import Interpreter._
+class SparkInterpreter extends Interpreter {
+  import SparkInterpreter._
 
   private implicit def executor: ExecutionContext = ExecutionContext.global
   private implicit def formats = DefaultFormats
 
-  private var _state: Interpreter.State = Interpreter.NotStarted()
+  private var _state: State = NotStarted()
   private val outputStream = new ByteArrayOutputStream()
   private var sparkIMain: SparkIMain = _
   private var sparkContext: SparkContext = _
   private var executeCount = 0
 
+  @Override
   def state = _state
 
   def start() = {
-    require(_state == Interpreter.NotStarted() && sparkIMain == null)
+    require(_state == NotStarted() && sparkIMain == null)
 
-    _state = Interpreter.Starting()
+    _state = Starting()
 
     class InterpreterClassLoader(classLoader: ClassLoader) extends ClassLoader(classLoader) {}
-    val classLoader = new InterpreterClassLoader(classOf[Interpreter].getClassLoader)
+    val classLoader = new InterpreterClassLoader(classOf[SparkInterpreter].getClassLoader)
 
     val settings = new Settings()
     settings.usejavacp.value = true
@@ -87,7 +82,7 @@ class Interpreter {
       sparkIMain.bind("sc", "org.apache.spark.SparkContext", sparkContext, List("""@transient"""))
     }
 
-    _state = Interpreter.Idle()
+    _state = Idle()
   }
 
   private def getMaster(): String = {
@@ -230,16 +225,52 @@ class Interpreter {
     }
   }
 
-  def execute(code: String): ExecuteResponse = synchronized {
+  @Override
+  def execute(code: String): Future[JValue] = {
     executeCount += 1
 
-    _state = Interpreter.Busy()
+    synchronized {
+      _state = Busy()
+    }
 
-    val result = executeLines(code.trim.split("\n").toList, ExecuteComplete(executeCount, ""))
+    Future {
+      val result = executeLines(code.trim.split("\n").toList, ExecuteComplete(executeCount, ""))
 
-    _state = Interpreter.Idle()
+      val response = result match {
+        case ExecuteComplete(executeCount, output) =>
+          Map(
+            "status" -> "ok",
+            "execution_count" -> executeCount,
+            "data" -> Map(
+              "text/plain" -> output
+            )
+          )
+        case ExecuteMagic(executeCount, content) =>
+          Map(
+            "status" -> "ok",
+            "execution_count" -> executeCount,
+            "data" -> content
+          )
+        case ExecuteIncomplete(executeCount, output) =>
+          Map(
+            "status" -> "error",
+            "execution_count" -> executeCount,
+            "ename" -> "Error",
+            "evalue" -> output
+          )
+        case ExecuteError(executeCount, output) =>
+          Map(
+            "status" -> "error",
+            "execution_count" -> executeCount,
+            "ename" -> "Error",
+            "evalue" -> output
+          )
+      }
 
-    result
+      _state = Idle()
+
+      Extraction.decompose(response)
+    }
   }
 
   private def executeLines(lines: List[String], result: ExecuteResponse): ExecuteResponse = {
@@ -291,8 +322,9 @@ class Interpreter {
     }
   }
 
-  def shutdown(): Unit = synchronized {
-    _state = Interpreter.ShuttingDown()
+  @Override
+  def close(): Unit = synchronized {
+    _state = ShuttingDown()
 
     if (sparkContext != null) {
       sparkContext.stop()
@@ -303,6 +335,6 @@ class Interpreter {
       sparkIMain = null
     }
 
-    _state = Interpreter.ShutDown()
+    _state = Dead()
   }
 }

@@ -18,14 +18,12 @@
 
 package com.cloudera.hue.livy.repl.scala
 
-import com.cloudera.hue.livy.repl.scala.interpreter._
+import com.cloudera.hue.livy.repl.scala.SparkInterpreter._
 import com.cloudera.hue.livy.repl.{Session, Statement}
 import com.cloudera.hue.livy.sessions._
 import org.json4s._
-import org.json4s.jackson.JsonMethods._
-import org.json4s.jackson.Serialization.write
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 object SparkSession {
   def create(): Session = new SparkSession()
@@ -37,57 +35,17 @@ private class SparkSession extends Session {
   implicit val formats = DefaultFormats
 
   private var _history = IndexedSeq[Statement]()
-  private val interpreter = new Interpreter()
+  private val interpreter = new SparkInterpreter()
   interpreter.start()
 
   override def kind: Kind = Spark()
 
-  override def state: State = interpreter.state match {
-    case Interpreter.NotStarted() => NotStarted()
-    case Interpreter.Starting() => Starting()
-    case Interpreter.Idle() => Idle()
-    case Interpreter.Busy() => Busy()
-    case Interpreter.ShuttingDown() => ShuttingDown()
-    case Interpreter.ShutDown() => Dead()
-  }
+  override def state: State = interpreter.state
 
   override def history: IndexedSeq[Statement] = _history
 
   override def execute(code: String): Statement = synchronized {
-    val result = Future {
-      val response = interpreter.execute(code) match {
-        case ExecuteComplete(executeCount, output) =>
-          Map(
-            "status" -> "ok",
-            "execution_count" -> executeCount,
-            "data" -> Map(
-              "text/plain" -> output
-            )
-          )
-        case ExecuteMagic(executeCount, content) =>
-          Map(
-            "status" -> "ok",
-            "execution_count" -> executeCount,
-            "data" -> content
-          )
-        case ExecuteIncomplete(executeCount, output) =>
-          Map(
-            "status" -> "error",
-            "execution_count" -> executeCount,
-            "ename" -> "Error",
-            "evalue" -> output
-          )
-        case ExecuteError(executeCount, output) =>
-          Map(
-            "status" -> "error",
-            "execution_count" -> executeCount,
-            "ename" -> "Error",
-            "evalue" -> output
-          )
-      }
-
-      Extraction.decompose(response)
-    }
+    val result = interpreter.execute(code)
 
     val statement = Statement(_history.length, result)
     _history :+= statement
@@ -95,6 +53,6 @@ private class SparkSession extends Session {
   }
 
   override def close(): Unit = {
-    interpreter.shutdown()
+    interpreter.close()
   }
 }
