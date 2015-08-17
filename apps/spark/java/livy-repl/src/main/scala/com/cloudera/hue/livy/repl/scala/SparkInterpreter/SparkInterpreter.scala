@@ -294,32 +294,26 @@ class SparkInterpreter extends Interpreter {
     }
   }
 
-  def executeLine(code: String) = {
+  private def executeLine(code: String) = {
     code match {
       case MAGIC_REGEX(magic, rest) =>
         executeMagic(magic, rest)
       case _ =>
         scala.Console.withOut(outputStream) {
           sparkIMain.interpret(code) match {
-            case Results.Success =>
-              val output = outputStream.toString("UTF-8").trim
-              outputStream.reset()
-
-              ExecuteComplete(executeCount - 1, output)
-
-            case Results.Incomplete =>
-              val output = outputStream.toString("UTF-8").trim
-              outputStream.reset()
-
-              ExecuteIncomplete(executeCount - 1, output)
-
-            case Results.Error =>
-              val output = outputStream.toString("UTF-8").trim
-              outputStream.reset()
-              ExecuteError(executeCount - 1, output)
+            case Results.Success => ExecuteComplete(executeCount - 1, readStdout())
+            case Results.Incomplete => ExecuteIncomplete(executeCount - 1, readStdout())
+            case Results.Error => ExecuteError(executeCount - 1, readStdout())
           }
         }
     }
+  }
+
+  private def readStdout() = {
+    val output = outputStream.toString("UTF-8").trim
+    outputStream.reset()
+
+    output
   }
 
   @Override
