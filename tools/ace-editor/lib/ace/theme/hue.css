@@ -20,11 +20,6 @@
   opacity: 0;
 }
 
-.ace-hue .ace_gutter {
-  background: #f6f6f6;
-  color: #4D4D4C
-}
-
 .ace-hue .ace_print-margin {
   width: 1px;
   background: #f6f6f6
@@ -56,12 +51,15 @@
   border: 1px solid #D1D1D1
 }
 
-.ace-hue .ace_gutter-active-line {
-  background-color: #dcdcdc
-}
-
 .ace-hue .ace_marker-layer .ace_selected-word {
   border: 1px solid #D6D6D6
+}
+
+.ace-hue .ace_marker-layer .ace_error-line {
+  position: absolute;
+  background-color: #f2dede;
+  width: 100% !important;
+  margin-left: -3px;
 }
 
 .ace-hue .ace_invisible {
