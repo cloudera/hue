@@ -26,10 +26,16 @@ import _root_.scala.concurrent._
 import _root_.scala.concurrent.duration.Duration
 
 trait Interpreter {
+  /** The Interpreter's state */
   def state: State
 
+    /**
+     * Execute the code and return the result as a Future as it may
+     * take some time to execute.
+     */
   def execute(code: String): Future[JValue]
 
+  /** Shut down the interpreter. */
   def close(): Unit
 
   @throws(classOf[TimeoutException])
