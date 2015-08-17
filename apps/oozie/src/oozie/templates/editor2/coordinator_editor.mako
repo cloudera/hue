@@ -299,7 +299,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                   </span>
                   <span data-bind="visible: dataset_variable().length > 0 && instance_choice() != 'range'">
                     ${ _('Will convert to') }
-                    <a target="_blank" data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice()), attr: {'href': '/filebrowser/view' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice())}"></a>
+                    <a target="_blank" data-bind="text: convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice()), attr: {'href': '/filebrowser/view=' + convertDatasetVariables(dataset_variable(), same_start(), start(), same_frequency(), frequency_unit(), start_instance(), instance_choice())}"></a>
                   </span>
                   </a>
                 </span>

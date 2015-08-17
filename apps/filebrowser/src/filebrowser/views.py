@@ -1304,6 +1304,7 @@ def status(request):
 def location_to_url(location, strict=True):
     """
     If possible, returns a file browser URL to the location.
+    Prunes HDFS URI to path.
     Location is a URI, if strict is True.
 
     Python doesn't seem to have a readily-available URI-comparison
@@ -1315,7 +1316,11 @@ def location_to_url(location, strict=True):
     if strict and not split_path[1] or not split_path[2]:
       # No netloc not full url or no URL
       return None
-    return reverse("filebrowser.views.view", kwargs=dict(path=split_path[2]))
+    path = location
+    if split_path[0] == 'hdfs':
+      path = split_path[2]
+    return reverse("filebrowser.views.view", kwargs=dict(path=path))
+
 
 def truncate(toTruncate, charsToKeep=50):
     """
@@ -1326,6 +1331,7 @@ def truncate(toTruncate, charsToKeep=50):
         return truncated
     else:
         return toTruncate
+
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

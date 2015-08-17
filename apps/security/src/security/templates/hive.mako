@@ -114,7 +114,7 @@ ${ layout.menubar(section='hive') }
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
     <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>

@@ -549,13 +549,13 @@
 <script type="text/html" id="common-fs-link">
 <!-- ko if: $data.path.length > 0 -->
   <!-- ko if: with_label -->
-    <a data-bind="attr: {href: '/filebrowser/view' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _('Open') } '+ $data.path }" target="_blank">
+    <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _('Open') } '+ $data.path }" target="_blank">
       <span data-bind="text: $data.path.lastIndexOf('/') == $data.path.length - 1 ? $data.path : $data.path.split('/').pop()"></span>
     </a>
   <!-- /ko -->
 
    <!-- ko if: ! with_label -->
-     <a data-bind="attr: {href: '/filebrowser/view' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path }" target="_blank" title="${ _('Open') }">
+     <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path }" target="_blank" title="${ _('Open') }">
        <i class="fa fa-external-link-square"></i>
      </a>
    <!-- /ko -->
@@ -565,7 +565,7 @@
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
-    <a data-bind="attr: {href: '/filebrowser/view' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
+    <a data-bind="attr: {href: '/filebrowser/view=' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
       <i class="fa fa-external-link-square"></i>
     </a>
   <!-- /ko -->

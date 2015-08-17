@@ -55,7 +55,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
 
     <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
-        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
+        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }">
       <i class="fa fa-fw fa-folder-open"></i>
     </a>
 

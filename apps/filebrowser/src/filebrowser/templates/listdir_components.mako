@@ -1292,7 +1292,7 @@ from django.utils.translation import ugettext as _
             if (response.status != 0) {
               $(document).trigger("error", "${ _('Error: ') }" + response['data']);
             } else if (num_of_pending_uploads == 0) {
-              location = "/filebrowser/view" + self.currentPath();
+              location = "/filebrowser/view=" + self.currentPath();
             }
           },
           onSubmit:function (id, fileName, responseJSON) {
@@ -1340,7 +1340,7 @@ from django.utils.translation import ugettext as _
           onComplete:function (id, fileName, responseJSON) {
             num_of_pending_uploads--;
             if (num_of_pending_uploads == 0) {
-              location = "/filebrowser/view" + self.currentPath();
+              location = "/filebrowser/view=" + self.currentPath();
             }
           },
           onSubmit:function (id, fileName, responseJSON) {

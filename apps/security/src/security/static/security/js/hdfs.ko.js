@@ -376,7 +376,7 @@ var Assist = function (vm, assist) {
   }
 
   self.openPath = function (obj) {
-    window.open("/filebrowser/view" + obj.path(), '_blank');
+    window.open("/filebrowser/view=" + obj.path(), '_blank');
   }
 
   self.loadParents = function (breadcrumbs) {

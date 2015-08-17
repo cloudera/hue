@@ -944,5 +944,5 @@ def test_get_data_link():
   assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
   assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1:c1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
 
-  assert_equal('/filebrowser/view/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
+  assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
   assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))

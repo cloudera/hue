@@ -448,7 +448,7 @@ def save_results_hdfs_directory(request, query_history_id):
         response['id'] = query_history.id
         response['query'] = query_history.query
         response['path'] = target_dir
-        response['success_url'] = '/filebrowser/view%s' % target_dir
+        response['success_url'] = '/filebrowser/view=%s' % target_dir
         query_history = db.insert_query_into_directory(query_history, target_dir)
         response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
       except Exception, ex:
@@ -515,7 +515,7 @@ def save_results_hdfs_file(request, query_history_id):
         response['id'] = query_history.id
         response['query'] = query_history.query
         response['path'] = target_file
-        response['success_url'] = '/filebrowser/view%s' % target_file
+        response['success_url'] = '/filebrowser/view=%s' % target_file
         response['watch_url'] = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id})
       except Exception, ex:
         error_msg, log = expand_exception(ex, db)

@@ -14,7 +14,6 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from filebrowser.views import location_to_url
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
 %>
