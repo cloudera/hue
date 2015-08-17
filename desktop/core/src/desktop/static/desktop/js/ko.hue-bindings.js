@@ -1922,11 +1922,11 @@ ko.bindingHandlers.aceEditor = {
             editor.showSpinner();
             // fill up with fields
             valueAccessor().autocompleter.getTableColumns(valueAccessor().autocompleter.getDatabase(), foundTable, statement, function (data) {
-              var fieldNames = data.split(" ");
+              var fieldNames = data.split(" ").sort();
               var fields = [];
-              fieldNames.forEach(function (fld) {
+              fieldNames.forEach(function (fld, idx) {
                 if (fld != "") {
-                  fields.push({value: fld, score: (fld == "*") ? 1001 : 1000, meta: "column"});
+                  fields.push({value: fld, score: (fld == "*") ? 10000 : 1000 - idx, meta: "column"});
                 }
               });
               valueAccessor().extraCompleters([newCompleter(fields)]);
@@ -1944,6 +1944,10 @@ ko.bindingHandlers.aceEditor = {
 
     editor.previousCursorPosition = null;
     editor.previousSize = 0;
+
+    window.setInterval(function(){
+      editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
+    }, 100);
 
     editor.on("change", function (e) {
       editor.clearErrors();
@@ -1981,11 +1985,11 @@ ko.bindingHandlers.aceEditor = {
               options.extraCompleters([]);
               if (autocompleter != null) {
                 autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-                  var tableNames = data.split(" ");
+                  var tableNames = data.split(" ").sort();
                   var tables = [];
-                  tableNames.forEach(function (tbl) {
+                  tableNames.forEach(function (tbl, idx) {
                     if (tbl != "") {
-                      tables.push({value: tbl, score: 1000, meta: "table"});
+                      tables.push({value: tbl, score: 1000 - idx, meta: "table"});
                     }
                   });
                   options.extraCompleters([newCompleter(tables)]);
@@ -2010,11 +2014,11 @@ ko.bindingHandlers.aceEditor = {
                     if (before.indexOf("SELECT") > -1) {
                       fromKeyword = fromKeyword.toUpperCase();
                     }
-                    var tableNames = data.split(" ");
+                    var tableNames = data.split(" ").sort();
                     var tables = [];
-                    tableNames.forEach(function (tbl) {
+                    tableNames.forEach(function (tbl, idx) {
                       if (tbl != "") {
-                        tables.push({value: "* " + fromKeyword + " " + tbl, score: 1000, meta: "* table"});
+                        tables.push({value: "* " + fromKeyword + " " + tbl, score: 1000 - idx, meta: "* table"});
                       }
                     });
                     options.extraCompleters([newCompleter(tables)]);
