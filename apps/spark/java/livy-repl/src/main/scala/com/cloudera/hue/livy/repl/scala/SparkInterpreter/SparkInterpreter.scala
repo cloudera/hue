@@ -107,6 +107,13 @@ class SparkInterpreter extends Interpreter {
 
   private def executeJsonMagic(name: String): ExecuteResponse = {
     sparkIMain.valueOfTerm(name) match {
+      case Some(value: RDD) =>
+        ExecuteMagic(
+          executeCount,
+          Extraction.decompose(Map(
+            "application/json" -> value.asInstanceOf[RDD[_]].take(10)
+          ))
+        )
       case Some(value) =>
         ExecuteMagic(
           executeCount,
