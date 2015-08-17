@@ -125,7 +125,7 @@
     var _root = $("<ul>").addClass("content unstyled").attr("data-path", "__JHUEHDFSTREE__ROOT__").attr("data-loaded", "true");
     _root.appendTo(_tree.find("li"));
 
-    var BASE_PATH = "/filebrowser/view";
+    var BASE_PATH = "/filebrowser/view=";
     var _currentFiles = [];
     
     function escapeSingleQuote(path) {

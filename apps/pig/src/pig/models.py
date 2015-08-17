@@ -160,9 +160,9 @@ def hdfs_link(url):
     path = Hdfs.urlsplit(url)[2]
     if path:
       if path.startswith(posixpath.sep):
-        return "/filebrowser/view" + path
+        return "/filebrowser/view=" + path
       else:
-        return "/filebrowser/home_relative_view/" + path
+        return "/filebrowser/home_relative_view=/" + path
     else:
       return url
   else:

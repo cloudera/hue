@@ -927,7 +927,7 @@ ${ commonshare() | n,unicode }
         CodeMirror.isTable = false;
         if (_partial.toLowerCase().indexOf("load") > -1 || _partial.toLowerCase().indexOf("into") > -1) {
           var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
-          var _autocompleteUrl = "/filebrowser/view";
+          var _autocompleteUrl = "/filebrowser/view=";
           if (_path.indexOf("/") == 0) {
             _autocompleteUrl += _path.substr(0, _path.lastIndexOf("/"));
           }
@@ -1000,11 +1000,11 @@ ${ commonshare() | n,unicode }
             var _path = _partial.substring(_partial.lastIndexOf("'") + 1);
             if (_path[0] == "/") {
               if (_path.lastIndexOf("/") != 0) {
-                showHdfsAutocomplete("/filebrowser/view" + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json", false);
+                showHdfsAutocomplete("/filebrowser/view=" + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json", false);
               }
             }
             else {
-              showHdfsAutocomplete("/filebrowser/view" + USER_HOME + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json", false);
+              showHdfsAutocomplete("/filebrowser/view=" + USER_HOME + _partial.substring(_partial.lastIndexOf("'") + 1) + "?format=json", false);
             }
           }
         }

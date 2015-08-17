@@ -94,9 +94,9 @@
     <% path = Hdfs.urlsplit(url)[2] %>
     % if path:
       % if path.startswith(posixpath.sep):
-        <a href="/filebrowser/view${path}">${ url }</a>
+        <a href="/filebrowser/view=${path}">${ url }</a>
       % else:
-        <a href="/filebrowser/home_relative_view/${path}">${ url }</a>
+        <a href="/filebrowser/home_relative_view=/${path}">${ url }</a>
       % endif
     % else:
       ${ url }
@@ -111,9 +111,9 @@
     <% path = Hdfs.urlsplit(url)[2] %>
     % if path:
       % if path.startswith(posixpath.sep):
-        /filebrowser/view${path}
+        /filebrowser/view=${path}
       % else:
-        /filebrowser/home_relative_view/${path}
+        /filebrowser/home_relative_view=/${path}
       % endif
     % else:
       javascript:void(0)
@@ -360,7 +360,7 @@
         // check if it's a relative path
         var pathAddition = "";
         if ($.trim(inputElement.val()) != "") {
-          var checkPath = "/filebrowser/chooser${ workflow.deployment_dir }" + "/" + inputElement.val();
+          var checkPath = "/filebrowser/chooser=${ workflow.deployment_dir }" + "/" + inputElement.val();
           $.getJSON(checkPath, function (data) {
             pathAddition = "${ workflow.deployment_dir }/";
             callFileChooser();

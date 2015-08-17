@@ -820,7 +820,7 @@ def get_data_link(meta):
     elif 'fam' in meta:
       link += '[%(fam)s]' % meta
   elif meta['type'] == 'hdfs':
-    link = '/filebrowser/view%(path)s' % meta # Could add a byte #
+    link = '/filebrowser/view=%(path)s' % meta # Could add a byte #
   elif meta['type'] == 'link':
     link = meta['link']
   elif meta['type'] == 'hive':

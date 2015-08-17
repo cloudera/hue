@@ -208,7 +208,7 @@
       }
     });
 
-    var BASE_PATH = "/filebrowser/view";
+    var BASE_PATH = "/filebrowser/view=";
     var _currentFiles = [];
 
     function showHdfsAutocomplete(callback) {

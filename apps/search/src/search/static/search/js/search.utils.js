@@ -49,17 +49,17 @@ function addTemplateFunctions(item) {
 
   item.hue_fn_preview = function () {
     return function (val) {
-      return '<a href="/filebrowser/view/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
+      return '<a href="/filebrowser/view=/' + $.trim(Mustache.render(val, item)) + '">' + $.trim(Mustache.render(val, item)) + '</a>';
     }
   };
   item.hue_fn_embeddeddownload = function () {
     return function (val) {
-      return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
+      return '<a href="/filebrowser/download=/' + $.trim(Mustache.render(val, item)) + '?disposition=inline">' + $.trim(Mustache.render(val, item)) + '</a>';
     }
   };
   item.hue_fn_download = function () {
     return function (val) {
-      return '<a href="/filebrowser/download/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
+      return '<a href="/filebrowser/download=/' + $.trim(Mustache.render(val, item)) + '>' + $.trim(Mustache.render(val, item)) + '</a>';
     }
   };
   item.hue_fn_date = function () {

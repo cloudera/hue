@@ -106,7 +106,7 @@
         else {
           $(_parent.element).html("<i style=\"font-size: 24px; color: #DDD\" class=\"fa fa-spinner fa-spin\"></i>");
         }
-        $.getJSON("/filebrowser/chooser" + path, function (data) {
+        $.getJSON("/filebrowser/chooser=" + path, function (data) {
             $(_parent.element).empty();
             path = data.current_dir_path; // use real path.
             var _flist = $("<ul>").addClass("unstyled").css("margin-left", "2px");
