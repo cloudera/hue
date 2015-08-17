@@ -26,7 +26,8 @@ from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from hadoop import pseudo_hdfs4, is_live_cluster
+from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.tests import OozieBase
 
