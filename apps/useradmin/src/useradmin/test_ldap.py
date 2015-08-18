@@ -32,7 +32,8 @@ from django.core.urlresolvers import reverse
 from useradmin.models import LdapGroup, UserProfile
 from useradmin.models import get_profile
 
-from hadoop import pseudo_hdfs4, is_live_cluster
+from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
                   add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 
