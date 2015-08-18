@@ -369,10 +369,12 @@ ko.bindingHandlers.leafletMapChart = {
               attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(_map);
 
-            var _zoomBox = L.control.zoomBox({
-              modal: true
-            });
-            _map.addControl(_zoomBox);
+            if (L.control.zoomBox) {
+              var _zoomBox = L.control.zoomBox({
+                modal: true
+              });
+              _map.addControl(_zoomBox);
+            }
 
             if (_options.showMoveCheckbox) {
               var _command = L.control({
