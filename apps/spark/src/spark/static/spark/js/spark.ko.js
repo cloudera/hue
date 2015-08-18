@@ -99,6 +99,7 @@ var Result = function (snippet, result) {
     });
     self.fetchedOnce(false);
     self.data.removeAll();
+    self.images.removeAll();
     self.logs('');
     self.startTime(new Date());
     self.endTime(new Date());
@@ -427,7 +428,7 @@ var Snippet = function (vm, notebook, snippet) {
           _tempData.push(row);
         });
 
-        self.result.images(data.result.images);
+        self.result.images(typeof data.result.images != "undefined" && data.result.images != null ? data.result.images : []);
 
         $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
 
