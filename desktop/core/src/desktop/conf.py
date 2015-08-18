@@ -356,18 +356,19 @@ METRICS = ConfigSection(
   help=_("""Configuration options for metrics"""),
   members=dict(
     ENABLE_WEB_METRICS=Config(
-      key='web_metrics',
-      help=_('Enable metrics url'),
+      key='enable_web_metrics',
+      help=_('Enable metrics URL "desktop/metrics"'),
       default=True,
       type=coerce_bool),
     LOCATION=Config(
       key='location',
-      help=_('Write metrics to this location'),
+      help=_('If specified, Hue will write metrics to this file'),
       type=str),
     COLLECTION_INTERVAL=Config(
       key='collection_interval',
       help=_('Time in milliseconds on how frequently to collect metrics'),
-      type=int),
+      type=int,
+      default=30000),
   )
 )
 
