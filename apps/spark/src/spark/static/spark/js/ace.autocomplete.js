@@ -53,6 +53,7 @@ Autocomplete.prototype.jsonCalls = function (options) {
       type: "GET",
       url: _url + "?" + Math.random(),
       success: options.onDataReceived,
+      error: options.onError ? options.onError() : $.noop,
       async: typeof options.sync == "undefined"
     });
   }
@@ -90,7 +91,7 @@ Autocomplete.prototype.getTotalStorageUserPrefix = function () {
   return (_app != "" ? _app + "_" : "");
 };
 
-Autocomplete.prototype.getTableColumns = function (databaseName, tableName, textScanned, callback) {
+Autocomplete.prototype.getTableColumns = function (databaseName, tableName, textScanned, callback, failCallback) {
   var self = this;
   if (tableName.indexOf("(") > -1) {
     tableName = tableName.substr(tableName.indexOf("(") + 1);
@@ -101,29 +102,7 @@ Autocomplete.prototype.getTableColumns = function (databaseName, tableName, text
     tableName = _aliases[tableName];
   }
 
-  if ($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName) != null && $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName) != null) {
-    callback($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
-    if ($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName) == null || hasExpired($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName))) {
-      self.jsonCalls({
-        database: databaseName,
-        table: tableName,
-        onDataReceived: function (data) {
-          if (typeof self.options.autocompleteGlobalCallback == "function") {
-            self.options.autocompleteGlobalCallback(data);
-          }
-          if (data.error) {
-            self.errorHandler(data);
-          }
-          else {
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
-          }
-        }
-      });
-    }
-  }
-  else {
+  var fetchData = function (successCallback) {
     self.jsonCalls({
       database: databaseName,
       table: tableName,
@@ -132,15 +111,32 @@ Autocomplete.prototype.getTableColumns = function (databaseName, tableName, text
           self.options.autocompleteGlobalCallback(data);
         }
         if (data.error) {
-          self.errorHandler(data);
-        }
-        else {
+          if (failCallback) {
+            failCallback();
+          } else {
+            self.errorHandler(data);
+          }
+        } else {
           $.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
           $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
           $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
-          callback($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
+          if (successCallback) {
+            successCallback();
+          }
         }
-      }
+      },
+      onError: failCallback
+    });
+  };
+
+  if ($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName) != null && $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName) != null) {
+    callback($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
+    if ($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName) == null || hasExpired($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName))) {
+      fetchData();
+    }
+  } else {
+    fetchData(function() {
+      callback($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
     });
   }
 };
