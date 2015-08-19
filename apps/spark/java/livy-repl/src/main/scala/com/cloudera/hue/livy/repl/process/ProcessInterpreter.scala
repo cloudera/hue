@@ -51,13 +51,12 @@ abstract class ProcessInterpreter(process: Process)
   override def state: State = _state
 
   override def execute(code: String): Future[JValue] = {
-    _state match {
-      case (Dead() | ShuttingDown() | Error()) =>
-        Future.failed(new IllegalStateException("interpreter is not running"))
-      case _ =>
-        val promise = Promise[JValue]()
-        _queue.add(ExecuteRequest(code, promise))
-        promise.future
+    if (state.isShutDown()) {
+      Future.failed(new IllegalStateException("interpreter is not running"))
+    } else {
+      val promise = Promise[JValue]()
+      _queue.add(ExecuteRequest(code, promise))
+      promise.future
     }
   }
 
@@ -139,20 +138,19 @@ abstract class ProcessInterpreter(process: Process)
 
   override def close(): Unit = {
     val future = synchronized {
-      _state match {
-        case (Dead() | ShuttingDown()) =>
-          Future.successful()
-        case _ =>
-          val promise = Promise[Unit]()
-          _queue.add(ShutdownRequest(promise))
+      if (_state.isShutDown()) {
+        Future.successful()
+      } else {
+        val promise = Promise[Unit]()
+        _queue.add(ShutdownRequest(promise))
 
-          promise.future.andThen {
-            case util.Success(_) =>
-              thread.join()
-            case util.Failure(_) =>
-              thread.interrupt()
-              thread.join()
-          }
+        promise.future.andThen {
+          case util.Success(_) =>
+            thread.join()
+          case util.Failure(_) =>
+            thread.interrupt()
+            thread.join()
+        }
       }
     }
 
