@@ -653,7 +653,7 @@ from django.utils.translation import ugettext as _
     </div>
   </div>
   <div data-bind="visible: errors().length > 0, css: errorsKlass" style="margin-left: 3px">
-    <ul data-bind="foreach: errors">
+    <ul class="unstyled" data-bind="foreach: errors">
       <li data-bind="text: message"></li>
     </ul>
   </div>
