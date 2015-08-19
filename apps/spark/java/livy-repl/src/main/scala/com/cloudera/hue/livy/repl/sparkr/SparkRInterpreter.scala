@@ -177,6 +177,7 @@ private class SparkRInterpreter(process: Process)
       throw new Exited(output.toString())
     } else {
       val char = byte.toChar
+      System.out.print(char)
       output.append(char)
       char
     }
@@ -223,6 +224,7 @@ private class SparkRInterpreter(process: Process)
       val lines = Source.fromInputStream(process.getErrorStream).getLines()
 
       for (line <- lines) {
+        System.out.print(line)
         _lock.lock()
         try {
           stderrLines :+= line
