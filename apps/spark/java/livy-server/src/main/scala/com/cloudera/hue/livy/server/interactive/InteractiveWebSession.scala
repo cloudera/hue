@@ -70,7 +70,7 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
   override def state: State = _state
 
   override def executeStatement(content: ExecuteRequest): Statement = {
-    ensureIdle {
+    ensureRunning {
       _state = Busy()
       touchLastActivity()
 
@@ -179,10 +179,6 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
         throw new IllegalStateException("Session is in state %s" format _state)
       }
     }
-  }
-
-  private def ensureIdle[A](f: => A) = {
-    ensureState(Idle(), f)
   }
 
   private def ensureRunning[A](f: => A) = {
