@@ -370,8 +370,8 @@ class BeeswaxSampleProvider(object):
     if _INITIALIZED:
       return
 
-    make_query(cls.client, 'CREATE DATABASE %(db)s' % {'db': cls.db_name}, wait=True)
-    make_query(cls.client, 'CREATE DATABASE %(db)s_other' % {'db': cls.db_name}, wait=True)
+    make_query(cls.client, 'CREATE DATABASE IF NOT EXISTS %(db)s' % {'db': cls.db_name}, wait=True)
+    make_query(cls.client, 'CREATE DATABASE IF NOT EXISTS %(db)s_other' % {'db': cls.db_name}, wait=True)
 
     data_file = cls.cluster.fs_prefix + u'/beeswax/sample_data_échantillon_%d.tsv'
 
