@@ -1696,7 +1696,7 @@ ko.bindingHandlers.aceEditor = {
       showPrintMargin: false,
       minLines: 6,
       maxLines: 25
-    }
+    };
 
     var userOptions = $.totalStorage("hue.ace.options") || {};
     $.extend(editorOptions, options.editorOptions || userOptions);
@@ -1903,24 +1903,26 @@ ko.bindingHandlers.aceEditor = {
       }
     }
 
-    function fieldsAutocomplete(editor, valueAccessor) {
+    function fieldsAutocomplete (editor, valueAccessor, successCallback) {
       try {
         var before = editor.getTextBeforeCursor(";");
         var after = editor.getTextAfterCursor(";");
         var statement = before + after;
         var foundTable = "";
-        if (before.substr(-1) == ".") { // gets the table alias
-          foundTable = before.split(" ").pop().slice(0, -1);
+
+        var aliasMatch = before.match(/([^ \-\+\<\>]*)\.$/);
+        if (aliasMatch) { // gets the table alias
+          foundTable = aliasMatch[1];
         }
         else { // gets the standard table
-          var from = statement.toUpperCase().indexOf("FROM");
+          var from = after.toUpperCase().indexOf("FROM");
           if (from > -1) {
-            var match = statement.toUpperCase().substring(from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
-            var to = statement.length;
+            var match = after.toUpperCase().substring(from).match(/ON|LIMIT|WHERE|GROUP|SORT|ORDER BY|SELECT|;/);
+            var to = after.length;
             if (match) {
               to = match.index;
             }
-            var found = statement.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+            var found = after.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
           }
 
           for (var i = 0; i < found.length; i++) {
@@ -1931,31 +1933,123 @@ ko.bindingHandlers.aceEditor = {
         }
 
         if (foundTable != "") {
-          if (valueAccessor().autocompleter != null) {
-            editor.showSpinner();
-            // fill up with fields
-            valueAccessor().autocompleter.getTableColumns(valueAccessor().autocompleter.getDatabase(), foundTable, statement, function (data) {
-              var fieldNames = data.split(" ").sort();
-              var fields = [];
-              fieldNames.forEach(function (fld, idx) {
-                if (fld != "") {
-                  fields.push({value: fld, score: (fld == "*") ? 10000 : 1000 - idx, meta: "column"});
-                }
-              });
-              valueAccessor().extraCompleters([newCompleter(fields)]);
-              editor.hideSpinner();
-              window.setTimeout(function () {
-                editor.execCommand("startAutocomplete");
-              }, 100);
+          editor.showSpinner();
+          // fill up with fields
+          valueAccessor().autocompleter.getTableColumns(valueAccessor().autocompleter.getDatabase(), foundTable, statement, function (data) {
+            var fieldNames = data.split(" ").sort();
+            var fields = [];
+            fieldNames.forEach(function (fld, idx) {
+              if (fld != "") {
+                fields.push({value: fld, score: (fld == "*") ? 10000 : 1000 - idx, meta: "column"});
+              }
             });
-          }
+            editor.completers.push(newCompleter(fields));
+            editor.hideSpinner();
+            successCallback();
+          }, function() {
+            editor.hideSpinner();
+          });
+        } else {
+          successCallback();
         }
-      }
-      catch (e) {
-      }
+      } catch (e) {}
     }
 
-    editor.previousCursorPosition = null;
+    var originalCompleters = editor.completers.slice();
+
+    var sql_terms = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
+
+    var refreshAutoComplete = function (successCallback) {
+      editor.completers = originalCompleters.slice();
+        if (options.extraCompleters().length > 0) {
+          options.extraCompleters().forEach(function (complete) {
+            editor.completers.push(complete);
+          });
+        }
+
+      if (autocompleter != null && editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
+        var before = editor.getTextBeforeCursor(";");
+        var beforeU = before.toUpperCase();
+        var after = editor.getTextAfterCursor(";");
+        var afterU = after.toUpperCase();
+
+        var beforeMatcher = beforeU.match(sql_terms);
+        var afterMatcher = afterU.match(sql_terms);
+
+        var tableNameAutoComplete = beforeMatcher != null && (
+          beforeMatcher[beforeMatcher.length - 1] === "FROM" ||
+          beforeMatcher[beforeMatcher.length - 1] === "TABLE" ||
+          beforeMatcher[beforeMatcher.length - 1] === "STATS" ||
+          beforeMatcher[beforeMatcher.length - 1] === "REFRESH" ||
+          beforeMatcher[beforeMatcher.length - 1] === "METADATA" ||
+          beforeMatcher[beforeMatcher.length - 1] === "DESCRIBE");
+
+        var selectBefore = beforeMatcher != null &&
+          beforeMatcher[beforeMatcher.length - 1] === "SELECT";
+
+        var fromAfter = afterMatcher != null &&
+          afterMatcher[0] === "FROM";
+
+        var fieldTermBefore = beforeMatcher != null && (
+          beforeMatcher[beforeMatcher.length - 1] === "WHERE" ||
+          beforeMatcher[beforeMatcher.length - 1] === "ON" ||
+          beforeMatcher[beforeMatcher.length - 1] === "ORDER BY");
+
+        if (tableNameAutoComplete) {
+          editor.showSpinner();
+          autocompleter.getTables(autocompleter.getDatabase(), function (data) {
+            var tableNames = data.split(" ").sort();
+            var tables = [];
+            tableNames.forEach(function (tbl, idx) {
+              if (tbl != "") {
+                tables.push({value: tbl, score: 1000 - idx, meta: "table"});
+              }
+            });
+            editor.completers.push(newCompleter(tables));
+            successCallback();
+            editor.hideSpinner();
+          });
+        } else if ((selectBefore && fromAfter) || fieldTermBefore) {
+          fieldsAutocomplete(editor, valueAccessor, successCallback);
+        } else if (selectBefore) {
+          editor.showSpinner();
+          autocompleter.getTables(autocompleter.getDatabase(), function (data) {
+            var fromKeyword = "from";
+            if (before.indexOf("SELECT") > -1) {
+              fromKeyword = fromKeyword.toUpperCase();
+            }
+            if (!before.match(/\*\s*$/)) {
+              fromKeyword = "? " + fromKeyword;
+            } else if (!before.match(/\s+$/)) {
+              fromKeyword = " " + fromKeyword;
+            }
+            var tableNames = data.split(" ").sort();
+            var tables = [];
+            tableNames.forEach(function (tbl, idx) {
+              if (tbl != "") {
+                tables.push({value: fromKeyword + " " + tbl, score: 1000 - idx, meta: "* table"});
+              }
+            });
+            editor.completers.push(newCompleter(tables));
+            successCallback();
+            editor.hideSpinner();
+          });
+        } else {
+          successCallback();
+        }
+      } else {
+        successCallback();
+      }
+    };
+
+    var originalExec = editor.commands.byName.startAutocomplete.exec;
+
+    editor.commands.byName.startAutocomplete.exec = function (editor) {
+      refreshAutoComplete(function() {
+        originalExec(editor);
+      });
+    };
+
     editor.previousSize = 0;
 
     window.setInterval(function(){
@@ -1964,91 +2058,12 @@ ko.bindingHandlers.aceEditor = {
 
     editor.on("change", function (e) {
       editor.clearErrors();
-      options.extraCompleters([]);
       editor.session.getMode().$id = valueAccessor().mode();
       var currentSize = editor.session.getLength();
       if (currentSize != editor.previousSize && currentSize >= editorOptions.minLines && currentSize <= editorOptions.maxLines){
         editor.previousSize = editor.session.getLength();
         $(document).trigger("editorSizeChanged");
       }
-
-      var before = editor.getTextBeforeCursor(";");
-      var beforeU = before.toUpperCase();
-      var after = editor.getTextAfterCursor(";");
-      var afterU = after.toUpperCase();
-
-      if (editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
-        if (beforeU.indexOf("SELECT ") > -1 && afterU.indexOf("* FROM ") > -1) {
-          if (editor.previousCursorPosition != null) {
-            window.setTimeout(function () {
-              editor.moveCursorTo(editor.previousCursorPosition.row, editor.previousCursorPosition.column + 1);
-              editor.removeTextBeforeCursor(1);
-              window.setTimeout(function () {
-                editor.previousCursorPosition = null;
-              }, 100);
-            }, 50);
-            editor.previousCursorPosition = null;
-          }
-        }
-        else {
-          if ($.trim(before).substr(-1) != ".") {
-            if ((beforeU.indexOf(" FROM ") > -1 || beforeU.indexOf(" TABLE ") > -1 || beforeU.indexOf(" STATS ") > -1) && beforeU.indexOf(" ON ") == -1 && beforeU.indexOf(" ORDER BY ") == -1 && beforeU.indexOf(" WHERE ") == -1 ||
-                beforeU.indexOf("REFRESH") > -1 || beforeU.indexOf("METADATA") > -1 || beforeU.indexOf("DESCRIBE") > -1) {
-              editor.showSpinner();
-              options.extraCompleters([]);
-              if (autocompleter != null) {
-                autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-                  var tableNames = data.split(" ").sort();
-                  var tables = [];
-                  tableNames.forEach(function (tbl, idx) {
-                    if (tbl != "") {
-                      tables.push({value: tbl, score: 1000 - idx, meta: "table"});
-                    }
-                  });
-                  options.extraCompleters([newCompleter(tables)]);
-                  editor.hideSpinner();
-                });
-
-              }
-              else {
-                console.error("A valid instance of Autocomplete is missing. Please set it on the 'autocompleter' options of the binding.");
-              }
-            }
-            if (beforeU.indexOf("SELECT") > -1 && beforeU.indexOf(" FROM ") == -1) {
-              if (afterU.indexOf("FROM ") > -1) {
-                fieldsAutocomplete(editor, valueAccessor);
-              }
-              else {
-                editor.showSpinner();
-                options.extraCompleters([]);
-                if (autocompleter != null) {
-                  autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-                    var fromKeyword = "from";
-                    if (before.indexOf("SELECT") > -1) {
-                      fromKeyword = fromKeyword.toUpperCase();
-                    }
-                    var tableNames = data.split(" ").sort();
-                    var tables = [];
-                    tableNames.forEach(function (tbl, idx) {
-                      if (tbl != "") {
-                        tables.push({value: "* " + fromKeyword + " " + tbl, score: 1000 - idx, meta: "* table"});
-                      }
-                    });
-                    options.extraCompleters([newCompleter(tables)]);
-                    editor.hideSpinner();
-                  });
-                }
-              }
-            }
-            else {
-              if ((beforeU.indexOf("WHERE") > -1 || beforeU.indexOf("ORDER BY") > -1) && beforeU.match(/ ON| LIMIT| GROUP| SORT/) == null) {
-                fieldsAutocomplete(editor, valueAccessor);
-              }
-            }
-          }
-        }
-      }
-      editor.previousCursorPosition = editor.getCursorPosition();
       onChange(e, editor, valueAccessor);
     });
 
@@ -2064,6 +2079,13 @@ ko.bindingHandlers.aceEditor = {
     editor.lastCalledAutocomplete = 0;
 
     editor.commands.on("afterExec", function (e) {
+      if (e.command.name === "insertstring" && e.args.toLowerCase().indexOf("? from ") == 0) {
+        editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
+        editor.removeTextBeforeCursor(1);
+        window.setTimeout(function () {
+          editor.execCommand("startAutocomplete");
+        }, 100);
+      }
       var now = (new Date()).getTime();
       editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
       if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && now - editor.lastCalledAutocomplete > 1000 && (e.args == "." || (typeof e.args == "undefined" && e.command != null && e.command.name == "startAutocomplete"))) {
