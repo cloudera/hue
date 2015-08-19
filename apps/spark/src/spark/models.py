@@ -317,7 +317,8 @@ class SparkApi(Api):
       time.sleep(1)
 
     if status['state'] != 'idle':
-      raise QueryError('\n'.join(status['log']))
+      info = '\n'.join(status['log']) if status['log'] else 'timeout'
+      raise QueryError(_('The Spark session could not be created in the cluster: %s') % info)
 
     return {
         'type': lang,
