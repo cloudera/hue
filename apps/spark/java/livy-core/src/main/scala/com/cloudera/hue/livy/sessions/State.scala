@@ -18,7 +18,23 @@
 
 package com.cloudera.hue.livy.sessions
 
-sealed trait State
+sealed trait State {
+  /** Returns true if the State represents a process that can eventually execute commands */
+  final def isActive(): Boolean = {
+    this match {
+      case (NotStarted() | Starting() | Idle() | Running() | Busy()) => true
+      case _ => false
+    }
+  }
+
+  /** Returns true if the State represents a process shutting down or already shut down */
+  final def isShutDown(): Boolean = {
+    this match {
+      case (Error() | ShuttingDown() | Dead() | Success()) => true
+      case _ => false
+    }
+  }
+}
 
 case class NotStarted() extends State {
   override def toString = "not_started"
