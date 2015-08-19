@@ -171,10 +171,12 @@ abstract class ProcessInterpreter(process: Process)
     override def run() = {
       val exitCode = process.waitFor()
       if (exitCode != 0) {
+        error("Process has died")
+
         _state = Error()
 
         // Give livy-server a moment to see that we've died.
-        Thread.sleep(1000)
+        Thread.sleep(30000)
 
         System.exit(1)
       }
