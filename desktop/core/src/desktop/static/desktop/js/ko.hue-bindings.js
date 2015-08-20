@@ -1917,12 +1917,12 @@ ko.bindingHandlers.aceEditor = {
         else { // gets the standard table
           var from = after.toUpperCase().indexOf("FROM");
           if (from > -1) {
-            var match = after.toUpperCase().substring(from).match(/ON|LIMIT|WHERE|GROUP|SORT|ORDER BY|SELECT|;/);
+            var match = after.toUpperCase().substring(from).match(/\bON|LIMIT|WHERE|GROUP|SORT|ORDER BY|SELECT|;\b/);
             var to = after.length;
             if (match) {
               to = match.index;
             }
-            var found = after.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
+            var found = after.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/\bfrom\b/gi, "").replace(/\bjoin\b/gi, ",").split(",");
           }
 
           for (var i = 0; i < found.length; i++) {
@@ -2076,8 +2076,6 @@ ko.bindingHandlers.aceEditor = {
       }
     });
 
-    editor.lastCalledAutocomplete = 0;
-
     editor.commands.on("afterExec", function (e) {
       if (e.command.name === "insertstring" && e.args.toLowerCase().indexOf("? from ") == 0) {
         editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
@@ -2086,11 +2084,9 @@ ko.bindingHandlers.aceEditor = {
           editor.execCommand("startAutocomplete");
         }, 100);
       }
-      var now = (new Date()).getTime();
       editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
-      if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && now - editor.lastCalledAutocomplete > 1000 && (e.args == "." || (typeof e.args == "undefined" && e.command != null && e.command.name == "startAutocomplete"))) {
-        fieldsAutocomplete(editor, valueAccessor);
-        editor.lastCalledAutocomplete = now;
+      if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
+        editor.execCommand("startAutocomplete");
       }
       // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
       if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
