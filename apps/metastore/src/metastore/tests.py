@@ -69,7 +69,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     add_permission("test", "test", "write", "metastore")
 
   def test_basic_flow(self):
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     # Default database should exist
@@ -107,7 +107,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(verify_history(self.client, fragment='test'), history_cnt, 'Implicit queries should not be saved in the history')
 
   def test_describe_view(self):
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     resp = self.client.get('/metastore/table/%s/myview' % self.db_name)
@@ -120,7 +120,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true("myview" in resp.content)
 
   def test_describe_partitions(self):
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
@@ -141,7 +141,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true("is not partitioned." in response.content)
 
   def test_describe_partitioned_table_with_limit(self):
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     # Limit to 90
@@ -154,7 +154,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       finish()
 
   def test_read_partitions(self):
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     partition_spec = "baz='baz_one',boom='boom_two'"
@@ -165,7 +165,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true(len(results['results']) > 0, results)
 
   def test_browse_partition(self):
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     partition_spec = "baz='baz_one',boom='boom_two'"
@@ -178,8 +178,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
 
   def test_drop_multi_tables(self):
-
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     hql = """
@@ -229,7 +228,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     about whether a table is partitioned.
     """
 
-    if not is_live_cluster():
+    if is_live_cluster():
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     # Check that view works
