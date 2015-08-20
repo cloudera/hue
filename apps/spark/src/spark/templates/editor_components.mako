@@ -204,7 +204,7 @@ from desktop.views import _ko
 </div>
 
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible(), click: function() { $root.isLeftPanelVisible(true) }">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable, click: function() { $root.isLeftPanelVisible(true) }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
@@ -219,13 +219,13 @@ from desktop.views import _ko
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible()">
+  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable">
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible(), splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable, splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},

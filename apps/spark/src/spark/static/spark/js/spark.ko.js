@@ -860,14 +860,13 @@ function EditorViewModel(notebooks, options) {
     $("#removeSnippetModal").modal("show");
   };
 
-  self.isLeftPanelVisible = ko.observable($.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
+  self.assistAvailable = options.assistAvailable;
+
+  self.isLeftPanelVisible = ko.observable(self.assistAvailable && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
   self.isLeftPanelVisible.subscribe(function(newValue) {
     $.totalStorage('spark_left_panel_visible', newValue);
   });
-
-  self.assistContent = ko.observable();
-  self.assistSelectedMainObject = ko.observable();
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
   self.snippetPlaceholders = options.snippet_placeholders;

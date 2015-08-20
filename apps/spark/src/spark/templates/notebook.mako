@@ -76,6 +76,7 @@ ${ editorComponents.commonJS() }
   });
 
   var options = ${ options_json | n,unicode };
+  options.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
 
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, options);
   ko.applyBindings(viewModel);
