@@ -120,7 +120,7 @@ def test_useradmin_ldap_suboordinate_group_integration():
     test_admins = Group.objects.get(name='Test Administrators')
     assert_equal(test_admins.user_set.all().count(), 2)
     larry = User.objects.get(username='lårry')
-    assert_equal(test_admins.user_set.all()[0].username, larry.username)
+    assert_equal(test_admins.user_set.all().order_by('username')[1].username, larry.username)
 
     # Only sync already imported
     ldap_access.CACHED_LDAP_CONN.remove_user_group_for_test('uid=moe,ou=People,dc=example,dc=com', 'TestUsers')
@@ -185,7 +185,7 @@ def test_useradmin_ldap_nested_group_integration():
     test_admins = Group.objects.get(name='Test Administrators')
     assert_equal(test_admins.user_set.all().count(), 2)
     larry = User.objects.get(username='lårry')
-    assert_equal(test_admins.user_set.all()[0].username, larry.username)
+    assert_equal(test_admins.user_set.all().order_by('username')[1].username, larry.username)
 
     # Only sync already imported
     assert_equal(test_users.user_set.all().count(), 3)
@@ -269,7 +269,7 @@ def test_useradmin_ldap_suboordinate_posix_group_integration():
     test_admins = Group.objects.get(name='Test Administrators')
     assert_equal(test_admins.user_set.all().count(), 1)
     larry = User.objects.get(username='lårry')
-    assert_equal(test_admins.user_set.all()[0].username, larry.username)
+    assert_equal(test_admins.user_set.all().order_by('username')[0].username, larry.username)
 
     # Only sync already imported
     ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
@@ -334,7 +334,7 @@ def test_useradmin_ldap_nested_posix_group_integration():
     test_admins = Group.objects.get(name='Test Administrators')
     assert_equal(test_admins.user_set.all().count(), 1)
     larry = User.objects.get(username='lårry')
-    assert_equal(test_admins.user_set.all()[0].username, larry.username)
+    assert_equal(test_admins.user_set.all().order_by('username')[0].username, larry.username)
 
     # Only sync already imported
     ldap_access.CACHED_LDAP_CONN.remove_posix_user_group_for_test('posix_person', 'PosixGroup')
