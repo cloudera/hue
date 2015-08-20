@@ -389,10 +389,6 @@ var Snippet = function (vm, notebook, snippet) {
 
         self.result.hasResultset(data.handle.has_result_set);
         self.checkStatus();
-
-        if (notebook.snippets()[notebook.snippets().length - 1] == self) {
-          notebook.newSnippet();
-        }
       } else {
         self._ajaxError(data, self.execute);
       }
@@ -443,6 +439,8 @@ var Snippet = function (vm, notebook, snippet) {
           setTimeout(function () {
             self.fetchResultData(rows, false);
           }, 500);
+        } else if (notebook.snippets()[notebook.snippets().length - 1] == self) {
+          notebook.newSnippet();
         }
       } else {
         self._ajaxError(data);
@@ -743,8 +741,6 @@ var Notebook = function (vm, notebook) {
       if (lastSnippet.ace() != null) {
         lastSnippet.ace().focus();
       }
-
-      $(".right-panel").scrollTop($(".right-panel").prop('scrollHeight'));
     }, 100);
 
     logGA('/add_snippet/' + self.selectedSnippet());
