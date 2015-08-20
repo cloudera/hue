@@ -148,9 +148,9 @@ from django.utils.translation import ugettext as _
                 <a href="javascript:void(0)" data-bind="click: $parent.showTablePreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
                 <a href="javascript:void(0)" data-bind="click: function(data, event) { $parent.showStats(data, null, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
               </div>
-              <a class="assist-table-link" href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); }, text: $data }"><span data-bind="text: $data"></span></a>
-              <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
-                <ul class="assist-columns" data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()">
+              <a class="assist-table-link" href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name); }, text: $data.name }"><span data-bind="text: $data.name"></span></a>
+              <div data-bind="visible: loaded() && open()">
+                <ul class="assist-columns" data-bind="visible: items().length > 0, foreach: items">
                   <li class="assist-column reveals-actions-3rd">
                     <div class="hover-actions-3rd assist-actions">
                       <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parents[1].showStats($parent, data.name, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
@@ -287,6 +287,7 @@ from django.utils.translation import ugettext as _
               var _obj = {};
               data.tables.forEach(function (item) {
                 _obj[item] = {
+                  name: item,
                   items: ko.observableArray([]),
                   open: ko.observable(false),
                   loaded: ko.observable(false)
@@ -304,19 +305,19 @@ from django.utils.translation import ugettext as _
         };
 
         self.loadAssistSecondLevel = function(first) {
-          if (!self.assist.firstLevelObjects()[first].loaded()) {
+          if (!first.loaded()) {
             self.assist.isLoading(true);
             self.assist.options.onDataReceived = function (data) {
               if (data.columns) {
                 var _cols = data.extended_columns ? data.extended_columns : data.columns;
-                self.assist.firstLevelObjects()[first].items(_cols);
-                self.assist.firstLevelObjects()[first].loaded(true);
+                first.items(_cols);
+                first.loaded(true);
               }
               self.assist.isLoading(false);
             };
-            self.assist.getData(self.assist.selectedMainObject() + "/" + first);
+            self.assist.getData(self.assist.selectedMainObject() + "/" + first.name);
           }
-          self.assist.firstLevelObjects()[first].open(!self.assist.firstLevelObjects()[first].open());
+          first.open(!first.open());
           window.setTimeout(self.resizeAssist, 100);
         };
 
@@ -325,10 +326,10 @@ from django.utils.translation import ugettext as _
           self.loadAssistMain(true);
         };
 
-        self.showTablePreview = function(table) {
-          var tableUrl = "/" + self.assistAppName + "/api/table/" + self.assist.selectedMainObject() + "/" + table;
-          $("#assistQuickLook").find(".tableName").text(table);
-          $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + self.assist.selectedMainObject() + "/" + table);
+        self.showTablePreview = function(firstLevelObject) {
+          var tableUrl = "/" + self.assistAppName + "/api/table/" + self.assist.selectedMainObject() + "/" + firstLevelObject.name;
+          $("#assistQuickLook").find(".tableName").text(firstLevelObject.name);
+          $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + self.assist.selectedMainObject() + "/" + firstLevelObject.name);
           $("#assistQuickLook").find(".sample").empty("");
           $("#assistQuickLook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
           $.ajax({
@@ -511,8 +512,8 @@ from django.utils.translation import ugettext as _
         };
         window.setInterval(refreshPosition, 200);
 
-        self.showStats = function (table, column, event) {
-          self.analysisStats(new TableStats(self.assistAppName, self.assist.selectedMainObject(), table, column));
+        self.showStats = function (firstLevelObject, column, event) {
+          self.analysisStats(new TableStats(self.assistAppName, self.assist.selectedMainObject(), firstLevelObject.name, column));
           $("#tableAnalysis").data("targetElement", $(event.target));
           window.setTimeout(refreshPosition, 20);
         };
