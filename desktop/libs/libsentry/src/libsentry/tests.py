@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true, assert_false, assert_not_equal
 
@@ -24,7 +26,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
-from libsentry.conf import HOSTNAME, PORT
+from libsentry.conf import HOSTNAME, PORT, SENTRY_CONF_DIR
 from libsentry.client import SentryClient
 
 
@@ -35,7 +37,10 @@ class TestWithSentry:
   def setup_class(cls):
 
     if not is_live_cluster():
-      raise SkipTest()
+      raise SkipTest('Sentry tests require a live sentry server')
+
+    if not os.path.exists(os.path.join(SENTRY_CONF_DIR.get(), 'sentry-site.xml')):
+      raise SkipTest('Could not find sentry-site.xml, skipping sentry tests')
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
