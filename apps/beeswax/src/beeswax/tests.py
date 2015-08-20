@@ -1710,6 +1710,9 @@ for x in sys.stdin:
 
 
   def test_get_top_terms(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2902: Skipping because test is not reentrant')
+
     resp = self.client.get(reverse("beeswax:get_top_terms", kwargs={'database': self.db_name, 'table': 'test', 'column': 'foo'}))
 
     content = json.loads(resp.content)

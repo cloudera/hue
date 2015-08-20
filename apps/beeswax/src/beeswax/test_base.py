@@ -350,16 +350,18 @@ class BeeswaxSampleProvider(object):
       db = dbms.get(user, query_server)
 
       for db_name in [cls.db_name, '%s_other' % cls.db_name]:
-        tables = db.get_tables(database=db_name)
-        for table in tables:
-          make_query(client, 'DROP TABLE IF EXISTS `%(db)s`.`%(table)s`' % {'db': db_name, 'table': table}, wait=True)
-        make_query(client, 'DROP VIEW IF EXISTS `%(db)s`.`myview`' % {'db': db_name}, wait=True)
-        make_query(client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
+        databases = db.get_databases()
 
-      # Check the cleanup
-      databases = db.get_databases()
-      assert_false(cls.db_name in databases)
-      assert_false('%(db)s_other' % {'db': cls.db_name} in databases)
+        if db_name in databases:
+          tables = db.get_tables(database=db_name)
+          for table in tables:
+            make_query(client, 'DROP TABLE IF EXISTS `%(db)s`.`%(table)s`' % {'db': db_name, 'table': table}, wait=True)
+          make_query(client, 'DROP VIEW IF EXISTS `%(db)s`.`myview`' % {'db': db_name}, wait=True)
+          make_query(client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
+
+          # Check the cleanup
+          databases = db.get_databases()
+          assert_false(db_name in databases)
 
   @classmethod
   def init_beeswax_db(cls):
