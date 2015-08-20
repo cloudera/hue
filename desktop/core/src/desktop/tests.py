@@ -569,6 +569,7 @@ def test_validate_path():
 def test_config_check():
   reset = (
     desktop.conf.SECRET_KEY.set_for_testing(''),
+    desktop.conf.SECRET_KEY_SCRIPT.set_for_testing(present=False),
     desktop.conf.SSL_CERTIFICATE.set_for_testing('foobar'),
     desktop.conf.SSL_PRIVATE_KEY.set_for_testing(''),
     desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
