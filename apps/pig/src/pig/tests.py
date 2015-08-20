@@ -22,6 +22,7 @@ import time
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
