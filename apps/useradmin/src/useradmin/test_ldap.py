@@ -499,7 +499,7 @@ def test_useradmin_ldap_user_integration():
 
 def test_add_ldap_users():
   if is_live_cluster():
-    raise SkipTests('HUE-2897: Skipping because the DB may not be case sensitive')
+    raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
 
   done = []
 

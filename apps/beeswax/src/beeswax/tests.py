@@ -754,7 +754,7 @@ for x in sys.stdin:
 
   def test_designs(self):
     if is_live_cluster():
-      raise SkipTests('HUE-2902: Skipping because test is not reentrant')
+      raise SkipTest('HUE-2902: Skipping because test is not reentrant')
 
     cli = self.client
 
