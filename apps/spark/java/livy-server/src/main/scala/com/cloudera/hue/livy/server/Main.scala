@@ -140,8 +140,8 @@ class ScalatraBootstrap extends LifeCycle with Logging {
           (new InteractiveSessionYarnFactory(livyConf), new BatchSessionYarnFactory(livyConf))
       }
 
-      sessionManager = new SessionManager(sessionFactory)
-      batchManager = new SessionManager(batchFactory)
+      sessionManager = new SessionManager(livyConf, sessionFactory)
+      batchManager = new SessionManager(livyConf, batchFactory)
 
       context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")
       context.mount(new BatchSessionServlet(batchManager), "/batches/*")

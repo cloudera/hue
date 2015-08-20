@@ -21,6 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
+import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions._
@@ -80,7 +81,8 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
     }
   }
 
-  val sessionManager = new SessionManager(new MockInteractiveSessionFactory())
+  val livyConf = new LivyConf()
+  val sessionManager = new SessionManager(livyConf, new MockInteractiveSessionFactory())
   val servlet = new InteractiveSessionServlet(sessionManager)
 
   addServlet(servlet, "/*")
