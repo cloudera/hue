@@ -2359,14 +2359,15 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.save()
     assert_equal(5, len(Node.objects.filter(workflow=workflow)))
     assert_equal(6, len(Link.objects.filter(parent__workflow=workflow)))
-    nodes = [Node.objects.filter(workflow=workflow, node_type='java')[0].get_full_node(),
-             Node.objects.filter(workflow=workflow, node_type='java')[1].get_full_node()]
-    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
-    assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
-    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
-    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
-    assert_true(nodes[0].capture_output)
-    assert_false(nodes[1].capture_output)
+    java_nodes = Node.objects.filter(workflow=workflow, node_type='java').order_by('name')
+    tera_gen_node = java_nodes[0].get_full_node()
+    tera_sort_node = java_nodes[1].get_full_node()
+    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', tera_gen_node.main_class)
+    assert_equal('${records} ${output_dir}/teragen', tera_gen_node.args)
+    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', tera_sort_node.main_class)
+    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', tera_sort_node.args)
+    assert_true(tera_gen_node.capture_output)
+    assert_false(tera_sort_node.capture_output)
     workflow.delete(skip_trash=True)
 
 
@@ -2379,15 +2380,16 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.save()
     assert_equal(5, len(Node.objects.filter(workflow=workflow)))
     assert_equal(6, len(Link.objects.filter(parent__workflow=workflow)))
-    nodes = [Node.objects.filter(workflow=workflow, node_type='shell')[0].get_full_node(),
-             Node.objects.filter(workflow=workflow, node_type='shell')[1].get_full_node()]
-    assert_equal('shell-1', nodes[0].name)
-    assert_equal('shell-2', nodes[1].name)
-    assert_equal('my-job.xml', nodes[0].job_xml)
-    assert_equal('hello.py', nodes[0].command)
-    assert_equal('[{"type":"argument","value":"World!"}]', nodes[0].params)
-    assert_true(nodes[0].capture_output)
-    assert_false(nodes[1].capture_output)
+    shell_nodes = Node.objects.filter(workflow=workflow, node_type='shell').order_by('name')
+    shell_1_node = shell_nodes[0].get_full_node()
+    shell_2_node = shell_nodes[1].get_full_node()
+    assert_equal('shell-1', shell_1_node.name)
+    assert_equal('shell-2', shell_2_node.name)
+    assert_equal('my-job.xml', shell_1_node.job_xml)
+    assert_equal('hello.py', shell_1_node.command)
+    assert_equal('[{"type":"argument","value":"World!"}]', shell_1_node.params)
+    assert_true(shell_1_node.capture_output)
+    assert_false(shell_2_node.capture_output)
     workflow.delete(skip_trash=True)
 
 
