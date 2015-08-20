@@ -32,6 +32,7 @@ import proxy.conf
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
+from django.conf import settings
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -42,6 +43,7 @@ from beeswax.conf import HIVE_SERVER_HOST
 from pig.models import PigScript
 from useradmin.models import GroupPermission
 
+from desktop.appmanager import DESKTOP_APPS
 from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
@@ -441,35 +443,41 @@ def test_app_permissions():
   # Reset all perms
   GroupPermission.objects.filter(group__name=GROUPNAME).delete()
 
+  def check_app(status_code, app_name):
+    if app_name in DESKTOP_APPS:
+      assert_equal(
+          status_code,
+          c.get('/' + app_name, follow=True).status_code,
+          'status_code=%s app_name=%s' % (status_code, app_name))
+
   # Access to nothing
-  assert_equal(401, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(401, 'beeswax')
+  check_app(401, 'impala')
+  check_app(401, 'hbase')
 
   # Add access to beeswax
   grant_access(USERNAME, GROUPNAME, "beeswax")
-  assert_equal(200, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(200, 'beeswax')
+  check_app(401, 'impala')
+  check_app(401, 'hbase')
 
   # Add access to hbase
   grant_access(USERNAME, GROUPNAME, "hbase")
-  assert_equal(200, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(200, c.get('/hbase', follow=True).status_code)
+  check_app(200, 'beeswax')
+  check_app(401, 'impala')
+  check_app(200, 'hbase')
 
   # Reset all perms
   GroupPermission.objects.filter(group__name=GROUPNAME).delete()
-
-  assert_equal(401, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(401, 'beeswax')
+  check_app(401, 'impala')
+  check_app(401, 'hbase')
 
   # Test only impala perm
   grant_access(USERNAME, GROUPNAME, "impala")
-  assert_equal(401, c.get('/beeswax', follow=True).status_code)
-  assert_equal(200, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(401, 'beeswax')
+  check_app(200, 'impala')
+  check_app(401, 'hbase')
 
 
 def test_error_handling_failure():
