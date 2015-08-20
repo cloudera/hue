@@ -22,23 +22,31 @@ Livy is used for powering the `Spark Notebook`_ of `Hue 3.8`_, which you can see
 Prerequisites
 =============
 
-To build Livy, you will need:
+To build/run Livy, you will need:
 
 Debian/Ubuntu:
   * mvn (from ``maven`` package or maven3 tarball)
   * openjdk-7-jdk (or Oracle Java7 jdk)
-  * spark 1.3 from (from `Apache Spark tarball`_)
+  * spark 1.4 from (from `Apache Spark tarball`_)
+	* Python 2.6+
+	* R 3.x
 
 Redhat/CentOS:
   * mvn (from ``maven`` package or maven3 tarball)
   * java-1.7.0-openjdk (or Oracle Java7 jdk)
-  * spark 1.3 (from `Apache Spark tarball`_)
+  * spark 1.4 (from `Apache Spark tarball`_)
+	* Python 2.6+
+	* R 3.x
       
 MacOS:
   * Xcode command line tools
   * Oracle's JDK 1.7+
   * Maven (Homebrew)
-  * apache-spark (Homebrew)
+  * apache-spark 1.4 (Homebrew)
+	* Python 2.6+
+	* R 3.x
+
+
 
 .. _Apache Spark Tarball: https://spark.apache.org/downloads.html
 
@@ -105,6 +113,7 @@ takes Scala code:
     >>> import json, pprint, requests, textwrap
     >>> host = 'http://localhost:8998'
     >>> data = {'kind': 'spark'}
+		>>> headers = {'Content-Type': 'application/json'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
     {u'state': u'starting', u'id': 0, u’kind’: u’spark’}
