@@ -28,6 +28,7 @@ import textwrap
 import time
 
 from desktop.lib.python_util import find_unused_port
+from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
 import hadoop
 from hadoop import cluster
@@ -571,10 +572,10 @@ def shared_cluster():
         hadoop.conf.YARN_CLUSTERS['default'].HISTORY_SERVER_API_URL.set_for_testing('%s:%s' % (cluster._fqdn, cluster._jh_web_port,)),
       ]
 
-      old = hadoop.cluster.clear_caches()
+      old_caches = clear_sys_caches()
 
       def restore_config():
-        hadoop.cluster.restore_caches(old)
+        restore_sys_caches(old_caches)
         for x in closers:
           x()
 

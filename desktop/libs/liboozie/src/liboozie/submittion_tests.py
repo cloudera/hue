@@ -26,6 +26,7 @@ from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
 from liboozie.submittion import Submission
 from oozie.tests import OozieMockBase
+from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
 
 
@@ -183,7 +184,7 @@ class TestSubmission(OozieMockBase):
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
 
-      cluster.clear_caches()
+      clear_sys_caches()
       fs = cluster.get_hdfs()
       jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
@@ -198,7 +199,7 @@ class TestSubmission(OozieMockBase):
 
       finish.append(HDFS_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('namenode'))
       finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
-      cluster.clear_caches()
+      clear_sys_caches()
       fs = cluster.get_hdfs()
       jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
@@ -211,7 +212,7 @@ class TestSubmission(OozieMockBase):
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
     finally:
-      cluster.clear_caches()
+      clear_sys_caches()
       for reset in finish:
         reset()
 

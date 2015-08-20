@@ -53,6 +53,7 @@ import lxml.etree
 import urllib2
 
 from desktop.lib import python_util
+from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 
 from hadoop.fs.hadoopfs import HadoopFileSystem
 from hadoop.job_tracker import LiveJobTracker
@@ -419,11 +420,11 @@ def shared_cluster(conf=False):
     # This is djanky (that's django for "janky").
     # Caches are tricky w.r.t. to to testing;
     # perhaps there are better patterns?
-    old = hadoop.cluster.clear_caches()
+    old_caches = clear_sys_caches()
 
   def finish():
     if conf:
-      hadoop.cluster.restore_caches(old)
+      restore_sys_caches(old_caches)
     for x in closers:
       x()
 

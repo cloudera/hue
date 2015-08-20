@@ -23,7 +23,10 @@ from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 
 import desktop.conf as desktop_conf
+
+from desktop.lib.test_utils import clear_sys_caches, restore_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
+
 from hadoop import cluster
 from hadoop import conf
 from hadoop import confparse
@@ -119,7 +122,7 @@ def test_config_validator_basic():
     conf.MR_CLUSTERS.set_for_testing({'default': {}}),
     conf.MR_CLUSTERS['default'].JT_THRIFT_PORT.set_for_testing(70000),
   )
-  old = cluster.clear_caches()
+  old_caches = clear_sys_caches()
   try:
     cli = make_logged_in_client()
     resp = cli.get('/desktop/debug/check_config')
@@ -127,7 +130,7 @@ def test_config_validator_basic():
   finally:
     for old_conf in reset:
       old_conf()
-    cluster.restore_caches(old)
+    restore_sys_caches(old_caches)
 
 
 @attr('requires_hadoop')
@@ -139,7 +142,7 @@ def test_config_validator_more():
   minicluster = pseudo_hdfs4.shared_cluster()
   cli = make_logged_in_client()
 
-  old = cluster.clear_caches()
+  old_caches = clear_sys_caches()
   try:
     resp = cli.get('/debug/check_config')
 
@@ -148,12 +151,12 @@ def test_config_validator_more():
     assert_false('Failed to chown' in resp.content)
     assert_false('Failed to delete' in resp.content)
   finally:
-    cluster.restore_caches(old)
+    restore_sys_caches(old_caches)
 
 
 def test_non_default_cluster():
   NON_DEFAULT_NAME = 'non_default'
-  old = cluster.clear_caches()
+  old_caches = clear_sys_caches()
   reset = (
     conf.HDFS_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
     conf.MR_CLUSTERS.set_for_testing({ NON_DEFAULT_NAME: { } }),
@@ -171,7 +174,7 @@ def test_non_default_cluster():
   finally:
     for old_conf in reset:
       old_conf()
-    cluster.restore_caches(old)
+    restore_sys_caches(old_caches)
 
 
 def test_hdfs_ssl_validate():
