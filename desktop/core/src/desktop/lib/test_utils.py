@@ -21,6 +21,9 @@ from lxml import objectify, etree
 from django.contrib.auth.models import Group, User
 from useradmin.models import HuePermission, GroupPermission, get_default_user_group
 
+from hadoop import cluster
+from desktop.lib import fsmanager
+
 
 def grant_access(username, groupname, appname):
     add_permission(username, groupname, 'access', appname)
@@ -64,3 +67,12 @@ def reformat_xml(xml_obj):
         return etree.tostring(objectify.fromstring(xml_obj, etree.XMLParser(strip_cdata=False, remove_blank_text=True)))
     else:
         return etree.tostring(xml_obj)
+
+
+def clear_sys_caches():
+  return cluster.clear_caches(), fsmanager.clear_cache()
+
+
+def restore_sys_caches(old_caches):
+  cluster.restore_caches(old_caches[0])
+  fsmanager.restore_cache(old_caches[1])

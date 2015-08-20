@@ -198,9 +198,9 @@ def config_validator(user):
     res.append((NICE_NAME, _(msg)))
 
   try:
-    from hadoop import cluster
+    from desktop.lib.fsmanager import get_filesystem
     warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
-    fs = cluster.get_hdfs()
+    fs = get_filesystem()
     fs.stats(warehouse)
   except Exception:
     msg = 'Failed to access Hive warehouse: %s'

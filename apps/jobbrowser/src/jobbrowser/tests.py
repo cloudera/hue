@@ -126,7 +126,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
       # Remove user home directories.
       cls.cluster.fs.do_as_superuser(cls.cluster.fs.rmtree, cls.home_dir)
     except:
-      LOG.exception('failed to teardown %s' % self.home_dir)
+      LOG.exception('failed to teardown %s' % cls.home_dir)
     cls.cluster.fs.setuser(cls.prev_user)
 
   @classmethod
