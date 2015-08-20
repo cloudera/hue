@@ -126,8 +126,13 @@ var Assist = function (options) {
   self.filter = ko.observable("");
   self.filter.extend({ rateLimit: 150 });
   self.filteredFirstLevelObjects = ko.computed(function () {
-    return ko.utils.arrayFilter(Object.keys(self.firstLevelObjects()), function (item) {
-      return item.toLowerCase().indexOf(self.filter()) > -1;
+    var result = [];
+    var noFilter = self.filter() === "";
+    $.each(Object.keys(self.firstLevelObjects()), function(index, key) {
+      if (noFilter || key.toLowerCase().indexOf(self.filter()) > -1) {
+        result.push(self.firstLevelObjects()[key]);
+      }
     });
+    return result;
   });
 }
