@@ -54,8 +54,9 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
     script
   }
 
-  val batchFactory = new BatchSessionProcessFactory(new LivyConf())
-  val batchManager = new SessionManager(batchFactory)
+  val livyConf = new LivyConf()
+  val batchFactory = new BatchSessionProcessFactory(livyConf)
+  val batchManager = new SessionManager(livyConf, batchFactory)
   val servlet = new BatchSessionServlet(batchManager)
 
   addServlet(servlet, "/*")

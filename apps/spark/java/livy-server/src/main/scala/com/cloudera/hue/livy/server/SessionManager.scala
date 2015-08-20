@@ -20,31 +20,23 @@ package com.cloudera.hue.livy.server
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.{LivyConf, Logging}
 import org.json4s.JValue
 
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
-object SessionManager {
-  // Time in milliseconds; TODO: make configurable
-  val TIMEOUT = 60000
-
-  // Time in milliseconds; TODO: make configurable
-  val GC_PERIOD = 1000 * 60 * 60
-}
-
-class SessionManager[S <: Session](factory: SessionFactory[S])
+class SessionManager[S <: Session](livyConf: LivyConf, factory: SessionFactory[S])
   extends Logging {
-
-  import SessionManager._
 
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
-  protected[this] val _idCounter = new AtomicInteger()
-  protected[this] val _sessions = mutable.Map[Int, S]()
+  private[this] val _idCounter = new AtomicInteger()
+  private[this] val _sessions = mutable.Map[Int, S]()
 
-  private val garbageCollector = new GarbageCollector
+  private[this] val sessionTimeout = livyConf.getInt("livy.server.session.timeout", 1000 * 60 * 60)
+  private[this] val garbageCollector = new GarbageCollector
+  garbageCollector.setDaemon(true)
   garbageCollector.start()
 
   def create(createRequest: JValue): S = {
@@ -84,7 +76,7 @@ class SessionManager[S <: Session](factory: SessionFactory[S])
   def collectGarbage() = {
     def expired(session: Session): Boolean = {
       session.lastActivity match {
-        case Some(lastActivity) => System.currentTimeMillis() - lastActivity > TIMEOUT
+        case Some(lastActivity) => System.currentTimeMillis() - lastActivity > sessionTimeout
         case None => false
       }
     }
@@ -92,14 +84,14 @@ class SessionManager[S <: Session](factory: SessionFactory[S])
     all().filter(expired).foreach(delete)
   }
 
-  private class GarbageCollector extends Thread {
+  private class GarbageCollector extends Thread("session gc thread") {
 
     private var finished = false
 
     override def run(): Unit = {
       while (!finished) {
         collectGarbage()
-        Thread.sleep(SessionManager.GC_PERIOD)
+        Thread.sleep(60 * 1000)
       }
     }
 
