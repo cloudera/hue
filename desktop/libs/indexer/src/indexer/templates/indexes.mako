@@ -44,6 +44,9 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { collection.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create collection') }
       </a>
+      <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(true) }">
+        <i class="fa fa-plus-circle"></i> ${ _('Create collection from a file') }
+      </a>      
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
       </a>
@@ -97,6 +100,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   </div>
 </script>
 
+
 <!-- ko template: 'create-alias' --><!-- /ko -->
 
 <script type="text/html" id="create-alias">
@@ -114,16 +118,70 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
   </div>
 </script>
 
-<script type="text/html" id="create-collection-from-file">
-  <div class="snippet-settings" data-bind="visible: alias.showCreateModal">
 
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
+<!-- ko template: 'create-collection-wizard' --><!-- /ko -->
+
+<script type="text/html" id="create-collection-wizard">
+  <div class="snippet-settings" data-bind="visible: createWizard.show">
+
+    ${ _('Name') } <input data-bind="value: createWizard.name"></input>
+    
+    <!-- ko if: createWizard.name() -->
+    <select data-bind="options: createWizard.availableWizards, value: createWizard.wizard, optionsText: 'name'" size="5"></select>
+
+    <span data-bind="template: { name: 'create-collection-from-file', data: createWizard.wizard }"></span>
+    <span data-bind="template: { name: 'create-collection-from-hive', data: createWizard.wizard }"></span>
+    
+    <ul data-bind="foreach: createWizard.wizard().sample">
+      <li>
+        <div data-bind="foreach: $data">
+          <span data-bind="text: $data"></span>
+        </div>
+        <a rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}" class="btn" data-original-title="Edit">
+          <i class="fa fa-pencil"></i>
+        </a>
+      </li>
+    </ul>
+
+    <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.getSample">
+      <i class="fa fa-list-alt"></i> ${ _('Get Sample') }
     </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
+
+    <!-- /ko -->
+
+    <br/>
+
+    <a href="javascript:void(0)" class="btn" data-bind="visible: createWizard.showCreate, click: createWizard.create">
+      <i class="fa fa-plus-circle"></i> ${ _('Create') }
+    </a>
+    <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(false) }">
       <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
     </a>
   </div>
+</script>
+
+
+<script type="text/html" id="create-collection-from-file">
+  <!-- ko if: name() == 'file' -->
+    <div class="snippet-settings" data-bind="visible: show">
+
+      ${ _('Path') } <input data-bind="value: path"></input>
+      <select data-bind="visible: path, options: availableFormats, value: format" size="5"></select>
+
+    </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="create-collection-from-hive">
+  <!-- ko if: name() == 'hive' -->
+    <div class="snippet-settings" data-bind="visible: show">
+
+      ${ _('Database') } <input data-bind="value: database"></input>
+      ${ _('Table') } <input data-bind="value: table"></input>
+
+    </div>
+  <!-- /ko -->
 </script>
 
 
@@ -199,10 +257,76 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
     }
     
     self.edit = function(alias) {
-      self.name(alias.name());console.log(alias.collections());
+      self.name(alias.name());
       self.chosenCollections(alias.collections());
 
       self.showCreateModal(true);
+    }
+  };
+
+  var FileWizard = function (vm) {
+    var self = this;
+
+    self.name = ko.observable('file');
+    self.sample = ko.observableArray();
+    self.show = ko.observable(false);
+
+    self.path = ko.observable('');
+    self.format = ko.observable('csv');
+    self.availableFormats = ko.observableArray(['csv', 'log', 'apache logs', 'mailbox']);
+  };
+
+  var HiveWizard = function (vm) {
+    var self = this;
+
+    self.name = ko.observable('hive');
+    self.show = ko.observable(false);
+
+    self.database = ko.observable('');
+    self.table = ko.observable('');
+  };
+
+  var CreateWizard = function (vm) {
+    var self = this;
+
+    self.show = ko.observable(false);
+    self.showCreate = ko.observable(false);
+    
+    self.fileWizard = new FileWizard(vm);
+    self.hiveWizard = new HiveWizard(vm);    
+
+    self.name = ko.observable('');
+    self.wizard = ko.observable();
+    self.wizard.subscribe(function(val) {
+      val.show(true);
+    });
+    self.wizard(self.fileWizard);
+    self.availableWizards = ko.observableArray([self.fileWizard, self.hiveWizard]);
+
+    self.getSample = function() {
+      $.post("${ url('indexer:create_wizard_get_sample') }", {
+        "wizard": ko.mapping.toJSON(self.wizard)
+      }, function(resp) {
+        self.wizard().sample(resp.data);
+        self.showCreate(true);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
+
+    self.create = function() {
+      $.post("${ url('indexer:create_wizard_create') }", {
+        "wizard": ko.mapping.toJSON(self.wizard)
+      }, function(resp) {
+        self.wizard().sample(resp.data);
+        self.showCreate(true);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    }
+
+    self.edit = function() {
+      self.show(true);
     }
   };
 
@@ -213,6 +337,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     self.collection = new Collection(self);
     self.alias = new Alias(self);
+    self.createWizard = new CreateWizard(self);
 
     self.selectedJobs = ko.computed(function() {
       return $.grep(self.indexes(), function(index) { return index.isSelected(); });

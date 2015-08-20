@@ -34,9 +34,14 @@ urlpatterns += patterns('indexer.api',
   url(r'^api/collections/(?P<collection>[^/]+)/fields/$', 'collections_fields', name='api_collections_fields'),
   url(r'^api/collections/(?P<collection>[^/]+)/update/$', 'collections_update', name='api_collections_update'),
   url(r'^api/collections/(?P<collection>[^/]+)/data/$', 'collections_data', name='api_collections_data'),
+)
 
+
+urlpatterns += patterns('indexer.api2',
   # V2
   url(r'^api/v2/collections/create/$', 'create_collection', name='create_collection'),
   url(r'^api/alias/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
-  url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes')
+  url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes'),
+  url(r'^api/indexes/create_wizard_get_sample/$', 'create_wizard_get_sample', name='create_wizard_get_sample'),
+  url(r'^api/indexes/create_wizard_create/$', 'create_wizard_create', name='create_wizard_create')
 )
