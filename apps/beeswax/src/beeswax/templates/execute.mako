@@ -78,12 +78,12 @@ ${layout.menubar(section='query')}
                       </div>
                       <div data-bind="css: {'error': $root.getSettingKeyErrors($index()).length > 0}" class="control-group">
                         <label>${_('Key')}</label>
-                        <input data-bind="value: key" type="text" class="settingsField span8" autocomplete="off" placeholder="${ 'impala.resultset.cache.size' if app_name == 'impala' else 'mapred.reduce.tasks' }"/>
+                        <input data-bind="value: key" type="text" class="settingsField" autocomplete="off" placeholder="${ 'impala.resultset.cache.size' if app_name == 'impala' else 'mapred.reduce.tasks' }"/>
                       </div>
 
                       <div data-bind="css: {'error': $root.getSettingValueErrors($index()).length > 0}" class="control-group">
                         <label>${_('Value')}</label>
-                        <input data-bind="value: value" type="text" class="settingValuesField span8" placeholder="${ '5000' if app_name == 'impala' else '1' }"/>
+                        <input data-bind="value: value" type="text" class="settingValuesField" placeholder="${ '5000' if app_name == 'impala' else '1' }"/>
                       </div>
                     </div>
                     <!-- /ko -->
@@ -120,7 +120,7 @@ ${layout.menubar(section='query')}
 
                       <div data-bind="css: {'error': $root.getFileResourcePathErrors($index()).length > 0}" class="control-group">
                         <label>${_('Path')}</label>
-                        <input data-bind="value: path" type="text" class="filesField span7 fileChooser" placeholder="/user/foo/udf.jar"/>
+                        <input data-bind="value: path" type="text" class="filesField fileChooser" placeholder="/user/foo/udf.jar"/>
                       </div>
                     </div>
                     <!-- /ko -->
@@ -148,12 +148,12 @@ ${layout.menubar(section='query')}
                       </div>
                       <div data-bind="css: {'error': $root.getFunctionNameErrors($index()).length > 0}" class="control-group">
                         <label>${_('Name')}</label>
-                        <input data-bind="value: name" type="text" class="functionsField span8" autocomplete="off" placeholder="myFunction"/>
+                        <input data-bind="value: name" type="text" class="functionsField" autocomplete="off" placeholder="myFunction"/>
                       </div>
 
                       <div data-bind="css: {'error': $root.getFunctionClassNameErrors($index()).length > 0}" class="control-group">
                         <label>${_('Class name')}</label>
-                        <input data-bind="value: class_name" type="text" class="classNamesField span8" placeholder="com.acme.example"/>
+                        <input data-bind="value: class_name" type="text" class="classNamesField" placeholder="com.acme.example"/>
                       </div>
                     </div>
                     <!-- /ko -->
@@ -882,6 +882,7 @@ ${ commonshare() | n,unicode }
 
   .fileChooserBtn {
     border-radius: 0 3px 3px 0;
+    height: 31px;
   }
 
   .CodeMirror {
@@ -1042,6 +1043,16 @@ ${ commonshare() | n,unicode }
   .tooltip {
     z-index: 10001;
   }
+
+  .filesField, .functionsField, .classNamesField, .settingsField, .settingValuesField {
+    width: 60%;
+  }
+
+  .fileChooser, .folderChooser {
+    border-radius: 3px 0 0 3px !important;
+    border-right: 0 !important;
+  }
+
 
 </style>
 
