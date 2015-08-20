@@ -136,7 +136,7 @@ from django.utils.translation import ugettext as _
           <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
         </li>
         <li class="nav-header" style="margin-top:10px;">${_('tables')}
-          <div class="pull-right hover-actions">
+          <div class="pull-right" data-bind="css: { 'hover-actions': assist.filter().length == 0, 'blue': assist.filter().length > 0 }">
             <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           </div>
         </li>
