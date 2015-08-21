@@ -21,9 +21,9 @@ package com.cloudera.hue.livy.repl
 import java.util.concurrent.TimeUnit
 import javax.servlet.ServletContext
 
-import com.cloudera.hue.livy.repl.python.PythonSession
-import com.cloudera.hue.livy.repl.scala.SparkSession
-import com.cloudera.hue.livy.repl.sparkr.SparkRSession
+import com.cloudera.hue.livy.repl.python.PythonInterpreter
+import com.cloudera.hue.livy.repl.scala.SparkInterpreter
+import com.cloudera.hue.livy.repl.sparkr.SparkRInterpreter
 import com.cloudera.hue.livy.sessions.Starting
 import com.cloudera.hue.livy.{Logging, WebServer}
 import dispatch._
@@ -102,11 +102,13 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
   override def init(context: ServletContext): Unit = {
     try {
-      session = context.getInitParameter(Main.SESSION_KIND) match {
-        case Main.PYSPARK_SESSION => PythonSession.create()
-        case Main.SPARK_SESSION => SparkSession.create()
-        case Main.SPARKR_SESSION => SparkRSession.create()
+      val interpreter = context.getInitParameter(Main.SESSION_KIND) match {
+        case Main.PYSPARK_SESSION => PythonInterpreter()
+        case Main.SPARK_SESSION => SparkInterpreter()
+        case Main.SPARKR_SESSION => SparkRInterpreter()
       }
+
+      session = Session(interpreter)
 
       context.mount(new WebApp(session), "/*")
 

@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.repl.sparkr.SparkRSession
+import com.cloudera.hue.livy.repl.sparkr.SparkRInterpreter
 import org.json4s.Extraction
 import org.json4s.JsonAST.JValue
 
@@ -27,7 +27,7 @@ import _root_.scala.concurrent.duration.Duration
 
 class SparkRSessionSpec extends BaseSessionSpec {
 
-  override def createSession() = SparkRSession.create()
+  override def createInterpreter() = SparkRInterpreter()
 
   describe("A sparkr session") {
     it("should execute `1 + 2` == 3") {

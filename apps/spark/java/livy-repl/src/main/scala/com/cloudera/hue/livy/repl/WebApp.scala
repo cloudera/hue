@@ -95,18 +95,7 @@ private object Serializers {
   def Formats: List[CustomSerializer[_]] = List(StatementSerializer)
 
   def serializeSession(session: Session): JValue = {
-    val state = session.state match {
-      case NotStarted() => "not_started"
-      case Starting() => "starting"
-      case Idle() => "idle"
-      case Busy() => "busy"
-      case Running() => "running"
-      case Error() => "error"
-      case ShuttingDown() => "shutting_down"
-      case Dead() => "dead"
-      case Success() => "success"
-    }
-    Map("state" -> state)
+    Map("state" -> session.state.toString)
   }
 
   def serializeHistory(history: IndexedSeq[Statement],

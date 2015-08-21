@@ -18,16 +18,16 @@
 
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.repl.scala.SparkSession
+import com.cloudera.hue.livy.repl.scala.SparkInterpreter
 import org.json4s.Extraction
-import org.json4s.JsonAST.JValue
+import org.json4s.JsonAST.{JArray, JValue}
 
 import _root_.scala.concurrent.Await
 import _root_.scala.concurrent.duration.Duration
 
 class SparkSessionSpec extends BaseSessionSpec {
 
-  override def createSession() = SparkSession.create()
+  override def createInterpreter() = SparkInterpreter()
 
   describe("A spark session") {
     it("should execute `1 + 2` == 3") {
@@ -118,7 +118,8 @@ class SparkSessionSpec extends BaseSessionSpec {
         "evalue" ->
           """<console>:8: error: not found: value x
             |              x
-            |              ^""".stripMargin
+            |              ^""".stripMargin,
+        "traceback" -> List()
       ))
 
       result should equal (expectedResult)
@@ -136,7 +137,7 @@ class SparkSessionSpec extends BaseSessionSpec {
       resultMap("execution_count").extract[Int] should equal (0)
       resultMap("ename").extract[String] should equal ("Error")
       resultMap("evalue").extract[String] should include ("java.lang.Exception")
-      resultMap.get("traceback") should equal (None)
+      resultMap("traceback").extract[List[_]] should equal (List())
     }
 
     it("should access the spark context") {
@@ -181,7 +182,7 @@ class SparkSessionSpec extends BaseSessionSpec {
 
       val expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
-        "execution_count" -> 1,
+        "execution_count" -> 0,
         "data" -> Map(
           "application/vnd.livy.table.v1+json" -> Map(
             "headers" -> List(

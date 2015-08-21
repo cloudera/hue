@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.repl.python.PythonSession
+import com.cloudera.hue.livy.repl.python.PythonInterpreter
 import org.json4s.Extraction
 import org.json4s.JsonAST.JValue
 
@@ -27,7 +27,7 @@ import _root_.scala.concurrent.duration.Duration
 
 class PythonSessionSpec extends BaseSessionSpec {
 
-  override def createSession() = PythonSession.create()
+  override def createInterpreter() = PythonInterpreter()
 
   describe("A python session") {
     it("should execute `1 + 2` == 3") {
@@ -97,7 +97,7 @@ class PythonSessionSpec extends BaseSessionSpec {
       val result = Await.result(statement.result, Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
         "status" -> "ok",
-        "execution_count" -> 1,
+        "execution_count" -> 0,
         "data" -> Map(
           "application/vnd.livy.table.v1+json" -> Map(
             "headers" -> List(
