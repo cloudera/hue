@@ -18,24 +18,26 @@
 
 package com.cloudera.hue.livy.repl.sparkr
 
+import java.io.{File, FileOutputStream}
+import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Files
-import java.util.concurrent.locks.ReentrantLock
 
+import com.cloudera.hue.livy.repl
+import com.cloudera.hue.livy.repl.Interpreter
 import com.cloudera.hue.livy.repl.process.ProcessInterpreter
 import org.apache.commons.codec.binary.Base64
-import org.json4s.jackson.JsonMethods._
-import org.json4s.jackson.Serialization.write
-import org.json4s.{JValue, _}
+import org.json4s.JsonDSL._
+import org.json4s._
 
 import scala.annotation.tailrec
-import scala.io.Source
+import scala.collection.JavaConversions._
 
-private object SparkRInterpreter {
-  val LIVY_END_MARKER = "----LIVY_END_OF_COMMAND----"
-  val PRINT_MARKER = f"""print("$LIVY_END_MARKER")"""
-  val EXPECTED_OUTPUT = f"""[1] "$LIVY_END_MARKER""""
+object SparkRInterpreter {
+  private val LIVY_END_MARKER = "----LIVY_END_OF_COMMAND----"
+  private val PRINT_MARKER = f"""print("$LIVY_END_MARKER")"""
+  private val EXPECTED_OUTPUT = f"""[1] "$LIVY_END_MARKER""""
 
-  val PLOT_REGEX = (
+  private val PLOT_REGEX = (
     "(" +
       "(?:bagplot)|" +
       "(?:barplot)|" +
@@ -56,9 +58,50 @@ private object SparkRInterpreter {
       "(?:vioplot)" +
     ")"
     ).r.unanchored
+
+  def apply(): SparkRInterpreter = {
+    val sparkrExec = sys.env.getOrElse("SPARKR_DRIVER_R", "sparkR")
+
+    val builder = new ProcessBuilder(Seq(
+      sparkrExec
+    ))
+
+    val env = builder.environment()
+    env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
+    env.put("SPARKR_DRIVER_R", createFakeShell().toString)
+
+    builder.redirectError(Redirect.PIPE)
+
+    val process = builder.start()
+
+    new SparkRInterpreter(process)
+  }
+
+  private def createFakeShell(): File = {
+    val source = getClass.getClassLoader.getResourceAsStream("fake_R.sh")
+
+    val file = Files.createTempFile("", "").toFile
+    file.deleteOnExit()
+
+    val sink = new FileOutputStream(file)
+    val buf = new Array[Byte](1024)
+    var n = source.read(buf)
+
+    while (n > 0) {
+      sink.write(buf, 0, n)
+      n = source.read(buf)
+    }
+
+    source.close()
+    sink.close()
+
+    file.setExecutable(true)
+
+    file
+  }
 }
 
-private class SparkRInterpreter(process: Process)
+class SparkRInterpreter(process: Process)
   extends ProcessInterpreter(process)
 {
   import SparkRInterpreter._
@@ -67,13 +110,15 @@ private class SparkRInterpreter(process: Process)
 
   private[this] var executionCount = 0
 
+  override def kind = "sparkR"
+
   final override protected def waitUntilReady(): Unit = {
     // Set the option to catch and ignore errors instead of halting.
     sendExecuteRequest("options(error = dump.frames)")
     executionCount = 0
   }
 
-  override protected def sendExecuteRequest(command: String): Option[JValue] = synchronized {
+  override protected def sendExecuteRequest(command: String): Interpreter.ExecuteResponse = {
     var code = command
 
     // Create a image file if this command is trying to plot.
@@ -87,40 +132,24 @@ private class SparkRInterpreter(process: Process)
     }
 
     try {
-      executionCount += 1
-
-      var content = Map(
-        "text/plain" -> (sendRequest(code) + takeErrorLines())
-      )
+      var content: JObject = repl.TEXT_PLAIN -> (sendRequest(code) + takeErrorLines())
 
       // If we rendered anything, pass along the last image.
       tempFile.foreach { case file =>
         val bytes = Files.readAllBytes(file)
         if (bytes.nonEmpty) {
           val image = Base64.encodeBase64String(bytes)
-          content = content + (("image/png", image))
+          content = content ~ (repl.IMAGE_PNG -> image)
         }
       }
 
-      Some(parse(write(
-        Map(
-          "status" -> "ok",
-          "execution_count" -> (executionCount - 1),
-          "data" -> content
-        ))))
+      Interpreter.ExecuteSuccess(content)
     } catch {
       case e: Error =>
-        Some(parse(write(
-        Map(
-          "status" -> "error",
-          "ename" -> "Error",
-          "evalue" -> e.output,
-          "data" -> Map(
-            "text/plain" -> takeErrorLines()
-          )
-        ))))
+        val message = Seq(e.output, takeErrorLines()).mkString("\n")
+        Interpreter.ExecuteError("Error", message)
       case e: Exited =>
-        None
+        Interpreter.ExecuteAborted(takeErrorLines())
     } finally {
       tempFile.foreach(Files.delete)
     }
@@ -201,38 +230,4 @@ private class SparkRInterpreter(process: Process)
 
   private class Exited(val output: String) extends Exception {}
   private class Error(val output: String) extends Exception {}
-
-  private[this] val _lock = new ReentrantLock()
-  private[this] var stderrLines = Seq[String]()
-
-  private def takeErrorLines(): String = {
-    var lines: Seq[String] = null
-    _lock.lock()
-    try {
-      lines = stderrLines
-      stderrLines = Seq[String]()
-    } finally {
-      _lock.unlock()
-    }
-
-    lines.mkString("\n")
-  }
-
-  private[this] val stderrThread = new Thread("sparkr stderr thread") {
-    override def run() = {
-      val lines = Source.fromInputStream(process.getErrorStream).getLines()
-
-      for (line <- lines) {
-        _lock.lock()
-        try {
-          stderrLines :+= line
-        } finally {
-          _lock.unlock()
-        }
-      }
-    }
-  }
-
-  stderrThread.setDaemon(true)
-  stderrThread.start()
 }

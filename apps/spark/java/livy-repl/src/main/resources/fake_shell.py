@@ -16,6 +16,7 @@
 
 import ast
 import cStringIO
+import collections
 import datetime
 import decimal
 import json
@@ -28,19 +29,13 @@ LOG = logging.getLogger('fake_shell')
 
 global_dict = {}
 
-execution_count = 0
-
 
 def execute_reply(status, content):
-    global execution_count
-    execution_count += 1
-
     return {
         'msg_type': 'execute_reply',
         'content': dict(
             content,
             status=status,
-            execution_count=execution_count - 1
         )
     }
 
@@ -60,7 +55,6 @@ def execute_reply_error(exc_type, exc_value, tb):
 
 def execute(code):
     try:
-        code = ast.parse(code)
         to_run_exec, to_run_single = code.body[:-1], code.body[-1:]
 
         for node in to_run_exec:
@@ -93,7 +87,23 @@ def execute(code):
 
     return execute_reply_ok({
         'text/plain': output.rstrip(),
-        })
+    })
+
+
+def execute_magic(line):
+    parts = line[1:].split(' ', 1)
+    if len(parts) == 1:
+        magic, rest = parts[0], ()
+    else:
+        magic, rest = parts[0], (parts[1],)
+
+    try:
+        handler = magic_router[magic]
+    except KeyError:
+        exc_type, exc_value, tb = sys.exc_info()
+        return execute_reply_error(exc_type, exc_value, [])
+    else:
+        return handler(*rest)
 
 
 def execute_request(content):
@@ -103,33 +113,38 @@ def execute_request(content):
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
 
-    lines = code.split('\n')
+    lines = collections.deque(code.rstrip().split('\n'))
+    last_line = ''
+    result = None
 
-    if lines and lines[-1].startswith('%'):
-        code, magic = lines[:-1], lines[-1]
+    while lines:
+        line = last_line + lines.popleft()
 
-        # Make sure to execute the other lines first.
-        if code:
-            result = execute('\n'.join(code))
-            if result['content']['status'] != 'ok':
-                return result
+        if line.rstrip() == '':
+            continue
 
-        parts = magic[1:].split(' ', 1)
-        if len(parts) == 1:
-            magic, rest = parts[0], ()
+        if line.startswith('%'):
+            result = execute_magic(line)
         else:
-            magic, rest = parts[0], (parts[1],)
+            try:
+                code = ast.parse(line)
+            except SyntaxError:
+                last_line = line + '\n'
+                continue
+            else:
+                result = execute(code)
 
-        try:
-            handler = magic_router[magic]
-        except KeyError:
-            exc_type, exc_value, tb = sys.exc_info()
-            return execute_reply_error(exc_type, exc_value, [])
+        if result['content']['status'] == 'ok':
+            last_line = ''
         else:
-            return handler(*rest)
+            return result
+
+    if result is None:
+        return execute_reply_ok({
+            'text/plain': '',
+        })
     else:
-        return execute(code)
-
+        return result
 
 def magic_table_convert(value):
     try:
@@ -330,7 +345,6 @@ try:
         except ValueError, e:
             response = json.dumps({
                 'msg_type': 'inspect_reply',
-                'execution_count': execution_count - 1,
                 'content': {
                     'status': 'error',
                     'ename': 'ValueError',
@@ -342,7 +356,8 @@ try:
         print >> sys_stdout, response
         sys_stdout.flush()
 finally:
-    global_dict['sc'].stop()
+    if 'sc' in global_dict:
+        global_dict['sc'].stop()
 
     sys.stdin = sys_stdin
     sys.stdout = sys_stdout

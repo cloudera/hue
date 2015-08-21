@@ -18,40 +18,52 @@
 
 package com.cloudera.hue.livy.sessions
 
-sealed trait State
+sealed trait State {
+  /** Returns true if the State represents a process that can eventually execute commands */
+  def isActive: Boolean
+}
 
 case class NotStarted() extends State {
+  override def isActive = true
   override def toString = "not_started"
 }
 
 case class Starting() extends State {
+  override def isActive = true
   override def toString = "starting"
 }
 
 case class Idle() extends State {
+  override def isActive = true
   override def toString = "idle"
 }
 
 case class Running() extends State {
+  override def isActive = true
   override def toString = "running"
 }
 
 case class Busy() extends State {
+  override def isActive = true
   override def toString = "busy"
 }
 
 case class Error() extends State {
+  override def isActive = true
   override def toString = "error"
 }
 
 case class ShuttingDown() extends State {
+  override def isActive = false
   override def toString = "shutting_down"
 }
 
 case class Dead() extends State {
+  override def isActive = false
   override def toString = "dead"
 }
 
 case class Success() extends State {
+  override def isActive = false
   override def toString = "success"
 }

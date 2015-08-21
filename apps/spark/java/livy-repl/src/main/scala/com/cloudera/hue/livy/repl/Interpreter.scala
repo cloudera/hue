@@ -18,29 +18,33 @@
 
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.Utils
-import com.cloudera.hue.livy.sessions.State
-import org.json4s._
+import org.json4s.JObject
 
-import _root_.scala.concurrent._
-import _root_.scala.concurrent.duration.Duration
+object Interpreter {
+  abstract class ExecuteResponse
+
+  case class ExecuteSuccess(content: JObject) extends ExecuteResponse
+  case class ExecuteError(ename: String,
+                          evalue: String,
+                          traceback: Seq[String] = Seq()) extends ExecuteResponse
+  case class ExecuteIncomplete() extends ExecuteResponse
+  case class ExecuteAborted(message: String) extends ExecuteResponse
+}
 
 trait Interpreter {
-  /** The Interpreter's state */
-  def state: State
+  import Interpreter._
 
-    /**
-     * Execute the code and return the result as a Future as it may
-     * take some time to execute.
-     */
-  def execute(code: String): Future[JValue]
+  def kind: String
+
+  /** Start the Interpreter */
+  def start(): Unit
+
+  /**
+   * Execute the code and return the result as a Future as it may
+   * take some time to execute.
+   */
+  def execute(code: String): ExecuteResponse
 
   /** Shut down the interpreter. */
   def close(): Unit
-
-  @throws(classOf[TimeoutException])
-  @throws(classOf[InterruptedException])
-  final def waitForStateChange(oldState: State, atMost: Duration) = {
-    Utils.waitUntil({ () => state != oldState }, atMost)
-  }
 }

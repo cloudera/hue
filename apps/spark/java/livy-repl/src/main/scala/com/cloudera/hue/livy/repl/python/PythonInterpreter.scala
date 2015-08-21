@@ -26,6 +26,7 @@ import com.cloudera.hue.livy.repl.Interpreter
 import com.cloudera.hue.livy.repl.process.ProcessInterpreter
 import com.cloudera.hue.livy.{Logging, Utils}
 import org.apache.spark.SparkContext
+import org.json4s.JsonAST.JObject
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, JValue}
@@ -34,34 +35,32 @@ import py4j.GatewayServer
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.ExecutionContext
 
-object PythonInterpreter {
-  def create(): Interpreter = {
+object PythonInterpreter extends Logging {
+  def apply(): Interpreter = {
     val pythonExec = sys.env.getOrElse("PYSPARK_DRIVER_PYTHON", "python")
 
     val gatewayServer = new GatewayServer(null, 0)
     gatewayServer.start()
 
-    val builder = new ProcessBuilder(Seq(
-      pythonExec,
-      createFakeShell().toString
-    ))
+    val pythonPath = buildPythonPath
+    val builder = new ProcessBuilder(Seq(pythonExec, createFakeShell().toString))
 
     val env = builder.environment()
+
     env.put("PYTHONPATH", pythonPath)
     env.put("PYTHONUNBUFFERED", "YES")
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
 
-    builder.redirectError(Redirect.INHERIT)
+    builder.redirectError(Redirect.PIPE)
 
     val process = builder.start()
 
     new PythonInterpreter(process, gatewayServer)
   }
 
-  private def pythonPath = {
+  private def buildPythonPath = {
     val pythonPath = new ArrayBuffer[String]
     for (sparkHome <- sys.env.get("SPARK_HOME")) {
       pythonPath += Seq(sparkHome, "python", "lib", "pyspark.zip").mkString(File.separator)
@@ -122,6 +121,8 @@ private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
 {
   implicit val formats = DefaultFormats
 
+  override def kind = "pyspark"
+
   override def close(): Unit = {
     try {
       super.close()
@@ -139,14 +140,27 @@ private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
     }
   }
 
-  override protected def sendExecuteRequest(code: String): Option[JValue] = {
-    val rep = sendRequest(Map("msg_type" -> "execute_request", "content" -> Map("code" -> code)))
-    rep.map { case rep =>
-      assert((rep \ "msg_type").extract[String] == "execute_reply")
+  override protected def sendExecuteRequest(code: String): Interpreter.ExecuteResponse = {
+    sendRequest(Map("msg_type" -> "execute_request", "content" -> Map("code" -> code))) match {
+      case Some(response) =>
+        assert((response \ "msg_type").extract[String] == "execute_reply")
 
-      val content: JValue = rep \ "content"
+        val content = response \ "content"
 
-      content
+        (content \ "status").extract[String] match {
+          case "ok" =>
+            Interpreter.ExecuteSuccess((content \ "data").extract[JObject])
+          case "error" =>
+            val ename = (content \ "ename").extract[String]
+            val evalue = (content \ "evalue").extract[String]
+            val traceback = (content \ "traceback").extract[Seq[String]]
+
+            Interpreter.ExecuteError(ename, evalue, traceback)
+          case status =>
+            Interpreter.ExecuteError("Internal Error", f"Unknown status $status")
+        }
+      case None =>
+        Interpreter.ExecuteAborted(takeErrorLines())
     }
   }
 
@@ -163,6 +177,8 @@ private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
     stdin.println(write(request))
     stdin.flush()
 
-    Option(stdout.readLine()).map { case line => parse(line) }
+    Option(stdout.readLine()).map { case line =>
+      parse(line)
+    }
   }
 }
