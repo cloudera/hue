@@ -40,7 +40,7 @@ from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
-from oozie.utils import utc_datetime_format
+from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT
 from hadoop.fs.exceptions import WebHdfsException
 
 
@@ -54,6 +54,9 @@ class Job(object):
 
     for param in self.parameters:
       params[param['name'].strip()] = param['value']
+
+    if params.get('nominal_time') == '':
+      params['nominal_time'] = datetime.today().strftime(UTC_TIME_FORMAT)
 
     return  [{'name': name, 'value': value} for name, value in params.iteritems() if with_lib_path or name != 'oozie.use.system.libpath']
 
