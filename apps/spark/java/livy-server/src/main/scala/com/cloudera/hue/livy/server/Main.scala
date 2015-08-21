@@ -25,6 +25,8 @@ import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.server.batch._
 import com.cloudera.hue.livy.server.interactive._
 import org.scalatra._
+import org.scalatra.metrics.MetricsBootstrap
+import org.scalatra.metrics.MetricsSupportExtensions._
 import org.scalatra.servlet.ScalatraListener
 import org.slf4j.LoggerFactory
 
@@ -121,7 +123,10 @@ object Main {
   }
 }
 
-class ScalatraBootstrap extends LifeCycle with Logging {
+class ScalatraBootstrap
+  extends LifeCycle
+  with Logging
+  with MetricsBootstrap {
 
   var sessionManager: SessionManager[InteractiveSession] = null
   var batchManager: SessionManager[BatchSession] = null
@@ -145,6 +150,7 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
       context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")
       context.mount(new BatchSessionServlet(batchManager), "/batches/*")
+      context.mountMetricsAdminServlet("/")
     } catch {
       case e: Throwable =>
         println(f"Exception thrown when initializing server: $e")
