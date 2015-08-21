@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, commonshare
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 from django.utils.translation import ugettext as _
 %>
 
@@ -93,7 +93,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       <div class="card card-home">
         <h1 class="card-heading simple" style="border-bottom: none"><span data-bind="editable: $root.coordinator.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></h1>
         <div class="card-body muted" style="margin-top: 2px" data-bind="visible: $root.isEditing() || (! $root.isEditing() && $root.coordinator.properties.description)">
-          <span data-bind="editable: $root.coordinator.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+          <span data-bind="editable: $root.coordinator.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
         </div>
       </div>
 
@@ -211,7 +211,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
               <div class="control-group" style="margin-bottom: 0">
                 <label class="control-label">${ _('Timezone') }</label>
                 <div class="controls">
-                  <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: coordinator.properties.timezone}" style="width: 180px"></select>
+                  <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _ko("Select a Timezone") }', update: coordinator.properties.timezone}" style="width: 180px"></select>
                   <span class="help-inline"></span>
                 </div>
               </div>
@@ -233,7 +233,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
 
           <ul data-bind="foreach: coordinator.variables, visible: coordinator.variables().length > 0" class="unstyled">
             <li style="margin-bottom: 10px">
-              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', optionsValue: 'name', select2: { placeholder: '${ _("Select a parameter") }', update: workflow_variable, type: 'parameter'}, visible: $root.isEditing" style="width: 250px"></select>
+              <select data-bind="options: $parent.coordinator.workflowParameters, optionsText: 'name', optionsValue: 'name', select2: { placeholder: '${ _ko("Select a parameter") }', update: workflow_variable, type: 'parameter'}, visible: $root.isEditing" style="width: 250px"></select>
 
               <div class="pull-left" style="width: 130px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; line-height: 30px;" data-bind="text: workflow_variable, visible: ! $root.isEditing(), attr:{'title': workflow_variable}"></div>
 
@@ -275,8 +275,8 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
 
               <span data-bind="visible: $root.isEditing">
                 <input type="text" class="filechooser-input dataset-input" data-bind="value: dataset_variable, filechooser: dataset_variable, attr: { placeholder:
-                  dataset_type() == 'input_path' ? '${ _("Required data path dependency to start the worklow") }' :
-                  dataset_type() == 'output_path' ? '${ _("Data path created by the workflow") }' :
+                  dataset_type() == 'input_path' ? '${ _ko("Required data path dependency to start the worklow") }' :
+                  dataset_type() == 'output_path' ? '${ _ko("Data path created by the workflow") }' :
                   'e.g. 1, 2, 3, /data/logs, ${"$"}{coord:nominalTime()}' },
                   typeahead: { target: dataset_variable, source: datasetTypeaheadSource, triggerOnFocus: true, multipleValues: true, multipleValuesSeparator: '', multipleValuesExtractors: [' ', '/'] }" style="margin-bottom:0; width: 380px" />
               </span>
@@ -344,7 +344,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                       <label class="control-label">${ _('Same timezone') }</label>
                       <div class="controls">
                         <input type="checkbox" data-bind="checked: same_timezone, style: {'margin-top': same_timezone() ? '5px' : '0'}, enable: $root.isEditing" />
-                        <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _("Select a Timezone") }', update: timezone}, visible: ! same_timezone(), enable: $root.isEditing" style="width: 180px"></select>
+                        <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _ko("Select a Timezone") }', update: timezone}, visible: ! same_timezone(), enable: $root.isEditing" style="width: 180px"></select>
                       </div>
                     </div>
                     <div class="control-group">
