@@ -23,6 +23,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from desktop.views import _ko
 %>
 <%namespace name="utils" file="../utils.inc.mako" />
 
@@ -493,7 +494,7 @@
   </h6>
   <ul class="unstyled" data-bind="foreach: properties.parameters">
     <li style="margin-bottom: 3px">
-      <input type="text" class="filechooser-input seventy" data-bind="value: value, filechooser: value, filechooserOptions: globalFilechooserOptions, filechooserPrefixSeparator: '=', hdfsAutocomplete: value, attr: { placeholder: ' ${ _("Fill me up!") }' }, typeahead: { target: value, source: $parent.actionParametersUI, sourceSuffix: '=', triggerOnFocus: true }"  validate="nonempty"/>
+      <input type="text" class="filechooser-input seventy" data-bind="value: value, filechooser: value, filechooserOptions: globalFilechooserOptions, filechooserPrefixSeparator: '=', hdfsAutocomplete: value, attr: { placeholder: ' ${ _ko("Fill me up!") }' }, typeahead: { target: value, source: $parent.actionParametersUI, sourceSuffix: '=', triggerOnFocus: true }"  validate="nonempty"/>
       <span data-bind='template: { name: "param-fs-link", data: {path: value()} }'></span>
       <a href="#" data-bind="click: function(){ $parent.properties.parameters.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
@@ -549,7 +550,7 @@
 <script type="text/html" id="common-fs-link">
 <!-- ko if: $data.path.length > 0 -->
   <!-- ko if: with_label -->
-    <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _('Open') } '+ $data.path }" target="_blank">
+    <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _ko('Open') } '+ $data.path }" target="_blank">
       <span data-bind="text: $data.path.lastIndexOf('/') == $data.path.length - 1 ? $data.path : $data.path.split('/').pop()"></span>
     </a>
   <!-- /ko -->
@@ -1287,14 +1288,14 @@
 
     <div data-bind="visible: ! $root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
-      <span data-bind="text: '${ _("Delete") }', visible: properties.deletes().length > 0"></span>
+      <span data-bind="text: '${ _ko("Delete") }', visible: properties.deletes().length > 0"></span>
       <ul data-bind="foreach: properties.deletes" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
         </li>
       </ul>
 
-      <span data-bind="text: '${ _("Create") }', visible: properties.mkdirs().length > 0 || properties.touchzs().length > 0"></span>
+      <span data-bind="text: '${ _ko("Create") }', visible: properties.mkdirs().length > 0 || properties.touchzs().length > 0"></span>
       <ul data-bind="foreach: properties.mkdirs" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
@@ -1306,7 +1307,7 @@
         </li>
       </ul>
 
-      <span data-bind="text: '${ _("Move") }', visible: properties.moves().length > 0"></span>
+      <span data-bind="text: '${ _ko("Move") }', visible: properties.moves().length > 0"></span>
       <ul data-bind="foreach: properties.moves" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: source(), with_label: true} }, visible: source().length > 0'></span>
@@ -1315,27 +1316,27 @@
         </li>
       </ul>
 
-      <span data-bind="text: '${ _("Change permissions") }', visible: properties.chmods().length > 0"></span>
+      <span data-bind="text: '${ _ko("Change permissions") }', visible: properties.chmods().length > 0"></span>
       <ul data-bind="foreach: properties.chmods" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
           ${ _('to') }
           <span data-bind="text: permissions"/>
-          <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
-          <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _('recursivelt') }'"/>
+          <span data-bind="visible: ! dir_files(), text: '${ _ko('for directories') }'"/>
+          <span data-bind="visible: dir_files(), text: '${ _ko('for directories and files') }'"/>
+          <span data-bind="visible: recursive, text: '${ _ko('recursively') }'"/>
         </li>
       </ul>
 
-      <span data-bind="text: '${ _("Change groups") }', visible: properties.chgrps().length > 0"></span>
+      <span data-bind="text: '${ _ko("Change groups") }', visible: properties.chgrps().length > 0"></span>
       <ul data-bind="foreach: properties.chgrps" class="unstyled">
         <li>
           <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: true} }, visible: value().length > 0'></span>
           ${ _('to') }
           <span data-bind="text: group"/>
-          <span data-bind="visible: ! dir_files(), text: '${ _('for directories') }'"/>
-          <span data-bind="visible: dir_files(), text: '${ _('for directories and files') }'"/>
-          <span data-bind="visible: recursive, text: '${ _('recursively') }'"/>
+          <span data-bind="visible: ! dir_files(), text: '${ _ko('for directories') }'"/>
+          <span data-bind="visible: dir_files(), text: '${ _ko('for directories and files') }'"/>
+          <span data-bind="visible: recursive, text: '${ _ko('recursively') }'"/>
         </li>
       </ul>
     </div>

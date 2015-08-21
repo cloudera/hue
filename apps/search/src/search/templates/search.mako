@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, _ko
 from desktop import conf
 from django.utils.translation import ugettext as _
 %>
@@ -388,7 +388,7 @@ ${ dashboard.layout_skeleton() }
             <span class="facet-field-label facet-field-label-fixed-width">
               ${ _('Field') }
             </span>
-            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Choose...') }'"></select>
+            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Choose...') }'"></select>
           </span>
         </div>
 
@@ -560,7 +560,7 @@ ${ dashboard.layout_skeleton() }
         </div>
         <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields">
           <div style="margin-bottom: 3px; white-space: nowrap">
-            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr:{'title': '${ _('Click to analyze field') } ' + name()}"></i>
+            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr:{'title': '${ _ko('Click to analyze field') } ' + name()}"></i>
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right: 10px"></div>
           </div>
@@ -1024,7 +1024,7 @@ ${ dashboard.layout_skeleton() }
           <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
             <i class="fa fa-plus"></i> ${ _('Add') }
           </a>
-          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
+          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
           <div class="clearfix"></div>
         </div>
         <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
@@ -1268,7 +1268,7 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: properties.scope() == 'tree' -->
         <div data-bind="partitionChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()},
           fqs: $root.query.fqs,
-          tooltip: '${ _('Click to zoom, double click to select') }',
+          tooltip: '${ _ko('Click to zoom, double click to select') }',
           transformer: partitionChartDataTransformer,
           onStateChange: function(state){ },
           onClick: function(d) {
@@ -1457,13 +1457,13 @@ ${ dashboard.layout_skeleton() }
         <strong>${_('selected')}</strong>
         <span class="label label-info">
           [
-          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_sw, attr: {'title': '${ _('Latitude South West') }'"></span>
-          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_sw, attr: {'title': '${ _('Longitude South West') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_sw, attr: {'title': '${ _ko('Latitude South West') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_sw, attr: {'title': '${ _ko('Longitude South West') }'"></span>
           ]
           ${ _("TO") }
           [
-          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_ne, attr: {'title': '${ _('Latitude North East') }'"></span>
-          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_ne, attr: {'title': '${ _('Longitude North East') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_ne, attr: {'title': '${ _ko('Latitude North East') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_ne, attr: {'title': '${ _ko('Longitude North East') }'"></span>
           ]
         </span>
       </div>
@@ -1557,18 +1557,18 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px;" class="leaflet-align">
       <span class="facet-field-label">${_('Latitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _ko('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Longitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _ko('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Label')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _ko('Choose...') }'"></select>
     </div>
 
-    <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
+    <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
       onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); },
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">

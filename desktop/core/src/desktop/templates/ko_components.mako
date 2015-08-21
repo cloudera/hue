@@ -18,6 +18,7 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from desktop.views import _ko
 %>
 
 <%def name="assistPanel()">
@@ -132,7 +133,7 @@ from django.utils.translation import ugettext as _
         </li>
         <!-- ko if: assist.mainObjects().length > 0 -->
         <li>
-          <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+          <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
           <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
         </li>
         <li class="nav-header" style="margin-top:10px;">${_('tables')}
