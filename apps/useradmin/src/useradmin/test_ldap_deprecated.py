@@ -19,6 +19,7 @@
 import ldap
 
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 import desktop.conf
@@ -31,6 +32,7 @@ from django.core.urlresolvers import reverse
 from useradmin.models import LdapGroup, UserProfile, get_profile
 
 from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from views import sync_ldap_users, sync_ldap_groups, import_ldap_users, import_ldap_groups, \
                   add_ldap_users, add_ldap_groups, sync_ldap_users_groups
 
@@ -423,6 +425,22 @@ def test_useradmin_ldap_user_integration():
 
     reset_all_users()
     reset_all_groups()
+  finally:
+    for finish in done:
+      finish()
+
+
+def test_useradmin_ldap_case_sensitivity():
+  if is_live_cluster():
+    raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+
+  done = []
+  try:
+    reset_all_users()
+    reset_all_groups()
+
+    # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+    ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
 
     # Test import case sensitivity
     done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
@@ -477,6 +495,41 @@ def test_add_ldap_users():
     response = c.post(URL, dict(username_pattern='*rr*', password1='test', password2='test'))
     assert_true('/useradmin/users' in response['Location'], response)
 
+    # Test regular with spaces (should fail)
+    response = c.post(URL, dict(username_pattern='user with space', password1='test', password2='test'))
+    assert_true("Username must not contain whitespaces and ':'" in response.context['form'].errors['username_pattern'][0], response)
+
+    # Test dn with spaces in username and dn (should fail)
+    response = c.post(URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+    assert_true("Could not get LDAP details for users in pattern" in response.content, response)
+    response = c.get(reverse(desktop.views.log_view))
+    assert_true("{username}: Username must not contain whitespaces".format(username='user with space') in response.content, response.content)
+
+    # Test dn with spaces in dn, but not username (should succeed)
+    response = c.post(URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
+    assert_true(User.objects.filter(username='spaceless').exists())
+
+  finally:
+    for finish in done:
+      finish()
+
+
+def test_add_ldap_users_case_sensitivity():
+  if is_live_cluster():
+    raise SkipTest('HUE-2897: Cannot yet guarantee database is case sensitive')
+
+  done = []
+  try:
+    URL = reverse(add_ldap_users)
+
+    reset_all_users()
+    reset_all_groups()
+
+    # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
+    ldap_access.CACHED_LDAP_CONN = LdapTestConnection()
+
+    c = make_logged_in_client('test', is_superuser=True)
+
     # Test ignore case
     done.append(desktop.conf.LDAP.IGNORE_USERNAME_CASE.set_for_testing(True))
     User.objects.filter(username='moe').delete()
@@ -498,21 +551,6 @@ def test_add_ldap_users():
     assert_true('/useradmin/users' in response['Location'], response)
     assert_false(User.objects.filter(username='Rock').exists())
     assert_true(User.objects.filter(username='rock').exists())
-
-    # Test regular with spaces (should fail)
-    response = c.post(URL, dict(username_pattern='user with space', password1='test', password2='test'))
-    assert_true("Username must not contain whitespaces and ':'" in response.context['form'].errors['username_pattern'][0], response)
-
-    # Test dn with spaces in username and dn (should fail)
-    response = c.post(URL, dict(username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
-    assert_true("Could not get LDAP details for users in pattern" in response.content, response)
-    response = c.get(reverse(desktop.views.log_view))
-    assert_true("{username}: Username must not contain whitespaces".format(username='user with space') in response.content, response.content)
-
-    # Test dn with spaces in dn, but not username (should succeed)
-    response = c.post(URL, dict(username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
-    assert_true(User.objects.filter(username='spaceless').exists())
-
   finally:
     for finish in done:
       finish()
