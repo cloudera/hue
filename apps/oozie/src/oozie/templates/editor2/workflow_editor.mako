@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, commonshare
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 from desktop import conf
 from django.utils.translation import ugettext as _
 %>
@@ -66,7 +66,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </a>
 
     <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _("Share") } ' + name},
+        attr: {'data-original-title': '${ _ko("Share") } ' + name},
         css: {'isShared': isShared(), 'btn': true},
         visible: workflow.id() != null && canEdit()">
       <i class="fa fa-users"></i>
@@ -218,7 +218,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
     <div class="object-description" style="text-align: center; margin-top: 10px">
-      <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+      <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
     </div>
     </div>
   </div>

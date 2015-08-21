@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -57,7 +57,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         </a>
 
         <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ $root.oneSelected() ? prepareShareModal(e) : void(0) },
-          attr: {'data-original-title': '${ _("Share") } ' + name},
+          attr: {'data-original-title': '${ _ko("Share") } ' + name},
           css: {'disabled': ! $root.oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>

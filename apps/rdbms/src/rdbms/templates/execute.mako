@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -76,7 +76,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
                 % if can_edit_name:
 
                   <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
-                    attr: {'data-original-title': '${ _("Share") } '+name},
+                    attr: {'data-original-title': '${ _ko("Share") } '+name},
                     css: {'baseShared': true, 'isShared': isShared()}">
                     <i class="fa fa-users"></i>
                   </a>

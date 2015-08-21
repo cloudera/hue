@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, commonshare
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 from django.utils.translation import ugettext as _
 %>
 
@@ -56,7 +56,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user) | n,unicode }
     </a>
 
     <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _("Share") } ' + name},
+        attr: {'data-original-title': '${ _ko("Share") } ' + name},
         css: {'isShared': isShared(), 'btn': true},
         visible: bundle.id() != null && canEdit()">
       <i class="fa fa-users"></i>
@@ -89,7 +89,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
       <div class="card card-home" style="padding-bottom: 10px">
         <h1 class="card-heading simple" style="border-bottom: none"><span data-bind="editable: $root.bundle.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></h1>
         <div class="card-body muted" style="margin-top: 2px" data-bind="visible: $root.isEditing() || (! $root.isEditing() && $root.bundle.properties.description)">
-          <span data-bind="editable: $root.bundle.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+          <span data-bind="editable: $root.bundle.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
         </div>
       </div>
 

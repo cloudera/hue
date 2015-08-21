@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="../actionbar.mako" />
@@ -45,7 +45,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
         <span style="padding-right:40px"></span>
 
         <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function(e){ oneSelected() ? prepareShareModal(e) : void(0) },
-          attr: {'data-original-title': '${ _("Share") } ' + name},
+          attr: {'data-original-title': '${ _ko("Share") } ' + name},
           css: {'disabled': ! oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>

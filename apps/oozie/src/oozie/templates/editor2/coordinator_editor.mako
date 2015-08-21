@@ -58,7 +58,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user) | n,unicode }
     </a>
 
     <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _("Share") } ' + name},
+        attr: {'data-original-title': '${ _ko("Share") } ' + name},
         css: {'isShared': isShared(), 'btn': true},
         visible: coordinator.id() != null && canEdit()">
       <i class="fa fa-users"></i>
@@ -469,7 +469,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       <input data-bind="value: coordinator.properties.timeout" type="number"/>
 
       <h4>${ _('Concurrency') }</h4>
-      <select data-bind="options: availableSettings, optionsCaption: '${ _("Default") }', value: coordinator.properties.concurrency"></select>
+      <select data-bind="options: availableSettings, optionsCaption: '${ _ko("Default") }', value: coordinator.properties.concurrency"></select>
 
       <h4>${ _('Execution') }</h4>
       <select data-bind="value: coordinator.properties.execution">
@@ -479,7 +479,7 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       </select>
 
       <h4>${ _('Throttle') }</h4>
-      <select data-bind="options: availableSettings, optionsCaption: '${ _("Default") }', value: coordinator.properties.throttle"></select>
+      <select data-bind="options: availableSettings, optionsCaption: '${ _ko("Default") }', value: coordinator.properties.throttle"></select>
 
       <h4>${ _('SLA Configuration') }</h4>
       <div class="sla-form" data-bind="with: $root.coordinator.properties">

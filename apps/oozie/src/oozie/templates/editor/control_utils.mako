@@ -16,6 +16,7 @@
 
 <%!
   from django.utils.translation import ugettext as _
+  from desktop.views import _ko
 %>
 
 <%namespace name="utils" file="../utils.inc.mako" />
@@ -30,7 +31,7 @@
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>
+        <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
       <div class="modal-content">
@@ -64,7 +65,7 @@
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>
+        <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
       <div class="modal-content">
@@ -104,7 +105,7 @@
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 class="message" data-bind="text: '${_('Edit Node: ')}' + name()"></h3>
+        <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
       <div class="modal-content">

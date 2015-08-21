@@ -16,7 +16,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, _ko
   from django.utils.translation import ugettext as _
   
   from oozie.conf import ENABLE_V2
@@ -244,11 +244,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               <tr data-bind="css: { disabled: url == '' }">
                 <td data-bind="click: handleSelect"><div data-bind="css: { 'fa-check': selected }" class="hueCheckbox fa"></div></td>
                 <td data-bind="css: { disabled: url == '' }">
-                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
+                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
                     <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
                   </a>
                 </td>
-                <td data-bind="css: { disabled: url == '' }"><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == ''">${ _('Workflow not available or instantiated yet') }</em><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url != ''">${_('-')}</em> <span data-bind="visible: errorMessage != null && errorMessage != '', text: errorMessage"></span> <span data-bind="visible:missingDependencies !='' && missingDependencies != null, text: '${ _('Missing')} ' + missingDependencies"></span></td>
+                <td data-bind="css: { disabled: url == '' }"><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == ''">${ _('Workflow not available or instantiated yet') }</em><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url != ''">${_('-')}</em> <span data-bind="visible: errorMessage != null && errorMessage != '', text: errorMessage"></span> <span data-bind="visible:missingDependencies !='' && missingDependencies != null, text: '${ _ko('Missing')} ' + missingDependencies"></span></td>
               </tr>
             </script>
 

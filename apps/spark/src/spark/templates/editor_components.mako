@@ -18,6 +18,7 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from desktop.views import _ko
 %>
 
 <%def name="includes()">
@@ -179,7 +180,7 @@ from django.utils.translation import ugettext as _
   <div class="pull-left" style="padding: 9px">
     <!-- ko foreach: notebooks -->
       <!-- ko if: $root.isEditing() -->
-        <span data-bind="editable: description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}" class="muted"></span>
+        <span data-bind="editable: description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}" class="muted"></span>
       <!-- /ko  -->
       <!-- ko ifnot: $root.isEditing() -->
         <span data-bind="text: description" class="muted"></span>
@@ -443,7 +444,7 @@ from django.utils.translation import ugettext as _
           extraCompleters: completers,
           errors: errors,
           autocompleter: aceAutocomplete,
-          openIt: '${ _("Double click to open it") }',
+          openIt: '${ _ko("Double click to open it") }',
           placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>
     <div class="clearfix"></div>
@@ -528,7 +529,7 @@ from django.utils.translation import ugettext as _
           <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
         </ul>
         <div data-bind="visible: chartType() != ''">
-          <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartX}" class="input-medium"></select>
+          <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? result.cleanedMeta : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX}" class="input-medium"></select>
         </div>
 
         <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
@@ -544,28 +545,28 @@ from django.utils.translation import ugettext as _
           </ul>
         </div>
         <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-          <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
+          <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
         </div>
 
         <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
           <li class="nav-header">${_('label')}</li>
         </ul>
         <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
-          <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
+          <select data-bind="options: result.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
         </div>
 
         <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
           <li class="nav-header">${_('scatter group')}</li>
         </ul>
         <div data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-          <select data-bind="options: result.cleanedMeta, value: chartScatterGroup, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterGroup}" class="input-medium"></select>
+          <select data-bind="options: result.cleanedMeta, value: chartScatterGroup, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartScatterGroup}" class="input-medium"></select>
         </div>
 
         <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
           <li class="nav-header">${_('scatter size')}</li>
         </ul>
         <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
-          <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_('Choose a column...')}', select2: { width: '100%', placeholder: '${ _("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
+          <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
         </div>
 
         <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
@@ -827,7 +828,7 @@ from django.utils.translation import ugettext as _
                          optionsText: 'nice_name',
                          optionsValue: 'name',
                          value: selectedSessionProperty,
-                         optionsCaption: '${ _('Choose a property...') }'"></select>
+                         optionsCaption: '${ _ko('Choose a property...') }'"></select>
                 <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
                     properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
                     selectedSessionProperty('');

@@ -15,7 +15,7 @@
 ## limitations under the License.
 <%!
   from desktop.lib.django_util import extract_field_data
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
   from django.utils.translation import ugettext as _
 
@@ -221,7 +221,7 @@ ${layout.menubar(section='query')}
           % if can_edit_name:
           <h1 class="card-heading simple">
             <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
-              attr: {'data-original-title': '${ _("Share") } '+name},
+              attr: {'data-original-title': '${ _ko("Share") } '+name},
               css: {'baseShared': true, 'isShared': isShared()}">
               <i class="fa fa-users"></i>
             </a>
@@ -378,7 +378,7 @@ ${layout.menubar(section='query')}
             <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
               <tbody data-bind="foreach: $root.design.results.columns">
                 <tr class="columnRow" data-bind="visible: $index() > 0">
-                  <td rel="columntooltip" data-placement="left" data-bind="attr: {title: '${ _("Scroll to the column") }">
+                  <td rel="columntooltip" data-placement="left" data-bind="attr: {title: '${ _ko("Scroll to the column") }">
                     <a href="javascript:void(0)" data-row-selector="true" class="column-selector" data-bind="text: $data.name"></a>
                   </td>
                   <td class="columnType" data-bind="text: $.trim($data.type)"></td>
