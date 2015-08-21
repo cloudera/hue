@@ -156,8 +156,12 @@ class HiveServer2Dbms(object):
     return self.client.get_table(database, table_name)
 
 
-  def get_column(self, database, table_name, column_name, nested_tokens=None):
-    return self.client.get_table(database, table_name, column_name=column_name, nested_tokens=nested_tokens)
+  def get_column(self, database, table_name, column_name):
+    table = self.client.get_table(database, table_name)
+    for col in table.cols:
+      if col.name == column_name:
+        return col
+    return None
 
 
   def execute_query(self, query, design):

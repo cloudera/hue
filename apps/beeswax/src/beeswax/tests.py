@@ -59,7 +59,6 @@ import beeswax.models
 import beeswax.views
 
 from beeswax import conf, hive_site
-from beeswax.api import _get_simple_data_type, _extract_nested_type
 from beeswax.conf import HIVE_SERVER_HOST
 from beeswax.views import collapse_whitespace, _save_design
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
@@ -1791,20 +1790,17 @@ for x in sys.stdin:
     assert_false('error' in json_resp, 'Failed to autocomplete nested type: %s' % json_resp.get('error'))
 
     assert_equal("array", json_resp['type'])
-    assert_equal("array<struct<bar:int,baz:string>>", json_resp['extended_type'])
-    assert_true("elem" in json_resp)
-    assert_equal("struct", json_resp["elem"]["type"])
-    assert_equal("struct<bar:int,baz:string>", json_resp["elem"]["extended_type"])
+    assert_true("item" in json_resp)
+    assert_equal("struct", json_resp["item"]["type"])
 
-    # Autcomplete nested fields for a given nested type
-    resp = self.client.get(reverse("beeswax:api_autocomplete_nested", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo', 'nested': '$elem$'}))
+    # Autocomplete nested fields for a given nested type
+    resp = self.client.get(reverse("beeswax:api_autocomplete_nested", kwargs={'database': self.db_name, 'table': 'nested_table', 'column': 'foo', 'nested': 'item'}))
     json_resp = json.loads(resp.content)
     assert_false('error' in json_resp, 'Failed to autocomplete nested type: %s' % json_resp.get('error'))
 
     assert_equal("struct", json_resp['type'])
-    assert_equal("struct<bar:int,baz:string>", json_resp['extended_type'])
     assert_true("fields" in json_resp)
-    assert_true("extended_fields" in json_resp)
+
 
   def test_databases_quote(self):
     c = self.client
@@ -1817,27 +1813,6 @@ for x in sys.stdin:
     finally:
       self.db.use(self.db_name)
       _make_query(c, "DROP DATABASE IF EXISTS `%s`" % db_name, database=self.db_name)
-
-
-def test_beeswax_api_get_simple_data_type():
-  # Return just the outer type name for complex nested types
-  assert_equal('array', _get_simple_data_type('array<struct<first_name:string,last_name:string>>'))
-  # Return same value for primitive types
-  assert_equal('string', _get_simple_data_type('string'))
-  # Return None if None
-  assert_equal(None, _get_simple_data_type())
-
-
-def test_beeswax_api_extract_nested_type():
-  # Return full and simple type of array element if token = $elem$
-  assert_equal(('struct<first_name:string,last_name:string>', 'struct'),
-               _extract_nested_type('array<struct<first_name:string,last_name:string>>', '$elem$'))
-  # Return full and simple type of map key if token = $key$
-  assert_equal(('string', 'string'), _extract_nested_type('map<string,array<string>>', '$key$'))
-  # Return full and simple type of map value if token = $value$
-  assert_equal(('array<string>', 'array'), _extract_nested_type('map<string,array<string>>', '$value$'))
-  # Return None, None if token is not valid
-  assert_equal((None, None), _extract_nested_type('struct<first_name:string,last_name:string>', 'first_name'))
 
 
 def test_import_gzip_reader():
