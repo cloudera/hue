@@ -29,6 +29,7 @@ from django.core.urlresolvers import reverse
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
 from desktop.lib.test_utils import add_permission, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from metastore import parser
 from useradmin.models import HuePermission, GroupPermission, group_has_permission
 
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
@@ -306,3 +307,50 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
     check(client, [200, 302]) # Ok
+
+
+class TestParser(object):
+
+  def test_parse_simple(self):
+    name = 'simple'
+    type = 'string'
+    comment = 'test_parse_simple'
+    column = {'name': name, 'type': type, 'comment': comment}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+
+  def test_parse_array(self):
+    name = 'array'
+    type = 'array<string>'
+    comment = 'test_parse_array'
+    column = {'name': name, 'type': 'array', 'comment': comment, 'item': {'type': 'string'}}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+
+  def test_parse_map(self):
+    name = 'map'
+    type = 'map<string,int>'
+    comment = 'test_parse_map'
+    column = {'name': name, 'type': 'map', 'comment': comment, 'key': {'type': 'string'}, 'value': {'type': 'int'}}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+
+  def test_parse_struct(self):
+    name = 'struct'
+    type = 'struct<name:string,age:int>'
+    comment = 'test_parse_struct'
+    column = {'name': name, 'type': 'struct', 'comment': comment, 'fields': [{'name': 'name', 'type': 'string'}, {'name': 'age', 'type': 'int'}]}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+
+  def test_parse_nested(self):
+    name = 'nested'
+    type = 'array<struct<name:string,age:int>>'
+    comment = 'test_parse_nested'
+    column = {'name': name, 'type': 'array', 'comment': comment, 'item': {'type': 'struct', 'fields': [{'name': 'name', 'type': 'string'}, {'name': 'age', 'type': 'int'}]}}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)

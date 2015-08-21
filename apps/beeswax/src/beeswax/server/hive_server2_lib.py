@@ -633,22 +633,17 @@ class HiveServerClient:
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
 
-  def get_table(self, database, table_name, column_name=None, nested_tokens=None, partition_spec=None):
+  def get_table(self, database, table_name, partition_spec=None):
     req = TGetTablesReq(schemaName=database, tableName=table_name)
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(res.operationHandle)
 
-    if column_name and nested_tokens:  # DESCRIBE on nested types cannot accept database name
-      nested_spec = '.'.join('`%s`' % token for token in nested_tokens)
-      query = 'DESCRIBE FORMATTED `%s`.`%s`.%s' % (table_name, column_name, nested_spec)
+    if partition_spec:
+      query = 'DESCRIBE FORMATTED `%s`.`%s` PARTITION(%s)' % (database, table_name, partition_spec)
     else:
       query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
-      if column_name:
-        query += ' `%s`' % column_name
-      elif partition_spec:
-        query += ' PARTITION(%s)' % partition_spec
 
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
@@ -1008,8 +1003,8 @@ class HiveServerClientCompatible(object):
     return tables
 
 
-  def get_table(self, database, table_name, column_name=None, nested_tokens=None, partition_spec=None):
-    table = self._client.get_table(database, table_name, column_name, nested_tokens, partition_spec)
+  def get_table(self, database, table_name, partition_spec=None):
+    table = self._client.get_table(database, table_name, partition_spec)
     return HiveServerTableCompatible(table)
 
 
