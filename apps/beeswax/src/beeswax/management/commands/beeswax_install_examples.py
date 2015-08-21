@@ -32,7 +32,7 @@ from desktop.models import Document
 
 import beeswax.conf
 
-from beeswax.models import SavedQuery, IMPALA
+from beeswax.models import SavedQuery, HQL, IMPALA
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
@@ -102,9 +102,11 @@ class Command(BaseCommand):
     design_list = json.load(design_file)
     design_file.close()
 
+    # Filter design list to app-specific designs
+    app_type = HQL if app_name == 'beeswax' else IMPALA
+    design_list = filter(lambda d: int(d['type']) == app_type, design_list)
+
     for design_dict in design_list:
-      if app_name == 'impala':
-        design_dict['type'] = IMPALA
       design = SampleDesign(design_dict)
       try:
         design.install(django_user)

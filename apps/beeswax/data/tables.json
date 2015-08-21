@@ -8,5 +8,10 @@
     "data_file": "sample_08.csv", 
     "create_hql": "CREATE TABLE `sample_08` (\n  `code` string ,\n  `description` string ,\n  `total_emp` int ,\n  `salary` int )\nROW FORMAT DELIMITED\n  FIELDS TERMINATED BY '\t'\nSTORED AS TextFile\n", 
     "table_name": "sample_08"
+  },
+  {
+    "data_file": "customers.parquet",
+    "create_hql": "CREATE TABLE `customers` (\n `id` INT,\n `name` STRING,\n `email_preferences` STRUCT<`email_format`:STRING, `frequency`:STRING, `categories`:STRUCT<`promos`:BOOLEAN, `surveys`:BOOLEAN>>,\n `addresses` MAP<STRING, STRUCT<`street_1`:STRING, `street_2`:STRING, `city`:STRING, `state`:STRING, `zip_code`:STRING>>,\n `orders` ARRAY<STRUCT<`order_id`:STRING, `order_date`:STRING, `items`:ARRAY<STRUCT<`product_id`:INT, `sku`:STRING, `name`:STRING, `price`:DOUBLE, `qty`:INT>>>>)\nROW FORMAT SERDE 'parquet.hive.serde.ParquetHiveSerDe'\r\nSTORED AS\r\n  INPUTFORMAT 'parquet.hive.DeprecatedParquetInputFormat'\r\n  OUTPUTFORMAT 'parquet.hive.DeprecatedParquetOutputFormat'",
+    "table_name": "customers"
   }
 ]
