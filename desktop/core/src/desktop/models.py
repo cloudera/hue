@@ -257,184 +257,193 @@ class DocumentManager(models.Manager):
     def find_jobs_with_no_doc(model):
       return model.objects.filter(doc__isnull=True).select_related('owner')
 
+    table_names = connection.introspection.table_names()
+
     try:
-      with transaction.atomic():
-        from oozie.models import Workflow, Coordinator, Bundle
+      from oozie.models import Workflow, Coordinator, Bundle
 
-        for job in chain(
-            find_jobs_with_no_doc(Workflow),
-            find_jobs_with_no_doc(Coordinator),
-            find_jobs_with_no_doc(Bundle)):
-          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
+      if \
+          Workflow._meta.db_table in table_names or \
+          Coordinator._meta.db_table in table_names or \
+          Bundle._meta.db_table in table_names:
+        with transaction.atomic():
+          for job in chain(
+              find_jobs_with_no_doc(Workflow),
+              find_jobs_with_no_doc(Coordinator),
+              find_jobs_with_no_doc(Bundle)):
+            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description)
 
-          if job.is_trashed:
-            doc.send_to_trash()
+            if job.is_trashed:
+              doc.send_to_trash()
 
-          if job.is_shared:
-            doc.share_to_default()
+            if job.is_shared:
+              doc.share_to_default()
 
-          if hasattr(job, 'managed'):
-            if not job.managed:
-              doc.extra = 'jobsub'
-              doc.save()
+            if hasattr(job, 'managed'):
+              if not job.managed:
+                doc.extra = 'jobsub'
+                doc.save()
     except Exception, e:
       LOG.exception('error syncing oozie')
 
     try:
-      with transaction.atomic():
-        from beeswax.models import SavedQuery
+      from beeswax.models import SavedQuery
 
-        for job in find_jobs_with_no_doc(SavedQuery):
-          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
-          if job.is_trashed:
-            doc.send_to_trash()
+      if SavedQuery._meta.db_table in table_names:
+        with transaction.atomic():
+          for job in find_jobs_with_no_doc(SavedQuery):
+            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.desc, extra=job.type)
+            if job.is_trashed:
+              doc.send_to_trash()
     except Exception, e:
       LOG.exception('error syncing beeswax')
 
     try:
-      with transaction.atomic():
-        from pig.models import PigScript
+      from pig.models import PigScript
 
-        for job in find_jobs_with_no_doc(PigScript):
-          Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
+      if PigScript._meta.db_table in table_names:
+        with transaction.atomic():
+          for job in find_jobs_with_no_doc(PigScript):
+            Document.objects.link(job, owner=job.owner, name=job.dict['name'], description='')
     except Exception, e:
       LOG.exception('error syncing pig')
 
     try:
-      with transaction.atomic():
-        from search.models import Collection
+      from search.models import Collection
 
-        for dashboard in Collection.objects.all():
-          col_dict = dashboard.properties_dict['collection']
-          if not 'uuid' in col_dict:
-            _uuid = str(uuid.uuid4())
-            col_dict['uuid'] = _uuid
-            dashboard.update_properties({'collection': col_dict})
-            if dashboard.owner is None:
-              from useradmin.models import install_sample_user
-              owner = install_sample_user()
-            else:
-              owner = dashboard.owner
-            dashboard_doc = Document2.objects.create(name=dashboard.label, uuid=_uuid, type='search-dashboard', owner=owner, description=dashboard.label, data=dashboard.properties)
-            Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
-            dashboard.save()
+      if Collection._meta.db_table in table_names:
+        with transaction.atomic():
+          for dashboard in Collection.objects.all():
+            col_dict = dashboard.properties_dict['collection']
+            if not 'uuid' in col_dict:
+              _uuid = str(uuid.uuid4())
+              col_dict['uuid'] = _uuid
+              dashboard.update_properties({'collection': col_dict})
+              if dashboard.owner is None:
+                from useradmin.models import install_sample_user
+                owner = install_sample_user()
+              else:
+                owner = dashboard.owner
+              dashboard_doc = Document2.objects.create(name=dashboard.label, uuid=_uuid, type='search-dashboard', owner=owner, description=dashboard.label, data=dashboard.properties)
+              Document.objects.link(dashboard_doc, owner=owner, name=dashboard.label, description=dashboard.label, extra='search-dashboard')
+              dashboard.save()
     except Exception, e:
       LOG.exception('error syncing search')
 
     try:
-      with transaction.atomic():
-        for job in find_jobs_with_no_doc(Document2):
-          if job.type == 'oozie-workflow2':
-            extra = 'workflow2'
-          elif job.type == 'oozie-coordinator2':
-            extra = 'coordinator2'
-          elif job.type == 'oozie-bundle2':
-            extra = 'bundle2'
-          elif job.type == 'notebook':
-            extra = 'notebook'
-          elif job.type == 'search-dashboard':
-            extra = 'search-dashboard'
-          else:
-            extra = ''
-          doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
+      if Document2._meta.db_table in table_names:
+        with transaction.atomic():
+          for job in find_jobs_with_no_doc(Document2):
+            if job.type == 'oozie-workflow2':
+              extra = 'workflow2'
+            elif job.type == 'oozie-coordinator2':
+              extra = 'coordinator2'
+            elif job.type == 'oozie-bundle2':
+              extra = 'bundle2'
+            elif job.type == 'notebook':
+              extra = 'notebook'
+            elif job.type == 'search-dashboard':
+              extra = 'search-dashboard'
+            else:
+              extra = ''
+            doc = Document.objects.link(job, owner=job.owner, name=job.name, description=job.description, extra=extra)
     except Exception, e:
       LOG.exception('error syncing Document2')
 
 
-    # Make sure doc have at least a tag
-    try:
-      for doc in Document.objects.filter(tags=None):
-        default_tag = DocumentTag.objects.get_default_tag(doc.owner)
-        doc.tags.add(default_tag)
-    except Exception, e:
-      LOG.exception('error adding at least one tag to docs')
+    if Document._meta.db_table in table_names:
+      # Make sure doc have at least a tag
+      try:
+        for doc in Document.objects.filter(tags=None):
+          default_tag = DocumentTag.objects.get_default_tag(doc.owner)
+          doc.tags.add(default_tag)
+      except Exception, e:
+        LOG.exception('error adding at least one tag to docs')
 
-    # Make sure all the sample user documents are shared.
-    try:
+      # Make sure all the sample user documents are shared.
+      try:
+        with transaction.atomic():
+          for doc in Document.objects.filter(owner__username=SAMPLE_USERNAME):
+            doc.share_to_default()
+
+            tag = DocumentTag.objects.get_example_tag(user=doc.owner)
+            doc.tags.add(tag)
+
+            doc.save()
+      except Exception, e:
+        LOG.exception('error sharing sample user documents')
+
+      # For now remove the default tag from the examples
+      try:
+        for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
+          default_tag = DocumentTag.objects.get_default_tag(doc.owner)
+          doc.tags.remove(default_tag)
+      except Exception, e:
+        LOG.exception('error removing default tags')
+
+      # ------------------------------------------------------------------------
+
+      LOG.info('Looking for documents that have no object')
+
+      # Delete documents with no object.
       with transaction.atomic():
-        for doc in Document.objects.filter(owner__username=SAMPLE_USERNAME):
-          doc.share_to_default()
+        # First, delete all the documents that don't have a content type
+        docs = Document.objects.filter(content_type=None)
 
-          tag = DocumentTag.objects.get_example_tag(user=doc.owner)
-          doc.tags.add(tag)
+        if docs:
+          LOG.info('Deleting %s doc(s) that do not have a content type' % docs.count())
+          docs.delete()
 
-          doc.save()
-    except Exception, e:
-      LOG.exception('error sharing sample user documents')
+        # Next, it's possible that there are documents pointing at a non-existing
+        # content_type. We need to do a left join to find these records, but we
+        # can't do this directly in django. To get around writing wrap sql (which
+        # might not be portable), we'll use an aggregate to count up all the
+        # associated content_types, and delete the documents that have a count of
+        # zero.
+        #
+        # Note we're counting `content_type__name` to force the join.
+        docs = Document.objects \
+            .values('id') \
+            .annotate(content_type_count=models.Count('content_type__name')) \
+            .filter(content_type_count=0)
 
-    # For now remove the default tag from the examples
-    try:
-      for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
-        default_tag = DocumentTag.objects.get_default_tag(doc.owner)
-        doc.tags.remove(default_tag)
-    except Exception, e:
-      LOG.exception('error removing default tags')
+        if docs:
+          LOG.info('Deleting %s doc(s) that have invalid content types' % docs.count())
+          docs.delete()
 
-    # ------------------------------------------------------------------------
+        # Finally we need to delete documents with no associated content object.
+        # This is tricky because of our use of generic foreign keys. So to do
+        # this a bit more efficiently, we'll start with a query of all the
+        # documents, then step through each content type and and filter out all
+        # the documents it's referencing from our document query. Messy, but it
+        # works.
 
-    LOG.info('Looking for documents that have no object')
+        docs = Document.objects.all()
 
-    # Delete documents with no object.
-    with transaction.atomic():
-      # First, delete all the documents that don't have a content type
-      docs = Document.objects.filter(content_type=None)
+        for content_type in ContentType.objects.all():
+          model_class = content_type.model_class()
 
-      if docs:
-        LOG.info('Deleting %s doc(s) that do not have a content type' % docs.count())
-        docs.delete()
+          # Ignore any types that don't have a model.
+          if model_class is None:
+            continue
 
-      # Next, it's possible that there are documents pointing at a non-existing
-      # content_type. We need to do a left join to find these records, but we
-      # can't do this directly in django. To get around writing wrap sql (which
-      # might not be portable), we'll use an aggregate to count up all the
-      # associated content_types, and delete the documents that have a count of
-      # zero.
-      #
-      # Note we're counting `content_type__name` to force the join.
-      docs = Document.objects \
-          .values('id') \
-          .annotate(content_type_count=models.Count('content_type__name')) \
-          .filter(content_type_count=0)
+          # Ignore types that don't have a table yet.
+          if model_class._meta.db_table not in table_names:
+            continue
 
-      if docs:
-        LOG.info('Deleting %s doc(s) that have invalid content types' % docs.count())
-        docs.delete()
+          # Ignore classes that don't have a 'doc'.
+          if not hasattr(model_class, 'doc'):
+            continue
 
-      # Finally we need to delete documents with no associated content object.
-      # This is tricky because of our use of generic foreign keys. So to do
-      # this a bit more efficiently, we'll start with a query of all the
-      # documents, then step through each content type and and filter out all
-      # the documents it's referencing from our document query. Messy, but it
-      # works.
+          # First create a query that grabs all the document ids for this type.
+          docs_from_content = model_class.objects.values('doc__id')
 
-      docs = Document.objects.all()
+          # Next, filter these from our document query.
+          docs = docs.exclude(id__in=docs_from_content)
 
-      table_names = connection.introspection.table_names()
-
-      for content_type in ContentType.objects.all():
-        model_class = content_type.model_class()
-
-        # Ignore any types that don't have a model.
-        if model_class is None:
-          continue
-
-        # Ignore types that don't have a table yet.
-        if model_class._meta.db_table not in table_names:
-          continue
-
-        # Ignore classes that don't have a 'doc'.
-        if not hasattr(model_class, 'doc'):
-          continue
-
-        # First create a query that grabs all the document ids for this type.
-        docs_from_content = model_class.objects.values('doc__id')
-
-        # Next, filter these from our document query.
-        docs = docs.exclude(id__in=docs_from_content)
-
-      if docs.exists():
-        LOG.info('Deleting %s documents' % docs.count())
-        docs.delete()
+        if docs.exists():
+          LOG.info('Deleting %s documents' % docs.count())
+          docs.delete()
 
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
