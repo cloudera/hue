@@ -23,16 +23,16 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.lib.django_util import format_preserving_redirect
+from desktop.lib.i18n import smart_str
+from jobsub.parameterization import substitute_variables
+from filebrowser.views import location_to_url
+
 from beeswax import hive_site
 from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
-
-from filebrowser.views import location_to_url
-from desktop.lib.django_util import format_preserving_redirect
-from desktop.lib.i18n import smart_str
-
 
 
 LOG = logging.getLogger(__name__)
@@ -528,6 +528,11 @@ class HiveServer2Dbms(object):
     query_history.last_state = QueryHistory.STATE.submitted.index
     query_history.save()
     query = query_history.design.get_design()
+
+    # In case of multiquery, we need to re-replace the parameters as we save the non substituted query
+    if query._data_dict['query']['is_parameterized']:
+      real_query = substitute_variables(query._data_dict['query']['query'], query_history.get_extra('parameters'))
+      query._data_dict['query']['query'] = real_query
 
     return self.execute_and_watch(query, query_history=query_history)
 

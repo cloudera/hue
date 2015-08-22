@@ -311,9 +311,9 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
   """
   resp = client.get('/%(server_name)s/query_history' % {'server_name': server_name})
   my_assert = reverse and assert_false or assert_true
-  my_assert(fragment in resp.content)
+  my_assert(fragment in resp.content, resp.content)
   if design:
-    my_assert(design in resp.content)
+    my_assert(design in resp.content, resp.content)
 
   if resp.context:
     try:
