@@ -83,7 +83,7 @@ class QueryHistory(models.Model):
   notify = models.BooleanField(default=False)                        # Notify on completion
 
   is_redacted = models.BooleanField(default=False)
-
+  extra = models.TextField(default='{}')                   # Json fields for extra properties
 
   class Meta:
     ordering = ['-submission_date']
@@ -137,7 +137,7 @@ class QueryHistory(models.Model):
     query.hql_query = hql_query
     self.design.data = query.dumps()
     self.query = hql_query
- 
+
   def is_finished(self):
     is_statement_finished = not self.is_running()
 
@@ -187,6 +187,14 @@ class QueryHistory(models.Model):
         self.is_redacted = True
 
     super(QueryHistory, self).save(*args, **kwargs)
+
+  def update_extra(self, key, val):
+    extra = json.loads(self.extra)
+    extra[key] = val
+    self.extra = json.dumps(extra)
+
+  def get_extra(self, key):
+    return json.loads(self.extra).get(key)
 
 
 def make_query_context(type, info):

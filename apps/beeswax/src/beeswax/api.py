@@ -150,6 +150,7 @@ def parameters(request, design_id=None):
 def execute_directly(request, query, design, query_server, tablename=None, **kwargs):
   if design is not None:
     design = authorized_get_design(request, design.id)
+  parameters = kwargs.pop('parameters', None)
 
   db = dbms.get(request.user, query_server)
   database = query.query.get('database', 'default')
@@ -157,6 +158,10 @@ def execute_directly(request, query, design, query_server, tablename=None, **kwa
 
   history_obj = db.execute_query(query, design)
   watch_url = reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': history_obj.id})
+
+  if parameters is not None:
+    history_obj.update_extra('parameters', parameters)
+    history_obj.save()
 
   response = {
     'status': 0,
@@ -298,7 +303,8 @@ def execute(request, design_id=None):
           parameterization_form = parameterization_form_cls(request.REQUEST, prefix="parameterization")
 
           if parameterization_form.is_valid():
-            real_query = substitute_variables(query_str, parameterization_form.cleaned_data)
+            parameters = parameterization_form.cleaned_data
+            real_query = substitute_variables(query_str, parameters)
             query = HQLdesign(query_form, query_type=query_type)
             query._data_dict['query']['query'] = real_query
 
@@ -306,7 +312,7 @@ def execute(request, design_id=None):
               if explain:
                 return explain_directly(request, query, design, query_server)
               else:
-                return execute_directly(request, query, design, query_server)
+                return execute_directly(request, query, design, query_server, parameters=parameters)
 
             except Exception, ex:
               db = dbms.get(request.user, query_server)

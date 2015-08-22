@@ -49,6 +49,7 @@ from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.pseudo_hdfs4 import is_live_cluster
+from jobsub.parameterization import substitute_variables
 
 import desktop.conf as desktop_conf
 
@@ -89,6 +90,8 @@ def _make_query(client, query, submission_type="Execute",
 
   # Should be in the history if it's submitted.
   if submission_type == 'Execute':
+    if is_parameterized and params:
+      query = substitute_variables(query, dict(params))
     fragment = collapse_whitespace(smart_str(escape(query[:20])))
     verify_history(client, fragment=fragment, server_name=server_name)
 
@@ -621,6 +624,30 @@ for x in sys.stdin:
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
     content = fetch_query_result_data(self.client, resp)
     assert_true([0, u'0x0'] in content.get('results'), content)
+
+
+  def test_multiple_statements_with_params(self):
+    hql = """
+      select ${x} from test;
+      select ${y} from test;
+    """
+
+    resp = _make_query(self.client, hql, params=[('x', '1'), ('y', '2')], database=self.db_name)
+
+    # First statement
+    content = json.loads(resp.content)
+    watch_url = content['watch_url']
+    assert_equal('select ${x} from test', content.get('statement'), content)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    content = fetch_query_result_data(self.client, resp)
+
+    # Next statement
+    resp = self.client.post(watch_url, {'next': True, 'query-query': hql})
+    content = json.loads(resp.content)
+    assert_equal('select ${y} from test', content.get('statement'), content)
+
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
 
   def test_multiple_statements_with_error(self):
