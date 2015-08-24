@@ -1819,7 +1819,6 @@ ko.bindingHandlers.aceEditor = {
               editor.renderer.setCursorStyle("pointer");
               this.setText(options.openIt);
               if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
-                $(".ace_tooltip").show();
                 this.show(null, this.x + 10, this.y + 10);
               }
               this.link = token;
@@ -1836,7 +1835,7 @@ ko.bindingHandlers.aceEditor = {
 
         this.clear = function () {
           if (this.isClearable) {
-            $(".ace_tooltip").hide();
+            this.hide(); // hides the tooltip
             this.editor.session.removeMarker(this.marker);
             this.editor.renderer.setCursorStyle("");
             this.isClearable = false;
