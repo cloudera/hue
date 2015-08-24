@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import format_preserving_redirect
 from desktop.lib.i18n import smart_str
-from jobsub.parameterization import substitute_variables
+from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site

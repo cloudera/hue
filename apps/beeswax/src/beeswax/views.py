@@ -41,8 +41,7 @@ from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from desktop.models import Document
-
-from jobsub.parameterization import find_variables
+from desktop.lib.parameterization import find_variables
 
 import beeswax.forms
 import beeswax.design
