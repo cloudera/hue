@@ -490,4 +490,4 @@ def check_config_ajax(request):
 
 # This is a global non-view for inline KO i18n
 def _ko(str=""):
-  return repr(_(str)).replace("'", "\\'")
+  return _(str).replace("'", "\\'")
