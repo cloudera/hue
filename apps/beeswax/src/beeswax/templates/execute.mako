@@ -1721,7 +1721,7 @@ $(document).ready(function () {
           var _line = codeMirror.getLine(codeMirror.getCursor().line);
           var _partial = _line.substring(0, codeMirror.getCursor().ch);
           var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-          if (_statement.indexOf("FROM") > -1) {
+          if (_statement.toUpperCase().indexOf("FROM") > -1) {
             hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
               var _cols = columns.split(" ");
               for (var col in _cols) {
@@ -1829,7 +1829,7 @@ $(document).ready(function () {
           var _line = codeMirror.getLine(codeMirror.getCursor().line);
           var _partial = _line.substring(0, codeMirror.getCursor().ch);
           var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-          if (_statement.indexOf("FROM") > -1) {
+          if (_statement.toUpperCase().indexOf("FROM") > -1) {
             hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
               var _cols = columns.split(" ");
               for (var col in _cols) {
