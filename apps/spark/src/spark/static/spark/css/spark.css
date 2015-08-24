@@ -370,22 +370,15 @@ h1.empty {
   margin-top: 31px;
   width: 10px;
   text-align: center;
-}
-
-.toggle-result-settings i {
-  display: none;
-}
-
-.toggle-result-settings.hoverable {
   cursor: pointer;
 }
 
-.toggle-result-settings.hoverable i {
-  display: inline-block;
+.toggle-result-settings .close {
+  margin-right: 2px;
 }
 
-.toggle-result-settings.hoverable:hover {
-  background-color: #F0F0F0;
+.toggle-result-settings .open {
+  margin-left: 2px;
 }
 
 .chart-icon {
