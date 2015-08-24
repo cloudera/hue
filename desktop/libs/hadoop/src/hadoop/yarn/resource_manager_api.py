@@ -92,7 +92,14 @@ class ResourceManagerApi(object):
     return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def kill(self, app_id):
-    return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
+    try:
+      import subprocess
+      subprocess.check_call(["which", "yarn"]) # checking if yarn CLI is available on path, otherwise fallback to HTTP API
+      output = subprocess.Popen("yarn application -kill %s" % app_id, shell=True, stdout=subprocess.PIPE).communicate()[0]
+      LOG.info("Killed job %s, command output: %s" % (app_id, output))
+      return """{"state":"KILLED"}"""
+    except:
+      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
 
   def _execute(self, function, *args, **kwargs):
     response = function(*args, **kwargs)
