@@ -14,32 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""
-Support for parameterizing job designs.
-
-The current incarnation supports $input and $output only.
-
-One possible design for this is rather complicated.
-Pretty much every job (including streaming) can be specified
-as "hadoop $opts", and then "streaming" could be a template
-where $opts = "streaming-jar -map $map -reduce $reduce" and so on.
-This requires a template language that can auto-generate
-forms (and hence, needs types for each variable).  It might
-also need validation rules.  This punts on that right now
-and explicitly only supports two variables.
-
-TODO(philip): This also needs methods for simply
-indicating which variables need substitution, to
-prompt the user only for those.
-
-DEPRECATED!!!
-Jobsub uses oozie models now.
-"""
 
 import logging
+
 from string import Template
 
+
 LOG = logging.getLogger(__name__)
+
 
 def recursive_walk(function, data):
   """

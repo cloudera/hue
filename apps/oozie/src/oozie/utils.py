@@ -23,10 +23,11 @@ from datetime import datetime
 
 from django.utils.formats import localize_input
 from django.utils.translation import ugettext as _
-from jobsub.parameterization import find_variables
+from desktop.lib.parameterization import find_variables
 
 
 LOG = logging.getLogger(__name__)
+
 
 JSON_FIELDS = ('parameters', 'job_properties', 'files', 'archives', 'prepares', 'params',
                'deletes', 'mkdirs', 'moves', 'chmods', 'touchzs')

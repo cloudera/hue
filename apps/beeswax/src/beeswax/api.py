@@ -28,7 +28,7 @@ from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
-from jobsub.parameterization import substitute_variables
+from desktop.lib.parameterization import substitute_variables
 from metastore import parser
 
 import beeswax.models

@@ -49,7 +49,7 @@ from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from jobsub.parameterization import substitute_variables
+from desktop.lib.parameterization import substitute_variables
 
 import desktop.conf as desktop_conf
 

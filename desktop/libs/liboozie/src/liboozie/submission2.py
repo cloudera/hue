@@ -25,17 +25,14 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
+from desktop.lib.parameterization import find_variables
+from desktop.models import Document2
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
-
-from desktop.models import Document2
-
-from jobsub.parameterization import find_variables
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 from liboozie.credentials import Credentials
-
 
 
 LOG = logging.getLogger(__name__)
