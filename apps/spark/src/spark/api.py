@@ -51,6 +51,7 @@ def create_session(request):
       properties = old_session[0]['properties']
 
   response['session'] = get_api(request.user, session).create_session(lang=session['type'], properties=properties)
+  response['session']['properties'] = properties
   response['status'] = 0
 
   return JsonResponse(response)
