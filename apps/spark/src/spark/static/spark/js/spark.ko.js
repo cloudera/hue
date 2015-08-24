@@ -24,8 +24,9 @@ var Result = function (snippet, result) {
 
   self.id = ko.observable(typeof result.id != "undefined" && result.id != null ? result.id : UUID());
   self.type = ko.observable(typeof result.type != "undefined" && result.type != null ? result.type : 'table');
-  self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true);
-  self.handle = ko.observable({});
+  self.hasResultset = ko.observable(typeof result.hasResultset != "undefined" && result.hasResultset != null ? result.hasResultset : true)
+    .extend("throttle", 100);
+  self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
   self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
   self.cleanedMeta = ko.computed(function () {
     return ko.utils.arrayFilter(self.meta(), function (item) {
@@ -85,18 +86,9 @@ var Result = function (snippet, result) {
         type: self.type,
         handle: self.handle
     };
-  }
-
-  if (typeof result.handle != "undefined" && result.handle != null) {
-    $.each(result.handle, function (key, val) {
-      self.handle()[key] = val;
-    });
-  }
+  };
 
   self.clear = function () {
-    $.each(self.handle, function (key, val) {
-      delete self.handle()[key];
-    });
     self.fetchedOnce(false);
     self.data.removeAll();
     self.images.removeAll();
@@ -293,11 +285,33 @@ var Snippet = function (vm, notebook, snippet) {
   self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
   self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
 
+  self.hasDataForChart = ko.computed(function () {
+    if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART) {
+      return typeof self.chartX() != "undefined" && self.chartX() != null && self.chartYMulti().length > 0;
+    }
+    return typeof self.chartX() != "undefined" && self.chartX() != null && typeof self.chartYSingle() != "undefined" && self.chartYSingle() != null ;
+  });
+
+  self.hasDataForChart.subscribe(function(newValue) {
+    if (!newValue) {
+      self.isResultSettingsVisible(true);
+    }
+    self.chartX.notifySubscribers();
+    self.chartX.valueHasMutated();
+  });
+
   self.chartType.subscribe(function (val) {
     $(document).trigger("forceChartDraw", self);
   });
 
-  self.tempChartOptions = {};
+  self.previousChartOptions = {};
+
+  self.result.meta.subscribe(function(newValue) {
+    self.chartX(self.previousChartOptions.chartX);
+    self.chartYSingle(self.previousChartOptions.chartYSingle);
+    self.chartMapLabel(self.previousChartOptions.chartMapLabel);
+    self.chartYMulti(self.previousChartOptions.chartYMulti || []);
+  });
 
   self.isResultSettingsVisible = ko.observable(typeof snippet.isResultSettingsVisible != "undefined" && snippet.isResultSettingsVisible != null ? snippet.isResultSettingsVisible : false);
   self.toggleResultSettings = function () {
@@ -329,7 +343,7 @@ var Snippet = function (vm, notebook, snippet) {
       properties: self.properties,
       result: self.result.getContext()
     };
-  }
+  };
 
   self._ajaxError = function (data, callback) {
     if (data.status == -2 || data.status == -1) {
@@ -363,13 +377,18 @@ var Snippet = function (vm, notebook, snippet) {
     if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000) {
       return;
     }
+    self.previousChartOptions = {
+      chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
+      chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
+      chartMapLabel: typeof self.chartMapLabel() !== "undefined" ? self.chartMapLabel() : self.previousChartOptions.chartMapLabel,
+      chartYMulti: typeof self.chartYMulti() !== "undefined" ? self.chartYMulti() : self.previousChartOptions.chartYMulti
+    };
     $(document).trigger("executeStarted", self);
     self.lastExecuted = now;
     $(".jHueNotify").hide();
     logGA('/execute/' + self.type());
 
     self.status('running');
-    self.result.clear();
     self.errors([]);
     self.result.logLines = 0;
     self.progress(0);
@@ -383,10 +402,8 @@ var Snippet = function (vm, notebook, snippet) {
       snippet: ko.mapping.toJSON(self.getContext())
     }, function (data) {
       if (data.status == 0) {
-        $.each(data.handle, function (key, val) {
-          self.result.handle()[key] = val;
-        });
-
+        self.result.clear();
+        self.result.handle(data.handle);
         self.result.hasResultset(data.handle.has_result_set);
         self.checkStatus();
       } else {
