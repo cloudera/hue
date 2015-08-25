@@ -83,7 +83,7 @@ class ResourceManagerApi(object):
     return self._security_enabled
 
   def cluster(self, **kwargs):
-    return self._execute(self._root.get, 'cluster', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
+    return self._execute(self._root.get, 'cluster/info', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def apps(self, **kwargs):
     return self._execute(self._root.get, 'cluster/apps', params=kwargs, headers={'Accept': _JSON_CONTENT_TYPE})
