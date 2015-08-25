@@ -26,8 +26,9 @@
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 
-  <script src="${ static('desktop/js/jquery.selector.js') }"></script>
-  <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
-  <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
+
+  ## Specs below
+  <script src="${ static('desktop/js/autocomplete.js') }"></script>
+  <script src="${ static('desktop/spec/autocompleteSpec.js') }"></script>
 </%block>
 

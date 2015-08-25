@@ -53,7 +53,7 @@ Autocomplete.prototype.jsonCalls = function (options) {
       type: "GET",
       url: _url + "?" + Math.random(),
       success: options.onDataReceived,
-      error: options.onError ? options.onError() : $.noop,
+      error: options.onError ? options.onError : $.noop,
       async: typeof options.sync == "undefined"
     });
   }
