@@ -27,12 +27,7 @@
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 
   <script src="${ static('desktop/js/jquery.selector.js') }"></script>
-  <script src="${ static('desktop/jasmine/jHueSelectorSpec.js') }"></script>
-
   <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
-  <script src="${ static('desktop/jasmine/jHueTableExtenderSpec.js') }"></script>
-
   <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
-  <script src="${ static('desktop/jasmine/jHueTableScrollerSpec.js') }"></script>
 </%block>
 
