@@ -242,6 +242,113 @@ Autocomplete.prototype.getDatabases = function (callback) {
   }
 };
 
+var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
+
+Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
+  var beforeCursorU = beforeCursor.toUpperCase();
+  var afterCursorU = afterCursor.toUpperCase();
+
+  var beforeMatcher = beforeCursorU.match(SQL_TERMS);
+  var afterMatcher = afterCursorU.match(SQL_TERMS);
+
+  var tableNameAutoComplete = beforeMatcher != null && (
+    beforeMatcher[beforeMatcher.length - 1] === "FROM" ||
+    beforeMatcher[beforeMatcher.length - 1] === "TABLE" ||
+    beforeMatcher[beforeMatcher.length - 1] === "STATS" ||
+    beforeMatcher[beforeMatcher.length - 1] === "REFRESH" ||
+    beforeMatcher[beforeMatcher.length - 1] === "METADATA" ||
+    beforeMatcher[beforeMatcher.length - 1] === "DESCRIBE");
+
+  var selectBefore = beforeMatcher != null &&
+    beforeMatcher[beforeMatcher.length - 1] === "SELECT";
+
+  var fromAfter = afterMatcher != null &&
+    afterMatcher[0] === "FROM";
+
+  var fieldTermBefore = beforeMatcher != null && (
+    beforeMatcher[beforeMatcher.length - 1] === "WHERE" ||
+    beforeMatcher[beforeMatcher.length - 1] === "ON" ||
+    beforeMatcher[beforeMatcher.length - 1] === "ORDER BY");
+
+
+  if (tableNameAutoComplete) {
+    this.getTables(this.getDatabase(), function (data) {
+      var tableNames = data.split(" ").sort();
+      var tables = [];
+      tableNames.forEach(function (tbl, idx) {
+        if (tbl != "") {
+          tables.push({value: tbl, score: 1000 - idx, meta: "table"});
+        }
+      });
+      callback(tables);
+    });
+  } else if ((selectBefore && fromAfter) || fieldTermBefore) {
+    var foundTable = "";
+
+    var aliasMatch = beforeCursor.match(/([^ \-\+\<\>]*)\.$/);
+    if (aliasMatch) { // gets the table alias
+      foundTable = aliasMatch[1];
+    }
+    else { // gets the standard table
+      var from = afterCursorU.indexOf("FROM");
+      if (from > -1) {
+        var match = afterCursorU.substring(from).match(/\bON|LIMIT|WHERE|GROUP|SORT|ORDER BY|SELECT|;\b/);
+        var to = afterCursorU.length;
+        if (match) {
+          to = match.index;
+        }
+        var found = afterCursor.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/\bfrom\b/gi, "").replace(/\bjoin\b/gi, ",").split(",");
+      }
+
+      for (var i = 0; i < found.length; i++) {
+        if ($.trim(found[i]) != "" && foundTable == "") {
+          foundTable = $.trim(found[i]).split(" ")[0];
+        }
+      }
+    }
+
+    if (foundTable != "") {
+      // fill up with fields
+      this.getTableColumns(this.getDatabase(), foundTable, beforeCursor + afterCursor, function (data) {
+        var fieldNames = data.split(" ").sort();
+        var fields = [];
+        fieldNames.forEach(function (fld, idx) {
+          if (fld != "") {
+            fields.push({value: fld, score: (fld == "*") ? 10000 : 1000 - idx, meta: "column"});
+          }
+        });
+        callback(fields);
+      }, function() {
+        callback([]);
+      });
+    } else {
+      callback([]);
+    }
+  } else if (selectBefore) {
+    this.getTables(this.getDatabase(), function (data) {
+      var fromKeyword = "from";
+      if (beforeCursor.indexOf("SELECT") > -1) {
+        fromKeyword = fromKeyword.toUpperCase();
+      }
+      if (!beforeCursor.match(/\*\s*$/)) {
+        fromKeyword = "? " + fromKeyword;
+      } else if (!beforeCursor.match(/\s+$/)) {
+        fromKeyword = " " + fromKeyword;
+      }
+      var tableNames = data.split(" ").sort();
+      var tables = [];
+      tableNames.forEach(function (tbl, idx) {
+        if (tbl != "") {
+          tables.push({value: fromKeyword + " " + tbl, score: 1000 - idx, meta: "* table"});
+        }
+      });
+      callback(tables);
+    });
+  } else {
+    callback([]);
+  }
+};
+
 Autocomplete.prototype.errorHandler = function (data) {
   var self = this;
   $(document).trigger('error.autocomplete');
@@ -253,20 +360,20 @@ Autocomplete.prototype.errorHandler = function (data) {
       $(document).trigger('error', data.error);
     }
   }
-}
+};
 
 Autocomplete.prototype.setDatabase = function (db) {
   this.currentDB = db;
-}
+};
 
 Autocomplete.prototype.getDatabase = function () {
   return this.currentDB;
-}
+};
 
 Autocomplete.prototype.setCurrentTables = function (tables) {
   this.currentTables = tables;
-}
+};
 
 Autocomplete.prototype.getCurrentTables = function () {
   return this.currentTables;
-}
+};
