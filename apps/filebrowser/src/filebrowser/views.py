@@ -1127,7 +1127,7 @@ def upload_file(request):
             resp = _upload_file(request)
             response.update(resp)
         except Exception, ex:
-            response['data'] = str(ex)
+            response['data'] = str(ex).split('\n', 1)[0]
             hdfs_file = request.FILES.get('hdfs_file')
             if hdfs_file:
                 hdfs_file.remove()
