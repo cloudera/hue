@@ -2055,6 +2055,23 @@ ko.bindingHandlers.aceEditor = {
       editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
     }, 100);
 
+    editor.middleClick = false;
+    editor.on("mousedown", function (e) {
+      if (e.domEvent.which == 2) { // middle click
+        editor.middleClick = true;
+        var tempText = editor.getSelectedText();
+        if (e.$pos) {
+          editor.session.insert(e.$pos, tempText);
+        }
+        window.setTimeout(function () {
+          editor.middleClick = false;
+          if (e.$pos) {
+            editor.moveCursorTo(e.$pos.row, e.$pos.column + tempText.length);
+          }
+        }, 200);
+      }
+    });
+
     editor.on("change", function (e) {
       editor.clearErrors();
       editor.session.getMode().$id = valueAccessor().mode();
