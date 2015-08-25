@@ -264,6 +264,9 @@ var TextInput = function(parentNode, host) {
     };
     
     var handleClipboardData = function(e, data) {
+        if (typeof host.middleClick != "undefined" && host.middleClick){
+          return host.getSelectedText() || " ";
+        }
         var clipboardData = e.clipboardData || window.clipboardData;
         if (!clipboardData || BROKEN_SETDATA)
             return;
