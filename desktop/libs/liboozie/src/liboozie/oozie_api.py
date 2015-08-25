@@ -88,6 +88,7 @@ class OozieApi(object):
     return defaults
 
   VALID_JOB_FILTERS = ('name', 'user', 'group', 'status', 'startcreatedtime')
+  VALID_LOG_FILTERS = {'recent', 'limit'}
 
   def get_jobs(self, jobtype, offset=None, cnt=None, filters=None):
     """
@@ -172,15 +173,31 @@ class OozieApi(object):
     """
     params = self._get_params()
     params['show'] = 'definition'
-    xml = self._root.get('job/%s' % (jobid,), params)
-    return xml
+    return self._root.get('job/%s' % (jobid,), params)
 
-  def get_job_log(self, jobid):
+
+  def get_job_log(self, jobid, logfilter=None):
     """
     get_job_log(jobid) -> Log (xml string)
     """
     params = self._get_params()
     params['show'] = 'log'
+
+    filter_list = []
+    if logfilter is None:
+      logfilter = {}
+    for key, val in logfilter:
+      if key not in OozieApi.VALID_LOG_FILTERS:
+        raise ValueError('"%s" is not a valid filter for job logs' % (key,))
+      filter_list.append('%s=%s' % (key, val))
+    params['logfilter'] = ';'.join(filter_list)
+    return self._root.get('job/%s' % (jobid,), params)
+
+
+  def get_job_status(self, jobid):
+    params = self._get_params()
+    params['show'] = 'status'
+
     xml = self._root.get('job/%s' % (jobid,), params)
     return xml
 

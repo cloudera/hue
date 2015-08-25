@@ -361,6 +361,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             </div>
 
             <div class="tab-pane" id="log">
+              <div class="pull-left">
+                ${ _("Recent") } <input type="text" class="input-medium" data-bind="value: logFilterRecent" placeholder="${_('2h:30m or 5h:5m')}">
+                ${ _("Limit") } <input type="text" class="input-medium" data-bind="value: logFilterLimit" placeholder="${_('Number of lines, Ex: 10')}">
+              </div>
+              <div class="pull-right">
+                <button data-bind="enable: isLogFilterSet()" class="btn log-refresh">  ${ _('Refresh') } </button>
+              </div>
+
+              <div class="clearfix"></div>
               <pre></pre>
             </div>
 
@@ -492,7 +501,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     };
   };
 
-  var RunningCoordinatorActionsModel = function (actions) {
+  var RunningCoordinatorModel = function (actions) {
     var self = this;
     this.isLoading = ko.observable(true);
 
@@ -505,6 +514,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     this.filter = ko.observableArray([]);
 
     this.searchFilter = ko.observable('');
+
+    this.logFilterRecent = ko.observable('');
+
+    this.logFilterLimit = ko.observable('100');
+
+    this.isLogFilterSet = function () {
+      return this.logFilterRecent() || this.logFilterLimit();
+    }
 
     this.select = function (filter) {
       ko.utils.arrayFilter(self.actions(), function(action) {
@@ -610,7 +627,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     });
   };
 
-  var viewModel = new RunningCoordinatorActionsModel([]);
+  var viewModel = new RunningCoordinatorModel([]);
   ko.applyBindings(viewModel);
 
   var CHART_LABELS = {
@@ -687,6 +704,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       btnCalendar.toggleClass("active");
       btnAction.toggleClass("active");
       refreshView();
+    });
+
+    $('#log-refresh, .log-refresh').click(function () {
+      refreshLogs();
     });
 
     $("a.btn-actions-pagination").on("click", function () {
@@ -817,7 +838,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
     var logsAtEnd = true;
     function refreshLogs() {
-      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }", function (data) {
+      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }" + "?format=json&recent=" + viewModel.logFilterRecent() + "&limit=" + viewModel.logFilterLimit(), function (data) {
         var _logsEl = $("#log pre");
         _logsEl.text(data.log);
 
