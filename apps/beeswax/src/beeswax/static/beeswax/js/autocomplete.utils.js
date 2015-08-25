@@ -28,7 +28,7 @@ function hac_jsoncalls(options) {
       type: "GET",
       url: _url + "?" + Math.random(),
       success: options.onDataReceived,
-      async: options.sync == "undefined"
+      async: typeof options.sync == "undefined"
     });
   }
 }
