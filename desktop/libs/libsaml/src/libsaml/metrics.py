@@ -22,6 +22,7 @@ saml2_authentication_time = global_registry().timer(
     name='desktop.auth.saml2.authentication-time',
     label='SAML2 Authentication time',
     description='Time taken to authenticate a user with SAML2',
-    numerator='auths',
-    denominator='seconds',
+    numerator='s',
+    counter_numerator='auths',
+    rate_denominator='seconds',
 )

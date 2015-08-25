@@ -22,6 +22,7 @@ openid_authentication_time = global_registry().timer(
     name='desktop.auth.openid.authentication-time',
     label='OpenID Authentication time',
     description='Time taken to authenticate a user with OpenID',
-    numerator='auths',
-    denominator='seconds',
+    numerator='s',
+    counter_numerator='auths',
+    rate_denominator='seconds',
 )
