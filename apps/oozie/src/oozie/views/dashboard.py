@@ -525,12 +525,23 @@ def list_oozie_workflow_action(request, action):
 
 @show_oozie_error
 def get_oozie_job_log(request, job_id):
-  oozie_job = check_job_access_permission(request, job_id)
+  oozie_api = get_oozie(request.user, api_version="v2")
+  check_job_access_permission(request, job_id)
+  kwargs = {'logfilter' : []}
+
+  if request.GET.get('format') == 'json':
+    if request.GET.get('recent'):
+      kwargs['logfilter'].extend([('recent', val) for val in request.GET.get('recent').split(':')])
+    if request.GET.get('limit'):
+      kwargs['logfilter'].extend([('limit', request.GET.get('limit'))])
+
+  status_resp = oozie_api.get_job_status(job_id)
+  log = oozie_api.get_job_log(job_id, **kwargs)
 
   return_obj = {
-    'id': oozie_job.id,
-    'status':  oozie_job.status,
-    'log': oozie_job.log,
+    'id': job_id,
+    'status': status_resp['status'],
+    'log': log,
   }
 
   return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
