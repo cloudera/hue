@@ -1902,142 +1902,31 @@ ko.bindingHandlers.aceEditor = {
       }
     }
 
-    function fieldsAutocomplete (editor, valueAccessor, successCallback) {
-      try {
-        var before = editor.getTextBeforeCursor(";");
-        var after = editor.getTextAfterCursor(";");
-        var statement = before + after;
-        var foundTable = "";
-
-        var aliasMatch = before.match(/([^ \-\+\<\>]*)\.$/);
-        if (aliasMatch) { // gets the table alias
-          foundTable = aliasMatch[1];
-        }
-        else { // gets the standard table
-          var from = after.toUpperCase().indexOf("FROM");
-          if (from > -1) {
-            var match = after.toUpperCase().substring(from).match(/\bON|LIMIT|WHERE|GROUP|SORT|ORDER BY|SELECT|;\b/);
-            var to = after.length;
-            if (match) {
-              to = match.index;
-            }
-            var found = after.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/\bfrom\b/gi, "").replace(/\bjoin\b/gi, ",").split(",");
-          }
-
-          for (var i = 0; i < found.length; i++) {
-            if ($.trim(found[i]) != "" && foundTable == "") {
-              foundTable = $.trim(found[i]).split(" ")[0];
-            }
-          }
-        }
-
-        if (foundTable != "") {
-          editor.showSpinner();
-          // fill up with fields
-          valueAccessor().autocompleter.getTableColumns(valueAccessor().autocompleter.getDatabase(), foundTable, statement, function (data) {
-            var fieldNames = data.split(" ").sort();
-            var fields = [];
-            fieldNames.forEach(function (fld, idx) {
-              if (fld != "") {
-                fields.push({value: fld, score: (fld == "*") ? 10000 : 1000 - idx, meta: "column"});
-              }
-            });
-            editor.completers.push(newCompleter(fields));
-            editor.hideSpinner();
-            successCallback();
-          }, function() {
-            editor.hideSpinner();
-          });
-        } else {
-          successCallback();
-        }
-      } catch (e) {}
-    }
-
     var originalCompleters = editor.completers.slice();
 
     var sql_terms = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
 
-    var refreshAutoComplete = function (successCallback) {
+    var refreshAutoComplete = function (callback) {
       editor.completers = originalCompleters.slice();
-        if (options.extraCompleters().length > 0) {
-          options.extraCompleters().forEach(function (complete) {
-            editor.completers.push(complete);
-          });
-        }
+      if (options.extraCompleters().length > 0) {
+        options.extraCompleters().forEach(function (complete) {
+          editor.completers.push(complete);
+        });
+      }
 
       if (autocompleter != null && editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
         var before = editor.getTextBeforeCursor(";");
-        var beforeU = before.toUpperCase();
         var after = editor.getTextAfterCursor(";");
-        var afterU = after.toUpperCase();
-
-        var beforeMatcher = beforeU.match(sql_terms);
-        var afterMatcher = afterU.match(sql_terms);
-
-        var tableNameAutoComplete = beforeMatcher != null && (
-          beforeMatcher[beforeMatcher.length - 1] === "FROM" ||
-          beforeMatcher[beforeMatcher.length - 1] === "TABLE" ||
-          beforeMatcher[beforeMatcher.length - 1] === "STATS" ||
-          beforeMatcher[beforeMatcher.length - 1] === "REFRESH" ||
-          beforeMatcher[beforeMatcher.length - 1] === "METADATA" ||
-          beforeMatcher[beforeMatcher.length - 1] === "DESCRIBE");
-
-        var selectBefore = beforeMatcher != null &&
-          beforeMatcher[beforeMatcher.length - 1] === "SELECT";
-
-        var fromAfter = afterMatcher != null &&
-          afterMatcher[0] === "FROM";
-
-        var fieldTermBefore = beforeMatcher != null && (
-          beforeMatcher[beforeMatcher.length - 1] === "WHERE" ||
-          beforeMatcher[beforeMatcher.length - 1] === "ON" ||
-          beforeMatcher[beforeMatcher.length - 1] === "ORDER BY");
-
-        if (tableNameAutoComplete) {
-          editor.showSpinner();
-          autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-            var tableNames = data.split(" ").sort();
-            var tables = [];
-            tableNames.forEach(function (tbl, idx) {
-              if (tbl != "") {
-                tables.push({value: tbl, score: 1000 - idx, meta: "table"});
-              }
-            });
-            editor.completers.push(newCompleter(tables));
-            successCallback();
-            editor.hideSpinner();
-          });
-        } else if ((selectBefore && fromAfter) || fieldTermBefore) {
-          fieldsAutocomplete(editor, valueAccessor, successCallback);
-        } else if (selectBefore) {
-          editor.showSpinner();
-          autocompleter.getTables(autocompleter.getDatabase(), function (data) {
-            var fromKeyword = "from";
-            if (before.indexOf("SELECT") > -1) {
-              fromKeyword = fromKeyword.toUpperCase();
-            }
-            if (!before.match(/\*\s*$/)) {
-              fromKeyword = "? " + fromKeyword;
-            } else if (!before.match(/\s+$/)) {
-              fromKeyword = " " + fromKeyword;
-            }
-            var tableNames = data.split(" ").sort();
-            var tables = [];
-            tableNames.forEach(function (tbl, idx) {
-              if (tbl != "") {
-                tables.push({value: fromKeyword + " " + tbl, score: 1000 - idx, meta: "* table"});
-              }
-            });
-            editor.completers.push(newCompleter(tables));
-            successCallback();
-            editor.hideSpinner();
-          });
-        } else {
-          successCallback();
-        }
+        editor.showSpinner();
+        autocompleter.autocomplete(before, after, function(result) {
+          editor.hideSpinner();
+          if (result.length > 0) {
+            editor.completers.push(newCompleter(result));
+          }
+          callback();
+        });
       } else {
-        successCallback();
+        callback();
       }
     };
 
