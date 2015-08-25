@@ -31,39 +31,16 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     """Generates a Monitor Descriptor file."""
     registry = global_registry()
-    metrics = registry.dump_metrics()
     definitions = []
 
     for schema in registry.schemas:
-      metric = metrics[schema.name]
-      for key in metric.iterkeys():
-        definition = {
-          'context': '%s::%s::%s' % (schema.metric_type, schema.name, key),
-          'name': '%s_%s' % (schema.name.replace('.', '_').replace('-', '_'), key),
-          'label': schema.label,
-          'description': schema.description,
-          'numeratorUnit': schema.numerator,
-          'counter': schema.is_counter,
-        }
-
-        if schema.denominator is not None:
-          definition['denominatorUnit'] = schema.denominator
-
-        if schema.weighting_metric_name is not None:
-          definition['weightingMetricName'] = schema.weighting_metric_name
-
-        definitions.append(definition)
+      definitions.extend(schema.to_json())
 
     d = {
         'name': 'HUE',
         'nameForCrossEntityAggregateMetrics': 'hues',
         'version': 1,
         'metricDefinitions': [],
-        'compability': {
-          'cdhVersion': {
-            'min': '5.5',
-          },
-        },
         'roles': [
           {
             'name': 'HUE_SERVER',

@@ -37,27 +37,27 @@ class MetricsRegistry(object):
     return list(self._schemas)
 
   def counter(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('counter', name, is_counter=True, **kwargs))
+    self._schemas.append(CounterDefinition(name, **kwargs))
     return self._registry.counter(name)
 
   def histogram(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('histogram', name, is_counter=True, **kwargs))
+    self._schemas.append(HistogramDefinition(name, **kwargs))
     return self._registry.histogram(name)
 
   def gauge(self, name, gauge=None, default=float('nan'), **kwargs):
-    self._schemas.append(MetricDefinition('gauge', name, **kwargs))
+    self._schemas.append(GaugeDefinition(name, **kwargs))
     return self._registry.gauge(name, gauge, default)
 
   def gauge_callback(self, name, callback, default=float('nan'), **kwargs):
-    self._schemas.append(MetricDefinition('gauge', name, **kwargs))
+    self._schemas.append(GaugeDefinition(name, **kwargs))
     return self._registry.gauge(name, pyformance.meters.CallbackGauge(callback), default)
 
   def meter(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('meter', name, is_counter=True, **kwargs))
+    self._schemas.append(MeterDefinition(name, **kwargs))
     return self._registry.meter(name)
 
   def timer(self, name, **kwargs):
-    self._schemas.append(MetricDefinition('timer', name, is_counter=True, **kwargs))
+    self._schemas.append(TimerDefinition(name, **kwargs))
     return Timer(self._registry.timer(name))
 
   def dump_metrics(self):
@@ -76,20 +76,140 @@ class MetricsRegistry(object):
 
 
 class MetricDefinition(object):
-  def __init__(self, metric_type, name, label, description, numerator,
+  def __init__(self, name, label, description, numerator,
       denominator=None,
-      is_counter=False,
       weighting_metric_name=None,
       context=None):
-    self.metric_type = metric_type
     self.name = name
     self.label = label
     self.description = description
     self.numerator = numerator
     self.denominator = denominator
-    self.is_counter = is_counter
     self.weighting_metric_name = weighting_metric_name
     self.context = context
+
+    assert self.name is not None
+    assert self.label is not None
+    assert self.description is not None
+    assert self.numerator is not None
+
+
+  def to_json(self):
+    raise NotImplementedError
+
+
+  def _make_json(self, key, **kwargs):
+    mdl = dict(
+      context='%s::%s' % (self.name, key),
+      name='hue_%s_%s' % (self.name.replace('.', '_').replace('-', '_'), key),
+      label=self.label,
+      description=self.description,
+      numeratorUnit=self.numerator,
+    )
+    mdl.update(**kwargs)
+
+    return mdl
+
+
+
+class CounterDefinition(MetricDefinition):
+  def __init__(self, *args, **kwargs):
+    super(CounterDefinition, self).__init__(*args, **kwargs)
+
+    assert self.denominator is None, "Counters should not have denominators"
+
+
+  def to_json(self):
+    return [
+        self._make_json('counter', counter=True),
+    ]
+
+
+class HistogramDefinition(MetricDefinition):
+  def __init__(self, *args, **kwargs):
+    self.counter_numerator = kwargs.pop('counter_numerator')
+
+    super(HistogramDefinition, self).__init__(*args, **kwargs)
+
+
+  def to_json(self):
+    return [
+        self._make_json('max'),
+        self._make_json('min'),
+        self._make_json('avg'),
+        self._make_json('count', counter=True, numeratorUnit=self.counter_numerator),
+        self._make_json('std_dev'),
+        self._make_json('75_percentile'),
+        self._make_json('95_percentile'),
+        self._make_json('99_percentile'),
+        self._make_json('999_percentile'),
+    ]
+
+
+class GaugeDefinition(MetricDefinition):
+  def __init__(self, *args, **kwargs):
+    self.counter = kwargs.pop('counter', False)
+
+    super(GaugeDefinition, self).__init__(*args, **kwargs)
+
+    assert not self.counter or self.denominator is None, \
+        "Gauge metrics that are marked as counters cannot have a denominator"
+
+
+  def to_json(self):
+    return [
+        self._make_json('gauge', counter=self.counter),
+    ]
+
+
+class MeterDefinition(MetricDefinition):
+  def __init__(self, *args, **kwargs):
+    self.counter_numerator = kwargs.pop('counter_numerator')
+    self.rate_denominator = kwargs.pop('rate_denominator')
+
+    assert self.counter_numerator is not None
+    assert self.rate_denominator is not None
+
+    super(MeterDefinition, self).__init__(*args, **kwargs)
+
+  def to_json(self):
+    return [
+        self._make_json('count', counter=True, numeratorUnit=self.counter_numerator),
+        self._make_json('15m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('5m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('1m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('mean_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+    ]
+
+
+class TimerDefinition(MetricDefinition):
+  def __init__(self, *args, **kwargs):
+    self.counter_numerator = kwargs.pop('counter_numerator')
+    self.rate_denominator = kwargs.pop('rate_denominator')
+
+    assert self.counter_numerator is not None
+    assert self.rate_denominator is not None
+
+    super(TimerDefinition, self).__init__(*args, **kwargs)
+
+
+  def to_json(self):
+    return [
+        self._make_json('avg'),
+        self._make_json('sum'),
+        self._make_json('count', counter=True, numeratorUnit=self.counter_numerator),
+        self._make_json('max'),
+        self._make_json('min'),
+        self._make_json('std_dev'),
+        self._make_json('15m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('5m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('1m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('mean_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('75_percentile'),
+        self._make_json('95_percentile'),
+        self._make_json('99_percentile'),
+        self._make_json('999_percentile'),
+    ]
 
 
 class Timer(object):
