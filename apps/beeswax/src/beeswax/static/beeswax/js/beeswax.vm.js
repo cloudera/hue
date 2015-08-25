@@ -682,43 +682,52 @@ function BeeswaxViewModel(server) {
     timer = setTimeout(_fn, TIMEOUT);
   };
 
-  self.fetchResults = function() {
-    $(document).trigger('fetch.results');
-    self.design.errors.removeAll();
-    self.design.results.errors.removeAll();
-    var request = {
-      url: self.design.results.url(),
-      dataType: 'text',
-      type: 'GET',
-      success: function(data) {
-        data = JSON.bigdataParse(data);
-        if (data.error) {
-          self.design.results.errors.push(data.message);
-          self.design.isRunning(false);
-          self.design.results.empty(true);
-        } else {
-          self.design.isRunning(false);
-          self.design.isFinished(data.is_finished);
-          if (self.design.results.columns().length == 0){
-            if (data.columns != null){
-              data.columns.unshift({ type:"INT_TYPE", name:"", comment:null});
-            }
-            self.design.results.columns(data.columns ? data.columns : []); // Some querysets have empty or null for columns
-          }
-          self.design.results.rows.push.apply(self.design.results.rows, data.results);
-          self.design.results.empty(self.design.results.rows().length == 0);
-          if (data.has_more) {
-            self.design.results.url(data.next_json_set);
+  self.isFetchingResults = ko.observable(false);
+
+  self.fetchResults = function () {
+    if (!self.isFetchingResults()) {
+      self.isFetchingResults(true);
+      $(document).trigger('fetch.results');
+      self.design.errors.removeAll();
+      self.design.results.errors.removeAll();
+      var request = {
+        url: self.design.results.url(),
+        dataType: 'text',
+        type: 'GET',
+        success: function (data) {
+          data = JSON.bigdataParse(data);
+          if (data.error) {
+            self.design.results.errors.push(data.message);
+            self.design.isRunning(false);
+            self.design.results.empty(true);
           } else {
-            self.design.results.url(null);
+            self.design.isRunning(false);
+            self.design.isFinished(data.is_finished);
+            if (self.design.results.columns().length == 0) {
+              if (data.columns != null) {
+                data.columns.unshift({ type: "INT_TYPE", name: "", comment: null});
+              }
+              self.design.results.columns(data.columns ? data.columns : []); // Some querysets have empty or null for columns
+            }
+            self.design.results.rows.push.apply(self.design.results.rows, data.results);
+            self.design.results.empty(self.design.results.rows().length == 0);
+            if (data.has_more) {
+              self.design.results.url(data.next_json_set);
+            } else {
+              self.design.results.url(null);
+            }
           }
-        }
-        $(document).trigger('fetched.results', [data]);
-      },
-      error: error_fn,
-      cache: false
-    };
-    $.ajax(request);
+          self.isFetchingResults(false);
+          $(document).trigger('fetched.results', [data]);
+        },
+        error: function (jqXHR, status, errorThrown) {
+          self.isFetchingResults(false);
+          error_fn(jqXHR, status, errorThrown);
+        },
+        cache: false
+      };
+      $.ajax(request);
+    }
   };
 
   self.saveDesign = function() {
