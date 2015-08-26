@@ -17,7 +17,7 @@
 # limitations under the License.
 
 import logging
-import io
+import os
 import random
 import sys
 import threading
@@ -87,14 +87,14 @@ class WebhdfsTests(unittest.TestCase):
       f.close()
 
       f = fs.open(test_file, "r")
-      f.seek(0, io.SEEK_SET)
+      f.seek(0, os.SEEK_SET)
       assert_equals("he", f.read(2))
-      f.seek(1, io.SEEK_SET)
+      f.seek(1, os.SEEK_SET)
       assert_equals("el", f.read(2))
-      f.seek(-1, io.SEEK_END)
+      f.seek(-1, os.SEEK_END)
       assert_equals("o", f.read())
-      f.seek(0, io.SEEK_SET)
-      f.seek(2, io.SEEK_CUR)
+      f.seek(0, os.SEEK_SET)
+      f.seek(2, os.SEEK_CUR)
       assert_equals("ll", f.read(2))
     finally:
       fs.remove(test_file)
@@ -115,7 +115,7 @@ class WebhdfsTests(unittest.TestCase):
 
         for j in xrange(1, 100):
           offset = random.randint(0, len(data) - 1)
-          f.seek(offset, io.SEEK_SET)
+          f.seek(offset, os.SEEK_SET)
           assert_equals(data[offset:offset+50], f.read(50))
         f.close()
 
