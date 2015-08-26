@@ -1660,7 +1660,7 @@ ko.bindingHandlers.aceEditor = {
     var onPaste = options.onPaste || function () {};
     var onAfterExec = options.onAfterExec || function () {};
     var onExecute = options.onExecute || function () {};
-    var autocompleter = options.autocompleter || null;
+    var autocompleter = options.autocompleter;
 
     $el.text(options.value());
 
@@ -1806,8 +1806,14 @@ ko.bindingHandlers.aceEditor = {
 
           var token = editor.session.getTokenAt(docPos.row, docPos.column);
 
+          var currentAssistTables = [];
+
+          huePubSub.subscribe('assist.firstLevelChange', function (tables) {
+            currentAssistTables = tables;
+          });
+
           if (token) {
-            var isMetastoreLink = Object.keys(valueAccessor().autocompleter.getCurrentTables()).indexOf(token.value) > -1;
+            var isMetastoreLink = Object.keys(currentAssistTables).indexOf(token.value) > -1;
 
             if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
                 token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
@@ -1880,6 +1886,13 @@ ko.bindingHandlers.aceEditor = {
 
     });
 
+
+    var currentAssistDb = "";
+    huePubSub.subscribe('assist.mainObjectChange', function (db) {
+      currentAssistDb = db;
+    });
+
+
     HueLink = ace.require("huelink").HueLink;
     editor.hueLink = new HueLink(editor);
     editor.hueLink.on("open", function (token) {
@@ -1890,7 +1903,7 @@ ko.bindingHandlers.aceEditor = {
         window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""));
       }
       else {
-        window.open("/metastore/table/" + valueAccessor().autocompleter.getDatabase() + "/" + token.value);
+        window.open("/metastore/table/" + currentAssistDb + "/" + token.value);
       }
     });
 
@@ -1914,7 +1927,7 @@ ko.bindingHandlers.aceEditor = {
         });
       }
 
-      if (autocompleter != null && editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") {
+      if (typeof autocompleter != "undefined" && autocompleter != null && (editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala")) {
         var before = editor.getTextBeforeCursor(";");
         var after = editor.getTextAfterCursor(";");
         editor.showSpinner();

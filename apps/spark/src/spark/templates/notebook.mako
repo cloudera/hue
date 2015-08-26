@@ -51,37 +51,4 @@ ${ koComponents.assistPanel() }
 
 ${ editorComponents.commonJS() }
 
-<script type="text/javascript" charset="utf-8">
-
-  var aceAutocomplete = new Autocomplete({
-    autocompleteBaseURL: "${ autocomplete_base_url | n,unicode }",
-    autocompleteApp: "beeswax",
-    autocompleteUser: "${user}",
-    autocompleteFailsQuietlyOn: [500] // error codes from beeswax/views.py - autocomplete
-  });
-
-  var assist = new Assist({
-    app: "beeswax",
-    user: "${user}",
-    failsSilentlyOn: [500], // error codes from beeswax/views.py - autocomplete
-    baseURL: "${ autocomplete_base_url | n,unicode }"
-  });
-
-  huePubSub.subscribe('assist.mainObjectChange', function (db) {
-    aceAutocomplete.setDatabase(db);
-  });
-
-  huePubSub.subscribe('assist.firstLevelChange', function (tables) {
-    aceAutocomplete.setCurrentTables(tables);
-  });
-
-  var options = ${ options_json | n,unicode };
-  options.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
-
-  viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, options);
-  ko.applyBindings(viewModel);
-  viewModel.init();
-
-</script>
-
 ${ commonfooter(messages) | n,unicode }
