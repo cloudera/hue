@@ -2106,6 +2106,16 @@ ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2);"""
               hql_query(query).statements, hql_query(query).statements)
 
 
+def test_api_get_session():
+  client = make_logged_in_client(is_superuser=False)
+  grant_access("test", "test", "beeswax")
+
+  resp = client.get(reverse("beeswax:api_get_session"))
+
+  data = json.loads(resp.content)
+  assert_true('properties' in data)
+
+
 class MockHiveServerTable(HiveServerTable):
 
   def __init__(self, describe=None):

@@ -36,6 +36,9 @@ ${layout.menubar(section='query')}
     <ul class="nav nav-tabs" style="margin-bottom: 0">
       <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${_('Assist')}</a></li>
       <li><a href="#settingsTab" data-toggle="tab" class="sidetab">${_('Settings')} <span data-bind="visible:design.settings.values().length + design.fileResources.values().length + design.functions.values().length > 0, text: design.settings.values().length + design.fileResources.values().length + design.functions.values().length" class="badge badge-info">12</span></a></li>
+      % if app_name == 'impala':
+      <li><a href="#sessionTab" data-toggle="tab" class="sidetab">${_('Session')}</a></li>
+      % endif
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="navigatorTab">
@@ -199,6 +202,21 @@ ${layout.menubar(section='query')}
           </div>
         </div>
       </div>
+      % if app_name == 'impala':
+      <div class="tab-pane" id="sessionTab">
+        <div class="card card-small card-tab">
+          <div class="card-body">
+            <div id="advanced-settings">
+            <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
+
+              link
+
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      % endif
     </div>
   </div>
   <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
