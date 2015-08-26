@@ -17,6 +17,7 @@
 
 import logging
 import itertools
+import json
 import re
 
 from itertools import imap
@@ -534,13 +535,15 @@ class HiveServerClient:
     LOG.info('Opening session %s' % sessionId)
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
+    properties = json.dumps(res.configuration)
 
     return Session.objects.create(owner=user,
                                   application=self.query_server['server_name'],
                                   status_code=res.status.statusCode,
                                   secret=encoded_status,
                                   guid=encoded_guid,
-                                  server_protocol_version=res.serverProtocolVersion)
+                                  server_protocol_version=res.serverProtocolVersion,
+                                  properties=properties)
 
 
   def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):

@@ -220,6 +220,12 @@ class TestImpalaIntegration:
     assert_true('531091827' in resp.content, resp.content) # We are getting one or two random rows
     assert_true(len(resp.context['sample']) > 0, resp.context['sample'])
 
+  def test_get_session(self):
+    resp = self.client.get(reverse("impala:api_get_session"))
+    data = json.loads(resp.content)
+    assert_true('properties' in data)
+    assert_true(data['properties'].get('http_addr'))
+
 
 # Could be refactored with SavedQuery.create_empty()
 def create_saved_query(app_name, owner):

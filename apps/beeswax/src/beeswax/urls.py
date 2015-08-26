@@ -57,6 +57,7 @@ urlpatterns += patterns(
 urlpatterns += patterns(
   'beeswax.api',
 
+  url(r'^api/session/$', 'get_session', name='api_get_session'),
   url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
   url(r'^api/autocomplete/(?P<database>\w+)$', 'autocomplete', name='api_autocomplete_tables'),
   url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),

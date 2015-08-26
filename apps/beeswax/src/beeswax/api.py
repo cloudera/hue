@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import re
 
 from django.contrib.auth.models import User
@@ -42,6 +43,7 @@ from beeswax.server.dbms import expand_exception, get_query_server_config, Query
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           _parse_out_hadoop_jobs
+from beeswax.models import Session
 
 LOG = logging.getLogger(__name__)
 
@@ -700,6 +702,20 @@ def get_top_terms(request, database, table, column, prefix=None):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+def get_session(request):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+
+  session = Session.objects.get_session(request.user, query_server['server_name'])
+
+  if session:
+    properties = json.loads(session.properties)
+  else:
+    properties = {}
+
+  return JsonResponse({'properties': properties})
 
 
 """
