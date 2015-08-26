@@ -281,6 +281,46 @@ describe("autocomplete.js", function() {
       });
     });
 
+    describe("struct completion", function() {
+      it("should suggest fields from columns that are structs", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "http://baseUrl/testDb/testTable/columnA" : {
+              fields: [
+                {"type": "string", "name": "fieldA" },
+                {"type": "boolean", "name": "fieldB" },
+                {"type": "struct",  "name": "fieldC", "fields": [
+                  {"type": "string", "name": "fieldC_A" },
+                  {"type": "boolean", "name": "fieldC_B"}
+                ]}
+              ],
+              "type": "struct",
+              "name": "columnB"
+            }
+          },
+          beforeCursor: "SELECT columnA.",
+          afterCursor: " FROM testTable",
+          expectedSuggestions: ["fieldA", "fieldB", "fieldC"]
+        });
+      });
 
+      it("should suggest fields from nested structs", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "http://baseUrl/testDb/testTable/columnA/fieldC" : {
+              fields: [
+                {"type": "string", "name": "fieldC_A" },
+                {"type": "boolean", "name": "fieldC_B"}
+              ],
+              "type": "struct",
+              "name": "fieldC"
+            }
+          },
+          beforeCursor: "SELECT columnA.fieldC.",
+          afterCursor: " FROM testTable",
+          expectedSuggestions: ["fieldC_A", "fieldC_B"]
+        });
+      });
+    });
   });
 });
