@@ -22,14 +22,10 @@ var hasExpired = function (timestamp) {
 
 
 /**
- *
  * @param options {object}
- * @param options.autocompleteBaseURL
- * @param options.autocompleteApp
- * @param options.autocompleteUser
- * @param options.autocompleteGlobalCallback
- * @param options.autocompleteFailsSilentlyOn
- * @param options.autocompleteFailsQuietlyOn
+ * @param options.baseUrl
+ * @param options.app
+ * @param options.user
  *
  * @constructor
  */
@@ -81,14 +77,14 @@ Autocomplete.prototype.getTableAliases = function (textScanned) {
 };
 
 Autocomplete.prototype.getTotalStorageUserPrefix = function () {
-  var _app = "";
-  if (typeof this.options.autocompleteApp != "undefined") {
-    _app = this.options.autocompleteApp;
+  var app = "";
+  if (typeof this.options.app != "undefined") {
+    app = this.options.app;
   }
-  if (typeof this.options.autocompleteUser != "undefined") {
-    return _app + "_" + this.options.autocompleteUser + "_";
+  if (typeof this.options.user != "undefined") {
+    return app + "_" + this.options.user;
   }
-  return (_app != "" ? _app + "_" : "");
+  return app;
 };
 
 Autocomplete.prototype.getTableColumns = function (databaseName, tableName, textScanned, callback, failCallback) {
@@ -244,7 +240,77 @@ Autocomplete.prototype.getDatabases = function (callback) {
 
 var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
 
+var getTableReferenceIndex = function (statement) {
+  var result = {};
+  var fromMatch = statement.match(/\s*from\s*([^;]*).*$/i);
+  if (fromMatch) {
+    var tableRefsRaw = fromMatch[1];
+    upToMatch = tableRefsRaw.match(/\bON|LIMIT|WHERE|GROUP|SORT|ORDER BY\b/i);
+    if (upToMatch) {
+      tableRefsRaw = $.trim(tableRefsRaw.substring(0, upToMatch.index));
+    }
+    var tableRefs = tableRefsRaw.split(",");
+    $.each(tableRefs, function(index, tableRefRaw) {
+      var tableMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
+      result[tableMatch[2] || tableMatch[1]] = tableMatch[1];
+    })
+  }
+  return result;
+};
+
+var extractFields = function(data, valuePrefix, includeStar) {
+  var fields = [];
+  var type;
+  var fieldNames = [];
+  if (data.type == "struct") {
+    type = "struct";
+    fieldNames = $.map(data.fields, function(field) {
+      return field.name;
+    });
+  } else if (typeof data.columns != "undefined") {
+    type = "column";
+    fieldNames = data.columns;
+    if (includeStar) {
+      fields.push({value: '*', score: 10000, meta: type});
+    }
+  } else if (typeof data.tables != "undefined") {
+    type = "table";
+    fieldNames = data.tables;
+  }
+
+  fieldNames.sort();
+  fieldNames.forEach(function(name, idx) {
+    if (name != "") {
+      fields.push({value: typeof valuePrefix != "undefined" ? valuePrefix + name : name, score: 1000 - idx, meta: type});
+    }
+  });
+  return fields;
+};
+
+var fetchAssistData = function(assist, url, successCallback, errorCallback) {
+  var cachedData = $.totalStorage("hue.assist." + assist.getTotalStorageUserPrefix()) || {};
+
+  if (typeof cachedData[url] == "undefined" || hasExpired(cachedData[url].timestamp)) {
+    $.ajax({
+      type: "GET",
+      url: url + "?" + Math.random(),
+      success: function (data) {
+        cachedData[url] = {
+          timestamp: (new Date()).getTime(),
+          data: data
+        };
+        $.totalStorage("hue.assist." + assist.getTotalStorageUserPrefix(), cachedData);
+        successCallback(data);
+      },
+      error: errorCallback
+    });
+  } else {
+    successCallback(cachedData[url].data);
+  }
+};
+
 Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
+  var self = this;
   var beforeCursorU = beforeCursor.toUpperCase();
   var afterCursorU = afterCursor.toUpperCase();
 
@@ -271,78 +337,62 @@ Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callba
     beforeMatcher[beforeMatcher.length - 1] === "ORDER BY");
 
 
-  if (tableNameAutoComplete) {
-    this.getTables(this.getDatabase(), function (data) {
-      var tableNames = data.split(" ").sort();
-      var tables = [];
-      tableNames.forEach(function (tbl, idx) {
-        if (tbl != "") {
-          tables.push({value: tbl, score: 1000 - idx, meta: "table"});
+  if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
+    var url = self.options.autocompleteBaseURL + self.getDatabase();
+    fetchAssistData(self, url, function(data) {
+      var fromKeyword = "";
+      if (selectBefore) {
+        if (beforeCursor.indexOf("SELECT") > -1) {
+          fromKeyword = "FROM";
+        } else {
+          fromKeyword = "from";
         }
-      });
-      callback(tables);
+        if (!beforeCursor.match(/\*\s*$/)) {
+          fromKeyword = "? " + fromKeyword;
+        } else if (!beforeCursor.match(/\s+$/)) {
+          fromKeyword = " " + fromKeyword;
+        }
+        fromKeyword += " ";
+      }
+      callback(extractFields(data, fromKeyword));
+    }, function() {
+      callback([]);
     });
   } else if ((selectBefore && fromAfter) || fieldTermBefore) {
-    var foundTable = "";
+    var partialTermsMatch = beforeCursor.match(/([^ \-\+\<\>\,]*)$/);
+    var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
 
-    var aliasMatch = beforeCursor.match(/([^ \-\+\<\>]*)\.$/);
-    if (aliasMatch) { // gets the table alias
-      foundTable = aliasMatch[1];
-    }
-    else { // gets the standard table
-      var from = afterCursorU.indexOf("FROM");
-      if (from > -1) {
-        var match = afterCursorU.substring(from).match(/\bON|LIMIT|WHERE|GROUP|SORT|ORDER BY|SELECT|;\b/);
-        var to = afterCursorU.length;
-        if (match) {
-          to = match.index;
-        }
-        var found = afterCursor.substr(from, to).replace(/(\r\n|\n|\r)/gm, "").replace(/\bfrom\b/gi, "").replace(/\bjoin\b/gi, ",").split(",");
-      }
-
-      for (var i = 0; i < found.length; i++) {
-        if ($.trim(found[i]) != "" && foundTable == "") {
-          foundTable = $.trim(found[i]).split(" ")[0];
-        }
-      }
+    if (parts.length > 0 && parts[parts.length - 1] != '') {
+      // SELECT tablename.colu
+      parts.pop();
     }
 
-    if (foundTable != "") {
-      // fill up with fields
-      this.getTableColumns(this.getDatabase(), foundTable, beforeCursor + afterCursor, function (data) {
-        var fieldNames = data.split(" ").sort();
-        var fields = [];
-        fieldNames.forEach(function (fld, idx) {
-          if (fld != "") {
-            fields.push({value: fld, score: (fld == "*") ? 10000 : 1000 - idx, meta: "column"});
-          }
-        });
-        callback(fields);
-      }, function() {
-        callback([]);
-      });
+    var tableReferences = getTableReferenceIndex(beforeCursor + afterCursor);
+    var tableName = "";
+    if (parts.length > 0 && tableReferences[parts[0]]) {
+      // SELECT tablename.column.
+      tableName = tableReferences[parts[0]];
+      parts.shift();
+    } else if (Object.keys(tableReferences).length == 1) {
+      // SELECT column.
+      // We use first and only table reference
+      tableName = tableReferences[Object.keys(tableReferences)[0]];
     } else {
+      // No table refs
       callback([]);
+      return;
     }
-  } else if (selectBefore) {
-    this.getTables(this.getDatabase(), function (data) {
-      var fromKeyword = "from";
-      if (beforeCursor.indexOf("SELECT") > -1) {
-        fromKeyword = fromKeyword.toUpperCase();
+    var url = self.options.autocompleteBaseURL + self.getDatabase() + "/" + tableName;
+    $.each(parts, function(index, part) {
+      if (part != '' && (index > 0 || part !== tableName)) {
+        url += "/" + part;
       }
-      if (!beforeCursor.match(/\*\s*$/)) {
-        fromKeyword = "? " + fromKeyword;
-      } else if (!beforeCursor.match(/\s+$/)) {
-        fromKeyword = " " + fromKeyword;
-      }
-      var tableNames = data.split(" ").sort();
-      var tables = [];
-      tableNames.forEach(function (tbl, idx) {
-        if (tbl != "") {
-          tables.push({value: fromKeyword + " " + tbl, score: 1000 - idx, meta: "* table"});
-        }
-      });
-      callback(tables);
+    });
+
+    fetchAssistData(self, url, function(data) {
+      callback(extractFields(data, "", !fieldTermBefore));
+    }, function() {
+      callback([]);
     });
   } else {
     callback([]);
