@@ -14,233 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
 var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
-
-var hasExpired = function (timestamp) {
-  return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
-};
-
 
 /**
  * @param options {object}
  * @param options.baseUrl
  * @param options.app
  * @param options.user
+ * @param options.db
  *
  * @constructor
  */
-function Autocomplete(options) {
-  this.options = options;
-  this.currentDB = "";
-  this.currentTables = [];
+function Autocompleter(options) {
+  var self = this;
+  self.options = options;
+  self.currentDb = options.db;
+
+  huePubSub.subscribe('assist.mainObjectChange', function (db) {
+    self.currentDb = db;
+  });
 }
 
-Autocomplete.prototype.jsonCalls = function (options) {
-  var _url = typeof options.autocompleteBaseURL != "undefined" ? options.autocompleteBaseURL : this.options.autocompleteBaseURL;
-  if (_url != "") {
-    if (options.database != null) {
-      _url += options.database
-    }
-    if (options.table != null) {
-      _url += "/" + options.table
-    }
-
-    $.ajax({
-      type: "GET",
-      url: _url + "?" + Math.random(),
-      success: options.onDataReceived,
-      error: options.onError ? options.onError : $.noop,
-      async: typeof options.sync == "undefined"
-    });
-  }
+Autocompleter.prototype.hasExpired = function (timestamp) {
+  return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
 };
 
-Autocomplete.prototype.getTableAliases = function (textScanned) {
-  var _aliases = {};
-  var _val = textScanned.split("\n").join(" ");
-  var _from = _val.toUpperCase().indexOf("FROM ");
-  if (_from > -1) {
-    var _match = _val.toUpperCase().substring(_from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
-    var _to = _val.length;
-    if (_match) {
-      _to = _match.index;
-    }
-    var _found = _val.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
-    for (var i = 0; i < _found.length; i++) {
-      var _tablealias = $.trim(_found[i]).split(" ");
-      if (_tablealias.length > 1) {
-        _aliases[_tablealias[1]] = _tablealias[0];
-      }
-    }
-  }
-  return _aliases;
-};
-
-Autocomplete.prototype.getTotalStorageUserPrefix = function () {
-  var app = "";
-  if (typeof this.options.app != "undefined") {
-    app = this.options.app;
-  }
-  if (typeof this.options.user != "undefined") {
-    return app + "_" + this.options.user;
-  }
-  return app;
-};
-
-Autocomplete.prototype.getTableColumns = function (databaseName, tableName, textScanned, callback, failCallback) {
-  var self = this;
-  if (tableName.indexOf("(") > -1) {
-    tableName = tableName.substr(tableName.indexOf("(") + 1);
-  }
-
-  var _aliases = self.getTableAliases(textScanned);
-  if (_aliases[tableName]) {
-    tableName = _aliases[tableName];
-  }
-
-  var fetchData = function (successCallback) {
-    self.jsonCalls({
-      database: databaseName,
-      table: tableName,
-      onDataReceived: function (data) {
-        if (typeof self.options.autocompleteGlobalCallback == "function") {
-          self.options.autocompleteGlobalCallback(data);
-        }
-        if (data.error) {
-          if (failCallback) {
-            failCallback();
-          } else {
-            self.errorHandler(data);
-          }
-        } else {
-          $.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName, (data.columns ? "* " + data.columns.join(" ") : "*"));
-          $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName, (data.extended_columns ? data.extended_columns : []));
-          $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName, (new Date()).getTime());
-          if (successCallback) {
-            successCallback();
-          }
-        }
-      },
-      onError: failCallback
-    });
-  };
-
-  if ($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName) != null && $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName) != null) {
-    callback($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
-    if ($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName) == null || hasExpired($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_columns_' + databaseName + '_' + tableName))) {
-      fetchData();
-    }
-  } else {
-    fetchData(function() {
-      callback($.totalStorage(self.getTotalStorageUserPrefix() + 'columns_' + databaseName + '_' + tableName), $.totalStorage(self.getTotalStorageUserPrefix() + 'extended_columns_' + databaseName + '_' + tableName));
-    });
-  }
-};
-
-Autocomplete.prototype.tableHasAlias = function (tableName, textScanned) {
-  var self = this;
-  var _aliases = self.getTableAliases(textScanned);
-  for (var alias in _aliases) {
-    if (_aliases[alias] == tableName) {
-      return true;
-    }
-  }
-  return false;
-};
-
-Autocomplete.prototype.getTables = function (databaseName, callback) {
-  var self = this;
-  if ($.totalStorage(self.getTotalStorageUserPrefix() + 'tables_' + databaseName) != null) {
-    callback($.totalStorage(self.getTotalStorageUserPrefix() + 'tables_' + databaseName));
-    if ($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName) == null || hasExpired($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName))) {
-      self.jsonCalls({
-        database: databaseName,
-        onDataReceived: function (data) {
-          if (typeof self.options.autocompleteGlobalCallback == "function") {
-            self.options.autocompleteGlobalCallback(data);
-          }
-          if (data.error) {
-            self.errorHandler(data);
-          }
-          else {
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
-          }
-        }
-      });
-    }
-  }
-  else {
-    self.jsonCalls({
-      database: databaseName,
-      onDataReceived: function (data) {
-        if (typeof self.options.autocompleteGlobalCallback == "function") {
-          self.options.autocompleteGlobalCallback(data);
-        }
-        if (data.error) {
-          self.errorHandler(data);
-        }
-        else {
-          if (data.tables) {
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'tables_' + databaseName, data.tables.join(" "));
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_tables_' + databaseName, (new Date()).getTime());
-            callback($.totalStorage(self.getTotalStorageUserPrefix() + 'tables_' + databaseName));
-          }
-        }
-      }
-    });
-  }
-};
-
-Autocomplete.prototype.getDatabases = function (callback) {
-  var self = this;
-  if ($.totalStorage(self.getTotalStorageUserPrefix() + 'databases') != null) {
-    if (callback) {
-      callback($.totalStorage(self.getTotalStorageUserPrefix() + 'databases'));
-    }
-    if ($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases') == null || hasExpired($.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases'))) {
-      this.jsonCalls({
-        onDataReceived: function (data) {
-          if (typeof self.options.autocompleteGlobalCallback == "function") {
-            self.options.autocompleteGlobalCallback(data);
-          }
-          if (data.error) {
-            self.errorHandler(data);
-          }
-          else {
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'databases', data.databases);
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
-          }
-        }
-      });
-    }
-  }
-  else {
-    this.jsonCalls({
-      onDataReceived: function (data) {
-        if (typeof self.options.autocompleteGlobalCallback == "function") {
-          self.options.autocompleteGlobalCallback(data);
-        }
-        if (data.error) {
-          self.errorHandler(data);
-        }
-        else {
-          if (data.databases) {
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'databases', data.databases);
-            $.totalStorage(self.getTotalStorageUserPrefix() + 'timestamp_databases', (new Date()).getTime());
-            if (callback) {
-              callback($.totalStorage(self.getTotalStorageUserPrefix() + 'databases'));
-            }
-          }
-        }
-      }
-    });
-  }
-};
-
-var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
-
-var getTableReferenceIndex = function (statement) {
+Autocompleter.prototype.getTableReferenceIndex = function (statement) {
   var result = {};
   var fromMatch = statement.match(/\s*from\s*([^;]*).*$/i);
   if (fromMatch) {
@@ -258,7 +58,7 @@ var getTableReferenceIndex = function (statement) {
   return result;
 };
 
-var extractFields = function(data, valuePrefix, includeStar) {
+Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar) {
   var fields = [];
   var type;
   var fieldNames = [];
@@ -287,10 +87,23 @@ var extractFields = function(data, valuePrefix, includeStar) {
   return fields;
 };
 
-var fetchAssistData = function(assist, url, successCallback, errorCallback) {
-  var cachedData = $.totalStorage("hue.assist." + assist.getTotalStorageUserPrefix()) || {};
+Autocompleter.prototype.getTotalStorageUserPrefix = function () {
+  var self = this;
+  var app = "";
+  if (typeof self.options.app != "undefined") {
+    app = self.options.app;
+  }
+  if (typeof self.options.user != "undefined") {
+    return app + "_" + self.options.user;
+  }
+  return app;
+};
 
-  if (typeof cachedData[url] == "undefined" || hasExpired(cachedData[url].timestamp)) {
+Autocompleter.prototype.fetchAssistData = function (url, successCallback, errorCallback) {
+  var self = this;
+  var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix()) || {};
+
+  if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
     $.ajax({
       type: "GET",
       url: url + "?" + Math.random(),
@@ -299,7 +112,7 @@ var fetchAssistData = function(assist, url, successCallback, errorCallback) {
           timestamp: (new Date()).getTime(),
           data: data
         };
-        $.totalStorage("hue.assist." + assist.getTotalStorageUserPrefix(), cachedData);
+        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
         successCallback(data);
       },
       error: errorCallback
@@ -309,8 +122,14 @@ var fetchAssistData = function(assist, url, successCallback, errorCallback) {
   }
 };
 
-Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
+Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
   var self = this;
+
+  if (typeof self.currentDb == "undefined" || self.currentDb == null || self.currentDb == "") {
+    callback([]);
+    return;
+  }
+
   var beforeCursorU = beforeCursor.toUpperCase();
   var afterCursorU = afterCursor.toUpperCase();
 
@@ -338,8 +157,8 @@ Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callba
 
 
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
-    var url = self.options.autocompleteBaseURL + self.getDatabase();
-    fetchAssistData(self, url, function(data) {
+    var url = self.options.baseUrl + self.currentDb;
+    self.fetchAssistData(url, function(data) {
       var fromKeyword = "";
       if (selectBefore) {
         if (beforeCursor.indexOf("SELECT") > -1) {
@@ -354,7 +173,7 @@ Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callba
         }
         fromKeyword += " ";
       }
-      callback(extractFields(data, fromKeyword));
+      callback(self.extractFields(data, fromKeyword));
     }, function() {
       callback([]);
     });
@@ -367,7 +186,7 @@ Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callba
       parts.pop();
     }
 
-    var tableReferences = getTableReferenceIndex(beforeCursor + afterCursor);
+    var tableReferences = self.getTableReferenceIndex(beforeCursor + afterCursor);
     var tableName = "";
     if (parts.length > 0 && tableReferences[parts[0]]) {
       // SELECT tablename.column.
@@ -382,48 +201,19 @@ Autocomplete.prototype.autocomplete = function(beforeCursor, afterCursor, callba
       callback([]);
       return;
     }
-    var url = self.options.autocompleteBaseURL + self.getDatabase() + "/" + tableName;
+    var url = self.options.baseUrl + self.currentDb + "/" + tableName;
     $.each(parts, function(index, part) {
       if (part != '' && (index > 0 || part !== tableName)) {
         url += "/" + part;
       }
     });
 
-    fetchAssistData(self, url, function(data) {
-      callback(extractFields(data, "", !fieldTermBefore));
+    self.fetchAssistData(url, function(data) {
+      callback(self.extractFields(data, "", !fieldTermBefore));
     }, function() {
       callback([]);
     });
   } else {
     callback([]);
   }
-};
-
-Autocomplete.prototype.errorHandler = function (data) {
-  var self = this;
-  $(document).trigger('error.autocomplete');
-  if (typeof self.options.autocompleteFailsSilentlyOn == "undefined" || data.code == null || self.options.autocompleteFailsSilentlyOn.indexOf(data.code) == -1) {
-    if (typeof self.options.autocompleteFailsQuietlyOn != "undefined" && self.options.autocompleteFailsQuietlyOn.indexOf(data.code) > -1) {
-      $(document).trigger('info', data.error);
-    }
-    else {
-      $(document).trigger('error', data.error);
-    }
-  }
-};
-
-Autocomplete.prototype.setDatabase = function (db) {
-  this.currentDB = db;
-};
-
-Autocomplete.prototype.getDatabase = function () {
-  return this.currentDB;
-};
-
-Autocomplete.prototype.setCurrentTables = function (tables) {
-  this.currentTables = tables;
-};
-
-Autocomplete.prototype.getCurrentTables = function () {
-  return this.currentTables;
 };

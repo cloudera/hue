@@ -64,12 +64,12 @@ describe("autocomplete.js", function() {
 
   beforeEach(function() {
     var options = {
-      autocompleteBaseURL: "http://baseUrl/",
-      autocompleteApp: "testApp",
-      autocompleteUser: "testUser"
+      baseUrl: "http://baseUrl/",
+      app: "testApp",
+      user: "testUser",
+      db: "testDb"
     };
-    subject = new Autocomplete(options);
-    subject.setDatabase("testDb");
+    subject = new Autocompleter(options);
     ajaxHelper.responseForUrls = {};
   });
 

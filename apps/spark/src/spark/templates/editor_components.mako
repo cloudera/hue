@@ -443,7 +443,7 @@ from desktop.views import _ko
           mode: aceEditorMode,
           extraCompleters: completers,
           errors: errors,
-          autocompleter: aceAutocomplete,
+          autocompleter: aceAutocompleter,
           openIt: '${ _ko("Double click to open it") }',
           placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>
@@ -1450,5 +1450,25 @@ from desktop.views import _ko
     $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
     $('#snippet_' + snippet.id()).find('.download-form').submit();
   }
+
+  var aceAutocompleter = new Autocompleter({
+    baseUrl: '${ autocomplete_base_url | n,unicode }',
+    app: 'beeswax',
+    user: '${user}'
+  });
+
+  var assist = new Assist({
+    baseURL: "${ autocomplete_base_url | n,unicode }",
+    app: "beeswax",
+    user: "${user}",
+    failsSilentlyOn: [500] // error codes from beeswax/views.py - autocomplete
+  });
+
+  var vmOptions = ${ options_json | n,unicode };
+  vmOptions.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
+
+  viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, vmOptions);
+  ko.applyBindings(viewModel);
+  viewModel.init();
 </script>
 </%def>
