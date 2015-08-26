@@ -683,7 +683,6 @@ function BeeswaxViewModel(server) {
   };
 
   self.isFetchingResults = ko.observable(false);
-
   self.fetchResults = function () {
     if (!self.isFetchingResults()) {
       self.isFetchingResults(true);
@@ -696,11 +695,16 @@ function BeeswaxViewModel(server) {
         type: 'GET',
         success: function (data) {
           data = JSON.bigdataParse(data);
-          if (data.error) {
+          if (data.traceback) {
+            self.design.isRunning(false);
+            $(document).trigger('server.unmanageable_error', data.traceback.length > 0 ? data.traceback[data.traceback.length - 1].join("\n") : "");
+          }
+          else if (data.error) {
             self.design.results.errors.push(data.message);
             self.design.isRunning(false);
             self.design.results.empty(true);
-          } else {
+          }
+          else {
             self.design.isRunning(false);
             self.design.isFinished(data.is_finished);
             if (self.design.results.columns().length == 0) {
@@ -718,7 +722,9 @@ function BeeswaxViewModel(server) {
             }
           }
           self.isFetchingResults(false);
-          $(document).trigger('fetched.results', [data]);
+          if (!data.traceback) {
+            $(document).trigger('fetched.results', [data]);
+          }
         },
         error: function (jqXHR, status, errorThrown) {
           self.isFetchingResults(false);
