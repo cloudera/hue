@@ -18,6 +18,7 @@
 # Tests for proxy app.
 
 import threading
+import logging
 import BaseHTTPServer
 import StringIO
 
@@ -27,6 +28,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 
 from proxy.views import _rewrite_links
 import proxy.conf
+
 
 class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
   """
@@ -51,6 +53,13 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     # Somehow in this architecture read() blocks, so we read the exact
     # number of bytes the test sends.
     self.wfile.write("Data: " + self.rfile.read(16))
+
+  def log_message(self, fmt, *args):
+    logging.debug("%s - - [%s] %s" %
+                  (self.address_string(),
+                   self.log_date_time_string(),
+                   fmt % args))
+
 
 def run_test_server():
   """
