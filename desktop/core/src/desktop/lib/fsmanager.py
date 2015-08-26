@@ -20,6 +20,8 @@ from __future__ import absolute_import
 import sys
 import logging
 
+import aws
+
 from desktop.lib.fs import ProxyFS
 from hadoop import cluster
 
@@ -28,7 +30,8 @@ FS_CACHE = {}
 DEFAULT_SCHEMA = 'hdfs'
 
 FS_GETTERS = {
-  "hdfs": cluster.get_hdfs
+  "hdfs": cluster.get_hdfs,
+  "s3": aws.get_s3fs
 }
 
 
