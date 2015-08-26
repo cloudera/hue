@@ -866,6 +866,8 @@ from desktop.views import _ko
 <%def name="commonJS()">
 <script type="text/javascript" charset="utf-8">
 
+  ace.config.set("basePath", "/static/desktop/js/ace");
+
   $.scrollbarWidth = function() {
     var _parent, _child, _width;
     _parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
