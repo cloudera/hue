@@ -393,7 +393,10 @@ if OAUTH_AUTHENTICATION:
 if desktop.conf.REDIRECT_WHITELIST.get():
   MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
 
-#Support HTTPS load-balancing
+# Enable X-Forwarded-Host header if the load balancer requires it
+USE_X_FORWARDED_HOST = desktop.conf.USE_X_FORWARDED_HOST.get()
+
+# Support HTTPS load-balancing
 if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
   SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 

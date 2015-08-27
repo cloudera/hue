@@ -217,6 +217,12 @@ REDIRECT_WHITELIST = Config(
   type=list_of_compiled_res(skip_empty=True),
   default='^\/.*$')
 
+USE_X_FORWARDED_HOST = Config(
+  key="use_x_forwarded_host",
+  help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
+  type=coerce_bool,
+  default=False)
+
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
   help=_("Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER."),
