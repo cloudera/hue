@@ -41,7 +41,7 @@ from desktop.models import Document, Document2
 
 from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
-from liboozie.submittion import Submission
+from liboozie.submission2 import Submission
 from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
@@ -637,6 +637,49 @@ def massaged_sla_for_json(sla, request):
 
   return massaged_sla
 
+
+@show_oozie_error
+def sync_coord_workflow(request, job_id):
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+  job = check_job_access_permission(request, job_id)
+  check_job_edition_permission(job, request.user)
+
+  hue_coord = get_history().get_coordinator_from_config(job.conf_dict)
+  hue_wf = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(job.conf_dict)
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+
+      submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=mapping)
+      submission._sync_definition(hue_wf.deployment_dir, mapping)
+
+      request.info(_('Successfully updated Workflow definition'))
+      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    parameters = hue_wf and hue_wf.find_all_parameters() or []
+    params_dict = dict([(param['name'], param['value']) for param in parameters])
+
+    submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=None)
+    prev_properties = hue_wf and hue_wf.deployment_dir and \
+                      submission.get_external_parameters(request.fs.join(hue_wf.deployment_dir, hue_wf.XML_FILE_NAME)) or {}
+
+    for key, value in params_dict.iteritems():
+      params_dict[key] = prev_properties[key] if key in prev_properties.keys() else params_dict[key]
+
+    initial_params = ParameterForm.get_initial_params(params_dict)
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor2/submit_job_popup.mako', request, {
+             'params_form': params_form,
+             'name': _('Job'),
+             'header': _('Sync Workflow definition?'),
+             'action': reverse('oozie:sync_coord_workflow', kwargs={'job_id': job_id})
+           }, force_template=True).content
+  return JsonResponse(popup, safe=False)
 
 @show_oozie_error
 def rerun_oozie_job(request, job_id, app_path):
