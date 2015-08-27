@@ -277,13 +277,9 @@ class Submission(object):
     Copy XML and the jar_path files from Java or MR actions to the deployment directory.
     This should run as the workflow user.
     """
-    xml_path = self.fs.join(deployment_dir, self.job.XML_FILE_NAME)
-    self.fs.create(xml_path, overwrite=True, permission=0644, data=smart_str(oozie_xml))
-    LOG.debug("Created %s" % (xml_path,))
 
-    properties_path = self.fs.join(deployment_dir, 'job.properties')
-    self.fs.create(properties_path, overwrite=True, permission=0644, data=smart_str('\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.iteritems()])))
-    LOG.debug("Created %s" % (properties_path,))
+    self._create_file(deployment_dir, self.job.XML_FILE_NAME, oozie_xml)
+    self._create_file(deployment_dir, 'job.properties', data='\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.iteritems()]))
 
     # List jar files
     files = []
@@ -337,7 +333,22 @@ class Submission(object):
     from oozie.models2 import Coordinator
     return Coordinator.PROPERTY_APP_PATH in self.properties
 
+  def _create_file(self, deployment_dir, file_name, data, do_as=False):
+   file_path = self.fs.join(deployment_dir, file_name)
+   if do_as:
+     self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0644, data=smart_str(data))
+   else:
+     self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
+   LOG.debug("Created/Updated %s" % (file_path,))
 
+  def _sync_definition(self, deployment_dir, mapping):
+    """ This is helper function for 'Sync Workflow' functionality in a Coordinator.
+      It copies updated workflow changes into HDFS """
+
+    self._create_file(deployment_dir, self.job.XML_FILE_NAME, self.job.to_xml(mapping=mapping), do_as=True)
+
+    data_properties = smart_str('\n'.join(['%s=%s' % (key, val) for key, val in mapping.iteritems()]))
+    self._create_file(deployment_dir, 'job.properties', data_properties, do_as=True)
 
 def create_directories(fs, directory_list=[]):
   # If needed, create the remote home, deployment and data directories
