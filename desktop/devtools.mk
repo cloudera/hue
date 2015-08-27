@@ -19,21 +19,20 @@
 
 # May require download from PyPI or whereever
 DEVTOOLS += \
-	ipdb \
-	ipython \
-	nose \
-	coverage \
-	nosetty \
-	werkzeug \
-	windmill
+	ipdb[0.1dev-r1716] \
+	ipython[0.10] \
+	nose[0.11.3] \
+	coverage[3.2] \
+	nosetty[0.4] \
+	werkzeug[0.6] \
+	windmill[1.3]
 
 # Install/download dev tools for SDK into the virtual environment
 .PHONY: $(DEVTOOLS)
 $(DEVTOOLS):
 	@echo "--- Installing development tool: $@"
-	@# Force downloads from pypi host - developer sites are sometimes dead!
 	$(ENV_EASY_INSTALL) -f http://archive.cloudera.com/desktop-sdk-python-packages/ \
-	   -H archive.cloudera.com $(SETUPTOOLS_OPTS) $@
+	   -H pypi.python.org,archive.cloudera.com $(SETUPTOOLS_OPTS) $(subst ],,$(subst [,==,$@))
 
 $(BLD_DIR):
 	@mkdir -p $@
