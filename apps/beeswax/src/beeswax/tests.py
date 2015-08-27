@@ -983,7 +983,7 @@ for x in sys.stdin:
       if content['status'] == 0:
         success_url = content['success_url']
         resp = self.client.get(content['watch_url'], follow=True)
-        resp = wait_for_query_to_finish(self.client, resp, max=60)
+        resp = wait_for_query_to_finish(self.client, resp, max=120)
         resp.success_url = success_url # Hack until better API
 
       # Check that data is right
@@ -1702,11 +1702,11 @@ for x in sys.stdin:
 
       # Compute stats
       response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': self.db_name, 'table': 'test'}), follow=True)
-      response = wait_for_query_to_finish(self.client, response, max=60.0)
+      response = wait_for_query_to_finish(self.client, response, max=120.0)
       assert_true(response, response)
 
       response = self.client.post(reverse("beeswax:analyze_table", kwargs={'database': self.db_name, 'table': 'test', 'columns': True}), follow=True)
-      response = wait_for_query_to_finish(self.client, response, max=60.0)
+      response = wait_for_query_to_finish(self.client, response, max=120.0)
       assert_true(response, response)
 
       # Retrieve stats
