@@ -409,7 +409,7 @@ class AuditLoggingMiddleware(object):
       'operation': operation,
       'eventTime': self._milliseconds_since_epoch(),
       'allowed': allowed,
-      'status': status,
+      'statusCode': status,
       'service': get_app_name(request),
       'url': request.path
     }))
