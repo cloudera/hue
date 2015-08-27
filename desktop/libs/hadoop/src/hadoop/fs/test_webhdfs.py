@@ -23,11 +23,14 @@ import sys
 import threading
 import unittest
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_false, assert_true, assert_equals, assert_raises, assert_not_equals
 
 from hadoop import pseudo_hdfs4
 from hadoop.fs.exceptions import WebHdfsException
 from hadoop.fs.hadoopfs import Hdfs
+from hadoop.pseudo_hdfs4 import is_live_cluster
+
 
 LOG = logging.getLogger(__name__)
 
@@ -101,6 +104,9 @@ class WebhdfsTests(unittest.TestCase):
 
   def test_seek_across_blocks(self):
     """Makes a file with a lot of blocks, seeks around"""
+    if is_live_cluster():
+      raise SkipTest('HUE-2946: Skipping because requires more memory')
+
     fs = self.cluster.fs
     test_file = self.prefix + "/fortest-blocks.txt"
     fs.create(test_file, replication=1, blocksize=1024**2)
