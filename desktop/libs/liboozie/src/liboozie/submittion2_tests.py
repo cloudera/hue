@@ -135,6 +135,10 @@ def test_copy_files():
     assert_not_equal(stats_udf5['fileId'], cluster.fs.stats(deployment_dir + '/udf5.jar')['fileId'])
     assert_equal(stats_udf6['fileId'], cluster.fs.stats(deployment_dir + '/udf6.jar')['fileId'])
 
+    # Test _create_file()
+    submission._create_file(deployment_dir, 'test.txt', data='Test data')
+    assert_true(cluster.fs.exists(deployment_dir + '/test.txt'), list_dir_workspace)
+
   finally:
     try:
       cluster.fs.rmtree(prefix)

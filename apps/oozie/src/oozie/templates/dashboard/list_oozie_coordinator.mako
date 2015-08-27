@@ -149,6 +149,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   </button>
                 </li>
               % endif
+              <li class="white">
+                <button title="${ _('Sync Workflow') }" id="sync-wf-btn"
+                     data-sync-url="${ url('oozie:sync_coord_workflow', job_id=oozie_coordinator.id) }"
+                     class="btn btn-small sync-wf-btn" style="margin-bottom: 5px">
+                    ${ _('Sync Workflow') }
+                  </button>
+              </li>
             </ul>
           </div>
         </div>
@@ -863,6 +870,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         $('#rerun-coord-modal').html(response);
         $('#rerun-coord-modal').modal('show');
       });
+    });
+
+    $('#sync-wf-btn, .sync-wf-btn').click(function () {
+
+      $.get($(this).data("sync-url"), function (response) {
+        $('#rerun-coord-modal').html(response);
+        $('#rerun-coord-modal').modal('show');
+      });
+
     });
 
     function refreshActionsPagination() {
