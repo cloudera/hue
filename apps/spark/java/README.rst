@@ -28,23 +28,23 @@ Debian/Ubuntu:
   * mvn (from ``maven`` package or maven3 tarball)
   * openjdk-7-jdk (or Oracle Java7 jdk)
   * spark 1.4 from (from `Apache Spark tarball`_)
-	* Python 2.6+
-	* R 3.x
+  * Python 2.6+
+  * R 3.x
 
 Redhat/CentOS:
   * mvn (from ``maven`` package or maven3 tarball)
   * java-1.7.0-openjdk (or Oracle Java7 jdk)
   * spark 1.4 (from `Apache Spark tarball`_)
-	* Python 2.6+
-	* R 3.x
-      
+  * Python 2.6+
+  * R 3.x
+
 MacOS:
   * Xcode command line tools
   * Oracle's JDK 1.7+
   * Maven (Homebrew)
   * apache-spark 1.4 (Homebrew)
-	* Python 2.6+
-	* R 3.x
+  * Python 2.6+
+  * R 3.x
 
 
 
@@ -113,7 +113,7 @@ takes Scala code:
     >>> import json, pprint, requests, textwrap
     >>> host = 'http://localhost:8998'
     >>> data = {'kind': 'spark'}
-		>>> headers = {'Content-Type': 'application/json'}
+    >>> headers = {'Content-Type': 'application/json'}
     >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
     >>> r.json()
     {u'state': u'starting', u'id': 0, u’kind’: u’spark’}
@@ -224,6 +224,50 @@ The PI example from before then can be run as:
      u'state': u'running'}
 
 
+SparkR Example
+==============
+
+SparkR also has the same API:
+
+.. code:: python
+
+    >>> data = {'kind': 'sparkR'}
+    >>> r = requests.post(host + '/sessions', data=json.dumps(data), headers=headers)
+    >>> r.json()
+    {u'id': 1, u'state': u'idle'}
+
+The PI example from before then can be run as:
+
+.. code:: python
+
+    >>> data = {
+    ...   'code': textwrap.dedent("""\
+    ...      n <- 100000
+    ...      piFunc <- function(elem) {
+    ...        rands <- runif(n = 2, min = -1, max = 1)
+    ...        val <- ifelse((rands[1]^2 + rands[2]^2) < 1, 1.0, 0.0)
+    ...        val
+    ...      }
+    ...      piFuncVec <- function(elems) {
+    ...        message(length(elems))
+    ...        rands1 <- runif(n = length(elems), min = -1, max = 1)
+    ...        rands2 <- runif(n = length(elems), min = -1, max = 1)
+    ...        val <- ifelse((rands1^2 + rands2^2) < 1, 1.0, 0.0)
+    ...        sum(val)
+    ...      }
+    ...      rdd <- parallelize(sc, 1:n, slices)
+    ...      count <- reduce(lapplyPartition(rdd, piFuncVec), sum)
+    ...      cat("Pi is roughly", 4.0 * count / n, "\n")
+    ...     """)
+    ... }
+    >>> r = requests.post(statements_url, data=json.dumps(data), headers=headers)
+    >>> pprint.pprint(r.json())
+    {u'id': 12,
+     u'output': {u'data': {u'text/plain': u'Pi is roughly 3.136000'},
+                 u'execution_count': 12,
+                 u'status': u'ok'},
+     u'state': u'running'}
+
 
 Community
 =========
@@ -262,7 +306,13 @@ Request Body
 +----------------+--------------------------------------------------+----------------------------+
 | name           | description                                      | type                       |
 +================+==================================================+============================+
+| id             | The session id                                   | int                        |
++----------------+--------------------------------------------------+----------------------------+
 | kind           | session kind (spark, pyspark, or sparkr)         | `session kind`_ (required) |
++----------------+--------------------------------------------------+----------------------------+
+| log            | The log lines                                    | list of strings            |
++----------------+--------------------------------------------------+----------------------------+
+| state          | The session state                                | string                     |
 +----------------+--------------------------------------------------+----------------------------+
 | file           | archive holding the file                         | path (required)            |
 +----------------+--------------------------------------------------+----------------------------+
@@ -311,6 +361,38 @@ DELETE /sessions/{sessionId}
 -------------------------
 
 Kill the `Session`_ job.
+
+
+GET /sessions/{sessionId}/logs
+---------------------------
+
+Get the log lines from this session.
+
+Request Parameters
+^^^^^^^^^^^^^^^^^^
+
++------+-----------------------------+------+
+| name | description                 | type |
++======+=============================+======+
+| from | offset                      | int  |
++------+-----------------------------+------+
+| size | amount of batches to return | int  |
++------+-----------------------------+------+
+
+Response Body
+^^^^^^^^^^^^^
+
++------+-----------------------+-----------------+
+| name | description           | type            |
++======+=======================+=================+
+| id   | The session id        | int             |
++------+-----------------------+-----------------+
+| from | offset                | int             |
++------+-----------------------+-----------------+
+| size | total amount of lines | int             |
++------+-----------------------+-----------------+
+| log  | The log lines         | list of strings |
++------+-----------------------+-----------------+
 
 
 GET /sessions/{sessionId}/statements
@@ -372,6 +454,12 @@ Request Body
 +----------------+--------------------------------------------------+-----------------+
 | name           | description                                      | type            |
 +================+==================================================+=================+
+| id             | The session id                                   | int             |
++----------------+--------------------------------------------------+-----------------+
+| log            | The log lines                                    | list of strings |
++----------------+--------------------------------------------------+-----------------+
+| state          | The session state                                | string          |
++----------------+--------------------------------------------------+-----------------+
 | file           | archive holding the file                         | path (required) |
 +----------------+--------------------------------------------------+-----------------+
 | args           | command line arguments                           | list of strings |
@@ -423,11 +511,11 @@ Response Body
 +-------+-----------------------------+-----------------+
 | name  | description                 | type            |
 +=======+=============================+=================+
-| id    | `batch`_ list               | list            |
+| id    | The batch id                | int             |
 +-------+-----------------------------+-----------------+
 | state | The state of the batch      | `batch`_ state  |
 +-------+-----------------------------+-----------------+
-| lines | The output of the batch job | list of strings |
+| log   | The output of the batch job | list of strings |
 +-------+-----------------------------+-----------------+
 
 
@@ -435,6 +523,38 @@ DELETE /batches/{batchId}
 -------------------------
 
 Kill the `Batch`_ job.
+
+
+GET /batches/{batchId}/logs
+---------------------------
+
+Get the log lines from this batch.
+
+Request Parameters
+^^^^^^^^^^^^^^^^^^
+
++------+-----------------------------+------+
+| name | description                 | type |
++======+=============================+======+
+| from | offset                      | int  |
++------+-----------------------------+------+
+| size | amount of batches to return | int  |
++------+-----------------------------+------+
+
+Response Body
+^^^^^^^^^^^^^
+
++------+-----------------------+-----------------+
+| name | description           | type            |
++======+=======================+=================+
+| id   | The batch id          | int             |
++------+-----------------------+-----------------+
+| from | offset                | int             |
++------+-----------------------+-----------------+
+| size | total amount of lines | int             |
++------+-----------------------+-----------------+
+| log  | The log lines         | list of strings |
++------+-----------------------+-----------------+
 
 
 REST Objects
