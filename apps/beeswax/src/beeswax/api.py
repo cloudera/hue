@@ -631,10 +631,13 @@ def describe_table(request, database, table):
 
 
 def get_query_form(request):
-  # Get database choices
-  query_server = dbms.get_query_server_config(get_app_name(request))
-  db = dbms.get(request.user, query_server)
-  databases = [(database, database) for database in db.get_databases()]
+  try:
+    # Get database choices
+    query_server = dbms.get_query_server_config(get_app_name(request))
+    db = dbms.get(request.user, query_server)
+    databases = [(database, database) for database in db.get_databases()]
+  except Exception, e:
+    raise PopupException(_('Unable to access databases, Query Server or Metastore may be down.'), detail=e)
 
   if not databases:
     raise RuntimeError(_("No databases are available. Permissions could be missing."))
