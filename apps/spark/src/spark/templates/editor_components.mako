@@ -860,11 +860,164 @@ from desktop.views import _ko
   </div>
   <div style="position:absolute; width:100%; bottom: 0;"><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
+
+<div class="hoverMsg hide">
+  <p class="hoverText">${_('Drop iPython/Zeppelin notebooks here')}</p>
+</div>
+
 </%def>
 
 
 <%def name="commonJS()">
+
 <script type="text/javascript" charset="utf-8">
+
+  // Drag and drop iPython / Zeppelin notebooks
+  if (window.FileReader) {
+
+    var showHoverMsg = function () {
+      $(".hoverMsg").removeClass("hide");
+    };
+
+    var hideHoverMsg = function () {
+      $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
+      $(".hoverMsg").addClass("hide");
+    };
+
+    var aceChecks = 0;
+
+    function handleFileSelect(evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      var dt = evt.dataTransfer;
+      var files = dt.files;
+      showHoverMsg();
+
+      function addMarkdown(content) {
+        var snip = viewModel.notebooks()[0].addSnippet({type: "text", result: {}}, true);
+        snip.statement_raw(markdown.toHTML(content));
+      }
+
+      function addAce(content, snippetType) {
+        var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
+        snip.statement_raw(content);
+        aceChecks++;
+        snip.checkForAce = window.setInterval(function () {
+          if (snip.ace()) {
+            window.clearInterval(snip.checkForAce);
+            aceChecks--;
+            if (aceChecks == 0) {
+              hideHoverMsg();
+            }
+          }
+        }, 100);
+      }
+
+      function addPySpark(content) {
+        addAce(content, "pyspark");
+      }
+
+      function addSql(content) {
+        addAce(content, "hive");
+      }
+
+      function addScala(content) {
+        addAce(content, "spark");
+      }
+
+      for (var i = 0, f; f = files[i]; i++) {
+        var reader = new FileReader();
+        reader.onload = (function (file) {
+          return function (e) {
+            $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
+            try {
+              var loaded = JSON.parse(e.target.result);
+
+              if (loaded.cells) { //ipython
+                loaded.cells.forEach(function (cell) {
+                  window.setTimeout(function () {
+                    if (cell.cell_type == "code") {
+                      addPySpark(cell.source.join("\n"));
+                    }
+                    if (cell.cell_type == "markdown") {
+                      addMarkdown(cell.source.join("\n"));
+                    }
+                  }, 10);
+                });
+              }
+
+              if (loaded.paragraphs) { //zeppelin
+                if (loaded.name) {
+                  viewModel.notebooks()[0].name(loaded.name);
+                }
+                loaded.paragraphs.forEach(function (paragraph) {
+                  if (paragraph.text) {
+                    var content = paragraph.text.split("\n");
+                    if (content[0].indexOf("%md") > -1) {
+                      content.shift();
+                      addMarkdown(content.join("\n"));
+                    }
+                    else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
+                      content.shift();
+                      addSql(content.join("\n"));
+                    }
+                    else if (content[0].indexOf("%pyspark") > -1) {
+                      content.shift();
+                      addPySpark(content.join("\n"));
+                    }
+                    else {
+                      if (content[0].indexOf("%spark") > -1){
+                        content.shift();
+                      }
+                      addScala(content.join("\n"));
+                    }
+                  }
+                });
+              }
+            }
+            catch (e) {
+              hideHoverMsg();
+            }
+          };
+        })(f);
+        reader.readAsText(f);
+      }
+    }
+
+    function handleDragOver(evt) {
+      evt.stopPropagation();
+      evt.preventDefault();
+      evt.dataTransfer.dropEffect = "copy";
+    }
+
+    var dropZone = $("body")[0];
+    dropZone.addEventListener("dragenter", showHoverMsg, false);
+    dropZone.addEventListener("dragover", handleDragOver, false);
+    dropZone.addEventListener("drop", handleFileSelect, false);
+
+    var isDraggingOverText = false;
+
+    $(".hoverText").on("dragenter", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      isDraggingOverText = true;
+    });
+
+    $(".hoverText").on("dragleave", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      isDraggingOverText = false;
+    });
+
+    $(".hoverMsg").on("dragleave", function (e) {
+      if (!isDraggingOverText) {
+        hideHoverMsg();
+      }
+    });
+  }
+
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 
