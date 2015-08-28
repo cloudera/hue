@@ -97,15 +97,16 @@ class Resource(object):
     return self.invoke("GET", relpath, params, headers=headers, allow_redirects=True)
 
 
-  def delete(self, relpath=None, params=None):
+  def delete(self, relpath=None, params=None, headers=None):
     """
     Invoke the DELETE method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
     @param params: Key-value data.
+    @param headers: Optional. Base set of headers.
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("DELETE", relpath, params)
+    return self.invoke("DELETE", relpath, params, headers=headers)
 
 
   def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None):

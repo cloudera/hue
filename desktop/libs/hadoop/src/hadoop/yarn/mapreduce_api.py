@@ -35,14 +35,14 @@ _api_cache = None
 _api_cache_lock = threading.Lock()
 
 
-def get_mapreduce_api():
+def get_mapreduce_api(user):
   global _api_cache
   if _api_cache is None:
     _api_cache_lock.acquire()
     try:
       if _api_cache is None:
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
-        _api_cache = MapreduceApi(yarn_cluster.PROXY_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        _api_cache = MapreduceApi(user, yarn_cluster.PROXY_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       _api_cache_lock.release()
   return _api_cache
@@ -50,8 +50,9 @@ def get_mapreduce_api():
 
 class MapreduceApi(object):
 
-  def __init__(self, oozie_url, security_enabled=False, ssl_cert_ca_verify=False):
-    self._url = posixpath.join(oozie_url, 'proxy')
+  def __init__(self, user, mr_url, security_enabled=False, ssl_cert_ca_verify=False):
+    self._user = user
+    self._url = posixpath.join(mr_url, 'proxy')
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
@@ -114,4 +115,4 @@ class MapreduceApi(object):
 
   def kill(self, job_id):
     app_id = job_id.replace('job', 'application')
-    get_resource_manager().kill(app_id) # We need to call the RM
+    get_resource_manager(self._user).kill(app_id) # We need to call the RM

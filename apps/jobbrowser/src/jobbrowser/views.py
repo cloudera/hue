@@ -242,7 +242,11 @@ def kill_job(request, job):
     access_warn(request, _('Insufficient permission'))
     raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") % {'username': request.user.username, 'user': job.user})
 
-  job.kill()
+  try:
+    job.kill()
+  except Exception, e:
+    LOGGER.exception('Killing job')
+    raise PopupException(e)
 
   cur_time = time.time()
   api = get_api(request.user, request.jt)
