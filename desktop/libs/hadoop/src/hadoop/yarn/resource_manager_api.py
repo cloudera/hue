@@ -76,8 +76,8 @@ class ResourceManagerApi(object):
   def _get_params(self):
     params = {}
 
-    if DEFAULT_USER != self._user.username: # We impersonate if needed
-      params['doAs'] = self._user.username
+    if self._user != DEFAULT_USER: # We impersonate if needed
+      params['doAs'] = self._user
       if not self.security_enabled:
         params['user.name'] = DEFAULT_USER
 
@@ -96,7 +96,6 @@ class ResourceManagerApi(object):
 
   def cluster(self, **kwargs):
     params = self._get_params()
-    params.update(kwargs)
     return self._execute(self._root.get, 'cluster/info', params=params, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def apps(self, **kwargs):

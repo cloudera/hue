@@ -387,10 +387,6 @@ class TestMapReduce2NoHadoop:
     if not hasattr(history_server_api, 'old_get_history_server_api'):
       history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
 
-    resource_manager_api.get_resource_manager = lambda: MockResourceManagerApi()
-    mapreduce_api.get_mapreduce_api = lambda: MockMapreduceApi()
-    history_server_api.get_history_server_api = lambda: HistoryServerApi()
-
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "jobbrowser")
     self.user = User.objects.get(username='test')
@@ -398,6 +394,10 @@ class TestMapReduce2NoHadoop:
     self.c2 = make_logged_in_client(is_superuser=False, username="test2")
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
+
+    resource_manager_api.get_resource_manager = lambda user: MockResourceManagerApi(user)
+    mapreduce_api.get_mapreduce_api = lambda: MockMapreduceApi()
+    history_server_api.get_history_server_api = lambda: HistoryServerApi()
 
     self.finish = [
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),

@@ -209,7 +209,7 @@ def test_yarn_configurations(user):
 
   try:
     url = ''
-    api = get_resource_manager(user)
+    api = get_resource_manager(user.username)
     url = api._url
     api.apps()
   except Exception, e:
