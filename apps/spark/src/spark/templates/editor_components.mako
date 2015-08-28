@@ -1020,12 +1020,12 @@ from desktop.views import _ko
 
     if (rawDatum.sorting == "asc") {
       _data.sort(function (a, b) {
-        return a.value > b.value
+        return a.value - b.value
       });
     }
     if (rawDatum.sorting == "desc") {
       _data.sort(function (a, b) {
-        return b.value > a.value
+        return b.value - a.value
       });
     }
 
@@ -1127,12 +1127,12 @@ from desktop.views import _ko
           });
           if (rawDatum.sorting == "asc") {
             _data.sort(function (a, b) {
-              return a.y > b.y
+              return a.y - b.y
             });
           }
           if (rawDatum.sorting == "desc") {
             _data.sort(function (a, b) {
-              return b.y > a.y
+              return b.y - a.y
             });
           }
           _datum.push({
