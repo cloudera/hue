@@ -395,8 +395,8 @@ class TestMapReduce2NoHadoop:
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
 
-    resource_manager_api.get_resource_manager = lambda user: MockResourceManagerApi(user)
-    mapreduce_api.get_mapreduce_api = lambda: MockMapreduceApi()
+    resource_manager_api.get_resource_manager = lambda user: MockResourceManagerApi(user.username)
+    mapreduce_api.get_mapreduce_api = lambda user: MockMapreduceApi(user.username)
     history_server_api.get_history_server_api = lambda: HistoryServerApi()
 
     self.finish = [
@@ -606,7 +606,7 @@ class MockMapreduce2Api(object):
   MockMapreduceApi and HistoryServerApi are very similar and inherit from it.
   """
 
-  def __init__(self, oozie_url=None): pass
+  def __init__(self, mr_url=None): pass
 
   def tasks(self, job_id):
     return {
@@ -746,7 +746,7 @@ class MockMapreduceApi(MockMapreduce2Api):
 
 class HistoryServerApi(MockMapreduce2Api):
 
-  def __init__(self, oozie_url=None): pass
+  def __init__(self, hs_url=None): pass
 
   def job(self, user, job_id):
     if '1356251510842_0054' == job_id:
