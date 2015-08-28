@@ -689,11 +689,11 @@ var Notebook = function (vm, notebook) {
     self.sessions.push(session);
   };
 
-  self.addSnippet = function (snippet) {
+  self.addSnippet = function (snippet, skipSession) {
     var _snippet = new Snippet(vm, self, snippet);
     self.snippets.push(_snippet);
 
-    if (self.getSession(_snippet.type()) == null) {
+    if (self.getSession(_snippet.type()) == null && typeof skipSession == "undefined") {
       window.setTimeout(function(){
         self.createSession(new Session(vm, {'type': _snippet.type()}));
       }, 200);
@@ -702,6 +702,7 @@ var Notebook = function (vm, notebook) {
     }
 
     _snippet.init();
+    return _snippet;
   };
 
   self.createSession = function (session, callback, failCallback) {
