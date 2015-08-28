@@ -86,6 +86,8 @@ function BeeswaxViewModel(server) {
     });
   });
 
+  self.impalaSessionLink = ko.observable("");
+
   self.chartType = ko.observable("bars");
   self.chartSorting = ko.observable("none");
   self.chartData = ko.observableArray();
@@ -377,6 +379,31 @@ function BeeswaxViewModel(server) {
       $(document).trigger('server.unmanageable_error', jqXHR.responseText);
     }
   };
+
+  self.fetchingImpalaSession = ko.observable(false);
+  self.fetchImpalaSession = function () {
+    self.fetchingImpalaSession(true);
+    var request = {
+      url: '/impala/api/session/',
+      dataType: 'json',
+      type: 'GET',
+      success: function (data) {
+        if (data && data.properties && data.properties.http_addr) {
+          if (!data.properties.http_addr.match(/^(https?):\/\//)) {
+            data.properties.http_addr = window.location.protocol + "//" + data.properties.http_addr;
+          }
+          self.impalaSessionLink(data.properties.http_addr);
+        }
+        else {
+          self.impalaSessionLink("");
+        }
+        self.fetchingImpalaSession(false);
+      },
+      error: error_fn,
+      cache: false
+    };
+    $.ajax(request);
+  }
 
   self.fetchDesign = function() {
     $(document).trigger('fetch.design');

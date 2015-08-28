@@ -206,13 +206,28 @@ ${layout.menubar(section='query')}
       <div class="tab-pane" id="sessionTab">
         <div class="card card-small card-tab">
           <div class="card-body">
-            <div id="advanced-settings">
-            <form id="advancedSettingsForm" action="" method="POST" class="form form-horizontal">
-
-              link
-
-            </form>
+            <!-- ko if: $root.fetchingImpalaSession() -->
+            <div style="margin: 5px">
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
+            <!-- /ko -->
+
+            <!-- ko ifnot: $root.fetchingImpalaSession() -->
+              <!-- ko if: $root.impalaSessionLink() != '' -->
+              <ul class="nav nav-list" style="border: none; padding: 0;">
+                <li class="nav-header">${ _('address')}</li>
+              </ul>
+              <div style="margin: 2px">
+              <a data-bind="attr: {'href': $root.impalaSessionLink()}" target="_blank"><span data-bind="text: $root.impalaSessionLink().replace(/^(https?):\/\//, '')"></span> <i class="fa fa-external-link"></i></a>
+              </div>
+              <!-- /ko -->
+              <!-- ko if: $root.impalaSessionLink() == '' -->
+              <div style="margin: 5px">
+                ${ _("There's currently no valid session") }
+              </div>
+              <!-- /ko -->
+            <!-- /ko -->
           </div>
         </div>
       </div>
@@ -2081,6 +2096,13 @@ $(document).ready(function () {
   $("a[href='#log']").on("shown", function () {
     resizeLogs();
   });
+
+  % if app_name == 'impala':
+  $("a[href='#sessionTab']").on("shown", function () {
+    // get the impala session info
+    viewModel.fetchImpalaSession();
+  });
+  % endif
 
   $(".blueprintSelect").on("change", function () {
     generateGraph(getGraphType())
