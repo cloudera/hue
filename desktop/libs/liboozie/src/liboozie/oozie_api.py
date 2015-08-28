@@ -16,7 +16,6 @@
 
 import logging
 import posixpath
-import threading
 
 from desktop.conf import TIME_ZONE
 from desktop.conf import DEFAULT_USER

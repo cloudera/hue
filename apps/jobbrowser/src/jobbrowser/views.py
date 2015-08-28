@@ -66,7 +66,7 @@ def check_job_permission(view_func):
       job = get_api(request.user, request.jt).get_job(jobid=jobid)
     except ApplicationNotRunning, e:
       if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
-        rm_api = resource_manager_api.get_resource_manager()
+        rm_api = resource_manager_api.get_resource_manager(request.user)
         job = Application(e.job, rm_api)
       else:
         # reverse() seems broken, using request.path but beware, it discards GET and POST info
@@ -108,21 +108,21 @@ def jobs(request):
   retired = request.GET.get('retired')
 
   if request.GET.get('format') == 'json':
-    try:
+#    try:
       # Limit number of jobs to be 10,000
       jobs = get_api(request.user, request.jt).get_jobs(user=request.user, username=user, state=state, text=text, retired=retired, limit=10000)
-    except Exception, ex:
-      ex_message = str(ex)
-      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
-        raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
-      elif 'Could not connect to' in ex_message:
-        raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
-      else:
-        raise ex
-    json_jobs = {
-      'jobs': [massage_job_for_json(job, request) for job in jobs],
-    }
-    return JsonResponse(json_jobs, encoder=JSONEncoderForHTML)
+#    except Exception, ex:
+#      ex_message = str(ex)
+#      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
+#        raise PopupException(_('Resource Manager cannot be contacted or might be down.'))
+#      elif 'Could not connect to' in ex_message:
+#        raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
+#      else:
+#        raise ex
+      json_jobs = {
+        'jobs': [massage_job_for_json(job, request) for job in jobs],
+      }
+      return JsonResponse(json_jobs, encoder=JSONEncoderForHTML)
 
   return render('jobs.mako', request, {
     'request': request,
