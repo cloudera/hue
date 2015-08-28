@@ -134,7 +134,7 @@ ${ layout.menubar(section='hive') }
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             <div>
             <br/>
-             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
+             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
             </div>
           </li>
         </ul>
