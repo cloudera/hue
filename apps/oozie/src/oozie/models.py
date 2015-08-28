@@ -109,7 +109,7 @@ class Job(models.Model):
   Base class for Oozie Workflows, Coordinators and Bundles.
   """
   owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.')) # Deprecated
-  name = models.CharField(max_length=40, blank=False, validators=[name_validator], # Deprecated
+  name = models.CharField(max_length=255, blank=False, validators=[name_validator], # Deprecated
       help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
   description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'), # Deprecated
                                  help_text=_t('The purpose of the job.'))
@@ -637,7 +637,7 @@ class Node(models.Model):
   """
   PARAM_FIELDS = ()
 
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
+  name = models.CharField(max_length=255, validators=[name_validator], verbose_name=_t('Name'),
                           help_text=_t('Name of the action, which must be unique by workflow.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
                                  help_text=_t('The purpose of the action.'))
