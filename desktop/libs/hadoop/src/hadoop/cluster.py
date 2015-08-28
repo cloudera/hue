@@ -22,6 +22,7 @@ from hadoop import conf
 from hadoop.fs import webhdfs, LocalSubFileSystem
 from hadoop.job_tracker import LiveJobTracker
 
+from desktop.conf import DEFAULT_USER
 from desktop.lib.paths import get_build_dir
 
 
@@ -31,6 +32,7 @@ LOG = logging.getLogger(__name__)
 FS_CACHE = None
 MR_CACHE = None
 MR_NAME_CACHE = 'default'
+DEFAULT_USER = DEFAULT_USER.get()
 
 
 def _make_filesystem(identifier):
@@ -185,7 +187,7 @@ def get_next_ha_yarncluster():
   for name in conf.YARN_CLUSTERS.keys():
     config = conf.YARN_CLUSTERS[name]
     if config.SUBMIT_TO.get():
-      rm = ResourceManagerApi(config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get(), config.SSL_CERT_CA_VERIFY.get())
+      rm = ResourceManagerApi(DEFAULT_USER, config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get(), config.SSL_CERT_CA_VERIFY.get())
       if has_ha:
         try:
           cluster_info = rm.cluster()
