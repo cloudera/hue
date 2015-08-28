@@ -2981,12 +2981,12 @@ function pieChartDataTransformer(data) {
 
   if (viewModel.chartSorting() == "asc"){
     _data.sort(function(a, b){
-      return a.value > b.value
+      return a.value - b.value
     });
   }
   if (viewModel.chartSorting() == "desc"){
     _data.sort(function(a, b){
-      return b.value > a.value
+      return b.value - a.value
     });
   }
 
@@ -3023,12 +3023,12 @@ function barChartDataTransformer(rawDatum) {
 
   if (viewModel.chartSorting() == "asc"){
     _data.sort(function(a, b){
-      return a.y > b.y
+      return a.y - b.y
     });
   }
   if (viewModel.chartSorting() == "desc"){
     _data.sort(function(a, b){
-      return b.y > a.y
+      return b.y - a.y
     });
   }
 
@@ -3064,12 +3064,12 @@ function lineChartDataTransformer(rawDatum) {
 
     if (viewModel.chartSorting() == "asc"){
       _data.sort(function(a, b){
-        return a.y > b.y
+        return a.y - b.y
       });
     }
     if (viewModel.chartSorting() == "desc"){
       _data.sort(function(a, b){
-        return b.y > a.y
+        return b.y - a.y
       });
     }
 
