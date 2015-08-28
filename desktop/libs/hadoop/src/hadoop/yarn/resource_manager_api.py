@@ -24,6 +24,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.conf import DEFAULT_USER
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.i18n import smart_str
 from desktop.lib.rest.http_client import HttpClient
 from desktop.lib.rest.resource import Resource
 
@@ -108,8 +109,34 @@ class ResourceManagerApi(object):
     return self._execute(self._root.get, 'cluster/apps/%(app_id)s' % {'app_id': app_id}, params=params, headers={'Accept': _JSON_CONTENT_TYPE})
 
   def kill(self, app_id):
+    data = {'state': 'KILLED'}
+    token = None
+
+    # Tokens are managed within the kill method but should be moved out when not alpha anymore or we support submitting an app.
+    if self.security_enabled:
+      full_token = self.delegation_token()
+      if 'token' not in full_token:
+        raise PopupException(_('YARN did not return any token field.'), detail=smart_str(full_token))
+      data['X-Hadoop-Delegation-Token'] = token = full_token.pop('token')
+      LOG.debug('Received delegation token %s' % full_token)
+
+    try:
+      params = self._get_params()
+      return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    finally:
+      if token:
+        self.cancel_token(token)
+
+  def delegation_token(self):
     params = self._get_params()
-    return self._execute(self._root.put, 'cluster/apps/%(app_id)s/state' % {'app_id': app_id}, params=params, data=json.dumps({'state': 'KILLED'}), contenttype=_JSON_CONTENT_TYPE)
+    data = {'renewer': self._user}
+    return self._execute(self._root.post, 'cluster/delegation-token', params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+
+  def cancel_token(self, token):
+    params = self._get_params()
+    headers = {'Hadoop-YARN-RM-Delegation-Token': token}
+    LOG.debug('Canceling delegation token of ' % self._user)
+    return self._execute(self._root.delete, 'cluster/delegation-token', params=params, headers=headers)
 
   def _execute(self, function, *args, **kwargs):
     response = function(*args, **kwargs)
