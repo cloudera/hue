@@ -95,6 +95,21 @@ class TestWithZooKeeper:
     db = client.get_children_data(namespace='')
     assert_true(len(db) > 0)
 
+  def test_path_exists(self):
+    try:
+      root_node = '%s/%s' % (TestWithZooKeeper.namespace, 'test_path_exists')
+      client = ZookeeperClient(hosts=zkensemble(), read_only=False)
+
+      # Delete the root_node first just in case it wasn't cleaned up in previous run
+      client.zk.start()
+      client.zk.create(root_node, value='test_path_exists')
+      client.zk.stop()
+
+      assert_true(client.path_exists(namespace=root_node))
+      assert_false(client.path_exists(namespace='bogus_path'))
+    finally:
+      client.delete_path(root_node)
+
   def test_copy_and_delete_path(self):
     root_node = '%s/%s' % (TestWithZooKeeper.namespace, 'test_copy_and_delete_path')
     client = ZookeeperClient(hosts=zkensemble(), read_only=False)

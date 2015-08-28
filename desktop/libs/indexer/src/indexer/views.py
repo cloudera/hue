@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse, render
 
-from indexer.controller2 import CollectionController
+from indexer.controller2 import IndexController
 from indexer.management.commands import indexer_setup
 
 
@@ -34,7 +34,7 @@ def collections(request, is_redirect=False):
 
 
 def indexes(request):
-  searcher = CollectionController(request.user)
+  searcher = IndexController(request.user)
   indexes = searcher.get_indexes()
   
   for index in indexes:
