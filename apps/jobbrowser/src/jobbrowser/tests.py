@@ -577,7 +577,7 @@ class MockResourceManagerApi:
     },
   }
 
-  def __init__(self, oozie_url=None): pass
+  def __init__(self, user, rm_url=None): pass
 
   def apps(self, **kwargs):
     return {

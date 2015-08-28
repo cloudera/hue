@@ -191,7 +191,7 @@ def config_validator(user):
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
-      res.extend(test_yarn_configurations())
+      res.extend(test_yarn_configurations(user))
       submit_to.append('yarn_clusters.' + name)
 
   if not submit_to:
@@ -201,7 +201,7 @@ def config_validator(user):
   return res
 
 
-def test_yarn_configurations():
+def test_yarn_configurations(user):
   # Single cluster for now
   from hadoop.yarn.resource_manager_api import get_resource_manager
 
@@ -209,7 +209,7 @@ def test_yarn_configurations():
 
   try:
     url = ''
-    api = get_resource_manager()
+    api = get_resource_manager(user)
     url = api._url
     api.apps()
   except Exception, e:

@@ -213,7 +213,7 @@ class YarnApi(JobBrowserApi):
   """
   def __init__(self, user):
     self.user = user
-    self.resource_manager_api = resource_manager_api.get_resource_manager()
+    self.resource_manager_api = resource_manager_api.get_resource_manager(user)
     self.mapreduce_api = mapreduce_api.get_mapreduce_api()
     self.history_server_api = history_server_api.get_history_server_api()
 
@@ -302,7 +302,7 @@ class YarnApi(JobBrowserApi):
     return self.get_job(jobid).task(task_id)
 
   def get_tracker(self, node_manager_http_address, container_id):
-    api = node_manager_api.get_resource_manager_api('http://' + node_manager_http_address)
+    api = node_manager_api.get_node_manager_api('http://' + node_manager_http_address)
     return Container(api.container(container_id))
 
 
