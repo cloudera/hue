@@ -1551,7 +1551,7 @@ for x in sys.stdin:
       resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=180.0)
       resp = self.client.get("/metastore/databases/")
-      assert_true(db_name in resp.context["database_names"], resp)
+      assert_true(db_name in resp.context["databases"], resp)
 
       # Test for accented characters in 'comment'
       resp = self.client.post("/beeswax/create/database", {
@@ -1563,7 +1563,7 @@ for x in sys.stdin:
       resp = self.client.get(reverse("beeswax:api_watch_query_refresh_json", kwargs={'id': resp.context['query'].id}), follow=True)
       resp = wait_for_query_to_finish(self.client, resp, max=180.0)
       resp = self.client.get("/metastore/databases/")
-      assert_true(db_name_accent in resp.context['database_names'], resp)
+      assert_true(db_name_accent in resp.context['databases'], resp)
     finally:
       make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
       make_query(self.client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name_accent}, wait=True)
@@ -2842,3 +2842,13 @@ def test_ssl_validate():
     finally:
       for reset in resets:
         reset()
+
+
+def test_to_matching_wildcard():
+    match_fn = dbms.HiveServer2Dbms.to_matching_wildcard
+
+    assert_equal(match_fn(None), '*')
+    assert_equal(match_fn(''), '*')
+    assert_equal(match_fn('*'), '*')
+    assert_equal(match_fn('test'), '*test*')
+    assert_equal(match_fn('test*'), '*test*')

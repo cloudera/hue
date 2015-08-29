@@ -53,9 +53,10 @@ ${ components.menubar() }
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
         <%actionbar:render>
           <%def name="search()">
-            <input id="filterInput" type="text" class="input-xlarge search-query" placeholder="${_('Search for table name')}">
+            <form id="searchQueryForm" action="${ url('metastore:show_tables') }" method="GET" class="inline">
+              <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="${ search_filter }" placeholder="${_('Search for table name')}" />
+            </form>
           </%def>
-
           <%def name="actions()">
             <button id="viewBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-eye"></i> ${_('View')}</button>
             <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
@@ -71,8 +72,10 @@ ${ components.menubar() }
                 <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
                 <th>&nbsp;</th>
                 <th>${_('Table Name')}</th>
+                % if has_metadata:
                 <th>${_('Comment')}</th>
                 <th>${_('Type')}</th>
+                % endif
               </tr>
             </thead>
             <tbody>
@@ -87,10 +90,12 @@ ${ components.menubar() }
                 </td>
                 <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="${ table['name'] }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
                 <td>
-                  <a href="${ url('metastore:describe_table', database=database, table=table['name']) }" data-row-selector="true">${ table['name'] }</a>
+                  <a class="tableLink" href="${ url('metastore:describe_table', database=database, table=table['name']) }" data-row-selector="true">${ table['name'] }</a>
                 </td>
+                % if has_metadata:
                 <td>${ smart_unicode(table['comment']) }</td>
                 <td>${ smart_unicode(table['type']) }</td>
+                % endif
               </tr>
             % endfor
             </tbody>
@@ -160,8 +165,10 @@ ${ components.menubar() }
         {"bSortable": false, "sWidth": "1%" },
         {"bSortable": false, "sWidth": "1%" },
         null,
+        % if has_metadata:
         null,
         null
+        % endif
       ],
       "oLanguage": {
         "sEmptyTable": "${_('No data available')}",
@@ -169,9 +176,16 @@ ${ components.menubar() }
       }
     });
 
-    $("#filterInput").keyup(function () {
-      tables.fnFilter($(this).val());
+    var _searchInputValue = $("#filterInput").val();
+
+    $("#filterInput").jHueDelayedInput(function(){
+      if ($("#filterInput").val() != _searchInputValue){
+        $("#searchQueryForm").submit();
+      }
     });
+
+    $("#filterInput").focus();
+    $("#filterInput").val(_searchInputValue); // set caret at the end of the field
 
     $("a[data-row-selector='true']").jHueRowSelector();
 
@@ -211,6 +225,21 @@ ${ components.menubar() }
         $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
+    });
+
+      $(".tableLink").mouseover(function() {
+      var _link = $(this);
+      $.ajax({
+        type: "GET",
+        url: "/metastore/table/${database}/" + $(this).text() + "/metadata",
+        dataType: "json",
+        data: {},
+        success: function (response) {
+          if (response && response.status == 0) {
+            _link.attr("title", response.data.comment).tooltip("show");
+          }
+        },
+      });
     });
 
     $(".tableCheck").click(function () {
