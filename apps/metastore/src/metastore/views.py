@@ -33,6 +33,7 @@ from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
+from metastore.conf import HS2_GET_TABLES_MAX
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 
@@ -40,7 +41,7 @@ from metastore.settings import DJANGO_APPS
 LOG = logging.getLogger(__name__)
 
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
-
+HS2_GET_TABLES_MAX = HS2_GET_TABLES_MAX.get()
 
 def check_has_write_access_permission(view_func):
   """
@@ -63,18 +64,15 @@ Database Views
 """
 
 def databases(request):
-  db = dbms.get(request.user)
-  databases = []
-  database_names = db.get_databases()
+  search_filter = request.GET.get('filter', '')
 
-  for database in database_names:
-    db_metadata = db.get_database(database)
-    databases.append(db_metadata)
+  db = dbms.get(request.user)
+  databases = db.get_databases(search_filter)
 
   return render("databases.mako", request, {
     'breadcrumbs': [],
+    'search_filter': search_filter,
     'databases': databases,
-    'database_names': json.dumps(database_names),
     'databases_json': json.dumps(databases),
     'has_write_access': has_write_access(request.user),
   })
@@ -102,6 +100,20 @@ def drop_database(request):
     return render('confirm.mako', request, {'url': request.path, 'title': title})
 
 
+def get_database_metadata(request, database):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'data': ''}
+  try:
+    db_metadata = db.get_database(database)
+    response['status'] = 0
+    response['data'] = db_metadata
+  except Exception, ex:
+    response['status'] = 1
+    response['data'] = _("Cannot get metadata for database: %s") % (database,)
+
+  return JsonResponse(response)
+
+
 """
 Table Views
 """
@@ -125,8 +137,19 @@ def show_tables(request, database=None):
     else:
       db_form = DbForm(initial={'database': database}, databases=databases)
 
-    tables = db.get_tables_meta(database=database)
-    table_names = [table['name'] for table in tables]
+    search_filter = request.GET.get('filter', '')
+
+    table_names = db.get_tables(database=database, table_names=search_filter)
+    tables = [{'name': table} for table in table_names]
+    has_metadata = False
+
+    if len(table_names) <= HS2_GET_TABLES_MAX:  # Only attempt to do a GetTables HS2 call for small result sets
+      try:
+        tables = db.get_tables_meta(database=database, table_names=search_filter)
+        table_names = [table['name'] for table in tables]
+        has_metadata = True
+      except Exception, ex:
+        LOG.exception('Unable to fetch table metadata')
   except Exception, e:
     raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
@@ -139,13 +162,32 @@ def show_tables(request, database=None):
     ],
     'tables': tables,
     'db_form': db_form,
+    'search_filter': search_filter,
     'database': database,
+    'has_metadata': has_metadata,
     'table_names': json.dumps(table_names),
-    'tables_json': json.dumps(tables),
     'has_write_access': has_write_access(request.user),
   })
   resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
+
+
+def get_table_metadata(request, database, table):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'data': ''}
+  try:
+    table_metadata = db.get_table(database, table)
+    response['status'] = 0
+    response['data'] = {
+      'comment': table_metadata.comment,
+      'hdfs_link': table_metadata.hdfs_link,
+      'is_view': table_metadata.is_view
+    }
+  except Exception, ex:
+    response['status'] = 1
+    response['data'] = _("Cannot get metadata for table: `%s`.`%s`") % (database, table)
+
+  return JsonResponse(response)
 
 
 def describe_table(request, database, table):

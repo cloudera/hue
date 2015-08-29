@@ -998,7 +998,6 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
-
 def validate_ldap(user, config):
   res = []
 

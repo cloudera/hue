@@ -22,10 +22,12 @@ urlpatterns = patterns('metastore.views',
 
   url(r'^databases/?$', 'databases', name='databases'),
   url(r'^databases/drop/?$', 'drop_database', name='drop_database'),
+  url(r'^databases/(?P<database>\w+)/metadata$', 'get_database_metadata', name='get_database_metadata'),
 
   url(r'^tables/(?P<database>\w+)?$', 'show_tables', name='show_tables'),
   url(r'^tables/drop/(?P<database>\w+)$', 'drop_table', name='drop_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/metadata$', 'get_table_metadata', name='get_table_metadata'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/load$', 'load_table', name='load_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/read$', 'read_table', name='read_table'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions$', 'describe_partitions', name='describe_partitions'),
