@@ -50,6 +50,7 @@ Autocompleter.prototype.getTableReferenceIndex = function (statement) {
       tableRefsRaw = $.trim(tableRefsRaw.substring(0, upToMatch.index));
     }
     var tableRefs = tableRefsRaw.split(",");
+    tableRefs.sort();
     $.each(tableRefs, function(index, tableRefRaw) {
       var tableMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
       result[tableMatch[2] || tableMatch[1]] = tableMatch[1];
@@ -197,6 +198,11 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       // SELECT column.
       // We use first and only table reference
       tableName = tableReferences[Object.keys(tableReferences)[0]];
+    } else if (Object.keys(tableReferences).length > 1) {
+      callback($.map(Object.keys(tableReferences), function(key, idx) {
+        return { value: key + ".", score: 1000 - idx, meta: tableReferences[key] == key ? 'table' : 'alias' };
+      }));
+      return;
     } else {
       // No table refs
       callback([]);
