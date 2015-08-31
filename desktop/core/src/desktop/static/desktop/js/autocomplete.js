@@ -166,9 +166,10 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
         } else {
           fromKeyword = "from";
         }
-        if (!beforeCursor.match(/\*\s*$/)) {
+        if (beforeCursor.match(/select\s*$/i)) {
           fromKeyword = "? " + fromKeyword;
-        } else if (!beforeCursor.match(/\s+$/)) {
+        }
+        if (!beforeCursor.match(/(\s+|f|fr|fro|from)$/)) {
           fromKeyword = " " + fromKeyword;
         }
         fromKeyword += " ";
