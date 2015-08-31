@@ -126,8 +126,7 @@ describe("autocomplete.js", function() {
       });
     });
 
-    // TODO: Fix me
-    xit("should suggest table names with started FROM", function() {
+    it("should suggest table names with started FROM", function() {
       assertAutoComplete({
         serverResponses: {
           "http://baseUrl/testDb" : {
@@ -136,7 +135,7 @@ describe("autocomplete.js", function() {
         },
         beforeCursor: "SELECT * fr",
         afterCursor: "",
-        expectedSuggestions: [" FROM testTable1", " FROM testTable2"]
+        expectedSuggestions: ["FROM testTable1", "FROM testTable2"]
       });
     });
 
