@@ -627,6 +627,7 @@ var Notebook = function (vm, notebook) {
   self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
   self.snippets = ko.observableArray();
   self.selectedSnippet = ko.observable(vm.availableSnippets()[0].type());
+  self.creatingSessionLocks = ko.observableArray();
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : [], {
     create: function(value) {
       return new Session(vm, value.data);
@@ -644,14 +645,18 @@ var Notebook = function (vm, notebook) {
     return _s;
   };
 
+  self.getSnippets = function(type) {
+    return $.grep(self.snippets(), function (snippet) {
+      return snippet.type() == type;
+    });
+  };
+
   self.restartSession = function (session, callback) {
     if (session.restarting()) {
       return;
     }
     session.restarting(true);
-    var snippets = $.grep(self.snippets(), function (snippet) {
-      return snippet.type() == session.type();
-    });
+    var snippets = self.getSnippets(session.type());
 
     $.each(snippets, function(index, snippet) {
       snippet.status('loading');
@@ -694,7 +699,8 @@ var Notebook = function (vm, notebook) {
     self.snippets.push(_snippet);
 
     if (self.getSession(_snippet.type()) == null && typeof skipSession == "undefined") {
-      window.setTimeout(function(){
+      window.setTimeout(function() {
+        _snippet.status('loading');
         self.createSession(new Session(vm, {'type': _snippet.type()}));
       }, 200);
     } else {
@@ -706,16 +712,18 @@ var Notebook = function (vm, notebook) {
   };
 
   self.createSession = function (session, callback, failCallback) {
-    var snippets = $.grep(self.snippets(), function (snippet) {
-       return snippet.type() == session.type();
-    });
+    if (self.creatingSessionLocks().indexOf(session.type()) != -1) { // Create one type of session max
+      return;
+    } else {
+      self.creatingSessionLocks.push(session.type());
+    }
 
-    $.each(snippets, function(index, snippet) {
+    $.each(self.getSnippets(session.type()), function(index, snippet) {
       snippet.status('loading');
     });
 
     var fail = function (message) {
-      $.each(snippets, function(index, snippet) {
+      $.each(self.getSnippets(session.type()), function(index, snippet) {
         snippet.status('failed');
       });
       $(document).trigger("error", message);
@@ -733,7 +741,7 @@ var Notebook = function (vm, notebook) {
         if (self.getSession(session.type()) == null) {
           self.addSession(session);
         }
-        $.each(snippets, function(index, snippet) {
+        $.each(self.getSnippets(session.type()), function(index, snippet) {
           snippet.status('ready');
         });
         if (callback) {
@@ -745,7 +753,9 @@ var Notebook = function (vm, notebook) {
       }
     }).fail(function (xhr) {
       fail(xhr.responseText);
-    });
+    }).complete(function(xhr, status) {
+      self.creatingSessionLocks.remove(session.type());
+    })
   };
 
   self.newSnippet = function () {
