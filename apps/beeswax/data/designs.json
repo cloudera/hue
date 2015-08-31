@@ -59,7 +59,7 @@
       "type":"0",
       "data":{
          "query":{
-            "query": "SELECT\r\n  c.id,\r\n  c.name,\r\n  c.email_preferences.categories.surveys\r\nFROM customers c;\n\nSELECT\r\n  customers.id,\r\n  customers.name\r\nFROM customers\r\nWHERE customers.addresses['shipping'].zip_code = '${zip_code}';\n\nSELECT\r\n  c.id AS customer_id,\r\n  c.name AS customer_name,\r\n  ords.order_id AS order_id,\r\n  SUM(order_items.price * order_items.qty) AS total_amount\r\nFROM\r\n  customers c\r\nLATERAL VIEW EXPLODE(c.orders) o AS ords\r\nLATERAL VIEW EXPLODE(ords.items) i AS order_items\r\nGROUP BY c.id, c.name, ords.order_id;",
+            "query": "-- Get email survey opt-in values for all customers\nSELECT\r\n  c.id,\r\n  c.name,\r\n  c.email_preferences.categories.surveys\r\nFROM customers c;\n\n\n\n-- Select customers for a given shipping ZIP Code\nSELECT\r\n  customers.id,\r\n  customers.name\r\nFROM customers\r\nWHERE customers.addresses['shipping'].zip_code = '${zip_code}';\n\n\n\n-- Compute total amount per order for all customers\nSELECT\r\n  c.id AS customer_id,\r\n  c.name AS customer_name,\r\n  ords.order_id AS order_id,\r\n  SUM(order_items.price * order_items.qty) AS total_amount\r\nFROM\r\n  customers c\r\nLATERAL VIEW EXPLODE(c.orders) o AS ords\r\nLATERAL VIEW EXPLODE(ords.items) i AS order_items\r\nGROUP BY c.id, c.name, ords.order_id;",
             "type":0,
             "email_notify":false,
             "is_parameterized":true,
@@ -131,7 +131,7 @@
       "type":"1",
       "data":{
          "query":{
-            "query": "SELECT\r\n  c.id,\r\n  c.name,\r\n  c.email_preferences.categories.surveys\r\nFROM customers c;\n\nSELECT\r\n  c.id,\r\n  c.name\r\nFROM customers c, c.addresses a\r\nWHERE a.key = 'shipping' and a.zip_code = '${zip_code}';\n\nSELECT\r\n  c.id AS customer_id,\r\n c.name AS customer_name,\r\n  o.order_id,\r\n  v.total\r\nFROM\r\n  customers c,\r\n  c.orders o,\r\n  (SELECT SUM(price * qty) total FROM o.items) v;",
+            "query": "-- Get email survey opt-in values for all customers \nSELECT\r\n  c.id,\r\n  c.name,\r\n  c.email_preferences.categories.surveys\r\nFROM customers c;\n\n\n\n-- Select customers for a given shipping ZIP Code\nSELECT\r\n  c.id,\r\n  c.name\r\nFROM customers c, c.addresses a\r\nWHERE a.key = 'shipping' and a.zip_code = '${zip_code}';\n\n\n\n-- Compute total amount per order for all customers\nSELECT\r\n  c.id AS customer_id,\r\n c.name AS customer_name,\r\n  o.order_id,\r\n  v.total\r\nFROM\r\n  customers c,\r\n  c.orders o,\r\n  (SELECT SUM(price * qty) total FROM o.items) v;",
             "type":1,
             "email_notify":false,
             "is_parameterized":false,
