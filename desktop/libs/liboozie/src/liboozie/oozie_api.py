@@ -88,7 +88,7 @@ class OozieApi(object):
     return defaults
 
   VALID_JOB_FILTERS = ('name', 'user', 'group', 'status', 'startcreatedtime')
-  VALID_LOG_FILTERS = {'recent', 'limit'}
+  VALID_LOG_FILTERS = {'recent', 'limit', 'loglevel', 'text'}
 
   def get_jobs(self, jobtype, offset=None, cnt=None, filters=None):
     """

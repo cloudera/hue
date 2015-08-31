@@ -534,6 +534,10 @@ def get_oozie_job_log(request, job_id):
       kwargs['logfilter'].extend([('recent', val) for val in request.GET.get('recent').split(':')])
     if request.GET.get('limit'):
       kwargs['logfilter'].extend([('limit', request.GET.get('limit'))])
+    if request.GET.get('loglevel'):
+      kwargs['logfilter'].extend([('loglevel', request.GET.get('loglevel'))])
+    if request.GET.get('text'):
+      kwargs['logfilter'].extend([('text', request.GET.get('text'))])
 
   status_resp = oozie_api.get_job_status(job_id)
   log = oozie_api.get_job_log(job_id, **kwargs)

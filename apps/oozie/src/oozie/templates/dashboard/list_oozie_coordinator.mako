@@ -373,6 +373,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   ${ _("Number of lines") }
                   <input type="text" class="input-medium" data-bind="spinedit: logFilterLimit" placeholder="${_('ie. 10')}"/>
                 </label>
+                <input type="text" data-bind="value: logFilterText" class="input-xlarge search-query" placeholder="${_('String to search in logs')}">
+
+                <span class="btn-group" style="float:right;">
+                  <a class="btn log-status btn-success" data-value='DEBUG|INFO|TRACE'>${ _('Debug') }</a>
+                  <a class="btn log-status btn-warning" data-value='WARN'>${ _('Warning') }</a>
+                  <a class="btn log-status btn-danger disable-feedback" data-value='ERROR|FATAL'>${ _('Error') }</a>
+                </span>
+
                 <div class="inline" style="margin: 10px"><a class="pointer" data-bind="click: $root.toggleLogFilterVisible"><i class="fa fa-times"></i></a></div>
                 <div class="clearfix"></div>
               </div>
@@ -543,13 +551,19 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return (_h != "" ? _h + "h" : "") + (_h != "" && _m != "" ? ":" : "") +  (_m != "" ? _m + "m" : "");
     }).extend({ throttle: 500 });
 
-    self.logFilterLimit = ko.observable("100").extend({ throttle: 500 });
+    self.logFilterLimit = ko.observable("5000").extend({ throttle: 500 });
+
+    self.logFilterText = ko.observable("").extend({ throttle: 500 });
 
     self.logFilterRecent.subscribe(function(){
       refreshLogs();
     });
 
     self.logFilterLimit.subscribe(function(){
+      refreshLogs();
+    });
+
+    self.logFilterText.subscribe(function(){
       refreshLogs();
     });
 
@@ -741,6 +755,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       refreshView();
     });
 
+    $("a.log-status").click(function () {
+      var val = $(this).data("value")
+      var btn = $("a.log-status[data-value='"+ val + "']");
+
+      btn.toggleClass("active");
+      refreshLogs();
+    });
+
     $("a.btn-actions-pagination").on("click", function () {
       if (!$(this).parent().hasClass("disabled")) {
         var _additionalOffset = 0;
@@ -863,9 +885,32 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return selectedStatuses;
     }
 
+    function getLogLevels() {
+      var logStatuses = '';
+      $.each($("a.log-status.active"), function () {
+        val = $(this).data('value');
+        if (logStatuses == '') {
+          logStatuses = val;
+        } else {
+          logStatuses += '|' + val;
+        }
+      });
+
+      return logStatuses;
+    }
+
+    function getLogFilterParams() {
+      return "?format=json" +
+             "&recent=" + viewModel.logFilterRecent() +
+             "&limit=" + viewModel.logFilterLimit() +
+             "&loglevel=" + getLogLevels() +
+             "&text=" + viewModel.logFilterText();
+    }
+
     var logsAtEnd = true;
     refreshLogs = function () {
-      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }" + "?format=json&recent=" + viewModel.logFilterRecent() + "&limit=" + viewModel.logFilterLimit(), function (data) {
+      window.clearTimeout(refreshLogs);
+      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }" + getLogFilterParams(), function (data) {
         var _logsEl = $("#log pre");
         _logsEl.text(data.log);
 
