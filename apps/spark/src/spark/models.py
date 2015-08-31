@@ -443,7 +443,7 @@ class SparkApi(Api):
   def _progress(self, snippet, logs):
     return 50
 
-  def close_statement(self, notebook, snippet): # Individual statements cannot be closed
+  def close_statement(self, snippet): # Individual statements cannot be closed
     pass
 
   def close_session(self, session):

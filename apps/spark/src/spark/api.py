@@ -243,11 +243,12 @@ def close_notebook(request):
 def close_statement(request):
   response = {'status': -1}
 
+  # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['result'] = get_api(request.user, snippet).close_statement(notebook, snippet)
+    response['result'] = get_api(request.user, snippet).close_statement(snippet)
   except QueryExpired:
     pass
 
