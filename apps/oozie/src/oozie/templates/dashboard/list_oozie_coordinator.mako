@@ -361,16 +361,27 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             </div>
 
             <div class="tab-pane" id="log">
-              <div class="pull-left">
-                ${ _("Recent") } <input type="text" class="input-medium" data-bind="value: logFilterRecent" placeholder="${_('2h:30m or 5h:5m')}">
-                ${ _("Limit") } <input type="text" class="input-medium" data-bind="value: logFilterLimit" placeholder="${_('Number of lines, Ex: 10')}">
+              <div data-bind="visible: isLogFilterVisible()" class="margin-bottom-10">
+                <label class="spinedit">
+                  ${ _("Last") }
+                  <input type="text" class="input-medium" style="margin-left: 10px" data-bind="spinedit: logFilterRecentHours, override: { minimum: 0, maximum: 1000, step: 1 }" placeholder="${_('ie. 2')}"/>
+                  ${ _("hours and") }
+                  <input type="text" class="input-medium" style="margin-left: 10px" data-bind="spinedit: logFilterRecentMinutes, override: { minimum: 0, maximum: 59, step: 5 }" placeholder="${_('ie. 30')}"/>
+                  ${ _("minutes") }
+                </label>
+                <label class="spinedit" style="margin-left: 30px">
+                  ${ _("Number of lines") }
+                  <input type="text" class="input-medium" data-bind="spinedit: logFilterLimit" placeholder="${_('ie. 10')}"/>
+                </label>
+                <div class="inline" style="margin: 10px"><a class="pointer" data-bind="click: $root.toggleLogFilterVisible"><i class="fa fa-times"></i></a></div>
+                <div class="clearfix"></div>
               </div>
-              <div class="pull-right">
-                <button data-bind="enable: isLogFilterSet()" class="btn log-refresh">  ${ _('Refresh') } </button>
+              <div style="position:relative">
+                <ul class="pointer unstyled settings-overlay" data-bind="click: $root.toggleLogFilterVisible, visible: !isLogFilterVisible()">
+                  <li><a class="pointer"><i class="fa fa-filter"></i> ${ _("Filter") }</a></li>
+                </ul>
+                <pre></pre>
               </div>
-
-              <div class="clearfix"></div>
-              <pre></pre>
             </div>
 
             <div class="tab-pane" id="definition">
@@ -469,6 +480,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 % endif
 
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
+
+<script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
+
+
 <script>
 
   var setupjHueRowSelector = function () {
@@ -503,42 +522,59 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
   var RunningCoordinatorModel = function (actions) {
     var self = this;
-    this.isLoading = ko.observable(true);
 
-    this.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
+    self.isLoading = ko.observable(true);
+
+    self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
       return new Action(action);
     });
 
-    this.allSelected = ko.observable(false);
+    self.allSelected = ko.observable(false);
 
-    this.filter = ko.observableArray([]);
+    self.filter = ko.observableArray([]);
 
-    this.searchFilter = ko.observable('');
+    self.searchFilter = ko.observable("");
 
-    this.logFilterRecent = ko.observable('');
+    self.logFilterRecentHours = ko.observable("");
+    self.logFilterRecentMinutes = ko.observable("");
+    self.logFilterRecent = ko.computed(function () {
+      var _h = self.logFilterRecentHours();
+      var _m = self.logFilterRecentMinutes();
+      return (_h != "" ? _h + "h" : "") + (_h != "" && _m != "" ? ":" : "") +  (_m != "" ? _m + "m" : "");
+    }).extend({ throttle: 500 });
 
-    this.logFilterLimit = ko.observable('100');
+    self.logFilterLimit = ko.observable("100").extend({ throttle: 500 });
 
-    this.isLogFilterSet = function () {
-      return this.logFilterRecent() || this.logFilterLimit();
-    }
+    self.logFilterRecent.subscribe(function(){
+      refreshLogs();
+    });
 
-    this.select = function (filter) {
-      ko.utils.arrayFilter(self.actions(), function(action) {
+    self.logFilterLimit.subscribe(function(){
+      refreshLogs();
+    });
+
+    self.isLogFilterVisible = ko.observable(false);
+
+    self.toggleLogFilterVisible = function () {
+      self.isLogFilterVisible(!self.isLogFilterVisible());
+    };
+
+    self.select = function (filter) {
+      ko.utils.arrayFilter(self.actions(), function (action) {
         if (action.status.toLowerCase() === filter) {
           action.selected(true);
         }
       });
     };
 
-    this.clearAllSelections = function () {
+    self.clearAllSelections = function () {
       ko.utils.arrayFilter(self.actions(), function (action) {
         action.selected(false);
       });
       self.allSelected(false);
     };
 
-    this.clearSelections = function (filter) {
+    self.clearSelections = function (filter) {
       ko.utils.arrayFilter(self.actions(), function (action) {
         if (action.status.toLowerCase() === filter) {
           action.selected(false);
@@ -547,23 +583,23 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       self.allSelected(false);
     };
 
-    this.selectAll = function () {
+    self.selectAll = function () {
       var regexp;
 
-      if (! Array.isArray(self.filter())) {
+      if (!Array.isArray(self.filter())) {
         ko.utils.arrayForEach(self.actions(), function (action) {
           regexp = new RegExp(self.filter());
 
-          self.allSelected(! self.allSelected());
+          self.allSelected(!self.allSelected());
 
           if (regexp.test(action.title.toLowerCase())) {
-            action.selected(! action.selected());
+            action.selected(!action.selected());
           }
         });
         return true;
       }
 
-      self.allSelected(! self.allSelected());
+      self.allSelected(!self.allSelected());
 
       ko.utils.arrayForEach(self.actions(), function (action) {
         if (action.id) {
@@ -573,7 +609,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return true;
     };
 
-    this.selectedActions = ko.computed(function () {
+    self.selectedActions = ko.computed(function () {
       var actionlist = [];
 
       ko.utils.arrayFilter(self.actions(), function (action) {
@@ -584,7 +620,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return actionlist;
     });
 
-    this.searchFilter.subscribe(function () {
+    self.searchFilter.subscribe(function () {
       if (self.searchFilter().length === 0) {
         self.filter([]);
       } else {
@@ -598,11 +634,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       }
     });
 
-    this.filteredActions = ko.computed(function () {
+    self.filteredActions = ko.computed(function () {
       var filter = self.filter(),
-        actions = [],
-        regexp,
-        data;
+          actions = [],
+          regexp,
+          data;
 
       if (self.filter().length === 0) {
         return self.actions();
@@ -638,10 +674,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     ACTUAL_END: "${_('Actual End')}",
     TOOLTIP_ADDON: "${_('click for the SLA dashboard')}"
   }
-  var slaTable, refreshViewTimer;
+  var slaTable, refreshViewTimer, refreshLogs;
   var PAGE_SIZE = 50;
   var actionTableOffset = 1;
-
 
   $(document).ready(function(){
     $("a[data-row-selector='true']").jHueRowSelector();
@@ -704,10 +739,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       btnCalendar.toggleClass("active");
       btnAction.toggleClass("active");
       refreshView();
-    });
-
-    $('#log-refresh, .log-refresh').click(function () {
-      refreshLogs();
     });
 
     $("a.btn-actions-pagination").on("click", function () {
@@ -832,12 +863,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return selectedStatuses;
     }
 
-    resizeLogs();
-    refreshView();
-    refreshLogs();
-
     var logsAtEnd = true;
-    function refreshLogs() {
+    refreshLogs = function () {
       $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }" + "?format=json&recent=" + viewModel.logFilterRecent() + "&limit=" + viewModel.logFilterLimit(), function (data) {
         var _logsEl = $("#log pre");
         _logsEl.text(data.log);
@@ -851,6 +878,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         window.setTimeout(refreshLogs, 20000);
       });
     }
+
+    resizeLogs();
+    refreshView();
+    refreshLogs();
 
     function refreshActionPaginationButtons(totalJobs) {
       var prevBtnActions = $("a.btn-actions-pagination[data-table='actions'][data-value='prev']");

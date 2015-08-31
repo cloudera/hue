@@ -962,13 +962,14 @@ ko.bindingHandlers.clearable = {
 
 ko.bindingHandlers.spinedit = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
-    $(element).spinedit({
+    var options = $.extend({
       minimum: 0,
       maximum: 10000,
       step: 5,
       value: ko.unwrap(valueAccessor()),
       numberOfDecimals: 0
-    });
+    }, allBindingsAccessor().override);
+    $(element).spinedit(options);
     $(element).on("valueChanged", function (e) {
       valueAccessor()(e.value);
     });
