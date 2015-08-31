@@ -41,3 +41,35 @@
 .search-query {
    margin-right: .75em;
 }
+
+.settings-overlay {
+  background-color: #FFF;
+  opacity: 0.95;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+}
+
+.settings-overlay li {
+  padding: 5px;
+}
+
+.settings-overlay:hover {
+  opacity: 1;
+}
+
+div.spinedit .fa-chevron-up {
+  top: -6px!important;
+}
+
+div.spinedit .fa-chevron-down {
+  top: 5px!important;;
+}
+
+label.spinedit {
+  display: inline;
+}
+
+label.spinedit input {
+  margin-bottom: 0;
+}
