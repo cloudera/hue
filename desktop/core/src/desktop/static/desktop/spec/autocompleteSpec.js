@@ -263,8 +263,7 @@ describe("autocomplete.js", function() {
       });
     });
 
-    // TODO: Fix me
-    xit("should suggest aliases", function() {
+    it("should suggest aliases", function() {
       assertAutoComplete({
         serverResponses: {
           "http://baseUrl/testDb/testTableA" : {
@@ -275,8 +274,8 @@ describe("autocomplete.js", function() {
           }
         },
         beforeCursor: "SELECT ",
-        afterCursor: " FROM testTableA tta, testTableB ttb",
-        expectedSuggestions: ["tta", "ttb"]
+        afterCursor: " FROM testTableA tta, testTableB",
+        expectedSuggestions: ["testTableB.", "tta."]
       });
     });
 
