@@ -802,6 +802,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/Autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 
@@ -1124,6 +1125,12 @@ var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
     hasBeenResetAfterError = true;
   }
 };
+
+var autocompleter = new Autocompleter({
+  baseUrl: HIVE_AUTOCOMPLETE_BASE_URL,
+  app: HIVE_AUTOCOMPLETE_APP,
+  user: HIVE_AUTOCOMPLETE_USER
+});
 
 var escapeOutput = function (str) {
   return $('<span>').text(str).html().trim();
@@ -1738,102 +1745,38 @@ $(document).ready(function () {
     }
     $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
 
-    if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + viewModel.database()) == null) {
+    var _statementAtCursor = getStatementAtCursor();
+    var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
+    var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
+
+    autocompleter.autocomplete(_before, _after, function(suggestions) {
+      CodeMirror.possibleSoloField = suggestions.length > 0;
+      CodeMirror.tableFieldMagic = false;
+      CodeMirror.fromDot = _before.match(/.*\.[^ ]*$/) != null;
+      var isTable = false;
+
+      var values = suggestions.map(function(suggestion) {
+        if (suggestion.meta === "table") {
+          isTable = true; // They're all tables.
+          var match = suggestion.value.match(/(\? )?f?r?o?m? ?([^ ]+)$/i);
+          if (typeof match[1] !== "undefined") {
+            CodeMirror.tableFieldMagic = true;
+          }
+          return match[2];
+        } else {
+          return CodeMirror.fromDot ? "." + suggestion.value : suggestion.value;
+        }
+      }).join(' ');
+
+      if (isTable) {
+        CodeMirror.possibleTable = !CodeMirror.tableFieldMagic;
+        CodeMirror.catalogTables = values;
+      } else {
+        CodeMirror.catalogFields = values;
+      }
       CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-      hac_getTables(viewModel.database(), function () {
-      }); // if preload didn't work, tries again
-    }
-    else {
-      hac_getTables(viewModel.database(), function (tables) {
-        CodeMirror.catalogTables = tables;
-        var _statementAtCursor = getStatementAtCursor();
-        var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
-        var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
-        if ($.trim(_before).substr(-1) == ".") {
-          var _statement = _statementAtCursor.statement;
-          var _line = codeMirror.getLine(codeMirror.getCursor().line);
-          var _partial = _line.substring(0, codeMirror.getCursor().ch);
-          var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
-          if (_statement.toUpperCase().indexOf("FROM") > -1) {
-            hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
-              var _cols = columns.split(" ");
-              for (var col in _cols) {
-                _cols[col] = "." + _cols[col];
-              }
-              CodeMirror.catalogFields = _cols.join(" ");
-              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-            });
-          }
-        }
-        else {
-          CodeMirror.possibleTable = false;
-          CodeMirror.tableFieldMagic = false;
-          if ((_before.toUpperCase().indexOf(" FROM ") > -1 || _before.toUpperCase().indexOf(" TABLE ") > -1 || _before.toUpperCase().indexOf(" STATS ") > -1) && _before.toUpperCase().indexOf(" ON ") == -1 && _before.toUpperCase().indexOf(" ORDER BY ") == -1 && _before.toUpperCase().indexOf(" WHERE ") == -1 ||
-              _before.toUpperCase().indexOf("REFRESH") > -1 || _before.toUpperCase().indexOf("METADATA") > -1 || _before.toUpperCase().indexOf("DESCRIBE") > -1) {
-            CodeMirror.possibleTable = true;
-          }
-          CodeMirror.possibleSoloField = false;
-          if (_before.toUpperCase().indexOf("SELECT ") > -1 && _before.toUpperCase().indexOf(" FROM ") == -1 && !CodeMirror.fromDot) {
-            if (_after.toUpperCase().indexOf("FROM ") > -1 || $.trim(_before).substr(-1) == "(") {
-              fieldsAutocomplete(cm);
-            }
-            else {
-              CodeMirror.tableFieldMagic = true;
-              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-            }
-          }
-          else {
-            if ((_before.toUpperCase().indexOf("WHERE ") > -1 || _before.toUpperCase().indexOf("ORDER BY ") > -1) && !CodeMirror.fromDot && _before.toUpperCase().match(/ ON| LIMIT| GROUP| SORT/) == null) {
-              fieldsAutocomplete(cm);
-            }
-            else {
-              CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-            }
-          }
-        }
-      });
-    }
+    });
   };
-
-  function fieldsAutocomplete(cm) {
-    CodeMirror.possibleSoloField = true;
-    try {
-      var _value = getStatementAtCursor().statement;
-      var _from = _value.toUpperCase().indexOf("FROM");
-      if (_from > -1) {
-        var _match = _value.toUpperCase().substring(_from).match(/ ON| LIMIT| WHERE| GROUP| SORT| ORDER BY|;/);
-        var _to = _value.length;
-        if (_match) {
-          _to = _match.index;
-        }
-        var _found = _value.substr(_from, _to).replace(/(\r\n|\n|\r)/gm, "").replace(/from/gi, "").replace(/join/gi, ",").split(",");
-      }
-
-      var _foundTable = "";
-      for (var i = 0; i < _found.length; i++) {
-        if ($.trim(_found[i]) != "" && _foundTable == "") {
-          _foundTable = $.trim(_found[i]).split(" ")[0];
-        }
-      }
-      if (_foundTable != "") {
-        if (hac_tableHasAlias(_foundTable, _value)) {
-          CodeMirror.possibleSoloField = false;
-          CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-        }
-        else {
-          hac_getTableColumns(viewModel.database(), _foundTable, _value,
-              function (columns) {
-                CodeMirror.catalogFields = columns;
-                CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
-              });
-        }
-      }
-    }
-    catch (e) {
-    }
-  }
-
-  CodeMirror.fromDot = false;
 
   codeMirror = CodeMirror(function (elt) {
     queryEditor.parentNode.replaceChild(elt, queryEditor);
@@ -1848,7 +1791,6 @@ $(document).ready(function () {
     % endif
     extraKeys: {
       "Ctrl-Space": function () {
-        CodeMirror.fromDot = false;
         codeMirror.execCommand("autocomplete");
       },
       Tab: function (cm) {
@@ -1859,21 +1801,10 @@ $(document).ready(function () {
       if (s.type == "keyup") {
         if (s.keyCode == 190) {
           var _statement = getStatementAtCursor().statement;
-          var _line = codeMirror.getLine(codeMirror.getCursor().line);
-          var _partial = _line.substring(0, codeMirror.getCursor().ch);
-          var _table = _partial.substring(_partial.lastIndexOf(" ") + 1, _partial.length - 1);
           if (_statement.toUpperCase().indexOf("FROM") > -1) {
-            hac_getTableColumns(viewModel.database(), _table, _statement, function (columns) {
-              var _cols = columns.split(" ");
-              for (var col in _cols) {
-                _cols[col] = "." + _cols[col];
-              }
-              CodeMirror.catalogFields = _cols.join(" ");
-              CodeMirror.fromDot = true;
-              window.setTimeout(function () {
-                codeMirror.execCommand("autocomplete");
-              }, 100);  // timeout for IE8
-            });
+            window.setTimeout(function () {
+              codeMirror.execCommand("autocomplete");
+            }, 100);  // timeout for IE8
           }
         }
       }

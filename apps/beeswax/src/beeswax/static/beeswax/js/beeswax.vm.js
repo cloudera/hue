@@ -135,6 +135,7 @@ function BeeswaxViewModel(server) {
     },
     'write': function(value) {
       if (value) {
+        huePubSub.publish('assist.mainObjectChange', value);
         self.selectedDatabase(self.databases.indexOf(value));
       }
     },
