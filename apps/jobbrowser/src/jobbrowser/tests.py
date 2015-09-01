@@ -832,10 +832,14 @@ def test_make_log_links():
       LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058')
   )
   assert_equal(
-      """ Logging error messages to: job_201307091553_0028/attempt_201307091553_002""",
+      """ Logging error messages to: <a href="/jobbrowser/jobs/job_201307091553_0028" target="_blank">job_201307091553_0028</a>/attempt_201307091553_002""",
       LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002')
   )
   assert_equal(
-      """ pig-job_201307091553_0028.log""",
+      """ pig-<a href="/jobbrowser/jobs/job_201307091553_0028" target="_blank">job_201307091553_0028</a>.log""",
       LinkJobLogs._make_links(' pig-job_201307091553_0028.log')
+  )
+  assert_equal(
+      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>. Look at the UI""",
+      LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI')
   )
