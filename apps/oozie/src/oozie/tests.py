@@ -196,8 +196,24 @@ class MockOozieApi:
     else:
       return """<workflow-app name="MapReduce" xmlns="uri:oozie:workflow:0.4">BAD</workflow-app>"""
 
-  def get_job_log(self, jobid):
-    return '2013-01-08 16:28:06,487  INFO ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+  def get_job_log(self, jobid, logfilter=None):
+    rows = {}
+    rows['INFO'] = '2013-01-08 16:28:06,487  INFO ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+    rows['DEBUG'] = '2013-01-08 16:28:06,487  DEBUG ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+    rows['ERROR'] = '2013-01-08 16:28:06,487  ERROR ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+
+    filterMap = {}
+    for key, val in logfilter:
+      filterMap[key] = val
+
+    if 'loglevel' in filterMap:
+      row = rows.get(filterMap['loglevel'])
+    if 'text' in filterMap:
+      row = '' if filterMap['text'] not in row else row
+    if 'limit' in filterMap:
+      row = ((row + '\n') * int(filterMap['limit'])).strip()
+
+    return row
 
   def get_oozie_slas(self, **kwargs):
     return MockOozieApi.WORKFLOWS_SLAS
@@ -211,6 +227,9 @@ class MockOozieApi:
     return {
         'oozie.credentials.credentialclasses': oozie_credentialclasses
     }
+
+  def get_job_status(self, job_id):
+    return {'status': "RUNNING"}
 
 
 class OozieMockBase(object):
@@ -3193,9 +3212,17 @@ my_prop_not_filtered=10
         u'form-2-value': [u'/path/output'],
     }, follow=True)
     assert_true(response.context['oozie_workflow'], response.content)
+    wf_id = response.context['oozie_workflow'].id
+
+    # Check if response contains log data
+    response = self.c.get(reverse('oozie:get_oozie_job_log', args=[response.context['oozie_workflow'].id]) + "?format=json&limit=100&loglevel=INFO&recent=2h:30m")
+    data = json.loads(response.content)
+    assert_true(len(data['log'].split('\n')) <= 100)
+    assert_equal('RUNNING', data['status'])
+    assert_true("INFO" in data['log'])
 
     # Clean-up
-    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[response.context['oozie_workflow'].id, 'kill']))
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[wf_id, 'kill']))
     data = json.loads(response.content)
     assert_equal(0, data.get('status'), data)
 
@@ -3232,6 +3259,15 @@ class TestDashboard(OozieMockBase):
     assert_true(('rerun_oozie_coord/%s' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
     assert_true(('%s/suspend' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
     assert_true(('%s/resume' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
+
+    # Test log filtering
+    url = reverse('oozie:get_oozie_job_log', args=[MockOozieApi.COORDINATOR_IDS[0]])
+    assert_true(url in response.content, response.content)
+    response = self.c.get(url + "?format=json&limit=100&loglevel=INFO&text=MapReduce")
+    data = json.loads(response.content)
+    assert_true(len(data['log'].split('\n')) <= 100)
+    assert_equal('RUNNING', data['status'])
+    assert_true("INFO" in data['log'])
 
 
   def test_manage_bundles_dashboard(self):
