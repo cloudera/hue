@@ -151,7 +151,82 @@ describe("autocomplete.js", function() {
         expectedSuggestions: ["testTable1", "testTable2"]
       });
     });
+  });
 
+  describe("hive-specific stuff", function() {
+    beforeEach(function() {
+      var options = {
+        baseUrl: "http://baseUrl/",
+        app: "testApp",
+        user: "testUser",
+        db: "testDb",
+        mode: "hive"
+      };
+      subject = new Autocompleter(options);
+      ajaxHelper.responseForUrls = {};
+    });
+
+    it("should suggest struct from map values", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "http://baseUrl/testDb/testTable/testMap/value" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" },
+              {"type": "struct",  "name": "fieldC", "fields": [
+                {"type": "string", "name": "fieldC_A" },
+                {"type": "boolean", "name": "fieldC_B"}
+              ]}],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT testMap[\"anyKey\"].",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: ["fieldA", "fieldB", "fieldC"]
+      });
+    });
+
+    it("should suggest struct from structs from map values", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "http://baseUrl/testDb/testTable/testMap/value/fieldC" : {
+            fields: [
+              {"type": "string", "name": "fieldC_A" },
+              {"type": "boolean", "name": "fieldC_B"}
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT testMap[\"anyKey\"].fieldC.",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: ["fieldC_A", "fieldC_B"]
+      });
+    });
+  });
+
+  describe("impala-specific stuff", function() {
+    beforeEach(function () {
+      var options = {
+        baseUrl: "http://baseUrl/",
+        app: "testApp",
+        user: "testUser",
+        db: "testDb",
+        mode: "impala"
+      };
+      subject = new Autocompleter(options);
+      ajaxHelper.responseForUrls = {};
+    });
+
+    it("should not suggest struct from map values with hive style syntax", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "http://baseUrl/testDb/testTable/testMap[\"anyKey\"]" : {}
+        },
+        beforeCursor: "SELECT testMap[\"anyKey\"].",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: []
+      });
+    });
   });
 
   describe("field completion", function() {

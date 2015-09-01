@@ -224,7 +224,17 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
     var url = self.options.baseUrl + self.currentDb + "/" + tableName;
     $.each(parts, function(index, part) {
       if (part != '' && (index > 0 || part !== tableName)) {
-        url += "/" + part;
+        url += "/";
+        if (self.currentMode === "hive") {
+          var mapMatch = part.match(/([^\[]*)\[[^\]]+\]$/i);
+          if (mapMatch !== null) {
+            url += mapMatch[1] + "/value"
+          } else {
+            url += part;
+          }
+        } else {
+          url += part;
+        }
       }
     });
 
