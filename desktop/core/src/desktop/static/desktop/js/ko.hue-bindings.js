@@ -1995,12 +1995,19 @@ ko.bindingHandlers.aceEditor = {
     });
 
     editor.commands.on("afterExec", function (e) {
-      if (e.command.name === "insertstring" && e.args.toLowerCase().indexOf("? from ") == 0) {
-        editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
-        editor.removeTextBeforeCursor(1);
-        window.setTimeout(function () {
-          editor.execCommand("startAutocomplete");
-        }, 100);
+      if (e.command.name === "insertstring") {
+        var triggerAutocomplete = /\.$/.test(e.args);
+        if(e.args.toLowerCase().indexOf("? from ") == 0) {
+          editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
+          editor.removeTextBeforeCursor(1);
+          triggerAutocomplete = true;
+        }
+
+        if (triggerAutocomplete) {
+          window.setTimeout(function () {
+            editor.execCommand("startAutocomplete");
+          }, 100);
+        }
       }
       editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
       if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
