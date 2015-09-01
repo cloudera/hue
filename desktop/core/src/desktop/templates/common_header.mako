@@ -272,7 +272,7 @@ from django.utils.translation import ugettext as _
         window.clearTimeout(closeTimeout);
         openTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
-          $(".navigator ul.dropdown-menu").hide();
+          $(".navigator .nav-pills li.dropdown > ul.dropdown-menu").hide();
           $("[rel='navigator-tooltip']").tooltip("hide");
           _this.find("ul.dropdown-menu:eq(0)").show();
         }, _timeout);
@@ -318,7 +318,8 @@ from django.utils.translation import ugettext as _
         var _lastShown = $(this).find(".dropdown-menu").data("lastShown");
         if (_lastShown == null || (new Date()).getTime() - _lastShown > 300) {
           var _el = $(this);
-          window.setTimeout(function () {
+          _el.hideTimeout = window.setTimeout(function () {
+            window.clearTimeout(_el.hideTimeout);
             _el.find(".dropdown-menu").hide();
           }, 50);
         }
