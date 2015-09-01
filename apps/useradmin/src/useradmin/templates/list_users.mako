@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, antixss
 from django.template.defaultfilters import date, time
 from django.utils.translation import ugettext as _
 %>
@@ -143,7 +143,7 @@ ${layout.menubar(section='users')}
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     var viewModel = {
-      availableUsers: ko.observableArray(${ users_json | n }),
+      availableUsers: ko.observableArray(${ users_json | n,antixss }),
       chosenUsers: ko.observableArray([])
     };
 

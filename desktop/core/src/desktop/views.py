@@ -491,3 +491,8 @@ def check_config_ajax(request):
 # This is a global non-view for inline KO i18n
 def _ko(str=""):
   return _(str).replace("'", "\\'")
+
+# This global Mako filtering option, use it with ${ yourvalue | n,antixss }
+def antixss(value):
+  xss_regex = re.compile(r'<[^>]+>')
+  return xss_regex.sub('', value)
