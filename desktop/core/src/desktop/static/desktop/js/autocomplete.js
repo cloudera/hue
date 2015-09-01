@@ -23,6 +23,7 @@ var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
  * @param options.app
  * @param options.user
  * @param options.db
+ * @param options.mode
  *
  * @constructor
  */
@@ -30,10 +31,19 @@ function Autocompleter(options) {
   var self = this;
   self.options = options;
   self.currentDb = options.db;
+  if (typeof options.mode === "undefined" || options.mode === null || options.mode === "beeswax") {
+    self.currentMode = "hive";
+  } else {
+    self.currentMode = options.mode;
+  }
 
   huePubSub.subscribe('assist.mainObjectChange', function (db) {
     self.currentDb = db;
   });
+
+  huePubSub.subscribe('hue.ace.activeMode', function(mode) {
+    self.currentMode = mode.split("/").pop();
+  })
 }
 
 Autocompleter.prototype.hasExpired = function (timestamp) {
@@ -126,7 +136,10 @@ Autocompleter.prototype.fetchAssistData = function (url, successCallback, errorC
 Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
   var self = this;
 
-  if (typeof self.currentDb == "undefined" || self.currentDb == null || self.currentDb == "") {
+  if (typeof self.currentDb == "undefined"
+    || self.currentDb == null
+    || self.currentDb == ""
+    || (self.currentMode !== "hive" && self.currentMode !== "impala")) {
     callback([]);
     return;
   }
