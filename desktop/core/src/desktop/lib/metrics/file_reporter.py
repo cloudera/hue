@@ -33,10 +33,12 @@ class FileReporter(Reporter):
 
   def report_now(self, registry=None, timestamp=None):
     dirname = os.path.dirname(self.location)
-    try:
-      os.makedirs(dirname)
-    except OSError:
-      pass
+
+    if not os.path.exist(dirname):
+      try:
+        os.makedirs(dirname)
+      except OSError, e:
+        LOG.error('failed to make the directory %s: %s' % (dirname, e))
 
     # Write the metrics to a temporary file, then atomically
     # rename the file to the real location.
@@ -51,6 +53,7 @@ class FileReporter(Reporter):
 
       os.rename(f.name, self.location)
     except Exception:
+      LOG.exception('failed to write metrics to file')
       os.remove(f.name)
       raise
 
