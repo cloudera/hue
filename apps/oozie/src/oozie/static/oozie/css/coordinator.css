@@ -58,6 +58,16 @@
   opacity: 1;
 }
 
+.spinner-overlay {
+  opacity: 0.95;
+  position: absolute;
+  top: 10px;
+  left: 15px;
+  font-size: 24px;
+  color: #DDD;
+}
+
+
 div.spinedit .fa-chevron-up {
   top: -6px!important;
 }

@@ -373,7 +373,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                   ${ _("Number of lines") }
                   <input type="text" class="input-medium" data-bind="spinedit: logFilterLimit" placeholder="${_('ie. 10')}"/>
                 </label>
-                <input type="text" data-bind="value: logFilterText" class="input-xlarge search-query" placeholder="${_('String to search in logs')}">
+                <input type="text" data-bind="clearable: logFilterText, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('String to search in logs')}">
 
                 <span class="btn-group" style="float:right;">
                   <a class="btn log-status btn-success" data-value='DEBUG|INFO|TRACE'>${ _('Debug') }</a>
@@ -385,6 +385,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <div class="clearfix"></div>
               </div>
               <div style="position:relative">
+                <div class="spinner-overlay" data-bind="visible: isRefreshingLogs()">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </div>
                 <ul class="pointer unstyled settings-overlay" data-bind="click: $root.toggleLogFilterVisible, visible: !isLogFilterVisible()">
                   <li><a class="pointer"><i class="fa fa-filter"></i> ${ _("Filter") }</a></li>
                 </ul>
@@ -543,6 +546,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
     self.searchFilter = ko.observable("");
 
+    self.isRefreshingLogs = ko.observable(false);
     self.logFilterRecentHours = ko.observable("");
     self.logFilterRecentMinutes = ko.observable("");
     self.logFilterRecent = ko.computed(function () {
@@ -910,6 +914,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     var logsAtEnd = true;
     refreshLogs = function () {
       window.clearTimeout(refreshLogs);
+      viewModel.isRefreshingLogs(true);
       $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }" + getLogFilterParams(), function (data) {
         var _logsEl = $("#log pre");
         _logsEl.text(data.log);
@@ -917,6 +922,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
+        viewModel.isRefreshingLogs(false);
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
