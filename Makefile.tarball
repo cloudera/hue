@@ -59,7 +59,7 @@ define remove_devtree_exclusions
 		      -name 'desktop.db' -o \
 		      -name 'app.reg' -o \
 		      -name '*.py[co]' -o \
-		      -name '.*.sw?' \) -prune -exec rm -rf {} \;
+		      -name '.*.sw?' \) -not -path '*/boto/*' -prune -exec rm -rf {} \;
 endef
 
 
