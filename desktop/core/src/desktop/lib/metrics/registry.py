@@ -78,15 +78,13 @@ class MetricsRegistry(object):
 class MetricDefinition(object):
   def __init__(self, name, label, description, numerator,
       denominator=None,
-      weighting_metric_name=None,
-      context=None):
+      weighting_metric_name=None):
     self.name = name
     self.label = label
     self.description = description
     self.numerator = numerator
     self.denominator = denominator
     self.weighting_metric_name = weighting_metric_name
-    self.context = context
 
     assert self.name is not None
     assert self.label is not None
