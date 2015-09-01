@@ -48,7 +48,7 @@
     var _this = this;
     var MARGIN = 10;
 
-    _this.options.message = $("<span>").html(_this.options.message).text(); // escape HTML messages
+    _this.options.message = $("<span>").text(_this.options.message).html(); // escape HTML messages
 
     if (_this.options.level == TYPES.ERROR && $(".jHueNotify.alert-error").length > 0) {
       $(".jHueNotify.alert-error").find(".message").html("<i class='fa fa-exclamation-triangle'></i> <strong>" + _this.options.message + "</strong>");

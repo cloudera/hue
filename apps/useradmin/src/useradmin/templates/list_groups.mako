@@ -14,10 +14,11 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, antixss
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
 %>
+
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
@@ -116,7 +117,7 @@ ${layout.menubar(section='groups')}
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
     <div class="hide">
-      <select name="group_names" data-bind="options: availableUsers, selectedOptions: chosenUsers" multiple="true"></select>
+      <select name="group_names" data-bind="options: availableGroups, selectedOptions: chosenGroups" multiple="true"></select>
     </div>
   </form>
 </div>
@@ -128,8 +129,8 @@ ${layout.menubar(section='groups')}
 
   $(document).ready(function () {
     viewModel = {
-      availableUsers: ko.observableArray(${ groups_json | n }),
-      chosenUsers: ko.observableArray([])
+      availableGroups: ko.observableArray(${ groups_json | n,antixss }),
+      chosenGroups: ko.observableArray([])
     };
 
     ko.applyBindings(viewModel);
@@ -189,10 +190,10 @@ ${layout.menubar(section='groups')}
     }
 
     $("#deleteGroupBtn").click(function () {
-      viewModel.chosenUsers.removeAll();
+      viewModel.chosenGroups.removeAll();
 
       $(".hueCheckbox[checked='checked']").each(function (index) {
-        viewModel.chosenUsers.push($(this).data("name").toString()); // needed for numeric group names
+        viewModel.chosenGroups.push($(this).data("name").toString()); // needed for numeric group names
       });
 
       $("#deleteGroup").modal("show");
