@@ -185,7 +185,7 @@ class OozieApi(object):
 
     filter_list = []
     if logfilter is None:
-      logfilter = {}
+      logfilter = []
     for key, val in logfilter:
       if key not in OozieApi.VALID_LOG_FILTERS:
         raise ValueError('"%s" is not a valid filter for job logs' % (key,))

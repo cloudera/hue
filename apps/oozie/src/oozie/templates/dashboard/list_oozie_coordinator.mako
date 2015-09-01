@@ -376,9 +376,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <input type="text" data-bind="clearable: logFilterText, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('String to search in logs')}">
 
                 <span class="btn-group" style="float:right;">
-                  <a class="btn log-status btn-success" data-value='DEBUG|INFO|TRACE'>${ _('Debug') }</a>
-                  <a class="btn log-status btn-warning" data-value='WARN'>${ _('Warning') }</a>
-                  <a class="btn log-status btn-danger disable-feedback" data-value='ERROR|FATAL'>${ _('Error') }</a>
+                  <a class="btn log-status btn-success" data-value="DEBUG|INFO|TRACE">${ _('Debug') }</a>
+                  <a class="btn log-status btn-warning" data-value="WARN">${ _('Warning') }</a>
+                  <a class="btn log-status btn-danger disable-feedback" data-value="ERROR|FATAL">${ _('Error') }</a>
                 </span>
 
                 <div class="inline" style="margin: 10px"><a class="pointer" data-bind="click: $root.toggleLogFilterVisible"><i class="fa fa-times"></i></a></div>
