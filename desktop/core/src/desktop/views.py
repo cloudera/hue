@@ -463,3 +463,8 @@ def check_config_ajax(request):
                 request,
                 dict(error_list=error_list),
                 force_template=True)
+
+# This global Mako filtering option, use it with ${ yourvalue | n,antixss }
+def antixss(value):
+  xss_regex = re.compile(r'<[^>]+>')
+  return xss_regex.sub('', value)
