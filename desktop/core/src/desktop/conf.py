@@ -69,6 +69,15 @@ def coerce_timedelta(value):
   return datetime.timedelta(seconds=int(value))
 
 
+def coerce_positive_integer(integer):
+  integer = int(integer)
+
+  if integer <= 0:
+    raise Exception('integer is not positive')
+
+  return integer
+
+
 HTTP_HOST = Config(
   key="http_host",
   help=_("HTTP host to bind to."),
@@ -378,7 +387,7 @@ METRICS = ConfigSection(
     COLLECTION_INTERVAL=Config(
       key='collection_interval',
       help=_('Time in milliseconds on how frequently to collect metrics'),
-      type=int,
+      type=coerce_positive_integer,
       default=30000),
   )
 )
