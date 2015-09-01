@@ -22,7 +22,6 @@ import threading
 
 from django.contrib.auth.models import User
 from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from desktop.lib.metrics import global_registry
@@ -139,24 +138,13 @@ response_time = global_registry().timer(
 
 # ------------------------------------------------------------------------------
 
-user_count = global_registry().gauge(
+user_count = global_registry().gauge_callback(
     name='desktop.users.count',
+    callback=lambda: User.objects.count(),
     label='User count',
     description='Total number of users',
     numerator='users',
 )
-
-# Initialize with the current user count.
-user_count.set_value(User.objects.all().count())
-
-@receiver(post_save, sender=User)
-def user_post_save_handler(sender, **kwargs):
-  if 'created' in kwargs:
-    user_count.set_value(User.objects.all().count())
-
-@receiver(post_delete, sender=User)
-def user_post_delete_handler(sender, **kwargs):
-  user_count.set_value(User.objects.all().count())
 
 logged_in_users = global_registry().counter(
     name='desktop.users.logged-in.count',
