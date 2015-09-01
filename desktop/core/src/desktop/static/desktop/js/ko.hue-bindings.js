@@ -1665,12 +1665,15 @@ ko.bindingHandlers.aceEditor = {
     $el.text(options.value());
 
     var editor = ace.edit($el.attr("id"));
-    editor.session.setMode(options.mode());
+    editor.session.setMode(ko.utils.unwrapObservable(options.mode));
     if (ko.isObservable(options.mode)) {
-      options.mode.subscribe(function(newValue) {
+      options.mode.subscribe(function (newValue) {
         editor.session.setMode(newValue);
       });
     }
+    editor.on("focus", function () {
+      huePubSub.publish("hue.ace.activeMode", ko.utils.unwrapObservable(options.mode));
+    });
 
     if (ko.isObservable(options.errors)) {
       options.errors.subscribe(function(errors) {

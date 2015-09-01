@@ -1129,7 +1129,8 @@ var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
 var autocompleter = new Autocompleter({
   baseUrl: HIVE_AUTOCOMPLETE_BASE_URL,
   app: HIVE_AUTOCOMPLETE_APP,
-  user: HIVE_AUTOCOMPLETE_USER
+  user: HIVE_AUTOCOMPLETE_USER,
+  mode: HIVE_AUTOCOMPLETE_APP
 });
 
 var escapeOutput = function (str) {
