@@ -802,6 +802,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
@@ -1126,10 +1127,13 @@ var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
   }
 };
 
+var asssitHelper = new AssistHelper({
+    app: HIVE_AUTOCOMPLETE_APP,
+    user: HIVE_AUTOCOMPLETE_USER,
+})
+
 var autocompleter = new Autocompleter({
-  baseUrl: HIVE_AUTOCOMPLETE_BASE_URL,
-  app: HIVE_AUTOCOMPLETE_APP,
-  user: HIVE_AUTOCOMPLETE_USER,
+  assistHelper: asssitHelper,
   mode: HIVE_AUTOCOMPLETE_APP
 });
 

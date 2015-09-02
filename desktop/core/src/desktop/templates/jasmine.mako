@@ -28,6 +28,7 @@
   <script src="${ static('desktop/js/hue.utils.js') }"></script>
 
   ## Specs below
+  <script src="${ static('desktop/js/assistHelper.js') }"></script>
   <script src="${ static('desktop/js/autocomplete.js') }"></script>
   <script src="${ static('desktop/spec/autocompleteSpec.js') }"></script>
 </%block>

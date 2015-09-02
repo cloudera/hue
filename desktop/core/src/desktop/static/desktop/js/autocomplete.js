@@ -19,17 +19,16 @@ var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
 
 /**
  * @param options {object}
- * @param options.baseUrl
- * @param options.app
- * @param options.user
  * @param options.db
  * @param options.mode
+ * @param options.assistHelper
  *
  * @constructor
  */
 function Autocompleter(options) {
   var self = this;
   self.options = options;
+  self.assistHelper = options.assistHelper;
   self.currentDb = options.db;
   if (typeof options.mode === "undefined" || options.mode === null || options.mode === "beeswax") {
     self.currentMode = "hive";
@@ -45,10 +44,6 @@ function Autocompleter(options) {
     self.currentMode = mode.split("/").pop();
   })
 }
-
-Autocompleter.prototype.hasExpired = function (timestamp) {
-  return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
-};
 
 Autocompleter.prototype.getTableReferenceIndex = function (statement) {
   var result = {};
@@ -98,41 +93,6 @@ Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar
   return fields;
 };
 
-Autocompleter.prototype.getTotalStorageUserPrefix = function () {
-  var self = this;
-  var app = "";
-  if (typeof self.options.app != "undefined") {
-    app = self.options.app;
-  }
-  if (typeof self.options.user != "undefined") {
-    return app + "_" + self.options.user;
-  }
-  return app;
-};
-
-Autocompleter.prototype.fetchAssistData = function (url, successCallback, errorCallback) {
-  var self = this;
-  var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix()) || {};
-
-  if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
-    $.ajax({
-      type: "GET",
-      url: url + "?" + Math.random(),
-      success: function (data) {
-        cachedData[url] = {
-          timestamp: (new Date()).getTime(),
-          data: data
-        };
-        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
-        successCallback(data);
-      },
-      error: errorCallback
-    });
-  } else {
-    successCallback(cachedData[url].data);
-  }
-};
-
 Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
   var self = this;
 
@@ -171,8 +131,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
 
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
-    var url = self.options.baseUrl + self.currentDb;
-    self.fetchAssistData(url, function(data) {
+    self.assistHelper.fetchTables(self.currentDb, function(data) {
       var fromKeyword = "";
       if (selectBefore) {
         if (beforeCursor.indexOf("SELECT") > -1) {
@@ -221,24 +180,24 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       callback([]);
       return;
     }
-    var url = self.options.baseUrl + self.currentDb + "/" + tableName;
+    var fields = [];
     $.each(parts, function(index, part) {
       if (part != '' && (index > 0 || part !== tableName)) {
-        url += "/";
         if (self.currentMode === "hive") {
           var mapMatch = part.match(/([^\[]*)\[[^\]]+\]$/i);
           if (mapMatch !== null) {
-            url += mapMatch[1] + "/value"
+            fields.push(mapMatch[1]);
+            fields.push("value");
           } else {
-            url += part;
+            fields.push(part);
           }
         } else {
-          url += part;
+          fields.push(part);
         }
       }
     });
 
-    self.fetchAssistData(url, function(data) {
+    self.assistHelper.fetchFields(self.currentDb, tableName, fields, function(data) {
       callback(self.extractFields(data, "", !fieldTermBefore));
     }, function() {
       callback([]);

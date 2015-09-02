@@ -64,9 +64,10 @@ describe("autocomplete.js", function() {
 
   beforeEach(function() {
     var options = {
-      baseUrl: "http://baseUrl/",
-      app: "testApp",
-      user: "testUser",
+      assistHelper: new AssistHelper({
+        app: "testApp",
+        user: "testUser"
+      }),
       db: "testDb"
     };
     subject = new Autocompleter(options);
@@ -90,7 +91,7 @@ describe("autocomplete.js", function() {
     it("should suggest table names with no columns", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb" : {
+          "/testApp/api/autocomplete/testDb" : {
             tables: ["testTable1", "testTable2"]
           }
         },
@@ -103,7 +104,7 @@ describe("autocomplete.js", function() {
     it("should follow keyword case for table name completion", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb" : {
+          "/testApp/api/autocomplete/testDb" : {
             tables: ["testTable1", "testTable2"]
           }
         },
@@ -116,7 +117,7 @@ describe("autocomplete.js", function() {
     it("should suggest table names with *", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb" : {
+          "/testApp/api/autocomplete/testDb" : {
             tables: ["testTable1", "testTable2"]
           }
         },
@@ -129,7 +130,7 @@ describe("autocomplete.js", function() {
     it("should suggest table names with started FROM", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb" : {
+          "/testApp/api/autocomplete/testDb" : {
             tables: ["testTable1", "testTable2"]
           }
         },
@@ -142,7 +143,7 @@ describe("autocomplete.js", function() {
     it("should suggest table names after FROM", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb" : {
+          "/testApp/api/autocomplete/testDb" : {
             tables: ["testTable1", "testTable2"]
           }
         },
@@ -156,9 +157,10 @@ describe("autocomplete.js", function() {
   describe("hive-specific stuff", function() {
     beforeEach(function() {
       var options = {
-        baseUrl: "http://baseUrl/",
-        app: "testApp",
-        user: "testUser",
+        assistHelper: new AssistHelper({
+          app: "testApp",
+          user: "testUser"
+        }),
         db: "testDb",
         mode: "hive"
       };
@@ -169,7 +171,7 @@ describe("autocomplete.js", function() {
     it("should suggest struct from map values", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable/testMap/value" : {
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
             fields: [
               {"type": "string", "name": "fieldA" },
               {"type": "string", "name": "fieldB" },
@@ -189,7 +191,7 @@ describe("autocomplete.js", function() {
     it("should suggest struct from structs from map values", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable/testMap/value/fieldC" : {
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value/fieldC" : {
             fields: [
               {"type": "string", "name": "fieldC_A" },
               {"type": "boolean", "name": "fieldC_B"}
@@ -207,9 +209,10 @@ describe("autocomplete.js", function() {
   describe("impala-specific stuff", function() {
     beforeEach(function () {
       var options = {
-        baseUrl: "http://baseUrl/",
-        app: "testApp",
-        user: "testUser",
+        assistHelper: new AssistHelper({
+          app: "testApp",
+          user: "testUser"
+        }),
         db: "testDb",
         mode: "impala"
       };
@@ -220,7 +223,7 @@ describe("autocomplete.js", function() {
     it("should not suggest struct from map values with hive style syntax", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable/testMap[\"anyKey\"]" : {}
+          "/testApp/api/autocomplete/testDb/testTable/testMap[\"anyKey\"]" : {}
         },
         beforeCursor: "SELECT testMap[\"anyKey\"].",
         afterCursor: " FROM testTable",
@@ -234,7 +237,7 @@ describe("autocomplete.js", function() {
     it("should suggest columns for table", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable" : {
+          "/testApp/api/autocomplete/testDb/testTable" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           }
         },
@@ -248,7 +251,7 @@ describe("autocomplete.js", function() {
     it("should suggest columns for table after WHERE", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable" : {
+          "/testApp/api/autocomplete/testDb/testTable" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           }
         },
@@ -262,7 +265,7 @@ describe("autocomplete.js", function() {
     it("should suggest columns for table after ORDER BY ", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable" : {
+          "/testApp/api/autocomplete/testDb/testTable" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           }
         },
@@ -276,10 +279,10 @@ describe("autocomplete.js", function() {
     it("should suggest columns for table after ON ", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable1" : {
+          "/testApp/api/autocomplete/testDb/testTable1" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           },
-          "http://baseUrl/testDb/testTable2" : {
+          "/testDb/testTable2" : {
             columns: ["testTableColumn3", "testTableColumn4"]
           }
         },
@@ -292,7 +295,7 @@ describe("autocomplete.js", function() {
     it("should suggest columns for table with table ref", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable" : {
+          "/testApp/api/autocomplete/testDb/testTable" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           }
         },
@@ -305,7 +308,7 @@ describe("autocomplete.js", function() {
     it("should suggest columns with table alias", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTable" : {
+          "/testApp/api/autocomplete/testDb/testTable" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           }
         },
@@ -317,10 +320,10 @@ describe("autocomplete.js", function() {
 
     it("should suggest columns with multiple table aliases", function() {
       var serverResponses = {
-        "http://baseUrl/testDb/testTableA": {
+        "/testApp/api/autocomplete/testDb/testTableA": {
           columns: ["testTableColumn1", "testTableColumn2"]
         },
-        "http://baseUrl/testDb/testTableB": {
+        "/testApp/api/autocomplete/testDb/testTableB": {
           columns: ["testTableColumn3", "testTableColumn4"]
         }
       };
@@ -341,10 +344,10 @@ describe("autocomplete.js", function() {
     it("should suggest aliases", function() {
       assertAutoComplete({
         serverResponses: {
-          "http://baseUrl/testDb/testTableA" : {
+          "/testApp/api/autocomplete/testDb/testTableA" : {
             columns: ["testTableColumn1", "testTableColumn2"]
           },
-          "http://baseUrl/testDb/testTableB" : {
+          "/testApp/api/autocomplete/testDb/testTableB" : {
             columns: ["testTableColumn3", "testTableColumn4"]
           }
         },
@@ -358,7 +361,7 @@ describe("autocomplete.js", function() {
       it("should suggest fields from columns that are structs", function() {
         assertAutoComplete({
           serverResponses: {
-            "http://baseUrl/testDb/testTable/columnA" : {
+            "/testApp/api/autocomplete/testDb/testTable/columnA" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "boolean", "name": "fieldB" },
@@ -380,7 +383,7 @@ describe("autocomplete.js", function() {
       it("should suggest fields from nested structs", function() {
         assertAutoComplete({
           serverResponses: {
-            "http://baseUrl/testDb/testTable/columnA/fieldC" : {
+            "/testApp/api/autocomplete/testDb/testTable/columnA/fieldC" : {
               fields: [
                 {"type": "string", "name": "fieldC_A" },
                 {"type": "boolean", "name": "fieldC_B"}
