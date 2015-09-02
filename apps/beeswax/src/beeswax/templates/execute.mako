@@ -1840,6 +1840,12 @@ $(document).ready(function () {
     }
   });
 
+  $("#download-excel").click(function () {
+    if (viewModel.design.results.columns().length > 255) {
+      $.jHueNotify.warn("${ _('Results exceeds maximum number of columns permitted by Excel, will truncate results to 255 columns.') }")
+    }
+  });
+
 });
 
 var editables = function() {
