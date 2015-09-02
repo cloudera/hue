@@ -1937,6 +1937,7 @@ ${ dashboard.import_charts() }
 var viewModel;
 
 nv.dev = false;
+moment.suppressDeprecationWarnings = true;
 
 var HIT_OPTIONS = [
   { value: "count", label: "${ _('Count') }" },
