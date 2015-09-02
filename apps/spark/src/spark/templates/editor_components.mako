@@ -90,6 +90,7 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
+<script src="${ static('desktop/js/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 </%def>
 
@@ -1604,10 +1605,13 @@ from desktop.views import _ko
     $('#snippet_' + snippet.id()).find('.download-form').submit();
   }
 
-  var aceAutocompleter = new Autocompleter({
-    baseUrl: '${ autocomplete_base_url | n,unicode }',
+  var assistHelper = new AssistHelper({
     app: 'beeswax',
     user: '${user}'
+  });
+
+  var aceAutocompleter = new Autocompleter({
+    assistHelper: assistHelper
   });
 
   var assist = new Assist({
