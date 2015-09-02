@@ -114,40 +114,46 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       raise SkipTest('HUE-2902: Test is not re-entrant')
 
     # Set max limit to 3
-    HS2_GET_TABLES_MAX.set_for_testing(3)
+    resets = [
+      HS2_GET_TABLES_MAX.set_for_testing(3)
+    ]
 
-    hql = """
-      CREATE TABLE test_show_tables_1 (a int) COMMENT 'Test for show_tables';
-      CREATE TABLE test_show_tables_2 (a int) COMMENT 'Test for show_tables';
-      CREATE TABLE test_show_tables_3 (a int) COMMENT 'Test for show_tables';
-    """
-    resp = _make_query(self.client, hql, database=self.db_name)
-    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    try:
+      hql = """
+        CREATE TABLE test_show_tables_1 (a int) COMMENT 'Test for show_tables';
+        CREATE TABLE test_show_tables_2 (a int) COMMENT 'Test for show_tables';
+        CREATE TABLE test_show_tables_3 (a int) COMMENT 'Test for show_tables';
+      """
+      resp = _make_query(self.client, hql, database=self.db_name)
+      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-    # Table should have been created
-    response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
-    assert_equal(200, response.status_code)
-    assert_equal(len(response.context['tables']), 3)
-    assert_equal(response.context['has_metadata'], True)
-    assert_true('name' in response.context["tables"][0])
-    assert_true('comment' in response.context["tables"][0])
-    assert_true('type' in response.context["tables"][0])
+      # Table should have been created
+      response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
+      assert_equal(200, response.status_code)
+      assert_equal(len(response.context['tables']), 3)
+      assert_equal(response.context['has_metadata'], True)
+      assert_true('name' in response.context["tables"][0])
+      assert_true('comment' in response.context["tables"][0])
+      assert_true('type' in response.context["tables"][0])
 
-    hql = """
-      CREATE TABLE test_show_tables_4 (a int) COMMENT 'Test for show_tables';
-      CREATE TABLE test_show_tables_5 (a int) COMMENT 'Test for show_tables';
-    """
-    resp = _make_query(self.client, hql, database=self.db_name)
-    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+      hql = """
+        CREATE TABLE test_show_tables_4 (a int) COMMENT 'Test for show_tables';
+        CREATE TABLE test_show_tables_5 (a int) COMMENT 'Test for show_tables';
+      """
+      resp = _make_query(self.client, hql, database=self.db_name)
+      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-    # Table should have been created
-    response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
-    assert_equal(200, response.status_code)
-    assert_equal(len(response.context['tables']), 5)
-    assert_equal(response.context['has_metadata'], False)
-    assert_true('name' in response.context["tables"][0])
-    assert_false('comment' in response.context["tables"][0], response.context["tables"])
-    assert_false('type' in response.context["tables"][0])
+      # Table should have been created
+      response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
+      assert_equal(200, response.status_code)
+      assert_equal(len(response.context['tables']), 5)
+      assert_equal(response.context['has_metadata'], False)
+      assert_true('name' in response.context["tables"][0])
+      assert_false('comment' in response.context["tables"][0], response.context["tables"])
+      assert_false('type' in response.context["tables"][0])
+    finally:
+      for reset in resets:
+        reset()
 
   def test_describe_view(self):
     if is_live_cluster():
