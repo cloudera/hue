@@ -34,7 +34,7 @@ class FileReporter(Reporter):
   def report_now(self, registry=None, timestamp=None):
     dirname = os.path.dirname(self.location)
 
-    if not os.path.exist(dirname):
+    if not os.path.exists(dirname):
       try:
         os.makedirs(dirname)
       except OSError, e:
