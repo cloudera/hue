@@ -22,7 +22,7 @@ DEVTOOLS += \
 	ipdb[0.1dev-r1716] \
 	ipython[0.10] \
 	nose[0.11.3] \
-	coverage[3.2] \
+	coverage[3.7.1] \
 	nosetty[0.4] \
 	werkzeug[0.6] \
 	windmill[1.3]
