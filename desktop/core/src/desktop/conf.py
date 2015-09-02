@@ -52,6 +52,10 @@ def coerce_port(port):
   else:
     return port
 
+def coerce_file(path):
+  if path and not os.path.isfile(path):
+    raise Exception('File %s does not exist.' % path)
+  return path
 
 def coerce_password_from_script(script):
   p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -100,11 +104,13 @@ HTTP_ALLOWED_METHODS = Config(
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",
   help=_("Filename of SSL Certificate"),
+  type=coerce_file,
   default=None)
 
 SSL_PRIVATE_KEY = Config(
   key="ssl_private_key",
   help=_("Filename of SSL RSA Private Key"),
+  type=coerce_file,
   default=None)
 
 SSL_CIPHER_LIST = Config(
