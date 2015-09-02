@@ -112,14 +112,17 @@ class MetricDefinition(object):
 
 class CounterDefinition(MetricDefinition):
   def __init__(self, *args, **kwargs):
+    self.raw_counter = kwargs.pop('raw_counter', False)
+
     super(CounterDefinition, self).__init__(*args, **kwargs)
 
-    assert self.denominator is None, "Counters should not have denominators"
+    assert not self.raw_counter or self.denominator is None, \
+        "Counters should not have denominators"
 
 
   def to_json(self):
     return [
-        self._make_json('counter', counter=True),
+        self._make_json('count', counter=self.raw_counter),
     ]
 
 
@@ -146,17 +149,17 @@ class HistogramDefinition(MetricDefinition):
 
 class GaugeDefinition(MetricDefinition):
   def __init__(self, *args, **kwargs):
-    self.counter = kwargs.pop('counter', False)
+    self.raw_counter = kwargs.pop('raw_counter', False)
 
     super(GaugeDefinition, self).__init__(*args, **kwargs)
 
-    assert not self.counter or self.denominator is None, \
+    assert not self.raw_counter or self.denominator is None, \
         "Gauge metrics that are marked as counters cannot have a denominator"
 
 
   def to_json(self):
     return [
-        self._make_json('gauge', counter=self.counter),
+        self._make_json('value', counter=self.raw_counter),
     ]
 
 
