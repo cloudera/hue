@@ -41,7 +41,6 @@ from metastore.settings import DJANGO_APPS
 LOG = logging.getLogger(__name__)
 
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
-HS2_GET_TABLES_MAX = HS2_GET_TABLES_MAX.get()
 
 def check_has_write_access_permission(view_func):
   """
@@ -143,7 +142,7 @@ def show_tables(request, database=None):
     tables = [{'name': table} for table in table_names]
     has_metadata = False
 
-    if len(table_names) <= HS2_GET_TABLES_MAX:  # Only attempt to do a GetTables HS2 call for small result sets
+    if len(table_names) <= HS2_GET_TABLES_MAX.get():  # Only attempt to do a GetTables HS2 call for small result sets
       try:
         tables = db.get_tables_meta(database=database, table_names=search_filter)
         table_names = [table['name'] for table in tables]
