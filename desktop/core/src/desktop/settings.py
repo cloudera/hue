@@ -146,6 +146,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.middleware.http.ConditionalGetMiddleware',
+    'axes.middleware.FailedLoginMiddleware',
 ]
 
 if os.environ.get(ENV_DESKTOP_DEBUG):
@@ -179,7 +180,10 @@ INSTALLED_APPS = [
     'babeldjango',
 
     # Desktop injects all the other installed apps into here magically.
-    'desktop'
+    'desktop',
+
+    # App that keeps track of failed logins.
+    'axes',
 ]
 
 LOCALE_PATHS = [
@@ -361,6 +365,13 @@ if SECRET_KEY:
 else:
   import uuid
   SECRET_KEY = str(uuid.uuid4())
+
+# Axes
+AXES_LOGIN_FAILURE_LIMIT = desktop.conf.AUTH.LOGIN_FAILURE_LIMIT.get()
+AXES_LOCK_OUT_AT_FAILURE = desktop.conf.AUTH.LOGIN_LOCK_OUT_AT_FAILURE.get()
+AXES_COOLOFF_TIME = desktop.conf.AUTH.LOGIN_COOLOFF_TIME.get()
+AXES_USE_USER_AGENT = desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP.get()
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP.get()
 
 # SAML
 SAML_AUTHENTICATION = 'libsaml.backend.SAML2Backend' in AUTHENTICATION_BACKENDS

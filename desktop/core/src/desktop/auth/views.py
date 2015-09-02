@@ -26,6 +26,7 @@ import logging
 import urllib
 
 import django.contrib.auth.views
+from axes.decorators import watch_login
 from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
@@ -81,6 +82,7 @@ def get_backend_names():
 
 
 @login_notrequired
+@watch_login
 def dt_login(request):
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()

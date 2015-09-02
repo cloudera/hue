@@ -256,6 +256,21 @@
     # Force users to change password on first login with desktop.auth.backend.AllowFirstUserDjangoBackend
     ## change_default_password=false
 
+    # Number of login attempts allowed before a record is created for failed logins
+    ## login_failure_limit=3
+
+    # After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?
+    ## login_lock_out_at_failure=false
+
+    # If set, defines period of inactivity in seconds after which failed logins will be forgotten
+    ## login_cooloff_time=60
+
+    # If True, lock out based on IP and browser user agent
+    ## login_lock_out_by_combination_browser_user_agent_and_ip=false
+
+    # If True, lock out based on IP and user
+    ## login_lock_out_by_combination_user_and_ip=false
+
   # Configuration options for connecting to LDAP and Active Directory
   # -------------------------------------------------------------------
   [[ldap]]

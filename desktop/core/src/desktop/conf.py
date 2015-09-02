@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 import os
 import socket
@@ -62,6 +63,10 @@ def coerce_password_from_script(script):
   # whitespace may be significant in the password, but most files have a
   # trailing newline.
   return stdout.strip('\n')
+
+
+def coerce_timedelta(value):
+  return datetime.timedelta(seconds=int(value))
 
 
 HTTP_HOST = Config(
@@ -605,7 +610,37 @@ AUTH = ConfigSection(
                                    "their password upon first login.  The default is false."),
                             type=coerce_bool,
                             default=False,
-    )
+    ),
+    LOGIN_FAILURE_LIMIT = Config(
+      key="login_failure_limit",
+      help=_("Number of login attempts allowed before a record is created for failed logins"),
+      type=int,
+      default=3,
+    ),
+    LOGIN_LOCK_OUT_AT_FAILURE = Config(
+      key="login_lock_out_at_failure",
+      help=_("After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?"),
+      type=coerce_bool,
+      default=False,
+    ),
+    LOGIN_COOLOFF_TIME = Config(
+      key="login_cooloff_time",
+      help=_("If set, defines period of inactivity in seconds after which failed logins will be forgotten"),
+      type=coerce_timedelta,
+      default=None,
+    ),
+    LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP = Config(
+      key="login_lock_out_by_combination_browser_user_agent_and_ip",
+      help=_("If True, lock out based on IP and browser user agent"),
+      type=coerce_bool,
+      default=False,
+    ),
+    LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP = Config(
+      key="login_lock_out_by_combination_user_and_ip",
+      help=_("If True, lock out based on IP and user"),
+      type=coerce_bool,
+      default=False,
+    ),
 ))
 
 LDAP = ConfigSection(
