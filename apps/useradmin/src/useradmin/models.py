@@ -205,12 +205,14 @@ class HuePermission(models.Model):
 
 def get_default_user_group(**kwargs):
   default_user_group = useradmin.conf.DEFAULT_USER_GROUP.get()
-  if default_user_group is not None:
-    group, created = auth_models.Group.objects.get_or_create(name=default_user_group)
-    if created:
-      group.save()
+  if default_user_group is None:
+    return None
 
-    return group
+  group, created = auth_models.Group.objects.get_or_create(name=default_user_group)
+  if created:
+    group.save()
+
+  return group
 
 def update_app_permissions(**kwargs):
   """

@@ -40,7 +40,9 @@ def add_permission(username, groupname, permname, appname):
 
 def add_to_group(username, groupname=None):
     if groupname is None:
-        groupname = get_default_user_group().name
+        group = get_default_user_group()
+        assert group is not None
+        groupname = group.name
 
     user = User.objects.get(username=username)
     group, created = Group.objects.get_or_create(name=groupname)
