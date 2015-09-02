@@ -34,6 +34,7 @@ import desktop.redaction
 
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
+from django.utils.translation import ugettext_lazy as _
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -425,6 +426,10 @@ os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
 # This is for the REST calls made by Hue with the requests library.
 if desktop.conf.SSL_CACERTS.get() and os.environ.get('REQUESTS_CA_BUNDLE') is None:
   os.environ['REQUESTS_CA_BUNDLE'] = desktop.conf.SSL_CACERTS.get()
+
+# Preventing local build failure by not validating the default value of REQUESTS_CA_BUNDLE
+if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE') != desktop.conf.SSL_CACERTS.config.default and not os.path.isfile(os.environ['REQUESTS_CA_BUNDLE']):
+  raise Exception(_('SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s') % os.environ['REQUESTS_CA_BUNDLE'])
 
 # Memory
 if desktop.conf.MEMORY_PROFILER.get():
