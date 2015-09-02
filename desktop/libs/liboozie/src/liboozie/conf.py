@@ -49,6 +49,11 @@ SSL_CERT_CA_VERIFY=Config(
   default=True,
   type=coerce_bool)
 
+SHARE_LIB_PATH = Config(
+  key='share_lib_path',
+  help=_t('Oozie Share Lib path.'),
+  default='/user/oozie/share/lib',
+  type=str)
 
 def get_oozie_status(user):
   from liboozie.oozie_api import get_oozie
