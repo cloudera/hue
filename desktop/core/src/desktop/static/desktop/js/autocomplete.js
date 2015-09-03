@@ -36,7 +36,7 @@ function Autocompleter(options) {
     self.currentMode = options.mode;
   }
 
-  huePubSub.subscribe('assist.mainObjectChange', function (db) {
+  huePubSub.subscribe('hue.assist.databaseChanged', function (db) {
     self.currentDb = db;
   });
 

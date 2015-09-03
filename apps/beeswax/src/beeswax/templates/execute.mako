@@ -18,15 +18,15 @@
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
   from django.utils.translation import ugettext as _
-
 %>
 
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="dashboard" file="common_dashboard.mako" />
+<%namespace name="koComponents" file="/ko_components.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
-${layout.menubar(section='query')}
+${ layout.menubar(section='query') }
 
 <div id="temporaryPlaceholder"></div>
 <div id="beeswax-execute">
@@ -43,24 +43,8 @@ ${layout.menubar(section='query')}
     <div class="tab-content">
       <div class="tab-pane active" id="navigatorTab">
         <div class="card card-small card-tab">
-          <div class="card-body" style="margin-top: 0">
-            <a href="#" title="${_('Double click on a table name or field to insert it in the editor')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
-              <i class="fa fa-question-circle"></i>
-            </a>
-            <a id="refreshNavigator" href="#" title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right" style="margin:3px; margin-top:7px">
-              <i class="fa fa-refresh"></i>
-            </a>
-            <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF">
-              <li class="nav-header">${_('database')}</li>
-            </ul>
-            <select data-bind="options: databases, value: database" class="input-medium chosen-select hide" name="query-database" data-placeholder="${_('Choose a database...')}"></select>
-            <input id="navigatorSearch" type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px"/>
-            <div id="navigatorNoTables">${_('The selected database has no tables.')}</div>
-            <ul id="navigatorTables" class="unstyled"></ul>
-            <div id="navigatorLoader" class="center">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-            </div>
+          <div class="card-body" style="margin-top: 0;">
+            <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, database: database }}"></div>
           </div>
         </div>
       </div>
@@ -823,6 +807,12 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
+<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
+<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
+
+
+${ koComponents.assistPanel() }
+
 <style type="text/css">
   h1 {
     margin-bottom: 5px;
@@ -937,19 +927,6 @@ ${ commonshare() | n,unicode }
     font-style: normal;
   }
 
-  #navigatorTables {
-    position: relative;
-    margin: 4px;
-  }
-
-  #navigatorSearch, #navigatorNoTables {
-    display: none;
-  }
-
-  #navigatorNoTables {
-    padding: 6px;
-  }
-
   .tooltip.left {
     margin-left: -13px;
   }
@@ -1009,9 +986,13 @@ ${ commonshare() | n,unicode }
     white-space: nowrap;
   }
 
+  .table-container {
+    margin-right:10px;
+  }
+
   #navigator .card-body {
     margin-top: 1px !important;
-    padding: 6px !important;
+    padding: 7px !important;
   }
 
   #navigator .nav-header {
@@ -1110,7 +1091,7 @@ var leftPanelWidth = $.totalStorage("${app_name}_left_panel_width") != null ? $.
 $(".left-panel").css("width", leftPanelWidth + "px");
 $(".right-panel").css("left", leftPanelWidth + 20 + "px");
 
-var codeMirror, renderNavigator, resetNavigator, resizeNavigator, dataTable, renderRecent, syncWithHive;
+var codeMirror, resizeNavigator, dataTable, renderRecent, syncWithHive;
 
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
@@ -1119,21 +1100,13 @@ var HIVE_AUTOCOMPLETE_APP = "${app_name}";
 
 var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
 
-var hasBeenResetAfterError = false;
-var HIVE_AUTOCOMPLETE_GLOBAL_CALLBACK = function (data) {
-  if (data != null && data.error && typeof resetNavigator != "undefined" && !hasBeenResetAfterError) {
-    resetNavigator();
-    hasBeenResetAfterError = true;
-  }
-};
-
-var asssitHelper = new AssistHelper({
-    app: HIVE_AUTOCOMPLETE_APP,
-    user: HIVE_AUTOCOMPLETE_USER,
-})
+var assistHelper = new AssistHelper({
+  app: HIVE_AUTOCOMPLETE_APP,
+  user: HIVE_AUTOCOMPLETE_USER
+});
 
 var autocompleter = new Autocompleter({
-  assistHelper: asssitHelper,
+  assistHelper: assistHelper,
   mode: HIVE_AUTOCOMPLETE_APP
 });
 
@@ -1294,175 +1267,14 @@ $(document).ready(function () {
   resizeNavigator = function () {
     $(".resizer").css("height", ($(window).height() - 150) + "px");
     $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
-    $("#navigatorTables").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
+    $(".table-container").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
   };
 
-  resetNavigator = function () {
-    var _db = viewModel.database();
-    if (_db != null) {
-      $.totalStorage(hac_getTotalStorageUserPrefix() + 'databases', null);
-      // clear all the table fields too
-      if ($.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db) != null) {
-        $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db).split(" ").forEach(function (item) {
-          $.totalStorage(hac_getTotalStorageUserPrefix() + 'columns_' + _db + '_' + item, null);
-        });
-      }
-      getDatabases(function(){
-        $.totalStorage(hac_getTotalStorageUserPrefix() + 'tables_' + _db, null);
-        $.totalStorage(hac_getTotalStorageUserPrefix() + 'timestamp_tables_' + _db, null);
-      });
-    }
-  };
-
-  renderNavigator = function () {
-    var $navigatorTables = $("#navigatorTables");
-    $navigatorTables.empty();
-    $("#navigatorLoader").show();
-
-    $navigatorTables.scroll(function() {
-      $navigatorTables.find(".table-actions").css('right', -$navigatorTables.scrollLeft() + 'px');
-    });
-
-    if (! viewModel.database()) {
-      $("#navigatorLoader").html("${_('No databases or tables found.')}");
-    } else {
-      hac_getTables(viewModel.database(), function (data) {  //preload tables for the default db
-        $("#navigatorTables").empty();
-        $("#navigatorLoader").show();
-        $(data.split(" ")).each(function (cnt, table) {
-          if ($.trim(table) != "") {
-            var _table = $("<li>");
-            var _statsLink = "";
-            % if has_metastore:
-              _statsLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
-            % endif
-            _table.html("<div class='table-actions' style='display:none;'><a href='javascript:void(0)' class='preview-data'><i class='fa fa-list' title='" + "${ _('Preview Sample data') }" + "'></i></a>" +
-            "<a href='javascript:void(0)' class='table-stats'>" + _statsLink + "</a></div>" +
-            "<div><a href='javascript:void(0)' class='show-columns' title='" + table + "'>" + table + "</a><ul class='unstyled' style='overflow-x: auto'></ul></div>");
-
-            var tableActions = _table.find('.table-actions');
-            _table.hover(function () {
-              tableActions.show();
-            }, function () {
-              tableActions.hide();
-            });
-
-            _table.data("table", table).attr("id", "navigatorTables_" + table);
-            _table.find("a.show-columns").on("click", function () {
-              if (_table.find("li").length > 0){
-                _table.find("ul").empty();
-              }
-              else {
-                _table.find(".fa-table").removeClass("fa-table").addClass("fa-spin").addClass("fa-spinner");
-                hac_getTableColumns(viewModel.database(), table, "", function (plain_columns, extended_columns) {
-                  _table.find("ul").empty();
-                  _table.find(".fa-spinner").removeClass("fa-spinner").removeClass("fa-spin").addClass("fa-table");
-                  $(extended_columns).each(function (iCnt, col) {
-                    var _column = $("<li>");
-
-                    var getTitle = function () {
-                      var title = '';
-
-                      var isTruncated = function () {
-                        return (col.name.length + col.type.length) > 20;
-                      }
-
-                      if (col.comment && isTruncated()) {
-                        title = col.type + ": " + col.comment;
-                      } else if (isTruncated()) {
-                        title = col.type;
-                      } else if (col.comment) {
-                        title = col.comment;
-                      }
-                      return escapeOutput(title);
-                    };
-
-                    var _colStatsLink = "";
-                    % if has_metastore:
-                      _colStatsLink = "<i class='fa fa-bar-chart' title='" + "${ _('View statistics') }" + "'></i>";
-                    % endif
-
-                    _column.html("<a href='javascript:void(0)' style='padding-left:10px' title='" + getTitle() + "'>" + col.name + (col.type != "" ? " (" + truncateOutput({ name: col.name, type: col.type}) + ")" : "") + "</a> <a class='pointer col-stats'>" + _colStatsLink + "</a>");
-                    _column.appendTo(_table.find("ul"));
-                    _column.on("dblclick", function () {
-                      codeMirror.replaceSelection($.trim(col.name) + ', ');
-                      codeMirror.setSelection(codeMirror.getCursor());
-                      codeMirror.focus();
-                    });
-                    _column.find("a.col-stats").on("click", function () {
-                      var _link = $(this);
-                      var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/" + col.name;
-                      var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/" + col.name;
-                      var termsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/terms/" + col.name + "/";
-                      $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
-                      $("#columnAnalysisTerms .content").html("<i class='fa fa-spinner fa-spin'></i>");
-                      $("#columnAnalysis").show().css("top", _link.offset().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.offset().left + _link.outerWidth());
-                      showColumnStats(statsUrl, refreshUrl, termsUrl, col.name, STATS_PROBLEMS, function () {
-                        $("#columnAnalysis").show().css("top", _link.offset().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.offset().left + _link.outerWidth());
-                      });
-                    });
-                  });
-                });
-              }
-            });
-            _table.find("a.table-link").on("dblclick", function () {
-              codeMirror.replaceSelection($.trim(table) + ' ');
-              codeMirror.setSelection(codeMirror.getCursor());
-              codeMirror.focus();
-            });
-            _table.find("a.preview-data").on("click", function () {
-              var tableUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table");
-              $("#navigatorQuicklook").find(".tableName").text(table);
-              $("#navigatorQuicklook").find(".tableLink").attr("href", "/metastore/table/" + viewModel.database() + "/" + table);
-              $("#navigatorQuicklook").find(".sample").empty("");
-              $("#navigatorQuicklook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
-              $.ajax({
-                url: tableUrl,
-                data: {"sample": true},
-                beforeSend: function (xhr) {
-                  xhr.setRequestHeader("X-Requested-With", "Hue");
-                },
-                dataType: "html",
-                success: function (data) {
-                  $("#navigatorQuicklook").find(".loader").hide();
-                  $("#navigatorQuicklook").find(".sample").html(data);
-                },
-                error: function (e) {
-                  if (e.status == 500) {
-                    resetNavigator();
-                    $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
-                    $("#navigatorQuicklook").modal("hide");
-                  }
-                }
-              });
-              $("#navigatorQuicklook").modal("show");
-            });
-
-            _table.find("a.table-stats").on("click", function () {
-              var _link = $(this);
-              var statsUrl = "/${ app_name }/api/table/" + viewModel.database() + "/" + _table.data("table") + "/stats/";
-              var refreshUrl = "/${ app_name }/api/analyze/" + viewModel.database() + "/" + _table.data("table") + "/";
-              $("#tableAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
-              $("#tableAnalysis").show().css("top", _link.offset().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.offset().left + _link.outerWidth());
-              showTableStats(statsUrl, refreshUrl, _table.data("table"), STATS_PROBLEMS, function(){
-                $("#tableAnalysis").show().css("top", _link.offset().top - $("#tableAnalysis").outerHeight()/2 + _link.outerHeight()/2).css("left", _link.offset().left + _link.outerWidth());
-              });
-            });
-            _table.appendTo($("#navigatorTables"));
-          }
-        });
-        $("#navigatorLoader").hide();
-        if ($("#navigatorTables li").length > 0) {
-          $("#navigatorSearch").show();
-          $("#navigatorNoTables").hide();
-        }
-        else {
-          $("#navigatorSearch").hide();
-          $("#navigatorNoTables").show();
-        }
-      });
-    }
-  };
+  huePubSub.subscribe('assist.dblClickItem', function(value) {
+    codeMirror.replaceSelection(value);
+    codeMirror.setSelection(codeMirror.getCursor());
+    codeMirror.focus();
+  });
 
   $("#expandResults").on("click", function(){
     $("#resultTablejHueTableExtenderClonedContainer").remove();
@@ -1477,54 +1289,11 @@ $(document).ready(function () {
     reinitializeTable();
   });
 
-  $("#refreshNavigator").on("click", function () {
-    $("#navigatorTables").empty();
-    $("#navigatorLoader").show();
-
-    % if app_name == 'impala':
-      syncWithHive = function () {
-        // Diff Hive / Impala metastore and invalidate out of sync tables
-        hac_jsoncalls({
-          autocompleteBaseURL: "${ autocomplete_base_url_hive | n,unicode }",
-          database: viewModel.database(),
-          sync: true,
-          onDataReceived: function (data) {
-            if (data.tables) {
-              var _hiveTables = data.tables;
-              hac_getTables(viewModel.database(), function (data) {
-                var _impalaTables = data.split(" ");
-                $.ajax({
-                  type: "POST",
-                  url: "${ url('impala:refresh_tables') }",
-                  data: {
-                    database: ko.mapping.toJSON(viewModel.database()),
-                    added: ko.mapping.toJSON(_hiveTables.diff(_impalaTables)),
-                    removed: ko.mapping.toJSON(_impalaTables.diff(_hiveTables)),
-                  },
-                  success: function (data) {
-                    if (data.status != 0) {
-                      $(document).trigger("error", data.message);
-                    }
-                  }
-                });
-              });
-            }
-          }
-        });
-      };
-
-      window.setTimeout(syncWithHive, 100);
-
-    % endif
-
-    window.setTimeout(resetNavigator, 100);
-  });
-
   resizeNavigator();
+  window.setTimeout(resizeNavigator, 200);
 
   viewModel.database.subscribe(function (value) {
     $(".chosen-select").trigger("chosen:updated");
-    renderNavigator();
   });
 
   $(document).on("click", ".column-selector", function () {
@@ -1688,7 +1457,6 @@ $(document).ready(function () {
 
   $(document).on("error.autocomplete", function(){
     $(".CodeMirror-spinner").remove();
-    $("#navigatorLoader").hide();
   });
 
   function splitStatements(hql) {

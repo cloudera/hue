@@ -1892,7 +1892,7 @@ ko.bindingHandlers.aceEditor = {
 
 
     var currentAssistDb = "";
-    huePubSub.subscribe('assist.mainObjectChange', function (db) {
+    huePubSub.subscribe('hue.assist.databaseChanged', function (db) {
       currentAssistDb = db;
     });
 
