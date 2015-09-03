@@ -1012,7 +1012,7 @@ div.box {
   margin-left: -200px;
   width: 400px;
   text-align: center;
-  z-index: 8000;
+  z-index: 11000;
   word-break: break-word;
 }
 

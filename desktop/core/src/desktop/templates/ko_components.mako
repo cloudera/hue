@@ -529,9 +529,9 @@ from desktop.views import _ko
           if (shouldFetchTerms) {
             self.fetchTerms();
           }
-        }, function() {
-          $(document).trigger("error", "${ _('There was a problem refreshing the stats.') }");
+        }, function(message) {
           self.refreshing(false);
+          $(document).trigger("error", message || "${ _('There was a problem refreshing the stats.') }");
         });
       };
 
