@@ -50,7 +50,6 @@ SSL_CERT_CA_VERIFY=Config(
   dynamic_default=default_ssl_validate,
   type=coerce_bool)
 
-
 def get_oozie_status(user):
   from liboozie.oozie_api import get_oozie
 
@@ -72,6 +71,8 @@ def config_validator(user):
   Called by core check_config() view.
   """
   from hadoop.cluster import get_all_hdfs
+  from liboozie.oozie_api import get_oozie
+  from hadoop.fs.hadoopfs import Hdfs
 
   res = []
 
@@ -79,14 +80,20 @@ def config_validator(user):
     status = get_oozie_status(user)
     if 'NORMAL' not in status:
       res.append((status, _('The Oozie server is not available')))
-
+      
+    api = get_oozie(user)
+    configuration = api.get_configuration()
+    sharelib_url = configuration.get('sharelib.system.libpath', '')
+    sharelib_url = Hdfs.urlsplit(sharelib_url)[2]
+    
     class ConfigMock:
       def __init__(self, value): self.value = value
       def get(self): return self.value
       def get_fully_qualifying_key(self): return self.value
 
     for cluster in get_all_hdfs().values():
-      res.extend(validate_path(ConfigMock('/user/oozie/share/lib'), is_dir=True, fs=cluster,
+      res.extend(validate_path(ConfigMock(sharelib_url), is_dir=True, fs=cluster,
                                message=_('Oozie Share Lib not installed in default location.')))
+
 
   return res
