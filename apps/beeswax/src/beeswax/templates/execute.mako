@@ -44,7 +44,7 @@ ${ layout.menubar(section='query') }
       <div class="tab-pane active" id="navigatorTab">
         <div class="card card-small card-tab">
           <div class="card-body" style="margin-top: 0;">
-            <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, database: database }}"></div>
+            <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, database: database, appName: '${ app_name }' }}"></div>
           </div>
         </div>
       </div>
@@ -2575,18 +2575,21 @@ function getDatabases(callback){
         width: "100%",
         no_results_text: "${_('Oops, no database found!')}"
       }).change(function () {
-        saveLastUsedDatabase();
+        updateAssistDatabase();
       });
       $(".chosen-select").trigger("chosen:updated");
-      if ($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database") != null && $.inArray($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"), viewModel.databases()) > -1) {
-        viewModel.database($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database"));
+      var assistOptions = $.totalStorage("${app_name}.assist.options") || {};
+
+      if (assistOptions != null && $.inArray(assistOptions.lastSelectedDb, viewModel.databases()) > -1) {
+        viewModel.database(assistOptions.lastSelectedDb);
       }
       else {
         if ($.inArray("default", viewModel.databases()) > -1){
           viewModel.database("default");
         }
         else {
-          $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", null);
+          assistOptions.lastSelectedDb = null;
+          $.totalStorage("${app_name}.assist.options", assistOptions);
         }
       }
       var _waitForNavigatorInit = -1;
@@ -2608,8 +2611,11 @@ function getDatabases(callback){
   });
 }
 
-function saveLastUsedDatabase(){
-  $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_last_database", viewModel.database());
+function updateAssistDatabase(){
+  var desiredDb = viewModel.database();
+  window.setTimeout(function() {
+    huePubSub.publish('hue.assist.changeDatabase', desiredDb)
+  }, 100);
 }
 
 function loadEditor() {
@@ -2622,11 +2628,17 @@ function loadDesign(design_id) {
     viewModel.fetchDesign();
   });
 
-  $(document).one('fetched.design', saveLastUsedDatabase);
+  $(document).one('fetched.design', updateAssistDatabase);
 
   setupCodeMirrorSubscription();
   loadEditor();
 }
+
+huePubSub.subscribe('hue.assist.databaseChanged', function(name) {
+  if (name !== viewModel.database()) {
+    viewModel.database(name);
+  }
+});
 
 function loadQueryHistory(query_history_id) {
   $(document).one('fetched.databases', function() {
@@ -2634,7 +2646,7 @@ function loadQueryHistory(query_history_id) {
     viewModel.fetchQueryHistory();
   });
 
-  $(document).one('fetched.query', saveLastUsedDatabase);
+  $(document).one('fetched.query', updateAssistDatabase);
 
   setupCodeMirrorSubscription();
   loadEditor();
