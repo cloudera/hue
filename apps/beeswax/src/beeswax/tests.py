@@ -111,6 +111,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
 
   def setUp(self):
     self.user = User.objects.get(username='test')
+    add_to_group()
     add_to_group('test')
     self.db = dbms.get(self.user, get_query_server_config())
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
