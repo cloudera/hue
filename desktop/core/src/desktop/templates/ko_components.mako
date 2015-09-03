@@ -202,7 +202,9 @@ from desktop.views import _ko
         </li>
         <!-- /ko -->
 
+        <div class="table-container">
         <!-- ko template: { if: selectedDatabase() != null && ! loadingTables(), name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
+        </div>
       </ul>
     </div>
 
@@ -640,9 +642,16 @@ from desktop.views import _ko
               return name === database.definition.name;
             }));
           }, 10);
-
-          huePubSub.publish('assist.mainObjectChange', name);
+          huePubSub.publish('hue.assist.databaseChanged', name);
         });
+
+        // params.database is leading database source (set from saved queries for instance)
+        if (ko.isObservable(params.database)) {
+          self.selectedDatabaseName(params.database());
+          params.database.subscribe(function(newValue) {
+            self.selectedDatabaseName(newValue);
+          });
+        }
 
         self.loadingTables = ko.computed(function() {
           return self.selectedDatabaseName() && ! (self.selectedDatabase() && !self.selectedDatabase().loading());

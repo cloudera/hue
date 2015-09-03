@@ -133,13 +133,16 @@ function BeeswaxViewModel(server) {
         return "";
       }
     },
-    'write': function(value) {
-      if (value) {
-        huePubSub.publish('assist.mainObjectChange', value);
-        self.selectedDatabase(self.databases.indexOf(value));
+    'write': function(databaseName) {
+      if (databaseName) {
+        self.selectedDatabase(self.databases.indexOf(databaseName));
       }
     },
     'deferEvaluation': true
+  });
+
+  huePubSub.subscribe('hue.assist.databaseChanged', function(databaseName) {
+    self.selectedDatabase(self.databases.indexOf(databaseName));
   });
 
   self.hasParametersFilled = ko.computed(function() {
