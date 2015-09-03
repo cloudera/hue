@@ -141,10 +141,6 @@ function BeeswaxViewModel(server) {
     'deferEvaluation': true
   });
 
-  huePubSub.subscribe('hue.assist.databaseChanged', function(databaseName) {
-    self.selectedDatabase(self.databases.indexOf(databaseName));
-  });
-
   self.hasParametersFilled = ko.computed(function() {
     var hasBlank = false;
     $.each(self.design.parameters(), function(index, element) {
