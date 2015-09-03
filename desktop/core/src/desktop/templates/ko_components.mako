@@ -24,6 +24,8 @@ from desktop.views import _ko
 <%def name="assistPanel()">
   <style>
     .assist-tables {
+      overflow-y: hidden;
+      overflow-x: auto;
       margin-left: 7px;
     }
 
@@ -36,14 +38,21 @@ from desktop.views import _ko
     }
 
     .assist-tables > li {
-      margin-bottom: 5px;
+      position: relative;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    .assist-tables > li:hover .hover-actions-2nd {
+      visibility: visible;
+      opacity: 1;
     }
 
     .assist-table-link {
       font-size: 13px;
     }
 
-    .assist-column-link {
+    .assist-field-link {
       font-size: 12px;
     }
 
@@ -52,8 +61,9 @@ from desktop.views import _ko
       color: #444;
     }
 
-    .assist-column-link,
-    .assist-column-link:focus {
+    .assist-field-link,
+    .assist-field-link:focus {
+      white-space: nowrap;
       color: #737373;
     }
 
@@ -68,8 +78,9 @@ from desktop.views import _ko
 
     .assist-actions  {
       position:absolute;
-      right: 4px;
-      padding-left:3px;
+      right: 0px;
+      padding-right:4px;
+      padding-left:4px;
       background-color: #FFF;
     }
 
@@ -123,6 +134,42 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-no-entries">
+    <ul>
+      <li data-bind="visible: definition.isDatabase">
+        <span>${_('The selected database has no tables.')}</span>
+      </li>
+      <li data-bind="visible: definition.isTable">
+        <span>${_('The selected table has no columns.')}</span>
+      </li>
+    </ul>
+  </script>
+
+  <script type="text/html" id="assist-entry-actions">
+    <div class="assist-actions" data-bind="css: { 'hover-actions-2nd': definition.isTable,  'hover-actions-3rd': definition.isColumn }">
+      <a href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: definition.isTable || definition.isColumn, click: showStats"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-entries">
+    <div class="nav-header center" data-bind="visible: loading">
+      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+    </div>
+
+    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }">
+      <li data-bind="css: { 'assist-table reveals-actions-2nd': definition.isTable, 'assist-column reveals-actions-3rd': definition.isColumn }">
+        <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
+        <a class="assist-column-link" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
+          <span data-bind="text: definition.displayName, event: { 'dblclick': dblClick }"></span>
+        </a>
+        <!-- ko template: { if: open() && ! hasEntries() && ! loading(), name: 'assist-no-entries' } --><!-- /ko -->
+        <!-- ko template: { if: open() && hasEntries() && ! loading(), name: 'assist-entries'  } --><!-- /ko -->
+      </li>
+    </ul>
+  </script>
+
   <script type="text/html" id="assist-panel-template">
     <div class="reveals-actions" style="position: relative; width:100%">
       <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
@@ -131,50 +178,31 @@ from desktop.views import _ko
             <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
           </div>
         </li>
-        <!-- ko if: assist.mainObjects().length > 0 -->
-        <li>
-          <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
-          <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
+        <li data-bind="visible: ! hasErrors()" >
+          <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: selectedDatabaseName }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
         </li>
+        <li data-bind="visible: hasErrors">
+          <span>${ _('The database list cannot be loaded.') }</span>
+        </li>
+
+        <li class="nav-header center" data-bind="visible: loadingTables">
+          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+        </li>
+
+        <!-- ko if: selectedDatabase() != null && ! loadingTables() -->
         <li class="nav-header" style="margin-top:10px;">${_('tables')}
-          <div class="pull-right" data-bind="css: { 'hover-actions': assist.filter().length == 0, 'blue': assist.filter().length > 0 }">
+          <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
             <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           </div>
         </li>
-        <li>
-          <div data-bind="slideVisible: options.isSearchVisible"><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/></div>
-          <ul class="assist-tables" data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()">
-            <li class="assist-table reveals-actions-2nd" style="position:relative;">
-              <div class="hover-actions-2nd assist-actions">
-                <a href="javascript:void(0)" data-bind="click: $parent.showTablePreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-                <a href="javascript:void(0)" data-bind="click: function(data, event) { $parent.showStats(data, null, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
-              </div>
-              <a class="assist-table-link" href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name); }, text: $data.name }"><span data-bind="text: $data.name"></span></a>
-              <div data-bind="visible: loaded() && open()">
-                <ul class="assist-columns" data-bind="visible: items().length > 0, foreach: items">
-                  <li class="assist-column reveals-actions-3rd">
-                    <div class="hover-actions-3rd assist-actions">
-                      <a href="javascript:void(0)" class="table-stats" data-bind="click: function(data, event) { $parents[1].showStats($parent, data.name, event) }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
-                    </div>
-                    <a class="assist-column-link" data-bind="attr: {'title': name + ' (' + type + ')' + (comment ? ' ' + comment : '') }" style="padding-left:10px" href="javascript:void(0)"><span data-bind="text: name + ' (' + type + ')', event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a>
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
+
+        <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
+          <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
         </li>
         <!-- /ko -->
-        <!-- ko if: assist.isLoading() || assist.hasErrors() -->
-        <li>
-          <div id="navigatorLoader" class="center"  data-bind="visible: assist.isLoading">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-          </div>
-          <div class="center" data-bind="visible: assist.hasErrors">
-            ${ _('The database list cannot be loaded.') }
-          </div>
-        </li>
-        <!-- /ko -->
+
+        <!-- ko template: { if: selectedDatabase() != null && ! loadingTables(), name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
       </ul>
     </div>
 
@@ -221,11 +249,311 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function() {
+      function AssistEntry (definition, parent, assistPanel, filter) {
+        var self = this;
+        self.definition = definition;
+
+        self.assistPanel = assistPanel;
+        self.parent = parent;
+        self.filter = filter;
+
+        self.loading = ko.observable(false);
+        self.open = ko.observable(false);
+        self.entries = ko.observableArray([]);
+
+        self.open.subscribe(function(newValue) {
+          if (newValue && self.entries().length == 0) {
+            self.loadEntries();
+          }
+        });
+
+        self.hasEntries = ko.computed(function() {
+          return self.entries().length > 0;
+        });
+
+        self.filteredEntries = ko.computed(function () {
+          if (self.filter == null || self.filter().length === 0) {
+            return self.entries();
+          }
+          var result = [];
+          $.each(self.entries(), function (index, entry) {
+            if (entry.definition.name.toLowerCase().indexOf(self.filter()) > -1) {
+              result.push(entry);
+            }
+          });
+          return result;
+        });
+      }
+
+      AssistEntry.prototype.loadEntries = function() {
+        var self = this;
+        if (self.loading()) {
+          return;
+        }
+        self.loading(true);
+
+        self.assistPanel.assistHelper.fetchPanelData(self.getHierarchy(), function(data) {
+          if (typeof data.tables !== "undefined") {
+            self.entries($.map(data.tables, function(tableName) {
+              return self.createEntry({
+                name: tableName,
+                displayName: tableName,
+                title: tableName,
+                isTable: true
+              });
+            }));
+          } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
+            self.entries($.map(data.extended_columns, function (columnDef) {
+              var displayName = columnDef.name;
+              if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
+                displayName += ' (' + columnDef.type + ')'
+              }
+              var title = displayName;
+              if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
+                title += ' ' + columnDef.comment;
+              }
+              return self.createEntry({
+                name: columnDef.name,
+                displayName: displayName,
+                title: title,
+                isColumn: true
+              });
+            }));
+          } else if (typeof data.columns !== "undefined" && data.columns !== null) {
+            self.entries($.map(data.columns, function(columnName) {
+              return self.createEntry({
+                name: columnName,
+                displayName: columnName,
+                title: columnName,
+                isColumn: true
+              });
+            }));
+          } else if (typeof data.type !== "undefined" && data.type !== null) {
+            if (data.type === "map") {
+              self.entries([
+                self.createEntry({
+                  name: "key",
+                  displayName: "key (" + data.key.type + ")",
+                  title: "key (" + data.key.type + ")"
+                }),
+                self.createEntry({
+                  name: "value",
+                  displayName: "value (" + data.value.type + ")",
+                  title: "value (" + data.value.type + ")"
+                })
+              ]);
+            } else if (data.type == "struct") {
+              self.entries($.map(data.fields, function(field) {
+                return self.createEntry({
+                  name: field.name,
+                  displayName: field.name + " (" + field.type + ")",
+                  title: field.name + " (" + field.type + ")"
+                });
+              }));
+            } else if (data.type == "array") {
+              self.entries([
+                self.createEntry({
+                  name: "item",
+                  displayName: "item (" + data.item.type + ")",
+                  title: "item (" + data.item.type + ")"
+                })
+              ]);
+            }
+          }
+          self.loading(false);
+        }, function() {
+          self.assistPanel.hasErrors(true);
+          self.loading(false);
+        })
+      };
+
+      AssistEntry.prototype.createEntry = function(definition) {
+        var self = this;
+        return new AssistEntry(definition, self, self.assistPanel, null)
+      };
+
+      AssistEntry.prototype.getHierarchy = function () {
+        var self = this;
+        var parts = [];
+        var entry = self;
+        while (entry != null) {
+          parts.push(entry.definition.name);
+          entry = entry.parent;
+        }
+        parts.reverse();
+        return parts;
+      };
+
+      AssistEntry.prototype.dblClick = function (data, event) {
+        var self = this;
+        huePubSub.publish('assist.dblClickItem', self.name);
+      };
+
+      AssistEntry.prototype.toggleOpen = function () {
+        var self = this;
+        self.open(!self.open());
+      };
+
+      AssistEntry.prototype.showPreview = function () {
+        var self = this;
+        var $assistQuickLook = $("#assistQuickLook");
+
+        var hierarchy = self.getHierarchy();
+        var databaseName = hierarchy[0];
+        var tableName = hierarchy[1];
+
+        $assistQuickLook.find(".tableName").text(self.definition.name);
+        $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
+        $assistQuickLook.find(".sample").empty("");
+        $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
+
+        self.assistPanel.assistHelper.fetchTableHtmlPreview(databaseName, tableName, function(data) {
+          $assistQuickLook.find(".loader").hide();
+          $assistQuickLook.find(".sample").html(data);
+        }, function(e) {
+          if (e.status == 500) {
+            $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
+            $("#assistQuickLook").modal("hide");
+          }
+        });
+
+        $assistQuickLook.modal("show");
+      };
+
+      AssistEntry.prototype.showStats = function (data, event) {
+        var self = this;
+
+        var hierarchy = self.getHierarchy();
+        var databaseName = hierarchy[0];
+        var tableName = hierarchy[1];
+        var columnName = hierarchy.length == 3 ? hierarchy[2] : null;
+
+        self.assistPanel.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistPanel.assistHelper));
+        $("#tableAnalysis").data("targetElement", $(event.target));
+        window.setTimeout(self.assistPanel.refreshPosition, 20);
+      };
+
+      function TableStats (database, table, column, assistHelper) {
+        var self = this;
+
+        self.database = database;
+        self.table = table;
+        self.column = column;
+        self.assistHelper = assistHelper;
+
+        self.loading = ko.observable(false);
+        self.refreshing = ko.observable(false);
+        self.loadingTerms = ko.observable(false);
+        self.inaccurate = ko.observable(false);
+        self.statRows = ko.observableArray();
+        self.terms = ko.observableArray();
+        self.termsTabActive = ko.observable(false);
+        self.prefixFilter = ko.observable().extend({'throttle': 500});
+
+        self.prefixFilter.subscribe(function (newValue) {
+          self.fetchTerms();
+        });
+
+        self.termsTabActive.subscribe(function (newValue) {
+          if (self.terms().length == 0 && newValue) {
+            self.fetchTerms();
+          }
+        });
+
+        self.fetchData();
+      }
+
+      TableStats.prototype.fetchData = function () {
+        var self = this;
+        self.loading(true);
+        self.assistHelper.fetchStats(self.database, self.table, self.column != null ? self.column : null, function (data) {
+          if (data && data.status == 0) {
+            self.statRows(data.stats);
+            var inaccurate = true;
+            for(var i = 0; i < data.stats.length; i++) {
+              if (data.stats[i].data_type == "COLUMN_STATS_ACCURATE" && data.stats[i].comment == "true") {
+                inaccurate = false;
+                break;
+              }
+            }
+            self.inaccurate(inaccurate);
+          } else {
+            $("#tableAnalysis").hide();
+          }
+          self.loading(false);
+        },
+        function (e) {
+          if (e.status == 500) {
+            $(document).trigger("error", "${ _('There was a problem loading the stats.') }");
+            $("#tableAnalysis").hide();
+          }
+          self.loading(false);
+        });
+      };
+
+      TableStats.prototype.refresh = function () {
+        var self = this;
+        if (self.refreshing()) {
+          return;
+        }
+        var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
+        self.refreshing(true);
+
+        self.assistHelper.refreshTableStats(self.database, self.table, function() {
+          self.refreshing(false);
+          self.fetchData();
+          if (shouldFetchTerms) {
+            self.fetchTerms();
+          }
+        }, function() {
+          $(document).trigger("error", "${ _('There was a problem refreshing the stats.') }");
+          self.refreshing(false);
+        });
+      };
+
+      TableStats.prototype.fetchTerms = function () {
+        var self = this;
+        if (self.column == null) {
+          return;
+        }
+
+        self.loadingTerms(true);
+        self.assistHelper.fetchTerms(self.database.name, self.table.name, self.column.name, self.prefixFilter(), function (data) {
+          if (data && data.status == 0) {
+            self.terms($.map(data.terms, function (term) {
+              return {
+                name: term[0],
+                count: term[1],
+                percent: (parseFloat(term[1]) / parseFloat(data.terms[0][1])) * 100
+              }
+            }));
+          } else {
+            $("#tableAnalysis").hide();
+            $(document).trigger("error", "${ _('There was a problem loading the terms.') }");
+          }
+          self.loadingTerms(false);
+        }, function (e) {
+          if (e.status == 500) {
+            $("#tableAnalysis").hide();
+            $(document).trigger("error", "${ _('There was a problem loading the terms.') }");
+          }
+          self.loadingTerms(false);
+        });
+      };
+
       function AssistPanel(params) {
         var self = this;
 
-        self.assistAppName = params.assistAppName || "beeswax";
+        self.hasErrors = ko.observable(false);
         self.reloading = ko.observable(false);
+        self.simpleStyles = ko.observable(false);
+
+        self.filter = ko.observable("").extend({ rateLimit: 150 });
+
+        self.filterActive = ko.computed(function () {
+          return self.filter().length !== 0;
+        });
+
         self.options = ko.mapping.fromJS($.extend({
           isSearchVisible: false,
           lastSelectedDb: null
@@ -239,268 +567,56 @@ from desktop.views import _ko
           }
         });
 
-        self.assist = params.assist;
+        self.assistHelper = params.assistHelper;
+        self.app = self.assistHelper.options.app;
 
-        self.toggleSearch = function () {
-          self.options.isSearchVisible(!self.options.isSearchVisible());
-        };
+        self.databases = ko.observableArray();
+        self.selectedDatabase = ko.observable();
+
+        self.selectedDatabase.subscribe(function(newValue) {
+          if (newValue != null) {
+            newValue.loadEntries();
+          }
+        });
+
+        // We need the names because select2 does not support objects
+        self.availableDatabaseNames = ko.computed(function() {
+          return $.map(self.databases(), function(database) {
+            return database.definition.name;
+          })
+        });
+        self.selectedDatabaseName = ko.observable();
+
+        self.selectedDatabaseName.subscribe(function(name) {
+          if (name == null) {
+            return;
+          }
+          self.options.lastSelectedDb(name);
+
+          // TODO: find a better criteria for showing the spinner
+          // This is deferred so that the spinner gets a chance to be shown
+          self.selectedDatabase(null);
+          window.setTimeout(function () {
+            self.selectedDatabase(ko.utils.arrayFirst(self.databases(), function(database) {
+              return name === database.definition.name;
+            }));
+          }, 10);
+
+          huePubSub.publish('assist.mainObjectChange', name);
+        });
+
+        self.loadingTables = ko.computed(function() {
+          return self.selectedDatabaseName() && ! (self.selectedDatabase() && !self.selectedDatabase().loading());
+        });
+
+        self.fetchDatabases();
 
         self.modalItem = ko.observable();
         self.analysisStats = ko.observable();
 
-        self.loadAssistMain = function(force) {
-          self.assist.options.onDataReceived = function (data) {
-            self.reloading(false);
-            if (data.databases) {
-              self.assist.mainObjects(data.databases);
-              if (force) {
-                self.loadAssistFirstLevel(force);
-              }
-              else if (self.assist.mainObjects().length > 0 && !self.assist.selectedMainObject()) {
-                if (self.options.lastSelectedDb() != null && $.inArray(self.options.lastSelectedDb(), self.assist.mainObjects()) > -1) {
-                  self.assist.selectedMainObject(self.options.lastSelectedDb());
-                } else if ($.inArray("default", self.assist.mainObjects()) > -1) {
-                  self.assist.selectedMainObject("default");
-                } else {
-                  self.assist.selectedMainObject(self.assist.mainObjects()[0]);
-                }
-                self.loadAssistFirstLevel();
-              }
-            }
-          };
-          self.assist.options.onError = function() {
-            self.reloading(false);
-            self.assist.isLoading(false);
-          };
-          self.assist.getData(null, force);
-
-          self.assist.selectedMainObject.subscribe(function(value) {
-            self.options.lastSelectedDb(value);
-            self.loadAssistFirstLevel();
-            huePubSub.publish('assist.mainObjectChange', value);
-          });
-        };
-
-        self.loadAssistFirstLevel = function(force) {
-          var self = this;
-          self.assist.options.onDataReceived = function (data) {
-            if (data.tables) {
-              var _obj = {};
-              data.tables.forEach(function (item) {
-                _obj[item] = {
-                  name: item,
-                  items: ko.observableArray([]),
-                  open: ko.observable(false),
-                  loaded: ko.observable(false)
-                }
-              });
-              self.assist.firstLevelObjects(_obj);
-            }
-            self.assist.isLoading(false);
-          };
-          self.assist.getData(self.assist.selectedMainObject(), force);
-
-          self.assist.firstLevelObjects.subscribe(function(value){
-            huePubSub.publish('assist.firstLevelChange', value);
-          });
-        };
-
-        self.loadAssistSecondLevel = function(first) {
-          if (!first.loaded()) {
-            self.assist.isLoading(true);
-            self.assist.options.onDataReceived = function (data) {
-              if (data.columns) {
-                var _cols = data.extended_columns ? data.extended_columns : data.columns;
-                first.items(_cols);
-                first.loaded(true);
-              }
-              self.assist.isLoading(false);
-            };
-            self.assist.getData(self.assist.selectedMainObject() + "/" + first.name);
-          }
-          first.open(!first.open());
-          window.setTimeout(self.resizeAssist, 100);
-        };
-
-        self.reloadAssist = function() {
-          self.reloading(true);
-          self.loadAssistMain(true);
-        };
-
-        self.showTablePreview = function(firstLevelObject) {
-          var tableUrl = "/" + self.assistAppName + "/api/table/" + self.assist.selectedMainObject() + "/" + firstLevelObject.name;
-          $("#assistQuickLook").find(".tableName").text(firstLevelObject.name);
-          $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + self.assist.selectedMainObject() + "/" + firstLevelObject.name);
-          $("#assistQuickLook").find(".sample").empty("");
-          $("#assistQuickLook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
-          $.ajax({
-            url: tableUrl,
-            data: {"sample": true},
-            beforeSend: function (xhr) {
-              xhr.setRequestHeader("X-Requested-With", "Hue");
-            },
-            dataType: "html",
-            success: function (data) {
-              $("#assistQuickLook").find(".loader").hide();
-              $("#assistQuickLook").find(".sample").html(data);
-            },
-            error: function (e) {
-              if (e.status == 500) {
-                $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
-                $("#assistQuickLook").modal("hide");
-              }
-            }
-          });
-          $("#assistQuickLook").modal("show");
-        };
-
-        function TableStats (assistAppName, database, table, column) {
-          var self = this;
-
-          self.table = table;
-          self.column = column;
-          self.loading = ko.observable(false);
-          self.refreshing = ko.observable(false);
-          self.loadingTerms = ko.observable(false);
-          self.inaccurate = ko.observable(false);
-          self.statRows = ko.observableArray();
-          self.terms = ko.observableArray();
-          self.termsTabActive = ko.observable(false);
-          self.prefixFilter = ko.observable().extend({'throttle': 500});
-
-          self.prefixFilter.subscribe(function(newValue) {
-            self.fetchTerms();
-          });
-
-          self.termsTabActive.subscribe(function(newValue) {
-            if (self.terms().length == 0 && newValue) {
-              self.fetchTerms();
-            }
-          });
-
-          self.refresh = function () {
-            if (self.refreshing()) {
-              return;
-            }
-            var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
-            self.refreshing(true);
-
-            var pollRefresh = function (url) {
-              $.post(url, function (data) {
-                if (data.isSuccess) {
-                  self.refreshing(false);
-                  self.fetchData();
-                  if (shouldFetchTerms) {
-                    self.fetchTerms();
-                  }
-                } else if (data.isFailure) {
-                  $(document).trigger("error", data.message);
-                } else {
-                  window.setTimeout(function () {
-                    pollRefresh(url);
-                  }, 1000)
-                }
-              }).fail(function () {
-                self.refreshing(false);
-                $(document).trigger("error", options.errorLabel);
-              });
-            };
-
-            $.post("/" + assistAppName + "/api/analyze/" + database + "/" + table + "/", function (data) {
-              if (data.status == 0 && data.watch_url) {
-                pollRefresh(data.watch_url);
-              } else {
-                $(document).trigger("error", options.errorLabel);
-              }
-            }).fail(function () {
-              $(document).trigger("error", options.errorLabel);
-            });
-          };
-
-          self.fetchTerms = function () {
-            if (this.column == null) {
-              return;
-            }
-            self.loadingTerms(true);
-            var url = "/" + assistAppName + "/api/table/" + database + "/" + table + "/terms/" + column + "/";
-
-            if (self.prefixFilter()) {
-              url += self.prefixFilter();
-            }
-            $.ajax({
-              url: url,
-              data: {},
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-Requested-With", "Hue");
-              },
-              dataType: "json",
-              success: function (data) {
-                if (data && data.status == 0) {
-                  self.terms($.map(data.terms, function (term) {
-                    return {
-                      name: term[0],
-                      count: term[1],
-                      percent: (parseFloat(term[1]) / parseFloat(data.terms[0][1])) * 100
-                    }
-                  }));
-                } else {
-                  $("#tableAnalysis").hide();
-                  $(document).trigger("error", options.errorLabel);
-                }
-              },
-              error: function (e) {
-                if (e.status == 500) {
-                  $("#tableAnalysis").hide();
-                  $(document).trigger("error", options.errorLabel);
-                }
-              },
-              complete: function () {
-                self.loadingTerms(false);
-              }
-            });
-          };
-
-          self.fetchData = function() {
-            self.loading(true);
-            $.ajax({
-              url: "/" + assistAppName + "/api/table/" + database + "/" + table + "/stats/" + (column || ""),
-              data: {},
-              beforeSend: function (xhr) {
-                xhr.setRequestHeader("X-Requested-With", "Hue");
-              },
-              dataType: "json",
-              success: function (data) {
-                if (data && data.status == 0) {
-                  self.statRows(data.stats);
-                  for(var i = 0; i < data.stats.length; i++) {
-                    if (data.stats[i].data_type == "COLUMN_STATS_ACCURATE" && data.stats[i].comment == "false") {
-                      self.inaccurate(true);
-                      break;
-                    }
-                  }
-                } else {
-                  $("#tableAnalysis").hide();
-                  $(document).trigger("error", options.errorLabel);
-                }
-              },
-              error: function (e) {
-                if (e.status == 500) {
-                  $("#tableAnalysis").hide();
-                  $(document).trigger("error", options.errorLabel);
-                }
-              },
-              complete: function () {
-                self.loading(false);
-              }
-            });
-          };
-
-          self.fetchData();
-        }
-
         var lastOffset = { top: -1, left: -1 };
         var $tableAnalysis = $("#tableAnalysis");
-        var refreshPosition = function () {
+        self.refreshPosition = function () {
           var targetElement = $tableAnalysis.data("targetElement");
           if (targetElement != null && targetElement.is(":visible")) {
             if (targetElement != null && (lastOffset.left != targetElement.offset().left || lastOffset.top != targetElement.offset().top)) {
@@ -511,23 +627,55 @@ from desktop.views import _ko
             $tableAnalysis.hide();
           }
         };
-        window.setInterval(refreshPosition, 200);
-
-        self.showStats = function (firstLevelObject, column, event) {
-          self.analysisStats(new TableStats(self.assistAppName, self.assist.selectedMainObject(), firstLevelObject.name, column));
-          $("#tableAnalysis").data("targetElement", $(event.target));
-          window.setTimeout(refreshPosition, 20);
-        };
-
-        if (self.assist.options.baseURL != ""){
-          self.loadAssistMain();
-        }
+        window.setInterval(self.refreshPosition, 200);
 
         var $assistMain = $(".assist-tables");
         $assistMain.scroll(function() {
           $assistMain.find(".table-actions").css('right', -$assistMain.scrollLeft() + 'px');
         });
       }
+
+      AssistPanel.prototype.toggleSearch = function () {
+        var self = this;
+        self.options.isSearchVisible(!self.options.isSearchVisible());
+      };
+
+      AssistPanel.prototype.reloadAssist = function() {
+        var self = this;
+        self.reloading(true);
+        var selectedDb = self.selectedDatabaseName();
+        self.selectedDatabaseName(null);
+        self.assistHelper.clearCache();
+        self.fetchDatabases();
+        self.selectedDatabaseName(selectedDb);
+      };
+
+      AssistPanel.prototype.fetchDatabases = function() {
+        var self = this;
+
+        self.assistHelper.fetchDatabases(function(data) {
+          self.databases($.map(data.databases, function(databaseName) {
+            return new AssistEntry({
+              name: databaseName,
+              displayName: databaseName,
+              title: databaseName,
+              isDatabase: true
+            }, null, self, self.filter);
+          }));
+
+          if (self.options.lastSelectedDb() != null && $.inArray(self.options.lastSelectedDb(), data.databases) > -1) {
+            self.selectedDatabaseName(self.options.lastSelectedDb());
+          } else if ($.inArray("default", data.databases) > -1) {
+            self.selectedDatabaseName("default");
+          } else if (data.databases.length > 0) {
+            self.selectedDatabaseName(data.databases[0]);
+          }
+          self.reloading(false);
+        }, function() {
+          self.reloading(false);
+          self.hasErrors(true);
+        });
+      };
 
       ko.components.register('assist-panel', {
         viewModel: AssistPanel,
