@@ -621,11 +621,7 @@ from desktop.views import _ko
         });
 
         // We need the names because select2 does not support objects
-        self.availableDatabaseNames = ko.computed(function() {
-          return $.map(self.databases(), function(database) {
-            return database.definition.name;
-          })
-        });
+        self.availableDatabaseNames = ko.observableArray();
         self.selectedDatabaseName = ko.observable();
 
         self.selectedDatabaseName.subscribe(function(name) {
@@ -645,19 +641,28 @@ from desktop.views import _ko
           huePubSub.publish('hue.assist.databaseChanged', name);
         });
 
-        // params.database is leading database source (set from saved queries for instance)
-        if (ko.isObservable(params.database)) {
-          self.selectedDatabaseName(params.database());
-          params.database.subscribe(function(newValue) {
-            self.selectedDatabaseName(newValue);
-          });
-        }
-
-        self.loadingTables = ko.computed(function() {
-          return self.selectedDatabaseName() && ! (self.selectedDatabase() && !self.selectedDatabase().loading());
+        huePubSub.subscribe('hue.assist.changeDatabase', function(name) {
+          self.selectedDatabaseName(name);
         });
 
-        self.fetchDatabases();
+        self.loadingTables = ko.computed(function() {
+          return  ! (self.selectedDatabase() && !self.selectedDatabase().loading());
+        });
+
+        self.fetchDatabases(function() {
+          window.setTimeout(function() {
+            if ($.inArray(self.selectedDatabaseName(), self.availableDatabaseNames()) > -1) {
+              return;
+            }
+            if ($.inArray(self.options.lastSelectedDb(), self.availableDatabaseNames()) > -1) {
+              self.selectedDatabaseName(self.options.lastSelectedDb());
+            } else if ($.inArray("default", self.availableDatabaseNames()) > -1) {
+              self.selectedDatabaseName("default");
+            } else if (self.availableDatabaseNames().length > 0) {
+              self.selectedDatabaseName(self.availableDatabaseNames()[0]);
+            }
+          }, 150);
+        });
 
         self.modalItem = ko.observable();
         self.analysisStats = ko.observable();
@@ -711,7 +716,7 @@ from desktop.views import _ko
         self.selectedDatabaseName(selectedDb);
       };
 
-      AssistPanel.prototype.fetchDatabases = function() {
+      AssistPanel.prototype.fetchDatabases = function(callback) {
         var self = this;
 
         self.assistHelper.fetchDatabases(function(data) {
@@ -723,15 +728,12 @@ from desktop.views import _ko
               isDatabase: true
             }, null, self, self.filter);
           }));
+          self.availableDatabaseNames(data.databases);
 
-          if (self.options.lastSelectedDb() != null && $.inArray(self.options.lastSelectedDb(), data.databases) > -1) {
-            self.selectedDatabaseName(self.options.lastSelectedDb());
-          } else if ($.inArray("default", data.databases) > -1) {
-            self.selectedDatabaseName("default");
-          } else if (data.databases.length > 0) {
-            self.selectedDatabaseName(data.databases[0]);
-          }
           self.reloading(false);
+          if (callback) {
+            callback();
+          }
         }, function() {
           self.reloading(false);
           self.hasErrors(true);
