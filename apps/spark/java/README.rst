@@ -1,19 +1,20 @@
 Welcome to Livy, the REST Spark Server
 ======================================
 
-Livy is an open source REST interface (in **Beta**) for interacting with a
-remote Spark Shell running locally or from inside YARN.
+Livy is an open source REST interface for interacting with Spark from anywhere. It supports executing snippets of code or programs in a Spark context that runs locally or in YARN.
 
-* Interactive Spark Scala, Python shells
+* Interactive Scala, Python and R shells
 * Batch submissions in Scala, Java, Python
-* Multi users can submit to the same server with their own credentials in YARN mode (impersonation support)
+* Multi users can share the same server (impersonation support)
 * Can be used for submitting jobs from anywhere with REST
 * Does not require any code change to your programs
 
+The code is currently incubating in Hue but hopefully will eventually graduate in its top project. `Pull requests` are welcomed!
 
 Livy is used for powering the `Spark Notebook`_ of `Hue 3.8`_, which you can see the
 `implementation here`_.
 
+.. _Pull requests: https://github.com/cloudera/hue/pulls
 .. _Spark Notebook: http://gethue.com/new-notebook-application-for-spark-sql/
 .. _Hue 3.8: http://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
 .. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
