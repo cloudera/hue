@@ -224,7 +224,7 @@ from desktop.views import _ko
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
-    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assist: assist, appName: 'spark' }}"></div>
+    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper }}"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable, splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
@@ -1612,13 +1612,6 @@ from desktop.views import _ko
 
   var aceAutocompleter = new Autocompleter({
     assistHelper: assistHelper
-  });
-
-  var assist = new Assist({
-    baseURL: "${ autocomplete_base_url | n,unicode }",
-    app: "beeswax",
-    user: "${user}",
-    failsSilentlyOn: [500] // error codes from beeswax/views.py - autocomplete
   });
 
   var vmOptions = ${ options_json | n,unicode };
