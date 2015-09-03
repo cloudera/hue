@@ -2010,6 +2010,11 @@ pre {
   opacity: 1;
 }
 
+.show-actions {
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 .hover-actions,
 .hover-actions-2nd,
 .hover-actions-3rd {
