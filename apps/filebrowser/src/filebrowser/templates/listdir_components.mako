@@ -1452,7 +1452,7 @@ from django.utils.translation import ugettext as _
           _isExternalFile = true;
         });
 
-        $('.card').on('dragenter', function (e) {
+        $('body').on('dragenter', function (e) {
           e.preventDefault();
 
           if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && !($("#uploadArchiveModal").is(":visible"))) {
@@ -1533,6 +1533,12 @@ from django.utils.translation import ugettext as _
             },
             canceled: function () {
               $.jHueNotify.info("${_('Upload has been canceled')}");
+            },
+            complete: function (data) {
+              var response = JSON.parse(data.xhr.response);
+              if (response && response.status && response.status == -1){
+                $.jHueNotify.error(response.data);
+              }
             }
           };
           _dropzone = new Dropzone(document.body, options);
@@ -1542,7 +1548,7 @@ from django.utils.translation import ugettext as _
                 $('#progressStatus').addClass('hide');
                 $('#progressStatusBar').addClass('hide');
                 $('#progressStatusBar div').css("width", "0");
-                location.reload();
+                viewModel.retrieveData();
                 },
               2500);
           });
