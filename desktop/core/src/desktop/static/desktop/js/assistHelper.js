@@ -113,7 +113,11 @@ AssistHelper.prototype.fetchTerms = function(databaseName, tableName, columnName
 
 AssistHelper.prototype.fetchDatabases = function(successCallback, errorCallback) {
   var self = this;
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/", successCallback, errorCallback);
+  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/", function(data) {
+    // Blacklist of system databases
+    data.databases = $.grep(data.databases, function(database) { return database !== "_impala_builtins" });
+    successCallback(data);
+  }, errorCallback);
 };
 
 AssistHelper.prototype.fetchTables = function(databaseName, successCallback, errorCallback) {
