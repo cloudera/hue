@@ -78,7 +78,7 @@ AssistHelper.prototype.refreshTableStats = function(databaseName, tableName, suc
     if (data.status == 0 && data.watch_url) {
       pollRefresh(data.watch_url);
     } else {
-      errorCallback();
+      errorCallback(data.message);
     }
   }).fail(errorCallback);
 };
