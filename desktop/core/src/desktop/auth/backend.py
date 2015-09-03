@@ -123,6 +123,14 @@ def find_or_create_user(username, password=None):
     user = create_user(username, password)
   return user
 
+def ensure_has_a_group(user):
+  default_group = get_default_user_group()
+
+  if not user.groups.exists() and default_group is not None:
+    user.groups.add(default_group)
+    user.save()
+
+
 class DesktopBackendBase(object):
   """
   Abstract base class for providing external authentication schemes.
@@ -173,10 +181,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
       userprofile.first_login = False
       userprofile.save()
 
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
-        user.save()
+      ensure_has_a_group(user)
 
       return user
 
@@ -214,9 +219,7 @@ class OAuthBackend(DesktopBackendBase):
     user.is_superuser = False
     user.save()
 
-    default_group = get_default_user_group()
-    if default_group is not None:
-      user.groups.add(default_group)
+    ensure_has_a_group(user)
 
     return user
 
@@ -239,10 +242,9 @@ class AllowAllBackend(DesktopBackendBase):
       user = create_user(username, password)
       user.is_superuser = False
       user.save()
-      
-    default_group = get_default_user_group()
-    if default_group is not None:
-      user.groups.add(default_group)
+
+    ensure_has_a_group(user)
+
     return user
 
   @classmethod
@@ -264,9 +266,8 @@ class DemoBackend(django.contrib.auth.backends.ModelBackend):
 
       user.is_superuser = False
       user.save()
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
+
+      ensure_has_a_group(user)
 
     user = rewrite_user(user)
 
@@ -308,9 +309,7 @@ class PamBackend(DesktopBackendBase):
           profile.save()
           user.is_superuser = is_super
 
-          default_group = get_default_user_group()
-          if default_group is not None:
-            user.groups.add(default_group)
+          ensure_has_a_group(user)
 
           user.save()
 
@@ -445,10 +444,7 @@ class LdapBackend(object):
       user.is_superuser = is_super
       user = rewrite_user(user)
 
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
-        user.save()
+      ensure_has_a_group(user)
 
       if desktop.conf.LDAP.SYNC_GROUPS_ON_LOGIN.get():
         self.import_groups(server, user)
@@ -497,9 +493,7 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
         profile.save()
         user.is_superuser = is_super
 
-        default_group = get_default_user_group()
-        if default_group is not None:
-          user.groups.add(default_group)
+        ensure_has_a_group(user)
 
         user.save()
 
@@ -542,9 +536,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
         profile.save()
         user.is_superuser = is_super
 
-        default_group = get_default_user_group()
-        if default_group is not None:
-          user.groups.add(default_group)
+        ensure_has_a_group(user)
 
         user.save()
 
