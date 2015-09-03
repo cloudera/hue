@@ -1997,6 +1997,10 @@ ko.bindingHandlers.aceEditor = {
       }
     });
 
+    huePubSub.subscribe("assist.dblClickItem", function(value) {
+      editor.session.insert(editor.getCursorPosition(),value);
+    });
+
     editor.commands.on("afterExec", function (e) {
       if (e.command.name === "insertstring") {
         var triggerAutocomplete = /\.$/.test(e.args);

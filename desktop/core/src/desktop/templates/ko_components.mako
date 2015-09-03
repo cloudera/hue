@@ -339,7 +339,8 @@ from desktop.views import _ko
                 self.createEntry({
                   name: "value",
                   displayName: "value (" + data.value.type + ")",
-                  title: "value (" + data.value.type + ")"
+                  title: "value (" + data.value.type + ")",
+                  isMapValue: true
                 })
               ]);
             } else if (data.type == "struct") {
@@ -355,7 +356,8 @@ from desktop.views import _ko
                 self.createEntry({
                   name: "item",
                   displayName: "item (" + data.item.type + ")",
-                  title: "item (" + data.item.type + ")"
+                  title: "item (" + data.item.type + ")",
+                  isArray: true
                 })
               ]);
             }
@@ -386,7 +388,29 @@ from desktop.views import _ko
 
       AssistEntry.prototype.dblClick = function (data, event) {
         var self = this;
-        huePubSub.publish('assist.dblClickItem', self.name);
+        if (self.definition.isTable) {
+          huePubSub.publish('assist.dblClickItem', self.definition.name);
+        } else if (self.definition.isColumn) {
+          huePubSub.publish('assist.dblClickItem', self.definition.name + ", ");
+        } else {
+          var parts = [];
+          var entry = self;
+          while (entry != null) {
+            if (entry.definition.isTable) {
+              break;
+            }
+            if (entry.definition.isArray || entry.definition.isMapValue) {
+              parts.push("[]");
+            } else {
+              parts.push(entry.definition.name);
+              parts.push(".");
+            }
+            entry = entry.parent;
+          }
+          parts.reverse();
+          parts.push(", ");
+          huePubSub.publish('assist.dblClickItem', parts.slice(1).join(""));
+        }
       };
 
       AssistEntry.prototype.toggleOpen = function () {
