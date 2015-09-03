@@ -72,6 +72,8 @@ def config_validator(user):
   Called by core check_config() view.
   """
   from hadoop.cluster import get_all_hdfs
+  from hadoop.fs.hadoopfs import Hdfs
+  from liboozie.oozie_api import get_oozie
 
   res = []
 
@@ -80,13 +82,22 @@ def config_validator(user):
     if 'NORMAL' not in status:
       res.append((status, _('The Oozie server is not available')))
 
+    api = get_oozie(user)
+    intrumentation = api.get_instrumentation()
+    sharelib_url = [param['value'] for group in intrumentation['variables'] for param in group['data'] if param['name'] == 'sharelib.system.libpath']
+    if sharelib_url:
+      sharelib_url = Hdfs.urlsplit(sharelib_url[0])[2]
+
+    if not sharelib_url:
+      res.append((status, _('Oozie Share Lib path is not available')))
+
     class ConfigMock:
       def __init__(self, value): self.value = value
       def get(self): return self.value
       def get_fully_qualifying_key(self): return self.value
 
     for cluster in get_all_hdfs().values():
-      res.extend(validate_path(ConfigMock('/user/oozie/share/lib'), is_dir=True, fs=cluster,
+      res.extend(validate_path(ConfigMock(sharelib_url), is_dir=True, fs=cluster,
                                message=_('Oozie Share Lib not installed in default location.')))
 
   return res
