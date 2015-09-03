@@ -113,7 +113,7 @@ class ResourceManagerApi(object):
     token = None
 
     # Tokens are managed within the kill method but should be moved out when not alpha anymore or we support submitting an app.
-    if self.security_enabled:
+    if self.security_enabled and False:
       full_token = self.delegation_token()
       if 'token' not in full_token:
         raise PopupException(_('YARN did not return any token field.'), detail=smart_str(full_token))
