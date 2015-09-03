@@ -18,17 +18,19 @@
 from nose.tools import assert_true, assert_false, assert_equal
 
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.test.client import Client
 
 from desktop import conf, middleware
 from desktop.auth import backend
 from django_auth_ldap import backend as django_auth_ldap_backend
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_to_group
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
 
 from useradmin import ldap_access
+from useradmin.models import get_default_user_group
 from useradmin.tests import LdapTestConnection
 from useradmin.views import import_ldap_groups
 
@@ -162,6 +164,47 @@ class TestLdapLogin(PseudoHdfsTestBase):
     response = self.c.get('/accounts/login/')
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_false(response.context['first_login_ever'])
+
+  def test_login_does_not_reset_groups(self):
+    client = make_logged_in_client(username=self.test_username, password="test")
+
+    user = User.objects.get(username=self.test_username)
+    test_group, created = Group.objects.get_or_create(name=self.test_username)
+    default_group = get_default_user_group()
+
+    user.groups.all().delete()
+    assert_false(user.groups.exists())
+
+    # No groups
+    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal([default_group.name], list(user.groups.values_list('name', flat=True)))
+
+    add_to_group(self.test_username, self.test_username)
+
+    # Two groups
+    client.get('/accounts/logout')
+    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal(set([default_group.name, test_group.name]), set(user.groups.values_list('name', flat=True)))
+
+    user.groups.filter(name=default_group.name).delete()
+    assert_equal(set([test_group.name]), set(user.groups.values_list('name', flat=True)))
+
+    # Keep manual group only, don't re-add default group
+    client.get('/accounts/logout')
+    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal([test_group.name], list(user.groups.values_list('name', flat=True)))
+
+    user.groups.remove(test_group)
+    assert_false(user.groups.exists())
+
+    # Re-add default group
+    client.get('/accounts/logout')
+    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
+    assert_equal([default_group.name], list(user.groups.values_list('name', flat=True)))
 
   def test_login_home_creation_failure(self):
     response = self.c.get('/accounts/login/')
@@ -554,6 +597,51 @@ class TestLogin(PseudoHdfsTestBase):
     user.save()
     response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
     assert_equal(200, response.status_code, "Expected unauthorized status.")
+
+
+class TestLoginNoHadoop(object):
+
+  reset = []
+  test_username = "test_login_no_hadoop"
+
+  @classmethod
+  def setup_class(cls):
+    # Simulate first login ever
+    User.objects.all().delete()
+
+    cls.auth_backends = settings.AUTHENTICATION_BACKENDS
+    settings.AUTHENTICATION_BACKENDS = ('desktop.auth.backend.AllowFirstUserDjangoBackend',)
+
+  @classmethod
+  def teardown_class(cls):
+    settings.AUTHENTICATION_BACKENDS = cls.auth_backends
+
+  def setUp(self):
+    self.c = Client()
+
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing(['desktop.auth.backend.AllowFirstUserDjangoBackend']) )
+
+  def tearDown(self):
+    for finish in self.reset:
+      finish()
+
+    User.objects.all().delete()
+    if Group.objects.filter(name=self.test_username).exists():
+      Group.objects.filter(name=self.test_username).delete()
+
+  def test_login_does_not_reset_groups(self):
+    self.reset.append( conf.AUTH.BACKEND.set_for_testing(["desktop.auth.backend.AllowFirstUserDjangoBackend"]) )
+
+    client = make_logged_in_client(username=self.test_username, password="test")
+    client.get('/accounts/logout')
+    user = User.objects.get(username=self.test_username)
+    group, created = Group.objects.get_or_create(name=self.test_username)
+
+    user.groups.all().delete()
+    assert_false(user.groups.exists())
+
+    response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
+    assert_equal(200, response.status_code, "Expected ok status.")
 
 
 class MockLdapBackend(object):
