@@ -146,9 +146,9 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entry-actions">
-    <div class="assist-actions" data-bind="css: { 'hover-actions-2nd': definition.isTable,  'hover-actions-3rd': definition.isColumn }">
+    <div class="assist-actions" data-bind="css: { 'hover-actions-2nd': definition.isTable,  'hover-actions-3rd': definition.isColumn, 'show-actions': statsVisible }">
       <a href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-      <a href="javascript:void(0)" data-bind="visible: definition.isTable || definition.isColumn, click: showStats"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+      <a href="javascript:void(0)" data-bind="visible: definition.isTable || definition.isColumn, click: showStats, css: { 'blue': statsVisible }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
     </div>
   </script>
 
@@ -158,7 +158,7 @@ from desktop.views import _ko
       <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
     </div>
 
-    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }">
+    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistPanel.repositionActions }">
       <li data-bind="css: { 'assist-table reveals-actions-2nd': definition.isTable, 'assist-column reveals-actions-3rd': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-column-link" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
@@ -260,6 +260,7 @@ from desktop.views import _ko
         self.loading = ko.observable(false);
         self.open = ko.observable(false);
         self.entries = ko.observableArray([]);
+        self.statsVisible = ko.observable(false);
 
         self.open.subscribe(function(newValue) {
           if (newValue && self.entries().length == 0) {
@@ -447,12 +448,26 @@ from desktop.views import _ko
       AssistEntry.prototype.showStats = function (data, event) {
         var self = this;
 
+        if (self.statsVisible()) {
+          self.statsVisible(false);
+          self.assistPanel.analysisStats(null);
+          return;
+        }
+
         var hierarchy = self.getHierarchy();
         var databaseName = hierarchy[0];
         var tableName = hierarchy[1];
         var columnName = hierarchy.length == 3 ? hierarchy[2] : null;
 
+        self.statsVisible(true);
         self.assistPanel.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistPanel.assistHelper));
+
+        var catchChange = self.assistPanel.analysisStats.subscribe(function(newValue) {
+          if (newValue === null || newValue.database !== databaseName || newValue.table !== tableName || newValue.column !== columnName) {
+            self.statsVisible(false);
+            catchChange.dispose();
+          }
+        });
         $("#tableAnalysis").data("targetElement", $(event.target));
         window.setTimeout(self.assistPanel.refreshPosition, 20);
       };
@@ -641,11 +656,22 @@ from desktop.views import _ko
         var lastOffset = { top: -1, left: -1 };
         var $tableAnalysis = $("#tableAnalysis");
         self.refreshPosition = function () {
+          if (self.analysisStats() == null) {
+            return;
+          }
           var targetElement = $tableAnalysis.data("targetElement");
           if (targetElement != null && targetElement.is(":visible")) {
-            if (targetElement != null && (lastOffset.left != targetElement.offset().left || lastOffset.top != targetElement.offset().top)) {
-              lastOffset = targetElement.offset();
-              $tableAnalysis.css("top", lastOffset.top - $tableAnalysis.outerHeight() / 2 + targetElement.outerHeight() / 2).css("left", lastOffset.left + targetElement.outerWidth());
+            var newTop = targetElement.offset().top - $(window).scrollTop();
+            if (targetElement != null && (lastOffset.left != targetElement.offset().left || lastOffset.top != newTop)) {
+              lastOffset.left = targetElement.offset().left;
+              lastOffset.top = newTop
+              var newCssTop = lastOffset.top - $tableAnalysis.outerHeight() / 2 + targetElement.outerHeight() / 2;
+              $tableAnalysis.css("top", newCssTop).css("left", lastOffset.left + targetElement.outerWidth());
+              if ((newCssTop + $tableAnalysis.outerHeight() / 2) < 70) {
+                $tableAnalysis.hide();
+              } else {
+                $tableAnalysis.show();
+              }
             }
           } else {
             $tableAnalysis.hide();
@@ -653,10 +679,12 @@ from desktop.views import _ko
         };
         window.setInterval(self.refreshPosition, 200);
 
-        var $assistMain = $(".assist-tables");
-        $assistMain.scroll(function() {
-          $assistMain.find(".table-actions").css('right', -$assistMain.scrollLeft() + 'px');
-        });
+        self.repositionActions = function(data, event) {
+          if (data.definition.isDatabase) {
+            var $container = $(event.target);
+            $container.find(".assist-actions").css('right', -$container.scrollLeft() + 'px');
+          }
+        };
       }
 
       AssistPanel.prototype.toggleSearch = function () {
