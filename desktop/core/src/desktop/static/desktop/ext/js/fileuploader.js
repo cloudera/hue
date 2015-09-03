@@ -641,12 +641,11 @@ qq.extend(qq.FileUploader.prototype, {
         var item = this._getItemByFileId(id);
         qq.remove(this._find(item, 'cancel'));
         qq.remove(this._find(item, 'spinner'));
-        console.log(result)
-       // if (result.success){
-            qq.addClass(item, this._classes.success);
-        /*} else {
-            qq.addClass(item, this._classes.fail);
-        }*/
+        if (result.status && result.status == -1){
+          qq.addClass(item, this._classes.fail);
+        } else {
+          qq.addClass(item, this._classes.success);
+        }
     },
     _addToList: function(id, fileName){
         var item = qq.toElement(this._options.fileTemplate);

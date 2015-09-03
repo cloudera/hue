@@ -279,3 +279,7 @@
 .qq-upload-drop-area {
   width: 99%;
 }
+
+.qq-upload-failed-text {
+  color: #b94a48;
+}
