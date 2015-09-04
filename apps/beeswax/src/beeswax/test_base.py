@@ -334,9 +334,9 @@ class BeeswaxSampleProvider(object):
     cls.db_name = get_db_prefix(name='hive')
     cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
     cls.client = make_logged_in_client(username='test', is_superuser=False)
-    add_to_group()
-    add_to_group('test')
+    add_to_group('test', 'test')
     grant_access('test', 'test', 'beeswax')
+    grant_access('test', 'test', 'metastore')
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()
