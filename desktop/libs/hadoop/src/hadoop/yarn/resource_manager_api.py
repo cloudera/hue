@@ -33,7 +33,6 @@ from hadoop import cluster
 
 LOG = logging.getLogger(__name__)
 
-DEFAULT_USER = DEFAULT_USER.get()
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
 
@@ -41,7 +40,7 @@ _api_cache = None
 _api_cache_lock = threading.Lock()
 
 
-def get_resource_manager(user):
+def get_resource_manager(username):
   global _api_cache
   if _api_cache is None:
     _api_cache_lock.acquire()
@@ -50,7 +49,7 @@ def get_resource_manager(user):
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        _api_cache = ResourceManagerApi(user, yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        _api_cache = ResourceManagerApi(username, yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       _api_cache_lock.release()
   return _api_cache
@@ -62,8 +61,8 @@ class YarnFailoverOccurred(Exception):
 
 class ResourceManagerApi(object):
 
-  def __init__(self, user, rm_url, security_enabled=False, ssl_cert_ca_verify=False):
-    self._user = user
+  def __init__(self, username, rm_url, security_enabled=False, ssl_cert_ca_verify=False):
+    self._username = username
     self._url = posixpath.join(rm_url, 'ws', _API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
@@ -77,10 +76,10 @@ class ResourceManagerApi(object):
   def _get_params(self):
     params = {}
 
-    if self._user != DEFAULT_USER: # We impersonate if needed
-      params['doAs'] = self._user
+    if self._username != DEFAULT_USER.get(): # We impersonate if needed
+      params['doAs'] = self._username
       if not self.security_enabled:
-        params['user.name'] = DEFAULT_USER
+        params['user.name'] = DEFAULT_USER.get()
 
     return params
 
@@ -129,13 +128,13 @@ class ResourceManagerApi(object):
 
   def delegation_token(self):
     params = self._get_params()
-    data = {'renewer': self._user}
+    data = {'renewer': self._username}
     return self._execute(self._root.post, 'cluster/delegation-token', params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
   def cancel_token(self, token):
     params = self._get_params()
     headers = {'Hadoop-YARN-RM-Delegation-Token': token}
-    LOG.debug('Canceling delegation token of ' % self._user)
+    LOG.debug('Canceling delegation token of ' % self._username)
     return self._execute(self._root.delete, 'cluster/delegation-token', params=params, headers=headers)
 
   def _execute(self, function, *args, **kwargs):
