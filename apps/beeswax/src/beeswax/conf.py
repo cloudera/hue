@@ -84,6 +84,13 @@ DOWNLOAD_ROW_LIMIT = Config(
   type=int,
   help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 65,000 is applied to XLS downloads.'))
 
+APPLY_NATURAL_SORT_MAX = Config(
+  key="apply_natural_sort_max",
+  help=_t("The max number of records in the result set permitted to apply a natural sort to the database or tables list."),
+  type=int,
+  default=2000
+)
+
 CLOSE_QUERIES = Config(
   key="close_queries",
   help=_t("Hue will try to close the Hive query when the user leaves the editor page. "

@@ -29,7 +29,9 @@ from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, \
+                         APPLY_NATURAL_SORT_MAX
+from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
@@ -145,7 +147,10 @@ class HiveServer2Dbms(object):
     if handle:
       result = self.fetch(handle, rows=5000)
       self.close(handle)
-      return [name for database in result.rows() for name in database]
+      databases = [name for database in result.rows() for name in database]
+      if len(databases) <= APPLY_NATURAL_SORT_MAX.get():
+        databases = apply_natural_sort(databases)
+      return databases
     else:
       return []
 
@@ -156,7 +161,10 @@ class HiveServer2Dbms(object):
 
   def get_tables_meta(self, database='default', table_names='*'):
     identifier = self.to_matching_wildcard(table_names)
-    return self.client.get_tables_meta(database, identifier)
+    tables = self.client.get_tables_meta(database, identifier)
+    if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
+      tables = apply_natural_sort(tables, key='name')
+    return tables
 
 
   def get_tables(self, database='default', table_names='*'):
@@ -171,7 +179,10 @@ class HiveServer2Dbms(object):
     if handle:
       result = self.fetch(handle, rows=5000)
       self.close(handle)
-      return [name for table in result.rows() for name in table]
+      tables = [name for table in result.rows() for name in table]
+      if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
+        tables = apply_natural_sort(tables)
+      return tables
     else:
       return []
 
