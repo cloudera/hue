@@ -34,10 +34,10 @@ from metastore import parser
 
 import beeswax.models
 
-from beeswax.forms import QueryForm
 from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.conf import USE_GET_LOG_API
+from beeswax.forms import QueryForm
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\

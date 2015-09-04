@@ -24,5 +24,5 @@ HS2_GET_TABLES_MAX = Config(
   key="hs2_get_tables_max",
   help=_("The max number of records in the result set permitted to do a HS2 GetTables call."),
   type=int,
-  default=1000
+  default=250
 )
