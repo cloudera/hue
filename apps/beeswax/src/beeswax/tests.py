@@ -59,6 +59,7 @@ import beeswax.models
 import beeswax.views
 
 from beeswax import conf, hive_site
+from beeswax.common import apply_natural_sort
 from beeswax.conf import HIVE_SERVER_HOST
 from beeswax.views import collapse_whitespace, _save_design
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
@@ -2852,3 +2853,17 @@ def test_to_matching_wildcard():
     assert_equal(match_fn('*'), '*')
     assert_equal(match_fn('test'), '*test*')
     assert_equal(match_fn('test*'), '*test*')
+
+
+def test_apply_natural_sort():
+  test_strings = ['test_1', 'test_100', 'test_2', 'test_200']
+  assert_equal(apply_natural_sort(test_strings), ['test_1', 'test_2', 'test_100', 'test_200'])
+
+  test_dicts = [{'name': 'test_1', 'comment': 'Test'},
+                {'name': 'test_100', 'comment': 'Test'},
+                {'name': 'test_2', 'comment': 'Test'},
+                {'name': 'test_200', 'comment': 'Test'}]
+  assert_equal(apply_natural_sort(test_dicts, key='name'), [{'name': 'test_1', 'comment': 'Test'},
+                                                            {'name': 'test_2', 'comment': 'Test'},
+                                                            {'name': 'test_100', 'comment': 'Test'},
+                                                            {'name': 'test_200', 'comment': 'Test'}])
