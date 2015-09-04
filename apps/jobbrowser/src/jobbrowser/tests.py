@@ -395,8 +395,8 @@ class TestMapReduce2NoHadoop:
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
 
-    resource_manager_api.get_resource_manager = lambda user: MockResourceManagerApi(user.username)
-    mapreduce_api.get_mapreduce_api = lambda user: MockMapreduceApi(user.username)
+    resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
+    mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
     history_server_api.get_history_server_api = lambda: HistoryServerApi()
 
     self.finish = [
@@ -425,7 +425,7 @@ class TestMapReduce2NoHadoop:
 
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
-    assert_true('job_1356251510842_0054' in response.content)
+    assert_true('job_1356251510842_0054' in response.content, response.content)
     assert_true('RUNNING' in response.content)
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
