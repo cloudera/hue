@@ -101,6 +101,19 @@ Or with YARN sessions by running:
      ./bin/livy-server
 
 
+Livy Configuration
+==================
+
+The properties of the server can be modified by copying <https://github.com/cloudera/hue/blob/master/apps/spark/java/conf/livy-defaults.conf.tmpl>
+and renaming it ``livy-defaults.conf``.
+
+In particular the ``YARN mode`` (default is ``local`` process for development) can be set with:
+
+.. code:: shell
+
+    livy.server.session.factory = yarn
+
+
 Spark Example
 =============
 
@@ -132,6 +145,7 @@ Now we can execute Scala by passing in a simple JSON command:
 
 .. code:: python
 
+    >>> statements_url = session_url + '/statements'
     >>> data = {'code': '1 + 1'}
     >>> r = requests.post(statements_url, data=json.dumps(data), headers=headers)
     >>> r.json()
