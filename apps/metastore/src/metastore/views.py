@@ -116,7 +116,6 @@ def get_database_metadata(request, database):
 """
 Table Views
 """
-
 def show_tables(request, database=None):
   if database is None:
     database = request.COOKIES.get('hueBeeswaxLastDatabase', 'default') # Assume always 'default'
@@ -168,6 +167,7 @@ def show_tables(request, database=None):
     'has_write_access': has_write_access(request.user),
   })
   resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
+
   return resp
 
 
