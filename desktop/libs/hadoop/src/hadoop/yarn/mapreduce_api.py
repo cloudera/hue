@@ -26,7 +26,6 @@ from hadoop.yarn.resource_manager_api import get_resource_manager
 
 
 LOG = logging.getLogger(__name__)
-DEFAULT_USER = 'hue'
 
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
@@ -50,8 +49,8 @@ def get_mapreduce_api(user):
 
 class MapreduceApi(object):
 
-  def __init__(self, user, mr_url, security_enabled=False, ssl_cert_ca_verify=False):
-    self._user = user
+  def __init__(self, username, mr_url, security_enabled=False, ssl_cert_ca_verify=False):
+    self._user = username
     self._url = posixpath.join(mr_url, 'proxy')
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
