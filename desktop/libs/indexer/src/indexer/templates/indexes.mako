@@ -373,7 +373,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 
     self.deleteIndexes = function() {
       $.post("${ url('indexer:delete_indexes') }", {
-        "indexes": ko.mapping.toJSON(self.selectedJobs)
+        "indexes": ko.mapping.toJSON(self.selectedIndexes)
       }, function() {
         window.location.reload();
         $('#deleteIndex').modal('hide');
