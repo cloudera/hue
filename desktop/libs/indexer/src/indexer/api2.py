@@ -76,7 +76,7 @@ def delete_indexes(request):
 
     for index in indexes:
       if index['type'] == 'collection':
-        searcher.delete_collection(index['name'])
+        searcher.delete_index(index['name'])
       elif index['type'] == 'alias':
         searcher.delete_alias(index['name'])
       else:
