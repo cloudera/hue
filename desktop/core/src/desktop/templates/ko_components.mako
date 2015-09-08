@@ -559,7 +559,7 @@ from desktop.views import _ko
         }
 
         self.loadingTerms(true);
-        self.assistHelper.fetchTerms(self.database.name, self.table.name, self.column.name, self.prefixFilter(), function (data) {
+        self.assistHelper.fetchTerms(self.database, self.table, self.column, self.prefixFilter(), function (data) {
           if (data && data.status == 0) {
             self.terms($.map(data.terms, function (term) {
               return {
