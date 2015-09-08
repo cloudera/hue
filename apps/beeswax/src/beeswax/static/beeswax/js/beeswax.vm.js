@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function BeeswaxViewModel(server) {
+function BeeswaxViewModel(server, assistHelper) {
   var self = this;
 
   var DESIGN_DEFAULTS = {
@@ -72,6 +72,8 @@ function BeeswaxViewModel(server) {
     'isRedacted': false
   };
 
+  self.database = assistHelper.activeDatabase;
+
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
   self.design.inlineErrors = ko.computed(function() {
@@ -93,8 +95,6 @@ function BeeswaxViewModel(server) {
   self.chartData = ko.observableArray();
 
   self.server = ko.observable(server);
-  self.databases = ko.observableArray();
-  self.selectedDatabase = ko.observable(0);
   self.isReady = ko.observable(false);
   // Use a view model attribute so that we don't have to override KO.
   // This allows Hue to disable the execute button until the query placeholder dies.
@@ -123,22 +123,6 @@ function BeeswaxViewModel(server) {
 
   self.design.results.save.targetFileError = ko.computed(function() {
     return (self.design.results.save.errors() && 'target_file' in self.design.results.save.errors()) ? self.design.results.save.errors()['target_file'] : null;
-  });
-
-  self.database = ko.computed({
-    'read': function() {
-      if (self.databases()) {
-        return self.databases()[self.selectedDatabase()];
-      } else{
-        return "";
-      }
-    },
-    'write': function(databaseName) {
-      if (databaseName) {
-        self.selectedDatabase(self.databases.indexOf(databaseName));
-      }
-    },
-    'deferEvaluation': true
   });
 
   self.hasParametersFilled = ko.computed(function() {
@@ -177,16 +161,6 @@ function BeeswaxViewModel(server) {
       self.design.settings.errors.push.apply(self.design.settings.errors, errors.settings);
       self.design.fileResources.errors.push.apply(self.design.fileResources.errors, errors.file_resources);
       self.design.functions.errors.push.apply(self.design.functions.errors, errors.functions);
-    }
-  };
-
-  self.updateDatabases = function(databases) {
-    if (databases) {
-      var i = databases.indexOf("_impala_builtins"); // Blacklist of system databases
-      if (i != -1) {
-        databases.splice(i, 1);
-      }
-      self.databases(databases);
     }
   };
 

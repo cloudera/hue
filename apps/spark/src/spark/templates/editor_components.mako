@@ -445,6 +445,7 @@ from desktop.views import _ko
           extraCompleters: completers,
           errors: errors,
           autocompleter: aceAutocompleter,
+          assistHelper: assistHelper,
           openIt: '${ _ko("Double click to open it") }',
           placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>

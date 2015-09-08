@@ -23,13 +23,8 @@ describe("autocomplete.js", function() {
   };
 
   beforeAll(function() {
-    var totalStorage = {};
     $.totalStorage = function(key, value) {
-      if (typeof value === "undefined") {
-        return totalStorage[key];
-      }
-      totalStorage[key] = value;
-      return value;
+      return null;
     };
 
     jasmine.addMatchers({
@@ -66,9 +61,9 @@ describe("autocomplete.js", function() {
     var options = {
       assistHelper: new AssistHelper({
         app: "testApp",
-        user: "testUser"
-      }),
-      db: "testDb"
+        user: "testUser",
+        db: "testDb"
+      })
     };
     subject = new Autocompleter(options);
     ajaxHelper.responseForUrls = {};
@@ -159,9 +154,9 @@ describe("autocomplete.js", function() {
       var options = {
         assistHelper: new AssistHelper({
           app: "testApp",
-          user: "testUser"
+          user: "testUser",
+          db: "testDb"
         }),
-        db: "testDb",
         mode: "hive"
       };
       subject = new Autocompleter(options);
@@ -247,7 +242,6 @@ describe("autocomplete.js", function() {
       });
     });
 
-    // TODO: Fix me
     it("should suggest columns for table after WHERE", function() {
       assertAutoComplete({
         serverResponses: {
@@ -261,7 +255,6 @@ describe("autocomplete.js", function() {
       });
     });
 
-    // TODO: Fix me
     it("should suggest columns for table after ORDER BY ", function() {
       assertAutoComplete({
         serverResponses: {
@@ -275,7 +268,6 @@ describe("autocomplete.js", function() {
       });
     });
 
-    // TODO: Fix me
     it("should suggest columns for table after ON ", function() {
       assertAutoComplete({
         serverResponses: {
