@@ -135,7 +135,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-no-entries">
-    <ul>
+    <ul class="assist-tables">
       <li data-bind="visible: definition.isDatabase">
         <span>${_('The selected database has no tables.')}</span>
       </li>
@@ -153,7 +153,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entries">
-    <div class="nav-header center" data-bind="visible: loading">
+    <div class="center" data-bind="visible: loading">
       <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
       <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
     </div>
@@ -164,47 +164,51 @@ from desktop.views import _ko
         <a class="assist-column-link" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
           <span data-bind="text: definition.displayName, event: { 'dblclick': dblClick }"></span>
         </a>
-        <!-- ko template: { if: open() && ! hasEntries() && ! loading(), name: 'assist-no-entries' } --><!-- /ko -->
-        <!-- ko template: { if: open() && hasEntries() && ! loading(), name: 'assist-entries'  } --><!-- /ko -->
+        <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
     </ul>
+    <!-- ko template: { if: ! hasEntries() && ! loading(), name: 'assist-no-entries' } --><!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-panel-template">
     <div class="reveals-actions" style="position: relative; width:100%">
       <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
-        <li class="nav-header">${_('database')}
+        <li class="nav-header">
+          ${_('database')}
           <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
             <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
           </div>
         </li>
-        <li data-bind="visible: ! hasErrors()" >
+
+        <li data-bind="visible: ! hasErrors() && ! loadingDatabases()" >
           <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
         </li>
-        <li data-bind="visible: hasErrors">
-          <span>${ _('The database list cannot be loaded.') }</span>
-        </li>
 
-        <li class="nav-header center" data-bind="visible: loadingTables">
+        <li class="center" data-bind="visible: loadingDatabases" >
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </li>
 
-        <!-- ko if: selectedDatabase() != null && ! loadingTables() -->
-        <li class="nav-header" style="margin-top:10px;">${_('tables')}
+        <li data-bind="visible: hasErrors">
+          <span>${ _('The database list cannot be loaded.') }</span>
+        </li>
+
+        <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases()">
+          ${_('tables')}
           <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
             <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           </div>
         </li>
 
-        <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
-          <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
-        </li>
-        <!-- /ko -->
+        <!-- ko if: selectedDatabase() != null -->
+          <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
+            <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
+          </li>
 
         <div class="table-container">
-        <!-- ko template: { if: selectedDatabase() != null && ! loadingTables(), name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
-        </div>
+          <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
+          </div>
+        <!-- /ko -->
       </ul>
     </div>
 
@@ -259,6 +263,7 @@ from desktop.views import _ko
         self.parent = parent;
         self.filter = filter;
 
+        self.loaded = false;
         self.loading = ko.observable(false);
         self.open = ko.observable(false);
         self.entries = ko.observableArray([]);
@@ -294,82 +299,86 @@ from desktop.views import _ko
           return;
         }
         self.loading(true);
+        self.entries([]);
 
-        self.assistPanel.assistHelper.fetchPanelData(self.getHierarchy(), function(data) {
-          if (typeof data.tables !== "undefined") {
-            self.entries($.map(data.tables, function(tableName) {
-              return self.createEntry({
-                name: tableName,
-                displayName: tableName,
-                title: tableName,
-                isTable: true
-              });
-            }));
-          } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
-            self.entries($.map(data.extended_columns, function (columnDef) {
-              var displayName = columnDef.name;
-              if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
-                displayName += ' (' + columnDef.type + ')'
-              }
-              var title = displayName;
-              if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
-                title += ' ' + columnDef.comment;
-              }
-              return self.createEntry({
-                name: columnDef.name,
-                displayName: displayName,
-                title: title,
-                isColumn: true
-              });
-            }));
-          } else if (typeof data.columns !== "undefined" && data.columns !== null) {
-            self.entries($.map(data.columns, function(columnName) {
-              return self.createEntry({
-                name: columnName,
-                displayName: columnName,
-                title: columnName,
-                isColumn: true
-              });
-            }));
-          } else if (typeof data.type !== "undefined" && data.type !== null) {
-            if (data.type === "map") {
-              self.entries([
-                self.createEntry({
-                  name: "key",
-                  displayName: "key (" + data.key.type + ")",
-                  title: "key (" + data.key.type + ")"
-                }),
-                self.createEntry({
-                  name: "value",
-                  displayName: "value (" + data.value.type + ")",
-                  title: "value (" + data.value.type + ")",
-                  isMapValue: true
-                })
-              ]);
-            } else if (data.type == "struct") {
-              self.entries($.map(data.fields, function(field) {
+        // Defer this part to allow ko to react on empty entries and loading
+        window.setTimeout(function() {
+          self.assistPanel.assistHelper.fetchPanelData(self.getHierarchy(), function(data) {
+            if (typeof data.tables !== "undefined") {
+              self.entries($.map(data.tables, function(tableName) {
                 return self.createEntry({
-                  name: field.name,
-                  displayName: field.name + " (" + field.type + ")",
-                  title: field.name + " (" + field.type + ")"
+                  name: tableName,
+                  displayName: tableName,
+                  title: tableName,
+                  isTable: true
                 });
               }));
-            } else if (data.type == "array") {
-              self.entries([
-                self.createEntry({
-                  name: "item",
-                  displayName: "item (" + data.item.type + ")",
-                  title: "item (" + data.item.type + ")",
-                  isArray: true
-                })
-              ]);
+            } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
+              self.entries($.map(data.extended_columns, function (columnDef) {
+                var displayName = columnDef.name;
+                if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
+                  displayName += ' (' + columnDef.type + ')'
+                }
+                var title = displayName;
+                if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
+                  title += ' ' + columnDef.comment;
+                }
+                return self.createEntry({
+                  name: columnDef.name,
+                  displayName: displayName,
+                  title: title,
+                  isColumn: true
+                });
+              }));
+            } else if (typeof data.columns !== "undefined" && data.columns !== null) {
+              self.entries($.map(data.columns, function(columnName) {
+                return self.createEntry({
+                  name: columnName,
+                  displayName: columnName,
+                  title: columnName,
+                  isColumn: true
+                });
+              }));
+            } else if (typeof data.type !== "undefined" && data.type !== null) {
+              if (data.type === "map") {
+                self.entries([
+                  self.createEntry({
+                    name: "key",
+                    displayName: "key (" + data.key.type + ")",
+                    title: "key (" + data.key.type + ")"
+                  }),
+                  self.createEntry({
+                    name: "value",
+                    displayName: "value (" + data.value.type + ")",
+                    title: "value (" + data.value.type + ")",
+                    isMapValue: true
+                  })
+                ]);
+              } else if (data.type == "struct") {
+                self.entries($.map(data.fields, function(field) {
+                  return self.createEntry({
+                    name: field.name,
+                    displayName: field.name + " (" + field.type + ")",
+                    title: field.name + " (" + field.type + ")"
+                  });
+                }));
+              } else if (data.type == "array") {
+                self.entries([
+                  self.createEntry({
+                    name: "item",
+                    displayName: "item (" + data.item.type + ")",
+                    title: "item (" + data.item.type + ")",
+                    isArray: true
+                  })
+                ]);
+              }
             }
-          }
-          self.loading(false);
-        }, function() {
-          self.assistPanel.hasErrors(true);
-          self.loading(false);
-        })
+            self.loading(false);
+          }, function() {
+            self.assistPanel.hasErrors(true);
+            self.loading(false);
+          });
+        }, 10);
       };
 
       AssistEntry.prototype.createEntry = function(definition) {
@@ -586,7 +595,6 @@ from desktop.views import _ko
         var self = this;
 
         self.hasErrors = ko.observable(false);
-        self.reloading = ko.observable(false);
         self.simpleStyles = ko.observable(false);
 
         self.filter = ko.observable("").extend({ rateLimit: 150 });
@@ -614,13 +622,16 @@ from desktop.views import _ko
         self.databases = ko.observableArray();
         self.selectedDatabase = ko.observable();
 
+        self.reloading = ko.observable(false);
+        self.loadingDatabases = ko.observable(true);
+
         self.loadingTables = ko.computed(function() {
-          return  ! (self.selectedDatabase() && !self.selectedDatabase().loading());
+          return typeof self.selectedDatabase() != "undefined" && self.selectedDatabase() !== null && self.selectedDatabase().loading();
         });
 
         self.selectedDatabase.subscribe(function(newValue) {
-          if (newValue != null) {
-            newValue.loadEntries();
+          if (newValue != null && !newValue.hasEntries() && !newValue.loading()) {
+              newValue.loadEntries()
           }
         });
 
@@ -628,10 +639,14 @@ from desktop.views import _ko
         self.availableDatabaseNames = ko.observableArray();
 
         self.fetchDatabases(function() {
-          self.assistHelper.activeDatabase.subscribe(setDatabase);
+          self.assistHelper.activeDatabase.subscribe(function(newValue) {
+            window.setTimeout(function() {
+              self.setDatabase(newValue);
+            }, 10);
+          });
 
           if ($.inArray(self.assistHelper.activeDatabase(), self.availableDatabaseNames()) > -1) {
-            setDatabase(self.assistHelper.activeDatabase());
+            self.setDatabase(self.assistHelper.activeDatabase());
             return;
           }
           if ($.inArray(self.options.lastSelectedDb(), self.availableDatabaseNames()) > -1) {
@@ -658,7 +673,7 @@ from desktop.views import _ko
             var newTop = targetElement.offset().top - $(window).scrollTop();
             if (targetElement != null && (lastOffset.left != targetElement.offset().left || lastOffset.top != newTop)) {
               lastOffset.left = targetElement.offset().left;
-              lastOffset.top = newTop
+              lastOffset.top = newTop;
               var newCssTop = lastOffset.top - $tableAnalysis.outerHeight() / 2 + targetElement.outerHeight() / 2;
               $tableAnalysis.css("top", newCssTop).css("left", lastOffset.left + targetElement.outerWidth());
               if ((newCssTop + $tableAnalysis.outerHeight() / 2) < 70) {
@@ -701,6 +716,7 @@ from desktop.views import _ko
       AssistPanel.prototype.reloadAssist = function() {
         var self = this;
         self.reloading(true);
+        self.loadingDatabases(true);
         self.selectedDatabase(null);
         self.assistHelper.clearCache();
         self.fetchDatabases(function() {
@@ -723,10 +739,12 @@ from desktop.views import _ko
           self.availableDatabaseNames(data.databases);
 
           self.reloading(false);
+          self.loadingDatabases(false);
           if (callback) {
             callback();
           }
         }, function() {
+          self.loadingDatabases(false);
           self.reloading(false);
           self.hasErrors(true);
         });
