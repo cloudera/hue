@@ -2570,12 +2570,6 @@ function loadDesign(design_id) {
   setupCodeMirrorSubscription();
 }
 
-huePubSub.subscribe('hue.assist.databaseChanged', function(name) {
-  if (name !== viewModel.database()) {
-    viewModel.database(name);
-  }
-});
-
 function loadQueryHistory(query_history_id) {
   viewModel.design.history.id(query_history_id);
   viewModel.fetchQueryHistory();
@@ -2598,7 +2592,7 @@ function setupCodeMirrorSubscription() {
 }
 
 // Knockout
-viewModel = new BeeswaxViewModel("${app_name}");
+viewModel = new BeeswaxViewModel("${app_name}", assistHelper);
 ko.applyBindings(viewModel, $("#beeswax-execute")[0]);
 
 shareViewModel = initSharing("#documentShareModal");

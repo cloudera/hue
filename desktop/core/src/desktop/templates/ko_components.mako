@@ -179,7 +179,7 @@ from desktop.views import _ko
           </div>
         </li>
         <li data-bind="visible: ! hasErrors()" >
-          <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: selectedDatabaseName }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+          <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
         </li>
         <li data-bind="visible: hasErrors">
           <span>${ _('The database list cannot be loaded.') }</span>
@@ -430,11 +430,11 @@ from desktop.views import _ko
         var tableName = hierarchy[1];
 
         $assistQuickLook.find(".tableName").text(self.definition.name);
-        $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
+        $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + self.assistPanel.assistHelper.activeDatabase() + "/" + tableName);
         $assistQuickLook.find(".sample").empty("");
         $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
-        self.assistPanel.assistHelper.fetchTableHtmlPreview(databaseName, tableName, function(data) {
+        self.assistPanel.assistHelper.fetchTableHtmlPreview(tableName, function(data) {
           $assistQuickLook.find(".loader").hide();
           $assistQuickLook.find(".sample").html(data);
         }, function(e) {
@@ -507,7 +507,7 @@ from desktop.views import _ko
       TableStats.prototype.fetchData = function () {
         var self = this;
         self.loading(true);
-        self.assistHelper.fetchStats(self.database, self.table, self.column != null ? self.column : null, function (data) {
+        self.assistHelper.fetchStats(self.table, self.column != null ? self.column : null, function (data) {
           if (data && data.status == 0) {
             self.statRows(data.stats);
             var inaccurate = true;
@@ -540,7 +540,7 @@ from desktop.views import _ko
         var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
         self.refreshing(true);
 
-        self.assistHelper.refreshTableStats(self.database, self.table, function() {
+        self.assistHelper.refreshTableStats(self.table, function() {
           self.refreshing(false);
           self.fetchData();
           if (shouldFetchTerms) {
@@ -559,7 +559,7 @@ from desktop.views import _ko
         }
 
         self.loadingTerms(true);
-        self.assistHelper.fetchTerms(self.database, self.table, self.column, self.prefixFilter(), function (data) {
+        self.assistHelper.fetchTerms(self.table, self.column, self.prefixFilter(), function (data) {
           if (data && data.status == 0) {
             self.terms($.map(data.terms, function (term) {
               return {
@@ -614,6 +614,10 @@ from desktop.views import _ko
         self.databases = ko.observableArray();
         self.selectedDatabase = ko.observable();
 
+        self.loadingTables = ko.computed(function() {
+          return  ! (self.selectedDatabase() && !self.selectedDatabase().loading());
+        });
+
         self.selectedDatabase.subscribe(function(newValue) {
           if (newValue != null) {
             newValue.loadEntries();
@@ -622,46 +626,22 @@ from desktop.views import _ko
 
         // We need the names because select2 does not support objects
         self.availableDatabaseNames = ko.observableArray();
-        self.selectedDatabaseName = ko.observable();
-
-        self.selectedDatabaseName.subscribe(function(name) {
-          if (name == null) {
-            return;
-          }
-          self.options.lastSelectedDb(name);
-
-          // TODO: find a better criteria for showing the spinner
-          // This is deferred so that the spinner gets a chance to be shown
-          self.selectedDatabase(null);
-          window.setTimeout(function () {
-            self.selectedDatabase(ko.utils.arrayFirst(self.databases(), function(database) {
-              return name === database.definition.name;
-            }));
-          }, 10);
-          huePubSub.publish('hue.assist.databaseChanged', name);
-        });
-
-        huePubSub.subscribe('hue.assist.changeDatabase', function(name) {
-          self.selectedDatabaseName(name);
-        });
-
-        self.loadingTables = ko.computed(function() {
-          return  ! (self.selectedDatabase() && !self.selectedDatabase().loading());
-        });
 
         self.fetchDatabases(function() {
-          window.setTimeout(function() {
-            if ($.inArray(self.selectedDatabaseName(), self.availableDatabaseNames()) > -1) {
-              return;
-            }
-            if ($.inArray(self.options.lastSelectedDb(), self.availableDatabaseNames()) > -1) {
-              self.selectedDatabaseName(self.options.lastSelectedDb());
-            } else if ($.inArray("default", self.availableDatabaseNames()) > -1) {
-              self.selectedDatabaseName("default");
-            } else if (self.availableDatabaseNames().length > 0) {
-              self.selectedDatabaseName(self.availableDatabaseNames()[0]);
-            }
-          }, 150);
+          self.assistHelper.activeDatabase.subscribe(setDatabase);
+
+          if ($.inArray(self.assistHelper.activeDatabase(), self.availableDatabaseNames()) > -1) {
+            setDatabase(self.assistHelper.activeDatabase());
+            return;
+          }
+          if ($.inArray(self.options.lastSelectedDb(), self.availableDatabaseNames()) > -1) {
+            self.assistHelper.activeDatabase(self.options.lastSelectedDb());
+          } else if ($.inArray("default", self.availableDatabaseNames()) > -1) {
+            self.assistHelper.activeDatabase("default");
+          } else if (self.availableDatabaseNames().length > 0) {
+            self.assistHelper.activeDatabase(self.availableDatabaseNames()[0]);
+          }
+
         });
 
         self.modalItem = ko.observable();
@@ -701,6 +681,18 @@ from desktop.views import _ko
         };
       }
 
+      AssistPanel.prototype.setDatabase = function(name) {
+        var self = this;
+        if (name == null) {
+          return;
+        }
+        self.options.lastSelectedDb(name);
+
+        self.selectedDatabase(ko.utils.arrayFirst(self.databases(), function(database) {
+          return name === database.definition.name;
+        }));
+      };
+
       AssistPanel.prototype.toggleSearch = function () {
         var self = this;
         self.options.isSearchVisible(!self.options.isSearchVisible());
@@ -709,11 +701,11 @@ from desktop.views import _ko
       AssistPanel.prototype.reloadAssist = function() {
         var self = this;
         self.reloading(true);
-        var selectedDb = self.selectedDatabaseName();
-        self.selectedDatabaseName(null);
+        self.selectedDatabase(null);
         self.assistHelper.clearCache();
-        self.fetchDatabases();
-        self.selectedDatabaseName(selectedDb);
+        self.fetchDatabases(function() {
+          self.setDatabase(self.options.lastSelectedDb());
+        });
       };
 
       AssistPanel.prototype.fetchDatabases = function(callback) {
