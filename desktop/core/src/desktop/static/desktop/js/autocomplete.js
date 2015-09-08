@@ -29,16 +29,11 @@ function Autocompleter(options) {
   var self = this;
   self.options = options;
   self.assistHelper = options.assistHelper;
-  self.currentDb = options.db;
   if (typeof options.mode === "undefined" || options.mode === null || options.mode === "beeswax") {
     self.currentMode = "hive";
   } else {
     self.currentMode = options.mode;
   }
-
-  huePubSub.subscribe('hue.assist.databaseChanged', function (db) {
-    self.currentDb = db;
-  });
 
   huePubSub.subscribe('hue.ace.activeMode', function(mode) {
     self.currentMode = mode.split("/").pop();
@@ -96,9 +91,9 @@ Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar
 Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
   var self = this;
 
-  if (typeof self.currentDb == "undefined"
-    || self.currentDb == null
-    || self.currentDb == ""
+  if (typeof self.assistHelper.activeDatabase() == "undefined"
+    || self.assistHelper.activeDatabase() == null
+    || self.assistHelper.activeDatabase() == ""
     || (self.currentMode !== "hive" && self.currentMode !== "impala")) {
     callback([]);
     return;
@@ -131,7 +126,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
 
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
-    self.assistHelper.fetchTables(self.currentDb, function(data) {
+    self.assistHelper.fetchTables(function(data) {
       var fromKeyword = "";
       if (selectBefore) {
         if (beforeCursor.indexOf("SELECT") > -1) {
@@ -197,7 +192,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       }
     });
 
-    self.assistHelper.fetchFields(self.currentDb, tableName, fields, function(data) {
+    self.assistHelper.fetchFields(tableName, fields, function(data) {
       callback(self.extractFields(data, "", !fieldTermBefore));
     }, function() {
       callback([]);

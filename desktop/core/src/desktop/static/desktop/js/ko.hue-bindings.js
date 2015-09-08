@@ -1662,6 +1662,7 @@ ko.bindingHandlers.aceEditor = {
     var onAfterExec = options.onAfterExec || function () {};
     var onExecute = options.onExecute || function () {};
     var autocompleter = options.autocompleter;
+    var assistHelper = options.assistHelper;
 
     $el.text(options.value());
 
@@ -1887,15 +1888,7 @@ ko.bindingHandlers.aceEditor = {
       }).call(HueLink.prototype);
 
       exports.HueLink = HueLink;
-
     });
-
-
-    var currentAssistDb = "";
-    huePubSub.subscribe('hue.assist.databaseChanged', function (db) {
-      currentAssistDb = db;
-    });
-
 
     HueLink = ace.require("huelink").HueLink;
     editor.hueLink = new HueLink(editor);
@@ -1907,7 +1900,7 @@ ko.bindingHandlers.aceEditor = {
         window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""));
       }
       else {
-        window.open("/metastore/table/" + currentAssistDb + "/" + token.value);
+        window.open("/metastore/table/" + self.assistHelper.activeDatabase() + "/" + token.value);
       }
     });
 

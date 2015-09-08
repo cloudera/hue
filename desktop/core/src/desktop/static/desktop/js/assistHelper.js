@@ -26,6 +26,11 @@ var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
 function AssistHelper (options) {
   var self = this;
   self.options = options;
+
+  self.activeDatabase = ko.observable();
+  if (typeof options.db !== "undefined") {
+    self.activeDatabase(options.db)
+  }
 }
 
 AssistHelper.prototype.hasExpired = function (timestamp) {
@@ -44,10 +49,10 @@ AssistHelper.prototype.getTotalStorageUserPrefix = function () {
   return app;
 };
 
-AssistHelper.prototype.fetchTableHtmlPreview = function(databaseName, tableName, successCallback, errorCallback) {
+AssistHelper.prototype.fetchTableHtmlPreview = function(tableName, successCallback, errorCallback) {
   var self = this;
   $.ajax({
-    url: "/" + self.options.app + "/api/table/" + databaseName + "/" + tableName,
+    url: "/" + self.options.app + "/api/table/" + self.activeDatabase() + "/" + tableName,
     data: {"sample": true},
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-Requested-With", "Hue");
@@ -58,7 +63,7 @@ AssistHelper.prototype.fetchTableHtmlPreview = function(databaseName, tableName,
   });
 };
 
-AssistHelper.prototype.refreshTableStats = function(databaseName, tableName, successCallback, errorCallback) {
+AssistHelper.prototype.refreshTableStats = function(tableName, successCallback, errorCallback) {
   var self = this;
   var pollRefresh = function (url) {
     $.post(url, function (data) {
@@ -74,7 +79,7 @@ AssistHelper.prototype.refreshTableStats = function(databaseName, tableName, suc
     }).fail(errorCallback);
   };
 
-  $.post("/" + self.options.app + "/api/analyze/" + databaseName + "/" + tableName + "/", function (data) {
+  $.post("/" + self.options.app + "/api/analyze/" + self.activeDatabase() + "/" + tableName + "/", function (data) {
     if (data.status == 0 && data.watch_url) {
       pollRefresh(data.watch_url);
     } else {
@@ -83,10 +88,10 @@ AssistHelper.prototype.refreshTableStats = function(databaseName, tableName, suc
   }).fail(errorCallback);
 };
 
-AssistHelper.prototype.fetchStats = function(databaseName, tableName, columnName, successCallback, errorCallback) {
+AssistHelper.prototype.fetchStats = function(tableName, columnName, successCallback, errorCallback) {
   var self = this;
   $.ajax({
-    url: "/" + self.options.app + "/api/table/" + databaseName + "/" + tableName + "/stats/" + (columnName || ""),
+    url: "/" + self.options.app + "/api/table/" + self.activeDatabase() + "/" + tableName + "/stats/" + (columnName || ""),
     data: {},
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-Requested-With", "Hue");
@@ -97,10 +102,10 @@ AssistHelper.prototype.fetchStats = function(databaseName, tableName, columnName
   });
 };
 
-AssistHelper.prototype.fetchTerms = function(databaseName, tableName, columnName, prefixFilter, successCallback, errorCallback) {
+AssistHelper.prototype.fetchTerms = function(tableName, columnName, prefixFilter, successCallback, errorCallback) {
   var self = this;
   $.ajax({
-    url: "/" + self.options.app + "/api/table/" + databaseName + "/" + tableName + "/terms/" + columnName + "/" + (prefixFilter || ""),
+    url: "/" + self.options.app + "/api/table/" + self.activeDatabase() + "/" + tableName + "/terms/" + columnName + "/" + (prefixFilter || ""),
     data: {},
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-Requested-With", "Hue");
@@ -120,16 +125,16 @@ AssistHelper.prototype.fetchDatabases = function(successCallback, errorCallback)
   }, errorCallback);
 };
 
-AssistHelper.prototype.fetchTables = function(databaseName, successCallback, errorCallback) {
+AssistHelper.prototype.fetchTables = function(successCallback, errorCallback) {
   var self = this;
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + databaseName, successCallback, errorCallback);
+  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + self.activeDatabase(), successCallback, errorCallback);
 };
 
-AssistHelper.prototype.fetchFields = function(databaseName, tableName, fields, successCallback, errorCallback) {
+AssistHelper.prototype.fetchFields = function(tableName, fields, successCallback, errorCallback) {
   var self = this;
 
   var fieldPart = fields.length > 0 ? "/" + fields.join("/") : "";
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + databaseName + "/" + tableName + fieldPart, successCallback, errorCallback);
+  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + self.activeDatabase() + "/" + tableName + fieldPart, successCallback, errorCallback);
 };
 
 AssistHelper.prototype.clearCache = function() {
