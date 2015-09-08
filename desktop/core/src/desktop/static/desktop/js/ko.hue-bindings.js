@@ -1748,6 +1748,20 @@ ko.bindingHandlers.aceEditor = {
       onPaste(editor);
     });
 
+
+    var currentAssistTables = {};
+
+    var refreshTables = function() {
+      currentAssistTables = {};
+      self.assistHelper.fetchTables(function(data) {
+        $.each(data.tables, function(index, table) {
+          currentAssistTables[table] = true;
+        });
+      })
+    };
+    self.assistHelper.activeDatabase.subscribe(refreshTables);
+    refreshTables();
+
     ace.define("huelink", [], function (require, exports, module) {
       "use strict";
 
@@ -1811,18 +1825,10 @@ ko.bindingHandlers.aceEditor = {
 
           var token = editor.session.getTokenAt(docPos.row, docPos.column);
 
-          var currentAssistTables = [];
-
-          huePubSub.subscribe('assist.firstLevelChange', function (tables) {
-            currentAssistTables = tables;
-          });
-
           if (token) {
-            var isMetastoreLink = Object.keys(currentAssistTables).indexOf(token.value) > -1;
-
             if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
                 token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
-                isMetastoreLink) {
+                currentAssistTables[token.value]) {
               // add highlight for the clicked token
               var range = new AceRange(docPos.row, token.start, docPos.row, token.start + token.value.length);
               editor.session.removeMarker(this.marker);
