@@ -1519,30 +1519,45 @@ $(document).ready(function () {
     var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
 
     autocompleter.autocomplete(_before, _after, function(suggestions) {
-      CodeMirror.possibleSoloField = suggestions.length > 0;
-      CodeMirror.tableFieldMagic = false;
-      CodeMirror.fromDot = _before.match(/.*\.[^ ]*$/) != null;
+      var isFromDot = _before.match(/.*\.[^ ]*$/) != null;
       var isTable = false;
+      var tableFieldMagic = false;
+      var hasFromPrefix = false;
 
       var values = suggestions.map(function(suggestion) {
         if (suggestion.meta === "table") {
           isTable = true; // They're all tables.
-          var match = suggestion.value.match(/(\? )?f?r?o?m? ?([^ ]+)$/i);
-          if (typeof match[1] !== "undefined") {
-            CodeMirror.tableFieldMagic = true;
+          var match = suggestion.value.match(/(\? )?from ([^ ]+)$/i);
+          if (match != null) {
+            if (typeof match[1] != "undefined") {
+              tableFieldMagic = true;
+              return match[2];
+            } else {
+              hasFromPrefix = true;
+            }
           }
-          return match[2];
+          return suggestion.value;
         } else {
-          return CodeMirror.fromDot ? "." + suggestion.value : suggestion.value;
+          return isFromDot ? "." + suggestion.value : suggestion.value;
         }
-      }).join(' ');
+      }).join(" ");
 
-      if (isTable) {
-        CodeMirror.possibleTable = !CodeMirror.tableFieldMagic;
-        CodeMirror.catalogTables = values;
+      if (values.length > 0 && !hasFromPrefix) {
+        CodeMirror.fromDot = isFromDot;
+        CodeMirror.possibleSoloField = true;
+        CodeMirror.tableFieldMagic = tableFieldMagic;
+        CodeMirror.possibleTable = isTable && !tableFieldMagic;
+        CodeMirror.catalogTables = isTable ? values : "";
+        CodeMirror.catalogFields = isTable ? "" : values;
       } else {
-        CodeMirror.catalogFields = values;
+        CodeMirror.fromDot = false;
+        CodeMirror.possibleSoloField = false;
+        CodeMirror.tableFieldMagic = false;
+        CodeMirror.possibleTable = false;
+        CodeMirror.catalogTables = "";
+        CodeMirror.catalogFields = "";
       }
+
       CodeMirror.showHint(cm, AUTOCOMPLETE_SET);
     });
   };
