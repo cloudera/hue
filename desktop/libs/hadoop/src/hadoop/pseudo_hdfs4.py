@@ -554,10 +554,7 @@ def shared_cluster():
       cluster = PseudoHdfs4()
       atexit.register(cluster.stop)
 
-      try:
-        cluster.start()
-      except Exception, ex:
-        LOG.exception("Failed to fully bring up test cluster: %s" % (ex,))
+      cluster.start()
 
       fqdn = socket.getfqdn()
       webhdfs_url = "http://%s:%s/webhdfs/v1" % (fqdn, cluster.dfs_http_port,)
