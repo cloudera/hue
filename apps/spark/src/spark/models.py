@@ -229,7 +229,7 @@ class HS2Api(Api):
     return {'status': 0}
 
   @query_error_handler
-  def get_log(self, snippet, startFrom=None, size=None):
+  def get_log(self, notebook, snippet, startFrom=None, size=None):
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
@@ -437,8 +437,11 @@ class SparkApi(Api):
 
     return {'status': 0}
 
-  def get_log(self, snippet, startFrom=0, size=None):
-    return 'Not available'
+  def get_log(self, notebook, snippet, startFrom=0, size=None):
+    api = get_spark_api(self.user)
+    session = _get_snippet_session(notebook, snippet)
+
+    return api.get_log(session['id'], startFrom=startFrom, size=size)
 
   def _progress(self, snippet, logs):
     return 50
@@ -505,7 +508,7 @@ class SparkBatchApi(Api):
         'status': state,
     }
 
-  def get_log(self, snippet, startFrom=0, size=None):
+  def get_log(self, notebook, snippet, startFrom=0, size=None):
     api = get_spark_api(self.user)
 
     return api.get_batch_log(snippet['result']['handle']['id'], startFrom=startFrom, size=size)
