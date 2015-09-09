@@ -105,7 +105,7 @@ def test_hdfs_copy():
   copy_test_src = minicluster.fs_prefix + '/copy_test_src'
   copy_test_dst = minicluster.fs_prefix + '/copy_test_dst'
   try:
-    data = "I will not make flatuent noises in class\n" * 2000
+    data = "I will not make flatulent noises in class\n" * 2000
     minifs.create(copy_test_src, permission=0646, data=data)
     minifs.create(copy_test_dst, data="some initial data")
 
@@ -134,7 +134,7 @@ def test_hdfs_full_copy():
 
     # File to directory copy.
     # No guarantees on file permissions at the moment.
-    data = "I will not make flatuent noises in class\n" * 2000
+    data = "I will not make flatulent noises in class\n" * 2000
     minifs.create(prefix + '/src/file.txt', permission=0646, data=data)
     minifs.copy(prefix + '/src/file.txt', prefix + '/dest')
     assert_true(minifs.exists(prefix + '/dest/file.txt'))
@@ -163,7 +163,7 @@ def test_hdfs_copy_from_local():
   path = os.path.join(tempfile.gettempdir(), 'copy_test_src')
   logging.info(path)
 
-  data = "I will not make flatuent noises in class\n" * 2000
+  data = "I will not make flatulent noises in class\n" * 2000
   f = open(path, 'w')
   f.write(data)
   f.close()
