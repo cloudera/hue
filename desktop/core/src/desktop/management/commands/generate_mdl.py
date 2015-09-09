@@ -36,6 +36,8 @@ class Command(NoArgsCommand):
     for schema in registry.schemas:
       definitions.extend(schema.to_json())
 
+    definitions.sort(lambda a, b: cmp(a['context'], b['context']))
+
     d = {
         'name': 'HUE',
         'nameForCrossEntityAggregateMetrics': 'hues',
