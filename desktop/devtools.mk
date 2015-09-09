@@ -25,7 +25,8 @@ DEVTOOLS += \
 	coverage[3.7.1] \
 	nosetty[0.4] \
 	werkzeug[0.6] \
-	windmill[1.3]
+	windmill[1.3] \
+	pylint[1.3.1]
 
 # Install/download dev tools for SDK into the virtual environment
 .PHONY: $(DEVTOOLS)
