@@ -164,7 +164,7 @@ def get_logs(request):
   size = int(size) if size else None
 
   db = get_api(request.user, snippet)
-  response['logs'] = db.get_log(snippet, startFrom=startFrom, size=size)
+  response['logs'] = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
   response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['job_urls'] = [{
       'name': job,
