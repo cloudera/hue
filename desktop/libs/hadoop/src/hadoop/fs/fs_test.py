@@ -102,10 +102,9 @@ def test_hdfs_copy():
   minicluster = pseudo_hdfs4.shared_cluster()
   minifs = minicluster.fs
 
+  copy_test_src = minicluster.fs_prefix + '/copy_test_src'
+  copy_test_dst = minicluster.fs_prefix + '/copy_test_dst'
   try:
-    copy_test_src = minicluster.fs_prefix + '/copy_test_src'
-    copy_test_dst = minicluster.fs_prefix + '/copy_test_dst'
-
     data = "I will not make flatuent noises in class\n" * 2000
     minifs.create(copy_test_src, permission=0646, data=data)
     minifs.create(copy_test_dst, data="some initial data")
@@ -116,7 +115,6 @@ def test_hdfs_copy():
 
     sb = minifs.stats(copy_test_dst)
     assert_equal(0646, stat.S_IMODE(sb.mode))
-
   finally:
     minifs.do_as_superuser(minifs.rmtree, copy_test_src)
     minifs.do_as_superuser(minifs.rmtree, copy_test_dst)
@@ -128,8 +126,8 @@ def test_hdfs_full_copy():
   minifs = minicluster.fs
   minifs.setuser('test')
 
+  prefix = minicluster.fs_prefix + '/copy_test'
   try:
-    prefix = minicluster.fs_prefix + '/copy_test'
     minifs.mkdir(prefix)
     minifs.mkdir(prefix + '/src')
     minifs.mkdir(prefix + '/dest')
@@ -153,7 +151,6 @@ def test_hdfs_full_copy():
       pass
     except Exception:
       raise
-
   finally:
     minifs.do_as_superuser(minifs.rmtree, prefix)
 
