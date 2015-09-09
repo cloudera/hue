@@ -22,7 +22,8 @@ import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.conf import default_ssl_cacerts, default_ssl_validate
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
+  coerce_password_from_script, AUTH_USERNAME as DEFAULT_AUTH_USERNAME
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
 
 from beeswax.settings import NICE_NAME
@@ -140,6 +141,35 @@ SSL = ConfigSection(
     )
   )
 )
+
+def get_auth_username():
+  """Get from top level default from desktop"""
+  return DEFAULT_AUTH_USERNAME.get()
+
+AUTH_USERNAME = Config(
+  key="auth_username",
+  help=_t("Auth username of the hue user used for authentications."),
+  dynamic_default=get_auth_username)
+
+def get_auth_password():
+  password = AUTH_PASSWORD_SCRIPT.get()
+  if not password:
+    password = DEFAULT_AUTH_PASSWORD.get()
+  return password
+
+AUTH_PASSWORD = Config(
+  key="auth_password",
+  help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
+  private=True,
+  dynamic_default=get_auth_password)
+
+AUTH_PASSWORD_SCRIPT = Config(
+  key="auth_password_script",
+  help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
