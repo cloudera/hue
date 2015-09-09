@@ -29,8 +29,8 @@ from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, \
-                         APPLY_NATURAL_SORT_MAX
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, get_auth_username, get_auth_password, \
+  APPLY_NATURAL_SORT_MAX
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -68,7 +68,7 @@ def get(user, query_server=None):
 def get_query_server_config(name='beeswax', server=None):
   if name == 'impala':
     from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
-        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS, QUERY_TIMEOUT_S
+        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS, QUERY_TIMEOUT_S, get_auth_username as get_impala_auth_username, get_auth_password as get_impala_auth_password
 
     query_server = {
         'server_name': 'impala',
@@ -78,6 +78,8 @@ def get_query_server_config(name='beeswax', server=None):
         'impersonation_enabled': IMPERSONATION_ENABLED.get(),
         'querycache_rows': QUERYCACHE_ROWS.get(),
         'QUERY_TIMEOUT_S': QUERY_TIMEOUT_S.get(),
+        'auth_username': get_impala_auth_username(),
+        'auth_password': get_impala_auth_password()
     }
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
@@ -94,9 +96,13 @@ def get_query_server_config(name='beeswax', server=None):
             'end_point': hive_site.hiveserver2_thrift_http_path()
         },
         'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
+        'auth_username': get_auth_username(),
+        'auth_password': get_auth_password()
     }
 
-  LOG.debug("Query Server: %s" % query_server)
+  debug_query_server = query_server.copy()
+  debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password'))
+  LOG.debug("Query Server: %s" % debug_query_server)
 
   return query_server
 

@@ -158,12 +158,14 @@ SSL_VALIDATE = Config(
   type=coerce_bool,
   default=True)
 
+# Deprecated by AUTH_PASSWORD
 LDAP_PASSWORD = Config(
   key="ldap_password",
   help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   default=None)
 
+# Deprecated by AUTH_PASSWORD_SCRIPT
 LDAP_PASSWORD_SCRIPT = Config(
   key="ldap_password_script",
   help=_("Execute this script to produce the LDAP password. This will be used when `ldap_password` is not set."),
@@ -171,11 +173,46 @@ LDAP_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+# Deprecated by by AUTH_USERNAME
 LDAP_USERNAME = Config(
   key="ldap_username",
   help=_("LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   default="hue")
+
+def get_auth_username():
+  """Backward compatibility"""
+  return LDAP_USERNAME.get()
+
+AUTH_USERNAME = Config(
+  key="auth_username",
+  help=_("Auth username of the hue user used for authentications. For example for LDAP Authentication with HiveServer2/Impala."),
+  dynamic_default=get_auth_username)
+
+def get_auth_password():
+  """Get from script or backward compatibility"""
+  password = AUTH_PASSWORD_SCRIPT.get()
+  if password:
+    return password
+
+  password = LDAP_PASSWORD.get() # 2 levels for backward compatibility
+  if password:
+    return password
+
+  return LDAP_PASSWORD_SCRIPT.get()
+
+AUTH_PASSWORD = Config(
+  key="auth_password",
+  help=_("LDAP/PAM/.. password of the hue user used for authentications. Inactive if empty. For example for LDAP Authentication with HiveServer2/Impala."),
+  private=True,
+  dynamic_default=get_auth_password)
+
+AUTH_PASSWORD_SCRIPT = Config(
+  key="auth_password_script",
+  help=_("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
 
 ENABLE_SERVER = Config(
   key="enable_server",
@@ -1160,14 +1197,6 @@ def get_smtp_password():
   password = SMTP.PASSWORD.get()
   if not password:
     password = SMTP.PASSWORD_SCRIPT.get()
-
-  return password
-
-
-def get_ldap_password():
-  password = LDAP_PASSWORD.get()
-  if not password:
-    password = LDAP_PASSWORD_SCRIPT.get()
 
   return password
 
