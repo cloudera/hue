@@ -40,7 +40,7 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import LDAP_USERNAME, LDAP_PASSWORD
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, LDAP_USERNAME, LDAP_PASSWORD
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -60,7 +60,7 @@ import beeswax.views
 
 from beeswax import conf, hive_site
 from beeswax.common import apply_natural_sort
-from beeswax.conf import HIVE_SERVER_HOST
+from beeswax.conf import HIVE_SERVER_HOST, AUTH_USERNAME, AUTH_PASSWORD, AUTH_PASSWORD_SCRIPT
 from beeswax.views import collapse_whitespace, _save_design
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config,\
   fetch_query_result_data
@@ -2599,39 +2599,34 @@ def test_hiveserver2_get_security():
     default_query_server = {'server_host': 'my_host', 'server_port': 12345}
 
     # Beeswax
-    beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hive'}
+    beeswax_query_server = {'server_name': 'beeswax', 'principal': 'hive', 'auth_username': 'hue', 'auth_password': None}
     beeswax_query_server.update(default_query_server)
-    assert_equal((True, 'PLAIN', 'hive', False, None, None), HiveServerClient(beeswax_query_server, user).get_security())
+    assert_equal((True, 'PLAIN', 'hive', False, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
 
     # HiveServer2 LDAP passthrough
-    finish = []
-    finish.append(LDAP_USERNAME.set_for_testing('hueabcd'))
-    finish.append(LDAP_PASSWORD.set_for_testing('abcd'))
-    try:
-      assert_equal((True, 'PLAIN', 'hive', False, 'hueabcd', 'abcd'), HiveServerClient(beeswax_query_server, user).get_security())
-    finally:
-      for f in finish:
-        f()
+    beeswax_query_server.update({'auth_username': 'hueabcd', 'auth_password': 'abcd'})
+    assert_equal((True, 'PLAIN', 'hive', False, 'hueabcd', 'abcd'), HiveServerClient(beeswax_query_server, user).get_security())
+    beeswax_query_server.update({'auth_username': 'hue', 'auth_password': None})
 
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'NOSASL'
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_IMPERSONATION] = 'true'
-    assert_equal((False, 'NOSASL', 'hive', True, None, None), HiveServerClient(beeswax_query_server, user).get_security())
+    assert_equal((False, 'NOSASL', 'hive', True, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
     hive_site._HIVE_SITE_DICT[hive_site._CNF_HIVESERVER2_AUTHENTICATION] = 'KERBEROS'
-    assert_equal((True, 'GSSAPI', 'hive', True, None, None), HiveServerClient(beeswax_query_server, user).get_security())
+    assert_equal((True, 'GSSAPI', 'hive', True, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
 
     # Impala
-    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False}
+    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False, 'auth_username': 'hue', 'auth_password': None}
     impala_query_server.update(default_query_server)
-    assert_equal((False, 'GSSAPI', 'impala', False, None, None), HiveServerClient(impala_query_server, user).get_security())
+    assert_equal((False, 'GSSAPI', 'impala', False, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
 
-    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True}
+    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True, 'auth_username': 'hue', 'auth_password': None}
     impala_query_server.update(default_query_server)
-    assert_equal((False, 'GSSAPI', 'impala', True, None, None), HiveServerClient(impala_query_server, user).get_security())
+    assert_equal((False, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
 
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
     finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
     try:
-      assert_equal((True, 'GSSAPI', 'impala', True, None, None), HiveServerClient(impala_query_server, user).get_security())
+      assert_equal((True, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
     finally:
       finish()
   finally:
@@ -2730,6 +2725,120 @@ def test_close_queries_flag():
     assert_true('closeQuery()' in resp.content, resp.content)
   finally:
     finish()
+
+
+def test_auth_pass_through():
+  # Backward compatibility nothing set
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing(present=False))
+  finish.append(LDAP_PASSWORD.set_for_testing(present=False))
+
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
+
+  finish.append(AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+  try:
+    assert_equal('hue', AUTH_USERNAME.get())
+    assert_equal(None, AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
+
+  # Backward compatibility
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
+
+  finish.append(AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+  try:
+    assert_equal('deprecated_default_username', AUTH_USERNAME.get())
+    assert_equal('deprecated_default_password', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
+
+  # Backward compatibility override
+  finish = []
+
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing('default_password'))
+  try:
+    assert_equal('default_username', AUTH_USERNAME.get())
+    assert_equal('default_password', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
+
+  # HiveServer2 specific
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing('default_password'))
+
+  finish.append(AUTH_USERNAME.set_for_testing('hive_username'))
+  finish.append(AUTH_PASSWORD.set_for_testing('hive_password'))
+  try:
+    assert_equal('hive_username', AUTH_USERNAME.get())
+    assert_equal('hive_password', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
+
+  # Common
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing('default_password'))
+
+  finish.append(AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+
+  try:
+    assert_equal('default_username', AUTH_USERNAME.get())
+    assert_equal('default_password', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
+
+  # Password file specific and use common username
+  with tempfile.NamedTemporaryFile(delete=False) as pwd_file:
+    pwd_file.write('''#!/usr/bin/env bash
+
+echo "my_hue_secret"''')
+    pwd_file.flush()
+    pwd_file.close() # Closing as getting "Text file busy" otherwise
+    os.chmod(pwd_file.name, 0770)
+
+    finish = []
+    finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+    finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+
+    finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+    finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
+
+    finish.append(AUTH_USERNAME.set_for_testing(present=False))
+    finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+    finish.append(AUTH_PASSWORD_SCRIPT.set_for_testing(pwd_file.name))
+
+    try:
+      assert_equal('default_username', AUTH_USERNAME.get())
+      assert_equal('my_hue_secret', AUTH_PASSWORD.get())
+    finally:
+      os.remove(pwd_file.name)
+      for f in finish:
+        f()
 
 
 def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
