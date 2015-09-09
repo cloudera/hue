@@ -76,6 +76,8 @@ class MetricsRegistry(object):
 
 
 class MetricDefinition(object):
+  _add_key_to_name = False
+
   def __init__(self, name, label, description, numerator,
       denominator=None,
       weighting_metric_name=None):
@@ -97,9 +99,14 @@ class MetricDefinition(object):
 
 
   def _make_json(self, key, **kwargs):
+    names = ['hue', self.name.replace('.', '_').replace('-', '_')]
+
+    if self._add_key_to_name:
+      names.append(key)
+
     mdl = dict(
       context='%s::%s' % (self.name, key),
-      name='hue_%s_%s' % (self.name.replace('.', '_').replace('-', '_'), key),
+      name='_'.join(names),
       label=self.label,
       description=self.description,
       numeratorUnit=self.numerator,
@@ -127,6 +134,8 @@ class CounterDefinition(MetricDefinition):
 
 
 class HistogramDefinition(MetricDefinition):
+  _add_key_to_name = True
+
   def __init__(self, *args, **kwargs):
     self.counter_numerator = kwargs.pop('counter_numerator')
 
@@ -164,6 +173,8 @@ class GaugeDefinition(MetricDefinition):
 
 
 class MeterDefinition(MetricDefinition):
+  _add_key_to_name = True
+
   def __init__(self, *args, **kwargs):
     self.counter_numerator = kwargs.pop('counter_numerator')
     self.rate_denominator = kwargs.pop('rate_denominator')
@@ -184,6 +195,8 @@ class MeterDefinition(MetricDefinition):
 
 
 class TimerDefinition(MetricDefinition):
+  _add_key_to_name = True
+
   def __init__(self, *args, **kwargs):
     self.counter_numerator = kwargs.pop('counter_numerator')
     self.rate_denominator = kwargs.pop('rate_denominator')
