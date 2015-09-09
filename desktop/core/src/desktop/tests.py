@@ -715,7 +715,7 @@ class BaseTestPasswordConfig(object):
     ]
 
     try:
-      assert_equal(self.get_password(), ' password from script ', 'kwargs: %s' % kwargs)
+      assert_equal(self.get_password(), ' password from script ', 'pwd: %s, kwargs: %s' % (self.get_password(), kwargs))
     finally:
       for reset in resets:
         reset()
@@ -785,13 +785,14 @@ class TestDatabasePasswordConfig(BaseTestPasswordConfig):
 class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
   def get_config_password(self):
-    return desktop.conf.LDAP_PASSWORD
+    return desktop.conf.AUTH_PASSWORD
 
   def get_config_password_script(self):
-    return desktop.conf.LDAP_PASSWORD_SCRIPT
+    return desktop.conf.AUTH_PASSWORD_SCRIPT
 
   def get_password(self):
-    return desktop.conf.get_ldap_password()
+    # We are using dynamic_default now, so we need to cheat for the tests as only using set_for_testing(present=False) will trigger it.
+    return desktop.conf.AUTH_PASSWORD.get() if desktop.conf.AUTH_PASSWORD.get() else self.get_config_password_script().get()
 
 
 class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):

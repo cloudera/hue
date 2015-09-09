@@ -26,7 +26,6 @@ from operator import itemgetter
 from django.utils.translation import ugettext as _
 
 from desktop.lib import thrift_util
-from desktop.conf import get_ldap_password, LDAP_USERNAME
 from desktop.conf import DEFAULT_USER
 from hadoop import cluster
 
@@ -413,15 +412,21 @@ class HiveServerTColumnDesc:
 
 
 class HiveServerClient:
-  HS2_MECHANISMS = {'KERBEROS': 'GSSAPI', 'NONE': 'PLAIN', 'NOSASL': 'NOSASL', 'LDAP': 'PLAIN'}
+  HS2_MECHANISMS = {
+      'KERBEROS': 'GSSAPI',
+      'NONE': 'PLAIN',
+      'NOSASL': 'NOSASL',
+      'LDAP': 'PLAIN',
+      'PAM': 'PLAIN'
+  }
 
   def __init__(self, query_server, user):
     self.query_server = query_server
     self.user = user
 
-    use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, ldap_username, ldap_password = self.get_security()
-    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s' % (
-             use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled))
+    use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password = self.get_security()
+    LOG.info('use_sasl=%s, mechanism=%s, kerberos_principal_short_name=%s, impersonation_enabled=%s, auth_username=%s' % (
+             use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username))
 
     self.use_sasl = use_sasl
     self.kerberos_principal_short_name = kerberos_principal_short_name
@@ -444,9 +449,9 @@ class HiveServerClient:
       validate = beeswax_conf.SSL.VALIDATE.get()
       timeout = beeswax_conf.SERVER_CONN_TIMEOUT.get()
 
-    if ldap_username:
-      username = ldap_username
-      password = ldap_password
+    if auth_username:
+      username = auth_username
+      password = auth_password
     else:
       username = user.username
       password = None
@@ -474,11 +479,8 @@ class HiveServerClient:
   def get_security(self):
     principal = self.query_server['principal']
     impersonation_enabled = False
-    ldap_username = None
-    ldap_password = get_ldap_password()
-
-    if ldap_password is not None: # Pass-through LDAP authentication
-      ldap_username = LDAP_USERNAME.get()
+    auth_username = self.query_server['auth_username'] # Pass-through LDAP/PAM authentication
+    auth_password = self.query_server['auth_password']
 
     if principal:
       kerberos_principal_short_name = principal.split('/', 1)[0]
@@ -486,7 +488,7 @@ class HiveServerClient:
       kerberos_principal_short_name = None
 
     if self.query_server['server_name'] == 'impala':
-      if ldap_password: # Force LDAP auth if ldap_password is provided
+      if auth_password: # Force LDAP/PAM.. auth if auth_password is provided
         use_sasl = True
         mechanism = HiveServerClient.HS2_MECHANISMS['NONE']
       else:
@@ -498,11 +500,11 @@ class HiveServerClient:
       hive_mechanism = hive_site.get_hiveserver2_authentication()
       if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
         raise Exception(_('%s server authentication not supported. Valid are %s.') % (hive_mechanism, HiveServerClient.HS2_MECHANISMS.keys()))
-      use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP')
+      use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP', 'PAM')
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
-    return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, ldap_username, ldap_password
+    return use_sasl, mechanism, kerberos_principal_short_name, impersonation_enabled, auth_username, auth_password
 
 
   def open_session(self, user):
