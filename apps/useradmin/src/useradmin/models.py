@@ -59,7 +59,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import SAMPLE_USERNAME
+from desktop.models import SAMPLE_USER_INSTALL
 from hadoop import cluster
 
 import useradmin.conf
@@ -295,19 +295,33 @@ def install_sample_user():
   """
   Setup the de-activated sample user with a certain id. Do not create a user profile.
   """
-
-  user, created = auth_models.User.objects.get_or_create(
-      username=SAMPLE_USERNAME,
+  user = None
+  try:
+    user = auth_models.User.objects.get(id=1100713)
+    LOG.info('Sample user found: %s' % user.username)
+  except auth_models.User.DoesNotExist:
+    user, created = auth_models.User.objects.get_or_create(
+      username=SAMPLE_USER_INSTALL,
       password='!',
       is_active=False,
       is_superuser=False,
       id=1100713,
       pk=1100713)
 
-  if created:
-    LOG.info('Installed a user called "%s"' % (SAMPLE_USERNAME,))
+    if created:
+      LOG.info('Installed a user called "%s"' % SAMPLE_USER_INSTALL)
+  except Exception, ex:
+    LOG.exception('Failed to get or create sample user')
 
-    fs = cluster.get_hdfs()
-    fs.do_as_user(SAMPLE_USERNAME, fs.create_home_dir)
+  fs = cluster.get_hdfs()
+  # If home directory doesn't exist for sample user, create it
+  try:
+    if not fs.do_as_user(SAMPLE_USER_INSTALL, fs.get_home_dir):
+      fs.do_as_user(SAMPLE_USER_INSTALL, fs.create_home_dir)
+      LOG.info('Created home directory for user: %s' % SAMPLE_USER_INSTALL)
+    else:
+      LOG.info('Home directory already exists for user: %s' % SAMPLE_USER_INSTALL)
+  except Exception, ex:
+    LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
 
   return user
