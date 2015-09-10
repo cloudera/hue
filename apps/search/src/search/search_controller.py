@@ -20,7 +20,7 @@ import logging
 
 from django.db.models import Q
 
-from desktop.models import Document2, Document, SAMPLE_USERNAME
+from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
@@ -42,7 +42,7 @@ class SearchController(object):
 
   def get_shared_search_collections(self):
     # Those are the ones appearing in the menu
-    docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username=SAMPLE_USERNAME), extra='search-dashboard')
+    docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), extra='search-dashboard')
 
     return [d.content_object for d in docs.order_by('-id')]
 
