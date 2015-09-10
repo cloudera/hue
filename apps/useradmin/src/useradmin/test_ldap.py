@@ -172,9 +172,6 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
 
   def test_useradmin_ldap_nested_group_integration(self):
-    if is_live_cluster():
-      raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
-
     reset = []
 
     # Set up LDAP tests to use a LdapTestConnection instead of an actual LDAP connection
@@ -405,7 +402,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
 
   def test_useradmin_ldap_user_integration(self):
     if is_live_cluster():
-      raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
+      raise SkipTest('HUE-2897: Skipping because the DB may not be case sensitive')
 
     done = []
 
