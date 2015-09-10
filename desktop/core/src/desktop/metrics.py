@@ -27,7 +27,7 @@ from django.dispatch import receiver
 from desktop.lib.metrics import global_registry
 
 global_registry().gauge_callback(
-    name='python.threads.count',
+    name='python.threads.total',
     callback=lambda: len(threading.enumerate()),
     label='Thread count',
     description='Number of threads',
@@ -53,7 +53,7 @@ global_registry().gauge_callback(
 # ------------------------------------------------------------------------------
 
 global_registry().gauge_callback(
-    name='python.multiprocessing.count',
+    name='python.multiprocessing.total',
     callback=lambda: len(multiprocessing.active_children()),
     label='Process count',
     description='Number of multiprocessing processes',
@@ -88,7 +88,7 @@ for i in xrange(3):
   )
 
 global_registry().gauge_callback(
-    name='python.gc.objects.count',
+    name='python.gc.objects',
     callback=lambda: len(gc.get_objects()),
     label='GC tracked object count',
     description='Number of objects being tracked by the garbage collector',
@@ -96,7 +96,7 @@ global_registry().gauge_callback(
 )
 
 global_registry().gauge_callback(
-    name='python.gc.referrers.count',
+    name='python.gc.referrers',
     callback=lambda: len(gc.get_referrers()),
     label='GC tracked object referrers',
     description='Number of objects that directly refer to any objects',
@@ -104,7 +104,7 @@ global_registry().gauge_callback(
 )
 
 global_registry().gauge_callback(
-    name='python.gc.referents.count',
+    name='python.gc.referents',
     callback=lambda: len(gc.get_referrers()),
     label='GC tracked object referents',
     description='Number of objects that directly referred to any objects',
@@ -114,21 +114,21 @@ global_registry().gauge_callback(
 # ------------------------------------------------------------------------------
 
 active_requests = global_registry().counter(
-    name='desktop.requests.active.count',
+    name='requests.active',
     label='Active requests',
     description='Number of currently active requests',
     numerator='active requests',
 )
 
 request_exceptions = global_registry().counter(
-    name='desktop.requests.exceptions.count',
+    name='requests.exceptions',
     label='Request exceptions',
     description='Number requests that resulted in an exception',
     numerator='failed requests',
 )
 
 response_time = global_registry().timer(
-    name='desktop.requests.aggregate-response-time',
+    name='requests.aggregate-response-time',
     label='Request aggregate response time',
     description='Time taken to respond to requests',
     numerator='seconds',
@@ -139,7 +139,7 @@ response_time = global_registry().timer(
 # ------------------------------------------------------------------------------
 
 user_count = global_registry().gauge_callback(
-    name='desktop.users.count',
+    name='users.total',
     callback=lambda: User.objects.count(),
     label='User count',
     description='Total number of users',
@@ -147,7 +147,7 @@ user_count = global_registry().gauge_callback(
 )
 
 logged_in_users = global_registry().counter(
-    name='desktop.users.logged-in.count',
+    name='users.logged-in',
     label='Number of logged in users',
     description='Number of logged in users',
     numerator='logged in users',
@@ -164,7 +164,7 @@ def user_logged_out_handler(sender, **kwargs):
 # ------------------------------------------------------------------------------
 
 ldap_authentication_time = global_registry().timer(
-    name='desktop.auth.ldap.authentication-time',
+    name='ldap.authentication-time',
     label='LDAP Authentication time',
     description='Time taken to authenticate a user with LDAP',
     numerator='seconds',
@@ -173,7 +173,7 @@ ldap_authentication_time = global_registry().timer(
 )
 
 oauth_authentication_time = global_registry().timer(
-    name='desktop.auth.oauth.authentication-time',
+    name='auth.oauth.authentication-time',
     label='OAUTH Authentication time',
     description='Time taken to authenticate a user with OAUTH',
     numerator='seconds',
@@ -182,7 +182,7 @@ oauth_authentication_time = global_registry().timer(
 )
 
 pam_authentication_time = global_registry().timer(
-    name='desktop.auth.pam.authentication-time',
+    name='auth.pam.authentication-time',
     label='PAM Authentication time',
     description='Time taken to authenticate a user with PAM',
     numerator='seconds',
@@ -191,7 +191,7 @@ pam_authentication_time = global_registry().timer(
 )
 
 spnego_authentication_time = global_registry().timer(
-    name='desktop.auth.spnego.authentication-time',
+    name='auth.spnego.authentication-time',
     label='SPNEGO Authentication time',
     description='Time taken to authenticate a user with SPNEGO',
     numerator='seconds',
