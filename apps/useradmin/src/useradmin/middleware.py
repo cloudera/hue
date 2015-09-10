@@ -16,12 +16,13 @@
 # limitations under the License.
 
 import logging
+from datetime import datetime
 
 from django.contrib.auth.models import User
 
 from desktop.conf import LDAP
 
-from models import UserProfile
+from models import UserProfile, get_profile
 from views import import_ldap_users
 
 import ldap_access
@@ -57,3 +58,23 @@ class LdapSynchronizationMiddleware(object):
 
       request.session[self.USER_CACHE_NAME] = True
       request.session.modified = True
+
+
+class UpdateLastActivityMiddleware(object):
+  """
+  Middleware to track the last activity of a user.
+  """
+
+  def process_request(self, request):
+    user = request.user
+
+    if not user or not user.is_authenticated():
+      return
+
+    profile = get_profile(user)
+    profile.last_activity = datetime.now()
+
+    try:
+      profile.save()
+    except DatabaseError:
+      log.exception('Error saving profile information')
