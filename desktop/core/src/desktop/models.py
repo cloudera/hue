@@ -39,7 +39,8 @@ from desktop.lib.exceptions_renderable import PopupException
 LOG = logging.getLogger(__name__)
 
 
-SAMPLE_USERNAME = 'sample'
+SAMPLE_USER_INSTALL = 'hue'
+SAMPLE_USER_OWNERS = ['hue', 'sample']
 
 
 class UserPreferences(models.Model):
@@ -363,7 +364,7 @@ class DocumentManager(models.Manager):
       # Make sure all the sample user documents are shared.
       try:
         with transaction.atomic():
-          for doc in Document.objects.filter(owner__username=SAMPLE_USERNAME):
+          for doc in Document.objects.filter(owner__username__in=SAMPLE_USER_OWNERS):
             doc.share_to_default()
 
             tag = DocumentTag.objects.get_example_tag(user=doc.owner)
