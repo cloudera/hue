@@ -28,6 +28,7 @@ import desktop.conf
 import desktop.urls
 import desktop.views as views
 import proxy.conf
+import tempfile
 
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
@@ -557,21 +558,30 @@ def test_log_event():
   root.removeHandler(handler)
 
 def test_validate_path():
-  reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/')
-  assert_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
-  reset()
+  with tempfile.NamedTemporaryFile() as local_file:
+    reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing(local_file.name)
+    assert_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=False))
+    reset()
 
-  reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/tmm/does_not_exist')
-  assert_not_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
-  reset()
+  try:
+    reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/tmm/does_not_exist')
+    assert_not_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
+    assert_true(False)
+  except Exception, ex:
+    assert_true('does not exist' in str(ex), ex)
+  finally:
+    reset()
 
 @attr('requires_hadoop')
 def test_config_check():
+  cert_file = tempfile.NamedTemporaryFile()
+  key_file = tempfile.NamedTemporaryFile()
+
   reset = (
     desktop.conf.SECRET_KEY.set_for_testing(''),
     desktop.conf.SECRET_KEY_SCRIPT.set_for_testing(present=False),
-    desktop.conf.SSL_CERTIFICATE.set_for_testing('foobar'),
-    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(''),
+    desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
     desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
   )
 
@@ -897,9 +907,11 @@ class TestDocument(object):
 
 
 def test_session_secure_cookie():
+  cert_file = tempfile.NamedTemporaryFile()
+  key_file = tempfile.NamedTemporaryFile()
   resets = [
-    desktop.conf.SSL_CERTIFICATE.set_for_testing('cert.pem'),
-    desktop.conf.SSL_PRIVATE_KEY.set_for_testing('key.pem'),
+    desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
     desktop.conf.SESSION.SECURE.set_for_testing(False),
   ]
   try:
@@ -910,8 +922,8 @@ def test_session_secure_cookie():
       reset()
 
   resets = [
-    desktop.conf.SSL_CERTIFICATE.set_for_testing('cert.pem'),
-    desktop.conf.SSL_PRIVATE_KEY.set_for_testing('key.pem'),
+    desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
     desktop.conf.SESSION.SECURE.set_for_testing(True),
   ]
   try:
@@ -922,8 +934,8 @@ def test_session_secure_cookie():
       reset()
 
   resets = [
-    desktop.conf.SSL_CERTIFICATE.set_for_testing('cert.pem'),
-    desktop.conf.SSL_PRIVATE_KEY.set_for_testing('key.pem'),
+    desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
     desktop.conf.SESSION.SECURE.set_for_testing(present=False),
   ]
   try:
