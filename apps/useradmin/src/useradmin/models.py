@@ -49,8 +49,9 @@ what models you may or may not edit, and there are elaborations (especially
 in Django 1.2) to manipulate this row by row.  This does not map nicely
 onto actions which may not relate to database models.
 """
-from enum import Enum
 import logging
+from datetime import datetime
+from enum import Enum
 
 from django.db import connection, models
 from django.contrib.auth import models as auth_models
@@ -95,6 +96,7 @@ class UserProfile(models.Model):
   creation_method = models.CharField(editable=True, null=False, max_length=64, default=str(CreationMethod.HUE))
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
                                    help_text=_t('If this is users first login.'))
+  last_activity = models.DateTimeField(default=datetime.fromtimestamp(0))
 
   def get_groups(self):
     return self.user.groups.all()
