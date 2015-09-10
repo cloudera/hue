@@ -227,17 +227,17 @@ function editCell($data) {
 }
 
 function parseXML(xml) {
-  var parser, xmlDoc;
-  if (window.DOMParser) {
-    parser = new DOMParser();
-    xmlDoc = parser.parseFromString(xml, "text/xml");
-  }
-  else {
-    xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+  if (window.ActiveXObject) {
+    var xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
     xmlDoc.async = false;
     xmlDoc.loadXML(xml);
+    return xmlDoc.xml;
   }
-  return new XMLSerializer().serializeToString(xmlDoc);
+  if (window.DOMParser) {
+    var xmlDoc = new DOMParser().parseFromString(xml, "text/xml");
+    return new XMLSerializer().serializeToString(xmlDoc);
+  }
+  return xml;
 }
 
 function detectMimeType(data) {
@@ -256,9 +256,12 @@ function detectMimeType(data) {
       }
     },
     'text/xml': function (data) {
+      if(window.ActiveXObject) {
+        return parseXML(data) != "";
+      }
       return parseXML(data).indexOf('parsererror') == -1;
     }
-  }
+  };
   var keys = Object.keys(MIME_TESTS);
   for (var i = 0; i < keys.length; i++) {
     if (MIME_TESTS[keys[i]](data))

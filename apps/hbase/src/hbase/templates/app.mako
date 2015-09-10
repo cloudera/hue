@@ -95,7 +95,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
             % if can_write:
               <a class="corner-btn btn" data-bind="click: $data.drop, clickBubble: false"><i class="fa fa-trash-o"></i></a>
             % endif
-            <a class="corner-btn btn" data-bind="event: { mousedown: function(){ showFullEditor($data) } }"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
+            <a class="corner-btn btn" style="z-index:1000" data-bind="click: function() { showFullEditor($data); }, clickBubble: false"><i class="fa fa-pencil"></i> ${_('Full Editor')}</a>
             <div data-bind="visible: ! isLoading()" style="display: none;">
               <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
               <textarea data-bind="visible: editing, hasFocus: editing, disable: ! app.views.tabledata.canWrite(), value: value, click: function() {}, clickBubble: false"></textarea>
@@ -408,7 +408,7 @@ ${ commonheader(None, "hbase", user) | n,unicode }
     </script>
 
     <script id="cell_image_template" type="text/html">
-      <img data-bind="attr: {src: 'data:image/' + $data.mime() + ';base64,' + value()}"/>
+      <img data-bind="attr: { src: 'data:' + $data.mime() + ';base64,' + value()}"/>
       <input type="hidden" data-bind="value: value"/>
     </script>
 
