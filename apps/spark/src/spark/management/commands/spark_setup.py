@@ -23,7 +23,7 @@ from django.contrib.auth.models import User
 from django.core import management
 from django.core.management.base import BaseCommand
 
-from desktop.models import Document, Document2, SAMPLE_USERNAME
+from desktop.models import Document, Document2, SAMPLE_USER_OWNERS
 from useradmin.models import install_sample_user
 
 
@@ -40,7 +40,7 @@ class Command(BaseCommand):
     else:
       user = options['user']
 
-    if not Document2.objects.filter(type='notebook', owner__username=SAMPLE_USERNAME).exists():
+    if not Document2.objects.filter(type='notebook', owner__username__in=SAMPLE_USER_OWNERS).exists():
       install_sample_user()
 
       management.call_command('loaddata', 'apps/spark/src/spark/fixtures/initial_spark_examples.json', verbosity=2)
