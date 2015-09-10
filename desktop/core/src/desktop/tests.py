@@ -802,7 +802,10 @@ class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
   def get_password(self):
     # We are using dynamic_default now, so we need to cheat for the tests as only using set_for_testing(present=False) will trigger it.
-    return desktop.conf.AUTH_PASSWORD.get() if desktop.conf.AUTH_PASSWORD.get() else self.get_config_password_script().get()
+    if desktop.conf.AUTH_PASSWORD.get():
+      return desktop.conf.AUTH_PASSWORD.get()
+    else:
+      return self.get_config_password_script().get()
 
 
 class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
