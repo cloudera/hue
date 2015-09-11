@@ -1,0 +1,109 @@
+# Portuguese translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: VERSÃO DO PROJECTO\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-09-11 11:43-0400\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: pt <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#~ msgid "Solr Indexes"
+#~ msgstr "Eliminar índices"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr ""
+
+#~ msgid "Delete"
+#~ msgstr "Eliminar"
+
+#~ msgid "Create index"
+#~ msgstr "Eliminar índice "
+
+#~ msgid "Create index from a file"
+#~ msgstr ""
+
+#~ msgid "Create alias"
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr "Nome"
+
+#~ msgid "Type"
+#~ msgstr "Tipo"
+
+#~ msgid "Collections"
+#~ msgstr "Colecções"
+
+#~ msgid "Schema"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Cancel"
+#~ msgstr "Cancelar"
+
+#~ msgid "Create or edit"
+#~ msgstr ""
+
+#~ msgid "Get Sample"
+#~ msgstr ""
+
+#~ msgid "Create"
+#~ msgstr "Criar"
+
+#~ msgid "Path"
+#~ msgstr "Actualizar"
+
+#~ msgid "Database"
+#~ msgstr ""
+
+#~ msgid "Table"
+#~ msgstr ""
+
+#~ msgid "Delete the selected index(es)?"
+#~ msgstr "Formato do ficheiro seleccionado para índice"
+
+#~ msgid "No"
+#~ msgstr ""
+
+#~ msgid "Yes"
+#~ msgstr ""
+
+#~ msgid "No data available"
+#~ msgstr ""
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr ""
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr ""
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr ""
+
+#~ msgid "No matching records"
+#~ msgstr ""
+
+#~ msgid "First"
+#~ msgstr ""
+
+#~ msgid "Last"
+#~ msgstr ""
+
+#~ msgid "Next"
+#~ msgstr "Seguinte"
+
+#~ msgid "Previous"
+#~ msgstr "Anterior"
+

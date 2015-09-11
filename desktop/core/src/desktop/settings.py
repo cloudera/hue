@@ -107,6 +107,7 @@ MEDIA_URL = ''
 # Additional locations of static files
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'desktop', 'libs', 'indexer', 'src', 'indexer', 'static'),
+    os.path.join(BASE_DIR, 'desktop', 'libs', 'notebook', 'src', 'notebook', 'static'),
     os.path.join(BASE_DIR, 'desktop', 'libs', 'liboauth', 'src', 'liboauth', 'static'),
 )
 

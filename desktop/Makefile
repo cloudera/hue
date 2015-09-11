@@ -49,7 +49,8 @@ APPS := core \
 	libs/libsaml \
 	libs/libsentry \
 	libs/libsolr \
-	libs/libzookeeper
+	libs/libzookeeper \
+	libs/notebook
 
 .PHONY: default
 default:: hue syncdb
