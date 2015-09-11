@@ -29,6 +29,7 @@ from desktop.lib.parameterization import find_variables
 from desktop.models import Document2
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
+from oozie.utils import convert_to_server_timezone
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
@@ -63,7 +64,7 @@ class Submission(object):
   - submit
   - rerun
   """
-  def __init__(self, user, job=None, fs=None, jt=None, properties=None, oozie_id=None):
+  def __init__(self, user, job=None, fs=None, jt=None, properties=None, oozie_id=None, local_tz=None):
     self.job = job
     self.user = user
     self.fs = fs
@@ -75,6 +76,13 @@ class Submission(object):
       self.properties = properties
     else:
       self.properties = {}
+
+    if local_tz and isinstance(self.job.data, dict):
+      local_tz = self.job.data.get('properties')['timezone']
+    if 'start_date' in self.properties:
+      properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
+    if 'end_date' in self.properties:
+      properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
 
     self.properties['security_enabled'] = self.api.security_enabled
 

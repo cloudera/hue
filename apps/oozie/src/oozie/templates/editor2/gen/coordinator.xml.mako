@@ -57,7 +57,7 @@
   % else:
   frequency="${ coord.frequency }"
   % endif
-  start="${ coord.start_utc }" end="${ coord.end_utc }" timezone="${ coord.data['properties']['timezone'] }"
+  start="${ coord.start_server_tz }" end="${ coord.end_server_tz }" timezone="${ coord.data['properties']['timezone'] }"
   xmlns="${ 'uri:oozie:coordinator:0.4' if coord.sla_enabled else coord.data['properties']['schema_version'] | n,unicode }"
   ${ 'xmlns:sla="uri:oozie:sla:0.2"' if coord.sla_enabled else '' | n,unicode }>
   % if coord.data['properties']['timeout'] or coord.data['properties'].get('concurrency') or coord.data['properties']['execution'] or coord.data['properties'].get('throttle'):
@@ -81,7 +81,7 @@
   <datasets>
     % for dataset in coord.datasets:
     <dataset name="${ dataset.data['name'] }" frequency="${ dataset.frequency }"
-             initial-instance="${ dataset.start_utc }" timezone="${ dataset.timezone }">
+             initial-instance="${ dataset.start_server_tz }" timezone="${ dataset.timezone }">
       <uri-template>${ smart_path(dataset.data['dataset_variable'], mapping, is_coordinator=True) }</uri-template>
       % if dataset.data['use_done_flag']:
       <done-flag>${ dataset.data['done_flag'] }</done-flag>
@@ -132,8 +132,13 @@
         % endfor
         % for property in coord.properties:
         <property>
-          <name>${ property['name'] }</name>
-          <value>${ property['value'] }</value>
+          % if property['name'] in ['start_date', 'end_date']:
+            <name>${ property['name'] }</name>
+            <value>${'${' + property['name']}}</value>
+          % else:
+            <name>${ property['name'] }</name>
+            <value>${ property['value'] }</value>
+          % endif
         </property>
         % endfor
       </configuration>

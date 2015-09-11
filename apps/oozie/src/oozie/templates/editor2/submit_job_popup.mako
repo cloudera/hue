@@ -129,7 +129,7 @@
   });
 
   $(".now-link").on("click", function(){
-    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm") + 'Z');
+    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm"));
   });
 
   $(".calendar-link").on("click", function(){

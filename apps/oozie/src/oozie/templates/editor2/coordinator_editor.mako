@@ -121,9 +121,6 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
       </div>
 
       <div class="card card-home" data-bind="visible: coordinator.properties.workflow" style="margin-top: 20px">
-        <div class="alert alert-warning pull-right" style="border: none">
-          ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
-        </div>
         <h1 class="card-heading simple">${ _('How often?') }
         </h1>
 
@@ -172,6 +169,14 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                 </div>
               </div>
 
+              <div class="control-group" style="margin-bottom: 20">
+                <label class="control-label">${ _('Timezone') }</label>
+                <div class="controls">
+                  <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _ko("Select a Timezone") }', update: coordinator.properties.timezone}" style="width: 180px"></select>
+                  <span class="help-inline"></span>
+                </div>
+              </div>
+
               <div class="control-group">
                 <label class="control-label">${ _('From') }</label>
                 <div class="controls">
@@ -205,13 +210,6 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
                     </span>
                     <input type="text" class="input-mini" data-bind="value: coordinator.properties.endTimeUI, timepicker: {}" />
                   </div>
-                  <span class="help-inline"></span>
-                </div>
-              </div>
-              <div class="control-group" style="margin-bottom: 0">
-                <label class="control-label">${ _('Timezone') }</label>
-                <div class="controls">
-                  <select data-bind="options: $root.availableTimezones, select2: { placeholder: '${ _ko("Select a Timezone") }', update: coordinator.properties.timezone}" style="width: 180px"></select>
                   <span class="help-inline"></span>
                 </div>
               </div>

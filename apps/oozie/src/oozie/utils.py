@@ -20,10 +20,13 @@ import logging
 import re
 import urlparse
 from datetime import datetime
+from dateutil import tz
+from dateutil import parser
 
 from django.utils.formats import localize_input
 from django.utils.translation import ugettext as _
 from desktop.lib.parameterization import find_variables
+from liboozie.oozie_api import get_oozie, DEFAULT_USER
 
 
 LOG = logging.getLogger(__name__)
@@ -163,3 +166,32 @@ def oozie_to_hue_frequency(frequency_string):
     return matches.group('frequency_unit'), matches.group('frequency_number')
   else:
     raise InvalidFrequency(_('invalid frequency: %s') % frequency_string)
+
+def convert_to_server_timezone(date, local_tz='UTC', server_tz='UTC', user=DEFAULT_USER):
+  api = get_oozie(user)
+  oozie_conf = api.get_configuration()
+  if server_tz is None:
+    server_tz = oozie_conf['oozie.processing.timezone']
+
+  if date and date.startswith('$'):
+    return date
+
+  # To support previously created jobs
+  if date.endswith('Z'):
+    date = date[:-1]
+    local_tz = 'UTC'
+
+  try:
+    date_local_tz = parser.parse(date)
+    date_local_tz = date_local_tz.replace(tzinfo=tz.gettz(local_tz))
+    date_server_tz = date_local_tz.astimezone(tz.gettz(server_tz))
+
+    date_server_tz = date_server_tz.strftime('%Y-%m-%dT%H:%M')
+    # Oozie timezone is either UTC or GMT(+/-)####
+    if 'UTC' == server_tz:
+      return date_server_tz + u'Z'
+    else:
+      return date_server_tz + u'+' + re.split('[+-]', server_tz)[1]
+  except TypeError, ValueError:
+    LOG.error("Failed to convert Oozie timestamp: %s" % date)
+  return None

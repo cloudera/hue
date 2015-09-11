@@ -29,6 +29,7 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.conf import TIME_ZONE
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
@@ -40,7 +41,7 @@ from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
 
 from oozie.conf import REMOTE_SAMPLE_DIR
-from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT
+from oozie.utils import utc_datetime_format, UTC_TIME_FORMAT, convert_to_server_timezone
 from hadoop.fs.exceptions import WebHdfsException
 
 
@@ -1820,7 +1821,7 @@ class Coordinator(Job):
               'frequency_unit': 'days',
               'cron_frequency': '0 0 * * *',
               'cron_advanced': False,
-              'timezone': 'America/Los_Angeles',
+              'timezone': TIME_ZONE.get(),
               'start': '${start_date}',
               'end': '${end_date}',
               'workflow': None,
@@ -1832,8 +1833,8 @@ class Coordinator(Job):
               'credentials': [],
               'parameters': [
                   {'name': 'oozie.use.system.libpath', 'value': True},
-                  {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%MZ')},
-                  {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%MZ')}
+                  {'name': 'start_date', 'value':  datetime.today().strftime('%Y-%m-%dT%H:%M')},
+                  {'name': 'end_date', 'value': (datetime.today() + timedelta(days=7)).strftime('%Y-%m-%dT%H:%M')}
               ],
               'sla': Workflow.SLA_DEFAULT
           }
@@ -1852,11 +1853,11 @@ class Coordinator(Job):
 
     start_date = filter(lambda a: a['name'] == 'start_date', self._data['properties']['parameters'])
     if start_date and type(start_date[0]['value']) == datetime:
-      start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%SZ')
+      start_date[0]['value'] = start_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     end_date = filter(lambda a: a['name'] == 'end_date', self._data['properties']['parameters'])
     if end_date and type(end_date[0]['value']) == datetime:
-      end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%SZ')
+      end_date[0]['value'] = end_date[0]['value'].strftime('%Y-%m-%dT%H:%M:%S')
 
     return _data
 
@@ -1942,11 +1943,11 @@ class Coordinator(Job):
     return [Dataset(dataset, self) for dataset in self.data['variables'] if dataset['dataset_type'] == 'output_path']
 
   @property
-  def start_utc(self):
+  def start_server_tz(self):
     return self.data['properties']['start']
 
   @property
-  def end_utc(self):
+  def end_server_tz(self):
     return self.data['properties']['end']
 
   @property
@@ -2011,9 +2012,6 @@ class Dataset():
 
   @property
   def data(self):
-    if type(self._data['start']) == unicode:
-      self._data['start'] = parse(self._data['start'])
-
     self._data['name'] = self._data['workflow_variable']
 
     return self._data
@@ -2040,11 +2038,11 @@ class Dataset():
     return '${coord:%(unit)s(%(number)s)}' % {'unit': frequency_unit, 'number': frequency_number}
 
   @property
-  def start_utc(self):
+  def start_server_tz(self):
     if self.data['same_start']:
-      return self.coordinator.start_utc
+      return self.coordinator.start_server_tz
     else:
-      return utc_datetime_format(self.data['start'])
+      return convert_to_server_timezone(self.data['start'], self.data['timezone'])
 
   @property
   def timezone(self):

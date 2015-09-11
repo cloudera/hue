@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
+from desktop.conf import TIME_ZONE
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions_renderable import PopupException
@@ -43,13 +44,13 @@ from hadoop.fs.hadoopfs import Hdfs
 from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
 from liboozie.submission2 import Submission
-from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateCoordinatorForm
 from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
+from oozie.utils import convert_to_server_timezone
 
 
 def get_history():
@@ -108,7 +109,12 @@ def manage_oozie_jobs(request, job_id, action):
       if request.POST.get('clear_pause_time') == 'true':
         pause_time_val = ''
 
-      params = {'value': 'endtime=%s' % (request.POST.get('end_time')) + ';'
+      end_time_val = request.POST.get('end_time')
+      if end_time_val:
+        end_time_val = convert_to_server_timezone(end_time_val, TIME_ZONE.get())
+      if pause_time_val:
+        pause_time_val = convert_to_server_timezone(pause_time_val, TIME_ZONE.get())
+      params = {'value': 'endtime=%s' % (end_time_val) + ';'
                             'pausetime=%s' % (pause_time_val) + ';'
                             'concurrency=%s' % (request.POST.get('concurrency'))}
     elif action == 'ignore':

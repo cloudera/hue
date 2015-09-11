@@ -808,7 +808,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     $(".confirmationModal").bind('confirmation', function () {
       var _this = this;
       var IN_DATETIME_FORMAT = "MM/DD/YYYY hh:mm A";
-      var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
+      var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm";
 
       var params = { 'notification': $(_this).attr("data-message") };
       if ($(this).attr("id") == "edit-coord-btn") {
