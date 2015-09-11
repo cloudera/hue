@@ -26,11 +26,11 @@ from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 from spark.conf import LIVY_SERVER_SESSION_KIND
 
-from notebook.conf import LANGUAGES
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
 from notebook.connectors.base import Notebook, get_api
 from notebook.management.commands.notebook_setup import Command
 from notebook.connectors.spark_shell import SparkApi
+from notebook.conf import INTERPRETERS
 
 
 LOG = logging.getLogger(__name__)
@@ -54,8 +54,9 @@ def notebook(request):
   return render('notebook.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
-          'languages': LANGUAGES.get(),
+          'languages': [{"name": INTERPRETERS.get()[i].NAME.get(), "type": i} for i in INTERPRETERS.get()],
           'snippet_placeholders' : {
+              'sql': _('Example: 1 + 1, or press CTRL + space'),
               'spark': _('Example: 1 + 1, or press CTRL + space'),
               'pyspark': _('Example: 1 + 1, or press CTRL + space'),
               'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),

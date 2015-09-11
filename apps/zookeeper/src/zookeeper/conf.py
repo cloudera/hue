@@ -18,7 +18,7 @@
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_string
 
 
-# Used only for ZooKeeper app proeprties, ZooKeeper specific properties should come from libzookeeper
+# Used only for ZooKeeper app properties, ZooKeeper specific properties should come from libzookeeper
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
   help="One entry for each Zookeeper cluster",
