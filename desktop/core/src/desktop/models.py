@@ -38,7 +38,7 @@ from desktop.lib.exceptions_renderable import PopupException
 
 LOG = logging.getLogger(__name__)
 
-
+SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'
 SAMPLE_USER_OWNERS = ['hue', 'sample']
 
