@@ -574,30 +574,31 @@ def test_validate_path():
 
 @attr('requires_hadoop')
 def test_config_check():
-  with tempfile.NamedTemporaryFile() as cert_file, tempfile.NamedTemporaryFile() as key_file:
-    reset = (
-      desktop.conf.SECRET_KEY.set_for_testing(''),
-      desktop.conf.SECRET_KEY_SCRIPT.set_for_testing(present=False),
-      desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
-      desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
-      desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
-    )
+  with tempfile.NamedTemporaryFile() as cert_file:
+    with tempfile.NamedTemporaryFile() as key_file:
+      reset = (
+        desktop.conf.SECRET_KEY.set_for_testing(''),
+        desktop.conf.SECRET_KEY_SCRIPT.set_for_testing(present=False),
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
+      )
 
-    try:
-      cli = make_logged_in_client()
-      resp = cli.get('/desktop/debug/check_config')
-      assert_true('Secret key should be configured' in resp.content, resp)
-      assert_true('klingon' in resp.content, resp)
-      assert_true('Encoding not supported' in resp.content, resp)
+      try:
+        cli = make_logged_in_client()
+        resp = cli.get('/desktop/debug/check_config')
+        assert_true('Secret key should be configured' in resp.content, resp)
+        assert_true('klingon' in resp.content, resp)
+        assert_true('Encoding not supported' in resp.content, resp)
 
-      # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
-      os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-      resp = cli.get('/desktop/debug/check_config')
-      del os.environ["HUE_CONF_DIR"]
-      assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
-    finally:
-      for old_conf in reset:
-        old_conf()
+        # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
+        os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+        resp = cli.get('/desktop/debug/check_config')
+        del os.environ["HUE_CONF_DIR"]
+        assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
+      finally:
+        for old_conf in reset:
+          old_conf()
 
 
 def test_last_access_time():
@@ -905,54 +906,55 @@ class TestDocument(object):
 
 
 def test_session_secure_cookie():
-  with tempfile.NamedTemporaryFile() as cert_file, tempfile.NamedTemporaryFile() as key_file:
-    resets = [
-      desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
-      desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
-      desktop.conf.SESSION.SECURE.set_for_testing(False),
-    ]
-    try:
-      assert_true(desktop.conf.is_https_enabled())
-      assert_false(desktop.conf.SESSION.SECURE.get())
-    finally:
-      for reset in resets:
-        reset()
+  with tempfile.NamedTemporaryFile() as cert_file:
+    with tempfile.NamedTemporaryFile() as key_file:
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.SESSION.SECURE.set_for_testing(False),
+      ]
+      try:
+        assert_true(desktop.conf.is_https_enabled())
+        assert_false(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
 
-    resets = [
-      desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
-      desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
-      desktop.conf.SESSION.SECURE.set_for_testing(True),
-    ]
-    try:
-      assert_true(desktop.conf.is_https_enabled())
-      assert_true(desktop.conf.SESSION.SECURE.get())
-    finally:
-      for reset in resets:
-        reset()
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.SESSION.SECURE.set_for_testing(True),
+      ]
+      try:
+        assert_true(desktop.conf.is_https_enabled())
+        assert_true(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
 
-    resets = [
-      desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
-      desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
-      desktop.conf.SESSION.SECURE.set_for_testing(present=False),
-    ]
-    try:
-      assert_true(desktop.conf.is_https_enabled())
-      assert_true(desktop.conf.SESSION.SECURE.get())
-    finally:
-      for reset in resets:
-        reset()
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.SESSION.SECURE.set_for_testing(present=False),
+      ]
+      try:
+        assert_true(desktop.conf.is_https_enabled())
+        assert_true(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
 
-    resets = [
-      desktop.conf.SSL_CERTIFICATE.set_for_testing(present=None),
-      desktop.conf.SSL_PRIVATE_KEY.set_for_testing(present=None),
-      desktop.conf.SESSION.SECURE.set_for_testing(present=False),
-    ]
-    try:
-      assert_false(desktop.conf.is_https_enabled())
-      assert_false(desktop.conf.SESSION.SECURE.get())
-    finally:
-      for reset in resets:
-        reset()
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(present=None),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(present=None),
+        desktop.conf.SESSION.SECURE.set_for_testing(present=False),
+      ]
+      try:
+        assert_false(desktop.conf.is_https_enabled())
+        assert_false(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
 
 
 def test_get_data_link():
