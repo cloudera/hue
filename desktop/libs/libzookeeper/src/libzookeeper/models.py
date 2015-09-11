@@ -56,38 +56,35 @@ class ZookeeperClient(object):
 
 
   def get_children_data(self, namespace):
-    children_data = []
+    self.zk.start()
     try:
-      self.zk.start()
-
       children = self.zk.get_children(namespace)
+
+      children_data = []
 
       for node in children:
         data, stat = self.zk.get("%s/%s" % (namespace, node))
         children_data.append(data)
+
+      return children_data
     finally:
       self.zk.stop()
-
-    return children_data
 
 
   def path_exists(self, namespace):
+    self.zk.start()
     try:
-      self.zk.start()
-
       return self.zk.exists(namespace) is not None
     finally:
       self.zk.stop()
-    return False
 
 
   def copy_path(self, namespace, filepath):
     if self.read_only:
       raise ReadOnlyClientException('Cannot execute copy_path when read_only is set to True.')
 
+    self.zk.start()
     try:
-      self.zk.start()
-
       self.zk.ensure_path(namespace)
       for dir, subdirs, files in os.walk(filepath):
         path = dir.replace(filepath, '').strip('/')
@@ -107,9 +104,8 @@ class ZookeeperClient(object):
     if self.read_only:
       raise ReadOnlyClientException('Cannot execute delete_path when read_only is set to True.')
 
+    self.zk.start()
     try:
-      self.zk.start()
-
       self.zk.delete(namespace, recursive=True)
     finally:
       self.zk.stop()
