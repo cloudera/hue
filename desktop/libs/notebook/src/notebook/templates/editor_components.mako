@@ -23,7 +23,7 @@ from desktop.views import _ko
 
 <%def name="includes()">
 <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
-<link rel="stylesheet" href="${ static('spark/css/spark.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
@@ -47,10 +47,10 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('spark/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('spark/js/spark.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script src="${ static('notebook/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('notebook/js/notebook.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
@@ -157,11 +157,11 @@ from desktop.views import _ko
 
    &nbsp;&nbsp;&nbsp;
 
-   <a class="btn" href="${ url('spark:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+   <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
      <i class="fa fa-file-o"></i>
    </a>
 
-   <a class="btn" href="${ url('spark:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+   <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
      <i class="fa fa-tags"></i>
    </a>
   </div>
@@ -224,9 +224,9 @@ from desktop.views import _ko
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
-    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, appName: 'spark'  }}"></div>
+    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, appName: 'notebook'  }}"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable, splitDraggable : { appName: 'spark', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable, splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
@@ -737,7 +737,7 @@ from desktop.views import _ko
         <i class="fa fa-file-text-o"></i>
       </a>
 
-      <form method="POST" action="${ url('spark:download') }" class="download-form" style="display: inline">
+      <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
         ${ csrf_token(request) | n,unicode }
         <input type="hidden" name="notebook"/>
         <input type="hidden" name="snippet"/>

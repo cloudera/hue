@@ -56,7 +56,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
     </%def>
 
     <%def name="creation()">
-      <a href="${ url('spark:new') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
+      <a href="${ url('notebook:new') }" class="btn"><i class="fa fa-plus-circle"></i> ${ _('Create') }</a>
       <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
         <i class="fa fa-upload"></i> ${ _('Import') }
       </a>
@@ -78,7 +78,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
           <div class="hueCheckbox fa" data-bind="multiCheck: '#notebookTable', css: {'fa-check': isSelected }" data-row-selector-exclude="true"></div>
-          <a data-bind="attr: { 'href': '${ url('spark:notebook') }?notebook=' + id() }" data-row-selector="true"></a>
+          <a data-bind="attr: { 'href': '${ url('notebook:notebook') }?notebook=' + id() }" data-row-selector="true"></a>
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: description"></td>
@@ -164,7 +164,7 @@ ${ commonshare() | n,unicode }
     self.datatable = null;
 
     self.delete2 = function() {
-      $.post("${ url('spark:delete') }", {
+      $.post("${ url('notebook:delete') }", {
         "notebooks": ko.mapping.toJSON(self.selectedJobs)
       }, function() {
         window.location.reload();
@@ -175,7 +175,7 @@ ${ commonshare() | n,unicode }
     };
 
     self.copy = function() {
-      $.post("${ url('spark:copy') }", {
+      $.post("${ url('notebook:copy') }", {
         "notebooks": ko.mapping.toJSON(self.selectedJobs)
       }, function(data) {
         window.location.reload();

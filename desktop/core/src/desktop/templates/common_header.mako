@@ -431,8 +431,8 @@ from django.utils.translation import ugettext as _
              <li class="dropdown-submenu">
                <a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark (beta)')}</a>
                <ul class="dropdown-menu">
-                 <li><a href="${ url('spark:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
-                 <li><a href="${ url('spark:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
+                 <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
+                 <li><a href="${ url('notebook:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
                </ul>
              </li>
            % endif

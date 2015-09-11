@@ -25,9 +25,10 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
-
-from spark.models import QueryExpired, QueryError, SessionExpired
 from desktop.models import Document2, Document
+
+
+from notebook.models import QueryExpired, QueryError, SessionExpired
 
 
 LOG = logging.getLogger(__name__)
