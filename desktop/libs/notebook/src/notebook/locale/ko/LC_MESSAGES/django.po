@@ -1,0 +1,109 @@
+# Korean translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 프로젝트 버전\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-09-11 11:43-0400\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#~ msgid "Solr Indexes"
+#~ msgstr "인덱스 삭제"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr ""
+
+#~ msgid "Delete"
+#~ msgstr "삭제"
+
+#~ msgid "Create index"
+#~ msgstr "인덱스 삭제 "
+
+#~ msgid "Create index from a file"
+#~ msgstr ""
+
+#~ msgid "Create alias"
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr "이름"
+
+#~ msgid "Type"
+#~ msgstr "유형"
+
+#~ msgid "Collections"
+#~ msgstr "컬렉션"
+
+#~ msgid "Schema"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Cancel"
+#~ msgstr "취소"
+
+#~ msgid "Create or edit"
+#~ msgstr ""
+
+#~ msgid "Get Sample"
+#~ msgstr ""
+
+#~ msgid "Create"
+#~ msgstr "생성"
+
+#~ msgid "Path"
+#~ msgstr "업데이트"
+
+#~ msgid "Database"
+#~ msgstr ""
+
+#~ msgid "Table"
+#~ msgstr ""
+
+#~ msgid "Delete the selected index(es)?"
+#~ msgstr "인덱스를 위해 선택한 파일 형식"
+
+#~ msgid "No"
+#~ msgstr ""
+
+#~ msgid "Yes"
+#~ msgstr ""
+
+#~ msgid "No data available"
+#~ msgstr ""
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr ""
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr ""
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr ""
+
+#~ msgid "No matching records"
+#~ msgstr ""
+
+#~ msgid "First"
+#~ msgstr ""
+
+#~ msgid "Last"
+#~ msgstr ""
+
+#~ msgid "Next"
+#~ msgstr "다음"
+
+#~ msgid "Previous"
+#~ msgstr "이전"
+

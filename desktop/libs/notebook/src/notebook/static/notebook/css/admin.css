@@ -1,0 +1,167 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+h3 {
+  line-height: 24px;
+}
+
+.sidebar-nav {
+  padding: 9px 0;
+}
+
+#content-editor {
+  border: 1px dotted #DDD;
+}
+
+.available-fields {
+  padding: 0;
+  padding-left:10px;
+}
+
+.available-fields ul {
+  list-style: none outside none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.available-fields ul li {
+  cursor: pointer;
+  color: #666;
+}
+
+.form-actions {
+  padding-left: 0!important;
+}
+
+.bubble {
+  float: left;
+  background-color: #EEEEEE;
+  border: 1px solid #E0E0E0;
+  padding: 8px;
+  margin: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.section {
+  background-color: #FAFAFA;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
+
+.miniform {
+  margin-top: 20px;
+  background-color: #F3F3F3;
+  padding: 10px;
+  border-top: 1px solid #DDD;
+}
+
+.select-mini {
+  width: 100%;
+}
+
+.search-bar {
+  background-color: #fafafa;
+  border-bottom: 1px solid #e3e3e3;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+  margin: 0;
+  margin-bottom: 20px;
+  padding: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  text-align: left;
+}
+
+.search-bar h4 {
+  font-size: 20px !important;
+  color: #338BB8 !important;
+  padding: 0 !important;
+  margin-top: 4px !important;
+  margin-left: 20px;
+  border: none !important;
+  max-width: none!important;
+}
+
+.waiting {
+  font-size: 196px;
+  color: #DDD;
+}
+
+h1.emptyMessage {
+  margin-top: 50px;
+  color: #BBB;
+  line-height: 60px;
+}
+
+.stepDetails {
+  padding: 5px;
+}
+
+.editable {
+  cursor: pointer;
+}
+
+.collectionRow {
+  cursor: pointer;
+  margin-bottom: 10px;
+  padding: 10px;
+  height: 40px;
+}
+
+.collectionRow:hover {
+  background-color: #EFEFEF;
+}
+
+.hue-colorchart {
+  width: 100%;
+}
+
+.hue-colorchart td {
+  padding: 4px;
+  cursor: pointer;
+}
+
+.cloud-tmpl {
+  border: 1px dashed #FFFFFF;
+  padding: 10px;
+  margin-bottom: 10px;
+  color: #666;
+  cursor: pointer;
+}
+
+.cloud-tmpl h4 {
+  margin-top: 0;
+}
+
+.cloud-tmpl.selected {
+  border: 1px dashed #338BB8;
+}
+
+.cloud-tmpl:hover, .cloud-tmpl.selected:hover  {
+  color: #000;
+  border: 1px dashed #CCCCCC;
+}
+
+.actionbar-actions {
+  min-height: 20px;
+}
