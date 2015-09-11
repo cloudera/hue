@@ -26,7 +26,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 from oozie.decorators import check_document_access_permission # Bad dependency
 
-from notebook.models import get_api, Notebook, QueryExpired
+from notebook.connectors.base import get_api, Notebook, QueryExpired
 from notebook.decorators import api_error_handler, check_document_modify_permission
 
 

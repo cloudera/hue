@@ -1,0 +1,110 @@
+#!/usr/bin/env python
+# Licensed to Cloudera, Inc. under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  Cloudera, Inc. licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import json
+import logging
+
+from desktop.lib.i18n import force_unicode
+
+
+LOG = logging.getLogger(__name__)
+
+
+class SessionExpired(Exception):
+  pass
+
+
+class QueryExpired(Exception):
+  pass
+
+
+class QueryError(Exception):
+  def __init__(self, message):
+    self.message = message
+
+  def __str__(self):
+    return force_unicode(str(self.message))
+
+
+class Notebook():
+
+  def __init__(self, document=None):
+    self.document = None
+
+    if document is not None:
+      self.data = document.data
+      self.document = document
+    else:
+      self.data = json.dumps({
+          'name': 'My Notebook',
+          'description': '',
+          'snippets': []
+      })
+
+  def get_json(self):
+    _data = self.get_data()
+
+    return json.dumps(_data)
+
+  def get_data(self):
+    _data = json.loads(self.data)
+
+    if self.document is not None:
+      _data['id'] = self.document.id
+
+    return _data
+
+  def get_str(self):
+    return '\n\n'.join([snippet['statement_raw'] for snippet in self.get_data()['snippets']])
+
+
+def get_api(user, snippet):
+  from notebook.connectors.hiveserver2 import HS2Api
+  from notebook.connectors.spark_batch import SparkBatchApi
+  from notebook.connectors.text import TextApi
+  from notebook.connectors.spark_shell import SparkApi
+
+  if snippet['type'] in ('hive', 'impala', 'spark-sql'):
+    return HS2Api(user)
+  elif snippet['type'] in ('jar', 'py'):
+    return SparkBatchApi(user)
+  elif snippet['type'] == 'text':
+    return TextApi(user)
+  else:
+    return SparkApi(user)
+
+
+def _get_snippet_session(notebook, snippet):
+  return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0]
+
+
+# Base API
+
+class Api(object):
+
+  def __init__(self, user):
+    self.user = user
+
+  def create_session(self, lang, properties=None):
+    return {
+        'type': lang,
+        'id': None,
+        'properties': []
+    }
+
+  def close_session(self, session):
+    pass

@@ -28,8 +28,9 @@ from spark.conf import LIVY_SERVER_SESSION_KIND
 
 from notebook.conf import LANGUAGES
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
-from notebook.models import Notebook, get_api, SparkApi
+from notebook.connectors.base import Notebook, get_api
 from notebook.management.commands.notebook_setup import Command
+from notebook.connectors.spark_shell import SparkApi
 
 
 LOG = logging.getLogger(__name__)
