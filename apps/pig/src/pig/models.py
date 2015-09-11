@@ -25,7 +25,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document as Doc
+from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
 
 
@@ -93,7 +93,7 @@ class PigScript(Document):
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)
-    if id == '1100713': # Special case for the Example, just create an history
+    if id == str(SAMPLE_USER_ID): # Special case for the Example, just create an history
       is_design = False
       raise PigScript.DoesNotExist()
     pig_script.doc.get().can_write_or_exception(user)

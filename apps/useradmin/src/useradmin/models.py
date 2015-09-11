@@ -53,14 +53,14 @@ import logging
 from datetime import datetime
 from enum import Enum
 
-from django.db import connection, models
+from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import SAMPLE_USER_INSTALL
+from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
 from hadoop import cluster
 
 import useradmin.conf
@@ -299,16 +299,21 @@ def install_sample_user():
   """
   user = None
   try:
-    user = auth_models.User.objects.get(id=1100713)
+    user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
     LOG.info('Sample user found: %s' % user.username)
+    if user.username != SAMPLE_USER_INSTALL:
+      with transaction.atomic():
+        user = auth_models.User.objects.filter(id=SAMPLE_USER_ID).select_for_update()[0]
+        user.username = SAMPLE_USER_INSTALL
+        user.save()
   except auth_models.User.DoesNotExist:
     user, created = auth_models.User.objects.get_or_create(
       username=SAMPLE_USER_INSTALL,
       password='!',
       is_active=False,
       is_superuser=False,
-      id=1100713,
-      pk=1100713)
+      id=SAMPLE_USER_ID,
+      pk=SAMPLE_USER_ID)
 
     if created:
       LOG.info('Installed a user called "%s"' % SAMPLE_USER_INSTALL)
