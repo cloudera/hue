@@ -166,6 +166,9 @@ describe("autocomplete.js", function() {
     it("should suggest struct from map values", function() {
       assertAutoComplete({
         serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
           "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
             fields: [
               {"type": "string", "name": "fieldA" },
@@ -183,9 +186,32 @@ describe("autocomplete.js", function() {
       });
     });
 
+    it("should suggest struct from map values without a given key", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" }
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT testMap[].",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: ["fieldA", "fieldB"]
+      });
+    });
+
     it("should suggest struct from structs from map values", function() {
       assertAutoComplete({
         serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
           "/testApp/api/autocomplete/testDb/testTable/testMap/value/fieldC" : {
             fields: [
               {"type": "string", "name": "fieldC_A" },
@@ -197,6 +223,49 @@ describe("autocomplete.js", function() {
         beforeCursor: "SELECT testMap[\"anyKey\"].fieldC.",
         afterCursor: " FROM testTable",
         expectedSuggestions: ["fieldC_A", "fieldC_B"]
+      });
+    });
+
+    it("should suggest struct from structs from arrays", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testArray" : {
+            type: "array"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testArray/item/fieldC" : {
+            fields: [
+              {"type": "string", "name": "fieldC_A" },
+              {"type": "boolean", "name": "fieldC_B"}
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT testArray[1].fieldC.",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: ["fieldC_A", "fieldC_B"]
+      });
+    });
+
+    it("should suggest structs from maps from arrays", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testArray" : {
+            type: "array"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testArray/item/testMap" : {
+            type: "map"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testArray/item/testMap/value" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "boolean", "name": "fieldB"}
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT testArray[1].testMap[\"key\"].",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: ["fieldA", "fieldB"]
       });
     });
   });
