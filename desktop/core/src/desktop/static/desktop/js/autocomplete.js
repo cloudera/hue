@@ -61,31 +61,44 @@ Autocompleter.prototype.getTableReferenceIndex = function (statement) {
 
 Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar) {
   var fields = [];
-  var type;
-  var fieldNames = [];
+  var result = [];
+
   if (data.type == "struct") {
-    type = "struct";
-    fieldNames = $.map(data.fields, function(field) {
-      return field.name;
+    fields = $.map(data.fields, function(field) {
+      return {
+        name: field.name,
+        type: field.type
+      };
     });
   } else if (typeof data.columns != "undefined") {
-    type = "column";
-    fieldNames = data.columns;
+    fields = $.map(data.columns, function(column) {
+      return {
+        name: column,
+        type: "column"
+      }
+    });
     if (includeStar) {
-      fields.push({value: '*', score: 10000, meta: type});
+      result.push({value: '*', score: 10000, meta: "column"});
     }
   } else if (typeof data.tables != "undefined") {
-    type = "table";
-    fieldNames = data.tables;
+    fields = $.map(data.tables, function(table) {
+      return {
+        name: table,
+        type: "table"
+      }
+    });
   }
 
-  fieldNames.sort();
-  fieldNames.forEach(function(name, idx) {
-    if (name != "") {
-      fields.push({value: typeof valuePrefix != "undefined" ? valuePrefix + name : name, score: 1000 - idx, meta: type});
+  fields.sort(function (a, b) {
+    return a.name.localeCompare(b.name);
+  });
+
+  fields.forEach(function(field, idx) {
+    if (field.name != "") {
+      result.push({value: typeof valuePrefix != "undefined" ? valuePrefix + field.name : field.name, score: 1000 - idx, meta: field.type});
     }
   });
-  return fields;
+  return result;
 };
 
 Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
