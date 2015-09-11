@@ -2325,6 +2325,7 @@ class TestWithMockedServer(object):
     # Beware: Monkey patch Beeswax/Hive server with Mock API
     if not hasattr(dbms, 'OriginalBeeswaxApi'):
       dbms.OriginalBeeswaxApi = dbms.HiveServer2Dbms
+    dbms.DBMS_CACHE = {}
     dbms.HiveServer2Dbms = MockDbms
 
     self.client = make_logged_in_client(is_superuser=False)
@@ -2334,6 +2335,7 @@ class TestWithMockedServer(object):
     grant_access("test", "test", "beeswax")
 
   def tearDown(self):
+    dbms.DBMS_CACHE = {}
     dbms.HiveServer2Dbms = dbms.OriginalBeeswaxApi
 
   def test_bulk_query_trash(self):
