@@ -1594,12 +1594,6 @@ ko.bindingHandlers.timepicker = {
       showMeridian: false,
       defaultTime: false
     });
-    _el.on("change", function () {
-      if (_el.val().substr(-1) != "Z") {
-        _el.val(_el.val() + "Z");
-        _el.trigger("change");
-      }
-    });
   }
 }
 

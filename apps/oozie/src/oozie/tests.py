@@ -50,7 +50,7 @@ from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.models import Dataset, Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.models2 import _get_hiveserver2_url
-from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink
+from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink, convert_to_server_timezone
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
@@ -3777,6 +3777,19 @@ class TestUtils(OozieMockBase):
     assert_false(contains_symlink('${output}', {}))
     assert_false(contains_symlink('${output}', {'output': '${path}'}))
     assert_true(contains_symlink('${output_dir}', {'output': '/path/out', 'output_dir': 'hdfs://nn/path/out#out'}))
+
+  def test_convert_to_server_timezone(self):
+    # To UTC
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='America/Los_Angeles', server_tz='UTC', user='test'), u'2015-07-01T17:10Z')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='Europe/Paris', server_tz='UTC', user='test'), u'2015-07-01T08:10Z')
+    # To GMT(+/-)####
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='Asia/Jayapura', server_tz='GMT+0800', user='test'), u'2015-07-01T09:10+0800')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='Australia/LHI', server_tz='GMT-0530', user='test'), u'2015-06-30T18:10+0530')
+    # Previously created coordinators might have 'Z' appended, we consider them as UTC local time
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10Z', local_tz='America/Los_Angeles', server_tz='UTC', user='test'), u'2015-07-01T10:10Z')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10Z', local_tz='Asia/Jayapura', server_tz='GMT+0800', user='test'), u'2015-07-01T18:10+0800')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10Z', local_tz='Australia/LHI', server_tz='GMT-0530', user='test'), u'2015-07-01T04:40+0530')
+
 
 # Utils
 WORKFLOW_DICT = {
