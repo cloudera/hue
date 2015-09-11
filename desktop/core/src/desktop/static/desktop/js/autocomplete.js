@@ -102,13 +102,17 @@ Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar
 };
 
 Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
+  var onFailure = function() {
+    callback([]);
+  };
+
   var self = this;
 
   if (typeof self.assistHelper.activeDatabase() == "undefined"
     || self.assistHelper.activeDatabase() == null
     || self.assistHelper.activeDatabase() == ""
     || (self.currentMode !== "hive" && self.currentMode !== "impala")) {
-    callback([]);
+    onFailure();
     return;
   }
 
@@ -156,9 +160,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
         fromKeyword += " ";
       }
       callback(self.extractFields(data, fromKeyword));
-    }, function() {
-      callback([]);
-    });
+    }, onFailure );
   } else if ((selectBefore && fromAfter) || fieldTermBefore) {
     var partialTermsMatch = beforeCursor.match(/([^ \-\+\<\>\,]*)$/);
     var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
@@ -185,32 +187,45 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       return;
     } else {
       // No table refs
-      callback([]);
+      onFailure();
       return;
     }
-    var fields = [];
-    $.each(parts, function(index, part) {
-      if (part != '' && (index > 0 || part !== tableName)) {
-        if (self.currentMode === "hive") {
-          var mapMatch = part.match(/([^\[]*)\[[^\]]+\]$/i);
-          if (mapMatch !== null) {
-            fields.push(mapMatch[1]);
-            fields.push("value");
-          } else {
-            fields.push(part);
-          }
-        } else {
-          fields.push(part);
-        }
-      }
-    });
 
-    self.assistHelper.fetchFields(tableName, fields, function(data) {
-      callback(self.extractFields(data, "", !fieldTermBefore));
-    }, function() {
-      callback([]);
-    });
+    var getFields = function (remainingParts, fields) {
+      if (remainingParts.length == 0) {
+        self.assistHelper.fetchFields(tableName, fields, function(data) {
+          callback(self.extractFields(data, "", !fieldTermBefore));
+        }, onFailure);
+        return; // break recursion
+      }
+      var part = remainingParts.shift();
+
+      if (part != '' && part !== tableName) {
+        if (self.currentMode === "hive") {
+          var mapOrArrayMatch = part.match(/([^\[]*)\[[^\]]*\]$/i);
+          if (mapOrArrayMatch !== null) {
+            fields.push(mapOrArrayMatch[1]);
+            self.assistHelper.fetchFields(tableName, fields, function(data) {
+              if (data.type === "map") {
+                fields.push("value");
+                getFields(remainingParts, fields);
+              } else if (data.type === "array") {
+                fields.push("item");
+                getFields(remainingParts, fields);
+              } else {
+                onFailure();
+              }
+            }, onFailure);
+            return; // break recursion, it'll be async above
+          }
+        }
+        fields.push(part);
+      }
+      getFields(remainingParts, fields);
+    };
+
+    getFields(parts, []);
   } else {
-    callback([]);
+    onFailure();
   }
 };
