@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import os
 import sys
@@ -28,26 +27,6 @@ from spark.settings import NICE_NAME
 
 LOG = logging.getLogger(__name__)
 
-
-def coerce_json(j):
-  return json.loads(j)
-
-
-LANGUAGES = Config(
-  key="languages",
-  help=_t("List of available types of snippets."),
-  type=coerce_json,
-  default="""[
-      {"name": "Scala", "type": "spark"},
-      {"name": "PySpark", "type": "pyspark"},
-      {"name": "R", "type": "r"},
-      {"name": "Impala", "type": "impala"},
-      {"name": "Hive", "type": "hive"},
-      {"name": "Jar", "type": "jar"},
-      {"name": "Python", "type": "py"},
-      {"name": "Text", "type": "text"}
-  ]"""
-)
 
 LIVY_ASSEMBLY_JAR = Config(
   key="livy_assembly_jar",
