@@ -101,10 +101,18 @@ class IndexController(object):
     Create schema.xml file so that we can set UniqueKey field.
     """
     if self.is_solr_cloud_mode():
+      self._create_solr_cloud_index(name, fields, unique_key_field, df)
+
+    else:  # Non-solrcloud mode
+      self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
+
+    return name
+
+  def _create_solr_cloud_index(self, name, fields, unique_key_field, df):
+    with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
       tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
 
       try:
-        zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
         config_root_path = '%s/%s' % (solr_config_path, 'conf')
         zc.copy_path(root_node, config_root_path)
@@ -120,27 +128,28 @@ class IndexController(object):
         # Remove tmp config directory
         shutil.rmtree(tmp_path)
 
-    else:  # Non-solrcloud mode
-      # Create instance directory locally.
-      instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
 
-      if os.path.exists(instancedir):
-        raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
+  def _create_non_solr_cloud_index(self, name, fields, unique_key_field, df):
+    # Create instance directory locally.
+    instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
 
+    if os.path.exists(instancedir):
+      raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
+
+    try:
+      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
       try:
-        tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
         shutil.move(solr_config_path, instancedir)
+      finally:
         shutil.rmtree(tmp_path)
 
-        if not self.api.create_core(name, instancedir):
-          raise Exception('Failed to create core: %s' % name)
-      except Exception, e:
-        raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
-      finally:
-        # Delete instance directory if we couldn't create the core.
-        shutil.rmtree(instancedir)
-
-    return name
+      if not self.api.create_core(name, instancedir):
+        raise Exception('Failed to create core: %s' % name)
+    except Exception, e:
+      raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
+    finally:
+      # Delete instance directory if we couldn't create the core.
+      shutil.rmtree(instancedir)
 #
 
   def delete_index(self, name):
@@ -155,8 +164,8 @@ class IndexController(object):
       # Delete instance directory.
       try:
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-        zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
-        zc.delete_path(root_node)
+        with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+          zc.delete_path(root_node)
       except Exception, e:
         # Re-create collection so that we don't have an orphan config
         self.api.add_collection(name)

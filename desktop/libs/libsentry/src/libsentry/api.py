@@ -255,8 +255,8 @@ def _get_server_properties():
       if not _api_cache:
 
         servers = []
-        client = ZookeeperClient(hosts=get_sentry_server_ha_zookeeper_quorum())
-        sentry_servers = client.get_children_data(namespace=get_sentry_server_ha_zookeeper_namespace())
+        with ZookeeperClient(hosts=get_sentry_server_ha_zookeeper_quorum()) as client:
+          sentry_servers = client.get_children_data(namespace=get_sentry_server_ha_zookeeper_namespace())
 
         for data in sentry_servers:
           server = json.loads(data.decode("utf-8"))
