@@ -55,57 +55,70 @@ class ZookeeperClient(object):
                           sasl_server_principal=self.sasl_server_principal)
 
 
-  def get_children_data(self, namespace):
+  def start(self):
+    """Start the zookeeper session."""
     self.zk.start()
-    try:
-      children = self.zk.get_children(namespace)
 
-      children_data = []
 
-      for node in children:
-        data, stat = self.zk.get("%s/%s" % (namespace, node))
-        children_data.append(data)
+  def stop(self):
+    """Stop the zookeeper session, but leaves the socket open."""
+    self.zk.stop()
 
-      return children_data
-    finally:
-      self.zk.stop()
+
+  def close(self):
+    """Closes a stopped zookeeper socket."""
+    self.zk.close()
+
+
+  def get_children_data(self, namespace):
+    children = self.zk.get_children(namespace)
+
+    children_data = []
+
+    for node in children:
+      data, stat = self.zk.get("%s/%s" % (namespace, node))
+      children_data.append(data)
+
+    return children_data
 
 
   def path_exists(self, namespace):
-    self.zk.start()
-    try:
-      return self.zk.exists(namespace) is not None
-    finally:
-      self.zk.stop()
+    return self.zk.exists(namespace) is not None
 
 
   def copy_path(self, namespace, filepath):
     if self.read_only:
       raise ReadOnlyClientException('Cannot execute copy_path when read_only is set to True.')
 
-    self.zk.start()
-    try:
-      self.zk.ensure_path(namespace)
-      for dir, subdirs, files in os.walk(filepath):
-        path = dir.replace(filepath, '').strip('/')
-        if path:
-          node_path = '%s/%s' % (namespace, path)
-          self.zk.create(path=node_path, value='', makepath=True)
-        for filename in files:
-          node_path = '%s/%s/%s' % (namespace, path, filename)
-          with open(os.path.join(dir, filename), 'r') as f:
-            file_content = f.read()
-            self.zk.create(path=node_path, value=file_content, makepath=True)
-    finally:
-      self.zk.stop()
+    self.zk.ensure_path(namespace)
+    for dir, subdirs, files in os.walk(filepath):
+      path = dir.replace(filepath, '').strip('/')
+      if path:
+        node_path = '%s/%s' % (namespace, path)
+        self.zk.create(path=node_path, value='', makepath=True)
+      for filename in files:
+        node_path = '%s/%s/%s' % (namespace, path, filename)
+        with open(os.path.join(dir, filename), 'r') as f:
+          file_content = f.read()
+          self.zk.create(path=node_path, value=file_content, makepath=True)
 
 
   def delete_path(self, namespace):
     if self.read_only:
       raise ReadOnlyClientException('Cannot execute delete_path when read_only is set to True.')
 
+    self.zk.delete(namespace, recursive=True)
+
+
+  def __enter__(self):
+    """Start a zookeeper session and return a `with` context."""
     self.zk.start()
+    return self
+
+
+  def __exit__(self, exc_type, exc_value, traceback):
+    """Stops and closes zookeeper session at the end of the `with` context."""
     try:
-      self.zk.delete(namespace, recursive=True)
+      self.stop()
     finally:
-      self.zk.stop()
+      self.close()
