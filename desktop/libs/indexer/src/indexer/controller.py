@@ -126,22 +126,25 @@ class CollectionManagerController(object):
     Create schema.xml file so that we can set UniqueKey field.
     """
     if self.is_solr_cloud_mode():
-      # solrcloud mode
+      self._create_solr_cloud_collection(name, fields, unique_key_field, df)
+    else:
+      self._create_non_solr_cloud_collection(name, fields, unique_key_field, df)
 
-      # Need to remove path afterwards
-      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
-
-      zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
+  def _create_solr_cloud_collection(self, name, fields, unique_key_field, df):
+    with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
       root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-      config_root_path = '%s/%s' % (solr_config_path, 'conf')
-      try:
-        zc.copy_path(root_node, config_root_path)
-      except Exception, e:
-        zc.delete_path(root_node)
-        raise PopupException(_('Error in copying Solr configurations.'), detail=e)
 
-      # Don't want directories laying around
-      shutil.rmtree(tmp_path)
+      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
+      try:
+        config_root_path = '%s/%s' % (solr_config_path, 'conf')
+        try:
+          zc.copy_path(root_node, config_root_path)
+        except Exception, e:
+          zc.delete_path(root_node)
+          raise PopupException(_('Error in copying Solr configurations.'), detail=e)
+      finally:
+        # Don't want directories laying around
+        shutil.rmtree(tmp_path)
 
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
@@ -151,21 +154,26 @@ class CollectionManagerController(object):
         except Exception, e:
           raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
         raise PopupException(_('Could not create collection. Check error logs for more info.'))
-    else:
-      # Non-solrcloud mode
-      # Create instance directory locally.
-      instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
-      if os.path.exists(instancedir):
-        raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
-      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
+
+  def _create_non_solr_cloud_collection(self, name, fields, unique_key_field, df):
+    # Non-solrcloud mode
+    # Create instance directory locally.
+    instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
+    if os.path.exists(instancedir):
+      raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
+
+    tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
+    try:
       shutil.move(solr_config_path, instancedir)
+    finally:
       shutil.rmtree(tmp_path)
 
-      api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-      if not api.create_core(name, instancedir):
-        # Delete instance directory if we couldn't create a collection.
-        shutil.rmtree(instancedir)
-        raise PopupException(_('Could not create collection. Check error logs for more info.'))
+    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+    if not api.create_core(name, instancedir):
+      # Delete instance directory if we couldn't create a collection.
+      shutil.rmtree(instancedir)
+      raise PopupException(_('Could not create collection. Check error logs for more info.'))
+
 
   def delete_collection(self, name, core):
     """
@@ -179,8 +187,8 @@ class CollectionManagerController(object):
       # Delete instance directory.
       try:
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-        zc = ZookeeperClient(hosts=get_solr_ensemble(), read_only=False)
-        zc.delete_path(root_node)
+        with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+          zc.delete_path(root_node)
       except Exception, e:
         # Re-create collection so that we don't have an orphan config
         api.add_collection(name)

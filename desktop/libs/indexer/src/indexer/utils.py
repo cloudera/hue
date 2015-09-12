@@ -83,33 +83,38 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
-  config_template_path = get_config_template_path(solr_cloud_mode)
+  try:
+    config_template_path = get_config_template_path(solr_cloud_mode)
 
-  solr_config_path = os.path.join(tmp_path, 'solr_configs')
-  shutil.copytree(config_template_path, solr_config_path)
+    solr_config_path = os.path.join(tmp_path, 'solr_configs')
+    shutil.copytree(config_template_path, solr_config_path)
 
-  if fields or unique_key_field:
-    # Get complete schema.xml
-    with open(os.path.join(config_template_path, 'conf/schema.xml')) as f:
-      schemaxml = SchemaXml(f.read())
-      schemaxml.uniqueKeyField(unique_key_field)
-      schemaxml.fields(fields)
+    if fields or unique_key_field:
+      # Get complete schema.xml
+      with open(os.path.join(config_template_path, 'conf/schema.xml')) as f:
+        schemaxml = SchemaXml(f.read())
+        schemaxml.uniqueKeyField(unique_key_field)
+        schemaxml.fields(fields)
 
-    # Write complete schema.xml to copy
-    with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
-      f.write(smart_str(schemaxml.xml))
+      # Write complete schema.xml to copy
+      with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
+        f.write(smart_str(schemaxml.xml))
 
-  if df:
-    # Get complete solrconfig.xml
-    with open(os.path.join(config_template_path, 'conf/solrconfig.xml')) as f:
-      solrconfigxml = SolrConfigXml(f.read())
-      solrconfigxml.defaultField(df)
+    if df:
+      # Get complete solrconfig.xml
+      with open(os.path.join(config_template_path, 'conf/solrconfig.xml')) as f:
+        solrconfigxml = SolrConfigXml(f.read())
+        solrconfigxml.defaultField(df)
 
-    # Write complete solrconfig.xml to copy
-    with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
-      f.write(smart_str(solrconfigxml.xml))
+      # Write complete solrconfig.xml to copy
+      with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
+        f.write(smart_str(solrconfigxml.xml))
 
-  return tmp_path, solr_config_path
+    return tmp_path, solr_config_path
+  except Exception:
+    # Don't leak the tempdir if there was an exception.
+    shutil.rmtree(tmp_path)
+    raise
 
 
 def get_field_types(field_list, iterations=3):
