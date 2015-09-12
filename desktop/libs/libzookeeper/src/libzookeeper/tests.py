@@ -91,34 +91,23 @@ class TestWithZooKeeper:
     shutil.rmtree(cls.local_directory)
 
   def teardown(self):
-    client = ZookeeperClient(hosts=zkensemble(), read_only=False)
-    # Delete the root_node first just in case it wasn't cleaned up in previous run
-    client.zk.start()
-    try:
+    with ZookeeperClient(hosts=zkensemble(), read_only=False) as client:
       if client.zk.exists(self.namespace):
         client.zk.delete(self.namespace, recursive=True)
-    finally:
-      client.zk.stop()
 
   def test_get_children_data(self):
     root_node = '%s/%s' % (TestWithZooKeeper.namespace, 'test_path_exists')
-    client = ZookeeperClient(hosts=zkensemble(), read_only=False)
 
-    client.zk.start()
-    try:
+    with ZookeeperClient(hosts=zkensemble(), read_only=False) as client:
       client.zk.create(root_node, value='test_path_exists', makepath=True)
-    finally:
-      client.zk.stop()
 
-    db = client.get_children_data(namespace=TestWithZooKeeper.namespace)
-    assert_true(len(db) > 0)
+      db = client.get_children_data(namespace=TestWithZooKeeper.namespace)
+      assert_true(len(db) > 0)
 
   def test_path_exists(self):
     root_node = '%s/%s' % (TestWithZooKeeper.namespace, 'test_path_exists')
-    client = ZookeeperClient(hosts=zkensemble(), read_only=False)
 
-    client.zk.start()
-    try:
+    with ZookeeperClient(hosts=zkensemble(), read_only=False) as client:
       client.zk.create(root_node, value='test_path_exists', makepath=True)
 
       try:
@@ -126,33 +115,23 @@ class TestWithZooKeeper:
         assert_false(client.path_exists(namespace='bogus_path'))
       finally:
         client.delete_path(root_node)
-    finally:
-      client.zk.stop()
 
   def test_copy_and_delete_path(self):
     root_node = '%s/%s' % (TestWithZooKeeper.namespace, 'test_copy_and_delete_path')
-    client = ZookeeperClient(hosts=zkensemble(), read_only=False)
 
-    # Test copy_path
-    client.copy_path(root_node, TestWithZooKeeper.local_directory)
+    with ZookeeperClient(hosts=zkensemble(), read_only=False) as client:
+      # Test copy_path
+      client.copy_path(root_node, TestWithZooKeeper.local_directory)
 
-    client.zk.start()
-    try:
       assert_true(client.zk.exists('%s' % root_node))
       assert_true(client.zk.exists('%s/%s' % (root_node, TestWithZooKeeper.subdir_name)))
       assert_true(client.zk.exists('%s/%s/%s' % (root_node, TestWithZooKeeper.subdir_name, TestWithZooKeeper.filename)))
       contents, stats = client.zk.get('%s/%s/%s' % (root_node, TestWithZooKeeper.subdir_name, TestWithZooKeeper.filename))
       assert_equal(contents, TestWithZooKeeper.file_contents)
-    finally:
-      client.zk.stop()
 
-    # Test delete_path
-    client.delete_path(root_node)
+      # Test delete_path
+      client.delete_path(root_node)
 
-    client.zk.start()
-    try:
       assert_equal(client.zk.exists('%s' % root_node), None)
       assert_equal(client.zk.exists('%s/%s' % (root_node, TestWithZooKeeper.subdir_name)), None)
       assert_equal(client.zk.exists('%s/%s/%s' % (root_node, TestWithZooKeeper.subdir_name, TestWithZooKeeper.filename)), None)
-    finally:
-      client.zk.stop()
