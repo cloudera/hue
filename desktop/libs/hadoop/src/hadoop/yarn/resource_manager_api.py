@@ -36,23 +36,23 @@ LOG = logging.getLogger(__name__)
 _API_VERSION = 'v1'
 _JSON_CONTENT_TYPE = 'application/json'
 
-_api_cache = None
-_api_cache_lock = threading.Lock()
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
 
 
 def get_resource_manager(username):
-  global _api_cache
-  if _api_cache is None:
-    _api_cache_lock.acquire()
+  global API_CACHE
+  if API_CACHE is None:
+    API_CACHE_LOCK.acquire()
     try:
-      if _api_cache is None:
+      if API_CACHE is None:
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        _api_cache = ResourceManagerApi(username, yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = ResourceManagerApi(username, yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
-      _api_cache_lock.release()
-  return _api_cache
+      API_CACHE_LOCK.release()
+  return API_CACHE
 
 
 class YarnFailoverOccurred(Exception):
