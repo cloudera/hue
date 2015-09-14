@@ -134,7 +134,7 @@
             "query": "-- Get email survey opt-in values for all customers \nSELECT\r\n  c.id,\r\n  c.name,\r\n  c.email_preferences.categories.surveys\r\nFROM customers c;\n\n\n\n-- Select customers for a given shipping ZIP Code\nSELECT\r\n  c.id,\r\n  c.name\r\nFROM customers c, c.addresses a\r\nWHERE a.key = 'shipping' and a.zip_code = '${zip_code}';\n\n\n\n-- Compute total amount per order for all customers\nSELECT\r\n  c.id AS customer_id,\r\n c.name AS customer_name,\r\n  o.order_id,\r\n  v.total\r\nFROM\r\n  customers c,\r\n  c.orders o,\r\n  (SELECT SUM(price * qty) total FROM o.items) v;",
             "type":1,
             "email_notify":false,
-            "is_parameterized":false,
+            "is_parameterized":true,
             "database":"default"
          },
          "functions":[ ],
