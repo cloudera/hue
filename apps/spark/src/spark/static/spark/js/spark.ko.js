@@ -346,7 +346,7 @@ var Snippet = function (vm, notebook, snippet) {
   };
 
   self._ajaxError = function (data, callback) {
-    if (data.status == -2 || data.status == -1) {
+    if (data.status == -2) { // Session expired
       var existingSession = notebook.getSession(self.type());
       if (existingSession) {
         notebook.restartSession(existingSession, callback);
@@ -354,10 +354,10 @@ var Snippet = function (vm, notebook, snippet) {
         notebook.createSession(new Session(vm, {'type': self.type()}), callback);
       }
     }
-    else if (data.status == -3) {
+    else if (data.status == -3) { // Statement expired
       self.status('expired');
     }
-    else if (data.status == 1) {
+    else if (data.status == 1 || data.status == -1) {
       self.status('failed');
       var match = ERROR_REGEX.exec(data.message);
       self.errors.push({
