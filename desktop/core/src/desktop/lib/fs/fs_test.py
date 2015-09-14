@@ -16,21 +16,21 @@
 
 from __future__ import absolute_import
 
-import posixpath
-import urlparse
+from nose.tools import eq_
 
-from desktop.lib.fs.proxyfs import ProxyFS
-
-
-def splitpath(path):
-  split = urlparse.urlparse(path)
-  if split.scheme:
-    parts = [split.scheme + '://', split.netloc] + split.path.split('/')
-  else:
-    parts = ['/'] + posixpath.normpath(path).split('/')
-  # Filter empty parts out
-  return filter(len, parts)
+from desktop.lib import fs
 
 
+def test_splitpath():
+  s = fs.splitpath
 
+  eq_(s('s3://'), ['s3://'])
+  eq_(s('s3://bucket'), ['s3://', 'bucket'])
+  eq_(s('s3://bucket/key'), ['s3://', 'bucket', 'key'])
+  eq_(s('s3://bucket/key/'), ['s3://', 'bucket', 'key'])
+  eq_(s('s3://bucket/bar/foo'), ['s3://', 'bucket', 'bar', 'foo'])
 
+  eq_(s('/'), ['/'])
+  eq_(s('/dir'), ['/', 'dir'])
+  eq_(s('/dir/file'), ['/', 'dir', 'file'])
+  eq_(s('/dir/file/'), ['/', 'dir', 'file'])

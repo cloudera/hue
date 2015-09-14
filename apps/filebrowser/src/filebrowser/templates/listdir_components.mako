@@ -602,7 +602,7 @@ from django.utils.translation import ugettext as _
       $('.history').removeClass('no-history');
       var history = getHistory();
       if (path != '/filebrowser/') {
-        var _basePath = '${url('filebrowser.views.view', path=urlencode('/'))}';
+        var _basePath = '${url('filebrowser.views.view', path='')}';
         if (path.indexOf(_basePath) > -1) {
           path = path.substr(_basePath.length - 1);
         }
@@ -748,7 +748,7 @@ from django.utils.translation import ugettext as _
           }
 
           viewModel.targetPageNum(1);
-          viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(this.url));
+          viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
           location.hash = this.url;
         }
       }
@@ -998,7 +998,7 @@ from django.utils.translation import ugettext as _
           // Reset page number so that we don't hit a page that doesn't exist
           self.targetPageNum(1);
           self.searchQuery("");
-          self.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + "." + stripHashes(file.path));
+          self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
           location.hash = stripHashes(file.path);
         } else {
           location.href = file.url;
@@ -1006,11 +1006,11 @@ from django.utils.translation import ugettext as _
       };
 
       self.editFile = function () {
-        location.href = "${url('filebrowser.views.edit', path=urlencode('/'))}" + self.selectedFile().path;
+        location.href = "${url('filebrowser.views.edit', path='')}" + self.selectedFile().path;
       };
 
       self.downloadFile = function () {
-        location.href = "${url('filebrowser.views.download', path=urlencode('/'))}" + self.selectedFile().path;
+        location.href = "${url('filebrowser.views.download', path='')}" + self.selectedFile().path;
       };
 
       self.renameFile = function () {
@@ -1020,7 +1020,7 @@ from django.utils.translation import ugettext as _
 
         $("#newNameInput").val(self.selectedFile().name);
 
-        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#renameModal").modal({
           keyboard:true,
@@ -1042,7 +1042,7 @@ from django.utils.translation import ugettext as _
         if (!isMoveOnSelf){
           hiddenFields($("#moveForm"), "src_path", paths);
 
-          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+          $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
           if (mode === 'nomodal') {
             $.jHueNotify.info('${ _('Items moving to') } "' + $('#moveDestination').val() + '"');
@@ -1082,7 +1082,7 @@ from django.utils.translation import ugettext as _
 
         hiddenFields($("#copyForm"), "src_path", paths);
 
-        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#copyForm").attr("action", "/filebrowser/copy?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#copyModal").modal({
           keyboard:true,
@@ -1116,7 +1116,7 @@ from django.utils.translation import ugettext as _
 
           hiddenFields($("#chownForm"), 'path', paths);
 
-          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+          $("#chownForm").attr("action", "/filebrowser/chown?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
           $("select[name=user]").val(self.selectedFile().stats.user);
 
@@ -1153,7 +1153,7 @@ from django.utils.translation import ugettext as _
 
           hiddenFields($("#chmodForm"), 'path', paths);
 
-          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+          $("#chmodForm").attr("action", "/filebrowser/chmod?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
           $("#changePermissionModal").modal({
             keyboard: true,
@@ -1196,7 +1196,7 @@ from django.utils.translation import ugettext as _
 
         $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
           (skip_trash ? "skip_trash=true&" : "") +
-          "next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+          "next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#deleteModal").modal({
           keyboard:true,
@@ -1224,12 +1224,12 @@ from django.utils.translation import ugettext as _
       };
 
       self.createDirectory = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
         return true;
       };
 
       self.createFile = function (formElement) {
-        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
         return true;
       };
 
@@ -1242,7 +1242,7 @@ from django.utils.translation import ugettext as _
 
         hiddenFields($("#restoreTrashForm"), 'path', paths);
 
-        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser.views.view', path=urlencode('/'))}" + "." + self.currentPath());
+        $("#restoreTrashForm").attr("action", "/filebrowser/trash/restore?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#restoreTrashModal").modal({
           keyboard:true,
@@ -1259,7 +1259,7 @@ from django.utils.translation import ugettext as _
 
         hiddenFields($("#purgeTrashForm"), 'path', paths);
 
-        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path=urlencode('/'))}" + viewModel.homeDir().slice(1) + "/.Trash");
+        $("#purgeTrashForm").attr("action", "/filebrowser/trash/purge?next=${url('filebrowser.views.view', path='')}" + viewModel.homeDir() + "/.Trash");
 
         $("#purgeTrashModal").modal({
           keyboard:true,
@@ -1783,9 +1783,9 @@ from django.utils.translation import ugettext as _
         var targetPath = "";
         var hash = window.location.hash.substring(1).replace(/(<([^>]+)>)/ig, "");
         if (hash != null && hash != "") {
-          targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}";
+          targetPath = "${url('filebrowser.views.view', path='')}";
           if (hash.indexOf("!!") != 0) {
-            targetPath += stripHashes(hash.substring(1));
+            targetPath += stripHashes(hash);
           }
           else {
             targetPath = viewModel.targetPath() + hash;
@@ -1825,7 +1825,7 @@ from django.utils.translation import ugettext as _
         home: "/user/${ user }/",
         skipKeydownEvents: true,
         onEnter: function (el) {
-          viewModel.targetPath("${url('filebrowser.views.view', path=urlencode('/'))}" + stripHashes(el.val().substring(1)));
+          viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(el.val()));
           viewModel.getStats(function (data) {
             if (data.type != null && data.type == "file") {
               location.href = data.url;
@@ -1860,9 +1860,9 @@ from django.utils.translation import ugettext as _
         if (hash != null && hash != "") {
           addPathToHistory(hash);
 
-          targetPath = "${url('filebrowser.views.view', path=urlencode('/'))}";
+          targetPath = "${url('filebrowser.views.view', path='')}";
           if (hash.indexOf("!!") != 0) {
-            targetPath += stripHashes(hash.substring(1));
+            targetPath += stripHashes(hash);
           }
           else {
             targetPath = viewModel.targetPath() + hash;
