@@ -156,12 +156,16 @@ AssistHelper.prototype.fetchAssistData = function (url, successCallback, errorCa
       type: "GET",
       url: url + "?" + Math.random(),
       success: function (data) {
-        cachedData[url] = {
-          timestamp: (new Date()).getTime(),
-          data: data
-        };
-        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
-        successCallback(data);
+        if (data.code === 500){
+          errorCallback(data.error);
+        } else {
+          cachedData[url] = {
+            timestamp: (new Date()).getTime(),
+            data: data
+          };
+          $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
+          successCallback(data);
+        }
       },
       error: errorCallback
     });

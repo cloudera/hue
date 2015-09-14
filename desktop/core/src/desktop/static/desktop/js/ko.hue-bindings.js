@@ -1753,11 +1753,13 @@ ko.bindingHandlers.aceEditor = {
 
     var refreshTables = function() {
       currentAssistTables = {};
-      self.assistHelper.fetchTables(function(data) {
-        $.each(data.tables, function(index, table) {
-          currentAssistTables[table] = true;
-        });
-      })
+      if (typeof self.assistHelper.activeDatabase() != undefined && self.assistHelper.activeDatabase() != null) {
+        self.assistHelper.fetchTables(function(data) {
+          $.each(data.tables, function(index, table) {
+            currentAssistTables[table] = true;
+          });
+        })
+      }
     };
     self.assistHelper.activeDatabase.subscribe(refreshTables);
     refreshTables();
