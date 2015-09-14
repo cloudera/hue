@@ -102,6 +102,17 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-panel-column-no-stats">
+    <div class="arrow"></div>
+    <h3 class="popover-title" style="text-align: left">
+      <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
+      <strong class="table-name" data-bind="text: column"></strong> ${ _(' column analysis') }
+    </h3>
+    <div class="popover-content">
+      <div style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-panel-column-stats">
     <div class="pull-right filter" data-bind="visible: termsTabActive" style="display:none;">
       <input type="text" data-bind="textInput: prefixFilter" placeholder="${ _('Prefix filter...') }"/>
@@ -232,7 +243,9 @@ from desktop.views import _ko
       </div>
     </div>
 
-    <div id="tableAnalysis" style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="visible: analysisStats() != null, with: analysisStats">
+    <div id="tableAnalysis" style="position: fixed; display: none;" class="popover show right" data-bind="css: { 'mega-popover': analysisStats() != null && !analysisStats().isComplexType }, visible: analysisStats() != null, with: analysisStats">
+      <!-- ko template: {if: isComplexType, name: 'assist-panel-column-no-stats' } --><!-- /ko -->
+      <!-- ko ifnot: isComplexType -->
       <div class="arrow"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
@@ -250,6 +263,7 @@ from desktop.views import _ko
         <!-- ko template: {if: column == null, name: 'assist-panel-table-stats' } --><!-- /ko -->
         <!-- ko template: {ifnot: column == null, name: 'assist-panel-column-stats' } --><!-- /ko -->
       </div>
+      <!-- /ko -->
     </div>
   </script>
 
@@ -323,11 +337,16 @@ from desktop.views import _ko
                 if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
                   title += ' ' + columnDef.comment;
                 }
+                var shortType = null;
+                if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
+                  shortType = columnDef.type.match(/^[^<]*/g)[0]; // everything before '<'
+                }
                 return self.createEntry({
                   name: columnDef.name,
                   displayName: displayName,
                   title: title,
-                  isColumn: true
+                  isColumn: true,
+                  type: shortType
                 });
               }));
             } else if (typeof data.columns !== "undefined" && data.columns !== null) {
@@ -471,7 +490,7 @@ from desktop.views import _ko
         var columnName = hierarchy.length == 3 ? hierarchy[2] : null;
 
         self.statsVisible(true);
-        self.assistPanel.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistPanel.assistHelper));
+        self.assistPanel.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistPanel.assistHelper, self.definition.type));
 
         var catchChange = self.assistPanel.analysisStats.subscribe(function(newValue) {
           if (newValue === null || newValue.database !== databaseName || newValue.table !== tableName || newValue.column !== columnName) {
@@ -483,7 +502,7 @@ from desktop.views import _ko
         window.setTimeout(self.assistPanel.refreshPosition, 20);
       };
 
-      function TableStats (database, table, column, assistHelper) {
+      function TableStats (database, table, column, assistHelper, type) {
         var self = this;
 
         self.database = database;
@@ -499,6 +518,8 @@ from desktop.views import _ko
         self.terms = ko.observableArray();
         self.termsTabActive = ko.observable(false);
         self.prefixFilter = ko.observable().extend({'throttle': 500});
+        self.type = type
+        self.isComplexType = /^(map|array|struct)/i.test(type);
 
         self.prefixFilter.subscribe(function (newValue) {
           self.fetchTerms();
