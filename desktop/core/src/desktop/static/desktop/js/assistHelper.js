@@ -63,7 +63,7 @@ AssistHelper.prototype.fetchTableHtmlPreview = function(tableName, successCallba
   });
 };
 
-AssistHelper.prototype.refreshTableStats = function(tableName, successCallback, errorCallback) {
+AssistHelper.prototype.refreshTableStats = function(tableName, columnName, successCallback, errorCallback) {
   var self = this;
   var pollRefresh = function (url) {
     $.post(url, function (data) {
@@ -79,7 +79,7 @@ AssistHelper.prototype.refreshTableStats = function(tableName, successCallback, 
     }).fail(errorCallback);
   };
 
-  $.post("/" + self.options.app + "/api/analyze/" + self.activeDatabase() + "/" + tableName + "/", function (data) {
+  $.post("/" + self.options.app + "/api/analyze/" + self.activeDatabase() + "/" + tableName + "/"  + (columnName || ""), function (data) {
     if (data.status == 0 && data.watch_url) {
       pollRefresh(data.watch_url);
     } else {
