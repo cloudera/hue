@@ -108,3 +108,7 @@ class Api(object):
 
   def close_session(self, session):
     pass
+
+
+  def fetch_result(self, notebook, snippet, rows, start_over):
+    pass
