@@ -35,8 +35,8 @@ def query_error_handler(func):
       return func(*args, **kwargs)
     except Exception, e:
       message = force_unicode(str(e))
-      if 'Invalid query handle' in message or 'Invalid OperationHandle' in message:
-        raise QueryExpired(e)
+      if 'Class com.mysql.jdbc.Driver not found' in message:
+        raise QueryExpired(_('%s: did you export CLASSPATH=$CLASSPATH:/usr/share/java/mysql.jar?') % message)
       else:
         raise QueryError(message)
   return decorator
@@ -44,6 +44,9 @@ def query_error_handler(func):
 
 class JDBCApi(Api):
 
+  # TODO
+  # async with queuing system
+  # impersonation / prompting for username/password
   def execute(self, notebook, snippet):
     user = 'root'
     password = 'root'
@@ -64,7 +67,7 @@ class JDBCApi(Api):
     curs = db.cursor()
     curs.execute(snippet['statement'])
 
-    curs.description
+    print curs.description
     
     return {
       'result': curs.fetchmany(100)

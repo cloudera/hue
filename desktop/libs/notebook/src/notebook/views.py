@@ -30,7 +30,7 @@ from notebook.decorators import check_document_access_permission, check_document
 from notebook.connectors.base import Notebook, get_api
 from notebook.management.commands.notebook_setup import Command
 from notebook.connectors.spark_shell import SparkApi
-from notebook.conf import INTERPRETERS
+from notebook.conf import get_interpreters
 
 
 LOG = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ def notebook(request):
   return render('notebook.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
-          'languages': [{"name": INTERPRETERS.get()[i].NAME.get(), "type": i} for i in INTERPRETERS.get()],
+          'languages': get_interpreters(),
           'snippet_placeholders' : {
               'sql': _('Example: 1 + 1, or press CTRL + space'),
               'spark': _('Example: 1 + 1, or press CTRL + space'),

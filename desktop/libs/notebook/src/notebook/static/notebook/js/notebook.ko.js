@@ -406,7 +406,7 @@ var Snippet = function (vm, notebook, snippet) {
         self.result.handle(data.handle);
         self.result.hasResultset(data.handle.has_result_set);
         self.checkStatus();
-      } else {
+      } else {console.log('aaa');
         self._ajaxError(data, self.execute);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
