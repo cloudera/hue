@@ -26,8 +26,8 @@ from django.utils.translation import ugettext as _
         <li>
             <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="fa fa-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
             <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px">
-                <li data-bind="visible: label == '/'"><a href="#" data-bind="click: show"><span class="divider" data-bind="text: label"></span></a></li>
-                <li data-bind="visible: label != '/'"><a href="#" data-bind="text: label, click: show"></a><span class="divider">/</span></li>
+                <li data-bind="visible: label.slice(-1) == '/'"><a href="#" data-bind="click: show"><span class="divider" data-bind="text: label"></span></a></li>
+                <li data-bind="visible: label.slice(-1) != '/'"><a href="#" data-bind="text: label, click: show"></a><span class="divider">/</span></li>
             </ul>
             <input id="hueBreadcrumbText" type="text" class="input-xxlarge" style="margin-top:4px;margin-right:4px;display:none" data-bind="value: currentPath" autocomplete="off" />
         </li>
@@ -48,12 +48,17 @@ from django.utils.translation import ugettext as _
         <li>
             <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
                     % for breadcrumb_item in breadcrumbs:
-                    <% label = breadcrumb_item['label'] %>
-                    %if label == '/':
-                            <li><a href="/filebrowser/view=${breadcrumb_item['url']}"><span
-                                    class="divider">${label}</span></a></li>
+                    <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
+                    %if label[-1] == '/':
+                            <li>
+                              <a href="${url('filebrowser.views.view', path=f_url)}">
+                                <span class="divider">${label}</span>
+                              </a>
+                            </li>
                     %else:
-                            <li><a href="/filebrowser/view=${breadcrumb_item['url']}">${label}</a><span class="divider">/</span></li>
+                            <li>
+                              <a href="${url('filebrowser.views.view', path=f_url)}">${label}</a>
+                              <span class="divider">/</span></li>
                     %endif
                     % endfor
             </ul>

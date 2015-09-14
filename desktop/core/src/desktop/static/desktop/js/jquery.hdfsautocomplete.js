@@ -211,18 +211,16 @@
     var BASE_PATH = "/filebrowser/view=";
     var _currentFiles = [];
 
+    function prepareAutocompletePath(path) {
+      if (path.indexOf('/') == 0 || /^([a-zA-Z0-9]+):\/\//.test(path))
+        return path.substr(0, path.lastIndexOf("/") + 1);
+      if (path.indexOf("/") > 0)
+        return _this.options.home + path.substr(0, path.lastIndexOf("/"));
+      return _this.options.home;
+    }
+
     function showHdfsAutocomplete(callback) {
-      var path = _el.val();
-      var autocompleteUrl = BASE_PATH;
-      if (path.indexOf("/") == 0) {
-        autocompleteUrl += path.substr(0, path.lastIndexOf("/"));
-      }
-      else if (path.indexOf("/") > 0) {
-        autocompleteUrl += _this.options.home + path.substr(0, path.lastIndexOf("/"));
-      }
-      else {
-        autocompleteUrl += _this.options.home;
-      }
+      autocompleteUrl = BASE_PATH + prepareAutocompletePath(_el.val());
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
         _currentFiles = [];
         if (data.error == null) {

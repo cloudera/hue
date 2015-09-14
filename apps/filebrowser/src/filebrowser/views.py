@@ -31,7 +31,6 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.core import urlresolvers
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
@@ -50,12 +49,13 @@ from avro import datafile, io
 from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
+from desktop.lib.django_util import make_absolute, render, format_preserving_redirect
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.fs import splitpath
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
-from hadoop.fs.fsutils import do_newfile_save, do_overwrite_save
+from hadoop.fs.fsutils import do_overwrite_save
 
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
@@ -262,14 +262,13 @@ def save_file(request):
     if not is_valid:
         return edit(request, path, form=form)
 
+    encoding = form.cleaned_data['encoding']
+    data = form.cleaned_data['contents'].encode(encoding)
+
     if request.fs.exists(path):
-        do_overwrite_save(request.fs, path,
-                           form.cleaned_data['contents'],
-                           form.cleaned_data['encoding'])
+        do_overwrite_save(request.fs, path, data)
     else:
-        do_newfile_save(request.fs, path,
-                         form.cleaned_data['contents'],
-                         form.cleaned_data['encoding'])
+        request.fs.create(path, overwrite=False, data=data)
 
     messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
     request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
@@ -277,14 +276,13 @@ def save_file(request):
 
 
 def parse_breadcrumbs(path):
-    breadcrumbs_parts = Hdfs.normpath(path).split('/')
-    i = 1
-    breadcrumbs = [{'url': '', 'label': '/'}]
-    while (i < len(breadcrumbs_parts)):
-        breadcrumb_url = breadcrumbs[i - 1]['url'] + '/' + breadcrumbs_parts[i]
-        if breadcrumb_url != '/':
-            breadcrumbs.append({'url': breadcrumb_url, 'label': breadcrumbs_parts[i]})
-        i = i + 1
+    parts = splitpath(path)
+    url, breadcrumbs = '', []
+    for part in parts:
+      if url and not url.endswith('/'):
+        url += '/'
+      url += part
+      breadcrumbs.append({'url': url, 'label': part})
     return breadcrumbs
 
 
@@ -327,7 +325,7 @@ def listdir(request, path, chooser):
     stats = request.fs.listdir_stats(path)
 
     # Include parent dir, unless at filesystem root.
-    if Hdfs.normpath(path) != posixpath.sep:
+    if not request.fs.isroot(path):
         parent_path = request.fs.join(path, "..")
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
@@ -411,7 +409,7 @@ def listdir_paged(request, path):
     shown_stats = page.object_list
 
     # Include parent dir always as second option, unless at filesystem root.
-    if Hdfs.normpath(path) != posixpath.sep:
+    if not request.fs.isroot(path):
         parent_path = request.fs.join(path, "..")
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
@@ -483,7 +481,7 @@ def _massage_stats(request, stats):
     into the format that the views would like it in.
     """
     path = stats['path']
-    normalized = Hdfs.normpath(path)
+    normalized = request.fs.normpath(path)
     return {
         'path': normalized,
         'name': stats['name'],
