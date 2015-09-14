@@ -20,6 +20,15 @@ from django.utils.translation import ugettext_lazy as _t
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
 
 
+def get_interpreters():
+  return [{
+      "name": INTERPRETERS.get()[i].NAME.get(),
+      "type": i,
+      "interface": INTERPRETERS.get()[i].INTERFACE.get()}
+      for i in INTERPRETERS.get()
+  ]
+
+
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
   help="One entry for each type of snippet",

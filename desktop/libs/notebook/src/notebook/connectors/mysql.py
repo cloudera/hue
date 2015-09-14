@@ -16,14 +16,13 @@
 # limitations under the License.
 
 import logging
-import re
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
-from notebook.connectors.base import Api, QueryError, QueryExpired
+from librdbms.server import dbms
 
-import jaydebeapi
+from notebook.connectors.base import Api, QueryError, QueryExpired
 
 
 LOG = logging.getLogger(__name__)
@@ -45,29 +44,14 @@ def query_error_handler(func):
 class MySqlApi(Api):
 
   def execute(self, notebook, snippet):
-    user = 'root'
-    password = 'root'
+    query_server = dbms.get_query_server_config(server='mysql')
+    db = dbms.get(self.user, query_server)
+    table = db.execute_statement()
     
-    host = 'localhost'
-    port = 3306
-    database = 'test'
-    
-    autocommit = True
-    jclassname = "com.mysql.jdbc.Driver"
-    url = "jdbc:mysql://{host}:{port}/{database}".format(host=host, port=port, database=database)
-    driver_args = [url, user, password]
-    jars = None
-    libs = None
-    db = jaydebeapi.connect(jclassname, driver_args, jars=jars, libs=libs)
-    db.jconn.setAutoCommit(autocommit)
-    
-    curs = db.cursor()
-    curs.execute(snippet['statement'])
-
-    curs.description
+    print table
     
     return {
-      'result': curs.fetchmany(100)
+      'result': table
     }
 
   @query_error_handler
@@ -75,17 +59,7 @@ class MySqlApi(Api):
     return {'status': 'running'}
 
   def _fetch_result(self, cursor):
-
-    return {
-        'has_more': results.has_more,
-        'data': list(results.rows()),
-        'meta': [{
-          'name': column.name,
-          'type': column.type,
-          'comment': column.comment
-        } for column in results.data_table.cols()],
-        'type': 'table'
-    }
+    return {}
 
   @query_error_handler
   def fetch_result_metadata(self):
@@ -101,21 +75,6 @@ class MySqlApi(Api):
 
   def download(self, notebook, snippet, format):
     raise PopupException('Downloading is not supported yet')
-
-  def _progress(self, snippet, logs):
-    if snippet['type'] == 'hive':
-      match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
-      total = (int(match.group(1)) if match else 1) * 2
-
-      started = logs.count('Starting Job')
-      ended = logs.count('Ended Job')
-
-      return int((started + ended) * 100 / total)
-    elif snippet['type'] == 'impala':
-      match = re.search('(\d+)% Complete', logs, re.MULTILINE)
-      return int(match.group(1)) if match else 0
-    else:
-      return 50
 
   @query_error_handler
   def close_statement(self, snippet):

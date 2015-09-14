@@ -18,7 +18,12 @@
 import json
 import logging
 
+from django.utils.translation import ugettext as _
+
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+
+from notebook.conf import get_interpreters
 
 
 LOG = logging.getLogger(__name__)
@@ -73,17 +78,28 @@ class Notebook():
 
 
 def get_api(user, snippet):
-  from notebook.connectors.hiveserver2 import HS2Api
-  from notebook.connectors.spark_batch import SparkBatchApi
+  from notebook.connectors.hiveserver2 import HS2Api  
+  from notebook.connectors.mysql import MySqlApi
+  from notebook.connectors.jdbc import JDBCApi
   from notebook.connectors.text import TextApi
   from notebook.connectors.spark_shell import SparkApi
+  from notebook.connectors.spark_batch import SparkBatchApi
 
-  if snippet['type'] in ('hive', 'impala', 'spark-sql'):
+  interface = [interpreter for interpreter in get_interpreters() if interpreter['type'] == snippet['type']]
+  if not interface:
+    raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
+  interface = interface[0]['interface']
+
+  if interface == 'hiveserver2':
     return HS2Api(user)
-  elif snippet['type'] in ('jar', 'py'):
+  elif interface == 'spark-submit':
     return SparkBatchApi(user)
-  elif snippet['type'] == 'text':
+  elif interface == 'text':
     return TextApi(user)
+  elif interface == 'mysql':
+    return MySqlApi(user)
+  elif interface == 'jdbc':
+    return JDBCApi(user)
   else:
     return SparkApi(user)
 
