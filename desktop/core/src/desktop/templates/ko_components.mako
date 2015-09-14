@@ -250,7 +250,7 @@ from desktop.views import _ko
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
         <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
-        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
+        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
         <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
         <strong class="table-name" data-bind="text: table"></strong> ${ _(' table analysis') }
@@ -518,7 +518,7 @@ from desktop.views import _ko
         self.terms = ko.observableArray();
         self.termsTabActive = ko.observable(false);
         self.prefixFilter = ko.observable().extend({'throttle': 500});
-        self.type = type
+        self.type = type;
         self.isComplexType = /^(map|array|struct)/i.test(type);
 
         self.prefixFilter.subscribe(function (newValue) {
@@ -570,7 +570,7 @@ from desktop.views import _ko
         var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
         self.refreshing(true);
 
-        self.assistHelper.refreshTableStats(self.table, function() {
+        self.assistHelper.refreshTableStats(self.table, self.column, function() {
           self.refreshing(false);
           self.fetchData();
           if (shouldFetchTerms) {
