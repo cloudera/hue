@@ -194,7 +194,7 @@ from desktop.views import _ko
           <span>${ _('The database list cannot be loaded.') }</span>
         </li>
 
-        <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases()">
+        <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases() && ! hasErrors()">
           ${_('tables')}
           <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
             <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
