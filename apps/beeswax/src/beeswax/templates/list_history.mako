@@ -42,7 +42,6 @@ ${ layout.menubar(section='history') }
     % if request.user == design.owner:
     </a>
     % else:
-    ## TODO (bc/nutron): Shouldn't be able to edit someone else's design. Let user clone instead.
     <a href="${ url(app_name + ':clone_design', design_id=design.id) }" title="${_('Copy this query.')}">${_('Copy')}</a>
     % endif
   % else:
@@ -102,14 +101,12 @@ ${ layout.menubar(section='history') }
 
             <%actionbar:render>
               <%def name="search()">
-                <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc.')}" value="${ filter }">
+                <input id="filter" type="text" class="input-xxlarge search-query" placeholder="${_('Search for name, query, etc.')}" data-bind="textInput: searchQuery">
               </%def>
             </%actionbar:render>
 
             <div class="card-body">
               <p>
-
-            <img id="spinner" src="${ static('desktop/art/spinner.gif') }" class="hide" />
 
             <table class="table table-striped table-condensed datatables" style="padding-left: 0;">
             <thead>
@@ -156,10 +153,22 @@ ${ layout.menubar(section='history') }
     </div>
 </div>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
+
+    function HistoryViewModel() {
+      this.searchQuery = ko.observable("${ filter }").extend({ throttle: 500 });
+      this.searchQuery.subscribe(function (val) {
+        $(".datatables").css("opacity", 0.5)
+        $(".pagination").css("opacity", 0.5)
+        location.href = '?${ filter_params.get(prefix + 'user') and (prefix + 'user=' + filter_params.get(prefix + 'user') + '&') or '' }${ prefix }search=' + val;
+      });
+    }
+
+    ko.applyBindings(new HistoryViewModel());
 
     var locale = window.navigator.userLanguage || window.navigator.language;
     moment.locale(locale);
@@ -199,15 +208,7 @@ ${ layout.menubar(section='history') }
       "bStateSave": true
     });
 
-    $(".search-query").jHueDelayedInput(function(){
-      $("#spinner").show();
-      $(".datatables").hide();
-      $(".pagination").hide();
-      location.href = '?${ filter_params.get(prefix + 'user') and (prefix + 'user=' + filter_params.get(prefix + 'user') + '&') or '' }${ prefix }search='+$(".search-query").val();
-    }, 500);
-
-    var _val = $(".search-query").val();
-    $(".search-query").focus().val("").val(_val);
+    $(".search-query").focus().val($(".search-query").val());
 
     $("a[data-row-selector='true']").jHueRowSelector();
   });
