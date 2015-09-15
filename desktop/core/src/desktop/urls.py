@@ -132,20 +132,16 @@ if settings.OPENID_AUTHENTICATION:
 if settings.OAUTH_AUTHENTICATION:
   static_patterns.append((r'^oauth/', include('liboauth.urls')))
 
-# Add indexer app
-if 'search' in [app.name for app in appmanager.DESKTOP_APPS]:
-  namespace = {'namespace': 'indexer', 'app_name': 'indexer'}
-  dynamic_patterns.extend( patterns('', ('^indexer/', include('indexer.urls', **namespace))) )
-
 # Root each app at /appname if they have a "urls" module
-for app in appmanager.DESKTOP_APPS:
+for app in appmanager.DESKTOP_MODULES:
   if app.urls:
     if app.is_url_namespaced:
       namespace = {'namespace': app.name, 'app_name': app.name}
     else:
       namespace = {}
-    dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
-    app.urls_imported = True
+    if namespace or app in appmanager.DESKTOP_APPS:
+      dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
+      app.urls_imported = True
 
 static_patterns.append(
     (r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),
