@@ -534,7 +534,7 @@
   # - name: is the nice name to print in the notebook
   # - interface: is the connector to use to talk to the server:
   #   * hiveserver2 is configurable in [beeswax] and [impala]
-  #   * livy and livy-batch are configurable in [spark]
+  #   * livy and livy-batch are configurable for spark shell and spark-submit, respectively
   #   * dbms-X in [libdbms] [[X]]
   #   * jdbc in [jdbc]
   #   * odbc in [odbc]
@@ -546,32 +546,47 @@
   name=Hive
   interface=hiveserver2
 
-  [impala]
+  [[[impala]]]
   name=Impala
   interface=hiveserver2
 
-  [pyspark]
+  [[[scala]]]
+  name=Scala
+  interface=livy
+
+  [[[pyspark]]]
   name=PySpark
   interface=livy
 
-  [spark-submit]
-  name=Spark Submit
+  [[[r]]]
+  name=R
+  interface=livy
+
+  [[[jar]]]
+  name=Spark Submit Jar
   interface=livy-batch
 
-  [phoenix]
+  [[[py]]]
+  name=Spark Submit Python
+  interface=livy-batch
+
+  [[[phoenix]]]
   name=Phoenix
   interface=jdbc
 
-  [mysql]
+  [[[mysql]]]
   name=MySql
   interface=dbms-mysql
   # interface=jdbc
   # interface=odbc
 
-  [pig]
+  [[[pig]]]
   name=Pig
   interface=pig
 
+  [[[text]]]
+  name=Text
+  interface=text
 
 [jdbc]
   [[mysql]]
