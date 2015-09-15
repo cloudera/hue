@@ -20,8 +20,9 @@ import re
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from django.utils.translation import ugettext as _
 
-from notebook.connectors.base import Api, QueryError, QueryExpired
+from notebook.connectors.base import Api, QueryError
 
 import jaydebeapi
 
@@ -36,7 +37,7 @@ def query_error_handler(func):
     except Exception, e:
       message = force_unicode(str(e))
       if 'Class com.mysql.jdbc.Driver not found' in message:
-        raise QueryExpired(_('%s: did you export CLASSPATH=$CLASSPATH:/usr/share/java/mysql.jar?') % message)
+        raise QueryError(_('%s: did you export CLASSPATH=$CLASSPATH:/usr/share/java/mysql.jar?') % message)
       else:
         raise QueryError(message)
   return decorator
@@ -47,6 +48,7 @@ class JDBCApi(Api):
   # TODO
   # async with queuing system
   # impersonation / prompting for username/password
+  @query_error_handler
   def execute(self, notebook, snippet):
     user = 'root'
     password = 'root'
@@ -67,28 +69,32 @@ class JDBCApi(Api):
     curs = db.cursor()
     curs.execute(snippet['statement'])
 
-    print curs.description
+    data = curs.fetchmany(100)
+    description = curs.description
+    
+    curs.close()
+    db.close()
     
     return {
-      'result': curs.fetchmany(100)
+      'sync': True,
+      'result': {
+        'has_more': False,
+        'data': list(data),
+        'meta': [{
+          'name': column[0],
+          'type': 'TODO',
+          'comment': ''
+        } for column in description],
+        'type': 'table'
+      }
     }
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    return {'status': 'running'}
+    return {'status': 'available'}
 
   def _fetch_result(self, cursor):
-
-    return {
-        'has_more': results.has_more,
-        'data': list(results.rows()),
-        'meta': [{
-          'name': column.name,
-          'type': column.type,
-          'comment': column.comment
-        } for column in results.data_table.cols()],
-        'type': 'table'
-    }
+    return {}
 
   @query_error_handler
   def fetch_result_metadata(self):
@@ -98,12 +104,11 @@ class JDBCApi(Api):
   def cancel(self, notebook, snippet):
     return {'status': 0}
 
-  @query_error_handler
-  def get_log(self, notebook, snippet, startFrom=None, size=None):
-    return 'No logs'
-
   def download(self, notebook, snippet, format):
     raise PopupException('Downloading is not supported yet')
+
+  def _get_jobs(self, logs):
+    return []
 
   def _progress(self, snippet, logs):
     if snippet['type'] == 'hive':

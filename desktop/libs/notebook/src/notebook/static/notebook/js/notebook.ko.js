@@ -405,8 +405,14 @@ var Snippet = function (vm, notebook, snippet) {
         self.result.clear();
         self.result.handle(data.handle);
         self.result.hasResultset(data.handle.has_result_set);
-        self.checkStatus();
-      } else {console.log('aaa');
+        if (data.handle.sync) {
+          self.loadData(data.handle, 100);
+          self.status('success');
+          self.progress(100);
+        } else {
+          self.checkStatus();
+        }
+      } else {
         self._ajaxError(data, self.execute);
       }
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -431,34 +437,7 @@ var Snippet = function (vm, notebook, snippet) {
       startOver: startOver
     }, function (data) {
       if (data.status == 0) {
-        rows -= data.result.data.length;
-
-        var _initialIndex = self.result.data().length;
-        var _tempData = [];
-        $.each(data.result.data, function (index, row) {
-          row.unshift(_initialIndex + index);
-          self.result.data.push(row);
-          _tempData.push(row);
-        });
-
-        self.result.images(typeof data.result.images != "undefined" && data.result.images != null ? data.result.images : []);
-
-        $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
-
-        if (!self.result.fetchedOnce()) {
-          data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
-          self.result.meta(data.result.meta);
-          self.result.type(data.result.type);
-          self.result.fetchedOnce(true);
-        }
-
-        if (data.result.has_more && rows > 0) {
-          setTimeout(function () {
-            self.fetchResultData(rows, false);
-          }, 500);
-        } else if (notebook.snippets()[notebook.snippets().length - 1] == self) {
-          notebook.newSnippet();
-        }
+        self.loadData(data, rows);
       } else {
         self._ajaxError(data);
         $(document).trigger("renderDataError", {snippet: self});
@@ -468,6 +447,37 @@ var Snippet = function (vm, notebook, snippet) {
     });
   };
 
+  self.loadData = function (data, rows) {
+    rows -= data.result.data.length;
+
+    var _initialIndex = self.result.data().length;
+    var _tempData = [];
+    $.each(data.result.data, function (index, row) {
+      row.unshift(_initialIndex + index);
+      self.result.data.push(row);
+      _tempData.push(row);
+    });
+
+    self.result.images(typeof data.result.images != "undefined" && data.result.images != null ? data.result.images : []);
+
+    $(document).trigger("renderData", {data: _tempData, snippet: self, initial: _initialIndex == 0});
+
+    if (! self.result.fetchedOnce()) {
+      data.result.meta.unshift({type: "INT_TYPE", name: "", comment: null});
+      self.result.meta(data.result.meta);
+      self.result.type(data.result.type);
+      self.result.fetchedOnce(true);
+    }
+
+    if (data.result.has_more && rows > 0) {
+      setTimeout(function () {
+        self.fetchResultData(rows, false);
+      }, 500);
+    } else if (notebook.snippets()[notebook.snippets().length - 1] == self) {
+      notebook.newSnippet();
+    }
+  };
+  
   self.fetchResultMetadata = function () {
     $.post("/notebook/api/fetch_result_metadata", {
       notebook: ko.mapping.toJSON(notebook.getContext()),
