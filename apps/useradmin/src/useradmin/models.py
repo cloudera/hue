@@ -303,7 +303,7 @@ def install_sample_user():
     LOG.info('Sample user found: %s' % user.username)
     if user.username != SAMPLE_USER_INSTALL:
       with transaction.atomic():
-        user = auth_models.User.objects.filter(id=SAMPLE_USER_ID).select_for_update()[0]
+        user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
         user.username = SAMPLE_USER_INSTALL
         user.save()
   except auth_models.User.DoesNotExist:
