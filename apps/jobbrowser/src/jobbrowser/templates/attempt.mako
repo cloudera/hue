@@ -30,14 +30,14 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Attempt ID')}</li>
-          <li class="white hellipsify">${attempt.attemptId_short}</li>
+          <li class="white truncate" title="${attempt.attemptId_short}">${attempt.attemptId_short}</li>
           <li class="nav-header">${_('Task')}</li>
           <li><a href="${url('jobbrowser.views.single_task', job=joblnk.jobId, taskid=taskid)}"
-                 class="hellipsify">${task.taskId_short}</a>
+                 class="truncate" title="${task.taskId_short}">${task.taskId_short}</a>
           </li>
           <li class="nav-header">${_('Job')}</li>
           <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}"
-                 class="hellipsify">${joblnk.jobId_short}</a></li>
+                 class="truncate" title="${joblnk.jobId_short}">${joblnk.jobId_short}</a></li>
           <li class="nav-header">${_('Status')}</li>
           <li class="white">
             <%
@@ -210,8 +210,6 @@ ${ comps.menubar() }
     if (window.location.hash != null && window.location.hash.length > 1) {
       $('#tabs a[href="#' + window.location.hash.substring(2).replace(/(<([^>]+)>)/ig, "") + '"]').tab('show');
     }
-
-    hellipsify();
   });
 </script>
 
