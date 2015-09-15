@@ -106,13 +106,13 @@ from desktop.views import _ko
     <div class="pull-right filter" data-bind="visible: termsTabActive" style="display:none;">
       <input type="text" data-bind="textInput: prefixFilter" placeholder="${ _('Prefix filter...') }"/>
     </div>
-    <ul class="nav nav-tabs" role="tablist">
-      <li data-bind="click: function() { termsTabActive(false) }"class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
+    <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 0">
+      <li data-bind="click: function() { termsTabActive(false) }" class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
       <li data-bind="click: function() { termsTabActive(true) }"><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
-        <div data-bind="visible: isComplexType" style="padding: 10px;">${ _('Column stats are currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
+        <div class="alert" data-bind="visible: isComplexType" style="margin: 5px">${ _('Column stats are currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
         <div class="content" data-bind="ifnot: isComplexType">
           <table class="table table-striped">
             <tbody data-bind="foreach: statRows">
@@ -249,9 +249,11 @@ from desktop.views import _ko
       </h3>
       <div class="popover-content">
         <div class="alert" style="text-align: left; display:none" data-bind="visible: hasError">${ _('There is no analysis available') }</div>
-
-        <!-- ko template: {if: column == null && ! hasError(), name: 'assist-panel-table-stats' } --><!-- /ko -->
-        <!-- ko template: {if: column != null && ! hasError(), name: 'assist-panel-column-stats' } --><!-- /ko -->
+        <!-- ko if: isComplexType && assistHelper.app == 'impala' -->
+        <div class="alert" style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
+        <!-- /ko -->
+        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && assistHelper.app == 'impala'), name: 'assist-panel-table-stats' } --><!-- /ko -->
+        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && assistHelper.app == 'impala'), name: 'assist-panel-column-stats' } --><!-- /ko -->
       </div>
     </div>
   </script>
@@ -579,7 +581,7 @@ from desktop.views import _ko
 
       TableStats.prototype.fetchTerms = function () {
         var self = this;
-        if (self.column == null) {
+        if (self.column == null || (self.isComplexType && self.assistHelper.app == "impala")) {
           return;
         }
 
