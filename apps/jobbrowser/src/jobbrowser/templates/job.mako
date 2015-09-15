@@ -107,9 +107,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
-          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white hellipsify">${job.applicationType}</li>
+          <li class="white truncate" title="${job.applicationType}">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -212,9 +212,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Job ID')}</li>
-          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white hellipsify">${job.applicationType or 'MR2'}</li>
+          <li class="white truncate" title="${job.applicationType or 'MR2'}">${job.applicationType or 'MR2'}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -429,9 +429,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
-          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white hellipsify">${job.applicationType}</li>
+          <li class="white truncate" title="${job.applicationType}">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -756,8 +756,6 @@ $(document).ready(function () {
       callJobDetails();
     }
   }, 2000);
-
-  hellipsify();
 
   $("a[data-row-selector='true']").jHueRowSelector();
 });
