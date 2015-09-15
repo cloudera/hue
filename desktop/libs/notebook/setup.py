@@ -25,5 +25,5 @@ setup(
       packages = find_packages('src'),
       package_dir = {'': 'src'},
       install_requires = ['setuptools', 'desktop'],
-      entry_points = { 'desktop.sdk.application': 'notebook=notebook' },
+      entry_points = { 'desktop.sdk.lib': 'notebook=notebook' },
 )
