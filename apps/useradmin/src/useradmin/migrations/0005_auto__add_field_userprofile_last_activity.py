@@ -9,9 +9,13 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding field 'UserProfile.last_activity'
-        db.add_column(u'useradmin_userprofile', 'last_activity',
-                      self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(1969, 12, 31, 0, 0)),
-                      keep_default=False)
+        if db.backend_name.lower() == 'oracle':
+            # Oracle requires strict TO_DATE format to be specified
+            db.execute("ALTER TABLE \"USERADMIN_USERPROFILE\" ADD \"LAST_ACTIVITY\" TIMESTAMP DEFAULT TO_DATE('1969-12-31 00:00:00', 'YYYY-MM-DD HH24:MI:SS') NOT NULL")
+        else:
+            db.add_column(u'useradmin_userprofile', 'last_activity',
+                          self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(1969, 12, 31, 0, 0)),
+                          keep_default=False)
 
 
     def backwards(self, orm):
