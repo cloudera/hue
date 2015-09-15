@@ -204,7 +204,7 @@ class TestUserAdminLdap(BaseUserAdminTests):
       test_admins = Group.objects.get(name='Test Administrators')
       assert_equal(test_admins.user_set.all().count(), 2)
       larry = User.objects.get(username='lårry')
-      assert_equal(test_admins.user_set.all()[0].username, larry.username)
+      assert_equal(test_admins.user_set.all().order_by('username')[1].username, larry.username)
 
       # Only sync already imported
       assert_equal(test_users.user_set.all().count(), 3)
