@@ -34,7 +34,7 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Job ID')}</li>
-          <li class="white hellipsify">${ jobid }</li>
+          <li class="white truncate" title="${ jobid }">${ jobid }</li>
         </ul>
       </div>
     </div>
