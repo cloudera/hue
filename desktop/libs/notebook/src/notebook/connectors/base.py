@@ -92,7 +92,9 @@ def get_api(user, snippet):
 
   if interface == 'hiveserver2':
     return HS2Api(user)
-  elif interface == 'spark-submit':
+  elif interface == 'livy':
+    return SparkApi(user)
+  elif interface == 'livy-batch':
     return SparkBatchApi(user)
   elif interface == 'text':
     return TextApi(user)
@@ -101,7 +103,7 @@ def get_api(user, snippet):
   elif interface == 'jdbc':
     return JDBCApi(user)
   else:
-    return SparkApi(user)
+    raise PopupException(_('Notebook connector interface not recognized: ') % interface)
 
 
 def _get_snippet_session(notebook, snippet):
