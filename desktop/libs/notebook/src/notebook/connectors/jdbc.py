@@ -17,6 +17,7 @@
 
 import logging
 import re
+import sys
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
@@ -24,10 +25,13 @@ from django.utils.translation import ugettext as _
 
 from notebook.connectors.base import Api, QueryError
 
-import jaydebeapi
-
 
 LOG = logging.getLogger(__name__)
+
+try:
+  import jaydebeapi
+except ImportError, e:
+  LOG.exception('Failed to import jaydebeapi')
 
 
 def query_error_handler(func):
@@ -50,6 +54,9 @@ class JDBCApi(Api):
   # impersonation / prompting for username/password
   @query_error_handler
   def execute(self, notebook, snippet):
+    if 'jaydebeapi' not in sys.modules:
+      raise Exception('Required jaydebeapi module is not imported.')
+
     user = 'root'
     password = 'root'
     
@@ -63,6 +70,7 @@ class JDBCApi(Api):
     driver_args = [url, user, password]
     jars = None
     libs = None
+
     db = jaydebeapi.connect(jclassname, driver_args, jars=jars, libs=libs)
     db.jconn.setAutoCommit(autocommit)
     
