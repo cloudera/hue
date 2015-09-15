@@ -585,14 +585,14 @@ from desktop.views import _ko
                 percent: (parseFloat(term[1]) / parseFloat(data.terms[0][1])) * 100
               }
             }));
+          } else if (data && data.message) {
+            $(document).trigger("error", data.message);
           } else {
-            $("#tableAnalysis").hide();
             $(document).trigger("error", "${ _('There was a problem loading the terms.') }");
           }
           self.loadingTerms(false);
         }, function (e) {
           if (e.status == 500) {
-            $("#tableAnalysis").hide();
             $(document).trigger("error", "${ _('There was a problem loading the terms.') }");
           }
           self.loadingTerms(false);
