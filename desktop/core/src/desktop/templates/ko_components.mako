@@ -102,17 +102,6 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/html" id="assist-panel-column-no-stats">
-    <div class="arrow"></div>
-    <h3 class="popover-title" style="text-align: left">
-      <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
-      <strong class="table-name" data-bind="text: column"></strong> ${ _(' column analysis') }
-    </h3>
-    <div class="popover-content">
-      <div style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
-    </div>
-  </script>
-
   <script type="text/html" id="assist-panel-column-stats">
     <div class="pull-right filter" data-bind="visible: termsTabActive" style="display:none;">
       <input type="text" data-bind="textInput: prefixFilter" placeholder="${ _('Prefix filter...') }"/>
@@ -123,7 +112,8 @@ from desktop.views import _ko
     </ul>
     <div class="tab-content">
       <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
-        <div class="content">
+        <div data-bind="visible: isComplexType" style="padding: 10px;">${ _('Column stats are currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
+        <div class="content" data-bind="ifnot: isComplexType">
           <table class="table table-striped">
             <tbody data-bind="foreach: statRows">
               <tr><th data-bind="text: Object.keys($data)[0]"></th><td data-bind="text: $data[Object.keys($data)[0]]"></td></tr>
@@ -243,13 +233,11 @@ from desktop.views import _ko
       </div>
     </div>
 
-    <div id="tableAnalysis" style="position: fixed; display: none;" class="popover show right" data-bind="css: { 'mega-popover': analysisStats() != null && !analysisStats().isComplexType }, visible: analysisStats() != null, with: analysisStats">
-      <!-- ko template: {if: isComplexType, name: 'assist-panel-column-no-stats' } --><!-- /ko -->
-      <!-- ko ifnot: isComplexType -->
+    <div id="tableAnalysis" style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="visible: analysisStats() != null, with: analysisStats">
       <div class="arrow"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parent.analysisStats(null) }"><i class="fa fa-times"></i></a>
-        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
+        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
         <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
         <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
@@ -263,7 +251,6 @@ from desktop.views import _ko
         <!-- ko template: {if: column == null, name: 'assist-panel-table-stats' } --><!-- /ko -->
         <!-- ko template: {ifnot: column == null, name: 'assist-panel-column-stats' } --><!-- /ko -->
       </div>
-      <!-- /ko -->
     </div>
   </script>
 
