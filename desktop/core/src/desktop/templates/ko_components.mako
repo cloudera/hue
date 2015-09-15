@@ -248,8 +248,10 @@ from desktop.views import _ko
         <!-- /ko -->
       </h3>
       <div class="popover-content">
-        <!-- ko template: {if: column == null, name: 'assist-panel-table-stats' } --><!-- /ko -->
-        <!-- ko template: {ifnot: column == null, name: 'assist-panel-column-stats' } --><!-- /ko -->
+        <div class="alert" style="text-align: left; display:none" data-bind="visible: hasError">${ _('There is no analysis available') }</div>
+
+        <!-- ko template: {if: column == null && ! hasError(), name: 'assist-panel-table-stats' } --><!-- /ko -->
+        <!-- ko template: {if: column != null && ! hasError(), name: 'assist-panel-column-stats' } --><!-- /ko -->
       </div>
     </div>
   </script>
@@ -498,6 +500,7 @@ from desktop.views import _ko
         self.assistHelper = assistHelper;
 
         self.loading = ko.observable(false);
+        self.hasError = ko.observable(false);
         self.refreshing = ko.observable(false);
         self.loadingTerms = ko.observable(false);
         self.inaccurate = ko.observable(false);
@@ -524,6 +527,7 @@ from desktop.views import _ko
       TableStats.prototype.fetchData = function () {
         var self = this;
         self.loading(true);
+        self.hasError(false);
         self.assistHelper.fetchStats(self.table, self.column != null ? self.column : null, function (data) {
           if (data && data.status == 0) {
             self.statRows(data.stats);
@@ -535,16 +539,20 @@ from desktop.views import _ko
               }
             }
             self.inaccurate(inaccurate);
+          } else if (data && data.message) {
+            $(document).trigger("error", data.message);
+            self.hasError(true);
           } else {
-            $("#tableAnalysis").hide();
+            $(document).trigger("error", "${ _('There was a problem loading the stats.') }");
+            self.hasError(true);
           }
           self.loading(false);
         },
         function (e) {
           if (e.status == 500) {
             $(document).trigger("error", "${ _('There was a problem loading the stats.') }");
-            $("#tableAnalysis").hide();
           }
+          self.hasError(true);
           self.loading(false);
         });
       };
@@ -751,7 +759,13 @@ from desktop.views import _ko
           if (callback) {
             callback();
           }
-        }, function() {
+        }, function(message) {
+          if (message) {
+            $(document).trigger("error", message);
+          } else {
+            $(document).trigger("error", "${ _('There was a problem loading the databases.') }");
+          }
+
           self.loadingDatabases(false);
           self.reloading(false);
           self.hasErrors(true);
