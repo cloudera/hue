@@ -1389,6 +1389,7 @@ a#advanced-btn:hover {
   margin-top: 1px;
   padding: 9px 18px;
   text-shadow: none;
+  font-size: 14px;
   transition: border 0.218s ease 0s;
 }
 
@@ -2071,4 +2072,10 @@ pre {
 
 .clearable.onX {
   cursor: pointer !important;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
