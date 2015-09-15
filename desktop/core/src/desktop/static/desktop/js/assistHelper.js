@@ -26,7 +26,7 @@ var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
 function AssistHelper (options) {
   var self = this;
   self.options = options;
-
+  self.app = options.app;
   self.activeDatabase = ko.observable();
   if (typeof options.db !== "undefined") {
     self.activeDatabase(options.db)
