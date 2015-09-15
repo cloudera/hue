@@ -156,7 +156,7 @@ AssistHelper.prototype.fetchAssistData = function (url, successCallback, errorCa
       type: "GET",
       url: url + "?" + Math.random(),
       success: function (data) {
-        if (data.code === 500){
+        if (typeof data.code != "undefined" && data.code != null) {
           errorCallback(data.error);
         } else {
           cachedData[url] = {
