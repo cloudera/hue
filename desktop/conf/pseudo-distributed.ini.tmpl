@@ -534,73 +534,63 @@
 ###########################################################################
 
 [notebook]
-  # - section name: is a unique id of the type of snippet
-  # - name: is the nice name to print in the notebook
-  # - interface: is the connector to use to talk to the server:
-  #   * hiveserver2 is configurable in [beeswax] and [impala]
-  #   * livy and livy-batch are configurable for spark shell and spark-submit, respectively
-  #   * dbms-X in [libdbms] [[X]]
-  #   * jdbc in [jdbc]
-  #   * odbc in [odbc]
-  #   * pig in [pig] 
-  
+
   [[interpreters]]
-  
-  [[[hive]]]
-  name=Hive
-  interface=hiveserver2
 
-  [[[impala]]]
-  name=Impala
-  interface=hiveserver2
+    [[[hive]]]
+    name=Hive
+    interface=hiveserver2
 
-  [[[scala]]]
-  name=Scala
-  interface=livy
+    [[[impala]]]
+    name=Impala
+    interface=hiveserver2
 
-  [[[pyspark]]]
-  name=PySpark
-  interface=livy
+    [[[scala]]]
+    name=Scala
+    interface=livy
 
-  [[[r]]]
-  name=R
-  interface=livy
+    [[[pyspark]]]
+    name=PySpark
+    interface=livy
 
-  [[[jar]]]
-  name=Spark Submit Jar
-  interface=livy-batch
+    [[[r]]]
+    name=R
+    interface=livy
 
-  [[[py]]]
-  name=Spark Submit Python
-  interface=livy-batch
+    [[[jar]]]
+    name=Spark Submit Jar
+    interface=livy-batch
 
-  [[[phoenix]]]
-  name=Phoenix
-  interface=jdbc
+    [[[py]]]
+    name=Spark Submit Python
+    interface=livy-batch
 
-  [[[mysql]]]
-  name=MySql
-  interface=dbms-mysql
-  # interface=jdbc
-  # interface=odbc
+    [[[text]]]
+    name=Text
+    interface=text
 
-  [[[pig]]]
-  name=Pig
-  interface=pig
+    [[[mysql]]]
+    name=MySql
+    interface=mysql
 
-  [[[text]]]
-  name=Text
-  interface=text
+    [[[mysqljdbc]]]
+    name=MySql JDBC
+    interface=jdbc
 
-[jdbc]
-  [[mysql]]
-  driver={host, port, database}
-  auth={user, password}
-  # auth: optional: prompt user or impersonation if available, e.g. https://issues.apache.org/jira/browse/HIVE-6486
+    ## [[[phoenix]]]
+    ## name=Phoenix
+    ## interface=jdbc-phoenix
 
-  [[phoenix]]
-  driver={host, port, database}
-  auth={user, password}
+# Proof of concept
+# [jdbc]
+#  [[mysql]]
+#  driver={host, port, database}
+#  auth={user, password}
+#  # auth: optional: prompt user or impersonation if available, e.g. https://issues.apache.org/jira/browse/HIVE-6486
+
+#  [[phoenix]]
+#  driver={host, port, database}
+#  auth={user, password}
 
 
 ###########################################################################
