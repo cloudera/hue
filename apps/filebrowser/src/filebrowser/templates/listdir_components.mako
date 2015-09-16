@@ -1061,7 +1061,7 @@ from django.utils.translation import ugettext as _
                 home: "/user/${ user }",
                 initialPath: viewModel.currentPath(),
                 onPathChange: function (path) {
-                  $("#moveDestination").val(path);
+                  $("#moveDestination").val((path.indexOf("/") == 0 ? "" : "/") + path);
                   $("#moveNameRequiredAlert").hide();
                 }
               });
@@ -1097,7 +1097,7 @@ from django.utils.translation import ugettext as _
             home: "/user/${ user }",
             initialPath: viewModel.currentPath(),
             onPathChange: function(path){
-              $("#copyDestination").val(path);
+              $("#copyDestination").val((path.indexOf("/") == 0 ? "" : "/") + path);
               $("#copyNameRequiredAlert").hide();
             }
           });
