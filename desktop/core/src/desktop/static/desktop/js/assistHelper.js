@@ -142,9 +142,9 @@ AssistHelper.prototype.clearCache = function() {
   $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), {});
 };
 
-AssistHelper.prototype.fetchPanelData = function (hierarcy, successCallback, errorCallback) {
+AssistHelper.prototype.fetchPanelData = function (hierarchy, successCallback, errorCallback) {
   var self = this;
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + hierarcy.join("/"), successCallback, errorCallback);
+  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + hierarchy.join("/"), successCallback, errorCallback);
 };
 
 AssistHelper.prototype.fetchAssistData = function (url, successCallback, errorCallback) {
