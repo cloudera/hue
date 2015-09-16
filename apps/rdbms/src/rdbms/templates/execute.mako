@@ -70,32 +70,40 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
       <div class="right-panel">
         <div id="query">
           <div class="card card-small">
-            <div style="margin-bottom: 10px">
-              <h1 class="card-heading simple">
-                <a id="collapse-editor" href="javascript:void(0)" class="pull-right"><i class="fa fa-caret-up"></i></a>
-                % if can_edit_name:
 
-                  <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
-                    attr: {'data-original-title': '${ _ko("Share") } '+name},
-                    css: {'baseShared': true, 'isShared': isShared()}">
-                    <i class="fa fa-users"></i>
-                  </a>
-                  <a href="javascript:void(0);"
-                     id="query-name"
-                     data-type="text"
-                     data-name="name"
-                     data-value="${design.name}"
-                     data-original-title="${ _('Query name') }"
-                     data-placement="right">
-                  </a>
-                  <a href="javascript:void(0);"
-                     id="query-description"
-                     data-type="textarea"
-                     data-name="description"
-                     data-value="${design.desc}"
-                     data-original-title="${ _('Query description') }"
-                     data-placement="right" style="font-size: 14px; margin-left: 10px">
-                  </a>
+            <div class="pull-right" style="
+            % if can_edit_name:
+              margin: 10px
+            % else:
+              margin-top: -6px; margin-right: 8px
+            % endif
+            ">
+              <a id="collapse-editor" href="javascript:void(0)"><i class="fa fa-caret-up"></i></a>
+            </div>
+            <div style="margin-bottom: 10px">
+              % if can_edit_name:
+              <h1 class="card-heading simple">
+                <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
+                  attr: {'data-original-title': '${ _ko("Share") } '+name},
+                  css: {'baseShared': true, 'isShared': isShared()}">
+                  <i class="fa fa-users"></i>
+                </a>
+                <a href="javascript:void(0);"
+                   id="query-name"
+                   data-type="text"
+                   data-name="name"
+                   data-value="${design.name}"
+                   data-original-title="${ _('Query name') }"
+                   data-placement="right">
+                </a>
+                <a href="javascript:void(0);"
+                   id="query-description"
+                   data-type="textarea"
+                   data-name="description"
+                   data-value="${design.desc}"
+                   data-original-title="${ _('Query description') }"
+                   data-placement="right" style="font-size: 14px; margin-left: 10px">
+                </a>
               </h1>
               % endif
             </div>
