@@ -41,8 +41,7 @@
           CANCEL: "Cancel",
           HOME: "Home"
         }
-      },
-      STORAGE_PREFIX = "hueFileBrowserLastPathForUser_";
+      }
 
   function Plugin(element, options) {
     this.element = element;
@@ -77,7 +76,7 @@
     _el.empty();
     _el.addClass("jHueHdfsTree");
 
-    if (_this.options.home != ""){
+    if (_this.options.home != "") {
       var _homeLink = $("<a>").html('<i class="fa fa-home"></i> ' + _this.options.labels.HOME).click(function () {
         var _path = _this.options.home;
         _this.options.onPathChange(_path);
@@ -89,7 +88,7 @@
           _paths.push(_path.substr(0, match.index));
         }
         _paths.push(_path);
-        
+
         showHdfsLeaf({
           paths: _paths,
           scroll: true
@@ -105,15 +104,14 @@
         "width": "560px"
       })
     }
-    
+
     var _tree = $("<ul>").addClass("content unstyled").html('<li><a class="pointer"><i class="fa fa-folder-open-o"></i> /</a></li>');
     _tree.css("padding-top", "30px");
-    
-    if (_this.options.home != ""){
+
+    if (_this.options.home != "") {
       _homeLink.appendTo(_el);
     }
     _tree.appendTo(_el);
-
 
 
     _tree.find("a").on("click", function () {
@@ -127,9 +125,16 @@
 
     var BASE_PATH = "/filebrowser/view=";
     var _currentFiles = [];
-    
+
     function escapeSingleQuote(path) {
       return path.replace(/\'/gi, "\\'");
+    }
+
+    function removeLeadingSlash(path) {
+      if (path.indexOf("/") == 0) {
+        return path.substr(1);
+      }
+      return path;
     }
 
     function showHdfsLeaf(options) {
@@ -146,24 +151,26 @@
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
         _currentFiles = [];
         if (data.error == null) {
-          var _dataPathForCurrent = currentPath != "" ? currentPath : "__JHUEHDFSTREE__ROOT__";
+          var _dataPathForCurrent = currentPath != "" ? removeLeadingSlash(currentPath) : "__JHUEHDFSTREE__ROOT__";
           _el.find("[data-path='" + escapeSingleQuote(_dataPathForCurrent) + "']").attr("data-loaded", true);
           _el.find("[data-path='" + escapeSingleQuote(_dataPathForCurrent) + "']").siblings("a").find(".fa-folder-o").removeClass("fa-folder-o").addClass("fa-folder-open-o");
           _tree.find("a").removeClass("selected");
           _el.find("[data-path='" + escapeSingleQuote(_dataPathForCurrent) + "']").siblings("a").addClass("selected");
-          
+
           if (options.scroll) {
             _el.parent().scrollTop(_el.find("[data-path='" + escapeSingleQuote(_dataPathForCurrent) + "']").siblings("a").position().top + _el.parent().scrollTop() - 30);
           }
           $(data.files).each(function (cnt, item) {
             if (item.name != "." && item.name != ".." && item.type == "dir") {
               var _path = item.path;
-              if (_el.find("[data-path='" + escapeSingleQuote(_path) + "']").length == 0){
-                var _li = $("<li>").html('<a class="pointer"><i class="fa fa-folder-o"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + (_path) + '" data-loaded="false"></ul>');
+              var _escapedPath = escapeSingleQuote(_path);
+              if (_el.find("[data-path='" + removeLeadingSlash(_escapedPath) + "']").length == 0) {
+                var _li = $("<li>").html('<a class="pointer"><i class="fa fa-folder-o"></i> ' + item.name + '</a><ul class="content unstyled" data-path="' + removeLeadingSlash(_escapedPath) + '" data-loaded="false"></ul>');
                 var _destination = _path.substr(0, _path.lastIndexOf("/"));
-                if (_destination == ""){
+                if (_destination == "") {
                   _destination = "__JHUEHDFSTREE__ROOT__";
                 }
+                _destination = removeLeadingSlash(_destination);
                 _li.appendTo(_el.find("[data-path='" + escapeSingleQuote(_destination) + "']"));
                 _li.find("a").on("click", function () {
                   _this.options.onPathChange(_path);
@@ -190,7 +197,7 @@
           });
           if (_this.options.createFolder) {
             var _createFolderLi = $("<li>").html('<a class="pointer"><i class="fa fa-plus-square-o"></i> ' + _this.options.labels.CREATE_FOLDER + '</a>');
-            _createFolderLi.appendTo(_el.find("[data-path='" + escapeSingleQuote(currentPath) + "']"));
+            _createFolderLi.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(currentPath)) + "']"));
 
             var _createFolderDetails = $("<form>").css("margin-top", "10px").addClass("form-inline");
             _createFolderDetails.hide();
@@ -224,7 +231,7 @@
               });
 
             });
-            _createFolderDetails.appendTo(_el.find("[data-path='" + escapeSingleQuote(currentPath) + "']"));
+            _createFolderDetails.appendTo(_el.find("[data-path='" + removeLeadingSlash(escapeSingleQuote(currentPath)) + "']"));
 
             _createFolderLi.find("a").on("click", function () {
               _createFolderDetails.slideDown();
