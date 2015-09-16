@@ -162,8 +162,8 @@ from desktop.views import _ko
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistPanel.repositionActions }">
       <li data-bind="css: { 'assist-table reveals-actions-2nd': definition.isTable, 'assist-column reveals-actions-3rd': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
-        <a class="assist-column-link" data-bind="click: toggleOpen, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
-          <span data-bind="text: definition.displayName, event: { 'dblclick': dblClick }"></span>
+        <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
+          <span data-bind="text: definition.displayName"></span>
         </a>
         <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
