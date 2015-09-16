@@ -37,6 +37,46 @@ ko.bindingHandlers.fadeVisible = {
   }
 };
 
+ko.bindingHandlers.multiClick = {
+  init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+    var clickHandlerFunction = valueAccessor().click;
+    var dblClickHandlerFunction = valueAccessor().dblClick;
+    if (!dblClickHandlerFunction && !clickHandlerFunction) {
+      return;
+    }
+
+    var clickedOnce = false;
+    var singleClickTimeout = -1;
+    var dblClickTimeout = -1;
+
+    var newValueAccessor = function() {
+      return function() {
+        var clickArgs = arguments;
+        if (!dblClickHandlerFunction && clickHandlerFunction) {
+          clickHandlerFunction.apply(viewModel, clickArgs);
+          return;
+        }
+        if (clickedOnce) {
+          dblClickHandlerFunction.apply(viewModel, clickArgs);
+          clickedOnce = false;
+          clearTimeout(singleClickTimeout);
+          clearTimeout(dblClickTimeout);
+        } else {
+          clickedOnce = true;
+          singleClickTimeout = window.setTimeout(function() {
+            clickHandlerFunction.apply(viewModel, clickArgs);
+            dblClickTimeout = window.setTimeout(function() {
+              clickedOnce = false;
+            }, 275);
+          }, 225);
+        }
+      }
+    };
+
+    ko.bindingHandlers.click.init(element, newValueAccessor, allBindings, viewModel, bindingContext);
+  }
+};
+
 ko.bindingHandlers.logScroller = {
   init: function (element, valueAccessor) {
     var $element = $(element);
