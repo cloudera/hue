@@ -50,11 +50,21 @@ describe("autocomplete.js", function() {
         }
       }
     });
+
     spyOn($, "ajax").and.callFake(function(options) {
       var firstUrlPart = options.url.split("?")[0];
       expect(ajaxHelper.responseForUrls[firstUrlPart]).toBeDefined("fake response for url " + firstUrlPart + " not found");
-      options.success(ajaxHelper.responseForUrls[firstUrlPart]);
+      if (ajaxHelper.responseForUrls[firstUrlPart]) {
+        ajaxHelper.responseForUrls[firstUrlPart].called = true;
+        options.success(ajaxHelper.responseForUrls[firstUrlPart]);
+      }
     });
+  });
+
+  afterEach(function() {
+    $.each(ajaxHelper.responseForUrls, function(key, value) {
+      expect(value.called).toEqual(true, key + " was never called");
+    })
   });
 
   beforeEach(function() {
@@ -268,6 +278,115 @@ describe("autocomplete.js", function() {
         expectedSuggestions: ["fieldA", "fieldB"]
       });
     });
+
+    describe("lateral views", function() {
+      it("should suggest structs from exploded item references to arrays", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testArray/item": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT testItem.",
+          afterCursor: " FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+      });
+
+      it("should suggest structs from references to exploded arrays", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testArray/item": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT explodedTable.testItem.",
+          afterCursor: " FROM testTable LATERAL VIEW explode(testArray) explodedTable AS testItem",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+      });
+
+      it("should suggest posexploded references to arrays", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testArray/item": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT testValue.",
+          afterCursor: " FROM testTable LATERAL VIEW posexplode(testArray) explodedTable AS (testIndex, testValue)",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+      });
+
+      it("should suggest exploded references to map values", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testMap/value": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT testMapValue.",
+          afterCursor: " FROM testTable LATERAL VIEW explode(testMap) AS (testMapKey, testMapValue)",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+      });
+
+      it("should suggest exploded references to map values from view references", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testMap/value": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT explodedMap.testMapValue.",
+          afterCursor: " FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+      });
+
+      it("should suggest references to exploded references from view reference", function () {
+        assertAutoComplete({
+          serverResponses: {},
+          beforeCursor: "SELECT explodedMap.",
+          afterCursor: " FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)",
+          expectedSuggestions: ["testMapKey", "testMapValue"]
+        });
+      });
+
+      it("should suggest references to exploded references", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT ",
+          afterCursor: " FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)",
+          expectedSuggestions: ["*", "explodedMap", "testTableColumn1", "testTableColumn2", "testMapKey", "testMapValue"]
+        });
+      });
+    });
   });
 
   describe("impala-specific stuff", function() {
@@ -286,9 +405,7 @@ describe("autocomplete.js", function() {
 
     it("should not suggest struct from map values with hive style syntax", function() {
       assertAutoComplete({
-        serverResponses: {
-          "/testApp/api/autocomplete/testDb/testTable/testMap[\"anyKey\"]" : {}
-        },
+        serverResponses: {},
         beforeCursor: "SELECT testMap[\"anyKey\"].",
         afterCursor: " FROM testTable",
         expectedSuggestions: []
@@ -342,9 +459,6 @@ describe("autocomplete.js", function() {
         serverResponses: {
           "/testApp/api/autocomplete/testDb/testTable1" : {
             columns: ["testTableColumn1", "testTableColumn2"]
-          },
-          "/testDb/testTable2" : {
-            columns: ["testTableColumn3", "testTableColumn4"]
           }
         },
         beforeCursor: "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM testTable1 t1 JOIN testTable2 t2 ON t1.",
@@ -404,14 +518,7 @@ describe("autocomplete.js", function() {
 
     it("should suggest aliases", function() {
       assertAutoComplete({
-        serverResponses: {
-          "/testApp/api/autocomplete/testDb/testTableA" : {
-            columns: ["testTableColumn1", "testTableColumn2"]
-          },
-          "/testApp/api/autocomplete/testDb/testTableB" : {
-            columns: ["testTableColumn3", "testTableColumn4"]
-          }
-        },
+        serverResponses: {},
         beforeCursor: "SELECT ",
         afterCursor: " FROM testTableA tta, testTableB",
         expectedSuggestions: ["testTableB.", "tta."]
