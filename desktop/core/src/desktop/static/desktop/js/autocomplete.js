@@ -45,7 +45,7 @@ Autocompleter.prototype.getTableReferenceIndex = function (statement) {
   var fromMatch = statement.match(/\s*from\s*([^;]*).*$/i);
   if (fromMatch) {
     var tableRefsRaw = fromMatch[1];
-    upToMatch = tableRefsRaw.match(/\bON|LIMIT|WHERE|GROUP|SORT|ORDER BY\b/i);
+    var upToMatch = tableRefsRaw.match(/\bLATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP|SORT|ORDER BY\b/i);
     if (upToMatch) {
       tableRefsRaw = $.trim(tableRefsRaw.substring(0, upToMatch.index));
     }
@@ -59,7 +59,76 @@ Autocompleter.prototype.getTableReferenceIndex = function (statement) {
   return result;
 };
 
-Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar) {
+Autocompleter.prototype.getViewReferenceIndex = function (statement) {
+  var result = {
+    allViewReferences: [],
+    index: {}
+  };
+
+  // Matches both arrays and maps "AS ref" or "AS (keyRef, valueRef)" and with
+  // or without view reference.
+  // group 1 = pos for posexplode or undefined
+  // group 2 = argument to table generating function
+  // group 3 = view reference or undefined
+  // group 4 = array item reference
+  //           array index reference (if posexplode)
+  //           map key reference (if group 5 is exists)
+  // group 5 = array value (if posexplode)
+  //           map value reference (if ! posexplode)
+  var lateralViewRegex = /.*LATERAL\s+VIEW\s+(pos)?explode\(([^\)]+)\)\s+(?:(\S+)\s+)?AS \(?([^ ,\)]*)(?:\s*,\s*([^ ,\)]*))?/gi;
+  var lateralViewMatch;
+
+  while (lateralViewMatch = lateralViewRegex.exec(statement)) {
+    var isMapRef = (!lateralViewMatch[1] && lateralViewMatch[5]) || false ;
+    var isPosexplode = lateralViewMatch[1] || false;
+
+    var pathToField = lateralViewMatch[2].split(".");
+
+    var viewRef = {
+      leadingPath: pathToField,
+      references: []
+    };
+
+    if (isMapRef) {
+      // TODO : use lateralViewMatch[4] for key ref once API supports map key lookup
+      result.index[lateralViewMatch[5]] = {
+        leadingPath: pathToField,
+        addition: 'value'
+      };
+      viewRef.references.push({ name: lateralViewMatch[4], type: 'key'});
+      viewRef.references.push({ name: lateralViewMatch[5], type: 'value'});
+    } else if (isPosexplode) {
+      // TODO : use lateralViewMatch[4] for array index ref once API supports array index lookup
+      // Currently we don't support array key refs
+      result.index[lateralViewMatch[5]] = {
+        leadingPath: pathToField,
+        addition: 'item'
+      };
+      viewRef.references.push({ name: lateralViewMatch[4], type: 'index'});
+      viewRef.references.push({ name: lateralViewMatch[5], type: 'item'});
+    } else {
+      // exploded array without position
+      result.index[lateralViewMatch[4]] = {
+        leadingPath: pathToField,
+        addition: 'item'
+      };
+      viewRef.references.push({ name: lateralViewMatch[4], type: 'item'});
+    }
+
+    result.allViewReferences = result.allViewReferences.concat(viewRef.references);
+
+    if(lateralViewMatch[3]) {
+      result.allViewReferences.push({ name: lateralViewMatch[3], type: 'view' });
+      result.index[lateralViewMatch[3]] = viewRef;
+    }
+  }
+
+  // TODO: Support view references from views. (expand result values using result, limit steps to prevent infinite refs)
+
+  return result;
+};
+
+Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, references) {
   var fields = [];
   var result = [];
 
@@ -87,6 +156,10 @@ Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar
         type: "table"
       }
     });
+  }
+
+  if (references) {
+    fields = fields.concat(references);
   }
 
   fields.sort(function (a, b) {
@@ -141,7 +214,6 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
     beforeMatcher[beforeMatcher.length - 1] === "ON" ||
     beforeMatcher[beforeMatcher.length - 1] === "ORDER BY");
 
-
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
     self.assistHelper.fetchTables(function(data) {
       var fromKeyword = "";
@@ -191,10 +263,15 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       return;
     }
 
+    var viewReferences = self.getViewReferenceIndex(beforeCursor + afterCursor);
     var getFields = function (remainingParts, fields) {
       if (remainingParts.length == 0) {
         self.assistHelper.fetchFields(tableName, fields, function(data) {
-          callback(self.extractFields(data, "", !fieldTermBefore));
+          if (fields.length == 0) {
+            callback(self.extractFields(data, "", !fieldTermBefore, viewReferences.allViewReferences));
+          } else {
+            callback(self.extractFields(data, "", !fieldTermBefore));
+          }
         }, onFailure);
         return; // break recursion
       }
@@ -202,6 +279,20 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
       if (part != '' && part !== tableName) {
         if (self.currentMode === "hive") {
+          if (viewReferences.index[part]) {
+            if (viewReferences.index[part].references && remainingParts.length == 0) {
+              callback(self.extractFields([], "", true, viewReferences.index[part].references));
+              return;
+            }
+            if (fields.length == 0) {
+              fields.push(viewReferences.index[part].leadingPath);
+            }
+            if (viewReferences.index[part].addition) {
+              fields.push(viewReferences.index[part].addition);
+            }
+            getFields(remainingParts, fields);
+            return;
+          }
           var mapOrArrayMatch = part.match(/([^\[]*)\[[^\]]*\]$/i);
           if (mapOrArrayMatch !== null) {
             fields.push(mapOrArrayMatch[1]);
@@ -223,6 +314,10 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       }
       getFields(remainingParts, fields);
     };
+
+    parts = parts.filter(function(value) {
+      return value != '';
+    });
 
     getFields(parts, []);
   } else {
