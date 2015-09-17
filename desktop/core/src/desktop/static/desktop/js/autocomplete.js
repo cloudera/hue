@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
+var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
 var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
 
 /**
@@ -49,7 +49,7 @@ Autocompleter.prototype.getTableReferenceIndex = function (statement) {
     if (upToMatch) {
       tableRefsRaw = $.trim(tableRefsRaw.substring(0, upToMatch.index));
     }
-    var tableRefs = tableRefsRaw.split(",");
+    var tableRefs = tableRefsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i);
     tableRefs.sort();
     $.each(tableRefs, function(index, tableRefRaw) {
       var tableMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
@@ -195,24 +195,28 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
   var beforeMatcher = beforeCursorU.match(SQL_TERMS);
   var afterMatcher = afterCursorU.match(SQL_TERMS);
 
-  var tableNameAutoComplete = beforeMatcher != null && (
-    beforeMatcher[beforeMatcher.length - 1] === "FROM" ||
-    beforeMatcher[beforeMatcher.length - 1] === "TABLE" ||
-    beforeMatcher[beforeMatcher.length - 1] === "STATS" ||
-    beforeMatcher[beforeMatcher.length - 1] === "REFRESH" ||
-    beforeMatcher[beforeMatcher.length - 1] === "METADATA" ||
-    beforeMatcher[beforeMatcher.length - 1] === "DESCRIBE");
+  if (beforeMatcher == null || beforeMatcher.length == 0) {
+    callback([]);
+    return;
+  }
 
-  var selectBefore = beforeMatcher != null &&
-    beforeMatcher[beforeMatcher.length - 1] === "SELECT";
+  var keywordBeforeCursor = beforeMatcher[beforeMatcher.length - 1];
 
-  var fromAfter = afterMatcher != null &&
-    afterMatcher[0] === "FROM";
+  var tableNameAutoComplete = keywordBeforeCursor === "FROM" ||
+    keywordBeforeCursor === "TABLE" ||
+    keywordBeforeCursor === "STATS" ||
+    keywordBeforeCursor === "JOIN" ||
+    keywordBeforeCursor === "REFRESH" ||
+    keywordBeforeCursor === "METADATA" ||
+    keywordBeforeCursor === "DESCRIBE";
 
-  var fieldTermBefore = beforeMatcher != null && (
-    beforeMatcher[beforeMatcher.length - 1] === "WHERE" ||
-    beforeMatcher[beforeMatcher.length - 1] === "ON" ||
-    beforeMatcher[beforeMatcher.length - 1] === "ORDER BY");
+  var selectBefore = keywordBeforeCursor === "SELECT";
+
+  var fieldTermBefore = keywordBeforeCursor === "WHERE" ||
+    keywordBeforeCursor === "ON" ||
+    keywordBeforeCursor === "ORDER BY";
+
+  var fromAfter = afterMatcher != null && afterMatcher[0] === "FROM";
 
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
     self.assistHelper.fetchTables(function(data) {
@@ -234,7 +238,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       callback(self.extractFields(data, fromKeyword));
     }, onFailure );
   } else if ((selectBefore && fromAfter) || fieldTermBefore) {
-    var partialTermsMatch = beforeCursor.match(/([^ \-\+\<\>\,]*)$/);
+    var partialTermsMatch = beforeCursor.match(/([^ \(\-\+\<\>\,]*)$/);
     var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
 
     if (parts.length > 0 && parts[parts.length - 1] != '') {
@@ -248,13 +252,13 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       // SELECT tablename.column.
       tableName = tableReferences[parts[0]];
       parts.shift();
-    } else if (Object.keys(tableReferences).length == 1) {
+    } else if (parts.length > 0 && Object.keys(tableReferences).length == 1) {
       // SELECT column.
       // We use first and only table reference
       tableName = tableReferences[Object.keys(tableReferences)[0]];
-    } else if (Object.keys(tableReferences).length > 1) {
+    } else if (Object.keys(tableReferences).length > 0) {
       callback($.map(Object.keys(tableReferences), function(key, idx) {
-        return { value: key + ".", score: 1000 - idx, meta: tableReferences[key] == key ? 'table' : 'alias' };
+        return { value: key + (afterCursor.indexOf(".") == 0 ? "" : "."), score: 1000 - idx, meta: tableReferences[key] == key ? 'table' : 'alias' };
       }));
       return;
     } else {
