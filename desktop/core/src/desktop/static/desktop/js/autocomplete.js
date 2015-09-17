@@ -40,20 +40,33 @@ function Autocompleter(options) {
   })
 }
 
-Autocompleter.prototype.getTableReferenceIndex = function (statement) {
-  var result = {};
+Autocompleter.prototype.getFromReferenceIndex = function (statement) {
+  var result = {
+    tables: {},
+    complex: {}
+  };
   var fromMatch = statement.match(/\s*from\s*([^;]*).*$/i);
   if (fromMatch) {
-    var tableRefsRaw = fromMatch[1];
-    var upToMatch = tableRefsRaw.match(/\bLATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP|SORT|ORDER BY\b/i);
+    var refsRaw = fromMatch[1];
+    var upToMatch = refsRaw.match(/\bLATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP|SORT|ORDER BY\b/i);
     if (upToMatch) {
-      tableRefsRaw = $.trim(tableRefsRaw.substring(0, upToMatch.index));
+      refsRaw = $.trim(refsRaw.substring(0, upToMatch.index));
     }
-    var tableRefs = tableRefsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i);
-    tableRefs.sort();
-    $.each(tableRefs, function(index, tableRefRaw) {
-      var tableMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
-      result[tableMatch[2] || tableMatch[1]] = tableMatch[1];
+    var refs = refsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i);
+    refs.sort();
+    $.each(refs, function(index, tableRefRaw) {
+      var refMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
+
+      var refParts = refMatch[1].split('.');
+      if (refMatch[2]) {
+        if (refParts.length == 1) {
+          result.tables[refMatch[2]] = refParts[0];
+        } else {
+          result.complex[refMatch[2]] = refParts;
+        }
+      } else {
+        result.tables[refMatch[1]] = refMatch[1];
+      }
     })
   }
   return result;
@@ -128,7 +141,7 @@ Autocompleter.prototype.getViewReferenceIndex = function (statement) {
   return result;
 };
 
-Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, references) {
+Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, extraSuggestions) {
   var fields = [];
   var result = [];
 
@@ -158,13 +171,16 @@ Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar
     });
   }
 
-  if (references) {
-    fields = fields.concat(references);
-  }
-
   fields.sort(function (a, b) {
     return a.name.localeCompare(b.name);
   });
+
+  if (extraSuggestions) {
+    extraSuggestions.sort(function (a, b) {
+      return a.name.localeCompare(b.name);
+    });
+    fields = extraSuggestions.concat(fields);
+  }
 
   fields.forEach(function(field, idx) {
     if (field.name != "") {
@@ -181,10 +197,13 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
   var self = this;
 
+  var hiveSyntax = self.currentMode === "hive";
+  var impalaSyntax = self.currentMode === "impala";
+
   if (typeof self.assistHelper.activeDatabase() == "undefined"
     || self.assistHelper.activeDatabase() == null
     || self.assistHelper.activeDatabase() == ""
-    || (self.currentMode !== "hive" && self.currentMode !== "impala")) {
+    || (!hiveSyntax && !impalaSyntax)) {
     onFailure();
     return;
   }
@@ -202,13 +221,15 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
   var keywordBeforeCursor = beforeMatcher[beforeMatcher.length - 1];
 
-  var tableNameAutoComplete = keywordBeforeCursor === "FROM" ||
+  var impalaFieldRef = impalaSyntax && beforeCursor.slice(-1) === '.';
+
+  var tableNameAutoComplete = (keywordBeforeCursor === "FROM" ||
     keywordBeforeCursor === "TABLE" ||
     keywordBeforeCursor === "STATS" ||
     keywordBeforeCursor === "JOIN" ||
     keywordBeforeCursor === "REFRESH" ||
     keywordBeforeCursor === "METADATA" ||
-    keywordBeforeCursor === "DESCRIBE";
+    keywordBeforeCursor === "DESCRIBE") && !impalaFieldRef;
 
   var selectBefore = keywordBeforeCursor === "SELECT";
 
@@ -237,32 +258,59 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       }
       callback(self.extractFields(data, fromKeyword));
     }, onFailure );
-  } else if ((selectBefore && fromAfter) || fieldTermBefore) {
+  } else if ((selectBefore && fromAfter) || fieldTermBefore || impalaFieldRef) {
     var partialTermsMatch = beforeCursor.match(/([^ \(\-\+\<\>\,]*)$/);
     var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
 
-    if (parts.length > 0 && parts[parts.length - 1] != '') {
-      // SELECT tablename.colu
-      parts.pop();
-    }
+    // Drop the last part, empty or not. If it's not empty it's the start of a
+    // field (or a complete one) for that case we suggest the same.
+    // SELECT tablename.colu => suggestion: "column"
+    parts.pop();
 
-    var tableReferences = self.getTableReferenceIndex(beforeCursor + afterCursor);
+    var fromReferences = self.getFromReferenceIndex(beforeCursor + afterCursor);
     var tableName = "";
-    if (parts.length > 0 && tableReferences[parts[0]]) {
-      // SELECT tablename.column.
-      tableName = tableReferences[parts[0]];
-      parts.shift();
-    } else if (parts.length > 0 && Object.keys(tableReferences).length == 1) {
-      // SELECT column.
-      // We use first and only table reference
-      tableName = tableReferences[Object.keys(tableReferences)[0]];
-    } else if (Object.keys(tableReferences).length > 0) {
-      callback($.map(Object.keys(tableReferences), function(key, idx) {
-        return { value: key + (afterCursor.indexOf(".") == 0 ? "" : "."), score: 1000 - idx, meta: tableReferences[key] == key ? 'table' : 'alias' };
-      }));
+
+    if (parts.length > 0 && fromReferences.tables[parts[0]]) {
+      // SELECT tableref.column.
+      tableName = fromReferences.tables[parts.shift()];
+    } else if (parts.length > 0 && fromReferences.complex[parts[0]]) {
+      var complexRefList = fromReferences.complex[parts.shift()];
+      if (fromReferences.tables[complexRefList[0]]) {
+        tableName = fromReferences.tables[complexRefList[0]];
+        // The first part is a table ref, the rest are col, struct etc.
+        parts = complexRefList.slice(1).concat(parts);
+      } else {
+        onFailure();
+        return;
+      }
+    } else if (parts.length === 0 && (Object.keys(fromReferences.tables).length + Object.keys(fromReferences.complex).length) > 1) {
+      // There are multiple table or complex type references possible so we suggest those
+      var count = 0;
+      var tableRefs = $.map(Object.keys(fromReferences.tables), function (key, idx) {
+        return {
+          value: key + (afterCursor.indexOf(".") == 0 ? "" : "."),
+          score: 1000 - count++,
+          meta: fromReferences.tables[key] == key ? 'table' : 'alias'
+        };
+      });
+
+      var complexRefs = $.map(Object.keys(fromReferences.complex), function (key, idx) {
+        return {
+          value: key + (afterCursor.indexOf(".") == 0 ? "" : "."),
+          score: 1000 - count++,
+          meta: 'alias'
+        };
+      });
+
+      callback(tableRefs.concat(complexRefs));
       return;
+    } else if (Object.keys(fromReferences.tables).length == 1) {
+      // SELECT column. or just SELECT
+      // We use first and only table reference if exist
+      // if there are no parts the call to getFields will fetch the columns
+      tableName = fromReferences.tables[Object.keys(fromReferences.tables)[0]];
     } else {
-      // No table refs
+      // Can't complete without table reference
       onFailure();
       return;
     }
@@ -272,7 +320,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       if (remainingParts.length == 0) {
         self.assistHelper.fetchFields(tableName, fields, function(data) {
           if (fields.length == 0) {
-            callback(self.extractFields(data, "", !fieldTermBefore, viewReferences.allViewReferences));
+            callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
           } else {
             callback(self.extractFields(data, "", !fieldTermBefore));
           }
@@ -282,7 +330,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       var part = remainingParts.shift();
 
       if (part != '' && part !== tableName) {
-        if (self.currentMode === "hive") {
+        if (hiveSyntax) {
           if (viewReferences.index[part]) {
             if (viewReferences.index[part].references && remainingParts.length == 0) {
               callback(self.extractFields([], "", true, viewReferences.index[part].references));
@@ -313,15 +361,50 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
             }, onFailure);
             return; // break recursion, it'll be async above
           }
+        } else if (impalaSyntax) {
+          var isValueCompletion = part == "value" && fields.length > 0 && fields[fields.length - 1] == "value";
+          if (!isValueCompletion) {
+            fields.push(part);
+          }
+          // For impala we have to fetch info about each field as we don't know
+          // whether it's a map or array for hive the [ and ] gives it away...
+          self.assistHelper.fetchFields(tableName, fields, function(data) {
+            if (data.type === "map") {
+              remainingParts.unshift("value");
+            } else if (data.type === "array") {
+              remainingParts.unshift("item");
+            } else if (remainingParts.length == 0 && fields.length > 0) {
+              var extraFields = [];
+              if (fields[fields.length - 1] == "value") {
+                // impala map completion
+                if (!fieldTermBefore) {
+                  extraFields.push({ name: "*", type: "all" });
+                }
+                if (!isValueCompletion) {
+                  if (fieldTermBefore || (data.type !== "map" && data.type !== "array" && data.type !== "struct")) {
+                    extraFields.push({ name: "value", type: "value" });
+                  }
+                  extraFields.push({ name: "key", type: "key" });
+                }
+              } else if (fields[fields.length - 1] == "item") {
+                if (!fieldTermBefore) {
+                  extraFields.push({ name: "*", type: "all" });
+                }
+                if (fieldTermBefore || (data.type !== "map" && data.type !== "array" && data.type !== "struct")) {
+                  extraFields.push({ name: "items", type: "items" });
+                }
+              }
+              callback(self.extractFields(data, "", false, extraFields));
+              return;
+            }
+            getFields(remainingParts, fields);
+          }, onFailure);
+          return; // break recursion, it'll be async above
         }
         fields.push(part);
       }
       getFields(remainingParts, fields);
     };
-
-    parts = parts.filter(function(value) {
-      return value != '';
-    });
 
     getFields(parts, []);
   } else {
