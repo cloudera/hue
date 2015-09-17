@@ -25,7 +25,7 @@ def active_users():
 global_registry().gauge_callback(
     name='users.active',
     callback=active_users,
-    label='Number of Active Users',
+    label='Active Users',
     description='Number of users that were active in the last hour',
     numerator='users',
 )

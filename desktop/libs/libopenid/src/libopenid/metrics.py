@@ -21,7 +21,7 @@ from desktop.lib.metrics import global_registry
 openid_authentication_time = global_registry().timer(
     name='openid.authentication-time',
     label='OpenID Authentication Time',
-    description='The time spent waiting for OpenID to authenticate a user over the life of the process',
+    description='The time spent waiting for OpenID to authenticate a user',
     numerator='seconds',
     counter_numerator='authentications',
     rate_denominator='seconds',

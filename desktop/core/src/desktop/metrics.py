@@ -27,41 +27,33 @@ from desktop.lib.metrics import global_registry
 global_registry().gauge_callback(
     name='python.threads.total',
     callback=lambda: len(threading.enumerate()),
-    label='Thread Count',
-    description='Number of threads',
+    label='Threads',
+    description='The total number of threads',
     numerator='threads',
 )
 
 global_registry().gauge_callback(
     name='python.threads.daemon',
     callback=lambda: sum(1 for thread in threading.enumerate() if thread.isDaemon()),
-    label='Daemon Thread Count',
-    description='Number of daemon threads',
+    label='Daemon Threads',
+    description='The number of daemon threads',
     numerator='threads',
 )
 
 # ------------------------------------------------------------------------------
 
 global_registry().gauge_callback(
-    name='python.multiprocessing.total',
+    name='python.multiprocessing',
     callback=lambda: len(multiprocessing.active_children()),
-    label='Process Count',
+    label='Multiprocessing Processes',
     description='Number of multiprocessing processes',
-    numerator='processes',
-)
-
-global_registry().gauge_callback(
-    name='python.multiprocessing.active',
-    callback=lambda: sum(1 for proc in multiprocessing.active_children() if proc.is_alive()),
-    label='Active Multiprocessing Processes',
-    description='Number of active multiprocessing processes',
     numerator='processes',
 )
 
 global_registry().gauge_callback(
     name='python.multiprocessing.daemon',
     callback=lambda: sum(1 for proc in multiprocessing.active_children() if proc.daemon),
-    label='Daemon Processes Count',
+    label='Daemon Multiprocessing Processes',
     description='Number of daemon multiprocessing processes',
     numerator='processes',
 )
@@ -75,7 +67,6 @@ for i in xrange(3):
       label='GC Object Count in Generation %s' % i,
       description='Total number of objects in garbage collection generation %s' % i,
       numerator='objects',
-      raw_counter=True,
   )
 
 global_registry().gauge_callback(
@@ -84,7 +75,6 @@ global_registry().gauge_callback(
     label='GC Object Count',
     description='Total number of objects in the Python process',
     numerator='objects',
-    raw_counter=True,
 )
 
 # ------------------------------------------------------------------------------
@@ -127,7 +117,7 @@ user_count = global_registry().gauge_callback(
 ldap_authentication_time = global_registry().timer(
     name='ldap.authentication-time',
     label='LDAP Authentication Time',
-    description='The time spent waiting for LDAP to authenticate a user over the life of the process',
+    description='The time spent waiting for LDAP to authenticate a user',
     numerator='seconds',
     counter_numerator='authentications',
     rate_denominator='seconds',
@@ -136,7 +126,7 @@ ldap_authentication_time = global_registry().timer(
 oauth_authentication_time = global_registry().timer(
     name='auth.oauth.authentication-time',
     label='OAUTH Authentication Time',
-    description='The time spent waiting for OAUTH to authenticate a user over the life of the process',
+    description='The time spent waiting for OAUTH to authenticate a user',
     numerator='seconds',
     counter_numerator='authentications',
     rate_denominator='seconds',
@@ -145,7 +135,7 @@ oauth_authentication_time = global_registry().timer(
 pam_authentication_time = global_registry().timer(
     name='auth.pam.authentication-time',
     label='PAM Authentication Time',
-    description='The time spent waiting for PAM to authenticate a user over the life of the process',
+    description='The time spent waiting for PAM to authenticate a user',
     numerator='seconds',
     counter_numerator='authentications',
     rate_denominator='seconds',
@@ -154,7 +144,7 @@ pam_authentication_time = global_registry().timer(
 spnego_authentication_time = global_registry().timer(
     name='auth.spnego.authentication-time',
     label='SPNEGO Authentication Time',
-    description='The time spent waiting for SPNEGO to authenticate a user over the life of the process',
+    description='The time spent waiting for SPNEGO to authenticate a user',
     numerator='seconds',
     counter_numerator='authentications',
     rate_denominator='seconds',
