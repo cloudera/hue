@@ -446,7 +446,7 @@ from desktop.views import _ko
           errors: errors,
           autocompleter: aceAutocompleter,
           assistHelper: assistHelper,
-          openIt: '${ _ko("Double click to open it") }',
+          openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
           placeholder: $root.snippetPlaceholders[type()] }"></div>
       </div>
     <div class="clearfix"></div>
