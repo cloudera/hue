@@ -92,6 +92,24 @@ describe("autocomplete.js", function() {
     expect(callback).toHaveBeenCalled();
   };
 
+  it("should return empty suggestions for empty statement", function() {
+    assertAutoComplete({
+      serverResponses: { },
+      beforeCursor: "",
+      afterCursor: "",
+      expectedSuggestions: []
+    });
+  });
+
+  it("should return empty suggestions for bogus statement", function() {
+    assertAutoComplete({
+      serverResponses: { },
+      beforeCursor: "foo",
+      afterCursor: "bar",
+      expectedSuggestions: []
+    });
+  });
+
   describe("table completion", function() {
     it("should suggest table names with no columns", function() {
       assertAutoComplete({
@@ -567,4 +585,86 @@ describe("autocomplete.js", function() {
       });
     });
   });
+
+  describe("joins", function() {
+
+    it("should suggest tables to join with", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb" : {
+            tables: ["testTable1", "testTable2"]
+          }
+        },
+        beforeCursor: "SELECT * FROM testTable1 JOIN ",
+        afterCursor: "",
+        expectedSuggestions: ["testTable1", "testTable2"]
+      });
+    });
+
+    it("should suggest table references in join condition if not already there", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (",
+        afterCursor: "",
+        expectedSuggestions: ["testTable1.", "testTable2."]
+      });
+    });
+
+    it("should suggest table references in join condition if not already there for multiple conditions", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND ",
+        afterCursor: "",
+        expectedSuggestions: ["testTable1.", "testTable2."]
+      });
+    });
+
+    it("should suggest table references in join condition if not already there for multiple conditions", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (",
+        afterCursor: " AND testTable1.testColumn1 = testTable2.testColumn3",
+        expectedSuggestions: ["testTable1.", "testTable2."]
+      });
+    });
+
+    it("should suggest field references in join condition if table reference is present", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable2" : {
+            columns: ["testColumn3", "testColumn4"]
+          }
+        },
+        beforeCursor: "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable2.",
+        afterCursor: "",
+        expectedSuggestions: ["testColumn3", "testColumn4"]
+      });
+    });
+
+    it("should suggest field references in join condition if table reference is present from multiple tables", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable2" : {
+            columns: ["testColumn3", "testColumn4"]
+          }
+        },
+        beforeCursor: "select * from testTable1 JOIN testTable2 on (testTable1.testColumn1 = testTable2.",
+        afterCursor: "",
+        expectedSuggestions: ["testColumn3", "testColumn4"]
+      });
+    });
+
+    it("should suggest field references in join condition if table reference is present from multiple tables for multiple conditions", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable1" : {
+            columns: ["testColumn1", "testColumn2"]
+          }
+        },
+        beforeCursor: "SELECT testTable1.* FROM testTable1 JOIN testTable2 ON (testTable1.testColumn1 = testTable2.testColumn3 AND testTable1.",
+        afterCursor: "",
+        expectedSuggestions: ["testColumn1", "testColumn2"]
+      });
+    });
+  })
 });
