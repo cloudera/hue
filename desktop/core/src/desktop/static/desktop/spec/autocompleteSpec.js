@@ -412,9 +412,9 @@ describe("autocomplete.js", function() {
       var options = {
         assistHelper: new AssistHelper({
           app: "testApp",
+          db: "testDb",
           user: "testUser"
         }),
-        db: "testDb",
         mode: "impala"
       };
       subject = new Autocompleter(options);
@@ -423,10 +423,190 @@ describe("autocomplete.js", function() {
 
     it("should not suggest struct from map values with hive style syntax", function() {
       assertAutoComplete({
-        serverResponses: {},
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap[\"anyKey\"]" : {
+            someResponse: true
+          }
+        },
         beforeCursor: "SELECT testMap[\"anyKey\"].",
         afterCursor: " FROM testTable",
         expectedSuggestions: []
+      });
+    });
+
+    it("should suggest fields from nested structs", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/columnA" : {
+            // Impala has to query every part for it's type, for hive '[' and ']' is used to indicate map or array.
+          },
+          "/testApp/api/autocomplete/testDb/testTable/columnA/fieldC" : {
+            fields: [
+              {"type": "string", "name": "fieldC_A" },
+              {"type": "boolean", "name": "fieldC_B"}
+            ],
+            "type": "struct",
+            "name": "fieldC"
+          }
+        },
+        beforeCursor: "SELECT columnA.fieldC.",
+        afterCursor: " FROM testTable",
+        expectedSuggestions: ["fieldC_A", "fieldC_B"]
+      });
+    });
+
+    it("should suggest fields from map values of type structs", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" }
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT tm.",
+        afterCursor: " FROM testTable t, t.testMap tm;",
+        expectedSuggestions: ["*", "key", "fieldA", "fieldB"]
+      });
+    });
+
+    it("should suggest map value if type is scalar", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
+            type: "int"
+          }
+        },
+        beforeCursor: "SELECT tm.",
+        afterCursor: " FROM testTable t, t.testMap tm;",
+        expectedSuggestions: ["*", "key", "value"]
+      });
+    });
+
+    it("should not suggest items from arrays if complex in select clause", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testArray" : {
+            type: "array"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testArray/item" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" }
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT ta.",
+        afterCursor: " FROM testTable t, t.testArray ta;",
+        expectedSuggestions: ["*", "fieldA", "fieldB"]
+      });
+    });
+
+    it("should suggest items from arrays if scalar in select clause", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testArray" : {
+            type: "array"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testArray/item" : {
+            type: "int"
+          }
+        },
+        beforeCursor: "SELECT ta.",
+        afterCursor: " FROM testTable t, t.testArray ta;",
+        expectedSuggestions: ["*", "items"]
+      });
+    });
+
+    it("should suggest items from arrays if complex in from clause", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testArray" : {
+            type: "array"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testArray/item" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" }
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT ta.* FROM testTable t, t.testArray ta WHERE ta.",
+        afterCursor: "",
+        expectedSuggestions: ["items", "fieldA", "fieldB"]
+      });
+    });
+
+
+    it("should suggest columns from table refs in from clause", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable" : {
+            columns: ["testTableColumn1", "testTableColumn2"]
+          }
+        },
+        beforeCursor: "SELECT t.*  FROM testTable t, t.",
+        afterCursor: "",
+        expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+      });
+    });
+
+    it("should suggest map references in select", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT ",
+        afterCursor: " FROM testTable t, t.testMap tm;",
+        expectedSuggestions: ["t.", "tm."]
+      });
+    });
+
+    it("should suggest fields with key and value in where clause from map values of type structs", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" }
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.",
+        afterCursor: "",
+        expectedSuggestions: ["key", "value", "fieldA", "fieldB"]
+      });
+    });
+
+    it("should suggest fields in where clause from map values of type structs", function() {
+      assertAutoComplete({
+        serverResponses: {
+          "/testApp/api/autocomplete/testDb/testTable/testMap" : {
+            type: "map"
+          },
+          "/testApp/api/autocomplete/testDb/testTable/testMap/value" : {
+            fields: [
+              {"type": "string", "name": "fieldA" },
+              {"type": "string", "name": "fieldB" }
+            ],
+            type: "struct"
+          }
+        },
+        beforeCursor: "SELECT tm.* FROM testTable t, t.testMap tm WHERE tm.value.",
+        afterCursor: "",
+        expectedSuggestions: ["fieldA", "fieldB"]
       });
     });
   });
