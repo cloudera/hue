@@ -98,17 +98,29 @@ class MetricDefinition(object):
     raise NotImplementedError
 
 
-  def _make_json(self, key, **kwargs):
+  def _make_json(self, key,
+      suffix=None,
+      **kwargs):
     names = ['hue', self.name.replace('.', '_').replace('-', '_')]
+
+    label = self.label
+    description = self.description
+
+    if suffix:
+      label += suffix
+      description += suffix
 
     if self._add_key_to_name:
       names.append(key)
 
+    if 'counter' in kwargs and not kwargs['counter']:
+      kwargs.pop('counter')
+
     mdl = dict(
       context='%s::%s' % (self.name, key),
       name='_'.join(names),
-      label=self.label,
-      description=self.description,
+      label=label,
+      description=description,
       numeratorUnit=self.numerator,
     )
     mdl.update(**kwargs)
@@ -144,15 +156,28 @@ class HistogramDefinition(MetricDefinition):
 
   def to_json(self):
     return [
-        self._make_json('max'),
-        self._make_json('min'),
-        self._make_json('avg'),
-        self._make_json('count', counter=True, numeratorUnit=self.counter_numerator),
-        self._make_json('std_dev'),
-        self._make_json('75_percentile'),
-        self._make_json('95_percentile'),
-        self._make_json('99_percentile'),
-        self._make_json('999_percentile'),
+        self._make_json('max',
+          suffix=': Max'),
+        self._make_json('min',
+          suffix=': Min'),
+        self._make_json('avg',
+          suffix=': Average'),
+        self._make_json('count',
+          suffix=': Samples',
+          counter=True,
+          numeratorUnit=self.counter_numerator),
+        self._make_json('std_dev',
+          suffix=': Standard Deviation'),
+        self._make_json('median',
+          suffix=': 50th Percentile'),
+        self._make_json('75_percentile',
+          suffix=': 75th Percentile'),
+        self._make_json('95_percentile',
+          suffix=': 95th Percentile'),
+        self._make_json('99_percentile',
+          suffix=': 99th Percentile'),
+        self._make_json('999_percentile',
+          suffix=': 999th Percentile'),
     ]
 
 
@@ -186,11 +211,25 @@ class MeterDefinition(MetricDefinition):
 
   def to_json(self):
     return [
-        self._make_json('count', counter=True, numeratorUnit=self.counter_numerator),
-        self._make_json('15m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('5m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('1m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('mean_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
+        self._make_json('count',
+          counter=True,
+          numeratorUnit=self.counter_numerator),
+        self._make_json('15m_rate',
+          suffix=': 15 Minute Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
+        self._make_json('5m_rate',
+          suffix=': 5 Minute Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
+        self._make_json('1m_rate',
+          suffix=': 1 Minute Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
+        self._make_json('mean_rate',
+          suffix=': Mean Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
     ]
 
 
@@ -209,20 +248,48 @@ class TimerDefinition(MetricDefinition):
 
   def to_json(self):
     return [
-        self._make_json('avg'),
-        self._make_json('sum'),
-        self._make_json('count', counter=True, numeratorUnit=self.counter_numerator),
-        self._make_json('max'),
-        self._make_json('min'),
-        self._make_json('std_dev'),
-        self._make_json('15m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('5m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('1m_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('mean_rate', numeratorUnit=self.counter_numerator, denominatorUnit=self.rate_denominator),
-        self._make_json('75_percentile'),
-        self._make_json('95_percentile'),
-        self._make_json('99_percentile'),
-        self._make_json('999_percentile'),
+        self._make_json('max',
+          suffix=': Max'),
+        self._make_json('min',
+          suffix=': Min'),
+        self._make_json('avg',
+          suffix=': Average'),
+        self._make_json('sum',
+          suffix=': Samples',
+          counter=True,
+          numeratorUnit=self.counter_numerator),
+        #self._make_json('count',
+        #  suffix=': Samples',
+        #  counter=True,
+        #  numeratorUnit=self.counter_numerator),
+        self._make_json('std_dev',
+          suffix=': Standard Deviation'),
+        self._make_json('1m_rate',
+          suffix=': 1 Minute Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
+        self._make_json('5m_rate',
+          suffix=': 5 Minute Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
+        self._make_json('15m_rate',
+          suffix=': 15 Minue Rate',
+          numeratorUnit=self.counter_numerator,
+          denominatorUnit=self.rate_denominator),
+        #self._make_json('mean_rate',
+        #  suffix=': Mean Rate',
+        #  numeratorUnit=self.counter_numerator,
+        #  denominatorUnit=self.rate_denominator),
+        self._make_json('median',
+          suffix=': 50th Percentile'),
+        self._make_json('75_percentile',
+          suffix=': 75th Percentile'),
+        self._make_json('95_percentile',
+          suffix=': 95th Percentile'),
+        self._make_json('99_percentile',
+          suffix=': 99th Percentile'),
+        self._make_json('999_percentile',
+          suffix=': 999th Percentile'),
     ]
 
 
