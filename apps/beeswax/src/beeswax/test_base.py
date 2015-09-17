@@ -364,6 +364,9 @@ class BeeswaxSampleProvider(object):
           databases = db.get_databases()
           assert_false(db_name in databases)
 
+      global _INITIALIZED
+      _INITIALIZED = False
+
   @classmethod
   def init_beeswax_db(cls):
     """
