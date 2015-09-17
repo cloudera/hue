@@ -21,7 +21,7 @@ from desktop.lib.metrics import global_registry
 saml2_authentication_time = global_registry().timer(
     name='saml2.authentication-time',
     label='SAML2 Authentication Time',
-    description='The time spent waiting for SAML2 to authenticate a user over the life of the process',
+    description='The time spent waiting for SAML2 to authenticate a user',
     numerator='seconds',
     counter_numerator='authentications',
     rate_denominator='seconds',
