@@ -35,6 +35,9 @@ ${ commonheader(_('Notebook'), app_name, user, "68px") | n,unicode }
 ${ editorComponents.includes() }
 <%editorComponents:commonHTML>
   <%def name="addSnippetHTML()">
+    <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
+
+    <!-- ko if: $root.availableSnippets().length > 0 -->
     <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
     <div class="add-snippet">
@@ -42,6 +45,7 @@ ${ editorComponents.includes() }
         <i class="add-last-used-snippet fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
       </div>
     </div>
+    <!-- /ko -->
   </%def>
 </%editorComponents:commonHTML>
 
