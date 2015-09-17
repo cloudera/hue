@@ -636,7 +636,7 @@ var Notebook = function (vm, notebook) {
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
   self.snippets = ko.observableArray();
-  self.selectedSnippet = ko.observable(vm.availableSnippets()[0].type());
+  self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : "NO_SNIPPETS");
   self.creatingSessionLocks = ko.observableArray();
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : [], {
     create: function(value) {
