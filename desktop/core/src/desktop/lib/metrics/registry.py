@@ -100,15 +100,25 @@ class MetricDefinition(object):
 
   def _make_json(self, key,
       suffix=None,
+      label_suffix=None,
+      description_suffix=None,
       **kwargs):
     names = ['hue', self.name.replace('.', '_').replace('-', '_')]
 
     label = self.label
     description = self.description
 
-    if suffix:
-      label += suffix
-      description += suffix
+    if label_suffix is None:
+      label_suffix = suffix
+
+    if description_suffix is None:
+      description_suffix = suffix
+
+    if label_suffix:
+      label += label_suffix
+
+    if description_suffix:
+      description += description_suffix
 
     if self._add_key_to_name:
       names.append(key)
@@ -157,17 +167,22 @@ class HistogramDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('max',
-          suffix=': Max'),
+          label_suffix=': Max',
+          description_suffix=' over the life of the process: Max'),
         self._make_json('min',
-          suffix=': Min'),
+          label_suffix=': Min',
+          description_suffix=' over the life of the process: Min'),
         self._make_json('avg',
-          suffix=': Average'),
-        self._make_json('count',
-          suffix=': Samples',
+          label_suffix=': Average',
+          description_suffix=' over the life of the process: Average'),
+        self._make_json('sum',
+          label_suffix=': Samples',
+          description_suffix=' over the life of the process: Samples',
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('std_dev',
-          suffix=': Standard Deviation'),
+          label_suffix=': Standard Deviation',
+          description_suffix=' over the life of the process: Standard Deviation'),
         self._make_json('median',
           suffix=': 50th Percentile'),
         self._make_json('75_percentile',
@@ -212,6 +227,8 @@ class MeterDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('count',
+          label_suffix=': Samples',
+          description_suffix=' over the life of the process: Samples',
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('15m_rate',
@@ -249,21 +266,22 @@ class TimerDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('max',
-          suffix=': Max'),
+          label_suffix=': Max',
+          description_suffix=' over the life of the process: Max'),
         self._make_json('min',
-          suffix=': Min'),
+          label_suffix=': Min',
+          description_suffix=' over the life of the process: Min'),
         self._make_json('avg',
-          suffix=': Average'),
+          label_suffix=': Average',
+          description_suffix=' over the life of the process: Average'),
         self._make_json('sum',
-          suffix=': Samples',
+          label_suffix=': Samples',
+          description_suffix=' over the life of the process: Samples',
           counter=True,
           numeratorUnit=self.counter_numerator),
-        #self._make_json('count',
-        #  suffix=': Samples',
-        #  counter=True,
-        #  numeratorUnit=self.counter_numerator),
         self._make_json('std_dev',
-          suffix=': Standard Deviation'),
+          label_suffix=': Standard Deviation',
+          description_suffix=' over the life of the process: Standard Deviation'),
         self._make_json('1m_rate',
           suffix=': 1 Minute Rate',
           numeratorUnit=self.counter_numerator,
@@ -276,10 +294,6 @@ class TimerDefinition(MetricDefinition):
           suffix=': 15 Minue Rate',
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
-        #self._make_json('mean_rate',
-        #  suffix=': Mean Rate',
-        #  numeratorUnit=self.counter_numerator,
-        #  denominatorUnit=self.rate_denominator),
         self._make_json('median',
           suffix=': 50th Percentile'),
         self._make_json('75_percentile',
