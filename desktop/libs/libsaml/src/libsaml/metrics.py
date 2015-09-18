@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from desktop.lib.metrics import global_registry
 
 saml2_authentication_time = global_registry().timer(
-    name='saml2.authentication-time',
+    name='auth.saml2.auth-time',
     label='SAML2 Authentication Time',
     description='The time spent waiting for SAML2 to authenticate a user',
     numerator='seconds',
