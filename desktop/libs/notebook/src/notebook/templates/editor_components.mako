@@ -942,7 +942,8 @@ from desktop.views import _ko
 
       function addMarkdown(content) {
         var snip = viewModel.notebooks()[0].addSnippet({type: "text", result: {}}, true);
-        snip.statement_raw(markdown.toHTML(content));
+        snip.subtype(true);
+        snip.statement_raw(content);
       }
 
       function addAce(content, snippetType) {
