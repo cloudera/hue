@@ -109,7 +109,7 @@ user_count = global_registry().gauge_callback(
     name='users',
     callback=lambda: User.objects.count(),
     label='Users',
-    description='Total number of user accounts in Hue',
+    description='Total number of user accounts',
     numerator='users',
 )
 
