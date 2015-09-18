@@ -1713,6 +1713,9 @@ ko.bindingHandlers.aceEditor = {
         editor.session.setMode(newValue);
       });
     }
+    if (navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1) {
+      editor.setOptions({fontSize: "14px"})
+    }
     editor.on("focus", function () {
       huePubSub.publish("hue.ace.activeMode", ko.utils.unwrapObservable(options.mode));
     });
