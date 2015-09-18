@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from desktop.lib.metrics import global_registry
 
 openid_authentication_time = global_registry().timer(
-    name='openid.authentication-time',
+    name='auth.openid.auth-time',
     label='OpenID Authentication Time',
     description='The time spent waiting for OpenID to authenticate a user',
     numerator='seconds',

@@ -141,17 +141,17 @@ class MetricDefinition(object):
 
 class CounterDefinition(MetricDefinition):
   def __init__(self, *args, **kwargs):
-    self.raw_counter = kwargs.pop('raw_counter', False)
+    self.treat_counter_as_gauge = kwargs.pop('treat_counter_as_gauge', False)
 
     super(CounterDefinition, self).__init__(*args, **kwargs)
 
-    assert not self.raw_counter or self.denominator is None, \
+    assert not self.treat_counter_as_gauge or self.denominator is None, \
         "Counters should not have denominators"
 
 
   def to_json(self):
     return [
-        self._make_json('count', counter=self.raw_counter),
+        self._make_json('count', counter=not self.treat_counter_as_gauge),
     ]
 
 
@@ -175,9 +175,14 @@ class HistogramDefinition(MetricDefinition):
         self._make_json('avg',
           label_suffix=': Average',
           description_suffix=' over the life of the process: Average'),
+        self._make_json('count',
+          label_suffix=': Sample Count',
+          description_suffix=' over the life of the process: Sample Count',
+          counter=True,
+          numeratorUnit=self.counter_numerator),
         self._make_json('sum',
-          label_suffix=': Samples',
-          description_suffix=' over the life of the process: Samples',
+          label_suffix=': Sample Sum',
+          description_suffix=' over the life of the process: Sample Sum',
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('std_dev',
@@ -198,17 +203,17 @@ class HistogramDefinition(MetricDefinition):
 
 class GaugeDefinition(MetricDefinition):
   def __init__(self, *args, **kwargs):
-    self.raw_counter = kwargs.pop('raw_counter', False)
+    self.treat_gauge_as_counter = kwargs.pop('treat_gauge_as_counter', False)
 
     super(GaugeDefinition, self).__init__(*args, **kwargs)
 
-    assert not self.raw_counter or self.denominator is None, \
+    assert not self.treat_gauge_as_counter or self.denominator is None, \
         "Gauge metrics that are marked as counters cannot have a denominator"
 
 
   def to_json(self):
     return [
-        self._make_json('value', counter=self.raw_counter),
+        self._make_json('value', counter=self.treat_gauge_as_counter),
     ]
 
 
@@ -227,8 +232,8 @@ class MeterDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('count',
-          label_suffix=': Samples',
-          description_suffix=' over the life of the process: Samples',
+          label_suffix=': Sample Sum',
+          description_suffix=' over the life of the process: Sample Sum',
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('15m_rate',
@@ -274,9 +279,14 @@ class TimerDefinition(MetricDefinition):
         self._make_json('avg',
           label_suffix=': Average',
           description_suffix=' over the life of the process: Average'),
+        self._make_json('count',
+          label_suffix=': Sample Count',
+          description_suffix=' over the life of the process: Sample Count',
+          counter=True,
+          numeratorUnit=self.counter_numerator),
         self._make_json('sum',
-          label_suffix=': Samples',
-          description_suffix=' over the life of the process: Samples',
+          label_suffix=': Sample Sum',
+          description_suffix=' over the life of the process: Sample Sum',
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('std_dev',
