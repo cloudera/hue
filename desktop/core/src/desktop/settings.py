@@ -299,6 +299,9 @@ else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
   logging.debug("DESKTOP_DB_TEST_NAME SET: %s" % test_name)
 
+  test_user = os.environ.get('DESKTOP_DB_TEST_USER', 'hue_test')
+  logging.debug("DESKTOP_DB_TEST_USER SET: %s" % test_user)
+
   default_db = {
     "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
     "NAME" : desktop.conf.DATABASE.NAME.get(),
@@ -309,6 +312,7 @@ else:
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
     "TEST_NAME" : test_name,
+    "TEST_USER" : test_user,
     # Wrap each request in a transaction.
     "ATOMIC_REQUESTS" : True,
   }
