@@ -147,7 +147,8 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.id = ko.observable(typeof snippet.id != "undefined" && snippet.id != null ? snippet.id : UUID());
   self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
-  self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : "hive");
+  self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
+  self.subtype = ko.observable(typeof snippet.subtype != "undefined" && snippet.subtype != null ? snippet.subtype : '');
 
   //Ace stuff
   self.aceEditorMode = ko.observable(TYPE_ACE_EDITOR_MAP[self.type()]);

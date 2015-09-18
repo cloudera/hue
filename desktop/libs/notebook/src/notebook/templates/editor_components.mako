@@ -346,6 +346,8 @@ from desktop.views import _ko
           </ul>
         </div>
 
+        <label data-bind="visible: type() == 'text' && $root.isEditing()" class="checkbox inline" style="margin-top: -6px"><input type="checkbox" data-bind="checked: $data.subtype" /> Markdown</label>
+
         <span data-bind="visible: type() == 'text'">&nbsp;</span>
 
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
@@ -356,6 +358,7 @@ from desktop.views import _ko
           <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
           <a href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
         </div>
+
       </h2>
 
       <div>
@@ -636,7 +639,29 @@ from desktop.views import _ko
 </script>
 
 <script type="text/html" id="text-snippet-body">
+  <!-- ko ifnot: subtype() -->
   <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
+  <!-- /ko -->
+  <!-- ko if: subtype() -->
+    <!-- ko if: $root.isEditing() -->
+      <div class="row-fluid">
+        <div class="span6">
+          <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+            value: statement_raw,
+            aceInstance: ace,
+            updateOnInput: true,
+            mode: ko.observable('markdown'),
+            placeholder: '${ _('Type your markdown here') }' }"></div>
+        </div>
+        <div class="span6">
+          <div data-bind="html: markdown.toHTML(statement_raw())"></div>
+        </div>
+      </div>
+    <!-- /ko -->
+    <!-- ko ifnot: $root.isEditing() -->
+      <div data-bind="html: markdown.toHTML(statement_raw())"></div>
+    <!-- /ko -->
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="executable-snippet-body">
