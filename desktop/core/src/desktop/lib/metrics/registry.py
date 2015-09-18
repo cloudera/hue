@@ -22,6 +22,49 @@ import functools
 import pyformance
 
 
+MAX_LABEL_SUFFIX = ': Max'
+MAX_DESCRIPTION_SUFFIX = ': Max. This is computed over the lifetime of the process.'
+
+MIN_LABEL_SUFFIX = ': Min'
+MIN_DESCRIPTION_SUFFIX = ': Min. This is computed over the lifetime of the process.'
+
+AVERAGE_LABEL_SUFFIX = ': Average'
+AVERAGE_DESCRIPTION_SUFFIX = ': Average. This is computed over the lifetime of the process.'
+
+SAMPLE_COUNT_LABEL_SUFFIX = ': Sample Count'
+SAMPLE_COUNT_DESCRIPTION_SUFFIX = ': Sample Count. This is computed over the lifetime of the process.'
+
+SAMPLE_SUM_LABEL_SUFFIX = ': Sample Sum'
+SAMPLE_SUM_DESCRIPTION_SUFFIX = ': Sample Sum. This is computed over the lifetime of the process.'
+
+STD_DEV_LABEL_SUFFIX = ': Standard Deviation'
+STD_DEV_DESCRIPTION_SUFFIX = ': Standard Deviation. This is computed over the lifetime of the process.'
+
+RATE_1_LABEL_SUFFIX = ': 1-Minute Rate'
+RATE_1_DESCRIPTION_SUFFIX = ': 1-Minute moving average rate.'
+
+RATE_5_LABEL_SUFFIX = ': 5-Minute Rate'
+RATE_5_DESCRIPTION_SUFFIX = ': 5-Minute Rate'
+
+RATE_15_LABEL_SUFFIX = ': 15-Minute Rate'
+RATE_15_DESCRIPTION_SUFFIX = ': 15-Minute Rate'
+
+PERCENTILE_50_LABEL_SUFFIX = ': 50th Percentile'
+PERCENTILE_50_DESCRIPTION_SUFFIX = ': 50th Percentile. This is computed over the past hour.'
+
+PERCENTILE_75_LABEL_SUFFIX = ': 75th Percentile'
+PERCENTILE_75_DESCRIPTION_SUFFIX = ': 75th Percentile. This is computed over the past hour.'
+
+PERCENTILE_95_LABEL_SUFFIX = ': 95th Percentile'
+PERCENTILE_95_DESCRIPTION_SUFFIX = ': 95th Percentile. This is computed over the past hour.'
+
+PERCENTILE_99_LABEL_SUFFIX = ': 99th Percentile'
+PERCENTILE_99_DESCRIPTION_SUFFIX = ': 99th Percentile. This is computed over the past hour.'
+
+PERCENTILE_999_LABEL_SUFFIX = ': 999th Percentile'
+PERCENTILE_999_DESCRIPTION_SUFFIX = ': 999th Percentile. This is computed over the past hour.'
+
+
 class MetricsRegistry(object):
   def __init__(self, registry=None):
     if registry is None:
@@ -167,37 +210,42 @@ class HistogramDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('max',
-          label_suffix=': Max',
-          description_suffix=' over the life of the process: Max'),
+          label_suffix=MAX_LABEL_SUFFIX,
+          description_suffix=MAX_DESCRIPTION_SUFFIX),
         self._make_json('min',
-          label_suffix=': Min',
-          description_suffix=' over the life of the process: Min'),
+          label_suffix=MIN_LABEL_SUFFIX,
+          description_suffix=MIN_DESCRIPTION_SUFFIX),
         self._make_json('avg',
           label_suffix=': Average',
-          description_suffix=' over the life of the process: Average'),
+          description_suffix=AVERAGE_DESCRIPTION_SUFFIX),
         self._make_json('count',
-          label_suffix=': Sample Count',
-          description_suffix=' over the life of the process: Sample Count',
+          label_suffix=SAMPLE_COUNT_LABEL_SUFFIX,
+          description_suffix=SAMPLE_COUNT_DESCRIPTION_SUFFIX,
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('sum',
-          label_suffix=': Sample Sum',
-          description_suffix=' over the life of the process: Sample Sum',
+          label_suffix=SAMPLE_SUM_LABEL_SUFFIX,
+          description_suffix=SAMPLE_SUM_DESCRIPTION_SUFFIX,
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('std_dev',
-          label_suffix=': Standard Deviation',
-          description_suffix=' over the life of the process: Standard Deviation'),
+          label_suffix=STD_DEV_LABEL_SUFFIX,
+          description_suffix=STD_DEV_DESCRIPTION_SUFFIX),
         self._make_json('median',
-          suffix=': 50th Percentile'),
+          label_suffix=PERCENTILE_50_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_50_DESCRIPTION_SUFFIX),
         self._make_json('75_percentile',
-          suffix=': 75th Percentile'),
+          label_suffix=PERCENTILE_75_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_75_DESCRIPTION_SUFFIX),
         self._make_json('95_percentile',
-          suffix=': 95th Percentile'),
+          label_suffix=PERCENTILE_95_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_95_DESCRIPTION_SUFFIX),
         self._make_json('99_percentile',
-          suffix=': 99th Percentile'),
+          label_suffix=PERCENTILE_99_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_99_DESCRIPTION_SUFFIX),
         self._make_json('999_percentile',
-          suffix=': 999th Percentile'),
+          label_suffix=PERCENTILE_999_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_999_DESCRIPTION_SUFFIX),
     ]
 
 
@@ -232,24 +280,23 @@ class MeterDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('count',
-          label_suffix=': Sample Sum',
-          description_suffix=' over the life of the process: Sample Sum',
+          label_suffix=SAMPLE_SUM_LABEL_SUFFIX,
+          description_suffix=SAMPLE_SUM_DESCRIPTION_SUFFIX,
           counter=True,
           numeratorUnit=self.counter_numerator),
-        self._make_json('15m_rate',
-          suffix=': 15 Minute Rate',
+        self._make_json('1m_rate',
+          label_suffix=RATE_1_LABEL_SUFFIX,
+          description_suffix=RATE_1_DESCRIPTION_SUFFIX,
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
         self._make_json('5m_rate',
-          suffix=': 5 Minute Rate',
+          label_suffix=RATE_5_LABEL_SUFFIX,
+          description_suffix=RATE_5_DESCRIPTION_SUFFIX,
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
-        self._make_json('1m_rate',
-          suffix=': 1 Minute Rate',
-          numeratorUnit=self.counter_numerator,
-          denominatorUnit=self.rate_denominator),
-        self._make_json('mean_rate',
-          suffix=': Mean Rate',
+        self._make_json('15m_rate',
+          label_suffix=RATE_15_LABEL_SUFFIX,
+          description_suffix=RATE_15_DESCRIPTION_SUFFIX,
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
     ]
@@ -271,49 +318,57 @@ class TimerDefinition(MetricDefinition):
   def to_json(self):
     return [
         self._make_json('max',
-          label_suffix=': Max',
-          description_suffix=' over the life of the process: Max'),
+          label_suffix=MAX_LABEL_SUFFIX,
+          description_suffix=MAX_DESCRIPTION_SUFFIX),
         self._make_json('min',
-          label_suffix=': Min',
-          description_suffix=' over the life of the process: Min'),
+          label_suffix=MIN_LABEL_SUFFIX,
+          description_suffix=MIN_DESCRIPTION_SUFFIX),
         self._make_json('avg',
           label_suffix=': Average',
-          description_suffix=' over the life of the process: Average'),
+          description_suffix=AVERAGE_DESCRIPTION_SUFFIX),
         self._make_json('count',
-          label_suffix=': Sample Count',
-          description_suffix=' over the life of the process: Sample Count',
+          label_suffix=SAMPLE_COUNT_LABEL_SUFFIX,
+          description_suffix=SAMPLE_COUNT_DESCRIPTION_SUFFIX,
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('sum',
-          label_suffix=': Sample Sum',
-          description_suffix=' over the life of the process: Sample Sum',
+          label_suffix=SAMPLE_SUM_LABEL_SUFFIX,
+          description_suffix=SAMPLE_SUM_DESCRIPTION_SUFFIX,
           counter=True,
           numeratorUnit=self.counter_numerator),
         self._make_json('std_dev',
-          label_suffix=': Standard Deviation',
-          description_suffix=' over the life of the process: Standard Deviation'),
+          label_suffix=STD_DEV_LABEL_SUFFIX,
+          description_suffix=STD_DEV_DESCRIPTION_SUFFIX),
         self._make_json('1m_rate',
-          suffix=': 1 Minute Rate',
+          label_suffix=RATE_1_LABEL_SUFFIX,
+          description_suffix=RATE_1_DESCRIPTION_SUFFIX,
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
         self._make_json('5m_rate',
-          suffix=': 5 Minute Rate',
+          label_suffix=RATE_5_LABEL_SUFFIX,
+          description_suffix=RATE_5_DESCRIPTION_SUFFIX,
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
         self._make_json('15m_rate',
-          suffix=': 15 Minue Rate',
+          label_suffix=RATE_15_LABEL_SUFFIX,
+          description_suffix=RATE_15_DESCRIPTION_SUFFIX,
           numeratorUnit=self.counter_numerator,
           denominatorUnit=self.rate_denominator),
         self._make_json('median',
-          suffix=': 50th Percentile'),
+          label_suffix=PERCENTILE_50_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_50_DESCRIPTION_SUFFIX),
         self._make_json('75_percentile',
-          suffix=': 75th Percentile'),
+          label_suffix=PERCENTILE_75_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_75_DESCRIPTION_SUFFIX),
         self._make_json('95_percentile',
-          suffix=': 95th Percentile'),
+          label_suffix=PERCENTILE_95_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_95_DESCRIPTION_SUFFIX),
         self._make_json('99_percentile',
-          suffix=': 99th Percentile'),
+          label_suffix=PERCENTILE_99_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_99_DESCRIPTION_SUFFIX),
         self._make_json('999_percentile',
-          suffix=': 999th Percentile'),
+          label_suffix=PERCENTILE_999_LABEL_SUFFIX,
+          description_suffix=PERCENTILE_999_DESCRIPTION_SUFFIX),
     ]
 
 
