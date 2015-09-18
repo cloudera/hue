@@ -84,6 +84,7 @@ active_requests = global_registry().counter(
     label='Active Requests',
     description='Number of currently active requests',
     numerator='requests',
+    treat_counter_as_gauge=True,
 )
 
 request_exceptions = global_registry().counter(
@@ -115,7 +116,7 @@ user_count = global_registry().gauge_callback(
 # ------------------------------------------------------------------------------
 
 ldap_authentication_time = global_registry().timer(
-    name='ldap.authentication-time',
+    name='auth.ldap.auth-time',
     label='LDAP Authentication Time',
     description='The time spent waiting for LDAP to authenticate a user',
     numerator='seconds',
@@ -124,7 +125,7 @@ ldap_authentication_time = global_registry().timer(
 )
 
 oauth_authentication_time = global_registry().timer(
-    name='auth.oauth.authentication-time',
+    name='auth.oauth.auth-time',
     label='OAUTH Authentication Time',
     description='The time spent waiting for OAUTH to authenticate a user',
     numerator='seconds',
@@ -133,7 +134,7 @@ oauth_authentication_time = global_registry().timer(
 )
 
 pam_authentication_time = global_registry().timer(
-    name='auth.pam.authentication-time',
+    name='auth.pam.auth-time',
     label='PAM Authentication Time',
     description='The time spent waiting for PAM to authenticate a user',
     numerator='seconds',
@@ -142,7 +143,7 @@ pam_authentication_time = global_registry().timer(
 )
 
 spnego_authentication_time = global_registry().timer(
-    name='auth.spnego.authentication-time',
+    name='auth.spnego.auth-time',
     label='SPNEGO Authentication Time',
     description='The time spent waiting for SPNEGO to authenticate a user',
     numerator='seconds',
