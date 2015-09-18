@@ -330,6 +330,8 @@ from desktop.views import _ko
   <div class="snippet-container reveals-actions row-fluid">
     <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
+      <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
+
       <h2 class="card-heading simple">
 
         <div class="dropdown inline widget-type" data-bind="visible: type() != 'text' || $root.isEditing()">
