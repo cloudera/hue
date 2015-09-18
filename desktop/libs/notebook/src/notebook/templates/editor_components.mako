@@ -111,9 +111,14 @@ from desktop.views import _ko
 % endif
 </style>
 
-<div class="search-bar">
+<div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
-
+    <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0 -->
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }">
+      <i class="fa fa-expand"></i>
+    </a>
+    &nbsp;&nbsp;
+    <!-- /ko -->
     <div class="btn-group">
       <a class="btn dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-check-square-o"></i>
@@ -191,6 +196,15 @@ from desktop.views import _ko
 
 </div>
 
+<div class="player-toolbar" data-bind="visible: $root.isPlayerMode()">
+  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
+  <img src="${ static('desktop/art/icon_hue_48.png') }" />
+  <!-- ko if: $root.selectedNotebook() -->
+  <h4 data-bind="text: $root.selectedNotebook().name"></h4>
+  <!-- /ko -->
+</div>
+
+
 <div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
@@ -205,7 +219,7 @@ from desktop.views import _ko
 </div>
 
 
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable, click: function() { $root.isLeftPanelVisible(true) }">
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { wasAssistVisible = true; $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
@@ -220,13 +234,13 @@ from desktop.views import _ko
 </div>
 
 <script type="text/html" id="notebook">
-  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable">
-    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+  <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+    <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
     <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, appName: 'notebook'  }}"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable, splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
@@ -1621,5 +1635,27 @@ from desktop.views import _ko
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, vmOptions);
   ko.applyBindings(viewModel);
   viewModel.init();
+
+  var isAssistAvailable = viewModel.assistAvailable();
+  var wasAssistVisible = viewModel.isLeftPanelVisible();
+
+
+  viewModel.isPlayerMode.subscribe(function(value) {
+    if (value){
+      $(".jHueNotify").hide();
+      viewModel.assistAvailable(false);
+      viewModel.isLeftPanelVisible(false);
+      $(".navigator").hide();
+      $(".add-snippet").hide();
+      $(".main-content").css("top", "50px");
+    }
+    else {
+      viewModel.isLeftPanelVisible(wasAssistVisible);
+      viewModel.assistAvailable(isAssistAvailable);
+      $(".navigator").show();
+      $(".add-snippet").show();
+      $(".main-content").css("top", "70px");
+    }
+  });
 </script>
 </%def>

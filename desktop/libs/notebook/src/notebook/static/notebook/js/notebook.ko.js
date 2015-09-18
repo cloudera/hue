@@ -636,7 +636,7 @@ var Notebook = function (vm, notebook) {
   self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
   self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
   self.snippets = ko.observableArray();
-  self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : "NO_SNIPPETS");
+  self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
   self.creatingSessionLocks = ko.observableArray();
   self.sessions = ko.mapping.fromJS(typeof notebook.sessions != "undefined" && notebook.sessions != null ? notebook.sessions : [], {
     create: function(value) {
@@ -864,6 +864,7 @@ function EditorViewModel(notebooks, options) {
   self.notebooks = ko.observableArray();
   self.selectedNotebook = ko.observable();
   self.combinedContent = ko.observable();
+  self.isPlayerMode = ko.observable(false);
 
   self.displayCombinedContent = function () {
     if (! self.selectedNotebook()) {
@@ -898,9 +899,9 @@ function EditorViewModel(notebooks, options) {
     $("#removeSnippetModal").modal("show");
   };
 
-  self.assistAvailable = options.assistAvailable;
+  self.assistAvailable = ko.observable(options.assistAvailable);
 
-  self.isLeftPanelVisible = ko.observable(self.assistAvailable && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
+  self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
   self.isLeftPanelVisible.subscribe(function(newValue) {
     $.totalStorage('spark_left_panel_visible', newValue);
