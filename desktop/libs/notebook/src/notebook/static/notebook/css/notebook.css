@@ -441,6 +441,10 @@ h1.empty {
   height: 24px;
 }
 
+.card-heading-print {
+  display: none;
+}
+
 @media print {
   .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .hover-actions, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
     display: none !important;
@@ -466,6 +470,10 @@ h1.empty {
   }
   .print-logo {
     display: block;
+  }
+  .card-heading-print.visible {
+    display: block;
+    font-weight: bold;
   }
 }
 
