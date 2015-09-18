@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,4 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import liboauth.metrics
+from __future__ import absolute_import
+
+from desktop.lib.metrics import global_registry
+
+oauth_authentication_time = global_registry().timer(
+    name='auth.oauth.auth-time',
+    label='OAUTH Authentication Time',
+    description='The time spent waiting for OAUTH to authenticate a user',
+    numerator='seconds',
+    counter_numerator='authentications',
+    rate_denominator='seconds',
+)

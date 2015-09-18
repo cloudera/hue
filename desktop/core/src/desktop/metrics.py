@@ -124,15 +124,6 @@ ldap_authentication_time = global_registry().timer(
     rate_denominator='seconds',
 )
 
-oauth_authentication_time = global_registry().timer(
-    name='auth.oauth.auth-time',
-    label='OAUTH Authentication Time',
-    description='The time spent waiting for OAUTH to authenticate a user',
-    numerator='seconds',
-    counter_numerator='authentications',
-    rate_denominator='seconds',
-)
-
 pam_authentication_time = global_registry().timer(
     name='auth.pam.auth-time',
     label='PAM Authentication Time',
