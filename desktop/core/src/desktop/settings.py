@@ -417,7 +417,7 @@ if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
   SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 
 # Add last activity tracking.
-if 'useradmin' in appmanager.DESKTOP_APPS:
+if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
   MIDDLEWARE_CLASSES.append('useradmin.middleware.UpdateLastActivityMiddleware')
 
 ############################################################
