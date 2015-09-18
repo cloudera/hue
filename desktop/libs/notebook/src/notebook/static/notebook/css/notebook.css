@@ -432,13 +432,40 @@ h1.empty {
   font-style: normal !important;
 }
 
+.print-logo {
+  display: none;
+}
+
+.print-logo img {
+  width: 24px;
+  height: 24px;
+}
+
 @media print {
-  .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .CodeMirror-gutters, .add-snippet {
+  .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .hover-actions, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
     display: none !important;
   }
-
-  .CodeMirror {
-    border: none;
+  .right-panel {
+    width: 100%!important;
+    left: 0px!important;
+  }
+  * {
+    border: none!important;
+  }
+  .editable {
+    font-size: 20px;
+    font-weight: bold;
+    border-bottom: 2px solid #CCC!important;
+  }
+  .tab-content, .right-panel {
+    overflow: visible;
+  }
+  .ace_scroller {
+    border-left: 4px solid #DDD!important;
+    padding-left: 10px;
+  }
+  .print-logo {
+    display: block;
   }
 }
 

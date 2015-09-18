@@ -111,6 +111,10 @@ from desktop.views import _ko
 % endif
 </style>
 
+<div class="print-logo">
+  <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
+</div>
+
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
     <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0 -->
