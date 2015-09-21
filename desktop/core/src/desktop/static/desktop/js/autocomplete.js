@@ -90,7 +90,7 @@ Autocompleter.prototype.getViewReferenceIndex = function (statement) {
   //           map key reference (if group 5 is exists)
   // group 5 = array value (if posexplode)
   //           map value reference (if ! posexplode)
-  var lateralViewRegex = /.*LATERAL\s+VIEW\s+(pos)?explode\(([^\)]+)\)\s+(?:(\S+)\s+)?AS \(?([^ ,\)]*)(?:\s*,\s*([^ ,\)]*))?/gi;
+  var lateralViewRegex = /LATERAL\s+VIEW\s+(pos)?explode\(([^\)]+)\)\s+(?:(\S+)\s+)?AS \(?([^ ,\)]*)(?:\s*,\s*([^ ,]*)\))?/gi;
   var lateralViewMatch;
 
   while (lateralViewMatch = lateralViewRegex.exec(statement)) {
