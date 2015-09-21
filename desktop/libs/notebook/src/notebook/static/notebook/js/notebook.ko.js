@@ -265,7 +265,7 @@ var Snippet = function (vm, notebook, snippet) {
     return self.status() == "loading";
   });
   self.klass = ko.computed(function () {
-    return "snippet card card-widget";
+    return "snippet card card-widget" + (self.type() == "text" ? " snippet-text" : "");
   });
 
   self.resultsKlass = ko.computed(function () {

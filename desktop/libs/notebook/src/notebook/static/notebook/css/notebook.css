@@ -94,6 +94,18 @@ body {
   min-height: 40px;
 }
 
+.snippet-text .snippet-body {
+  min-height: 1px;
+}
+
+.snippet-text.card-widget {
+  min-height: 1px;
+}
+
+.snippet-body h2 {
+  padding-left: 0!important;
+}
+
 .snippet-settings {
   width: 200%;
   margin-left: -100%;
@@ -107,6 +119,7 @@ body {
   margin: 0;
   padding: 10px;
 }
+
 .snippet-settings-body {
   padding: 10px;
 }
