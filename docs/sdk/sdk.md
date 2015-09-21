@@ -50,13 +50,13 @@ for their "models".  (For example, the JobDesigner application stores
 job designs in the database.)
 
 In addition to the web server, some Hue applications run
-daemon processes "on the side".  For example, Beeswax runs a daemon
-("beeswax_server") that keeps track of query states.  Running
+daemon processes "on the side".  For example, Spark runs a daemon
+("livy_server") that keeps track of the Spark shells of the user. Running
 a separate process for applications is the preferred
 way to manage long-running tasks that you may wish
 to co-exist with web page rendering.  The web "views"
 typically communicate with these side daemons
-by using Thrift (e.g., for Beeswax query execution) or by exchanging state
+by using Thrift (e.g., for Hive query execution) or by exchanging state
 through the database.
 
 Interacting with Hadoop
