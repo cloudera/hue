@@ -1443,6 +1443,12 @@ from desktop.views import _ko
       return false;
     });
 
+    $(window).bind("keydown", "ctrl+n alt+n meta+n", function (e) {
+      e.preventDefault();
+      viewModel.selectedNotebook().newSnippet();
+      return false;
+    });
+
     var initialResizePosition = 100;
 
     function getDraggableOptions(minY) {
