@@ -343,6 +343,41 @@ describe("autocomplete.js", function() {
         });
       });
 
+      it("should suggest structs from multiple exploded item references to arrays", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testArrayA/item": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT testItemA.",
+          afterCursor: " FROM testTable " +
+                       " LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA," +
+                       " LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+        assertAutoComplete({
+          serverResponses: {
+            "/testApp/api/autocomplete/testDb/testTable/testArrayB/item": {
+              fields: [
+                {"type": "string", "name": "fieldA"},
+                {"type": "string", "name": "fieldB"}
+              ],
+              type: "struct"
+            }
+          },
+          beforeCursor: "SELECT testItemB.",
+          afterCursor: " FROM testTable " +
+          " LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA," +
+          " LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB",
+          expectedSuggestions: ["fieldA", "fieldB"]
+        });
+      });
+
       it("should suggest structs from references to exploded arrays", function () {
         assertAutoComplete({
           serverResponses: {
