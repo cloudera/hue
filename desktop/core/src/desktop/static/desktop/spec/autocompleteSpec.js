@@ -355,14 +355,17 @@ describe("autocomplete.js", function() {
             }
           },
           beforeCursor: "SELECT testItemA.",
-          afterCursor: " FROM testTable " +
-                       " LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA," +
+          afterCursor: " FROM testTable" +
+                       " LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA" +
                        " LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB",
           expectedSuggestions: ["fieldA", "fieldB"]
         });
+      });
+
+      it("should support table references as arguments of explode function", function() {
         assertAutoComplete({
           serverResponses: {
-            "/testApp/api/autocomplete/testDb/testTable/testArrayB/item": {
+            "/testApp/api/autocomplete/testDb/testTable2/testArrayB/item": {
               fields: [
                 {"type": "string", "name": "fieldA"},
                 {"type": "string", "name": "fieldB"}
@@ -371,9 +374,9 @@ describe("autocomplete.js", function() {
             }
           },
           beforeCursor: "SELECT testItemB.",
-          afterCursor: " FROM testTable " +
-          " LATERAL VIEW explode(testArrayA) explodedTableA AS testItemA," +
-          " LATERAL VIEW explode(testArrayB) explodedTableB AS testItemB",
+          afterCursor: " FROM testTable1, testTable2 tt2" +
+          " LATERAL VIEW explode(tt2.testArrayA) explodedTableA AS testItemA" +
+          " LATERAL VIEW explode(tt2.testArrayB) explodedTableB AS testItemB",
           expectedSuggestions: ["fieldA", "fieldB"]
         });
       });
