@@ -1157,33 +1157,46 @@ function reinitializeTableExtenders() {
 }
 
 var CURRENT_CODEMIRROR_SIZE = 100;
+var INITIAL_HORIZONTAL_RESIZE_POSITION = -1;
 
 // Navigator, recent queries
 $(document).ready(function () {
-  var INITIAL_RESIZE_POSITION = 299;
   $("#resizePanel a").draggable({
     axis: "y",
-    drag: function(e, ui) {
+    drag: function (e, ui) {
       draggableHelper($(this), e, ui);
       $(".jHueTableExtenderClonedContainer").hide();
     },
-    stop: function(e, ui) {
+    stop: function (e, ui) {
       $(".jHueTableExtenderClonedContainer").show();
       draggableHelper($(this), e, ui);
       reinitializeTableExtenders();
     }
   });
 
-  function draggableHelper(el, e, ui) {
-    if (el.offset().top > INITIAL_RESIZE_POSITION){
-      CURRENT_CODEMIRROR_SIZE = 100 + (el.offset().top - INITIAL_RESIZE_POSITION);
-      codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
-    }
-    if (ui.position.top < INITIAL_RESIZE_POSITION) {
-      ui.position.top = INITIAL_RESIZE_POSITION;
+  function checkForInitialSplitterPosition() {
+    INITIAL_HORIZONTAL_RESIZE_POSITION = $("#resizePanel a").position().top;
+    if (INITIAL_HORIZONTAL_RESIZE_POSITION <= 0) {
+      window.setTimeout(checkForInitialSplitterPosition, 200);
     }
   }
 
+  checkForInitialSplitterPosition();
+
+  function resizeCodeMirror(el) {
+    CURRENT_CODEMIRROR_SIZE = 100 + (el.position().top - INITIAL_HORIZONTAL_RESIZE_POSITION);
+    codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
+  }
+
+  function draggableHelper(el, e, ui) {
+    if (el.position().top > INITIAL_HORIZONTAL_RESIZE_POSITION) {
+      resizeCodeMirror(el);
+    }
+    if (ui.position.top < INITIAL_HORIZONTAL_RESIZE_POSITION) {
+      ui.position.top = INITIAL_HORIZONTAL_RESIZE_POSITION;
+      resizeCodeMirror(el);
+    }
+  }
 
   var recentQueries = $("#recentQueries").dataTable({
       "bPaginate": false,
