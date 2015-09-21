@@ -55,17 +55,19 @@ Autocompleter.prototype.getFromReferenceIndex = function (statement) {
     var refs = refsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i);
     refs.sort();
     $.each(refs, function(index, tableRefRaw) {
-      var refMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
+      if (tableRefRaw.indexOf('(') == -1) {
+        var refMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
 
-      var refParts = refMatch[1].split('.');
-      if (refMatch[2]) {
-        if (refParts.length == 1) {
-          result.tables[refMatch[2]] = refParts[0];
+        var refParts = refMatch[1].split('.');
+        if (refMatch[2]) {
+          if (refParts.length == 1) {
+            result.tables[refMatch[2]] = refParts[0];
+          } else {
+            result.complex[refMatch[2]] = refParts;
+          }
         } else {
-          result.complex[refMatch[2]] = refParts;
+          result.tables[refMatch[1]] = refMatch[1];
         }
-      } else {
-        result.tables[refMatch[1]] = refMatch[1];
       }
     })
   }
