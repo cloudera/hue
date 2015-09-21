@@ -25,7 +25,7 @@ from django.contrib.auth.models import User
 from desktop.lib.metrics import global_registry
 
 global_registry().gauge_callback(
-    name='python.threads.total',
+    name='threads.total',
     callback=lambda: len(threading.enumerate()),
     label='Threads',
     description='The total number of threads',
@@ -33,7 +33,7 @@ global_registry().gauge_callback(
 )
 
 global_registry().gauge_callback(
-    name='python.threads.daemon',
+    name='threads.daemon',
     callback=lambda: sum(1 for thread in threading.enumerate() if thread.isDaemon()),
     label='Daemon Threads',
     description='The number of daemon threads',
@@ -43,7 +43,7 @@ global_registry().gauge_callback(
 # ------------------------------------------------------------------------------
 
 global_registry().gauge_callback(
-    name='python.multiprocessing',
+    name='multiprocessing.processes.total',
     callback=lambda: len(multiprocessing.active_children()),
     label='Multiprocessing Processes',
     description='Number of multiprocessing processes',
@@ -51,7 +51,7 @@ global_registry().gauge_callback(
 )
 
 global_registry().gauge_callback(
-    name='python.multiprocessing.daemon',
+    name='multiprocessing.processes.daemon',
     callback=lambda: sum(1 for proc in multiprocessing.active_children() if proc.daemon),
     label='Daemon Multiprocessing Processes',
     description='Number of daemon multiprocessing processes',
