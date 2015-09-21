@@ -175,6 +175,34 @@ describe("autocomplete.js", function() {
         expectedSuggestions: ["testTable1", "testTable2"]
       });
     });
+
+    it("should suggest aliases", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT ",
+        afterCursor: " FROM testTableA tta, testTableB",
+        expectedSuggestions: ["testTableB.", "tta."]
+      });
+    });
+
+    it("should only suggest table aliases", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT ",
+        afterCursor: " FROM testTableA tta, (SELECT SUM(A*B) total FROM tta.array) ttaSum, testTableB ttb",
+        expectedSuggestions: ["tta.", "ttb."]
+      });
+    });
+
+    // TODO: Fix me...
+    xit("should suggest aliases from nested selects", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "SELECT ",
+        afterCursor: " FROM testTableA tta, testTableB ttb, (SELECT SUM(A*B) total FROM tta.array) ttaSum",
+        expectedSuggestions: ["tta.", "ttb.", "ttaSum."]
+      });
+    });
   });
 
   describe("hive-specific stuff", function() {
@@ -711,15 +739,6 @@ describe("autocomplete.js", function() {
         beforeCursor: "SELECT ttb.",
         afterCursor: " FROM testTableA tta, testTableB ttb",
         expectedSuggestions: ["*", "testTableColumn3", "testTableColumn4"]
-      });
-    });
-
-    it("should suggest aliases", function() {
-      assertAutoComplete({
-        serverResponses: {},
-        beforeCursor: "SELECT ",
-        afterCursor: " FROM testTableA tta, testTableB",
-        expectedSuggestions: ["testTableB.", "tta."]
       });
     });
 
