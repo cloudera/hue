@@ -270,6 +270,8 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
     parts.pop();
 
     var fromReferences = self.getFromReferenceIndex(beforeCursor + afterCursor);
+    var viewReferences = self.getViewReferenceIndex(beforeCursor + afterCursor);
+
     var tableName = "";
 
     if (parts.length > 0 && fromReferences.tables[parts[0]]) {
@@ -311,13 +313,14 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       // We use first and only table reference if exist
       // if there are no parts the call to getFields will fetch the columns
       tableName = fromReferences.tables[Object.keys(fromReferences.tables)[0]];
+    } else if (parts.length > 0 && viewReferences.index[parts[0]] && viewReferences.index[parts[0]].leadingPath.length > 0) {
+      tableName = fromReferences.tables[viewReferences.index[parts[0]].leadingPath[0]];
     } else {
       // Can't complete without table reference
       onFailure();
       return;
     }
 
-    var viewReferences = self.getViewReferenceIndex(beforeCursor + afterCursor);
     var getFields = function (remainingParts, fields) {
       if (remainingParts.length == 0) {
         self.assistHelper.fetchFields(tableName, fields, function(data) {
@@ -338,8 +341,13 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
               callback(self.extractFields([], "", true, viewReferences.index[part].references));
               return;
             }
-            if (fields.length == 0) {
-              fields.push(viewReferences.index[part].leadingPath);
+            if (fields.length == 0 && viewReferences.index[part].leadingPath.length > 0) {
+              // Drop first if table ref
+              if (fromReferences.tables[viewReferences.index[part].leadingPath[0]]) {
+                fields = fields.concat(viewReferences.index[part].leadingPath.slice(1));
+              } else {
+                fields = fields.concat(viewReferences.index[part].leadingPath);
+              }
             }
             if (viewReferences.index[part].addition) {
               fields.push(viewReferences.index[part].addition);
