@@ -417,7 +417,7 @@ ${ layout.menubar(section='query') }
               <table id="resultTable" class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
                 <thead>
                 <tr data-bind="foreach: $root.design.results.columns">
-                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}"></th>
+                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type), 'datatables-counter-col': $index() == 0}"></th>
                 </tr>
                 </thead>
               </table>
@@ -1923,7 +1923,7 @@ function cleanResultsTable() {
 function addRowNumberToResults(data, startIndex) {
   var _tmpdata = [];
   $(data).each(function(cnt, item){
-    item.unshift(cnt + startIndex);
+    item.unshift(cnt + startIndex + 1);
     _tmpdata.push(item);
   });
   return _tmpdata;

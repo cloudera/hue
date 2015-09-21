@@ -2079,3 +2079,7 @@ pre {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.datatables-counter-col {
+  width: 10px;
+}
