@@ -139,7 +139,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
               <thead>
                 <tr data-bind="foreach: columns">
-                  <th data-bind="text: $data"></th>
+                  <th data-bind="text: $data, css:{'datatables-counter-col': $index() == 0}"></th>
                 </tr>
               </thead>
             </table>
@@ -862,7 +862,7 @@ ${ commonshare() | n,unicode }
       var ordered_row = [];
       $.each(viewModel.columns(), function (col_index, col) {
         if (col_index == 0) {
-          ordered_row.push(index + row_index);
+          ordered_row.push(index + row_index + 1);
         }
         else {
           ordered_row.push(row[col]);
