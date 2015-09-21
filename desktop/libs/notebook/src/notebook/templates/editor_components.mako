@@ -332,7 +332,7 @@ from desktop.views import _ko
 
       <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-      <h2 class="card-heading simple">
+      <h2 class="card-heading simple" data-bind="visible: type() != 'text' || $root.isEditing()">
 
         <div class="dropdown inline widget-type" data-bind="visible: type() != 'text' || $root.isEditing()">
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
@@ -982,13 +982,16 @@ from desktop.views import _ko
               var loaded = JSON.parse(e.target.result);
 
               if (loaded.cells) { //ipython
-                loaded.cells.forEach(function (cell) {
+                loaded.cells.forEach(function (cell, cellCnt) {
                   window.setTimeout(function () {
                     if (cell.cell_type == "code") {
                       addPySpark(cell.source.join("\n"));
                     }
                     if (cell.cell_type == "markdown") {
                       addMarkdown(cell.source.join("\n"));
+                    }
+                    if (cellCnt == loaded.cells.length - 1 && aceChecks == 0){
+                      hideHoverMsg();
                     }
                   }, 10);
                 });
