@@ -138,7 +138,24 @@ Autocompleter.prototype.getViewReferenceIndex = function (statement) {
     }
   }
 
-  // TODO: Support view references from views. (expand result values using result, limit steps to prevent infinite refs)
+  // Expand any references in paths of references
+  var foundRef = false;
+  // Limit iterations to 10
+  for (var i = 0; i < 10 && (i == 0 || foundRef); i++) {
+    $.each(result.index, function(alias, value) {
+      var newLeadingPath = [];
+      $.each(value.leadingPath, function(index, path) {
+        if (result.index[path]) {
+          foundRef = true;
+          newLeadingPath = newLeadingPath.concat(result.index[path].leadingPath);
+          newLeadingPath.push(result.index[path].addition);
+        } else {
+          newLeadingPath.push(path);
+        }
+      });
+      value.leadingPath = newLeadingPath;
+    });
+  }
 
   return result;
 };
