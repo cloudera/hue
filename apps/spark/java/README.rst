@@ -28,14 +28,14 @@ To build/run Livy, you will need:
 Debian/Ubuntu:
   * mvn (from ``maven`` package or maven3 tarball)
   * openjdk-7-jdk (or Oracle Java7 jdk)
-  * spark 1.4 from (from `Apache Spark tarball`_)
+  * spark 1.5 from (from `Apache Spark tarball`_)
   * Python 2.6+
   * R 3.x
 
 Redhat/CentOS:
   * mvn (from ``maven`` package or maven3 tarball)
   * java-1.7.0-openjdk (or Oracle Java7 jdk)
-  * spark 1.4 (from `Apache Spark tarball`_)
+  * spark 1.5 (from `Apache Spark tarball`_)
   * Python 2.6+
   * R 3.x
 
@@ -43,7 +43,7 @@ MacOS:
   * Xcode command line tools
   * Oracle's JDK 1.7+
   * Maven (Homebrew)
-  * apache-spark 1.4 (Homebrew)
+  * apache-spark 1.5 (Homebrew)
   * Python 2.6+
   * R 3.x
 
@@ -95,6 +95,7 @@ Or with YARN sessions by running:
 
 .. code:: shell
 
+   % export SPARK_HOME=/usr/lib/spark
    % env \
      LIVY_SERVER_JAVA_OPTS="-Dlivy.server.session.factory=yarn" \
      CLASSPATH=`hadoop classpath` \
