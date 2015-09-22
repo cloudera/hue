@@ -14,11 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
+
 #Cleans up old oozie workflow and beeswax savedqueries to
 #prevent the DB from getting too large.
 PARCEL_DIR=/opt/cloudera/parcels/CDH
-LOG_FILE=/var/log/hue_history_cron.log
+LOG_FILE=/var/log/hue/`basename "$0" | awk -F\. '{print $1}'`.log
 LOG_ROTATE_SIZE=10 #MB before rotating, size in MB before rotating log to .1
 LOG_ROTATE_COUNT=2 #number of log files, so 20MB max
 DATE=`date '+%Y%m%d-%H%M'`
@@ -45,18 +45,23 @@ else
    COMMAND="${CDH_HOME}/share/hue/build/env/bin/hue shell"
 fi
 
-export CDH_HOME HUE_CONF_DIR COMMAND
+ORACLE_HOME=/opt/cloudera/parcels/ORACLE_INSTANT_CLIENT/instantclient_11_2/
+LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_HOME}
+export CDH_HOME HUE_CONF_DIR ORACLE_HOME LD_LIBRARY_PATH COMMAND
 
-${COMMAND} <<EOF
+${COMMAND} >> /dev/null 2>&1 <<EOF
 from beeswax.models import SavedQuery
 from datetime import date, timedelta
 from oozie.models import Workflow
+from django.db.utils import DatabaseError
 import logging
 import logging.handlers
 import sys
 
 LOGFILE="${LOG_FILE}"
 keepDays = ${KEEP_DAYS}
+deleteRecords = 900
+errorCount = 0
 log = logging.getLogger('')
 log.setLevel(logging.INFO)
 format = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -69,15 +74,34 @@ log.info('HUE_CONF_DIR: ${HUE_CONF_DIR}')
 log.info("Cleaning up anything in the Hue tables oozie*, desktop* and beeswax* older than ${KEEP_DAYS} old")
 
 savedQuerys = SavedQuery.objects.filter(is_auto=True, mtime__lte=date.today() - timedelta(days=keepDays))
-log.info("SavedQuery count is: %s" % savedQuerys.count())
-savedQuerys.delete()
-log.info("SavedQuery new count is: %s" % savedQuerys.count())
+totalQuerys = savedQuerys.count()
+loopCount = totalQuerys
+deleteCount = deleteRecords
+log.info("SavedQuerys left: %s" % totalQuerys)
+log.info("Looping through querys")
+while loopCount > 0:
+   if loopCount < deleteCount:
+      deleteCount = loopCount
+   excludeCount = loopCount - deleteCount
+   savedQuerys = SavedQuery.objects.filter(is_auto=True, mtime__lte=date.today() - timedelta(days=keepDays))[:excludeCount].values_list("id", flat=True)
+   try:
+      SavedQuery.objects.exclude(pk__in=list(savedQuerys)).delete()
+      loopCount -= deleteCount
+      errorCount = 0
+      deleteCount = deleteRecords
+   except DatabaseError, e:
+      log.info("Non Fatal Exception: %s: %s" % (e.__class__.__name__, e))
+      errorCount += 1
+      deleteCount = 1
+      if errorCount > 9:
+         raise
+   log.info("querys left: %s" % loopCount)
 
 workflows = Workflow.objects.filter(is_trashed=True, last_modified__lte=date.today() - timedelta(days=keepDays))
 totalWorkflows = workflows.count()
 loopCount = 1
 maxCount = 1000
-log.info("workflows left: %s" % totalWorkflows)
+log.info("Workflows left: %s" % totalWorkflows)
 log.info("Looping through workflows")
 for w in workflows:
    w.delete(skip_trash=True)
@@ -85,6 +109,6 @@ for w in workflows:
    if loopCount == maxCount:
       totalWorkflows = totalWorkflows - maxCount
       loopCount = 1
-      log.info("workflows left: %s" % totalWorkflows)
+      log.info("Workflows left: %s" % totalWorkflows)
 
 EOF
