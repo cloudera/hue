@@ -18,6 +18,8 @@
 import os
 import logging
 
+from django.utils.functional import wraps
+
 from hadoop import conf
 from hadoop.fs import webhdfs, LocalSubFileSystem
 from hadoop.job_tracker import LiveJobTracker
@@ -35,28 +37,54 @@ MR_NAME_CACHE = 'default'
 DEFAULT_USER = DEFAULT_USER.get()
 
 
-def _make_filesystem(identifier):
-  choice = os.getenv("FB_FS")
+def jt_ha(funct):
+  """
+  Support JT plugin HA by trying other MR cluster.
 
-  if choice == "testing":
-    path = os.path.join(get_build_dir(), "fs")
-    if not os.path.isdir(path):
-      LOG.warning(("Could not find fs directory: %s. Perhaps you need to run manage.py filebrowser_test_setup?") % path)
-    return LocalSubFileSystem(path)
-  else:
-    cluster_conf = conf.HDFS_CLUSTERS[identifier]
-    return webhdfs.WebHdfs.from_config(cluster_conf)
+  This modifies the cached JT and so will happen just once by failover.
+  """
+  def decorate(api, *args, **kwargs):
+    try:
+      return funct(api, *args, **kwargs)
+    except Exception, ex:
+      if 'Could not connect to' in str(ex):
+        LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
+        jt_ha = get_next_ha_mrcluster()
+        if jt_ha is not None:
+          if jt_ha[1].host == api.jt.host:
+            raise ex
+          config, api.jt = jt_ha
+          return funct(api, *args, **kwargs)
+      raise ex
+  return wraps(funct)(decorate)
 
 
-def _make_mrcluster(identifier):
-  cluster_conf = conf.MR_CLUSTERS[identifier]
-  return LiveJobTracker.from_conf(cluster_conf)
+def rm_ha(funct):
+  """
+  Support RM HA by trying other RM API.
+  """
+  def decorate(api, *args, **kwargs):
+    try:
+      return funct(api, *args, **kwargs)
+    except Exception, ex:
+      ex_message = str(ex)
+      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
+        LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
+        rm_ha = get_next_ha_yarncluster()
+        if rm_ha is not None:
+          if rm_ha[1].url == api.resource_manager_api.url:
+            raise ex
+          config, api.resource_manager_api = rm_ha
+          return funct(api, *args, **kwargs)
+      raise ex
+  return wraps(funct)(decorate)
 
 
 def get_hdfs(identifier="default"):
   global FS_CACHE
   get_all_hdfs()
   return FS_CACHE[identifier]
+
 
 def get_defaultfs():
   fs = get_hdfs()
@@ -65,6 +93,7 @@ def get_defaultfs():
     return fs.logical_name
   else:
     return fs.fs_defaultfs
+
 
 def get_all_hdfs():
   global FS_CACHE
@@ -272,3 +301,21 @@ def restore_caches(old):
   """
   global FS_CACHE, MR_CACHE
   FS_CACHE, MR_CACHE = old
+
+
+def _make_filesystem(identifier):
+  choice = os.getenv("FB_FS")
+
+  if choice == "testing":
+    path = os.path.join(get_build_dir(), "fs")
+    if not os.path.isdir(path):
+      LOG.warning(("Could not find fs directory: %s. Perhaps you need to run manage.py filebrowser_test_setup?") % path)
+    return LocalSubFileSystem(path)
+  else:
+    cluster_conf = conf.HDFS_CLUSTERS[identifier]
+    return webhdfs.WebHdfs.from_config(cluster_conf)
+
+
+def _make_mrcluster(identifier):
+  cluster_conf = conf.MR_CLUSTERS[identifier]
+  return LiveJobTracker.from_conf(cluster_conf)
