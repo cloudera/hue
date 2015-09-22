@@ -18,7 +18,8 @@
 
 package com.cloudera.hue.livy.server
 
-import java.io.IOException
+import java.io.{File, IOException}
+import java.nio.file.{Paths, Files}
 import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy._
@@ -45,6 +46,7 @@ object Main {
     val port = livyConf.getInt("livy.server.port", 8998)
 
     // Make sure the `spark-submit` program exists, otherwise much of livy won't work.
+    testSparkHome(livyConf)
     testSparkSubmit(livyConf)
 
     val server = new WebServer(host, port)
@@ -63,6 +65,23 @@ object Main {
 
       // Make sure to close all our outstanding http requests.
       dispatch.Http.shutdown()
+    }
+  }
+
+  /**
+   * Sets the spark-submit path if it's not configured in the LivyConf
+   */
+  private def testSparkHome(livyConf: LivyConf) = {
+    val sparkHome = livyConf.sparkHome().getOrElse {
+      System.err.println("Livy requires the SPARK_HOME environment variable")
+      sys.exit(1)
+    }
+
+    val sparkHomeFile = new File(sparkHome)
+
+    if (!sparkHomeFile.exists) {
+      System.err.println("SPARK_HOME path does not exist")
+      sys.exit(1)
     }
   }
 
@@ -121,6 +140,7 @@ object Main {
       case _ => throw new IOException(f"Unable to determing spark-submit version [$exitCode]:\n$output")
     }
   }
+
 }
 
 class ScalatraBootstrap
