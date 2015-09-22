@@ -92,6 +92,17 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 <script src="${ static('desktop/js/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] },
+    TeX: { equationNumbers: {autoNumber: "AMS"} }
+  });
+</script>
+<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
 </%def>
 
 
@@ -654,12 +665,12 @@ from desktop.views import _ko
             placeholder: '${ _('Type your markdown here') }' }"></div>
         </div>
         <div class="span6">
-          <div data-bind="html: markdown.toHTML(statement_raw())"></div>
+          <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD'+id()}"></div>
         </div>
       </div>
     <!-- /ko -->
     <!-- ko ifnot: $root.isEditing() -->
-      <div data-bind="html: markdown.toHTML(statement_raw())"></div>
+      <div data-bind="html: renderMarkdown(statement_raw(), id())"></div>
     <!-- /ko -->
   <!-- /ko -->
 </script>
@@ -1069,6 +1080,46 @@ from desktop.views import _ko
     });
   }
 
+  function escapeMathJax(code) {
+    var escapeMap = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#x27;",
+      "`": "&#x60;"
+    };
+    var escaper = function (match) {
+      return escapeMap[match];
+    };
+    var source = "(?:" + Object.keys(escapeMap).join("|") + ")";
+    var testRegexp = RegExp(source);
+    var replaceRegexp = RegExp(source, "g");
+    code = code == null ? "" : "" + code;
+    return testRegexp.test(code) ? string.replace(replaceRegexp, escaper) : code;
+  }
+
+  var mathJaxTimeout = 0;
+
+  if (typeof MathJax == "undefined") {
+    escapeMathJax = function (code) {
+      return code;
+    }
+  }
+
+  function renderMarkdown(text, snippetId) {
+    window.clearTimeout(mathJaxTimeout);
+
+    text = text.replace(/([^$]*)([$]+[^$]*[$]+)?/g, function (a, text, code) {
+      return markdown.toHTML(text).replace(/^<p>|<\/p>$/g, '') + (code ? escapeMathJax(code) : '');
+    });
+    if (typeof MathJax != "undefined") {
+      mathJaxTimeout = window.setTimeout(function () {
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, $("#liveMD" + snippetId)[0]]);
+      }, 500);
+    }
+    return text;
+  }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 
