@@ -21,11 +21,11 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.sessions.Error
+import com.cloudera.hue.livy.sessions.{PySpark, Error, Spark}
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{RelativePath, AbsolutePath}
-import com.cloudera.hue.livy.yarn.{Client, Job}
-import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf, Utils}
+import com.cloudera.hue.livy.yarn.Client
+import com.cloudera.hue.livy.{LivyConf, Utils}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
@@ -58,10 +58,17 @@ object InteractiveSessionYarn {
     createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
     createInteractiveRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
 
+    val kind = createInteractiveRequest.kind.toString
+
+    createInteractiveRequest.kind match {
+      case PySpark() => builder.conf("spark.yarn.isPython", "true")
+      case _ =>
+    }
+
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(true)
 
-    val process = builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
+    val process = builder.start(AbsolutePath(livyJar(livyConf)), List(kind))
 
     new InteractiveSessionYarn(id, client, process, createInteractiveRequest)
   }

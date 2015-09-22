@@ -81,7 +81,8 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
         "evalue" ->
           """<console>:8: error: not found: value x
             |              x
-            |              ^""".stripMargin
+            |              ^""".stripMargin,
+        "traceback" -> List()
       ))
 
       result should equal (expectedResult)

@@ -66,7 +66,7 @@ class SparkInterpreter extends Interpreter {
       .setAppName("Livy Spark shell")
       .set("spark.repl.class.uri", sparkIMain.classServerUri)
 
-    sparkContext = new SparkContext(sparkConf)
+    sparkContext = SparkContext.getOrCreate(sparkConf)
 
     sparkIMain.beQuietDuring {
       sparkIMain.bind("sc", "org.apache.spark.SparkContext", sparkContext, List("""@transient"""))
