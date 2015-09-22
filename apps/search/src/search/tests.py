@@ -154,7 +154,7 @@ class TestWithMockedSolr(TestSearchBase):
 
     result = json.loads(response.content)
     assert_equal(
-        [{u'id': u'change.me', u'_version_': 1513046095083602000, u'title': [u'val1', u'val2', u'[val3]', u'val4'], u'details': [], u'externalLink': None}],
+        [{'id': 'change.me', '_version_': 1513046095083602000, 'title': ['val1', 'val2', '[val3]', 'val4'], 'details': [], 'externalLink': None}],
         result['response']['docs']
     )
 
@@ -257,7 +257,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_equal(4 + 1 + 1, len(csv_response_content.split('\n')), csv_response_content.split('\n'))
     assert_true('_version_,author,cat,category,comments,content,content_type,description,features,inStock,includes,keywords,last_modified,links,manu,manu_exact,name,payloads,popularity,price,resourcename,sku,store,subject,text,text_rev,title,url,weight,id' in csv_response_content, csv_response_content)
     # Fields does not exactly match the response but this is because the collection schema does not match the query response.
-    assert_true("""1450807641462800385,"[u&#39;B B Hallberg&#39;, u&#39;M M Blennow&#39;]",,,,,,,,,,,,,,,,,,,,,,,,,,,,23680099""" in csv_response_content, csv_response_content)
+    assert_true("""1450807641462800385,"['B B Hallberg', 'M M Blennow']",,,,,,,,,,,,,,,,,,,,,,,,,,,,23680099""" in csv_response_content, csv_response_content)
 
     xls_response = self.c.post(reverse('search:download'), {
         'xls': True,

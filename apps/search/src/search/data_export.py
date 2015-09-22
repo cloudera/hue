@@ -64,6 +64,8 @@ def SearchDataAdapter(results, format, collection):
           row.append("")
         elif isinstance(data[column], basestring) or isinstance(data[column], (int, long, float, complex)):
           row.append(data[column])
+        elif isinstance(data[column], list): # Multivalue field
+          row.append([smart_str(val, errors='replace') for val in data[column]])
         else:
           row.append(smart_str(data[column]))
       rows.append(row)
