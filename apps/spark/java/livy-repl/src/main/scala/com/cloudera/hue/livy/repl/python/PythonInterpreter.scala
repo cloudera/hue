@@ -67,7 +67,7 @@ object PythonInterpreter extends Logging {
         val pyLibPath = Seq(sparkHome, "python", "lib").mkString(File.separator)
         val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
         require(pyArchivesFile.exists(),
-          "pyspark.zip not found; cannot run pyspark application in YARN mode.")
+          "pyspark.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
 
         val py4jFile = Files.newDirectoryStream(Paths.get(pyLibPath), "py4j-*-src.zip")
           .iterator()
@@ -75,7 +75,7 @@ object PythonInterpreter extends Logging {
           .toFile
 
         require(py4jFile.exists(),
-          "py4j-0.8.2.1-src.zip not found; cannot run pyspark application in YARN mode.")
+          "py4j-*-src.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
         Seq(pyArchivesFile.getAbsolutePath(), py4jFile.getAbsolutePath())
       }.getOrElse(Seq())
     }
