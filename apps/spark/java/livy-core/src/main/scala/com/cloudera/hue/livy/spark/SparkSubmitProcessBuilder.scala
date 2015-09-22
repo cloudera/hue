@@ -46,7 +46,7 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
   private[this] var _master: Option[String] = None
   private[this] var _deployMode: Option[String] = None
   private[this] var _className: Option[String] = None
-  private[this] var _name: Option[String] = None
+  private[this] var _name: Option[String] = Some("Livy")
   private[this] var _jars: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _pyFiles: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _files: ArrayBuffer[Path] = ArrayBuffer()

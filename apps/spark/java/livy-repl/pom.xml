@@ -154,6 +154,7 @@
                 <version>1.0</version>
                 <configuration>
                     <systemProperties>
+                        <spark.app.name>Livy</spark.app.name>
                         <spark.master>local</spark.master>
                         <spark.driver.allowMultipleContexts>true</spark.driver.allowMultipleContexts>
                         <spark.ui.enabled>false</spark.ui.enabled>
