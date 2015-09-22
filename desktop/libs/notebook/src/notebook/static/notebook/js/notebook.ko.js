@@ -896,8 +896,22 @@ function EditorViewModel(notebooks, options) {
   self.removeSnippetConfirmation = ko.observable();
 
   self.removeSnippet = function (notebook, snippet) {
-    self.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
-    $("#removeSnippetModal").modal("show");
+    var hasContent = snippet.statement_raw().length > 0;
+    if (!hasContent) {
+      $.each(snippet.properties(), function (key, value) {
+        hasContent = hasContent || (ko.isObservable(value) && value().length > 0);
+      });
+    }
+    if (hasContent) {
+      self.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
+      $("#removeSnippetModal").modal("show");
+    }
+    else {
+      notebook.snippets.remove(snippet);
+      window.setTimeout(function () {
+        $(document).trigger("editorSizeChanged");
+      }, 100);
+    }
   };
 
   self.assistAvailable = ko.observable(options.assistAvailable);
