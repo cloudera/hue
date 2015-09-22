@@ -116,7 +116,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                   <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'spark' in apps:
-                  <li><a href="${ url('spark:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
