@@ -24,7 +24,7 @@ from django.forms import FileField, CharField, BooleanField, Textarea
 from django.forms.formsets import formset_factory, BaseFormSet
 
 from desktop.lib import i18n
-from desktop.lib.fs.utils import normpath
+from hadoop.fs import normpath
 from filebrowser.lib import rwx
 
 from django.utils.translation import ugettext_lazy as _

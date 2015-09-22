@@ -32,7 +32,8 @@ from aws import s3
 from aws.s3 import translate_s3_error, s3file
 from aws.s3.s3stat import S3Stat
 
-from desktop.lib.fs import utils as fs_utils
+from hadoop.fs import normpath
+
 
 DEFAULT_READ_SIZE = 1024 * 1024  # 1MB
 LOG = logging.getLogger(__name__)
@@ -114,7 +115,7 @@ class S3FileSystem(object):
 
   @staticmethod
   def normpath(path):
-    return fs_utils.normpath(path)
+    return normpath(path)
 
   @translate_s3_error
   def open(self, path, mode='r'):
@@ -149,7 +150,7 @@ class S3FileSystem(object):
 
   @translate_s3_error
   def stats(self, path):
-    path = fs_utils.normpath(path)
+    path = normpath(path)
     stats = self._stats(path)
     if stats:
       return stats

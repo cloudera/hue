@@ -24,9 +24,10 @@ import sys
 import time
 
 from functools import wraps
-from boto.exception import S3ResponseError
 
-from desktop.lib.fs import utils as fs_utils
+from boto.exception import S3ResponseError
+from hadoop.fs import normpath
+
 
 ERRNO_MAP = {
   403: errno.EACCES,
@@ -84,7 +85,7 @@ def abspath(cd, uri):
   abspath('s3://bucket/key', 's3://bucket2/key2') == 's3://bucket2/key2'
   """
   if not uri.lower().startswith(S3_ROOT):
-    uri = fs_utils.normpath(join(cd, '..', uri))
+    uri = normpath(join(cd, '..', uri))
   return uri
 
 
