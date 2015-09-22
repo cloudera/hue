@@ -24,27 +24,44 @@ KILL_ME=5000  #This is the number of MB at which it will kill.
              #Starting with 5000(5gb)
 VERBOSE=true #true then this writes out the proc info each time it runs, leave blank
              #to only write out when we kill the process
-LOG_FILE=/var/log/hue_mem_cron.log
+LOG_FILE=/var/log/hue/`basename "$0" | awk -F\. '{print $1}'`.log
 ROTATE_SIZE=10 #MB before rotating, size in MB before rotating log to .1, we only keep
                #2 log files, so 20MB max
 
 main()
 {
-#  Command to get memory usage.  This will handle multiple Hue instances per server, so
-#  this command grabs the highest memory Hue process at the time of running and
+#  Command to get memory usage.  This will handle multiple Hue instances per server, so 
+#  this command grabs the highest memory Hue process at the time of running and 
 #  kills it.  Then the next run it'll get the next process.
-PS_COMMAND=`ps aux | grep [r]uncherrypyserver | awk '{print $6" "$2" "$3" "$12}'`
-MEM=`echo ${PS_COMMAND} | awk '{print $1}'`
+if [[ ! ${USER} =~ .*root* ]]
+then
+   echo "Script must be run as root: exiting"
+   exit 1
+fi
+
+PS_COMMAND="ps aux | grep [r]uncherrypyserver | awk '{print \$6\" \"\$2\" \"\$3\" \"\$12}'"
+PS_RESULTS=`eval ${PS_COMMAND}`
+if [[ -z ${PS_RESULTS} ]]
+then
+   PS_COMMAND="ps aux | grep [r]unspawningserver | awk '{print \$6\" \"\$2\" \"\$3\" \"\$12}'"
+   PS_RESULTS=`eval ${PS_COMMAND}`
+fi
+if [[ -z ${PS_RESULTS} ]]
+then
+   echo "No Hue processes found: runcherrypyserver or runspawningserver process must be running"
+   exit 1
+fi
+MEM=`echo ${PS_RESULTS} | awk '{print $1}'`
 MEM_MB=`expr ${MEM} / 1024`
-PID=`echo ${PS_COMMAND} | awk '{print $2}'`
-CPU=`echo ${PS_COMMAND} | awk '{print $3}'`
-PROC=`echo ${PS_COMMAND} | awk '{print $4}'`
+PID=`echo ${PS_RESULTS} | awk '{print $2}'`
+CPU=`echo ${PS_RESULTS} | awk '{print $3}'`
+PROC=`echo ${PS_RESULTS} | awk '{print $4}'`
 DATE=`date '+%Y%m%d-%H%M'`
 
 if [[ -f ${LOG_FILE} ]]
 then
    LOG_SIZE=`du -sm ${LOG_FILE} | awk '{print $1}'`
-   if [ ${LOG_SIZE} -gt ${ROTATE_SIZE} ]
+   if [[ ${LOG_SIZE} -gt ${ROTATE_SIZE} ]]
    then
       mv ${LOG_FILE} ${LOG_FILE}.1
    fi
@@ -57,7 +74,8 @@ then
    echo "${DATE} - Killing Hue Process: Too much memory: ${MEM_MB} : PID: ${PID}" >> ${LOG_FILE}
    kill ${PID}
    sleep 30
-   PID2=`ps aux | grep [r]uncherrypyserver | awk '{print $2}'`
+   PS_RESULTS=`eval ${PS_COMMAND}`
+   PID2=`echo ${PS_RESULTS} | awk '{print $2}'`
    if [[ ${PID} == ${PID2} ]]
    then
       kill -9 ${PID}
