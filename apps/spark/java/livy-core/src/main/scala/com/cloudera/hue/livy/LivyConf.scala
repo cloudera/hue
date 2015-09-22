@@ -18,12 +18,14 @@
 
 package com.cloudera.hue.livy
 
+import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 import scala.collection.JavaConverters._
 
 object LivyConf {
   val SESSION_FACTORY_KEY = "livy.server.session.factory"
+  val SPARK_HOME_KEY = "livy.server.spark-home"
   val SPARK_SUBMIT_KEY = "livy.server.spark-submit"
   val IMPERSONATION_ENABLED_KEY = "livy.impersonation.enabled"
 
@@ -94,7 +96,15 @@ class LivyConf(loadDefaults: Boolean) {
   /** Return if the configuration includes this setting */
   def contains(key: String): Boolean = settings.containsKey(key)
 
-  def sparkSubmit(): String = getOption(SPARK_SUBMIT_KEY).getOrElse("spark-submit")
+  /** Return the location of the spark home directory */
+  def sparkHome(): Option[String] = getOption(SPARK_HOME_KEY).orElse(sys.env.get("SPARK_HOME"))
+
+  /** Return the path to the spark-submit executable. */
+  def sparkSubmit(): String = {
+    getOption(SPARK_SUBMIT_KEY)
+      .orElse { sparkHome().map { _ + File.separator + "bin" + File.separator + "spark-submit" } }
+      .getOrElse("spark-submit")
+  }
 
   def sessionKind(): SessionKind = getOption(SESSION_FACTORY_KEY).getOrElse("process") match {
     case "process" => Process()
