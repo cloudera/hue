@@ -806,6 +806,8 @@ def augment_solr_response(response, collection, query):
     for field, value in doc.iteritems():
       if isinstance(value, numbers.Number):
         escaped_value = value
+      elif isinstance(value, list): # Multivalue field
+        escaped_value = [smart_unicode(val, errors='replace') for val in value]
       else:
         value = smart_unicode(value, errors='replace')
         escaped_value = escape(value)
