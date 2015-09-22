@@ -25,7 +25,7 @@ import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
 import dispatch._
-import org.json4s.JsonAST.JNull
+import org.json4s.JsonAST.{JString, JNull}
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats, JValue}
 
@@ -77,14 +77,10 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
       val req = (svc / "execute").setContentType("application/json", "UTF-8") << write(content)
 
       val future = Http(req OK as.json4s.Json).map { case resp: JValue =>
-        resp \ "result" match {
-          case JNull =>
-            // The result isn't ready yet. Loop until it is.
-            val id = (resp \ "id").extract[Int]
-            waitForStatement(id)
-          case result =>
-            transition(Idle())
-            result
+        parseResponse(resp).getOrElse {
+          // The result isn't ready yet. Loop until it is.
+          val id = (resp \ "id").extract[Int]
+          waitForStatement(id)
         }
       }
 
@@ -102,13 +98,41 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
     val req = (svc / "history" / id).setContentType("application/json", "UTF-8")
     val resp = Await.result(Http(req OK as.json4s.Json), Duration.Inf)
 
-    resp \ "result" match {
-      case JNull =>
+    parseResponse(resp) match {
+      case Some(result) => result
+      case None =>
         Thread.sleep(1000)
         waitForStatement(id)
+    }
+  }
+
+  private def parseResponse(response: JValue): Option[JValue] = {
+    response \ "result" match {
+      case JNull => None
       case result =>
-        transition(Idle())
-        result
+        // If the response errored out, it's possible it took down the interpreter. Check if
+        // it's still running.
+        result \ "status" match {
+          case JString("error") =>
+            if (replErroredOut()) {
+              transition(Error())
+            } else {
+              transition(Idle())
+            }
+          case _ => transition(Idle())
+        }
+
+        Some(result)
+    }
+  }
+
+  private def replErroredOut() = {
+    val req = svc.setContentType("application/json", "UTF-8")
+    val response = Await.result(Http(req OK as.json4s.Json), Duration.Inf)
+
+    response \ "state" match {
+      case JString("error") => true
+      case _ => false
     }
   }
 
