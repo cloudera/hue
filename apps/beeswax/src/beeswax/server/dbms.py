@@ -29,7 +29,7 @@ from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, get_auth_username, get_auth_password, \
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, AUTH_USERNAME, AUTH_PASSWORD, \
   APPLY_NATURAL_SORT_MAX
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
@@ -68,7 +68,7 @@ def get(user, query_server=None):
 def get_query_server_config(name='beeswax', server=None):
   if name == 'impala':
     from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
-        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS, QUERY_TIMEOUT_S, get_auth_username as get_impala_auth_username, get_auth_password as get_impala_auth_password
+        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS, QUERY_TIMEOUT_S, AUTH_USERNAME as IMPALA_AUTH_USERNAME, AUTH_PASSWORD as IMPALA_AUTH_PASSWORD
 
     query_server = {
         'server_name': 'impala',
@@ -78,8 +78,8 @@ def get_query_server_config(name='beeswax', server=None):
         'impersonation_enabled': IMPERSONATION_ENABLED.get(),
         'querycache_rows': QUERYCACHE_ROWS.get(),
         'QUERY_TIMEOUT_S': QUERY_TIMEOUT_S.get(),
-        'auth_username': get_impala_auth_username(),
-        'auth_password': get_impala_auth_password()
+        'auth_username': IMPALA_AUTH_USERNAME.get(),
+        'auth_password': IMPALA_AUTH_PASSWORD.get()
     }
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
@@ -96,8 +96,8 @@ def get_query_server_config(name='beeswax', server=None):
             'end_point': hive_site.hiveserver2_thrift_http_path()
         },
         'transport_mode': 'http' if hive_site.hiveserver2_transport_mode() == 'HTTP' else 'socket',
-        'auth_username': get_auth_username(),
-        'auth_password': get_auth_password()
+        'auth_username': AUTH_USERNAME.get(),
+        'auth_password': AUTH_PASSWORD.get()
     }
 
   debug_query_server = query_server.copy()
