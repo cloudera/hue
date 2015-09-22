@@ -569,7 +569,7 @@ class Document(models.Model):
       elif self.extra == 'bundle2':
         return staticfiles_storage.url('oozie/art/icon_oozie_bundle_48.png')
       elif self.extra == 'notebook':
-        return staticfiles_storage.url('notebook/art/icon_spark_48.png')
+        return staticfiles_storage.url('notebook/art/icon_notebook_48.png')
       elif self.extra.startswith('search'):
         return staticfiles_storage.url('search/art/icon_search_48.png')
       elif self.content_type.app_label == 'beeswax':
