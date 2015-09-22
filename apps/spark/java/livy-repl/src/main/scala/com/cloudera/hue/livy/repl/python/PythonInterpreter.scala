@@ -22,10 +22,9 @@ import java.io._
 import java.lang.ProcessBuilder.Redirect
 import java.nio.file.Files
 
+import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.repl.Interpreter
 import com.cloudera.hue.livy.repl.process.ProcessInterpreter
-import com.cloudera.hue.livy.{Logging, Utils}
-import org.apache.spark.SparkContext
 import org.json4s.JsonAST.JObject
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
@@ -34,7 +33,6 @@ import py4j.GatewayServer
 
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
-import scala.collection.mutable.ArrayBuffer
 
 object PythonInterpreter extends Logging {
   def apply(): Interpreter = {
@@ -43,12 +41,13 @@ object PythonInterpreter extends Logging {
     val gatewayServer = new GatewayServer(null, 0)
     gatewayServer.start()
 
-    val pythonPath = buildPythonPath
+    val pySparkArchives = findPySparkArchives()
+
     val builder = new ProcessBuilder(Seq(pythonExec, createFakeShell().toString))
 
     val env = builder.environment()
 
-    env.put("PYTHONPATH", pythonPath)
+    env.put("PYTHONPATH", (sys.env.get("PYTHONPATH") ++ pySparkArchives).mkString(File.pathSeparator))
     env.put("PYTHONUNBUFFERED", "YES")
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
@@ -60,14 +59,21 @@ object PythonInterpreter extends Logging {
     new PythonInterpreter(process, gatewayServer)
   }
 
-  private def buildPythonPath = {
-    val pythonPath = new ArrayBuffer[String]
-    for (sparkHome <- sys.env.get("SPARK_HOME")) {
-      pythonPath += Seq(sparkHome, "python", "lib", "pyspark.zip").mkString(File.separator)
-      pythonPath += Seq(sparkHome, "python", "lib", "py4j-0.8.2.1-src.zip").mkString(File.separator)
+  private def findPySparkArchives(): Seq[String] = {
+    sys.env.get("PYSPARK_ARCHIVES_PATH")
+      .map(_.split(",").toSeq)
+      .getOrElse {
+      sys.env.get("SPARK_HOME") .map { case sparkHome =>
+        val pyLibPath = Seq(sparkHome, "python", "lib").mkString(File.separator)
+        val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
+        require(pyArchivesFile.exists(),
+          "pyspark.zip not found; cannot run pyspark application in YARN mode.")
+        val py4jFile = new File(pyLibPath, "py4j-0.8.2.1-src.zip")
+        require(py4jFile.exists(),
+          "py4j-0.8.2.1-src.zip not found; cannot run pyspark application in YARN mode.")
+        Seq(pyArchivesFile.getAbsolutePath(), py4jFile.getAbsolutePath())
+      }.getOrElse(Seq())
     }
-    pythonPath ++= Utils.jarOfClass(classOf[SparkContext])
-    pythonPath.mkString(File.pathSeparator)
   }
 
   private def createFakeShell(): File = {
