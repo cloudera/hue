@@ -19,7 +19,7 @@
 package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions.Spark
+import com.cloudera.hue.livy.sessions.PySpark
 import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
 
 class InteractiveSessionProcessSpec extends BaseSessionSpec with FunSpecLike with Matchers with BeforeAndAfter {
@@ -27,5 +27,5 @@ class InteractiveSessionProcessSpec extends BaseSessionSpec with FunSpecLike wit
   val livyConf = new LivyConf()
   livyConf.set("livy.repl.driverClassPath", sys.props("java.class.path"))
 
-  def createSession() = InteractiveSessionProcess.create(livyConf, 0, CreateInteractiveRequest(kind = Spark()))
+  def createSession() = InteractiveSessionProcess.create(livyConf, 0, CreateInteractiveRequest(kind = PySpark()))
 }

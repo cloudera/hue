@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.sessions.{Idle, Starting}
+import com.cloudera.hue.livy.sessions.{Error, Idle, Starting}
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
@@ -63,7 +63,7 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
         "status" -> "ok",
         "execution_count" -> 0,
         "data" -> Map(
-          "text/plain" -> "res0: Int = 3"
+          "text/plain" -> "3"
         )
       ))
 
@@ -77,15 +77,23 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
       val expectedResult = Extraction.decompose(Map(
         "status" -> "error",
         "execution_count" -> 0,
-        "ename" -> "Error",
-        "evalue" ->
-          """<console>:8: error: not found: value x
-            |              x
-            |              ^""".stripMargin,
-        "traceback" -> List()
+        "ename" -> "NameError",
+        "evalue" -> "name 'x' is not defined",
+        "traceback" -> List(
+          "Traceback (most recent call last):\n",
+          "NameError: name 'x' is not defined\n"
+        )
       ))
 
       result should equal (expectedResult)
+      session.state should equal (Idle())
+    }
+
+    it("should error out the session if the interpreter dies") {
+      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
+      val stmt = session.executeStatement(ExecuteRequest("import os; os._exit(1)"))
+      val result = Await.result(stmt.output(), Duration.Inf)
+      session.state should equal (Error())
     }
   }
 }
