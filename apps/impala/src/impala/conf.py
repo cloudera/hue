@@ -134,10 +134,12 @@ AUTH_USERNAME = Config(
   dynamic_default=get_auth_username)
 
 def get_auth_password():
+  """Get from script or backward compatibility"""
   password = AUTH_PASSWORD_SCRIPT.get()
-  if not password:
-    password = DEFAULT_AUTH_PASSWORD.get()
-  return password
+  if password:
+    return password
+
+  return DEFAULT_AUTH_PASSWORD.get()
 
 AUTH_PASSWORD = Config(
   key="auth_password",
