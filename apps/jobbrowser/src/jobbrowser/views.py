@@ -323,6 +323,8 @@ def job_single_logs(request, job):
   failed_tasks.sort(cmp_exec_time)
   if failed_tasks:
     task = failed_tasks[0]
+    if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
+      task = failed_tasks[1]
   else:
     task_states = ['running', 'succeeded']
     if job.is_mr2:
