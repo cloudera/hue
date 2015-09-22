@@ -20,7 +20,7 @@ package com.cloudera.hue.livy.repl.python
 
 import java.io._
 import java.lang.ProcessBuilder.Redirect
-import java.nio.file.Files
+import java.nio.file.{Paths, Files}
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.repl.Interpreter
@@ -68,7 +68,12 @@ object PythonInterpreter extends Logging {
         val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
         require(pyArchivesFile.exists(),
           "pyspark.zip not found; cannot run pyspark application in YARN mode.")
-        val py4jFile = new File(pyLibPath, "py4j-0.8.2.1-src.zip")
+
+        val py4jFile = Files.newDirectoryStream(Paths.get(pyLibPath), "py4j-*-src.zip")
+          .iterator()
+          .next()
+          .toFile
+
         require(py4jFile.exists(),
           "py4j-0.8.2.1-src.zip not found; cannot run pyspark application in YARN mode.")
         Seq(pyArchivesFile.getAbsolutePath(), py4jFile.getAbsolutePath())
