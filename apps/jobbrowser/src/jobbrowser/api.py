@@ -17,9 +17,11 @@
 
 import logging
 
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paginator import Paginator
-from django.utils.functional import wraps
+
 from hadoop import cluster
+from hadoop.cluster import jt_ha, rm_ha
 from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundException, ThriftJobState
 
 import hadoop.yarn.history_server_api as history_server_api
@@ -30,8 +32,6 @@ import hadoop.yarn.node_manager_api as node_manager_api
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
 from jobbrowser.yarn_models import Application, Job as YarnJob, KilledJob as KilledYarnJob, Container, SparkJob
-from hadoop.cluster import get_next_ha_mrcluster, get_next_ha_yarncluster
-from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
@@ -44,49 +44,6 @@ def get_api(user, jt):
     return YarnApi(user)
   else:
     return JtApi(jt)
-
-
-def jt_ha(funct):
-  """
-  Support JT plugin HA by trying other MR cluster.
-
-  This modifies the cached JT and so will happen just once by failover.
-  """
-  def decorate(api, *args, **kwargs):
-    try:
-      return funct(api, *args, **kwargs)
-    except Exception, ex:
-      if 'Could not connect to' in str(ex):
-        LOG.info('JobTracker not available, trying JT plugin HA: %s.' % ex)
-        jt_ha = get_next_ha_mrcluster()
-        if jt_ha is not None:
-          if jt_ha[1].host == api.jt.host:
-            raise ex
-          config, api.jt = jt_ha
-          return funct(api, *args, **kwargs)
-      raise ex
-  return wraps(funct)(decorate)
-
-
-def rm_ha(funct):
-  """
-  Support RM HA by trying other RM API.
-  """
-  def decorate(api, *args, **kwargs):
-    try:
-      return funct(api, *args, **kwargs)
-    except Exception, ex:
-      ex_message = str(ex)
-      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
-        LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
-        rm_ha = get_next_ha_yarncluster()
-        if rm_ha is not None:
-          if rm_ha[1].url == api.resource_manager_api.url:
-            raise ex
-          config, api.resource_manager_api = rm_ha
-          return funct(api, *args, **kwargs)
-      raise ex
-  return wraps(funct)(decorate)
 
 
 class JobBrowserApi(object):
