@@ -140,7 +140,7 @@ ${ components.menubar() }
                     </tr>
                   </thead>
                   <tbody>
-                  % for i, row in enumerate(sample.rows()):
+                  % for i, row in enumerate(sample_rows):
                     <tr>
                       <td>${ i }</td>
                     % for item in row:
