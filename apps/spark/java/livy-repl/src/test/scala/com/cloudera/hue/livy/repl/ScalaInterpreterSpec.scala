@@ -29,102 +29,100 @@ class ScalaInterpreterSpec extends BaseInterpreterSpec {
 
   override def createInterpreter() = SparkInterpreter()
 
-  describe("A spark interpreter") {
-    it("should execute `1 + 2` == 3") {
-      val response = interpreter.execute("1 + 2")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "res0: Int = 3"
-      ))
-    }
+  it should "execute `1 + 2` == 3" in withInterpreter { interpreter =>
+    val response = interpreter.execute("1 + 2")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "res0: Int = 3"
+    ))
+  }
 
-    it("should execute multiple statements") {
-      var response = interpreter.execute("val x = 1")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "x: Int = 1"
-      ))
+  it should "execute multiple statements" in withInterpreter { interpreter =>
+    var response = interpreter.execute("val x = 1")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "x: Int = 1"
+    ))
 
-      response = interpreter.execute("val y = 2")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "y: Int = 2"
-      ))
+    response = interpreter.execute("val y = 2")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "y: Int = 2"
+    ))
 
-      response = interpreter.execute("x + y")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "res0: Int = 3"
-      ))
-    }
+    response = interpreter.execute("x + y")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "res0: Int = 3"
+    ))
+  }
 
-    it("should execute multiple statements in one block") {
-      val response = interpreter.execute(
-        """
-          |val x = 1
-          |
-          |val y = 2
-          |
-          |x + y
-        """.stripMargin)
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "res2: Int = 3"
-      ))
-    }
+  it should "execute multiple statements in one block" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """
+        |val x = 1
+        |
+        |val y = 2
+        |
+        |x + y
+      """.stripMargin)
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "res2: Int = 3"
+    ))
+  }
 
-    it("should do table magic") {
-      val response = interpreter.execute(
-        """val x = List(List(1, "a"), List(3, "b"))
-          |%table x
-        """.stripMargin)
+  it should "do table magic" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """val x = List(List(1, "a"), List(3, "b"))
+        |%table x
+      """.stripMargin)
 
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.APPLICATION_LIVY_TABLE_JSON -> (
-          ("headers" -> List(
-            ("type" -> "BIGINT_TYPE") ~ ("name" -> "0"),
-            ("type" -> "STRING_TYPE") ~ ("name" -> "1")
-          )) ~
-            ("data" -> List(
-              List[JValue](1, "a"),
-              List[JValue](3, "b")
-            ))
-          )
-      ))
-    }
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.APPLICATION_LIVY_TABLE_JSON -> (
+        ("headers" -> List(
+          ("type" -> "BIGINT_TYPE") ~ ("name" -> "0"),
+          ("type" -> "STRING_TYPE") ~ ("name" -> "1")
+        )) ~
+          ("data" -> List(
+            List[JValue](1, "a"),
+            List[JValue](3, "b")
+          ))
+        )
+    ))
+  }
 
-    it("should allow magic inside statements") {
-      val response = interpreter.execute(
-        """val x = List(List(1, "a"), List(3, "b"))
-          |%table x
-          |1 + 2
-        """.stripMargin)
+  it should "allow magic inside statements" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """val x = List(List(1, "a"), List(3, "b"))
+        |%table x
+        |1 + 2
+      """.stripMargin)
 
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "res0: Int = 3"
-      ))
-    }
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "res0: Int = 3"
+    ))
+  }
 
-    it("should capture stdout") {
-      val response = interpreter.execute("println(\"Hello World\")")
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "Hello World"
-      ))
-    }
+  it should "capture stdout" in withInterpreter { interpreter =>
+    val response = interpreter.execute("println(\"Hello World\")")
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "Hello World"
+    ))
+  }
 
-    it("should report an error if accessing an unknown variable") {
-      val response = interpreter.execute("x")
-      response should equal(Interpreter.ExecuteError(
-        "Error",
-        """<console>:8: error: not found: value x
-          |              x
-          |              ^""".stripMargin,
-        List()
-      ))
-    }
+  it should "report an error if accessing an unknown variable" in withInterpreter { interpreter =>
+    val response = interpreter.execute("x")
+    response should equal(Interpreter.ExecuteError(
+      "Error",
+      """<console>:8: error: not found: value x
+        |              x
+        |              ^""".stripMargin,
+      List()
+    ))
+  }
 
-    it("should execute spark commands") {
-      val response = interpreter.execute(
-        """sc.parallelize(0 to 1).map { i => i+1 }.collect""".stripMargin)
+  it should "execute spark commands" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """sc.parallelize(0 to 1).map { i => i+1 }.collect""".stripMargin)
 
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "res0: Array[Int] = Array(1, 2)"
-      ))
-    }
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "res0: Array[Int] = Array(1, 2)"
+    ))
   }
 }

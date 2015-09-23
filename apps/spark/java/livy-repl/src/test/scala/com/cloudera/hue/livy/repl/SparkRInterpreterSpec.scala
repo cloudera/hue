@@ -21,85 +21,91 @@ package com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.repl.sparkr.SparkRInterpreter
 import org.json4s.JsonDSL._
-import org.json4s.{JObject, DefaultFormats, JValue}
+import org.json4s.{DefaultFormats, JValue}
 
 class SparkRInterpreterSpec extends BaseInterpreterSpec {
 
   implicit val formats = DefaultFormats
 
-  override def createInterpreter() = SparkRInterpreter()
+  override protected def withFixture(test: NoArgTest) = {
+    val sparkRExecutable = SparkRInterpreter.sparkRExecutable
+    assume(sparkRExecutable.isDefined, "Cannot find sparkR")
+    test()
+  }
 
-  describe("A python interpreter") {
-    it("should execute `1 + 2` == 3") {
-      val response = interpreter.execute("1 + 2")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "[1] 3"
-      ))
+  override def createInterpreter() = {
+    SparkRInterpreter()
+  }
+
+  it should "execute `1 + 2` == 3" in withInterpreter { interpreter =>
+    val response = interpreter.execute("1 + 2")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "[1] 3"
+    ))
+  }
+
+  it should "execute multiple statements" in withInterpreter { interpreter =>
+    var response = interpreter.execute("x = 1")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> ""
+    ))
+
+    response = interpreter.execute("y = 2")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> ""
+    ))
+
+    response = interpreter.execute("x + y")
+    response should equal (Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "[1] 3"
+    ))
+  }
+
+  it should "execute multiple statements in one block" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """
+        |x = 1
+        |
+        |y = 2
+        |
+        |x + y
+      """.stripMargin)
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "[1] 3"
+    ))
+  }
+
+  it should "capture stdout" in withInterpreter { interpreter =>
+    val response = interpreter.execute("cat(3)")
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "3"
+    ))
+  }
+
+  it should "report an error if accessing an unknown variable" in withInterpreter { interpreter =>
+    val response = interpreter.execute("x")
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "Error: object 'x' not found"
+    ))
+  }
+
+  it should "execute spark commands" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """head(createDataFrame(sqlContext, faithful))""")
+
+    response match {
+      case Interpreter.ExecuteSuccess(map: JValue) =>
+        (map \ "text/plain").extract[String] should include (
+          """  eruptions waiting
+            |1     3.600      79
+            |2     1.800      54
+            |3     3.333      74
+            |4     2.283      62
+            |5     4.533      85
+            |6     2.883      55""".stripMargin)
+      case _ =>
+        throw new Exception("response is not a success")
     }
 
-    it("should execute multiple statements") {
-      var response = interpreter.execute("x = 1")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> ""
-      ))
-
-      response = interpreter.execute("y = 2")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> ""
-      ))
-
-      response = interpreter.execute("x + y")
-      response should equal (Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "[1] 3"
-      ))
-    }
-
-    it("should execute multiple statements in one block") {
-      val response = interpreter.execute(
-        """
-          |x = 1
-          |
-          |y = 2
-          |
-          |x + y
-        """.stripMargin)
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "[1] 3"
-      ))
-    }
-
-    it("should capture stdout") {
-      val response = interpreter.execute("cat(3)")
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "3"
-      ))
-    }
-
-    it("should report an error if accessing an unknown variable") {
-      val response = interpreter.execute("x")
-      response should equal(Interpreter.ExecuteSuccess(
-        repl.TEXT_PLAIN -> "Error: object 'x' not found"
-      ))
-    }
-
-    it("should execute spark commands") {
-      val response = interpreter.execute(
-        """head(createDataFrame(sqlContext, faithful))""")
-
-      response match {
-        case Interpreter.ExecuteSuccess(map: JValue) =>
-          (map \ "text/plain").extract[String] should include (
-            """  eruptions waiting
-              |1     3.600      79
-              |2     1.800      54
-              |3     3.333      74
-              |4     2.283      62
-              |5     4.533      85
-              |6     2.883      55""".stripMargin)
-        case _ =>
-          throw new Exception("response is not a success")
-      }
-
-    }
   }
 }

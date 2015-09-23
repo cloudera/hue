@@ -20,36 +20,32 @@ package com.cloudera.hue.livy.repl
 
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.sessions.{Idle, Starting}
+import com.cloudera.hue.livy.sessions.{NotStarted, Idle, Starting}
 import org.json4s.DefaultFormats
-import org.scalatest.{Matchers, FunSpec, BeforeAndAfter}
+import org.scalatest.{FlatSpec, Matchers}
 
 import _root_.scala.concurrent.duration.Duration
 
-abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter {
+abstract class BaseSessionSpec extends FlatSpec with Matchers {
 
   implicit val formats = DefaultFormats
 
+  def withSession(testCode: Session => Any) = {
+    val session = Session(createInterpreter())
+    session.waitForStateChange(NotStarted(), Duration(30, TimeUnit.SECONDS))
+    try {
+      testCode(session)
+    } finally session.close()
+  }
+
   def createInterpreter(): Interpreter
 
-  var session: Session = null
-
-  before {
-    session = Session(createInterpreter())
+  it should "start in the starting or idle state" in withSession { session =>
+    session.state should (equal (Starting()) or equal (Idle()))
   }
 
-  after {
-    session.close()
-  }
-
-  describe("A session") {
-    it("should start in the starting or idle state") {
-      session.state should (equal (Starting()) or equal (Idle()))
-    }
-
-    it("should eventually become the idle state") {
-      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
-      session.state should equal (Idle())
-    }
+  it should "eventually become the idle state" in withSession { session =>
+    session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
+    session.state should equal (Idle())
   }
 }
