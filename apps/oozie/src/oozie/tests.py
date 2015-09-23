@@ -2587,7 +2587,7 @@ class TestImportCoordinator02(OozieMockBase):
     assert_equal(1, coordinator.frequency_number)
     assert_equal(None, coordinator.timeout)
     assert_equal(None, coordinator.concurrency)
-    assert_equal(None, coordinator.execution)
+    assert_false(coordinator.execution)  # coordinator.execution can be None or empty string
     assert_equal(None, coordinator.throttle)
     assert_not_equal(None, coordinator.deployment_dir)
 
