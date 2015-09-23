@@ -2224,6 +2224,16 @@ class TestHiveServer2API():
                  ], table.partition_keys)
 
 
+  def test_hiveserver_has_complex(self):
+    # Test simple table with only scalars
+    table = MockHiveServerTable()
+    assert_false(table.has_complex, table.cols)
+
+    # Test complex table with array column
+    table.describe.insert(4, {'comment': '', 'col_name': 'fizz', 'data_type': 'array<string>'})
+    assert_true(table.has_complex, table.cols)
+
+
   def test_hiveserver_table_partition_keys(self):
     describe = [
         {'comment': None, 'col_name': '# Partition Information', 'data_type': None},

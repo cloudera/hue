@@ -144,6 +144,24 @@ class HiveServerTable(Table):
     end_cols_index = map(itemgetter('data_type'), rows[col_row_index:]).index(None)
     return rows[col_row_index:][:end_cols_index]
 
+  @property
+  def has_complex(self):
+    has_complex = False
+    complex_types = ["struct", "array", "map", "uniontype"]
+    patterns = [re.compile(typ) for typ in complex_types]
+
+    for column in self.cols:
+      if isinstance(column, dict) and 'data_type' in column:
+        column_type = column['data_type']
+      else:  # Col object
+        column_type = column.type
+      if column_type and any(p.match(column_type.lower()) for p in patterns):
+        has_complex = True
+        break
+
+    return has_complex
+
+
 
 class HiveServerTRowSet2:
   def __init__(self, row_set, schema):
