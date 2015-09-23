@@ -134,13 +134,13 @@ ${ components.menubar() }
                   <thead>
                     <tr>
                       <th style="width: 10px"></th>
-                    % for col in table.cols:
-                      <th>${col.name}</th>
+                    % for col in sample.cols():
+                      <th>${ col }</th>
                     % endfor
                     </tr>
                   </thead>
                   <tbody>
-                  % for i, row in enumerate(sample):
+                  % for i, row in enumerate(sample.rows()):
                     <tr>
                       <td>${ i }</td>
                     % for item in row:
