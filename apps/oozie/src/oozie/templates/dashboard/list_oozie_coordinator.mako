@@ -93,9 +93,10 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               % endif
               % endif
 
+              % if oozie_coordinator.status not in ('KILLED', 'SUCCEEDED'):
               <li class="nav-header">${ _('Manage') }</li>
               <li class="white">
-                % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'SUCCEEDED'):
+                % if has_job_edition_permission(oozie_coordinator, user):
                 <div id="rerun-coord-modal" class="modal hide"></div>
                 <div class="btn-group action-button-group" style="display: block; margin-bottom: 10px">
                   <button title="${ _('Resume the coordinator') }" id="resume-btn"
@@ -131,7 +132,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 </div>
                 % endif
                 <div class="btn-group" style="margin-left: 0; margin-bottom: 5px">
-                  % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'SUCCEEDED'):
+                  % if has_job_edition_permission(oozie_coordinator, user):
                   <button title="${ _('Update Coordinator Job properties') }" id="edit-coord-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='change') }"
                      data-message="${ _('Successfully updated Coordinator Job Properties') }"
@@ -148,6 +149,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                      class="btn btn-small sync-wf-btn">${ _('Sync Workflow') }</button>
                 </div>
               </li>
+              % endif
             </ul>
           </div>
         </div>
