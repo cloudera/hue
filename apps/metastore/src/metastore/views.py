@@ -200,6 +200,7 @@ def describe_table(request, database, table):
   try:
     table = db.get_table(database, table)
   except Exception, e:
+    LOG.exception("Describe table error")
     if hasattr(e, 'message') and e.message:
       raise PopupException(_("Hive Error"), detail=e.message)
     else:
@@ -229,7 +230,7 @@ def describe_table(request, database, table):
     ],
     'table': table,
     'partitions': partitions,
-    'sample': table_data and list(table_data.rows()),
+    'sample': table_data,
     'error_message': error_message,
     'database': database,
     'has_write_access': has_write_access(request.user),
