@@ -1456,7 +1456,7 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
-    assert_equal([['ta\tb', 'nada', 'sp ace'], ['f\too', 'bar', 'fred'], ['a\ta', 'bb', 'cc']], resp.context['sample'])
+    assert_equal([['ta\tb', 'nada', 'sp ace'], ['f\too', 'bar', 'fred'], ['a\ta', 'bb', 'cc']], resp.context['sample_rows'])
     assert_true("nada" in resp.content, resp.content)
     assert_true("sp&nbsp;ace" in resp.content, resp.content)
 
@@ -1511,8 +1511,8 @@ for x in sys.stdin:
     # Check data is in the table (by describing it)
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
-    assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
-    assert_equal(resp.context['sample'], [
+    assert_equal([col.name for col in cols], ['col_a', 'col_b', 'col_c'])
+    assert_equal(resp.context['sample_rows'], [
       #['a', 'b', 'c'], # Gone as told to be header
       ['"a', 'a"', '"b'], # Hive does not support natively quoted CSV
       ['"a', '""a"', '"b']
@@ -1631,8 +1631,8 @@ for x in sys.stdin:
     resp = client.get(reverse('beeswax:describe_table', kwargs={'database': self.db_name, 'table': 'test'}) + '?sample=true')
 
     assert_equal(resp.status_code, 200)
-    assert_true('<th>foo</th>' in resp.content, resp.content)
-    assert_true([0, '0x0'] in resp.context['sample'], resp.context['sample'])
+    assert_true('<th>test.foo</th>' in resp.content, resp.content)
+    assert_true([0, '0x0'] in resp.context['sample_rows'], resp.context['sample_rows'])
 
 
   def test_redacting_queries(self):
