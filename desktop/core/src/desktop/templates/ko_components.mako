@@ -268,6 +268,8 @@ from desktop.views import _ko
         self.parent = parent;
         self.filter = filter;
 
+        self.expandable = typeof definition.type === "undefined" || definition.type === "struct" || definition.type === "array" || definition.type === "map";
+
         self.loaded = false;
         self.loading = ko.observable(false);
         self.open = ko.observable(false);
@@ -300,7 +302,7 @@ from desktop.views import _ko
 
       AssistEntry.prototype.loadEntries = function() {
         var self = this;
-        if (self.loading()) {
+        if (!self.expandable || self.loading()) {
           return;
         }
         self.loading(true);
@@ -355,13 +357,15 @@ from desktop.views import _ko
                   self.createEntry({
                     name: "key",
                     displayName: "key (" + data.key.type + ")",
-                    title: "key (" + data.key.type + ")"
+                    title: "key (" + data.key.type + ")",
+                    type: data.key.type
                   }),
                   self.createEntry({
                     name: "value",
                     displayName: "value (" + data.value.type + ")",
                     title: "value (" + data.value.type + ")",
-                    isMapValue: true
+                    isMapValue: true,
+                    type: data.value.type
                   })
                 ]);
               } else if (data.type == "struct") {
@@ -369,7 +373,8 @@ from desktop.views import _ko
                   return self.createEntry({
                     name: field.name,
                     displayName: field.name + " (" + field.type + ")",
-                    title: field.name + " (" + field.type + ")"
+                    title: field.name + " (" + field.type + ")",
+                    type: field.type
                   });
                 }));
               } else if (data.type == "array") {
@@ -378,7 +383,8 @@ from desktop.views import _ko
                     name: "item",
                     displayName: "item (" + data.item.type + ")",
                     title: "item (" + data.item.type + ")",
-                    isArray: true
+                    isArray: true,
+                    type: data.item.type
                   })
                 ]);
               }
