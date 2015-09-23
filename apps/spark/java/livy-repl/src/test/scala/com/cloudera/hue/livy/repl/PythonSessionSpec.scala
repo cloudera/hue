@@ -29,178 +29,176 @@ class PythonSessionSpec extends BaseSessionSpec {
 
   override def createInterpreter() = PythonInterpreter()
 
-  describe("A python session") {
-    it("should execute `1 + 2` == 3") {
-      val statement = session.execute("1 + 2")
-      statement.id should equal (0)
+  it should "execute `1 + 2` == 3" in withSession { session =>
+    val statement = session.execute("1 + 2")
+    statement.id should equal (0)
 
-      val result = Await.result(statement.result, Duration.Inf)
-      val expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 0,
-        "data" -> Map(
-          "text/plain" -> "3"
+    val result = Await.result(statement.result, Duration.Inf)
+    val expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 0,
+      "data" -> Map(
+        "text/plain" -> "3"
+      )
+    ))
+
+    result should equal (expectedResult)
+  }
+
+  it should "execute `x = 1`, then `y = 2`, then `x + y`" in withSession { session =>
+    var statement = session.execute("x = 1")
+    statement.id should equal (0)
+
+    var result = Await.result(statement.result, Duration.Inf)
+    var expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 0,
+      "data" -> Map(
+        "text/plain" -> ""
+      )
+    ))
+
+    result should equal (expectedResult)
+
+    statement = session.execute("y = 2")
+    statement.id should equal (1)
+
+    result = Await.result(statement.result, Duration.Inf)
+    expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 1,
+      "data" -> Map(
+        "text/plain" -> ""
+      )
+    ))
+
+    result should equal (expectedResult)
+
+    statement = session.execute("x + y")
+    statement.id should equal (2)
+
+    result = Await.result(statement.result, Duration.Inf)
+    expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 2,
+      "data" -> Map(
+        "text/plain" -> "3"
+      )
+    ))
+
+    result should equal (expectedResult)
+  }
+
+  it should "do table magic" in withSession { session =>
+    val statement = session.execute("x = [[1, 'a'], [3, 'b']]\n%table x")
+    statement.id should equal (0)
+
+    val result = Await.result(statement.result, Duration.Inf)
+    val expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 0,
+      "data" -> Map(
+        "application/vnd.livy.table.v1+json" -> Map(
+          "headers" -> List(
+            Map("type" -> "INT_TYPE", "name" -> "0"),
+            Map("type" -> "STRING_TYPE", "name" -> "1")),
+          "data" -> List(List(1, "a"), List(3, "b"))
         )
-      ))
+      )
+    ))
 
-      result should equal (expectedResult)
-    }
+    result should equal (expectedResult)
+  }
 
-    it("should execute `x = 1`, then `y = 2`, then `x + y`") {
-      var statement = session.execute("x = 1")
-      statement.id should equal (0)
+  it should "capture stdout" in withSession { session =>
+    val statement = session.execute("""print 'Hello World'""")
+    statement.id should equal (0)
 
-      var result = Await.result(statement.result, Duration.Inf)
-      var expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 0,
-        "data" -> Map(
-          "text/plain" -> ""
-        )
-      ))
+    val result = Await.result(statement.result, Duration.Inf)
+    val expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 0,
+      "data" -> Map(
+        "text/plain" -> "Hello World"
+      )
+    ))
 
-      result should equal (expectedResult)
+    result should equal (expectedResult)
+  }
 
-      statement = session.execute("y = 2")
-      statement.id should equal (1)
+  it should "report an error if accessing an unknown variable" in withSession { session =>
+    val statement = session.execute("""x""")
+    statement.id should equal (0)
 
-      result = Await.result(statement.result, Duration.Inf)
-      expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 1,
-        "data" -> Map(
-          "text/plain" -> ""
-        )
-      ))
+    val result = Await.result(statement.result, Duration.Inf)
+    val expectedResult = Extraction.decompose(Map(
+      "status" -> "error",
+      "execution_count" -> 0,
+      "traceback" -> List(
+        "Traceback (most recent call last):\n",
+        "NameError: name 'x' is not defined\n"
+      ),
+      "ename" -> "NameError",
+      "evalue" -> "name 'x' is not defined"
+    ))
 
-      result should equal (expectedResult)
+    result should equal (expectedResult)
+  }
 
-      statement = session.execute("x + y")
-      statement.id should equal (2)
+  it should "report an error if exception is thrown" in withSession { session =>
+    val statement = session.execute(
+      """def foo():
+        |    raise Exception()
+        |foo()
+        |""".stripMargin)
+    statement.id should equal (0)
 
-      result = Await.result(statement.result, Duration.Inf)
-      expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 2,
-        "data" -> Map(
-          "text/plain" -> "3"
-        )
-      ))
+    val result = Await.result(statement.result, Duration.Inf)
+    val expectedResult = Extraction.decompose(Map(
+      "status" -> "error",
+      "execution_count" -> 0,
+      "traceback" -> List(
+        "Traceback (most recent call last):\n",
+        "Exception\n"
+      ),
+      "ename" -> "Exception",
+      "evalue" -> ""
+    ))
 
-      result should equal (expectedResult)
-    }
+    result should equal (expectedResult)
+  }
 
-    it("should do table magic") {
-      val statement = session.execute("x = [[1, 'a'], [3, 'b']]\n%table x")
-      statement.id should equal (0)
+  it should "access the spark context" in withSession { session =>
+    val statement = session.execute("""sc""")
+    statement.id should equal (0)
 
-      val result = Await.result(statement.result, Duration.Inf)
-      val expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 0,
-        "data" -> Map(
-          "application/vnd.livy.table.v1+json" -> Map(
-            "headers" -> List(
-              Map("type" -> "INT_TYPE", "name" -> "0"),
-              Map("type" -> "STRING_TYPE", "name" -> "1")),
-            "data" -> List(List(1, "a"), List(3, "b"))
-          )
-        )
-      ))
+    val result = Await.result(statement.result, Duration.Inf)
+    val resultMap = result.extract[Map[String, JValue]]
 
-      result should equal (expectedResult)
-    }
+    // Manually extract the values since the line numbers in the exception could change.
+    resultMap("status").extract[String] should equal ("ok")
+    resultMap("execution_count").extract[Int] should equal (0)
 
-    it("should capture stdout") {
-      val statement = session.execute("""print 'Hello World'""")
-      statement.id should equal (0)
+    val data = resultMap("data").extract[Map[String, JValue]]
+    data("text/plain").extract[String] should include ("<pyspark.context.SparkContext object at")
+  }
 
-      val result = Await.result(statement.result, Duration.Inf)
-      val expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 0,
-        "data" -> Map(
-          "text/plain" -> "Hello World"
-        )
-      ))
+  it should "execute spark commands" in withSession { session =>
+    val statement = session.execute("""
+                                      |sc.parallelize(xrange(0, 2)).map(lambda i: i + 1).collect()
+                                      |""".stripMargin)
+    statement.id should equal (0)
 
-      result should equal (expectedResult)
-    }
+    val result = Await.result(statement.result, Duration.Inf)
 
-    it("should report an error if accessing an unknown variable") {
-      val statement = session.execute("""x""")
-      statement.id should equal (0)
+    val expectedResult = Extraction.decompose(Map(
+      "status" -> "ok",
+      "execution_count" -> 0,
+      "data" -> Map(
+        "text/plain" -> "[1, 2]"
+      )
+    ))
 
-      val result = Await.result(statement.result, Duration.Inf)
-      val expectedResult = Extraction.decompose(Map(
-        "status" -> "error",
-        "execution_count" -> 0,
-        "traceback" -> List(
-          "Traceback (most recent call last):\n",
-          "NameError: name 'x' is not defined\n"
-        ),
-        "ename" -> "NameError",
-        "evalue" -> "name 'x' is not defined"
-      ))
-
-      result should equal (expectedResult)
-    }
-
-    it("should report an error if exception is thrown") {
-      val statement = session.execute(
-        """def foo():
-          |    raise Exception()
-          |foo()
-          |""".stripMargin)
-      statement.id should equal (0)
-
-      val result = Await.result(statement.result, Duration.Inf)
-      val expectedResult = Extraction.decompose(Map(
-        "status" -> "error",
-        "execution_count" -> 0,
-        "traceback" -> List(
-          "Traceback (most recent call last):\n",
-          "Exception\n"
-        ),
-        "ename" -> "Exception",
-        "evalue" -> ""
-      ))
-
-      result should equal (expectedResult)
-    }
-
-    it("should access the spark context") {
-      val statement = session.execute("""sc""")
-      statement.id should equal (0)
-
-      val result = Await.result(statement.result, Duration.Inf)
-      val resultMap = result.extract[Map[String, JValue]]
-
-      // Manually extract the values since the line numbers in the exception could change.
-      resultMap("status").extract[String] should equal ("ok")
-      resultMap("execution_count").extract[Int] should equal (0)
-
-      val data = resultMap("data").extract[Map[String, JValue]]
-      data("text/plain").extract[String] should include ("<pyspark.context.SparkContext object at")
-    }
-
-    it("should execute spark commands") {
-      val statement = session.execute("""
-          |sc.parallelize(xrange(0, 2)).map(lambda i: i + 1).collect()
-          |""".stripMargin)
-      statement.id should equal (0)
-
-      val result = Await.result(statement.result, Duration.Inf)
-
-      val expectedResult = Extraction.decompose(Map(
-        "status" -> "ok",
-        "execution_count" -> 0,
-        "data" -> Map(
-          "text/plain" -> "[1, 2]"
-        )
-      ))
-
-      result should equal (expectedResult)
-    }
+    result should equal (expectedResult)
   }
 }

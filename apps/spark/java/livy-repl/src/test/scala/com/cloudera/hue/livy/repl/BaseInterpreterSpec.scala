@@ -18,20 +18,17 @@
 
 package com.cloudera.hue.livy.repl
 
-import org.scalatest.{BeforeAndAfter, Matchers, FunSpec}
+import org.scalatest.{FlatSpec, Matchers}
 
-abstract class BaseInterpreterSpec extends FunSpec with Matchers with BeforeAndAfter {
+abstract class BaseInterpreterSpec extends FlatSpec with Matchers {
 
   def createInterpreter(): Interpreter
 
-  var interpreter: Interpreter = null
-
-  before {
-    interpreter = createInterpreter()
+  def withInterpreter(testCode: Interpreter => Any) = {
+    val interpreter = createInterpreter()
     interpreter.start()
-  }
-
-  after {
-    interpreter.close()
+    try {
+      testCode(interpreter)
+    } finally interpreter.close()
   }
 }

@@ -137,7 +137,7 @@ object Main {
 
     output match {
       case regex(version) => version
-      case _ => throw new IOException(f"Unable to determing spark-submit version [$exitCode]:\n$output")
+      case _ => throw new IOException(f"Unable to determine spark-submit version [$exitCode]:\n$output")
     }
   }
 
