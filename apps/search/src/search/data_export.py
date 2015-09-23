@@ -32,7 +32,7 @@ def download(results, format, collection):
   """
   download(results, format) -> HttpResponse
 
-  Transform the search result set to the specified format and dwonload.
+  Transform the search result set to the specified format and download.
   """
   if format not in DL_FORMATS:
     LOG.error('Unknown download format "%s"' % format)

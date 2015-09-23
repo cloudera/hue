@@ -627,6 +627,7 @@ def describe_table(request, database, table):
     from metastore.views import describe_table
     return describe_table(request, database, table)
   except Exception, e:
+    LOG.exception('Describe table failed')
     raise PopupException(_('Problem accessing table metadata'), detail=e)
 
 
