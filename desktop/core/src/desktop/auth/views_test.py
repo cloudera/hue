@@ -377,7 +377,7 @@ class TestRemoteUserLogin(PseudoHdfsTestBase):
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username.upper(), '2')})
     assert_equal(200, response.status_code, "Expected ok status.")
     assert_equal(2, len(User.objects.all().order_by('username')))
-    assert_equal("%s_%s" % (self.test_username, '2'), User.objects.all()[1].username)
+    assert_equal("%s_%s" % (self.test_username, '2'), User.objects.all().order_by('username')[1].username)
 
     response = self.c.post('/accounts/login/', {}, **{"REMOTE_USER": "%s_%s" % (self.test_username, '2')})
     assert_equal(200, response.status_code, "Expected ok status.")

@@ -135,7 +135,7 @@ class TestDocModelTags():
         {"id": default_tag.id, "name": "default"},
         {"id": tag1_id, "name": "update_tags_1"},
         {"id": tag2_id, "name": "update_tags_2"}
-      ], content['doc']['tags'])
+      ], sorted(content['doc']['tags'], key=lambda t: t['id']))
 
     # No perms
     response = self.client_not_me.post("/desktop/api/doc/update_tags", {'data': json.dumps({'doc_id': doc.id, 'tag_ids': [tag1_id, tag2_id]})})
