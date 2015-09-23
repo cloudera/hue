@@ -153,7 +153,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             </ul>
           </div>
         </div>
-        <div class="span10">
+        <div class="span10" id="tab-panel">
           <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
             % if oozie_bundle:
               ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
@@ -396,7 +396,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               </div>
             </div>
 
-            <div class="tab-pane" id="definition">
+            <div class="tab-pane" id="definition" style="margin-bottom: 10px;">
               <textarea id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</textarea>
             </div>
 
@@ -938,9 +938,19 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         }
         window.setTimeout(refreshLogs, 20000);
       });
+    };
+
+    var $codeMirror = $(".CodeMirror");
+    var tabPanelTop = $("#tab-panel").position().top;
+    var $logPre = $("#log pre").css("overflow", "auto");
+    var $window = $(window);
+
+    function resizeTabs() {
+      $codeMirror.height($window.height() - tabPanelTop - 185);
+      $logPre.height($window.height() - tabPanelTop - 204);
     }
 
-    resizeLogs();
+    resizeTabs();
     refreshView();
     refreshLogs();
 
@@ -1039,11 +1049,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     }
 
     $(window).resize(function () {
-      resizeLogs();
+      resizeTabs();
     });
 
     $("a[href='#log']").on("shown", function () {
-      resizeLogs();
+      resizeTabs();
     });
 
     $("#log pre").scroll(function () {
@@ -1054,10 +1064,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         logsAtEnd = false;
       }
     });
-
-    function resizeLogs() {
-      $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
-    }
 
     if (window.location.hash == "#showSla") {
       $("a[href='#sla']").click();
