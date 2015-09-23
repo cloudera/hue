@@ -154,11 +154,6 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entries">
-    <div class="center" data-bind="visible: loading">
-      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-    </div>
-
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistPanel.repositionActions }">
       <li data-bind="css: { 'assist-table reveals-actions-2nd': definition.isTable, 'assist-column reveals-actions-3rd': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
@@ -207,6 +202,10 @@ from desktop.views import _ko
           </li>
 
         <div class="table-container">
+          <div class="center" data-bind="visible: selectedDatabase() != null && selectedDatabase().loading()">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+          </div>
           <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
           </div>
         <!-- /ko -->
