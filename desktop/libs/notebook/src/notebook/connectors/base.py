@@ -103,7 +103,7 @@ def get_api(user, snippet):
   elif interface == 'jdbc':
     return JDBCApi(user)
   else:
-    raise PopupException(_('Notebook connector interface not recognized: ') % interface)
+    raise PopupException(_('Notebook connector interface not recognized: %s') % interface)
 
 
 def _get_snippet_session(notebook, snippet):
