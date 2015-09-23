@@ -21,8 +21,6 @@ import os
 import re
 import time
 
-from datetime import datetime
-
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.utils.functional import wraps
@@ -39,6 +37,8 @@ from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
 from desktop.models import Document, Document2
 
+from hadoop.fs.hadoopfs import Hdfs
+
 from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
 from liboozie.submission2 import Submission
@@ -49,6 +49,8 @@ from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleFor
 from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
+
+from urlparse import urlparse
 
 
 def get_history():
@@ -646,6 +648,7 @@ def sync_coord_workflow(request, job_id):
 
   hue_coord = get_history().get_coordinator_from_config(job.conf_dict)
   hue_wf = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(job.conf_dict)
+  wf_application_path = job.conf_dict.get('wf_application_path') and Hdfs.urlsplit(job.conf_dict['wf_application_path'])[2] or ''
 
   if request.method == 'POST':
     params_form = ParametersFormSet(request.POST)
@@ -653,7 +656,7 @@ def sync_coord_workflow(request, job_id):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
       submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=mapping)
-      submission._sync_definition(hue_wf.deployment_dir, mapping)
+      submission._sync_definition(wf_application_path, mapping)
 
       request.info(_('Successfully updated Workflow definition'))
       return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
@@ -665,7 +668,7 @@ def sync_coord_workflow(request, job_id):
 
     submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=None)
     prev_properties = hue_wf and hue_wf.deployment_dir and \
-                      submission.get_external_parameters(request.fs.join(hue_wf.deployment_dir, hue_wf.XML_FILE_NAME)) or {}
+                      submission.get_external_parameters(request.fs.join(wf_application_path, hue_wf.XML_FILE_NAME)) or {}
 
     for key, value in params_dict.iteritems():
       params_dict[key] = prev_properties[key] if key in prev_properties.keys() else params_dict[key]
