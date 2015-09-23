@@ -25,6 +25,9 @@ from django.utils.translation import ugettext as _
       <pre>${ error_message | h }</pre>
     </div>
   % else:
+    % if app_name == 'impala' and table.has_complex:
+      <p class="alert">${ _('Impala does not support selecting complex types. These columns have been hidden from the sample results.') }</p>
+    % endif
   <table class="table table-striped table-condensed sampleTable">
     <thead>
       <tr>
