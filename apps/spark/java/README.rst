@@ -11,11 +11,19 @@ Livy is an open source REST interface for interacting with Spark from anywhere. 
 
 The code is currently incubating in Hue but hopefully will eventually graduate in its top project. `Pull requests` are welcomed!
 
-Livy is used for powering the `Spark Notebook`_ of `Hue 3.8`_, which you can see the
+.. _Pull requests: https://github.com/cloudera/hue/pulls
+
+
+Quick Start
+=============
+
+Livy is used for powering the Spark snippets of the `Hadoop Notebook`_ of `Hue 3.8`_, which you can see the
 `implementation here`_.
 
-.. _Pull requests: https://github.com/cloudera/hue/pulls
-.. _Spark Notebook: http://gethue.com/new-notebook-application-for-spark-sql/
+See some `curl examples`_ and the API documentation is available below.
+
+.. _curl examples: http://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark/
+.. _Hadoop Notebook: http://gethue.com/new-notebook-application-for-spark-sql/
 .. _Hue 3.8: http://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
 .. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
 
@@ -57,11 +65,17 @@ Building Livy
 
 Livy is currently built by the `Hue Build System`_, it can also be built on
 it's own (aka without any other Hue dependency) with `Apache Maven`_. To build,
-run:
+checks out the code, go to the Livy directory and run:
 
 .. code:: shell
 
-    % cd $HUE_HOME/apps/spark/java
+    git clone git@github.com:cloudera/hue.git
+    cd hue
+
+
+.. code:: shell
+
+    % cd apps/spark/java
     % mvn -DskipTests clean package
 
 .. _Hue Build System: https://github.com/cloudera/hue/#getting-started
@@ -76,7 +90,6 @@ Livy`_. Then run:
 
 .. code:: shell
 
-    % cd $HUE_HOME/apps/spark/java
     % export SPARK_HOME=/usr/lib/spark
     % mvn test
 
@@ -123,6 +136,9 @@ library. By default livy runs on port 8998 (which can be changed with the
 ``livy_server_port config`` option). We’ll start off with a Spark session that
 takes Scala code:
 
+.. code:: shell
+    % sudo pip install requests
+    
 .. code:: python
 
     >>> import json, pprint, requests, textwrap
@@ -289,8 +305,8 @@ Community
 =========
 
  * User group: http://groups.google.com/a/cloudera.org/group/hue-user
- * Jira: https://issues.cloudera.org/browse/HUE-2588
- * Reviews: https://review.cloudera.org/dashboard/?view=to-group&group=hue (repo 'hue-rw')
+ * Umbrella Jira: https://issues.cloudera.org/browse/HUE-2588
+ * Pull requests: https://github.com/cloudera/hue/pulls
 
 
 REST API
@@ -314,46 +330,36 @@ Response Body
 POST /sessions
 --------------
 
-Creates a new interative Scala or Python shell in the cluster.
+Creates a new interative Scala, Python or R shell in the cluster.
 
 Request Body
 ^^^^^^^^^^^^
 
-+----------------+--------------------------------------------------+----------------------------+
-| name           | description                                      | type                       |
-+================+==================================================+============================+
-| id             | The session id                                   | int                        |
-+----------------+--------------------------------------------------+----------------------------+
-| kind           | session kind (spark, pyspark, or sparkr)         | `session kind`_ (required) |
-+----------------+--------------------------------------------------+----------------------------+
-| log            | The log lines                                    | list of strings            |
-+----------------+--------------------------------------------------+----------------------------+
-| state          | The session state                                | string                     |
-+----------------+--------------------------------------------------+----------------------------+
-| file           | archive holding the file                         | path (required)            |
-+----------------+--------------------------------------------------+----------------------------+
-| args           | command line arguments                           | list of strings            |
-+----------------+--------------------------------------------------+----------------------------+
-| className      | application's java/spark main class              | string                     |
-+----------------+--------------------------------------------------+----------------------------+
-| jars           | files to be placed on the java classpath         | list of paths              |
-+----------------+--------------------------------------------------+----------------------------+
-| pyFiles        | files to be placed on the PYTHONPATH             | list of paths              |
-+----------------+--------------------------------------------------+----------------------------+
-| files          | files to be placed in executor working directory | list of paths              |
-+----------------+--------------------------------------------------+----------------------------+
-| driverMemory   | memory for driver                                | string                     |
-+----------------+--------------------------------------------------+----------------------------+
-| driverCores    | number of cores used by driver                   | int                        |
-+----------------+--------------------------------------------------+----------------------------+
-| executorMemory | memory for executor                              | string                     |
-+----------------+--------------------------------------------------+----------------------------+
-| executorCores  | number of cores used by executor                 | int                        |
-+----------------+--------------------------------------------------+----------------------------+
-| numExecutors   | number of executor                               | int                        |
-+----------------+--------------------------------------------------+----------------------------+
-| archives       |                                                  | list of paths              |
-+----------------+--------------------------------------------------+----------------------------+
++----------------+--------------------------------------------------------------------------------+------------------+
+| name           | description                                                                    | type             |
++================+================================================================================+==================+
+| kind           | The session kind (required)                                                    | `session kind`_  |
++----------------+--------------------------------------------------------------------------------+------------------+
+| proxyUser      | The user to impersonate that will run this session (e.g. bob)                  | string           |
++----------------+--------------------------------------------------------------------------------+------------------+
+| jars           | files to be placed on the java classpath                                       | list of paths    |
++----------------+--------------------------------------------------------------------------------+------------------+
+| pyFiles        | files to be placed on the PYTHONPATH                                           | list of paths    |
++----------------+--------------------------------------------------------------------------------+------------------+
+| files          | files to be placed in executor working directory                               | list of paths    |
++----------------+--------------------------------------------------------------------------------+------------------+
+| driverMemory   | memory for driver (e.g. 1000M, 2G)                                             | string           |
++----------------+--------------------------------------------------------------------------------+------------------+
+| driverCores    | number of cores used by driver (YARN mode only)                                | int              |
++----------------+--------------------------------------------------------------------------------+------------------+
+| executorMemory | memory for executor (e.g. 1000M, 2G)                                           | string           |
++----------------+--------------------------------------------------------------------------------+------------------+
+| executorCores  | number of cores used by executor                                               | int              |
++----------------+--------------------------------------------------------------------------------+------------------+
+| numExecutors   | number of executors (YARN mode only)                                           | int              |
++----------------+--------------------------------------------------------------------------------+------------------+
+| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths    |
++----------------+--------------------------------------------------------------------------------+------------------+
 
 
 Response Body
@@ -470,11 +476,7 @@ Request Body
 +----------------+--------------------------------------------------+-----------------+
 | name           | description                                      | type            |
 +================+==================================================+=================+
-| id             | The session id                                   | int             |
-+----------------+--------------------------------------------------+-----------------+
-| log            | The log lines                                    | list of strings |
-+----------------+--------------------------------------------------+-----------------+
-| state          | The session state                                | string          |
+| proxyUser      | The user to impersonate that will execute the job| string          |
 +----------------+--------------------------------------------------+-----------------+
 | file           | archive holding the file                         | path (required) |
 +----------------+--------------------------------------------------+-----------------+
@@ -488,17 +490,17 @@ Request Body
 +----------------+--------------------------------------------------+-----------------+
 | files          | files to be placed in executor working directory | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
-| driverMemory   | memory for driver                                | string          |
+| driverMemory   | memory for driver (e.g. 1000M, 2G)               | string          |
 +----------------+--------------------------------------------------+-----------------+
 | driverCores    | number of cores used by driver                   | int             |
 +----------------+--------------------------------------------------+-----------------+
-| executorMemory | memory for executor                              | string          |
+| executorMemory | memory for executor (e.g. 1000M, 2G)             | string          |
 +----------------+--------------------------------------------------+-----------------+
 | executorCores  | number of cores used by executor                 | int             |
 +----------------+--------------------------------------------------+-----------------+
 | numExecutors   | number of executor                               | int             |
 +----------------+--------------------------------------------------+-----------------+
-| archives       |                                                  | list of paths   |
+| archives       | Archives to be uncompressed (YARN mode only)     | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
 
 Response Body
@@ -581,35 +583,18 @@ Session
 
 Sessions represent an interactive shell.
 
-+----------------+--------------------------------------------------------------------------------+------------------+
-| name           | description                                                                    | type             |
-+================+================================================================================+==================+
-| id             | The session id                                                                 | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| state          | The state of the session                                                       | `session state`_ |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| kind           | The session kind                                                               | `session kind`_  |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| proxyUser      | The user running this session                                                  | optional string  |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| jars           | files to be placed on the java classpath                                       | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| pyFiles        | files to be placed on the PYTHONPATH                                           | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| files          | files to be placed in executor working directory                               | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| driverMemory   | memory for driver                                                              | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| driverCores    | number of cores used by driver (YARN mode only)                                | int              |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| executorMemory | memory for executor                                                            | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| executorCores  | number of cores used by executor                                               | int              |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| numExecutors   | number of executors (YARN mode only)                                           | int              |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
++----------------+--------------------------------------------------+----------------------------+
+| name           | description                                      | type                       |
++================+==================================================+============================+
+| id             | The session id                                   | int                        |
++----------------+--------------------------------------------------+----------------------------+
+| kind           | session kind (spark, pyspark, or sparkr)         | `session kind`_ (required) |
++----------------+--------------------------------------------------+----------------------------+
+| log            | The log lines                                    | list of strings            |
++----------------+--------------------------------------------------+----------------------------+
+| state          | The session state                                | string                     |
++----------------+--------------------------------------------------+----------------------------+
+
 
 Session State
 ^^^^^^^^^^^^^
@@ -639,6 +624,8 @@ Session Kind
 | spark   | interactive scala/spark session  |
 +---------+----------------------------------+
 | pyspark | interactive python/spark session |
++---------+----------------------------------+
+| sparkr  | interactive R/spark session      |
 +---------+----------------------------------+
 
 Statement
@@ -689,33 +676,17 @@ Statement Output
 Batch
 -----
 
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| name           | description                                                                    | type            |
-+================+================================================================================+=================+
-| file           | archive holding the file                                                       | path (required) |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| args           | command line arguments                                                         | list of strings |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| className      | application's java/spark main class                                            | string          |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| jars           | files to be placed on the java classpath                                       | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| pyFiles        | files to be placed on the PYTHONPATH                                           | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| files          | files to be placed in executor working directory                               | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| driverMemory   | memory for driver                                                              | string          |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| driverCores    | number of cores used by driver (YARN mode only)                                | int             |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| executorMemory | memory for executor                                                            | string          |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| executorCores  | number of cores used by executor                                               | int             |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| numExecutors   | number of executors (YARN mode only)                                           | int             |
-+----------------+--------------------------------------------------------------------------------+-----------------+
-| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths   |
-+----------------+--------------------------------------------------------------------------------+-----------------+
++----------------+--------------------------------------------------+----------------------------+
+| name           | description                                      | type                       |
++================+==================================================+============================+
+| id             | The session id                                   | int                        |
++----------------+--------------------------------------------------+----------------------------+
+| kind           | session kind (spark, pyspark, or sparkr)         | `session kind`_ (required) |
++----------------+--------------------------------------------------+----------------------------+
+| log            | The log lines                                    | list of strings            |
++----------------+--------------------------------------------------+----------------------------+
+| state          | The session state                                | string                     |
++----------------+--------------------------------------------------+----------------------------+
 
 
 License
