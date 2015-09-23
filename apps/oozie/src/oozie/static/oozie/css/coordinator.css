@@ -80,6 +80,10 @@ div.spinedit .fa-chevron-down {
   top: 5px!important;;
 }
 
+.label-ignored {
+  background-color: #ccc;
+}
+
 label.spinedit {
   display: inline;
 }

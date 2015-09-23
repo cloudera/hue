@@ -219,7 +219,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 </tbody>
                 <tfoot>
                   <tr data-bind="visible: isLoading()">
-                    <td colspan="2" class="left">
+                    <td colspan="3" class="left">
                       <img src="${ static('desktop/art/spinner.gif') }" />
                     </td>
                   </tr>
@@ -889,7 +889,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         } else if (val == 'RUNNING') {
           btnStatuses = btnStatuses.concat(['RUNNING', 'READY', 'SUBMITTED', 'SUSPENDED', 'WAITING']);
         } else if (val == 'ERROR') {
-          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'TIMEDOUT', 'IGNORED', 'SKIPPED']);
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'TIMEDOUT', 'SKIPPED']);
         }
       });
 
