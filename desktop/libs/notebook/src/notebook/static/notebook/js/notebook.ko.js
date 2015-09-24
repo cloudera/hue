@@ -101,10 +101,12 @@ var Result = function (snippet, result) {
 var TYPE_ACE_EDITOR_MAP = {
   'hive': 'ace/mode/hive',
   'impala': 'ace/mode/impala',
-  'pyspark': 'ace/mode/python',
-  'spark': 'ace/mode/scala',
+  'mysql': 'ace/mode/sql',
+  'mysqljdbc': 'ace/mode/sql',
   'pig': 'ace/mode/pig',
-  'r': 'ace/mode/r'
+  'pyspark': 'ace/mode/python',
+  'r': 'ace/mode/r',
+  'scala': 'ace/mode/scala'
 };
 
 var getDefaultSnippetProperties = function (snippetType) {

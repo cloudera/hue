@@ -36,7 +36,11 @@ function Autocompleter(options) {
   }
 
   huePubSub.subscribe('hue.ace.activeMode', function(mode) {
-    self.currentMode = mode.split("/").pop();
+    if (mode) {
+      self.currentMode = mode.split("/").pop();
+    } else {
+      self.currentMode = null;
+    }
   })
 }
 
