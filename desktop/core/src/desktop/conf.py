@@ -1082,7 +1082,7 @@ def validate_ldap(user, config):
 
   return res
 
-def validate_mysql_storage():
+def validate_database():
 
   from django.db import connection
 
@@ -1113,7 +1113,8 @@ def validate_mysql_storage():
                                                         storage engine type (preferably InnoDB).'''))))
       except Exception, ex:
         LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
-
+  elif 'sqlite' in connection.vendor:
+    res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', unicode(_('SQLite is only recommended for small development environments with a few users.'))))
   return res
 
 
@@ -1161,7 +1162,7 @@ def config_validator(user):
     res.extend(validate_ldap(user, LDAP))
 
   # Validate MYSQL storage engine of all tables
-  res.extend(validate_mysql_storage())
+  res.extend(validate_database())
 
   return res
 
