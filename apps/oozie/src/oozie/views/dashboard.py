@@ -21,6 +21,8 @@ import os
 import re
 import time
 
+from datetime import datetime
+
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.utils.functional import wraps
@@ -38,7 +40,6 @@ from desktop.log.access import access_warn
 from desktop.models import Document, Document2
 
 from hadoop.fs.hadoopfs import Hdfs
-
 from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
 from liboozie.submission2 import Submission
@@ -49,8 +50,6 @@ from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleFor
 from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
-
-from urlparse import urlparse
 
 
 def get_history():
