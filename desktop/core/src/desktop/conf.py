@@ -609,6 +609,10 @@ CUSTOM = ConfigSection(
                    help=_("Top banner HTML code. This code will be placed in the navigation bar "
                         "so that it will reside at the top of the page in a fixed position. " +
                         "One common value is `<img src=\"http://www.example.com/example.gif\" />`")),
+    LOGIN_SPLASH_HTML=Config("login_splash_html",
+                   default="",
+                   help=_("The login splash HTML code. This code will be placed in the login page, "
+                        "useful for security warning messages.")),
 ))
 
 AUTH = ConfigSection(

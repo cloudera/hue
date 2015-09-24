@@ -622,15 +622,18 @@ def test_last_access_time():
 
 
 def test_ui_customizations():
-  custom_banner = 'test ui customization'
+  custom_message = 'test ui customization'
   reset = (
-    desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_banner),
+    desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_message),
+    desktop.conf.CUSTOM.LOGIN_SPLASH_HTML.set_for_testing(custom_message),
   )
 
   try:
     c = make_logged_in_client()
+    resp = c.get('/accounts/login/', follow=False)
+    assert_true(custom_message in resp.content, resp)
     resp = c.get('/about', follow=True)
-    assert_true(custom_banner in resp.content, resp)
+    assert_true(custom_message in resp.content, resp)
   finally:
     for old_conf in reset:
       old_conf()
