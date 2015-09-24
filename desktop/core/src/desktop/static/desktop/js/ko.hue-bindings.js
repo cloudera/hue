@@ -1707,12 +1707,7 @@ ko.bindingHandlers.aceEditor = {
     $el.text(options.value());
 
     var editor = ace.edit($el.attr("id"));
-    editor.session.setMode(ko.utils.unwrapObservable(options.mode));
-    if (ko.isObservable(options.mode)) {
-      options.mode.subscribe(function (newValue) {
-        editor.session.setMode(newValue);
-      });
-    }
+    editor.session.setMode(options.mode);
     if (navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1) {
       editor.setOptions({fontSize: "14px"})
     }
@@ -2005,7 +2000,7 @@ ko.bindingHandlers.aceEditor = {
     editor.previousSize = 0;
 
     window.setInterval(function(){
-      editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
+      editor.session.getMode().$id = valueAccessor().mode; // forces the id again because of Ace command internals
     }, 100);
 
     editor.middleClick = false;
@@ -2027,7 +2022,7 @@ ko.bindingHandlers.aceEditor = {
 
     editor.on("change", function (e) {
       editor.clearErrors();
-      editor.session.getMode().$id = valueAccessor().mode();
+      editor.session.getMode().$id = valueAccessor().mode;
       var currentSize = editor.session.getLength();
       if (currentSize != editor.previousSize && currentSize >= editorOptions.minLines && currentSize <= editorOptions.maxLines){
         editor.previousSize = editor.session.getLength();
@@ -2064,7 +2059,7 @@ ko.bindingHandlers.aceEditor = {
           }, 100);
         }
       }
-      editor.session.getMode().$id = valueAccessor().mode(); // forces the id again because of Ace command internals
+      editor.session.getMode().$id = valueAccessor().mode; // forces the id again because of Ace command internals
       if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
         editor.execCommand("startAutocomplete");
       }
@@ -2116,6 +2111,7 @@ ko.bindingHandlers.aceEditor = {
     var options = ko.unwrap(valueAccessor());
     if (options.aceInstance()) {
       var editor = options.aceInstance();
+      editor.session.setMode(options.mode);
       editor.completers = element.originalCompleters.slice();
       if (options.extraCompleters && options.extraCompleters().length > 0) {
         options.extraCompleters().forEach(function (complete) {
