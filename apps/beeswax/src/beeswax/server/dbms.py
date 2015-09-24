@@ -175,7 +175,7 @@ class HiveServer2Dbms(object):
 
   def get_tables(self, database='default', table_names='*'):
     identifier = self.to_matching_wildcard(table_names)
-    identifier = "'%s'" % identifier if identifier != '*' else '' # Filter not always supported
+    identifier = "'%s'" % identifier if identifier != '*' else '' # Filter not supported in SparkSql
 
     hql = "SHOW TABLES IN `%s` %s" % (database, identifier) # self.client.get_tables(database, table_names) is too slow
     query = hql_query(hql)
@@ -186,7 +186,7 @@ class HiveServer2Dbms(object):
     if handle:
       result = self.fetch(handle, rows=5000)
       self.close(handle)
-      tables = [name for table in result.rows() for name in table]
+      tables = [table[0] for table in result.rows()] # We only keep the first column as the name, SparkSql returns multiple columns
       if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
         tables = apply_natural_sort(tables)
       return tables
