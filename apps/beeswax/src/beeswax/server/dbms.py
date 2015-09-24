@@ -175,8 +175,9 @@ class HiveServer2Dbms(object):
 
   def get_tables(self, database='default', table_names='*'):
     identifier = self.to_matching_wildcard(table_names)
+    identifier = "'%s'" % identifier if identifier != '*' else '' # Filter not always supported
 
-    hql = "SHOW TABLES IN `%s` '%s'" % (database, identifier) # self.client.get_tables(database, table_names) is too slow
+    hql = "SHOW TABLES IN `%s` %s" % (database, identifier) # self.client.get_tables(database, table_names) is too slow
     query = hql_query(hql)
     timeout = SERVER_CONN_TIMEOUT.get()
 
