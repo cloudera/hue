@@ -575,8 +575,8 @@ var Snippet = function (vm, notebook, snippet) {
       from: self.result.logLines
     }, function (data) {
       if (data.status == 1) { // Append errors to the logs
-    	data.status = 0;
-    	data.logs = data.message;
+        data.status = 0;
+        data.logs = data.message;
       }
       if (data.status == 0) {
         if (data.logs.length > 0) {

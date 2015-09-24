@@ -139,13 +139,16 @@ def show_tables(request, database=None):
 
     table_names = db.get_tables(database=database, table_names=search_filter)
     tables = [{'name': table} for table in table_names]
+
     has_metadata = False
 
     if len(table_names) <= HS2_GET_TABLES_MAX.get():  # Only attempt to do a GetTables HS2 call for small result sets
       try:
-        tables = db.get_tables_meta(database=database, table_names=search_filter)
-        table_names = [table['name'] for table in tables]
-        has_metadata = True
+        tables_meta = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
+        if tables_meta:
+          tables = tables_meta
+          table_names = [table['name'] for table in tables_meta]
+          has_metadata = True
       except Exception, ex:
         LOG.exception('Unable to fetch table metadata')
   except Exception, e:
