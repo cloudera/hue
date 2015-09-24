@@ -98,17 +98,6 @@ var Result = function (snippet, result) {
   };
 };
 
-var TYPE_ACE_EDITOR_MAP = {
-  'hive': 'ace/mode/hive',
-  'impala': 'ace/mode/impala',
-  'mysql': 'ace/mode/sql',
-  'mysqljdbc': 'ace/mode/sql',
-  'pig': 'ace/mode/pig',
-  'pyspark': 'ace/mode/python',
-  'r': 'ace/mode/r',
-  'scala': 'ace/mode/scala'
-};
-
 var getDefaultSnippetProperties = function (snippetType) {
   var properties = {};
 
@@ -153,7 +142,6 @@ var Snippet = function (vm, notebook, snippet) {
   self.subtype = ko.observable(typeof snippet.subtype != "undefined" && snippet.subtype != null ? snippet.subtype : '');
 
   //Ace stuff
-  self.aceEditorMode = ko.observable(TYPE_ACE_EDITOR_MAP[self.type()]);
   self.ace = ko.observable(null);
   self.completers = ko.observableArray([]);
   self.errors = ko.observableArray([]);
@@ -168,13 +156,16 @@ var Snippet = function (vm, notebook, snippet) {
     return Object.keys(ko.mapping.toJS(self.properties())).length > 0;
   });
 
+  self.viewSettings = ko.computed(function() {
+    return vm.getSnippetViewSettings(self.type());
+  });
+
   var previousProperties = {};
   self.type.subscribe(function(oldValue) {
     previousProperties[oldValue] = self.properties();
   }, null, "beforeChange");
 
   self.type.subscribe(function (newValue) {
-    self.aceEditorMode(TYPE_ACE_EDITOR_MAP[newValue]);
     if (typeof previousProperties[newValue] != "undefined") {
       self.properties(previousProperties[newValue]);
     } else {
@@ -929,7 +920,13 @@ function EditorViewModel(notebooks, options) {
   });
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
-  self.snippetPlaceholders = options.snippet_placeholders;
+
+  self.getSnippetViewSettings = function(snippetType) {
+    if (options.snippetViewSettings[snippetType]) {
+      return options.snippetViewSettings[snippetType];
+    }
+    return options.snippetViewSettings.default;
+  };
 
   self.availableSessionProperties = ko.computed(function () { // Only Spark
     return ko.utils.arrayFilter(options.session_properties, function (item) {

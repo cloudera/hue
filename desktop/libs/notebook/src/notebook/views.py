@@ -55,14 +55,6 @@ def notebook(request):
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
           'languages': get_interpreters(),
-          'snippet_placeholders' : {
-              'sql': _('Example: 1 + 1, or press CTRL + space'),
-              'spark': _('Example: 1 + 1, or press CTRL + space'),
-              'pyspark': _('Example: 1 + 1, or press CTRL + space'),
-              'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),
-              'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
-              'r': _('Example: 1 + 1, or press CTRL + space')
-          },
           'session_properties': SparkApi.PROPERTIES
       }),
       'autocomplete_base_url': autocomplete_base_url,
