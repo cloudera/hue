@@ -548,8 +548,9 @@ def test_add_ldap_users():
 
     # Test dn with spaces in username and dn (should fail)
     response = c.post(URL, dict(server='nonsense', username_pattern='uid=user with space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
-    assert_true("There was a problem with some of the LDAP information" in response.content, response)
-    assert_true("Username must not contain whitespaces" in response.content, response)
+    assert_true("Could not get LDAP details for users in pattern" in response.content, response.content)
+    response = c.get(reverse(desktop.views.log_view))
+    assert_true("{username}: Username must not contain whitespaces".format(username='user with space') in response.content, response.content)
 
     # Test dn with spaces in dn, but not username (should succeed)
     response = c.post(URL, dict(server='nonsense', username_pattern='uid=user without space,ou=People,dc=example,dc=com', password1='test', password2='test', dn=True))
