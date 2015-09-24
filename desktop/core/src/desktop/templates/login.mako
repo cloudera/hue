@@ -202,16 +202,16 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
           <div class="alert alert-block">
             ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
             <strong>${_('they will become your Hue superuser credentials.')}</strong>
-            % if is_password_policy_enabled():
+            %if is_password_policy_enabled():
 	      <p>${get_password_hint()}</p>
-            % endif
+            %endif
           </div>
         %endif
 
         <div class="input-prepend
-          % if backend_names == ['OAuthBackend']:
+          %if backend_names == ['OAuthBackend']:
             hide
-          % endif
+          %endif
         ">
           <span class="add-on"><i class="fa fa-user"></i></span>
           ${ form['username'] | n,unicode }
@@ -220,9 +220,9 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         ${ form['username'].errors | n,unicode }
 
         <div class="input-prepend
-          % if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
+          %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
             hide
-          % endif
+          %endif
         ">
           <span class="add-on"><i class="fa fa-lock"></i></span>
           ${ form['password'] | n,unicode }
@@ -239,11 +239,11 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         %if login_errors and not form['username'].errors and not form['password'].errors:
           <div class="alert alert-error" style="text-align: center">
             <strong><i class="fa fa-exclamation-triangle"></i> ${_('Error!')}</strong>
-            % if form.errors:
+            %if form.errors:
               % for error in form.errors:
                ${ form.errors[error]|unicode,n }
               % endfor
-            % endif
+            %endif
           </div>
         %endif
         <hr/>
@@ -254,7 +254,13 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
         %endif
         <input type="hidden" name="next" value="${next}"/>
       </form>
+
     </div>
+    %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
+    <div class="alert alert-info" id="login-splash">
+      ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+    </div>
+    %endif
   </div>
 </div>
 
@@ -273,17 +279,17 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
       }, 1000);
     });
 
-    % if 'AllowAllBackend' in backend_names:
+    %if 'AllowAllBackend' in backend_names:
       $('#id_password').val('password');
-    % endif
+    %endif
 
-    % if backend_names == ['OAuthBackend']:
+    %if backend_names == ['OAuthBackend']:
       $("input").css({"display": "block", "margin-left": "auto", "margin-right": "auto"});
       $("input").bind('click', function () {
         window.location.replace('/login/oauth/');
         return false;
       });
-    % endif
+    %endif
 
     $("ul.errorlist").each(function () {
       $(this).prev().addClass("error");
