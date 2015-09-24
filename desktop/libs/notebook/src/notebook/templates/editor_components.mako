@@ -306,32 +306,11 @@ from desktop.views import _ko
 
 <script type="text/html" id="snippetIcon">
 
-  <!-- ko if: type() == 'text' -->
-  <i class="fa fa-header snippet-icon"></i>
+  <!-- ko if: viewSettings().snippetImage -->
+  <img class="snippet-icon" data-bind="attr: { 'src': viewSettings().snippetImage }">
   <!-- /ko -->
-
-  <!-- ko if: type() == 'hive' -->
-  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="snippet-icon">
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'jar' -->
-  <i class="fa fa-file-archive-o snippet-icon"></i>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'py' -->
-  <i class="fa fa-file-code-o snippet-icon"></i>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'impala' -->
-  <img src="${ static('impala/art/icon_impala_48.png') }" class="snippet-icon">
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'pig' -->
-  <img src="${ static('pig/art/icon_pig_48.png') }" class="snippet-icon">
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'r' || type() == 'spark' || type() == 'pyspark' || type() == 'sql' -->
-  <img src="${ static('spark/art/icon_spark_48.png') }" class="snippet-icon">
+  <!-- ko if: viewSettings().snippetIcon -->
+  <i class="fa snippet-icon" data-bind="css: viewSettings().snippetIcon"></i>
   <!-- /ko -->
 
   <sup style="color: #338bb8; margin-left: -2px" data-bind="text: $root.getSnippetName(type())"></sup>
@@ -476,13 +455,13 @@ from desktop.views import _ko
           value: statement_raw,
           onExecute: execute,
           aceInstance: ace,
-          mode: aceEditorMode,
+          mode: viewSettings().aceMode,
           extraCompleters: completers,
           errors: errors,
           autocompleter: aceAutocompleter,
           assistHelper: assistHelper,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
-          placeholder: $root.snippetPlaceholders[type()] }"></div>
+          placeholder: viewSettings().placeHolder }"></div>
       </div>
     <div class="clearfix"></div>
     <ul data-bind="foreach: variables" class="unstyled inline">
@@ -930,6 +909,63 @@ from desktop.views import _ko
 <%def name="commonJS()">
 
 <script type="text/javascript" charset="utf-8">
+
+  var SNIPPET_VIEW_SETTINGS = {
+    default: {
+      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+      snippetIcon: 'fa-code'
+    },
+    hive: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/hive',
+      snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }'
+    },
+    impala: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/impala',
+      snippetImage: '${ static("impala/art/icon_impala_48.png") }'
+    },
+    jar : {
+      snippetIcon: 'fa-file-archive-o '
+    },
+    mysql: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/sql',
+      snippetIcon: 'fa-database'
+    },
+    mysqljdbc: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/sql',
+      snippetIcon: 'fa-database'
+    },
+    pig: {
+      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+      aceMode: 'ace/mode/pig',
+      snippetImage: '${ static("pig/art/icon_pig_48.png") }'
+    },
+    py : {
+      snippetIcon: 'fa-file-code-o'
+    },
+    pyspark: {
+      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+      aceMode: 'ace/mode/python',
+      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+    },
+    r: {
+      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+      aceMode: 'ace/mode/r',
+      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+    },
+    scala: {
+      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+      aceMode: 'ace/mode/scala',
+      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+    },
+    text: {
+      snippetIcon: 'fa-header'
+    }
+  };
+
 
   // Drag and drop iPython / Zeppelin notebooks
   if (window.FileReader) {
@@ -1724,6 +1760,7 @@ from desktop.views import _ko
 
   var vmOptions = ${ options_json | n,unicode };
   vmOptions.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
+  vmOptions.snippetViewSettings = SNIPPET_VIEW_SETTINGS;
 
   viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, vmOptions);
   ko.applyBindings(viewModel);
