@@ -574,6 +574,10 @@ var Snippet = function (vm, notebook, snippet) {
       snippet: ko.mapping.toJSON(self.getContext()),
       from: self.result.logLines
     }, function (data) {
+      if (data.status == 1) { // Append errors to the logs
+    	data.status = 0;
+    	data.logs = data.message;
+      }
       if (data.status == 0) {
         if (data.logs.length > 0) {
           var logs = data.logs.split("\n");
