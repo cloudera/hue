@@ -217,7 +217,7 @@ class OozieApi(object):
     job_control(jobid, action) -> None
     Raise RestException on error.
     """
-    if action not in ('start', 'suspend', 'resume', 'kill', 'rerun', 'coord-rerun', 'bundle-rerun', 'change', 'ignore'):
+    if action not in ('start', 'suspend', 'resume', 'kill', 'rerun', 'coord-rerun', 'bundle-rerun', 'change', 'ignore', 'update'):
       msg = 'Invalid oozie job action: %s' % (action,)
       LOG.error(msg)
       raise ValueError(msg)
