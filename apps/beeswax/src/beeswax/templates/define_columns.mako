@@ -329,7 +329,7 @@ ${ layout.metastore_menubar() }
               var _bytes = Math.ceil((Math.log(_val)/Math.log(2))/8);
               switch (_bytes){
                 case 1:
-                  _foundType = "tinyint";
+                  _foundType = "smallint";
                   break;
                 case 2:
                   _foundType = "smallint";
