@@ -67,6 +67,20 @@ class PythonInterpreterSpec extends BaseInterpreterSpec {
     ))
   }
 
+  it should "do json magic" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """x = [[1, 'a'], [3, 'b']]
+        |%json x
+      """.stripMargin)
+
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.APPLICATION_JSON -> List[JValue](
+        List[JValue](1, "a"),
+        List[JValue](3, "b")
+      )
+    ))
+  }
+
   it should "do table magic" in withInterpreter { interpreter =>
     val response = interpreter.execute(
       """x = [[1, 'a'], [3, 'b']]

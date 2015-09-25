@@ -268,12 +268,25 @@ def magic_table(name):
     })
 
 
+def magic_json(name):
+    try:
+        value = global_dict[name]
+    except KeyError:
+        exc_type, exc_value, tb = sys.exc_info()
+        return execute_reply_error(exc_type, exc_value, [])
+
+    return execute_reply_ok({
+        'application/json': value,
+    })
+
+
 def shutdown_request(content):
     sys.exit()
 
 
 magic_router = {
     'table': magic_table,
+    'json': magic_json,
 }
 
 
