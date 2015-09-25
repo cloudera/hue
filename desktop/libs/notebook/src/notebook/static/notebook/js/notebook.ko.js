@@ -134,9 +134,10 @@ var getDefaultSnippetProperties = function (snippetType) {
     properties['files'] = [];
   }
   else if (snippetType == 'pig') {
+    properties['script'] = '';
     properties['parameters'] = [];
-    properties['hadoop_properties'] = [];
-    properties['files'] = [];
+    properties['hadoopProperties'] = [];
+    properties['resources'] = [];
   }
 
   return properties;

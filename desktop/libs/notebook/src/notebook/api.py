@@ -50,7 +50,7 @@ def create_session(request):
     if any(old_session) and 'properties' in old_session[0]:
       properties = old_session[0]['properties']
 
-  response['session'] = get_api(request.user, session).create_session(lang=session['type'], properties=properties)
+  response['session'] = get_api(request.user, session, request.fs, request.jt).create_session(lang=session['type'], properties=properties)
   response['session']['properties'] = properties
   response['status'] = 0
 
@@ -65,7 +65,7 @@ def close_session(request):
 
   session = json.loads(request.POST.get('session', '{}'))
 
-  response['session'] = get_api(request.user, {'type': session['type']}).close_session(session=session)
+  response['session'] = get_api(request.user, {'type': session['type']}, request.fs, request.jt).close_session(session=session)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -80,7 +80,7 @@ def execute(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['handle'] = get_api(request.user, snippet).execute(notebook, snippet)
+  response['handle'] = get_api(request.user, snippet, request.fs, request.jt).execute(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -95,7 +95,7 @@ def check_status(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['query_status'] = get_api(request.user, snippet).check_status(notebook, snippet)
+  response['query_status'] = get_api(request.user, snippet, request.fs, request.jt).check_status(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -112,7 +112,7 @@ def fetch_result_data(request):
   rows = json.loads(request.POST.get('rows', 100))
   start_over = json.loads(request.POST.get('startOver', False))
 
-  response['result'] = get_api(request.user, snippet).fetch_result(notebook, snippet, rows, start_over)
+  response['result'] = get_api(request.user, snippet, request.fs, request.jt).fetch_result(notebook, snippet, rows, start_over)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -127,7 +127,7 @@ def fetch_result_metadata(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['result'] = get_api(request.user, snippet).fetch_result_metadata(notebook, snippet)
+  response['result'] = get_api(request.user, snippet, request.fs, request.jt).fetch_result_metadata(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -142,7 +142,7 @@ def cancel_statement(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['result'] = get_api(request.user, snippet).cancel(notebook, snippet)
+  response['result'] = get_api(request.user, snippet, request.fs, request.jt).cancel(notebook, snippet)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -163,7 +163,7 @@ def get_logs(request):
   size = request.POST.get('size')
   size = int(size) if size else None
 
-  db = get_api(request.user, snippet)
+  db = get_api(request.user, snippet, request.fs, request.jt)
   response['logs'] = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
   response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['job_urls'] = [{
@@ -226,7 +226,7 @@ def close_notebook(request):
 
   for session in notebook['sessions']:
     try:
-      response['result'].append(get_api(request.user, session).close_session(session))
+      response['result'].append(get_api(request.user, session, request.fs, request.jt).close_session(session))
     except QueryExpired:
       pass
     except Exception, e:
@@ -248,7 +248,7 @@ def close_statement(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   try:
-    response['result'] = get_api(request.user, snippet).close_statement(snippet)
+    response['result'] = get_api(request.user, snippet, request.fs, request.jt).close_statement(snippet)
   except QueryExpired:
     pass
 

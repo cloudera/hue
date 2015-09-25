@@ -77,13 +77,15 @@ class Notebook():
     return '\n\n'.join([snippet['statement_raw'] for snippet in self.get_data()['snippets']])
 
 
-def get_api(user, snippet):
-  from notebook.connectors.hiveserver2 import HS2Api  
-  from notebook.connectors.mysql import MySqlApi
+def get_api(user, snippet, fs, jt):
+  from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JDBCApi
-  from notebook.connectors.text import TextApi
+  from notebook.connectors.mysql import MySqlApi
+  from notebook.connectors.pig_batch import PigApi
   from notebook.connectors.spark_shell import SparkApi
   from notebook.connectors.spark_batch import SparkBatchApi
+  from notebook.connectors.text import TextApi
+
 
   interface = [interpreter for interpreter in get_interpreters() if interpreter['type'] == snippet['type']]
   if not interface:
@@ -102,6 +104,8 @@ def get_api(user, snippet):
     return MySqlApi(user)
   elif interface == 'jdbc':
     return JDBCApi(user)
+  elif interface == 'pig':
+    return PigApi(user, fs, jt)
   else:
     raise PopupException(_('Notebook connector interface not recognized: %s') % interface)
 
@@ -114,8 +118,10 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user):
+  def __init__(self, user, fs=None, jt=None):
     self.user = user
+    self.fs = fs
+    self.jt = jt
 
   def create_session(self, lang, properties=None):
     return {
@@ -128,6 +134,9 @@ class Api(object):
     pass
 
   def fetch_result(self, notebook, snippet, rows, start_over):
+    pass
+
+  def download(self, notebook, snippet, format):
     pass
 
   def get_log(self, notebook, snippet, startFrom=None, size=None):
