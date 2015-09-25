@@ -648,31 +648,42 @@ def sync_coord_workflow(request, job_id):
   hue_coord = get_history().get_coordinator_from_config(job.conf_dict)
   hue_wf = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(job.conf_dict)
   wf_application_path = job.conf_dict.get('wf_application_path') and Hdfs.urlsplit(job.conf_dict['wf_application_path'])[2] or ''
+  coord_application_path = job.conf_dict.get('oozie.coord.application.path') and Hdfs.urlsplit(job.conf_dict['oozie.coord.application.path'])[2] or ''
+  properties = hue_coord and hue_coord.properties and dict([(param['name'], param['value']) for param in hue_coord.properties]) or None
 
   if request.method == 'POST':
     params_form = ParametersFormSet(request.POST)
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
 
-      submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=mapping)
-      submission._sync_definition(wf_application_path, mapping)
+      # Update workflow params in coordinator
+      hue_coord.clear_workflow_params()
+      properties = dict([(param['name'], param['value']) for param in hue_coord.properties])
+
+      # Deploy WF XML
+      submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=properties)
+      submission._create_file(wf_application_path, hue_wf.XML_FILE_NAME, hue_wf.to_xml(mapping=properties), do_as=True)
+
+      # Deploy Coordinator XML
+      job.conf_dict.update(mapping)
+      submission = Submission(user=request.user, job=hue_coord, fs=request.fs, jt=request.jt, properties=job.conf_dict, oozie_id=job.id)
+      submission._create_file(coord_application_path, hue_coord.XML_FILE_NAME, hue_coord.to_xml(mapping=job.conf_dict), do_as=True)
+      # Server picks up deployed Coordinator XML changes after running 'update' action
+      submission.update_coord()
 
       request.info(_('Successfully updated Workflow definition'))
       return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
-    parameters = hue_wf and hue_wf.find_all_parameters() or []
-    params_dict = dict([(param['name'], param['value']) for param in parameters])
+    new_params = hue_wf and hue_wf.find_all_parameters() or []
+    new_params = dict([(param['name'], param['value']) for param in new_params])
 
-    submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=None)
-    prev_properties = hue_wf and hue_wf.deployment_dir and \
-                      submission.get_external_parameters(request.fs.join(wf_application_path, hue_wf.XML_FILE_NAME)) or {}
+    # Set previous values
+    if properties:
+      new_params = dict([(key, properties[key]) if key in properties.keys() else (key, new_params[key]) for key, value in new_params.iteritems()])
 
-    for key, value in params_dict.iteritems():
-      params_dict[key] = prev_properties[key] if key in prev_properties.keys() else params_dict[key]
-
-    initial_params = ParameterForm.get_initial_params(params_dict)
+    initial_params = ParameterForm.get_initial_params(new_params)
     params_form = ParametersFormSet(initial=initial_params)
 
   popup = render('editor2/submit_job_popup.mako', request, {
