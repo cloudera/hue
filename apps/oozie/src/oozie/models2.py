@@ -1980,6 +1980,10 @@ class Coordinator(Job):
     tmpl = "editor2/gen/coordinator.xml.mako"
     return re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {'coord': self, 'mapping': mapping})).encode('utf-8', 'xmlcharrefreplace')
 
+  def clear_workflow_params(self):
+    # Repopulated in the config properties
+    self.data['variables'] = [dataset for dataset in self.data['variables'] if dataset['dataset_type'] != 'parameter']
+
   @property
   def properties(self):
     props = [{'name': dataset['workflow_variable'], 'value': dataset['dataset_variable']} for dataset in self.data['variables'] if dataset['dataset_type'] == 'parameter']
