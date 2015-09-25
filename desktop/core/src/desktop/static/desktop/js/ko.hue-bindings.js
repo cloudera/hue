@@ -232,8 +232,7 @@ ko.bindingHandlers.radialMenu = {
         var iconRadius = $element.find("i").width() / 2;
 
         $.each(alternatives(), function (index, alternative) {
-          $("<div>")
-            .text(textRenderer(alternative))
+          var outerDiv = $("<div>")
             .addClass(alternativeCss)
             .css("left", radius * Math.cos(currentRad) + iconRadius)
             .css("top", radius * Math.sin(currentRad) + iconRadius)
@@ -245,6 +244,10 @@ ko.bindingHandlers.radialMenu = {
             })
             .on("mouseleave", hideAlternatives)
             .appendTo(allAlternatives);
+          $("<div>")
+            .text(textRenderer(alternative))
+            .appendTo(outerDiv);
+
           currentRad += radIncrements;
         });
         $element.append(allAlternatives);

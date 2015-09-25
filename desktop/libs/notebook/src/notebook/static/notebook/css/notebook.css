@@ -156,12 +156,19 @@ body {
   position: absolute;
   background-color: #61abd1;
   color: #DBE8F1;
-  font-size: 11px;
-  line-height: 50px;
   height: 50px;
   width: 50px;
   border-radius: 25px;
+}
+
+.add-snippet-alt > div {
+  display: table-cell;
   text-align: center;
+  vertical-align: middle;
+  line-height: 15px;
+  width: 50px;
+  height: 50px;
+  font-size: 11px;
 }
 
 .add-last-used-snippet,
