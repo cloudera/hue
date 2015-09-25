@@ -134,6 +134,12 @@ class Submission(object):
 
     return self.oozie_id
 
+  def update_coord(self):
+    self.api = get_oozie(self.user, api_version="v2")
+    self.api.job_control(self.oozie_id, action='update', properties=self.properties, parameters=None)
+    LOG.info("Update: %s" % (self,))
+
+    return self.oozie_id
 
   def rerun_bundle(self, deployment_dir, params):
     jt_address = cluster.get_cluster_addr_for_job_submission()
@@ -340,15 +346,6 @@ class Submission(object):
    else:
      self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
    LOG.debug("Created/Updated %s" % (file_path,))
-
-  def _sync_definition(self, deployment_dir, mapping):
-    """ This is helper function for 'Sync Workflow' functionality in a Coordinator.
-      It copies updated workflow changes into HDFS """
-
-    self._create_file(deployment_dir, self.job.XML_FILE_NAME, self.job.to_xml(mapping=mapping), do_as=True)
-
-    data_properties = smart_str('\n'.join(['%s=%s' % (key, val) for key, val in mapping.iteritems()]))
-    self._create_file(deployment_dir, 'job.properties', data_properties, do_as=True)
 
 def create_directories(fs, directory_list=[]):
   # If needed, create the remote home, deployment and data directories
