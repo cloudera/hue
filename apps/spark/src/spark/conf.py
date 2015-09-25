@@ -46,7 +46,7 @@ LIVY_SERVER_PORT = Config(
 
 LIVY_SERVER_SESSION_KIND = Config(
   key="livy_server_session_kind",
-  help=_t("Configure livy to start with process, thread, or yarn workers"),
+  help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
   default="process")
 
 LIVY_YARN_JAR = Config(
