@@ -90,6 +90,47 @@ class PigScript(Document):
     return 'org.apache.pig.backend.hadoop.hbase.HBaseStorage' in script
 
 
+class PigScript2(object):
+
+  def __init__(self, attrs=None):
+    self.data = json.dumps({
+        'script': '',
+        'name': '',
+        'properties': [],
+        'job_id': None,
+        'parameters': [],
+        'resources': [],
+        'hadoopProperties': []
+    })
+
+    if attrs:
+      self.update_from_dict(attrs)
+
+  def update_from_dict(self, attrs):
+    data_dict = self.dict
+
+    data_dict.update(attrs)
+
+    self.data = json.dumps(data_dict)
+
+  @property
+  def dict(self):
+    return json.loads(self.data)
+
+  @property
+  def use_hcatalog(self):
+    script = self.dict['script']
+
+    return ('org.apache.hcatalog.pig.HCatStorer' in script or 'org.apache.hcatalog.pig.HCatLoader' in script) or \
+        ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script) # New classes
+
+  @property
+  def use_hbase(self):
+    script = self.dict['script']
+
+    return 'org.apache.pig.backend.hadoop.hbase.HBaseStorage' in script
+
+
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)
