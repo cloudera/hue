@@ -909,59 +909,73 @@ from desktop.views import _ko
 
 <script type="text/javascript" charset="utf-8">
 
+  var colors = HueColors.d3Scale();
+
   var SNIPPET_VIEW_SETTINGS = {
     default: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-      snippetIcon: 'fa-code'
+      snippetIcon: 'fa-code',
+      color: colors[1]
     },
     hive: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/hive',
-      snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }'
+      snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+      color: colors[3]
     },
     impala: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/impala',
-      snippetImage: '${ static("impala/art/icon_impala_48.png") }'
+      snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+      color: colors[5]
     },
     jar : {
-      snippetIcon: 'fa-file-archive-o '
+      snippetIcon: 'fa-file-archive-o ',
+      color: colors[7]
     },
     mysql: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/sql',
-      snippetIcon: 'fa-database'
+      snippetIcon: 'fa-database',
+      color: colors[9]
     },
     mysqljdbc: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/sql',
-      snippetIcon: 'fa-database'
+      snippetIcon: 'fa-database',
+      color: colors[11]
     },
     pig: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       aceMode: 'ace/mode/pig',
-      snippetImage: '${ static("pig/art/icon_pig_48.png") }'
+      snippetImage: '${ static("pig/art/icon_pig_48.png") }',
+      color: colors[13]
     },
     py : {
-      snippetIcon: 'fa-file-code-o'
+      snippetIcon: 'fa-file-code-o',
+      color: colors[15]
     },
     pyspark: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       aceMode: 'ace/mode/python',
-      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      snippetImage: '${ static("spark/art/icon_spark_48.png") }',
+      color: colors[17]
     },
     r: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       aceMode: 'ace/mode/r',
-      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      snippetImage: '${ static("spark/art/icon_spark_48.png") }',
+      color: colors[19]
     },
     scala: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       aceMode: 'ace/mode/scala',
-      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+      snippetImage: '${ static("spark/art/icon_spark_48.png") }',
+      color: colors[21]
     },
     text: {
-      snippetIcon: 'fa-header'
+      snippetIcon: 'fa-header',
+      color: colors[23]
     }
   };
 
