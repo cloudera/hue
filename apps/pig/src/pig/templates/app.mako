@@ -1114,7 +1114,7 @@ ${ commonshare() | n,unicode }
       $("#runScriptBtn").button("loading");
       $("#withoutLogs").removeClass("hide");
       $("#withLogs").addClass("hide").text("");
-      showAlert("${_('Running')} <b>" + viewModel.currentScript().name() + "</b>...");
+      showAlert("${_('Running')} " + viewModel.currentScript().name() + "..");
     });
 
     $(document).on("saved", function () {
