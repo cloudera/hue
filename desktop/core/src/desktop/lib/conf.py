@@ -77,6 +77,12 @@ import textwrap
 import re
 import sys
 
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict
+
+
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
 
@@ -466,7 +472,7 @@ class UnspecifiedConfigSection(Config):
 
     The keys are the keys specified by the user in the config file.
     """
-    return dict([(key, self.get_member(raw, key, prefix))
+    return OrderedDict([(key, self.get_member(raw, key, prefix))
                  for key in raw.iterkeys()])
 
   def get_member(self, data, attr, prefix=''):
