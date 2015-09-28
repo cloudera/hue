@@ -969,6 +969,7 @@ from desktop.views import _ko
           }
           if (! alternative && self.snippetHistory().length > 0) {
             self.notebook.newSnippet(self.snippetHistory()[0].type());
+            return;
           }
 
           var currentIndex = self.snippetHistory().indexOf(alternative);
