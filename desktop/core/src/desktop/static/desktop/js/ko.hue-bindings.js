@@ -28,12 +28,22 @@ ko.bindingHandlers.slideVisible = {
 ko.bindingHandlers.fadeVisible = {
   init: function (element, valueAccessor) {
     var value = valueAccessor();
-    $(element).toggle(ko.unwrap(value));
+    var toggleValue = typeof value.value === "undefined" ? value : value.value;
+    $(element).toggle(ko.unwrap(toggleValue));
   },
   update: function (element, valueAccessor) {
     var value = valueAccessor();
+    var toggleValue = typeof value.value === "undefined" ? value : value.value;
+    var speed = typeof value.speed === "undefined" ? 'normal' : value.speed;
+    var fadeOut = typeof value.fadeOut === "undefined" ? false : value.fadeOut;
     $(element).stop();
-    ko.unwrap(value) ? $(element).fadeIn() : $(element).hide();
+    if (ko.unwrap(toggleValue)) {
+      $(element).fadeIn(speed);
+    } else if (fadeOut) {
+      $(element).fadeOut(speed);
+    } else {
+      $(element).hide();
+    }
   }
 };
 
