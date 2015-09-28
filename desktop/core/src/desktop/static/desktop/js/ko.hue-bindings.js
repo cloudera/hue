@@ -1909,7 +1909,7 @@ ko.bindingHandlers.aceEditor = {
         };
 
         this.onClick = function (e) {
-          if (this.link && (e.altKey || e.metaKey)) {
+          if (this.link && (e.altKey || e.metaKey || e.ctrlKey)) {
             this.link.editor = this.editor;
             this._signal("open", this.link);
             this.clear()
