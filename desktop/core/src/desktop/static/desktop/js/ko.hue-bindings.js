@@ -191,44 +191,47 @@ ko.bindingHandlers.numericTextInput = {
 ko.bindingHandlers.radialMenu = {
   init: function(element, valueAccessor) {
     var $element = $(element);
+    var allAlternatives = $("<div>").addClass('all-alternatives').hide().appendTo($element);
+    $element.data('hide-timeout', -1);
+  },
+
+  update: function(element, valueAccessor) {
+    var $element = $(element);
     var options = valueAccessor();
 
     var alternatives = options.alternatives;
-    var selected = options.selected; // Will be set before onSelect is called
-    var mainAlt = options.mainAlternative; // Alternative for clicking center
     var onSelect = options.onSelect || $.noop;
     var minRadius = options.minRadius || 70;
     var alternativeCss = options.alternativeCss;
     var alternativeSize = options.alternativeSize || 65;
 
-    var selectAttribute = options.selectAttribute;
     var textRenderer = options.textRenderer || function(item) {
         return item[selectAttribute]();
       };
 
-    var allAlternatives = $("<div>").hide();
+    var allAlternatives = $element.find('.all-alternatives');
 
-    var hideTimeout = -1;
     var hideAlternatives = function () {
-      clearTimeout(hideTimeout);
-      hideTimeout = setTimeout(function () {
+      clearTimeout($element.data('hide-timeout'));
+      $element.data('hide-timeout', setTimeout(function () {
         allAlternatives.fadeOut();
-      }, 600);
+      }, 600));
     };
 
-    var select = function (selectedValue) {
-      selected(selectedValue);
-      onSelect(selectedValue);
-      clearTimeout(hideTimeout);
+    var select = function (alternative) {
+      onSelect(alternative);
+      clearTimeout($element.data('hide-timeout'));
       allAlternatives.fadeOut();
     };
 
-    if (alternatives().length > 1) {
+    allAlternatives.empty();
+
+    if (alternatives().length > 0) {
       window.setTimeout(function() {
         var circumference = alternatives().length * alternativeSize;
         var radius = Math.max(minRadius, circumference / Math.PI / 2);
         var radIncrements = 2 * Math.PI / alternatives().length;
-        var currentRad = alternatives().length == 2 ? 2 * Math.PI : -0.5 * Math.PI;
+        var currentRad = -0.5 * Math.PI;
         var iconRadius = $element.find("i").width() / 2;
 
         $.each(alternatives(), function (index, alternative) {
@@ -237,32 +240,33 @@ ko.bindingHandlers.radialMenu = {
             .css("left", radius * Math.cos(currentRad) + iconRadius)
             .css("top", radius * Math.sin(currentRad) + iconRadius)
             .on("click", function () {
-              select(alternative[selectAttribute]());
+              select(alternative);
             })
             .on("mouseenter", function () {
-              clearTimeout(hideTimeout);
+              clearTimeout($element.data('hide-timeout'));
             })
             .on("mouseleave", hideAlternatives)
             .appendTo(allAlternatives);
           $("<div>")
             .text(textRenderer(alternative))
             .appendTo(outerDiv);
-
           currentRad += radIncrements;
         });
-        $element.append(allAlternatives);
       }, 500);
     }
 
-    $element.find("i")
-      .on("click", function() {
-        select(mainAlt());
-      })
-      .on("mouseenter", function() {
-        clearTimeout(hideTimeout);
-        allAlternatives.fadeIn();
-      })
-      .on("mouseleave", hideAlternatives);
+    if (! $element.data('radial-initialized')) {
+      $element.find("i")
+        .on("click", function() {
+          select();
+        })
+        .on("mouseenter", function() {
+          clearTimeout($element.data('hide-timeout'));
+          allAlternatives.fadeIn();
+        })
+        .on("mouseleave", hideAlternatives);
+      $element.data('radial-initialized', true);
+    }
   }
 };
 
@@ -1715,7 +1719,7 @@ ko.bindingHandlers.aceEditor = {
       editor.setOptions({fontSize: "14px"})
     }
     editor.on("focus", function () {
-      huePubSub.publish("hue.ace.activeMode", ko.utils.unwrapObservable(options.mode));
+      huePubSub.publish("hue.ace.activeMode", ko.unwrap(options.mode));
     });
 
     if (ko.isObservable(options.errors)) {

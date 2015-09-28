@@ -40,10 +40,13 @@ ${ editorComponents.includes() }
     <!-- ko if: $root.availableSnippets().length > 0 -->
     <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
 
-    <div class="add-snippet">
-      <div class="add-snippet-button pointer" style="position:relative; width:65px; text-align: center;" data-bind="radialMenu: { alternatives: $root.availableSnippets, selectAttribute: 'type', textRenderer: function(attribute) { return attribute.name() }, selected: selectedSnippet, mainAlternative: selectedSnippet, onSelect: newSnippet, alternativeCss: 'add-snippet-alt' }">
-        <i class="add-last-used-snippet fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
-      </div>
+    <div class="add-snippet" data-bind="component: {
+      name: 'add-snippet-menu',
+      params: {
+        notebook: $data,
+        availableSnippets: $root.availableSnippets
+      }
+    }">
     </div>
     <!-- /ko -->
   </%def>
@@ -52,6 +55,7 @@ ${ editorComponents.includes() }
 ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
+${ koComponents.addSnippetMenu() }
 
 ${ editorComponents.commonJS() }
 
