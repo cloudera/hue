@@ -99,6 +99,13 @@
           .scale((element.offsetWidth + 1) / 2 / Math.PI)
           .translate([element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)]);
     }
+    else if (options.scope === 'chn') {
+      projection = d3.geo[options.projection]()
+          .center([104.18741784700012,34.672410587000066])
+          .rotate([0, 0])
+          .scale(380)
+          .translate([element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)]);
+    }
 
     path = d3.geo.path()
         .projection(projection);
