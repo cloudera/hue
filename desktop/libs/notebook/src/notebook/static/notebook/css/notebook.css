@@ -182,6 +182,7 @@ body {
   padding: 5px 0 5px 10px;
   cursor: pointer;
   color: #464646;
+  border-left: 2px solid;
   margin-bottom: 2px;
 }
 

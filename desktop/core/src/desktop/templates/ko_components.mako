@@ -921,7 +921,7 @@ from desktop.views import _ko
       </div>
       <div class="modal-body" style="min-height: 100px">
         <ul class="snippet-list-alts" data-bind="foreach: availableSnippets">
-          <li data-bind="click: function() { $parent.addNewSnippet($data) }">
+          <li data-bind="click: function() { $parent.addNewSnippet($data) }, style: { 'border-left-color': $root.getSnippetViewSettings($data.type()).color }">
             <div style="width: 30px; display:inline-block;">
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetImage -->
             <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }">
