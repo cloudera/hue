@@ -906,8 +906,9 @@ from desktop.views import _ko
 <%def name="addSnippetMenu()">
   <script type="text/html" id="add-snippet-menu-template">
     <div class="add-snippet-button" style="position:relative; width:65px; text-align: center;">
-      <i class="add-last-used-snippet pointer fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }" data-bind="click: addLastUsedSnippet, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }"></i>
-      <div class="all-alternatives" data-bind="foreach: snippetsInWheel">
+      <i class="pointer fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }" data-bind="click: addLastUsedSnippet, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }"></i>
+      <div class="select-snippet-button" title="${ _('Select snippet') }" data-bind="fadeVisible: { value: showingSelectSnippet, fadeOut: true }, click: showSnippetModal, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }">...</div>
+      <div class="all-alternatives" data-bind="foreach: snippetHistory">
         <div class="add-snippet-alt pointer" style="display:none;" data-bind="
             event: { 'mouseenter': $parent.showHistory, 'mouseleave': $parent.hideHistory },
             fadeVisible: { value: $parent.showingHistory(), fadeOut: true, speed: 'slow' },
@@ -953,7 +954,7 @@ from desktop.views import _ko
         name: function() { return "..." }
       };
 
-      var WHEEL_RADIUS = 70;
+      var WHEEL_RADIUS = 75;
       var PLUS_ICON_RADIUS = 27.859; // FA-5X
 
       var calculatePositions = function(alternativeCount) {
@@ -978,31 +979,32 @@ from desktop.views import _ko
         var self = this;
         self.notebook = params.notebook;
         self.availableSnippets = params.availableSnippets;
-        self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,4)));
-        self.positions = calculatePositions(self.snippetHistory().length + 1);
+        self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,5)));
+        self.positions = calculatePositions(self.snippetHistory().length);
         self.showingHistory = ko.observable(false);
-
-        self.snippetsInWheel = ko.computed(function () {
-          return self.snippetHistory().concat(SHOW_MODAL_SNIPPET_ALT);
-        });
+        self.showingSelectSnippet = ko.observable(false);
 
         self.addLastUsedSnippet = function() {
           self.addNewSnippet(self.snippetHistory()[0]);
         };
 
+        self.showSnippetModal = function () {
+          $("#addSnippetModal").modal('show');
+        };
+
         self.addNewSnippet = function (alternative) {
           clearTimeout(hideTimeout);
           self.showingHistory(false);
+          self.showingSelectSnippet(false);
           $("#addSnippetModal").modal('hide');
           if (alternative && alternative.type() === SHOW_MODAL_SNIPPET_ALT.type()) {
-            $("#addSnippetModal").modal('show');
             return;
           }
 
           var currentIndex = self.snippetHistory().indexOf(alternative);
           if (currentIndex > -1) {
             self.snippetHistory().splice(currentIndex, 1);
-          } else if (self.snippetHistory().length == 4) {
+          } else if (self.snippetHistory().length == 5) {
             self.snippetHistory.pop();
           }
           self.snippetHistory.unshift(alternative);
@@ -1015,12 +1017,14 @@ from desktop.views import _ko
         self.showHistory = function () {
           clearTimeout(hideTimeout);
           self.showingHistory(true);
+          self.showingSelectSnippet(true);
         };
 
         self.hideHistory = function () {
           clearTimeout(hideTimeout);
           hideTimeout = window.setTimeout(function () {
             self.showingHistory(false);
+            self.showingSelectSnippet(false);
           }, 500);
         };
       }
