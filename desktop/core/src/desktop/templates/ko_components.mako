@@ -902,3 +902,91 @@ from desktop.views import _ko
     }());
   </script>
 </%def>
+
+<%def name="addSnippetMenu()">
+  <script type="text/html" id="add-snippet-menu-template">
+    <div class="add-snippet-button pointer" style="position:relative; width:65px; text-align: center;" data-bind="radialMenu: {
+        alternatives: snippetsInWheel,
+        textRenderer: function(attribute) { return attribute.name() },
+        onSelect: addNewSnippet,
+        alternativeCss: 'add-snippet-alt'
+      }">
+      <i class="add-last-used-snippet fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
+    </div>
+
+    <div id="addSnippetModal" class="modal hide fade">
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${ _('Add Snippet') }</h3>
+      </div>
+      <div class="modal-body" style="min-height: 100px">
+        <ul class="snippet-list-alts" data-bind="foreach: availableSnippets">
+          <li data-bind="click: function() { $parent.addNewSnippet($data) }">
+            <div style="width: 30px; display:inline-block;">
+            <!-- ko if: $root.getSnippetViewSettings(type()).snippetImage -->
+            <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }">
+            <!-- /ko -->
+            <!-- ko if: $root.getSnippetViewSettings(type()).snippetIcon -->
+            <i style="margin-left: 6px" class="fa snippet-icon" data-bind="css: $root.getSnippetViewSettings(type()).snippetIcon"></i>
+            <!-- /ko -->
+            </div>
+            <span data-bind="text: name"></span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Close')}</button>
+      </div>
+    </div>
+  </script>
+
+
+  <script type="text/javascript" charset="utf-8">
+    (function() {
+
+      var SHOW_MODAL_SNIPPET_ALT = {
+        type: function() { return "SHOW_MODAL" },
+        name: function() { return "..." }
+      };
+
+      function AddSnippetMenuViewModel (params) {
+        var self = this;
+        self.notebook = params.notebook;
+        self.availableSnippets = params.availableSnippets;
+
+        self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,4)));
+
+        self.snippetsInWheel = ko.computed(function () {
+          var result = self.snippetHistory().concat(SHOW_MODAL_SNIPPET_ALT);
+          return result;
+        });
+
+        self.addNewSnippet = function (alternative) {
+          $("#addSnippetModal").modal('hide');
+          if (alternative && alternative.type() === SHOW_MODAL_SNIPPET_ALT.type()) {
+            $("#addSnippetModal").modal('show');
+            return;
+          }
+          if (! alternative && self.snippetHistory().length > 0) {
+            self.notebook.newSnippet(self.snippetHistory()[0].type());
+          }
+
+          var currentIndex = self.snippetHistory().indexOf(alternative);
+          if (currentIndex > -1) {
+            self.snippetHistory().splice(currentIndex, 1);
+          } else if (self.snippetHistory().length == 4) {
+            self.snippetHistory.pop();
+          }
+          self.snippetHistory.unshift(alternative);
+
+          self.notebook.newSnippet(alternative.type())
+        };
+      }
+
+      ko.components.register('add-snippet-menu', {
+        viewModel: AddSnippetMenuViewModel,
+        template: { element: 'add-snippet-menu-template' }
+      });
+    }());
+  </script>
+</%def>

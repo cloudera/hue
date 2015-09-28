@@ -146,7 +146,7 @@ body {
   padding: 20px;
 }
 
-.add-last-used-snippet {
+.add-snippet-button > i {
   color: #CCC;
   cursor: pointer;
 }
@@ -159,6 +159,7 @@ body {
   height: 50px;
   width: 50px;
   border-radius: 25px;
+  border: 1px solid;
 }
 
 .add-snippet-alt > div {
@@ -171,7 +172,25 @@ body {
   font-size: 11px;
 }
 
-.add-last-used-snippet,
+.snippet-list-alts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.snippet-list-alts > li {
+  padding: 5px 0 5px 10px;
+  cursor: pointer;
+  color: #464646;
+  margin-bottom: 2px;
+}
+
+.snippet-list-alts > li:hover {
+  padding: 5px 0 5px 10px;
+  background-color: #f0f0f0;
+}
+
+.add-snippet-button > i,
 .add-snippet-alt {
   -webkit-transition: color 0.3s ease, -webkit-transform 0.3s;
   -ms-transition: color 0.3s ease, -ms-transform 0.3s;
@@ -181,7 +200,7 @@ body {
 .add-snippet-alt:hover {
   color: #FFF;
 }
-.add-last-used-snippet:hover,
+.add-snippet-button > i:hover,
 .add-snippet-alt:hover {
   -webkit-transform: scale(1.3, 1.3);
   -ms-transform: scale(1.3, 1.3);
