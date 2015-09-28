@@ -202,7 +202,7 @@ var huePubSub = (function () {
       }
 
       topics[topic].forEach(function (item) {
-        item(info != undefined ? info : {});
+        item(info);
       });
     }
   };
