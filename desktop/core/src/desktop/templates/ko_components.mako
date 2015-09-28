@@ -905,13 +905,17 @@ from desktop.views import _ko
 
 <%def name="addSnippetMenu()">
   <script type="text/html" id="add-snippet-menu-template">
-    <div class="add-snippet-button pointer" style="position:relative; width:65px; text-align: center;" data-bind="radialMenu: {
-        alternatives: snippetsInWheel,
-        textRenderer: function(attribute) { return attribute.name() },
-        onSelect: addNewSnippet,
-        alternativeCss: 'add-snippet-alt'
-      }">
-      <i class="add-last-used-snippet fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }"></i>
+    <div class="add-snippet-button" style="position:relative; width:65px; text-align: center;">
+      <i class="add-last-used-snippet pointer fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }" data-bind="click: addLastUsedSnippet, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }"></i>
+      <div class="all-alternatives" data-bind="foreach: snippetsInWheel">
+        <div class="add-snippet-alt pointer" style="display:none;" data-bind="
+            event: { 'mouseenter': $parent.showHistory, 'mouseleave': $parent.hideHistory },
+            fadeVisible: $parent.showingHistory(),
+            style: { 'left': $parent.positions[$index()].left, 'top': $parent.positions[$index()].top },
+            click: $parent.addNewSnippet">
+          <div data-bind="text: name()"></div>
+        </div>
+      </div>
     </div>
 
     <div id="addSnippetModal" class="modal hide fade">
@@ -949,26 +953,49 @@ from desktop.views import _ko
         name: function() { return "..." }
       };
 
+      var WHEEL_RADIUS = 70;
+      var PLUS_ICON_RADIUS = 27.859; // FA-5X
+
+      var calculatePositions = function(alternativeCount) {
+        var radius = WHEEL_RADIUS;
+        var radIncrements = 2 * Math.PI / alternativeCount;
+        var currentRad = -0.5 * Math.PI;
+
+        var result = [];
+
+        for (var i = 0; i < alternativeCount; i++) {
+          result.push({
+            left: radius * Math.cos(currentRad) + PLUS_ICON_RADIUS  + 'px',
+            top: radius * Math.sin(currentRad) + PLUS_ICON_RADIUS  + 'px'
+          });
+          currentRad += radIncrements;
+        }
+
+        return result;
+      };
+
       function AddSnippetMenuViewModel (params) {
         var self = this;
         self.notebook = params.notebook;
         self.availableSnippets = params.availableSnippets;
-
         self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,4)));
+        self.positions = calculatePositions(self.snippetHistory().length + 1);
+        self.showingHistory = ko.observable(false);
 
         self.snippetsInWheel = ko.computed(function () {
-          var result = self.snippetHistory().concat(SHOW_MODAL_SNIPPET_ALT);
-          return result;
+          return self.snippetHistory().concat(SHOW_MODAL_SNIPPET_ALT);
         });
 
+        self.addLastUsedSnippet = function() {
+          self.addNewSnippet(self.snippetHistory()[0]);
+        };
+
         self.addNewSnippet = function (alternative) {
+          clearTimeout(hideTimeout);
+          self.showingHistory(false);
           $("#addSnippetModal").modal('hide');
           if (alternative && alternative.type() === SHOW_MODAL_SNIPPET_ALT.type()) {
             $("#addSnippetModal").modal('show');
-            return;
-          }
-          if (! alternative && self.snippetHistory().length > 0) {
-            self.notebook.newSnippet(self.snippetHistory()[0].type());
             return;
           }
 
@@ -981,6 +1008,20 @@ from desktop.views import _ko
           self.snippetHistory.unshift(alternative);
 
           self.notebook.newSnippet(alternative.type())
+        };
+
+        var hideTimeout = -1;
+
+        self.showHistory = function () {
+          clearTimeout(hideTimeout);
+          self.showingHistory(true);
+        };
+
+        self.hideHistory = function () {
+          clearTimeout(hideTimeout);
+          hideTimeout = window.setTimeout(function () {
+            self.showingHistory(false);
+          }, 500);
         };
       }
 
