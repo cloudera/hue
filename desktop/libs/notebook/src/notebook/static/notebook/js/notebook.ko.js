@@ -767,7 +767,10 @@ var Notebook = function (vm, notebook) {
     })
   };
 
-  self.newSnippet = function () {
+  self.newSnippet = function (type) {
+    if (type) {
+      self.selectedSnippet(type);
+    }
     self.addSnippet({
       type: self.selectedSnippet(),
       result: {}
