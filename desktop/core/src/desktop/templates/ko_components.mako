@@ -910,7 +910,7 @@ from desktop.views import _ko
       <div class="all-alternatives" data-bind="foreach: snippetsInWheel">
         <div class="add-snippet-alt pointer" style="display:none;" data-bind="
             event: { 'mouseenter': $parent.showHistory, 'mouseleave': $parent.hideHistory },
-            fadeVisible: $parent.showingHistory(),
+            fadeVisible: { value: $parent.showingHistory(), fadeOut: true, speed: 'slow' },
             style: { 'left': $parent.positions[$index()].left, 'top': $parent.positions[$index()].top },
             click: $parent.addNewSnippet">
           <div data-bind="text: name()"></div>
