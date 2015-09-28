@@ -69,6 +69,8 @@ from django.utils.encoding import smart_str
 
 from desktop.lib.paths import get_desktop_root, get_build_dir
 
+from collections import OrderedDict
+
 import configobj
 import json
 import logging
@@ -466,7 +468,7 @@ class UnspecifiedConfigSection(Config):
 
     The keys are the keys specified by the user in the config file.
     """
-    return dict([(key, self.get_member(raw, key, prefix))
+    return OrderedDict([(key, self.get_member(raw, key, prefix))
                  for key in raw.iterkeys()])
 
   def get_member(self, data, attr, prefix=''):
