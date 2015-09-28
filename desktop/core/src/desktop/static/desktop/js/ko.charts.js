@@ -366,7 +366,7 @@ ko.bindingHandlers.leafletMapChart = {
           if (_map == null) {
             _map = L.map(element);
             L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              attribution: $(element).width() > 300 ? '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' : ''
             }).addTo(_map);
 
             if (L.control.zoomBox) {
@@ -378,12 +378,12 @@ ko.bindingHandlers.leafletMapChart = {
 
             if (_options.showMoveCheckbox) {
               var _command = L.control({
-                position: "topright"
+                position: $(element).width() > 300 ? "topright" : "bottomleft"
               });
 
               _command.onAdd = function (map) {
                 var div = L.DomUtil.create("div", "leaflet-search-command leaflet-bar");
-                div.innerHTML = '<label class="checkbox"><input id="command' + $(element).parents(".card-widget").attr("id") + '" type="checkbox"/> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</label>';
+                div.innerHTML = '<label class="checkbox" style="font-size: 11px"><input id="command' + $(element).parents(".card-widget").attr("id") + '" type="checkbox"/> ' + (_options.moveCheckboxLabel ? _options.moveCheckboxLabel : 'Search as I move the map') + '</label>';
                 return div;
               };
 
