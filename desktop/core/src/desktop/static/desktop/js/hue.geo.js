@@ -282,6 +282,10 @@ var HueGeo = {
     }
     return null;
   },
+  getISOAlpha2: function (code) {
+    var _country = HueGeo.getCountryFromCode(code);
+    return _country ? _country.alpha2 : "AQ";
+  },
   getISOAlpha3: function (code) {
     var _country = HueGeo.getCountryFromCode(code);
     return _country ? _country.alpha3 : "ATA";

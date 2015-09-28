@@ -587,6 +587,9 @@ ko.bindingHandlers.mapChart = {
         addToLegend(getHighestCategoryValue(cnt, item));
         var _place = typeof item.label == "String" ? item.label.toUpperCase() : item.label;
         if (_place != null) {
+          if (_scope != "world" && _scope != "usa" && _place.indexOf(".") == -1) {
+            _place = HueGeo.getISOAlpha2(_scope) + "." + _place;
+          }
           _mapdata[_place] = {
             fillKey: "fill_" + (_is2d ? getHighestCategoryValue(cnt, item).idx : (Math.ceil(item.value / _chunk) - 1)),
             id: _place,
@@ -609,6 +612,9 @@ ko.bindingHandlers.mapChart = {
       $(_data).each(function (cnt, item) {
         var _place = item.label.toUpperCase();
         if (_place != null) {
+          if (_scope != "world" && _scope != "usa" && _place.indexOf(".") == -1) {
+            _place = HueGeo.getISOAlpha2(_scope) + "." + _place;
+          }
           _mapdata[_place] = {
             fillKey: "selected",
             id: _place,
