@@ -16,13 +16,12 @@
 # limitations under the License.
 
 import logging
-import re
 
+from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from librdbms.jdbc import Jdbc
-from django.utils.translation import ugettext as _
 
 from notebook.connectors.base import Api, QueryError
 
@@ -36,32 +35,19 @@ def query_error_handler(func):
       return func(*args, **kwargs)
     except Exception, e:
       message = force_unicode(str(e))
-      if 'Class com.mysql.jdbc.Driver not found' in message:
-        raise QueryError(_('%s: did you export CLASSPATH=$CLASSPATH:/usr/share/java/mysql.jar?') % message)
+      if 'error occurred while trying to connect to the Java server' in message:
+        raise QueryError(_('%s: is the DB Proxy server running?') % message)
       else:
         raise QueryError(message)
   return decorator
 
 
-class JDBCApi(Api):
+class JdbcApi(Api):
 
-  # TODO
-  # async with queuing system
-  # impersonation / prompting for username/password
   @query_error_handler
   def execute(self, notebook, snippet):
-    user = 'root'
-    password = 'root'
 
-    host = 'localhost'
-    port = 3306
-    database = 'test'
-
-
-    jclassname = "com.mysql.jdbc.Driver"
-    url = "jdbc:mysql://{host}:{port}/{database}".format(host=host, port=port, database=database)
-
-    db = Jdbc(jclassname, url, user, password)
+    db = Jdbc(self.options['driver'], self.options['url'], self.options['user'], self.options['password'])
     db.connect()
 
     curs = db.cursor()
@@ -110,19 +96,7 @@ class JDBCApi(Api):
     return []
 
   def _progress(self, snippet, logs):
-    if snippet['type'] == 'hive':
-      match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
-      total = (int(match.group(1)) if match else 1) * 2
-
-      started = logs.count('Starting Job')
-      ended = logs.count('Ended Job')
-
-      return int((started + ended) * 100 / total)
-    elif snippet['type'] == 'impala':
-      match = re.search('(\d+)% Complete', logs, re.MULTILINE)
-      return int(match.group(1)) if match else 0
-    else:
-      return 50
+    return 50
 
   @query_error_handler
   def close_statement(self, snippet):
