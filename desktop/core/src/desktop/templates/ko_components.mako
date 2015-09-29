@@ -1002,13 +1002,12 @@ from desktop.views import _ko
             return;
           }
 
-          var currentIndex = self.snippetHistory().indexOf(alternative);
-          if (currentIndex > -1) {
-            self.snippetHistory().splice(currentIndex, 1);
-          } else if (self.snippetHistory().length == 5) {
-            self.snippetHistory.pop();
+          if (self.snippetHistory().indexOf(alternative) == -1) {
+            if (self.snippetHistory().length == 5) {
+              self.snippetHistory.pop();
+            }
+            self.snippetHistory.unshift(alternative);
           }
-          self.snippetHistory.unshift(alternative);
 
           self.notebook.newSnippet(alternative.type())
         };
