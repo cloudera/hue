@@ -64,10 +64,14 @@ class JDBCApi(Api):
     db = Jdbc(jclassname, url, user, password)
     db.connect()
 
+    curs = db.cursor()
+    curs.execute(snippet['statement'])
 
-    data, meta = db.execute(snippet['statement'])
+    data = curs.fetchmany(100)
+    description = curs.description
 
-    db.disconnect()
+    curs.close()
+    db.close()
 
     return {
       'sync': True,
@@ -76,10 +80,10 @@ class JDBCApi(Api):
         'has_more': False,
         'data': list(data),
         'meta': [{
-          'name': column['name'],
-          'type': column['type'],
+          'name': col[0],
+          'type': col[1],
           'comment': ''
-        } for column in meta],
+        } for col in description],
         'type': 'table'
       }
     }
