@@ -71,6 +71,7 @@ class JDBCApi(Api):
 
     return {
       'sync': True,
+      'has_result_set': True,
       'result': {
         'has_more': False,
         'data': list(data),
