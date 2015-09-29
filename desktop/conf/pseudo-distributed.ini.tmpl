@@ -1,3 +1,7 @@
+#####################################
+# DEVELOPMENT EDITION
+#####################################
+
 # Hue configuration file
 # ===================================
 #
@@ -26,19 +30,22 @@
 
   # Webserver listens on this address and port
   http_host=0.0.0.0
-  http_port=8888
+  http_port=8000
 
   # Time zone name
   time_zone=America/Los_Angeles
 
   # Enable or disable Django debug mode.
-  django_debug_mode=false
+  ## django_debug_mode=true
 
   # Enable or disable database debug mode.
   ## database_logging=false
 
+  # Whether to send debug messages from JavaScript to the server logs.
+  send_dbug_messages=true
+
   # Enable or disable backtrace for server error
-  http_500_debug_mode=false
+  ## http_500_debug_mode=true
 
   # Enable or disable memory profiling.
   ## memory_profiler=false
@@ -93,6 +100,7 @@
   ## validate=true
 
   # Default LDAP/PAM/.. username and password of the hue user used for authentications with other services.
+  # Inactive if password is empty.
   # e.g. LDAP pass-through authentication for HiveServer2 or Impala. Apps can override them individually.
   ## auth_username=hue
   ## auth_password=
@@ -197,6 +205,10 @@
     # e.g. <H2>Test Lab A2 Hue Services</H2>
     ## banner_top_html=
 
+    # Login splash HTML code
+    # e.g. WARNING: You are required to have authorization before you proceed
+    ## login_splash_html=
+
   # Configuration options for user authentication into the web application
   # ------------------------------------------------------------------------
   [[auth]]
@@ -214,6 +226,8 @@
     # - libopenid.backend.OpenIDBackend
     # - liboauth.backend.OAuthBackend
     #     (New oauth, support Twitter, Facebook, Google+ and Linkedin
+    # Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.
+    # However, in order to enable OAuthBackend, it must be the ONLY backend configured.
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
     # The service to use when querying PAM.
@@ -716,7 +730,7 @@
     ## validate=true
 
   # Override the default desktop username and password of the hue user used for authentications with other services.
-  # e.g. LDAP/PAM pass-through authentication.
+  # e.g. Used for LDAP/PAM pass-through authentication.
   ## auth_username=hue
   ## auth_password=
 
@@ -765,7 +779,7 @@
     ## validate=true
 
   # Override the desktop default username and password of the hue user used for authentications with other services.
-  # e.g. LDAP/PAM pass-through authentication.
+  # e.g. Used for LDAP/PAM pass-through authentication.
   ## auth_username=hue
   ## auth_password=
 
@@ -1219,4 +1233,3 @@
 
   # Whitelisted domains (only applies to Google OAuth). CSV format.
   ## whitelisted_domains_google=
- 
