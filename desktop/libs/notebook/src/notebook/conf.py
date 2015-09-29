@@ -17,14 +17,16 @@
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
+  coerce_json_dict
 
 
 def get_interpreters():
   return [{
       "name": INTERPRETERS.get()[i].NAME.get(),
       "type": i,
-      "interface": INTERPRETERS.get()[i].INTERFACE.get()}
+      "interface": INTERPRETERS.get()[i].INTERFACE.get(),
+      "options": INTERPRETERS.get()[i].OPTIONS.get()}
       for i in INTERPRETERS.get()
   ]
 
@@ -33,7 +35,7 @@ INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
   help="One entry for each type of snippet",
   each=ConfigSection(
-    help=_t("Information about a single Zookeeper cluster"),
+    help=_t("Define the name and how to execute the language"),
     members=dict(
       NAME=Config(
           "name",
@@ -47,6 +49,12 @@ INTERPRETERS = UnspecifiedConfigSection(
           default="hiveserver2",
           type=str,
       ),
+      OPTIONS=Config(
+        key='options',
+        help=_t('Database options to specify the server for connecting.'),
+        type=coerce_json_dict,
+        default='{}'
+      )                 
     )
   )
 )

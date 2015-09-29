@@ -79,7 +79,7 @@ class Notebook():
 
 def get_api(user, snippet, fs, jt):
   from notebook.connectors.hiveserver2 import HS2Api
-  from notebook.connectors.jdbc import JDBCApi
+  from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.mysql import MySqlApi
   from notebook.connectors.pig_batch import PigApi
   from notebook.connectors.spark_shell import SparkApi
@@ -87,10 +87,11 @@ def get_api(user, snippet, fs, jt):
   from notebook.connectors.text import TextApi
 
 
-  interface = [interpreter for interpreter in get_interpreters() if interpreter['type'] == snippet['type']]
-  if not interface:
+  interpreter = [interpreter for interpreter in get_interpreters() if interpreter['type'] == snippet['type']]
+  if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
-  interface = interface[0]['interface']
+  interface = interpreter[0]['interface']
+  options = interpreter[0]['options']
 
   if interface == 'hiveserver2':
     return HS2Api(user)
@@ -103,9 +104,9 @@ def get_api(user, snippet, fs, jt):
   elif interface == 'mysql':
     return MySqlApi(user)
   elif interface == 'jdbc':
-    return JDBCApi(user)
+    return JdbcApi(user, options=options)
   elif interface == 'pig':
-    return PigApi(user, fs, jt)
+    return PigApi(user, fs=fs, jt=jt)
   else:
     raise PopupException(_('Notebook connector interface not recognized: %s') % interface)
 
@@ -118,10 +119,11 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, fs=None, jt=None):
+  def __init__(self, user, fs=None, jt=None, options=None):
     self.user = user
     self.fs = fs
     self.jt = jt
+    self.options = options
 
   def create_session(self, lang, properties=None):
     return {
