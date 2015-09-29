@@ -89,22 +89,82 @@
       options.scope = 'world';
     }
 
-    if (options.scope === 'usa') {
-      projection = d3.geo.albersUsa()
+    var defaultTranslate = [element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)];
+
+    switch (options.scope) {
+      case "usa":
+        projection = d3.geo.albersUsa()
           .scale(element.offsetWidth)
           .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
-    }
-    else if (options.scope === 'world') {
-      projection = d3.geo[options.projection]()
+        break;
+      case "world":
+        projection = d3.geo[options.projection]()
           .scale((element.offsetWidth + 1) / 2 / Math.PI)
-          .translate([element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)]);
-    }
-    else if (options.scope === 'chn') {
-      projection = d3.geo[options.projection]()
+          .translate(defaultTranslate);
+        break;
+      case "chn":
+        projection = d3.geo[options.projection]()
           .center([104.18741784700012,34.672410587000066])
           .rotate([0, 0])
           .scale(380)
-          .translate([element.offsetWidth / 2, element.offsetHeight / (options.projection === "mercator" ? 1.45 : 1.8)]);
+          .translate(defaultTranslate);
+        break;
+      case "aus":
+        projection = d3.geo[options.projection]()
+          .center([136.0129500660001, -31.995293877999913])
+          .rotate([0, 0])
+          .scale(350)
+          .translate(defaultTranslate);
+        break;
+      case "bra":
+        projection = d3.geo[options.projection]()
+          .center([-51.447769636499956, -14.23752777099994])
+          .rotate([0, 0])
+          .scale(320)
+          .translate(defaultTranslate);
+        break;
+      case "can":
+        projection = d3.geo[options.projection]()
+          .center([-96.81107793155442, 62.3928040600001])
+          .rotate([0, 0])
+          .scale(300)
+          .translate(defaultTranslate);
+        break;
+      case "fra":
+        projection = d3.geo[options.projection]()
+          .center([2, 46])
+          .rotate([0, 0])
+          .scale(1300)
+          .translate(defaultTranslate);
+        break;
+      case "deu":
+        projection = d3.geo[options.projection]()
+          .center([10.43727461750008, 51.16822764400005])
+          .rotate([0, 0])
+          .scale(1600)
+          .translate(defaultTranslate);
+        break;
+      case "ita":
+        projection = d3.geo[options.projection]()
+          .center([12.560077144500099, 41.287229413500036])
+          .rotate([0, 0])
+          .scale(1300)
+          .translate(defaultTranslate);
+        break;
+      case "jpn":
+        projection = d3.geo[options.projection]()
+          .center([138.4618839855001, 34.779750881000126])
+          .rotate([0, 0])
+          .scale(700)
+          .translate(defaultTranslate);
+        break;
+      case "gbr":
+        projection = d3.geo[options.projection]()
+          .center([-3, 54.501734])
+          .rotate([0, 0])
+          .scale(1300)
+          .translate(defaultTranslate);
+        break;
     }
 
     path = d3.geo.path()
