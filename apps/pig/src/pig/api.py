@@ -86,17 +86,30 @@ class OozieApi(object):
     popup_params = json.loads(params)
     popup_params_names = [param['name'] for param in popup_params]
     pig_params = self._build_parameters(popup_params)
-    script_params = [param for param in pig_script.dict['parameters'] if param['name'] not in popup_params_names]
 
-    pig_params += self._build_parameters(script_params)
+    if pig_script.isV2:
+      pig_params += [{"type": "argument", "value": param} for param in pig_script.dict['parameters']]
 
-    job_properties = [{"name": prop['name'], "value": prop['value']} for prop in pig_script.dict['hadoopProperties']]
+      job_properties = [{"name": prop.split('=', 1)[0], "value": prop.split('=', 1)[1]} for prop in pig_script.dict['hadoopProperties']]
 
-    for resource in pig_script.dict['resources']:
-      if resource['type'] == 'file':
-        files.append(resource['value'])
-      if resource['type'] == 'archive':
-        archives.append({"dummy": "", "name": resource['value']})
+      for resource in pig_script.dict['resources']:
+        if resource.endswith('.zip') or resource.endswith('.tgz') or resource.endswith('.tar') or resource.endswith('.gz'):
+          archives.append({"dummy": "", "name": resource})
+        else:
+          files.append(resource)
+
+    else:
+      script_params = [param for param in pig_script.dict['parameters'] if param['name'] not in popup_params_names]
+
+      pig_params += self._build_parameters(script_params)
+
+      job_properties = [{"name": prop['name'], "value": prop['value']} for prop in pig_script.dict['hadoopProperties']]
+
+      for resource in pig_script.dict['resources']:
+        if resource['type'] == 'file':
+          files.append(resource['value'])
+        if resource['type'] == 'archive':
+          archives.append({"dummy": "", "name": resource['value']})
 
     action = Pig.objects.create(
         name='pig',
