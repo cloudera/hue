@@ -907,7 +907,7 @@ from desktop.views import _ko
   <script type="text/html" id="add-snippet-menu-template">
     <div class="add-snippet-button" style="position:relative; width:65px; text-align: center;">
       <i class="pointer fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }" data-bind="click: addLastUsedSnippet, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }"></i>
-      <div class="select-snippet-button" title="${ _('Select snippet') }" data-bind="fadeVisible: { value: showingSelectSnippet, fadeOut: true }, click: showSnippetModal, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }">...</div>
+      <div class="select-snippet-button" title="${ _('Select snippet') }" data-bind="fadeVisible: { value: hasAdditionalSnippets && showingSelectSnippet(), fadeOut: true }, click: showSnippetModal, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }">...</div>
       <div class="all-alternatives" data-bind="foreach: snippetHistory">
         <div class="add-snippet-alt pointer" style="display:none;" data-bind="
             event: { 'mouseenter': $parent.showHistory, 'mouseleave': $parent.hideHistory },
@@ -982,6 +982,7 @@ from desktop.views import _ko
         self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,5)));
         self.positions = calculatePositions(self.snippetHistory().length);
         self.showingHistory = ko.observable(false);
+        self.hasAdditionalSnippets = params.availableSnippets().length > 5;
         self.showingSelectSnippet = ko.observable(false);
 
         self.addLastUsedSnippet = function() {
