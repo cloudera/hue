@@ -54,7 +54,7 @@ INTERPRETERS = UnspecifiedConfigSection(
         help=_t('Database options to specify the server for connecting.'),
         type=coerce_json_dict,
         default='{}'
-      )                 
+      )
     )
   )
 )
