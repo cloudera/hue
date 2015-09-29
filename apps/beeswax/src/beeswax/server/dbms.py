@@ -100,6 +100,15 @@ def get_query_server_config(name='beeswax', server=None):
         'auth_password': AUTH_PASSWORD.get()
     }
 
+  if name == 'sparksql': # Spark SQL is almost the same as Hive
+    from spark.conf import SQL_SERVER_HOST as SPARK_SERVER_HOST, SQL_SERVER_PORT as SPARK_SERVER_PORT
+
+    query_server.update({
+        'server_name': 'sparksql',
+        'server_host': SPARK_SERVER_HOST.get(),
+        'server_port': SPARK_SERVER_PORT.get()
+    })
+
   debug_query_server = query_server.copy()
   debug_query_server['auth_password_used'] = bool(debug_query_server.pop('auth_password'))
   LOG.debug("Query Server: %s" % debug_query_server)
