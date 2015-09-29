@@ -559,6 +559,10 @@
     name=Text
     interface=text
 
+    # [[[sparksql]]]
+    # name=SparkSql
+    # interface=hiveserver2
+
 
 ###########################################################################
 # Settings to configure your Hadoop cluster.
@@ -782,6 +786,12 @@
 
   # If livy should use proxy users when submitting a job.
   ## livy_impersonation_enabled=true
+
+  # Host of the Sql Server
+  ## sql_server_host=localhost
+
+  # Port of the Sql Server
+  ## sql_server_port=10000
 
 
 ###########################################################################

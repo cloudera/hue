@@ -67,6 +67,19 @@ START_LIVY_SERVER = Config(
   type=coerce_bool,
   private=True)
 
+
+SQL_SERVER_HOST = Config(
+  key="sql_server_host",
+  help=_t("Host where SparkSQL server is running."),
+  default="localhost")
+
+SQL_SERVER_PORT = Config(
+  key="sql_server_port",
+  help=_t("Port the SparkSQL server runs on."),
+  default=10000,
+  type=int)
+
+
 def get_livy_server_url():
   return 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())
 

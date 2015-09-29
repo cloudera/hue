@@ -541,6 +541,9 @@ class HiveServerClient:
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
+    if self.query_server['server_name'] == 'sparksql': # All the time
+      kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
+
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
 
