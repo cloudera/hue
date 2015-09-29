@@ -2627,15 +2627,20 @@ def test_hiveserver2_get_security():
     assert_equal((True, 'GSSAPI', 'hive', True, 'hue', None), HiveServerClient(beeswax_query_server, user).get_security())
 
     # Impala
-    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False, 'auth_username': 'hue', 'auth_password': None}
-    impala_query_server.update(default_query_server)
-    assert_equal((False, 'GSSAPI', 'impala', False, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
-
-    impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True, 'auth_username': 'hue', 'auth_password': None}
-    impala_query_server.update(default_query_server)
-    assert_equal((False, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
-
     cluster_conf = hadoop.cluster.get_cluster_conf_for_job_submission()
+
+    finish = cluster_conf.SECURITY_ENABLED.set_for_testing(False)
+    try:
+      impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': False, 'auth_username': 'hue', 'auth_password': None}
+      impala_query_server.update(default_query_server)
+      assert_equal((False, 'GSSAPI', 'impala', False, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
+
+      impala_query_server = {'server_name': 'impala', 'principal': 'impala', 'impersonation_enabled': True, 'auth_username': 'hue', 'auth_password': None}
+      impala_query_server.update(default_query_server)
+      assert_equal((False, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
+    finally:
+      finish()
+
     finish = cluster_conf.SECURITY_ENABLED.set_for_testing(True)
     try:
       assert_equal((True, 'GSSAPI', 'impala', True, 'hue', None), HiveServerClient(impala_query_server, user).get_security())
