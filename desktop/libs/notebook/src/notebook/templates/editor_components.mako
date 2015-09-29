@@ -960,7 +960,7 @@ from desktop.views import _ko
       aceMode: 'ace/mode/r',
       snippetImage: '${ static("spark/art/icon_spark_48.png") }'
     },
-    scala: {
+    spark: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       aceMode: 'ace/mode/scala',
       snippetImage: '${ static("spark/art/icon_spark_48.png") }'
