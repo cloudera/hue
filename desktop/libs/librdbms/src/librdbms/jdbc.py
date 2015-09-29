@@ -46,36 +46,60 @@ class Jdbc():
     if self.conn is None:
       self.conn = self.gateway.jvm.java.sql.DriverManager.getConnection(self.db_url, self.username, self.password)
 
-  def execute(self, statement):
-    stmt = self.conn.createStatement()
+  def cursor(self):
+    return Cursor(self.conn)
 
-    try:
-      rs = stmt.executeQuery(statement)
-
-      try:
-        md = rs.getMetaData()
-
-        rs_meta = [{
-            'name': md.getColumnName(i + 1),
-            'type': md.getColumnTypeName(i + 1),
-            'length': md.getColumnDisplaySize(i + 1),
-            'precision': md.getPrecision(i + 1),
-          } for i in xrange(md.getColumnCount())]
-
-        res = []
-        while rs.next():
-          row = []
-          for c in xrange(md.getColumnCount()):
-            row.append(rs.getString(c + 1))
-          res.append(row)
-
-        return res, rs_meta
-      finally:
-        rs.close()
-    finally:
-      stmt.close()
-
-  def disconnect(self):
+  def close(self):
     if self.conn is not None:
       self.conn.close()
       self.conn = None
+
+
+class Cursor():
+  """Similar to DB-API 2.0 Cursor interface"""
+
+  def __init__(self, conn):
+    self.conn = conn
+    self.stmt = None
+    self.rs = None
+    self._meta = None
+
+  def execute(self, statement):
+    self.stmt = self.conn.createStatement()
+    self.rs = self.stmt.executeQuery(statement)
+    self._meta = self.rs.getMetaData()
+
+  def fetchmany(self, n):
+    res = []
+
+    while self.rs.next() and n > 0:
+      row = []
+      for c in xrange(self._meta.getColumnCount()):
+        row.append(self.rs.getObject(c + 1))
+      res.append(row)
+      n -= 1
+
+    return res
+
+  @property
+  def description(self):
+    return [[
+        self._meta.getColumnName(i),
+        self._meta.getColumnTypeName(i),
+        self._meta.getColumnDisplaySize(i),
+        self._meta.getColumnDisplaySize(i),
+        self._meta.getPrecision(i),
+        self._meta.getScale(i),
+        self._meta.isNullable(i),
+      ] for i in xrange(1, self._meta.getColumnCount() + 1)]
+
+  def close(self):
+    self._meta = None
+
+    if self.rs is not None:
+      self.rs.close()
+      self.rs = None
+
+    if self.stmt is not None:
+      self.stmt.close()
+      self.stmt = None
