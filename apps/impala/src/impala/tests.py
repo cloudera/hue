@@ -218,7 +218,7 @@ class TestImpalaIntegration:
 
     assert_equal(resp.status_code, 200)
     assert_true('531091827' in resp.content, resp.content) # We are getting one or two random rows
-    assert_true(len(resp.context['sample']) > 0, resp.context['sample'])
+    assert_true(len(resp.context['sample_rows']) > 0, resp.context['sample_rows'])
 
   def test_get_session(self):
     resp = self.client.get(reverse("impala:api_get_session"))
