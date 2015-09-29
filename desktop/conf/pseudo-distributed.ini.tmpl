@@ -1,7 +1,3 @@
-#####################################
-# DEVELOPMENT EDITION
-#####################################
-
 # Hue configuration file
 # ===================================
 #
@@ -20,8 +16,6 @@
 
 [desktop]
 
-  send_dbug_messages=1
-
   # Set this to a random string, the longer the better.
   # This is used for secure hashing in the session store.
   secret_key=
@@ -32,19 +26,19 @@
 
   # Webserver listens on this address and port
   http_host=0.0.0.0
-  http_port=8000
+  http_port=8888
 
   # Time zone name
   time_zone=America/Los_Angeles
 
   # Enable or disable Django debug mode.
-  ## django_debug_mode=true
+  django_debug_mode=false
 
   # Enable or disable database debug mode.
   ## database_logging=false
 
   # Enable or disable backtrace for server error
-  ## http_500_debug_mode=true
+  http_500_debug_mode=false
 
   # Enable or disable memory profiling.
   ## memory_profiler=false
@@ -99,8 +93,7 @@
   ## validate=true
 
   # Default LDAP/PAM/.. username and password of the hue user used for authentications with other services.
-  # # Inactive if password is empty.
-  # e.g. Used for LDAP pass-through authentication for HiveServer2 or Impala. Apps can override them individually.
+  # e.g. LDAP pass-through authentication for HiveServer2 or Impala. Apps can override them individually.
   ## auth_username=hue
   ## auth_password=
 
@@ -189,7 +182,6 @@
   # e.g.: localhost,domain1,*
   ## allowed_hosts=*
 
-
   # Administrators
   # ----------------
   [[django_admins]]
@@ -204,10 +196,6 @@
     # Top banner HTML code
     # e.g. <H2>Test Lab A2 Hue Services</H2>
     ## banner_top_html=
-
-    # Login splash HTML code
-    # e.g. WARNING: You are required to have authorisation before you proceed
-    ## login_splash_html=
 
   # Configuration options for user authentication into the web application
   # ------------------------------------------------------------------------
@@ -226,8 +214,6 @@
     # - libopenid.backend.OpenIDBackend
     # - liboauth.backend.OAuthBackend
     #     (New oauth, support Twitter, Facebook, Google+ and Linkedin
-    # Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.
-    # However, in order to enable OAuthBackend, it must be the ONLY backend configured.
     ## backend=desktop.auth.backend.AllowFirstUserDjangoBackend
 
     # The service to use when querying PAM.
@@ -575,195 +561,6 @@
 
 
 ###########################################################################
-# Settings to configure SAML
-###########################################################################
-
-[libsaml]
-  # Xmlsec1 binary path. This program should be executable by the user running Hue.
-  ## xmlsec_binary=/usr/local/bin/xmlsec1
-
-  # Entity ID for Hue acting as service provider.
-  # Can also accept a pattern where '<base_url>' will be replaced with server URL base.
-  ## entity_id="<base_url>/saml2/metadata/"
-
-  # Create users from SSO on login.
-  ## create_users_on_login=true
-
-  # Required attributes to ask for from IdP.
-  # This requires a comma separated list.
-  ## required_attributes=uid
-
-  # Optional attributes to ask for from IdP.
-  # This requires a comma separated list.
-  ## optional_attributes=
-
-  # IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates.
-  ## metadata_file=
-
-  # Private key to encrypt metadata with.
-  ## key_file=
-
-  # Signed certificate to send along with encrypted metadata.
-  ## cert_file=
-
-  # A mapping from attributes in the response from the IdP to django user attributes.
-  ## user_attribute_mapping={'uid':'username'}
-
-  # Have Hue initiated authn requests be signed and provide a certificate.
-  ## authn_requests_signed=false
-
-  # Have Hue initiated logout requests be signed and provide a certificate.
-  ## logout_requests_signed=false
-
-  # Username can be sourced from 'attributes' or 'nameid'.
-  ## username_source=attributes
-
-  # Performs the logout or not.
-  ## logout_enabled=true
-
-
-###########################################################################
-# Settings to configure OpenID
-###########################################################################
-
-[libopenid]
-  # (Required) OpenId SSO endpoint url.
-  ## server_endpoint_url=https://www.google.com/accounts/o8/id
-
-  # OpenId 1.1 identity url prefix to be used instead of SSO endpoint url
-  # This is only supported if you are using an OpenId 1.1 endpoint
-  ## identity_url_prefix=https://app.onelogin.com/openid/your_company.com/
-
-  # Create users from OPENID on login.
-  ## create_users_on_login=true
-
-  # Use email for username
-  ## use_email_for_username=true
-
-
-###########################################################################
-# Settings to configure OAuth
-###########################################################################
-
-[liboauth]
-  # NOTE:
-  # To work, each of the active (i.e. uncommented) service must have
-  # applications created on the social network.
-  # Then the "consumer key" and "consumer secret" must be provided here.
-  #
-  # The addresses where to do so are:
-  # Twitter:  https://dev.twitter.com/apps
-  # Google+ : https://cloud.google.com/
-  # Facebook: https://developers.facebook.com/apps
-  # Linkedin: https://www.linkedin.com/secure/developer
-  #
-  # Additionnaly, the following must be set in the application settings:
-  # Twitter:  Callback URL (aka Redirect URL) must be set to http://YOUR_HUE_IP_OR_DOMAIN_NAME/oauth/social_login/oauth_authenticated
-  # Google+ : CONSENT SCREEN must have email address
-  # Facebook: Sandbox Mode must be DISABLED
-  # Linkedin: "In OAuth User Agreement", r_emailaddress is REQUIRED
-
-  # The Consumer key of the application
-  ## consumer_key_twitter=
-  ## consumer_key_google=
-  ## consumer_key_facebook=
-  ## consumer_key_linkedin=
-
-  # The Consumer secret of the application
-  ## consumer_secret_twitter=
-  ## consumer_secret_google=
-  ## consumer_secret_facebook=
-  ## consumer_secret_linkedin=
-
-  # The Request token URL
-  ## request_token_url_twitter=https://api.twitter.com/oauth/request_token
-  ## request_token_url_google=https://accounts.google.com/o/oauth2/auth
-  ## request_token_url_linkedin=https://www.linkedin.com/uas/oauth2/authorization
-  ## request_token_url_facebook=https://graph.facebook.com/oauth/authorize
-
-  # The Access token URL
-  ## access_token_url_twitter=https://api.twitter.com/oauth/access_token
-  ## access_token_url_google=https://accounts.google.com/o/oauth2/token
-  ## access_token_url_facebook=https://graph.facebook.com/oauth/access_token
-  ## access_token_url_linkedin=https://api.linkedin.com/uas/oauth2/accessToken
-
-  # The Authenticate URL
-  ## authenticate_url_twitter=https://api.twitter.com/oauth/authorize
-  ## authenticate_url_google=https://www.googleapis.com/oauth2/v1/userinfo?access_token=
-  ## authenticate_url_facebook=https://graph.facebook.com/me?access_token=
-  ## authenticate_url_linkedin=https://api.linkedin.com/v1/people/~:(email-address)?format=json&oauth2_access_token=
-
-  # Username Map. Json Hash format.
-  # Replaces username parts in order to simplify usernames obtained
-  # Example: {"@sub1.domain.com":"_S1", "@sub2.domain.com":"_S2"}
-  # converts 'email@sub1.domain.com' to 'email_S1'
-  ## username_map={}
-
-  # Whitelisted domains (only applies to Google OAuth). CSV format.
-  ## whitelisted_domains_google=
-
-###########################################################################
-# Settings for the RDBMS application
-###########################################################################
-
-[librdbms]
-  # The RDBMS app can have any number of databases configured in the databases
-  # section. A database is known by its section name
-  # (IE sqlite, mysql, psql, and oracle in the list below).
-
-  [[databases]]
-    # sqlite configuration.
-    ## [[[sqlite]]]
-      # Name to show in the UI.
-      ## nice_name=SQLite
-
-      # For SQLite, name defines the path to the database.
-      ## name=/tmp/sqlite.db
-
-      # Database backend to use.
-      ## engine=sqlite
-
-      # Database options to send to the server when connecting.
-      # https://docs.djangoproject.com/en/1.4/ref/databases/
-      ## options={}
-
-    # mysql, oracle, or postgresql configuration.
-    ## [[[mysql]]]
-      # Name to show in the UI.
-      ## nice_name="My SQL DB"
-
-      # For MySQL and PostgreSQL, name is the name of the database.
-      # For Oracle, Name is instance of the Oracle server. For express edition
-      # this is 'xe' by default.
-      ## name=mysqldb
-
-      # Database backend to use. This can be:
-      # 1. mysql
-      # 2. postgresql
-      # 3. oracle
-      ## engine=mysql
-
-      # IP or hostname of the database to connect to.
-      ## host=localhost
-
-      # Port the database server is listening to. Defaults are:
-      # 1. MySQL: 3306
-      # 2. PostgreSQL: 5432
-      # 3. Oracle Express Edition: 1521
-      ## port=3306
-
-      # Username to authenticate with when connecting to the database.
-      ## user=example
-
-      # Password matching the username to authenticate with when
-      # connecting to the database.
-      ## password=example
-
-      # Database options to send to the server when connecting.
-      # https://docs.djangoproject.com/en/1.4/ref/databases/
-      ## options={}
-
-###########################################################################
 # Settings to configure your Hadoop cluster.
 ###########################################################################
 
@@ -868,58 +665,6 @@
 
 
 ###########################################################################
-# Settings to configure the Filebrowser app
-###########################################################################
-
-[filebrowser]
-  # Location on local filesystem where the uploaded archives are temporary stored.
-  ## archive_upload_tempdir=/tmp
-
-  # Show Download Button for HDFS file browser.
-  ## show_download_button=false
-
-  # Show Upload Button for HDFS file browser.
-  ## show_upload_button=false
-
-
-###########################################################################
-# Settings to configure liboozie
-###########################################################################
-
-[liboozie]
-  # The URL where the Oozie service runs on. This is required in order for
-  # users to submit jobs. Empty value disables the config check.
-  ## oozie_url=http://localhost:11000/oozie
-
-  # Requires FQDN in oozie_url if enabled
-  ## security_enabled=false
-
-  # Location on HDFS where the workflows/coordinator are deployed when submitted.
-  ## remote_deployement_dir=/user/hue/oozie/deployments
-
-
-###########################################################################
-# Settings to configure the Oozie app
-###########################################################################
-
-[oozie]
-  # Location on local FS where the examples are stored.
-  ## local_data_dir=..../examples
-
-  # Location on local FS where the data for the examples is stored.
-  ## sample_data_dir=...thirdparty/sample_data
-
-  # Location on HDFS where the oozie examples and workflows are stored.
-  ## remote_data_dir=/user/hue/oozie/workspaces
-
-  # Maximum of Oozie workflows or coodinators to retrieve in one API call.
-  ## oozie_jobs_count=50
-
-  # Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.
-  ## enable_cron_scheduling=true
-
-
-###########################################################################
 # Settings to configure Beeswax with Hive
 ###########################################################################
 
@@ -967,7 +712,7 @@
     ## validate=true
 
   # Override the default desktop username and password of the hue user used for authentications with other services.
-  # e.g. Used for LDAP/PAM pass-through authentication.
+  # e.g. LDAP/PAM pass-through authentication.
   ## auth_username=hue
   ## auth_password=
 
@@ -1016,9 +761,63 @@
     ## validate=true
 
   # Override the desktop default username and password of the hue user used for authentications with other services.
-  # e.g. Used for LDAP/PAM pass-through authentication.
+  # e.g. LDAP/PAM pass-through authentication.
   ## auth_username=hue
   ## auth_password=
+
+
+###########################################################################
+# Settings to configure the Spark application.
+###########################################################################
+
+[spark]
+  # Host address of the Livy Server.
+  ## livy_server_host=localhost
+
+  # Port of the Livy Server.
+  ## livy_server_port=8998
+
+  # Configure livy to start in local 'process' mode, or 'yarn' workers.
+  ## livy_server_session_kind=process
+
+  # If livy should use proxy users when submitting a job.
+  ## livy_impersonation_enabled=true
+
+
+###########################################################################
+# Settings to configure the Oozie app
+###########################################################################
+
+[oozie]
+  # Location on local FS where the examples are stored.
+  ## local_data_dir=..../examples
+
+  # Location on local FS where the data for the examples is stored.
+  ## sample_data_dir=...thirdparty/sample_data
+
+  # Location on HDFS where the oozie examples and workflows are stored.
+  ## remote_data_dir=/user/hue/oozie/workspaces
+
+  # Maximum of Oozie workflows or coodinators to retrieve in one API call.
+  ## oozie_jobs_count=50
+
+  # Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.
+  ## enable_cron_scheduling=true
+
+
+###########################################################################
+# Settings to configure the Filebrowser app
+###########################################################################
+
+[filebrowser]
+  # Location on local filesystem where the uploaded archives are temporary stored.
+  ## archive_upload_tempdir=/tmp
+
+  # Show Download Button for HDFS file browser.
+  ## show_download_button=false
+
+  # Show Upload Button for HDFS file browser.
+  ## show_upload_button=false
 
 
 ###########################################################################
@@ -1160,24 +959,6 @@
 
 
 ###########################################################################
-# Settings to configure the Spark application.
-###########################################################################
-
-[spark]
-  # Host address of the Livy Server.
-  ## livy_server_host=localhost
-
-  # Port of the Livy Server.
-  ## livy_server_port=8998
-
-  # Configure livy to start in local 'process' mode, or 'yarn' workers.
-  ## livy_server_session_kind=process
-
-  # If livy should use proxy users when submitting a job.
-  ## livy_impersonation_enabled=true
-
-
-###########################################################################
 # Settings for the User Admin application
 ###########################################################################
 
@@ -1193,6 +974,22 @@
     ## pwd_regex="^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W_]){1,}).{8,}$"
     ## pwd_hint="The password must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
     ## pwd_error_message="The password must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
+
+
+###########################################################################
+# Settings to configure liboozie
+###########################################################################
+
+[liboozie]
+  # The URL where the Oozie service runs on. This is required in order for
+  # users to submit jobs. Empty value disables the config check.
+  ## oozie_url=http://localhost:11000/oozie
+
+  # Requires FQDN in oozie_url if enabled
+  ## security_enabled=false
+
+  # Location on HDFS where the workflows/coordinator are deployed when submitted.
+  ## remote_deployement_dir=/user/hue/oozie/deployments
 
 
 ###########################################################################
@@ -1221,3 +1018,195 @@
 
   # Name of Kerberos principal when using security.
   ## principal_name=zookeeper
+
+
+###########################################################################
+# Settings for the RDBMS application
+###########################################################################
+
+[librdbms]
+  # The RDBMS app can have any number of databases configured in the databases
+  # section. A database is known by its section name
+  # (IE sqlite, mysql, psql, and oracle in the list below).
+
+  [[databases]]
+    # sqlite configuration.
+    ## [[[sqlite]]]
+      # Name to show in the UI.
+      ## nice_name=SQLite
+
+      # For SQLite, name defines the path to the database.
+      ## name=/tmp/sqlite.db
+
+      # Database backend to use.
+      ## engine=sqlite
+
+      # Database options to send to the server when connecting.
+      # https://docs.djangoproject.com/en/1.4/ref/databases/
+      ## options={}
+
+    # mysql, oracle, or postgresql configuration.
+    ## [[[mysql]]]
+      # Name to show in the UI.
+      ## nice_name="My SQL DB"
+
+      # For MySQL and PostgreSQL, name is the name of the database.
+      # For Oracle, Name is instance of the Oracle server. For express edition
+      # this is 'xe' by default.
+      ## name=mysqldb
+
+      # Database backend to use. This can be:
+      # 1. mysql
+      # 2. postgresql
+      # 3. oracle
+      ## engine=mysql
+
+      # IP or hostname of the database to connect to.
+      ## host=localhost
+
+      # Port the database server is listening to. Defaults are:
+      # 1. MySQL: 3306
+      # 2. PostgreSQL: 5432
+      # 3. Oracle Express Edition: 1521
+      ## port=3306
+
+      # Username to authenticate with when connecting to the database.
+      ## user=example
+
+      # Password matching the username to authenticate with when
+      # connecting to the database.
+      ## password=example
+
+      # Database options to send to the server when connecting.
+      # https://docs.djangoproject.com/en/1.4/ref/databases/
+      ## options={}
+
+
+###########################################################################
+# Settings to configure SAML
+###########################################################################
+
+[libsaml]
+  # Xmlsec1 binary path. This program should be executable by the user running Hue.
+  ## xmlsec_binary=/usr/local/bin/xmlsec1
+
+  # Entity ID for Hue acting as service provider.
+  # Can also accept a pattern where '<base_url>' will be replaced with server URL base.
+  ## entity_id="<base_url>/saml2/metadata/"
+
+  # Create users from SSO on login.
+  ## create_users_on_login=true
+
+  # Required attributes to ask for from IdP.
+  # This requires a comma separated list.
+  ## required_attributes=uid
+
+  # Optional attributes to ask for from IdP.
+  # This requires a comma separated list.
+  ## optional_attributes=
+
+  # IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates.
+  ## metadata_file=
+
+  # Private key to encrypt metadata with.
+  ## key_file=
+
+  # Signed certificate to send along with encrypted metadata.
+  ## cert_file=
+
+  # A mapping from attributes in the response from the IdP to django user attributes.
+  ## user_attribute_mapping={'uid':'username'}
+
+  # Have Hue initiated authn requests be signed and provide a certificate.
+  ## authn_requests_signed=false
+
+  # Have Hue initiated logout requests be signed and provide a certificate.
+  ## logout_requests_signed=false
+
+  # Username can be sourced from 'attributes' or 'nameid'.
+  ## username_source=attributes
+
+  # Performs the logout or not.
+  ## logout_enabled=true
+
+
+###########################################################################
+# Settings to configure OpenID
+###########################################################################
+
+[libopenid]
+  # (Required) OpenId SSO endpoint url.
+  ## server_endpoint_url=https://www.google.com/accounts/o8/id
+
+  # OpenId 1.1 identity url prefix to be used instead of SSO endpoint url
+  # This is only supported if you are using an OpenId 1.1 endpoint
+  ## identity_url_prefix=https://app.onelogin.com/openid/your_company.com/
+
+  # Create users from OPENID on login.
+  ## create_users_on_login=true
+
+  # Use email for username
+  ## use_email_for_username=true
+
+
+###########################################################################
+# Settings to configure OAuth
+###########################################################################
+
+[liboauth]
+  # NOTE:
+  # To work, each of the active (i.e. uncommented) service must have
+  # applications created on the social network.
+  # Then the "consumer key" and "consumer secret" must be provided here.
+  #
+  # The addresses where to do so are:
+  # Twitter:  https://dev.twitter.com/apps
+  # Google+ : https://cloud.google.com/
+  # Facebook: https://developers.facebook.com/apps
+  # Linkedin: https://www.linkedin.com/secure/developer
+  #
+  # Additionnaly, the following must be set in the application settings:
+  # Twitter:  Callback URL (aka Redirect URL) must be set to http://YOUR_HUE_IP_OR_DOMAIN_NAME/oauth/social_login/oauth_authenticated
+  # Google+ : CONSENT SCREEN must have email address
+  # Facebook: Sandbox Mode must be DISABLED
+  # Linkedin: "In OAuth User Agreement", r_emailaddress is REQUIRED
+
+  # The Consumer key of the application
+  ## consumer_key_twitter=
+  ## consumer_key_google=
+  ## consumer_key_facebook=
+  ## consumer_key_linkedin=
+
+  # The Consumer secret of the application
+  ## consumer_secret_twitter=
+  ## consumer_secret_google=
+  ## consumer_secret_facebook=
+  ## consumer_secret_linkedin=
+
+  # The Request token URL
+  ## request_token_url_twitter=https://api.twitter.com/oauth/request_token
+  ## request_token_url_google=https://accounts.google.com/o/oauth2/auth
+  ## request_token_url_linkedin=https://www.linkedin.com/uas/oauth2/authorization
+  ## request_token_url_facebook=https://graph.facebook.com/oauth/authorize
+
+  # The Access token URL
+  ## access_token_url_twitter=https://api.twitter.com/oauth/access_token
+  ## access_token_url_google=https://accounts.google.com/o/oauth2/token
+  ## access_token_url_facebook=https://graph.facebook.com/oauth/access_token
+  ## access_token_url_linkedin=https://api.linkedin.com/uas/oauth2/accessToken
+
+  # The Authenticate URL
+  ## authenticate_url_twitter=https://api.twitter.com/oauth/authorize
+  ## authenticate_url_google=https://www.googleapis.com/oauth2/v1/userinfo?access_token=
+  ## authenticate_url_facebook=https://graph.facebook.com/me?access_token=
+  ## authenticate_url_linkedin=https://api.linkedin.com/v1/people/~:(email-address)?format=json&oauth2_access_token=
+
+  # Username Map. Json Hash format.
+  # Replaces username parts in order to simplify usernames obtained
+  # Example: {"@sub1.domain.com":"_S1", "@sub2.domain.com":"_S2"}
+  # converts 'email@sub1.domain.com' to 'email_S1'
+  ## username_map={}
+
+  # Whitelisted domains (only applies to Google OAuth). CSV format.
+  ## whitelisted_domains_google=
+ 
