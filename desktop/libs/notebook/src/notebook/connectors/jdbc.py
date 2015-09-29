@@ -17,21 +17,17 @@
 
 import logging
 import re
-import sys
+
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
+from librdbms.jdbc import Jdbc
 from django.utils.translation import ugettext as _
 
 from notebook.connectors.base import Api, QueryError
 
 
 LOG = logging.getLogger(__name__)
-
-try:
-  import jaydebeapi
-except ImportError, e:
-  LOG.exception('Failed to import jaydebeapi')
 
 
 def query_error_handler(func):
@@ -54,45 +50,35 @@ class JDBCApi(Api):
   # impersonation / prompting for username/password
   @query_error_handler
   def execute(self, notebook, snippet):
-    if 'jaydebeapi' not in sys.modules:
-      raise Exception('Required jaydebeapi module is not imported.')
-
     user = 'root'
     password = 'root'
-    
+
     host = 'localhost'
     port = 3306
     database = 'test'
-    
-    autocommit = True
+
+
     jclassname = "com.mysql.jdbc.Driver"
     url = "jdbc:mysql://{host}:{port}/{database}".format(host=host, port=port, database=database)
-    driver_args = [url, user, password]
-    jars = None
-    libs = None
 
-    db = jaydebeapi.connect(jclassname, driver_args, jars=jars, libs=libs)
-    db.jconn.setAutoCommit(autocommit)
-    
-    curs = db.cursor()
-    curs.execute(snippet['statement'])
+    db = Jdbc(jclassname, url, user, password)
+    db.connect()
 
-    data = curs.fetchmany(100)
-    description = curs.description
-    
-    curs.close()
-    db.close()
-    
+
+    data, meta = db.execute(snippet['statement'])
+
+    db.disconnect()
+
     return {
       'sync': True,
       'result': {
         'has_more': False,
         'data': list(data),
         'meta': [{
-          'name': column[0],
-          'type': 'TODO',
+          'name': column['name'],
+          'type': column['type'],
           'comment': ''
-        } for column in description],
+        } for column in meta],
         'type': 'table'
       }
     }
