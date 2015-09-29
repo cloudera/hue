@@ -59,6 +59,8 @@ class PigScript(Document):
 
   doc = generic.GenericRelation(Doc, related_name='pig_doc')
 
+  isV2 = False
+
   def update_from_dict(self, attrs):
     data_dict = self.dict
 
@@ -91,6 +93,7 @@ class PigScript(Document):
 
 
 class PigScript2(object):
+  isV2 = True     # V2 is for the Notebook app
 
   def __init__(self, attrs=None):
     self.data = json.dumps({
