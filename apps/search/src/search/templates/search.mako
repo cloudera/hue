@@ -368,8 +368,16 @@ ${ dashboard.layout_skeleton() }
           </span>
           <select data-bind="selectedOptions: properties.scope" class="input-small">
             <option value="world">${ _("World") }</option>
-            <option value="usa">${ _("USA") }</option>
+            <option value="aus">${ _("Australia") }</option>
+            <option value="bra">${ _("Brazil") }</option>
+            <option value="can">${ _("Canada") }</option>
             <option value="chn">${ _("China") }</option>
+            <option value="fra">${ _("France") }</option>
+            <option value="deu">${ _("Germany") }</option>
+            <option value="ita">${ _("Italy") }</option>
+            <option value="jpn">${ _("Japan") }</option>
+            <option value="gbr">${ _("UK") }</option>
+            <option value="usa">${ _("USA") }</option>
           </select>
         </span>
       </div>
