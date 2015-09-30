@@ -18,11 +18,14 @@
 import logging
 import sys
 
+from desktop.lib.i18n import smart_unicode
+
 
 LOG = logging.getLogger(__name__)
 
+
 try:
-  from py4j.java_gateway import JavaGateway
+  from py4j.java_gateway import JavaGateway, JavaObject
 except ImportError, e:
   LOG.exception('Failed to import py4j')
 
@@ -75,7 +78,12 @@ class Cursor():
     while self.rs.next() and n > 0:
       row = []
       for c in xrange(self._meta.getColumnCount()):
-        row.append(self.rs.getObject(c + 1))
+        cell = self.rs.getObject(c + 1)
+
+        if isinstance(cell, JavaObject):
+          cell = str(cell) # DATETIME
+        row.append(cell)
+
       res.append(row)
       n -= 1
 
