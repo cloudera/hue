@@ -650,7 +650,7 @@
 
   var EUROPE_TOPO = {};
   if (typeof  WORLD_TOPO != "undefined"){
-    EUROPE_TOPO = WORLD_TOPO;
+    EUROPE_TOPO = jQuery.extend(true, {}, WORLD_TOPO);
     EUROPE_TOPO.objects["europe"] =   EUROPE_TOPO.objects["world"];
     delete EUROPE_TOPO.objects["world"];
   }
