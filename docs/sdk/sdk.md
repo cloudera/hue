@@ -251,6 +251,7 @@ to include a simple form:
       <span>${a} ${op} ${b} = ${result}</span>
       % endif
       <form action=${url("calculator.views.index")} method=POST>
+        ${ csrf_token(request) | n,unicode }
         <input name="a">
         <input type="radio" name="op" value="add">+</input>
         <input type="radio" name="op" value="subtract">-</input>
