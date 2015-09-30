@@ -28,6 +28,7 @@ from oozie.decorators import check_document_access_permission # Bad dependency
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired
 from notebook.decorators import api_error_handler, check_document_modify_permission
+from notebook.models import escape_rows
 
 
 LOG = logging.getLogger(__name__)
@@ -81,6 +82,11 @@ def execute(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
   response['handle'] = get_api(request.user, snippet, request.fs, request.jt).execute(notebook, snippet)
+
+  # Materialize and HTML escape results
+  if response['handle'].get('sync') and 'data' in response['handle']['result']:
+    response['handle']['result']['data'] = escape_rows(response['handle']['result']['data'])
+
   response['status'] = 0
 
   return JsonResponse(response)
@@ -113,6 +119,11 @@ def fetch_result_data(request):
   start_over = json.loads(request.POST.get('startOver', False))
 
   response['result'] = get_api(request.user, snippet, request.fs, request.jt).fetch_result(notebook, snippet, rows, start_over)
+
+  # Materialize and HTML escape results
+  if 'data' in response['result']:
+    response['result']['data'] = escape_rows(response['result']['data'])
+
   response['status'] = 0
 
   return JsonResponse(response)

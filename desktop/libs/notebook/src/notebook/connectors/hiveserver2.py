@@ -110,7 +110,7 @@ class HS2Api(Api):
     # No escaping...
     return {
         'has_more': results.has_more,
-        'data': list(results.rows()),
+        'data': results.rows(),
         'meta': [{
           'name': column.name,
           'type': column.type,
