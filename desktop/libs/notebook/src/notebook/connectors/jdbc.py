@@ -69,7 +69,7 @@ class JdbcApi(Api):
       'has_result_set': True,
       'result': {
         'has_more': False,
-        'data': list(data),
+        'data': data,
         'meta': [{
           'name': col[0],
           'type': col[1],

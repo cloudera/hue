@@ -14,3 +14,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+import json
+import math
+import numbers
+
+from django.utils.html import escape
+
+from desktop.lib.i18n import smart_unicode
+
+
+# Materialize and HTML escape results
+def escape_rows(rows):
+  data = []
+
+  for row in rows:
+    escaped_row = []
+    for field in row:
+      if isinstance(field, numbers.Number):
+        if math.isnan(field) or math.isinf(field):
+          escaped_field = json.dumps(field)
+        else:
+          escaped_field = field
+      elif field is None:
+        escaped_field = 'NULL'
+      else:
+        field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
+        escaped_field = escape(field).replace(' ', '&nbsp;')
+      escaped_row.append(escaped_field)
+    data.append(escaped_row)
+
+  return data

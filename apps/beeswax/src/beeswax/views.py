@@ -17,7 +17,6 @@
 
 import json
 import logging
-import math
 import re
 import sys
 import time
@@ -39,9 +38,9 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
 from desktop.models import Document
 from desktop.lib.parameterization import find_variables
+from notebook.models import escape_rows
 
 import beeswax.forms
 import beeswax.design
@@ -477,25 +476,9 @@ def view_results(request, id, first_row=0):
       downloadable = False
     else:
       results = db.fetch(handle, start_over, 100)
-      data = []
 
       # Materialize and HTML escape results
-      # TODO: use Number + list comprehension
-      for row in results.rows():
-        escaped_row = []
-        for field in row:
-          if isinstance(field, (int, long, float, complex, bool)):
-            if math.isnan(field) or math.isinf(field):
-              escaped_field = json.dumps(field)
-            else:
-              escaped_field = field
-          elif field is None:
-            escaped_field = 'NULL'
-          else:
-            field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
-            escaped_field = escape(field).replace(' ', '&nbsp;')
-          escaped_row.append(escaped_field)
-        data.append(escaped_row)
+      data = escape_rows(results.rows())
 
       # We display the "Download" button only when we know that there are results:
       downloadable = first_row > 0 or data
