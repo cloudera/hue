@@ -52,9 +52,18 @@ class SolrApi(object):
     self._user = user
     self._client = HttpClient(self._url, logger=LOG)
     self.security_enabled = security_enabled
+
     if self.security_enabled:
       self._client.set_kerberos_auth()
+
     self._root = resource.Resource(self._client)
+
+    # The Kerberos handshake requires two requests in order to authenticate,
+    # but if our first request is a PUT/POST, it might flat-out reject the
+    # first request if the body is too large. So, connect here in order to get
+    # a cookie so future PUT/POSTs will be pre-authenticated.
+    if self.security_enabled:
+      self._root.invoke('HEAD', '/')
 
   def _get_params(self):
     if self.security_enabled:
