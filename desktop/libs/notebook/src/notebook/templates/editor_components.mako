@@ -925,6 +925,11 @@ from desktop.views import _ko
 
   var SNIPPET_VIEW_SETTINGS = {
     default: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/sql',
+      snippetIcon: 'fa-database'
+    },
+    code: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       snippetIcon: 'fa-code'
     },
@@ -940,16 +945,6 @@ from desktop.views import _ko
     },
     jar : {
       snippetIcon: 'fa-file-archive-o '
-    },
-    mysql: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/sql',
-      snippetIcon: 'fa-database'
-    },
-    mysqljdbc: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/sql',
-      snippetIcon: 'fa-database'
     },
     pig: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',

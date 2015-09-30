@@ -48,16 +48,21 @@ class JdbcApi(Api):
   def execute(self, notebook, snippet):
 
     db = Jdbc(self.options['driver'], self.options['url'], self.options['user'], self.options['password'])
-    db.connect()
 
-    curs = db.cursor()
-    curs.execute(snippet['statement'])
+    try:
+      db.connect()
 
-    data = curs.fetchmany(100)
-    description = curs.description
+      curs = db.cursor()
 
-    curs.close()
-    db.close()
+      try:
+        curs.execute(snippet['statement'])
+
+        data = curs.fetchmany(100)
+        description = curs.description
+      finally:
+        curs.close()
+    finally:
+      db.close()
 
     return {
       'sync': True,
