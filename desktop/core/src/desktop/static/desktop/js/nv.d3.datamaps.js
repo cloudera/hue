@@ -102,6 +102,12 @@
           .scale((element.offsetWidth + 1) / 2 / Math.PI)
           .translate(defaultTranslate);
         break;
+      case "europe":
+        projection = d3.geo[options.projection]()
+          .center([8.43727461750008, 51.16822764400005])
+          .scale(380)
+          .translate(defaultTranslate);
+        break;
       case "chn":
         projection = d3.geo[options.projection]()
           .center([104.18741784700012,34.672410587000066])
@@ -641,7 +647,16 @@
   /**************************************
    TopoJSON
    ***************************************/
+
+  var EUROPE_TOPO = {};
+  if (typeof  WORLD_TOPO != "undefined"){
+    EUROPE_TOPO = WORLD_TOPO;
+    EUROPE_TOPO.objects["europe"] =   EUROPE_TOPO.objects["world"];
+    delete EUROPE_TOPO.objects["world"];
+  }
+
   Datamap.prototype.worldTopo = typeof WORLD_TOPO != "undefined" ? WORLD_TOPO : {};
+  Datamap.prototype.europeTopo = EUROPE_TOPO;
   Datamap.prototype.abwTopo = typeof ABW_TOPO != "undefined" ? ABW_TOPO : {};
   Datamap.prototype.afgTopo = typeof AFG_TOPO != "undefined" ? AFG_TOPO : {};
   Datamap.prototype.agoTopo = typeof AGO_TOPO != "undefined" ? AGO_TOPO : {};
