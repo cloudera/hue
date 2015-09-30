@@ -52,6 +52,17 @@ class MockResource():
   def set_solr_response(cls, response):
     MockResource.RESPONSE = response
 
+  def invoke(self, method, *args, **kwargs):
+    if method.lower() == 'head':
+      return self.head(*args, **kwargs)
+    elif method.lower() == 'get':
+      return self.get(*args, **kwargs)
+    else:
+      raise Exception('do not know how to handle %s' % method)
+
+  def head(self, *args, **kwargs):
+    return ''
+
   def get(self, *args, **kwargs):
     if 'collection_1/admin/file' in args[0]:
       return SOLR_SCHEMA
