@@ -60,7 +60,7 @@ Autocompleter.prototype.getFromReferenceIndex = function (statement) {
     refs.sort();
     $.each(refs, function(index, tableRefRaw) {
       if (tableRefRaw.indexOf('(') == -1) {
-        var refMatch = tableRefRaw.match(/ *([^ ]*) ?([^ ]*)? */);
+        var refMatch = tableRefRaw.match(/\s*(\S+)\s*(\S+)?\s*/);
 
         var refParts = refMatch[1].split('.');
         if (refMatch[2]) {
@@ -94,7 +94,7 @@ Autocompleter.prototype.getViewReferenceIndex = function (statement) {
   //           map key reference (if group 5 is exists)
   // group 5 = array value (if posexplode)
   //           map value reference (if ! posexplode)
-  var lateralViewRegex = /LATERAL\s+VIEW\s+(pos)?explode\(([^\)]+)\)\s+(?:(\S+)\s+)?AS \(?([^ ,\)]*)(?:\s*,\s*([^ ,]*)\))?/gi;
+  var lateralViewRegex = /LATERAL\s+VIEW\s+(pos)?explode\(([^\)]+)\)\s+(?:(\S+)\s+)?AS\s+\(?([^\s,\)]*)(?:\s*,\s*([^\s,]*)\))?/gi;
   var lateralViewMatch;
 
   while (lateralViewMatch = lateralViewRegex.exec(statement)) {
@@ -282,7 +282,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
       callback(self.extractFields(data, fromKeyword));
     }, onFailure );
   } else if ((selectBefore && fromAfter) || fieldTermBefore || impalaFieldRef) {
-    var partialTermsMatch = beforeCursor.match(/([^ \(\-\+\<\>\,]*)$/);
+    var partialTermsMatch = beforeCursor.match(/([^\s\(\-\+\<\>\,]*)$/);
     var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
 
     // Drop the last part, empty or not. If it's not empty it's the start of a

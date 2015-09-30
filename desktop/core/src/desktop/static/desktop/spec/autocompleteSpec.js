@@ -180,7 +180,7 @@ describe("autocomplete.js", function() {
       assertAutoComplete({
         serverResponses: {},
         beforeCursor: "SELECT ",
-        afterCursor: " FROM testTableA tta, testTableB",
+        afterCursor: " FROM testTableA   tta, testTableB",
         expectedSuggestions: ["testTableB.", "tta."]
       });
     });
@@ -373,10 +373,10 @@ describe("autocomplete.js", function() {
               type: "struct"
             }
           },
-          beforeCursor: "SELECT testItemB.",
-          afterCursor: " FROM testTable1, testTable2 tt2" +
-          " LATERAL VIEW explode(tt2.testArrayA) explodedTableA AS testItemA" +
-          " LATERAL VIEW explode(tt2.testArrayB) explodedTableB AS testItemB",
+          beforeCursor: "SELECT\n testItemA,\n testItemB.",
+          afterCursor: "\n\tFROM\n\t testTable2 tt2\n" +
+          "\t LATERAL VIEW EXPLODE(tt2.testArrayA) explodedTableA AS testItemA\n" +
+          "\t LATERAL VIEW EXPLODE(tt2.testArrayB) explodedTableB AS testItemB",
           expectedSuggestions: ["fieldA", "fieldB"]
         });
       });
@@ -395,8 +395,8 @@ describe("autocomplete.js", function() {
           beforeCursor: "SELECT ta2_exp.",
           afterCursor: " FROM " +
           "   testTable tt" +
-          " LATERAL VIEW explode(tt.testArray1) ta1 AS ta1_exp " +
-          " LATERAL VIEW explode(ta1_exp.testArray2) ta2 AS ta2_exp",
+          " LATERAL VIEW explode(tt.testArray1) ta1 AS ta1_exp\n" +
+          "   LATERAL VIEW explode(ta1_exp.testArray2)    ta2   AS  ta2_exp",
           expectedSuggestions: ["fieldA", "fieldB"]
         });
       });
