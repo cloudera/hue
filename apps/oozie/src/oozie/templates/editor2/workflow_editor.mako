@@ -505,28 +505,45 @@ ${ dashboard.import_bindings() }
     if (viewModel.workflow.properties.show_arrows()){
       drawArrows();
     }
+    $(".widget-main-section").removeClass("zoom-in");
+    $(".widget-main-section").each(function(){
+      var $el = $(this);
+      if (!$el.is("a") && !$el.is("input") && !$el.is("i") && !$el.is("button")) {
+        var w = ko.dataFor($el.parents(".card-widget")[0]);
+        if (!w.oozieExpanded() && !w.ooziePropertiesExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget", "decision-widget"].indexOf(w.widgetType()) == -1 && $el.width() < 500){
+          $el.addClass("zoom-in");
+        }
+      }
+    });
   }
 
   var lastSeenPosition = null;
   var lastExpandedWidget = null;
   function setLastExpandedWidget(widget) {
     lastExpandedWidget = widget;
-    if (! widget.oozieExpanded()){
+    if (! widget.oozieExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget", "decision-widget"].indexOf(widget.widgetType()) == -1){
       var _el = $("#wdg_" + widget.id());
-      if (_el.width() < 400){
+      _el.find(".widget-main-section").removeClass("zoom-in");
+      if (_el.width() < 500){
         _el.css("z-index", "1032");
         lastSeenPosition = _el.position();
         var _width = _el.width();
-
+        _el.parent().css("height", viewModel.isEditing() ? _el.height() : (_el.height() + 17) + "px");
         _el.css("position", "absolute");
         _el.css({
           "top": (lastSeenPosition.top) + "px",
           "left": lastSeenPosition.left + "px",
           "width": _width
         });
-        _el.width(500);
         $("#exposeOverlay").fadeIn(300);
-        widget.oozieExpanded(true);
+        _el.animate({
+          "width": "500px"
+        }, 200, function(){
+          widget.oozieExpanded(true);
+          if ($(document).width() > $(window).width()){
+            $("html, body").scrollLeft($(document).width() - $(window).width());
+          }
+        });
       }
       else {
         widget.oozieExpanded(false);
@@ -539,6 +556,7 @@ ${ dashboard.import_bindings() }
       var _el = $("#wdg_" + lastExpandedWidget.id());
       _el.find(".prop-editor").hide();
       _el.removeAttr("style");
+      _el.parent().removeAttr("style");
       lastExpandedWidget.ooziePropertiesExpanded(false);
       lastExpandedWidget.oozieExpanded(false);
     }
