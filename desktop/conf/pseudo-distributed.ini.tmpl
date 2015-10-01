@@ -1050,6 +1050,26 @@
 
 
 ###########################################################################
+# Settings for the AWS lib
+###########################################################################
+
+[aws]
+  [[aws_accounts]]
+    # Default AWS account
+    [[[default]]]
+      # AWS credentials
+      ## access_key_id=
+      ## secret_access_key=
+
+      # Allow to use either environment variables or
+      # EC2 InstanceProfile to retrieve AWS credentials.
+      ## allow_environment_credentials=yes
+
+      # AWS region to use
+      ## region=us-east-1
+
+
+###########################################################################
 # Settings for the Sentry lib
 ###########################################################################
 
