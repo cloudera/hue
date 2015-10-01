@@ -592,6 +592,35 @@ var Snippet = function (vm, notebook, snippet) {
     });
   };
 
+  self.autocomplete = function (database, table, column, nested) {
+    var path = "";
+    if (database) {
+      path += database + "/";
+    }
+    if (table) {
+      path += table + "/";
+    }
+    if (column) {
+      path += column + "/";
+    }
+    if (nested) {
+      path += nested + "/";
+    }
+
+    $.post("/notebook/api/autocomplete/" + path, {
+      notebook: ko.mapping.toJSON(notebook.getContext()),
+      snippet: ko.mapping.toJSON(self.getContext()),
+    }, function (data) {
+      if (data.status == 0) {
+        console.log(data)
+      } else {
+        self._ajaxError(data);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
   self.init = function () {
     if (self.status() == 'running') {
       self.checkStatus();

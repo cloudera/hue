@@ -145,7 +145,7 @@ class Api(object):
     return 'No logs'
 
   def autocomplete(self, database=None, table=None, column=None, nested=None):
-    pass
+    return {}
 
   def progress(self, snippet, logs=None):
     return 50

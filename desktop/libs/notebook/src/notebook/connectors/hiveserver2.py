@@ -22,6 +22,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
 from beeswax import data_export
+from beeswax.api import _autocomplete
 from beeswax.design import hql_query
 from beeswax import conf as beeswax_conf
 from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
@@ -183,3 +184,7 @@ class HS2Api(Api):
 
   def get_jobs(self, log):
     return _parse_out_hadoop_jobs(log)
+
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+    db = self._get_db(snippet)
+    return _autocomplete(db, database, table, column, nested)

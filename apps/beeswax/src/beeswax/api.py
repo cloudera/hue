@@ -89,6 +89,12 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
   if (request.user.is_superuser or request.user.has_hue_permission(action="impersonate", app="security")) and 'doas' in request.GET:
     do_as = User.objects.get(username=request.GET.get('doas'))
   db = dbms.get(do_as, query_server)
+
+  response = _autocomplete(db, database, table, column, nested)
+  return JsonResponse(response)
+
+
+def _autocomplete(db, database=None, table=None, column=None, nested=None):
   response = {}
 
   try:
@@ -118,7 +124,7 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
     response['code'] = 500
     response['error'] = e.message
 
-  return JsonResponse(response)
+  return response
 
 
 @error_handler
