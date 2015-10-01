@@ -267,3 +267,23 @@ def close_statement(request):
   response['message'] = _('Statement closed !')
 
   return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+def autocomplete(request, database=None, table=None, column=None, nested=None):
+  response = {'status': -1}
+
+  # Passed by check_document_access_permission but unused by APIs
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  try:
+    autocomplete_data = get_api(request.user, snippet, request.fs, request.jt).autocomplete(snippet, database, table, column, nested)
+    response.update(autocomplete_data)
+  except QueryExpired:
+    pass
+
+  response['status'] = 0
+
+  return JsonResponse(response)
