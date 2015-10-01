@@ -247,8 +247,12 @@ function DefaultHandlers(mouseHandler) {
         var dt = t - (this.$lastScrollTime||0);
         
         var editor = this.editor;
-        var isScrolable = editor.renderer.isScrollableBy(ev.wheelX * ev.speed, ev.wheelY * ev.speed);
-        if (isScrolable || dt < 200) {
+
+        // Check if overflow is hidden on the container
+        var hiddenOverflow = editor.container.style.overflow == "hidden";
+
+        var isScrollable = !hiddenOverflow && editor.renderer.isScrollableBy(ev.wheelX * ev.speed, ev.wheelY * ev.speed);
+        if (isScrollable || dt < 200) {
             this.$lastScrollTime = t;
             editor.renderer.scrollBy(ev.wheelX * ev.speed, ev.wheelY * ev.speed);
             return ev.stop();
