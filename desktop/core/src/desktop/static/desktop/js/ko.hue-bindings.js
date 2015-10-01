@@ -1625,6 +1625,23 @@ ko.toCleanJSON = function (koObj) {
 }
 
 
+ko.bindingHandlers.delayedOverflow = {
+  init: function (element) {
+    var $element = $(element);
+    $element.css("overflow", "hidden");
+
+    var scrollTimeout = -1;
+    $element.hover(function() {
+      scrollTimeout = window.setTimeout(function() {
+        $element.css("overflow", "auto");
+      }, 500);
+    }, function() {
+      clearTimeout(scrollTimeout);
+      $element.css("overflow", "hidden");
+    });
+  }
+};
+
 ko.bindingHandlers.aceEditor = {
   init: function (element, valueAccessor) {
     var $el = $(element);
