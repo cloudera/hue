@@ -396,23 +396,24 @@ class AuditLoggingMiddleware(object):
   def _log_message(self, operation, request, response=None):
     audit_logger = get_audit_logger()
 
-    allowed = True
     status = 200
     if response is not None:
-      allowed = response.status_code != 401
       status = response.status_code
 
     audit_logger.debug(JsonMessage(**{
-      'username': self._get_username(request),
+      'username': self._get_username(operation, request),
       'impersonator': self.impersonator,
       'ipAddress': self._get_client_ip(request),
       'operation': operation,
       'eventTime': self._milliseconds_since_epoch(),
-      'allowed': allowed,
+      'allowed': self._get_allowed(operation, request, response),
       'statusCode': status,
       'service': get_app_name(request),
       'url': request.path
     }))
+
+  def _is_invalid_login(self, operation, request):
+    return request.method == 'POST' and operation == 'USER_LOGIN' and not request.user.is_authenticated()
 
   def _get_client_ip(self, request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -420,14 +421,27 @@ class AuditLoggingMiddleware(object):
         x_forwarded_for = x_forwarded_for.split(',')[0]
     return request.META.get('HTTP_CLIENT_IP') or x_forwarded_for or request.META.get('REMOTE_ADDR')
 
-  def _get_username(self, request):
-    if hasattr(request, 'user') and not request.user.is_anonymous():
+  def _get_username(self, operation, request):
+    # On invalid login attempt, get username from form
+    if self._is_invalid_login(operation, request):
+      return request.POST.get('username', 'anonymous')
+    elif hasattr(request, 'user') and not request.user.is_anonymous():
       return request.user.get_username()
     else:
       return 'anonymous'
 
   def _milliseconds_since_epoch(self):
     return int(time.time() * 1000)
+
+  def _get_allowed(self, operation, request, response=None):
+    # Set allowed to False on failed login attempts since returned status_code is actually 200
+    if self._is_invalid_login(operation, request):
+      return False
+    # No response on logout
+    elif response is not None:
+      return response.status_code != 401
+    else:
+      return True
 
   def _get_operation(self, path):
     url = path.rstrip('/')
