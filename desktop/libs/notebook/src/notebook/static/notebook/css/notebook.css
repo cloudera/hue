@@ -261,6 +261,8 @@ body {
 .nav-list > li > a, .nav-list .nav-header {
   padding-left: 0;
   margin-left: 0;
+  margin-bottom: -7px;
+  margin-top: 10px!important;
 }
 
 .nav-list {

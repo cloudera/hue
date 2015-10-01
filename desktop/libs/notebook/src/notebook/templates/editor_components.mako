@@ -598,6 +598,28 @@ from desktop.views import _ko
             <select data-bind="options: result.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
           </div>
 
+          <!-- ko if: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
+          <ul class="nav nav-list" style="border: none; background-color: #FFF">
+            <li class="nav-header">${_('scope')}</li>
+          </ul>
+          <div data-bind="visible: chartType() != ''">
+            <select data-bind="selectedOptions: chartScope, optionsCaption: '${_ko('Choose a scope...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a scope...") }', update: chartScope}">
+              <option value="world">${ _("World") }</option>
+              <option value="europe">${ _("Europe") }</option>
+              <option value="aus">${ _("Australia") }</option>
+              <option value="bra">${ _("Brazil") }</option>
+              <option value="can">${ _("Canada") }</option>
+              <option value="chn">${ _("China") }</option>
+              <option value="fra">${ _("France") }</option>
+              <option value="deu">${ _("Germany") }</option>
+              <option value="ita">${ _("Italy") }</option>
+              <option value="jpn">${ _("Japan") }</option>
+              <option value="gbr">${ _("UK") }</option>
+              <option value="usa">${ _("USA") }</option>
+            </select>
+          </div>
+          <!-- /ko -->
+
           <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
             <li class="nav-header">${_('sorting')}</li>
           </ul>
@@ -606,6 +628,7 @@ from desktop.views import _ko
             <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
             <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
           </div>
+
         </div>
       </div>
 
@@ -631,7 +654,7 @@ from desktop.views import _ko
           <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
 
-          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data},
+          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, scope: chartScope()},
                       transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
 
           <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
