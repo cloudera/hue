@@ -377,7 +377,7 @@ from desktop.views import _ko
         <div class="clearfix"></div>
       </div>
 
-      <div data-bind="visible: showLogs, css: resultsKlass" style="margin-top: 5px">
+      <div data-bind="delayedOverflow, visible: showLogs, css: resultsKlass" style="margin-top: 5px">
         <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
       </div>
@@ -464,7 +464,7 @@ from desktop.views import _ko
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="verticalSlide: codeVisible">
-      <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+      <div class="ace-editor" data-bind="attr: { id: id() }, delayedOverflow, aceEditor: {
           value: statement_raw,
           onExecute: execute,
           aceInstance: ace,
@@ -529,8 +529,8 @@ from desktop.views import _ko
             <i class="fa fa-chevron-left"></i>
           </a>
         </div>
-        <div data-bind="css: resultsKlass">
-          <table class="table table-condensed resultTable" data-tablescroller-fixed-height="360" data-tablescroller-enforce-height="false">
+        <div data-bind="delayedOverflow, css: resultsKlass">
+          <table class="table table-condensed resultTable">
             <thead>
             <tr data-bind="foreach: result.meta">
               <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
@@ -1255,6 +1255,9 @@ from desktop.views import _ko
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
     dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
+      if ($(el).closest(".results").css("overflow") == "hidden") {
+        return;
+      }
       var _e = e.originalEvent,
           _deltaX = _e.wheelDeltaX || -_e.deltaX,
           _deltaY = _e.wheelDeltaY || -_e.deltaY;
