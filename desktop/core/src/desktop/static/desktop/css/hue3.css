@@ -2143,3 +2143,7 @@ pre {
 .player-toolbar .link {
   display: inline-block;
 }
+
+div.navigator .pull-right .nav {
+  margin-bottom: 0;
+}
