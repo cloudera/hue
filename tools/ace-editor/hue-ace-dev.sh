@@ -15,6 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#
+# First install Ace
+#
+#   npm install
+#   node ./Makefile.dryice.js
+#
+# https://github.com/ajaxorg/ace#building-ace
+
 echo "Compiling and copying Ace Editor for Hue"
 rm -rf ../../desktop/core/src/desktop/static/desktop/js/ace/* || echo "Skipping removal of folder"
 node ./Makefile.dryice.js minimal --nc --s --target ../../desktop/core/src/desktop/static/desktop/js/ace/
