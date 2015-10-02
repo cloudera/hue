@@ -84,7 +84,7 @@ def execute(request):
   response['handle'] = get_api(request.user, snippet, request.fs, request.jt).execute(notebook, snippet)
 
   # Materialize and HTML escape results
-  if response['handle'].get('sync') and 'data' in response['handle']['result']:
+  if response['handle'].get('sync') and response['handle']['result'].get('data'):
     response['handle']['result']['data'] = escape_rows(response['handle']['result']['data'])
 
   response['status'] = 0
@@ -121,7 +121,7 @@ def fetch_result_data(request):
   response['result'] = get_api(request.user, snippet, request.fs, request.jt).fetch_result(notebook, snippet, rows, start_over)
 
   # Materialize and HTML escape results
-  if 'data' in response['result']:
+  if response['result'].get('data'):
     response['result']['data'] = escape_rows(response['result']['data'])
 
   response['status'] = 0

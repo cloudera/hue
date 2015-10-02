@@ -52,18 +52,19 @@ class JdbcApi(Api):
   @query_error_handler
   def execute(self, notebook, snippet):
     data, description = query_and_fetch(self.db, snippet['statement'], 100)
+    has_result_set = data is not None
 
     return {
       'sync': True,
-      'has_result_set': True,
+      'has_result_set': has_result_set,
       'result': {
         'has_more': False,
-        'data': data,
+        'data': data if has_result_set else [],
         'meta': [{
           'name': col[0],
           'type': col[1],
           'comment': ''
-        } for col in description],
+        } for col in description] if has_result_set else [],
         'type': 'table'
       }
     }
