@@ -1927,7 +1927,10 @@ ko.bindingHandlers.aceEditor = {
         });
       }
 
-      if (typeof autocompleter != "undefined" && autocompleter != null && (editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala")) {
+      if (typeof autocompleter != "undefined" && autocompleter != null && (
+          editor.session.getMode().$id == "ace/mode/hive" ||
+          editor.session.getMode().$id == "ace/mode/impala" ||
+          editor.session.getMode().$id == "ace/mode/sql")) {
         var before = editor.getTextBeforeCursor(";");
         var after = editor.getTextAfterCursor(";");
         editor.showSpinner();
