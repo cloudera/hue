@@ -949,7 +949,8 @@ from desktop.views import _ko
     default: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/sql',
-      snippetIcon: 'fa-database'
+      snippetIcon: 'fa-database',
+      sqlDialect: true
     },
     code: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
@@ -958,12 +959,14 @@ from desktop.views import _ko
     hive: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/hive',
-      snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }'
+      snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+      sqlDialect: true
     },
     impala: {
       placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
       aceMode: 'ace/mode/impala',
-      snippetImage: '${ static("impala/art/icon_impala_48.png") }'
+      snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+      sqlDialect: true
     },
     jar : {
       snippetIcon: 'fa-file-archive-o '
