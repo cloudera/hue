@@ -106,7 +106,8 @@ your system:
       * maven (Homebrew)
       * mysql (Homebrew)
       * gmp (Homebrew)
-      * openssl (Homebrew - Required for Mac OS X 10.11+ (El Capitan), after `brew install openssl`, run: `export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include`)
+      * openssl (Homebrew)
+          * Required for Mac OS X 10.11+ (El Capitan), after ``brew install openssl``, run: ``export LDFLAGS=-L/usr/local/opt/openssl/lib && export CPPFLAGS=-I/usr/local/opt/openssl/include``
 
 
 File Layout
