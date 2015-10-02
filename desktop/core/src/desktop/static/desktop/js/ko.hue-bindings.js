@@ -1725,6 +1725,8 @@ ko.bindingHandlers.aceEditor = {
     });
 
     editor.on("focus", function () {
+      $(".ace-editor").data("last-active-editor", false);
+      $el.data("last-active-editor", true);
       onFocus(editor);
     });
 
@@ -1993,7 +1995,9 @@ ko.bindingHandlers.aceEditor = {
     });
 
     huePubSub.subscribe("assist.dblClickItem", function(value) {
-      editor.session.insert(editor.getCursorPosition(),value);
+      if ($el.data("last-active-editor")) {
+        editor.session.insert(editor.getCursorPosition(), value);
+      }
     });
 
     editor.commands.on("afterExec", function (e) {
