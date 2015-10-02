@@ -31,19 +31,20 @@ except ImportError, e:
 
 
 def query_and_fetch(db, statement, n=None):
+  data = None
   try:
     db.connect()
-
     curs = db.cursor()
 
     try:
-      curs.execute(statement)
-
-      return curs.fetchmany(n), curs.description
+      if curs.execute(statement):
+        data = curs.fetchmany(n)
+      meta = curs.description
+      return data, meta
     finally:
       curs.close()
   finally:
-    db.close()  
+    db.close()
 
 
 class Jdbc():
@@ -85,8 +86,15 @@ class Cursor():
 
   def execute(self, statement):
     self.stmt = self.conn.createStatement()
-    self.rs = self.stmt.executeQuery(statement)
-    self._meta = self.rs.getMetaData()
+    has_rs = self.stmt.execute(statement)
+
+    if has_rs:
+      self.rs = self.stmt.getResultSet()
+      self._meta = self.rs.getMetaData()
+    else:
+      self._meta = self.stmt.getUpdateCount()
+
+    return has_rs
 
   def fetchmany(self, n=None):
     res = []
@@ -110,7 +118,10 @@ class Cursor():
 
   @property
   def description(self):
-    return [[
+    if not self.rs:
+      return self._meta
+    else:
+      return [[
         self._meta.getColumnName(i),
         self._meta.getColumnTypeName(i),
         self._meta.getColumnDisplaySize(i),
