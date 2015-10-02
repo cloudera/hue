@@ -86,8 +86,8 @@ class SparkBatchApi(Api):
     # Batch jobs do not support interruption, so close statement instead.
     return self.close_statement(snippet)
 
-  def _progress(self, snippet, logs):
+  def progress(self, snippet, logs):
     return 50
 
-  def _get_jobs(self, log):
+  def get_jobs(self, log):
     return []

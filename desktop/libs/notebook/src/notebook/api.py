@@ -176,11 +176,11 @@ def get_logs(request):
 
   db = get_api(request.user, snippet, request.fs, request.jt)
   response['logs'] = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
-  response['progress'] = db._progress(snippet, response['logs']) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+  response['progress'] = db.progress(snippet, response['logs']) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['job_urls'] = [{
       'name': job,
       'url': reverse('jobbrowser.views.single_job', kwargs={'job': job})
-    } for job in db._get_jobs(response['logs'])]
+    } for job in db.get_jobs(response['logs'])]
   response['status'] = 0
 
   return JsonResponse(response)

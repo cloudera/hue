@@ -193,7 +193,7 @@ class SparkApi(Api):
 
     return api.get_log(session['id'], startFrom=startFrom, size=size)
 
-  def _progress(self, snippet, logs):
+  def progress(self, snippet, logs):
     return 50
 
   def close_statement(self, snippet): # Individual statements cannot be closed
@@ -215,5 +215,5 @@ class SparkApi(Api):
     else:
       return {'status': -1}
 
-  def _get_jobs(self, log):
+  def get_jobs(self, log):
     return []

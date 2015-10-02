@@ -97,11 +97,11 @@ class JdbcApi(Api):
   def download(self, notebook, snippet, format):
     raise PopupException('Downloading is not supported yet')
 
-  def _get_jobs(self, logs):
-    return []
-
-  def _progress(self, snippet, logs):
+  def progress(self, snippet, logs):
     return 50
+
+  def get_jobs(self, logs):
+    return []
 
   @query_error_handler
   def close_statement(self, snippet):
