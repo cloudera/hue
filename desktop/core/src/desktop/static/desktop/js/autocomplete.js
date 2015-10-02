@@ -34,6 +34,9 @@ function Autocompleter(options) {
 // ACE Format for autocompleter
 Autocompleter.prototype.getCompletions = function (editor, session, pos, prefix, callback) {
   var self = this;
+  if (! self.snippet.isSqlDialect()) {
+    return;
+  }
 
   var before = editor.getTextBeforeCursor(";");
   var after = editor.getTextAfterCursor(";");

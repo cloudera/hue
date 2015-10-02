@@ -145,6 +145,10 @@ var Snippet = function (vm, notebook, snippet) {
   self.ace = ko.observable(null);
   self.errors = ko.observableArray([]);
 
+  self.isSqlDialect = function () {
+    return vm.getSnippetViewSettings(self.type()).sqlDialect;
+  };
+
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
   self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
   // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
