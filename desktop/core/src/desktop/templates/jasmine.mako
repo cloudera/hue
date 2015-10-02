@@ -25,6 +25,9 @@
 
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+
   <script src="${ static('desktop/js/hue.utils.js') }"></script>
 
   ## Specs below

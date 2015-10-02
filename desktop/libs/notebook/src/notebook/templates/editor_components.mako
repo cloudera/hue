@@ -471,7 +471,7 @@ from desktop.views import _ko
           mode: viewSettings().aceMode,
           extraCompleters: completers,
           errors: errors,
-          autocompleter: aceAutocompleter,
+          autocompleter: autocompleter,
           assistHelper: assistHelper,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
           placeholder: viewSettings().placeHolder }"></div>
@@ -1788,11 +1788,8 @@ from desktop.views import _ko
     user: '${user}'
   });
 
-  var aceAutocompleter = new Autocompleter({
-    assistHelper: assistHelper
-  });
-
   var vmOptions = ${ options_json | n,unicode };
+  vmOptions.assistHelper = assistHelper;
   vmOptions.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
   vmOptions.snippetViewSettings = SNIPPET_VIEW_SETTINGS;
 

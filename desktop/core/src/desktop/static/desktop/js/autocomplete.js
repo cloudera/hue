@@ -15,34 +15,48 @@
 // limitations under the License.
 
 var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
-var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
 
 /**
  * @param options {object}
- * @param options.db
- * @param options.mode
+ * @param options.notebook
+ * @param options.snippet
  * @param options.assistHelper
  *
  * @constructor
  */
 function Autocompleter(options) {
   var self = this;
-  self.options = options;
+  self.snippet = options.snippet;
+  self.notebook = options.notebook;
   self.assistHelper = options.assistHelper;
-  if (typeof options.mode === "undefined" || options.mode === null || options.mode === "beeswax") {
-    self.currentMode = "hive";
-  } else {
-    self.currentMode = options.mode;
+}
+
+Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, success, failure) {
+  var self = this;
+  var path = self.assistHelper.activeDatabase();
+
+  if (tableName) {
+    path += "/" + tableName;
+    $.each(nested, function(index, part) {
+      path += "/" + part;
+    });
   }
 
-  huePubSub.subscribe('hue.ace.activeMode', function(mode) {
-    if (mode) {
-      self.currentMode = mode.split("/").pop();
+  var self = this;
+
+  // TODO: Use shared cache with assist helper.
+
+  $.post("/notebook/api/autocomplete/" + path, {
+    notebook: ko.mapping.toJSON(self.notebook.getContext()),
+    snippet: ko.mapping.toJSON(self.snippet.getContext())
+  }, function (data) {
+    if (data.status == 0) {
+      success(data);
     } else {
-      self.currentMode = null;
+      failure();
     }
-  })
-}
+  }).fail(failure);
+};
 
 Autocompleter.prototype.getFromReferenceIndex = function (statement) {
   var result = {
@@ -136,7 +150,7 @@ Autocompleter.prototype.getViewReferenceIndex = function (statement) {
 
     result.allViewReferences = result.allViewReferences.concat(viewRef.references);
 
-    if(lateralViewMatch[3]) {
+    if (lateralViewMatch[3]) {
       result.allViewReferences.push({ name: lateralViewMatch[3], type: 'view' });
       result.index[lateralViewMatch[3]] = viewRef;
     }
@@ -220,8 +234,8 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
   var self = this;
 
-  var hiveSyntax = self.currentMode === "hive";
-  var impalaSyntax = self.currentMode === "impala";
+  var hiveSyntax = self.snippet.type() === "hive";
+  var impalaSyntax = self.snippet.type() === "impala";
 
   if (typeof self.assistHelper.activeDatabase() == "undefined"
     || self.assistHelper.activeDatabase() == null
@@ -263,7 +277,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
   var fromAfter = afterMatcher != null && afterMatcher[0] === "FROM";
 
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
-    self.assistHelper.fetchTables(function(data) {
+    self.callAutocompleteApi(null, null, function (data) {
       var fromKeyword = "";
       if (selectBefore) {
         if (beforeCursor.indexOf("SELECT") > -1) {
@@ -344,7 +358,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
     var getFields = function (remainingParts, fields) {
       if (remainingParts.length == 0) {
-        self.assistHelper.fetchFields(tableName, fields, function(data) {
+        self.callAutocompleteApi(tableName, fields, function(data) {
           if (fields.length == 0) {
             callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
           } else {
@@ -379,7 +393,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
           var mapOrArrayMatch = part.match(/([^\[]*)\[[^\]]*\]$/i);
           if (mapOrArrayMatch !== null) {
             fields.push(mapOrArrayMatch[1]);
-            self.assistHelper.fetchFields(tableName, fields, function(data) {
+            self.callAutocompleteApi(tableName, fields, function(data) {
               if (data.type === "map") {
                 fields.push("value");
                 getFields(remainingParts, fields);
@@ -399,7 +413,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
           }
           // For impala we have to fetch info about each field as we don't know
           // whether it's a map or array for hive the [ and ] gives it away...
-          self.assistHelper.fetchFields(tableName, fields, function(data) {
+          self.callAutocompleteApi(tableName, fields, function(data) {
             if (data.type === "map") {
               remainingParts.unshift("value");
             } else if (data.type === "array") {
