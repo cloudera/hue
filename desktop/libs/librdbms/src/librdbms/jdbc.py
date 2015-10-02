@@ -30,6 +30,22 @@ except ImportError, e:
   LOG.exception('Failed to import py4j')
 
 
+def query_and_fetch(db, statement, n=None):
+  try:
+    db.connect()
+
+    curs = db.cursor()
+
+    try:
+      curs.execute(statement)
+
+      return curs.fetchmany(n), curs.description
+    finally:
+      curs.close()
+  finally:
+    db.close()  
+
+
 class Jdbc():
 
   def __init__(self, driver_name, url, username, password):
@@ -72,10 +88,10 @@ class Cursor():
     self.rs = self.stmt.executeQuery(statement)
     self._meta = self.rs.getMetaData()
 
-  def fetchmany(self, n):
+  def fetchmany(self, n=None):
     res = []
 
-    while self.rs.next() and n > 0:
+    while self.rs.next() and (n is not None and n > 0):
       row = []
       for c in xrange(self._meta.getColumnCount()):
         cell = self.rs.getObject(c + 1)
@@ -88,6 +104,9 @@ class Cursor():
       n -= 1
 
     return res
+
+  def fetchall(self, n=None):
+    return self.fetchmany()
 
   @property
   def description(self):

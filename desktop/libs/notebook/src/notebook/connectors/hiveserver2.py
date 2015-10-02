@@ -185,6 +185,7 @@ class HS2Api(Api):
   def get_jobs(self, log):
     return _parse_out_hadoop_jobs(log)
 
+  @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
     return _autocomplete(db, database, table, column, nested)
