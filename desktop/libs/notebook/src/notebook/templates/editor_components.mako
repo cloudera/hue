@@ -469,7 +469,6 @@ from desktop.views import _ko
           onExecute: execute,
           aceInstance: ace,
           mode: viewSettings().aceMode,
-          extraCompleters: completers,
           errors: errors,
           autocompleter: autocompleter,
           assistHelper: assistHelper,

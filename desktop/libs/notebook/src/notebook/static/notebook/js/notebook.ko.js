@@ -143,7 +143,6 @@ var Snippet = function (vm, notebook, snippet) {
 
   //Ace stuff
   self.ace = ko.observable(null);
-  self.completers = ko.observableArray([]);
   self.errors = ko.observableArray([]);
 
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');

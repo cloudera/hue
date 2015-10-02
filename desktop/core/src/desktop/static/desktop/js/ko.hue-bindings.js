@@ -1653,7 +1653,6 @@ ko.bindingHandlers.aceEditor = {
     var onPaste = options.onPaste || function () {};
     var onAfterExec = options.onAfterExec || function () {};
     var onExecute = options.onExecute || function () {};
-    var autocompleter = options.autocompleter;
     var assistHelper = options.assistHelper;
 
     $el.text(options.value());
@@ -1697,6 +1696,10 @@ ko.bindingHandlers.aceEditor = {
     $.extend(editorOptions, options.editorOptions || userOptions);
 
     editor.setOptions(editorOptions);
+
+    if (options.autocompleter) {
+      editor.session.setCompleters([options.autocompleter]);
+    }
 
     var placeHolderElement = null;
     var placeHolderVisible = false;
@@ -1907,53 +1910,6 @@ ko.bindingHandlers.aceEditor = {
       }
     });
 
-    function newCompleter(items) {
-      return {
-        getCompletions: function (editor, session, pos, prefix, callback) {
-          callback(null, items);
-        }
-      }
-    }
-
-    var originalCompleters = editor.completers.slice();
-
-    var sql_terms = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
-
-    var refreshAutoComplete = function (callback) {
-      editor.completers = originalCompleters.slice();
-      if (options.extraCompleters && options.extraCompleters().length > 0) {
-        options.extraCompleters().forEach(function (complete) {
-          editor.completers.push(complete);
-        });
-      }
-
-      if (typeof autocompleter != "undefined" && autocompleter != null && (
-          editor.session.getMode().$id == "ace/mode/hive" ||
-          editor.session.getMode().$id == "ace/mode/impala" ||
-          editor.session.getMode().$id == "ace/mode/sql")) {
-        var before = editor.getTextBeforeCursor(";");
-        var after = editor.getTextAfterCursor(";");
-        editor.showSpinner();
-        autocompleter.autocomplete(before, after, function(result) {
-          editor.hideSpinner();
-          if (result.length > 0) {
-            editor.completers.push(newCompleter(result));
-          }
-          callback();
-        });
-      } else {
-        callback();
-      }
-    };
-
-    var originalExec = editor.commands.byName.startAutocomplete.exec;
-
-    editor.commands.byName.startAutocomplete.exec = function (editor) {
-      refreshAutoComplete(function() {
-        originalExec(editor);
-      });
-    };
-
     editor.previousSize = 0;
 
     window.setInterval(function(){
@@ -2063,7 +2019,6 @@ ko.bindingHandlers.aceEditor = {
     });
 
     editor.$blockScrolling = Infinity
-    element.originalCompleters = editor.completers;
     options.aceInstance(editor);
   },
   update: function (element, valueAccessor) {
@@ -2071,12 +2026,6 @@ ko.bindingHandlers.aceEditor = {
     if (options.aceInstance()) {
       var editor = options.aceInstance();
       editor.session.setMode(options.mode);
-      editor.completers = element.originalCompleters.slice();
-      if (options.extraCompleters && options.extraCompleters().length > 0) {
-        options.extraCompleters().forEach(function (complete) {
-          editor.completers.push(complete);
-        });
-      }
     }
   }
 };

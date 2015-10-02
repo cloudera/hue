@@ -31,6 +31,20 @@ function Autocompleter(options) {
   self.assistHelper = options.assistHelper;
 }
 
+// ACE Format for autocompleter
+Autocompleter.prototype.getCompletions = function (editor, session, pos, prefix, callback) {
+  var self = this;
+
+  var before = editor.getTextBeforeCursor(";");
+  var after = editor.getTextAfterCursor(";");
+
+  editor.showSpinner();
+  self.autocomplete(before, after, function(result) {
+    editor.hideSpinner();
+    callback(null, result);
+  });
+};
+
 Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, success, failure) {
   var self = this;
   var path = self.assistHelper.activeDatabase();
