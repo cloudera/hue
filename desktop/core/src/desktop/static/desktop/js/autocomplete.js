@@ -92,11 +92,16 @@ Autocompleter.prototype.getFromReferenceIndex = function (statement) {
   return result;
 };
 
-Autocompleter.prototype.getViewReferenceIndex = function (statement) {
+Autocompleter.prototype.getViewReferenceIndex = function (statement, hiveSyntax) {
   var result = {
     allViewReferences: [],
     index: {}
   };
+
+  // For now we only support LATERAL VIEW references for Hive
+  if (! hiveSyntax) {
+    return result;
+  }
 
   // Matches both arrays and maps "AS ref" or "AS (keyRef, valueRef)" and with
   // or without view reference.
@@ -239,8 +244,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
   if (typeof self.assistHelper.activeDatabase() == "undefined"
     || self.assistHelper.activeDatabase() == null
-    || self.assistHelper.activeDatabase() == ""
-    || (!hiveSyntax && !impalaSyntax)) {
+    || self.assistHelper.activeDatabase() == "") {
     onFailure();
     return;
   }
@@ -305,7 +309,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
     parts.pop();
 
     var fromReferences = self.getFromReferenceIndex(beforeCursor + afterCursor);
-    var viewReferences = self.getViewReferenceIndex(beforeCursor + afterCursor);
+    var viewReferences = self.getViewReferenceIndex(beforeCursor + afterCursor, hiveSyntax);
 
     var tableName = "";
 

@@ -89,7 +89,7 @@ describe("autocomplete.js", function() {
   });
 
   beforeEach(function() {
-    subject = new Autocompleter(createOptions("hive"));
+    subject = new Autocompleter(createOptions("genericSqlType"));
     ajaxHelper.responseForUrls = {};
   });
 
