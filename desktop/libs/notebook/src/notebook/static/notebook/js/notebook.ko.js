@@ -233,6 +233,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.showChart = ko.observable(typeof snippet.showChart != "undefined" && snippet.showChart != null ? snippet.showChart : false);
   self.showLogs = ko.observable(typeof snippet.showLogs != "undefined" && snippet.showLogs != null ? snippet.showLogs : false);
   self.progress = ko.observable(typeof snippet.progress != "undefined" && snippet.progress != null ? snippet.progress : 0);
+  self.jobs = ko.observableArray(typeof snippet.jobs != "undefined" && snippet.jobs != null ? snippet.jobs : []);
 
   self.progress.subscribe(function (val) {
     $(document).trigger("progress", {data: val, snippet: self});
@@ -391,6 +392,7 @@ var Snippet = function (vm, notebook, snippet) {
     self.errors([]);
     self.result.logLines = 0;
     self.progress(0);
+    self.jobs([]);
 
     if (self.result.fetchedOnce()) {
       self.close();
@@ -568,7 +570,8 @@ var Snippet = function (vm, notebook, snippet) {
     $.post("/notebook/api/get_logs", {
       notebook: ko.mapping.toJSON(notebook.getContext()),
       snippet: ko.mapping.toJSON(self.getContext()),
-      from: self.result.logLines
+      from: self.result.logLines,
+      jobs: ko.mapping.toJSON(self.jobs)
     }, function (data) {
       if (data.status == 1) { // Append errors to the logs
         data.status = 0;
@@ -584,6 +587,9 @@ var Snippet = function (vm, notebook, snippet) {
           } else {
             self.result.logs(oldLogs + "\n" + data.logs);
           }
+        }
+        if (data.jobs.length > 0) {
+          self.jobs(data.jobs);
         }
         self.progress(data.progress);
       } else {
@@ -609,6 +615,7 @@ var Snippet = function (vm, notebook, snippet) {
     if (self.status() == 'loading') {
       self.status('failed');
       self.progress(0);
+      self.jobs([]);
     }
   };
 };
