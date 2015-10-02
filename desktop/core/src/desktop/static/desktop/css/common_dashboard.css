@@ -419,3 +419,13 @@ body.modal-open {
   margin-bottom: 10px;
   text-align: center;
 }
+
+.editor {
+  padding-left: 4px;
+  border-left: 1px solid #FFFFFF;
+  transition: border-left-color 0.2s ease;
+}
+
+.editor:hover {
+  border-left-color: #3893c2;
+}
