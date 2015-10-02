@@ -957,6 +957,20 @@ var EditSession = function(text, mode) {
         }
     };
 
+    this.$completers = [];
+
+    /**
+     * Sets the completers to be used for this session only. Each completer should provide a getCompletions function (see language_tools)
+     * @param {Object[]} completers
+     */
+    this.setCompleters = function(completers) {
+        this.$completers = completers;
+    };
+
+    this.getCompleters = function() {
+        return this.$completers;
+    };
+
     this.$stopWorker = function() {
         if (this.$worker) {
             this.$worker.terminate();
