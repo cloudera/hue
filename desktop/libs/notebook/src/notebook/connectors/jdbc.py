@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
-from librdbms.jdbc import Jdbc
+from librdbms.jdbc import Jdbc, query_and_fetch
 
 from notebook.connectors.base import Api, QueryError
 
@@ -44,25 +44,14 @@ def query_error_handler(func):
 
 class JdbcApi(Api):
 
+  def __init__(self, user, fs=None, jt=None, options=None):
+    Api.__init__(self, user, fs=fs, jt=jt, options=options)
+
+    self.db = Jdbc(self.options['driver'], self.options['url'], self.options['user'], self.options['password'])
+
   @query_error_handler
   def execute(self, notebook, snippet):
-
-    db = Jdbc(self.options['driver'], self.options['url'], self.options['user'], self.options['password'])
-
-    try:
-      db.connect()
-
-      curs = db.cursor()
-
-      try:
-        curs.execute(snippet['statement'])
-
-        data = curs.fetchmany(100)
-        description = curs.description
-      finally:
-        curs.close()
-    finally:
-      db.close()
+    data, description = query_and_fetch(self.db, snippet['statement'], 100)
 
     return {
       'sync': True,
@@ -106,3 +95,47 @@ class JdbcApi(Api):
   @query_error_handler
   def close_statement(self, snippet):
     return {'status': -1}
+
+  @query_error_handler
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+    assist = Assist(self.db)
+    response = {'error': 0}
+
+    try:
+      if database is None:
+        response['databases'] = assist.get_databases()
+      elif table is None:
+        response['tables'] = assist.get_tables(database)
+      else:
+        columns = assist.get_columns(database, table)
+        response['columns'] = [col[0] for col in columns]
+        response['extended_columns'] = [{
+            'name': col[0],
+            'type': col[1],
+            'comment': col[5]
+          } for col in columns
+        ]
+    except Exception, e:
+      LOG.warn('Autocomplete data fetching error: %s' % e)
+      response['code'] = -1
+      response['error'] = e.message
+
+    return response
+
+
+class Assist():
+
+  def __init__(self, db):
+    self.db = db
+
+  def get_databases(self):
+    databases, description = query_and_fetch(self.db, 'SHOW DATABASES')
+    return databases
+
+  def get_tables(self, database, table_names=[]):
+    tables, description = query_and_fetch(self.db, 'SHOW TABLES')
+    return tables
+
+  def get_columns(self, database, table):
+    columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
+    return columns
