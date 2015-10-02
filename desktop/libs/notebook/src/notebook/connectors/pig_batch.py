@@ -108,7 +108,7 @@ class PigApi(Api):
 
     return logs
 
-  def _progress(self, snippet, logs):
+  def progress(self, snippet, logs):
     job_id = snippet['result']['handle']['id']
 
     oozie_workflow = check_job_access_permission(MockRequest(self.user, self.fs, self.jt), job_id)
@@ -120,7 +120,7 @@ class PigApi(Api):
   def close_session(self, session):
     pass
 
-  def _get_jobs(self, log):
+  def get_jobs(self, log):
     return []
 
 

@@ -152,7 +152,7 @@ class HS2Api(Api):
         message = e.message
       raise PopupException(message, detail='')
 
-  def _progress(self, snippet, logs):
+  def progress(self, snippet, logs):
     if snippet['type'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
       total = (int(match.group(1)) if match else 1) * 2
@@ -181,5 +181,5 @@ class HS2Api(Api):
     else:
       return {'status': -1}  # skipped
 
-  def _get_jobs(self, log):
+  def get_jobs(self, log):
     return _parse_out_hadoop_jobs(log)

@@ -45,7 +45,7 @@ class QueryError(Exception):
     return force_unicode(str(self.message))
 
 
-class Notebook():
+class Notebook(object):
 
   def __init__(self, document=None):
     self.document = None
@@ -146,3 +146,9 @@ class Api(object):
 
   def autocomplete(self, database=None, table=None, column=None, nested=None):
     pass
+
+  def progress(self, snippet, logs=None):
+    return 50
+
+  def get_jobs(self, log):
+    return []
