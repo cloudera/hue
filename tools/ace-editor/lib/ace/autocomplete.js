@@ -235,8 +235,8 @@ var Autocomplete = function() {
         this.base.$insertRight = true;
 
         var matches = [];
-        var total = editor.completers.length;
-        editor.completers.forEach(function(completer, i) {
+        var total = editor.completers.length + session.getCompleters().length;
+        editor.completers.concat(session.getCompleters()).forEach(function(completer, i) {
             completer.getCompletions(editor, session, pos, prefix, function(err, results) {
                 if (!err)
                     matches = matches.concat(results);
