@@ -33,25 +33,25 @@ def get_interpreters():
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
-  help="One entry for each type of snippet",
+  help="One entry for each type of snippet. The first 5 will appear in the wheel.",
   each=ConfigSection(
-    help=_t("Define the name and how to execute the language"),
+    help=_t("Define the name and how to connect and execute the language."),
     members=dict(
       NAME=Config(
           "name",
-          help=_t("Nice name"),
+          help=_t("The name of the snippet."),
           default="SQL",
           type=str,
       ),
       INTERFACE=Config(
           "interface",
-          help="The backend connection to use to communicate with the server",
+          help="The backend connection to use to communicate with the server.",
           default="hiveserver2",
           type=str,
       ),
       OPTIONS=Config(
         key='options',
-        help=_t('Database options to specify the server for connecting.'),
+        help=_t('Specific options for connecting to the server.'),
         type=coerce_json_dict,
         default='{}'
       )
