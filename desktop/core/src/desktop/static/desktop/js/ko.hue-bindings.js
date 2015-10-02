@@ -1746,15 +1746,15 @@ ko.bindingHandlers.aceEditor = {
 
     var refreshTables = function() {
       currentAssistTables = {};
-      if (typeof self.assistHelper.activeDatabase() != undefined && self.assistHelper.activeDatabase() != null) {
-        self.assistHelper.fetchTables(function(data) {
+      if (typeof assistHelper.activeDatabase() != undefined && assistHelper.activeDatabase() != null) {
+        assistHelper.fetchTables(function(data) {
           $.each(data.tables, function(index, table) {
             currentAssistTables[table] = true;
           });
         })
       }
     };
-    self.assistHelper.activeDatabase.subscribe(refreshTables);
+    assistHelper.activeDatabase.subscribe(refreshTables);
     refreshTables();
 
     ace.define("huelink", [], function (require, exports, module) {
@@ -1901,7 +1901,7 @@ ko.bindingHandlers.aceEditor = {
         window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""));
       }
       else {
-        window.open("/metastore/table/" + self.assistHelper.activeDatabase() + "/" + token.value);
+        window.open("/metastore/table/" + assistHelper.activeDatabase() + "/" + token.value);
       }
     });
 
