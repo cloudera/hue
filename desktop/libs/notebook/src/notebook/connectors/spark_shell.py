@@ -215,5 +215,5 @@ class SparkApi(Api):
     else:
       return {'status': -1}
 
-  def get_jobs(self, log):
+  def get_jobs(self, logs):
     return []

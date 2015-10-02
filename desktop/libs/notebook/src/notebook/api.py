@@ -18,7 +18,6 @@
 import json
 import logging
 
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
@@ -175,12 +174,22 @@ def get_logs(request):
   size = int(size) if size else None
 
   db = get_api(request.user, snippet, request.fs, request.jt)
-  response['logs'] = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
-  response['progress'] = db.progress(snippet, response['logs']) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
-  response['job_urls'] = [{
-      'name': job,
-      'url': reverse('jobbrowser.views.single_job', kwargs={'job': job})
-    } for job in db.get_jobs(response['logs'])]
+
+  logs = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
+
+  jobs = json.loads(request.POST.get('jobs', '[]'))
+
+  # Get any new jobs from current logs snippet
+  new_jobs = db.get_jobs(logs)
+
+  # Append new jobs to known jobs and get the unique set
+  if new_jobs:
+    all_jobs = jobs + new_jobs
+    jobs = {job['name']: job for job in all_jobs}.values()
+
+  response['logs'] = logs
+  response['progress'] = db.progress(snippet, logs) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+  response['jobs'] = jobs
   response['status'] = 0
 
   return JsonResponse(response)

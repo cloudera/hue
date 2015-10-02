@@ -120,7 +120,7 @@ class PigApi(Api):
   def close_session(self, session):
     pass
 
-  def get_jobs(self, log):
+  def get_jobs(self, logs):
     return []
 
 

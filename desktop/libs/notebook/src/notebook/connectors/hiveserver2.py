@@ -18,6 +18,8 @@
 import logging
 import re
 
+from django.core.urlresolvers import reverse
+
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
@@ -139,6 +141,20 @@ class HS2Api(Api):
     handle = self._get_handle(snippet)
     return db.get_log(handle, start_over=startFrom == 0)
 
+  @query_error_handler
+  def close_statement(self, snippet):
+    if snippet['type'] == 'impala':
+      from impala import conf as impala_conf
+
+    if (snippet['type'] == 'hive' and beeswax_conf.CLOSE_QUERIES.get()) or (snippet['type'] == 'impala' and impala_conf.CLOSE_QUERIES.get()):
+      db = self._get_db(snippet)
+
+      handle = self._get_handle(snippet)
+      db.close_operation(handle)
+      return {'status': 0}
+    else:
+      return {'status': -1}  # skipped
+
   def download(self, notebook, snippet, format):
     try:
       db = self._get_db(snippet)
@@ -168,22 +184,15 @@ class HS2Api(Api):
     else:
       return 50
 
-  @query_error_handler
-  def close_statement(self, snippet):
-    if snippet['type'] == 'impala':
-      from impala import conf as impala_conf
+  def get_jobs(self, logs):
+    job_ids = _parse_out_hadoop_jobs(logs)
 
-    if (snippet['type'] == 'hive' and beeswax_conf.CLOSE_QUERIES.get()) or (snippet['type'] == 'impala' and impala_conf.CLOSE_QUERIES.get()):
-      db = self._get_db(snippet)
+    jobs = [{
+      'name': job_id,
+      'url': reverse('jobbrowser.views.single_job', kwargs={'job': job_id})
+    } for job_id in job_ids]
 
-      handle = self._get_handle(snippet)
-      db.close_operation(handle)
-      return {'status': 0}
-    else:
-      return {'status': -1}  # skipped
-
-  def get_jobs(self, log):
-    return _parse_out_hadoop_jobs(log)
+    return jobs
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
