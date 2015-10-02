@@ -516,7 +516,7 @@ from desktop.views import _ko
         <ul class="unstyled" data-bind="foreach: result.meta">
           <li data-bind="visible: name != ''">
             <input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" />
-            <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a>
+            <a class="pointer" title="${ _('Click to scroll to column') }" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a>
           </li>
         </ul>
       </div>
