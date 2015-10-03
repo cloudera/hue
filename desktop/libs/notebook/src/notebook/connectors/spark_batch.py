@@ -88,6 +88,3 @@ class SparkBatchApi(Api):
 
   def progress(self, snippet, logs):
     return 50
-
-  def get_jobs(self, logs):
-    return []

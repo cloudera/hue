@@ -184,7 +184,7 @@ class HS2Api(Api):
     else:
       return 50
 
-  def get_jobs(self, logs):
+  def get_jobs(self, notebook, snippet, logs):
     job_ids = _parse_out_hadoop_jobs(logs)
 
     jobs = [{

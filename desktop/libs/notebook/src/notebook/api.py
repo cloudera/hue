@@ -180,7 +180,7 @@ def get_logs(request):
   jobs = json.loads(request.POST.get('jobs', '[]'))
 
   # Get any new jobs from current logs snippet
-  new_jobs = db.get_jobs(logs)
+  new_jobs = db.get_jobs(notebook, snippet, logs)
 
   # Append new jobs to known jobs and get the unique set
   if new_jobs:
@@ -250,7 +250,7 @@ def close_notebook(request):
     except QueryExpired:
       pass
     except Exception, e:
-      LOG.exception('Error closing session %s' % e.message)
+      LOG.exception('Error closing session %s' % str(e))
 
   response['status'] = 0
   response['message'] = _('Notebook closed !')
