@@ -185,7 +185,7 @@ def get_logs(request):
   # Append new jobs to known jobs and get the unique set
   if new_jobs:
     all_jobs = jobs + new_jobs
-    jobs = {job['name']: job for job in all_jobs}.values()
+    jobs = dict((job['name'], job) for job in all_jobs).values()
 
   response['logs'] = logs
   response['progress'] = db.progress(snippet, logs) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
