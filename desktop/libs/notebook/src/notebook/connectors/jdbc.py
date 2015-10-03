@@ -90,9 +90,6 @@ class JdbcApi(Api):
   def progress(self, snippet, logs):
     return 50
 
-  def get_jobs(self, logs):
-    return []
-
   @query_error_handler
   def close_statement(self, snippet):
     return {'status': -1}

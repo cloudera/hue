@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 import time
 
 from django.utils.translation import ugettext as _
@@ -24,6 +25,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
 
+from spark.conf import LIVY_SERVER_SESSION_KIND
 from spark.job_server_api import get_api as get_spark_api
 
 from notebook.data_export import download as spark_download
@@ -35,6 +37,7 @@ LOG = logging.getLogger(__name__)
 
 
 class SparkApi(Api):
+
   PROPERTIES = [
     {'name': 'jars', 'nice_name': _('Jars'), 'default': '', 'type': 'csv-hdfs-files', 'is_yarn': False},
     {'name': 'files', 'nice_name': _('Files'), 'default': '', 'type': 'csv-hdfs-files', 'is_yarn': False},
@@ -48,6 +51,10 @@ class SparkApi(Api):
     {'name': 'archives', 'nice_name': _('Archives'), 'default': '', 'type': 'csv-hdfs-files', 'is_yarn': True},
     {'name': 'numExecutors', 'nice_name': _('Executors Numbers'), 'default': '1', 'type': 'number', 'is_yarn': True},
   ]
+
+  SPARK_UI_RE = re.compile("Started SparkUI at (http[s]?://([0-9a-zA-Z-_\.]+):(\d+))")
+  YARN_JOB_RE = re.compile("tracking URL: (http[s]?://.+/)")
+  STANDALONE_JOB_RE = re.compile("Got job (\d+)")
 
   def create_session(self, lang='scala', properties=None):
     properties = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
@@ -215,5 +222,52 @@ class SparkApi(Api):
     else:
       return {'status': -1}
 
-  def get_jobs(self, logs):
-    return []
+  def get_jobs(self, notebook, snippet, logs):
+    if self._is_yarn_mode():
+      # Tracking URL is found at the start of the logs
+      start_logs = self.get_log(notebook, snippet, startFrom=0, size=100)
+      return self._get_yarn_jobs(start_logs)
+    else:
+      return self._get_standalone_jobs(logs)
+
+  def _get_standalone_jobs(self, logs):
+    job_ids = set([])
+
+    # Attempt to find Spark UI Host and Port from startup logs
+    spark_ui_url = self.SPARK_UI_RE.search(logs)
+
+    if not spark_ui_url:
+      LOG.warn('Could not find the Spark UI URL in the session logs.')
+      return []
+    else:
+      spark_ui_url = spark_ui_url.group(1)
+
+    # Standalone/Local mode runs on same host as Livy, attempt to find Job IDs in Spark log
+    for match in self.STANDALONE_JOB_RE.finditer(logs):
+      job_id = match.group(1)
+      job_ids.add(job_id)
+
+    jobs = [{
+      'name': job_id,
+      'url': '%s/jobs/job/?id=%s' % (spark_ui_url, job_id)
+    } for job_id in job_ids]
+
+    return jobs
+
+  def _get_yarn_jobs(self, logs):
+    tracking_urls = set([])
+
+    # YARN mode only outputs the tracking-proxy URL, not Job IDs
+    for match in self.YARN_JOB_RE.finditer(logs):
+      url = match.group(1)
+      tracking_urls.add(url)
+
+    jobs = [{
+      'name': url.strip('/').split('/')[-1],  # application_id is the last token
+      'url': url
+    } for url in tracking_urls]
+
+    return jobs
+
+  def _is_yarn_mode(self):
+    return LIVY_SERVER_SESSION_KIND.get() == "yarn"

@@ -79,6 +79,3 @@ class MySqlApi(Api):
   @query_error_handler
   def close_statement(self, snippet):
     return {'status': -1}
-
-  def get_jobs(self, logs):
-    return []
