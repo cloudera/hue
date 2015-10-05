@@ -57,13 +57,13 @@ class SparkApi(Api):
   STANDALONE_JOB_RE = re.compile("Got job (\d+)")
 
   def create_session(self, lang='scala', properties=None):
-    properties = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
+    props = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
 
-    properties['kind'] = lang
+    props['kind'] = lang
 
     api = get_spark_api(self.user)
 
-    response = api.create_session(**properties)
+    response = api.create_session(**props)
 
     status = api.get_session(response['id'])
     count = 0
@@ -80,7 +80,7 @@ class SparkApi(Api):
     return {
         'type': lang,
         'id': response['id'],
-        'properties': []
+        'properties': properties
     }
 
   def execute(self, notebook, snippet):

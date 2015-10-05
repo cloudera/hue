@@ -365,6 +365,10 @@ var Snippet = function (vm, notebook, snippet) {
     else if (data.status == -3) { // Statement expired
       self.status('expired');
     }
+    else if (data.status == 403) { // Auth required
+      self.status('expired');
+      $(document).trigger("showAuthModal", {'type': self.type(), 'snippet': self});
+    }
     else if (data.status == 1 || data.status == -1) {
       self.status('failed');
       var match = ERROR_REGEX.exec(data.message);
@@ -381,7 +385,7 @@ var Snippet = function (vm, notebook, snippet) {
   self.lastExecuted = 0;
 
   self.execute = function () {
-    var now = (new Date()).getTime(); // we don't allow fast clicks
+    var now = (new Date()).getTime(); // We don't allow fast clicks
     if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000) {
       return;
     }
@@ -487,7 +491,7 @@ var Snippet = function (vm, notebook, snippet) {
       notebook.newSnippet();
     }
   };
-  
+
   self.fetchResultMetadata = function () {
     $.post("/notebook/api/fetch_result_metadata", {
       notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -769,7 +773,7 @@ var Notebook = function (vm, notebook) {
 
     $.post("/notebook/api/create_session", {
       notebook: ko.mapping.toJSON(self.getContext()),
-      session: ko.mapping.toJSON(session) // e.g. {'type': 'hive', 'properties': [{'driverCores': '2'}]}
+      session: ko.mapping.toJSON(session) // e.g. {'type': 'hive', 'properties': [{'name': driverCores', 'value', '2'}]}
     }, function (data) {
       if (data.status == 0) {
         ko.mapping.fromJS(data.session, {}, session);
@@ -782,6 +786,8 @@ var Notebook = function (vm, notebook) {
         if (callback) {
           setTimeout(callback, 500);
         }
+      } else if (data.status == 403) {
+        $(document).trigger("showAuthModal", {'type': session.type()});
       }
       else {
         fail(data.message);
@@ -791,6 +797,18 @@ var Notebook = function (vm, notebook) {
     }).complete(function(xhr, status) {
       self.creatingSessionLocks.remove(session.type());
     })
+  };
+
+  self.authSession = function () {
+    self.createSession(new Session(vm, {
+          'type': vm.authSessionType(),
+          'properties': [
+            {'name': 'user', 'value': vm.authSessionUsername()},
+            {'name': 'password', 'value': vm.authSessionPassword()}
+          ]
+        }),
+        vm.authSessionSnippet() ? vm.authSessionSnippet().execute : null  // On new session we don't automatically execute the snippet after the aut. On session expiration we do.
+    );
   };
 
   self.newSnippet = function (type) {
@@ -920,6 +938,11 @@ function EditorViewModel(notebooks, options) {
   self.toggleEditing = function () {
     self.isEditing(!self.isEditing());
   };
+
+  self.authSessionUsername = ko.observable(); // UI popup
+  self.authSessionPassword = ko.observable();
+  self.authSessionType = ko.observable();
+  self.authSessionSnippet = ko.observable();
 
   self.removeSnippetConfirmation = ko.observable();
 
