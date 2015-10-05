@@ -120,7 +120,7 @@ def fetch_result_data(request):
   response['result'] = get_api(request.user, snippet, request.fs, request.jt).fetch_result(notebook, snippet, rows, start_over)
 
   # Materialize and HTML escape results
-  if response['result'].get('data'):
+  if response['result'].get('data') and response['result'].get('type') == 'table':
     response['result']['data'] = escape_rows(response['result']['data'])
 
   response['status'] = 0
