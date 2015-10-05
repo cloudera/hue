@@ -27,12 +27,11 @@ import time
 
 import kerberos
 
-from datetime import datetime
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
 from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 import django.db
 from django.http import HttpResponseNotAllowed
@@ -40,7 +39,6 @@ from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
-from django.utils.encoding import iri_to_uri
 import django.views.static
 
 import desktop.views
@@ -403,6 +401,7 @@ class AuditLoggingMiddleware(object):
       'impersonator': self.impersonator,
       'ipAddress': self._get_client_ip(request),
       'operation': operation,
+      'operationText': self._get_operation_text(operation, request),
       'eventTime': self._milliseconds_since_epoch(),
       'allowed': self._get_allowed(operation, request, response),
       'service': get_app_name(request),
@@ -452,6 +451,34 @@ class AuditLoggingMiddleware(object):
           return operation
 
     return ''
+
+  def _get_operation_text(self, operation, request):
+    if request.method == 'POST':
+      if operation == 'CREATE_USER':
+        return 'Created User with username: %s' % request.POST.get('username', '')
+      elif operation == 'EDIT_USER':
+        return 'Edited User with username: %s' % request.POST.get('username', '')
+      elif operation == 'DELETE_USER':
+        usernames = self._get_usernames(request.POST.getlist('user_ids', []))
+        return 'Deleted User ID(s): %s' % ', '.join(usernames)
+      elif operation == 'ADD_LDAP_USERS':
+        return 'Added/Synced LDAP username(s): %s' % ', '.join(request.POST.getlist('username_pattern', []))
+      elif operation == 'CREATE_GROUP':
+        usernames = self._get_usernames(request.POST.getlist('members', []))
+        return 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
+      elif operation == 'EDIT_GROUP':
+        usernames = self._get_usernames(request.POST.getlist('members', []))
+        return 'Edited Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
+      elif operation == 'DELETE_GROUP':
+        return 'Deleted Group(s): %s' % ', '.join(request.POST.getlist('group_names', []))
+      elif operation == 'ADD_LDAP_GROUPS':
+        return 'Added LDAP Group(s): %s' % ', '.join(request.POST.getlist('groupname_pattern', []))
+
+    return ''
+
+  def _get_usernames(self, user_ids):
+    return User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
+
 
 try:
   import tidylib
