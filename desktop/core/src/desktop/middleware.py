@@ -480,6 +480,34 @@ class AuditLoggingMiddleware(object):
     return User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
 
 
+  def _get_operation_text(self, operation, request):
+    if request.method == 'POST':
+      if operation == 'CREATE_USER':
+        return 'Created User with username: %s' % request.POST.get('username', '')
+      elif operation == 'EDIT_USER':
+        return 'Edited User with username: %s' % request.POST.get('username', '')
+      elif operation == 'DELETE_USER':
+        usernames = self._get_usernames(request.POST.getlist('user_ids', []))
+        return 'Deleted User ID(s): %s' % ', '.join(usernames)
+      elif operation == 'ADD_LDAP_USERS':
+        return 'Added/Synced LDAP username(s): %s' % ', '.join(request.POST.getlist('username_pattern', []))
+      elif operation == 'CREATE_GROUP':
+        usernames = self._get_usernames(request.POST.getlist('members', []))
+        return 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
+      elif operation == 'EDIT_GROUP':
+        usernames = self._get_usernames(request.POST.getlist('members', []))
+        return 'Edited Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
+      elif operation == 'DELETE_GROUP':
+        return 'Deleted Group(s): %s' % ', '.join(request.POST.getlist('group_names', []))
+      elif operation == 'ADD_LDAP_GROUPS':
+        return 'Added LDAP Group(s): %s' % ', '.join(request.POST.getlist('groupname_pattern', []))
+
+    return ''
+
+  def _get_usernames(self, user_ids):
+    return User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
+
+
 try:
   import tidylib
   _has_tidylib = True
