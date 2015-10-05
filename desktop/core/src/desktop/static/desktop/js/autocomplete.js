@@ -41,14 +41,12 @@ Autocompleter.prototype.getCompletions = function (editor, session, pos, prefix,
   var before = editor.getTextBeforeCursor(";");
   var after = editor.getTextAfterCursor(";");
 
-  editor.showSpinner();
   self.autocomplete(before, after, function(result) {
-    editor.hideSpinner();
     callback(null, result);
-  });
+  }, editor);
 };
 
-Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, success, failure) {
+Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, success, failure, editor) {
   var self = this;
   var path = self.assistHelper.activeDatabase();
 
@@ -63,6 +61,9 @@ Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, succe
 
   // TODO: Use shared cache with assist helper.
 
+  if (editor) {
+    editor.showSpinner();
+  }
   $.post("/notebook/api/autocomplete/" + path, {
     notebook: ko.mapping.toJSON(self.notebook.getContext()),
     snippet: ko.mapping.toJSON(self.snippet.getContext())
@@ -72,7 +73,11 @@ Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, succe
     } else {
       failure();
     }
-  }).fail(failure);
+  }).fail(failure).always(function () {
+    if (editor) {
+      editor.hideSpinner();
+    }
+  });
 };
 
 Autocompleter.prototype.getFromReferenceIndex = function (statement) {
@@ -249,7 +254,7 @@ Autocompleter.prototype.extractFields = function (data, valuePrefix, includeStar
   return result;
 };
 
-Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback) {
+Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callback, editor) {
   var onFailure = function() {
     callback([]);
   };
@@ -315,7 +320,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
         fromKeyword += " ";
       }
       callback(self.extractFields(data, fromKeyword));
-    }, onFailure );
+    }, onFailure, editor);
   } else if ((selectBefore && fromAfter) || fieldTermBefore || impalaFieldRef) {
     var partialTermsMatch = beforeCursor.match(/([^\s\(\-\+\<\>\,]*)$/);
     var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
@@ -385,7 +390,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
           } else {
             callback(self.extractFields(data, "", !fieldTermBefore));
           }
-        }, onFailure);
+        }, onFailure, editor);
         return; // break recursion
       }
       var part = remainingParts.shift();
@@ -424,7 +429,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
               } else {
                 onFailure();
               }
-            }, onFailure);
+            }, onFailure, editor);
             return; // break recursion, it'll be async above
           }
         } else if (impalaSyntax) {
@@ -464,7 +469,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
               return;
             }
             getFields(remainingParts, fields);
-          }, onFailure);
+          }, onFailure, editor);
           return; // break recursion, it'll be async above
         }
         fields.push(part);
