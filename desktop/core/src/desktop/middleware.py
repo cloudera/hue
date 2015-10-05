@@ -396,10 +396,6 @@ class AuditLoggingMiddleware(object):
   def _log_message(self, operation, request, response=None):
     audit_logger = get_audit_logger()
 
-    status = 200
-    if response is not None:
-      status = response.status_code
-
     audit_logger.debug(JsonMessage(**{
       'username': self._get_username(operation, request),
       'impersonator': self.impersonator,
@@ -407,7 +403,6 @@ class AuditLoggingMiddleware(object):
       'operation': operation,
       'eventTime': self._milliseconds_since_epoch(),
       'allowed': self._get_allowed(operation, request, response),
-      'statusCode': status,
       'service': get_app_name(request),
       'url': request.path
     }))
