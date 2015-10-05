@@ -948,12 +948,6 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function() {
-
-      var SHOW_MODAL_SNIPPET_ALT = {
-        type: function() { return "SHOW_MODAL" },
-        name: function() { return "..." }
-      };
-
       var WHEEL_RADIUS = 75;
       var PLUS_ICON_RADIUS = 27.859; // FA-5X
 
@@ -980,13 +974,15 @@ from desktop.views import _ko
         self.notebook = params.notebook;
         self.availableSnippets = params.availableSnippets;
         self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,5)));
+        self.lastUsedSnippet = self.snippetHistory()[0];
+        self.roundCount = 0;
         self.positions = calculatePositions(self.snippetHistory().length);
         self.showingHistory = ko.observable(false);
         self.hasAdditionalSnippets = params.availableSnippets().length > 5;
         self.showingSelectSnippet = ko.observable(false);
 
         self.addLastUsedSnippet = function() {
-          self.addNewSnippet(self.snippetHistory()[0]);
+          self.addNewSnippet(self.lastUsedSnippet);
         };
 
         self.showSnippetModal = function () {
@@ -998,17 +994,14 @@ from desktop.views import _ko
           self.showingHistory(false);
           self.showingSelectSnippet(false);
           $("#addSnippetModal").modal('hide');
-          if (alternative && alternative.type() === SHOW_MODAL_SNIPPET_ALT.type()) {
-            return;
-          }
 
+          // When fewer than 5 it's always in history
           if (self.snippetHistory().indexOf(alternative) == -1) {
-            if (self.snippetHistory().length == 5) {
-              self.snippetHistory.pop();
-            }
-            self.snippetHistory.unshift(alternative);
+            self.snippetHistory.splice(4 - self.roundCount, 1, alternative);
+            self.roundCount = (self.roundCount + 1) % 5;
           }
 
+          self.lastUsedSnippet = alternative;
           self.notebook.newSnippet(alternative.type())
         };
 
