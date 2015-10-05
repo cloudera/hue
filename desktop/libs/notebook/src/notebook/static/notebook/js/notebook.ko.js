@@ -16,7 +16,7 @@
 
 
 var SPARK_MAPPING = {
-  ignore: ["ace", "images"]
+  ignore: ["ace", "images", "autocompleter"]
 }
 
 var Result = function (snippet, result) {
