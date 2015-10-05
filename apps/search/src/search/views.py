@@ -59,9 +59,16 @@ def index(request):
 
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
+  if request.method == 'GET':
+    if 'q' in request.GET:
+      query['qs'][0]['q'] = request.GET.get('q')
+    if 'qd' in request.GET:
+      query['qd'] = request.GET.get('qd')
+
+
   return render('search.mako', request, {
     'collection': collection,
-    'query': query,
+    'query': json.dumps(query),
     'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
     'is_owner': collection_doc.doc.get().can_write(request.user),
     'can_edit_index': can_edit_index(request.user)

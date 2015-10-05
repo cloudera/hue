@@ -1908,7 +1908,6 @@ ${ dashboard.layout_skeleton() }
 ${ dashboard.import_layout(True) }
 
 <script src="${ static('search/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('search/js/lzstring.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
@@ -2421,18 +2420,6 @@ $(document).ready(function () {
   });
 
   var _query = ${ query | n,unicode };
-  if (window.location.hash != ""){
-    if (window.location.hash.indexOf("collection") == -1){
-      try {
-        var _decompress = LZString.decompressFromBase64(window.location.hash.substr(1));
-        if (_decompress != null && $.trim(_decompress) != ""){
-          _query = ko.mapping.fromJSON(LZString.decompressFromBase64(window.location.hash.substr(1)));
-        }
-      }
-      catch (e){}
-    }
-  }
-
   viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, _query, ${ initial | n,unicode });
 
   viewModel.timelineChartTypes = ko.observableArray([
@@ -2538,14 +2525,20 @@ $(document).ready(function () {
     }
   });
 
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("q=") > -1) {
-      var _qdef = viewModel.collection.getQDefinition(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "").split("=")[1]);
-      if (_qdef != null){
-        viewModel.collection.loadQDefinition(_qdef);
-      }
+  function loadQueryDefinition(id) {
+    var _qdef = viewModel.collection.getQDefinition(id);
+    if (_qdef != null) {
+      viewModel.collection.loadQDefinition(_qdef);
     }
   }
+
+  if (window.location.hash != "" && window.location.hash.indexOf("qd=") > -1) {
+    loadQueryDefinition(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "").split("=")[1]);
+  }
+  else if (_query.qd) {
+    loadQueryDefinition(_query.qd);
+  }
+
 });
 
 

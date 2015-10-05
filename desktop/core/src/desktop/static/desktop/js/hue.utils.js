@@ -26,8 +26,8 @@ if (!('clean' in Array.prototype)) {
     return this;
   };
 }
-
 if (!('move' in Array.prototype)) {
+
   Array.prototype.move = function (old_index, new_index) {
     if (new_index >= this.length) {
       var k = new_index - this.length;
@@ -39,8 +39,8 @@ if (!('move' in Array.prototype)) {
     return this;
   };
 }
-
 if (!('indexOf' in Array.prototype)) {
+
   Array.prototype.indexOf = function (needle) {
     for (var i = 0; i < this.length; i++) {
       if (this[i] === needle) {
@@ -50,14 +50,16 @@ if (!('indexOf' in Array.prototype)) {
     return -1;
   };
 }
-
 // adding missing .filter for IE8
+
 if (!('filter' in Array.prototype)) {
   Array.prototype.filter = function (filter, that /*opt*/) {
     var other = [], v;
-    for (var i = 0, n = this.length; i < n; i++)
-      if (i in this && filter.call(that, v = this[i], i, this))
+    for (var i = 0, n = this.length; i < n; i++) {
+      if (i in this && filter.call(that, v = this[i], i, this)) {
         other.push(v);
+      }
+    }
     return other;
   };
 }
@@ -67,10 +69,10 @@ Array.prototype.diff = function (a) {
     return a.indexOf(i) < 0;
   });
 };
-
 /*
  * Add utility methods to the HUE object
 */
+
 (function (hue) {
   'use strict';
 
@@ -116,8 +118,8 @@ Array.prototype.diff = function (a) {
 
 }(hue = window.hue || {}));
 
-
 if (!Object.keys) {
+
   Object.keys = (function () {
     'use strict';
     var hasOwnProperty = Object.prototype.hasOwnProperty,
@@ -169,7 +171,6 @@ function s4() {
 function UUID() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
-
 // Based on original pub/sub implementation from http://davidwalsh.name/pubsub-javascript
 var huePubSub = (function () {
   var topics = {};
@@ -208,6 +209,7 @@ var huePubSub = (function () {
   };
 })();
 
+
 Number.prototype.toHHMMSS = function () {
   var _s = this;
   var _ms = _s % 1000;
@@ -216,6 +218,15 @@ Number.prototype.toHHMMSS = function () {
   _s = (_s - _secs) / 60;
   var _mins = _s % 60;
   var _hrs = (_s - _mins) / 60;
-
   return (_hrs > 0 ? _hrs + "h, " : "") + (_mins > 0 ? _mins + "m, " : "") + _secs + "." + _ms + "s";
+
+}
+
+if (!('getParameter' in window.location)) {
+  window.location.getParameter = function (name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(window.location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  };
 }
