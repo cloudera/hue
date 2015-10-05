@@ -788,19 +788,20 @@ var Notebook = function (vm, notebook) {
     if (type) {
       self.selectedSnippet(type);
     }
-    self.addSnippet({
+    var snippet = self.addSnippet({
       type: self.selectedSnippet(),
       result: {}
     });
 
     window.setTimeout(function () {
-      var lastSnippet = self.snippets()[self.snippets().length - 1];
+      var lastSnippet = snippet;
       if (lastSnippet.ace() != null) {
         lastSnippet.ace().focus();
       }
     }, 100);
 
-    logGA('/add_snippet/' + self.selectedSnippet());
+    logGA('/add_snippet/' + type);
+    return snippet;
   };
 
   self.getContext = function() {
@@ -997,8 +998,10 @@ function EditorViewModel(notebooks, options) {
   };
 
   self.newNotebook = function () {
-    self.notebooks.push(new Notebook(self, {}));
-    self.selectedNotebook(self.notebooks()[self.notebooks().length - 1]);
+    var notebook = new Notebook(self, {});
+    self.notebooks.push(notebook);
+    self.selectedNotebook(notebook);
+    return notebook;
   };
 
   self.saveNotebook = function () {
