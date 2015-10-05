@@ -971,10 +971,28 @@ from desktop.views import _ko
     jar : {
       snippetIcon: 'fa-file-archive-o '
     },
+    mysql: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/mysql',
+      snippetIcon: 'fa-database',
+      sqlDialect: true
+    },
+    mysqljdbc: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/mysql',
+      snippetIcon: 'fa-database',
+      sqlDialect: true
+    },
     pig: {
       placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
       aceMode: 'ace/mode/pig',
       snippetImage: '${ static("pig/art/icon_pig_48.png") }'
+    },
+    pgsql: {
+      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+      aceMode: 'ace/mode/pgsql',
+      snippetIcon: 'fa-database',
+      sqlDialect: true
     },
     py : {
       snippetIcon: 'fa-file-code-o'
