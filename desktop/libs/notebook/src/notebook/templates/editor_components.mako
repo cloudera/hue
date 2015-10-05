@@ -1037,7 +1037,12 @@ from desktop.views import _ko
       evt.preventDefault();
       var dt = evt.dataTransfer;
       var files = dt.files;
-      showHoverMsg();
+      if (files.length > 0){
+        showHoverMsg();
+      }
+      else {
+        hideHoverMsg();
+      }
 
       function addMarkdown(content) {
         var snip = viewModel.notebooks()[0].addSnippet({type: "text", result: {}}, true);
@@ -1079,7 +1084,6 @@ from desktop.views import _ko
             $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
             try {
               var loaded = JSON.parse(e.target.result);
-
               if (loaded.cells) { //ipython
                 loaded.cells.forEach(function (cell, cellCnt) {
                   window.setTimeout(function () {
