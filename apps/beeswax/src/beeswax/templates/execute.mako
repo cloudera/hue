@@ -788,6 +788,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('notebook/js/notebook.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 
@@ -1105,9 +1106,29 @@ var assistHelper = new AssistHelper({
   user: HIVE_AUTOCOMPLETE_USER
 });
 
+var editorViewModelOptions = {
+  snippetViewSettings: {},
+  languages: [
+    {
+      type: "hive"
+    },
+    {
+      type: "impala"
+    }
+  ]
+};
+
+var editorViewModel = new EditorViewModel([], editorViewModelOptions);
+
+var notebook = editorViewModel.newNotebook();
+
+var snippet = notebook.newSnippet(HIVE_AUTOCOMPLETE_APP == "beeswax" ? "hive" : "impala");
+
+
 var autocompleter = new Autocompleter({
   assistHelper: assistHelper,
-  mode: HIVE_AUTOCOMPLETE_APP
+  notebook: notebook,
+  snippet: snippet
 });
 
 var escapeOutput = function (str) {
