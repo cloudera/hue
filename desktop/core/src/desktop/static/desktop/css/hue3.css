@@ -2021,6 +2021,9 @@ pre {
 .hover-actions-3rd {
   display: inline-block;
   opacity: 0;
+  -webkit-transition: opacity 0.2s linear;
+  -moz-transition: opacity 0.2s linear;
+  -ms-transition: opacity 0.2s linear;
   transition: opacity 0.2s linear;
 }
 
@@ -2033,6 +2036,9 @@ pre {
 .hover-actions-2nd > a,
 .hover-actions-3rd > a {
   color: #D1D1D1;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
   transition: color 0.2s ease;
 }
 
