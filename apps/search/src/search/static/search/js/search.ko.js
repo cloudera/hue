@@ -627,8 +627,13 @@ var Collection = function (vm, collection) {
     qdefinition.hasChanged = ko.observable(false);
 
     vm.selectedQDefinition(qdefinition);
-    if (window.location.hash.indexOf("collection") == -1){
-      window.location.hash = "q=" + qdef.uuid();
+    if (window.location.hash.indexOf("collection") == -1) {
+      if (typeof history.pushState != "undefined" && location.getParameter("collection") != "") {
+        history.pushState(null, null, "?collection=" + location.getParameter("collection") + "&qd=" + qdef.uuid());
+      }
+      else {
+        window.location.hash = "qd=" + qdef.uuid();
+      }
     }
     vm.search();
     $(document).trigger("loadedQDefinition");
@@ -660,6 +665,14 @@ var Collection = function (vm, collection) {
     vm.query.fqs.removeAll();
     vm.query.start(0);
     vm.query.selectedMultiq([]);
+    if (window.location.hash.indexOf("collection") == -1) {
+      if (typeof history.pushState != "undefined" && location.getParameter("collection") != "") {
+        history.pushState(null, null, "?collection=" + location.getParameter("collection"));
+      }
+      else {
+        window.location.hash = "";
+      }
+    }
   }
 
   self.getQDefinition = function (qDefID) {
@@ -1320,6 +1333,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           || ko.toJSON(_prop.selectedMultiq()) != ko.mapping.toJSON(self.query.selectedMultiq())) {
         self.selectedQDefinition().hasChanged(true);
       }
+    }
+    else if (typeof history.pushState != "undefined" && location.getParameter("collection") != "") {
+      var firstQuery = self.query.qs()[0].q();
+      history.pushState(null, null, "?collection=" + location.getParameter("collection") + (firstQuery ? "&q=" + firstQuery : ""));
     }
 
     // Multi queries
