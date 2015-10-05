@@ -931,6 +931,22 @@ from desktop.views import _ko
   <p class="hoverText">${_('Drop iPython/Zeppelin notebooks here')}</p>
 </div>
 
+
+<div id="authModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Connect to the data source')}</h3>
+  </div>
+  <div class="modal-body">
+    <input name="username" type="text" data-bind="value: $root.authSessionUsername" placeholder="${ _('Username') }"/>
+    <input name="password" type="password" data-bind="value: $root.authSessionPassword" placeholder="${ _('Password') }"/>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <input type="submit" data-dismiss="modal" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { $root.selectedNotebook().authSession(); }" />
+  </div>
+</div>
+
 </%def>
 
 
@@ -1836,6 +1852,14 @@ from desktop.views import _ko
       $(".add-snippet").show();
       $(".main-content").css("top", "70px");
     }
+  });
+
+  $(document).on("showAuthModal", function(e, data) {
+    viewModel.authSessionUsername('${ user.username }');
+    viewModel.authSessionPassword('');
+    viewModel.authSessionType(data['type']);
+    viewModel.authSessionSnippet(data['snippet']);
+    $("#authModal").modal("show");
   });
 </script>
 </%def>

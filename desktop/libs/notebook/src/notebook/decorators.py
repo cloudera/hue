@@ -27,7 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import QueryExpired, QueryError, SessionExpired
+from notebook.connectors.base import QueryExpired, QueryError, SessionExpired, AuthenticationRequired
 
 
 LOG = logging.getLogger(__name__)
@@ -72,13 +72,15 @@ def check_document_modify_permission():
 def api_error_handler(func):
   def decorator(*args, **kwargs):
     response = {}
-    
+
     try:
       return func(*args, **kwargs)
     except SessionExpired, e:
-      response['status'] = -2    
+      response['status'] = -2
     except QueryExpired, e:
       response['status'] = -3
+    except AuthenticationRequired, e:
+      response['status'] = 403
     except QueryError, e:
       LOG.exception('error running %s' % func)
       response['status'] = 1

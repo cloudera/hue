@@ -23,16 +23,22 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from librdbms.jdbc import Jdbc, query_and_fetch
 
-from notebook.connectors.base import Api, QueryError
+from notebook.connectors.base import Api, QueryError, AuthenticationRequired
 
 
 LOG = logging.getLogger(__name__)
+
+
+# Cache one JDBC connection by user for not saving user credentials
+API_CACHE = {}
 
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
     try:
       return func(*args, **kwargs)
+    except AuthenticationRequired, e:
+      raise e
     except Exception, e:
       message = force_unicode(str(e))
       if 'error occurred while trying to connect to the Java server' in message:
@@ -45,12 +51,38 @@ def query_error_handler(func):
 class JdbcApi(Api):
 
   def __init__(self, user, fs=None, jt=None, options=None):
+    global API_CACHE
     Api.__init__(self, user, fs=fs, jt=jt, options=options)
 
-    self.db = Jdbc(self.options['driver'], self.options['url'], self.options['user'], self.options['password'])
+    self.db = None
+
+    if self.options['user'] in API_CACHE:
+      self.db = API_CACHE[self.options['user']]
+    elif 'password' in self.options:
+      self.db = API_CACHE[self.options['user']] = Jdbc(self.options['driver'], self.options['url'], self.options['user'], self.options['password'])
+
+  def create_session(self, lang=None, properties=None):
+    props = super(JdbcApi, self).create_session(lang, properties)
+
+    properties = dict([(p['name'], p['value']) for p in properties]) if properties is not None else {}
+    props['properties'] = {} # We don't store passwords
+
+    if self.db is None:
+      if 'password' in properties:
+        user = properties.get('user') or self.options.get('user')
+        props['properties'] = {'user': user}
+        self.db = API_CACHE[user] = Jdbc(self.options['driver'], self.options['url'], user, properties.pop('password'))
+
+    if self.db is None:
+      raise AuthenticationRequired()
+
+    return props
 
   @query_error_handler
   def execute(self, notebook, snippet):
+    if self.db is None:
+      raise AuthenticationRequired()
+
     data, description = query_and_fetch(self.db, snippet['statement'], 100)
     has_result_set = data is not None
 

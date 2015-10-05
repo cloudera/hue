@@ -27,12 +27,6 @@ LOG = logging.getLogger(__name__)
 
 class SparkBatchApi(Api):
 
-  def create_session(self, lang, properties=None):
-    return {
-        'type': lang,
-        'id': None
-    }
-
   def execute(self, notebook, snippet):
     api = get_spark_api(self.user)
 

@@ -36,6 +36,9 @@ class SessionExpired(Exception):
 class QueryExpired(Exception):
   pass
 
+class AuthenticationRequired(Exception):
+  pass
+
 
 class QueryError(Exception):
   def __init__(self, message):
@@ -129,7 +132,7 @@ class Api(object):
     return {
         'type': lang,
         'id': None,
-        'properties': []
+        'properties': properties if not None else []
     }
 
   def close_session(self, session):
