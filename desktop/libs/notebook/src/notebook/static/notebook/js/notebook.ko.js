@@ -145,8 +145,16 @@ var Snippet = function (vm, notebook, snippet) {
   self.ace = ko.observable(null);
   self.errors = ko.observableArray([]);
 
+  self.getAceMode = function() {
+    return vm.getSnippetViewSettings(self.type()).aceMode;
+  };
+
   self.isSqlDialect = function () {
     return vm.getSnippetViewSettings(self.type()).sqlDialect;
+  };
+
+  self.getPlaceHolder = function() {
+    return vm.getSnippetViewSettings(self.type()).placeHolder;
   };
 
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');

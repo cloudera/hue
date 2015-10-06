@@ -1644,40 +1644,30 @@ ko.bindingHandlers.delayedOverflow = {
 
 ko.bindingHandlers.aceEditor = {
   init: function (element, valueAccessor) {
+
     var $el = $(element);
     var options = ko.unwrap(valueAccessor());
-    var onFocus = options.onFocus || function () {};
-    var onBlur = options.onBlur || function () {};
-    var onChange = options.onChange || function () {};
-    var onCopy = options.onCopy || function () {};
-    var onPaste = options.onPaste || function () {};
-    var onAfterExec = options.onAfterExec || function () {};
-    var onExecute = options.onExecute || function () {};
+    var snippet = options.snippet;
     var assistHelper = options.assistHelper;
 
-    $el.text(options.value());
+    $el.text(snippet.statement_raw());
 
     var editor = ace.edit($el.attr("id"));
-    editor.session.setMode(options.mode);
+    editor.session.setMode(snippet.getAceMode());
     if (navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1) {
-      editor.setOptions({fontSize: "14px"})
+      editor.setOptions({ fontSize: "14px" });
     }
-    editor.on("focus", function () {
-      huePubSub.publish("hue.ace.activeMode", ko.unwrap(options.mode));
-    });
 
-    if (ko.isObservable(options.errors)) {
-      options.errors.subscribe(function(errors) {
-        editor.clearErrors();
-        if (errors.length > 0) {
-          errors.forEach(function (err) {
-            if (err.line !== null) {
-              editor.addError(err.message, err.line);
-            }
-          });
-        }
-      });
-    }
+    snippet.errors.subscribe(function(newErrors) {
+      editor.clearErrors();
+      if (newErrors.length > 0) {
+        newErrors.forEach(function (err) {
+          if (err.line !== null) {
+            editor.addError(err.message, err.line);
+          }
+        });
+      }
+    });
 
     editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
 
@@ -1693,19 +1683,18 @@ ko.bindingHandlers.aceEditor = {
     };
 
     var userOptions = $.totalStorage("hue.ace.options") || {};
-    $.extend(editorOptions, options.editorOptions || userOptions);
+    $.extend(editorOptions, userOptions);
 
     editor.setOptions(editorOptions);
 
-    if (options.autocompleter) {
-      editor.session.setCompleters([options.autocompleter]);
-    }
+    editor.session.setCompleters([snippet.autocompleter]);
 
     var placeHolderElement = null;
     var placeHolderVisible = false;
-    if (options.placeholder) {
+    var placeHolderText = snippet.getPlaceHolder();
+    if (placeHolderText) {
       placeHolderElement = $("<div>")
-        .text(options.placeholder)
+        .text(placeHolderText)
         .css("margin-left", "6px")
         .addClass("ace_invisible ace_emptyMessage");
       if (editor.getValue().length == 0) {
@@ -1723,35 +1712,24 @@ ko.bindingHandlers.aceEditor = {
         placeHolderVisible = false;
       }
       if (options.updateOnInput){
-        options.value(editor.getValue());
+        snippet.statement_raw(editor.getValue());
       }
     });
 
     editor.on("focus", function () {
       $(".ace-editor").data("last-active-editor", false);
       $el.data("last-active-editor", true);
-      onFocus(editor);
     });
 
     editor.on("blur", function () {
-      options.value(editor.getValue());
-      onBlur(editor);
+      snippet.statement_raw(editor.getValue());
     });
-
-    editor.on("copy", function () {
-      onCopy(editor);
-    });
-
-    editor.on("paste", function () {
-      onPaste(editor);
-    });
-
 
     var currentAssistTables = {};
 
     var refreshTables = function() {
       currentAssistTables = {};
-      if (typeof assistHelper.activeDatabase() != undefined && assistHelper.activeDatabase() != null) {
+      if (typeof assistHelper.activeDatabase() !== "undefined" && assistHelper.activeDatabase() != null) {
         assistHelper.fetchTables(function(data) {
           $.each(data.tables, function(index, table) {
             currentAssistTables[table] = true;
@@ -1912,8 +1890,9 @@ ko.bindingHandlers.aceEditor = {
 
     editor.previousSize = 0;
 
+    // TODO: Get rid of this
     window.setInterval(function(){
-      editor.session.getMode().$id = valueAccessor().mode; // forces the id again because of Ace command internals
+      editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
     }, 100);
 
     editor.middleClick = false;
@@ -1935,21 +1914,20 @@ ko.bindingHandlers.aceEditor = {
 
     editor.on("change", function (e) {
       editor.clearErrors();
-      editor.session.getMode().$id = valueAccessor().mode;
+      editor.session.getMode().$id = snippet.getAceMode();
       var currentSize = editor.session.getLength();
       if (currentSize != editor.previousSize && currentSize >= editorOptions.minLines && currentSize <= editorOptions.maxLines){
         editor.previousSize = editor.session.getLength();
         $(document).trigger("editorSizeChanged");
       }
-      onChange(e, editor, valueAccessor);
     });
 
     editor.commands.addCommand({
       name: "execute",
       bindKey: {win: "Ctrl-Enter", mac: "Command-Enter|Ctrl-Enter"},
       exec: function () {
-        options.value(editor.getValue());
-        onExecute();
+        snippet.statement_raw(editor.getValue());
+        snippet.execute();
       }
     });
 
@@ -1974,7 +1952,7 @@ ko.bindingHandlers.aceEditor = {
           }, 100);
         }
       }
-      editor.session.getMode().$id = valueAccessor().mode; // forces the id again because of Ace command internals
+      editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
       if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
         editor.execCommand("startAutocomplete");
       }
@@ -2015,17 +1993,18 @@ ko.bindingHandlers.aceEditor = {
           editor.enableAutocomplete();
         }
       }
-      onAfterExec(e, editor, valueAccessor);
     });
 
-    editor.$blockScrolling = Infinity
-    options.aceInstance(editor);
+    editor.$blockScrolling = Infinity;
+    snippet.ace(editor);
   },
+
   update: function (element, valueAccessor) {
     var options = ko.unwrap(valueAccessor());
-    if (options.aceInstance()) {
-      var editor = options.aceInstance();
-      editor.session.setMode(options.mode);
+    var snippet = options.snippet;
+    if (snippet.ace()) {
+      var editor = snippet.ace();
+      editor.session.setMode(snippet.getAceMode());
     }
   }
 };
