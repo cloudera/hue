@@ -115,6 +115,13 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
         if nested:
           parse_tree = _extract_nested_type(parse_tree, nested)
         response = parse_tree
+        # If column or nested type is scalar/primitive, add sample of values
+        if parser.is_scalar_type(parse_tree['type']):
+          table_obj = db.get_table(database, table)
+          sample = db.get_sample(database, table_obj, column, nested)
+          if sample:
+            sample = set([row[0] for row in db.get_sample(database, table_obj, column, nested).rows()])
+            response['sample'] = sorted(list(sample))
       else:
         raise Exception('Could not find column `%s`.`%s`.`%s`' % (database, table, column))
   except (QueryServerTimeoutException, TTransportException), e:

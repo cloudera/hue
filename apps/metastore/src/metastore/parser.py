@@ -37,6 +37,10 @@ def parse_column(name, type_string, comment=None):
   return column
 
 
+def is_scalar_type(type_string):
+  return not (type_string.startswith('array') or type_string.startswith('map') or type_string.startswith('struct'))
+
+
 def _parse_type(type_string):
   pattern = re.compile('^([a-z]+)(<(.+)>)?$', re.IGNORECASE)
   match = re.search(pattern, type_string)

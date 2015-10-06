@@ -3030,3 +3030,19 @@ def test_apply_natural_sort():
                                                             {'name': 'test_2', 'comment': 'Test'},
                                                             {'name': 'test_100', 'comment': 'Test'},
                                                             {'name': 'test_200', 'comment': 'Test'}])
+
+
+def test_get_impala_nested_select():
+  select_fn = dbms.HiveServer2Dbms.get_impala_nested_select
+
+  assert_equal(select_fn('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
+  assert_equal(select_fn('default', 'customers', 'email_preferences', 'categories/promos/'),
+               ('email_preferences.categories.promos', '`default`.`customers`'))
+  assert_equal(select_fn('default', 'customers', 'addresses', 'key'),
+               ('key', '`default`.`customers`.`addresses`'))
+  assert_equal(select_fn('default', 'customers', 'addresses', 'value/street_1/'),
+               ('street_1', '`default`.`customers`.`addresses`'))
+  assert_equal(select_fn('default', 'customers', 'orders', 'item/order_date'),
+               ('order_date', '`default`.`customers`.`orders`'))
+  assert_equal(select_fn('default', 'customers', 'orders', 'item/items/item/product_id'),
+               ('product_id', '`default`.`customers`.`orders`.`items`'))
