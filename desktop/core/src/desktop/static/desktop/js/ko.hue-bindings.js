@@ -1660,10 +1660,15 @@ ko.bindingHandlers.aceEditor = {
 
     snippet.errors.subscribe(function(newErrors) {
       editor.clearErrors();
+      var offset = 0;
+      if (snippet.isSqlDialect() && editor.getSelectedText()) {
+        var selectionRange = editor.getSelectionRange();
+        offset = Math.min(selectionRange.start.row, selectionRange.end.row);
+      }
       if (newErrors.length > 0) {
         newErrors.forEach(function (err) {
           if (err.line !== null) {
-            editor.addError(err.message, err.line);
+            editor.addError(err.message, err.line + offset);
           }
         });
       }
@@ -1719,6 +1724,10 @@ ko.bindingHandlers.aceEditor = {
     editor.on("focus", function () {
       $(".ace-editor").data("last-active-editor", false);
       $el.data("last-active-editor", true);
+    });
+
+    editor.selection.on("changeSelection", function () {
+      snippet.selectedStatement(editor.getSelectedText());
     });
 
     editor.on("blur", function () {
