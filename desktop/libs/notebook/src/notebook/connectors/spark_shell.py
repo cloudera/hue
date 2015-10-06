@@ -19,21 +19,25 @@ import logging
 import re
 import time
 
+
+LOG = logging.getLogger(__name__)
+
+
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
 
-from spark.conf import LIVY_SERVER_SESSION_KIND
-from spark.job_server_api import get_api as get_spark_api
+try:
+  from spark.conf import LIVY_SERVER_SESSION_KIND
+  from spark.job_server_api import get_api as get_spark_api
+except ImportError, e:
+  LOG.exception('Spark is not enabled')
 
 from notebook.data_export import download as spark_download
 from notebook.connectors.base import SessionExpired, _get_snippet_session, Api,\
   QueryError
-
-
-LOG = logging.getLogger(__name__)
 
 
 class SparkApi(Api):
