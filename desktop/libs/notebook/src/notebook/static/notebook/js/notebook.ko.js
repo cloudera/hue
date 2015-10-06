@@ -16,7 +16,7 @@
 
 
 var SPARK_MAPPING = {
-  ignore: ["ace", "images", "autocompleter"]
+  ignore: ["ace", "images", "autocompleter", "selectedStatement"]
 }
 
 var Result = function (snippet, result) {
@@ -158,6 +158,7 @@ var Snippet = function (vm, notebook, snippet) {
   };
 
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
+  self.selectedStatement = ko.observable('');
   self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
   // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
   self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
@@ -230,7 +231,7 @@ var Snippet = function (vm, notebook, snippet) {
     });
   });
   self.statement = ko.computed(function () {
-    var statement = self.statement_raw();
+    var statement = self.isSqlDialect() && self.selectedStatement() ? self.selectedStatement() : self.statement_raw();
     $.each(self.variables(), function (index, variable) {
       statement = statement.replace(RegExp("([^\\\\])?\\${" + variable.name() + "}", "g"), "$1" + variable.value());
     });
