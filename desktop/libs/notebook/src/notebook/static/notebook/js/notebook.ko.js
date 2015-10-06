@@ -463,7 +463,7 @@ var Snippet = function (vm, notebook, snippet) {
     var _initialIndex = self.result.data().length;
     var _tempData = [];
     $.each(data.result.data, function (index, row) {
-      row.unshift(_initialIndex + index);
+      row.unshift(_initialIndex + index + 1);
       self.result.data.push(row);
       _tempData.push(row);
     });

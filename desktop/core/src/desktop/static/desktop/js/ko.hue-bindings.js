@@ -1683,7 +1683,7 @@ ko.bindingHandlers.aceEditor = {
       showGutter: false,
       showLineNumbers: false,
       showPrintMargin: false,
-      minLines: 6,
+      minLines: 1,
       maxLines: 25
     };
 

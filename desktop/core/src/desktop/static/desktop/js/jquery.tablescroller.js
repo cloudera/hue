@@ -29,6 +29,7 @@
   var pluginName = "jHueTableScroller",
       defaults = {
         minHeight: 300,
+        maxHeight: -1,
         heightAfterCorrection: 40
       };
 
@@ -85,7 +86,7 @@
       heightCondition = true;
     }
 
-    var fixedHeight = $(_this.element).find("table").eq(0).data("tablescroller-fixed-height") || -1;
+    var fixedHeight = $(_this.element).find("table").eq(0).data("tablescroller-fixed-height") || _this.options.maxHeight;
 
     if (heightCondition) {
       var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");
