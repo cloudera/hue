@@ -1233,7 +1233,7 @@ from desktop.views import _ko
       },
       "fnDrawCallback": function (oSettings) {
         $(el).parents(".dataTables_wrapper").jHueTableScroller({
-          minHeight: Math.max($(window).height() - 400, 300),
+          maxHeight: 330,
           heightAfterCorrection: 0
         });
 
@@ -1260,7 +1260,7 @@ from desktop.views import _ko
       ]
     });
     $(el).parents(".dataTables_wrapper").jHueTableScroller({
-      minHeight: Math.max($(window).height() - 400, 300),
+      maxHeight: 330,
       heightAfterCorrection: 0
     });
 
