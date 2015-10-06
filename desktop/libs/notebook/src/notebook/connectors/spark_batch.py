@@ -25,7 +25,7 @@ try:
   from spark.job_server_api import get_api as get_spark_api
 except ImportError, e:
   LOG.exception('Spark is not enabled')
-  
+
 from notebook.connectors.base import Api
 
 
