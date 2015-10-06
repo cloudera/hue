@@ -465,15 +465,10 @@ from desktop.views import _ko
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="verticalSlide: codeVisible">
       <div class="ace-editor" data-bind="attr: { id: id() }, delayedOverflow, aceEditor: {
-          value: statement_raw,
-          onExecute: execute,
-          aceInstance: ace,
-          mode: viewSettings().aceMode,
-          errors: errors,
-          autocompleter: autocompleter,
+          snippet: $data,
           assistHelper: assistHelper,
-          openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
-          placeholder: viewSettings().placeHolder }"></div>
+          openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
+          }"></div>
       </div>
     <div class="clearfix"></div>
     <ul data-bind="foreach: variables" class="unstyled inline">
@@ -673,11 +668,9 @@ from desktop.views import _ko
       <div class="row-fluid">
         <div class="span6">
           <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
-            value: statement_raw,
-            aceInstance: ace,
-            updateOnInput: true,
-            mode: ko.observable('markdown'),
-            placeholder: '${ _('Type your markdown here') }' }"></div>
+              snippet: $data,
+              updateOnInput: true
+            "></div>
         </div>
         <div class="span6">
           <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD'+id()}"></div>
@@ -1013,6 +1006,8 @@ from desktop.views import _ko
       snippetImage: '${ static("spark/art/icon_spark_48.png") }'
     },
     text: {
+      placeholder: '${ _('Type your markdown here') }',
+      aceMode: 'markdown',
       snippetIcon: 'fa-header'
     }
   };
