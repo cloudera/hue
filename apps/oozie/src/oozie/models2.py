@@ -29,7 +29,6 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
-from desktop.conf import TIME_ZONE
 from desktop.lib import django_mako
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
@@ -1821,7 +1820,7 @@ class Coordinator(Job):
               'frequency_unit': 'days',
               'cron_frequency': '0 0 * * *',
               'cron_advanced': False,
-              'timezone': TIME_ZONE.get(),
+              'timezone': '',
               'start': '${start_date}',
               'end': '${end_date}',
               'workflow': None,

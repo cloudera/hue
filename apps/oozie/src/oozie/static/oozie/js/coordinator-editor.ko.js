@@ -114,7 +114,7 @@ var Coordinator = function (vm, coordinator) {
       'show_advanced': false,
       'use_done_flag': false,
       'done_flag': '_SUCCESS',
-      'timezone': coordinator.properties.timezone,
+      'timezone': tzdetect.matches()[0],
       'same_timezone': true,
       'instance_choice': 'default',
       'is_advanced_start_instance': false,
@@ -144,6 +144,9 @@ var Coordinator = function (vm, coordinator) {
 var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, workflows_json, can_edit_json) {
   var self = this;
 
+  if (! coordinator_json['properties']['timezone']) {
+    coordinator_json['properties']['timezone'] = tzdetect.matches()[0];
+   }
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(coordinator_json.id == null);
   self.isEditing.subscribe(function (newVal) {
