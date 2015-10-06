@@ -62,7 +62,7 @@ input[type="text"].seventy, textarea.seventy {
 }
 
 input[type="text"].thirty {
-  width: 30%;
+  width: 30%!important;
 }
 
 input[type="text"].with-errors, textarea.with-errors {
