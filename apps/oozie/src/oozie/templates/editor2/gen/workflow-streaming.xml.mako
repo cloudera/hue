@@ -21,6 +21,7 @@
         <map-reduce>
             <job-tracker>${ '${' }jobTracker}</job-tracker>
             <name-node>${ '${' }nameNode}</name-node>
+            ${ common.prepares(node['properties']['prepares']) }
             <streaming>
                 % if node['properties']['mapper']:
                 <mapper>${ node['properties']['mapper'] }</mapper>
@@ -29,6 +30,9 @@
                 <reducer>${ node['properties']['reducer'] }</reducer>
                 % endif
             </streaming>
+            % if node['properties']['job_xml']:
+              <job-xml>${ node['properties']['job_xml'] }</job-xml>
+            % endif
             ${ common.configuration(node['properties']['job_properties']) }
             ${ common.distributed_cache(node['properties']['files'], node['properties']['archives']) }
         </map-reduce>
