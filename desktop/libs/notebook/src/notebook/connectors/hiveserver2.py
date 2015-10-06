@@ -23,19 +23,22 @@ from django.core.urlresolvers import reverse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
-from beeswax import data_export
-from beeswax.api import _autocomplete
-from beeswax.design import hql_query
-from beeswax import conf as beeswax_conf
-from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
-from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config, QueryServerException
-from beeswax.views import _parse_out_hadoop_jobs
-
 from notebook.connectors.base import Api, QueryError, QueryExpired
 
-
 LOG = logging.getLogger(__name__)
+
+
+try:
+  from beeswax import data_export
+  from beeswax.api import _autocomplete
+  from beeswax.design import hql_query
+  from beeswax import conf as beeswax_conf
+  from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
+  from beeswax.server import dbms
+  from beeswax.server.dbms import get_query_server_config, QueryServerException
+  from beeswax.views import _parse_out_hadoop_jobs
+except ImportError, e:
+  LOG.exception('Hive and HiveServer2 interfaces are not enabled')
 
 
 def query_error_handler(func):

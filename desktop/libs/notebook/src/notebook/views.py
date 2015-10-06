@@ -24,7 +24,6 @@ from django.utils.translation import ugettext as _
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
-from spark.conf import LIVY_SERVER_SESSION_KIND
 
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
 from notebook.connectors.base import Notebook, get_api
@@ -51,6 +50,13 @@ def notebook(request):
   except:
     LOG.exception('failed to get autocomplete base url')
 
+  is_yarn_mode = False
+  try:
+    from spark.conf import LIVY_SERVER_SESSION_KIND
+    is_yarn_mode = LIVY_SERVER_SESSION_KIND.get()
+  except:
+    LOG.exception('Spark is not enabled')
+
   return render('notebook.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
@@ -58,7 +64,7 @@ def notebook(request):
           'session_properties': SparkApi.PROPERTIES
       }),
       'autocomplete_base_url': autocomplete_base_url,
-      'is_yarn_mode': LIVY_SERVER_SESSION_KIND.get()
+      'is_yarn_mode': is_yarn_mode
   })
 
 

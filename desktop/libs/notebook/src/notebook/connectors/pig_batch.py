@@ -31,8 +31,8 @@ try:
   from pig import api
   from pig.models import PigScript2, get_workflow_output, hdfs_link
   from oozie.views.dashboard import check_job_access_permission, check_job_edition_permission
-except ImportError, e:
-  LOG.exception('Pig application is not enabled')
+except Exception, e:
+  LOG.exception('Pig application is not enabled: %s' % e)
 
 
 class PigApi(Api):
