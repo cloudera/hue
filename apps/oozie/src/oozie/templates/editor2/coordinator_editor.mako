@@ -515,6 +515,8 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons) }
 <script src="${ static('desktop/js/jqCron.js') }" type="text/javascript"></script>
 
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
