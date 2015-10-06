@@ -365,9 +365,9 @@
       ${ _('Delete') } <i class="fa fa-plus"></i>
     </a>
 
-    <!-- ko if: properties.job_xml -->
+    <!-- ko if: properties.job_xml != null -->
       <h6>${ _('Job XML') }</h6>
-      <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: properties.job_xml, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.job_xml, attr: { placeholder: $root.workflow_properties.job_xml.help_text }" validate="nonempty"/>
+      <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: properties.job_xml, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.job_xml, attr: { placeholder: $root.workflow_properties.job_xml.help_text }"/>
     <!-- /ko -->
 
     <h6>
