@@ -212,7 +212,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tr>
                   <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
                   <th width="200">${ _('Day') }</th>
-                  <th>${ _('Comment') }</th>
+                  <th>${ _('Warning message') }</th>
                 </tr>
                 </thead>
                 <tbody data-bind="template: { name: 'calendarTemplate', foreach: filteredActions}" >
