@@ -44,7 +44,7 @@ ${ layout.menubar(section='query') }
       <div class="tab-pane active" id="navigatorTab">
         <div class="card card-small card-tab">
           <div class="card-body" style="margin-top: 0;">
-            <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, appName: '${ app_name }' }}"></div>
+            <div class="assist" data-bind="component: { name: 'assist-panel', params: { notebookViewModel: editorViewModel } }"></div>
           </div>
         </div>
       </div>
@@ -1101,37 +1101,27 @@ var HIVE_AUTOCOMPLETE_APP = "${app_name}";
 
 var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
 
-var assistHelper = new AssistHelper({
-  app: HIVE_AUTOCOMPLETE_APP,
-  user: HIVE_AUTOCOMPLETE_USER
-});
+var snippetType = HIVE_AUTOCOMPLETE_APP == "beeswax" ? "hive" : "impala";
 
 var editorViewModelOptions = {
-  snippetViewSettings: {
-    hive: {
-      sqlDialect: true
-    },
-    impala: {
-      sqlDialect: true
-    }
-  },
-  languages: [
-    {
-      type: "hive"
-    },
-    {
-      type: "impala"
-    }
-  ]
+  snippetViewSettings: {},
+  languages: [],
+  user: HIVE_AUTOCOMPLETE_USER
 };
 
+editorViewModelOptions.snippetViewSettings[snippetType] = {
+  sqlDialect: true
+};
+
+editorViewModelOptions.languages.push({
+  type: snippetType,
+  name: snippetType
+});
+
 var editorViewModel = new EditorViewModel([], editorViewModelOptions);
-
 var notebook = editorViewModel.newNotebook();
-
-var snippet = notebook.newSnippet(HIVE_AUTOCOMPLETE_APP == "beeswax" ? "hive" : "impala");
-
-
+var snippet = notebook.newSnippet(snippetType);
+var assistHelper = snippet.getAssistHelper();
 var autocompleter = new Autocompleter({
   assistHelper: assistHelper,
   notebook: notebook,
