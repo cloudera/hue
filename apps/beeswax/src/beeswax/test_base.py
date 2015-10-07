@@ -22,6 +22,7 @@ import json
 import logging
 import os
 import subprocess
+import threading
 import time
 
 from nose.tools import assert_true, assert_false
@@ -31,6 +32,7 @@ from django.contrib.auth.models import User
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
 from desktop.lib.python_util import find_unused_port
+from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.security_util import get_localhost_name
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop import pseudo_hdfs4
@@ -46,6 +48,7 @@ HIVE_SERVER_TEST_PORT = find_unused_port()
 _INITIALIZED = False
 _SHARED_HIVE_SERVER_PROCESS = None
 _SHARED_HIVE_SERVER = None
+_SHARED_HIVE_SERVER_LOCK = threading.Lock()
 _SHARED_HIVE_SERVER_CLOSER = None
 
 
@@ -90,40 +93,52 @@ def _start_server(cluster):
 def get_shared_beeswax_server(db_name='default'):
   global _SHARED_HIVE_SERVER
   global _SHARED_HIVE_SERVER_CLOSER
-  if _SHARED_HIVE_SERVER is None:
 
-    cluster = pseudo_hdfs4.shared_cluster()
+  with _SHARED_HIVE_SERVER_LOCK:
+    if _SHARED_HIVE_SERVER is None:
+      cluster = pseudo_hdfs4.shared_cluster()
 
-    if is_live_cluster():
-      def s():
-        pass
-    else:
-      s = _start_mini_hs2(cluster)
+      if is_live_cluster():
+        def s():
+          pass
+      else:
+        s = _start_mini_hs2(cluster)
 
-    start = time.time()
-    started = False
-    sleep = 1
+      start = time.time()
+      started = False
+      sleep = 1
 
-    make_logged_in_client()
-    user = User.objects.get(username='test')
-    query_server = get_query_server_config()
-    db = dbms.get(user, query_server)
+      make_logged_in_client()
+      user = User.objects.get(username='test')
+      query_server = get_query_server_config()
+      db = dbms.get(user, query_server)
 
-    while not started and time.time() - start <= 30:
-      try:
-        db.open_session(user)
-        started = True
-        break
-      except Exception, e:
-        LOG.info('HiveServer2 server could not be found after: %s' % e)
+      while not started and time.time() - start <= 60:
+        try:
+          db.open_session(user)
+        except StructuredThriftTransportException, e:
+          LOG.exception('Failed to open Hive Server session')
+
+          # Don't loop if we had an authentication error.
+          if 'Bad status: 3' in e.message:
+            raise
+        except Exception, e:
+          LOG.exception('Failed to open Hive Server session')
+          import pdb
+          pdb.set_trace()
+        else:
+          started = True
+          break
+
         time.sleep(sleep)
+        sleep *= 2
 
-    if not started:
-      raise Exception("Server took too long to come up.")
+      if not started:
+        raise Exception("Server took too long to come up.")
 
-    _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER = cluster, s
+      _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER = cluster, s
 
-  return _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER
+    return _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER
 
 
 def _start_mini_hs2(cluster):
