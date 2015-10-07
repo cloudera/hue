@@ -50,7 +50,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('notebook/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('notebook/js/notebook.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1361,7 +1360,9 @@ from desktop.views import _ko
     return _datum;
   }
 
-  requirejs([], function () {
+  requirejs([
+    'notebook/js/notebook.ko'
+  ], function (EditorViewModel) {
 
       var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',

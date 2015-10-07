@@ -1072,3 +1072,9 @@ function logGA(page) {
     trackOnGA('notebook/' + page);
   }
 }
+
+if (typeof define !== "undefined") {
+  define(function () {
+    return EditorViewModel;
+  });
+}
