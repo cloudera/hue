@@ -53,10 +53,10 @@ class ParameterForm(forms.Form):
       'hue-id-b',
   )
 
-  RERUN_HIDE_PARAMETERS = {
+  RERUN_HIDE_PARAMETERS = (
       'security_enabled',
       'dryrun'
-  }
+  )
 
   @staticmethod
   def get_initial_params(conf_dict):
