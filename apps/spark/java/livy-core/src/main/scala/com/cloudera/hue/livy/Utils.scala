@@ -109,4 +109,16 @@ object Utils {
 
     aux(1)
   }
+
+  /** Returns if the process is still running */
+  def isProcessAlive(process: Process): Boolean = {
+    try {
+      process.exitValue()
+      false
+    } catch {
+      case _: IllegalThreadStateException =>
+        true
+    }
+  }
+
 }

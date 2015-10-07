@@ -57,7 +57,7 @@ class Session(interpreter: Interpreter)
     interpreter.start()
     _state = Idle()
   }.onFailure { case _ =>
-    _state = Error()
+    _state = Error(System.currentTimeMillis())
   }
 
   def kind: String = interpreter.kind
@@ -117,7 +117,7 @@ class Session(interpreter: Interpreter)
           (EVALUE -> evalue) ~
           (TRACEBACK -> traceback)
         case Interpreter.ExecuteAborted(message) =>
-          _state = Error()
+          _state = Error(System.currentTimeMillis())
 
           (STATUS -> ERROR) ~
           (EXECUTION_COUNT -> executionCount) ~
