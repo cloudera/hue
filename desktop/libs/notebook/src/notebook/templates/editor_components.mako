@@ -110,8 +110,22 @@ from desktop.views import _ko
     TeX: { equationNumbers: {autoNumber: "AMS"} }
   });
 </script>
+
 <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+
+<script  src="${ static('desktop/ext/js/require.js') }"></script>
+<script>
+  require.config({
+    baseUrl: "${ static('') }",
+    paths: {
+      "jquery": "desktop/ext/js/jquery/jquery-2.1.1.min",
+      "knockout": "desktop/ext/js/knockout.min",
+    },
+    shim: {
+    }
+  });
+</script>
 
 </%def>
 
@@ -959,235 +973,6 @@ from desktop.views import _ko
 
 <script type="text/javascript" charset="utf-8">
 
-  var SNIPPET_VIEW_SETTINGS = {
-    default: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/sql',
-      snippetIcon: 'fa-database',
-      sqlDialect: true
-    },
-    code: {
-      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-      snippetIcon: 'fa-code'
-    },
-    hive: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/hive',
-      snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-      sqlDialect: true
-    },
-    impala: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/impala',
-      snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-      sqlDialect: true
-    },
-    jar : {
-      snippetIcon: 'fa-file-archive-o '
-    },
-    mysql: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/mysql',
-      snippetIcon: 'fa-database',
-      sqlDialect: true
-    },
-    mysqljdbc: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/mysql',
-      snippetIcon: 'fa-database',
-      sqlDialect: true
-    },
-    pig: {
-      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-      aceMode: 'ace/mode/pig',
-      snippetImage: '${ static("pig/art/icon_pig_48.png") }'
-    },
-    pgsql: {
-      placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-      aceMode: 'ace/mode/pgsql',
-      snippetIcon: 'fa-database',
-      sqlDialect: true
-    },
-    py : {
-      snippetIcon: 'fa-file-code-o'
-    },
-    pyspark: {
-      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-      aceMode: 'ace/mode/python',
-      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-    },
-    r: {
-      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-      aceMode: 'ace/mode/r',
-      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-    },
-    spark: {
-      placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
-      aceMode: 'ace/mode/scala',
-      snippetImage: '${ static("spark/art/icon_spark_48.png") }'
-    },
-    text: {
-      placeholder: '${ _('Type your markdown here') }',
-      aceMode: 'markdown',
-      snippetIcon: 'fa-header'
-    }
-  };
-
-
-  // Drag and drop iPython / Zeppelin notebooks
-  if (window.FileReader) {
-
-    var showHoverMsg = function () {
-      $(".hoverMsg").removeClass("hide");
-    };
-
-    var hideHoverMsg = function () {
-      $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
-      $(".hoverMsg").addClass("hide");
-    };
-
-    var aceChecks = 0;
-
-    function handleFileSelect(evt) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      var dt = evt.dataTransfer;
-      var files = dt.files;
-      if (files.length > 0){
-        showHoverMsg();
-      }
-      else {
-        hideHoverMsg();
-      }
-
-      function addMarkdown(content) {
-        var snip = viewModel.notebooks()[0].addSnippet({type: "text", result: {}}, true);
-        snip.subtype(true);
-        snip.statement_raw(content);
-      }
-
-      function addAce(content, snippetType) {
-        var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
-        snip.statement_raw(content);
-        aceChecks++;
-        snip.checkForAce = window.setInterval(function () {
-          if (snip.ace()) {
-            window.clearInterval(snip.checkForAce);
-            aceChecks--;
-            if (aceChecks == 0) {
-              hideHoverMsg();
-            }
-          }
-        }, 100);
-      }
-
-      function addPySpark(content) {
-        addAce(content, "pyspark");
-      }
-
-      function addSql(content) {
-        addAce(content, "hive");
-      }
-
-      function addScala(content) {
-        addAce(content, "spark");
-      }
-
-      for (var i = 0, f; f = files[i]; i++) {
-        var reader = new FileReader();
-        reader.onload = (function (file) {
-          return function (e) {
-            $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
-            try {
-              var loaded = JSON.parse(e.target.result);
-              if (loaded.cells) { //ipython
-                loaded.cells.forEach(function (cell, cellCnt) {
-                  window.setTimeout(function () {
-                    if (cell.cell_type == "code") {
-                      addPySpark(cell.source.join("\n"));
-                    }
-                    if (cell.cell_type == "markdown") {
-                      addMarkdown(cell.source.join("\n"));
-                    }
-                    if (cellCnt == loaded.cells.length - 1 && aceChecks == 0){
-                      hideHoverMsg();
-                    }
-                  }, 10);
-                });
-              }
-
-              if (loaded.paragraphs) { //zeppelin
-                if (loaded.name) {
-                  viewModel.notebooks()[0].name(loaded.name);
-                }
-                loaded.paragraphs.forEach(function (paragraph) {
-                  if (paragraph.text) {
-                    var content = paragraph.text.split("\n");
-                    if (content[0].indexOf("%md") > -1) {
-                      content.shift();
-                      addMarkdown(content.join("\n"));
-                    }
-                    else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
-                      content.shift();
-                      addSql(content.join("\n"));
-                    }
-                    else if (content[0].indexOf("%pyspark") > -1) {
-                      content.shift();
-                      addPySpark(content.join("\n"));
-                    }
-                    else {
-                      if (content[0].indexOf("%spark") > -1){
-                        content.shift();
-                      }
-                      addScala(content.join("\n"));
-                    }
-                  }
-                });
-              }
-            }
-            catch (e) {
-              hideHoverMsg();
-            }
-          };
-        })(f);
-        reader.readAsText(f);
-      }
-    }
-
-    function handleDragOver(evt) {
-      evt.stopPropagation();
-      evt.preventDefault();
-      evt.dataTransfer.dropEffect = "copy";
-    }
-
-    var dropZone = $("body")[0];
-    dropZone.addEventListener("dragenter", showHoverMsg, false);
-    dropZone.addEventListener("dragover", handleDragOver, false);
-    dropZone.addEventListener("drop", handleFileSelect, false);
-
-    var isDraggingOverText = false;
-
-    $(".hoverText").on("dragenter", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      isDraggingOverText = true;
-    });
-
-    $(".hoverText").on("dragleave", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      isDraggingOverText = false;
-    });
-
-    $(".hoverMsg").on("dragleave", function (e) {
-      if (!isDraggingOverText) {
-        hideHoverMsg();
-      }
-    });
-  }
-
   function escapeMathJax(code) {
     var escapeMap = {
       "&": "&amp;",
@@ -1359,7 +1144,6 @@ from desktop.views import _ko
   function isStringColumn(type) {
     return !isNumericColumn(type) && !isDateTimeColumn(type);
   }
-
 
   function pieChartDataTransformer(rawDatum) {
     var _data = [];
@@ -1577,289 +1361,520 @@ from desktop.views import _ko
     return _datum;
   }
 
-  function redrawFixedHeaders() {
-    viewModel.notebooks().forEach(function (notebook) {
-      notebook.snippets().forEach(function (snippet) {
-        var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-        _el.jHueTableExtender({
-          fixedHeader: true,
-          includeNavigator: false,
-          parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: "absolute"
+  requirejs([], function () {
+
+      var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
+      user: '${ user.username }',
+      assistAvailable: '${ autocomplete_base_url | n,unicode }' !== '',
+      snippetViewSettings: {
+        default: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/sql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        code: {
+          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+          snippetIcon: 'fa-code'
+        },
+        hive: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/hive',
+          snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+          sqlDialect: true
+        },
+        impala: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/impala',
+          snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+          sqlDialect: true
+        },
+        jar : {
+          snippetIcon: 'fa-file-archive-o '
+        },
+        mysql: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/mysql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        mysqljdbc: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/mysql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        pig: {
+          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+          aceMode: 'ace/mode/pig',
+          snippetImage: '${ static("pig/art/icon_pig_48.png") }'
+        },
+        pgsql: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/pgsql',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
+        py : {
+          snippetIcon: 'fa-file-code-o'
+        },
+        pyspark: {
+          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+          aceMode: 'ace/mode/python',
+          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+        },
+        r: {
+          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+          aceMode: 'ace/mode/r',
+          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+        },
+        spark: {
+          placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
+          aceMode: 'ace/mode/scala',
+          snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+        },
+        text: {
+          placeholder: '${ _('Type your markdown here') }',
+          aceMode: 'markdown',
+          snippetIcon: 'fa-header'
+        }
+      }
+    });
+
+    var viewModel;
+
+    function redrawFixedHeaders () {
+      viewModel.notebooks().forEach(function (notebook) {
+        notebook.snippets().forEach(function (snippet) {
+          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+          _el.jHueTableExtender({
+            fixedHeader: true,
+            includeNavigator: false,
+            parentId: 'snippet_' + snippet.id(),
+            clonedContainerPosition: "absolute"
+          });
         });
       });
-    });
-  }
-
-  $(document).ready(function () {
-    // Close the notebook snippets when leaving the page
-    window.onbeforeunload = function (e) {
-      viewModel.selectedNotebook().close();
-    };
-
-    $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
-
-    $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
-      e.preventDefault();
-      viewModel.saveNotebook();
-      return false;
-    });
-
-    $(window).bind("keydown", "ctrl+n alt+n meta+n", function (e) {
-      e.preventDefault();
-      viewModel.selectedNotebook().newSnippet();
-      return false;
-    });
-
-    var initialResizePosition = 100;
-
-    function getDraggableOptions(minY) {
-      return {
-        axis: "y",
-        start: function (e, ui) {
-          initialResizePosition = ui.offset.top;
-        },
-        drag: function (e, ui) {
-          draggableHelper($(this), e, ui);
-          $(".jHueTableExtenderClonedContainer").hide();
-        },
-        stop: function (e, ui) {
-          $(".jHueTableExtenderClonedContainer").show();
-          draggableHelper($(this), e, ui, true);
-          redrawFixedHeaders();
-          ui.helper.first().removeAttr("style");
-        },
-        containment: [0, minY, 4000, minY + 400]
-      }
-    };
-
-    $(".resize-panel a").each(function () {
-      $(this).draggable(getDraggableOptions($(this).parents(".snippet").offset().top + 128));
-    });
-
-    function draggableHelper(el, e, ui, setSize) {
-      var _snippet = ko.dataFor(el.parents(".snippet")[0]);
-      var _cm = $("#snippet_" + _snippet.id()).data("editor");
-      var _newSize = _snippet.codemirrorSize() + (ui.offset.top - initialResizePosition);
-      _cm.setSize("99%", _newSize);
-      if (setSize) {
-        _snippet.codemirrorSize(_newSize);
-      }
     }
 
-    $(document).on("toggleResultSettings", function (e, snippet) {
-      window.setTimeout(function() {
-        $("#snippet_" + snippet.id()).find(".chart").trigger("forceUpdate");
-        redrawFixedHeaders();
-      }, 10)
-    });
+    // Drag and drop iPython / Zeppelin notebooks
+    if (window.FileReader) {
 
-    $(document).on("editorSizeChanged", function () {
-      window.setTimeout(redrawFixedHeaders, 50);
-    });
+      var showHoverMsg = function () {
+        $(".hoverMsg").removeClass("hide");
+      };
 
-    $(document).on("executeStarted", function (e, snippet) {
-      var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-      $("#snippet_" + snippet.id()).find(".progress").animate({
-        height: "4px"
-      }, 100);
-      if (_el.hasClass("dt")) {
-        _el.removeClass("dt");
-        $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
-        _el.dataTable().fnClearTable();
-        _el.dataTable().fnDestroy();
-        _el.find("thead tr").empty();
-      }
-    });
+      var hideHoverMsg = function () {
+        $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
+        $(".hoverMsg").addClass("hide");
+      };
 
-    function resizeToggleResultSettings(snippet) {
-      var _dtElement;
-      if (snippet.showGrid()) {
-        _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
+      var aceChecks = 0;
+
+      function handleFileSelect (evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        var dt = evt.dataTransfer;
+        var files = dt.files;
+        if (files.length > 0){
+          showHoverMsg();
+        }
+        else {
+          hideHoverMsg();
+        }
+
+        function addMarkdown (content) {
+          var snip = viewModel.notebooks()[0].addSnippet({type: "text", result: {}}, true);
+          snip.subtype(true);
+          snip.statement_raw(content);
+        }
+
+        function addAce (content, snippetType) {
+          var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
+          snip.statement_raw(content);
+          aceChecks++;
+          snip.checkForAce = window.setInterval(function () {
+            if (snip.ace()) {
+              window.clearInterval(snip.checkForAce);
+              aceChecks--;
+              if (aceChecks == 0) {
+                hideHoverMsg();
+              }
+            }
+          }, 100);
+        }
+
+        function addPySpark (content) {
+          addAce(content, "pyspark");
+        }
+
+        function addSql (content) {
+          addAce(content, "hive");
+        }
+
+        function addScala (content) {
+          addAce(content, "spark");
+        }
+
+        for (var i = 0, f; f = files[i]; i++) {
+          var reader = new FileReader();
+          reader.onload = (function (file) {
+            return function (e) {
+              $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
+              try {
+                var loaded = JSON.parse(e.target.result);
+                if (loaded.cells) { //ipython
+                  loaded.cells.forEach(function (cell, cellCnt) {
+                    window.setTimeout(function () {
+                      if (cell.cell_type == "code") {
+                        addPySpark(cell.source.join("\n"));
+                      }
+                      if (cell.cell_type == "markdown") {
+                        addMarkdown(cell.source.join("\n"));
+                      }
+                      if (cellCnt == loaded.cells.length - 1 && aceChecks == 0){
+                        hideHoverMsg();
+                      }
+                    }, 10);
+                  });
+                }
+
+                if (loaded.paragraphs) { //zeppelin
+                  if (loaded.name) {
+                    viewModel.notebooks()[0].name(loaded.name);
+                  }
+                  loaded.paragraphs.forEach(function (paragraph) {
+                    if (paragraph.text) {
+                      var content = paragraph.text.split("\n");
+                      if (content[0].indexOf("%md") > -1) {
+                        content.shift();
+                        addMarkdown(content.join("\n"));
+                      }
+                      else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
+                        content.shift();
+                        addSql(content.join("\n"));
+                      }
+                      else if (content[0].indexOf("%pyspark") > -1) {
+                        content.shift();
+                        addPySpark(content.join("\n"));
+                      }
+                      else {
+                        if (content[0].indexOf("%spark") > -1){
+                          content.shift();
+                        }
+                        addScala(content.join("\n"));
+                      }
+                    }
+                  });
+                }
+              }
+              catch (e) {
+                hideHoverMsg();
+              }
+            };
+          })(f);
+          reader.readAsText(f);
+        }
       }
-      else {
-        _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
+
+      function handleDragOver (evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        evt.dataTransfer.dropEffect = "copy";
       }
-      if (_dtElement.length == 0) {
-        _dtElement = $("#snippet_" + snippet.id()).find(".table-results");
-      }
-      _dtElement.parents(".snippet-body").find(".toggle-result-settings").css({
-        "height": (_dtElement.height() - 30) + "px",
-        "line-height": (_dtElement.height() - 30) + "px"
+
+      var dropZone = $("body")[0];
+      dropZone.addEventListener("dragenter", showHoverMsg, false);
+      dropZone.addEventListener("dragover", handleDragOver, false);
+      dropZone.addEventListener("drop", handleFileSelect, false);
+
+      var isDraggingOverText = false;
+
+      $(".hoverText").on("dragenter", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        isDraggingOverText = true;
+      });
+
+      $(".hoverText").on("dragleave", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        isDraggingOverText = false;
+      });
+
+      $(".hoverMsg").on("dragleave", function (e) {
+        if (!isDraggingOverText) {
+          hideHoverMsg();
+        }
       });
     }
 
-    $(document).on("renderData", function (e, options) {
-      var _el = $("#snippet_" + options.snippet.id()).find(".resultTable");
-      if (options.data.length > 0) {
+    $(document).ready(function () {
+      viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
+      ko.applyBindings(viewModel);
+      viewModel.init();
+
+      var isAssistAvailable = viewModel.assistAvailable();
+      var wasAssistVisible = viewModel.isLeftPanelVisible();
+
+
+      viewModel.isPlayerMode.subscribe(function (value) {
+        if (value){
+          $(".jHueNotify").hide();
+          viewModel.assistAvailable(false);
+          viewModel.isLeftPanelVisible(false);
+          $(".navigator").hide();
+          $(".add-snippet").hide();
+          $(".main-content").css("top", "50px");
+        }
+        else {
+          viewModel.isLeftPanelVisible(wasAssistVisible);
+          viewModel.assistAvailable(isAssistAvailable);
+          $(".navigator").show();
+          $(".add-snippet").show();
+          $(".main-content").css("top", "70px");
+        }
+      });
+
+      $(document).on("showAuthModal", function (e, data) {
+        viewModel.authSessionUsername('${ user.username }');
+        viewModel.authSessionPassword('');
+        viewModel.authSessionType(data['type']);
+        viewModel.authSessionCallback(data['callback']);
+        $("#authModal").modal("show");
+      });
+
+      // Close the notebook snippets when leaving the page
+      window.onbeforeunload = function (e) {
+        viewModel.selectedNotebook().close();
+      };
+
+      $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
+
+      $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
+        e.preventDefault();
+        viewModel.saveNotebook();
+        return false;
+      });
+
+      $(window).bind("keydown", "ctrl+n alt+n meta+n", function (e) {
+        e.preventDefault();
+        viewModel.selectedNotebook().newSnippet();
+        return false;
+      });
+
+      var initialResizePosition = 100;
+
+      function getDraggableOptions (minY) {
+        return {
+          axis: "y",
+          start: function (e, ui) {
+            initialResizePosition = ui.offset.top;
+          },
+          drag: function (e, ui) {
+            draggableHelper($(this), e, ui);
+            $(".jHueTableExtenderClonedContainer").hide();
+          },
+          stop: function (e, ui) {
+            $(".jHueTableExtenderClonedContainer").show();
+            draggableHelper($(this), e, ui, true);
+            redrawFixedHeaders();
+            ui.helper.first().removeAttr("style");
+          },
+          containment: [0, minY, 4000, minY + 400]
+        }
+      }
+
+      $(".resize-panel a").each(function () {
+        $(this).draggable(getDraggableOptions($(this).parents(".snippet").offset().top + 128));
+      });
+
+      function draggableHelper (el, e, ui, setSize) {
+        var _snippet = ko.dataFor(el.parents(".snippet")[0]);
+        var _cm = $("#snippet_" + _snippet.id()).data("editor");
+        var _newSize = _snippet.codemirrorSize() + (ui.offset.top - initialResizePosition);
+        _cm.setSize("99%", _newSize);
+        if (setSize) {
+          _snippet.codemirrorSize(_newSize);
+        }
+      }
+
+      $(document).on("toggleResultSettings", function (e, snippet) {
         window.setTimeout(function () {
-          var _dt;
-          if (options.initial) {
-            options.snippet.result.meta.notifySubscribers();
-            $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
-            _dt = createDatatable(_el, options.snippet);
-          }
-          else {
-            _dt = _el.dataTable();
-          }
-          _dt.fnAddData(options.data);
+          $("#snippet_" + snippet.id()).find(".chart").trigger("forceUpdate");
+          redrawFixedHeaders();
+        }, 10)
+      });
+
+      $(document).on("editorSizeChanged", function () {
+        window.setTimeout(redrawFixedHeaders, 50);
+      });
+
+      $(document).on("executeStarted", function (e, snippet) {
+        var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+        $("#snippet_" + snippet.id()).find(".progress").animate({
+          height: "4px"
+        }, 100);
+        if (_el.hasClass("dt")) {
+          _el.removeClass("dt");
+          $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
+          _el.dataTable().fnClearTable();
+          _el.dataTable().fnDestroy();
+          _el.find("thead tr").empty();
+        }
+      });
+
+      function resizeToggleResultSettings (snippet) {
+        var _dtElement;
+        if (snippet.showGrid()) {
+          _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
+        }
+        else {
+          _dtElement = $("#snippet_" + snippet.id()).find(".chart:visible");
+        }
+        if (_dtElement.length == 0) {
+          _dtElement = $("#snippet_" + snippet.id()).find(".table-results");
+        }
+        _dtElement.parents(".snippet-body").find(".toggle-result-settings").css({
+          "height": (_dtElement.height() - 30) + "px",
+          "line-height": (_dtElement.height() - 30) + "px"
+        });
+      }
+
+      $(document).on("renderData", function (e, options) {
+        var _el = $("#snippet_" + options.snippet.id()).find(".resultTable");
+        if (options.data.length > 0) {
+          window.setTimeout(function () {
+            var _dt;
+            if (options.initial) {
+              options.snippet.result.meta.notifySubscribers();
+              $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
+              _dt = createDatatable(_el, options.snippet);
+            }
+            else {
+              _dt = _el.dataTable();
+            }
+            _dt.fnAddData(options.data);
+            var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+            _dtElement.animate({opacity: '1'}, 50);
+            _dtElement.scrollTop(_dtElement.data("scrollPosition"));
+            redrawFixedHeaders();
+            resizeToggleResultSettings(options.snippet);
+          }, 300);
+        }
+        else {
           var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
           _dtElement.animate({opacity: '1'}, 50);
-          _dtElement.scrollTop(_dtElement.data("scrollPosition"));
-          redrawFixedHeaders();
-          resizeToggleResultSettings(options.snippet);
-        }, 300);
-      }
-      else {
+          _dtElement.off("scroll");
+        }
+        $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
+      });
+
+      $(document).on("renderDataError", function (e, options) {
         var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
         _dtElement.animate({opacity: '1'}, 50);
         _dtElement.off("scroll");
-      }
-      $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
-    });
-
-    $(document).on("renderDataError", function (e, options) {
-      var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-      _dtElement.animate({opacity: '1'}, 50);
-      _dtElement.off("scroll");
-    });
-
-    $(document).on("progress", function (e, options) {
-      if (options.data == 100) {
-        window.setTimeout(function () {
-          $("#snippet_" + options.snippet.id()).find(".progress").animate({
-            height: "0"
-          }, 100, function () {
-            options.snippet.progress(0);
-            redrawFixedHeaders();
-          });
-        }, 2000);
-      }
-    });
-
-    $(document).on("gridShown", function (e, snippet) {
-      window.setTimeout(function () {
-        resizeToggleResultSettings(snippet);
-      }, 50);
-    });
-
-    $(document).on("chartShown", function (e, snippet) {
-      window.setTimeout(function () {
-        resizeToggleResultSettings(snippet);
-      }, 50);
-    });
-
-    $(document).on("forceChartDraw", function (e, snippet) {
-      window.setTimeout(function () {
-        snippet.chartX.notifySubscribers();
-        snippet.chartX.valueHasMutated();
-      }, 100);
-    });
-
-    $(document).on("refreshCodeMirror", function (e, snippet) {
-      window.setTimeout(function () {
-        $("#snippet_" + snippet.id()).find(".CodeMirror").each(function () {
-          $(this)[0].CodeMirror.refresh();
-        });
-      }, 100);
-    });
-
-    var hideTimeout = -1;
-    $(document).on("hideAutocomplete", function () {
-      window.clearTimeout(hideTimeout);
-      hideTimeout = window.setTimeout(function () {
-        $aceAutocomplete = $(".ace_editor.ace_autocomplete");
-        if ($aceAutocomplete.is(":visible")) {
-          $aceAutocomplete.hide();
-        }
-      }, 100);
-    });
-
-    function forceChartDraws() {
-      viewModel.notebooks().forEach(function (notebook) {
-        notebook.snippets().forEach(function (snippet) {
-          if (snippet.result.data().length > 0) {
-            var _elCheckerInterval = -1;
-            _elCheckerInterval = window.setInterval(function () {
-              var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-              if ($("#snippet_" + snippet.id()).find(".resultTable").length > 0) {
-                try {
-                  var _dt = createDatatable(_el, snippet);
-                  _dt.fnClearTable();
-                  _dt.fnAddData(snippet.result.data());
-                  resizeToggleResultSettings(snippet);
-                  $(document).trigger("forceChartDraw", snippet);
-                  window.clearInterval(_elCheckerInterval);
-                }
-                catch (e) {
-                }
-              }
-            }, 200)
-          }
-        });
       });
-    }
 
-    forceChartDraws();
+      $(document).on("progress", function (e, options) {
+        if (options.data == 100) {
+          window.setTimeout(function () {
+            $("#snippet_" + options.snippet.id()).find(".progress").animate({
+              height: "0"
+            }, 100, function () {
+              options.snippet.progress(0);
+              redrawFixedHeaders();
+            });
+          }, 2000);
+        }
+      });
 
-    $(".CodeMirror").each(function () {
-      $(this)[0].CodeMirror.refresh();
-    });
+      $(document).on("gridShown", function (e, snippet) {
+        window.setTimeout(function () {
+          resizeToggleResultSettings(snippet);
+        }, 50);
+      });
 
-    var _resizeTimeout = -1;
-    $(window).on("resize", function () {
-      window.clearTimeout(_resizeTimeout);
-      _resizeTimeout = window.setTimeout(function () {
-        forceChartDraws();
-      }, 200);
+      $(document).on("chartShown", function (e, snippet) {
+        window.setTimeout(function () {
+          resizeToggleResultSettings(snippet);
+        }, 50);
+      });
+
+      $(document).on("forceChartDraw", function (e, snippet) {
+        window.setTimeout(function () {
+          snippet.chartX.notifySubscribers();
+          snippet.chartX.valueHasMutated();
+        }, 100);
+      });
+
+      $(document).on("refreshCodeMirror", function (e, snippet) {
+        window.setTimeout(function () {
+          $("#snippet_" + snippet.id()).find(".CodeMirror").each(function () {
+            $(this)[0].CodeMirror.refresh();
+          });
+        }, 100);
+      });
+
+      var hideTimeout = -1;
+      $(document).on("hideAutocomplete", function () {
+        window.clearTimeout(hideTimeout);
+        hideTimeout = window.setTimeout(function () {
+          $aceAutocomplete = $(".ace_editor.ace_autocomplete");
+          if ($aceAutocomplete.is(":visible")) {
+            $aceAutocomplete.hide();
+          }
+        }, 100);
+      });
+
+      function forceChartDraws() {
+        viewModel.notebooks().forEach(function (notebook) {
+          notebook.snippets().forEach(function (snippet) {
+            if (snippet.result.data().length > 0) {
+              var _elCheckerInterval = -1;
+              _elCheckerInterval = window.setInterval(function () {
+                var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+                if ($("#snippet_" + snippet.id()).find(".resultTable").length > 0) {
+                  try {
+                    var _dt = createDatatable(_el, snippet);
+                    _dt.fnClearTable();
+                    _dt.fnAddData(snippet.result.data());
+                    resizeToggleResultSettings(snippet);
+                    $(document).trigger("forceChartDraw", snippet);
+                    window.clearInterval(_elCheckerInterval);
+                  }
+                  catch (e) {
+                  }
+                }
+              }, 200)
+            }
+          });
+        });
+      }
+
+      forceChartDraws();
+
+      $(".CodeMirror").each(function () {
+        $(this)[0].CodeMirror.refresh();
+      });
+
+      var _resizeTimeout = -1;
+      $(window).on("resize", function () {
+        window.clearTimeout(_resizeTimeout);
+        _resizeTimeout = window.setTimeout(function () {
+          forceChartDraws();
+        }, 200);
+      });
     });
   });
 
-
-  function downloadResult(snippet, format) {
+  function downloadResult (snippet, format) {
     $('#snippet_' + snippet.id()).find('.download-format').val(format);
     $('#snippet_' + snippet.id()).find('input[name=\'notebook\']').val(ko.mapping.toJSON(viewModel.selectedNotebook().getContext()));
     $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
     $('#snippet_' + snippet.id()).find('.download-form').submit();
   }
-
-  var vmOptions = ${ options_json | n,unicode };
-  vmOptions.user = '${user.username}';
-  vmOptions.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
-  vmOptions.snippetViewSettings = SNIPPET_VIEW_SETTINGS;
-
-  viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, vmOptions);
-  ko.applyBindings(viewModel);
-  viewModel.init();
-
-  var isAssistAvailable = viewModel.assistAvailable();
-  var wasAssistVisible = viewModel.isLeftPanelVisible();
-
-
-  viewModel.isPlayerMode.subscribe(function(value) {
-    if (value){
-      $(".jHueNotify").hide();
-      viewModel.assistAvailable(false);
-      viewModel.isLeftPanelVisible(false);
-      $(".navigator").hide();
-      $(".add-snippet").hide();
-      $(".main-content").css("top", "50px");
-    }
-    else {
-      viewModel.isLeftPanelVisible(wasAssistVisible);
-      viewModel.assistAvailable(isAssistAvailable);
-      $(".navigator").show();
-      $(".add-snippet").show();
-      $(".main-content").css("top", "70px");
-    }
-  });
-
-  $(document).on("showAuthModal", function(e, data) {
-    viewModel.authSessionUsername('${ user.username }');
-    viewModel.authSessionPassword('');
-    viewModel.authSessionType(data['type']);
-    viewModel.authSessionCallback(data['callback']);
-    $("#authModal").modal("show");
-  });
 </script>
 </%def>
