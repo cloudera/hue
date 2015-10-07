@@ -44,7 +44,7 @@
           % endfor
 
           <div class="control-group"
-            % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+            % if form['name'].form.initial.get('name').startswith('oozie.'):
                 style="display: none"
             % endif
           >
