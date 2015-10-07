@@ -481,6 +481,8 @@ class Collection2(object):
         'to': 'NOW',
         'truncate': True
       }
+    if 'suggest' not in props['collection']:
+      props['collection']['suggest'] = {'enabled': False, 'dictionary': ''}
 
     for facet in props['collection']['facets']:
       properties = facet['properties']

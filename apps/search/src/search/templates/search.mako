@@ -1736,6 +1736,14 @@ ${ dashboard.layout_skeleton() }
               </div>
             </div>
           </fieldset>
+            <div class="control-group">
+              <label class="control-label" for="settingsdescription">${ _('Autocomplete') }</label>
+              <div class="controls">
+                <input type="checkbox" data-bind="checked: $root.collection.suggest.enabled" style="margin-bottom: 0" />
+                <input type="text" class="input-xlarge" data-bind="value: $root.collection.suggest.dictionary" style="margin-bottom: 0" placeholder="${ _('Dictionary name or blank for default') }" />
+              </div>
+            </div>
+          </fieldset>
         </form>
       </div>
     </div>
