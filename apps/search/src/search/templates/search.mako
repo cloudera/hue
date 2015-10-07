@@ -96,7 +96,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
@@ -1727,6 +1727,14 @@ ${ dashboard.layout_skeleton() }
                 <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
               </div>
             </div>
+            <div class="control-group">
+              <label class="control-label">${ _('Autocomplete') }</label>
+              <div class="controls">
+                <label class="checkbox" style="padding-top:0">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled"> ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="value: $root.collection.suggest.dictionary" placeholder="${ _('Dictionary name or blank for default') }">
+                </label>
+              </div>
+            </div>
           </fieldset>
         </form>
       </div>
@@ -2368,6 +2376,27 @@ function resizeFieldsList() {
       $(".fields-list").css("max-height", _fillHeight);
     }
   }, 100);
+}
+
+function queryTypeahead(query, process) {
+  var _source = viewModel.collection.template.fieldsNames();
+  _source = _source.concat("AND OR TO".split(" "))
+
+  if (viewModel.collection.suggest.enabled()) {
+    viewModel.suggest(query, function (data) {
+      var _tmp = [];
+      if (typeof data != "undefined" && data.response && data.response.suggest && data.response.suggest[viewModel.collection.suggest.dictionary()]) {
+        var suggestions = data.response.suggest[viewModel.collection.suggest.dictionary()][query].suggestions;
+        suggestions.forEach(function (sugg) {
+          _tmp.push(sugg.term + "<i class='muted fa fa-search'></i>");
+        });
+      }
+      process(_tmp.concat(_source));
+    });
+  }
+  else {
+    return _source;
+  }
 }
 
 $(document).ready(function () {

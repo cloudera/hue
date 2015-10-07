@@ -263,13 +263,18 @@ def admin_collection_copy(request):
   return JsonResponse(response)
 
 
-def query_suggest(request, collection_id, query=""):
-  hue_collection = Collection.objects.get(id=collection_id)
-  result = {'status': -1, 'message': 'Error'}
+def query_suggest(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = request.POST.get('query', '')
+
+  result = {'status': -1, 'message': ''}
 
   solr_query = {}
-  solr_query['collection'] = hue_collection.name
   solr_query['q'] = query
+  solr_query['dictionary'] = collection['suggest']['dictionary']
 
   try:
     response = SolrApi(SOLR_URL.get(), request.user).suggest(solr_query, hue_collection)
