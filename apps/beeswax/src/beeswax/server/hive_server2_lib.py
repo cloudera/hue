@@ -557,6 +557,7 @@ class HiveServerClient:
       raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
 
     sessionId = res.sessionHandle.sessionId
+    LOG.info('Session %s opened' % repr(sessionId.guid))
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
