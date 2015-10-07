@@ -20,9 +20,9 @@ package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
 
-import com.cloudera.hue.livy.sessions.{Success, Running, State}
+import com.cloudera.hue.livy.sessions.{Error, Success, Running, State}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
-import com.cloudera.hue.livy.{LivyConf, LineBufferedProcess}
+import com.cloudera.hue.livy.{Utils, LivyConf, LineBufferedProcess}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
 
 import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
@@ -58,24 +58,12 @@ object BatchSessionProcess {
 }
 
 private class BatchSessionProcess(val id: Int,
-                           process: LineBufferedProcess) extends BatchSession {
+                                  process: LineBufferedProcess) extends BatchSession {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  private[this] var isAlive = true
+  private[this] var _state: State = Running()
 
-  override def state: State = {
-    if (isAlive) {
-      try {
-        process.exitValue()
-      } catch {
-        case e: IllegalThreadStateException => return Running()
-      }
-
-      destroyProcess()
-    }
-
-    Success()
-  }
+  override def state: State = _state
 
   override def logLines(): IndexedSeq[String] = process.inputLines
 
@@ -86,8 +74,28 @@ private class BatchSessionProcess(val id: Int,
   }
 
   private def destroyProcess() = {
-    process.destroy()
-    process.waitFor()
-    isAlive = false
+    if (process.isAlive) {
+      process.destroy()
+      reapProcess(process.waitFor())
+    }
   }
+
+  private def reapProcess(exitCode: Int) = synchronized {
+    if (_state.isActive) {
+      if (exitCode == 0) {
+        _state = Success()
+      } else {
+        _state = Error()
+      }
+    }
+  }
+
+  /** Simple daemon thread to make sure we change state when the process exits. */
+  private[this] val thread = new Thread("Batch Process Reaper") {
+    override def run(): Unit = {
+      reapProcess(process.waitFor())
+    }
+  }
+  thread.setDaemon(true)
+  thread.start()
 }

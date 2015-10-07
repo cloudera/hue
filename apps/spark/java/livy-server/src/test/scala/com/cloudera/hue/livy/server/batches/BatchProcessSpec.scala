@@ -56,9 +56,11 @@ class BatchProcessSpec
       )
       val batch = BatchSessionProcess(new LivyConf(), 0, req)
 
-      Utils.waitUntil({ () =>
-        batch.state == Success()
-      }, Duration(10, TimeUnit.SECONDS))
+      Utils.waitUntil({ () => !batch.state.isActive }, Duration(10, TimeUnit.SECONDS))
+      (batch.state match {
+        case Success(_) => true
+        case _ => false
+      }) should be (true)
 
       batch.logLines() should contain("hello world")
     }

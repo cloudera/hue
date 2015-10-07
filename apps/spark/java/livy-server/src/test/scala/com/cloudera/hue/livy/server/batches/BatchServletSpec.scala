@@ -92,9 +92,11 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
       // Wait for the process to finish.
       {
         val batch: BatchSession = batchManager.get(0).get
-        Utils.waitUntil({ () =>
-          batch.state == Success()
-        }, Duration(10, TimeUnit.SECONDS))
+        Utils.waitUntil({ () => !batch.state.isActive }, Duration(10, TimeUnit.SECONDS))
+        (batch.state match {
+          case Success(_) => true
+          case _ => false
+        }) should be (true)
       }
 
       get("/0") {

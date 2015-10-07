@@ -78,7 +78,9 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
   private var _jobThread: Thread = _
 
   jobFuture.onComplete {
-    case util.Failure(_) => _state = Error()
+    case util.Failure(_) =>
+      _state = Error(System.currentTimeMillis())
+
     case util.Success(job) =>
       _state = Running()
 
@@ -90,9 +92,9 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
               Thread.sleep(5000)
               job.getStatus match {
                 case Client.SuccessfulFinish() =>
-                  _state = Success()
+                  _state = Success(System.currentTimeMillis())
                 case Client.UnsuccessfulFinish() =>
-                  _state = Error()
+                  _state = Error(System.currentTimeMillis())
                 case _ => aux()
               }
             }
@@ -110,7 +112,7 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
   override def stop(): Future[Unit] = {
     jobFuture.map { job =>
       job.stop()
-      _state = Success()
+      _state = Success(System.currentTimeMillis())
       ()
     }
   }

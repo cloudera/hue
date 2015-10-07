@@ -93,7 +93,10 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
       session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("import os; os._exit(1)"))
       val result = Await.result(stmt.output(), Duration.Inf)
-      session.state should equal (Error())
+      (session.state match {
+        case Error(_) => true
+        case _ => false
+      }) should equal (true)
     }
   }
 }

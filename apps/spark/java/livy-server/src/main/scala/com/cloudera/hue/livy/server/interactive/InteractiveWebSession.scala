@@ -181,7 +181,7 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
             waitForStateChange(ShuttingDown(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case Error() | Dead() | Success() =>
+        case Error(_) | Dead(_) | Success(_) =>
           Future.successful(Unit)
       }
     }
