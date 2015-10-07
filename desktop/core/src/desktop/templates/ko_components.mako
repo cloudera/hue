@@ -154,7 +154,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entries">
-    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistPanel.repositionActions }">
+    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistSource.repositionActions }">
       <li data-bind="css: { 'assist-table reveals-actions-2nd': definition.isTable, 'assist-column reveals-actions-3rd': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
@@ -167,49 +167,62 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-template">
+    <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
+      <li class="nav-header">
+        ${_('source')}
+      </li>
+      <li>
+        <select data-bind="options: availableSourceTypes, select2: { width: '100%', placeholder: '${ _ko("Choose a source...") }', update: selectedSourceType }" class="input-medium" data-placeholder="${_('Choose a source...')}"></select>
+      </li>
+
+      <!-- ko with: selectedSource -->
+      <!-- ko template: { name: "assist-type-template" } --><!-- /ko -->
+      <!-- /ko -->
+    </ul>
+  </script>
+
+  <script type="text/html" id="assist-type-template">
     <div class="reveals-actions" style="position: relative; width:100%">
-      <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
-        <li class="nav-header">
-          ${_('database')}
-          <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
-            <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
-          </div>
+      <li class="nav-header">
+        ${_('database')}
+        <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
+          <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
+        </div>
+      </li>
+
+      <li data-bind="visible: ! hasErrors() && ! loadingDatabases()" >
+        <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+      </li>
+
+      <li class="center" data-bind="visible: loadingDatabases" >
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      </li>
+
+      <li data-bind="visible: hasErrors">
+        <span>${ _('The database list cannot be loaded.') }</span>
+      </li>
+
+      <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases() && ! hasErrors()">
+        ${_('tables')}
+        <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
+          <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+        </div>
+      </li>
+
+      <!-- ko if: selectedDatabase() != null -->
+        <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
+          <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
         </li>
 
-        <li data-bind="visible: ! hasErrors() && ! loadingDatabases()" >
-          <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
-        </li>
-
-        <li class="center" data-bind="visible: loadingDatabases" >
+      <div class="table-container">
+        <div class="center" data-bind="visible: selectedDatabase() != null && selectedDatabase().loading()">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </li>
-
-        <li data-bind="visible: hasErrors">
-          <span>${ _('The database list cannot be loaded.') }</span>
-        </li>
-
-        <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases() && ! hasErrors()">
-          ${_('tables')}
-          <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
-            <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
-          </div>
-        </li>
-
-        <!-- ko if: selectedDatabase() != null -->
-          <li data-bind="slideVisible: selectedDatabase() != null && selectedDatabase().hasEntries() && options.isSearchVisible()">
-            <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
-          </li>
-
-        <div class="table-container">
-          <div class="center" data-bind="visible: selectedDatabase() != null && selectedDatabase().loading()">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-          </div>
-          <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
-          </div>
-        <!-- /ko -->
-      </ul>
+        </div>
+        <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
+        </div>
+      <!-- /ko -->
     </div>
 
     <div id="assistQuickLook" class="modal hide fade">
@@ -248,22 +261,22 @@ from desktop.views import _ko
       </h3>
       <div class="popover-content">
         <div class="alert" style="text-align: left; display:none" data-bind="visible: hasError">${ _('There is no analysis available') }</div>
-        <!-- ko if: isComplexType && assistHelper.app == 'impala' -->
+        <!-- ko if: isComplexType && snippet.type() == 'impala' -->
         <div class="alert" style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
         <!-- /ko -->
-        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && assistHelper.app == 'impala'), name: 'assist-panel-table-stats' } --><!-- /ko -->
-        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && assistHelper.app == 'impala'), name: 'assist-panel-column-stats' } --><!-- /ko -->
+        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && snippet.type() == 'impala'), name: 'assist-panel-table-stats' } --><!-- /ko -->
+        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && snippet.type() == 'impala'), name: 'assist-panel-column-stats' } --><!-- /ko -->
       </div>
     </div>
   </script>
 
   <script type="text/javascript" charset="utf-8">
     (function() {
-      function AssistEntry (definition, parent, assistPanel, filter) {
+      function AssistEntry (definition, parent, assistSource, filter) {
         var self = this;
         self.definition = definition;
 
-        self.assistPanel = assistPanel;
+        self.assistSource = assistSource;
         self.parent = parent;
         self.filter = filter;
 
@@ -309,7 +322,7 @@ from desktop.views import _ko
 
         // Defer this part to allow ko to react on empty entries and loading
         window.setTimeout(function() {
-          self.assistPanel.assistHelper.fetchPanelData(self.getHierarchy(), function(data) {
+          self.assistSource.assistHelper.fetchPanelData(self.assistSource.snippet, self.getHierarchy(), function(data) {
             if (typeof data.tables !== "undefined") {
               self.entries($.map(data.tables, function(tableName) {
                 return self.createEntry({
@@ -390,7 +403,7 @@ from desktop.views import _ko
             }
             self.loading(false);
           }, function() {
-            self.assistPanel.hasErrors(true);
+            self.assistSource.hasErrors(true);
             self.loading(false);
           });
         }, 10);
@@ -398,7 +411,7 @@ from desktop.views import _ko
 
       AssistEntry.prototype.createEntry = function(definition) {
         var self = this;
-        return new AssistEntry(definition, self, self.assistPanel, null)
+        return new AssistEntry(definition, self, self.assistSource, null)
       };
 
       AssistEntry.prototype.getHierarchy = function () {
@@ -454,11 +467,11 @@ from desktop.views import _ko
         var tableName = hierarchy[1];
 
         $assistQuickLook.find(".tableName").text(self.definition.name);
-        $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + self.assistPanel.assistHelper.activeDatabase() + "/" + tableName);
+        $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + self.assistSource.assistHelper.activeDatabase() + "/" + tableName);
         $assistQuickLook.find(".sample").empty("");
         $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
-        self.assistPanel.assistHelper.fetchTableHtmlPreview(tableName, function(data) {
+        self.assistSource.assistHelper.fetchTableHtmlPreview(self.snippet, tableName, function(data) {
           $assistQuickLook.find(".loader").hide();
           $assistQuickLook.find(".sample").html(data);
         }, function(e) {
@@ -476,7 +489,7 @@ from desktop.views import _ko
 
         if (self.statsVisible()) {
           self.statsVisible(false);
-          self.assistPanel.analysisStats(null);
+          self.assistSource.analysisStats(null);
           return;
         }
 
@@ -486,21 +499,22 @@ from desktop.views import _ko
         var columnName = hierarchy.length == 3 ? hierarchy[2] : null;
 
         self.statsVisible(true);
-        self.assistPanel.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistPanel.assistHelper, self.definition.type));
+        self.assistSource.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistSource.assistHelper, self.definition.type));
 
-        var catchChange = self.assistPanel.analysisStats.subscribe(function(newValue) {
+        var catchChange = self.assistSource.analysisStats.subscribe(function(newValue) {
           if (newValue === null || newValue.database !== databaseName || newValue.table !== tableName || newValue.column !== columnName) {
             self.statsVisible(false);
             catchChange.dispose();
           }
         });
         $("#tableAnalysis").data("targetElement", $(event.target));
-        window.setTimeout(self.assistPanel.refreshPosition, 20);
+        window.setTimeout(self.assistSource.refreshPosition, 20);
       };
 
-      function TableStats (database, table, column, assistHelper, type) {
+      function TableStats (snippet, database, table, column, assistHelper, type) {
         var self = this;
 
+        self.snippet = snippet;
         self.database = database;
         self.table = table;
         self.column = column;
@@ -535,7 +549,7 @@ from desktop.views import _ko
         var self = this;
         self.loading(true);
         self.hasError(false);
-        self.assistHelper.fetchStats(self.table, self.column != null ? self.column : null, function (data) {
+        self.assistHelper.fetchStats(self.snippet, self.table, self.column != null ? self.column : null, function (data) {
           if (data && data.status == 0) {
             self.statRows(data.stats);
             var inaccurate = true;
@@ -572,7 +586,7 @@ from desktop.views import _ko
         var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
         self.refreshing(true);
 
-        self.assistHelper.refreshTableStats(self.table, self.column, function() {
+        self.assistHelper.refreshTableStats(self.snippet, self.table, self.column, function() {
           self.refreshing(false);
           self.fetchData();
           if (shouldFetchTerms) {
@@ -586,12 +600,12 @@ from desktop.views import _ko
 
       TableStats.prototype.fetchTerms = function () {
         var self = this;
-        if (self.column == null || (self.isComplexType && self.assistHelper.app == "impala")) {
+        if (self.column == null || (self.isComplexType && self.snippet.type() == "impala")) {
           return;
         }
 
         self.loadingTerms(true);
-        self.assistHelper.fetchTerms(self.table, self.column, self.prefixFilter(), function (data) {
+        self.assistHelper.fetchTerms(self.snippet, self.table, self.column, self.prefixFilter(), function (data) {
           if (data && data.status == 0) {
             self.terms($.map(data.terms, function (term) {
               return {
@@ -615,7 +629,37 @@ from desktop.views import _ko
       };
 
       function AssistPanel(params) {
+        var notebookViewModel = params.notebookViewModel;
+        var notebook = notebookViewModel.selectedNotebook();
+
+        self.sourceIndex = {};
+        $.each(notebookViewModel.availableSnippets(), function (index, snippet) {
+          var settings = notebookViewModel.getSnippetViewSettings(snippet.type());
+          var fakeSnippet = new Snippet(notebookViewModel, notebook, {
+            type: snippet.type(),
+            result: {}
+          });
+          if (settings.sqlDialect) {
+            self.sourceIndex[snippet.name()] = new AssistSource(fakeSnippet);
+          }
+        });
+
+        self.availableSourceTypes = Object.keys(self.sourceIndex);
+
+        self.selectedSourceType = ko.observable();
+        self.selectedSource = ko.observable();
+
+        self.selectedSourceType.subscribe(function (newSourceType) {
+          self.selectedSource(self.sourceIndex[newSourceType]);
+        });
+
+        self.selectedSourceType(self.availableSourceTypes[0]);
+      }
+
+      function AssistSource(snippet) {
         var self = this;
+        self.snippet = snippet;
+        self.assistHelper = snippet.getAssistHelper();
 
         self.hasErrors = ko.observable(false);
         self.simpleStyles = ko.observable(false);
@@ -629,18 +673,15 @@ from desktop.views import _ko
         self.options = ko.mapping.fromJS($.extend({
           isSearchVisible: false,
           lastSelectedDb: null
-        }, $.totalStorage(params.appName + ".assist.options") || {}));
+        }, $.totalStorage(snippet.type() + ".assist.options") || {}));
 
         $.each(Object.keys(self.options), function (index, key) {
           if (ko.isObservable(self.options[key])) {
             self.options[key].subscribe(function() {
-              $.totalStorage(params.appName + ".assist.options", ko.mapping.toJS(self.options))
+              $.totalStorage(snippet.type() + ".assist.options", ko.mapping.toJS(self.options))
             });
           }
         });
-
-        self.assistHelper = params.assistHelper;
-        self.app = self.assistHelper.options.app;
 
         self.databases = ko.observableArray();
         self.selectedDatabase = ko.observable();
@@ -652,7 +693,7 @@ from desktop.views import _ko
           return typeof self.selectedDatabase() != "undefined" && self.selectedDatabase() !== null && self.selectedDatabase().loading();
         });
 
-        self.selectedDatabase.subscribe(function(newValue) {
+        self.selectedDatabase.subscribe(function (newValue) {
           if (newValue != null && !newValue.hasEntries() && !newValue.loading()) {
               newValue.loadEntries()
           }
@@ -719,7 +760,7 @@ from desktop.views import _ko
         };
       }
 
-      AssistPanel.prototype.setDatabase = function(name) {
+      AssistSource.prototype.setDatabase = function(name) {
         var self = this;
         if (name == null) {
           return;
@@ -731,26 +772,26 @@ from desktop.views import _ko
         }));
       };
 
-      AssistPanel.prototype.toggleSearch = function () {
+      AssistSource.prototype.toggleSearch = function () {
         var self = this;
         self.options.isSearchVisible(!self.options.isSearchVisible());
       };
 
-      AssistPanel.prototype.reloadAssist = function() {
+      AssistSource.prototype.reloadAssist = function() {
         var self = this;
         self.reloading(true);
         self.loadingDatabases(true);
         self.selectedDatabase(null);
-        self.assistHelper.clearCache();
+        self.assistHelper.clearCache(self.snippet);
         self.fetchDatabases(function() {
           self.setDatabase(self.options.lastSelectedDb());
         });
       };
 
-      AssistPanel.prototype.fetchDatabases = function(callback) {
+      AssistSource.prototype.fetchDatabases = function(callback) {
         var self = this;
 
-        self.assistHelper.fetchDatabases(function(data) {
+        self.assistHelper.fetchDatabases(self.snippet, function(data) {
           self.databases($.map(data.databases, function(databaseName) {
             return new AssistEntry({
               name: databaseName,
@@ -767,7 +808,9 @@ from desktop.views import _ko
             callback();
           }
         }, function(message) {
-          if (message) {
+          if (message.statusText) {
+            $(document).trigger("error", "${ _('There was a problem loading the databases') }: " + message.statusText);
+          } else if (message) {
             $(document).trigger("error", message);
           } else {
             $(document).trigger("error", "${ _('There was a problem loading the databases.') }");
