@@ -21,15 +21,13 @@ var NOTEBOOK_API_PREFIX = "/notebook/api/autocomplete/";
  * @param options {object}
  * @param options.notebook
  * @param options.user
+ * @param options.activeDatabase
  *
  * @constructor
  */
 function AssistHelper (options) {
   var self = this;
-  self.activeDatabase = ko.observable();
-  if (typeof options.db !== "undefined") {
-    self.activeDatabase(options.db)
-  }
+  self.activeDatabase = ko.observable(options.activeDatabase);
   self.notebook = options.notebook;
   self.user = options.user;
   self.availableDatabases = ko.observableArray();

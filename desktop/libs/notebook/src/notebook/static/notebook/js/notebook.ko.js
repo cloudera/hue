@@ -680,6 +680,7 @@ var Notebook = function (vm, notebook) {
     }
   });
 
+  self.selectedDatabases = notebook.selectedDatabases != "undefined" && notebook.selectedDatabases != null ? notebook.selectedDatabases : {};
   self.assistHelpers = {};
 
   self.getAssistHelper = function (snippetType) {
@@ -687,7 +688,12 @@ var Notebook = function (vm, notebook) {
       self.assistHelpers[snippetType] = new AssistHelper({
         notebook: self,
         user: vm.user,
+        activeDatabase: self.selectedDatabases[snippetType]
       });
+
+      self.assistHelpers[snippetType].activeDatabase.subscribe(function (newActiveDatabase) {
+        self.selectedDatabases[snippetType] = newActiveDatabase;
+      })
     }
     return self.assistHelpers[snippetType]
   };
