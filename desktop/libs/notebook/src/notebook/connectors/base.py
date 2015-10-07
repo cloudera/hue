@@ -93,8 +93,8 @@ def get_api(user, snippet, fs, jt):
   interpreter = [interpreter for interpreter in get_interpreters() if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
-  interface = interpreter[0]['interface']
-  options = interpreter[0]['options']
+  interpreter = interpreter[0]
+  interface = interpreter['interface']
 
   if interface == 'hiveserver2':
     return HS2Api(user)
@@ -107,7 +107,7 @@ def get_api(user, snippet, fs, jt):
   elif interface == 'mysql':
     return MySqlApi(user)
   elif interface == 'jdbc':
-    return JdbcApi(user, options=options)
+    return JdbcApi(user, interpreter=interpreter)
   elif interface == 'pig':
     return PigApi(user, fs=fs, jt=jt)
   else:
@@ -122,11 +122,11 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, fs=None, jt=None, options=None):
+  def __init__(self, user, fs=None, jt=None, interpreter=None):
     self.user = user
     self.fs = fs
     self.jt = jt
-    self.options = options
+    self.interpreter = interpreter
 
   def create_session(self, lang, properties=None):
     return {
