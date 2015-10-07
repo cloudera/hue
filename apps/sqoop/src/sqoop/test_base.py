@@ -27,6 +27,7 @@ from django.conf import settings
 from nose.plugins.skip import SkipTest
 
 from desktop.lib.paths import get_run_root
+from desktop.lib.rest.http_client import RestException
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
@@ -122,66 +123,67 @@ class SqoopServerProvider(object):
   def get_shared_server(cls, username='sqoop', language=settings.LANGUAGE_CODE):
     callback = lambda: None
 
-    service_lock.acquire()
+    with service_lock:
+      if not SqoopServerProvider.is_running:
+        # Setup
+        cluster = pseudo_hdfs4.shared_cluster()
 
-    if not SqoopServerProvider.is_running:
-      # Setup
-      cluster = pseudo_hdfs4.shared_cluster()
+        if is_live_cluster():
+          finish = ()
+        else:
+          LOG.info('\nStarting a Mini Sqoop. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
 
-      if is_live_cluster():
-        finish = ()
-      else:
-        LOG.info('\nStarting a Mini Sqoop. Requires "tools/jenkins/jenkins.sh" to be previously ran.\n')
+          finish = (
+            SERVER_URL.set_for_testing("http://%s:%s/sqoop" % (socket.getfqdn(), SqoopServerProvider.TEST_PORT)),
+          )
 
-        finish = (
-          SERVER_URL.set_for_testing("http://%s:%s/sqoop" % (socket.getfqdn(), SqoopServerProvider.TEST_PORT)),
-        )
+          p = cls.start(cluster)
 
-        p = cls.start(cluster)
+          def kill():
+            with open(os.path.join(cluster._tmpdir, 'sqoop/sqoop.pid'), 'r') as pidfile:
+              pid = pidfile.read()
+              LOG.info("Killing Sqoop server (pid %s)." % pid)
+              os.kill(int(pid), 9)
+              p.wait()
+          atexit.register(kill)
 
-        def kill():
-          with open(os.path.join(cluster._tmpdir, 'sqoop/sqoop.pid'), 'r') as pidfile:
-            pid = pidfile.read()
-            LOG.info("Killing Sqoop server (pid %s)." % pid)
-            os.kill(int(pid), 9)
-            p.wait()
-        atexit.register(kill)
+        start = time.time()
+        started = False
+        sleep = 0.01
 
-      start = time.time()
-      started = False
-      sleep = 0.01
+        client = SqoopClient(SERVER_URL.get(), username, language)
 
-      client = SqoopClient(SERVER_URL.get(), username, language)
-
-      while not started and time.time() - start < 60.0:
-        try:
+        while not started and time.time() - start < 60.0:
           LOG.info('Check Sqoop status...')
-          version = client.get_version()
-          if version:
-            started = True
-            break
+          try:
+            version = client.get_version()
+          except RestException, e:
+            LOG.exception('Exception fetching the Sqoop server version')
+
+            # Don't loop if we had an authentication error.
+            if e.code == 401:
+              raise
+          except Exception, e:
+            LOG.info('Sqoop server not started yet: %s' % e)
+          else:
+            if version:
+              started = True
+              break
+
           time.sleep(sleep)
           sleep *= 2
-        except Exception, e:
-          LOG.info('Sqoop server not started yet: %s' % e)
-          time.sleep(sleep)
-          sleep *= 2
-          pass
 
-      if not started:
-        service_lock.release()
-        raise Exception("Sqoop server took too long to come up.")
+        if not started:
+          raise Exception("Sqoop server took too long to come up.")
 
-      def shutdown():
-        for f in finish:
-          f()
-        cluster.stop()
-      callback = shutdown
+        def shutdown():
+          for f in finish:
+            f()
+          cluster.stop()
+        callback = shutdown
 
-      SqoopServerProvider.is_running = True
-    else:
-      client = SqoopClient(SERVER_URL.get(), username, language)
+        SqoopServerProvider.is_running = True
+      else:
+        client = SqoopClient(SERVER_URL.get(), username, language)
 
-    service_lock.release()
-
-    return client, callback
+      return client, callback
