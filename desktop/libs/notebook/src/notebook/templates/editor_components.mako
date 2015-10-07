@@ -263,7 +263,10 @@ from desktop.views import _ko
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { wasAssistVisible = false; $root.isLeftPanelVisible(false) }">
       <i class="fa fa-chevron-left"></i>
     </a>
-    <div class="assist" data-bind="component: { name: 'assist-panel', params: { assistHelper: assistHelper, appName: 'notebook'  }}"></div>
+    <div class="assist" data-bind="component: {
+        name: 'assist-panel',
+        params: { notebookViewModel: $root }
+      }"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
@@ -466,7 +469,6 @@ from desktop.views import _ko
     <div class="editor span12" data-bind="verticalSlide: codeVisible">
       <div class="ace-editor" data-bind="attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
-          assistHelper: assistHelper,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
           }"></div>
       </div>
@@ -1818,13 +1820,8 @@ from desktop.views import _ko
     $('#snippet_' + snippet.id()).find('.download-form').submit();
   }
 
-  var assistHelper = new AssistHelper({
-    app: 'beeswax',
-    user: '${user}'
-  });
-
   var vmOptions = ${ options_json | n,unicode };
-  vmOptions.assistHelper = assistHelper;
+  vmOptions.user = '${user}';
   vmOptions.assistAvailable = "${ autocomplete_base_url | n,unicode }" !== "";
   vmOptions.snippetViewSettings = SNIPPET_VIEW_SETTINGS;
 
