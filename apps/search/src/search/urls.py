@@ -29,7 +29,7 @@ urlpatterns = patterns('search.views',
 
   # Ajax
   # Search
-  url(r'^suggest/(?P<collection_id>\w+)/(?P<query>\w+)?$', 'query_suggest', name='query_suggest'),
+  url(r'^suggest/$', 'query_suggest', name='query_suggest'),
   url(r'^index/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
   url(r'^template/new_facet$', 'new_facet', name='new_facet'),
   url(r'^get_document$', 'get_document', name='get_document'),

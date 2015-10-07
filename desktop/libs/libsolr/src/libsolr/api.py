@@ -415,13 +415,19 @@ class SolrApi(object):
     return self._get_json(response)
 
 
-  def suggest(self, solr_query, hue_core):
+  def suggest(self, collection, query):
     try:
       params = self._get_params() + (
-          ('q', solr_query['q']),
+          ('suggest', 'true'),
+          ('suggest.build', 'true'),
+          ('suggest.q', query['q']),
           ('wt', 'json'),
       )
-      response = self._root.get('%(collection)s/suggest' % solr_query, params)
+      if query.get('dictionary'):
+        params += (
+            ('suggest.dictionary', query['dictionary']),
+        )
+      response = self._root.get('%s/suggest' % collection, params)
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))

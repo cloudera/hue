@@ -277,8 +277,8 @@ def query_suggest(request):
   solr_query['dictionary'] = collection['suggest']['dictionary']
 
   try:
-    response = SolrApi(SOLR_URL.get(), request.user).suggest(solr_query, hue_collection)
-    result['message'] = response
+    response = SolrApi(SOLR_URL.get(), request.user).suggest(collection['name'], solr_query)
+    result['response'] = response
     result['status'] = 0
   except Exception, e:
     result['message'] = force_unicode(e)
