@@ -1107,7 +1107,14 @@ var assistHelper = new AssistHelper({
 });
 
 var editorViewModelOptions = {
-  snippetViewSettings: {},
+  snippetViewSettings: {
+    hive: {
+      sqlDialect: true
+    },
+    impala: {
+      sqlDialect: true
+    }
+  },
   languages: [
     {
       type: "hive"
