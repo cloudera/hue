@@ -214,7 +214,10 @@ def wait_for_query_to_finish(client, response, max=60.0):
 
 def is_finished(response):
   status = json.loads(response.content)
-  return 'error' in status or status.get('isSuccess') or status.get('isFailure')
+  return 'error' in status \
+      or status.get('isSuccess') \
+      or status.get('isFailure') \
+      or status.get('status') == -1
 
 
 def fetch_query_result_data(client, status_response, n=0, server_name='beeswax'):

@@ -130,6 +130,9 @@ class TestImpalaIntegration:
     resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
     resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
 
+    content = json.loads(resp.content)
+    assert_true(content['status'] == 0, resp.content)
+
     hql = """
       CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
 
@@ -142,6 +145,9 @@ class TestImpalaIntegration:
 
     resp = _make_query(cls.client, hql, database=cls.DATABASE, local=False, server_name='impala')
     resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
+
+    content = json.loads(resp.content)
+    assert_true(content['status'] == 0, resp.content)
 
   @classmethod
   def teardown_class(cls):
