@@ -168,13 +168,14 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-panel-template">
     <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
+      <!-- ko if: availableSourceTypes.length > 1 -->
       <li class="nav-header">
         ${_('source')}
       </li>
       <li>
         <select data-bind="options: availableSourceTypes, select2: { width: '100%', placeholder: '${ _ko("Choose a source...") }', update: selectedSourceType }" class="input-medium" data-placeholder="${_('Choose a source...')}"></select>
       </li>
-
+      <!-- /ko -->
       <!-- ko with: selectedSource -->
       <!-- ko template: { name: "assist-type-template" } --><!-- /ko -->
       <!-- /ko -->
