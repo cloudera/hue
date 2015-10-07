@@ -190,11 +190,11 @@ from desktop.views import _ko
         </div>
       </li>
 
-      <li data-bind="visible: ! hasErrors() && ! loadingDatabases()" >
-        <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+      <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
+        <select data-bind="options: assistHelper.availableDatabases, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
       </li>
 
-      <li class="center" data-bind="visible: loadingDatabases" >
+      <li class="center" data-bind="visible: assistHelper.loading()" >
         <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
       </li>
@@ -203,7 +203,7 @@ from desktop.views import _ko
         <span>${ _('The database list cannot be loaded.') }</span>
       </li>
 
-      <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! loadingDatabases() && ! hasErrors()">
+      <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! assistHelper.loading() && ! hasErrors()">
         ${_('tables')}
         <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
           <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
@@ -635,10 +635,19 @@ from desktop.views import _ko
         self.sourceIndex = {};
         $.each(notebookViewModel.availableSnippets(), function (index, snippet) {
           var settings = notebookViewModel.getSnippetViewSettings(snippet.type());
-          var fakeSnippet = new Snippet(notebookViewModel, notebook, {
-            type: snippet.type(),
-            result: {}
-          });
+
+          var fakeSnippet = {
+            type: snippet.type,
+            getContext: function() {
+              return {
+                type: snippet.type()
+              }
+            },
+            getAssistHelper: function() {
+              return notebook.getAssistHelper(snippet.type());
+            }
+          };
+
           if (settings.sqlDialect) {
             self.sourceIndex[snippet.name()] = new AssistSource(fakeSnippet);
           }
@@ -650,7 +659,11 @@ from desktop.views import _ko
         self.selectedSource = ko.observable();
 
         self.selectedSourceType.subscribe(function (newSourceType) {
-          self.selectedSource(self.sourceIndex[newSourceType]);
+          var source = self.sourceIndex[newSourceType];
+          if (! source.assistHelper.loaded()) {
+            source.assistHelper.load(source.snippet);
+          }
+          self.selectedSource(source);
         });
 
         self.selectedSourceType(self.availableSourceTypes[0]);
@@ -671,8 +684,7 @@ from desktop.views import _ko
         });
 
         self.options = ko.mapping.fromJS($.extend({
-          isSearchVisible: false,
-          lastSelectedDb: null
+          isSearchVisible: false
         }, $.totalStorage(snippet.type() + ".assist.options") || {}));
 
         $.each(Object.keys(self.options), function (index, key) {
@@ -687,7 +699,6 @@ from desktop.views import _ko
         self.selectedDatabase = ko.observable();
 
         self.reloading = ko.observable(false);
-        self.loadingDatabases = ko.observable(true);
 
         self.loadingTables = ko.computed(function() {
           return typeof self.selectedDatabase() != "undefined" && self.selectedDatabase() !== null && self.selectedDatabase().loading();
@@ -699,29 +710,25 @@ from desktop.views import _ko
           }
         });
 
-        // We need the names because select2 does not support objects
-        self.availableDatabaseNames = ko.observableArray();
+        var updateDatabases = function (names) {
+          self.databases($.map(names, function(name) {
+            return new AssistEntry({
+              name: name,
+              displayName: name,
+              title: name,
+              isDatabase: true
+            }, null, self, self.filter);
+          }));
 
-        self.fetchDatabases(function() {
-          self.assistHelper.activeDatabase.subscribe(function(newValue) {
-            window.setTimeout(function() {
-              self.setDatabase(newValue);
-            }, 10);
-          });
+          self.setDatabase(self.assistHelper.activeDatabase());
+        };
 
-          if ($.inArray(self.assistHelper.activeDatabase(), self.availableDatabaseNames()) > -1) {
-            self.setDatabase(self.assistHelper.activeDatabase());
-            return;
-          }
-          if ($.inArray(self.options.lastSelectedDb(), self.availableDatabaseNames()) > -1) {
-            self.assistHelper.activeDatabase(self.options.lastSelectedDb());
-          } else if ($.inArray("default", self.availableDatabaseNames()) > -1) {
-            self.assistHelper.activeDatabase("default");
-          } else if (self.availableDatabaseNames().length > 0) {
-            self.assistHelper.activeDatabase(self.availableDatabaseNames()[0]);
-          }
-
+        self.assistHelper.activeDatabase.subscribe(function(newValue) {
+          self.setDatabase(newValue);
         });
+
+        updateDatabases(self.assistHelper.availableDatabases());
+        self.assistHelper.availableDatabases.subscribe(updateDatabases);
 
         self.modalItem = ko.observable();
         self.analysisStats = ko.observable();
@@ -765,7 +772,6 @@ from desktop.views import _ko
         if (name == null) {
           return;
         }
-        self.options.lastSelectedDb(name);
 
         self.selectedDatabase(ko.utils.arrayFirst(self.databases(), function(database) {
           return name === database.definition.name;
@@ -780,46 +786,10 @@ from desktop.views import _ko
       AssistSource.prototype.reloadAssist = function() {
         var self = this;
         self.reloading(true);
-        self.loadingDatabases(true);
         self.selectedDatabase(null);
         self.assistHelper.clearCache(self.snippet);
-        self.fetchDatabases(function() {
-          self.setDatabase(self.options.lastSelectedDb());
-        });
-      };
-
-      AssistSource.prototype.fetchDatabases = function(callback) {
-        var self = this;
-
-        self.assistHelper.fetchDatabases(self.snippet, function(data) {
-          self.databases($.map(data.databases, function(databaseName) {
-            return new AssistEntry({
-              name: databaseName,
-              displayName: databaseName,
-              title: databaseName,
-              isDatabase: true
-            }, null, self, self.filter);
-          }));
-          self.availableDatabaseNames(data.databases);
-
-          self.reloading(false);
-          self.loadingDatabases(false);
-          if (callback) {
-            callback();
-          }
-        }, function(message) {
-          if (message.statusText) {
-            $(document).trigger("error", "${ _('There was a problem loading the databases') }: " + message.statusText);
-          } else if (message) {
-            $(document).trigger("error", message);
-          } else {
-            $(document).trigger("error", "${ _('There was a problem loading the databases.') }");
-          }
-
-          self.loadingDatabases(false);
-          self.reloading(false);
-          self.hasErrors(true);
-        });
+        self.assistHelper.loaded(false);
+        self.assistHelper.load(self.snippet);
       };
 
       ko.components.register('assist-panel', {

@@ -29,6 +29,9 @@ function Autocompleter(options) {
   self.snippet = options.snippet;
   self.notebook = options.notebook;
   self.assistHelper = options.assistHelper;
+  if (! self.assistHelper.loaded() && self.snippet.isSqlDialect()) {
+    self.assistHelper.load(self.snippet);
+  }
 }
 
 Autocompleter.prototype.setAssistHelper = function (assistHelper) {
