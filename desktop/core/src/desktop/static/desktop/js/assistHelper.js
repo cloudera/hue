@@ -32,7 +32,48 @@ function AssistHelper (options) {
   }
   self.notebook = options.notebook;
   self.user = options.user;
+  self.availableDatabases = ko.observableArray();
+  self.loaded = ko.observable(false);
+  self.loading = ko.observable(false);
 }
+
+AssistHelper.prototype.load = function (snippet) {
+  var self = this;
+  if (self.loading() || self.loaded()) {
+    return;
+  }
+  self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX, function(data) {
+    // Blacklist of system databases
+    self.availableDatabases($.grep(data.databases, function(database) { return database !== "_impala_builtins" }));
+
+    if ($.inArray(self.activeDatabase(), self.availableDatabases()) > -1) {
+      return;
+    }
+    var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(snippet));
+    if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
+      self.activeDatabase(lastSelectedDb);
+    } else if ($.inArray("default", self.availableDatabases()) > -1) {
+      self.activeDatabase("default");
+    } else if (self.availableDatabases().length > 0) {
+      self.activeDatabase(self.availableDatabases()[0]);
+    }
+    self.loaded(true);
+    self.loading(false);
+  }, function(message) {
+    if (message.statusText) {
+      $(document).trigger("error", "There was a problem loading the databases:" + message.statusText);
+    } else if (message) {
+      $(document).trigger("error", message);
+    } else {
+      $(document).trigger("error", "There was a problem loading the databases");
+    }
+  });
+};
+
+AssistHelper.prototype.setActiveDatabase = function (snippet, database) {
+  $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(snippet), database);
+  self.activeDatabase(database);
+};
 
 AssistHelper.prototype.hasExpired = function (timestamp) {
   return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
@@ -112,15 +153,6 @@ AssistHelper.prototype.fetchTerms = function(snippet, tableName, columnName, pre
     success: successCallback,
     error: errorCallback
   });
-};
-
-AssistHelper.prototype.fetchDatabases = function(snippet, successCallback, errorCallback) {
-  var self = this;
-  self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX, function(data) {
-    // Blacklist of system databases
-    data.databases = $.grep(data.databases, function(database) { return database !== "_impala_builtins" });
-    successCallback(data);
-  }, errorCallback);
 };
 
 AssistHelper.prototype.fetchTables = function(snippet, successCallback, errorCallback) {
