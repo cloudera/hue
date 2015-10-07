@@ -197,6 +197,11 @@ def get_type_from_morphline_type(morphline_type):
     return 'string'
 
 
+def utf_8_encoder(unicode_csv_data):
+  for line in unicode_csv_data:
+    yield force_unicode(line, errors='ignore') # Even 'replace' seems to break the DictReader
+
+
 def field_values_from_separated_file(fh, delimiter, quote_character, fields=None):
   if fields is None:
     field_names = None
@@ -252,7 +257,7 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
       headers = [name.strip() for name in headers]
 
     # User dict reader
-    reader = csv.DictReader(csvfile, fieldnames=headers, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
+    reader = csv.DictReader(utf_8_encoder(csvfile), fieldnames=headers, delimiter=smart_str(delimiter), quotechar=smart_str(quote_character))
 
     remove_keys = None
     for row in reader:
