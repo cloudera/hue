@@ -61,6 +61,7 @@ object BatchSessionYarn {
     createBatchRequest.executorCores.foreach(builder.executorCores)
     createBatchRequest.numExecutors.foreach(builder.numExecutors)
     createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
+    createBatchRequest.queue.foreach(builder.queue)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(true)
