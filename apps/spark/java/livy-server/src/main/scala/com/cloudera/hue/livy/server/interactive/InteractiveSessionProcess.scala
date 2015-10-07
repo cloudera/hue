@@ -126,7 +126,7 @@ private class InteractiveSessionProcess(id: Int,
     } else {
       // Set the state to done if the session shut down before contacting us.
       _state match {
-        case (Dead() | Error() | Success()) =>
+        case (Dead(_) | Error(_) | Success(_)) =>
         case _ =>
           _state = Success()
       }

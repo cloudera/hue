@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.repl.process
 import java.io.{BufferedReader, IOException, InputStreamReader, PrintWriter}
 import java.util.concurrent.locks.ReentrantLock
 
-import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.{Utils, Logging}
 import com.cloudera.hue.livy.repl.Interpreter
 import org.json4s.JValue
 
@@ -60,7 +60,7 @@ abstract class ProcessInterpreter(process: Process)
   }
 
   override def close(): Unit = {
-    if (isProcessAlive) {
+    if (Utils.isProcessAlive(process)) {
       logger.info("Shutting down process")
       sendShutdownRequest()
 
@@ -76,16 +76,6 @@ abstract class ProcessInterpreter(process: Process)
       } finally {
         logger.info("process has been shut down")
       }
-    }
-  }
-
-  private def isProcessAlive = {
-    try {
-      process.exitValue()
-      false
-    } catch {
-      case _: IllegalThreadStateException =>
-        true
     }
   }
 
