@@ -26,16 +26,22 @@ import org.json4s.JValue
 import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
+object SessionManager {
+  val LIVY_SERVER_SESSION_TIMEOUT = "livy.server.session.timeout"
+}
+
 class SessionManager[S <: Session](livyConf: LivyConf, factory: SessionFactory[S])
   extends Logging {
 
+  import SessionManager._
+
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
-  private[this] val _idCounter = new AtomicInteger()
-  private[this] val _sessions = mutable.Map[Int, S]()
+  private[this] final val _idCounter = new AtomicInteger()
+  private[this] final val _sessions = mutable.Map[Int, S]()
 
-  private[this] val sessionTimeout = livyConf.getInt("livy.server.session.timeout", 1000 * 60 * 60)
-  private[this] val garbageCollector = new GarbageCollector
+  private[this] final val sessionTimeout = livyConf.getInt(LIVY_SERVER_SESSION_TIMEOUT, 1000 * 60 * 60)
+  private[this] final val garbageCollector = new GarbageCollector
   garbageCollector.setDaemon(true)
   garbageCollector.start()
 
@@ -73,15 +79,18 @@ class SessionManager[S <: Session](livyConf: LivyConf, factory: SessionFactory[S
 
   def shutdown(): Unit = {}
 
-  def collectGarbage() = {
+  def collectGarbage(): Future[Iterable[Unit]] = {
     def expired(session: Session): Boolean = {
-      session.lastActivity match {
-        case Some(lastActivity) => System.currentTimeMillis() - lastActivity > sessionTimeout
-        case None => false
+      session.lastActivity.orElse(session.stoppedTime) match {
+        case Some(lastActivity) =>
+          val currentTime = System.currentTimeMillis()
+          currentTime - lastActivity > sessionTimeout
+        case None =>
+          false
       }
     }
 
-    all().filter(expired).foreach(delete)
+    Future.sequence(all().filter(expired).map(delete))
   }
 
   private class GarbageCollector extends Thread("session gc thread") {

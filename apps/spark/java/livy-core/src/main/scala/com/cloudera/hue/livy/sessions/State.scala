@@ -48,22 +48,22 @@ case class Busy() extends State {
   override def toString = "busy"
 }
 
-case class Error() extends State {
-  override def isActive = true
-  override def toString = "error"
-}
-
 case class ShuttingDown() extends State {
   override def isActive = false
   override def toString = "shutting_down"
 }
 
-case class Dead() extends State {
+case class Error(time: Long = System.currentTimeMillis()) extends State {
+  override def isActive = true
+  override def toString = "error"
+}
+
+case class Dead(time: Long = System.currentTimeMillis()) extends State {
   override def isActive = false
   override def toString = "dead"
 }
 
-case class Success() extends State {
+case class Success(time: Long = System.currentTimeMillis()) extends State {
   override def isActive = false
   override def toString = "success"
 }
