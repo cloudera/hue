@@ -15,45 +15,40 @@
 // limitations under the License.
 
 var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
+var NOTEBOOK_API_PREFIX = "/notebook/api/autocomplete/";
 
 /**
  * @param options {object}
- * @param options.app
+ * @param options.notebook
  * @param options.user
  *
  * @constructor
  */
 function AssistHelper (options) {
   var self = this;
-  self.options = options;
-  self.app = options.app;
   self.activeDatabase = ko.observable();
   if (typeof options.db !== "undefined") {
     self.activeDatabase(options.db)
   }
+  self.notebook = options.notebook;
+  self.user = options.user;
 }
 
 AssistHelper.prototype.hasExpired = function (timestamp) {
   return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
 };
 
-AssistHelper.prototype.getTotalStorageUserPrefix = function () {
+AssistHelper.prototype.getTotalStorageUserPrefix = function (snippet) {
   var self = this;
-  var app = "";
-  if (typeof self.options.app != "undefined") {
-    app = self.options.app;
-  }
-  if (typeof self.options.user != "undefined") {
-    return app + "_" + self.options.user;
-  }
-  return app;
+  return snippet.type() + "_" + self.user;
 };
 
-AssistHelper.prototype.fetchTableHtmlPreview = function(tableName, successCallback, errorCallback) {
+AssistHelper.prototype.fetchTableHtmlPreview = function(snippet, tableName, successCallback, errorCallback) {
   var self = this;
+  var app = snippet.type() == "hive" ? "beeswax" : snippet.type();
   $.ajax({
-    url: "/" + self.options.app + "/api/table/" + self.activeDatabase() + "/" + tableName,
-    data: {"sample": true},
+    url: "/" + app + "/api/table/" + self.activeDatabase() + "/" + tableName,
+    data: { "sample": true },
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-Requested-With", "Hue");
     },
@@ -63,7 +58,7 @@ AssistHelper.prototype.fetchTableHtmlPreview = function(tableName, successCallba
   });
 };
 
-AssistHelper.prototype.refreshTableStats = function(tableName, columnName, successCallback, errorCallback) {
+AssistHelper.prototype.refreshTableStats = function(snippet, tableName, columnName, successCallback, errorCallback) {
   var self = this;
   var pollRefresh = function (url) {
     $.post(url, function (data) {
@@ -79,7 +74,8 @@ AssistHelper.prototype.refreshTableStats = function(tableName, columnName, succe
     }).fail(errorCallback);
   };
 
-  $.post("/" + self.options.app + "/api/analyze/" + self.activeDatabase() + "/" + tableName + "/"  + (columnName || ""), function (data) {
+  var app = snippet.type() == "hive" ? "beeswax" : snippet.type();
+  $.post("/" + app + "/api/analyze/" + self.activeDatabase() + "/" + tableName + "/"  + (columnName || ""), function (data) {
     if (data.status == 0 && data.watch_url) {
       pollRefresh(data.watch_url);
     } else {
@@ -88,10 +84,11 @@ AssistHelper.prototype.refreshTableStats = function(tableName, columnName, succe
   }).fail(errorCallback);
 };
 
-AssistHelper.prototype.fetchStats = function(tableName, columnName, successCallback, errorCallback) {
+AssistHelper.prototype.fetchStats = function(snippet, tableName, columnName, successCallback, errorCallback) {
   var self = this;
+  var app = snippet.type() == "hive" ? "beeswax" : snippet.type();
   $.ajax({
-    url: "/" + self.options.app + "/api/table/" + self.activeDatabase() + "/" + tableName + "/stats/" + (columnName || ""),
+    url: "/" + app + "/api/table/" + self.activeDatabase() + "/" + tableName + "/stats/" + (columnName || ""),
     data: {},
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-Requested-With", "Hue");
@@ -102,10 +99,11 @@ AssistHelper.prototype.fetchStats = function(tableName, columnName, successCallb
   });
 };
 
-AssistHelper.prototype.fetchTerms = function(tableName, columnName, prefixFilter, successCallback, errorCallback) {
+AssistHelper.prototype.fetchTerms = function(snippet, tableName, columnName, prefixFilter, successCallback, errorCallback) {
   var self = this;
+  var app = snippet.type() == "hive" ? "beeswax" : snippet.type();
   $.ajax({
-    url: "/" + self.options.app + "/api/table/" + self.activeDatabase() + "/" + tableName + "/terms/" + columnName + "/" + (prefixFilter || ""),
+    url: "/" + app + "/api/table/" + self.activeDatabase() + "/" + tableName + "/terms/" + columnName + "/" + (prefixFilter || ""),
     data: {},
     beforeSend: function (xhr) {
       xhr.setRequestHeader("X-Requested-With", "Hue");
@@ -116,58 +114,58 @@ AssistHelper.prototype.fetchTerms = function(tableName, columnName, prefixFilter
   });
 };
 
-AssistHelper.prototype.fetchDatabases = function(successCallback, errorCallback) {
+AssistHelper.prototype.fetchDatabases = function(snippet, successCallback, errorCallback) {
   var self = this;
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/", function(data) {
+  self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX, function(data) {
     // Blacklist of system databases
     data.databases = $.grep(data.databases, function(database) { return database !== "_impala_builtins" });
     successCallback(data);
   }, errorCallback);
 };
 
-AssistHelper.prototype.fetchTables = function(successCallback, errorCallback) {
+AssistHelper.prototype.fetchTables = function(snippet, successCallback, errorCallback) {
   var self = this;
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + self.activeDatabase(), successCallback, errorCallback);
+  self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + self.activeDatabase(), successCallback, errorCallback);
 };
 
-AssistHelper.prototype.fetchFields = function(tableName, fields, successCallback, errorCallback) {
+AssistHelper.prototype.fetchFields = function(snippet, tableName, fields, successCallback, errorCallback, editor) {
   var self = this;
 
   var fieldPart = fields.length > 0 ? "/" + fields.join("/") : "";
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + self.activeDatabase() + "/" + tableName + fieldPart, successCallback, errorCallback);
+  self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + self.activeDatabase() + "/" + tableName + fieldPart, successCallback, errorCallback, editor);
 };
 
-AssistHelper.prototype.clearCache = function() {
+AssistHelper.prototype.clearCache = function(snippet) {
   var self = this;
-  $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), {});
+  $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(snippet), {});
 };
 
-AssistHelper.prototype.fetchPanelData = function (hierarchy, successCallback, errorCallback) {
+AssistHelper.prototype.fetchPanelData = function (snippet, hierarchy, successCallback, errorCallback) {
   var self = this;
-  self.fetchAssistData("/" + self.options.app + "/api/autocomplete/" + hierarchy.join("/"), successCallback, errorCallback);
+  self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + hierarchy.join("/"), successCallback, errorCallback);
 };
 
-AssistHelper.prototype.fetchAssistData = function (url, successCallback, errorCallback) {
+AssistHelper.prototype.fetchAssistData = function (snippet, url, successCallback, errorCallback, editor) {
   var self = this;
-  var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix()) || {};
+  var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(snippet)) || {};
 
   if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
-    $.ajax({
-      type: "GET",
-      url: url + "?" + Math.random(),
-      success: function (data) {
-        if (typeof data.code != "undefined" && data.code != null) {
-          errorCallback(data.error);
-        } else {
-          cachedData[url] = {
-            timestamp: (new Date()).getTime(),
-            data: data
-          };
-          $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
-          successCallback(data);
-        }
-      },
-      error: errorCallback
+    if (editor) {
+      editor.showSpinner();
+    }
+    $.post(url, {
+      notebook: ko.mapping.toJSON(self.notebook.getContext()),
+      snippet: ko.mapping.toJSON(snippet.getContext())
+    }, function (data) {
+      if (data.status == 0) {
+        successCallback(data);
+      } else {
+        errorCallback(data);
+      }
+    }).fail(errorCallback).always(function () {
+      if (editor) {
+        editor.hideSpinner();
+      }
     });
   } else {
     successCallback(cachedData[url].data);

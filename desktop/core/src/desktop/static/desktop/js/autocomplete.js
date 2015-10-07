@@ -46,40 +46,6 @@ Autocompleter.prototype.getCompletions = function (editor, session, pos, prefix,
   }, editor);
 };
 
-Autocompleter.prototype.callAutocompleteApi = function (tableName, nested, success, failure, editor) {
-  var self = this;
-  var path = self.assistHelper.activeDatabase();
-
-  if (tableName) {
-    path += "/" + tableName;
-    $.each(nested, function(index, part) {
-      path += "/" + part;
-    });
-  }
-
-  var self = this;
-
-  // TODO: Use shared cache with assist helper.
-
-  if (editor) {
-    editor.showSpinner();
-  }
-  $.post("/notebook/api/autocomplete/" + path, {
-    notebook: ko.mapping.toJSON(self.notebook.getContext()),
-    snippet: ko.mapping.toJSON(self.snippet.getContext())
-  }, function (data) {
-    if (data.status == 0) {
-      success(data);
-    } else {
-      failure();
-    }
-  }).fail(failure).always(function () {
-    if (editor) {
-      editor.hideSpinner();
-    }
-  });
-};
-
 Autocompleter.prototype.getFromReferenceIndex = function (statement) {
   var result = {
     tables: {},
@@ -303,7 +269,8 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
   var fromAfter = afterMatcher != null && afterMatcher[0] === "FROM";
 
   if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
-    self.callAutocompleteApi(null, null, function (data) {
+
+    self.assistHelper.fetchTables(self.snippet, function (data) {
       var fromKeyword = "";
       if (selectBefore) {
         if (beforeCursor.indexOf("SELECT") > -1) {
@@ -384,7 +351,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
 
     var getFields = function (remainingParts, fields) {
       if (remainingParts.length == 0) {
-        self.callAutocompleteApi(tableName, fields, function(data) {
+        self.assistHelper.fetchFields(self.snippet, tableName, fields, function(data) {
           if (fields.length == 0) {
             callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
           } else {
@@ -419,7 +386,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
           var mapOrArrayMatch = part.match(/([^\[]*)\[[^\]]*\]$/i);
           if (mapOrArrayMatch !== null) {
             fields.push(mapOrArrayMatch[1]);
-            self.callAutocompleteApi(tableName, fields, function(data) {
+            self.assistHelper.fetchFields(self.snippet, tableName, fields, function(data) {
               if (data.type === "map") {
                 fields.push("value");
                 getFields(remainingParts, fields);
@@ -439,7 +406,7 @@ Autocompleter.prototype.autocomplete = function(beforeCursor, afterCursor, callb
           }
           // For impala we have to fetch info about each field as we don't know
           // whether it's a map or array for hive the [ and ] gives it away...
-          self.callAutocompleteApi(tableName, fields, function(data) {
+          self.assistHelper.fetchFields(self.snippet, tableName, fields, function(data) {
             if (data.type === "map") {
               remainingParts.unshift("value");
             } else if (data.type === "array") {
