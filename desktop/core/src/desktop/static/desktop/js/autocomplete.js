@@ -31,6 +31,11 @@ function Autocompleter(options) {
   self.assistHelper = options.assistHelper;
 }
 
+Autocompleter.prototype.setAssistHelper = function (assistHelper) {
+  var self = this;
+  self.assistHelper = assistHelper;
+};
+
 // ACE Format for autocompleter
 Autocompleter.prototype.getCompletions = function (editor, session, pos, prefix, callback) {
   var self = this;

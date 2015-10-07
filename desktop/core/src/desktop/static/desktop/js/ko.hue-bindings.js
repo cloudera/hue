@@ -1648,7 +1648,7 @@ ko.bindingHandlers.aceEditor = {
     var $el = $(element);
     var options = ko.unwrap(valueAccessor());
     var snippet = options.snippet;
-    var assistHelper = options.assistHelper;
+    var assistHelper = snippet.getAssistHelper();
 
     $el.text(snippet.statement_raw());
 
@@ -1739,7 +1739,7 @@ ko.bindingHandlers.aceEditor = {
     var refreshTables = function() {
       currentAssistTables = {};
       if (typeof assistHelper.activeDatabase() !== "undefined" && assistHelper.activeDatabase() != null) {
-        assistHelper.fetchTables(function(data) {
+        assistHelper.fetchTables(snippet, function(data) {
           $.each(data.tables, function(index, table) {
             currentAssistTables[table] = true;
           });

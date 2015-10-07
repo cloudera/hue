@@ -16,8 +16,8 @@
 
 
 var SPARK_MAPPING = {
-  ignore: ["ace", "images", "autocompleter", "selectedStatement"]
-}
+  ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user"]
+};
 
 var Result = function (snippet, result) {
   var self = this;
@@ -155,6 +155,10 @@ var Snippet = function (vm, notebook, snippet) {
 
   self.getPlaceHolder = function() {
     return vm.getSnippetViewSettings(self.type()).placeHolder;
+  };
+
+  self.getAssistHelper = function() {
+    return notebook.getAssistHelper(self.type());
   };
 
   self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
@@ -615,9 +619,12 @@ var Snippet = function (vm, notebook, snippet) {
   };
 
   self.autocompleter = new Autocompleter({
-    notebook: notebook,
     snippet: self,
-    assistHelper: vm.assistHelper
+    assistHelper: self.getAssistHelper()
+  });
+
+  self.type.subscribe(function () {
+    self.autocompleter.setAssistHelper(self.getAssistHelper());
   });
 
   self.init = function () {
@@ -672,6 +679,18 @@ var Notebook = function (vm, notebook) {
       return new Session(vm, value.data);
     }
   });
+
+  self.assistHelpers = {};
+
+  self.getAssistHelper = function (snippetType) {
+    if (! self.assistHelpers[snippetType]) {
+      self.assistHelpers[snippetType] = new AssistHelper({
+        notebook: self,
+        user: vm.user,
+      });
+    }
+    return self.assistHelpers[snippetType]
+  };
 
   self.getSession = function (session_type) {
     var _s = null;
@@ -908,6 +927,7 @@ var Notebook = function (vm, notebook) {
 function EditorViewModel(notebooks, options) {
   var self = this;
 
+  self.user = options.user;
   self.notebooks = ko.observableArray();
   self.selectedNotebook = ko.observable();
   self.combinedContent = ko.observable();
@@ -965,7 +985,6 @@ function EditorViewModel(notebooks, options) {
     }
   };
 
-  self.assistHelper = options.assistHelper;
   self.assistAvailable = ko.observable(options.assistAvailable);
 
   self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
@@ -976,7 +995,7 @@ function EditorViewModel(notebooks, options) {
 
   self.availableSnippets = ko.mapping.fromJS(options.languages);
 
-  self.getSnippetViewSettings = function(snippetType) {
+  self.getSnippetViewSettings = function (snippetType) {
     if (options.snippetViewSettings[snippetType]) {
       return options.snippetViewSettings[snippetType];
     }
