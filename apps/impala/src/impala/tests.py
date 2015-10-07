@@ -128,7 +128,7 @@ class TestImpalaIntegration:
     """ % {'db': cls.DATABASE}
 
     resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
-    resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
+    resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
 
     hql = """
       CREATE TABLE tweets (row_num INTEGER, id_str STRING, text STRING) STORED AS PARQUET;
@@ -141,7 +141,7 @@ class TestImpalaIntegration:
     """
 
     resp = _make_query(cls.client, hql, database=cls.DATABASE, local=False, server_name='impala')
-    resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
+    resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
 
   @classmethod
   def teardown_class(cls):
@@ -152,7 +152,7 @@ class TestImpalaIntegration:
     DROP DATABASE %(db)s;
     """ % {'db': cls.DATABASE}
     resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
-    resp = wait_for_query_to_finish(cls.client, resp, max=30.0)
+    resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
 
     # Check the cleanup
     databases = cls.db.get_databases()
