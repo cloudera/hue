@@ -544,6 +544,8 @@ class HiveServerClient:
     if self.query_server['server_name'] == 'sparksql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
+    LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
+
     req = TOpenSessionReq(**kwargs)
     res = self._client.OpenSession(req)
 
@@ -555,7 +557,6 @@ class HiveServerClient:
       raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
 
     sessionId = res.sessionHandle.sessionId
-    LOG.info('Opening session %s' % sessionId)
 
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
