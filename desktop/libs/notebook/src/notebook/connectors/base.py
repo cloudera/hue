@@ -32,13 +32,11 @@ LOG = logging.getLogger(__name__)
 class SessionExpired(Exception):
   pass
 
-
 class QueryExpired(Exception):
   pass
 
 class AuthenticationRequired(Exception):
   pass
-
 
 class QueryError(Exception):
   def __init__(self, message):
@@ -115,7 +113,11 @@ def get_api(user, snippet, fs, jt):
 
 
 def _get_snippet_session(notebook, snippet):
-  return [session for session in notebook['sessions'] if session['type'] == snippet['type']][0]
+  session = [session for session in notebook['sessions'] if session['type'] == snippet['type']]
+  if not session:
+    raise SessionExpired()
+  else:
+    return session[0]
 
 
 # Base API
