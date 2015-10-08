@@ -80,7 +80,7 @@ def api_error_handler(func):
     except QueryExpired, e:
       response['status'] = -3
     except AuthenticationRequired, e:
-      response['status'] = 403
+      response['status'] = 401
     except QueryError, e:
       LOG.exception('error running %s' % func)
       response['status'] = 1

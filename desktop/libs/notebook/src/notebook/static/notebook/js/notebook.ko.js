@@ -369,7 +369,7 @@ var Snippet = function (vm, notebook, snippet) {
     else if (data.status == -3) { // Statement expired
       self.status('expired');
     }
-    else if (data.status == 403) { // Auth required
+    else if (data.status == 401) { // Auth required
       self.status('expired');
       $(document).trigger("showAuthModal", {'type': self.type(), 'callback': self.execute});
     }
@@ -811,7 +811,7 @@ var Notebook = function (vm, notebook) {
         if (callback) {
           setTimeout(callback, 500);
         }
-      } else if (data.status == 403) {
+      } else if (data.status == 401) {
         $(document).trigger("showAuthModal", {'type': session.type()});
       }
       else {
