@@ -1008,22 +1008,6 @@ ${ koComponents.assistPanel() }
     margin: 0;
   }
 
-  .jobs-overlay {
-    background-color: #FFF;
-    opacity: 0.8;
-    position: absolute;
-    top: 10px;
-    right: 15px;
-  }
-
-  .jobs-overlay li {
-    padding: 5px;
-  }
-
-  .jobs-overlay:hover {
-    opacity: 1;
-  }
-
   #saveResultsModal .overlay {
     background: black; opacity: 0.5;
     position: absolute;

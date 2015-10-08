@@ -380,7 +380,10 @@ from desktop.views import _ko
         <div class="clearfix"></div>
       </div>
 
-      <div data-bind="delayedOverflow, visible: showLogs, css: resultsKlass" style="margin-top: 5px">
+      <div data-bind="delayedOverflow, visible: showLogs, css: resultsKlass" style="margin-top: 5px; position: relative">
+        <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
+          <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
+        </ul>
         <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
         <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
       </div>
