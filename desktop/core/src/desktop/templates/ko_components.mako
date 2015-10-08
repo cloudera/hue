@@ -790,7 +790,9 @@ from desktop.views import _ko
         self.selectedDatabase(null);
         self.assistHelper.clearCache(self.snippet);
         self.assistHelper.loaded(false);
-        self.assistHelper.load(self.snippet);
+        self.assistHelper.load(self.snippet, function() {
+          self.reloading(false);
+        });
       };
 
       ko.components.register('assist-panel', {
