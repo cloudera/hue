@@ -35,7 +35,7 @@ function AssistHelper (options) {
   self.loading = ko.observable(false);
 }
 
-AssistHelper.prototype.load = function (snippet) {
+AssistHelper.prototype.load = function (snippet, callback) {
   var self = this;
   if (self.loading() || self.loaded()) {
     return;
@@ -44,19 +44,22 @@ AssistHelper.prototype.load = function (snippet) {
     // Blacklist of system databases
     self.availableDatabases($.grep(data.databases, function(database) { return database !== "_impala_builtins" }));
 
-    if ($.inArray(self.activeDatabase(), self.availableDatabases()) > -1) {
-      return;
+    if ($.inArray(self.activeDatabase(), self.availableDatabases()) === -1) {
+      var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(snippet));
+      if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
+        self.activeDatabase(lastSelectedDb);
+      } else if ($.inArray("default", self.availableDatabases()) > -1) {
+        self.activeDatabase("default");
+      } else if (self.availableDatabases().length > 0) {
+        self.activeDatabase(self.availableDatabases()[0]);
+      }
     }
-    var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(snippet));
-    if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
-      self.activeDatabase(lastSelectedDb);
-    } else if ($.inArray("default", self.availableDatabases()) > -1) {
-      self.activeDatabase("default");
-    } else if (self.availableDatabases().length > 0) {
-      self.activeDatabase(self.availableDatabases()[0]);
-    }
+
     self.loaded(true);
     self.loading(false);
+    if (callback) {
+      callback();
+    }
   }, function(message) {
     if (message.statusText) {
       $(document).trigger("error", "There was a problem loading the databases:" + message.statusText);
@@ -64,6 +67,9 @@ AssistHelper.prototype.load = function (snippet) {
       $(document).trigger("error", message);
     } else {
       $(document).trigger("error", "There was a problem loading the databases");
+    }
+    if (callback) {
+      callback();
     }
   });
 };
