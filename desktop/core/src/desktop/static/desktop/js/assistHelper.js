@@ -73,7 +73,7 @@ AssistHelper.prototype.load = function (snippet, callback) {
       callback();
     }
   }, function(message) {
-   if (message.status == 403) {
+   if (message.status == 401) {
       $(document).trigger("showAuthModal", {'type': self.type, 'callback': function() {self.loaded(false); self.load(snippet, callback) }});
     } else if (message.statusText) {
       $(document).trigger("error", "There was a problem loading the databases:" + message.statusText);
