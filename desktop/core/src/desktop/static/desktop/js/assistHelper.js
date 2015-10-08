@@ -73,7 +73,9 @@ AssistHelper.prototype.load = function (snippet, callback) {
       callback();
     }
   }, function(message) {
-    if (message.statusText) {
+   if (message.status == 403) {
+      $(document).trigger("error", "Please login in the JDBC connection");
+    } else if (message.statusText) {
       $(document).trigger("error", "There was a problem loading the databases:" + message.statusText);
     } else if (message) {
       $(document).trigger("error", message);

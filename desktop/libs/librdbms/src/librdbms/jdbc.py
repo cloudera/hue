@@ -18,8 +18,6 @@
 import logging
 import sys
 
-from desktop.lib.i18n import smart_unicode
-
 
 LOG = logging.getLogger(__name__)
 
@@ -99,7 +97,7 @@ class Cursor():
   def fetchmany(self, n=None):
     res = []
 
-    while self.rs.next() and (n is not None and n > 0):
+    while self.rs.next() and (n is None or n > 0):
       row = []
       for c in xrange(self._meta.getColumnCount()):
         cell = self.rs.getObject(c + 1)
@@ -109,7 +107,8 @@ class Cursor():
         row.append(cell)
 
       res.append(row)
-      n -= 1
+      if n is not None:
+        n -= 1
 
     return res
 
