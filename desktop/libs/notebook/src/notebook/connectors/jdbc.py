@@ -133,7 +133,7 @@ class JdbcApi(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     if self.db is None:
       raise AuthenticationRequired()
-        
+
     assist = Assist(self.db)
     response = {'error': 0}
 
