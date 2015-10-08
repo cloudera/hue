@@ -25,6 +25,7 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
   coerce_password_from_script, AUTH_USERNAME as DEFAULT_AUTH_USERNAME
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
+from desktop.lib.exceptions import StructuredThriftTransportException
 
 from beeswax.settings import NICE_NAME
 
@@ -180,13 +181,20 @@ def config_validator(user):
 
   res = []
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
-      server = dbms.get(user)
-      server.get_databases()
-  except:
+    try:
+      if not 'test' in sys.argv: # Avoid tests hanging
+        server = dbms.get(user)
+        server.get_databases()
+    except StructuredThriftTransportException, e:
+      if 'Error validating the login' in str(e):
+        msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
+        LOG.exception(msg)
+        res.append((NICE_NAME, _(msg)))
+      else:
+        raise e
+  except Exception, e:
     msg = "The application won't work without a running HiveServer2."
     LOG.exception(msg)
-
     res.append((NICE_NAME, _(msg)))
 
   try:

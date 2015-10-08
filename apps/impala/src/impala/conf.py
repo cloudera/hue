@@ -23,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME,\
   AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, coerce_password_from_script
 from desktop.lib.conf import ConfigSection, Config, coerce_bool
+from desktop.lib.exceptions import StructuredThriftTransportException
 
 from impala.settings import NICE_NAME
 
@@ -163,14 +164,21 @@ def config_validator(user):
 
   res = []
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
-      query_server = get_query_server_config(name='impala')
-      server = dbms.get(user, query_server)
-      server.get_databases()
-  except:
+    try:
+      if not 'test' in sys.argv: # Avoid tests hanging
+        query_server = get_query_server_config(name='impala')
+        server = dbms.get(user, query_server)
+        server.get_databases()
+    except StructuredThriftTransportException, ex:
+      if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
+        msg = "Failed to authenticate to Impalad, check authentication configurations."
+        LOG.exception(msg)
+        res.append((NICE_NAME, _(msg)))
+      else:
+       raise ex
+  except Exception, ex:
     msg = "No available Impalad to send queries to."
     LOG.exception(msg)
-
     res.append((NICE_NAME, _(msg)))
 
   return res
