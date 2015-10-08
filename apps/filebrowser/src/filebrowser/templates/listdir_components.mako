@@ -1901,18 +1901,28 @@ from django.utils.translation import ugettext as _
         }
       });
 
-      $("#uploadFileModal").on("shown", function(){
-        _dropzone.disable();
+      $("#uploadFileModal").on("shown", function () {
+        if (typeof _dropzone != "undefined") {
+          _dropzone.disable();
+        }
       });
-      $("#uploadFileModal").on("hidden", function(){
-        _dropzone.enable();
+      $("#uploadFileModal").on("hidden", function () {
+        if (typeof _dropzone != "undefined") {
+          _dropzone.enable();
+        }
+        $(".qq-upload-list").empty();
         $(".qq-upload-drop-area").hide();
       });
-      $("#uploadArchiveModal").on("shown", function(){
-        _dropzone.disable();
+      $("#uploadArchiveModal").on("shown", function () {
+        if (typeof _dropzone != "undefined") {
+          _dropzone.disable();
+        }
       });
-      $("#uploadArchiveModal").on("hidden", function(){
-        _dropzone.enable();
+      $("#uploadArchiveModal").on("hidden", function () {
+        if (typeof _dropzone != "undefined") {
+          _dropzone.enable();
+        }
+        $(".qq-upload-list").empty();
         $(".qq-upload-drop-area").hide();
       });
     });
