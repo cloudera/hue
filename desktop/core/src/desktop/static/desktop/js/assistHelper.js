@@ -27,12 +27,19 @@ var NOTEBOOK_API_PREFIX = "/notebook/api/autocomplete/";
  */
 function AssistHelper (options) {
   var self = this;
-  self.activeDatabase = ko.observable(options.activeDatabase);
+  self.activeDatabase = ko.observable();
+  self.initialDatabase = options.activeDatabase;
   self.notebook = options.notebook;
   self.user = options.user;
   self.availableDatabases = ko.observableArray();
   self.loaded = ko.observable(false);
   self.loading = ko.observable(false);
+  self.type = null;
+  self.activeDatabase.subscribe(function (newValue) {
+    if (self.loaded()) {
+      $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(), newValue);
+    }
+  })
 }
 
 AssistHelper.prototype.load = function (snippet, callback) {
@@ -40,13 +47,18 @@ AssistHelper.prototype.load = function (snippet, callback) {
   if (self.loading() || self.loaded()) {
     return;
   }
+  self.type = snippet.type();
+  self.loading(true);
+  self.loaded(false);
   self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX, function(data) {
     // Blacklist of system databases
     self.availableDatabases($.grep(data.databases, function(database) { return database !== "_impala_builtins" }));
 
     if ($.inArray(self.activeDatabase(), self.availableDatabases()) === -1) {
-      var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(snippet));
-      if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
+      var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix());
+      if ($.inArray(self.initialDatabase, self.availableDatabases()) > -1) {
+        self.activeDatabase(self.initialDatabase);
+      } else if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
         self.activeDatabase(lastSelectedDb);
       } else if ($.inArray("default", self.availableDatabases()) > -1) {
         self.activeDatabase("default");
@@ -68,24 +80,21 @@ AssistHelper.prototype.load = function (snippet, callback) {
     } else {
       $(document).trigger("error", "There was a problem loading the databases");
     }
+    self.loaded(true);
+    self.loading(false);
     if (callback) {
       callback();
     }
   });
 };
 
-AssistHelper.prototype.setActiveDatabase = function (snippet, database) {
-  $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(snippet), database);
-  self.activeDatabase(database);
-};
-
 AssistHelper.prototype.hasExpired = function (timestamp) {
   return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
 };
 
-AssistHelper.prototype.getTotalStorageUserPrefix = function (snippet) {
+AssistHelper.prototype.getTotalStorageUserPrefix = function () {
   var self = this;
-  return snippet.type() + "_" + self.user;
+  return self.type + "_" + self.user;
 };
 
 AssistHelper.prototype.fetchTableHtmlPreview = function(snippet, tableName, successCallback, errorCallback) {
@@ -173,7 +182,7 @@ AssistHelper.prototype.fetchFields = function(snippet, tableName, fields, succes
 
 AssistHelper.prototype.clearCache = function(snippet) {
   var self = this;
-  $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(snippet), {});
+  $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), {});
 };
 
 AssistHelper.prototype.fetchPanelData = function (snippet, hierarchy, successCallback, errorCallback) {
@@ -183,7 +192,7 @@ AssistHelper.prototype.fetchPanelData = function (snippet, hierarchy, successCal
 
 AssistHelper.prototype.fetchAssistData = function (snippet, url, successCallback, errorCallback, editor) {
   var self = this;
-  var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(snippet)) || {};
+  var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix()) || {};
 
   if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
     if (editor) {

@@ -729,7 +729,11 @@ from desktop.views import _ko
         });
 
         updateDatabases(self.assistHelper.availableDatabases());
-        self.assistHelper.availableDatabases.subscribe(updateDatabases);
+        self.assistHelper.loaded.subscribe(function (newValue) {
+          if (newValue) {
+            updateDatabases(self.assistHelper.availableDatabases());
+          }
+        });
 
         self.modalItem = ko.observable();
         self.analysisStats = ko.observable();
