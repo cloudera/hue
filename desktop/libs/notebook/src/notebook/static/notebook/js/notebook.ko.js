@@ -371,7 +371,7 @@ var Snippet = function (vm, notebook, snippet) {
     }
     else if (data.status == 403) { // Auth required
       self.status('expired');
-      $(document).trigger("showAuthModal", {'type': self.type(), 'snippet': self});
+      $(document).trigger("showAuthModal", {'type': self.type(), 'callback': self.execute});
     }
     else if (data.status == 1 || data.status == -1) {
       self.status('failed');
@@ -832,7 +832,7 @@ var Notebook = function (vm, notebook) {
             {'name': 'password', 'value': vm.authSessionPassword()}
           ]
         }),
-        vm.authSessionSnippet() ? vm.authSessionSnippet().execute : null  // On new session we don't automatically execute the snippet after the aut. On session expiration we do.
+        vm.authSessionCallback()  // On new session we don't automatically execute the snippet after the aut. On session expiration we do or we refresh assist DB when login-in.
     );
   };
 
@@ -968,7 +968,7 @@ function EditorViewModel(notebooks, options) {
   self.authSessionUsername = ko.observable(); // UI popup
   self.authSessionPassword = ko.observable();
   self.authSessionType = ko.observable();
-  self.authSessionSnippet = ko.observable();
+  self.authSessionCallback = ko.observable();
 
   self.removeSnippetConfirmation = ko.observable();
 

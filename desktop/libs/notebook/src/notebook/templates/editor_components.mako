@@ -1858,7 +1858,7 @@ from desktop.views import _ko
     viewModel.authSessionUsername('${ user.username }');
     viewModel.authSessionPassword('');
     viewModel.authSessionType(data['type']);
-    viewModel.authSessionSnippet(data['snippet']);
+    viewModel.authSessionCallback(data['callback']);
     $("#authModal").modal("show");
   });
 </script>
