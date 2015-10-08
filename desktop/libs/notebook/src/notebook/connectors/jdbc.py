@@ -86,7 +86,7 @@ class JdbcApi(Api):
     if self.db is None:
       raise AuthenticationRequired()
 
-    data, description = query_and_fetch(self.db, snippet['statement'], 100)
+    data, description = query_and_fetch(self.db, snippet['statement'], 1000)
     has_result_set = data is not None
 
     return {
@@ -131,6 +131,9 @@ class JdbcApi(Api):
 
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+    if self.db is None:
+      raise AuthenticationRequired()
+        
     assist = Assist(self.db)
     response = {'error': 0}
 
