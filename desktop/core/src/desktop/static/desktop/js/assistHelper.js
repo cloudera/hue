@@ -39,7 +39,7 @@ function AssistHelper (options) {
     if (self.loaded()) {
       $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix(), newValue);
     }
-  })
+  });
 }
 
 AssistHelper.prototype.load = function (snippet, callback) {
@@ -51,8 +51,10 @@ AssistHelper.prototype.load = function (snippet, callback) {
   self.loading(true);
   self.loaded(false);
   self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX, function(data) {
+
+    var databases = data.databases || [];
     // Blacklist of system databases
-    self.availableDatabases($.grep(data.databases, function(database) { return database !== "_impala_builtins" }));
+    self.availableDatabases($.grep(databases, function(database) { return database !== "_impala_builtins" }));
 
     if ($.inArray(self.activeDatabase(), self.availableDatabases()) === -1) {
       var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix());

@@ -667,7 +667,17 @@ from desktop.views import _ko
           self.selectedSource(source);
         });
 
-        self.selectedSourceType(self.availableSourceTypes[0]);
+        var lastSelectedSource =  $.totalStorage("hue.assist.lastSelectedSource." + notebookViewModel.user);
+        if ($.inArray(lastSelectedSource, self.availableSourceTypes) !== -1) {
+          self.selectedSourceType(lastSelectedSource);
+        } else {
+          self.selectedSourceType(self.availableSourceTypes[0]);
+        }
+
+        self.selectedSourceType.subscribe(function (newSourceType) {
+          $.totalStorage("hue.assist.lastSelectedSource." + notebookViewModel.user, newSourceType);
+        });
+
       }
 
       function AssistSource(snippet) {
