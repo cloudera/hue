@@ -34,3 +34,31 @@ default::
 env-install: compile ext-env-install
 	@echo '--- Installing $(APP_NAME) into virtual-env'
 	@$(ENV_PYTHON) setup.py develop -N -q
+
+
+###################################
+# Build DBProxy plugin
+###################################
+
+PLUGIN_DIR := $(realpath .)
+PLUGIN_JAVA_LIB := $(PLUGIN_DIR)/java-lib
+PLUGIN_JAVA_DIR := $(PLUGIN_DIR)/java
+BLD_DIR_PLUGINS := $(PLUGIN_DIR)/java/target
+
+compile: $(DESKTOP_PLUGIN_JAR)
+
+# Build the plugin jar iff the source is present
+ifneq (,$(wildcard $(PLUGIN_JAVA_DIR)))
+$(DESKTOP_PLUGIN_JAR): $(shell find $(PLUGIN_JAVA_DIR) -type f)
+  mkdir -p $(PLUGIN_JAVA_LIB)
+  @echo "--- Building DBProxy plugin"
+  cd $(PLUGIN_JAVA_DIR) && mvn clean install -DskipTests $(MAVEN_OPTIONS)
+  cp $(BLD_DIR_PLUGINS)/dbproxy-$(MAVEN_VERSION).jar $(DESKTOP_PLUGIN_JAR)
+
+clean::
+  rm -rf $(PLUGIN_JAVA_LIB)
+  cd $(PLUGIN_JAVA_DIR) && mvn clean $(MAVEN_OPTIONS) ||:
+else
+$(DESKTOP_PLUGIN_JAR):
+  $(error Cannot build DBProxy plugin without source)
+endif
