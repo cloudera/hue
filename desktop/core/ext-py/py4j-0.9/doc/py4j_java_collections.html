@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.3. py4j.java_collections — Py4J Collections API &mdash; Py4J</title>
+    <link rel="stylesheet" href="_static/py4jdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  'true'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="Py4J" href="index.html" />
+    <link rel="up" title="4. Py4J Python API" href="py4j_python.html" />
+    <link rel="next" title="4.4. py4j.finalizer — Py4J Finalizer API" href="py4j_finalizer.html" />
+    <link rel="prev" title="4.2. py4j.protocol — Py4J Protocol" href="py4j_java_protocol.html" />
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-18626179-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script> 
+  </head>
+  <body>
+  	<div class="page">
+<div class="banner">Py4J - A Bridge between Python and Java</div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py4j_finalizer.html" title="4.4. py4j.finalizer — Py4J Finalizer API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py4j_java_protocol.html" title="4.2. py4j.protocol — Py4J Protocol"
+             accesskey="P">previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+
+          <!-- <li><a href="py4j_python.html" accesskey="U">4. Py4J Python API</a> &raquo;</li>--> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">On This Page</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">4.3. <code class="docutils literal"><span class="pre">py4j.java_collections</span></code> &#8212; Py4J Collections API</a><ul>
+<li><a class="reference internal" href="#javaiterator">4.3.1. JavaIterator</a></li>
+<li><a class="reference internal" href="#javalist">4.3.2. JavaList</a></li>
+<li><a class="reference internal" href="#javamap">4.3.3. JavaMap</a></li>
+<li><a class="reference internal" href="#javaset">4.3.4. JavaSet</a></li>
+<li><a class="reference internal" href="#javaarray">4.3.5. JavaArray</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="py4j_java_protocol.html"
+                                  title="previous chapter">4.2. <code class="docutils literal"><span class="pre">py4j.protocol</span></code> &#8212; Py4J Protocol</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="py4j_finalizer.html"
+                                  title="next chapter">4.4. <code class="docutils literal"><span class="pre">py4j.finalizer</span></code> &#8212; Py4J Finalizer API</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/py4j_java_collections.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-py4j.java_collections">
+<span id="py4j-java-collections-py4j-collections-api"></span><h1>4.3. <a class="reference internal" href="#module-py4j.java_collections" title="py4j.java_collections: Converts Java Collection Types to Python Collection Types."><code class="xref py py-mod docutils literal"><span class="pre">py4j.java_collections</span></code></a> &#8212; Py4J Collections API<a class="headerlink" href="#module-py4j.java_collections" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-py4j.java_collections" title="py4j.java_collections: Converts Java Collection Types to Python Collection Types."><code class="xref py py-mod docutils literal"><span class="pre">py4j.java_collections</span></code></a> module maps Python collection classes with Java
+collection classes. These classes should practically never be directly
+instantiated by users: they are automatically used when receiving, for example,
+a Java list.</p>
+<div class="section" id="javaiterator">
+<span id="api-javaiterator"></span><h2>4.3.1. JavaIterator<a class="headerlink" href="#javaiterator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_collections.JavaIterator">
+<em class="property">class </em><code class="descclassname">py4j.java_collections.</code><code class="descname">JavaIterator</code><span class="sig-paren">(</span><em>target_id</em>, <em>gateway_client</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a Python list iterator to a Java list iterator.</p>
+<p>The <cite>JavaIterator</cite> follows the Python iterator protocol and raises a
+<cite>StopIteration</cite> error when the iterator can no longer iterate.</p>
+<dl class="method">
+<dt id="py4j.java_collections.JavaIterator.next">
+<code class="descname">next</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaIterator.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>This next method wraps the <cite>next</cite> method in Java iterators.</p>
+<p>The <cite>Iterator.next()</cite> method is called and if an exception occur (e.g.,
+NoSuchElementException), a StopIteration exception is raised.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="javalist">
+<span id="api-javalist"></span><h2>4.3.2. JavaList<a class="headerlink" href="#javalist" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_collections.JavaList">
+<em class="property">class </em><code class="descclassname">py4j.java_collections.</code><code class="descname">JavaList</code><span class="sig-paren">(</span><em>target_id</em>, <em>gateway_client</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a Python list to a Java list.</p>
+<p>All operations possible on a Python list are implemented. For example,
+slicing (e.g., list[1:3]) will create a copy of the list on the JVM.
+Slicing is thus not equivalent to subList(), because a modification to a
+slice such as the addition of a new element will not affect the original
+list.</p>
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.count">
+<code class="descname">count</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.extend">
+<code class="descname">extend</code><span class="sig-paren">(</span><em>other_list</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.extend" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.index">
+<code class="descname">index</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.insert">
+<code class="descname">insert</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.insert" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><em>key=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.pop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.reverse">
+<code class="descname">reverse</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.reverse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaList.sort">
+<code class="descname">sort</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaList.sort" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="javamap">
+<span id="api-javamap"></span><h2>4.3.3. JavaMap<a class="headerlink" href="#javamap" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_collections.JavaMap">
+<em class="property">class </em><code class="descclassname">py4j.java_collections.</code><code class="descname">JavaMap</code><span class="sig-paren">(</span><em>target_id</em>, <em>gateway_client</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaMap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a Python Dictionary to a Java Map.</p>
+<p>All operations possible on a Python dict are implemented.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="javaset">
+<span id="api-javaset"></span><h2>4.3.4. JavaSet<a class="headerlink" href="#javaset" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_collections.JavaSet">
+<em class="property">class </em><code class="descclassname">py4j.java_collections.</code><code class="descname">JavaSet</code><span class="sig-paren">(</span><em>target_id</em>, <em>gateway_client</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a Python Set to a Java Set.</p>
+<p>All operations possible on a Python set are implemented.</p>
+<dl class="method">
+<dt id="py4j.java_collections.JavaSet.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaSet.add" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaSet.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaSet.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaSet.discard">
+<code class="descname">discard</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaSet.discard" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_collections.JavaSet.remove">
+<code class="descname">remove</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaSet.remove" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="javaarray">
+<span id="api-javaarray"></span><h2>4.3.5. JavaArray<a class="headerlink" href="#javaarray" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_collections.JavaArray">
+<em class="property">class </em><code class="descclassname">py4j.java_collections.</code><code class="descname">JavaArray</code><span class="sig-paren">(</span><em>target_id</em>, <em>gateway_client</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_collections.JavaArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maps a Java Array to a Semi-Mutable Sequence: elements inside the
+sequence can be modified, but the length of the sequence cannot change.</p>
+<p>The backing collection is a Sequence and not a Python array because
+these arrays only accept primitives whereas Java arrays work for any types.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+		  		
+				<div class="helpbar">
+					<h3>Questions/Feedback?</h3>
+					<ul>
+						<li>Try the <a href="faq.html">FAQ</a> -- It answers many questions.</li>
+						<li>Search for information in the <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j">archives of the py4j-users mailing list</a>, or <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j/join">post a question</a>.</li>
+						<li>If you notice errors with this documentation, <a href="https://github.com/bartdag/py4j/issues">open a ticket</a> and let us know. Please, only open a ticket for feedback or improvements on the docs. To get help, use the links above!</li>
+					</ul>
+				</div>
+				
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py4j_finalizer.html" title="4.4. py4j.finalizer — Py4J Finalizer API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py4j_java_protocol.html" title="4.2. py4j.protocol — Py4J Protocol"
+             >previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+
+          <!-- <li><a href="py4j_python.html" >4. Py4J Python API</a> &raquo;</li>--> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2013, Barthélémy Dagenais.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.
+    </div>
+  </div>
+  </body>
+
+
+</html>

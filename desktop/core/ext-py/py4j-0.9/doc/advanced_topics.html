@@ -1,0 +1,739 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>3. Advanced Topics &mdash; Py4J</title>
+    <link rel="stylesheet" href="_static/py4jdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  'true'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="Py4J" href="index.html" />
+    <link rel="next" title="4. Py4J Python API" href="py4j_python.html" />
+    <link rel="prev" title="2. Getting Started with Py4J" href="getting_started.html" />
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-18626179-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script> 
+  </head>
+  <body>
+  	<div class="page">
+<div class="banner">Py4J - A Bridge between Python and Java</div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py4j_python.html" title="4. Py4J Python API"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="2. Getting Started with Py4J"
+             accesskey="P">previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">On This Page</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">3. Advanced Topics</a><ul>
+<li><a class="reference internal" href="#accessing-java-collections-and-arrays-from-python">3.1. Accessing Java collections and arrays from Python</a><ul>
+<li><a class="reference internal" href="#array">3.1.1. Array</a></li>
+<li><a class="reference internal" href="#list">3.1.2. List</a></li>
+<li><a class="reference internal" href="#set">3.1.3. Set</a></li>
+<li><a class="reference internal" href="#map">3.1.4. Map</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#byte-array-byte">3.2. Byte array (byte[])</a></li>
+<li><a class="reference internal" href="#implementing-java-interfaces-from-python-callback">3.3. Implementing Java interfaces from Python (callback)</a></li>
+<li><a class="reference internal" href="#converting-python-collections-to-java-collections">3.4. Converting Python collections to Java Collections</a></li>
+<li><a class="reference internal" href="#py4j-exceptions">3.5. Py4J Exceptions</a></li>
+<li><a class="reference internal" href="#importing-packages-with-jvm-views">3.6. Importing packages with JVM Views</a></li>
+<li><a class="reference internal" href="#using-py4j-with-eclipse">3.7. Using Py4J with Eclipse</a></li>
+<li><a class="reference internal" href="#py4j-memory-model">3.8. Py4J Memory model</a></li>
+<li><a class="reference internal" href="#py4j-threading-and-connection-model">3.9. Py4J Threading and connection model</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="getting_started.html"
+                                  title="previous chapter">2. Getting Started with Py4J</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="py4j_python.html"
+                                  title="next chapter">4. Py4J Python API</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/advanced_topics.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="advanced-topics">
+<h1>3. Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="accessing-java-collections-and-arrays-from-python">
+<h2>3.1. Accessing Java collections and arrays from Python<a class="headerlink" href="#accessing-java-collections-and-arrays-from-python" title="Permalink to this headline">¶</a></h2>
+<p>Java collections are automatically mapped to Python collections so that
+standard Python operations such as slicing work on Java collections. Here is
+the mapping of the collection:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="22%" />
+<col width="59%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Java Collection</th>
+<th class="head">Python Collection</th>
+<th class="head">Py4J Implementation</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Array</td>
+<td>Sequence <a class="footnote-reference" href="#arraynote" id="id1">[1]</a></td>
+<td><a class="reference internal" href="py4j_java_collections.html#py4j.java_collections.JavaArray" title="py4j.java_collections.JavaArray"><code class="xref py py-class docutils literal"><span class="pre">JavaArray</span></code></a></td>
+</tr>
+<tr class="row-odd"><td>java.util.List</td>
+<td>MutableSequence</td>
+<td><a class="reference internal" href="py4j_java_collections.html#py4j.java_collections.JavaList" title="py4j.java_collections.JavaList"><code class="xref py py-class docutils literal"><span class="pre">JavaList</span></code></a></td>
+</tr>
+<tr class="row-even"><td>java.util.Set</td>
+<td>MutableSet</td>
+<td><a class="reference internal" href="py4j_java_collections.html#py4j.java_collections.JavaSet" title="py4j.java_collections.JavaSet"><code class="xref py py-class docutils literal"><span class="pre">JavaSet</span></code></a></td>
+</tr>
+<tr class="row-odd"><td>java.util.Map</td>
+<td>MutableMapping</td>
+<td><a class="reference internal" href="py4j_java_collections.html#py4j.java_collections.JavaMap" title="py4j.java_collections.JavaMap"><code class="xref py py-class docutils literal"><span class="pre">JavaMap</span></code></a></td>
+</tr>
+<tr class="row-even"><td>java.util.Iterator</td>
+<td><em>Iterator Protocol</em></td>
+<td><a class="reference internal" href="py4j_java_collections.html#py4j.java_collections.JavaIterator" title="py4j.java_collections.JavaIterator"><code class="xref py py-class docutils literal"><span class="pre">JavaIterator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="arraynote" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Py4J allows elements to be modified (like a real Java array), which is not the case of true
+immutable sequences like tuples.</td></tr>
+</tbody>
+</table>
+<p>Java methods are still accessible when using the Python version of a Java
+collection. Here are some usage examples for each collection class. These
+examples do not cover the entire API.</p>
+<p>It is possible to change this default mapping by registering an output
+converter with <a class="reference internal" href="py4j_java_protocol.html#py4j.protocol.register_output_converter" title="py4j.protocol.register_output_converter"><code class="xref py py-func docutils literal"><span class="pre">register_output_converter</span></code></a></p>
+<div class="section" id="array">
+<h3>3.1.1. Array<a class="headerlink" href="#array" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">int_class</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">int</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">int_array</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">new_array</span><span class="p">(</span><span class="n">int_class</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">int_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">int_array</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">int_array</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">int_array</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">IndexError</span>: <span class="n">list index out of range</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">int_array</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">1</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sarray</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">new_array</span><span class="p">(</span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">String</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sarray</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">sarray</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sarray</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="s">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sarray</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="go">u&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sarray</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="bp">None</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list">
+<h3>3.1.2. List<a class="headerlink" href="#list" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ArrayList</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c"># calling Python interface</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">)</span> <span class="c"># calling Java interface</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">elem</span>
+<span class="gp">...</span>
+<span class="go">1</span>
+<span class="go">hello</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="go">&quot;[2, u&#39;hello&#39;, 3]&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l2</span> <span class="o">=</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">999</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span>
+<span class="go">[2, u&#39;hello&#39;, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l2</span> <span class="c"># l2 is a copy of l and not a view so a change in l2 does not affect l</span>
+<span class="go">[999, u&#39;hello&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span><span class="p">(</span><span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span>
+<span class="go">[u&#39;hello&#39;, 3]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="set">
+<h3>3.1.3. Set<a class="headerlink" href="#set" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HashSet</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&#39;hello&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span>
+<span class="go">set([1, u&#39;hello&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">1</span> <span class="ow">in</span> <span class="n">s</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">u&#39;hello&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span>
+<span class="go">set([1])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="map">
+<h3>3.1.4. Map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">m</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HashMap</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="p">[</span><span class="s">&quot;a&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="s">&quot;b&quot;</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">{u&#39;a&#39;: 0, u&#39;b&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s">u&quot;b&quot;</span> <span class="ow">in</span> <span class="n">m</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s">&quot;a&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span>
+<span class="go">{u&#39;b&#39;: 1}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">m</span><span class="p">[</span><span class="s">&quot;c&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%s</span><span class="s">:</span><span class="si">%i</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">m</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+<span class="gp">...</span>
+<span class="go">b:1</span>
+<span class="go">c:2</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="byte-array-byte">
+<h2>3.2. Byte array (byte[])<a class="headerlink" href="#byte-array-byte" title="Permalink to this headline">¶</a></h2>
+<p>Since version 0.7, Py4J automatically passes Java byte array (i.e., <cite>byte[]</cite>)
+by value and convert them to Python bytearray (2.x) or bytes (3.x) and vice
+versa. The rationale is that byte array are often used for binary processing
+and are often immutable: a program reads a series of byte from a data source
+and interpret it (or transform it into another byte array).</p>
+<p>Prior to 0.7, a Python program could interact with a Java byte[] but each
+access to a byte required a call between the Python and the Java interpreter
+(i.e., the Python program only had a reference to the array).</p>
+<p>In summary:</p>
+<ul class="simple">
+<li>If from Java, you return a byte[], Py4J will convert the byte[] to a
+bytearray (Python 2.x) or bytes (Python 3.x) variable in Python.</li>
+<li>If from Python, you pass a bytearray or bytes variable to the Java side,
+Py4J will convert it to a byte[].</li>
+<li>If you pass a byte[] from Java to Python, both arrays are disconnected: a
+change to the array on one side will not be reflected on the other side.</li>
+<li>If you want to pass an array by reference, use a <cite>Byte[]</cite> instead of a
+<cite>byte[]</cite> or you can use  <a class="reference external" href="http://guava-libraries.googlecode.com/svn/trunk/javadoc/com/google/common/primitives/Bytes.html#asList(byte...)">Bytes.asList</a>
+from <a class="reference external" href="http://code.google.com/p/guava-libraries/">Guava</a> to obtain a list
+backed by a byte array.</li>
+</ul>
+</div>
+<div class="section" id="implementing-java-interfaces-from-python-callback">
+<h2>3.3. Implementing Java interfaces from Python (callback)<a class="headerlink" href="#implementing-java-interfaces-from-python-callback" title="Permalink to this headline">¶</a></h2>
+<p>Since version 0.3, Py4J allows Python classes to implement Java interfaces so
+that the JVM can call back Python objects.  In the following example, you will
+play the role of a Mad Scientist <sup>TM</sup> and you will create a Java program
+that invokes an operator with two or three random integers. The operators will
+be implemented by a Python class.</p>
+<p>Here is the code of the main Java program:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">package</span> <span class="nn">py4j.examples</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">py4j.GatewayServer</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">OperatorExample</span> <span class="o">{</span>
+
+        <span class="c1">// To prevent integer overflow</span>
+        <span class="kd">private</span> <span class="kd">final</span> <span class="kd">static</span> <span class="kt">int</span> <span class="n">MAX</span> <span class="o">=</span> <span class="mi">1000</span><span class="o">;</span>
+
+        <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">randomBinaryOperator</span><span class="o">(</span><span class="n">Operator</span> <span class="n">op</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">Random</span> <span class="n">random</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">();</span>
+                <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">numbers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">random</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">MAX</span><span class="o">));</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">random</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">MAX</span><span class="o">));</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">op</span><span class="o">.</span><span class="na">doOperation</span><span class="o">(</span><span class="n">numbers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">),</span> <span class="n">numbers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">1</span><span class="o">)));</span>
+                <span class="k">return</span> <span class="n">numbers</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="nf">randomTernaryOperator</span><span class="o">(</span><span class="n">Operator</span> <span class="n">op</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">Random</span> <span class="n">random</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Random</span><span class="o">();</span>
+                <span class="n">List</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;</span> <span class="n">numbers</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">Integer</span><span class="o">&gt;();</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">random</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">MAX</span><span class="o">));</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">random</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">MAX</span><span class="o">));</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">random</span><span class="o">.</span><span class="na">nextInt</span><span class="o">(</span><span class="n">MAX</span><span class="o">));</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">op</span><span class="o">.</span><span class="na">doOperation</span><span class="o">(</span><span class="n">numbers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">),</span> <span class="n">numbers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">1</span><span class="o">),</span> <span class="n">numbers</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="mi">2</span><span class="o">)));</span>
+                <span class="k">return</span> <span class="n">numbers</span><span class="o">;</span>
+        <span class="o">}</span>
+
+        <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">main</span><span class="o">(</span><span class="n">String</span><span class="o">[]</span> <span class="n">args</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">GatewayServer</span> <span class="n">server</span> <span class="o">=</span> <span class="k">new</span> <span class="n">GatewayServer</span><span class="o">(</span><span class="k">new</span> <span class="n">OperatorExample</span><span class="o">());</span>
+                <span class="n">server</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+        <span class="o">}</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>The program has a main method starting a <cite>GatewayServer</cite>. The entry point, a
+<cite>OperatorExample</cite> instance, offers two methods that take as a parameter an
+<cite>Operator</cite> instance. Each method calls the operator with two or three random
+integers and save the integers and the result in a list. Here is the
+declaration of <cite>Operator</cite>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">package</span> <span class="nn">py4j.examples</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">Operator</span> <span class="o">{</span>
+
+        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">doOperation</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">int</span> <span class="n">j</span><span class="o">);</span>
+
+        <span class="kd">public</span> <span class="kt">int</span> <span class="nf">doOperation</span><span class="o">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">,</span> <span class="kt">int</span> <span class="n">j</span><span class="o">,</span> <span class="kt">int</span> <span class="n">k</span><span class="o">);</span>
+
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Now, because the Mad Scientist <sup>TM</sup> is, well, mad, he wants to define an
+Operator in Python. Here is his little Python program:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="kn">import</span> <span class="n">JavaGateway</span>
+
+<span class="k">class</span> <span class="nc">Addition</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">doOperation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span> <span class="o">+</span> <span class="n">j</span> <span class="o">+</span> <span class="n">k</span>
+
+    <span class="k">class</span> <span class="nc">Java</span><span class="p">:</span>
+        <span class="n">implements</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;py4j.examples.Operator&#39;</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c"># The callback server parameters is optional, but it tells to start the</span>
+    <span class="c"># callback server automatically.</span>
+    <span class="n">gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">(</span><span class="n">CallbackServerParameters</span><span class="p">())</span>
+    <span class="n">operator</span> <span class="o">=</span> <span class="n">Addition</span><span class="p">()</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">entry_point</span><span class="o">.</span><span class="n">randomBinaryOperator</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="n">numbers</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">entry_point</span><span class="o">.</span><span class="n">randomTernaryOperator</span><span class="p">(</span><span class="n">operator</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">numbers</span><span class="p">)</span>
+    <span class="n">gateway</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The <cite>Addition</cite> class is a standard Python class that has one method,
+<cite>doOperation</cite>. The signature of the method contains two parameters and an
+optional third parameter: this maps with the two overloaded methods in the
+<cite>Operator</cite> Java interface. Each method implementing an overloaded method in a
+Java interface should accept all possible combinations of parameters,
+otherwise, an exception will be thrown if the Java program tries to call an
+unsupported method.</p>
+<p>Py4J recognizes that the <cite>Addition</cite> class implements a Java interface because
+it declares an internal class called <cite>Java</cite>, which has a member named
+<cite>implements</cite>. This member is a list of string representing the fully qualified
+name of implemented Java interfaces.</p>
+<p>Finally, the Python program contains a main method that starts a gateway,
+initializes an Addition operator and sends it to the <cite>OperatorExample</cite> instance
+on the Java side. Py4J takes care of creating the necessary proxies: the
+<cite>doOperation</cite> method of the <cite>Addition</cite> class is called in the Java VM, but the
+method is executed in the Python interpreter.</p>
+<p>Note that to enable the Python program to receive callbacks, the JavaGateway
+instance must be created with <cite>start_callback_server=True</cite>. Otherwise, the
+callback server must be started manually by calling
+<a class="reference internal" href="py4j_java_gateway.html#py4j.java_gateway.JavaGateway.restart_callback_server" title="py4j.java_gateway.JavaGateway.restart_callback_server"><code class="xref py py-func docutils literal"><span class="pre">restart_callback_server</span></code></a></p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>Python classes can only implement Java interfaces. Abstract or concrete
+classes are not supported because Java does not natively support dynamic
+proxies for classes. Extending classes may be supported in future releases
+of Py4J.</p>
+<p class="last">As a workaround, a subclass of the abstract class could be created on the
+Java side. The methods of the subclass would call the methods of a custom
+interface that a Python class could implement.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p>If you want to implement an interface declared in a class (i.e., an
+internal class), you need to prefix the name of the interface with
+a dollar sign. For example, if the interface <cite>Operator</cite> is declared
+in the class <cite>package1.MyClass</cite>, you will have to write:</p>
+<p class="last"><cite>implements = [&#8216;package1.MyClass$Operator&#8217;]</cite></p>
+</div>
+</div>
+<div class="section" id="converting-python-collections-to-java-collections">
+<span id="collections-conversion"></span><h2>3.4. Converting Python collections to Java Collections<a class="headerlink" href="#converting-python-collections-to-java-collections" title="Permalink to this headline">¶</a></h2>
+<p>If you try to pass a Python collection to a method that expects a Java
+collection, an error will be thrown:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">my_list</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Collections</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">my_list</span><span class="p">)</span>
+<span class="gt">Traceback (most recent call last):</span>
+  File <span class="nb">&quot;&lt;stdin&gt;&quot;</span>, line <span class="m">1</span>, in <span class="n">&lt;module&gt;</span>
+  File <span class="nb">&quot;py4j/java_gateway.py&quot;</span>, line <span class="m">347</span>, in <span class="n">__call__</span>
+    <span class="n">args_command</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">get_command_part</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pool</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">new_args</span><span class="p">])</span>
+  File <span class="nb">&quot;py4j/protocol.py&quot;</span>, line <span class="m">195</span>, in <span class="n">get_command_part</span>
+    <span class="n">command_part</span> <span class="o">=</span> <span class="n">REFERENCE_TYPE</span> <span class="o">+</span> <span class="n">parameter</span><span class="o">.</span><span class="n">_get_object_id</span><span class="p">()</span>
+<span class="gr">AttributeError</span>: <span class="n">&#39;list&#39; object has no attribute &#39;_get_object_id&#39;</span>
+</pre></div>
+</div>
+<p>You can explicitly convert Python collections using one of the following
+converter located in the <cite>py4j.java_collections</cite> module: <cite>SetConverter</cite>,
+<cite>MapConverter</cite>, <cite>ListConverter</cite>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">py4j.java_collections</span> <span class="kn">import</span> <span class="n">SetConverter</span><span class="p">,</span> <span class="n">MapConverter</span><span class="p">,</span> <span class="n">ListConverter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">java_list</span> <span class="o">=</span> <span class="n">ListConverter</span><span class="p">()</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">my_list</span><span class="p">,</span> <span class="n">gateway</span><span class="o">.</span><span class="n">_gateway_client</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Collections</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">java_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">java_list</span>
+<span class="go">[1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_list</span>
+<span class="go">[3, 2, 1]</span>
+</pre></div>
+</div>
+<p>Note that the Python list is totally disconnected from the Java list. The Java
+List is actually a copy. You can also ask Py4J to automatically convert Python
+collections to Java Collections when calling a Java method: just set
+<code class="docutils literal"><span class="pre">auto_convert=True</span></code> when creating a <cite>JavaGateway</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">(</span><span class="n">GatewayParameters</span><span class="p">(</span><span class="n">auto_convert</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_list</span>
+<span class="go">[3, 2, 1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Collections</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">my_list</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_list</span> <span class="c"># The python list is not sorted!</span>
+<span class="go">[3, 2, 1]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Collections</span><span class="o">.</span><span class="n">frequency</span><span class="p">(</span><span class="n">my_list</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">1</span>
+</pre></div>
+</div>
+<p>Again, note that my_list is not sorted because when calling
+<cite>Collections.sort()</cite>, Py4J only makes a copy of the Python list. Still, a copy
+can be useful if you do not expect the list to be modified by the Java method
+like in the call to <code class="docutils literal"><span class="pre">frequency()</span></code>.</p>
+<p><strong>Order of Automatic Conversion</strong></p>
+<p>When <code class="docutils literal"><span class="pre">auto_convert=True</span></code>, Py4J will attempt to automatically convert Python
+objects that are not an instance of <code class="docutils literal"><span class="pre">basestring</span></code> or <code class="docutils literal"><span class="pre">JavaObject</span></code>. By
+default, Py4J performs the following checks and conversions:</p>
+<ol class="arabic simple">
+<li>If the Python object is an instance of <cite>collections.Set</cite>, it is converted to
+a <cite>HashSet</cite>.</li>
+<li>If the object has the methods <cite>keys()</cite> and <cite>__getitem__</cite>, it is converted to
+a <cite>HashMap</cite></li>
+<li>If the object is iterable, it is converted to an <cite>ArrayList</cite>.</li>
+<li>Otherwise, standard Py4J primitive type conversion is attempted (e.g., bool to boolean).</li>
+</ol>
+<p>It is possible to add custom converters by calling
+<a class="reference internal" href="py4j_java_protocol.html#py4j.protocol.register_input_converter" title="py4j.protocol.register_input_converter"><code class="xref py py-func docutils literal"><span class="pre">register_input_converter()</span></code></a>. Look at the source code of the
+default converters for an example. Note that automatic conversion makes calling
+Java methods slightly less efficient because in the worst case, Py4J needs to
+go through all registered converters for all parameters. This is why automatic
+conversion is disabled by default.</p>
+</div>
+<div class="section" id="py4j-exceptions">
+<span id="id2"></span><h2>3.5. Py4J Exceptions<a class="headerlink" href="#py4j-exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Py4J can raise three exceptions on the Python side:</p>
+<ul class="simple">
+<li><a class="reference internal" href="py4j_java_protocol.html#py4j.protocol.Py4JJavaError" title="py4j.protocol.Py4JJavaError"><code class="xref py py-class docutils literal"><span class="pre">Py4JJavaError</span></code></a>. This exception is
+raised when an exception occurs in the Java client code. For example, if you
+try to pop an element from an empty stack. The instance of the Java exception
+thrown is stored in the <cite>java_exception</cite> member.</li>
+<li><a class="reference internal" href="py4j_java_protocol.html#py4j.protocol.Py4JNetworkError" title="py4j.protocol.Py4JNetworkError"><code class="xref py py-class docutils literal"><span class="pre">Py4JNetworkError</span></code></a>. This exception is
+raised when a problem occurs during network transfer (e.g., connection lost).</li>
+<li><a class="reference internal" href="py4j_java_protocol.html#py4j.protocol.Py4JError" title="py4j.protocol.Py4JError"><code class="xref py py-class docutils literal"><span class="pre">Py4JError</span></code></a>. This exception is raised when
+any other error occurs such as when the client program tries to access an
+object that no longer exists on the Java side.</li>
+</ul>
+<p>Both <cite>Py4JJavaError</cite> and <cite>Py4JNetworkError</cite> inherits from <cite>Py4JError</cite> so it is
+possible to catch all related Py4J errors with one except clause:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+  <span class="n">java_object</span><span class="o">.</span><span class="n">doSomething</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">Py4JError</span><span class="p">:</span>
+  <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>If a Py4J Exception wraps another exception, the original exception will be
+available in the <code class="docutils literal"><span class="pre">clause</span></code> field.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+  <span class="n">java_object</span><span class="o">.</span><span class="n">doSomething</span><span class="p">()</span>
+<span class="k">except</span> <span class="n">Py4JError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+  <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">cause</span><span class="p">:</span>
+      <span class="k">print</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">cause</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="importing-packages-with-jvm-views">
+<span id="jvm-views"></span><h2>3.6. Importing packages with JVM Views<a class="headerlink" href="#importing-packages-with-jvm-views" title="Permalink to this headline">¶</a></h2>
+<p>Py4J allows you to import packages so that you don&#8217;t have to type the fully
+qualified name of the classes you want to instantiate. The <cite>java.lang</cite> package
+is always automatically imported.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="kn">import</span> <span class="n">JavaGateway</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="kn">import</span> <span class="n">java_import</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">java_import</span><span class="p">(</span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="p">,</span><span class="s">&#39;java.util.*&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jList</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">ArrayList</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jMap</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">HashMap</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">u&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="s">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">u&#39;a&#39;</span>
+</pre></div>
+</div>
+<p>As opposed to Java where import statements do not cross compilation units (java
+source files), the jvm instance can be shared across multiple Python modules: in
+other words, import statements are global.</p>
+<p>The recommended way to use import statements is to use one <a class="reference internal" href="py4j_java_gateway.html#py4j.java_gateway.JVMView" title="py4j.java_gateway.JVMView"><code class="xref py py-class docutils literal"><span class="pre">JVMView</span></code></a> instance per Python module. Here is an example on
+how to create and use a <cite>JVMView</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">module1_view</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">new_jvm_view</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">module2_view</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">new_jvm_view</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jList2</span> <span class="o">=</span> <span class="n">module1_view</span><span class="o">.</span><span class="n">ArrayList</span><span class="p">()</span>
+<span class="go">Py4JError: Trying to call a package.</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">java_import</span><span class="p">(</span><span class="n">module1_view</span><span class="p">,</span><span class="s">&#39;java.util.ArrayList&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jList2</span> <span class="o">=</span> <span class="n">module1_view</span><span class="o">.</span><span class="n">ArrayList</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jList3</span> <span class="o">=</span> <span class="n">module2_view</span><span class="o">.</span><span class="n">ArrayList</span><span class="p">()</span>
+<span class="go">Py4JError: Trying to call a package.</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>As you can see from the previous example, the import of <cite>java.util.ArrayList</cite>
+only affects <cite>module1_view</cite>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In fact, the <cite>gateway.jvm</cite> member is also an instance of <a class="reference internal" href="py4j_java_gateway.html#py4j.java_gateway.JVMView" title="py4j.java_gateway.JVMView"><code class="xref py py-class docutils literal"><span class="pre">JVMView</span></code></a>. It is automatically created when a gateway is
+initialized.</p>
+</div>
+</div>
+<div class="section" id="using-py4j-with-eclipse">
+<span id="eclipse-features"></span><h2>3.7. Using Py4J with Eclipse<a class="headerlink" href="#using-py4j-with-eclipse" title="Permalink to this headline">¶</a></h2>
+<p>Py4J can be used with Eclipse like any normal Java program. A plug-in needs to
+instantiate and start a GatewayServer. By default, the GatewayServer will only
+be able to access the classes declared in the plug-in or one of its
+dependencies.</p>
+<p>Unless they have specific needs, users are encouraged to use the Eclipse
+plug-ins provided by Py4J available on the following update site:</p>
+<p><code class="docutils literal"><span class="pre">http://eclipse.py4j.org/</span></code></p>
+<p>The first plug-in, <cite>net.sf.py4j</cite>, provides all the Py4J Java classes such as
+<cite>GatewayServer</cite>. The plug-in comes with the source and the javadoc. The plug-in
+also declares a <cite>global</cite> buddy policy which allows the <cite>GatewayServer</cite> to
+access any class declared in any plug-in loaded with Eclipse.</p>
+<p>The second plug-in, <cite>net.sf.py4j.defaultserver</cite>, instantiates a GatewayServer
+and starts it as soon as Eclipse is started (no lazy loading). The ports used
+by the default server can be changed in the Py4J Preferences page. The server
+is also accessible at runtime:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">net.sf.py4j.defaultserver.DefaultServerActivator</span><span class="o">;</span>
+
+<span class="o">...</span>
+
+<span class="n">GatewayServer</span> <span class="n">server</span> <span class="o">=</span> <span class="n">DefaultServerActivator</span><span class="o">.</span><span class="na">getDefault</span><span class="o">().</span><span class="na">getServer</span><span class="o">();</span>
+</pre></div>
+</div>
+<p>Here is a short example of what you could do with Py4J and Eclipse:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">py4j.java_gateway</span> <span class="kn">import</span> <span class="n">JavaGateway</span><span class="p">,</span> <span class="n">java_import</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jvm</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">java_import</span><span class="p">(</span><span class="n">jvm</span><span class="p">,</span> <span class="s">&#39;org.eclipse.core.resources.*&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">workspace_root</span> <span class="o">=</span> <span class="n">jvm</span><span class="o">.</span><span class="n">ResourcesPlugin</span><span class="o">.</span><span class="n">getWorkspace</span><span class="p">()</span><span class="o">.</span><span class="n">getRoot</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span><span class="o">.</span><span class="n">help</span><span class="p">(</span><span class="n">workspace_root</span><span class="p">,</span><span class="s">&#39;*Projects*&#39;</span><span class="p">)</span>
+<span class="go">Help on class WorkspaceRoot in package org.eclipse.core.internal.resources:</span>
+
+<span class="go">WorkspaceRoot extends org.eclipse.core.internal.resources.Container implements org.eclipse.core.resources.IWorkspaceRoot {</span>
+<span class="go">|</span>
+<span class="go">|  Methods defined here:</span>
+<span class="go">|</span>
+<span class="go">|  getProjects() : IProject[]</span>
+<span class="go">|</span>
+<span class="go">|  getProjects(int) : IProject[]</span>
+<span class="go">|</span>
+<span class="go">|  ------------------------------------------------------------</span>
+<span class="go">|  Fields defined here:</span>
+<span class="go">|</span>
+<span class="go">|  ------------------------------------------------------------</span>
+<span class="go">|  Internal classes defined here:</span>
+<span class="go">|</span>
+<span class="go">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">project_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">project</span><span class="o">.</span><span class="n">getName</span><span class="p">()</span> <span class="k">for</span> <span class="n">project</span> <span class="ow">in</span> <span class="n">workspace_root</span><span class="o">.</span><span class="n">getProjects</span><span class="p">()]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span><span class="p">(</span><span class="n">project_names</span><span class="p">)</span>
+<span class="go">[u&#39;test2&#39;, u&#39;testplugin&#39;, u&#39;testplugin2&#39;]</span>
+</pre></div>
+</div>
+<p>Support for Eclipse was introduced in Py4J 0.5 and more features will be added
+in the future.</p>
+</div>
+<div class="section" id="py4j-memory-model">
+<span id="adv-memory"></span><h2>3.8. Py4J Memory model<a class="headerlink" href="#py4j-memory-model" title="Permalink to this headline">¶</a></h2>
+<p><strong>Java objects sent to the Python side</strong></p>
+<p>Every time a Java object is sent to the Python side, a reference to the object
+is kept on the Java side (in the Gateway class). Once the object is garbage
+collected on the Python VM (reference count == 0), the reference is removed on
+the Java VM: if this was the last reference, the object will likely be garbage
+collected too. When a gateway is shut down, the remaining references are also
+removed on the Java VM.</p>
+<p>Because Java objects on the Python side are involved in a circular reference
+(<code class="xref py py-class docutils literal"><span class="pre">JavaObject</span></code> and <code class="xref py py-class docutils literal"><span class="pre">JavaMember</span></code> reference each other), these objects are not
+immediately garbage collected once the last reference to the object is removed
+(but they are guaranteed to be eventually collected <strong>if the Python garbage
+collector runs before the Python program exits</strong>).</p>
+<p>In doubt, users can always call the <a class="reference internal" href="py4j_java_gateway.html#py4j.java_gateway.JavaGateway.detach" title="py4j.java_gateway.JavaGateway.detach"><code class="xref py py-func docutils literal"><span class="pre">detach</span></code></a> function on the Python gateway to
+explicitly delete a reference on the Java side. A call to <cite>gc.collect()</cite> also
+usually works.</p>
+<p><strong>Python objects sent to the Java side (callback)</strong></p>
+<p>Every time a Python object is sent to the Java side, a reference to this object
+is kept on the Python side (by a <code class="xref py py-class docutils literal"><span class="pre">PythonProxyPool</span></code>). Once a python object is garbage
+collected on the Java side, a message is sent to the Python side to remove the
+reference to the Python object. When a gateway is shut down, the remaining
+references are removed from the Python VM.</p>
+<p>Unfortunately, there is no guarantee that the garbage collection message will
+ever be sent to the Python side (it usually works on Sun/Oracle VM). It might
+thus be necessary to manually remove the reference to the Python objects. Some
+helper functions will be developed in the future, but it is unlikely that
+garbage collection will be guarenteed because of the specifications of Java
+finalizers (which are surprisingly worse than Python finalizer strategies).</p>
+</div>
+<div class="section" id="py4j-threading-and-connection-model">
+<span id="adv-threading"></span><h2>3.9. Py4J Threading and connection model<a class="headerlink" href="#py4j-threading-and-connection-model" title="Permalink to this headline">¶</a></h2>
+<p>Py4J allocates one thread per connection. The design of Py4j is symmetrical on
+the Python and Java sides. A Python GatewayClient communicates with the Java
+GatewayServer and is then associated with a GatewayConnection. A Java
+CallbackClient (for callbacks) communicates with the Python CallbackServer and
+is then associated with a CallbackConnection. A connection runs in the calling
+thread.</p>
+<p>And now, for the details:</p>
+<p><strong>On the Python side: calling Java</strong></p>
+<p>Py4J on the Python side does not explicitly create a thread to call Java
+methods. When a method is called, a connection to the Java GatewayServer is
+established in the calling thread. If multiple threads are calling Java methods
+concurrently, Py4J will ensure that each thread has its own connection by
+requesting more connections.</p>
+<p>To be extra clear: if you only call Java, Py4J on the Python side will never
+create a thread.</p>
+<p>To be extra extra clear: Py4J is thread-safe so if you use a JavaGateway from
+multiple threads that <strong>you created</strong>, Py4J will make manage the network
+resources appropriately.</p>
+<p><strong>On the Python side: receiving callbacks from Java</strong></p>
+<p>Py4J explicitly creates a thread to run the
+<a class="reference internal" href="py4j_java_gateway.html#py4j.java_gateway.CallbackServer" title="py4j.java_gateway.CallbackServer"><code class="xref py py-class docutils literal"><span class="pre">CallbackServer</span></code></a>, which accepts
+callback connection requests, and a thread for each callback connection
+request. As long as there is no concurrent callback from the Java side, the
+same callback connection/thread will be used.</p>
+<p>These threads are necessary to prevent deadlocks. For example, if we only had a
+single thread to handle callbacks from Java, Py4J would deadlock as soon as it
+would encounter an indirect recursion between Java and Python functions. Early
+versions of Py4J made this mistake :-)</p>
+<p><strong>On the Java side: receiving calls from Python</strong></p>
+<p>Py4J explicitly creates a thread to run the GatewayServer, which accepts
+connection requests (from a GatewayClient), and a thread for each connection
+request. As long as there is no concurrent call from the Python side, the same
+connection/thread will be used.</p>
+<p><strong>On the Java side: calling back Python</strong></p>
+<p>Py4J on the Java side does not explicitly create a thread to make a callback to
+a Python object. When a callback is called, a connection to the CallbackServer
+is established in the calling thread. If <strong>you created</strong> multiple threads in
+Java to call back Python concurrently, Py4J will ensure that each thread has
+its own CallbackConnection.</p>
+</div>
+</div>
+
+
+          </div>
+		  		
+				<div class="helpbar">
+					<h3>Questions/Feedback?</h3>
+					<ul>
+						<li>Try the <a href="faq.html">FAQ</a> -- It answers many questions.</li>
+						<li>Search for information in the <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j">archives of the py4j-users mailing list</a>, or <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j/join">post a question</a>.</li>
+						<li>If you notice errors with this documentation, <a href="https://github.com/bartdag/py4j/issues">open a ticket</a> and let us know. Please, only open a ticket for feedback or improvements on the docs. To get help, use the links above!</li>
+					</ul>
+				</div>
+				
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py4j_python.html" title="4. Py4J Python API"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="2. Getting Started with Py4J"
+             >previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2013, Barthélémy Dagenais.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.
+    </div>
+  </div>
+  </body>
+
+
+</html>

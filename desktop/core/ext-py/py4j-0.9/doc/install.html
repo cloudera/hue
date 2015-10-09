@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Installing Py4J &mdash; Py4J</title>
+    <link rel="stylesheet" href="_static/py4jdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  'true'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="Py4J" href="index.html" />
+    <link rel="next" title="2. Getting Started with Py4J" href="getting_started.html" />
+    <link rel="prev" title="Py4J Documentation" href="contents.html" />
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-18626179-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script> 
+  </head>
+  <body>
+  	<div class="page">
+<div class="banner">Py4J - A Bridge between Python and Java</div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="2. Getting Started with Py4J"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="contents.html" title="Py4J Documentation"
+             accesskey="P">previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">On This Page</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">1. Installing Py4J</a><ul>
+<li><a class="reference internal" href="#installing-python-2-6-or-3-4">1.1. Installing Python 2.6+ or 3.4</a></li>
+<li><a class="reference internal" href="#installing-java-6">1.2. Installing Java 6+</a></li>
+<li><a class="reference internal" href="#id1">1.3. Installing Py4J</a><ul>
+<li><a class="reference internal" href="#using-easy-install-or-pip">1.3.1. Using easy_install or pip</a></li>
+<li><a class="reference internal" href="#using-an-official-release">1.3.2. Using an official release</a></li>
+<li><a class="reference internal" href="#using-the-latest-development-source-code">1.3.3. Using the latest development source code</a></li>
+<li><a class="reference internal" href="#maven-install">1.3.4. Maven install</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="contents.html"
+                                  title="previous chapter">Py4J Documentation</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="getting_started.html"
+                                  title="next chapter">2. Getting Started with Py4J</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/install.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installing-py4j">
+<span id="install-instructions"></span><h1>1. Installing Py4J<a class="headerlink" href="#installing-py4j" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installing-python-2-6-or-3-4">
+<h2>1.1. Installing Python 2.6+ or 3.4<a class="headerlink" href="#installing-python-2-6-or-3-4" title="Permalink to this headline">¶</a></h2>
+<p>Py4J is a library written in Python and Java. Currently, Py4J has been tested
+with Python 2.6, 2.7, and 3.4, but it should also be compatible with Python 3.3.
+You can install Python by going to the <a class="reference external" href="http://www.python.org/download/">official Python download page</a>.</p>
+</div>
+<div class="section" id="installing-java-6">
+<h2>1.2. Installing Java 6+<a class="headerlink" href="#installing-java-6" title="Permalink to this headline">¶</a></h2>
+<p>You also need to install a Java environment, version 6 (7 and 8 are also
+supported). You can install a Java environment by going to the <a class="reference external" href="http://www.oracle.com/technetwork/java/javase/downloads/index.html">official Java
+download page</a> You will
+need to download the JDK if you plan to use the Java compiler, but you only
+need the JRE if you are using another compiler, such as the one provided by the
+<a class="reference external" href="http://www.eclipse.org">Eclipse Development Environment</a>.</p>
+</div>
+<div class="section" id="id1">
+<h2>1.3. Installing Py4J<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>There are three ways to install Py4J:</p>
+<div class="section" id="using-easy-install-or-pip">
+<h3>1.3.1. Using easy_install or pip<a class="headerlink" href="#using-easy-install-or-pip" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Run <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">py4j</span></code> or <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">py4j</span></code> (don&#8217;t forget
+to prefix with sudo if you install Py4J system-wide on a
+*NIX operating system).</li>
+<li>Py4J should now be in your PYTHONPATH.</li>
+<li>The Py4J Java library is located in <code class="docutils literal"><span class="pre">share/py4j/py4j0.x.jar</span></code>. The exact
+location depends on the platform and the installation type. Some likely
+locations are:<ol class="arabic">
+<li><code class="docutils literal"><span class="pre">/usr/share/py4j/py4j0.x.jar</span></code> for system-wide install on Linux.</li>
+<li><code class="docutils literal"><span class="pre">{virtual_env_dir}/share/py4j/py4j0.x.jar</span></code> for installation in a
+virtual environment.</li>
+<li><code class="docutils literal"><span class="pre">C:\python27\share\py4j\py4j0.x.jar</span></code> for system-wide install on
+Windows.</li>
+</ol>
+</li>
+</ol>
+</div>
+<div class="section" id="using-an-official-release">
+<h3>1.3.2. Using an official release<a class="headerlink" href="#using-an-official-release" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download the latest official release from from <a class="reference external" href="http://pypi.python.org/pypi/py4j">PyPI</a>. If you are using a *NIX OS, download
+the tar.gz file. If you are using Windows, download the zip file.</li>
+<li>Untar/Unzip the file and navigate to the newly created directory, e.g., <code class="docutils literal"><span class="pre">cd</span>
+<span class="pre">py4j-0.x</span></code>.</li>
+<li>Run <code class="docutils literal"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> (don&#8217;t forget to prefix with sudo if you
+install Py4J system-wide).</li>
+<li>Py4J should now be in your PYTHONPATH.</li>
+<li>The Py4J Java library is located under <code class="docutils literal"><span class="pre">py4j-java/py4j0.x.jar</span></code>.  Add this
+library to your classpath when using Py4J in a Java program.</li>
+</ol>
+</div>
+<div class="section" id="using-the-latest-development-source-code">
+<h3>1.3.3. Using the latest development source code<a class="headerlink" href="#using-the-latest-development-source-code" title="Permalink to this headline">¶</a></h3>
+<p>You can install the latest version with pip and git:
+<code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/bartdag/py4j.git</span></code></p>
+<p>Otherwise, to build the Java and Python libraries, you need:</p>
+<ol class="arabic simple">
+<li><a class="reference external" href="http://git-scm.com/">Git</a> to download the latest source code.
+Execute the command line <code class="docutils literal"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">https://github.com/bartdag/py4j.git</span>
+<span class="pre">py4j</span></code> to download the source code.</li>
+<li><a class="reference external" href="http://ant.apache.org">Apache ant</a> to build the Py4J Java library execute
+the command line <code class="docutils literal"><span class="pre">ant</span> <span class="pre">jar</span></code> in the py4j-java project directory to build the
+code and create a jar file.</li>
+<li><a class="reference external" href="http://sphinx.pocoo.org/">Sphinx</a> to build the documentation. Just
+execute the command line <code class="docutils literal"><span class="pre">make</span> <span class="pre">html</span></code>  in the
+py4j-web project.</li>
+<li><a class="reference external" href="http://pypi.python.org/pypi/nose/">nose</a> to test the Py4J Python
+library.</li>
+</ol>
+<p>Execute the command line <code class="docutils literal"><span class="pre">ant</span> <span class="pre">python-light-release</span></code> in the py4j-java
+directory to create a tar.gz and zip source distribution. The
+<code class="docutils literal"><span class="pre">python-light-release</span></code> target will (1) build the Py4J Java library, (2)
+build the documentation, and (3) build the Py4J Python library and package it
+into a tar.gz and zip source distribution.</p>
+</div>
+<div class="section" id="maven-install">
+<h3>1.3.4. Maven install<a class="headerlink" href="#maven-install" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic simple">
+<li>Download the source code as explained above.</li>
+<li>Go to the py4j-java directory and execute <code class="docutils literal"><span class="pre">mvn</span> <span class="pre">install</span></code>.</li>
+<li>Alternatively, if a test fails (possible because of sockets), execute
+<code class="docutils literal"><span class="pre">mvn</span> <span class="pre">-Dmaven.test.skip=true</span> <span class="pre">install</span></code></li>
+<li>Builded binaries will be in the directory <code class="docutils literal"><span class="pre">target/py4j-0.x.jar</span></code>.</li>
+</ol>
+</div>
+</div>
+</div>
+
+
+          </div>
+		  		
+				<div class="helpbar">
+					<h3>Questions/Feedback?</h3>
+					<ul>
+						<li>Try the <a href="faq.html">FAQ</a> -- It answers many questions.</li>
+						<li>Search for information in the <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j">archives of the py4j-users mailing list</a>, or <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j/join">post a question</a>.</li>
+						<li>If you notice errors with this documentation, <a href="https://github.com/bartdag/py4j/issues">open a ticket</a> and let us know. Please, only open a ticket for feedback or improvements on the docs. To get help, use the links above!</li>
+					</ul>
+				</div>
+				
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="getting_started.html" title="2. Getting Started with Py4J"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="contents.html" title="Py4J Documentation"
+             >previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+ 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2013, Barthélémy Dagenais.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.
+    </div>
+  </div>
+  </body>
+
+
+</html>

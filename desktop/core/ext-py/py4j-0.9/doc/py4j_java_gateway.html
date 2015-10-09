@@ -1,0 +1,1025 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>4.1. py4j.java_gateway — Py4J Main API &mdash; Py4J</title>
+    <link rel="stylesheet" href="_static/py4jdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.8.1',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  'true'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="Py4J" href="index.html" />
+    <link rel="up" title="4. Py4J Python API" href="py4j_python.html" />
+    <link rel="next" title="4.2. py4j.protocol — Py4J Protocol" href="py4j_java_protocol.html" />
+    <link rel="prev" title="4. Py4J Python API" href="py4j_python.html" />
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-18626179-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script> 
+  </head>
+  <body>
+  	<div class="page">
+<div class="banner">Py4J - A Bridge between Python and Java</div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py4j_java_protocol.html" title="4.2. py4j.protocol — Py4J Protocol"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="py4j_python.html" title="4. Py4J Python API"
+             accesskey="P">previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+
+          <!-- <li><a href="py4j_python.html" accesskey="U">4. Py4J Python API</a> &raquo;</li>--> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="contents.html">On This Page</a></h3>
+            <ul>
+<li><a class="reference internal" href="#">4.1. <code class="docutils literal"><span class="pre">py4j.java_gateway</span></code> &#8212; Py4J Main API</a><ul>
+<li><a class="reference internal" href="#javagateway">4.1.1. JavaGateway</a><ul>
+<li><a class="reference internal" href="#examples">4.1.1.1. Examples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#gatewayparameters">4.1.2. GatewayParameters</a></li>
+<li><a class="reference internal" href="#callbackserverparameters">4.1.3. CallbackServerParameters</a></li>
+<li><a class="reference internal" href="#gatewayclient">4.1.4. GatewayClient</a></li>
+<li><a class="reference internal" href="#gatewayconnection">4.1.5. GatewayConnection</a></li>
+<li><a class="reference internal" href="#jvmview">4.1.6. JVMView</a></li>
+<li><a class="reference internal" href="#javaobject">4.1.7. JavaObject</a></li>
+<li><a class="reference internal" href="#javamember">4.1.8. JavaMember</a></li>
+<li><a class="reference internal" href="#javaclass">4.1.9. JavaClass</a></li>
+<li><a class="reference internal" href="#javapackage">4.1.10. JavaPackage</a></li>
+<li><a class="reference internal" href="#pythonproxypool">4.1.11. PythonProxyPool</a></li>
+<li><a class="reference internal" href="#callbackserver">4.1.12. CallbackServer</a></li>
+<li><a class="reference internal" href="#callbackconnection">4.1.13. CallbackConnection</a></li>
+<li><a class="reference internal" href="#py4j-functions">4.1.14. Py4J Functions</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="py4j_python.html"
+                                  title="previous chapter">4. Py4J Python API</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="py4j_java_protocol.html"
+                                  title="next chapter">4.2. <code class="docutils literal"><span class="pre">py4j.protocol</span></code> &#8212; Py4J Protocol</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/py4j_java_gateway.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-py4j.java_gateway">
+<span id="py4j-java-gateway-py4j-main-api"></span><h1>4.1. <a class="reference internal" href="#module-py4j.java_gateway" title="py4j.java_gateway: Main Py4J Python module."><code class="xref py py-mod docutils literal"><span class="pre">py4j.java_gateway</span></code></a> &#8212; Py4J Main API<a class="headerlink" href="#module-py4j.java_gateway" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#module-py4j.java_gateway" title="py4j.java_gateway: Main Py4J Python module."><code class="xref py py-mod docutils literal"><span class="pre">py4j.java_gateway</span></code></a> module defines most of the classes that are needed
+to use Py4J. Py4J users are expected to only use explicitly <a class="reference internal" href="#py4j.java_gateway.JavaGateway" title="py4j.java_gateway.JavaGateway"><code class="xref py py-class docutils literal"><span class="pre">JavaGateway</span></code></a> and optionally, <a class="reference internal" href="#py4j.java_gateway.GatewayParameters" title="py4j.java_gateway.GatewayParameters"><code class="xref py py-class docutils literal"><span class="pre">GatewayParameters</span></code></a>, <a class="reference internal" href="#py4j.java_gateway.CallbackServerParameters" title="py4j.java_gateway.CallbackServerParameters"><code class="xref py py-class docutils literal"><span class="pre">CallbackServerParameters</span></code></a>, <a class="reference internal" href="#py4j.java_gateway.java_import" title="py4j.java_gateway.java_import"><code class="xref py py-func docutils literal"><span class="pre">java_import</span></code></a>, <a class="reference internal" href="#py4j.java_gateway.get_field" title="py4j.java_gateway.get_field"><code class="xref py py-func docutils literal"><span class="pre">get_field</span></code></a>, <a class="reference internal" href="#py4j.java_gateway.get_method" title="py4j.java_gateway.get_method"><code class="xref py py-func docutils literal"><span class="pre">get_method</span></code></a>, <a class="reference internal" href="#py4j.java_gateway.launch_gateway" title="py4j.java_gateway.launch_gateway"><code class="xref py py-func docutils literal"><span class="pre">launch_gateway</span></code></a>, and <a class="reference internal" href="#py4j.java_gateway.is_instance_of" title="py4j.java_gateway.is_instance_of"><code class="xref py py-func docutils literal"><span class="pre">is_instance_of</span></code></a>. The other module members are documented to
+support the extension of Py4J.</p>
+<div class="section" id="javagateway">
+<span id="api-javagateway"></span><h2>4.1.1. JavaGateway<a class="headerlink" href="#javagateway" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.JavaGateway">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">JavaGateway</code><span class="sig-paren">(</span><em>gateway_client=None</em>, <em>auto_field=False</em>, <em>python_proxy_port=25334</em>, <em>start_callback_server=False</em>, <em>auto_convert=False</em>, <em>eager_load=False</em>, <em>gateway_parameters=None</em>, <em>callback_server_parameters=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>A <cite>JavaGateway</cite> is the main interaction point between a Python VM and</dt>
+<dd>a JVM.</dd>
+</dl>
+<ul class="simple">
+<li>A <cite>JavaGateway</cite> instance is connected to a <cite>Gateway</cite> instance on the
+Java side.</li>
+<li>The <cite>entry_point</cite> field of a <cite>JavaGateway</cite> instance is connected to
+the <cite>Gateway.entryPoint</cite> instance on the Java side.</li>
+<li>The <cite>jvm</cite> field of <cite>JavaGateway</cite> enables user to access classes, static
+members (fields and methods) and call constructors.</li>
+</ul>
+<p>Methods that are not defined by <cite>JavaGateway</cite> are always redirected to
+<cite>entry_point</cite>. For example, <code class="docutils literal"><span class="pre">gateway.doThat()</span></code> is equivalent to
+<code class="docutils literal"><span class="pre">gateway.entry_point.doThat()</span></code>. This is a trade-off between convenience
+and potential confusion.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gateway_parameters</strong> &#8211; An instance of <cite>GatewayParameters</cite> used to
+configure the various options of the gateway.</li>
+<li><strong>callback_server_parameters</strong> &#8211; An instance of
+<cite>CallbackServerParameters</cite> used to configure various options of the
+gateway server. Must be provided to start a gateway server.
+Otherwise, callbacks won&#8221;t be available.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.close">
+<code class="descname">close</code><span class="sig-paren">(</span><em>keep_callback_server=False</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.close" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Closes all gateway connections. A connection will be reopened if</dt>
+<dd>necessary (e.g., if a <code class="xref py py-class docutils literal"><span class="pre">JavaMethod</span></code> is called).</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>keep_callback_server</strong> &#8211; if <cite>True</cite>, the callback server is not
+shut down.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.detach">
+<code class="descname">detach</code><span class="sig-paren">(</span><em>java_object</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.detach" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes the Java Gateway dereference this object.</p>
+<p>The equivalent of this method is called when a JavaObject instance
+is garbage collected on the Python side. This method, or gc.collect()
+should still be invoked when memory is limited or when too many objects
+are created on the Java side.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>java_object</strong> &#8211; The JavaObject instance to dereference (free) on
+the Java side.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.help">
+<code class="descname">help</code><span class="sig-paren">(</span><em>var</em>, <em>pattern=None</em>, <em>short_name=True</em>, <em>display=True</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Displays a help page about a class or an object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>var</strong> &#8211; JavaObject, JavaClass or JavaMember for which a help page
+will be generated.</li>
+<li><strong>pattern</strong> &#8211; Star-pattern used to filter the members. For example
+&#8220;get*Foo&#8221; may return getMyFoo, getFoo, getFooBar, but not
+bargetFoo. The pattern is matched against the entire signature.
+To match only the name of a method, use &#8220;methodName(*&#8221;.</li>
+<li><strong>short_name</strong> &#8211; If True, only the simple name of the parameter
+types and return types will be displayed. If False, the fully
+qualified name of the types will be displayed.</li>
+<li><strong>display</strong> &#8211; If True, the help page is displayed in an interactive
+page similar to the <cite>help</cite> command in Python. If False, the page is
+returned as a string.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="py4j.java_gateway.JavaGateway.launch_gateway">
+<em class="property">classmethod </em><code class="descname">launch_gateway</code><span class="sig-paren">(</span><em>port=0</em>, <em>jarpath=u''</em>, <em>classpath=u''</em>, <em>javaopts=[]</em>, <em>die_on_exit=False</em>, <em>redirect_stdout=None</em>, <em>redirect_stderr=None</em>, <em>daemonize_redirect=False</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.launch_gateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch a <cite>Gateway</cite> in a new Java process and create a default
+<a class="reference internal" href="#py4j.java_gateway.JavaGateway" title="py4j.java_gateway.JavaGateway"><code class="xref py py-class docutils literal"><span class="pre">JavaGateway</span></code></a> to connect to
+it.</p>
+<p>See <a class="reference internal" href="#py4j.java_gateway.launch_gateway" title="py4j.java_gateway.launch_gateway"><code class="xref py py-func docutils literal"><span class="pre">launch_gateway</span></code></a> for more
+information about this function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>port</strong> &#8211; the port to launch the Java Gateway on.  If no port is
+specified then an ephemeral port is used.</li>
+<li><strong>jarpath</strong> &#8211; the path to the Py4J jar.  Only necessary if the jar
+was installed at a non-standard location or if Python is using
+a different <cite>sys.prefix</cite> than the one that Py4J was installed
+under.</li>
+<li><strong>classpath</strong> &#8211; the classpath used to launch the Java Gateway.</li>
+<li><strong>javaopts</strong> &#8211; an array of extra options to pass to Java (the
+classpath should be specified using the <cite>classpath</cite> parameter,
+not <cite>javaopts</cite>.)</li>
+<li><strong>die_on_exit</strong> &#8211; if <cite>True</cite>, the Java gateway process will die when
+this Python process exits or is killed.</li>
+<li><strong>redirect_stdout</strong> &#8211; where to redirect the JVM stdout.
+If None (default)
+stdout is redirected to os.devnull. Otherwise accepts a
+file descriptor, a queue, or a deque. Will send one line at a time
+to these objects.</li>
+<li><strong>redirect_stderr</strong> &#8211; where to redirect the JVM stdout.
+If None (default)
+stderr is redirected to os.devnull. Otherwise accepts a
+file descriptor, a queue, or a deque. Will send one line at a time
+to these objects.</li>
+<li><strong>daemonize_redirect</strong> &#8211; if True, the consumer threads will be
+daemonized and will not prevent the main Python process from
+exiting. This means the file descriptors (stderr, stdout,
+redirect_stderr, redirect_stdout) might not be properly closed.
+This is not usually a problem, but the default is conservatively
+set to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">a <a class="reference internal" href="#py4j.java_gateway.JavaGateway" title="py4j.java_gateway.JavaGateway"><code class="xref py py-class docutils literal"><span class="pre">JavaGateway</span></code></a>
+connected to the <cite>Gateway</cite> server.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.new_array">
+<code class="descname">new_array</code><span class="sig-paren">(</span><em>java_class</em>, <em>*dimensions</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.new_array" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Java array of type <cite>java_class</cite> of <cite>dimensions</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>java_class</strong> &#8211; The <code class="xref py py-class docutils literal"><span class="pre">JavaClass</span></code> instance representing the
+type of the array.</li>
+<li><strong>dimensions</strong> &#8211; A list of dimensions of the array. For example
+<cite>[1,2]</cite> would produce an <cite>array[1][2]</cite>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">A <a class="reference internal" href="py4j_java_collections.html#py4j.java_collections.JavaArray" title="py4j.java_collections.JavaArray"><code class="xref py py-class docutils literal"><span class="pre">JavaArray</span></code></a>
+instance.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.new_jvm_view">
+<code class="descname">new_jvm_view</code><span class="sig-paren">(</span><em>name=u'custom jvm'</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.new_jvm_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new JVM view with its own imports. A JVM view ensures
+that the import made in one view does not conflict with the import
+of another view.</p>
+<p>Generally, each Python module should have its own view (to replicate
+Java behavior).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> &#8211; Optional name of the jvm view. Does not need to be
+unique, i.e., two distinct views can have the same name
+(internally, they will have a distinct id).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">A JVMView instance (same class as the gateway.jvm instance).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.restart_callback_server">
+<code class="descname">restart_callback_server</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.restart_callback_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shuts down the callback server (if started) and restarts a new one.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.set_gateway_client">
+<code class="descname">set_gateway_client</code><span class="sig-paren">(</span><em>gateway_client</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.set_gateway_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the gateway client for this JavaGateway. This sets the
+appropriate gateway_property and resets the main jvm view (self.jvm).</p>
+<p>This is for advanced usage only. And should only be set before the
+gateway is loaded.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><em>raise_exception=False</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Shuts down the <a class="reference internal" href="#py4j.java_gateway.GatewayClient" title="py4j.java_gateway.GatewayClient"><code class="xref py py-class docutils literal"><span class="pre">GatewayClient</span></code></a> and the</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">CallbackServer</span></code>.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raise_exception</strong> &#8211; If <cite>True</cite>, raise an exception if an error
+occurs while shutting down (very likely with sockets).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.shutdown_callback_server">
+<code class="descname">shutdown_callback_server</code><span class="sig-paren">(</span><em>raise_exception=False</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.shutdown_callback_server" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Shuts down the</dt>
+<dd><code class="xref py py-class docutils literal"><span class="pre">CallbackServer</span></code>.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>raise_exception</strong> &#8211; If <cite>True</cite>, raise an exception if an error
+occurs while shutting down (very likely with sockets).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.JavaGateway.start_callback_server">
+<code class="descname">start_callback_server</code><span class="sig-paren">(</span><em>callback_server_parameters=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaGateway.start_callback_server" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the callback server.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>callback_server_parameters</strong> &#8211; parameters to use to start the
+server. If not provided, it will use the gateway callback server
+parameters.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Returns True if the server was started by this call or False if
+it was already started (you cannot have more than one started
+callback server).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="examples">
+<span id="api-java-gateway-examples"></span><h3>4.1.1.1. Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>Using the <code class="docutils literal"><span class="pre">jvm</span></code> property:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jvm</span> <span class="o">=</span> <span class="n">gateway</span><span class="o">.</span><span class="n">jvm</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span> <span class="o">=</span> <span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">ArrayList</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">jvm</span><span class="o">.</span><span class="n">java</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">Collections</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span>
+<span class="go">[1, 10]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">l</span>
+<span class="go">[1, 5, 10]</span>
+</pre></div>
+</div>
+<p>Using <code class="docutils literal"><span class="pre">auto_field</span></code>:</p>
+<p>First we declare a class that has a field AND a method called <cite>member</cite>:</p>
+<div class="highlight-java"><div class="highlight"><pre><span class="kn">package</span> <span class="nn">py4j.examples</span><span class="o">;</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">ExampleWithField</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kt">int</span> <span class="n">member</span> <span class="o">=</span> <span class="mi">1</span><span class="o">;</span>
+    <span class="kd">public</span> <span class="n">String</span> <span class="nf">member</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="s">&quot;Hello World&quot;</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</pre></div>
+</div>
+<p>Then we play with the class using the two possible values of auto_field:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">java_gateway</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">()</span> <span class="c"># auto_field = False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example</span> <span class="o">=</span> <span class="n">java_gateway</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">py4j</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">ExampleWithField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example</span><span class="o">.</span><span class="n">member</span><span class="p">()</span>
+<span class="go">u&#39;Hello World&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_field</span><span class="p">(</span><span class="n">example</span><span class="p">,</span><span class="s">&#39;member&#39;</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">java_gateway2</span> <span class="o">=</span> <span class="n">JavaGateway</span><span class="p">(</span><span class="n">GatewayParameters</span><span class="p">(</span><span class="n">auto_field</span><span class="o">=</span><span class="bp">True</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example2</span> <span class="o">=</span> <span class="n">java_gateway2</span><span class="o">.</span><span class="n">jvm</span><span class="o">.</span><span class="n">py4j</span><span class="o">.</span><span class="n">examples</span><span class="o">.</span><span class="n">ExampleWithField</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">example2</span><span class="o">.</span><span class="n">member</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">get_method</span><span class="p">(</span><span class="n">example2</span><span class="p">,</span><span class="s">&#39;member&#39;</span><span class="p">)()</span>
+<span class="go">u&#39;Hello World&#39;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="gatewayparameters">
+<span id="api-gatewayparameters"></span><h2>4.1.2. GatewayParameters<a class="headerlink" href="#gatewayparameters" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.GatewayParameters">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">GatewayParameters</code><span class="sig-paren">(</span><em>address=u'127.0.0.1'</em>, <em>port=25333</em>, <em>auto_field=False</em>, <em>auto_close=True</em>, <em>auto_convert=False</em>, <em>eager_load=False</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper class that contains all parameters that can be passed to
+configure a <cite>JavaGateway</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; the address to which the client will request a
+connection</li>
+<li><strong>port</strong> &#8211; the port to which the client will request a connection.
+Default is 25333.</li>
+<li><strong>auto_field</strong> &#8211; if <cite>False</cite>, each object accessed through this
+gateway won&#8221;t try to lookup fields (they will be accessible only by
+calling get_field). If <cite>True</cite>, fields will be automatically looked
+up, possibly hiding methods of the same name and making method calls
+less efficient.</li>
+<li><strong>auto_close</strong> &#8211; if <cite>True</cite>, the connections created by the client
+close the socket when they are garbage collected.</li>
+<li><strong>auto_convert</strong> &#8211; if <cite>True</cite>, try to automatically convert Python
+objects like sequences and maps to Java Objects. Default value is
+<cite>False</cite> to improve performance and because it is still possible to
+explicitly perform this conversion.</li>
+<li><strong>eager_load</strong> &#8211; if <cite>True</cite>, the gateway tries to connect to the JVM
+by calling System.currentTimeMillis. If the gateway cannot connect to
+the JVM, it shuts down itself and raises an exception.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="callbackserverparameters">
+<span id="api-callbackserverparameters"></span><h2>4.1.3. CallbackServerParameters<a class="headerlink" href="#callbackserverparameters" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.CallbackServerParameters">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">CallbackServerParameters</code><span class="sig-paren">(</span><em>address=u'127.0.0.1'</em>, <em>port=25334</em>, <em>daemonize=False</em>, <em>daemonize_connections=False</em>, <em>eager_load=True</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackServerParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper class that contains all parameters that can be passed to
+configure a <cite>CallbackServer</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; the address to which the client will request a
+connection</li>
+<li><strong>port</strong> &#8211; the port to which the client will request a connection.
+Default is 25333.</li>
+<li><strong>daemonize</strong> &#8211; If <cite>True</cite>, will set the daemon property of the server
+thread to True. The callback server will exit automatically if all
+the other threads exit.</li>
+<li><strong>daemonize_connections</strong> &#8211; If <cite>True</cite>, callback server connections
+are executed in daemonized threads and will not block the exit of a
+program if non daemonized threads are finished.</li>
+<li><strong>eager_load</strong> &#8211; If <cite>True</cite>, the callback server is automatically
+started when the JavaGateway is created.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="gatewayclient">
+<span id="api-gatewayclient"></span><h2>4.1.4. GatewayClient<a class="headerlink" href="#gatewayclient" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.GatewayClient">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">GatewayClient</code><span class="sig-paren">(</span><em>address=u'127.0.0.1'</em>, <em>port=25333</em>, <em>auto_close=True</em>, <em>gateway_property=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayClient" title="Permalink to this definition">¶</a></dt>
+<dd><p>Responsible for managing connections to the JavaGateway.</p>
+<p>This implementation is thread-safe and connections are created on-demand.
+This means that Py4J-Python can be accessed by multiple threads and
+messages are sent to and processed concurrently by the Java Gateway.</p>
+<p>When creating a custom <a class="reference internal" href="#py4j.java_gateway.JavaGateway" title="py4j.java_gateway.JavaGateway"><code class="xref py py-class docutils literal"><span class="pre">JavaGateway</span></code></a>, it is recommended to pass an
+instance of <a class="reference internal" href="#py4j.java_gateway.GatewayClient" title="py4j.java_gateway.GatewayClient"><code class="xref py py-class docutils literal"><span class="pre">GatewayClient</span></code></a> instead of a <a class="reference internal" href="#py4j.java_gateway.GatewayConnection" title="py4j.java_gateway.GatewayConnection"><code class="xref py py-class docutils literal"><span class="pre">GatewayConnection</span></code></a>:
+both have the same interface, but the client supports multiple threads and
+connections, which is essential when using callbacks.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; the address to which the client will request a
+connection</li>
+<li><strong>port</strong> &#8211; the port to which the client will request a connection.
+Default is 25333.</li>
+<li><strong>auto_close</strong> &#8211; if <cite>True</cite>, the connections created by the client
+close the socket when they are garbage collected.</li>
+<li><strong>gateway_property</strong> &#8211; used to keep gateway preferences without a
+cycle with the gateway</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayClient.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayClient.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes all currently opened connections.</p>
+<p>This operation is not thread safe and is only a best effort strategy
+to close active connections.</p>
+<p>All connections are guaranteed to be closed only if no other thread
+is accessing the client and no call is pending.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayClient.send_command">
+<code class="descname">send_command</code><span class="sig-paren">(</span><em>command</em>, <em>retry=True</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayClient.send_command" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Sends a command to the JVM. This method is not intended to be</dt>
+<dd>called directly by Py4J users. It is usually called by
+<code class="xref py py-class docutils literal"><span class="pre">JavaMember</span></code> instances.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>command</strong> &#8211; the <cite>string</cite> command to send to the JVM. The command
+must follow the Py4J protocol.</li>
+<li><strong>retry</strong> &#8211; if <cite>True</cite>, the GatewayClient tries to resend a message
+if it fails.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">the <cite>string</cite> answer received from the JVM. The answer follows
+the Py4J protocol.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayClient.shutdown_gateway">
+<code class="descname">shutdown_gateway</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayClient.shutdown_gateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a shutdown command to the gateway. This will close the
+gateway server: all active connections will be closed. This may
+be useful if the lifecycle of the Java program must be tied to
+the Python program.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="gatewayconnection">
+<span id="api-gatewayconnection"></span><h2>4.1.5. GatewayConnection<a class="headerlink" href="#gatewayconnection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.GatewayConnection">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">GatewayConnection</code><span class="sig-paren">(</span><em>address=u'127.0.0.1'</em>, <em>port=25333</em>, <em>auto_close=True</em>, <em>gateway_property=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default gateway connection (socket based) responsible for communicating
+with the Java Virtual Machine.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>address</strong> &#8211; the address to which the connection will be established</li>
+<li><strong>port</strong> &#8211; the port to which the connection will be established.
+Default is 25333.</li>
+<li><strong>auto_close</strong> &#8211; if <cite>True</cite>, the connection closes the socket when it
+is garbage collected.</li>
+<li><strong>gateway_property</strong> &#8211; contains gateway preferences to avoid a cycle
+with gateway</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayConnection.close">
+<code class="descname">close</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayConnection.close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Closes the connection by closing the socket.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayConnection.send_command">
+<code class="descname">send_command</code><span class="sig-paren">(</span><em>command</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayConnection.send_command" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Sends a command to the JVM. This method is not intended to be</dt>
+<dd>called directly by Py4J users: it is usually called by JavaMember
+instances.</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command</strong> &#8211; the <cite>string</cite> command to send to the JVM. The command
+must follow the Py4J protocol.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">the <cite>string</cite> answer received from the JVM. The answer follows
+the Py4J protocol.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayConnection.shutdown_gateway">
+<code class="descname">shutdown_gateway</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayConnection.shutdown_gateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends a shutdown command to the gateway. This will close the gateway
+server: all active connections will be closed. This may be useful
+if the lifecycle of the Java program must be tied to the Python
+program.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.GatewayConnection.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.GatewayConnection.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the connection by connecting to the <cite>address</cite> and the <cite>port</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="jvmview">
+<span id="api-jvm"></span><h2>4.1.6. JVMView<a class="headerlink" href="#jvmview" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.JVMView">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">JVMView</code><span class="sig-paren">(</span><em>gateway_client</em>, <em>jvm_name</em>, <em>id=None</em>, <em>jvm_object=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JVMView" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <cite>JVMView</cite> allows access to the Java Virtual Machine of a
+<cite>JavaGateway</cite>.</p>
+<p>This can be used to reference static members (fields and methods) and
+to call constructors.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="javaobject">
+<span id="api-javaobject"></span><h2>4.1.7. JavaObject<a class="headerlink" href="#javaobject" title="Permalink to this headline">¶</a></h2>
+<p>Represents a Java object from which you can call methods or access fields.</p>
+</div>
+<div class="section" id="javamember">
+<span id="api-javamember"></span><h2>4.1.8. JavaMember<a class="headerlink" href="#javamember" title="Permalink to this headline">¶</a></h2>
+<p>Represents a member (i.e., method) of a <code class="xref py py-class docutils literal"><span class="pre">JavaObject</span></code>. For now, only
+methods are supported. Fields are retrieved directly and are not contained in a
+JavaMember.</p>
+</div>
+<div class="section" id="javaclass">
+<span id="api-javaclass"></span><h2>4.1.9. JavaClass<a class="headerlink" href="#javaclass" title="Permalink to this headline">¶</a></h2>
+<p>A <cite>JavaClass</cite> represents a Java Class from which static members can be
+retrieved. <cite>JavaClass</cite> instances are also needed to initialize an array.</p>
+<p>Usually, <cite>JavaClass</cite> are not initialized using their constructor, but they are
+created while accessing the <cite>jvm</cite> property of a gateway, e.g.,
+<cite>gateway.jvm.java.lang.String</cite>.</p>
+</div>
+<div class="section" id="javapackage">
+<span id="api-javapackage"></span><h2>4.1.10. JavaPackage<a class="headerlink" href="#javapackage" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.JavaPackage">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">JavaPackage</code><span class="sig-paren">(</span><em>fqn</em>, <em>gateway_client</em>, <em>jvm_id=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.JavaPackage" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <cite>JavaPackage</cite> represents part of a Java package from which Java
+classes can be accessed.</p>
+<p>Usually, <cite>JavaPackage</cite> are not initialized using their constructor, but
+they are created while accessing the <cite>jvm</cite> property of a gateway, e.g.,
+<cite>gateway.jvm.java.lang</cite>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="pythonproxypool">
+<span id="api-pythonproxypool"></span><h2>4.1.11. PythonProxyPool<a class="headerlink" href="#pythonproxypool" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.PythonProxyPool">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">PythonProxyPool</code><a class="headerlink" href="#py4j.java_gateway.PythonProxyPool" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <cite>PythonProxyPool</cite> manages proxies that are passed to the Java side.
+A proxy is a Python class that implements a Java interface.</p>
+<p>A proxy has an internal class named <cite>Java</cite> with a member named
+<cite>implements</cite> which is a list of fully qualified names (string) of the
+implemented interfaces.</p>
+<p>The <cite>PythonProxyPool</cite> implements a subset of the dict interface:
+<cite>pool[id]</cite>, <cite>del(pool[id])</cite>, <cite>pool.put(proxy)</cite>, <cite>pool.clear()</cite>,
+<cite>id in pool</cite>, <cite>len(pool)</cite>.</p>
+<p>The <cite>PythonProxyPool</cite> is thread-safe.</p>
+<dl class="method">
+<dt id="py4j.java_gateway.PythonProxyPool.clear">
+<code class="descname">clear</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.PythonProxyPool.clear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.PythonProxyPool.put">
+<code class="descname">put</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.PythonProxyPool.put" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a proxy to the pool.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object</strong> &#8211; The proxy to add to the pool.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">A unique identifier associated with the object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="callbackserver">
+<span id="api-callbackserver"></span><h2>4.1.12. CallbackServer<a class="headerlink" href="#callbackserver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.CallbackServer">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">CallbackServer</code><span class="sig-paren">(</span><em>pool</em>, <em>gateway_client</em>, <em>port=25334</em>, <em>address=u'127.0.0.1'</em>, <em>callback_server_parameters=None</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackServer" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CallbackServer is responsible for receiving call back connection
+requests from the JVM. Usually connections are reused on the Java side,
+but there is at least one connection per concurrent thread.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pool</strong> &#8211; the pool responsible of tracking Python objects passed to
+the Java side.</li>
+<li><strong>gateway_client</strong> &#8211; the gateway client used to call Java objects.</li>
+<li><strong>callback_server_parameters</strong> &#8211; An instance of
+<cite>CallbackServerParameters</cite> used to configure various options of the
+callback server.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="py4j.java_gateway.CallbackServer.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackServer.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts listening and accepting connection requests.</p>
+<p>This method is called when invoking <cite>CallbackServer.start()</cite>. A
+CallbackServer instance is created and started automatically when
+a <a class="reference internal" href="#py4j.java_gateway.JavaGateway" title="py4j.java_gateway.JavaGateway"><code class="xref py py-class docutils literal"><span class="pre">JavaGateway</span></code></a> instance is
+created.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.CallbackServer.shutdown">
+<code class="descname">shutdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackServer.shutdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops listening and accepting connection requests. All live
+connections are closed.</p>
+<p>This method can safely be called by another thread.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="py4j.java_gateway.CallbackServer.start">
+<code class="descname">start</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackServer.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts the CallbackServer. This method should be called by the
+client instead of run().</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="callbackconnection">
+<span id="api-callbackconnection"></span><h2>4.1.13. CallbackConnection<a class="headerlink" href="#callbackconnection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="py4j.java_gateway.CallbackConnection">
+<em class="property">class </em><code class="descclassname">py4j.java_gateway.</code><code class="descname">CallbackConnection</code><span class="sig-paren">(</span><em>pool</em>, <em>input</em>, <em>socket_instance</em>, <em>gateway_client</em>, <em>callback_server_parameters</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <cite>CallbackConnection</cite> receives callbacks and garbage collection
+requests from the Java side.</p>
+<dl class="method">
+<dt id="py4j.java_gateway.CallbackConnection.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.CallbackConnection.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="py4j-functions">
+<span id="api-functions"></span><h2>4.1.14. Py4J Functions<a class="headerlink" href="#py4j-functions" title="Permalink to this headline">¶</a></h2>
+<p>The following functions get be used to import packages or to get a particular field or method when fields and methods in a Java class have the same name:</p>
+<dl class="function">
+<dt id="py4j.java_gateway.java_import">
+<code class="descclassname">py4j.java_gateway.</code><code class="descname">java_import</code><span class="sig-paren">(</span><em>jvm_view</em>, <em>import_str</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.java_import" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports the package or class specified by <cite>import_str</cite> in the
+jvm view namespace.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>jvm_view</strong> &#8211; The jvm_view in which to import a class/package.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Import_str:</th><td class="field-body">The class (e.g., java.util.List) or the package
+(e.g., java.io.*) to import</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="py4j.java_gateway.launch_gateway">
+<code class="descclassname">py4j.java_gateway.</code><code class="descname">launch_gateway</code><span class="sig-paren">(</span><em>port=0</em>, <em>jarpath=u''</em>, <em>classpath=u''</em>, <em>javaopts=[]</em>, <em>die_on_exit=False</em>, <em>redirect_stdout=None</em>, <em>redirect_stderr=None</em>, <em>daemonize_redirect=False</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.launch_gateway" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch a <cite>Gateway</cite> in a new Java process.</p>
+<p>The redirect parameters accept file-like objects, Queue, or deque. When
+text lines are sent to the stdout or stderr of the child JVM, these lines
+are redirected to the file-like object (<code class="docutils literal"><span class="pre">write(line)</span></code>), the Queue
+(<code class="docutils literal"><span class="pre">put(line)</span></code>), or the deque (<code class="docutils literal"><span class="pre">appendleft(line)</span></code>).</p>
+<p>The text line will contain a newline character.</p>
+<p>Only text output is accepted on stdout and stderr. If you wish to
+communicate with the child JVM through bytes, you need to create your own
+helper function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>port</strong> &#8211; the port to launch the Java Gateway on.  If no port is
+specified then an ephemeral port is used.</li>
+<li><strong>jarpath</strong> &#8211; the path to the Py4J jar.  Only necessary if the jar
+was installed at a non-standard location or if Python is using
+a different <cite>sys.prefix</cite> than the one that Py4J was installed
+under.</li>
+<li><strong>classpath</strong> &#8211; the classpath used to launch the Java Gateway.</li>
+<li><strong>javaopts</strong> &#8211; an array of extra options to pass to Java (the classpath
+should be specified using the <cite>classpath</cite> parameter, not <cite>javaopts</cite>.)</li>
+<li><strong>die_on_exit</strong> &#8211; if <cite>True</cite>, the Java gateway process will die when
+this Python process exits or is killed.</li>
+<li><strong>redirect_stdout</strong> &#8211; where to redirect the JVM stdout. If None (default)
+stdout is redirected to os.devnull. Otherwise accepts a
+file descriptor, a queue, or a deque. Will send one line at a time
+to these objects.</li>
+<li><strong>redirect_stderr</strong> &#8211; where to redirect the JVM stdout. If None (default)
+stderr is redirected to os.devnull. Otherwise accepts a
+file descriptor, a queue, or a deque. Will send one line at a time to
+these objects.</li>
+<li><strong>daemonize_redirect</strong> &#8211; if True, the consumer threads will be daemonized
+and will not prevent the main Python process from exiting. This means
+the file descriptors (stderr, stdout, redirect_stderr, redirect_stdout)
+might not be properly closed. This is not usually a problem, but the
+default is conservatively set to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">the port number of the <cite>Gateway</cite> server.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="py4j.java_gateway.get_field">
+<code class="descclassname">py4j.java_gateway.</code><code class="descname">get_field</code><span class="sig-paren">(</span><em>java_object</em>, <em>field_name</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.get_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the field named <cite>field_name</cite> from the <cite>java_object</cite>.</p>
+<p>This function is useful when <cite>auto_field=false</cite> in a gateway or
+Java object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>java_object</strong> &#8211; the instance containing the field</li>
+<li><strong>field_name</strong> &#8211; the name of the field to retrieve</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="py4j.java_gateway.set_field">
+<code class="descclassname">py4j.java_gateway.</code><code class="descname">set_field</code><span class="sig-paren">(</span><em>java_object</em>, <em>field_name</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.set_field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the field named <cite>field_name</cite> of <cite>java_object</cite> to <cite>value</cite>.</p>
+<p>This function is the only way to set a field because the assignment
+operator in Python cannot be overloaded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>java_object</strong> &#8211; the instance containing the field</li>
+<li><strong>field_name</strong> &#8211; the name of the field to set</li>
+<li><strong>value</strong> &#8211; the value to assign to the field</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="py4j.java_gateway.get_method">
+<code class="descclassname">py4j.java_gateway.</code><code class="descname">get_method</code><span class="sig-paren">(</span><em>java_object</em>, <em>method_name</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.get_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves a reference to the method of an object.</p>
+<p>This function is useful when <cite>auto_field=true</cite> and an instance field has
+the same name as a method. The full signature of the method is not
+required: it is determined when the method is called.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>java_object</strong> &#8211; the instance containing the method</li>
+<li><strong>method_name</strong> &#8211; the name of the method to retrieve</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="py4j.java_gateway.is_instance_of">
+<code class="descclassname">py4j.java_gateway.</code><code class="descname">is_instance_of</code><span class="sig-paren">(</span><em>gateway</em>, <em>java_object</em>, <em>java_class</em><span class="sig-paren">)</span><a class="headerlink" href="#py4j.java_gateway.is_instance_of" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicates whether a java object is an instance of the provided
+java_class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gateway</strong> &#8211; the JavaGateway instance</li>
+<li><strong>java_object</strong> &#8211; the JavaObject instance</li>
+<li><strong>java_class</strong> &#8211; can be a string (fully qualified name), a JavaClass
+instance, or a JavaObject instance)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+		  		
+				<div class="helpbar">
+					<h3>Questions/Feedback?</h3>
+					<ul>
+						<li>Try the <a href="faq.html">FAQ</a> -- It answers many questions.</li>
+						<li>Search for information in the <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j">archives of the py4j-users mailing list</a>, or <a href="https://groups.google.com/a/py4j.org/forum/#!forum/py4j/join">post a question</a>.</li>
+						<li>If you notice errors with this documentation, <a href="https://github.com/bartdag/py4j/issues">open a ticket</a> and let us know. Please, only open a ticket for feedback or improvements on the docs. To get help, use the links above!</li>
+					</ul>
+				</div>
+				
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 5px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="py4j_java_protocol.html" title="4.2. py4j.protocol — Py4J Protocol"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="py4j_python.html" title="4. Py4J Python API"
+             >previous</a> |</li>
+    <li><a href="index.html">Home</a> |</li>
+	<li><a href="download.html">Download</a> |</li>
+	<li><a href="contents.html">Doc</a> |</li>
+	<li><a href="https://blog.py4j.org">Blog</a> |</li>
+	<li><a href="https://github.com/bartdag/py4j">github</a> |</li>
+	<li><a href="about.html">About</a> &raquo;</li>
+
+          <!-- <li><a href="py4j_python.html" >4. Py4J Python API</a> &raquo;</li>--> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2009-2013, Barthélémy Dagenais.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.3.1.
+    </div>
+  </div>
+  </body>
+
+
+</html>
