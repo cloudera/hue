@@ -39,7 +39,6 @@ object SparkSubmitProcessBuilder {
 }
 
 class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
-
   private[this] val fsRoot = livyConf.filesystemRoot()
 
   private[this] var _executable: Path = AbsolutePath(livyConf.sparkSubmit())
@@ -270,7 +269,11 @@ class SparkSubmitProcessBuilder(livyConf: LivyConf) extends Logging {
     args_ += fromPath(file)
     args_ ++= args
 
-    info(s"Running ${args_.mkString(" ")}")
+    val argsString = args_
+      .map("'" + _.replace("'", "\\'") + "'")
+      .mkString(" ")
+
+    info(s"Running $argsString")
 
     val pb = new ProcessBuilder(args_)
     val env = pb.environment()
