@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (c) 2010, 2011, Barthelemy Dagenais All rights reserved.
+   
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+   
+    - Redistributions of source code must retain the above copyright notice, this
+    list of conditions and the following disclaimer.
+   
+    - Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+   
+    - The name of the author may not be used to endorse or promote products
+    derived from this software without specific prior written permission.
+   
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+ -->
+
+<project basedir="." default="build" name="py4j">
+    <property environment="env"/>
+	<property file="ant.properties"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+	<property name="jar.name" value="py4j${version}.jar"/>
+    <property name="release.name" value="py4j-${version}"/>
+    <property name="junit.src.tests" value="test"/>
+
+    <property name="py4jpy.dir" value="../py4j-python"/>
+    <property name="py4jpy.dist.dir" value="${py4jpy.dir}/dist"/>
+    <property name="java.dst.dir" value="${py4jpy.dir}/py4j-java"/>
+    <property name="javadoc.dst.dir" value="${java.dst.dir}/javadoc"/>
+    <property name="py4jdoc.dir" value="../py4j-web"/>
+    <property name="doc.src.dir" value="${py4jdoc.dir}/_build/html/"/>
+    <property name="doc.dst.dir" value="${py4jpy.dir}/doc" />
+    <property name="htdocs.dst.dir" value="${basedir}/${py4jpy.dir}/htdocs"/>
+    <property name="doc.javadoc.dst.dir" value="${doc.dst.dir}/_static/javadoc" />
+
+
+    <!-- Py4J JAVA -->
+	<path id="junit4.classpath">
+        <pathelement location="${junit.path}"/>
+    </path>
+
+    <path id="py4j.classpath">
+        <pathelement location="${build.dir}"/>
+        <path refid="junit4.classpath"/>
+    </path>
+    
+    <target name="init-dist">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/${release.name}"/>
+    </target>
+
+    <target name="init-java-release">
+        <mkdir dir="${java.dst.dir}"/>
+    </target>
+
+    <target name="init">
+        <mkdir dir="${build.dir}"/>
+		<mkdir dir="${junit.output.dir}"/>
+        <copy includeemptydirs="false" todir="${build.dir}">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+        <copy includeemptydirs="false" todir="${build.dir}">
+            <fileset dir="test">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- JAVA - CLEAN -->
+    <target name="clean">
+        <delete dir="${build.dir}"/>
+    </target>
+    
+    <target name="clean-javadoc">
+        <delete dir="${javadoc.dir}"/>
+    </target>
+    
+    <target name="clean-junit">
+        <delete dir="${junit.output.dir}"/>
+    </target>
+    
+    <target depends="clean" name="clean-dist">
+		<delete dir="${dist.dir}"/>
+	</target>
+
+    <target name="clean-jar">
+        <delete file="${jar.name}"/>
+    </target>
+
+    <target depends="clean,clean-javadoc,clean-junit,clean-dist,clean-jar" name="cleanall"/>
+
+    <target depends="cleanall" name="clean-java-release">
+        <delete dir="${java.dst.dir}"/>
+    </target>
+
+
+    <!-- JAVA - COMPILE -->
+    <target depends="init" name="build">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${build.dir}" encoding="UTF-8"
+            source="1.6" target="1.6" bootclasspath="${env.JAVA6_BOOTCLASSPATH}">
+            <src path="src"/>
+            <classpath refid="py4j.classpath"/>
+        </javac>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="${build.dir}" encoding="UTF-8"
+            source="1.6" target="1.6" bootclasspath="${env.JAVA6_BOOTCLASSPATH}">
+            <src path="test"/>
+            <classpath refid="py4j.classpath"/>
+        </javac>
+    </target>
+
+    <!-- JAVA - JUNIT -->
+    <target depends="build" name="java-test">
+        <mkdir dir="${junit.output.dir}"/>
+        <junit fork="yes" haltonfailure="true" printsummary="on">
+            <formatter type="brief" usefile="false"/>
+            <batchtest todir="${junit.output.dir}">
+                <fileset dir="${junit.src.tests}">
+                    <include name="**/*Test.java"/>
+                    <exclude name="py4j/examples/*.java"/>
+                </fileset>
+            </batchtest>
+            <classpath refid="py4j.classpath"/>
+        </junit>
+    </target>
+
+    <target name="junitreport">
+        <junitreport todir="${junit.output.dir}">
+            <fileset dir="${junit.output.dir}">
+                <include name="TEST-*.xml"/>
+            </fileset>
+            <report format="frames" todir="${junit.output.dir}"/>
+        </junitreport>
+    </target>
+
+    <!-- JAVA - JAVADOC -->
+	<target name="javadoc">
+        <javadoc access="protected" author="true" classpath="" destdir="${javadoc.dir}" doctitle="Py4J" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="py4j,py4j.examples,py4j.commands,py4j.reflection,py4j.model" source="1.6" sourcepath="src:examples" splitindex="true" use="true" version="true">
+            <link href="http://java.sun.com/javase/6/docs/api/"/>
+        </javadoc>
+    </target>
+
+    <!-- JAVA - DISTRIBUTION -->
+    <target depends="build" name="jar">
+		<jar destfile="${jar.name}" basedir="${build.dir}" excludes="p1/**,**/*Test*.class"/>
+	</target>
+
+	<target depends="init-dist,build,jar" name="dist">
+		<copy todir="${dist.dir}/${release.name}/src">
+    		<fileset dir="src"/>
+  		</copy>
+		<copy todir="${dist.dir}/${release.name}/test">
+    		<fileset dir="test"/>
+  		</copy>
+		<copy file="LICENSE.txt" tofile="${dist.dir}/py4j-${version}/LICENSE.txt"/>
+		<copy file="README.txt" tofile="${dist.dir}/py4j-${version}/README.txt"/>
+		<copy file="build.xml" tofile="${dist.dir}/py4j-${version}/build.xml"/>
+		<copy file="ant.properties" tofile="${dist.dir}/py4j-${version}/ant.properties"/>
+		<copy file="${jar.name}" tofile="${dist.dir}/py4j-${version}/${jar.name}"/>
+		
+		<tar destfile="${dist.dir}/${release.name}.tar" basedir="${dist.dir}/${release.name}/"/>
+		<gzip src="${dist.dir}/${release.name}.tar" destfile="${dist.dir}/${release.name}.tar.gz"/>
+		
+		<delete file="${dist.dir}/${release.name}.tar"/>
+	</target>
+
+    <target depends="dist,java-test,init-java-release,javadoc" name="java-release">
+        <copy todir="${java.dst.dir}">
+            <fileset dir="${dist.dir}/${release.name}"/> 
+        </copy>
+        <copy todir="${javadoc.dst.dir}">
+            <fileset dir="${javadoc.dir}"/> 
+        </copy>
+    </target>
+
+    <target depends="dist,init-java-release,javadoc" name="java-light-release">
+        <copy todir="${java.dst.dir}">
+            <fileset dir="${dist.dir}/${release.name}"/> 
+        </copy>
+        <copy todir="${javadoc.dst.dir}">
+            <fileset dir="${javadoc.dir}"/> 
+        </copy>
+    </target>
+
+    <!-- JAVA - EXECUTE EXAMPLE APPLICATIONS -->
+    <target name="BufferGateway">
+        <java classname="py4j.examples.BufferGateway" failonerror="true" fork="yes">
+            <classpath refid="py4j.classpath"/>
+        </java>
+    </target>
+
+    <target name="ExampleApplication">
+        <java classname="py4j.examples.ExampleApplication" failonerror="true" fork="yes">
+            <classpath refid="py4j.classpath"/>
+        </java>
+    </target>
+    
+    <!-- Py4J DOCUMENTATION -->
+    <target name="clean-sphinx">
+        <exec executable="make" dir="${py4jdoc.dir}">
+            <arg line="clean"/>
+        </exec>
+    </target>
+
+    <target name="sphinx">
+        <exec executable="make" dir="${py4jdoc.dir}">
+            <arg line="html"/>
+        </exec>
+    </target>
+
+    <target depends="clean-sphinx,clean-javadoc" name="clean-sphinx-release">
+        <delete dir="${doc.dst.dir}"/>
+        <delete dir="${htdocs.dst.dir}"/>
+    </target>
+
+    <target depends="sphinx,javadoc" name="sphinx-release">
+        <copy todir="${doc.dst.dir}">
+            <fileset dir="${doc.src.dir}"/>
+        </copy>
+        <copy todir="${doc.javadoc.dst.dir}">
+            <fileset dir="${javadoc.dir}"/>
+        </copy>
+    </target>
+
+    <!-- Py4J PYTHON DISTRIBUTION -->
+
+    <target name="clean-python-release">
+        <delete dir="${py4jpy.dist.dir}"/>
+        <delete file="${py4jpy.dir}/MANIFEST"/>
+    </target>
+
+    <target depends="build" name="python-test">
+        <exec executable="python" dir="${py4jpy.dir}" failonerror="true">
+            <arg line="--version"/>
+        </exec>
+        <exec executable="nosetests" dir="${py4jpy.dir}" failonerror="true">
+            <arg line="-w src"/>
+            <arg line="-c nose.cfg"/>
+        </exec>
+    </target>
+
+    <target depends="java-release" name="python-tox">
+        <exec executable="tox" dir="${py4jpy.dir}" failonerror="true">
+            <arg line="--"/>
+        </exec>
+    </target>
+
+    <target depends="java-light-release,sphinx-release" name="python-light-release">
+        <exec executable="python" dir="${py4jpy.dir}">
+            <arg line="setup.py"/>
+            <arg line="sdist"/>
+            <arg line="--formats=zip,gztar"/>
+        </exec>
+        <exec executable="python" dir="${py4jpy.dir}">
+            <arg line="setup.py"/>
+            <arg line="bdist_wheel"/>
+        </exec>
+    </target>
+
+    <target depends="java-release,sphinx-release,python-tox" name="python-release">
+        <exec executable="python" dir="${py4jpy.dir}">
+            <arg line="setup.py"/>
+            <arg line="sdist"/>
+            <arg line="--formats=zip,gztar"/>
+        </exec>
+        <exec executable="python" dir="${py4jpy.dir}">
+            <arg line="setup.py"/>
+            <arg line="bdist_wheel"/>
+        </exec>
+    </target>
+
+    <target depends="clean-python-release,clean-sphinx-release,clean-java-release" name="clean-release"/>
+
+</project>
