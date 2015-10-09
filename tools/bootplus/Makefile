@@ -1,6 +1,6 @@
-BOOTPLUS = ../../desktop/core/static/ext/css/bootplus.css
+BOOTPLUS = ../../desktop/core/src/desktop/static/desktop/ext/css/bootplus.css
 BOOTPLUS_LESS = ./less/bootplus/bootplus.less
-BOOTPLUS_RESPONSIVE = ../../desktop/core/static/ext/css/bootplus-responsive.css
+BOOTPLUS_RESPONSIVE = ../../desktop/core/src/desktop/static/desktop/ext/css/bootplus-responsive.css
 BOOTPLUS_RESPONSIVE_LESS = ./less/bootplus/responsive.less
 DATE=$(shell date +%I:%M%p)
 CHECK=\033[32m✔ Done\033[39m
