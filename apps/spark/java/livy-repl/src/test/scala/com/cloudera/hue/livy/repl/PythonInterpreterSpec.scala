@@ -67,6 +67,29 @@ class PythonInterpreterSpec extends BaseInterpreterSpec {
     ))
   }
 
+  it should "parse a class" in withInterpreter { interpreter =>
+    val response = interpreter.execute(
+      """
+        |class Counter(object):
+        |   def __init__(self):
+        |       self.count = 0
+        |
+        |   def add_one(self):
+        |       self.count += 1
+        |
+        |   def add_two(self):
+        |       self.count += 2
+        |
+        |counter = Counter()
+        |counter.add_one()
+        |counter.add_two()
+        |counter.count
+      """.stripMargin)
+    response should equal(Interpreter.ExecuteSuccess(
+      repl.TEXT_PLAIN -> "3"
+    ))
+  }
+
   it should "do json magic" in withInterpreter { interpreter =>
     val response = interpreter.execute(
       """x = [[1, 'a'], [3, 'b']]
@@ -131,6 +154,35 @@ class PythonInterpreterSpec extends BaseInterpreterSpec {
       )
     ))
   }
+
+  it should "not execute part of the block if there is a syntax error" in withInterpreter { interpreter =>
+    var response = interpreter.execute(
+      """x = 1
+        |'
+      """.stripMargin)
+
+    response should equal(Interpreter.ExecuteError(
+      "SyntaxError",
+      "EOL while scanning string literal (<stdin>, line 2)",
+      List(
+        "  File \"<stdin>\", line 2\n",
+        "    '\n",
+        "    ^\n",
+        "SyntaxError: EOL while scanning string literal\n"
+      )
+    ))
+
+    response = interpreter.execute("x")
+    response should equal(Interpreter.ExecuteError(
+      "NameError",
+      "name 'x' is not defined",
+      List(
+        "Traceback (most recent call last):\n",
+        "NameError: name 'x' is not defined\n"
+      )
+    ))
+  }
+
 
   it should "execute spark commands" in withInterpreter { interpreter =>
     val response = interpreter.execute(
