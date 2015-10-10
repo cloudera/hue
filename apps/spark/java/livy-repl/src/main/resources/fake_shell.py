@@ -16,7 +16,6 @@
 
 import ast
 import cStringIO
-import collections
 import datetime
 import decimal
 import json
@@ -53,23 +52,143 @@ def execute_reply_error(exc_type, exc_value, tb):
     })
 
 
-def execute(code):
+def execute_reply_internal_error(message, exc_info=None):
+    LOG.error('execute_reply_internal_error', exc_info=exc_info)
+    return execute_reply('error', {
+        'ename': 'InternalError',
+        'evalue': message,
+        'traceback': [],
+    })
+
+
+def ast_parse(code, filename='<stdin>', symbol='exec'):
+    return compile(code, filename, symbol, ast.PyCF_ONLY_AST, 1)
+
+
+class ExecutionError(Exception):
+    def __init__(self, exc_info):
+        self.exc_info = exc_info
+
+
+class NormalNode(object):
+    def __init__(self, code):
+        self.code = ast_parse(code)
+
+    def execute(self):
+        to_run_exec, to_run_single = self.code.body[:-1], self.code.body[-1:]
+
+        try:
+            for node in to_run_exec:
+                mod = ast.Module([node])
+                code = compile(mod, '<stdin>', 'exec')
+                exec code in global_dict
+
+            for node in to_run_single:
+                mod = ast.Interactive([node])
+                code = compile(mod, '<stdin>', 'single')
+                exec code in global_dict
+        except:
+            # We don't need to log the exception because we're just executing user
+            # code and passing the error along.
+            raise ExecutionError(sys.exc_info())
+
+
+class UnknownMagic(Exception):
+    pass
+
+
+class MagicNode(object):
+    def __init__(self, line):
+        parts = line[1:].split(' ', 1)
+        if len(parts) == 1:
+            self.magic, self.rest = parts[0], ()
+        else:
+            self.magic, self.rest = parts[0], (parts[1],)
+
+
+    def execute(self):
+        try:
+            self.handler = magic_router[self.magic]
+        except KeyError:
+            raise UnknownMagic(self.magic)
+
+        return self.handler(*self.rest)
+
+
+def parse_code_into_nodes(code):
+    nodes = []
     try:
-        to_run_exec, to_run_single = code.body[:-1], code.body[-1:]
+        nodes.append(NormalNode(code))
+    except SyntaxError:
+        # It's possible we hit a syntax error because of a magic command. Split the code groups
+        # of 'normal code', and code that starts with a '%'. possibly magic code
+        # lines, and see if any of the lines
+        # Remove lines until we find a node that parses, then check if the next line is a magic
+        # line
+        # .
 
-        for node in to_run_exec:
-            mod = ast.Module([node])
-            code = compile(mod, '<stdin>', 'exec')
-            exec code in global_dict
+        # Split the code into chunks of normal code, and possibly magic code, which starts with a '%'.
+        normal = []
+        chunks = []
+        for i, line in enumerate(code.rstrip().split('\n')):
+            if line.startswith('%'):
+                if normal:
+                    chunks.append(''.join(normal))
+                    normal = []
 
-        for node in to_run_single:
-            mod = ast.Interactive([node])
-            code = compile(mod, '<stdin>', 'single')
-            exec code in global_dict
-    except:
-        # We don't need to log the exception because we're just executing user
-        # code and passing the error along.
-        return execute_reply_error(*sys.exc_info())
+                chunks.append(line)
+            else:
+                normal.append(line)
+
+        if normal:
+            chunks.append('\n'.join(normal))
+
+        # Convert the chunks into AST nodes. Let exceptions propagate.
+        for chunk in chunks:
+            if chunk.startswith('%'):
+                nodes.append(MagicNode(chunk))
+            else:
+                nodes.append(NormalNode(chunk))
+
+    return nodes
+
+
+def execute_code(code):
+    try:
+        code = ast.parse(code)
+    except SyntaxError, syntax_error:
+        # It's possible we hit a syntax error because of a magic command. So see if one seems
+        # to be present.
+        try:
+            execute_handling_magic(code)
+        except SyntaxError, syntax_error:
+            pass
+    else:
+        return execute(code)
+
+
+def execute_request(content):
+    try:
+        code = content['code']
+    except KeyError:
+        return execute_reply_internal_error(
+            'Malformed message: content object missing "code"', sys.exc_info()
+        )
+
+    try:
+        nodes = parse_code_into_nodes(code)
+    except (SyntaxError, UnknownMagic):
+        exc_type, exc_value, tb = sys.exc_info()
+        return execute_reply_error(exc_type, exc_value, [])
+
+    try:
+        for node in nodes:
+            result = node.execute()
+    except ExecutionError, e:
+        return execute_reply_error(*e.exc_info)
+
+    if result is None:
+        result = {}
 
     stdout = fake_stdout.getvalue()
     fake_stdout.truncate(0)
@@ -77,7 +196,7 @@ def execute(code):
     stderr = fake_stderr.getvalue()
     fake_stderr.truncate(0)
 
-    output = ''
+    output = result.pop('text/plain', '')
 
     if stdout:
         output += stdout
@@ -85,66 +204,14 @@ def execute(code):
     if stderr:
         output += stderr
 
-    return execute_reply_ok({
-        'text/plain': output.rstrip(),
-    })
+    output = output.rstrip()
 
+    # Only add the output if it exists, or if there are no other mimetypes in the result.
+    if output or not result:
+        result['text/plain'] = output.rstrip()
 
-def execute_magic(line):
-    parts = line[1:].split(' ', 1)
-    if len(parts) == 1:
-        magic, rest = parts[0], ()
-    else:
-        magic, rest = parts[0], (parts[1],)
+    return execute_reply_ok(result)
 
-    try:
-        handler = magic_router[magic]
-    except KeyError:
-        exc_type, exc_value, tb = sys.exc_info()
-        return execute_reply_error(exc_type, exc_value, [])
-    else:
-        return handler(*rest)
-
-
-def execute_request(content):
-    try:
-        code = content['code']
-    except KeyError:
-        exc_type, exc_value, tb = sys.exc_info()
-        return execute_reply_error(exc_type, exc_value, [])
-
-    lines = collections.deque(code.rstrip().split('\n'))
-    last_line = ''
-    result = None
-
-    while lines:
-        line = last_line + lines.popleft()
-
-        if line.rstrip() == '':
-            continue
-
-        if line.startswith('%'):
-            result = execute_magic(line)
-        else:
-            try:
-                code = ast.parse(line)
-            except SyntaxError:
-                last_line = line + '\n'
-                continue
-            else:
-                result = execute(code)
-
-        if result['content']['status'] == 'ok':
-            last_line = ''
-        else:
-            return result
-
-    if result is None:
-        return execute_reply_ok({
-            'text/plain': '',
-        })
-    else:
-        return result
 
 def magic_table_convert(value):
     try:
@@ -260,12 +327,12 @@ def magic_table(name):
 
     headers = [v for k, v in sorted(headers.iteritems())]
 
-    return execute_reply_ok({
+    return {
         'application/vnd.livy.table.v1+json': {
             'headers': headers,
             'data': data,
         }
-    })
+    }
 
 
 def magic_json(name):
@@ -275,9 +342,9 @@ def magic_json(name):
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
 
-    return execute_reply_ok({
+    return {
         'application/json': value,
-    })
+    }
 
 
 def shutdown_request(content):
@@ -346,6 +413,10 @@ try:
             LOG.error('missing content', exc_info=True)
             continue
 
+        if not isinstance(content, dict):
+            LOG.error('content is not a dictionary')
+            continue
+
         try:
             handler = msg_type_router[msg_type]
         except KeyError:
@@ -353,6 +424,7 @@ try:
             continue
 
         response = handler(content)
+
         try:
             response = json.dumps(response)
         except ValueError, e:
