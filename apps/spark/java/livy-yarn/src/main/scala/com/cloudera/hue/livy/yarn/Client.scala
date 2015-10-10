@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.yarn
 
-import java.io.{InputStream, BufferedReader, InputStreamReader}
+import java.io.{File, InputStream, BufferedReader, InputStreamReader}
 
 import com.cloudera.hue.livy.yarn.Client._
 import com.cloudera.hue.livy.{Utils, LineBufferedProcess, LivyConf, Logging}
@@ -52,7 +52,7 @@ class Client(livyConf: LivyConf) extends Logging {
 
   private[this] val yarnConf = new YarnConfiguration()
   private[this] val yarnClient = YarnClient.createYarnClient()
-  val path = new Path(sys.env("HADOOP_CONF_DIR") + YarnConfiguration.YARN_SITE_CONFIGURATION_FILE)
+  val path = new Path(sys.env("HADOOP_CONF_DIR") + File.separator + YarnConfiguration.YARN_SITE_CONFIGURATION_FILE)
   yarnConf.addResource(path)
   val rm_address = yarnConf.get(YarnConfiguration.RM_ADDRESS)
   info(s"Resource Manager address: $rm_address")
