@@ -50,85 +50,77 @@
 
     _this.options.message = $("<span>").text(_this.options.message).html(); // escape HTML messages
 
-    if (_this.options.level == TYPES.ERROR && $(".jHueNotify.alert-error").length > 0) {
-      $(".jHueNotify.alert-error").find(".message").html("<i class='fa fa-exclamation-triangle'></i> <strong>" + _this.options.message + "</strong>");
+
+    var el = $("#jHueNotify").clone();
+    el.removeAttr("id");
+
+    // stops all the current animations and resets the style
+    el.stop(true);
+    el.attr("class", "alert jHueNotify");
+    el.find(".close").hide();
+
+    if ($(".jHueNotify").last().position() != null) {
+      el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN - $(window).scrollTop());
+    }
+
+
+    if (_this.options.level == TYPES.ERROR) {
+      el.addClass("alert-error");
+    }
+    else if (_this.options.level == TYPES.INFO) {
+      el.addClass("alert-info");
+    }
+    el.find(".message").html("<strong>" + _this.options.message + "</strong>");
+
+    if (_this.options.css != null) {
+      el.attr("style", _this.options.css);
+    }
+
+    if (_this.options.sticky) {
+      el.find(".close").click(function () {
+        el.fadeOut();
+        el.nextAll(".jHueNotify").animate({
+          top: '-=' + (el.outerHeight() + MARGIN)
+        }, 200);
+        el.remove();
+      }).show();
+      el.show();
     }
     else {
-      var el = $("#jHueNotify").clone();
-      el.removeAttr("id");
+      var t = window.setTimeout(function () {
+        el.fadeOut();
+        el.nextAll(".jHueNotify").animate({
+          top: '-=' + (el.outerHeight() + MARGIN)
+        }, 200);
+        el.remove();
 
-      // stops all the current animations and resets the style
-      el.stop(true);
-      el.attr("class", "alert jHueNotify");
-      el.find(".close").hide();
-
-      if ($(".jHueNotify").last().position() != null) {
-        el.css("top", $(".jHueNotify").last().position().top + $(".jHueNotify").last().outerHeight() + MARGIN - $(window).scrollTop());
-      }
-
-
-      if (_this.options.level == TYPES.ERROR) {
-        el.addClass("alert-error");
-        el.find(".message").html("<i class='fa fa-exclamation-triangle'></i> <strong>" + _this.options.message + "</strong>");
-      }
-      else if (_this.options.level == TYPES.INFO) {
-        el.addClass("alert-info");
-        el.find(".message").html("<i class='fa fa-info-circle'></i> <strong>" + _this.options.message + "</strong>");
-      }
-      else {
-        el.find(".message").html(_this.options.message);
-      }
-
-      if (_this.options.css != null) {
-        el.attr("style", _this.options.css);
-      }
-
-      if (_this.options.sticky) {
-        el.find(".close").click(function () {
-          el.fadeOut();
-          el.nextAll(".jHueNotify").animate({
-            top: '-=' + (el.outerHeight() + MARGIN)
-          }, 200);
-          el.remove();
-        }).show();
-        el.show();
-      }
-      else {
-        var t = window.setTimeout(function () {
-          el.fadeOut();
-          el.nextAll(".jHueNotify").animate({
-            top: '-=' + (el.outerHeight() + MARGIN)
-          }, 200);
-          el.remove();
-
-        }, 3000);
-        el.click(function () {
-          window.clearTimeout(t);
-          $(this).stop(true);
-          $(this).fadeOut();
-          $(this).nextAll(".jHueNotify").animate({
-            top: '-=' + ($(this).outerHeight() + MARGIN)
-          }, 200);
-        });
-        el.show();
-      }
-      el.appendTo($("body"));
+      }, 3000);
+      el.click(function () {
+        window.clearTimeout(t);
+        $(this).stop(true);
+        $(this).fadeOut();
+        $(this).nextAll(".jHueNotify").animate({
+          top: '-=' + ($(this).outerHeight() + MARGIN)
+        }, 200);
+      });
+      el.show();
     }
+    el.appendTo($("body"));
   };
 
   $[pluginName] = function () {
   };
 
   $[pluginName].info = function (message) {
-    new Plugin({ level: TYPES.INFO, message: message});
+    new Plugin({level: TYPES.INFO, message: message});
   };
 
   $[pluginName].warn = function (message) {
-    new Plugin({ level: TYPES.GENERAL, message: message, sticky: true});
+    new Plugin({level: TYPES.GENERAL, message: message, sticky: true});
   };
 
   $[pluginName].error = function (message) {
-    new Plugin({ level: TYPES.ERROR, message: message, sticky: true});
+    new Plugin({level: TYPES.ERROR, message: message, sticky: true});
   };
 
   $[pluginName].notify = function (options) {
