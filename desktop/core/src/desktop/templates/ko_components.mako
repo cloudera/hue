@@ -272,7 +272,14 @@ from desktop.views import _ko
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function() {
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout', 'desktop/js/assistHelper'], factory);
+      } else {
+        factory(ko, AssistHelper);
+      }
+    }(function (ko, AssistHelper) {
+      (function() {
       function AssistEntry (definition, parent, assistSource, filter) {
         var self = this;
         self.definition = definition;
@@ -814,6 +821,7 @@ from desktop.views import _ko
         template: { element: 'assist-panel-template' }
       });
     }());
+    }));
   </script>
 </%def>
 
@@ -823,39 +831,47 @@ from desktop.views import _ko
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function() {
-      var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
-      var UNITS = { 'MB' : 'M', 'GB' : 'G' };
-
-      function JvmMemoryInputViewModel(params) {
-        this.valueObservable = params.value;
-        this.units = Object.keys(UNITS);
-        this.selectedUnit = ko.observable();
-        this.value = ko.observable('');
-
-        var match = JVM_MEM_PATTERN.exec(this.valueObservable());
-        if (match && match.length === 3) {
-          this.value(match[1]);
-          this.selectedUnit(match[2] === 'M' ? 'MB' : 'GB');
-        }
-
-        this.value.subscribe(this.updateValueObservable, this);
-        this.selectedUnit.subscribe(this.updateValueObservable, this);
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
       }
+    }(function (ko) {
+      (function () {
+        var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
+        var UNITS = {'MB': 'M', 'GB': 'G'};
 
-      JvmMemoryInputViewModel.prototype.updateValueObservable = function() {
-        if (isNaN(this.value()) || this.value() === '') {
-          this.valueObservable(undefined);
-        } else {
-          this.valueObservable(this.value() + UNITS[this.selectedUnit()]);
+        function JvmMemoryInputViewModel(params) {
+          this.valueObservable = params.value;
+          this.units = Object.keys(UNITS);
+          this.selectedUnit = ko.observable();
+          this.value = ko.observable('');
+
+          var match = JVM_MEM_PATTERN.exec(this.valueObservable());
+          if (match && match.length === 3) {
+            this.value(match[1]);
+            this.selectedUnit(match[2] === 'M' ? 'MB' : 'GB');
+          }
+
+          this.value.subscribe(this.updateValueObservable, this);
+          this.selectedUnit.subscribe(this.updateValueObservable, this);
         }
-      };
 
-      ko.components.register('jvm-memory-input', {
-        viewModel: JvmMemoryInputViewModel,
-        template: { element: 'jvm-memory-input-template' }
-      });
-    }());
+        JvmMemoryInputViewModel.prototype.updateValueObservable = function () {
+          if (isNaN(this.value()) || this.value() === '') {
+            this.valueObservable(undefined);
+          } else {
+            this.valueObservable(this.value() + UNITS[this.selectedUnit()]);
+          }
+        };
+
+        ko.components.register('jvm-memory-input', {
+          viewModel: JvmMemoryInputViewModel,
+          template: {element: 'jvm-memory-input-template'}
+        });
+      }());
+    }));
   </script>
 </%def>
 
@@ -884,52 +900,60 @@ from desktop.views import _ko
   </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function() {
-      function CsvListInputViewModel (params) {
-        this.valueObservable = params.value;
-        this.isArray = $.isArray(this.valueObservable());
-        this.placeholder = params.placeholder || '';
-        this.inputTemplate = params.inputTemplate || null;
-
-        var initialValues;
-        if (this.isArray) {
-          initialValues = ko.mapping.toJS(this.valueObservable());
-        } else {
-          initialValues = this.valueObservable() != null ? this.valueObservable().split(",") : [];
-        }
-        for (var i = 0; i < initialValues.length; i++) {
-          initialValues[i] = { value: ko.observable(initialValues[i].trim()) };
-          initialValues[i].value.subscribe(this.updateValueObservable, this);
-        }
-        this.values = ko.observableArray(initialValues);
-        this.values.subscribe(this.updateValueObservable, this);
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
       }
+    }(function (ko) {
+      (function () {
+        function CsvListInputViewModel(params) {
+          this.valueObservable = params.value;
+          this.isArray = $.isArray(this.valueObservable());
+          this.placeholder = params.placeholder || '';
+          this.inputTemplate = params.inputTemplate || null;
 
-      CsvListInputViewModel.prototype.addValue = function () {
-        var newValue = { value: ko.observable('') };
-        newValue.value.subscribe(this.updateValueObservable, this);
-        this.values.push(newValue);
-      };
+          var initialValues;
+          if (this.isArray) {
+            initialValues = ko.mapping.toJS(this.valueObservable());
+          } else {
+            initialValues = this.valueObservable() != null ? this.valueObservable().split(",") : [];
+          }
+          for (var i = 0; i < initialValues.length; i++) {
+            initialValues[i] = {value: ko.observable(initialValues[i].trim())};
+            initialValues[i].value.subscribe(this.updateValueObservable, this);
+          }
+          this.values = ko.observableArray(initialValues);
+          this.values.subscribe(this.updateValueObservable, this);
+        }
 
-      CsvListInputViewModel.prototype.removeValue = function (valueToRemove) {
-        this.values.remove(valueToRemove);
-      };
+        CsvListInputViewModel.prototype.addValue = function () {
+          var newValue = {value: ko.observable('')};
+          newValue.value.subscribe(this.updateValueObservable, this);
+          this.values.push(newValue);
+        };
 
-      CsvListInputViewModel.prototype.updateValueObservable = function () {
-        var cleanValues = $.map(this.values(), function (item) {
-          return item.value();
+        CsvListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          this.values.remove(valueToRemove);
+        };
+
+        CsvListInputViewModel.prototype.updateValueObservable = function () {
+          var cleanValues = $.map(this.values(), function (item) {
+            return item.value();
+          });
+          cleanValues = $.grep(cleanValues, function (value) {
+            return value;
+          });
+          this.valueObservable(this.isArray ? cleanValues : cleanValues.join(','));
+        };
+
+        ko.components.register('csv-list-input', {
+          viewModel: CsvListInputViewModel,
+          template: {element: 'csv-list-input-template'}
         });
-        cleanValues = $.grep(cleanValues, function (value) {
-          return value;
-        });
-        this.valueObservable(this.isArray ? cleanValues : cleanValues.join(','));
-      };
-
-      ko.components.register('csv-list-input', {
-        viewModel: CsvListInputViewModel,
-        template: { element: 'csv-list-input-template' }
-      });
-    }());
+      }());
+    }));
   </script>
 </%def>
 
@@ -975,87 +999,94 @@ from desktop.views import _ko
     </div>
   </script>
 
-
   <script type="text/javascript" charset="utf-8">
-    (function() {
-      var WHEEL_RADIUS = 75;
-      var PLUS_ICON_RADIUS = 27.859; // FA-5X
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+        var WHEEL_RADIUS = 75;
+        var PLUS_ICON_RADIUS = 27.859; // FA-5X
 
-      var calculatePositions = function(alternativeCount) {
-        var radius = WHEEL_RADIUS;
-        var radIncrements = 2 * Math.PI / alternativeCount;
-        var currentRad = -0.5 * Math.PI;
+        var calculatePositions = function (alternativeCount) {
+          var radius = WHEEL_RADIUS;
+          var radIncrements = 2 * Math.PI / alternativeCount;
+          var currentRad = -0.5 * Math.PI;
 
-        var result = [];
+          var result = [];
 
-        for (var i = 0; i < alternativeCount; i++) {
-          result.push({
-            left: radius * Math.cos(currentRad) + PLUS_ICON_RADIUS  + 'px',
-            top: radius * Math.sin(currentRad) + PLUS_ICON_RADIUS  + 'px'
-          });
-          currentRad += radIncrements;
-        }
-
-        return result;
-      };
-
-      function AddSnippetMenuViewModel (params) {
-        var self = this;
-        self.notebook = params.notebook;
-        self.availableSnippets = params.availableSnippets;
-        self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0,5)));
-        self.lastUsedSnippet = self.snippetHistory()[0];
-        self.roundCount = 0;
-        self.positions = calculatePositions(self.snippetHistory().length);
-        self.showingHistory = ko.observable(false);
-        self.hasAdditionalSnippets = params.availableSnippets().length > 5;
-        self.showingSelectSnippet = ko.observable(false);
-
-        self.addLastUsedSnippet = function() {
-          self.addNewSnippet(self.lastUsedSnippet);
-        };
-
-        self.showSnippetModal = function () {
-          $("#addSnippetModal").modal('show');
-        };
-
-        self.addNewSnippet = function (alternative) {
-          clearTimeout(hideTimeout);
-          self.showingHistory(false);
-          self.showingSelectSnippet(false);
-          $("#addSnippetModal").modal('hide');
-
-          // When fewer than 5 it's always in history
-          if (self.snippetHistory().indexOf(alternative) == -1) {
-            self.snippetHistory.splice(4 - self.roundCount, 1, alternative);
-            self.roundCount = (self.roundCount + 1) % 5;
+          for (var i = 0; i < alternativeCount; i++) {
+            result.push({
+              left: radius * Math.cos(currentRad) + PLUS_ICON_RADIUS + 'px',
+              top: radius * Math.sin(currentRad) + PLUS_ICON_RADIUS + 'px'
+            });
+            currentRad += radIncrements;
           }
 
-          self.lastUsedSnippet = alternative;
-          self.notebook.newSnippet(alternative.type())
+          return result;
         };
 
-        var hideTimeout = -1;
+        function AddSnippetMenuViewModel(params) {
+          var self = this;
+          self.notebook = params.notebook;
+          self.availableSnippets = params.availableSnippets;
+          self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0, 5)));
+          self.lastUsedSnippet = self.snippetHistory()[0];
+          self.roundCount = 0;
+          self.positions = calculatePositions(self.snippetHistory().length);
+          self.showingHistory = ko.observable(false);
+          self.hasAdditionalSnippets = params.availableSnippets().length > 5;
+          self.showingSelectSnippet = ko.observable(false);
 
-        self.showHistory = function () {
-          clearTimeout(hideTimeout);
-          self.showingHistory(true);
-          self.showingSelectSnippet(true);
-        };
+          self.addLastUsedSnippet = function () {
+            self.addNewSnippet(self.lastUsedSnippet);
+          };
 
-        self.hideHistory = function () {
-          clearTimeout(hideTimeout);
-          hideTimeout = window.setTimeout(function () {
+          self.showSnippetModal = function () {
+            $("#addSnippetModal").modal('show');
+          };
+
+          self.addNewSnippet = function (alternative) {
+            clearTimeout(hideTimeout);
             self.showingHistory(false);
             self.showingSelectSnippet(false);
-          }, 500);
-        };
-      }
+            $("#addSnippetModal").modal('hide');
 
-      ko.components.register('add-snippet-menu', {
-        viewModel: AddSnippetMenuViewModel,
-        template: { element: 'add-snippet-menu-template' }
-      });
-    }());
+            // When fewer than 5 it's always in history
+            if (self.snippetHistory().indexOf(alternative) == -1) {
+              self.snippetHistory.splice(4 - self.roundCount, 1, alternative);
+              self.roundCount = (self.roundCount + 1) % 5;
+            }
+
+            self.lastUsedSnippet = alternative;
+            self.notebook.newSnippet(alternative.type())
+          };
+
+          var hideTimeout = -1;
+
+          self.showHistory = function () {
+            clearTimeout(hideTimeout);
+            self.showingHistory(true);
+            self.showingSelectSnippet(true);
+          };
+
+          self.hideHistory = function () {
+            clearTimeout(hideTimeout);
+            hideTimeout = window.setTimeout(function () {
+              self.showingHistory(false);
+              self.showingSelectSnippet(false);
+            }, 500);
+          };
+        }
+
+        ko.components.register('add-snippet-menu', {
+          viewModel: AddSnippetMenuViewModel,
+          template: {element: 'add-snippet-menu-template'}
+        });
+      }());
+    }));
   </script>
 </%def>

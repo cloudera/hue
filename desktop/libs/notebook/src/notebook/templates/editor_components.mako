@@ -39,14 +39,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-deferred-updates.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/hue.utils.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('notebook/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
@@ -86,9 +78,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/nv.d3.scatter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.scatterChart.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/js/ko.charts.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"> type="text/javascript" charset="utf-8"</script>
-
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <!--[if IE 9]>
@@ -99,7 +88,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script src="${ static('desktop/js/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/x-mathjax-config">
@@ -112,16 +100,38 @@ from desktop.views import _ko
 
 <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+<script src="${ static('desktop/js/hue.utils.js') }"></script>
 
-<script  src="${ static('desktop/ext/js/require.js') }"></script>
+
+<script src="${ static('desktop/ext/js/require.js') }"></script>
 <script>
+  define('jquery', [], function() {
+    return jQuery;
+  });
   require.config({
     baseUrl: "${ static('') }",
     paths: {
-      "jquery": "desktop/ext/js/jquery/jquery-2.1.1.min",
+      "jquery.ui.sortable": "desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min",
       "knockout": "desktop/ext/js/knockout.min",
+      "ko.charts" : "desktop/js/ko.charts",
+      "knockout-mapping" : "desktop/ext/js/knockout-mapping.min",
+      "knockout-sortable" : "desktop/ext/js/knockout-sortable.min",
+      "knockout-deferred-updates" : "desktop/ext/js/knockout-deferred-updates.min",
+      "ko.editable" : "desktop/js/ko.editable",
+      "ko.hue-bindings" : "desktop/js/ko.hue-bindings"
     },
     shim: {
+      "knockout": { exports: "ko" },
+      "knockout-mapping": { deps: ["knockout"] },
+      "knockout-sortable": { deps: ["knockout", "jquery", "jquery.ui.sortable"] },
+      "knockout-deferred-updates": { deps: ["knockout"] },
+      "ko.editable": { deps: ["knockout"] },
+      "ace.extended": { deps: ["ace"] },
+      "ace.ext-language-tools": { deps: ["ace"] }
+    },
+    deps: ["knockout", "knockout-mapping"],
+    callback: function(ko, mapping) {
+      ko.mapping = mapping;
     }
   });
 </script>
@@ -1360,9 +1370,16 @@ from desktop.views import _ko
     return _datum;
   }
 
-  requirejs([
-    'notebook/js/notebook.ko'
-  ], function (EditorViewModel) {
+  require([
+    "knockout",
+    "notebook/js/notebook.ko",
+    "ko.charts",
+    "knockout-mapping",
+    "knockout-sortable",
+    "knockout-deferred-updates",
+    "ko.editable",
+    "ko.hue-bindings"
+  ], function (ko, EditorViewModel) {
 
       var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
@@ -1444,7 +1461,7 @@ from desktop.views import _ko
 
     var viewModel;
 
-    function redrawFixedHeaders () {
+    var redrawFixedHeaders = function () {
       viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
           var _el = $("#snippet_" + snippet.id()).find(".resultTable");
@@ -1456,7 +1473,9 @@ from desktop.views import _ko
           });
         });
       });
-    }
+    };
+
+    window.redrawFixedHeaders = redrawFixedHeaders;
 
     // Drag and drop iPython / Zeppelin notebooks
     if (window.FileReader) {
