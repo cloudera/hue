@@ -27,6 +27,7 @@ from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired
 from notebook.decorators import api_error_handler, check_document_modify_permission
+from notebook.github import GithubClient, GithubClientException
 from notebook.models import escape_rows
 
 
@@ -294,5 +295,24 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
     pass
 
   response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def github_fetch(request):
+  response = {'status': -1}
+
+  api = GithubClient()
+
+  response['url'] = url = request.GET.get('url')
+
+  if url:
+    owner, repo, branch, filepath = api.parse_github_url(url)
+
+    response['status'] = 0
+    response['content'] = api.get_file_contents(owner, repo, filepath, branch)
+  else:
+    response['message'] = _('fetch_github requires full URL to Github file.')
 
   return JsonResponse(response)
