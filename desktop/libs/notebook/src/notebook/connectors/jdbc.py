@@ -154,7 +154,7 @@ class JdbcApi(Api):
     except Exception, e:
       LOG.warn('Autocomplete data fetching error: %s' % e)
       response['code'] = -1
-      response['error'] = e.message
+      response['error'] = str(e)
 
     return response
 
