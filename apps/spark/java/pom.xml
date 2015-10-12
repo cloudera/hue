@@ -29,6 +29,7 @@
 
     <groupId>com.cloudera.hue.livy</groupId>
     <artifactId>livy-main</artifactId>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
 
     <name>livy-main</name>
