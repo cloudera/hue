@@ -372,10 +372,6 @@ from desktop.views import _ko
           </ul>
         </div>
 
-        <label data-bind="visible: type() == 'text' && $root.isEditing()" class="checkbox inline" style="margin-top: -6px"><input type="checkbox" data-bind="checked: $data.subtype" /> Markdown</label>
-
-        <span data-bind="visible: type() == 'text'">&nbsp;</span>
-
         <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
 
         <div class="hover-actions inline pull-right" style="font-size: 15px;">
@@ -390,8 +386,9 @@ from desktop.views import _ko
       <div>
         <div style="float: left; width: 50%">
           <div class="snippet-body" style="position: relative; z-index: 90;">
-            <!-- ko template: { if: ['text', 'jar', 'py'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
           </div>
         </div>
@@ -496,7 +493,7 @@ from desktop.views import _ko
       <div class="ace-editor" data-bind="attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
-          }"></div>
+        }"></div>
       </div>
     <div class="clearfix"></div>
     <ul data-bind="foreach: variables" class="unstyled inline">
@@ -688,28 +685,28 @@ from desktop.views import _ko
 </script>
 
 <script type="text/html" id="text-snippet-body">
-  <!-- ko ifnot: subtype() -->
   <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
+</script>
+
+<script type="text/html" id="markdown-snippet-body">
+  <!-- ko if: $root.isEditing() -->
+  <div class="row-fluid">
+    <div class="span6">
+      <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
+        snippet: $data,
+        updateOnInput: true
+      }"></div>
+    </div>
+    <div class="span6">
+      <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD'+id()}"></div>
+    </div>
+  </div>
   <!-- /ko -->
-  <!-- ko if: subtype() -->
-    <!-- ko if: $root.isEditing() -->
-      <div class="row-fluid">
-        <div class="span6">
-          <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
-              snippet: $data,
-              updateOnInput: true
-            }"></div>
-        </div>
-        <div class="span6">
-          <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD'+id()}"></div>
-        </div>
-      </div>
-    <!-- /ko -->
-    <!-- ko ifnot: $root.isEditing() -->
-      <div data-bind="html: renderMarkdown(statement_raw(), id())"></div>
-    <!-- /ko -->
+  <!-- ko ifnot: $root.isEditing() -->
+  <div data-bind="html: renderMarkdown(statement_raw(), id())"></div>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="executable-snippet-body">
   <div data-bind="verticalSlide: codeVisible" style="padding:10px;">
@@ -1452,8 +1449,13 @@ from desktop.views import _ko
           snippetImage: '${ static("spark/art/icon_spark_48.png") }'
         },
         text: {
-          placeholder: '${ _('Type your markdown here') }',
-          aceMode: 'markdown',
+          placeHolder: '${ _('Type your text here') }',
+          aceMode: 'ace/mode/text',
+          snippetIcon: 'fa-header'
+        },
+        markdown: {
+          placeHolder: '${ _('Type your markdown here') }',
+          aceMode: 'ace/mode/markdown',
           snippetIcon: 'fa-header'
         }
       }
@@ -1503,12 +1505,6 @@ from desktop.views import _ko
           hideHoverMsg();
         }
 
-        function addMarkdown (content) {
-          var snip = viewModel.notebooks()[0].addSnippet({type: "text", result: {}}, true);
-          snip.subtype(true);
-          snip.statement_raw(content);
-        }
-
         function addAce (content, snippetType) {
           var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
           snip.statement_raw(content);
@@ -1522,6 +1518,11 @@ from desktop.views import _ko
               }
             }
           }, 100);
+        }
+
+        function addMarkdown (content) {
+          var snip = viewModel.notebooks()[0].addSnippet({type: "markdown", result: {}}, true);
+          snip.statement_raw(content);
         }
 
         function addPySpark (content) {
