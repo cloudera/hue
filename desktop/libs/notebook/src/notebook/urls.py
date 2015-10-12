@@ -60,6 +60,11 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/notebook/close$', 'close_notebook', name='close_notebook'),
 )
 
+# Github
+urlpatterns += patterns('notebook.api',
+  url(r'^api/github/fetch$', 'github_fetch', name='github_fetch'),
+)
+
 # Assist API
 urlpatterns += patterns('notebook.api',
   url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
