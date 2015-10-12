@@ -963,15 +963,27 @@ from desktop.views import _ko
     <h3>${_('Connect to the data source')}</h3>
   </div>
   <div class="modal-body">
-    <input name="username" type="text" data-bind="value: $root.authSessionUsername" placeholder="${ _('Username') }"/>
-    <input name="password" type="password" data-bind="value: $root.authSessionPassword" placeholder="${ _('Password') }"/>
+    <div class="row-fluid">
+      <div class="span6">
+        <div class="input-prepend">
+          <span class="add-on muted"><i class="fa fa-user"></i></span>
+          <input name="username" type="text" data-bind="value: $root.authSessionUsername" placeholder="${ _('Username') }"/>
+        </div>
+      </div>
+      <div class="span6">
+        <div class="input-prepend">
+          <span class="add-on muted"><i class="fa fa-lock"></i></span>
+          <input name="password" type="password" data-bind="value: $root.authSessionPassword" placeholder="${ _('Password') }"/>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <input type="submit" data-dismiss="modal" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { $root.selectedNotebook().authSession(); }" />
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: function() { $root.selectedNotebook().authSession(); }">${_('Connect')}</a>
   </div>
 </div>
-
+  
 </%def>
 
 
