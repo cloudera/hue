@@ -94,6 +94,9 @@ oozie.sql
 tools/jenkins/ext/
 tools/jenkins/oozie.sql
 apps/logs
+java-lib/
+dependency-reduced-pom.xml
+
 
 # Sublime Text temp files
 *.subl*
