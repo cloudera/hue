@@ -698,7 +698,7 @@ from desktop.views import _ko
           <div class="ace-editor" data-bind="attr: { id: id() }, aceEditor: {
               snippet: $data,
               updateOnInput: true
-            "></div>
+            }"></div>
         </div>
         <div class="span6">
           <div data-bind="html: renderMarkdown(statement_raw(), id()), attr: {'id': 'liveMD'+id()}"></div>
