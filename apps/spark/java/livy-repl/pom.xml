@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>livy-repl_2.10</artifactId>
+    <version>0.2.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
