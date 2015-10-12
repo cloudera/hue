@@ -161,12 +161,10 @@ from desktop.views import _ko
 
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
-    <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0 -->
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }">
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
       <i class="fa fa-expand"></i>
     </a>
     &nbsp;&nbsp;
-    <!-- /ko -->
     <div class="btn-group">
       <a class="btn dropdown-toggle" data-toggle="dropdown">
         <i class="fa fa-check-square-o"></i>
@@ -193,7 +191,7 @@ from desktop.views import _ko
 
    &nbsp;&nbsp;&nbsp;
 
-   <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
+   <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
      <i class="fa fa-pencil"></i>
    </a>
 
@@ -203,18 +201,17 @@ from desktop.views import _ko
 
    &nbsp;&nbsp;&nbsp;
 
-   <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }"
-      data-bind="click: saveNotebook, css: {'btn': true}">
+   <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
      <i class="fa fa-save"></i>
    </a>
 
    &nbsp;&nbsp;&nbsp;
 
-   <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+   <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
      <i class="fa fa-file-o"></i>
    </a>
 
-   <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+   <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
      <i class="fa fa-tags"></i>
    </a>
   </div>
@@ -244,8 +241,8 @@ from desktop.views import _ko
 
 </div>
 
-<div class="player-toolbar" data-bind="visible: $root.isPlayerMode()">
-  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
+<div class="player-toolbar" data-bind="visible: $root.isPlayerMode()" style="display: none;">
+  <div class="pull-right pointer" data-bind="click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
   <img src="${ static('desktop/art/icon_hue_48.png') }" />
   <!-- ko if: $root.selectedNotebook() -->
   <h4 data-bind="text: $root.selectedNotebook().name"></h4>
