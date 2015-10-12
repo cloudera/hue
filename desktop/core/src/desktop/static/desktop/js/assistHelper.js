@@ -52,7 +52,7 @@
 
   AssistHelper.prototype.load = function (snippet, callback) {
     var self = this;
-    if (self.loading() || self.loaded()) {
+    if (self.loading()) {
       return;
     }
     self.type = snippet.type();
@@ -82,9 +82,11 @@
       if (callback) {
         callback();
       }
-    }, function(message) {
-     if (message.status == 401) {
-        $(document).trigger("showAuthModal", {'type': self.type, 'callback': function() {self.loaded(false); self.load(snippet, callback) }});
+    }, function (message) {
+      self.loaded(true);
+      self.loading(false);
+      if (message.status == 401) {
+        $(document).trigger("showAuthModal", {'type': self.type, 'callback': function() { self.load(snippet, callback) }});
       } else if (message.statusText) {
         $(document).trigger("error", "There was a problem loading the databases:" + message.statusText);
       } else if (message) {
@@ -92,8 +94,6 @@
       } else {
         $(document).trigger("error", "There was a problem loading the databases");
       }
-      self.loaded(true);
-      self.loading(false);
       if (callback) {
         callback();
       }

@@ -810,7 +810,6 @@ from desktop.views import _ko
         self.reloading(true);
         self.selectedDatabase(null);
         self.assistHelper.clearCache(self.snippet);
-        self.assistHelper.loaded(false);
         self.assistHelper.load(self.snippet, function() {
           self.reloading(false);
         });
