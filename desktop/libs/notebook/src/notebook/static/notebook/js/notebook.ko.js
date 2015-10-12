@@ -630,7 +630,11 @@
     });
 
     self.type.subscribe(function () {
-      self.autocompleter.setAssistHelper(self.getAssistHelper());
+      var assistHelper = self.getAssistHelper();
+      self.autocompleter.setAssistHelper(assistHelper);
+      if (! assistHelper.loaded()) {
+        assistHelper.load(self);
+      }
     });
 
     self.init = function () {
