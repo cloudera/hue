@@ -47,17 +47,43 @@ class TestDocModelTags():
 
   def add_tag(self, name):
     response = self.client.post("/desktop/api/tag/add_tag", {'name': name})
-    assert_equal(0, json.loads(response.content)['status'], response.content)
-    return json.loads(response.content)['id']
+    content = json.loads(response.content)
+    assert_equal(content['status'], 0, content)
+
+    return content['id']
 
   def add_doc(self, name):
     script = PigScript.objects.create(owner=self.user)
     doc = Document.objects.link(script, owner=script.owner, name=name)
     return script, doc
 
+  def share_doc(self, doc, permissions):
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+        'doc_id': doc.id,
+        'data': json.dumps(*permissions)
+    })
+
+  def share_doc_read_only(self, doc):
+    return self.share_doc(doc, {
+      'read': {
+        'user_ids': [
+          self.user.id
+        ],
+        'group_ids': []
+      },
+      'write': {
+        'user_ids': [],
+        'group_ids': []
+      }
+    })
+
   def test_add_tag(self):
     response = self.client.get("/desktop/api/tag/add_tag")
     assert_equal(-1, json.loads(response.content)['status'])
+
+    response = self.client.post("/desktop/api/tag/add_tag")
+    content = json.loads(response.content)
+    assert_equal(content['status'], -1, content)
 
     tag_id = self.add_tag('my_tag')
 
@@ -91,8 +117,11 @@ class TestDocModelTags():
     response = self.client.get("/desktop/api/tag/remove_tag")
     assert_equal(-1, json.loads(response.content)['status'])
 
+    # Only the owner can remove tags.
     response = self.client_not_me.post("/desktop/api/tag/remove_tag", {'tag_id': tag_id})
-    assert_equal(-1, json.loads(response.content)['status'], response.content)
+    content = json.loads(response.content)
+    assert_equal(content['status'], -1, content)
+    assert_equal(content['message'], "DocumentTag matching query does not exist.", content)
 
     response = self.client.post("/desktop/api/tag/remove_tag", {'tag_id': tag_id})
     assert_equal(0, json.loads(response.content)['status'], response.content)
@@ -109,9 +138,27 @@ class TestDocModelTags():
     docs = _get_docs(self.user)
     assert_not_equal({}, massaged_documents_for_json(docs, self.user))
 
+  def test_tag_errors(self):
+    script, doc = self.add_doc('tag_pig_errors')
+
+    # Users without permission cannot see docs.
+    response = self.client_not_me.post("/desktop/api/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag': 'pig'})})
+    content = json.loads(response.content)
+    assert_equal(content['status'], -1, content)
+    assert_equal(content['message'], "Document matching query does not exist.", content)
+
+    # Users with permission cannot tag docs.
+    self.share_doc_read_only(doc)
+
+    response = self.client_not_me.post("/desktop/api/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag': 'pig'})})
+    content = json.loads(response.content)
+    assert_equal(content['status'], -1, content)
+    assert_equal(content['message'], "Document matching query does not exist.", content)
+
   def test_tag(self):
     script, doc = self.add_doc('tag_pig')
 
+    # Owners can add tags.
     response = self.client.post("/desktop/api/doc/tag", {'data': json.dumps({'doc_id': doc.id, 'tag': 'pig'})})
     assert_equal(0, json.loads(response.content)['status'], response.content)
 
@@ -137,14 +184,13 @@ class TestDocModelTags():
         {"id": tag2_id, "name": "update_tags_2"}
       ], sorted(content['doc']['tags'], key=lambda t: t['id']))
 
-    # No perms
+    # Only the owner can update tags.
     response = self.client_not_me.post("/desktop/api/doc/update_tags", {'data': json.dumps({'doc_id': doc.id, 'tag_ids': [tag1_id, tag2_id]})})
     content = json.loads(response.content)
-
-    assert_equal(-1, content['status'])
+    assert_equal(content['status'], -1, response.content)
+    assert_equal(content['message'], "Document matching query does not exist.", content)
 
     # todo no default tag on test user?
-
 
 
 class TestDocModelPermissions():
@@ -438,3 +484,63 @@ class TestDocModelPermissions():
     assert_true(doc_id in json.loads(response.context['json_documents']))
     response = self.client_not_me.get('/home')
     assert_false(doc_id in json.loads(response.context['json_documents']))
+
+  def test_update_permissions_cannot_escalate_privileges(self):
+    script, doc = self._add_doc('test_update_permissions_cannot_escape_privileges')
+
+    # Share read permissions
+    response = self.client.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id,
+            self.user_not_me.id,
+          ],
+          'group_ids': []
+        },
+        'write': {
+          'user_ids': [
+            self.user.id,
+          ],
+          'group_ids': []
+        }
+      })
+    })
+
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
+
+    # Try, and fail to escalate privileges.
+    response = self.client_not_me.post("/desktop/api/doc/update_permissions", {
+      'doc_id': doc.id,
+      'data': json.dumps({
+        'read': {
+          'user_ids': [
+            self.user.id,
+            self.user_not_me.id,
+          ],
+          'group_ids': []
+        },
+        'write': {
+          'user_ids': [
+            self.user_not_me.id,
+            self.user_not_me.id,
+          ],
+          'group_ids': []
+        }
+      })
+    })
+
+    content = json.loads(response.content)
+    assert_equal(content['status'], -1)
+    assert_equal(content['message'], "Document does not exist or you don\'t have the permission to access it.")
+
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
