@@ -1642,7 +1642,8 @@ ${ require.config() }
       viewModel.init();
 
       window.hueDebug = {
-        viewModel: viewModel
+        viewModel: viewModel,
+        ko: ko
       }
 
       var isAssistAvailable = viewModel.assistAvailable();
