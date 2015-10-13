@@ -1646,6 +1646,10 @@ from desktop.views import _ko
       ko.applyBindings(viewModel);
       viewModel.init();
 
+      window.hueDebug = {
+        viewModel: viewModel
+      }
+
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();
 
