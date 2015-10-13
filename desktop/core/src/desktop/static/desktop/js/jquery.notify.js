@@ -46,7 +46,7 @@
 
   Plugin.prototype.show = function () {
     var _this = this;
-    var MARGIN = 10;
+    var MARGIN = 4;
 
     _this.options.message = $("<span>").text(_this.options.message).html(); // escape HTML messages
 
