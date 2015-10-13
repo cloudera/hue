@@ -46,6 +46,10 @@ Want SSL support? Just set these attributes:
     
     server.ssl_certificate = <filename>
     server.ssl_private_key = <filename>
+
+Supports also SSL certificate chains with this attribute:
+
+    server.ssl_certificate_chain = <filename>
     
     if __name__ == '__main__':
         try:
@@ -1524,6 +1528,7 @@ class CherryPyWSGIServer(object):
     # Paths to certificate and private key files
     ssl_certificate = None
     ssl_private_key = None
+    ssl_certificate_chain = None
     ssl_cipher_list = "DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2"
     ssl_password_cb = None
     
@@ -1693,6 +1698,8 @@ class CherryPyWSGIServer(object):
             try:
               ctx.use_privatekey_file(self.ssl_private_key)
               ctx.use_certificate_file(self.ssl_certificate)
+              if self.ssl_certificate_chain:
+                ctx.use_certificate_chain_file(self.ssl_certificate_chain)
             except Exception, ex:
               logging.exception('SSL key and certificate could not be found or have a problem')
               raise ex
