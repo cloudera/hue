@@ -116,6 +116,12 @@ SSL_PRIVATE_KEY = Config(
   type=coerce_file,
   default=None)
 
+SSL_CERTIFICATE_CHAIN = Config(
+  key="ssl_certificate_chain",
+  help=_("Filename of SSL Certificate Chain"),
+  type=coerce_file,
+  default=None)
+
 SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
   help=_("List of allowed and disallowed ciphers"),
