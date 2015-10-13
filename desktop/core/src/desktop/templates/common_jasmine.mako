@@ -14,6 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+<%namespace name="require" file="/require.mako" />
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -23,23 +25,32 @@
     <link rel="shortcut icon" type="image/png" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine_favicon.png') }">
     <link rel="stylesheet" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine.css') }">
 
-    <script src="${ static('desktop/ext/js/jasmine-2.3.4/jasmine.js') }"></script>
-    <script src="${ static('desktop/ext/js/jasmine-2.3.4/jasmine-html.js') }"></script>
-    <script src="${ static('desktop/ext/js/jasmine-2.3.4/boot.js') }"></script>
-
-
     <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
     <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
-    <script type="text/javascript" src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 
-    <%block name="specs"/>
+    ${ require.config() }
 
-    <script type="text/javascript">
-        (function() {
-
-        })();
+    <script type="text/javascript" charset="utf-8">
+      // Adds the jasmine dependencies to the existing require config.
+      require.config({
+        baseUrl: "${ static('') }",
+        paths: {
+          'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
+          'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
+          'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot'
+        },
+        shim: {
+          'jasmine-html': {
+            deps : ['jasmine']
+          },
+          'jasmine-boot': {
+            deps : ['jasmine', 'jasmine-html']
+          }
+        }
+      })
     </script>
 
+    <%block name="specs"/>
 </head>
 
 <body>
