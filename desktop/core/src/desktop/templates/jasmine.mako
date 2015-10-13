@@ -25,7 +25,7 @@
   require(['jasmine-boot'], function () {
     // Add specs below
     require([
-      'desktop/spec/autocompleterSpec'
+      'desktop/spec/sqlAutocompleterSpec'
     ], function() {
       window.onload();
     });

@@ -625,16 +625,7 @@
     };
 
     self.autocompleter = new Autocompleter({
-      snippet: self,
-      assistHelper: self.getAssistHelper()
-    });
-
-    self.type.subscribe(function () {
-      var assistHelper = self.getAssistHelper();
-      self.autocompleter.setAssistHelper(assistHelper);
-      if (! assistHelper.loaded()) {
-        assistHelper.load(self);
-      }
+      snippet: self
     });
 
     self.init = function () {
