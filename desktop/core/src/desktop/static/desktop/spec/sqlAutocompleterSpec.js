@@ -15,10 +15,10 @@
 // limitations under the License.
 define([
   'knockout',
-  'desktop/js/autocompleter',
+  'desktop/js/sqlAutocompleter',
   'desktop/js/assistHelper'
-], function(ko, Autocompleter, AssistHelper) {
-  describe("autocomplete.js", function() {
+], function(ko, SqlAutocompleter, AssistHelper) {
+  describe("sqlAutocompleter.js", function() {
     var subject;
 
     var ajaxHelper = {
@@ -26,21 +26,21 @@ define([
     };
 
     var createOptions = function (type) {
-      var notebook = {
-        getContext: function() { return ko.mapping.fromJS(null) }
-      };
-      return {
-        assistHelper: new AssistHelper({
-          notebook: notebook,
-          activeDatabase: "testDb",
-          user: "testUser"
-        }),
-        snippet: {
-          type: ko.observable(type),
-          isSqlDialect: function() { return true; },
+      var assistHelper = new AssistHelper({
+        notebook: {
           getContext: function() { return ko.mapping.fromJS(null) }
         },
-        notebook: notebook
+        activeDatabase: "testDb",
+        user: "testUser"
+      });
+
+      return {
+        snippet: {
+          type: ko.observable(type),
+          isSqlDialect: function () { return true; },
+          getContext: function () { return ko.mapping.fromJS(null) },
+          getAssistHelper: function () { return assistHelper }
+        }
       }
     };
 
@@ -104,7 +104,7 @@ define([
     });
 
     beforeEach(function() {
-      subject = new Autocompleter(createOptions("genericSqlType"));
+      subject = new SqlAutocompleter(createOptions("genericSqlType"));
       ajaxHelper.responseForUrls = {};
     });
 
@@ -236,7 +236,7 @@ define([
 
     describe("hive-specific stuff", function() {
       beforeEach(function() {
-        subject = new Autocompleter(createOptions("hive"));
+        subject = new SqlAutocompleter(createOptions("hive"));
         ajaxHelper.responseForUrls = {};
       });
 
@@ -516,7 +516,7 @@ define([
 
     describe("impala-specific stuff", function() {
       beforeEach(function () {
-        subject = new Autocompleter(createOptions("impala"));
+        subject = new SqlAutocompleter(createOptions("impala"));
         ajaxHelper.responseForUrls = {};
       });
 
