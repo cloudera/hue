@@ -420,7 +420,7 @@ body.modal-open {
   text-align: center;
 }
 
-.editor {
+.ace-editor {
   padding-left: 4px;
   border-left: 1px solid #FFFFFF;
   -webkit-transition: border-left-color 0.2s ease;
@@ -429,6 +429,6 @@ body.modal-open {
   transition: border-left-color 0.2s ease;
 }
 
-.editor:hover {
+.ace-editor:hover {
   border-left-color: #3893c2;
 }
