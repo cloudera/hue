@@ -279,7 +279,6 @@ from desktop.views import _ko
         factory(ko, AssistHelper);
       }
     }(function (ko, AssistHelper) {
-      (function() {
       function AssistEntry (definition, parent, assistSource, filter) {
         var self = this;
         self.definition = definition;
@@ -819,7 +818,6 @@ from desktop.views import _ko
         viewModel: AssistPanel,
         template: { element: 'assist-panel-template' }
       });
-    }());
     }));
   </script>
 </%def>

@@ -65,16 +65,20 @@
       self.availableDatabases($.grep(databases, function(database) { return database !== "_impala_builtins" }));
 
       if ($.inArray(self.activeDatabase(), self.availableDatabases()) === -1) {
-        var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix());
-        if ($.inArray(self.initialDatabase, self.availableDatabases()) > -1) {
-          self.activeDatabase(self.initialDatabase);
-        } else if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
-          self.activeDatabase(lastSelectedDb);
-        } else if ($.inArray("default", self.availableDatabases()) > -1) {
-          self.activeDatabase("default");
-        } else if (self.availableDatabases().length > 0) {
-          self.activeDatabase(self.availableDatabases()[0]);
-        }
+        // Defer this, select2 will update the activeDatabase to undefined when loading so this should make sure we set
+        // it afterwards.
+        window.setTimeout(function() {
+          var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.getTotalStorageUserPrefix());
+          if ($.inArray(self.initialDatabase, self.availableDatabases()) > -1) {
+            self.activeDatabase(self.initialDatabase);
+          } else if ($.inArray(lastSelectedDb, self.availableDatabases()) > -1) {
+            self.activeDatabase(lastSelectedDb);
+          } else if ($.inArray("default", self.availableDatabases()) > -1) {
+            self.activeDatabase("default");
+          } else if (self.availableDatabases().length > 0) {
+            self.activeDatabase(self.availableDatabases()[0]);
+          }
+        }, 1);
       }
 
       self.loaded(true);

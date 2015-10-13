@@ -33,6 +33,7 @@
     <script type="text/javascript" charset="utf-8">
       // Adds the jasmine dependencies to the existing require config.
       require.config({
+        urlArgs: "random=" + Math.random(),
         baseUrl: "${ static('') }",
         paths: {
           'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
