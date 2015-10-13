@@ -22,10 +22,11 @@
 
 <%block name="specs">
   <script type="text/javascript" charset="utf-8">
-  require(['jasmine-boot'], function () {
+  require(['jasmine-boot', 'jasmine'], function () {
     // Add specs below
     require([
-      'desktop/spec/sqlAutocompleterSpec'
+      'desktop/spec/sqlAutocompleterSpec',
+      'desktop/spec/hdfsAutocompleterSpec'
     ], function() {
       window.onload();
     });

@@ -16,8 +16,9 @@
 define([
   'knockout',
   'desktop/js/sqlAutocompleter',
-  'desktop/js/assistHelper'
-], function(ko, SqlAutocompleter, AssistHelper) {
+  'desktop/js/assistHelper',
+  'desktop/spec/autocompleterTestUtils'
+], function(ko, SqlAutocompleter, AssistHelper, testUtils) {
   describe("sqlAutocompleter.js", function() {
     var subject;
 
@@ -45,34 +46,10 @@ define([
     };
 
     beforeAll(function() {
+      jasmine.addMatchers(testUtils.autocompleteMatcher);
       $.totalStorage = function(key, value) {
         return null;
       };
-
-      jasmine.addMatchers({
-        toEqualAutocompleteValues : function() {
-          return {
-            compare: function(actualItems, expectedValues) {
-              var itemIndex = {};
-
-              if (actualItems.length !== expectedValues.length) {
-                return { pass: false };
-              }
-              $.each(actualItems, function(i, item) {
-                itemIndex[item.value] = true;
-              });
-
-              for (var i = 0; i < expectedValues.length; i++) {
-                if (! itemIndex[expectedValues[i]]) {
-                  return { pass: false };
-                }
-              }
-              return { pass: true };
-            }
-          }
-        }
-      });
-
       spyOn($, "ajax").and.callFake(function(options) {
         var firstUrlPart = options.url.split("?")[0];
         var response;

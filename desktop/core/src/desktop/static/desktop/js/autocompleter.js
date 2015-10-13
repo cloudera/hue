@@ -16,11 +16,14 @@
 
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
-    define(['desktop/js/sqlAutocompleter'], factory);
+    define([
+      'desktop/js/sqlAutocompleter',
+      'desktop/js/HdfsAutocompleter'
+    ], factory);
   } else {
-    root.Autocompleter = factory(SqlAutocompleter);
+    root.Autocompleter = factory(SqlAutocompleter, HdfsAutocompleter);
   }
-}(this, function (SqlAutocompleter) {
+}(this, function (SqlAutocompleter, HdfsAutocompleter) {
 
   /**
    * @param options {object}
@@ -37,7 +40,7 @@
           snippet: options.snippet
         })
       } else {
-        self.autocompleter = null;
+        self.autocompleter = new HdfsAutocompleter();
       }
     };
     self.snippet.type.subscribe(function () {
