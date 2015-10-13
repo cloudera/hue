@@ -289,8 +289,9 @@ def update_permissions(request):
     data = json.loads(request.POST['data'])
     doc_id = request.POST['doc_id']
     try:
-      doc = Document.objects.get_doc(doc_id, request.user)
+      doc = Document.objects.get_doc_for_writing(doc_id, request.user)
       doc.sync_permissions(data)
+
       response['message'] = _('Permissions updated!')
       response['status'] = 0
       response['doc'] = massage_doc_for_json(doc, request.user)
