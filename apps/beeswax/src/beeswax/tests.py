@@ -40,7 +40,12 @@ from django.core.urlresolvers import reverse
 from django.db import transaction
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, LDAP_USERNAME, LDAP_PASSWORD
+from desktop.conf import \
+    AUTH_USERNAME as DEFAULT_AUTH_USERNAME, \
+    AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
+    AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
+    LDAP_USERNAME, \
+    LDAP_PASSWORD
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -2830,32 +2835,63 @@ def test_auth_pass_through():
       f()
 
   # Password file specific and use common username
-  with tempfile.NamedTemporaryFile(delete=False) as pwd_file:
-    pwd_file.write('''#!/usr/bin/env bash
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
 
-echo "my_hue_secret"''')
-    pwd_file.flush()
-    pwd_file.close() # Closing as getting "Text file busy" otherwise
-    os.chmod(pwd_file.name, 0770)
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
 
-    finish = []
-    finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
-    finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+  finish.append(AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD_SCRIPT.set_for_testing('/bin/echo "my_hue_secret"'))
 
-    finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
-    finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
+  try:
+    assert_equal('default_username', AUTH_USERNAME.get())
+    assert_equal('my_hue_secret', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
 
-    finish.append(AUTH_USERNAME.set_for_testing(present=False))
-    finish.append(AUTH_PASSWORD.set_for_testing(present=False))
-    finish.append(AUTH_PASSWORD_SCRIPT.set_for_testing(pwd_file.name))
+  # Make sure global auth password script can be used.
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
 
-    try:
-      assert_equal('default_username', AUTH_USERNAME.get())
-      assert_equal('my_hue_secret', AUTH_PASSWORD.get())
-    finally:
-      os.remove(pwd_file.name)
-      for f in finish:
-        f()
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
+  finish.append(DEFAULT_AUTH_PASSWORD_SCRIPT.set_for_testing('/bin/echo "my_hue_secret"'))
+
+  finish.append(AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD_SCRIPT.set_for_testing(present=False))
+
+  try:
+    assert_equal('default_username', AUTH_USERNAME.get())
+    assert_equal('my_hue_secret', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
+
+  # Make sure local auth password script overrides global password.
+  finish = []
+  finish.append(LDAP_USERNAME.set_for_testing('deprecated_default_username'))
+  finish.append(LDAP_PASSWORD.set_for_testing('deprecated_default_password'))
+
+  finish.append(DEFAULT_AUTH_USERNAME.set_for_testing('default_username'))
+  finish.append(DEFAULT_AUTH_PASSWORD.set_for_testing(present=False))
+  finish.append(DEFAULT_AUTH_PASSWORD_SCRIPT.set_for_testing('/bin/echo "not_my_secret"'))
+
+  finish.append(AUTH_USERNAME.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD.set_for_testing(present=False))
+  finish.append(AUTH_PASSWORD_SCRIPT.set_for_testing('/bin/echo "my_hue_secret"'))
+
+  try:
+    assert_equal('default_username', AUTH_USERNAME.get())
+    assert_equal('my_hue_secret', AUTH_PASSWORD.get())
+  finally:
+    for f in finish:
+      f()
 
 
 def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside-1234:9999',
