@@ -21,18 +21,15 @@
 <%inherit file="common_jasmine.mako"/>
 
 <%block name="specs">
-  <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
-
-  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
-
-  <script src="${ static('desktop/js/hue.utils.js') }"></script>
-
-  ## Specs below
-  <script src="${ static('desktop/js/assistHelper.js') }"></script>
-  <script src="${ static('desktop/js/autocomplete.js') }"></script>
-  <script src="${ static('desktop/spec/autocompleteSpec.js') }"></script>
+  <script type="text/javascript" charset="utf-8">
+  require(['jasmine-boot'], function () {
+    // Add specs below
+    require([
+      'desktop/spec/autocompleterSpec'
+    ], function() {
+      window.onload();
+    });
+  });
+  </script>
 </%block>
 
