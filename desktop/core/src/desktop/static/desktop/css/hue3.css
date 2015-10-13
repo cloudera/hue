@@ -1012,7 +1012,9 @@ div.box {
   width: 400px;
   text-align: left;
   z-index: 11000;
-  word-break: break-word;
+  word-break: break-all;
+  overflow-y: auto;
+  max-height: 140px;
 }
 
 .jHueNotify .close {
