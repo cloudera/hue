@@ -43,6 +43,7 @@ CPSERVER_OPTIONS = {
   'server_group': conf.SERVER_GROUP.get(),
   'ssl_certificate': conf.SSL_CERTIFICATE.get(),
   'ssl_private_key': conf.SSL_PRIVATE_KEY.get(),
+  'ssl_certificate_chain': conf.SSL_CERTIFICATE_CHAIN.get(),
   'ssl_cipher_list': conf.SSL_CIPHER_LIST.get()
 }
 
@@ -85,6 +86,8 @@ def start_server(options):
     if options['ssl_certificate'] and options['ssl_private_key']:
         server.ssl_certificate = options['ssl_certificate']
         server.ssl_private_key = options['ssl_private_key']
+        if options['ssl_certificate_chain']:
+            server.ssl_certificate_chain = options['ssl_certificate_chain']
         server.ssl_cipher_list = options['ssl_cipher_list']
 
         ssl_password = conf.get_ssl_password()
