@@ -90,7 +90,6 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
-<script src="${ static('desktop/js/autocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({

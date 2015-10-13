@@ -16,11 +16,11 @@
 
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
-    define(['knockout', 'desktop/js/assistHelper', 'knockout-mapping', 'ko.charts'], factory);
+    define(['knockout', 'desktop/js/assistHelper', 'desktop/js/autocompleter', 'knockout-mapping', 'ko.charts'], factory);
   } else {
-    root.EditorViewModel = factory(ko, AssistHelper);
+    root.EditorViewModel = factory(ko, AssistHelper, Autocompleter);
   }
-}(this, function (ko, AssistHelper) {
+}(this, function (ko, AssistHelper, Autocompleter) {
 
   var SPARK_MAPPING = {
     ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user"]
