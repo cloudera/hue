@@ -1523,16 +1523,41 @@ ${ require.config() }
               $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
               try {
                 var loaded = JSON.parse(e.target.result);
-                if (loaded.cells) { //ipython
-                  loaded.cells.forEach(function (cell, cellCnt) {
+                if (loaded.nbformat) { //ipython
+                  var cells = [];
+                  if (loaded.nbformat == 3) {
+                    cells = loaded.worksheets[0].cells;
+                  }
+                  else if (loaded.nbformat == 4) {
+                    cells = loaded.cells;
+                  }
+                  cells.forEach(function (cell, cellCnt) {
                     window.setTimeout(function () {
                       if (cell.cell_type == "code") {
-                        addPySpark(cell.source.join("\n"));
+                        if (loaded.nbformat == 3) {
+                          addPySpark(cell.input.join("\n"));
+                        }
+                        else {
+                          addPySpark(cell.source.join("\n"));
+                        }
+                      }
+                      if (cell.cell_type == "heading") {
+                        var heading = cell.source.join("");
+                        if (cell.level == 1) {
+                          heading += "\n====================";
+                        }
+                        else if (cell.level == 2) {
+                          heading += "\n--------------------";
+                        }
+                        else {
+                          heading = "### " + heading;
+                        }
+                        addMarkdown(heading);
                       }
                       if (cell.cell_type == "markdown") {
                         addMarkdown(cell.source.join("\n"));
                       }
-                      if (cellCnt == loaded.cells.length - 1 && aceChecks == 0){
+                      if (cellCnt == cells.length - 1 && aceChecks == 0) {
                         hideHoverMsg();
                       }
                     }, 10);
