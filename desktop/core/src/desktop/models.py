@@ -96,8 +96,9 @@ class DocumentTagManager(models.Manager):
     except DocumentTag.DoesNotExist:
       tag = self._get_tag(user=owner, name=tag_name)
 
-    doc = Document.objects.get_doc(doc_id, owner)
+    doc = Document.objects.get_doc_for_writing(doc_id, owner)
     doc.add_tag(tag)
+
     return tag
 
   def untag(self, tag_id, owner, doc_id):
@@ -106,8 +107,7 @@ class DocumentTagManager(models.Manager):
     if tag.tag in DocumentTag.RESERVED:
       raise Exception(_("Can't remove %s: it is a reserved tag.") % tag)
 
-    doc = Document.objects.get_doc(doc_id, owner=owner)
-    doc.can_write_or_exception(owner)
+    doc = Document.objects.get_doc_for_writing(doc_id, owner=owner)
     doc.remove_tag(tag)
 
   def delete_tag(self, tag_id, owner):
@@ -123,8 +123,7 @@ class DocumentTagManager(models.Manager):
       doc.add_tag(default_tag)
 
   def update_tags(self, owner, doc_id, tag_ids):
-    doc = Document.objects.get_doc(doc_id, owner)
-    doc.can_write_or_exception(owner)
+    doc = Document.objects.get_doc_for_writing(doc_id, owner)
 
     for tag in doc.tags.all():
       if tag.tag not in DocumentTag.RESERVED:
@@ -183,8 +182,11 @@ class DocumentManager(models.Manager):
 
     return docs
 
-  def get_doc(self, doc_id, user):
-    return Document.objects.documents(user).get(id=doc_id)
+  def get_doc_for_writing(self, doc_id, user):
+    """Fetch a document and confirm that this user can write to it."""
+    doc = Document.objects.documents(user).get(id=doc_id)
+    doc.can_write_or_exception(user)
+    return doc
 
   def trashed_docs(self, model_class, user):
     tag = DocumentTag.objects.get_trash_tag(user=user)
