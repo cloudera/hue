@@ -2059,6 +2059,7 @@ function clearErrorWidgets() {
 }
 
 $(document).on('execute.query', clearErrorWidgets);
+$(document).on('explain.query', clearErrorWidgets);
 
 $(document).on('error.query', function () {
   $.each(errorWidgets, function(index, el) {
