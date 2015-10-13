@@ -363,6 +363,8 @@ class AuditLoggingMiddleware(object):
     '/useradmin/groups/edit/(?P<name>%s)' % (groupname_re,): 'EDIT_GROUP'
   }
 
+  process_view_operations = ('USER_LOGOUT', 'DELETE_USER')
+
   def __init__(self):
     from desktop.conf import AUDIT_EVENT_LOG_DIR, SERVER_USER
 
@@ -375,7 +377,7 @@ class AuditLoggingMiddleware(object):
   def process_view(self, request, view_func, view_args, view_kwargs):
     try:
       operation = self._get_operation(request.path)
-      if operation == 'USER_LOGOUT':
+      if operation in self.process_view_operations:
         self._log_message(operation, request)
     except Exception, e:
       LOG.error('Could not audit the request: %s' % e)
@@ -386,7 +388,7 @@ class AuditLoggingMiddleware(object):
     response['audited'] = False
     try:
       operation = self._get_operation(request.path)
-      if request.method == 'POST' and operation and operation != 'USER_LOGOUT':
+      if request.method == 'POST' and operation not in self.process_view_operations:
         self._log_message(operation, request, response)
         response['audited'] = True
     except Exception, e:
@@ -449,7 +451,7 @@ class AuditLoggingMiddleware(object):
         if pattern.match(url):
           return operation
 
-    return None
+    return ''
 
 try:
   import tidylib
