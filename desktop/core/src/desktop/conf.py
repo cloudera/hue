@@ -191,8 +191,17 @@ AUTH_USERNAME = Config(
 
 def get_auth_password():
   """Get from script or backward compatibility"""
+
+  password = os.environ.get('HUE_AUTH_PASSWORD')
+  if password is not None:
+    return password
+
   password = AUTH_PASSWORD_SCRIPT.get()
   if password:
+    return password
+
+  password = os.environ.get('HUE_LDAP_PASSWORD')
+  if password is not None:
     return password
 
   password = LDAP_PASSWORD.get() # 2 levels for backward compatibility
@@ -1051,7 +1060,7 @@ def validate_ldap(user, config):
   if config.SEARCH_BIND_AUTHENTICATION.get():
     if config.LDAP_URL.get() is not None:
       bind_dn = config.BIND_DN.get()
-      bind_password = config.BIND_PASSWORD.get() or config.BIND_PASSWORD_SCRIPT.get()
+      bind_password = get_ldap_bind_password(config)
 
       if bool(bind_dn) != bool(bind_password):
         if bind_dn == None:
@@ -1182,6 +1191,10 @@ def get_secret_key():
 
 
 def get_ssl_password():
+  password = os.environ.get('HUE_SSL_PASSWORD')
+  if password is not None:
+    return password
+
   password = SSL_PASSWORD.get()
   if not password:
     password = SSL_PASSWORD_SCRIPT.get()
@@ -1190,6 +1203,10 @@ def get_ssl_password():
 
 
 def get_database_password():
+  password = os.environ.get('HUE_DATABASE_PASSWORD')
+  if password is not None:
+    return password
+
   password = DATABASE.PASSWORD.get()
   if not password:
     password = DATABASE.PASSWORD_SCRIPT.get()
@@ -1198,6 +1215,10 @@ def get_database_password():
 
 
 def get_smtp_password():
+  password = os.environ.get('HUE_SMTP_PASSWORD')
+  if password is not None:
+    return password
+
   password = SMTP.PASSWORD.get()
   if not password:
     password = SMTP.PASSWORD_SCRIPT.get()
@@ -1206,6 +1227,10 @@ def get_smtp_password():
 
 
 def get_ldap_bind_password(ldap_config):
+  password = os.environ.get('HUE_LDAP_BIND_PASSWORD')
+  if password is not None:
+    return password
+
   password = ldap_config.BIND_PASSWORD.get()
   if not password:
     password = ldap_config.BIND_PASSWORD_SCRIPT.get()
