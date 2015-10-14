@@ -18,7 +18,7 @@
   if(typeof define === "function" && define.amd) {
     define([
       'desktop/js/sqlAutocompleter',
-      'desktop/js/HdfsAutocompleter'
+      'desktop/js/hdfsAutocompleter'
     ], factory);
   } else {
     root.Autocompleter = factory(SqlAutocompleter, HdfsAutocompleter);
