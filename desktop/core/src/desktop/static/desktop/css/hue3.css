@@ -2215,3 +2215,8 @@ div.navigator .pull-right .nav {
 .jobs-overlay:hover {
   opacity: 1;
 }
+
+.dragging-pre {
+  border-left: none;
+  background: transparent;
+}
