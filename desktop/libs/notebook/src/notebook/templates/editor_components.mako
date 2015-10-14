@@ -273,15 +273,17 @@ ${ require.config() }
             'placeholder': 'snippet-move-placeholder',
             'greedy': true,
             'stop': function(event, ui) {
-              $('.snippet-body').slideDown('fast', function () { $(window).scrollTop(lastWindowScrollPosition); });
+              var $element = $(event.target);
+              $element.find('.snippet-body').slideDown('fast', function () { $(window).scrollTop(lastWindowScrollPosition); });
             },
             'helper': function(event) {
               lastWindowScrollPosition = $(window).scrollTop();
-              $('.snippet-body').slideUp('fast', function () {
+              var $element = $(event.target);
+              $element.find('.snippet-body').slideUp('fast', function () {
                 $('.sortable-snippets').sortable('refreshPositions')
               });
-              var $element = $(event.target);
               var _par = $('<div>')
+                .css('overflow', 'hidden')
                 .addClass('card-widget snippet-move-helper')
                 .width($element.parents('.snippet').width());
               $('<h2>')
@@ -290,6 +292,10 @@ ${ require.config() }
                 .appendTo(_par)
                 .find('.hover-actions')
                 .removeClass('hover-actions');
+              $('<pre>')
+                .addClass('dragging-pre muted')
+                .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
+                .appendTo(_par);
               _par.css('height', '100px');
               return _par;
             }
