@@ -376,15 +376,15 @@ ${ require.config() }
       </div>
 
       <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass">
-        ${ _('Success.') }
+        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
       </div>
 
       <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass">
-        ${ _('Success but empty results.') }
+        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
       </div>
 
       <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass">
-        ${ _('Loading...') }
+        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
       </div>
     </div>
   </div>
@@ -480,8 +480,11 @@ ${ require.config() }
 
 <script type="text/html" id="snippet-results">
   <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
-    <!-- ko if: result.data().length != 0 -->
-    <pre data-bind="text: result.data()[0][1]" style="margin-bottom: 0"></pre>
+    <!-- ko if: result.data().length != 0 && result.data()[0][1] != "" -->
+    <pre data-bind="text: result.data()[0][1]" class="no-margin-bottom"></pre>
+    <!-- /ko -->
+    <!-- ko ifnot: result.data().length != 0 && result.data()[0][1] != "" -->
+    <pre class="no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done.") }</pre>
     <!-- /ko -->
     <!-- ko if: result.images().length != 0 -->
     <ul class="unstyled results-images" data-bind="foreach: result.images()">
