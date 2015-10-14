@@ -15,9 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+if hash node 2>/dev/null; then
+  NODE_BIN="node"
+else
+  # Ubuntu
+  NODE_BIN="nodejs"
+fi
+
 echo "Compiling and copying Ace Editor for Hue"
 rm -rf ../../desktop/core/src/desktop/static/desktop/js/ace/* || echo "Skipping removal of folder"
-node ./Makefile.dryice.js minimal --m --nc --s --target ../../desktop/core/src/desktop/static/desktop/js/ace/
+$NODE_BIN ./Makefile.dryice.js minimal --m --nc --s --target ../../desktop/core/src/desktop/static/desktop/js/ace/
 mv ../../desktop/core/src/desktop/static/desktop/js/ace/src-min-noconflict/* ../../desktop/core/src/desktop/static/desktop/js/ace/
 rmdir ../../desktop/core/src/desktop/static/desktop/js/ace/src-min-noconflict
 echo "Done!"

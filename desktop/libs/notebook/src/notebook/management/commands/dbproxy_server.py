@@ -33,19 +33,8 @@ class Command(NoArgsCommand):
 
   def handle(self, *args, **kwargs):
     env = os.environ.copy()
-#../../../../../librdbms/java/bin/dbproxy
+
     cmd = os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "..", "librdbms", "java", "bin", "dbproxy")
-
-#     classpath = env.get('CLASSPATH', '').split(os.pathsep)
-#     classpath += 
-
-    args = [
-      #"java",
-    ]
-
-#     args.extend(("-cp", os.pathsep.join(classpath)))
-
-#     args.append("com.cloudera.hue.livy.server.Main")
 
     LOG.info("Executing %r (%r) (%r)" % (args, args, env))
 
