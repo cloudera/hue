@@ -1538,14 +1538,14 @@ ${ require.config() }
                     window.setTimeout(function () {
                       if (cell.cell_type == "code") {
                         if (loaded.nbformat == 3) {
-                          addPySpark(cell.input.join("\n"));
+                          addPySpark($.isArray(cell.input) ? cell.input.join("\n") : cell.input);
                         }
                         else {
-                          addPySpark(cell.source.join("\n"));
+                          addPySpark($.isArray(cell.source) ? cell.source.join("\n") : cell.source);
                         }
                       }
                       if (cell.cell_type == "heading") {
-                        var heading = cell.source.join("");
+                        var heading = $.isArray(cell.source) ? cell.source.join("") : cell.source;
                         if (cell.level == 1) {
                           heading += "\n====================";
                         }
@@ -1558,7 +1558,7 @@ ${ require.config() }
                         addMarkdown(heading);
                       }
                       if (cell.cell_type == "markdown") {
-                        addMarkdown(cell.source.join("\n"));
+                        addMarkdown($.isArray(cell.source) ? cell.source.join("") : cell.source);
                       }
                       if (cellCnt == cells.length - 1 && aceChecks == 0) {
                         hideHoverMsg();
