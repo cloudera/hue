@@ -337,7 +337,7 @@ var EditCollectionViewModel = function() {
       'collections': ko.mapping.toJSON(data)
     }).done(function(data) {
       if (data.status == 0) {
-        window.location.href = '/indexer';
+        window.location.reload();
       } else {
         $(document).trigger("error", data.message);
       }
@@ -519,10 +519,15 @@ var ManageCollectionsViewModel = function() {
         ko.utils.arrayForEach(remove, function(index) {
           self.collections.splice(index, 1);
         });
+        if (self.collections().length == remove.length) {
+          window.location.reload();
+        } else {
+          self.isLoading(false);
+        }
       } else {
         $(document).trigger("error", data.message);
+        self.isLoading(false);
       }
-      self.isLoading(false);
     })
     .fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
