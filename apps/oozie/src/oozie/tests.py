@@ -3402,15 +3402,14 @@ class TestDashboard(OozieMockBase):
     assert_true('Running' in response.content, response.content)
     assert_true('Completed' in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json")
+    assert_true(len(json.loads(response.content)['jobs']) == 0)
+
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=RUNNING&status=PREP&status=SUSPENDED")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
-    for coord_id in MockOozieApi.COORDINATOR_IDS:
-      assert_true(coord_id in response.content, response.content)
-
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=KILLED&status=FAILED&status=DONEWITHERROR")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
