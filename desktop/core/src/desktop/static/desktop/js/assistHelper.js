@@ -219,6 +219,11 @@
         snippet: ko.mapping.toJSON(snippet.getContext())
       }, function (data) {
         if (data.status == 0) {
+          cachedData[url] = {
+            timestamp: (new Date()).getTime(),
+            data: data
+          };
+          $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
           successCallback(data);
         } else {
           errorCallback(data);
