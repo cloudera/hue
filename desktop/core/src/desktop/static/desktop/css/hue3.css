@@ -1978,6 +1978,22 @@ form.form-inline .modal-header .close {
   margin: 0;
 }
 
+.no-margin-left {
+  margin-left: 0;
+}
+
+.no-margin-top {
+  margin-top: 0;
+}
+
+.no-margin-right {
+  margin-right: 0;
+}
+
+.no-margin-bottom {
+  margin-bottom: 0;
+}
+
 .badge-left {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
