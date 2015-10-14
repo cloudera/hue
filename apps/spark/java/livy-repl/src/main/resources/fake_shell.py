@@ -61,10 +61,6 @@ def execute_reply_internal_error(message, exc_info=None):
     })
 
 
-def ast_parse(code, filename='<stdin>', symbol='exec'):
-    return compile(code, filename, symbol, ast.PyCF_ONLY_AST, 1)
-
-
 class ExecutionError(Exception):
     def __init__(self, exc_info):
         self.exc_info = exc_info
@@ -72,7 +68,7 @@ class ExecutionError(Exception):
 
 class NormalNode(object):
     def __init__(self, code):
-        self.code = ast_parse(code)
+        self.code = compile(code, '<stdin>', 'exec', ast.PyCF_ONLY_AST, 1)
 
     def execute(self):
         to_run_exec, to_run_single = self.code.body[:-1], self.code.body[-1:]
@@ -107,10 +103,13 @@ class MagicNode(object):
 
 
     def execute(self):
+        if not self.magic:
+            raise UnknownMagic('magic command not specified')
+
         try:
             self.handler = magic_router[self.magic]
         except KeyError:
-            raise UnknownMagic(self.magic)
+            raise UnknownMagic("unknown magic command '%s'" % self.magic)
 
         return self.handler(*self.rest)
 
@@ -153,20 +152,6 @@ def parse_code_into_nodes(code):
     return nodes
 
 
-def execute_code(code):
-    try:
-        code = ast.parse(code)
-    except SyntaxError, syntax_error:
-        # It's possible we hit a syntax error because of a magic command. So see if one seems
-        # to be present.
-        try:
-            execute_handling_magic(code)
-        except SyntaxError, syntax_error:
-            pass
-    else:
-        return execute(code)
-
-
 def execute_request(content):
     try:
         code = content['code']
@@ -177,13 +162,16 @@ def execute_request(content):
 
     try:
         nodes = parse_code_into_nodes(code)
-    except (SyntaxError, UnknownMagic):
+    except SyntaxError:
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
 
     try:
         for node in nodes:
             result = node.execute()
+    except UnknownMagic:
+        exc_type, exc_value, tb = sys.exc_info()
+        return execute_reply_error(exc_type, exc_value, [])
     except ExecutionError, e:
         return execute_reply_error(*e.exc_info)
 

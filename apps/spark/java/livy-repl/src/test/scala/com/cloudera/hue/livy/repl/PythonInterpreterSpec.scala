@@ -155,6 +155,24 @@ class PythonInterpreterSpec extends BaseInterpreterSpec {
     ))
   }
 
+  it should "report an error if empty magic command" in withInterpreter { interpreter =>
+    val response = interpreter.execute("%")
+    response should equal(Interpreter.ExecuteError(
+      "UnknownMagic",
+      "magic command not specified",
+      List("UnknownMagic: magic command not specified\n")
+    ))
+  }
+
+  it should "report an error if unknown magic command" in withInterpreter { interpreter =>
+    val response = interpreter.execute("%foo")
+    response should equal(Interpreter.ExecuteError(
+      "UnknownMagic",
+      "unknown magic command 'foo'",
+      List("UnknownMagic: unknown magic command 'foo'\n")
+    ))
+  }
+
   it should "not execute part of the block if there is a syntax error" in withInterpreter { interpreter =>
     var response = interpreter.execute(
       """x = 1
