@@ -625,7 +625,8 @@
     };
 
     self.autocompleter = new Autocompleter({
-      snippet: self
+      snippet: self,
+      user: vm.user
     });
 
     self.init = function () {
