@@ -1679,9 +1679,12 @@
           offset = Math.min(selectionRange.start.row, selectionRange.end.row);
         }
         if (newErrors.length > 0) {
-          newErrors.forEach(function (err) {
+          newErrors.forEach(function (err, cnt) {
             if (err.line !== null) {
               editor.addError(err.message, err.line + offset);
+              if (cnt == 0) {
+                editor.scrollToLine(err.line + offset, true, true, function () {});
+              }
             }
           });
         }

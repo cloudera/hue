@@ -2086,6 +2086,10 @@ $(document).on('error.query', function () {
           }
         )
       );
+      codeMirror.scrollTo(null, codeMirror.charCoords({
+            line: selectedLine > 0 ? selectedLine - 1 : selectedLine,
+            ch: 0
+          }, "local").top - codeMirror.getScrollerElement().offsetHeight / 2 - 5);
       $(el).hide();
     }
   });
