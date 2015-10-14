@@ -223,6 +223,8 @@ def add_tag(request):
       response['docs'] = []
       response['owner'] = request.user.username
       response['status'] = 0
+    except KeyError, e:
+      response['message'] = _('Form is missing %s field') % e.message
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -240,6 +242,8 @@ def tag(request):
       tag = DocumentTag.objects.tag(request.user, request_json['doc_id'], request_json.get('tag'), request_json.get('tag_id'))
       response['tag_id'] = tag.id
       response['status'] = 0
+    except KeyError, e:
+      response['message'] = _('Form is missing %s field') % e.message
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -257,6 +261,8 @@ def update_tags(request):
       doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
       response['doc'] = massage_doc_for_json(doc, request.user)
       response['status'] = 0
+    except KeyError, e:
+      response['message'] = _('Form is missing %s field') % e.message
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -273,6 +279,8 @@ def remove_tag(request):
       DocumentTag.objects.delete_tag(request.POST['tag_id'], request.user)
       response['message'] = _('Project removed!')
       response['status'] = 0
+    except KeyError, e:
+      response['message'] = _('Form is missing %s field') % e.message
     except Exception, e:
       response['message'] = force_unicode(e)
   else:
@@ -294,6 +302,8 @@ def update_permissions(request):
       response['message'] = _('Permissions updated!')
       response['status'] = 0
       response['doc'] = massage_doc_for_json(doc, request.user)
+    except KeyError, e:
+      response['message'] = _('Form is missing %s field') % e.message
     except Exception, e:
       LOG.exception(e.message)
       response['message'] = force_unicode(e)
