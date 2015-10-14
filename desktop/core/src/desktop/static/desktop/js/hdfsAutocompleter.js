@@ -22,46 +22,70 @@
   }
 }(this, function () {
 
+  var TIME_TO_LIVE_IN_MILLIS = 60000; // 1 minute
   var BASE_PATH = "/filebrowser/view=";
   var PARAMETERS = "?pagesize=100&format=json";
 
   /**
    * @param options {object}
+   * @param options.user {string}
    *
    * @constructor
    */
   function HdfsAutocompleter(options) {
     var self = this;
+    self.user = options.user;
   }
+
+  HdfsAutocompleter.prototype.getTotalStorageUserPrefix = function () {
+    var self = this;
+    return self.user;
+  };
+
+  HdfsAutocompleter.prototype.hasExpired = function (timestamp) {
+    return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
+  };
 
   HdfsAutocompleter.prototype.fetchAlternatives = function (pathParts, success, error, editor) {
     var self = this;
-    if (editor) {
-      editor.showSpinner();
-    }
 
-    $.ajax({
-      dataType: "json",
-      url: BASE_PATH + "/" + pathParts.join("/") + PARAMETERS,
-      success: function (data) {
+    var url = BASE_PATH + "/" + pathParts.join("/") + PARAMETERS;
+    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix()) || {};
+
+    if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
+      if (editor) {
+        editor.showSpinner();
+      }
+      $.ajax({
+        dataType: "json",
+        url: url,
+        success: function (data) {
+          if (editor) {
+            editor.hideSpinner();
+          }
+          if (!data.error) {
+            cachedData[url] = {
+              timestamp: (new Date()).getTime(),
+              data: data
+            };
+            $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
+            success(self.extractFields(data));
+          } else {
+            error();
+          }
+        }
+      }).fail(function () {
         if (editor) {
           editor.hideSpinner();
         }
-        if (! data.error) {
-          success(self.extractFields(data, pathParts.length > 0));
-        } else {
-          error();
-        }
-      }
-    }).fail(function () {
-      if (editor) {
-        editor.hideSpinner();
-      }
-      error();
-    });
+        error();
+      });
+    } else {
+      success(self.extractFields(cachedData[url].data));
+    }
   };
 
-  HdfsAutocompleter.prototype.extractFields = function (data, includeParent) {
+  HdfsAutocompleter.prototype.extractFields = function (data) {
     var files = $.map(data.files, function (file) {
       return {
         name: file.name,

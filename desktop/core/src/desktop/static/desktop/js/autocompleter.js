@@ -28,6 +28,8 @@
   /**
    * @param options {object}
    * @param options.snippet
+   * @param options.user
+   *
    * @constructor
    */
   function Autocompleter(options) {
@@ -40,7 +42,9 @@
           snippet: options.snippet
         })
       } else {
-        self.autocompleter = new HdfsAutocompleter();
+        self.autocompleter = new HdfsAutocompleter({
+          user: options.user
+        });
       }
     };
     self.snippet.type.subscribe(function () {

@@ -56,7 +56,9 @@ define([
     });
 
     beforeEach(function() {
-      subject = new HdfsAutocompleter();
+      subject = new HdfsAutocompleter({
+        user: "user"
+      });
       ajaxHelper.responseForUrls = {};
     });
 

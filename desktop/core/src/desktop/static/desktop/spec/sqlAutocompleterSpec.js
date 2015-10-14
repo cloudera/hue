@@ -50,7 +50,7 @@ define([
       assistHelper.load(snippet, $.noop);
       window.setTimeout(function() {
         callback();
-      }, 10);
+      }, 0);
 
     };
 
