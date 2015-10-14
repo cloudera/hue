@@ -84,6 +84,7 @@ class TestDocModelTags():
     response = self.client.post("/desktop/api/tag/add_tag")
     content = json.loads(response.content)
     assert_equal(content['status'], -1, content)
+    assert_equal(content['message'], "Form is missing 'name' field", content)
 
     tag_id = self.add_tag('my_tag')
 
