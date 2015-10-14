@@ -1971,11 +1971,11 @@
           if (triggerAutocomplete) {
             window.setTimeout(function () {
               editor.execCommand("startAutocomplete");
-            }, 100);
+            }, 1);
           }
         }
         editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
-        if ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") {
+        if (e.args === '/' || ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".")) {
           editor.execCommand("startAutocomplete");
         }
         // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
