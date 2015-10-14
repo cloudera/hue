@@ -1190,6 +1190,10 @@ def get_redaction_policy():
 
 
 def get_secret_key():
+  secret_key = os.environ.get('HUE_SECRET_KEY')
+  if secret_key is not None:
+    return secret_key
+
   secret_key = SECRET_KEY.get()
   if not secret_key:
     secret_key = SECRET_KEY_SCRIPT.get()
