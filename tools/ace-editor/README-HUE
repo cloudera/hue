@@ -1,8 +1,8 @@
 For dev
 
 Install
-* nodejs
+* nodejs / nodejs-legacy (Ubuntu)
 * npm
 
-Then
+Then from this directory
 npm install
