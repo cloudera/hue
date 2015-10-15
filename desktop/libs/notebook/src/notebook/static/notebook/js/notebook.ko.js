@@ -858,6 +858,15 @@
       return snippet;
     };
 
+    self.newSnippetAbove = function (id) {
+      self.newSnippet();
+      var idx = 0;
+      self.snippets().forEach(function (snippet, cnt) {
+        if (snippet.id() == id) idx = cnt;
+      });
+      self.snippets(self.snippets().move(self.snippets().length - 1, idx));
+    }
+
     self.getContext = function() {
      return {
          id: self.id,

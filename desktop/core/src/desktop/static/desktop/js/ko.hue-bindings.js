@@ -2067,4 +2067,15 @@
       }
     }
   };
+
+  ko.bindingHandlers.dblclick = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
+      var fn = valueAccessor();
+      $(element).dblclick(function () {
+        var data = ko.dataFor(this);
+        fn.call(viewModel, data);
+      });
+    }
+  };
+
 }));
