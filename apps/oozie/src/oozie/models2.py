@@ -2027,8 +2027,8 @@ class Dataset():
       elif self.coordinator.cron_frequency == '0 0 0 * *':
         frequency_unit = 'months'
       else:
-        raise PopupException(_('The frequency of the workflow parameter %s cannot be guessed from the frequency of the coordinator.'
-                               ' It so needs to be specified manually.'))
+        raise PopupException(_('The frequency of the workflow parameter "%s" cannot be guessed from the frequency of the coordinator.'
+                               ' It so needs to be specified manually.') % self.data['name'])
       frequency_number = 1
     else:
       frequency_unit = self.data['frequency_unit']
