@@ -131,7 +131,7 @@ ${ require.config() }
 
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
       <i class="fa fa-expand"></i>
     </a>
     &nbsp;&nbsp;
@@ -212,7 +212,7 @@ ${ require.config() }
 </div>
 
 <div class="player-toolbar" data-bind="visible: $root.isPlayerMode()" style="display: none;">
-  <div class="pull-right pointer" data-bind="click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
+  <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
   <img src="${ static('desktop/art/icon_hue_48.png') }" />
   <!-- ko if: $root.selectedNotebook() -->
   <h4 data-bind="text: $root.selectedNotebook().name"></h4>
@@ -1644,6 +1644,8 @@ ${ require.config() }
         }
       });
     }
+
+
 
     $(document).ready(function () {
       viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);

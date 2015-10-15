@@ -381,7 +381,7 @@ ${ commonshare() | n,unicode }
       $.post("/desktop/api/tag/add_tag", {
         name: tag_name
       },function (data) {
-        data.name = hue.htmlEncode(data.name);
+        data.name = hueUtils.htmlEncode(data.name);
         viewModel.createTag(data);
         $("#tagsNew").val("");
         $(document).trigger("info", "${_('Project created')}");
