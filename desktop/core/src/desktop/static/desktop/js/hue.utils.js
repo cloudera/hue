@@ -73,14 +73,14 @@ Array.prototype.diff = function (a) {
  * Add utility methods to the HUE object
 */
 
-(function (hue) {
+(function (hueUtils) {
   'use strict';
 
   /*
    * Convert text to URLs
    * Selector arg can be jQuery or document.querySelectorAll()
   */
-  hue.text2Url = function (selectors) {
+  hueUtils.text2Url = function (selectors) {
     var i = 0,
       len = selectors.length;
 
@@ -112,11 +112,40 @@ Array.prototype.diff = function (a) {
    * then grab the encoded contents back out.
   */
 
-  hue.htmlEncode = function (value){
+  hueUtils.htmlEncode = function (value){
     return $('<div/>').text(value).html();
   };
 
-}(hue = window.hue || {}));
+  hueUtils.goFullScreen = function () {
+    if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) {
+        document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      }
+    }
+  }
+
+  hueUtils.exitFullScreen = function () {
+    if (document.fullscreenElement ||
+        document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  }
+
+}(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {
 

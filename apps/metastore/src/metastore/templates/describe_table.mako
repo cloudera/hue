@@ -344,7 +344,7 @@ ${ components.menubar() }
     });
 
     // convert link text to URLs in comment column (Columns tab)
-    hue.text2Url(document.querySelectorAll('.sampleTable td:last-child'));
+    hueUtils.text2Url(document.querySelectorAll('.sampleTable td:last-child'));
 
     $('a[data-toggle="tab"]:eq(0)').click();
 

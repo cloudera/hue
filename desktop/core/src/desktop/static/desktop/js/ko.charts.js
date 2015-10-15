@@ -66,7 +66,7 @@
               .height($(element).width())
               .showLabels(true).showLegend(false)
               .tooltipContent(function (key, y, e, graph) {
-                return '<h3>' + hue.htmlEncode(key) + '</h3><p>' + y + '</p>'
+                return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>'
               });
 
           var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
@@ -950,7 +950,7 @@
                 })
                 .staggerLabels(true)
                 .tooltipContent(function (key, x, y) {
-                  return '<h3>' + key + '</h3><p>' + y + ' on ' + hue.htmlEncode(x) + '</p>'
+                  return '<h3>' + key + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
                 });
           }
           else {
@@ -959,7 +959,7 @@
             }
             _chart = nv.models.multiBarWithBrushChart();
             _chart.tooltipContent(function (key, x, y) {
-              return '<h3>' + hue.htmlEncode(key) + '</h3><p>' + y + ' on ' + hue.htmlEncode(x) + '</p>'
+              return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
             });
             if (_datum.length > 0 && _datum[0].values.length > 10) {
               _chart.enableSelection();

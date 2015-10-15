@@ -38,7 +38,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ $root.isEditing(false); $root.isPlayerMode(true); }">
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
       <i class="fa fa-expand"></i>
     </a>
     &nbsp;&nbsp;
@@ -267,7 +267,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
 </%dashboard:layout_toolbar>
 
 <div class="player-toolbar" data-bind="visible: $root.isPlayerMode">
-  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
+  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
   <img src="${ static('desktop/art/icon_hue_48.png') }" />
   <h4 data-bind="text: collection.label"></h4>
   <form class="form-search" data-bind="submit: searchBtn">
