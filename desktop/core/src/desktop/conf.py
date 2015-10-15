@@ -62,7 +62,10 @@ def coerce_password_from_script(script):
   stdout, stderr = p.communicate()
 
   if p.returncode != 0:
-    raise subprocess.CalledProcessError(p.returncode, script)
+    if os.environ.get('HUE_IGNORE_PASSWORD_SCRIPT_ERRORS') is None:
+      raise subprocess.CalledProcessError(p.returncode, script)
+    else:
+      return None
 
   # whitespace may be significant in the password, but most files have a
   # trailing newline.
