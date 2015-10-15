@@ -14,3 +14,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from django.utils.translation import ugettext_lazy as _t
+
+from desktop.lib.conf import Config, coerce_bool
+from desktop.conf import default_ssl_validate
+
+
+SSL_CERT_CA_VERIFY = Config(
+  key="ssl_cert_ca_verify",
+  help=_t("In secure mode (HTTPS), if Solr SSL certificates have to be verified against certificate authority"),
+  dynamic_default=default_ssl_validate,
+  type=coerce_bool
+)
