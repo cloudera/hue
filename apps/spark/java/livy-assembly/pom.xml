@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>livy-assembly_2.10</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.0-SNAPSHOT</version>
     <name>Livy Project Assembly</name>
     <packaging>pom</packaging>
 
