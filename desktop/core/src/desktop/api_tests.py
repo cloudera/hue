@@ -79,7 +79,7 @@ class TestDocModelTags():
 
   def test_add_tag(self):
     response = self.client.get("/desktop/api/tag/add_tag")
-    assert_equal(-1, json.loads(response.content)['status'])
+    assert_equal(response.status_code, 405)
 
     response = self.client.post("/desktop/api/tag/add_tag")
     content = json.loads(response.content)
@@ -116,7 +116,7 @@ class TestDocModelTags():
     tag_id = json.loads(response.content)['id']
 
     response = self.client.get("/desktop/api/tag/remove_tag")
-    assert_equal(-1, json.loads(response.content)['status'])
+    assert_equal(response.status_code, 405)
 
     # Only the owner can remove tags.
     response = self.client_not_me.post("/desktop/api/tag/remove_tag", {'tag_id': tag_id})
