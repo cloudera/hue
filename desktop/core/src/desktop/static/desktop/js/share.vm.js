@@ -32,9 +32,10 @@ function ShareViewModel(updateDocF) {
 
   self.setDocId = function(docId) {
     if (docId == -1) { return false; }
-    $.get('/desktop/api/doc/get', { id : docId },
-      function (data) {
-        shareViewModel.selectedDoc(data)
+    $.get('/desktop/api/doc/get', { id : docId }, function (data) {
+      shareViewModel.selectedDoc(data)
+    }).fail(function (response) {
+      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
     });
   }
 }
@@ -146,6 +147,8 @@ function setupSharing(id, updateFunc) {
       if (typeof id == "function"){
         id();
       }
+    }).fail(function (response) {
+      $(document).trigger("error", "There was an error processing your action: " + response.responseText);
     });
 
     $("#documentShareAddBtn").on("click", function () {
@@ -248,5 +251,7 @@ function shareDocFinal() {
         shareViewModel.updateDoc(response.doc);
       }
     }
+  }).fail(function (response) {
+    $(document).trigger("error", "There was an error processing your action: " + response.responseText);
   });
 }

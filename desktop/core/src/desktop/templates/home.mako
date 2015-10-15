@@ -387,7 +387,7 @@ ${ commonshare() | n,unicode }
         $(document).trigger("info", "${_('Project created')}");
         $("#addTagModal").modal("hide");
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
+        $(document).trigger("error", "${_("There was an error processing your action: ")}" + xhr.responseText); // reserved name, duplicate etc
       });
     });
 
@@ -424,6 +424,8 @@ ${ commonshare() | n,unicode }
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
       }
+    }).fail(function (response) {
+      $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.responseText);
     });
   }
 
@@ -444,7 +446,7 @@ ${ commonshare() | n,unicode }
         tag_ids: [tag.id()]
       })
     }, function (response) {
-      if (response != null){
+      if (response != null) {
         if (response.status != 0) {
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
@@ -454,7 +456,9 @@ ${ commonshare() | n,unicode }
         }
       }
       $("#documentMoveModal").modal("hide");
-    })
+    }).fail(function (response) {
+      $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.responseText);
+    });
   }
 
 </script>
