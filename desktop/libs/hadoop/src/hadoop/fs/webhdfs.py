@@ -253,6 +253,9 @@ class WebHdfs(Hdfs):
       return False
     return not sb.isDir
 
+  def isroot(self, path):
+    return path == '/'
+
   def _ensure_current_trash_directory(self):
     """Create trash directory for a user if it doesn't exist."""
     if self.exists(self.current_trash_path):
