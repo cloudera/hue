@@ -170,6 +170,41 @@
     return result;
   };
 
+  SqlAutocompleter.prototype.getValueReferences = function (conditionMatch, fromReferences, tableAndComplexRefs, callback) {
+    var self = this;
+
+    var fields = conditionMatch[1].split(".");
+    var tableName = null;
+    if (fields[0] in fromReferences.complex) {
+      var complexRef = fields.shift();
+      fields = fromReferences.complex[complexRef].concat(fields);
+    }
+    if (fields[0] in fromReferences.tables) {
+      tableName = fromReferences.tables[fields.shift()];
+    }
+    if (! tableName && tableAndComplexRefs.length === 1) {
+      tableName = tableAndComplexRefs[0].value;
+    }
+    if (tableName) {
+      self.snippet.getAssistHelper().fetchFields(self.snippet, tableName, fields, function(data) {
+        if (data.sample) {
+          var isString = data.type === "string";
+          var values = $.map(data.sample.sort(), function(value, index) {
+            return {
+              meta: "value",
+              score: 900 - index,
+              value: isString ? "'" + value + "'" : new String(value)
+            }
+          });
+          callback(tableAndComplexRefs.concat(values));
+        } else {
+          callback(tableAndComplexRefs);
+        }
+      });
+      return;
+    }
+  };
+
   SqlAutocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, extraSuggestions) {
     var fields = [];
     var result = [];
@@ -298,6 +333,7 @@
 
       var fromReferences = self.getFromReferenceIndex(beforeCursor + afterCursor);
       var viewReferences = self.getViewReferenceIndex(beforeCursor + afterCursor, hiveSyntax);
+      var conditionMatch = beforeCursor.match(/(\S+)\s*=\s*$/);
 
       var tableName = "";
 
@@ -333,13 +369,26 @@
           };
         });
 
-        callback(tableRefs.concat(complexRefs));
+        if (conditionMatch && impalaSyntax) {
+          self.getValueReferences(conditionMatch, fromReferences, tableRefs.concat(complexRefs), callback);
+        } else {
+          callback(tableRefs.concat(complexRefs));
+        }
         return;
       } else if (Object.keys(fromReferences.tables).length == 1) {
         // SELECT column. or just SELECT
         // We use first and only table reference if exist
         // if there are no parts the call to getFields will fetch the columns
         tableName = fromReferences.tables[Object.keys(fromReferences.tables)[0]];
+        if (conditionMatch && impalaSyntax) {
+          var tableRefs = [{
+            value: tableName,
+            score: 1000,
+            meta: 'table'
+          }];
+          self.getValueReferences(conditionMatch, fromReferences, tableRefs, callback);
+          return;
+        }
       } else if (parts.length > 0 && viewReferences.index[parts[0]] && viewReferences.index[parts[0]].leadingPath.length > 0) {
         tableName = fromReferences.tables[viewReferences.index[parts[0]].leadingPath[0]];
       } else {
