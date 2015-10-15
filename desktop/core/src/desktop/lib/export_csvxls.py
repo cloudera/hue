@@ -14,12 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import StringIO
 """
 Common library to export either CSV or XLS.
 """
 import gc
 import logging
 import tablib
+import xlsxwriter
 
 from django.http import StreamingHttpResponse
 from django.utils.encoding import smart_str
@@ -54,6 +56,34 @@ def dataset(headers, data, encoding=None):
   return dataset
 
 
+class XlsWrapper():
+  def __init__(self, xls):
+    self.xls = xls
+
+
+def xls_dataset(headers, data, encoding=None):
+  output = StringIO.StringIO()
+
+  workbook = xlsxwriter.Workbook(output)
+  worksheet = workbook.add_worksheet()
+
+  n = 0
+
+  if headers:
+    worksheet.write_row(n, 0, format(headers, encoding))
+    n +=1
+
+  for row in data:
+    worksheet.write_row(n, 0, format(row, encoding))
+    n +=1
+
+  workbook.close()
+
+  output.seek(0)
+
+  return XlsWrapper(output.read())
+
+
 def create_generator(content_generator, format, encoding=None):
   if format == 'csv':
     show_headers = True
@@ -83,7 +113,7 @@ def create_generator(content_generator, format, encoding=None):
     if len(data) > MAX_XLS_ROWS:
       data = data[:MAX_XLS_ROWS]
 
-    yield dataset(headers, data, encoding).xls
+    yield xls_dataset(headers, data, encoding).xls
     gc.collect()
 
 
@@ -97,7 +127,7 @@ def make_response(generator, format, name, encoding=None):
   if format == 'csv':
     content_type = 'application/csv'
   elif format == 'xls':
-    content_type = 'application/xls'
+    content_type = 'application/xlsx'
   elif format == 'json':
     content_type = 'application/json'
   else:

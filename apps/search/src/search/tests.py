@@ -277,7 +277,7 @@ class TestWithMockedSolr(TestSearchBase):
     })
     xls_response_content = ''.join(xls_response.streaming_content)
     assert_not_equal(0, len(xls_response_content))
-    assert_equal('application/xls', xls_response['Content-Type'])
+    assert_equal('application/xlsx', xls_response['Content-Type'])
     assert_equal('attachment; filename=query_result.xls', xls_response['Content-Disposition'])
 
 
