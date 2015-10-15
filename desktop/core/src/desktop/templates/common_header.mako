@@ -206,7 +206,6 @@ from django.utils.translation import ugettext as _
         $.ajaxSetup({ cache: false });
       }
 
-
       // prevents framebusting and clickjacking
       if (self == top){
         $("body").css({
@@ -286,7 +285,6 @@ from django.utils.translation import ugettext as _
         openDropdown($(this));
       },
       function () {
-        var _this = $(this);
         window.clearTimeout(openTimeout);
         closeTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
@@ -427,19 +425,37 @@ from django.utils.translation import ugettext as _
            % if 'jobsub' in apps:
              <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
            % endif
-           % if 'spark' in apps:
-             <li class="dropdown-submenu">
-               <a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark (beta)')}</a>
-               <ul class="dropdown-menu">
-                 <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
-                 <li><a href="${ url('notebook:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
-               </ul>
-             </li>
-           % endif
          </ul>
        </li>
        % elif query_apps[1] == 1:
           <li><a href="/${apps[query_apps[0]].display_name}">${apps[query_apps[0]].nice_name}</a></li>
+       % endif
+       % if 'spark' in apps:
+         <% from desktop.models import Document2, Document %>
+         <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook')] %>
+         % if not notebooks:
+           <li>
+             <a title="${_('Notebook')}" rel="navigator-tooltip" href="${ url('notebook:new') }">${_('Notebooks')}</a>
+           </li>
+         % else:
+           <li class="dropdown">
+             <a title="${_('Notebook')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+               ${_('Notebooks')} <b class="caret"></b>
+             </a>
+             <ul role="menu" class="dropdown-menu">
+               <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
+               <li><a href="${ url('notebook:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
+               <li class="divider"></li>
+               % for notebook in notebooks:
+                 <li>
+                   <a href="${ url('notebook:notebook') }?notebook=${ notebook['id'] }">
+                     <i class="fa fa-file-text-o" style="vertical-align: middle"></i> ${ notebook['name'] |n }
+                   </a>
+                 </li>
+               % endfor
+             </ul>
+           </li>
+         % endif
        % endif
        <%
          data_apps = count_apps(apps, ['metastore', 'hbase', 'sqoop', 'zookeeper']);
@@ -506,7 +522,7 @@ from django.utils.translation import ugettext as _
          <% collections = controller.get_shared_search_collections() %>
          % if not collections:
            <li>
-             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">Search</a>
+             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
            </li>
          % else:
            <li class="dropdown">
@@ -514,15 +530,7 @@ from django.utils.translation import ugettext as _
                ${_('Search')} <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
-               % for collection in collections:
-                 <li>
-                   <a href="${ url('search:index') }?collection=${ collection.id }">
-                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon"/> ${ collection.name }
-                   </a>
-                 </li>
-               % endfor
                % if 'indexer' in apps or 'search' in apps:
-                 <li class="divider"></li>
                  % if 'search' in apps:
                  <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
                  <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
@@ -530,7 +538,15 @@ from django.utils.translation import ugettext as _
                  % if 'indexer' in apps:
                  <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
                  % endif
+                 <li class="divider"></li>
                % endif
+               % for collection in collections:
+                 <li>
+                   <a href="${ url('search:index') }?collection=${ collection.id }">
+                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon"/> ${ collection.name }
+                   </a>
+                 </li>
+               % endfor
              </ul>
            </li>
          % endif
