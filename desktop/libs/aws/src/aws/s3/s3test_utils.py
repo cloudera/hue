@@ -21,6 +21,8 @@ import random
 import string
 import unittest
 
+from nose.plugins.skip import SkipTest
+
 import aws
 
 from contextlib import contextmanager
@@ -39,6 +41,8 @@ def generate_id(size=6, chars=string.ascii_uppercase + string.digits):
 class S3TestBase(unittest.TestCase):
   @classmethod
   def setUpClass(cls):
+    raise SkipTest()
+
     cls.bucket_name = get_test_bucket()
 
     cls._should_skip = False
