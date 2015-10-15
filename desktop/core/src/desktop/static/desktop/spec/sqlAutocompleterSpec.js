@@ -695,6 +695,34 @@ define([
           expectedSuggestions: ["fieldA", "fieldB"]
         });
       });
+
+      it("should suggest values for map keys", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/testDb/testTable/testMap/key" : {
+              sample: ["value1", "value2"],
+              type: "string"
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable t, t.testMap tm WHERE tm.key =",
+          afterCursor: "",
+          expectedSuggestions: ["t.", "tm.", "'value1'", "'value2'"]
+        });
+      });
+
+      it("should suggest values for columns in conditions", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/testDb/testTable/id" : {
+              sample: [1, 2, 3],
+              type: "int"
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable WHERE id =",
+          afterCursor: "",
+          expectedSuggestions: ["testTable", "1", "2", "3"]
+        });
+      });
     });
 
     describe("field completion", function() {
