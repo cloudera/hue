@@ -804,25 +804,25 @@ def augment_solr_response(response, collection, query):
       response.pop('facets')
 
   # HTML escaping
-  for doc in response['response']['docs']:
-    for field, value in doc.iteritems():
-      if isinstance(value, numbers.Number):
-        escaped_value = value
-      elif isinstance(value, list): # Multivalue field
-        escaped_value = [smart_unicode(val, errors='replace') for val in value]
-      else:
-        value = smart_unicode(value, errors='replace')
-        escaped_value = escape(value)
-      doc[field] = escaped_value
+  if not query.get('download'):
+    for doc in response['response']['docs']:
+      for field, value in doc.iteritems():
+        if isinstance(value, numbers.Number):
+          escaped_value = value
+        elif isinstance(value, list): # Multivalue field
+          escaped_value = [smart_unicode(val, errors='replace') for val in value]
+        else:
+          value = smart_unicode(value, errors='replace')
+          escaped_value = escape(value)
+        doc[field] = escaped_value
 
-    if not query.get('download'):
-      link = None
-      if 'link-meta' in doc:
-        meta = json.loads(doc['link-meta'])
-        link = get_data_link(meta)
+        link = None
+        if 'link-meta' in doc:
+          meta = json.loads(doc['link-meta'])
+          link = get_data_link(meta)
 
-      doc['externalLink'] = link
-      doc['details'] = []
+        doc['externalLink'] = link
+        doc['details'] = []
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
