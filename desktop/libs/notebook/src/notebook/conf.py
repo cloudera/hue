@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
-  coerce_json_dict
+  coerce_json_dict, coerce_string
 
 
 def get_interpreters():
@@ -64,3 +64,19 @@ ENABLE_DBPROXY_SERVER = Config(
   help=_t("Main flag to override the automatic starting of the DBProxy server."),
   type=bool,
   default=True)
+
+
+GITHUB_REMOTE_URL = Config(
+    "github_remote_url",
+    help="Base URL to Github Remote Server",
+    default='https://github.com',
+    type=coerce_string,
+)
+
+
+GITHUB_API_URL = Config(
+    "github_api_url",
+    help="Base URL to Github API",
+    default='https://api.github.com',
+    type=coerce_string,
+)
