@@ -47,10 +47,10 @@ def test_export_xls():
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
-  assert_equal("application/xls", response["content-type"])
+  assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
   content = ''.join(response.streaming_content)
   assert_equal(dataset.xls, content)
-  assert_equal("attachment; filename=foo.xls", response["content-disposition"])
+  assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
 def test_export_xls_truncate_rows():
   headers = ["a"]
@@ -62,10 +62,10 @@ def test_export_xls_truncate_rows():
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
-  assert_equal("application/xls", response["content-type"])
+  assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
   content = ''.join(response.streaming_content)
   assert_equal(dataset.xls, content)
-  assert_equal("attachment; filename=foo.xls", response["content-disposition"])
+  assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
 def test_export_xls_truncate_cols():
   headers = ["a"] * (MAX_XLS_COLS + 1)
@@ -77,7 +77,7 @@ def test_export_xls_truncate_cols():
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
-  assert_equal("application/xls", response["content-type"])
+  assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
   content = ''.join(response.streaming_content)
   assert_equal(dataset.xls, content)
-  assert_equal("attachment; filename=foo.xls", response["content-disposition"])
+  assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
