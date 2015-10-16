@@ -171,6 +171,12 @@ ${ require.config() }
 
    &nbsp;&nbsp;&nbsp;
 
+   <a class="btn pointer" title="${ _('Import from Github') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#importGithubModal">
+     <i class="fa fa-github"></i>
+   </a>
+
+   &nbsp;&nbsp;&nbsp;
+
    <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
      <i class="fa fa-save"></i>
    </a>
@@ -230,6 +236,24 @@ ${ require.config() }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
+
+
+<div id="importGithubModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
+  <div class="modal-header">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <h3>${_('Import from Github')}</h3>
+  </div>
+  <div class="modal-body">
+    <div class="input-prepend">
+      <span class="add-on"><i class="fa fa-github"></i></span>
+      <input id="importGithubUrl" type="text" placeholder="ie: https://github.com/romainr/hadoop-tutorials-examples/blob/master/notebook/shared_rdd/hue-sharedrdd-notebook.json" style="width: 726px" />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="#" class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: importGithub">${_('Import')}</a>
   </div>
 </div>
 
@@ -967,6 +991,34 @@ ${ require.config() }
 
 <script type="text/javascript" charset="utf-8">
 
+  function importGithub() {
+    $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
+    showHoverMsg();
+    $.get("api/github/fetch?url=" + $("#importGithubUrl").val(), function(data){
+      if (data && data.content){
+        if ($.isArray(data.content)) { // it's a Hue Notebook
+          window.importExternalNotebook(JSON.parse(data.content[0].fields.data));
+        }
+        else { // iPython / Zeppelin
+          window.parseExternalJSON(data.content);
+        }
+        $("#importGithubUrl").val("");
+      }
+      else {
+        $.jHueNotify.error("${ _("Failed to load") } " + $("#importGithubUrl").val());
+      }
+    });
+  }
+
+  var showHoverMsg = function () {
+    $(".hoverMsg").removeClass("hide");
+  };
+
+  var hideHoverMsg = function () {
+    $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
+    $(".hoverMsg").addClass("hide");
+  };
+
   function escapeMathJax(code) {
     var escapeMap = {
       "&": "&amp;",
@@ -1458,6 +1510,24 @@ ${ require.config() }
 
     var viewModel;
 
+    var importExternalNotebook = function (notebook) {
+      var currentNotebook = viewModel.notebooks()[0];
+      currentNotebook.name(notebook.name);
+      currentNotebook.description(notebook.description);
+      currentNotebook.selectedDatabases = notebook.selectedDatabases;
+      currentNotebook.selectedSnippet(notebook.selectedSnippet);
+      notebook.snippets.forEach(function(snippet){
+        var newSnippet = currentNotebook.addSnippet({
+          type: snippet.type,
+          result: {}
+        });
+        newSnippet.statement_raw(snippet.statement);
+      });
+      hideHoverMsg();
+    };
+
+    window.importExternalNotebook = importExternalNotebook;
+
     var redrawFixedHeaders = function () {
       viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
@@ -1474,33 +1544,7 @@ ${ require.config() }
 
     window.redrawFixedHeaders = redrawFixedHeaders;
 
-    // Drag and drop iPython / Zeppelin notebooks
-    if (window.FileReader) {
-
-      var showHoverMsg = function () {
-        $(".hoverMsg").removeClass("hide");
-      };
-
-      var hideHoverMsg = function () {
-        $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
-        $(".hoverMsg").addClass("hide");
-      };
-
-      var aceChecks = 0;
-
-      function handleFileSelect (evt) {
-        evt.stopPropagation();
-        evt.preventDefault();
-        var dt = evt.dataTransfer;
-        var files = dt.files;
-        if (files.length > 0){
-          showHoverMsg();
-        }
-        else {
-          hideHoverMsg();
-        }
-
-        function addAce (content, snippetType) {
+    function addAce (content, snippetType) {
           var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
           snip.statement_raw(content);
           aceChecks++;
@@ -1532,86 +1576,109 @@ ${ require.config() }
           addAce(content, "spark");
         }
 
+        function parseExternalJSON(raw) {
+          try {
+            var loaded = typeof raw == "string" ? JSON.parse(raw) : raw;
+            if (loaded.nbformat) { //ipython
+              var cells = [];
+              if (loaded.nbformat == 3) {
+                cells = loaded.worksheets[0].cells;
+              }
+              else if (loaded.nbformat == 4) {
+                cells = loaded.cells;
+              }
+              cells.forEach(function (cell, cellCnt) {
+                window.setTimeout(function () {
+                  if (cell.cell_type == "code") {
+                    if (loaded.nbformat == 3) {
+                      addPySpark($.isArray(cell.input) ? cell.input.join("\n") : cell.input);
+                    }
+                    else {
+                      addPySpark($.isArray(cell.source) ? cell.source.join("\n") : cell.source);
+                    }
+                  }
+                  if (cell.cell_type == "heading") {
+                    var heading = $.isArray(cell.source) ? cell.source.join("") : cell.source;
+                    if (cell.level == 1) {
+                      heading += "\n====================";
+                    }
+                    else if (cell.level == 2) {
+                      heading += "\n--------------------";
+                    }
+                    else {
+                      heading = "### " + heading;
+                    }
+                    addMarkdown(heading);
+                  }
+                  if (cell.cell_type == "markdown") {
+                    addMarkdown($.isArray(cell.source) ? cell.source.join("") : cell.source);
+                  }
+                  if (cellCnt == cells.length - 1 && aceChecks == 0) {
+                    hideHoverMsg();
+                  }
+                }, 10);
+              });
+            }
+
+            if (loaded.paragraphs) { //zeppelin
+              if (loaded.name) {
+                viewModel.notebooks()[0].name(loaded.name);
+              }
+              loaded.paragraphs.forEach(function (paragraph) {
+                if (paragraph.text) {
+                  var content = paragraph.text.split("\n");
+                  if (content[0].indexOf("%md") > -1) {
+                    content.shift();
+                    addMarkdown(content.join("\n"));
+                  }
+                  else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
+                    content.shift();
+                    addSql(content.join("\n"));
+                  }
+                  else if (content[0].indexOf("%pyspark") > -1) {
+                    content.shift();
+                    addPySpark(content.join("\n"));
+                  }
+                  else {
+                    if (content[0].indexOf("%spark") > -1) {
+                      content.shift();
+                    }
+                    addScala(content.join("\n"));
+                  }
+                }
+              });
+            }
+          }
+          catch (e) {
+            hideHoverMsg();
+          }
+        }
+
+        window.parseExternalJSON = parseExternalJSON;
+
+    // Drag and drop iPython / Zeppelin notebooks
+    if (window.FileReader) {
+
+      var aceChecks = 0;
+
+      function handleFileSelect (evt) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        var dt = evt.dataTransfer;
+        var files = dt.files;
+        if (files.length > 0){
+          showHoverMsg();
+        }
+        else {
+          hideHoverMsg();
+        }
+
         for (var i = 0, f; f = files[i]; i++) {
           var reader = new FileReader();
           reader.onload = (function (file) {
             return function (e) {
               $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
-              try {
-                var loaded = JSON.parse(e.target.result);
-                if (loaded.nbformat) { //ipython
-                  var cells = [];
-                  if (loaded.nbformat == 3) {
-                    cells = loaded.worksheets[0].cells;
-                  }
-                  else if (loaded.nbformat == 4) {
-                    cells = loaded.cells;
-                  }
-                  cells.forEach(function (cell, cellCnt) {
-                    window.setTimeout(function () {
-                      if (cell.cell_type == "code") {
-                        if (loaded.nbformat == 3) {
-                          addPySpark($.isArray(cell.input) ? cell.input.join("\n") : cell.input);
-                        }
-                        else {
-                          addPySpark($.isArray(cell.source) ? cell.source.join("\n") : cell.source);
-                        }
-                      }
-                      if (cell.cell_type == "heading") {
-                        var heading = $.isArray(cell.source) ? cell.source.join("") : cell.source;
-                        if (cell.level == 1) {
-                          heading += "\n====================";
-                        }
-                        else if (cell.level == 2) {
-                          heading += "\n--------------------";
-                        }
-                        else {
-                          heading = "### " + heading;
-                        }
-                        addMarkdown(heading);
-                      }
-                      if (cell.cell_type == "markdown") {
-                        addMarkdown($.isArray(cell.source) ? cell.source.join("") : cell.source);
-                      }
-                      if (cellCnt == cells.length - 1 && aceChecks == 0) {
-                        hideHoverMsg();
-                      }
-                    }, 10);
-                  });
-                }
-
-                if (loaded.paragraphs) { //zeppelin
-                  if (loaded.name) {
-                    viewModel.notebooks()[0].name(loaded.name);
-                  }
-                  loaded.paragraphs.forEach(function (paragraph) {
-                    if (paragraph.text) {
-                      var content = paragraph.text.split("\n");
-                      if (content[0].indexOf("%md") > -1) {
-                        content.shift();
-                        addMarkdown(content.join("\n"));
-                      }
-                      else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
-                        content.shift();
-                        addSql(content.join("\n"));
-                      }
-                      else if (content[0].indexOf("%pyspark") > -1) {
-                        content.shift();
-                        addPySpark(content.join("\n"));
-                      }
-                      else {
-                        if (content[0].indexOf("%spark") > -1){
-                          content.shift();
-                        }
-                        addScala(content.join("\n"));
-                      }
-                    }
-                  });
-                }
-              }
-              catch (e) {
-                hideHoverMsg();
-              }
+              parseExternalJSON(e.target.result);
             };
           })(f);
           reader.readAsText(f);

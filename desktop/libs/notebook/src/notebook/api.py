@@ -22,13 +22,15 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.decorators import check_document_access_permission
-from desktop.lib.django_util import JsonResponse
+from desktop.lib.django_util import JsonResponse, HttpResponse
 from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired
 from notebook.decorators import api_error_handler, check_document_modify_permission
 from notebook.github import GithubClient, GithubClientException
 from notebook.models import escape_rows
+
+import requests
 
 
 LOG = logging.getLogger(__name__)
@@ -311,7 +313,8 @@ def github_fetch(request):
     owner, repo, branch, filepath = api.parse_github_url(url)
 
     response['status'] = 0
-    response['content'] = api.get_file_contents(owner, repo, filepath, branch)
+    content = api.get_file_contents(owner, repo, filepath, branch)
+    response['content'] = json.loads(content)
   else:
     response['message'] = _('fetch_github requires full URL to Github file.')
 
