@@ -15,10 +15,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import tablib
+import openpyxl
 
-from desktop.lib.export_csvxls import MAX_XLS_ROWS, MAX_XLS_COLS, create_generator, make_response
 from nose.tools import assert_equal
+
+from desktop.lib.export_csvxls import MAX_XLS_ROWS, MAX_XLS_COLS, create_generator, make_response,\
+  xls_dataset
 
 
 def content_generator(header, data):
@@ -40,16 +42,14 @@ def test_export_xls():
   headers = ["x", "y"]
   data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
 
-  dataset = tablib.Dataset(headers=headers)
-  for row in data:
-    dataset.append([cell is not None and cell or "NULL" for cell in row])
-
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
   assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
   content = ''.join(response.streaming_content)
-  assert_equal(dataset.xls, content)
+  expected_xls = xls_dataset(headers=headers, data=[cell is not None and cell or "NULL" for row in data for cell in row])
+  assert_equal(expected_xls.xls, content)
+  ## read it and get rwos + headers?
   assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
 def test_export_xls_truncate_rows():
