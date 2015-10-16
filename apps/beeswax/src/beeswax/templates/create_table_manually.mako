@@ -788,8 +788,8 @@ $(document).ready(function () {
   }
 
   function isValid(str) {
-    // validates against empty string and no spaces
-    return (str != "" && str.indexOf(" ") == -1);
+    // validates against empty string
+    return (str != "");
   }
 
   function showFieldError(field) {
