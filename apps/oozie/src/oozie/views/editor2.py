@@ -333,6 +333,26 @@ def gen_xml_workflow(request):
 @check_document_access_permission()
 def submit_workflow(request, doc_id):
   workflow = Workflow(document=Document2.objects.get(id=doc_id))
+
+  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id}))
+
+@check_document_access_permission()
+def submit_single_action(request, doc_id, node_id):
+  parent_doc = Document2.objects.get(id=doc_id)
+  workflow_data = Workflow(document=parent_doc).create_single_action_workflow_data(node_id)
+  _data = json.loads(workflow_data)
+
+  # Create separate wf object for the submit node with new deployment_dir
+  workflow = Workflow(data=workflow_data)
+  workflow.set_workspace(request.user)
+
+  workflow.check_workspace(request.fs, request.user)
+  workflow.document = wf_doc = Document2.objects.create(name=_data['workflow']['name'], type='oozie-workflow2', owner=parent_doc.owner, data=workflow_data)
+  Document.objects.link(wf_doc, owner=wf_doc.owner, name=wf_doc.name, description=wf_doc.description, extra='workflow2')
+
+  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
+
+def _submit_workflow_helper(request, workflow, submit_action):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
@@ -351,14 +371,14 @@ def submit_workflow(request, doc_id):
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
-    parameters = workflow.find_all_parameters()
+    parameters = workflow and workflow.find_all_parameters() or []
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
     popup = render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
-                     'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id}),
+                     'action': submit_action,
                      'show_dryrun': True
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)

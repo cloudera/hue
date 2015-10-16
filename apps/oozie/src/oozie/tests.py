@@ -239,6 +239,7 @@ class MockFs():
 
     self.fs_defaultfs = 'hdfs://curacao:8020'
     self.logical_name = logical_name if logical_name else ''
+    self.DEFAULT_USER = 'test'
 
   def setuser(self, user):
     pass
@@ -254,6 +255,18 @@ class MockFs():
 
   def exists(self, path):
     return True
+
+  def mkdir(self):
+    pass
+
+  def chmod(self):
+    pass
+
+  def stats(self, path):
+    class MockWebHdfsStat(object):
+      def __init__(self):
+        self.isDir = True
+    return MockWebHdfsStat()
 
 class OozieMockBase(object):
 
@@ -3970,6 +3983,7 @@ def save_temp_workflow(wf, user):
           'layout': [{
               "size":12, "rows":[
                   {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
+                  {"widgets":[{"size":12, "name":"Shell", "id":"3f107997-04cc-8733-60a9-a4bb62cebabc", "widgetType":"shell-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
                   {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
                   {"widgets":[{"size":12, "name":"Kill", "id":"17c9c895-5a16-7443-bb81-f34b30b21548", "widgetType":"kill-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}
               ],
@@ -4003,12 +4017,15 @@ def save_temp_workflow(wf, user):
                   "wf1_id": None
               },
               "nodes":[
-                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},
+                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '3f107997-04cc-8733-60a9-a4bb62cebabc'}]},
+                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebabc","name":"shell-fc94","type":"shell-widget","properties":{'archives': [], 'arguments': [], 'capture_output': True, 'credentials': [], 'env_var': [], 'files': [], 'job_properties': [], 'job_xml': u'', 'prepares': [], 'retry_interval': [], 'retry_max': [], 'shell_command': 'ls', 'sla': []},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},
                   {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]},
                   {"id":"17c9c895-5a16-7443-bb81-f34b30b21548","name":"Kill","type":"kill-widget","properties":{'message': 'Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'},"children":[]}
               ]
           }
       })
     workflow_doc = Document2.objects.create(name='test', type='oozie-workflow2', owner=user, data=data)
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+
     wf[u'conf'] = u'<configuration><property><name>hue-id-w</name><value>' + str(workflow_doc.id) + u'</value></property></configuration>'
     return workflow_doc

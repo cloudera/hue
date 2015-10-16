@@ -1188,6 +1188,16 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     });
   };
 
+  self.showSubmitActionPopup = function (w) {
+    $(".jHueNotify").hide();
+    $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
+    }, function (data) {
+      $(document).trigger("showSubmitPopup", data);
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
   self.schedule = function () {
     window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
