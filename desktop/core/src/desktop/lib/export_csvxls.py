@@ -21,7 +21,7 @@ Common library to export either CSV or XLS.
 import gc
 import logging
 import tablib
-import xlsxwriter
+import openpyxl
 
 from django.http import StreamingHttpResponse
 from django.utils.encoding import smart_str
@@ -64,20 +64,16 @@ class XlsWrapper():
 def xls_dataset(headers, data, encoding=None):
   output = StringIO.StringIO()
 
-  workbook = xlsxwriter.Workbook(output)
-  worksheet = workbook.add_worksheet()
-
-  n = 0
+  workbook = openpyxl.Workbook()
+  worksheet = workbook.active
 
   if headers:
-    worksheet.write_row(n, 0, format(headers, encoding))
-    n +=1
+    worksheet.append(format(headers, encoding))
 
   for row in data:
-    worksheet.write_row(n, 0, format(row, encoding))
-    n +=1
+    worksheet.append(format(row, encoding))
 
-  workbook.close()
+  workbook.save(output)
 
   output.seek(0)
 
