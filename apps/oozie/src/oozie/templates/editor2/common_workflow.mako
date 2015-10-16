@@ -216,6 +216,10 @@
       <span data-bind="visible: typeof $root.isViewer == 'undefined' || ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
       <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name" title="${ _('View workflow action') }"></a>
 
+      <div class="inline pull-right" data-bind="visible: (typeof $root.isViewer == 'undefined' || ! $root.isViewer()) && !$root.isEditing()" style="margin-right: 4px">
+        <a href="javascript:void(0)" data-bind="click: function(w) { viewModel.showSubmitActionPopup(w); }"><i class="fa fa-play-circle-o"></i></a>
+      </div>
+
       <!-- ko if: widgetType() == 'decision-widget' -->
         <div class="inline pull-right" data-bind="visible: $root.isEditing() && $root.workflow.getNodeById(id()) && $root.workflow.getNodeById(id()).children().length <= 1 && ! oozieExpanded() && ! ooziePropertiesExpanded()">
           <a href="javascript:void(0)" data-bind="click: function(w){addActionDemiModalFieldCancel();$root.removeWidget(w);}"><i class="fa fa-times"></i></a>

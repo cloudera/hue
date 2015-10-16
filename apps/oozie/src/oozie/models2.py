@@ -292,6 +292,41 @@ class Workflow(Job):
       LOG.error(msg)
       raise PopupException(msg)
 
+  def create_single_action_workflow_data(self, node_id):
+    _data = json.loads(self.data)
+
+    start_node = [node for node in _data['workflow']['nodes'] if node['name'] == 'Start'][0]
+    submit_node = [node for node in _data['workflow']['nodes'] if node['id'] == node_id][0]
+    end_node = [node for node in _data['workflow']['nodes'] if node['name'] == 'End'][0]
+    kill_node = [node for node in _data['workflow']['nodes'] if node['name'] == 'Kill'][0]
+
+    # Modify children to point Start -> Submit_node -> End/Kill
+    start_node['children'] = [{'to': submit_node['id']}]
+    submit_node['children'] = [{'to': end_node['id']}, {'error': kill_node['id']}]
+    _data['workflow']['properties']['deployment_dir'] = None
+
+    # Create wf data with above nodes
+    return json.dumps({
+      'layout': [{
+          "size": 12,
+          "rows": [
+              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['name'] == 'Start'][0],
+              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['id'] == node_id][0],
+              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['name'] == 'End'][0],
+              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['name'] == 'Kill'][0]
+          ],
+          "drops": ["temp"],
+          "klass": "card card-home card-column span12"
+      }],
+      'workflow': {
+          "id": None,
+          "uuid": None,
+          "name": _data['workflow']['name'],
+          "properties": _data['workflow']['properties'],
+          "nodes": [start_node, submit_node, end_node, kill_node]
+      }
+    })
+
   def get_absolute_url(self):
     return reverse('oozie:edit_workflow') + '?workflow=%s' % self.id
 
