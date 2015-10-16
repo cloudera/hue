@@ -127,7 +127,8 @@ def make_response(generator, format, name, encoding=None):
   if format == 'csv':
     content_type = 'application/csv'
   elif format == 'xls':
-    content_type = 'application/xlsx'
+    content_type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    format = 'xlsx'
   elif format == 'json':
     content_type = 'application/json'
   else:
