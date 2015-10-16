@@ -15,21 +15,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
+
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_string
 
 
-def get_interpreters():
-  return [{
-      "name": INTERPRETERS.get()[i].NAME.get(),
-      "type": i,
-      "interface": INTERPRETERS.get()[i].INTERFACE.get(),
-      "options": INTERPRETERS.get()[i].OPTIONS.get()}
-      for i in INTERPRETERS.get()
-  ]
+def get_interpreters(user=None):  
+  if not INTERPRETERS.get():
+    _default_interpreters()
 
+  interpreters = INTERPRETERS.get()
+
+  return [{
+      "name": interpreters[i].NAME.get(),
+      "type": i,
+      "interface": interpreters[i].INTERFACE.get(),
+      "options": interpreters[i].OPTIONS.get()}
+      for i in interpreters
+  ]
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
@@ -92,3 +101,39 @@ GITHUB_CLIENT_SECRET = Config(
     type=coerce_string,
     default=""
 )
+
+def _default_interpreters():
+  INTERPRETERS.set_for_testing(OrderedDict((
+      ('hive', {
+          'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
+      }),
+      ('impala', {
+          'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
+      }),
+      ('spark', {
+          'name': 'Scala', 'interface': 'livy', 'options': {}
+      }),
+      ('pyspark', {
+          'name': 'PySpark', 'interface': 'livy', 'options': {}
+      }),
+      ('r', {
+          'name': 'R', 'interface': 'livy', 'options': {}
+      }),
+      ('jar', {
+          'name': 'Spark Submit Jar', 'interface': 'livy-batch', 'options': {}
+      }),
+      ('py', {
+          'name': 'Spark Submit Python', 'interface': 'livy-batch', 'options': {}
+      }),
+      ('pig', {
+          'name': 'Pig', 'interface': 'pig', 'options': {}
+      }),
+      ('text', {
+          'name': 'Text', 'interface': 'text', 'options': {}
+      }),
+      ('markdown', {
+          'name': 'Markdown', 'interface': 'text', 'options': {}
+      })
+    ))
+  )
+

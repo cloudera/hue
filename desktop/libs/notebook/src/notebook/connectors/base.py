@@ -88,7 +88,7 @@ def get_api(user, snippet, fs, jt):
   from notebook.connectors.text import TextApi
 
 
-  interpreter = [interpreter for interpreter in get_interpreters() if interpreter['type'] == snippet['type']]
+  interpreter = [interpreter for interpreter in get_interpreters(user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]

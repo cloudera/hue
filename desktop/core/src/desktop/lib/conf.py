@@ -80,7 +80,7 @@ import sys
 try:
   from collections import OrderedDict
 except ImportError:
-  from ordereddict import OrderedDict
+  from ordereddict import OrderedDict # Python 2.6
 
 
 # Magical object for use as a "symbol"

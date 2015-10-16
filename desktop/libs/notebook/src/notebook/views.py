@@ -60,7 +60,7 @@ def notebook(request):
   return render('notebook.mako', request, {
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
-          'languages': get_interpreters(),
+          'languages': get_interpreters(request.user),
           'session_properties': SparkApi.PROPERTIES
       }),
       'autocomplete_base_url': autocomplete_base_url,
