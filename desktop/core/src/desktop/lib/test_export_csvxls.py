@@ -16,11 +16,12 @@
 # limitations under the License.
 
 import openpyxl
+import StringIO
 
 from nose.tools import assert_equal
+from openpyxl import load_workbook
 
-from desktop.lib.export_csvxls import MAX_XLS_ROWS, MAX_XLS_COLS, create_generator, make_response,\
-  xls_dataset
+from desktop.lib.export_csvxls import MAX_XLS_ROWS, MAX_XLS_COLS, create_generator, make_response
 
 
 def content_generator(header, data):
@@ -41,43 +42,60 @@ def test_export_csv():
 def test_export_xls():
   headers = ["x", "y"]
   data = [ ["1", "2"], ["3", "4"], ["5,6", "7"], [None, None] ]
+  sheet = [headers] + data
 
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
   assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
-  content = ''.join(response.streaming_content)
-  expected_xls = xls_dataset(headers=headers, data=[cell is not None and cell or "NULL" for row in data for cell in row])
-  assert_equal(expected_xls.xls, content)
-  ## read it and get rwos + headers?
+
+  expected_data = [[cell is not None and cell or "NULL" for cell in row] for row in sheet]
+  sheet_data = _read_xls_sheet_data(response)
+
+  assert_equal(expected_data, sheet_data)
   assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
 def test_export_xls_truncate_rows():
   headers = ["a"]
   data = [["1"]] * (MAX_XLS_ROWS + 1)
-
-  dataset = tablib.Dataset(headers=headers)
-  dataset.extend(data[:MAX_XLS_ROWS])
+  sheet = [headers] + data
 
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
   assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
-  content = ''.join(response.streaming_content)
-  assert_equal(dataset.xls, content)
+
+  sheet_data = _read_xls_sheet_data(response)
+  assert_equal(len(sheet[:MAX_XLS_ROWS + 1]), len(sheet_data))
   assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
 def test_export_xls_truncate_cols():
-  headers = ["a"] * (MAX_XLS_COLS + 1)
-  data = [["1"] * (MAX_XLS_COLS + 1)]
-
-  dataset = tablib.Dataset(headers=headers[:MAX_XLS_COLS])
-  dataset.extend([data[0][:MAX_XLS_COLS]])
+  headers = [u"a"] * (MAX_XLS_COLS + 1)
+  data = [[u"1"] * (MAX_XLS_COLS + 1)]
+  sheet = [headers] + data
 
   # Check XLS
   generator = create_generator(content_generator(headers, data), "xls")
   response = make_response(generator, "xls", "foo")
   assert_equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", response["content-type"])
-  content = ''.join(response.streaming_content)
-  assert_equal(dataset.xls, content)
+  expected_data = [[cell is not None and cell or "NULL" for cell in row][:MAX_XLS_COLS] for row in sheet]
+
+  sheet_data = _read_xls_sheet_data(response)
+  sheet_data[0] = sheet_data[0][:MAX_XLS_COLS]
+  sheet_data[1] = sheet_data[1][:MAX_XLS_COLS]
+  assert_equal(len(expected_data), len(sheet_data))
+  assert_equal(len(expected_data[0]), len(sheet_data[0]))
+
+  assert_equal(expected_data, sheet_data)
   assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
+
+def _read_xls_sheet_data(response):
+  content = ''.join(response.streaming_content)
+
+  data = StringIO.StringIO()
+  data.write(content)
+
+  wb = load_workbook(filename=data, read_only=True)
+  ws = wb.active
+
+  return [[cell.value if cell else cell for cell in row] for row in ws.rows]
