@@ -682,7 +682,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         user.groups.add(*new_groups)
         Group.objects.filter(group__in=remove_groups_filtered).delete()
     except (AssertionError, RuntimeError) as e:
-      LOG.warn('%s: %s' % (ldap_info['username'], e.message))
+      LOG.warn('Could not import %s: %s' % (ldap_info['username'], e.message))
 
   return imported_users
 
@@ -866,8 +866,11 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
         else:
           for ldap_info in user_info:
             try:
+              validate_username(ldap_info['username'])
               user = ldap_access.get_ldap_user(username=ldap_info['username'])
               group.user_set.add(user)
+            except AssertionError, e:
+              LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
             except User.DoesNotExist:
               pass
 
@@ -894,8 +897,11 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           else:
             for ldap_info in user_info:
               try:
+                validate_username(ldap_info['username'])
                 user = ldap_access.get_ldap_user(username=ldap_info['username'])
                 group.user_set.add(user)
+              except AssertionError, e:
+                LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
               except User.DoesNotExist:
                 pass
 
