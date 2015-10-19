@@ -24,7 +24,6 @@ import os
 import re
 import shutil
 import socket
-import tablib
 import tempfile
 import threading
 
@@ -50,11 +49,13 @@ from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod_whitespace
+from desktop.lib.parameterization import substitute_variables
 from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.lib.security_util import get_localhost_name
+from desktop.lib.test_export_csvxls import _read_xls_sheet_data
 from hadoop.fs.hadoopfs import Hdfs
+
 from hadoop.pseudo_hdfs4 import is_live_cluster
-from desktop.lib.parameterization import substitute_variables
 
 import desktop.conf as desktop_conf
 
@@ -754,24 +755,24 @@ for x in sys.stdin:
   def test_data_export(self):
     hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
     query = hql_query(hql)
-    dataset = tablib.Dataset()
 
     # Get the result in xls.
     handle = self.db.execute_and_wait(query)
-    xls_resp = download(handle, 'xls', self.db)
+    resp = download(handle, 'xls', self.db)
 
-    dataset.xls = ''.join(xls_resp.streaming_content)
+    sheet_data = _read_xls_sheet_data(resp)
     # It should have 257 lines (256 + header)
-    assert_equal(len(dataset.csv.strip('\r\n').split('\r\n')), 257, dataset.csv)
+    assert_equal(len(sheet_data), 257, sheet_data)
 
     # Get the result in csv.
     query = hql_query(hql)
     handle = self.db.execute_and_wait(query)
 
-    csv_resp = download(handle, 'csv', self.db)
-    csv_content = ''.join(csv_resp.streaming_content)
-    assert_equal(csv_content.replace('.0', ''), dataset.csv.replace('.0', ''))
+    resp = download(handle, 'csv', self.db)
+    csv_resp = ''.join(resp.streaming_content)
+    csv_data = [[int(col) if col.isdigit() else col for col in row.split(',')] for row in csv_resp.strip().split('\r\n')]
 
+    assert_equal(sheet_data, csv_data)
 
   def test_data_upload(self):
     hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}

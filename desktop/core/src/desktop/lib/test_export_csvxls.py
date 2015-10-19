@@ -89,6 +89,7 @@ def test_export_xls_truncate_cols():
   assert_equal(expected_data, sheet_data)
   assert_equal("attachment; filename=foo.xlsx", response["content-disposition"])
 
+
 def _read_xls_sheet_data(response):
   content = ''.join(response.streaming_content)
 
