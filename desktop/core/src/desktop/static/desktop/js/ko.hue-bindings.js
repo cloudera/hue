@@ -1567,6 +1567,8 @@
     return _btn;
   }
 
+  window.getFileBrowseButton = getFileBrowseButton;
+
   ko.bindingHandlers.datepicker = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var _el = $(element);
