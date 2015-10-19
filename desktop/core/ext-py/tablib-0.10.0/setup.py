@@ -48,7 +48,7 @@ setup(
     packages=[
         'tablib', 'tablib.formats',
         'tablib.packages',
-#        'tablib.packages.xlwt',
+#        'tablib.packages.xlwt', # Removed because of LGPL
 #        'tablib.packages.xlwt3',
         'tablib.packages.xlrd',
         'tablib.packages.xlrd3',
