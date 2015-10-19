@@ -33,4 +33,5 @@ urlpatterns = patterns('metastore.views',
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions$', 'describe_partitions', name='describe_partitions'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions/(?P<partition_spec>.+?)/read$', 'read_partition', name='read_partition'),
   url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions/(?P<partition_spec>.+?)/browse$', 'browse_partition', name='browse_partition'),
+  url(r'^table/(?P<database>\w+)/(?P<table>\w+)/partitions/drop$', 'drop_partition', name='drop_partition'),
 )

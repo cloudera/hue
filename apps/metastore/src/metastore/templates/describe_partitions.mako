@@ -62,9 +62,17 @@ ${ components.menubar() }
           </a>
           <div class="clearfix"></div>
 
+          <div class="actionbar-main" style="padding: 10px;">
+            <div class="actionbar-actions">
+              % if has_write_access:
+                <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected partitions')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+              % endif
+            </div>
+          </div>
 
           <table class="table table-striped table-condensed datatables" data-bind="visible: values().length > 0, style:{'opacity': isLoading() ? '.5': '1' }">
             <tr>
+              <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
               <!-- ko foreach: keys -->
               <th data-bind="text: $data"></th>
               <!-- /ko -->
@@ -72,6 +80,11 @@ ${ components.menubar() }
             </tr>
             <!-- ko foreach: values -->
             <tr>
+              <td data-row-selector-exclude="true" width="1%">
+                <div class="hueCheckbox partitionCheck fa"
+                       data-bind="attr:{'data-drop-name': partitionSpec}"
+                       data-row-selector-exclude="true"></div>
+              </td>
               <!-- ko foreach: $data.columns -->
               <td><a data-bind="attr:{'href': $parent.readUrl},text:$data"></a></td>
               <!-- /ko -->
@@ -83,6 +96,23 @@ ${ components.menubar() }
         </div>
       </div>
     </div>
+  </div>
+
+  <div id="dropPartition" class="modal hide fade">
+    <form id="dropPartitionForm" action="${ url('metastore:drop_partition', database=database, table=table.name) }" method="POST">
+      ${ csrf_token(request) | n,unicode }
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3 id="dropPartitionMessage">${_('Confirm action')}</h3>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+        <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+      </div>
+      <div class="hide">
+        <select name="partition_selection" data-bind="options: $root.availablePartitions, selectedOptions: $root.chosenPartitions" size="5" multiple="true"></select>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -99,10 +129,17 @@ ${ components.menubar() }
     self.isLoading = ko.observable(false);
 
     self.sortDesc = ko.observable(true);
-    self.filters = ko.observableArray([])
+    self.filters = ko.observableArray([]);
 
     self.keys = ko.observableArray(partition_keys_json);
     self.values = ko.observableArray(partition_values_json);
+
+    var partition_specs = [];
+    $.each(partition_values_json, function (index, partition) {
+        partition_specs.push(partition.partitionSpec);
+    });
+    self.availablePartitions = ko.observableArray(partition_specs);
+    self.chosenPartitions = ko.observableArray([]);
 
     self.typeaheadValues = function (column) {
       var _vals = [];
@@ -154,7 +191,52 @@ ${ components.menubar() }
 
   $(document).ready(function () {
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    $(".selectAll").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeAttr("checked").removeClass("fa-check");
+        $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
+      }
+      else {
+        $(this).attr("checked", "checked").addClass("fa-check");
+        $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
+      }
+      toggleActions();
+    });
+
+    $(".partitionCheck").click(function () {
+      if ($(this).attr("checked")) {
+        $(this).removeClass("fa-check").removeAttr("checked");
+      }
+      else {
+        $(this).addClass("fa-check").attr("checked", "checked");
+      }
+      $(".selectAll").removeAttr("checked").removeClass("fa-check");
+      toggleActions();
+    });
+
+    function toggleActions() {
+      $(".toolbarBtn").attr("disabled", "disabled");
+      var selector = $(".hueCheckbox[checked='checked']");
+      if (selector.length >= 1) {
+        $("#dropBtn").removeAttr("disabled");
+      }
+    }
+
+    $("#dropBtn").click(function () {
+      $.getJSON("${ url('metastore:drop_partition', database=database, table=table.name) }", function (data) {
+        $("#dropPartitionMessage").text(data.title);
+      });
+      var _tempList = [];
+      $(".hueCheckbox[checked='checked']").each(function (index) {
+        _tempList.push($(this).data("drop-name"));
+      });
+      viewModel.chosenPartitions.removeAll();
+      viewModel.chosenPartitions(_tempList);
+      $("#dropPartition").modal("show");
+    });
   });
+
 </script>
 
 ${ commonfooter(messages) | n,unicode }

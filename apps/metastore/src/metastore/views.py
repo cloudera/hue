@@ -19,10 +19,11 @@ import json
 import logging
 import urllib
 
+from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
+from django.views.decorators.http import require_http_methods
 
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
@@ -336,6 +337,7 @@ def describe_partitions(request, database, table):
   for partition in partitions:
     massaged_partitions.append({
       'columns': partition.values,
+      'partitionSpec': partition.partition_spec,
       'readUrl': reverse('metastore:read_partition', kwargs={'database': database, 'table': table_obj.name,
                                                              'partition_spec': urllib.quote(partition.partition_spec)}),
       'browseUrl': reverse('metastore:browse_partition', kwargs={'database': database, 'table': table_obj.name,
@@ -365,9 +367,9 @@ def describe_partitions(request, database, table):
         'partitions': partitions,
         'partition_keys_json': json.dumps([partition.name for partition in table_obj.partition_keys]),
         'partition_values_json': json.dumps(massaged_partitions),
-        'request': request
+        'request': request,
+        'has_write_access': has_write_access(request.user)
     })
-
 
 
 def browse_partition(request, database, table, partition_spec):
@@ -390,6 +392,28 @@ def read_partition(request, database, table, partition_spec):
     return redirect(url)
   except Exception, e:
     raise PopupException(_('Cannot read partition'), detail=e.message)
+
+@require_http_methods(["GET", "POST"])
+@check_has_write_access_permission
+def drop_partition(request, database, table):
+  db = dbms.get(request.user)
+
+  if request.method == 'POST':
+    partition_specs = request.POST.getlist('partition_selection')
+    partition_specs = [spec for spec in partition_specs]
+    try:
+      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
+      query_history = db.drop_partitions(database, table, partition_specs, design)
+      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + \
+            reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
+      return redirect(url)
+    except Exception, ex:
+      error_message, log = dbms.expand_exception(ex, db)
+      error = _("Failed to remove %(partition)s.  Error: %(error)s") % {'partition': '\n'.join(partition_specs), 'error': error_message}
+      raise PopupException(error, title=_("Hive Error"), detail=log)
+  else:
+    title = _("Do you really want to delete the partition(s)?")
+    return render('confirm.mako', request, {'url': request.path, 'title': title})
 
 
 def has_write_access(user):
