@@ -155,6 +155,10 @@ ${ components.menubar() }
 
     ko.applyBindings(viewModel);
 
+    if (location.getParameter("error") != "") {
+      $.jHueNotify.error(location.getParameter("error"));
+    }
+
     var tables = $(".datatables").dataTable({
       "sDom": "<'row'r>t<'row'<'span8'i><''p>>",
       "bPaginate": false,

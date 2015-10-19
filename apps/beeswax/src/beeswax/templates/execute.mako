@@ -218,7 +218,7 @@ ${ layout.menubar(section='query') }
       % endif
     </div>
   </div>
-  <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+  <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition, leftPanelVisible: isEditor }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
   <div class="right-panel" id="querySide">
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }
@@ -2420,6 +2420,7 @@ $(document).ready(function () {
 
   function watchPageComponents() {
     $('#advanced-settings').hide();
+    viewModel.isEditor(false);
     $('#navigator').hide();
     $('#queryContainer').hide();
     $('#resizePanel').hide();
@@ -2650,7 +2651,6 @@ viewModel.design.fileResources.values.subscribe(function() {
   $(".fileChooser:not(:has(~ button))").after(getFileBrowseButton($(".fileChooser:not(:has(~ button))")));
 });
 
-
 % if action == 'watch-results':
   $(document).ready(watchEvents);
   $(document).one('fetched.query', function(e) {
@@ -2664,7 +2664,13 @@ viewModel.design.fileResources.values.subscribe(function() {
     cacheQueryTextEvents();
   });
   $(document).on('stop_watch.query', function(e) {
-    if (viewModel.design.results.errors().length == 0) {
+    var successUrl = "${request.GET['on_success_url']}";
+    if (viewModel.design.watch.errors().length != 0) {
+      window.setTimeout(function(){
+        window.location.href = successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "error=" + encodeURIComponent(viewModel.design.watch.errors().join("\n"));
+      }, 200);
+    }
+    else if (viewModel.design.results.errors().length == 0) {
       window.setTimeout(function(){
         window.location.href = "${request.GET['on_success_url']}";
       }, 200);

@@ -796,7 +796,9 @@
         if (ko.isObservable(options.leftPanelVisible) && ! options.leftPanelVisible()) {
           $rightPanel.css("width", "100%");
           $rightPanel.css("left", "0");
+          $resizer.hide();
         } else {
+          $resizer.show();
           var totalWidth = $container.width();
           leftPanelWidth = Math.min(leftPanelWidth, totalWidth - 100);
           var rightPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
