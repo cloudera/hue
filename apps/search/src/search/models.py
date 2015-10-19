@@ -816,13 +816,13 @@ def augment_solr_response(response, collection, query):
           escaped_value = escape(value)
         doc[field] = escaped_value
 
-        link = None
-        if 'link-meta' in doc:
-          meta = json.loads(doc['link-meta'])
-          link = get_data_link(meta)
+      link = None
+      if 'link-meta' in doc:
+        meta = json.loads(doc['link-meta'])
+        link = get_data_link(meta)
 
-        doc['externalLink'] = link
-        doc['details'] = []
+      doc['externalLink'] = link
+      doc['details'] = []
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
