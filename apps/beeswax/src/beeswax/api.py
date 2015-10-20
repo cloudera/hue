@@ -369,7 +369,8 @@ def save_query_design(request, design_id=None):
         'query': [query_form.query.errors],
         'settings': query_form.settings.errors,
         'file_resources': query_form.file_resources.errors,
-        'functions': query_form.functions.errors
+        'functions': query_form.functions.errors,
+        'saveform': query_form.saveform.errors,
       }
   except RuntimeError, e:
     response['message'] = str(e)
