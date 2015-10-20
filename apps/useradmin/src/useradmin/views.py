@@ -355,7 +355,7 @@ def add_ldap_users(request):
       except ldap.LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
-      except AssertionError, e:
+      except (AssertionError, RuntimeError), e:
         raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       if users and form.cleaned_data['ensure_home_directory']:
@@ -407,7 +407,7 @@ def add_ldap_groups(request):
       except ldap.LDAPError, e:
         LOG.error(_("LDAP Exception: %s") % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
-      except AssertionError, e:
+      except (AssertionError, RuntimeError), e:
         raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       unique_users = set()
@@ -869,7 +869,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
               validate_username(ldap_info['username'])
               user = ldap_access.get_ldap_user(username=ldap_info['username'])
               group.user_set.add(user)
-            except AssertionError, e:
+            except (AssertionError, RuntimeError), e:
               LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
             except User.DoesNotExist:
               pass
@@ -900,7 +900,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
                 validate_username(ldap_info['username'])
                 user = ldap_access.get_ldap_user(username=ldap_info['username'])
                 group.user_set.add(user)
-              except AssertionError, e:
+              except (AssertionError, RuntimeError), e:
                 LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
               except User.DoesNotExist:
                 pass
