@@ -165,7 +165,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % endif
       </ul>
 
-      <div id="workflow-tab-content" class="tab-content" style="min-height:200px">
+      <div id="workflow-tab-content" class="tab-content" style="min-height:200px; overflow: visible">
         % if workflow_graph != 'MISSING':
         <div id="graph" class="tab-pane active">
         % if layout_json == '':
