@@ -38,41 +38,44 @@ ${ components.menubar() }
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
 
         <div class="card-body">
-          <div data-bind="visible: filters().length > 0">
-            <div data-bind="foreach: filters">
-                <div class="filter-box">
-                  <a href="javascript:void(0)" class="pull-right" data-bind="click: $root.removeFilter">
-                    <i class="fa fa-times"></i>
+          <div class="row-fluid">
+            <div class="span10">
+              <div data-bind="visible: filters().length > 0">
+                <div data-bind="foreach: filters">
+                    <div class="filter-box">
+                      <a href="javascript:void(0)" class="pull-right" data-bind="click: $root.removeFilter">
+                        <i class="fa fa-times"></i>
+                      </a>
+                      <select class="input-small" data-bind="options: $root.keys, value: column"></select>
+                      &nbsp;
+                      <input class="input-small" type="text" data-bind="value: value, typeahead: { target: value, source: $root.typeaheadValues(column), triggerOnFocus: true, forceUpdateSource: true}" placeholder="${ _('Value to filter...') }" />
+                  </div>
+                </div>
+                <div class="pull-left" style="margin-top: 4px; margin-bottom: 10px">
+                  <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter">
+                    <i class="fa fa-plus"></i> ${ _('Add') }
                   </a>
-                  <select class="input-small" data-bind="options: $root.keys, value: column"></select>
-                  &nbsp;
-                  <input class="input-small" type="text" data-bind="value: value, typeahead: { target: value, source: $root.typeaheadValues(column), triggerOnFocus: true, forceUpdateSource: true}" placeholder="${ _('Value to filter...') }" />
+                  <label class="checkbox inline pulled">${ _('Sort Desc') } <input type="checkbox" data-bind="checked: sortDesc" /></label>
+                  <button class="btn" data-bind="click: filter"><i class="fa fa-filter"></i> ${ _('Filter') }</button>
+                </div>
               </div>
-            </div>
-            <div class="pull-left" style="margin-top: 4px; margin-bottom: 10px">
-              <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter">
-                <i class="fa fa-plus"></i> ${ _('Add') }
+              <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter, visible: values().length > 0 && filters().length == 0" style="margin-bottom: 20px; margin-left: 14px">
+                <i class="fa fa-plus"></i> ${ _('Add a filter') }
               </a>
-              <label class="checkbox inline pulled">${ _('Sort Desc') } <input type="checkbox" data-bind="checked: sortDesc" /></label>
-              <button class="btn" data-bind="click: filter"><i class="fa fa-filter"></i> ${ _('Filter') }</button>
+              <div class="clearfix"></div>
             </div>
-          </div>
-          <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter, visible: values().length > 0 && filters().length == 0" style="margin-bottom: 20px; margin-left: 14px">
-            <i class="fa fa-plus"></i> ${ _('Add a filter') }
-          </a>
-          <div class="clearfix"></div>
-
-          <div class="actionbar-main" style="padding: 10px;">
-            <div class="actionbar-actions">
-              % if has_write_access:
-                <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected partitions')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
-              % endif
+            <div class="span2">
+            % if has_write_access:
+              <div class="pull-right">
+                <button id="dropBtn" class="btn" title="${_('Delete the selected partitions')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop partition(s)')}</button>
+              </div>
+            % endif
             </div>
           </div>
 
           <table class="table table-striped table-condensed datatables" data-bind="visible: values().length > 0, style:{'opacity': isLoading() ? '.5': '1' }">
             <tr>
-              <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
+              <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="partitionCheck"></div></th>
               <!-- ko foreach: keys -->
               <th data-bind="text: $data"></th>
               <!-- /ko -->
@@ -86,7 +89,7 @@ ${ components.menubar() }
                        data-row-selector-exclude="true"></div>
               </td>
               <!-- ko foreach: $data.columns -->
-              <td><a data-bind="attr:{'href': $parent.readUrl},text:$data"></a></td>
+              <td><a data-bind="attr:{'href': $parent.readUrl}, text:$data"></a></td>
               <!-- /ko -->
               <td><a data-bind="attr:{'href': browseUrl}"><i class="fa fa-share-square-o"></i> ${_('View Partition Files')}</a></td>
             </tr>
@@ -109,9 +112,7 @@ ${ components.menubar() }
         <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
         <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
-      <div class="hide">
-        <select name="partition_selection" data-bind="options: $root.availablePartitions, selectedOptions: $root.chosenPartitions" size="5" multiple="true"></select>
-      </div>
+      <select class="hide" name="partition_selection" data-bind="options: $root.availablePartitions, selectedOptions: $root.chosenPartitions" size="5" multiple="true"></select>
     </form>
   </div>
 </div>
@@ -134,11 +135,12 @@ ${ components.menubar() }
     self.keys = ko.observableArray(partition_keys_json);
     self.values = ko.observableArray(partition_values_json);
 
-    var partition_specs = [];
-    $.each(partition_values_json, function (index, partition) {
-        partition_specs.push(partition.partitionSpec);
-    });
-    self.availablePartitions = ko.observableArray(partition_specs);
+    self.availablePartitions = ko.computed(function () {
+      return ko.utils.arrayMap(partition_values_json, function (partition) {
+        return partition.partitionSpec;
+      });
+    }, self);
+
     self.chosenPartitions = ko.observableArray([]);
 
     self.typeaheadValues = function (column) {
@@ -158,7 +160,7 @@ ${ components.menubar() }
 
     self.removeFilter = function (data) {
       self.filters.remove(data);
-      if (self.filters().length == 0){
+      if (self.filters().length == 0) {
         self.sortDesc(true);
         self.filter();
       }
@@ -166,6 +168,7 @@ ${ components.menubar() }
 
     self.filter = function () {
       self.isLoading(true);
+      $("#dropBtn").attr("disabled", "disabled");
       var _filters = JSON.parse(ko.toJSON(self.filters));
       var _postData = {};
       _filters.forEach(function (filter) {
@@ -192,7 +195,7 @@ ${ components.menubar() }
   $(document).ready(function () {
     $("a[data-row-selector='true']").jHueRowSelector();
 
-    $(".selectAll").click(function () {
+    $(".selectAll").on("click", function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");
         $("." + $(this).data("selectables")).removeClass("fa-check").removeAttr("checked");
@@ -204,7 +207,7 @@ ${ components.menubar() }
       toggleActions();
     });
 
-    $(".partitionCheck").click(function () {
+    $(document).on("click", ".partitionCheck", function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
@@ -216,14 +219,14 @@ ${ components.menubar() }
     });
 
     function toggleActions() {
-      $(".toolbarBtn").attr("disabled", "disabled");
+      $("#dropBtn").attr("disabled", "disabled");
       var selector = $(".hueCheckbox[checked='checked']");
       if (selector.length >= 1) {
         $("#dropBtn").removeAttr("disabled");
       }
     }
 
-    $("#dropBtn").click(function () {
+    $("#dropBtn").on("click", function () {
       $.getJSON("${ url('metastore:drop_partition', database=database, table=table.name) }", function (data) {
         $("#dropPartitionMessage").text(data.title);
       });
