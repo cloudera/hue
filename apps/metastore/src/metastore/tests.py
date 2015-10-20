@@ -205,12 +205,22 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(response.request['PATH_INFO'], filebrowser_path)
 
   def test_drop_partition(self):
-    partition_spec = "baz='baz_one',boom='boom_two'"
+    # Create partition first
+    partition_spec = "baz='baz_drop',boom='boom_drop'"
+    hql = 'ALTER TABLE `%s`.`test_partitions` ADD IF NOT EXISTS PARTITION (%s);' % (self.db_name, partition_spec)
+    resp = _make_query(self.client, hql, database=self.db_name)
+    wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    # Assert partition exists
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
+    assert_true("baz_drop" in response.content)
+
+    # Drop partition
     self.client.post("/metastore/table/%s/test_partitions/partitions/drop" % self.db_name, {'partition_selection': [partition_spec]}, follow=True)
     query = QueryHistory.objects.latest('id')
     assert_equal_mod_whitespace("ALTER TABLE `%s`.`test_partitions` DROP IF EXISTS PARTITION (%s) PURGE" % (self.db_name, partition_spec), query.query)
     response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-    assert_false("baz_one" in response.content)
+    assert_false("baz_drop" in response.content)
 
   def test_drop_multi_tables(self):
     hql = """
