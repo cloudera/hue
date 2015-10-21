@@ -25,7 +25,7 @@ import urllib
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
-from notebook.conf import GITHUB_REMOTE_URL, GITHUB_API_URL
+from notebook.conf import GITHUB_REMOTE_URL, GITHUB_API_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
 
 
 LOG = logging.getLogger(__name__)
@@ -45,15 +45,87 @@ class GithubClient(object):
   BRANCH_RE = "(?P<branch>[\w\.@\:\-~]+)"
   FILEPATH_RE = "(?P<filepath>.+)"
 
+  DEFAULT_SCOPES = ['repo', 'user']
+
 
   def __init__(self, **options):
-    self._github_base_url = options.get('github_remote_url', GITHUB_REMOTE_URL.get()).strip('/')
-    self._api_url = options.get('github_api_url', GITHUB_API_URL.get()).strip('/')
+    self._github_base_url = options.get('remote_url', GITHUB_REMOTE_URL.get()).strip('/')
+    self._api_url = options.get('api_url', GITHUB_API_URL.get()).strip('/')
 
     self._client = HttpClient(self._api_url, logger=LOG)
     self._root = resource.Resource(self._client)
+
     self.__headers = {}
+    access_token = options.get('access_token')
+    if access_token:
+      self.__headers['Authorization'] = 'token %s' % access_token
+      # TODO: Redact access_token from logs
     self.__params = ()
+
+
+  @classmethod
+  def get_authorization_url(cls, **options):
+    """
+    https://developer.github.com/guides/basics-of-authentication/
+    """
+    remote_url = options.get('remote_url', GITHUB_REMOTE_URL.get()).strip('/')
+    client_id = options.get('client_id', GITHUB_CLIENT_ID.get())
+    scopes_list = options.get('scopes_list', cls.DEFAULT_SCOPES)
+    scopes = ','.join(scopes_list)
+    return '%s/login/oauth/authorize?scope=%s&client_id=%s' % (remote_url, scopes, client_id)
+
+
+  @classmethod
+  def get_access_token(cls, session_code, **options):
+    remote_url = options.get('remote_url', GITHUB_REMOTE_URL.get()).strip('/')
+    client_id = options.get('client_id', GITHUB_CLIENT_ID.get())
+    client_secret = options.get('client_secret', GITHUB_CLIENT_SECRET.get())
+
+    try:
+      client = HttpClient(remote_url, logger=LOG)
+      root = resource.Resource(client)
+      data = {
+        'client_id': client_id,
+        'client_secret': client_secret,
+        'code': session_code
+      }
+      headers = {
+        'content-type':'application/json',
+        'Accept': 'application/json'
+      }
+      response = root.post('login/oauth/access_token', headers=headers, data=json.dumps(data))
+      result = cls._get_json(response)
+      return result['access_token']
+    except RestException, e:
+      raise GithubClientException('Failed to request access token from GitHub: %s' % e)
+    except KeyError:
+      raise GithubClientException('Failed to find access_token in GitHub oAuth response')
+
+
+  @classmethod
+  def is_authenticated(cls, access_token, **options):
+    api_url = options.get('api_url', GITHUB_API_URL.get()).strip('/')
+
+    try:
+      client = HttpClient(api_url, logger=LOG)
+      root = resource.Resource(client)
+      params = (
+        ('access_token', access_token),
+      )
+      root.get('user', params=params)
+      return True
+    except RestException:
+      return False
+
+
+  @classmethod
+  def _get_json(cls, response):
+    if type(response) != dict:
+      try:
+        response = json.loads(response)
+      except ValueError:
+        raise GithubClientException('GitHub API did not return JSON response')
+    return response
 
 
   @property
@@ -67,15 +139,6 @@ class GithubClient(object):
     return cleaned_path
 
 
-  def _get_json(cls, response):
-    if type(response) != dict:
-      try:
-        response = json.loads(response)
-      except ValueError:
-        raise GithubClientException('Github API did not return JSON response')
-    return response
-
-
   def parse_github_url(self, url):
     """
     Given a base URL to a Github repository, return a tuple of the owner, repo, branch, and filepath
@@ -86,7 +149,7 @@ class GithubClient(object):
     if match:
       return match.group('owner'), match.group('repo'), match.group('branch'), match.group('filepath')
     else:
-      raise ValueError('Github URL is not formatted correctly: %s' % url)
+      raise ValueError('GitHub URL is not formatted correctly: %s' % url)
 
 
   def get_file_contents(self, owner, repo, filepath, branch='master'):
@@ -136,7 +199,7 @@ class GithubClient(object):
       response = self._root.get('repos/%s/%s/git/trees/%s' % (owner, repo, sha), headers=self.__headers, params=self.__params)
       return self._get_json(response)
     except RestException, e:
-      raise GithubClientException('Could not find Github object, check owner, repo and filepath or permissions: %s' % e)
+      raise GithubClientException('Could not find GitHub object, check owner, repo and filepath or permissions: %s' % e)
 
 
   def get_blob(self, owner, repo, sha):
@@ -148,4 +211,4 @@ class GithubClient(object):
       response = self._root.get('repos/%s/%s/git/blobs/%s' % (owner, repo, sha), headers=self.__headers, params=self.__params)
       return self._get_json(response)
     except RestException, e:
-      raise GithubClientException('Could not find Github object, check owner, repo and sha or permissions: %s' % e)
+      raise GithubClientException('Could not find GitHub object, check owner, repo and sha or permissions: %s' % e)
