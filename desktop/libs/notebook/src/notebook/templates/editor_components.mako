@@ -253,7 +253,7 @@ ${ require.config() }
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
-    <a href="#" class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: importGithub">${_('Import')}</a>
+    <a id ="importGithubBtn" href="#" class="btn btn-primary disable-feedback" data-bind="click: authorizeGithub">${_('Import')}</a>
   </div>
 </div>
 
@@ -991,10 +991,28 @@ ${ require.config() }
 
 <script type="text/javascript" charset="utf-8">
 
+  function authorizeGithub() {
+    if ($("#importGithubUrl").val().trim() != "") {
+      $(".fa-github").addClass("fa-spinner fa-spin");
+      $("#importGithubBtn").attr("disabled", "disabled");
+      $.getJSON("/notebook/api/github/authorize?currentURL=" + location.pathname + (location.search != "" ? location.search : "?github=true") + "&fetchURL=" + $("#importGithubUrl").val(), function (data) {
+        if (data.status == 0) {
+          $(".fa-github").removeClass("fa-spinner fa-spin");
+          $("#importGithubBtn").removeAttr("disabled");
+          $("#importGithubModal").modal("hide");
+          importGithub();
+        }
+        else {
+          location.href = data.auth_url;
+        }
+      });
+    }
+  }
+
   function importGithub() {
     $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
     showHoverMsg();
-    $.get("api/github/fetch?url=" + $("#importGithubUrl").val(), function(data){
+    $.get("api/github/fetch?url=" + $("#importGithubUrl").val().trim(), function(data){
       if (data && data.content){
         if ($.isArray(data.content)) { // it's a Hue Notebook
           window.importExternalNotebook(JSON.parse(data.content[0].fields.data));
@@ -1725,6 +1743,17 @@ ${ require.config() }
       viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
       ko.applyBindings(viewModel);
       viewModel.init();
+
+      if (location.getParameter("github_status") != "") {
+        if (location.getParameter("github_status") == "0") {
+          $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");
+          $("#importGithubUrl").val(location.getParameter("github_fetch"));
+          importGithub();
+        }
+        else {
+          $.jHueNotify.error("${ _('Could not decode Github file content to JSON.') }");
+        }
+      }
 
       window.hueDebug = {
         viewModel: viewModel,
