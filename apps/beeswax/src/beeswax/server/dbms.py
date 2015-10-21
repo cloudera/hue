@@ -36,12 +36,16 @@ from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
 
-
 LOG = logging.getLogger(__name__)
+
+try:
+  from impala.dbms import ImpalaDbms 
+except ImportError, e:
+  LOG.info('Impala app enabled: %s' % e)
+
 
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
-
 
 def get(user, query_server=None):
   global DBMS_CACHE
@@ -149,40 +153,6 @@ class HiveServer2Dbms(object):
       cleaned = "*%s*" % identifier.strip().strip("*")
     return cleaned
 
-
-  @classmethod
-  def get_impala_nested_select(cls, database, table, column, nested=None):
-    """
-    Given a column or nested type, return the corresponding SELECT and FROM clauses in Impala's nested-type syntax
-    """
-    select_tokens = [column]
-    from_tokens = [database, table]
-
-    if nested:
-      nested_tokens = nested.strip('/').split('/')
-      while nested_tokens:
-        token = nested_tokens.pop(0)
-        if token not in ['key', 'value', 'item']:
-          select_tokens.append(token)
-        else:
-          # if we encounter a reserved keyword, move current select_tokens to from_tokens and reset the select_tokens
-          from_tokens.extend(select_tokens)
-          select_tokens = []
-          # if reserved keyword is the last token, make it the only select_token, otherwise we ignore and continue
-          if not nested_tokens:
-            select_tokens = [token]
-
-    select_clause = '.'.join(select_tokens)
-    from_clause = '.'.join('`%s`' % token for token in from_tokens)
-    return select_clause, from_clause
-
-
-  @classmethod
-  def get_histogram_query(cls, database, table, column, nested=None):
-    select_clause, from_clause = cls.get_impala_nested_select(database, table, column, nested)
-    return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
-
-
   def get_databases(self, database_names='*'):
     identifier = self.to_matching_wildcard(database_names)
 
@@ -247,34 +217,6 @@ class HiveServer2Dbms(object):
         return col
     return None
 
-
-  def get_histogram(self, database, table, column, nested=None):
-    """
-    Returns the results of an Impala SELECT histogram() FROM query for a given column or nested type.
-
-    Assumes that the column/nested type is scalar.
-    """
-    results = []
-
-    if self.server_name == 'impala':  # Currently histogram() is only supported by Impala
-      hql = self.get_histogram_query(database, table, column, nested)
-      query = hql_query(hql)
-      handle = self.execute_and_wait(query, timeout_sec=5.0)
-
-      if handle:
-        result = self.fetch(handle)
-        try:
-          histogram = list(result.rows())[0][0]  # actual histogram results is in first-and-only result row
-          unique_values = set(histogram.split(', '))
-          results = list(unique_values)
-        except IndexError, e:
-          LOG.warn('Failed to get histogram results, result set has unexpected format: %s' % smart_str(e))
-        finally:
-          self.close(handle)
-
-    return results
-
-
   def execute_query(self, query, design):
     return self.execute_and_watch(query, design=design)
 
@@ -320,16 +262,17 @@ class HiveServer2Dbms(object):
 
   def get_sample(self, database, table, column=None, nested=None):
     result = None
+    hql = None
 
-    # No samples if it's a view (HUE-526)
     if not table.is_view:
 
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
 
-      if (column or nested) and self.server_name == 'impala':  # SELECT column or nested type
-          select_clause, from_clause = self.get_impala_nested_select(database, table.name, column, nested)
+      if column or nested: # Could do column for any type, then nested with partitions 
+        if self.server_name == 'impala':
+          select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
           hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
-      elif not column and not nested:  # SELECT * FROM table
+      else:
         partition_query = ""
         if table.partition_keys:
           partitions = self.get_partitions(database, table, partition_spec=None, max_parts=1)

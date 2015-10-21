@@ -17,9 +17,7 @@
 
 import json
 import logging
-import os
 import re
-import sys
 
 import desktop.conf as desktop_conf
 
@@ -30,7 +28,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import grant_access, add_to_group
+from desktop.lib.test_utils import add_to_group
 from desktop.models import Document
 
 from beeswax.design import hql_query
@@ -42,6 +40,7 @@ from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
 from impala import conf
 from impala.conf import SERVER_HOST
+from impala.dbms import ImpalaDbms
 
 
 LOG = logging.getLogger(__name__)
@@ -294,3 +293,19 @@ def test_ssl_validate():
     finally:
       for reset in resets:
         reset()
+
+
+class TestImpalaDbms():
+
+  def test_get_impala_nested_select(self):
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/'),
+                 ('email_preferences.categories.promos', '`default`.`customers`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key'),
+                 ('key', '`default`.`customers`.`addresses`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/'),
+                 ('street_1', '`default`.`customers`.`addresses`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date'),
+                 ('order_date', '`default`.`customers`.`orders`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
+                 ('product_id', '`default`.`customers`.`orders`.`items`'))
