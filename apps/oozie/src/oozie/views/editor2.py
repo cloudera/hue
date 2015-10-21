@@ -422,7 +422,7 @@ def edit_coordinator(request):
     LOG.error(smart_str(e))
 
   workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
-                    for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
+                    for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
 
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
