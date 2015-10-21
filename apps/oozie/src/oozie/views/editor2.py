@@ -373,7 +373,7 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
     detail = ex._headers.get('oozie-error-message', ex)
     if 'Max retries exceeded with url' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-    LOG.error(smart_str(detail))
+    LOG.exception('Error submitting workflow: %s' % smart_str(detail))
     raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
@@ -578,10 +578,8 @@ def _submit_coordinator(request, coordinator, mapping):
 
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
-                         detail=ex._headers.get('oozie-error-message', ex))
-
-
+    LOG.exception('Error submitting coordinator')
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex))
 
 
 def list_editor_bundles(request):
@@ -742,5 +740,6 @@ def _submit_bundle(request, bundle, properties):
 
     return job_id
   except RestException, ex:
+    LOG.exception('Error submitting bundle')
     raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex))
 
