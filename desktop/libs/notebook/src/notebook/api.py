@@ -18,7 +18,7 @@
 import json
 import logging
 
-from django.http import HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
@@ -305,17 +305,49 @@ def autocomplete(request, database=None, table=None, column=None, nested=None):
 def github_fetch(request):
   response = {'status': -1}
 
-  api = GithubClient()
+  api = GithubClient(access_token=request.session.get('github_access_token'))
 
   response['url'] = url = request.GET.get('url')
 
   if url:
     owner, repo, branch, filepath = api.parse_github_url(url)
-
-    response['status'] = 0
     content = api.get_file_contents(owner, repo, filepath, branch)
-    response['content'] = json.loads(content)
+    try:
+      response['content'] = json.loads(content)
+    except ValueError:
+      # Content is not JSON-encoded so return plain-text
+      response['content'] = content
+    response['status'] = 0
   else:
     return HttpResponseBadRequest(_('url param is required'))
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def github_authorize(request):
+  access_token = request.session.get('github_access_token')
+  if access_token and GithubClient.is_authenticated(access_token):
+    response = {
+      'status': 0,
+      'message': _('User is already authenticated to GitHub.')
+    }
+    return JsonResponse(response)
+  else:
+    auth_url = GithubClient.get_authorization_url()
+    return HttpResponseRedirect(auth_url)
+
+
+@api_error_handler
+def github_callback(request):
+  response = {'status': -1}
+
+  if 'code' in request.GET:
+    session_code = request.GET.get('code')
+    request.session['github_access_token'] = GithubClient.get_access_token(session_code)
+    response['status'] = 0
+    response['message'] = _('User successfully authenticated to GitHub.')
+  else:
+    response['message'] = _('Could not decode file content to JSON.')
 
   return JsonResponse(response)
