@@ -335,19 +335,24 @@ def github_authorize(request):
     return JsonResponse(response)
   else:
     auth_url = GithubClient.get_authorization_url()
+    request.session['github_callback_redirect'] = request.GET.get('currentURL')
+    request.session['github_callback_fetch'] = request.GET.get('fetchURL')
+    response = {
+      'status': -1,
+      'auth_url':auth_url
+    }
+    if (request.is_ajax()):
+      return JsonResponse(response)
+
     return HttpResponseRedirect(auth_url)
 
 
 @api_error_handler
 def github_callback(request):
-  response = {'status': -1}
-
+  redirect_base = request.session['github_callback_redirect'] + "&github_status="
   if 'code' in request.GET:
     session_code = request.GET.get('code')
     request.session['github_access_token'] = GithubClient.get_access_token(session_code)
-    response['status'] = 0
-    response['message'] = _('User successfully authenticated to GitHub.')
+    return HttpResponseRedirect(redirect_base + "0&github_fetch=" + request.session['github_callback_fetch'])
   else:
-    response['message'] = _('Could not decode file content to JSON.')
-
-  return JsonResponse(response)
+    return HttpResponseRedirect(redirect_base + "-1&github_fetch=" + request.session['github_callback_fetch'])
