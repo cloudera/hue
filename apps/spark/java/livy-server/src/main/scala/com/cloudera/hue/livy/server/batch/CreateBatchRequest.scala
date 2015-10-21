@@ -32,4 +32,6 @@ case class CreateBatchRequest(
     executorCores: Option[Int] = None,
     numExecutors: Option[Int] = None,
     archives: List[String] = List(),
-    queue: Option[String] = None)
+    queue: Option[String] = None,
+    name: Option[String] = None)
+
