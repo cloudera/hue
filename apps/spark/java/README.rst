@@ -20,9 +20,15 @@ Quick Start
 Livy is used for powering the Spark snippets of the `Hadoop Notebook`_ of `Hue 3.8`_, which you can see the
 `implementation here`_.
 
-See some `curl examples`_ and the API documentation is available below.
+See the API documentation below and some curl examples:
 
-.. _curl examples: http://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark/
+  * `Interactive shells`_
+  * `Batch jobs`_
+  * `Shared RDDs`_
+
+.. _Interactive shells: http://gethue.com/how-to-use-the-livy-spark-rest-job-server-for-interactive-spark/
+.. _Batch jobs: http://gethue.com/how-to-use-the-livy-spark-rest-job-server-api-for-sharing-spark-rdds-and-contexts/
+.. _Shared RDDs: http://gethue.com/how-to-use-the-livy-spark-rest-job-server-api-for-submitting-batch-jar-python-and-streaming-spark-jobs/
 .. _Hadoop Notebook: http://gethue.com/new-notebook-application-for-spark-sql/
 .. _Hue 3.8: http://gethue.com/hue-3-8-with-an-oozie-editor-revamp-better-performances-improved-spark-ui-is-out/
 .. _implementation here: https://github.com/cloudera/hue/blob/master/apps/spark/src/spark/job_server_api.py
@@ -138,7 +144,7 @@ takes Scala code:
 
 .. code:: shell
     % sudo pip install requests
-    
+
 .. code:: python
 
     >>> import json, pprint, requests, textwrap
@@ -360,6 +366,8 @@ Request Body
 +----------------+--------------------------------------------------------------------------------+------------------+
 | archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths    |
 +----------------+--------------------------------------------------------------------------------+------------------+
+| queue          | The YARN queue to submit too (YARN mode only)                                  | string           |
++----------------+--------------------------------------------------------------------------------+------------------+
 
 
 Response Body
@@ -502,7 +510,8 @@ Request Body
 +----------------+--------------------------------------------------+-----------------+
 | archives       | Archives to be uncompressed (YARN mode only)     | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
-
+| queue          | The YARN queue to submit too (YARN mode only)    | string          |
++----------------+--------------------------------------------------+-----------------+
 Response Body
 ^^^^^^^^^^^^^
 
