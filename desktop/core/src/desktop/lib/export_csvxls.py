@@ -30,7 +30,7 @@ from desktop.lib import i18n
 
 LOG = logging.getLogger(__name__)
 MAX_XLS_ROWS = 30000
-MAX_XLS_COLS = 255
+MAX_XLS_COLS = 5000
 
 
 def nullify(cell):
