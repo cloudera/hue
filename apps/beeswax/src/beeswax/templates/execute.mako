@@ -615,16 +615,16 @@ ${ layout.menubar(section='query') }
     <form class="form-horizontal">
       <div class="control-group" id="saveas-query-name">
         <label class="control-label">${_('Name')}</label>
-
         <div class="controls">
           <input data-bind="value: $root.design.name, html" type="text" class="input-xlarge">
+          <span class="help-inline"></span>
         </div>
       </div>
-      <div class="control-group">
+      <div class="control-group" id="saveas-query-description">
         <label class="control-label">${_('Description')}</label>
-
         <div class="controls">
           <input data-bind="value: $root.design.description, html" type="text" class="input-xlarge">
+          <span class="help-inline"></span>
         </div>
       </div>
     </form>
@@ -2118,8 +2118,8 @@ function trySaveAsDesign() {
   if (viewModel.design.query.value() && viewModel.design.name()) {
     viewModel.design.id(-1);
     viewModel.saveDesign();
-    $('#saveas-query-name').removeClass('error');
-    $('#saveAs').modal('hide');
+    $('#saveAs').find('.help-inline').text('');
+    $('#saveAs').find('.control-group').removeClass('error');
     logGA('design/save-as');
   } else if (viewModel.design.name()) {
     $.jHueNotify.error("${_('No query provided to save.')}");
@@ -2243,15 +2243,43 @@ $(document).on('server.unmanageable_error', function (e, responseText) {
 
 // Other
 $(document).on('saved.design', function (e, id) {
+  $('#saveAs').modal('hide');
   $(document).trigger('info', "${_('Query saved.')}");
   window.location.href = "/${ app_name }/execute/design/" + id;
 });
 $(document).on('error_save.design', function (e, message) {
   var _message = "${_('Could not save design')}";
-  if (message) {
-    _message += ": " + message;
+  if (typeof message == "object"){
+    $('#saveAs').find('.help-inline').text('');
+    $('#saveAs').find('.control-group').removeClass('error');
+    if (message.saveform){
+      if ($('#saveAs').is(":visible")){
+        if (message.saveform.name){
+          $('#saveas-query-name').addClass('error');
+          $('#saveas-query-name').find('.help-inline').text(message.saveform.name.join(' '));
+        }
+        if (message.saveform.description) {
+          $('#saveas-query-description').addClass('error');
+          $('#saveas-query-name').find('.help-inline').text(message.saveform.description.join(' '));
+        }
+      }
+      else {
+        if (message.saveform.name) {
+          _message += " - ${_('Name')}: " + message.saveform.name.join(' ');
+        }
+        if (message.saveform.description) {
+          _message += " - ${_('Description')}: " + message.saveform.description.join(' ');
+        }
+        $(document).trigger('error', _message);
+      }
+    }
   }
-  $(document).trigger('error', _message);
+  else {
+    if (message) {
+      _message += ": " + message;
+    }
+    $(document).trigger('error', _message);
+  }
 });
 $(document).on('error_save.results', function (e, message) {
   var _message = "${_('Could not save results')}";
