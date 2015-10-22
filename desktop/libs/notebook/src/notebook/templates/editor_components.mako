@@ -1609,10 +1609,10 @@ ${ require.config() }
                 window.setTimeout(function () {
                   if (cell.cell_type == "code") {
                     if (loaded.nbformat == 3) {
-                      addPySpark($.isArray(cell.input) ? cell.input.join("\n") : cell.input);
+                      addPySpark($.isArray(cell.input) ? cell.input.join("") : cell.input);
                     }
                     else {
-                      addPySpark($.isArray(cell.source) ? cell.source.join("\n") : cell.source);
+                      addPySpark($.isArray(cell.source) ? cell.source.join("") : cell.source);
                     }
                   }
                   if (cell.cell_type == "heading") {
