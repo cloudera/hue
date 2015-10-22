@@ -355,9 +355,9 @@ ${ require.config() }
 
       <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-      <h2 class="card-heading simple" data-bind="visible: type() != 'text' || $root.isEditing(), dblclick: function(){ $parent.newSnippetAbove(id()) }">
+      <h2 class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }">
 
-        <div class="dropdown inline widget-type" data-bind="visible: type() != 'text' || $root.isEditing()">
+        <div class="dropdown inline widget-type">
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
             <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
             <span class="hover-actions-no-transition">
