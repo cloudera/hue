@@ -462,7 +462,7 @@ ${ require.config() }
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
-    <div class="editor span12" data-bind="verticalSlide: codeVisible, click: function(){ ace().focus(); ace().execCommand('gotolineend') }">
+    <div class="editor span12" data-bind="verticalSlide: codeVisible, click: function(snippet, e){ setAceFocus(e, ace()); }">
       <div class="ace-editor" data-bind="attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
@@ -717,7 +717,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-footer-actions">
-  <div class="snippet-progress-container" data-bind="click: function(){ ace().focus(); ace().execCommand('gotolineend') }">
+  <div class="snippet-progress-container" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
     <div class="progress progress-striped active" style="height: 0" data-bind="css: {
       'progress-warning': progress() > 0 && progress() < 100,
       'progress-success': progress() == 100,
@@ -731,7 +731,7 @@ ${ require.config() }
     </ul>
   </div>
 
-  <div class="snippet-footer-actions-bar" data-bind="click: function(){ ace().focus(); ace().execCommand('gotolineend') }">
+  <div class="snippet-footer-actions-bar" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
     <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
@@ -1009,6 +1009,13 @@ ${ require.config() }
   }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
+
+  function setAceFocus(event, editor) {
+    if (!$(event.target).hasClass("ace_content")) {
+      editor.focus();
+      editor.execCommand("gotolineend");
+    }
+  }
 
   $.scrollbarWidth = function() {
     var _parent, _child, _width;
