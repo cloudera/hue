@@ -40,7 +40,9 @@
       }
     };
     self.snippet.type.subscribe(function() {
-      initDatabases();
+      if (self.snippet.isSqlDialect()) {
+        initDatabases();
+      }
     });
     initDatabases();
   }
