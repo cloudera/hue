@@ -506,7 +506,7 @@ from desktop.views import _ko
         var columnName = hierarchy.length == 3 ? hierarchy[2] : null;
 
         self.statsVisible(true);
-        self.assistSource.analysisStats(new TableStats(databaseName, tableName, columnName, self.assistSource.assistHelper, self.definition.type));
+        self.assistSource.analysisStats(new TableStats(self.assistSource, databaseName, tableName, columnName, self.definition.type));
 
         var catchChange = self.assistSource.analysisStats.subscribe(function(newValue) {
           if (newValue === null || newValue.database !== databaseName || newValue.table !== tableName || newValue.column !== columnName) {
@@ -515,17 +515,16 @@ from desktop.views import _ko
           }
         });
         $("#tableAnalysis").data("targetElement", $(event.target));
-        window.setTimeout(self.assistSource.refreshPosition, 20);
       };
 
-      function TableStats (snippet, database, table, column, assistHelper, type) {
+      function TableStats (assistSource, database, table, column, type) {
         var self = this;
 
-        self.snippet = snippet;
+        self.snippet = assistSource.snippet;
         self.database = database;
         self.table = table;
         self.column = column;
-        self.assistHelper = assistHelper;
+        self.assistHelper = assistSource.assistHelper;
 
         self.loading = ko.observable(false);
         self.hasError = ko.observable(false);
@@ -755,11 +754,11 @@ from desktop.views import _ko
         self.analysisStats = ko.observable();
 
         var lastOffset = { top: -1, left: -1 };
-        var $tableAnalysis = $("#tableAnalysis");
         self.refreshPosition = function () {
           if (self.analysisStats() == null) {
             return;
           }
+          var $tableAnalysis = $("#tableAnalysis");
           var targetElement = $tableAnalysis.data("targetElement");
           if (targetElement != null && targetElement.is(":visible")) {
             var newTop = targetElement.offset().top - $(window).scrollTop();
