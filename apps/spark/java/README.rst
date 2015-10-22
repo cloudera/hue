@@ -348,25 +348,27 @@ Request Body
 +----------------+--------------------------------------------------------------------------------+------------------+
 | proxyUser      | The user to impersonate that will run this session (e.g. bob)                  | string           |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| jars           | files to be placed on the java classpath                                       | list of paths    |
+| jars           | Files to be placed on the java classpath                                       | list of paths    |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| pyFiles        | files to be placed on the PYTHONPATH                                           | list of paths    |
+| pyFiles        | Files to be placed on the PYTHONPATH                                           | list of paths    |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| files          | files to be placed in executor working directory                               | list of paths    |
+| files          | Files to be placed in executor working directory                               | list of paths    |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| driverMemory   | memory for driver (e.g. 1000M, 2G)                                             | string           |
+| driverMemory   | Memory for driver (e.g. 1000M, 2G)                                             | string           |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| driverCores    | number of cores used by driver (YARN mode only)                                | int              |
+| driverCores    | Number of cores used by driver (YARN mode only)                                | int              |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| executorMemory | memory for executor (e.g. 1000M, 2G)                                           | string           |
+| executorMemory | Memory for executor (e.g. 1000M, 2G)                                           | string           |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| executorCores  | number of cores used by executor                                               | int              |
+| executorCores  | Number of cores used by executor                                               | int              |
 +----------------+--------------------------------------------------------------------------------+------------------+
-| numExecutors   | number of executors (YARN mode only)                                           | int              |
+| numExecutors   | Number of executors (YARN mode only)                                           | int              |
 +----------------+--------------------------------------------------------------------------------+------------------+
 | archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths    |
 +----------------+--------------------------------------------------------------------------------+------------------+
 | queue          | The YARN queue to submit too (YARN mode only)                                  | string           |
++----------------+--------------------------------------------------------------------------------+------------------+
+| name           | Name of the application                                                        | string           |
 +----------------+--------------------------------------------------------------------------------+------------------+
 
 
@@ -486,32 +488,36 @@ Request Body
 +================+==================================================+=================+
 | proxyUser      | The user to impersonate that will execute the job| string          |
 +----------------+--------------------------------------------------+-----------------+
-| file           | archive holding the file                         | path (required) |
+| file           | Archive holding the file                         | path (required) |
 +----------------+--------------------------------------------------+-----------------+
-| args           | command line arguments                           | list of strings |
+| args           | Command line arguments                           | list of strings |
 +----------------+--------------------------------------------------+-----------------+
-| className      | application's java/spark main class              | string          |
+| className      | Application's java/spark main class              | string          |
 +----------------+--------------------------------------------------+-----------------+
-| jars           | files to be placed on the java classpath         | list of paths   |
+| jars           | Files to be placed on the java classpath         | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
-| pyFiles        | files to be placed on the PYTHONPATH             | list of paths   |
+| pyFiles        | Files to be placed on the PYTHONPATH             | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
-| files          | files to be placed in executor working directory | list of paths   |
+| files          | Files to be placed in executor working directory | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
-| driverMemory   | memory for driver (e.g. 1000M, 2G)               | string          |
+| driverMemory   | Memory for driver (e.g. 1000M, 2G)               | string          |
 +----------------+--------------------------------------------------+-----------------+
-| driverCores    | number of cores used by driver                   | int             |
+| driverCores    | Number of cores used by driver                   | int             |
 +----------------+--------------------------------------------------+-----------------+
-| executorMemory | memory for executor (e.g. 1000M, 2G)             | string          |
+| executorMemory | Memory for executor (e.g. 1000M, 2G)             | string          |
 +----------------+--------------------------------------------------+-----------------+
-| executorCores  | number of cores used by executor                 | int             |
+| executorCores  | Number of cores used by executor                 | int             |
 +----------------+--------------------------------------------------+-----------------+
-| numExecutors   | number of executor                               | int             |
+| numExecutors   | Number of executor                               | int             |
 +----------------+--------------------------------------------------+-----------------+
 | archives       | Archives to be uncompressed (YARN mode only)     | list of paths   |
 +----------------+--------------------------------------------------+-----------------+
 | queue          | The YARN queue to submit too (YARN mode only)    | string          |
 +----------------+--------------------------------------------------+-----------------+
+| name           | Name of the application                          | string          |
++----------------+--------------------------------------------------+-----------------+
+
+
 Response Body
 ^^^^^^^^^^^^^
 
