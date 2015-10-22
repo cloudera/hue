@@ -773,7 +773,7 @@ function BeeswaxViewModel(server, assistHelper) {
             $(document).trigger('saved.design', [data.design_id]);
           } else {
             self.setErrors("", data.errors);
-            $(document).trigger('error_save.design', [data.message]);
+            $(document).trigger('error_save.design', [data.message ? data.message : data.errors]);
           }
         },
         error: function() {
