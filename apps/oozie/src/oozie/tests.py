@@ -268,6 +268,7 @@ class MockFs():
         self.isDir = True
     return MockWebHdfsStat()
 
+
 class OozieMockBase(object):
 
   def setUp(self):

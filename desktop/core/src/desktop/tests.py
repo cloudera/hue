@@ -907,6 +907,19 @@ class TestDocument(object):
     assert_equal(Document.objects.filter(name=name).count(), 1)
     assert_equal(doc.description, self.document.description)
 
+  def test_add_to_history(self):
+    assert_equal(len(self.document2.get_history()), 0)
+
+    doc_id = self.document2.id
+    history_doc = self.document2.add_to_history(self.user, {'key1': 'val1'})
+
+    assert_equal(len(Document2.objects.get(id=doc_id).dependencies.all()), 1) # Need to get original document dynamically
+    assert_equal(len(Document2.objects.get(id=doc_id).get_history()), 1)
+
+    assert_equal(history_doc, Document2.objects.get(id=doc_id).get_history()[0])
+
+    assert_not_equal(doc_id, history_doc.id)
+
 
 def test_session_secure_cookie():
   with tempfile.NamedTemporaryFile() as cert_file:

@@ -53,6 +53,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <i class="fa fa-fw fa-cog"></i>
     </a>
 
+    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}">
+      <i class="fa fa-fw fa-history"></i>
+    </a>
+
     <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
         data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }">
@@ -341,6 +345,21 @@ ${ workflow.render() }
 </div>
 
 
+<div id="historyModal" class="modal fade hide">
+  <div class="modal-header" style="padding-bottom: 2px">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${ _('Submission History') }</h3>
+  </div>
+  <div class="modal-body">
+    <ul data-bind="foreach: $root.history" class="unstyled">
+      <li>
+        <span data-bind="text: ko.mapping.toJSON($data)"></span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+
 <div class="submit-modal modal hide"></div>
 
 <div id="chooseFile" class="modal hide fade">
@@ -397,7 +416,7 @@ ${ dashboard.import_bindings() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }, ${ history_json | n,unicode });
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");

@@ -789,6 +789,10 @@ class Document2(models.Model):
 
     self.data = json.dumps(data_dict)
 
+  def __str__(self):
+    res = '%s - %s - %s' % (force_unicode(self.name), self.owner, self.uuid)
+    return force_unicode(res)
+
   def get_absolute_url(self):
     if self.type == 'oozie-coordinator2':
       return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
@@ -818,6 +822,21 @@ class Document2(models.Model):
 
   def can_read_or_exception(self, user):
     self.doc.get().can_read_or_exception(user)
+
+  def get_history(self):
+    return self.dependencies.filter(is_history=True).order_by('-last_modified')
+
+  def add_to_history(self, user, data_dict):
+    doc_id = self.id # Need to copy as the clone messes it
+
+    history_doc = self.copy(name=self.name, owner=user)
+    history_doc.update_data({'history': data_dict})
+    history_doc.is_history = True
+    history_doc.last_modified = None
+    history_doc.save()
+
+    Document2.objects.get(id=doc_id).dependencies.add(history_doc)
+    return history_doc
 
 
 def get_data_link(meta):
