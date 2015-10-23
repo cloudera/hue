@@ -67,14 +67,14 @@ ENABLE_DBPROXY_SERVER = Config(
 
 GITHUB_REMOTE_URL = Config(
     key="github_remote_url",
-    help="Base URL to GitHub Remote Server",
+    help=_t("Base URL to GitHub Remote Server"),
     default='https://github.com',
     type=coerce_string,
 )
 
 GITHUB_API_URL = Config(
     key="github_api_url",
-    help="Base URL to GitHub API",
+    help=_t("Base URL to GitHub API"),
     default='https://api.github.com',
     type=coerce_string,
 )
