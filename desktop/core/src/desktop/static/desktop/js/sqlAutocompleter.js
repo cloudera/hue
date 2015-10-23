@@ -188,22 +188,38 @@
       tableName = tableAndComplexRefs[0].value;
     }
     if (tableName) {
-      self.snippet.getAssistHelper().fetchFields(self.snippet, tableName, fields, function(data) {
-        if (data.sample) {
-          var isString = data.type === "string";
-          var values = $.map(data.sample.sort(), function(value, index) {
-            return {
-              meta: "value",
-              score: 900 - index,
-              value: isString ? "'" + value + "'" : new String(value)
+      var completeFields = [];
+      // For impala we need to check each part with the API, it could be a map or array in which case we need to add
+      // either "value" or "item" in between.
+      var fetchImpalaFields = function (remainingParts) {
+        completeFields.push(remainingParts.shift());
+        if (remainingParts.length > 0 && remainingParts[0] == "value" || remainingParts[0] == "key") {
+          fetchImpalaFields(remainingParts);
+        } else {
+          self.snippet.getAssistHelper().fetchFields(self.snippet, tableName, completeFields, function (data) {
+            if (data.type === "map") {
+              completeFields.push("value");
+              fetchImpalaFields(remainingParts);
+            } else if (data.type === "array") {
+              completeFields.push("item");
+              fetchImpalaFields(remainingParts);
+            } else if (remainingParts.length == 0 && data.sample) {
+              var isString = data.type === "string";
+              var values = $.map(data.sample.sort(), function(value, index) {
+                return {
+                  meta: "value",
+                  score: 900 - index,
+                  value: isString ? "'" + value + "'" : new String(value)
+                }
+              });
+              callback(tableAndComplexRefs.concat(values));
+            } else {
+              callback(tableAndComplexRefs);
             }
           });
-          callback(tableAndComplexRefs.concat(values));
-        } else {
-          callback(tableAndComplexRefs);
         }
-      });
-      return;
+      };
+      fetchImpalaFields(fields);
     }
   };
 
