@@ -1968,7 +1968,7 @@
 
       editor.commands.on("afterExec", function (e) {
         if (e.command.name === "insertstring") {
-          var triggerAutocomplete = /\.$/.test(e.args);
+          var triggerAutocomplete = ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") || /["']\/[^\/]*/.test(editor.getTextBeforeCursor());
           if(e.args.toLowerCase().indexOf("? from ") == 0) {
             editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
             editor.removeTextBeforeCursor(1);
@@ -1982,9 +1982,6 @@
           }
         }
         editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
-        if (e.args === '/' || ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".")) {
-          editor.execCommand("startAutocomplete");
-        }
         // if it's pig and before it's LOAD ' we disable the autocomplete and show a filechooser btn
         if (editor.session.getMode().$id = "ace/mode/pig" && e.args) {
           var textBefore = editor.getTextBeforeCursor();
