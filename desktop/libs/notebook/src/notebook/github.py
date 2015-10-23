@@ -40,7 +40,7 @@ class GithubClient(object):
   https://developer.github.com/v3/
   """
 
-  OWNER_RE = "(?P<owner>[a-z0-9](?:-?[a-z0-9]){0,38})"
+  OWNER_RE = "(?P<owner>[A-Za-z0-9](?:-?[A-Za-z0-9]){0,38})"
   REPO_RE = "(?P<repo>[\w\.@\:\-~]+)"
   BRANCH_RE = "(?P<branch>[\w\.@\:\-~]+)"
   FILEPATH_RE = "(?P<filepath>.+)"
