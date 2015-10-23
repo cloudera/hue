@@ -704,7 +704,9 @@ ${ layout.menubar(section='query') }
       </div>
     </div>
     <div class="modal-footer">
+      % if app_name != 'impala':
       <a id="save-results-advanced" href="javascript:void(0)" class="pull-left">${ _('Show advanced fields') }</a>
+      % endif
       <a id="save-results-simple" href="javascript:void(0)" class="pull-left hide">${ _('Hide advanced fields') }</a>
       <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
       <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
