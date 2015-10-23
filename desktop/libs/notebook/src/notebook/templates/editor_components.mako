@@ -339,13 +339,13 @@ ${ require.config() }
 <script type="text/html" id="snippetIcon">
 
   <!-- ko if: viewSettings().snippetImage -->
-  <img class="snippet-icon" data-bind="attr: { 'src': viewSettings().snippetImage }">
+  <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }">
   <!-- /ko -->
   <!-- ko if: viewSettings().snippetIcon -->
   <i class="fa snippet-icon" data-bind="css: viewSettings().snippetIcon"></i>
   <!-- /ko -->
 
-  <sup style="color: #338bb8; margin-left: -2px" data-bind="text: $root.getSnippetName(type())"></sup>
+  <sup style="margin-left: -2px" data-bind="text: $root.getSnippetName(type())"></sup>
 </script>
 
 
@@ -357,7 +357,7 @@ ${ require.config() }
 
       <h2 class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }">
 
-        <div class="dropdown inline widget-type">
+        <div class="hover-actions dropdown inline widget-type">
           <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
             <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
             <span class="hover-actions-no-transition">
