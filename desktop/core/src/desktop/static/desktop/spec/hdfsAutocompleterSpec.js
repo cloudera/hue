@@ -93,6 +93,15 @@ define([
       });
     });
 
+    it("should return empty suggestions for URIs with schemes ", function() {
+      assertAutoComplete({
+        serverResponses: {},
+        beforeCursor: "://blabla",
+        afterCursor: "",
+        expectedSuggestions: []
+      });
+    });
+
     it("should return suggestions for root with '", function() {
       assertAutoComplete({
         serverResponses: {
