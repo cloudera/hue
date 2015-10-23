@@ -723,6 +723,23 @@ define([
           expectedSuggestions: ["testTable", "1", "2", "3"]
         });
       });
+
+      it("should suggest values from fields in map values in conditions", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+              type: "map"
+            },
+            "/notebook/api/autocomplete/testDb/testTable/testMap/value/field" : {
+              sample: [1, 2, 3],
+              type: "int"
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable t, t.testMap m WHERE m.field = ",
+          afterCursor: "",
+          expectedSuggestions: ["t.", "m.", "1", "2", "3"]
+        });
+      })
     });
 
     describe("field completion", function() {
