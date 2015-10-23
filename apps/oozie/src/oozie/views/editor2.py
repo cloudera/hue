@@ -103,7 +103,12 @@ def _edit_workflow(request, doc, workflow):
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user)),
+      'history_json': json.dumps([{
+          'history': hist.data_dict.get('history', '{}'),
+          'id': hist.id,
+          'date': hist.last_modified.strftime('%Y-%m-%dT%H:%M')
+        } for hist in doc.get_history()], cls=JSONEncoderForHTML)
   })
 
 
@@ -336,6 +341,7 @@ def submit_workflow(request, doc_id):
 
   return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id}))
 
+
 @check_document_access_permission()
 def submit_single_action(request, doc_id, node_id):
   parent_doc = Document2.objects.get(id=doc_id)
@@ -351,6 +357,7 @@ def submit_single_action(request, doc_id, node_id):
   Document.objects.link(wf_doc, owner=wf_doc.owner, name=wf_doc.name, description=wf_doc.description, extra='workflow2')
 
   return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
+
 
 def _submit_workflow_helper(request, workflow, submit_action):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
@@ -388,6 +395,9 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
   try:
     submission = Submission(user, workflow, fs, jt, mapping)
     job_id = submission.run()
+
+    workflow.document.add_to_history(submission.user, {'properties': submission.properties, 'oozie_id': submission.oozie_id})
+
     return job_id
   except RestException, ex:
     detail = ex._headers.get('oozie-error-message', ex)
