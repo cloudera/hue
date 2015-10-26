@@ -1985,6 +1985,22 @@
           editor.previousSize = editor.session.getLength();
           $(document).trigger("editorSizeChanged");
         }
+        // automagically change snippet type
+        var firstLine = editor.session.getLine(0);
+        if (firstLine.indexOf("%") == 0 && firstLine.charAt(firstLine.length - 1) == " ") {
+          var availableSnippets = snippet.availableSnippets;
+          var removeFirstLine = false;
+          for (var i = 0; i < availableSnippets.length; i++) {
+            if ($.trim(firstLine.substr(1)) == availableSnippets[i].type()) {
+              snippet.type(availableSnippets[i].type());
+              removeFirstLine = true;
+              break;
+            }
+          }
+          if (removeFirstLine) {
+            editor.session.remove(new AceRange(0, 0, 0, 200));
+          }
+        }
       });
 
       editor.commands.addCommand({
