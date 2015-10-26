@@ -22,7 +22,7 @@
   }
 }(this, function () {
 
-  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP|SORT)\b/g;
+  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT)\b/g;
 
   /**
    * @param options {object}
@@ -55,7 +55,7 @@
     var fromMatch = statement.match(/\s*from\s*([^;]*).*$/i);
     if (fromMatch) {
       var refsRaw = fromMatch[1];
-      var upToMatch = refsRaw.match(/\bLATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP|SORT|ORDER BY\b/i);
+      var upToMatch = refsRaw.match(/\bLATERAL|VIEW|EXPLODE|POSEXPLODE|ON|LIMIT|WHERE|GROUP BY|SORT|ORDER BY\b/i);
       if (upToMatch) {
         refsRaw = $.trim(refsRaw.substring(0, upToMatch.index));
       }
@@ -316,6 +316,7 @@
 
     var fieldTermBefore = keywordBeforeCursor === "WHERE" ||
       keywordBeforeCursor === "ON" ||
+      keywordBeforeCursor === "GROUP BY" ||
       keywordBeforeCursor === "ORDER BY";
 
     var fromAfter = afterMatcher != null && afterMatcher[0] === "FROM";
