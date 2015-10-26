@@ -99,8 +99,6 @@ from desktop.views import _ko
   });
 </script>
 
-<script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 
 
@@ -2020,5 +2018,11 @@ ${ require.config() }
     $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
     $('#snippet_' + snippet.id()).find('.download-form').submit();
   }
+
+  var mathjax = document.createElement("script");
+  mathjax.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+  mathjax.async = false;
+  document.head.appendChild(mathjax);
 </script>
+
 </%def>
