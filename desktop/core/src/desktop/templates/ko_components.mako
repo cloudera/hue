@@ -192,7 +192,7 @@ from desktop.views import _ko
       </li>
 
       <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
-        <select data-bind="options: assistHelper.availableDatabases, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+        <div data-bind="select2: { options: assistHelper.availableDatabases, value: assistHelper.activeDatabase, width: '100%', placeholder: '${ _ko("Choose a database...") }' }" class="input-medium" data-placeholder="${_('Choose a database...')}"></div>
       </li>
 
       <li class="center" data-bind="visible: assistHelper.loading()" >
