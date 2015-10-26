@@ -151,6 +151,8 @@
     self.ace = ko.observable(null);
     self.errors = ko.observableArray([]);
 
+    self.availableSnippets = vm.availableSnippets();
+
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };
