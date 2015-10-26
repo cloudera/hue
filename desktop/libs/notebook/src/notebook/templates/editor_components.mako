@@ -367,7 +367,7 @@ ${ require.config() }
           </ul>
         </div>
 
-        <span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
+        <div class="hover-actions"><span data-bind="editable: name, editableOptions: { emptytext: '${_ko('Untitled')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;"></span></div>
 
         <div class="hover-actions inline pull-right" style="font-size: 15px;">
           <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>

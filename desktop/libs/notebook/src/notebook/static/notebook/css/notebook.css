@@ -344,12 +344,18 @@ body {
   -ms-transition: color 0.2s ease;
 }
 
+.hover-actions .editable {
+  color: #D1D1D1;
+}
+
+.hover-actions:hover .editable,
 .hover-actions:hover .snippet-icon {
   color: #338bb8;
 }
 
 .hover-actions sup,
-.hover-actions .caret {
+.hover-actions .caret,
+.hover-actions .editable {
   -webkit-transition: color 0.2s ease;
   -moz-transition: color 0.2s ease;
   -ms-transition: color 0.2s ease;
