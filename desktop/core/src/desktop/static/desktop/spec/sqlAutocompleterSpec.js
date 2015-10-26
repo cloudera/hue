@@ -201,6 +201,15 @@ define([
         });
       });
 
+      it("should suggest aliases in GROUP BY", function() {
+        assertAutoComplete({
+          serverResponses: {},
+          beforeCursor: "SELECT * FROM testTableA tta, testTableB GROUP BY ",
+          afterCursor: "",
+          expectedSuggestions: ["testTableB.", "tta."]
+        });
+      });
+
       it("should only suggest table aliases", function() {
         assertAutoComplete({
           serverResponses: {},
@@ -778,6 +787,19 @@ define([
             }
           },
           beforeCursor: "SELECT * FROM testTable ORDER BY ",
+          afterCursor: "",
+          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+        });
+      });
+
+      it("should suggest columns for table after GROUP BY ", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/testDb/testTable" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT * FROM testTable GROUP BY ",
           afterCursor: "",
           expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
         });
