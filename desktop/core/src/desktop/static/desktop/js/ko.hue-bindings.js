@@ -1239,6 +1239,37 @@
   ko.bindingHandlers.select2 = {
     init: function (element, valueAccessor, allBindingsAccessor, vm) {
       var options = ko.toJS(valueAccessor()) || {};
+      var $element = $(element);
+
+      // When the options are in the binding value accessor the data attribute will be used instead of any <select>
+      // tag it's attached to.
+      if (ko.isObservable(valueAccessor().options) && ko.isObservable(valueAccessor().value)) {
+        var optionsObservable = valueAccessor().options;
+        var valueObservable = valueAccessor().value;
+        options.data = $.map(optionsObservable(), function (value) {
+          return { id: value, text: value }
+        });
+        options.val = valueObservable();
+
+        var refreshSelect2Data = function () {
+          $element.select2("data", $.map(optionsObservable(), function (value) {
+            return { id: value, text: value }
+          }));
+          $element.select2("val", valueObservable());
+        };
+
+        valueObservable.subscribe(function (newValue) {
+          if (newValue !== $element.select2("val")) {
+            refreshSelect2Data();
+          }
+        });
+
+        optionsObservable.subscribe(refreshSelect2Data);
+
+        window.setTimeout(function () {
+          refreshSelect2Data();
+        }, 10)
+      }
 
       if (typeof valueAccessor().update != "undefined") {
         if (options.type == "user" && viewModel.selectableHadoopUsers().indexOf(options.update) == -1) {
@@ -1283,11 +1314,16 @@
           }
         }
       }
-      $(element)
+      $element
           .select2(options)
           .on("change", function (e) {
-            if (typeof e.val != "undefined" && typeof valueAccessor().update != "undefined") {
-              valueAccessor().update(e.val);
+            if (typeof e.val != "undefined") {
+              if (typeof valueAccessor().update != "undefined") {
+                valueAccessor().update(e.val);
+              }
+              if (typeof valueAccessor().value != "undefined") {
+                valueAccessor().value(e.val);
+              }
             }
           })
           .on("select2-focus", function (e) {
