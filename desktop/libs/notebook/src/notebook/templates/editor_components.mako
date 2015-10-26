@@ -395,7 +395,7 @@ ${ require.config() }
         <div class="clearfix"></div>
       </div>
 
-      <div data-bind="delayedOverflow, visible: showLogs, css: resultsKlass" style="margin-top: 5px; position: relative">
+      <div data-bind="delayedOverflow, visible: showLogs, css: resultsKlass" style="margin-top: 5px; position: relative; display: none;">
         <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
           <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
         </ul>
@@ -403,15 +403,15 @@ ${ require.config() }
         <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
       </div>
 
-      <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass">
+      <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass" style="display:none;">
         <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
       </div>
 
-      <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass">
+      <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass" style="display:none;">
         <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
       </div>
 
-      <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass">
+      <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
         <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
       </div>
     </div>
