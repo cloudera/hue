@@ -34,6 +34,14 @@ LOG = logging.getLogger(__name__)
 CACHED_LDAP_CONN = None
 
 
+class LdapBindException(Exception):
+  pass
+
+
+class LdapSearchException(Exception):
+  pass
+
+
 def get_connection_from_server(server=None):
 
   ldap_servers = desktop.conf.LDAP.LDAP_SERVERS.get()
@@ -129,7 +137,7 @@ class LdapConnection(object):
       except:
         msg = "Failed to bind to LDAP server as user %s" % bind_user
         LOG.exception(msg)
-        raise RuntimeError(msg)
+        raise LdapBindException(msg)
     else:
       try:
         # Do anonymous bind
@@ -137,7 +145,7 @@ class LdapConnection(object):
       except:
         msg = "Failed to bind to LDAP server anonymously"
         LOG.exception(msg)
-        raise RuntimeError(msg)
+        raise LdapBindException(msg)
 
   def _get_search_params(self, name, attr, find_by_dn=False):
     """
@@ -150,7 +158,7 @@ class LdapConnection(object):
       search_dn = re.sub(r'(\w+=)', lambda match: match.group(0).upper(), name)
 
       if not search_dn.upper().endswith(base_dn.upper()):
-        raise RuntimeError("Distinguished Name provided does not contain configured Base DN. Base DN: %(base_dn)s, DN: %(dn)s" % {
+        raise LdapSearchException("Distinguished Name provided does not contain configured Base DN. Base DN: %(base_dn)s, DN: %(dn)s" % {
           'base_dn': base_dn,
           'dn': search_dn
         })
