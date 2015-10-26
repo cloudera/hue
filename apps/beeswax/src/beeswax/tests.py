@@ -1159,12 +1159,22 @@ for x in sys.stdin:
     resp = self.client.get('/metastore/tables/')
     assert_true('sample_08' in resp.content)
     assert_true('sample_07' in resp.content)
+    assert_true('customers' in resp.content)
+
+    # Sample tables contain data (examples are installed in default DB)
+    resp = self.client.get('/metastore/table/default/sample_07')
+    assert_true('<table id="sampleTable' in resp.content, resp.content)
+    resp = self.client.get('/metastore/table/default/sample_08')
+    assert_true('<table id="sampleTable' in resp.content, resp.content)
+    resp = self.client.get('/metastore/table/default/customers')
+    assert_true('<table id="sampleTable' in resp.content, resp.content)
 
     # New designs exists
     resp = self.client.get('/beeswax/list_designs')
     assert_true('Sample: Job loss' in resp.content, resp.content)
     assert_true('Sample: Salary growth' in resp.content)
     assert_true('Sample: Top salary' in resp.content)
+    assert_true('Sample: Customers' in resp.content)
 
     # Now install it a second time, and no error
     resp = self.client.post('/beeswax/install_examples')
