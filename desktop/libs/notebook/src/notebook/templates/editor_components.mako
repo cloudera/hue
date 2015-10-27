@@ -101,6 +101,7 @@ from desktop.views import _ko
 
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 
+<script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
 ${ require.config() }
 
@@ -129,65 +130,66 @@ ${ require.config() }
 
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
-      <i class="fa fa-expand"></i>
+    <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
+      <i class="fa fa-pencil"></i>
     </a>
-    &nbsp;&nbsp;
+
+    <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
+      <i class="fa fa-cogs"></i>
+    </a>
+
     <div class="btn-group">
       <a class="btn dropdown-toggle" data-toggle="dropdown">
-        <i class="fa fa-check-square-o"></i>
-        <i class="fa fa-caret-down"></i>
+        <i class="fa fa-bars"></i>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu pull-right">
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-            <i class="fa fa-play fa-fw"></i> ${ _('Execute all snippets') }
+          <a href="javascript:void(0)" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+            <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
           </a>
         </li>
         <li>
           <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-            <i class="fa fa-eraser fa-fw"></i> ${ _('Clear all results') }
+            <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+            <i class="fa fa-fw fa-eraser"></i> ${ _('Clear all results') }
           </a>
         </li>
         <li>
           <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
-            <i class="fa fa-file-text-o fa-fw"></i> ${ _('Display all Notebook content') }
+            <i class="fa fa-fw fa-file-text-o"></i> ${ _('Display all Notebook content') }
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-toggle="modal" data-target="#importGithubModal">
+            <i class="fa fa-fw fa-github"></i> ${ _('Import from Github') }
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: exportJupyterNotebook">
+            <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
           </a>
         </li>
       </ul>
-   </div>
+    </div>
 
-   &nbsp;&nbsp;&nbsp;
 
-   <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
-     <i class="fa fa-pencil"></i>
-   </a>
+    &nbsp;&nbsp;&nbsp;
 
-   <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
-     <i class="fa fa-cloud"></i>
-   </a>
+    <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
+      <i class="fa fa-save"></i>
+    </a>
 
-   &nbsp;&nbsp;&nbsp;
+    <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
+      <i class="fa fa-file-o"></i>
+    </a>
 
-   <a class="btn pointer" title="${ _('Import from Github') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#importGithubModal">
-     <i class="fa fa-github"></i>
-   </a>
-
-   &nbsp;&nbsp;&nbsp;
-
-   <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
-     <i class="fa fa-save"></i>
-   </a>
-
-   &nbsp;&nbsp;&nbsp;
-
-   <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
-     <i class="fa fa-file-o"></i>
-   </a>
-
-   <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
-     <i class="fa fa-tags"></i>
-   </a>
+    <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
+      <i class="fa fa-tags"></i>
+    </a>
   </div>
 
 
@@ -1525,6 +1527,55 @@ ${ require.config() }
     });
 
     var viewModel;
+
+    var exportJupyterNotebook = function () {
+      function addCell(type, code) {
+        var cell = {
+          cell_type: type,
+          source: [
+            code
+          ],
+          metadata: {
+            collapsed: false
+          }
+        }
+        if (type == "code") {
+          cell.outputs = [];
+          cell.execution_count = 0;
+        }
+        return cell;
+      }
+
+      function addCodeCell(code) {
+        return addCell("code", code);
+      }
+
+      function addMarkdownCell(code) {
+        return addCell("markdown", code);
+      }
+
+      var currentNotebook = viewModel.notebooks()[0];
+      var jupyterNotebook = {
+        nbformat: 4,
+        nbformat_minor: 0,
+        cells: [],
+        metadata: {}
+      }
+
+      currentNotebook.snippets().forEach(function (snippet) {
+        if (snippet.type() == "pyspark") {
+          jupyterNotebook.cells.push(addCodeCell(snippet.statement_raw()));
+        }
+        if (snippet.type() == "markdown") {
+          jupyterNotebook.cells.push(addMarkdownCell(snippet.statement_raw()));
+        }
+      });
+
+
+      download(JSON.stringify(jupyterNotebook), currentNotebook.name() + ".ipynb", "text/plain");
+    }
+
+    window.exportJupyterNotebook = exportJupyterNotebook;
 
     var importExternalNotebook = function (notebook) {
       var currentNotebook = viewModel.notebooks()[0];
