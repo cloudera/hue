@@ -741,8 +741,8 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-footer-actions">
-  <div class="snippet-progress-container" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
-    <div class="progress progress-striped active" style="height: 0" data-bind="css: {
+  <div class="snippet-progress-container" data-bind="slideVisible: progress() > 0 || errors().length > 0, click: function(snippet, e){ setAceFocus(e, ace()); }">
+    <div class="progress progress-striped active" data-bind="css: {
       'progress-warning': progress() > 0 && progress() < 100,
       'progress-success': progress() == 100,
       'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
