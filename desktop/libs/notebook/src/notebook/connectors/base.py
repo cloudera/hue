@@ -100,7 +100,7 @@ def get_api(user, snippet, fs, jt):
     return SparkApi(user)
   elif interface == 'livy-batch':
     return SparkBatchApi(user)
-  elif interface == 'text':
+  elif interface == 'text' or interface == 'markdown':
     return TextApi(user)
   elif interface == 'mysql':
     return MySqlApi(user)
