@@ -97,24 +97,30 @@ Livy`_. Then run:
 .. code:: shell
 
     % export SPARK_HOME=/usr/lib/spark
+    % export HADOOP_CONF_DIR=/etc/hadoop/conf
     % mvn test
 
 
 Running Livy
 ============
 
-In order to run Livy with local sessions, start the server with:
+In order to run Livy with local sessions, first export these variables:
 
 .. code:: shell
 
-    % export SPARK_HOME=/usr/lib/spark
+   % export SPARK_HOME=/usr/lib/spark
+   % export HADOOP_CONF_DIR=/etc/hadoop/conf
+
+Then start the server with:
+
+.. code:: shell
+
     % ./bin/livy-server
 
 Or with YARN sessions by running:
 
 .. code:: shell
 
-   % export SPARK_HOME=/usr/lib/spark
    % env \
      LIVY_SERVER_JAVA_OPTS="-Dlivy.server.session.factory=yarn" \
      CLASSPATH=`hadoop classpath` \
