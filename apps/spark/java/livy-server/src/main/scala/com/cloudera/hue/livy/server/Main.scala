@@ -48,7 +48,7 @@ object Main {
     testSparkHome(livyConf)
     testSparkSubmit(livyConf)
 
-    val server = new WebServer(host, port)
+    val server = new WebServer(livyConf, host, port)
 
     server.context.setResourceBase("src/main/com/cloudera/hue/livy/server")
     server.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
@@ -171,10 +171,7 @@ class ScalatraBootstrap
       context.mount(new BatchSessionServlet(batchManager), "/batches/*")
       context.mountMetricsAdminServlet("/")
 
-      context.setInitParameter(org.scalatra.EnvironmentKey, livyConf.get("livy.environment", "development"))
-      context.setInitParameter(ScalatraBase.HostNameKey, livyConf.get("livy.hostname"))
-
-
+      context.initParameters(org.scalatra.EnvironmentKey) = livyConf.get("livy.environment", "development")
     } catch {
       case e: Throwable =>
         println(f"Exception thrown when initializing server: $e")
