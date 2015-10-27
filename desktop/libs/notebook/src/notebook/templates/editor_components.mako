@@ -350,7 +350,7 @@ ${ require.config() }
 
 
 <script type="text/html" id="snippet">
-  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { selector: '.hover-actions' }">
+  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
     <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
       <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
@@ -487,7 +487,7 @@ ${ require.config() }
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="verticalSlide: codeVisible, click: function(snippet, e){ setAceFocus(e, ace()); }">
-      <div class="ace-editor" data-bind="attr: { id: id() }, delayedOverflow, aceEditor: {
+      <div class="ace-editor" data-bind="css: {'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
         }"></div>
@@ -540,7 +540,7 @@ ${ require.config() }
         </ul>
       </div>
       <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': !isResultSettingsVisible()}">
-        <div data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id() }, click: toggleResultSettings" class="toggle-result-settings show-result-settings">
+        <div data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id() }, click: toggleResultSettings" class="hover-actions toggle-result-settings show-result-settings">
           <a class="inactive-action pointer" title="${_('Show columns')}" data-bind="visible: !isResultSettingsVisible()">
             <i class="fa fa-chevron-right"></i>
           </a>
@@ -565,7 +565,7 @@ ${ require.config() }
     <div data-bind="visible: showChart" style="display:none;">
       <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
         <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'hover-actions inline toggle-result-settings toggleResultSettingsChart' + id() }, click: toggleResultSettings">
-          <a class="inactive-action" title="${_('Hide settings')}" class="pointer">
+          <a class="inactive-action pointer" title="${_('Hide')}" data-bind="visible: isResultSettingsVisible">
             <i class="fa fa-chevron-left"></i>
           </a>
         </div>
@@ -653,7 +653,7 @@ ${ require.config() }
 
       <div data-bind="css:{'span10 chart-container': isResultSettingsVisible, 'span12 nomargin chart-container': !isResultSettingsVisible() }">
         <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isResultSettingsVisible(), click: toggleResultSettings, attr: { 'class': 'hover-actions inline toggle-result-settings toggleResultSettingsChart' + id()}">
-          <a class="inactive-action" title="${_('Show settings')}" class="pointer">
+          <a class="inactive-action pointer" title="${_('Show settings')}" data-bind="visible: !isResultSettingsVisible()">
             <i class="fa fa-chevron-right"></i>
           </a>
         </div>
