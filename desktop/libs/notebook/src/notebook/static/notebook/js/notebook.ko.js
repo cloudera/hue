@@ -23,7 +23,7 @@
 }(this, function (ko, AssistHelper, Autocompleter) {
 
   var SPARK_MAPPING = {
-    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user"]
+    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user", "inFocus"]
   };
 
   var Result = function (snippet, result) {
@@ -153,6 +153,7 @@
     self.errors = ko.observableArray([]);
 
     self.availableSnippets = vm.availableSnippets();
+    self.inFocus = ko.observable(false);
 
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;

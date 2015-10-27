@@ -40,7 +40,7 @@
       var hide = function () {
         hideTimeout = window.setTimeout(function () {
           $element.find(selector).fadeTo("normal", 0);
-        }, 100);
+        }, 50);
       };
 
       if (ko.isObservable(options.override)) {
@@ -1824,6 +1824,7 @@
       });
 
       editor.on("focus", function () {
+        snippet.inFocus(true);
         $(".ace-editor").data("last-active-editor", false);
         $el.data("last-active-editor", true);
       });
@@ -1833,6 +1834,7 @@
       });
 
       editor.on("blur", function () {
+        snippet.inFocus(false);
         snippet.statement_raw(editor.getValue());
       });
 

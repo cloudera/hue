@@ -429,6 +429,6 @@ body.modal-open {
   transition: border-left-color 0.2s ease;
 }
 
-.ace-editor:hover {
+.active-editor {
   border-left-color: #3893c2;
 }
