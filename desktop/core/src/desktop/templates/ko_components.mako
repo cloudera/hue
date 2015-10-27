@@ -478,7 +478,7 @@ from desktop.views import _ko
         $assistQuickLook.find(".sample").empty("");
         $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
-        self.assistSource.assistHelper.fetchTableHtmlPreview(self.snippet, tableName, function(data) {
+        self.assistSource.assistHelper.fetchTableHtmlPreview(self.assistSource.snippet, tableName, function(data) {
           $assistQuickLook.find(".loader").hide();
           $assistQuickLook.find(".sample").html(data);
         }, function(e) {
