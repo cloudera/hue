@@ -114,6 +114,7 @@
       properties['numExecutors'] = '';
       properties['queue'] = '';
       properties['archives'] = [];
+      properties['files'] = [];
     }
 
     if (snippetType == 'jar') {
