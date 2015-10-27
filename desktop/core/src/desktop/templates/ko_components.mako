@@ -43,11 +43,6 @@ from desktop.views import _ko
       padding-bottom: 2px;
     }
 
-    .assist-tables > li:hover .hover-actions-2nd {
-      visibility: visible;
-      opacity: 1;
-    }
-
     .assist-table-link {
       font-size: 13px;
     }
@@ -147,15 +142,15 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entry-actions">
-    <div class="assist-actions" data-bind="css: { 'hover-actions-2nd': definition.isTable,  'hover-actions-3rd': definition.isColumn, 'show-actions': statsVisible }">
-      <a href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-      <a href="javascript:void(0)" data-bind="visible: definition.isTable || definition.isColumn, click: showStats, css: { 'blue': statsVisible }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+    <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn } " style="opacity: 0">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable || definition.isColumn, click: showStats, css: { 'blue': statsVisible }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
     </div>
   </script>
 
   <script type="text/html" id="assist-entries">
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistSource.repositionActions }">
-      <li data-bind="css: { 'assist-table reveals-actions-2nd': definition.isTable, 'assist-column reveals-actions-3rd': definition.isColumn }">
+      <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isTable ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isTable, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
           <span data-bind="text: definition.displayName"></span>
@@ -183,11 +178,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-type-template">
-    <div class="reveals-actions" style="position: relative; width:100%">
+    <div data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position: relative; width:100%">
       <li class="nav-header">
         ${_('database')}
         <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
-          <a href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
         </div>
       </li>
 
@@ -207,7 +202,7 @@ from desktop.views import _ko
       <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! assistHelper.loading() && ! hasErrors()">
         ${_('tables')}
         <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
-          <a href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
         </div>
       </li>
 
@@ -889,7 +884,7 @@ from desktop.views import _ko
       </li>
     </ul>
     <div style="min-width: 280px; margin-top: 5px;">
-      <a class="pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
         <i class="fa fa-plus"></i>
       </a>
     </div>

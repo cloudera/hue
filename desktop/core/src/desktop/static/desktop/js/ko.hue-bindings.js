@@ -22,6 +22,52 @@
   }
 }(function (ko) {
 
+  ko.bindingHandlers.visibleOnHover = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var options = valueAccessor();
+      var $element  = $(element);
+
+      var selector = options.selector;
+      var hideTimeout = -1;
+      var override = false;
+      var inside = false;
+
+      var show = function () {
+        $element.find(selector).fadeTo("normal", 1);
+        clearTimeout(hideTimeout);
+      };
+
+      var hide = function () {
+        hideTimeout = window.setTimeout(function () {
+          $element.find(selector).fadeTo("normal", 0);
+        }, 100);
+      };
+
+      if (ko.isObservable(options.override)) {
+        options.override.subscribe(function (newValue) {
+          override = newValue;
+          if (newValue) {
+            show();
+          } else if (! inside) {
+            hide();
+          }
+        })
+      }
+
+      $element.mouseenter(function () {
+        inside = true;
+        show();
+      });
+
+      $element.mouseleave(function () {
+        inside = false;
+        if (! override) {
+          hide();
+        }
+      });
+    }
+  };
+
   ko.bindingHandlers.slideVisible = {
     init: function (element, valueAccessor) {
       var value = valueAccessor();

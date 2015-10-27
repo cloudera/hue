@@ -2049,51 +2049,6 @@ pre {
   white-space: nowrap;
 }
 
-.reveals-actions:hover .hover-actions,
-.reveals-actions:hover .hover-actions-no-transition,
-.reveals-actions-2nd:hover .hover-actions-2nd,
-.reveals-actions-3rd:hover .hover-actions-3rd {
-  visibility: visible;
-  opacity: 1;
-}
-
-.show-actions {
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.hover-actions,
-.hover-actions-2nd,
-.hover-actions-3rd {
-  display: inline-block;
-  opacity: 0;
-  -webkit-transition: opacity 0.2s linear;
-  -moz-transition: opacity 0.2s linear;
-  -ms-transition: opacity 0.2s linear;
-  transition: opacity 0.2s linear;
-}
-
-/* Work-around for chrome with element out-transition not firing in .dropdown */
-.hover-actions-no-transition {
-  visibility: hidden;
-}
-
-.hover-actions > a,
-.hover-actions-2nd > a,
-.hover-actions-3rd > a {
-  color: #D1D1D1;
-  -webkit-transition: color 0.2s ease;
-  -moz-transition: color 0.2s ease;
-  -ms-transition: color 0.2s ease;
-  transition: color 0.2s ease;
-}
-
-.hover-actions > a:hover,
-.hover-actions-2nd > a:hover,
-.hover-actions-3rd > a:hover {
-  color: #338bb8;
-}
-
 .leaflet-search-command {
   padding: 4px;
   background-color: #FFF;
@@ -2219,4 +2174,26 @@ div.navigator .pull-right .nav {
 .dragging-pre {
   border-left: none;
   background: transparent;
+}
+
+.hover-actions {
+  opacity: 0;
+}
+
+.hover-actions * {
+  text-decoration: none !important;
+}
+
+.inactive-action,
+.inactive-action a {
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+  color: #d1d1d1;
+}
+
+.inactive-action:hover,
+.inactive-action:hover > a {
+  color: #338bb8 !important;
 }

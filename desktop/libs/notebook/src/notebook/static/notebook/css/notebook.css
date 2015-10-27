@@ -327,7 +327,7 @@ body {
   -ms-transition: filter 0.2s ease;
 }
 
-.hover-actions:hover .snippet-icon-image {
+.inactive-action:hover .snippet-icon-image {
   -webkit-filter: grayscale(0)  brightness(1);
   -webkit-filter: grayscale(0%) brightness(100%);
   filter: grayscale(0%) brightness(100%);
@@ -342,28 +342,11 @@ body {
   -webkit-transition: color 0.2s ease;
   -moz-transition: color 0.2s ease;
   -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
 }
 
-.hover-actions .editable {
-  color: #D1D1D1;
-}
-
-.hover-actions:hover .editable,
-.hover-actions:hover .snippet-icon {
-  color: #338bb8;
-}
-
-.hover-actions sup,
-.hover-actions .caret,
-.hover-actions .editable {
-  -webkit-transition: color 0.2s ease;
-  -moz-transition: color 0.2s ease;
-  -ms-transition: color 0.2s ease;
-}
-
-.hover-actions:hover sup,
-.hover-actions:hover .caret {
-  color: #338bb8;
+.inactive-action:hover .snippet-icon {
+  color: #338bb8 !important;
 }
 
 .row-container.is-editing {
@@ -563,7 +546,7 @@ h1.empty {
 }
 
 @media print {
-  .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .hover-actions, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
+  .navigator, .assist-container, .result-settings, .left-panel, a.btn, button, .add-snippet, .card-heading.simple, .alert, .show-assist, .snippet-footer-actions-bar, .player-toolbar h4, .player-toolbar div {
     display: none !important;
   }
   .right-panel {
@@ -646,11 +629,6 @@ table.airy tr td {
   top: -8px;
   z-index: 1000;
   right: 0;
-}
-
-.hover-actions a {
-  text-decoration: none;
-  cursor: pointer;
 }
 
 .hover-dropdown {

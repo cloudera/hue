@@ -350,17 +350,17 @@ ${ require.config() }
 
 
 <script type="text/html" id="snippet">
-  <div class="snippet-container reveals-actions row-fluid">
+  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { selector: '.hover-actions' }">
     <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
 
       <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
       <h2 class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }">
 
-        <div class="hover-actions dropdown inline widget-type">
-          <a class="dropdown-toggle no-underline" data-toggle="dropdown" href="javascript:void(0)">
+        <div class="inactive-action hover-actions dropdown inline widget-type">
+          <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
             <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
-            <span class="hover-actions-no-transition">
+            <span>
               <b class="caret"></b>
             </span>
           </a>
@@ -369,13 +369,13 @@ ${ require.config() }
           </ul>
         </div>
 
-        <div class="hover-actions"><span data-bind="editable: name, editableOptions: { emptytext: '${_ko('Untitled')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;"></span></div>
+        <div class="inactive-action hover-actions inline"><span data-bind="editable: name, editableOptions: { emptytext: '${_ko('Untitled')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;"></span></div>
 
         <div class="hover-actions inline pull-right" style="font-size: 15px;">
-          <a href="javascript:void(0)" class="move-widget"><i class="fa fa-arrows"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
-          <a href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
+          <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
         </div>
 
       </h2>
@@ -421,14 +421,14 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="property">
-  <div class="reveals-actions" data-bind="css: { 'spark-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
+  <div data-bind="visibleOnHover: { selector: '.hover-actions' }, css: { 'spark-property' : typeof inline === 'undefined' || inline, 'control-group' : typeof inline !== 'undefined' && ! inline }">
     <label class="control-label" data-bind="text: label, style: { 'width' : typeof inline === 'undefined' || inline ? '120px' : '' }"></label>
     <div class="controls" style="margin-right:10px;" data-bind="style: { 'margin-left' : typeof inline === 'undefined' || inline ? '140px' : '' }">
       <!-- ko template: { name: 'property-' + type } --><!-- /ko -->
     </div>
     <!-- ko ifnot: typeof remove === "undefined" -->
     <div class="hover-actions spark-property-remove">
-      <a href="javascript:void(0)" data-bind="click: remove" title="${ _('Remove') }">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: remove" title="${ _('Remove') }">
         <i class="fa fa-times"></i>
       </a>
     </div>
@@ -541,10 +541,10 @@ ${ require.config() }
       </div>
       <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': !isResultSettingsVisible()}">
         <div data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id() }, click: toggleResultSettings" class="toggle-result-settings show-result-settings">
-          <a title="${_('Show columns')}" class="pointer" data-bind="visible: !isResultSettingsVisible()">
+          <a class="inactive-action pointer" title="${_('Show columns')}" data-bind="visible: !isResultSettingsVisible()">
             <i class="fa fa-chevron-right"></i>
           </a>
-          <a title="${_('Hide')}" class="pointer" data-bind="visible: isResultSettingsVisible">
+          <a class="inactive-action pointer" title="${_('Hide')}" data-bind="visible: isResultSettingsVisible">
             <i class="fa fa-chevron-left"></i>
           </a>
         </div>
@@ -564,8 +564,8 @@ ${ require.config() }
 
     <div data-bind="visible: showChart" style="display:none;">
       <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
-        <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'hover-actions toggle-result-settings toggleResultSettingsChart' + id() }, click: toggleResultSettings">
-          <a title="${_('Hide settings')}" class="pointer">
+        <div style="float: right; margin-right: -30px; margin-top:0" data-bind="attr: { 'class': 'hover-actions inline toggle-result-settings toggleResultSettingsChart' + id() }, click: toggleResultSettings">
+          <a class="inactive-action" title="${_('Hide settings')}" class="pointer">
             <i class="fa fa-chevron-left"></i>
           </a>
         </div>
@@ -652,8 +652,8 @@ ${ require.config() }
       </div>
 
       <div data-bind="css:{'span10 chart-container': isResultSettingsVisible, 'span12 nomargin chart-container': !isResultSettingsVisible() }">
-        <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isResultSettingsVisible(), click: toggleResultSettings, attr: { 'class': 'hover-actions toggle-result-settings toggleResultSettingsChart' + id()}">
-          <a title="${_('Show settings')}" class="pointer">
+        <div style="margin-right: -30px; margin-top:0" data-bind="visible: !isResultSettingsVisible(), click: toggleResultSettings, attr: { 'class': 'hover-actions inline toggle-result-settings toggleResultSettingsChart' + id()}">
+          <a class="inactive-action" title="${_('Show settings')}" class="pointer">
             <i class="fa fa-chevron-right"></i>
           </a>
         </div>
@@ -819,10 +819,10 @@ ${ require.config() }
       </div>
     </div>
 
-    <div class="pull-right hover-actions" style="padding-top: 8px; font-size: 15px;">
+    <div class="pull-right hover-actions inline" style="padding-top: 8px; font-size: 15px;">
       <span style="color: #CCC; padding-right: 10px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
 
-      <a href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
         <i class="fa fa-file-text-o"></i>
       </a>
 
@@ -832,19 +832,19 @@ ${ require.config() }
         <input type="hidden" name="snippet"/>
         <input type="hidden" name="format" class="download-format"/>
 
-        <div class="hover-actions hover-dropdown" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'">
-          <a class="dropdown-toggle" data-toggle="dropdown">
+        <div class="hover-dropdown" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'" style="display:none;">
+          <a class="inactive-action dropdown-toggle pointer" data-toggle="dropdown">
             <i class="fa fa-download"></i>
             <i class="fa fa-caret-down"></i>
           </a>
           <ul class="dropdown-menu pull-right">
             <li>
-              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
+              <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
                 <i class="fa fa-file-o"></i> ${ _('CSV') }
               </a>
             </li>
             <li>
-              <a class="download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
+              <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
                 <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
               </a>
             </li>
