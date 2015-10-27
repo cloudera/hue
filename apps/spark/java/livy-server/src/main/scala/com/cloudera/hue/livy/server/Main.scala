@@ -19,7 +19,6 @@
 package com.cloudera.hue.livy.server
 
 import java.io.{File, IOException}
-import java.nio.file.{Paths, Files}
 import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy._
@@ -171,6 +170,11 @@ class ScalatraBootstrap
       context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")
       context.mount(new BatchSessionServlet(batchManager), "/batches/*")
       context.mountMetricsAdminServlet("/")
+
+      context.setInitParameter(org.scalatra.EnvironmentKey, livyConf.get("livy.environment", "development"))
+      context.setInitParameter(ScalatraBase.HostNameKey, livyConf.get("livy.hostname"))
+
+
     } catch {
       case e: Throwable =>
         println(f"Exception thrown when initializing server: $e")
