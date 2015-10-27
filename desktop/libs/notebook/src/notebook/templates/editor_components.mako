@@ -144,17 +144,17 @@ ${ require.config() }
       </a>
       <ul class="dropdown-menu pull-right">
         <li>
-          <a href="javascript:void(0)" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+          <a class="pointer" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
             <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
             <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
             <i class="fa fa-fw fa-eraser"></i> ${ _('Clear all results') }
           </a>
         </li>
@@ -164,12 +164,12 @@ ${ require.config() }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-toggle="modal" data-target="#importGithubModal">
+          <a class="pointer" data-toggle="modal" data-target="#importGithubModal">
             <i class="fa fa-fw fa-github"></i> ${ _('Import from Github') }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: exportJupyterNotebook">
+          <a class="pointer" data-bind="click: exportJupyterNotebook">
             <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
           </a>
         </li>
