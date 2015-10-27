@@ -39,7 +39,7 @@ class SparkBatchApi(Api):
         'className': snippet['properties'].get('class'),
         'args': snippet['properties'].get('arguments'),
         'pyFiles': snippet['properties'].get('py_file'),
-        # files
+        'files': snippet['properties'].get('files'),
         # driverMemory
         # driverCores
         # executorMemory
