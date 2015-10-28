@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batches
+package com.cloudera.hue.livy.server.batch
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path}
@@ -24,8 +24,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.sessions.Success
 import com.cloudera.hue.livy.{LivyConf, Utils}
-import com.cloudera.hue.livy.server.batch.{CreateBatchRequest, BatchSessionProcess}
-import org.scalatest.{ShouldMatchers, BeforeAndAfterAll, FunSpec}
+import org.scalatest.{BeforeAndAfterAll, FunSpec, ShouldMatchers}
 
 import scala.concurrent.duration.Duration
 
