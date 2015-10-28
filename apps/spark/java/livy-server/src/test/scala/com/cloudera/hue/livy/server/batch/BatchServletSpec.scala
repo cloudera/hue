@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batches
+package com.cloudera.hue.livy.server.batch
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path}
