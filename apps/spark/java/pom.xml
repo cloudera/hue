@@ -48,18 +48,19 @@
     </organization>
 
     <properties>
+        <commons-codec.version>1.9</commons-codec.version>
+        <dispatch.version>0.11.2</dispatch.version>
         <guava.version>11.0.2</guava.version>
+        <httpclient.version>4.5</httpclient.version>
+        <httpcore.version>4.4.1</httpcore.version>
         <jetty.version>9.2.10.v20150310</jetty.version>
         <json4s.version>3.2.5</json4s.version>
         <logback.version>1.1.2</logback.version>
-        <scala.version>2.10.4</scala.version>
-        <scala.binary.version>2.10</scala.binary.version>
-        <scalatra.version>2.3.0</scalatra.version>
-        <dispatch.version>0.11.2</dispatch.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <httpclient.version>4.5</httpclient.version>
-        <httpcore.version>4.4.1</httpcore.version>
-        <commons-codec.version>1.9</commons-codec.version>
+        <scala.binary.version>2.10</scala.binary.version>
+        <scala.compat.version>2.10</scala.compat.version>
+        <scala.version>2.10.4</scala.version>
+        <scalatra.version>2.3.0</scalatra.version>
     </properties>
 
     <modules>
