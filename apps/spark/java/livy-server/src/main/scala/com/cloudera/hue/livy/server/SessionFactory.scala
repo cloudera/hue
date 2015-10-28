@@ -20,8 +20,6 @@ package com.cloudera.hue.livy.server
 
 import org.json4s.{DefaultFormats, Formats, JValue}
 
-import scala.concurrent.Future
-
 abstract class SessionFactory[S <: Session] {
 
   protected implicit def jsonFormats: Formats = DefaultFormats

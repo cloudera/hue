@@ -22,11 +22,11 @@ import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonDSL._
-import org.json4s.{MappingException, DefaultFormats, Formats, JValue}
+import org.json4s.{DefaultFormats, Formats, JValue, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 
 object SessionServlet extends Logging
 
