@@ -16,13 +16,13 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.spark.batch
 
-import com.cloudera.hue.livy.sessions.Kind
-
-case class CreateInteractiveRequest(
-    kind: Kind,
+case class CreateBatchRequest(
+    file: String,
     proxyUser: Option[String] = None,
+    args: List[String] = List(),
+    className: Option[String] = None,
     jars: List[String] = List(),
     pyFiles: List[String] = List(),
     files: List[String] = List(),

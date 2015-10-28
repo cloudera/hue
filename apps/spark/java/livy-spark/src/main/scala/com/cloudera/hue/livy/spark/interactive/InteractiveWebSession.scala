@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.spark.interactive
 
 import java.net.{ConnectException, URL}
 import java.util.concurrent.TimeUnit
@@ -26,16 +26,17 @@ import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{Statement, InteractiveSession}
 import dispatch._
-import org.json4s.JsonAST.{JString, JNull}
+import org.json4s.JsonAST.{JNull, JString}
 import org.json4s.jackson.Serialization.write
 import org.json4s.{DefaultFormats, Formats, JValue}
 
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
-import scala.util
 
-abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: CreateInteractiveRequest) extends InteractiveSession with Logging {
+abstract class InteractiveWebSession(val id: Int,
+                                     createInteractiveRequest: CreateInteractiveRequest)
+  extends InteractiveSession with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats

@@ -16,20 +16,19 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.spark.interactive
 
-import com.cloudera.hue.livy.sessions.{SessionFactory, SessionKindSerializer}
+import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
-import org.json4s.{DefaultFormats, Formats, JValue}
 
-import scala.concurrent.Future
+import scala.concurrent.ExecutionContext
 
-trait InteractiveSessionFactory extends SessionFactory[InteractiveSession] {
+class InteractiveSessionProcessFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
 
-  override protected implicit def jsonFormats: Formats = DefaultFormats ++ List(SessionKindSerializer)
+   implicit def executor: ExecutionContext = ExecutionContext.global
 
-  override def create(id: Int, createRequest: JValue) =
-    create(id, createRequest.extract[CreateInteractiveRequest])
-
-  def create(id: Int, createRequest: CreateInteractiveRequest): InteractiveSession
-}
+   override def create(id: Int,
+                       createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+     InteractiveSessionProcess.create(livyConf, id, createInteractiveRequest)
+   }
+ }
