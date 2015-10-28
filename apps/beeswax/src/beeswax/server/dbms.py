@@ -29,8 +29,8 @@ from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, AUTH_USERNAME, AUTH_PASSWORD, \
-  APPLY_NATURAL_SORT_MAX
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, \
+  AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, SAMPLE_TABLE_MAX_PARTITIONS
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
@@ -265,7 +265,6 @@ class HiveServer2Dbms(object):
     hql = None
 
     if not table.is_view:
-
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
 
       if column or nested: # Could do column for any type, then nested with partitions 
@@ -273,11 +272,10 @@ class HiveServer2Dbms(object):
           select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
           hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
       else:
-        partition_query = ""
-        if table.partition_keys:
-          partitions = self.get_partitions(database, table, partition_spec=None, max_parts=1)
-          partition_query = 'WHERE ' + ' AND '.join(["%s='%s'" % (table.partition_keys[idx].name, key) for idx, key in enumerate(partitions[0].values)])
-        hql = "SELECT * FROM `%s`.`%s` %s LIMIT %s" % (database, table.name, partition_query, limit)
+        if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+          hql = self._get_sample_partition_query(database, table, limit)
+        else:
+          hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
 
       if hql:
         query = hql_query(hql)
@@ -288,6 +286,20 @@ class HiveServer2Dbms(object):
           self.close(handle)
 
     return result
+
+
+  def _get_sample_partition_query(self, database, table, limit):
+    partitions = self.get_partitions(database, table, partition_spec=None, max_parts=SAMPLE_TABLE_MAX_PARTITIONS.get())
+
+    if partitions:
+      # Need to reformat partition specs for where clause syntax
+      partition_specs = [part.partition_spec.replace(',', ' AND ') for part in partitions]
+      partition_filters = ' OR '.join(['(%s)' % partition_spec for partition_spec in partition_specs])
+      partition_clause = 'WHERE %s' % partition_filters
+    else:
+      partition_clause = ''
+
+    return "SELECT * FROM `%s`.`%s` %s LIMIT %s" % (database, table.name, partition_clause, limit)
 
 
   def analyze_table(self, database, table):

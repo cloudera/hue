@@ -1651,6 +1651,71 @@ for x in sys.stdin:
     assert_true([0, '0x0'] in resp.context['sample_rows'], resp.context['sample_rows'])
 
 
+  def test_get_sample_partitioned(self):
+    # Test limit of one partition
+    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(1)
+    try:
+      table_name = 'test_partitions'
+      partition_spec = "(baz='baz_one' AND boom='boom_two')"
+      table = self.db.get_table(database=self.db_name, table_name=table_name)
+      hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
+      assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec), hql)
+    finally:
+      finish()
+
+    # Test limit of more than one partition
+    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
+    try:
+      table_name = 'test_partitions'
+      partition_spec = "(baz='baz_one' AND boom='boom_two') OR (baz='baz_foo' AND boom='boom_bar')"
+      table = self.db.get_table(database=self.db_name, table_name=table_name)
+      hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
+      assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec), hql)
+    finally:
+      finish()
+
+    # Test table with non-STRING (INT) partition columns
+    # Also tests for single partition column case
+    hql = """
+      CREATE TABLE test_partitions_int (a INT) PARTITIONED BY (b INT);
+      INSERT OVERWRITE TABLE test_partitions_int PARTITION (b=100)
+        SELECT 101 AS a FROM test_partitions LIMIT 1;
+      INSERT OVERWRITE TABLE test_partitions_int PARTITION (b=200)
+        SELECT 201 AS a FROM test_partitions LIMIT 1;
+      INSERT OVERWRITE TABLE test_partitions_int PARTITION (b=300)
+        SELECT 301 AS a FROM test_partitions LIMIT 1;
+    """
+    resp = _make_query(self.client, hql, database=self.db_name)
+    wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
+    try:
+      table_name = 'test_partitions_int'
+      table = self.db.get_table(database=self.db_name, table_name=table_name)
+      result = self.db.get_sample(self.db_name, table)
+      sample = list(result.rows())
+      assert_equal(len(sample), 2, sample)
+    finally:
+      finish()
+
+    # Test table that is partitioned but empty
+    hql = """
+      CREATE TABLE test_partitions_empty (a STRING) PARTITIONED BY (b STRING);
+    """
+    resp = _make_query(self.client, hql, database=self.db_name)
+    wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
+    try:
+      table_name = 'test_partitions_empty'
+      table = self.db.get_table(database=self.db_name, table_name=table_name)
+      result = self.db.get_sample(self.db_name, table)
+      sample = list(result.rows())
+      assert_equal(len(sample), 0, sample)
+    finally:
+      finish()
+
+
   def test_redacting_queries(self):
     c = make_logged_in_client()
 
