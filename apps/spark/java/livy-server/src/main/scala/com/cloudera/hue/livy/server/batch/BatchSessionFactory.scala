@@ -21,8 +21,6 @@ package com.cloudera.hue.livy.server.batch
 import com.cloudera.hue.livy.server.SessionFactory
 import org.json4s.JValue
 
-import scala.concurrent.Future
-
 abstract class BatchSessionFactory extends SessionFactory[BatchSession] {
   override def create(id: Int, createRequest: JValue) =
     create(id, createRequest.extract[CreateBatchRequest])
