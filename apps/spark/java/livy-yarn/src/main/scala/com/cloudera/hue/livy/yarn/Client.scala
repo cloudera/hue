@@ -18,29 +18,19 @@
 
 package com.cloudera.hue.livy.yarn
 
-import java.io.{File, InputStream, BufferedReader, InputStreamReader}
+import java.io.File
 
-import com.cloudera.hue.livy.yarn.Client._
-import com.cloudera.hue.livy.{Utils, LineBufferedProcess, LivyConf, Logging}
-import org.apache.hadoop.yarn.api.records.{ApplicationId, FinalApplicationStatus, YarnApplicationState}
+import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf, Logging}
+import org.apache.hadoop.fs.Path
 import org.apache.hadoop.yarn.client.api.YarnClient
 import org.apache.hadoop.yarn.conf.YarnConfiguration
 import org.apache.hadoop.yarn.util.ConverterUtils
-import org.apache.hadoop.fs.Path
 
 import scala.annotation.tailrec
 import scala.concurrent.ExecutionContext
-import scala.io.Source
 
 object Client {
   private lazy val regex = """Application report for (\w+)""".r.unanchored
-
-  sealed trait ApplicationStatus
-  case class New() extends ApplicationStatus
-  case class Accepted() extends ApplicationStatus
-  case class Running() extends ApplicationStatus
-  case class SuccessfulFinish() extends ApplicationStatus
-  case class UnsuccessfulFinish() extends ApplicationStatus
 }
 
 class FailedToSubmitApplication extends Exception
@@ -85,85 +75,4 @@ class Client(livyConf: LivyConf) extends Logging {
   }
 }
 
-class Job(yarnClient: YarnClient, appId: ApplicationId) {
-  def waitForFinish(timeoutMs: Long): Option[ApplicationStatus] = {
-    val startTimeMs = System.currentTimeMillis()
 
-    while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
-      val status = getStatus
-      status match {
-        case SuccessfulFinish() | UnsuccessfulFinish() =>
-          return Some(status)
-        case _ =>
-      }
-
-      Thread.sleep(1000)
-    }
-
-    None
-  }
-
-  def waitForStatus(status: ApplicationStatus, timeoutMs: Long): Option[ApplicationStatus] = {
-    val startTimeMs = System.currentTimeMillis()
-
-    while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
-      if (getStatus == status) {
-        return Some(status)
-      }
-
-      Thread.sleep(1000)
-    }
-
-    None
-  }
-
-  def waitForRPC(timeoutMs: Long): Option[(String, Int)] = {
-    waitForStatus(Running(), timeoutMs)
-
-    val startTimeMs = System.currentTimeMillis()
-
-    while (System.currentTimeMillis() - startTimeMs < timeoutMs) {
-      val statusResponse = yarnClient.getApplicationReport(appId)
-
-      (statusResponse.getHost, statusResponse.getRpcPort) match {
-        case ("N/A", _) | (_, -1) =>
-        case (hostname, port) => return Some((hostname, port))
-      }
-    }
-
-    None
-  }
-
-  def getHost: String = {
-    val statusResponse = yarnClient.getApplicationReport(appId)
-    statusResponse.getHost
-  }
-
-  def getPort: Int = {
-    val statusResponse = yarnClient.getApplicationReport(appId)
-    statusResponse.getRpcPort
-  }
-
-  def getStatus: ApplicationStatus = {
-    val statusResponse = yarnClient.getApplicationReport(appId)
-    convertState(statusResponse.getYarnApplicationState, statusResponse.getFinalApplicationStatus)
-  }
-
-  def stop(): Unit = {
-    yarnClient.killApplication(appId)
-  }
-
-  private def convertState(state: YarnApplicationState, status: FinalApplicationStatus): ApplicationStatus = {
-    (state, status) match {
-      case (YarnApplicationState.FINISHED, FinalApplicationStatus.SUCCEEDED) => SuccessfulFinish()
-      case (YarnApplicationState.FINISHED, _) |
-           (YarnApplicationState.KILLED, _) |
-           (YarnApplicationState.FAILED, _) => UnsuccessfulFinish()
-      case (YarnApplicationState.NEW, _) |
-           (YarnApplicationState.NEW_SAVING, _) |
-           (YarnApplicationState.SUBMITTED, _) => New()
-      case (YarnApplicationState.RUNNING, _) => Running()
-      case (YarnApplicationState.ACCEPTED, _) => Accepted()
-    }
-  }
-}

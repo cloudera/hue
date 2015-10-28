@@ -19,16 +19,15 @@
 package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
-import com.cloudera.hue.livy.sessions._
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
-import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.yarn._
 
-import scala.Error
+import com.cloudera.hue.livy.sessions._
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
+import com.cloudera.hue.livy.yarn._
+import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
+
 import scala.annotation.tailrec
-import scala.concurrent.{ExecutionContextExecutor, ExecutionContext, Future}
-import scala.util
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 object BatchSessionYarn {
 
@@ -92,9 +91,9 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
             if (_state == SessionState.Running()) {
               Thread.sleep(5000)
               job.getStatus match {
-                case Client.SuccessfulFinish() =>
+                case ApplicationState.SuccessfulFinish() =>
                   _state = SessionState.Success(System.currentTimeMillis())
-                case Client.UnsuccessfulFinish() =>
+                case ApplicationState.UnsuccessfulFinish() =>
                   _state = SessionState.Error(System.currentTimeMillis())
                 case _ => aux()
               }
