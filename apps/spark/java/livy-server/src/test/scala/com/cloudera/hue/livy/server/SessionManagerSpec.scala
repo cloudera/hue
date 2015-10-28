@@ -19,7 +19,7 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions.{State, Success}
+import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JNothing, JValue}
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -33,7 +33,7 @@ class SessionManagerSpec extends FlatSpec with Matchers {
 
     override def logLines(): IndexedSeq[String] = IndexedSeq()
 
-    override def state: State = Success(0)
+    override def state: SessionState = SessionState.Success(0)
   }
 
   class MockSessionFactory extends SessionFactory[MockSession] {

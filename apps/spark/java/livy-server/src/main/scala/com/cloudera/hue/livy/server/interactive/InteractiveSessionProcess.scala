@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
-import com.cloudera.hue.livy.sessions.{Success, Dead, Error}
+import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
@@ -124,13 +124,13 @@ private class InteractiveSessionProcess(id: Int,
   // Error out the job if the process errors out.
   Future {
     if (process.waitFor() != 0) {
-      _state = Error()
+      _state = SessionState.Error()
     } else {
       // Set the state to done if the session shut down before contacting us.
       _state match {
-        case (Dead(_) | Error(_) | Success(_)) =>
+        case (SessionState.Dead(_) | SessionState.Error(_) | SessionState.Success(_)) =>
         case _ =>
-          _state = Success()
+          _state = SessionState.Success()
       }
     }
   }

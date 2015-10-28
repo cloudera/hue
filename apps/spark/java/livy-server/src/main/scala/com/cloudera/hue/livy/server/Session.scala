@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.server
 
-import com.cloudera.hue.livy.sessions.{Dead, Error, Success, State}
+import com.cloudera.hue.livy.sessions.SessionState
 
 import scala.concurrent.Future
 
@@ -29,14 +29,14 @@ trait Session {
 
   def stoppedTime: Option[Long] = {
     state match {
-      case Error(time) => Some(time)
-      case Dead(time) => Some(time)
-      case Success(time) => Some(time)
+      case SessionState.Error(time) => Some(time)
+      case SessionState.Dead(time) => Some(time)
+      case SessionState.Success(time) => Some(time)
       case _ => None
     }
   }
 
-  def state: State
+  def state: SessionState
 
   def stop(): Future[Unit]
 

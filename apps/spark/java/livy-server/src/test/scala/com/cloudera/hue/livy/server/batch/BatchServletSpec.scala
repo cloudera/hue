@@ -23,9 +23,8 @@ import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.server.SessionManager
-import com.cloudera.hue.livy.sessions.Success
+import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.{LivyConf, Utils}
-import com.cloudera.hue.livy.server.batch._
 import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
@@ -91,10 +90,10 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
 
       // Wait for the process to finish.
       {
-        val batch: BatchSession = batchManager.get(0).get
+        val batch = batchManager.get(0).get
         Utils.waitUntil({ () => !batch.state.isActive }, Duration(10, TimeUnit.SECONDS))
         (batch.state match {
-          case Success(_) => true
+          case SessionState.Success(_) => true
           case _ => false
         }) should be (true)
       }

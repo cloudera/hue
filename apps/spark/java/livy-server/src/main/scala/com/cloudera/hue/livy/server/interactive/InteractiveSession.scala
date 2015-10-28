@@ -24,7 +24,7 @@ import java.util.concurrent.TimeoutException
 import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.Session
-import com.cloudera.hue.livy.sessions.{Kind, State}
+import com.cloudera.hue.livy.sessions.{SessionState, Kind}
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
@@ -54,7 +54,7 @@ trait InteractiveSession extends Session {
 
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  final def waitForStateChange(oldState: State, atMost: Duration) = {
+  final def waitForStateChange(oldState: SessionState, atMost: Duration) = {
     Utils.waitUntil({ () => state != oldState }, atMost)
   }
 }

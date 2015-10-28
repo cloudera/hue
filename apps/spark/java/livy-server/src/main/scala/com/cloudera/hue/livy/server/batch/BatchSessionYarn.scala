@@ -19,7 +19,6 @@
 package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
-
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
@@ -75,28 +74,28 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
 
   implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  private var _state: State = Starting()
+  private var _state: SessionState = SessionState.Starting()
 
   private var _jobThread: Thread = _
 
   jobFuture.onComplete {
     case util.Failure(_) =>
-      _state = Error(System.currentTimeMillis())
+      _state = SessionState.Error(System.currentTimeMillis())
 
     case util.Success(job) =>
-      _state = Running()
+      _state = SessionState.Running()
 
       _jobThread = new Thread {
         override def run(): Unit = {
           @tailrec
           def aux(): Unit = {
-            if (_state == Running()) {
+            if (_state == SessionState.Running()) {
               Thread.sleep(5000)
               job.getStatus match {
                 case Client.SuccessfulFinish() =>
-                  _state = Success(System.currentTimeMillis())
+                  _state = SessionState.Success(System.currentTimeMillis())
                 case Client.UnsuccessfulFinish() =>
-                  _state = Error(System.currentTimeMillis())
+                  _state = SessionState.Error(System.currentTimeMillis())
                 case _ => aux()
               }
             }
@@ -109,12 +108,12 @@ private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFut
       _jobThread.start()
   }
 
-  override def state: State = _state
+  override def state: SessionState = _state
 
   override def stop(): Future[Unit] = {
     jobFuture.map { job =>
       job.stop()
-      _state = Success(System.currentTimeMillis())
+      _state = SessionState.Success(System.currentTimeMillis())
       ()
     }
   }

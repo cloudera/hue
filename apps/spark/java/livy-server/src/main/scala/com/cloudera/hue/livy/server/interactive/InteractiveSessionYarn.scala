@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.sessions.{PySpark, Error, Spark}
+import com.cloudera.hue.livy.sessions.{PySpark, SessionState}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
 import com.cloudera.hue.livy.yarn.Client
@@ -93,7 +93,7 @@ private class InteractiveSessionYarn(id: Int,
   // Error out the job if the process errors out.
   Future {
     if (process.waitFor() != 0) {
-      _state = Error()
+      _state = SessionState.Error()
     }
   }
 
@@ -104,7 +104,7 @@ private class InteractiveSessionYarn(id: Int,
   }
 
   job.onFailure { case _ =>
-    _state = Error()
+    _state = SessionState.Error()
   }
 
   override def logLines() = process.inputLines
@@ -121,7 +121,7 @@ private class InteractiveSessionYarn(id: Int,
           }
         } catch {
           case e: Throwable =>
-            _state = Error()
+            _state = SessionState.Error()
             throw e
         }
     }

@@ -21,8 +21,7 @@ package com.cloudera.hue.livy.server.batch
 import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
-
-import com.cloudera.hue.livy.sessions.Success
+import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.{LivyConf, Utils}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, ShouldMatchers}
 
@@ -57,7 +56,7 @@ class BatchProcessSpec
 
       Utils.waitUntil({ () => !batch.state.isActive }, Duration(10, TimeUnit.SECONDS))
       (batch.state match {
-        case Success(_) => true
+        case SessionState.Success(_) => true
         case _ => false
       }) should be (true)
 

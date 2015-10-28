@@ -39,7 +39,7 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
   protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.SessionFormats
 
   class MockInteractiveSession(val id: Int) extends InteractiveSession {
-    var _state: State = Idle()
+    var _state: SessionState = SessionState.Idle()
 
     var _idCounter = new AtomicInteger()
     var _statements = IndexedSeq[Statement]()

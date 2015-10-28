@@ -47,7 +47,7 @@ class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSessio
 
     sessionManager.get(sessionId) match {
       case Some(session) =>
-        if (session.state == Starting()) {
+        if (session.state == SessionState.Starting()) {
           session.url = new URL(callback.url)
           Accepted()
         } else {
@@ -143,7 +143,7 @@ private object Serializers {
   def StatementFormats: List[CustomSerializer[_]] = List(StatementSerializer, StatementStateSerializer)
   def Formats: List[CustomSerializer[_]] = SessionFormats ++ StatementFormats
 
-  private def serializeSessionState(state: State) = JString(state.toString)
+  private def serializeSessionState(state: SessionState) = JString(state.toString)
 
   private def serializeSessionKind(kind: Kind) = JString(kind.toString)
 
@@ -193,11 +193,11 @@ private object Serializers {
     )
   )
 
-  case object SessionStateSerializer extends CustomSerializer[State](implicit formats => ( {
+  case object SessionStateSerializer extends CustomSerializer[SessionState](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case state: State => JString(state.toString)
+    case state: SessionState => JString(state.toString)
   }
     )
   )
