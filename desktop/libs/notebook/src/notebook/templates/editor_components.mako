@@ -2047,6 +2047,15 @@ ${ require.config() }
         });
       }
 
+      function downloadResult (snippet, format) {
+        $('#snippet_' + snippet.id()).find('.download-format').val(format);
+        $('#snippet_' + snippet.id()).find('input[name=\'notebook\']').val(ko.mapping.toJSON(viewModel.selectedNotebook().getContext()));
+        $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
+        $('#snippet_' + snippet.id()).find('.download-form').submit();
+      }
+
+      window.downloadResult = downloadResult;
+
       forceChartDraws();
 
       $(".CodeMirror").each(function () {
@@ -2062,13 +2071,6 @@ ${ require.config() }
       });
     });
   });
-
-  function downloadResult (snippet, format) {
-    $('#snippet_' + snippet.id()).find('.download-format').val(format);
-    $('#snippet_' + snippet.id()).find('input[name=\'notebook\']').val(ko.mapping.toJSON(viewModel.selectedNotebook().getContext()));
-    $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
-    $('#snippet_' + snippet.id()).find('.download-form').submit();
-  }
 
   var mathjax = document.createElement("script");
   mathjax.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
