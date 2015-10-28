@@ -19,8 +19,7 @@
 package com.cloudera.hue.livy.server.batch
 
 import java.lang.ProcessBuilder.Redirect
-
-import com.cloudera.hue.livy.sessions.{Error, Success, Running, State}
+import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
 import com.cloudera.hue.livy.{Utils, LivyConf, LineBufferedProcess}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
@@ -63,9 +62,9 @@ private class BatchSessionProcess(val id: Int,
                                   process: LineBufferedProcess) extends BatchSession {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  private[this] var _state: State = Running()
+  private[this] var _state: SessionState = SessionState.Running()
 
-  override def state: State = _state
+  override def state: SessionState = _state
 
   override def logLines(): IndexedSeq[String] = process.inputLines
 
@@ -85,9 +84,9 @@ private class BatchSessionProcess(val id: Int,
   private def reapProcess(exitCode: Int) = synchronized {
     if (_state.isActive) {
       if (exitCode == 0) {
-        _state = Success()
+        _state = SessionState.Success()
       } else {
-        _state = Error()
+        _state = SessionState.Error()
       }
     }
   }

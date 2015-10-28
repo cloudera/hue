@@ -42,8 +42,8 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
     contentType = formats("json")
 
     session.state match {
-      case ShuttingDown() => halt(500, "Shutting down")
-      case _ => {}
+      case SessionState.ShuttingDown() => halt(500, "Shutting down")
+      case _ =>
     }
   }
 

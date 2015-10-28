@@ -49,15 +49,15 @@ class Session(interpreter: Interpreter)
   private implicit val executor = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
   private implicit val formats = DefaultFormats
 
-  private var _state: State = NotStarted()
+  private var _state: SessionState = SessionState.NotStarted()
   private var _history = IndexedSeq[Statement]()
 
   Future {
-    _state = Starting()
+    _state = SessionState.Starting()
     interpreter.start()
-    _state = Idle()
+    _state = SessionState.Idle()
   }.onFailure { case _ =>
-    _state = Error(System.currentTimeMillis())
+    _state = SessionState.Error(System.currentTimeMillis())
   }
 
   def kind: String = interpreter.kind
@@ -84,24 +84,24 @@ class Session(interpreter: Interpreter)
 
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  def waitForStateChange(oldState: State, atMost: Duration) = {
+  def waitForStateChange(oldState: SessionState, atMost: Duration) = {
     Utils.waitUntil({ () => state != oldState }, atMost)
   }
 
   private def executeCode(executionCount: Int, code: String) = {
-    _state = Busy()
+    _state = SessionState.Busy()
 
     try {
 
       interpreter.execute(code) match {
         case Interpreter.ExecuteSuccess(data) =>
-          _state = Idle()
+          _state = SessionState.Idle()
 
           (STATUS -> OK) ~
           (EXECUTION_COUNT -> executionCount) ~
           (DATA -> data)
         case Interpreter.ExecuteIncomplete() =>
-          _state = Idle()
+          _state = SessionState.Idle()
 
           (STATUS -> ERROR) ~
           (EXECUTION_COUNT -> executionCount) ~
@@ -109,7 +109,7 @@ class Session(interpreter: Interpreter)
           (EVALUE -> "incomplete statement") ~
           (TRACEBACK -> List())
         case Interpreter.ExecuteError(ename, evalue, traceback) =>
-          _state = Idle()
+          _state = SessionState.Idle()
 
           (STATUS -> ERROR) ~
           (EXECUTION_COUNT -> executionCount) ~
@@ -117,7 +117,7 @@ class Session(interpreter: Interpreter)
           (EVALUE -> evalue) ~
           (TRACEBACK -> traceback)
         case Interpreter.ExecuteAborted(message) =>
-          _state = Error(System.currentTimeMillis())
+          _state = SessionState.Error(System.currentTimeMillis())
 
           (STATUS -> ERROR) ~
           (EXECUTION_COUNT -> executionCount) ~
@@ -129,7 +129,7 @@ class Session(interpreter: Interpreter)
       case e: Throwable =>
         error("Exception when executing code", e)
 
-        _state = Idle()
+        _state = SessionState.Idle()
 
 
         (STATUS -> ERROR) ~

@@ -21,7 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.sessions.{Error, Idle, Starting}
+import com.cloudera.hue.livy.sessions._
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}
 
@@ -46,16 +46,16 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
 
   describe("A spark session") {
     it("should start in the starting or idle state") {
-      session.state should (equal (Starting()) or equal (Idle()))
+      session.state should (equal (SessionState.Starting()) or equal (SessionState.Idle()))
     }
 
     it("should eventually become the idle state") {
-      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
-      session.state should equal (Idle())
+      session.waitForStateChange(SessionState.Starting(), Duration(30, TimeUnit.SECONDS))
+      session.state should equal (SessionState.Idle())
     }
 
     it("should execute `1 + 2` == 3") {
-      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
+      session.waitForStateChange(SessionState.Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("1 + 2"))
       val result = Await.result(stmt.output(), Duration.Inf)
 
@@ -71,7 +71,7 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
     }
 
     it("should report an error if accessing an unknown variable") {
-      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
+      session.waitForStateChange(SessionState.Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("x"))
       val result = Await.result(stmt.output(), Duration.Inf)
       val expectedResult = Extraction.decompose(Map(
@@ -86,15 +86,15 @@ abstract class BaseSessionSpec extends FunSpec with Matchers with BeforeAndAfter
       ))
 
       result should equal (expectedResult)
-      session.state should equal (Idle())
+      session.state should equal (SessionState.Idle())
     }
 
     it("should error out the session if the interpreter dies") {
-      session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
+      session.waitForStateChange(SessionState.Starting(), Duration(30, TimeUnit.SECONDS))
       val stmt = session.executeStatement(ExecuteRequest("import os; os._exit(1)"))
       val result = Await.result(stmt.output(), Duration.Inf)
       (session.state match {
-        case Error(_) => true
+        case SessionState.Error(_) => true
         case _ => false
       }) should equal (true)
     }

@@ -39,7 +39,7 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats
 
-  protected[this] var _state: State = Starting()
+  protected[this] var _state: SessionState = SessionState.Starting()
 
   private[this] var _lastActivity = Long.MaxValue
   private[this] var _url: Option[URL] = None
@@ -54,8 +54,8 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
   override def url: Option[URL] = _url
 
   override def url_=(url: URL) = {
-    ensureState(Starting(), {
-      _state = Idle()
+    ensureState(SessionState.Starting(), {
+      _state = SessionState.Idle()
       _url = Some(url)
     })
   }
@@ -67,11 +67,11 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
 
   override def lastActivity: Option[Long] = Some(_lastActivity)
 
-  override def state: State = _state
+  override def state: SessionState = _state
 
   override def executeStatement(content: ExecuteRequest): Statement = {
     ensureRunning {
-      _state = Busy()
+      _state = SessionState.Busy()
       touchLastActivity()
 
       val req = (svc / "execute").setContentType("application/json", "UTF-8") << write(content)
@@ -115,11 +115,11 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
         result \ "status" match {
           case JString("error") =>
             if (replErroredOut()) {
-              transition(Error())
+              transition(SessionState.Error())
             } else {
-              transition(Idle())
+              transition(SessionState.Idle())
             }
-          case _ => transition(Idle())
+          case _ => transition(SessionState.Idle())
         }
 
         Some(result)
@@ -145,15 +145,15 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
   override def stop(): Future[Unit] = {
     synchronized {
       _state match {
-        case Idle() =>
-          _state = Busy()
+        case SessionState.Idle() =>
+          _state = SessionState.Busy()
 
           Http(svc.DELETE OK as.String).either() match {
             case (Right(_) | Left(_: ConnectException)) =>
               // Make sure to eat any connection errors because the repl shut down before it sent
               // out an OK.
               synchronized {
-                _state = Dead()
+                _state = SessionState.Dead()
               }
 
               Future.successful(())
@@ -161,33 +161,33 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
             case Left(t: Throwable) =>
               Future.failed(t)
           }
-        case NotStarted() =>
+        case SessionState.NotStarted() =>
           Future {
-            waitForStateChange(NotStarted(), Duration(10, TimeUnit.SECONDS))
+            waitForStateChange(SessionState.NotStarted(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case Starting() =>
+        case SessionState.Starting() =>
           Future {
-            waitForStateChange(Starting(), Duration(10, TimeUnit.SECONDS))
+            waitForStateChange(SessionState.Starting(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case Busy() | Running() =>
+        case SessionState.Busy() | SessionState.Running() =>
           Future {
-            waitForStateChange(Busy(), Duration(10, TimeUnit.SECONDS))
+            waitForStateChange(SessionState.Busy(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case ShuttingDown() =>
+        case SessionState.ShuttingDown() =>
           Future {
-            waitForStateChange(ShuttingDown(), Duration(10, TimeUnit.SECONDS))
+            waitForStateChange(SessionState.ShuttingDown(), Duration(10, TimeUnit.SECONDS))
             stop()
           }
-        case Error(_) | Dead(_) | Success(_) =>
+        case SessionState.Error(_) | SessionState.Dead(_) | SessionState.Success(_) =>
           Future.successful(Unit)
       }
     }
   }
 
-  private def transition(state: State) = synchronized {
+  private def transition(state: SessionState) = synchronized {
     _state = state
   }
 
@@ -195,7 +195,7 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
     _lastActivity = System.currentTimeMillis()
   }
 
-  private def ensureState[A](state: State, f: => A) = {
+  private def ensureState[A](state: SessionState, f: => A) = {
     synchronized {
       if (_state == state) {
         f
@@ -208,7 +208,7 @@ abstract class InteractiveWebSession(val id: Int, createInteractiveRequest: Crea
   private def ensureRunning[A](f: => A) = {
     synchronized {
       _state match {
-        case Idle() | Busy() =>
+        case SessionState.Idle() | SessionState.Busy() =>
           f
         case _ =>
           throw new IllegalStateException("Session is in state %s" format _state)

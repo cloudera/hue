@@ -19,8 +19,7 @@
 package com.cloudera.hue.livy.repl
 
 import java.util.concurrent.TimeUnit
-
-import com.cloudera.hue.livy.sessions.{NotStarted, Idle, Starting}
+import com.cloudera.hue.livy.sessions.SessionState
 import org.json4s.DefaultFormats
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -32,7 +31,7 @@ abstract class BaseSessionSpec extends FlatSpec with Matchers {
 
   def withSession(testCode: Session => Any) = {
     val session = Session(createInterpreter())
-    session.waitForStateChange(NotStarted(), Duration(30, TimeUnit.SECONDS))
+    session.waitForStateChange(SessionState.NotStarted(), Duration(30, TimeUnit.SECONDS))
     try {
       testCode(session)
     } finally session.close()
@@ -41,11 +40,11 @@ abstract class BaseSessionSpec extends FlatSpec with Matchers {
   def createInterpreter(): Interpreter
 
   it should "start in the starting or idle state" in withSession { session =>
-    session.state should (equal (Starting()) or equal (Idle()))
+    session.state should (equal (SessionState.Starting()) or equal (SessionState.Idle()))
   }
 
   it should "eventually become the idle state" in withSession { session =>
-    session.waitForStateChange(Starting(), Duration(30, TimeUnit.SECONDS))
-    session.state should equal (Idle())
+    session.waitForStateChange(SessionState.Starting(), Duration(30, TimeUnit.SECONDS))
+    session.state should equal (SessionState.Idle())
   }
 }
