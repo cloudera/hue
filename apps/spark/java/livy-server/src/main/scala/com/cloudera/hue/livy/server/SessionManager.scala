@@ -20,7 +20,7 @@ package com.cloudera.hue.livy.server
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.cloudera.hue.livy.sessions.Session
+import com.cloudera.hue.livy.sessions.{SessionFactory, Session}
 import com.cloudera.hue.livy.{LivyConf, Logging}
 import org.json4s.JValue
 
