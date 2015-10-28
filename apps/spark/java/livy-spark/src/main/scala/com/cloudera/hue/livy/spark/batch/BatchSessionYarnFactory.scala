@@ -16,22 +16,16 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.spark.batch
 
-case class CreateBatchRequest(
-    file: String,
-    proxyUser: Option[String] = None,
-    args: List[String] = List(),
-    className: Option[String] = None,
-    jars: List[String] = List(),
-    pyFiles: List[String] = List(),
-    files: List[String] = List(),
-    driverMemory: Option[String] = None,
-    driverCores: Option[Int] = None,
-    executorMemory: Option[String] = None,
-    executorCores: Option[Int] = None,
-    numExecutors: Option[Int] = None,
-    archives: List[String] = List(),
-    queue: Option[String] = None,
-    name: Option[String] = None)
+import com.cloudera.hue.livy.LivyConf
+import com.cloudera.hue.livy.sessions.batch.BatchSession
+import com.cloudera.hue.livy.yarn.Client
 
+class BatchSessionYarnFactory(livyConf: LivyConf) extends BatchSessionFactory {
+
+  val client = new Client(livyConf)
+
+  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
+    BatchSessionYarn(livyConf, client, id, createBatchRequest)
+}

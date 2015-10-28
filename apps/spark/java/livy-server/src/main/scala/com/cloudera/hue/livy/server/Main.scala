@@ -22,10 +22,12 @@ import java.io.{File, IOException}
 import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy._
-import com.cloudera.hue.livy.server.batch._
-import com.cloudera.hue.livy.server.interactive._
+import com.cloudera.hue.livy.server.batch.BatchSessionServlet
+import com.cloudera.hue.livy.server.interactive.InteractiveSessionServlet
 import com.cloudera.hue.livy.sessions.batch.BatchSession
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
+import com.cloudera.hue.livy.spark.batch.{BatchSessionProcessFactory, BatchSessionYarnFactory}
+import com.cloudera.hue.livy.spark.interactive.{InteractiveSessionYarnFactory, InteractiveSessionProcessFactory}
 import org.scalatra._
 import org.scalatra.metrics.MetricsBootstrap
 import org.scalatra.metrics.MetricsSupportExtensions._

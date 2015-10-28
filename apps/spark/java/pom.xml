@@ -70,11 +70,12 @@
     </properties>
 
     <modules>
+        <module>livy-assembly</module>
         <module>livy-core</module>
         <module>livy-repl</module>
-        <module>livy-yarn</module>
         <module>livy-server</module>
-        <module>livy-assembly</module>
+        <module>livy-spark</module>
+        <module>livy-yarn</module>
     </modules>
 
     <dependencyManagement>

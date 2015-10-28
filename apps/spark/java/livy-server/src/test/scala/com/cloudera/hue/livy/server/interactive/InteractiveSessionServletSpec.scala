@@ -25,11 +25,12 @@ import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions._
-import com.cloudera.hue.livy.sessions.interactive.{Statement, InteractiveSession}
-import org.json4s.{DefaultFormats, Formats}
-import org.json4s.JsonAST.{JInt, JArray, JObject, JString}
+import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement}
+import com.cloudera.hue.livy.spark.interactive.{CreateInteractiveRequest, InteractiveSessionFactory}
+import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
+import org.json4s.{DefaultFormats, Formats}
 import org.scalatest.FunSpecLike
 import org.scalatra.test.scalatest.ScalatraSuite
 

@@ -16,16 +16,18 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.spark.interactive
 
-import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions.{BaseInteractiveSessionSpec, PySpark}
-import org.scalatest.{BeforeAndAfter, FunSpecLike, Matchers}
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
+import com.cloudera.hue.livy.sessions.{SessionFactory, SessionKindSerializer}
+import org.json4s.{DefaultFormats, Formats, JValue}
 
-class InteractiveSessionProcessSpec extends BaseInteractiveSessionSpec with FunSpecLike with Matchers with BeforeAndAfter {
+trait InteractiveSessionFactory extends SessionFactory[InteractiveSession] {
 
-  val livyConf = new LivyConf()
-  livyConf.set("livy.repl.driverClassPath", sys.props("java.class.path"))
+  override protected implicit def jsonFormats: Formats = DefaultFormats ++ List(SessionKindSerializer)
 
-  def createSession() = InteractiveSessionProcess.create(livyConf, 0, CreateInteractiveRequest(kind = PySpark()))
+  override def create(id: Int, createRequest: JValue) =
+    create(id, createRequest.extract[CreateInteractiveRequest])
+
+  def create(id: Int, createRequest: CreateInteractiveRequest): InteractiveSession
 }

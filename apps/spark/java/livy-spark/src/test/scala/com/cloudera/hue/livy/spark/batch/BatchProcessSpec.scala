@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.spark.batch
 
 import java.io.FileWriter
 import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
+
 import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.{LivyConf, Utils}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, ShouldMatchers}

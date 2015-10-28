@@ -16,15 +16,25 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.spark.interactive
 
-import com.cloudera.hue.livy.sessions.SessionFactory
-import com.cloudera.hue.livy.sessions.batch.BatchSession
-import org.json4s.JValue
+import com.cloudera.hue.livy.LivyConf
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
+import com.cloudera.hue.livy.yarn.Client
 
-abstract class BatchSessionFactory extends SessionFactory[BatchSession] {
-  override def create(id: Int, createRequest: JValue) =
-    create(id, createRequest.extract[CreateBatchRequest])
+import scala.concurrent.ExecutionContext
 
-  def create(id: Int, createRequest: CreateBatchRequest): BatchSession
-}
+class InteractiveSessionYarnFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
+
+   implicit def executor: ExecutionContext = ExecutionContext.global
+
+   val client = new Client(livyConf)
+
+   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+     InteractiveSessionYarn.create(livyConf, client, id, createInteractiveRequest)
+   }
+
+   override def close(): Unit = {
+     client.close()
+   }
+ }

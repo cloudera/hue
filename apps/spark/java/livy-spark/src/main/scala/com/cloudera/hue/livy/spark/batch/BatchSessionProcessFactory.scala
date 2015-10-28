@@ -16,12 +16,10 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.spark.batch
 
 import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.sessions.batch.BatchSession
-
-import scala.concurrent.Future
 
 class BatchSessionProcessFactory(livyConf: LivyConf)
   extends BatchSessionFactory

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.spark.interactive
 
 import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
@@ -35,7 +35,6 @@ object InteractiveSessionYarn {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
   private val CONF_LIVY_JAR = "livy.yarn.jar"
-  private lazy val regex = """Application report for (\w+)""".r.unanchored
 
   def create(livyConf: LivyConf,
              client: Client,

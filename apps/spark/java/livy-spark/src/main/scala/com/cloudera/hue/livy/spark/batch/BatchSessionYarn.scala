@@ -16,28 +16,40 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.spark.batch
 
 import java.lang.ProcessBuilder.Redirect
+
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.batch.BatchSession
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
-import com.cloudera.hue.livy.{Utils, LivyConf, LineBufferedProcess}
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
+import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
+import com.cloudera.hue.livy.yarn._
+import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 
-import scala.concurrent.{Future, ExecutionContext, ExecutionContextExecutor}
+import scala.annotation.tailrec
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
-object BatchSessionProcess {
-  def apply(livyConf: LivyConf, id: Int, createBatchRequest: CreateBatchRequest): BatchSession = {
+object BatchSessionYarn {
+
+  implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+
+  def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): BatchSession = {
     val builder = sparkBuilder(livyConf, createBatchRequest)
 
     val process = builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args)
-    new BatchSessionProcess(id, process)
+    val job = Future {
+      client.getJobFromProcess(process)
+    }
+    new BatchSessionYarn(id, process, job)
   }
 
   private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
     val builder = SparkSubmitProcessBuilder(livyConf)
 
+    builder.master("yarn-cluster")
+
+    createBatchRequest.proxyUser.foreach(builder.proxyUser)
     createBatchRequest.className.foreach(builder.className)
     createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
     createBatchRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
@@ -48,7 +60,6 @@ object BatchSessionProcess {
     createBatchRequest.executorCores.foreach(builder.executorCores)
     createBatchRequest.numExecutors.foreach(builder.numExecutors)
     createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
-    createBatchRequest.proxyUser.foreach(builder.proxyUser)
     createBatchRequest.queue.foreach(builder.queue)
     createBatchRequest.name.foreach(builder.name)
 
@@ -59,45 +70,53 @@ object BatchSessionProcess {
   }
 }
 
-private class BatchSessionProcess(val id: Int,
-                                  process: LineBufferedProcess) extends BatchSession {
-  protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+private class BatchSessionYarn(val id: Int, process: LineBufferedProcess, jobFuture: Future[Job]) extends BatchSession {
 
-  private[this] var _state: SessionState = SessionState.Running()
+  implicit def executor: ExecutionContextExecutor = ExecutionContext.global
+
+  private var _state: SessionState = SessionState.Starting()
+
+  private var _jobThread: Thread = _
+
+  jobFuture.onComplete {
+    case util.Failure(_) =>
+      _state = SessionState.Error()
+
+    case util.Success(job) =>
+      _state = SessionState.Running()
+
+      _jobThread = new Thread {
+        override def run(): Unit = {
+          @tailrec
+          def aux(): Unit = {
+            if (_state == SessionState.Running()) {
+              Thread.sleep(5000)
+              job.getStatus match {
+                case ApplicationState.SuccessfulFinish() =>
+                  _state = SessionState.Success()
+                case ApplicationState.UnsuccessfulFinish() =>
+                  _state = SessionState.Error()
+                case _ => aux()
+              }
+            }
+          }
+
+          aux()
+        }
+      }
+      _jobThread.setDaemon(true)
+      _jobThread.start()
+  }
 
   override def state: SessionState = _state
 
-  override def logLines(): IndexedSeq[String] = process.inputLines
-
   override def stop(): Future[Unit] = {
-    Future {
-      destroyProcess()
+    jobFuture.map { job =>
+      job.stop()
+      _state = SessionState.Success()
+      ()
     }
   }
 
-  private def destroyProcess() = {
-    if (process.isAlive) {
-      process.destroy()
-      reapProcess(process.waitFor())
-    }
-  }
-
-  private def reapProcess(exitCode: Int) = synchronized {
-    if (_state.isActive) {
-      if (exitCode == 0) {
-        _state = SessionState.Success()
-      } else {
-        _state = SessionState.Error()
-      }
-    }
-  }
-
-  /** Simple daemon thread to make sure we change state when the process exits. */
-  private[this] val thread = new Thread("Batch Process Reaper") {
-    override def run(): Unit = {
-      reapProcess(process.waitFor())
-    }
-  }
-  thread.setDaemon(true)
-  thread.start()
+  override def logLines(): IndexedSeq[String] = process.inputLines
 }
