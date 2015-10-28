@@ -152,7 +152,7 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  return get_api(request.user, snippet).download(notebook, snippet, file_format)
+  return get_api(request.user, snippet, request.fs, request.jt).download(notebook, snippet, file_format)
 
 
 def install_examples(request):
