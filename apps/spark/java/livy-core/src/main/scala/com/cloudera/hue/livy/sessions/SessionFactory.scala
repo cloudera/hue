@@ -16,9 +16,8 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.sessions
 
-import com.cloudera.hue.livy.sessions.Session
 import org.json4s.{DefaultFormats, Formats, JValue}
 
 abstract class SessionFactory[S <: Session] {
