@@ -22,8 +22,8 @@ import java.lang.ProcessBuilder.Redirect
 
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.batch.BatchSession
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
+import com.cloudera.hue.livy.spark.SparkProcessBuilder
+import com.cloudera.hue.livy.spark.SparkProcessBuilder.RelativePath
 import com.cloudera.hue.livy.yarn._
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 
@@ -44,8 +44,8 @@ object BatchSessionYarn {
     new BatchSessionYarn(id, process, job)
   }
 
-  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
-    val builder = SparkSubmitProcessBuilder(livyConf)
+  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkProcessBuilder = {
+    val builder = SparkProcessBuilder(livyConf)
 
     builder.master("yarn-cluster")
 

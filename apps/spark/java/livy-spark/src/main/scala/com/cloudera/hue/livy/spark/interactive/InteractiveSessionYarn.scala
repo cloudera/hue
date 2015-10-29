@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.sessions.{PySpark, SessionState}
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
-import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
+import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, RelativePath}
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilder}
 import com.cloudera.hue.livy.yarn.Client
 import com.cloudera.hue.livy.{LivyConf, Utils}
 
@@ -43,7 +43,7 @@ object InteractiveSessionYarn {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 
-    val builder = SparkSubmitProcessBuilder(livyConf)
+    val builder = SparkProcessBuilder(livyConf)
 
     builder.master("yarn-cluster")
     builder.className("com.cloudera.hue.livy.repl.Main")
