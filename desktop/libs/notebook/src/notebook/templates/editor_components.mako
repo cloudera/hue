@@ -169,7 +169,7 @@ ${ require.config() }
           </a>
         </li>
         <li>
-          <a class="pointer" data-bind="click: exportJupyterNotebook">
+          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().exportJupyterNotebook() }">
             <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
           </a>
         </li>
@@ -1443,7 +1443,7 @@ ${ require.config() }
     "ko.hue-bindings"
   ], function (ko, charts, EditorViewModel) {
 
-      var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
+    var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
       assistAvailable: '${ autocomplete_base_url | n,unicode }' !== '',
       snippetViewSettings: {
@@ -1527,55 +1527,6 @@ ${ require.config() }
     });
 
     var viewModel;
-
-    var exportJupyterNotebook = function () {
-      function addCell(type, code) {
-        var cell = {
-          cell_type: type,
-          source: [
-            code
-          ],
-          metadata: {
-            collapsed: false
-          }
-        }
-        if (type == "code") {
-          cell.outputs = [];
-          cell.execution_count = 0;
-        }
-        return cell;
-      }
-
-      function addCodeCell(code) {
-        return addCell("code", code);
-      }
-
-      function addMarkdownCell(code) {
-        return addCell("markdown", code);
-      }
-
-      var currentNotebook = viewModel.notebooks()[0];
-      var jupyterNotebook = {
-        nbformat: 4,
-        nbformat_minor: 0,
-        cells: [],
-        metadata: {}
-      }
-
-      currentNotebook.snippets().forEach(function (snippet) {
-        if (snippet.type() == "pyspark") {
-          jupyterNotebook.cells.push(addCodeCell(snippet.statement_raw()));
-        }
-        if (snippet.type() == "markdown") {
-          jupyterNotebook.cells.push(addMarkdownCell(snippet.statement_raw()));
-        }
-      });
-
-
-      download(JSON.stringify(jupyterNotebook), currentNotebook.name() + ".ipynb", "text/plain");
-    }
-
-    window.exportJupyterNotebook = exportJupyterNotebook;
 
     var importExternalNotebook = function (notebook) {
       var currentNotebook = viewModel.notebooks()[0];
