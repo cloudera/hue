@@ -18,20 +18,21 @@
 
 package com.cloudera.hue.livy.spark.interactive
 
-import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 import com.cloudera.hue.livy.yarn.Client
 
 import scala.concurrent.ExecutionContext
 
-class InteractiveSessionYarnFactory(livyConf: LivyConf) extends InteractiveSessionFactory {
+class InteractiveSessionYarnFactory(client: Client, processFactory: SparkProcessBuilderFactory)
+  extends InteractiveSessionFactory(processFactory) {
 
    implicit def executor: ExecutionContext = ExecutionContext.global
 
-   val client = new Client(livyConf)
-
-   override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
-     InteractiveSessionYarn(livyConf, client, id, createInteractiveRequest)
+   protected  override def create(id: Int,
+                                  process: SparkProcess,
+                                  request: CreateInteractiveRequest): InteractiveSession = {
+     InteractiveSessionYarn(client, id, process, request)
    }
 
    override def close(): Unit = {

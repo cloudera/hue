@@ -18,55 +18,23 @@
 
 package com.cloudera.hue.livy.spark.batch
 
-import java.lang.ProcessBuilder.Redirect
-
+import com.cloudera.hue.livy.LineBufferedProcess
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.batch.BatchSession
-import com.cloudera.hue.livy.spark.SparkProcessBuilder
-import com.cloudera.hue.livy.spark.SparkProcessBuilder.RelativePath
+import com.cloudera.hue.livy.spark.SparkProcess
 import com.cloudera.hue.livy.yarn._
-import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 
 import scala.annotation.tailrec
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 object BatchSessionYarn {
-
   implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  def apply(livyConf: LivyConf, client: Client, id: Int, createBatchRequest: CreateBatchRequest): BatchSession = {
-    val builder = sparkBuilder(livyConf, createBatchRequest)
-
-    val process = builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args)
+  def apply(client: Client, id: Int, process: SparkProcess): BatchSession = {
     val job = Future {
       client.getJobFromProcess(process)
     }
     new BatchSessionYarn(id, process, job)
-  }
-
-  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkProcessBuilder = {
-    val builder = SparkProcessBuilder(livyConf)
-
-    builder.master("yarn-cluster")
-
-    createBatchRequest.proxyUser.foreach(builder.proxyUser)
-    createBatchRequest.className.foreach(builder.className)
-    createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
-    createBatchRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
-    createBatchRequest.files.map(RelativePath).foreach(builder.file)
-    createBatchRequest.driverMemory.foreach(builder.driverMemory)
-    createBatchRequest.driverCores.foreach(builder.driverCores)
-    createBatchRequest.executorMemory.foreach(builder.executorMemory)
-    createBatchRequest.executorCores.foreach(builder.executorCores)
-    createBatchRequest.numExecutors.foreach(builder.numExecutors)
-    createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
-    createBatchRequest.queue.foreach(builder.queue)
-    createBatchRequest.name.foreach(builder.name)
-
-    builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(true)
-
-    builder
   }
 }
 

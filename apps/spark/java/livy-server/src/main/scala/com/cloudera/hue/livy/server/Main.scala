@@ -26,8 +26,10 @@ import com.cloudera.hue.livy.server.batch.BatchSessionServlet
 import com.cloudera.hue.livy.server.interactive.InteractiveSessionServlet
 import com.cloudera.hue.livy.sessions.batch.BatchSession
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
+import com.cloudera.hue.livy.spark.SparkProcessBuilderFactory
 import com.cloudera.hue.livy.spark.batch.{BatchSessionProcessFactory, BatchSessionYarnFactory}
 import com.cloudera.hue.livy.spark.interactive.{InteractiveSessionYarnFactory, InteractiveSessionProcessFactory}
+import com.cloudera.hue.livy.yarn.Client
 import org.scalatra._
 import org.scalatra.metrics.MetricsBootstrap
 import org.scalatra.metrics.MetricsSupportExtensions._
@@ -162,11 +164,21 @@ class ScalatraBootstrap
 
       info(f"Using $sessionFactoryKind sessions")
 
+      val processFactory = new SparkProcessBuilderFactory(livyConf)
+
       val (sessionFactory, batchFactory) = sessionFactoryKind match {
         case LivyConf.Process() =>
-          (new InteractiveSessionProcessFactory(livyConf), new BatchSessionProcessFactory(livyConf))
+          val interactiveFactory = new InteractiveSessionProcessFactory(processFactory)
+          val batchFactory = new BatchSessionProcessFactory(processFactory)
+
+          (interactiveFactory, batchFactory)
+
         case LivyConf.Yarn() =>
-          (new InteractiveSessionYarnFactory(livyConf), new BatchSessionYarnFactory(livyConf))
+          val client = new Client(livyConf)
+          val interactiveFactory = new InteractiveSessionYarnFactory(client, processFactory)
+          val batchFactory = new BatchSessionYarnFactory(client, processFactory)
+
+          (interactiveFactory, batchFactory)
       }
 
       sessionManager = new SessionManager(livyConf, sessionFactory)

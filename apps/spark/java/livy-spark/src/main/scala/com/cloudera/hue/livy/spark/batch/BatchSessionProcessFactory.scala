@@ -18,12 +18,13 @@
 
 package com.cloudera.hue.livy.spark.batch
 
-import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.sessions.batch.BatchSession
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 
-class BatchSessionProcessFactory(livyConf: LivyConf)
-  extends BatchSessionFactory
+class BatchSessionProcessFactory(processFactory: SparkProcessBuilderFactory)
+  extends BatchSessionFactory(processFactory)
 {
-  override def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
-    BatchSessionProcess(livyConf, id, createBatchRequest)
+  protected override def create(id: Int, process: SparkProcess): BatchSession = {
+    BatchSessionProcess(id, process)
+  }
 }

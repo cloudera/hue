@@ -18,16 +18,74 @@
 
 package com.cloudera.hue.livy.spark.interactive
 
+import java.lang.ProcessBuilder.Redirect
+
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
-import com.cloudera.hue.livy.sessions.{SessionFactory, SessionKindSerializer}
+import com.cloudera.hue.livy.sessions.{PySpark, SessionFactory, SessionKindSerializer}
+import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, RelativePath}
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilder, SparkProcessBuilderFactory}
+import com.cloudera.hue.livy.{LivyConf, Utils}
 import org.json4s.{DefaultFormats, Formats, JValue}
 
-trait InteractiveSessionFactory extends SessionFactory[InteractiveSession] {
+object InteractiveSessionFactory {
+  private val CONF_LIVY_JAR = "livy.repl.jar"
+}
+
+abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFactory)
+  extends SessionFactory[InteractiveSession] {
 
   override protected implicit def jsonFormats: Formats = DefaultFormats ++ List(SessionKindSerializer)
 
   override def create(id: Int, createRequest: JValue) =
     create(id, createRequest.extract[CreateInteractiveRequest])
 
-  def create(id: Int, createRequest: CreateInteractiveRequest): InteractiveSession
+  def create(id: Int, request: CreateInteractiveRequest): InteractiveSession = {
+    val builder = sparkBuilder(id, request)
+    val kind = request.kind.toString
+    val process = builder.start(AbsolutePath(livyJar(processFactory.livyConf)), List(kind))
+
+    create(id, process, request)
+  }
+
+  protected def create(id: Int, process: SparkProcess, request: CreateInteractiveRequest): InteractiveSession
+
+  protected def sparkBuilder(id: Int, request: CreateInteractiveRequest): SparkProcessBuilder = {
+    val builder = processFactory.builder()
+
+    builder.className("com.cloudera.hue.livy.repl.Main")
+    request.archives.map(RelativePath).foreach(builder.archive)
+    request.driverCores.foreach(builder.driverCores)
+    request.driverMemory.foreach(builder.driverMemory)
+    request.executorCores.foreach(builder.executorCores)
+    request.executorMemory.foreach(builder.executorMemory)
+    request.numExecutors.foreach(builder.numExecutors)
+    request.files.map(RelativePath).foreach(builder.file)
+    request.jars.map(RelativePath).foreach(builder.jar)
+    request.proxyUser.foreach(builder.proxyUser)
+    request.pyFiles.map(RelativePath).foreach(builder.pyFile)
+    request.queue.foreach(builder.queue)
+    request.name.foreach(builder.name)
+
+    val callbackUrl = System.getProperty("livy.server.callback-url")
+    val url = f"$callbackUrl/sessions/$id/callback"
+
+    builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
+
+    request.kind match {
+      case PySpark() => builder.conf("spark.yarn.isPython", "true")
+      case _ =>
+    }
+
+    builder.env("LIVY_PORT", "0")
+
+    builder.redirectOutput(Redirect.PIPE)
+    builder.redirectErrorStream(true)
+
+    builder
+  }
+
+  private def livyJar(livyConf: LivyConf) = {
+    livyConf.getOption(InteractiveSessionFactory.CONF_LIVY_JAR)
+      .getOrElse(Utils.jarOfClass(getClass).head)
+  }
 }
