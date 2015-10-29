@@ -676,7 +676,7 @@ class HiveServerClient:
     else:
       query = 'DESCRIBE FORMATTED `%s`.`%s`' % (database, table_name)
 
-    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
+    (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
     return HiveServerTable(table_results.results, table_schema.schema, desc_results.results, desc_schema.schema)
