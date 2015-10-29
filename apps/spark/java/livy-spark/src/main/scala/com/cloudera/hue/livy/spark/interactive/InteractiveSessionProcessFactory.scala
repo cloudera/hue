@@ -29,6 +29,6 @@ class InteractiveSessionProcessFactory(livyConf: LivyConf) extends InteractiveSe
 
    override def create(id: Int,
                        createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
-     InteractiveSessionProcess.create(livyConf, id, createInteractiveRequest)
+     InteractiveSessionProcess(livyConf, id, createInteractiveRequest)
    }
  }

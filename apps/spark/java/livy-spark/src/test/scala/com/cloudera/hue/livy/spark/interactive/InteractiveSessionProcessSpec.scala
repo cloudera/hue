@@ -31,5 +31,5 @@ class InteractiveSessionProcessSpec
   val livyConf = new LivyConf()
   livyConf.set("livy.repl.driverClassPath", sys.props("java.class.path"))
 
-  def createSession() = InteractiveSessionProcess.create(livyConf, 0, CreateInteractiveRequest(kind = PySpark()))
+  def createSession() = InteractiveSessionProcess(livyConf, 0, CreateInteractiveRequest(kind = PySpark()))
 }

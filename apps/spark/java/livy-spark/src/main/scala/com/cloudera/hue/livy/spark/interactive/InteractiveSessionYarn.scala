@@ -36,10 +36,10 @@ object InteractiveSessionYarn {
 
   private val CONF_LIVY_JAR = "livy.yarn.jar"
 
-  def create(livyConf: LivyConf,
-             client: Client,
-             id: Int,
-             createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+  def apply(livyConf: LivyConf,
+            client: Client,
+            id: Int,
+            createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
     val callbackUrl = System.getProperty("livy.server.callback-url")
     val url = f"$callbackUrl/sessions/$id/callback"
 

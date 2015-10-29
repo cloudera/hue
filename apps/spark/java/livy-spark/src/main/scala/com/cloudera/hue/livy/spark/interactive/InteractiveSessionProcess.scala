@@ -36,9 +36,9 @@ object InteractiveSessionProcess extends Logging {
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def create(livyConf: LivyConf,
-             id: Int,
-             createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+  def apply(livyConf: LivyConf,
+            id: Int,
+            createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
     val process = startProcess(livyConf, id, createInteractiveRequest)
     new InteractiveSessionProcess(id, createInteractiveRequest, process)
   }
