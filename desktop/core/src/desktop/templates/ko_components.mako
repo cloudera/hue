@@ -153,7 +153,7 @@ from desktop.views import _ko
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isTable ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isTable, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
-          <span data-bind="text: definition.displayName"></span>
+          <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
         <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
@@ -312,6 +312,32 @@ from desktop.views import _ko
           });
           return result;
         });
+
+        self.editorText = ko.computed(function () {
+          if (self.definition.isTable) {
+            return self.definition.name;
+          }
+          if (self.definition.isColumn) {
+            return self.definition.name + ", ";
+          }
+          var parts = [];
+          var entry = self;
+          while (entry != null) {
+            if (entry.definition.isTable) {
+              break;
+            }
+            if (entry.definition.isArray || entry.definition.isMapValue) {
+              parts.push("[]");
+            } else {
+              parts.push(entry.definition.name);
+              parts.push(".");
+            }
+            entry = entry.parent;
+          }
+          parts.reverse();
+          parts.push(", ");
+          return parts.slice(1).join("");
+        });
       }
 
       AssistEntry.prototype.loadEntries = function() {
@@ -430,29 +456,7 @@ from desktop.views import _ko
 
       AssistEntry.prototype.dblClick = function (data, event) {
         var self = this;
-        if (self.definition.isTable) {
-          huePubSub.publish('assist.dblClickItem', self.definition.name);
-        } else if (self.definition.isColumn) {
-          huePubSub.publish('assist.dblClickItem', self.definition.name + ", ");
-        } else {
-          var parts = [];
-          var entry = self;
-          while (entry != null) {
-            if (entry.definition.isTable) {
-              break;
-            }
-            if (entry.definition.isArray || entry.definition.isMapValue) {
-              parts.push("[]");
-            } else {
-              parts.push(entry.definition.name);
-              parts.push(".");
-            }
-            entry = entry.parent;
-          }
-          parts.reverse();
-          parts.push(", ");
-          huePubSub.publish('assist.dblClickItem', parts.slice(1).join(""));
-        }
+        huePubSub.publish('assist.dblClickItem', self.editorText());
       };
 
       AssistEntry.prototype.toggleOpen = function () {
