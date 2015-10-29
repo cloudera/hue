@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions.SessionState
+import com.cloudera.hue.livy.spark.SparkProcessBuilderFactory
 import com.cloudera.hue.livy.spark.batch.{BatchSessionProcessFactory, CreateBatchRequest}
 import com.cloudera.hue.livy.{LivyConf, Utils}
 import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
@@ -55,7 +56,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
   }
 
   val livyConf = new LivyConf()
-  val batchFactory = new BatchSessionProcessFactory(livyConf)
+  val batchFactory = new BatchSessionProcessFactory(SparkProcessBuilderFactory(livyConf))
   val batchManager = new SessionManager(livyConf, batchFactory)
   val servlet = new BatchSessionServlet(batchManager)
 

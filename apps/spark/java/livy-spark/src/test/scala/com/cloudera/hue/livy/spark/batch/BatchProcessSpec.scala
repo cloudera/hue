@@ -23,6 +23,7 @@ import java.nio.file.{Files, Path}
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.sessions.SessionState
+import com.cloudera.hue.livy.spark.SparkProcessBuilderFactory
 import com.cloudera.hue.livy.{LivyConf, Utils}
 import org.scalatest.{BeforeAndAfterAll, FunSpec, ShouldMatchers}
 
@@ -53,7 +54,10 @@ class BatchProcessSpec
       val req = CreateBatchRequest(
         file = script.toString
       )
-      val batch = BatchSessionProcess(new LivyConf(), 0, req)
+
+      val livyConf = new LivyConf()
+      val builder = new BatchSessionProcessFactory(SparkProcessBuilderFactory(livyConf))
+      val batch = builder.create(0, req)
 
       Utils.waitUntil({ () => !batch.state.isActive }, Duration(10, TimeUnit.SECONDS))
       (batch.state match {

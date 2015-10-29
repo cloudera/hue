@@ -18,15 +18,12 @@
 
 package com.cloudera.hue.livy.spark.interactive
 
-import java.lang.ProcessBuilder.Redirect
 import java.util.concurrent.TimeUnit
 
+import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
-import com.cloudera.hue.livy.sessions.{PySpark, SessionState}
-import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, RelativePath}
-import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilder}
+import com.cloudera.hue.livy.spark.SparkProcess
 import com.cloudera.hue.livy.yarn.Client
-import com.cloudera.hue.livy.{LivyConf, Utils}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Future}
@@ -34,61 +31,21 @@ import scala.concurrent.{Await, ExecutionContext, ExecutionContextExecutor, Futu
 object InteractiveSessionYarn {
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  private val CONF_LIVY_JAR = "livy.yarn.jar"
+  private lazy val regex = """Application report for (\w+)""".r.unanchored
 
-  def apply(livyConf: LivyConf,
-            client: Client,
+  def apply(client: Client,
             id: Int,
-            createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
-    val callbackUrl = System.getProperty("livy.server.callback-url")
-    val url = f"$callbackUrl/sessions/$id/callback"
-
-    val builder = SparkProcessBuilder(livyConf)
-
-    builder.master("yarn-cluster")
-    builder.className("com.cloudera.hue.livy.repl.Main")
-    builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
-    createInteractiveRequest.archives.map(RelativePath).foreach(builder.archive)
-    createInteractiveRequest.driverCores.foreach(builder.driverCores)
-    createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
-    createInteractiveRequest.executorCores.foreach(builder.executorCores)
-    createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
-    createInteractiveRequest.files.map(RelativePath).foreach(builder.file)
-    createInteractiveRequest.jars.map(RelativePath).foreach(builder.jar)
-    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
-    createInteractiveRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
-    createInteractiveRequest.queue.foreach(builder.queue)
-    createInteractiveRequest.name.foreach(builder.name)
-
-    val kind = createInteractiveRequest.kind.toString
-
-    createInteractiveRequest.kind match {
-      case PySpark() => builder.conf("spark.yarn.isPython", "true")
-      case _ =>
-    }
-
-    builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(true)
-
-    val process = builder.start(AbsolutePath(livyJar(livyConf)), List(kind))
-
-    new InteractiveSessionYarn(id, client, process, createInteractiveRequest)
-  }
-
-  private def livyJar(livyConf: LivyConf) = {
-    if (livyConf.contains(CONF_LIVY_JAR)) {
-      livyConf.get(CONF_LIVY_JAR)
-    } else {
-      Utils.jarOfClass(classOf[Client]).head
-    }
+            process: SparkProcess,
+            request: CreateInteractiveRequest): InteractiveSession = {
+    new InteractiveSessionYarn(id, client, process, request)
   }
 }
 
 private class InteractiveSessionYarn(id: Int,
                                      client: Client,
                                      process: SparkProcess,
-                                     createInteractiveRequest: CreateInteractiveRequest)
-  extends InteractiveWebSession(id, createInteractiveRequest) {
+                                     request: CreateInteractiveRequest)
+  extends InteractiveWebSession(id, request) {
 
   // Error out the job if the process errors out.
   Future {

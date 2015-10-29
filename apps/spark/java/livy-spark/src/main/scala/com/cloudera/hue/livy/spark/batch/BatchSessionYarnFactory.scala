@@ -19,13 +19,18 @@
 package com.cloudera.hue.livy.spark.batch
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions.batch.BatchSession
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 import com.cloudera.hue.livy.yarn.Client
 
-class BatchSessionYarnFactory(livyConf: LivyConf) extends BatchSessionFactory {
+class BatchSessionYarnFactory(client: Client, factory: SparkProcessBuilderFactory)
+  extends BatchSessionFactory(factory) {
 
-  val client = new Client(livyConf)
+  protected override def create(id: Int, process: SparkProcess) =
+    BatchSessionYarn(client, id, process)
 
-  def create(id: Int, createBatchRequest: CreateBatchRequest): BatchSession =
-    BatchSessionYarn(livyConf, client, id, createBatchRequest)
+  override def sparkBuilder(request: CreateBatchRequest) = {
+    val builder = super.sparkBuilder(request)
+    builder.master("yarn-cluster")
+    builder
+  }
 }

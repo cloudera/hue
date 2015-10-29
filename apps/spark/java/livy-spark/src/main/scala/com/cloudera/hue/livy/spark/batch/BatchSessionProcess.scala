@@ -18,45 +18,16 @@
 
 package com.cloudera.hue.livy.spark.batch
 
-import java.lang.ProcessBuilder.Redirect
-
+import com.cloudera.hue.livy.LineBufferedProcess
 import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.sessions.batch.BatchSession
-import com.cloudera.hue.livy.spark.SparkProcessBuilder
-import com.cloudera.hue.livy.spark.SparkProcessBuilder.RelativePath
-import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
+import com.cloudera.hue.livy.spark.SparkProcess
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 object BatchSessionProcess {
-  def apply(livyConf: LivyConf, id: Int, createBatchRequest: CreateBatchRequest): BatchSession = {
-    val builder = sparkBuilder(livyConf, createBatchRequest)
-
-    val process = builder.start(RelativePath(createBatchRequest.file), createBatchRequest.args)
+  def apply(id: Int, process: SparkProcess): BatchSession = {
     new BatchSessionProcess(id, process)
-  }
-
-  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkProcessBuilder = {
-    val builder = SparkProcessBuilder(livyConf)
-
-    createBatchRequest.className.foreach(builder.className)
-    createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
-    createBatchRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
-    createBatchRequest.files.map(RelativePath).foreach(builder.file)
-    createBatchRequest.driverMemory.foreach(builder.driverMemory)
-    createBatchRequest.driverCores.foreach(builder.driverCores)
-    createBatchRequest.executorMemory.foreach(builder.executorMemory)
-    createBatchRequest.executorCores.foreach(builder.executorCores)
-    createBatchRequest.numExecutors.foreach(builder.numExecutors)
-    createBatchRequest.archives.map(RelativePath).foreach(builder.archive)
-    createBatchRequest.proxyUser.foreach(builder.proxyUser)
-    createBatchRequest.queue.foreach(builder.queue)
-    createBatchRequest.name.foreach(builder.name)
-
-    builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(true)
-
-    builder
   }
 }
 

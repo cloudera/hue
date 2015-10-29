@@ -26,6 +26,7 @@ import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement}
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 import com.cloudera.hue.livy.spark.interactive.{CreateInteractiveRequest, InteractiveSessionFactory}
 import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
 import org.json4s.jackson.JsonMethods._
@@ -77,14 +78,19 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
     override def interrupt(): Future[Unit] = ???
   }
 
-  class MockInteractiveSessionFactory() extends InteractiveSessionFactory {
-    override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
+  class MockInteractiveSessionFactory(processFactory: SparkProcessBuilderFactory)
+    extends InteractiveSessionFactory(processFactory) {
+
+    protected override def create(id: Int,
+                                  process: SparkProcess,
+                                  request: CreateInteractiveRequest): InteractiveSession = {
       new MockInteractiveSession(id)
     }
   }
 
   val livyConf = new LivyConf()
-  val sessionManager = new SessionManager(livyConf, new MockInteractiveSessionFactory())
+  val processFactory = new SparkProcessBuilderFactory(livyConf)
+  val sessionManager = new SessionManager(livyConf, new MockInteractiveSessionFactory(processFactory))
   val servlet = new InteractiveSessionServlet(sessionManager)
 
   addServlet(servlet, "/*")

@@ -18,14 +18,12 @@
 
 package com.cloudera.hue.livy.spark.interactive
 
-import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
-import com.cloudera.hue.livy.sessions._
+import com.cloudera.hue.livy.Logging
+import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
-import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, RelativePath}
-import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilder}
-import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
+import com.cloudera.hue.livy.spark.SparkProcess
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
@@ -36,57 +34,17 @@ object InteractiveSessionProcess extends Logging {
   val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
   val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
-  def apply(livyConf: LivyConf,
-            id: Int,
+  def apply(id: Int,
+            process: SparkProcess,
             createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
-    val process = startProcess(livyConf, id, createInteractiveRequest)
-    new InteractiveSessionProcess(id, createInteractiveRequest, process)
-  }
-
-  // Loop until we've started a process with a valid port.
-  private def startProcess(livyConf: LivyConf, id: Int, createInteractiveRequest: CreateInteractiveRequest): SparkProcess = {
-
-    val builder = new SparkProcessBuilder(livyConf)
-
-    builder.className("com.cloudera.hue.livy.repl.Main")
-    createInteractiveRequest.archives.map(RelativePath).foreach(builder.archive)
-    createInteractiveRequest.driverCores.foreach(builder.driverCores)
-    createInteractiveRequest.driverMemory.foreach(builder.driverMemory)
-    createInteractiveRequest.executorCores.foreach(builder.executorCores)
-    createInteractiveRequest.executorMemory.foreach(builder.executorMemory)
-    createInteractiveRequest.numExecutors.foreach(builder.numExecutors)
-    createInteractiveRequest.files.map(RelativePath).foreach(builder.file)
-    createInteractiveRequest.jars.map(RelativePath).foreach(builder.jar)
-    createInteractiveRequest.proxyUser.foreach(builder.proxyUser)
-    createInteractiveRequest.pyFiles.map(RelativePath).foreach(builder.pyFile)
-    createInteractiveRequest.queue.foreach(builder.queue)
-    createInteractiveRequest.name.foreach(builder.name)
-
-    sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
-    livyConf.getOption(CONF_LIVY_REPL_DRIVER_CLASS_PATH).foreach(builder.driverClassPath)
-
-    livyConf.getOption(CONF_LIVY_REPL_CALLBACK_URL).foreach { case callbackUrl =>
-      builder.env("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
-    }
-
-    builder.env("LIVY_PORT", "0")
-
-    builder.redirectOutput(Redirect.PIPE)
-    builder.redirectErrorStream(true)
-
-    builder.start(AbsolutePath(livyJar(livyConf)), List(createInteractiveRequest.kind.toString))
-  }
-
-  private def livyJar(conf: LivyConf): String = {
-    conf.getOption(CONF_LIVY_REPL_JAR).getOrElse {
-      Utils.jarOfClass(getClass).head
-    }
+    new InteractiveSessionProcess(id, process, createInteractiveRequest)
   }
 }
 
 private class InteractiveSessionProcess(id: Int,
-                                        createInteractiveRequest: CreateInteractiveRequest,
-                                        process: SparkProcess) extends InteractiveWebSession(id, createInteractiveRequest) {
+                                        process: SparkProcess,
+                                        createInteractiveRequest: CreateInteractiveRequest)
+  extends InteractiveWebSession(id, createInteractiveRequest) {
 
   val stdoutThread = new Thread {
     override def run() = {

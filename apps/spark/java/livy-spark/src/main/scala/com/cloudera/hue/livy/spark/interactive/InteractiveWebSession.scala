@@ -34,9 +34,7 @@ import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-abstract class InteractiveWebSession(val id: Int,
-                                     createInteractiveRequest: CreateInteractiveRequest)
-  extends InteractiveSession with Logging {
+abstract class InteractiveWebSession(val id: Int, request: CreateInteractiveRequest) extends InteractiveSession with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats
@@ -49,9 +47,9 @@ abstract class InteractiveWebSession(val id: Int,
   private[this] var _executedStatements = 0
   private[this] var _statements = IndexedSeq[Statement]()
 
-  override def kind = createInteractiveRequest.kind
+  override def kind = request.kind
 
-  override def proxyUser = createInteractiveRequest.proxyUser
+  override def proxyUser = request.proxyUser
 
   override def url: Option[URL] = _url
 
