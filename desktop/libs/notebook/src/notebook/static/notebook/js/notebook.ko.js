@@ -750,7 +750,7 @@
     };
 
     self.addSession = function (session) {
-      var toRemove = []
+      var toRemove = [];
       $.each(self.sessions(), function (index, s) {
         if (s.type() == session.type()) {
           toRemove.push(s);
@@ -869,7 +869,7 @@
         if (snippet.id() == id) idx = cnt;
       });
       self.snippets(self.snippets().move(self.snippets().length - 1, idx));
-    }
+    };
 
     self.getContext = function() {
      return {
@@ -942,6 +942,43 @@
         }
       });
     };
+
+    self.exportJupyterNotebook = function () {
+      function addCell(type, code) {
+        var cell = {
+          cell_type: type,
+          source: [
+            code
+          ],
+          metadata: {
+            collapsed: false
+          }
+        };
+        if (type == "code") {
+          cell.outputs = [];
+          cell.execution_count = 0;
+        }
+        return cell;
+      }
+
+      var jupyterNotebook = {
+        nbformat: 4,
+        nbformat_minor: 0,
+        cells: [],
+        metadata: {}
+      };
+
+      self.snippets().forEach(function (snippet) {
+        if (snippet.type() == "pyspark") {
+          jupyterNotebook.cells.push(addCell("code", snippet.statement_raw()));
+        }
+        if (snippet.type() == "markdown") {
+          jupyterNotebook.cells.push(addCell("markdown",snippet.statement_raw()));
+        }
+      });
+
+      download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
+    }
   };
 
 
