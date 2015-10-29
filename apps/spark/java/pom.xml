@@ -492,37 +492,6 @@
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>2.2</version>
-                <configuration>
-                    <shadedArtifactAttached>false</shadedArtifactAttached>
-                    <artifactSet>
-                        <includes>
-                            <include>com.cloudera.hue:unused</include>
-                            <include>org.eclipse.jetty:jetty-http</include>
-                            <include>org.eclipse.jetty:jetty-io</include>
-                            <include>org.eclipse.jetty:jetty-continuation</include>
-                            <include>org.eclipse.jetty:jetty-servlet</include>
-                            <include>org.eclipse.jetty:jetty-plus</include>
-                            <include>org.eclipse.jetty:jetty-security</include>
-                            <include>org.eclipse.jetty:jetty-util</include>
-                            <include>org.eclipse.jetty:jetty-server</include>
-                            <include>com.google.guava:guava</include>
-                        </includes>
-                    </artifactSet>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
 
     </build>
