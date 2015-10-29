@@ -23,8 +23,8 @@ import java.net.URL
 
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
-import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
+import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, RelativePath}
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilder}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
 
 import scala.annotation.tailrec
@@ -46,7 +46,7 @@ object InteractiveSessionProcess extends Logging {
   // Loop until we've started a process with a valid port.
   private def startProcess(livyConf: LivyConf, id: Int, createInteractiveRequest: CreateInteractiveRequest): SparkProcess = {
 
-    val builder = new SparkSubmitProcessBuilder(livyConf)
+    val builder = new SparkProcessBuilder(livyConf)
 
     builder.className("com.cloudera.hue.livy.repl.Main")
     createInteractiveRequest.archives.map(RelativePath).foreach(builder.archive)

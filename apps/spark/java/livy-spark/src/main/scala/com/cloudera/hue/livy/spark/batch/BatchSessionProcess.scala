@@ -22,8 +22,8 @@ import java.lang.ProcessBuilder.Redirect
 
 import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.sessions.batch.BatchSession
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder
-import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.RelativePath
+import com.cloudera.hue.livy.spark.SparkProcessBuilder
+import com.cloudera.hue.livy.spark.SparkProcessBuilder.RelativePath
 import com.cloudera.hue.livy.{LineBufferedProcess, LivyConf}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -36,8 +36,8 @@ object BatchSessionProcess {
     new BatchSessionProcess(id, process)
   }
 
-  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkSubmitProcessBuilder = {
-    val builder = SparkSubmitProcessBuilder(livyConf)
+  private def sparkBuilder(livyConf: LivyConf, createBatchRequest: CreateBatchRequest): SparkProcessBuilder = {
+    val builder = SparkProcessBuilder(livyConf)
 
     createBatchRequest.className.foreach(builder.className)
     createBatchRequest.jars.map(RelativePath).foreach(builder.jar)
