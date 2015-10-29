@@ -1238,10 +1238,12 @@
   function chartsUpdatingState() {
     $(document).find("svg").css("opacity", "0.5");
   }
+  window.chartsUpdatingState = chartsUpdatingState;
 
   function chartsNormalState() {
     $(document).find("svg").css("opacity", "1");
   }
+  window.chartsNormalState = chartsNormalState;
 
   var tipBuilder = function () {
     var direction = d3_tip_direction,
