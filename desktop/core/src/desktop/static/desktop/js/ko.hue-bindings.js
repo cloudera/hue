@@ -22,6 +22,19 @@
   }
 }(function (ko) {
 
+  ko.bindingHandlers.draggableText = {
+    init: function (element, valueAccessor) {
+      var $element = $(element);
+      $element.addClass("draggableText");
+
+      var $helper = $("<div>").text(valueAccessor().text()).css("z-index", "99999");
+      $element.draggable({
+        helper: function () { return $helper },
+        appendTo: "body"
+      });
+    }
+  };
+
   ko.bindingHandlers.visibleOnHover = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
@@ -2063,6 +2076,18 @@
       huePubSub.subscribe("assist.dblClickItem", function(value) {
         if ($el.data("last-active-editor")) {
           editor.session.insert(editor.getCursorPosition(), value);
+        }
+      });
+
+      $el.droppable({
+        accept: ".draggableText",
+        drop: function (e, ui) {
+          var position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
+          var text = ui.helper.text();
+          editor.session.insert(position, text);
+          position.column += text.length;
+          editor.moveCursorToPosition(position);
+          editor.clearSelection();
         }
       });
 
