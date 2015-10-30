@@ -34,4 +34,3 @@ case class CreateBatchRequest(
     archives: List[String] = List(),
     queue: Option[String] = None,
     name: Option[String] = None)
-
