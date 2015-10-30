@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
+import com.cloudera.hue.livy.sessions.interactive.{Statement, InteractiveSession}
 import dispatch._
 import org.json4s.JsonAST.{JString, JNull}
 import org.json4s.jackson.Serialization.write

@@ -16,15 +16,14 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.sessions.interactive
 
 import java.net.URL
 import java.util.concurrent.TimeoutException
 
 import com.cloudera.hue.livy.Utils
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.Session
-import com.cloudera.hue.livy.sessions.{SessionState, Kind}
+import com.cloudera.hue.livy.sessions.{Session, Kind, SessionState}
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration

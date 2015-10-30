@@ -19,6 +19,7 @@
 package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.LivyConf
+import com.cloudera.hue.livy.sessions.batch.BatchSession
 
 import scala.concurrent.Future
 

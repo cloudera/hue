@@ -24,6 +24,8 @@ import javax.servlet.ServletContext
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.server.batch._
 import com.cloudera.hue.livy.server.interactive._
+import com.cloudera.hue.livy.sessions.batch.BatchSession
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import org.scalatra._
 import org.scalatra.metrics.MetricsBootstrap
 import org.scalatra.metrics.MetricsSupportExtensions._

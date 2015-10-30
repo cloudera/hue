@@ -19,6 +19,7 @@
 package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.server.SessionFactory
+import com.cloudera.hue.livy.sessions.batch.BatchSession
 import org.json4s.JValue
 
 abstract class BatchSessionFactory extends SessionFactory[BatchSession] {

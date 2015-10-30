@@ -16,37 +16,19 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package com.cloudera.hue.livy.sessions.interactive
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import org.json4s.JValue
-import org.json4s.JsonAST.{JArray, JObject, JField, JString}
+import org.json4s.JsonAST.{JArray, JField, JObject, JString}
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
-object Statement {
-  sealed trait State
-
-  case class Running() extends State {
-    override def toString = "running"
-  }
-
-  case class Available() extends State {
-    override def toString = "available"
-  }
-
-  case class Error() extends State {
-    override def toString = "error"
-  }
-}
-
 class Statement(val id: Int, val request: ExecuteRequest, _output: Future[JValue]) {
-  import Statement._
-
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
 
-  private[this] var _state: State = Running()
+  private[this] var _state: StatementState = StatementState.Running()
 
   def state = _state
 
@@ -77,7 +59,7 @@ class Statement(val id: Int, val request: ExecuteRequest, _output: Future[JValue
   }
 
   _output.onComplete {
-    case Success(_) => _state = Available()
-    case Failure(_) => _state = Error()
+    case Success(_) => _state = StatementState.Available()
+    case Failure(_) => _state = StatementState.Error()
   }
 }

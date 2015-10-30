@@ -16,16 +16,8 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.sessions.batch
 
 import com.cloudera.hue.livy.sessions.Session
-import org.json4s.{DefaultFormats, Formats, JValue}
 
-abstract class SessionFactory[S <: Session] {
-
-  protected implicit def jsonFormats: Formats = DefaultFormats
-
-  def create(id: Int, createRequest: JValue): S
-
-  def close(): Unit = {}
-}
+trait BatchSession extends Session

@@ -25,6 +25,7 @@ import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions._
+import com.cloudera.hue.livy.sessions.interactive.{Statement, InteractiveSession}
 import org.json4s.{DefaultFormats, Formats}
 import org.json4s.JsonAST.{JInt, JArray, JObject, JString}
 import org.json4s.jackson.JsonMethods._

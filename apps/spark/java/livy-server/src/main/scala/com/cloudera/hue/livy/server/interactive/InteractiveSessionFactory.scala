@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.server.SessionFactory
 import com.cloudera.hue.livy.sessions.SessionKindSerializer
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import org.json4s.{DefaultFormats, Formats, JValue}
 
 import scala.concurrent.Future

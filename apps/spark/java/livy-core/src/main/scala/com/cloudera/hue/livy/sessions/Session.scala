@@ -16,9 +16,27 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.batch
+package com.cloudera.hue.livy.sessions
 
-import com.cloudera.hue.livy.server.Session
+import scala.concurrent.Future
 
-trait BatchSession extends Session {
+trait Session {
+  def id: Int
+
+  def lastActivity: Option[Long] = None
+
+  def stoppedTime: Option[Long] = {
+    state match {
+      case SessionState.Error(time) => Some(time)
+      case SessionState.Dead(time) => Some(time)
+      case SessionState.Success(time) => Some(time)
+      case _ => None
+    }
+  }
+
+  def state: SessionState
+
+  def stop(): Future[Unit]
+
+  def logLines(): IndexedSeq[String]
 }
