@@ -2084,9 +2084,17 @@
         drop: function (e, ui) {
           var position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
           var text = ui.helper.text();
+          editor.moveCursorToPosition(position);
+          var before = editor.getTextBeforeCursor();
+          if (before.length > 0 && before.charAt(before.length - 1) !== ' ' && before.charAt(before.length - 1) !== '.') {
+            text = " " + text;
+          }
+          var after = editor.getTextAfterCursor();
+          if (after.length > 0 && after.charAt(0) !== ' ' && text.charAt(text.length - 1) !== ' ') {
+            text += " ";
+          }
           editor.session.insert(position, text);
           position.column += text.length;
-          editor.moveCursorToPosition(position);
           editor.clearSelection();
         }
       });

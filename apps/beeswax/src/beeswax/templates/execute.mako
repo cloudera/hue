@@ -1619,6 +1619,14 @@ $(document).ready(function () {
       var position = codeMirror.coordsChar({"left": e.clientX, "top": e.clientY});
       var text = ui.helper.text();
       codeMirror.setCursor(position);
+      var value = codeMirror.getValue();
+      var index = codeMirror.indexFromPos(codeMirror.getCursor());
+      if (index > 0 && value.charAt(index - 1) !== ' ' && value.charAt(index - 1) !== '.') {
+        text = " " + text;
+      }
+      if ((index + 1) < value.length - 1  && value.charAt(index + 1) !== ' ' && text.charAt(text.length - 1) !== ' ') {
+        text += " ";
+      }
       codeMirror.replaceSelection(text);
       codeMirror.setSelection(codeMirror.getCursor());
       codeMirror.focus();
