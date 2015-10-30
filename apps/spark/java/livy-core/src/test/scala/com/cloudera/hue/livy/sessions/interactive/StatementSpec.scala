@@ -18,9 +18,10 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server.interactive
+package scala.com.cloudera.hue.livy.sessions.interactive
 
 import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.sessions.interactive.Statement
 import org.json4s.JsonAST.JString
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{FunSpec, Matchers}

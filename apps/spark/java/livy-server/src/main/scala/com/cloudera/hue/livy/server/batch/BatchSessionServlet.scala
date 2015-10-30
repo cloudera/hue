@@ -20,6 +20,7 @@ package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
+import com.cloudera.hue.livy.sessions.batch.BatchSession
 import org.json4s.JsonDSL._
 import org.json4s._
 

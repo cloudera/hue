@@ -16,29 +16,20 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.sessions.interactive
 
-import com.cloudera.hue.livy.sessions.SessionState
+sealed trait StatementState
 
-import scala.concurrent.Future
-
-trait Session {
-  def id: Int
-
-  def lastActivity: Option[Long] = None
-
-  def stoppedTime: Option[Long] = {
-    state match {
-      case SessionState.Error(time) => Some(time)
-      case SessionState.Dead(time) => Some(time)
-      case SessionState.Success(time) => Some(time)
-      case _ => None
-    }
+object StatementState {
+  case class Running() extends StatementState {
+    override def toString = "running"
   }
 
-  def state: SessionState
+  case class Available() extends StatementState {
+    override def toString = "available"
+  }
 
-  def stop(): Future[Unit]
-
-  def logLines(): IndexedSeq[String]
+  case class Error() extends StatementState {
+    override def toString = "error"
+  }
 }

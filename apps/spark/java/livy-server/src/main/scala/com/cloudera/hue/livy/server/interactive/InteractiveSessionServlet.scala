@@ -25,6 +25,7 @@ import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
 import com.cloudera.hue.livy.sessions._
+import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement, StatementState}
 import org.json4s.JsonAST.JString
 import org.json4s._
 import org.scalatra._
@@ -147,7 +148,7 @@ private object Serializers {
 
   private def serializeSessionKind(kind: Kind) = JString(kind.toString)
 
-  private def serializeStatementState(state: Statement.State) = JString(state.toString)
+  private def serializeStatementState(state: StatementState) = JString(state.toString)
 
   def serializeSession(session: InteractiveSession): JValue = {
     ("id", session.id) ~
@@ -210,11 +211,11 @@ private object Serializers {
       serializeStatement(statement, None, None)
   }))
 
-  case object StatementStateSerializer extends CustomSerializer[Statement.State](implicit formats => ( {
+  case object StatementStateSerializer extends CustomSerializer[StatementState](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case state: Statement.State => JString(state.toString)
+    case state: StatementState => JString(state.toString)
   }
     )
   )

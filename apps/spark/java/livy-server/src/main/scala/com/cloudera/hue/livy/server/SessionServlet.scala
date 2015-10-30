@@ -19,7 +19,8 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
+import com.cloudera.hue.livy.sessions.Session
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession.SessionFailedToStart
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonDSL._
 import org.json4s.{DefaultFormats, Formats, JValue, MappingException}

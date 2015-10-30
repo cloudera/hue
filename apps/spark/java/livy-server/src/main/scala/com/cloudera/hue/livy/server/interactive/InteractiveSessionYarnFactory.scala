@@ -19,6 +19,7 @@
 package com.cloudera.hue.livy.server.interactive
 
 import com.cloudera.hue.livy.LivyConf
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.yarn.Client
 
 import scala.concurrent.{ExecutionContext, Future}

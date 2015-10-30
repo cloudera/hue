@@ -22,6 +22,7 @@ import java.lang.ProcessBuilder.Redirect
 import java.net.URL
 
 import com.cloudera.hue.livy.sessions.SessionState
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.spark.SparkSubmitProcessBuilder.{AbsolutePath, RelativePath}
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkSubmitProcessBuilder}
 import com.cloudera.hue.livy.{LivyConf, Logging, Utils}
