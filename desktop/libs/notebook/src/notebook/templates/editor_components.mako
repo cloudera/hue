@@ -826,31 +826,7 @@ ${ require.config() }
         <i class="fa fa-file-text-o"></i>
       </a>
 
-      <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
-        ${ csrf_token(request) | n,unicode }
-        <input type="hidden" name="notebook"/>
-        <input type="hidden" name="snippet"/>
-        <input type="hidden" name="format" class="download-format"/>
-
-        <div class="hover-dropdown" data-bind="visible: status() == 'available' && result.hasSomeResults() && result.type() == 'table'" style="display:none;">
-          <a class="inactive-action dropdown-toggle pointer" data-toggle="dropdown">
-            <i class="fa fa-download"></i>
-            <i class="fa fa-caret-down"></i>
-          </a>
-          <ul class="dropdown-menu pull-right">
-            <li>
-              <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'csv'); }" title="${ _('Download first rows as CSV') }">
-                <i class="fa fa-file-o"></i> ${ _('CSV') }
-              </a>
-            </li>
-            <li>
-              <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { downloadResult($data, 'xls'); }" title="${ _('Download first rows as XLS') }">
-                <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
-              </a>
-            </li>
-          </ul>
-        </div>
-      </form>
+      <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
     </div>
   </div>
 </script>
@@ -1997,15 +1973,6 @@ ${ require.config() }
           });
         });
       }
-
-      function downloadResult (snippet, format) {
-        $('#snippet_' + snippet.id()).find('.download-format').val(format);
-        $('#snippet_' + snippet.id()).find('input[name=\'notebook\']').val(ko.mapping.toJSON(viewModel.selectedNotebook().getContext()));
-        $('#snippet_' + snippet.id()).find('input[name=\'snippet\']').val(ko.mapping.toJSON(snippet.getContext()));
-        $('#snippet_' + snippet.id()).find('.download-form').submit();
-      }
-
-      window.downloadResult = downloadResult;
 
       forceChartDraws();
 

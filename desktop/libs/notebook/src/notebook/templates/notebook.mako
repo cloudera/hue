@@ -56,6 +56,7 @@ ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
 ${ koComponents.addSnippetMenu() }
+${ koComponents.downloadSnippetResults() }
 
 ${ editorComponents.commonJS() }
 

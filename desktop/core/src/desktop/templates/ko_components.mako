@@ -1081,3 +1081,75 @@ from desktop.views import _ko
     }));
   </script>
 </%def>
+
+<%def name="downloadSnippetResults()">
+  <script type="text/html" id="download-results-template">
+    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
+      ${ csrf_token(request) | n,unicode }
+      <input type="hidden" name="notebook"/>
+      <input type="hidden" name="snippet"/>
+      <input type="hidden" name="format"/>
+    </form>
+
+    <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
+      <a class="inactive-action dropdown-toggle pointer" data-toggle="dropdown">
+        <i class="fa fa-download"></i>
+        <i class="fa fa-caret-down"></i>
+      </a>
+      <ul class="dropdown-menu pull-right">
+        <li>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv" title="${ _('Download first rows as CSV') }">
+            <i class="fa fa-file-o"></i> ${ _('CSV') }
+          </a>
+        </li>
+        <li>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls" title="${ _('Download first rows as XLS') }">
+            <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
+          </a>
+        </li>
+      </ul>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      function DownloadResultsViewModel (params, element) {
+        var self = this;
+        self.$downloadForm = $(element).find(".download-form");
+        self.snippet = params.snippet;
+        self.notebook = params.notebook;
+      }
+
+      DownloadResultsViewModel.prototype.download = function (format) {
+        var self = this;
+        self.$downloadForm.find('input[name=\'format\']').val(format);
+        self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));
+        self.$downloadForm.find('input[name=\'snippet\']').val(ko.mapping.toJSON(self.snippet.getContext()));
+        self.$downloadForm.submit();
+      };
+
+      DownloadResultsViewModel.prototype.downloadXls = function () {
+        var self = this;
+        self.download("xls");
+      };
+
+      DownloadResultsViewModel.prototype.downloadCsv = function () {
+        var self = this;
+        self.download("csv");
+      };
+
+      ko.components.register('downloadSnippetResults', {
+        viewModel: { createViewModel: function (params, componentInfo) {
+          return new DownloadResultsViewModel(params, componentInfo.element);
+        }},
+        template: { element: 'download-results-template' }
+      });
+    }));
+  </script>
+</%def>
