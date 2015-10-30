@@ -196,6 +196,7 @@ def watch_query_refresh_json(request, id):
   # Go to next statement if asked to continue or when a statement with no dataset finished.
   try:
     if request.POST.get('next') or (not query_history.is_finished() and query_history.is_success() and not query_history.has_results):
+      close_operation(request, id)
       query_history = db.execute_next_statement(query_history, request.POST.get('query-query'))
       handle, state = _get_query_handle_and_state(query_history)
   except QueryServerException, ex:
