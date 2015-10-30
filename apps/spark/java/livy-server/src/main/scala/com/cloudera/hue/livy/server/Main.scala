@@ -24,6 +24,7 @@ import javax.servlet.ServletContext
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.server.batch.BatchSessionServlet
 import com.cloudera.hue.livy.server.interactive.InteractiveSessionServlet
+import com.cloudera.hue.livy.sessions.SessionManager
 import com.cloudera.hue.livy.sessions.batch.BatchSession
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.spark.SparkProcessBuilderFactory

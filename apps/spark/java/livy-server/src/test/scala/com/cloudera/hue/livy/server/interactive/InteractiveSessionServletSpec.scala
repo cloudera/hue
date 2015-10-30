@@ -23,7 +23,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.SessionManager
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement}
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
