@@ -50,16 +50,11 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
   private[this] var _pyFiles: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _files: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _conf: ArrayBuffer[(String, String)] = ArrayBuffer()
-  private[this] var _driverMemory: Option[String] = None
   private[this] var _driverJavaOptions: Option[String] = None
   private[this] var _driverClassPath: ArrayBuffer[String] = ArrayBuffer()
-  private[this] var _executorMemory: Option[String] = None
   private[this] var _proxyUser: Option[String] = None
 
-  private[this] var _driverCores: Option[String] = None
-  private[this] var _executorCores: Option[String] = None
   private[this] var _queue: Option[String] = None
-  private[this] var _numExecutors: Option[String] = None
   private[this] var _archives: ArrayBuffer[Path] = ArrayBuffer()
 
   private[this] var _env: ArrayBuffer[(String, String)] = ArrayBuffer()
@@ -132,14 +127,8 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def driverMemory(driverMemory: String): SparkProcessBuilder = {
-    _driverMemory = Some(driverMemory)
-    this
-  }
-
   def driverJavaOptions(driverJavaOptions: String): SparkProcessBuilder = {
-    _driverJavaOptions = Some(driverJavaOptions)
-    this
+    conf("spark.driver.extraJavaOptions", driverJavaOptions)
   }
 
   def driverClassPath(classPath: String): SparkProcessBuilder = {
@@ -152,23 +141,16 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def executorMemory(executorMemory: String): SparkProcessBuilder = {
-    _executorMemory = Some(executorMemory)
-    this
-  }
-
-  def proxyUser(proxyUser: String): SparkProcessBuilder = {
-    _proxyUser = Some(proxyUser)
-    this
-  }
-
   def driverCores(driverCores: Int): SparkProcessBuilder = {
     this.driverCores(driverCores.toString)
   }
 
+  def driverMemory(driverMemory: String): SparkProcessBuilder = {
+    conf("spark.driver.memory", driverMemory)
+  }
+
   def driverCores(driverCores: String): SparkProcessBuilder = {
-    _driverCores = Some(driverCores)
-    this
+    conf("spark.driver.cores", driverCores)
   }
 
   def executorCores(executorCores: Int): SparkProcessBuilder = {
@@ -176,17 +158,23 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
   }
 
   def executorCores(executorCores: String): SparkProcessBuilder = {
-    _executorCores = Some(executorCores)
-    this
+    conf("spark.executor.cores", executorCores)
   }
 
+  def executorMemory(executorMemory: String): SparkProcessBuilder = {
+    conf("spark.executor.memory", executorMemory)
+  }
 
   def numExecutors(numExecutors: Int): SparkProcessBuilder = {
     this.numExecutors(numExecutors.toString)
   }
 
   def numExecutors(numExecutors: String): SparkProcessBuilder = {
-    _numExecutors = Some(numExecutors)
+    this.conf("spark.executor.instances", numExecutors)
+  }
+
+  def proxyUser(proxyUser: String): SparkProcessBuilder = {
+    _proxyUser = Some(proxyUser)
     this
   }
 
@@ -250,19 +238,13 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
     addList("--files", _files.map(fromPath))
     addOpt("--class", _className)
     addList("--conf", _conf.map { case (key, value) => f"$key=$value" })
-    addOpt("--driver-memory", _driverMemory)
     addOpt("--driver-java-options", _driverJavaOptions)
     addList("--driver-class-path", _driverClassPath)
-    addOpt("--driver-cores", _driverCores)
-    addOpt("--executor-memory", _executorMemory)
 
     if (livyConf.getBoolean(LivyConf.IMPERSONATION_ENABLED_KEY, true)) {
       addOpt("--proxy-user", _proxyUser)
     }
 
-    addOpt("--driver-cores", _driverCores)
-    addOpt("--executor-cores", _executorCores)
-    addOpt("--num-executors", _numExecutors)
     addOpt("--queue", _queue)
     addList("--archives", _archives.map(fromPath))
 
