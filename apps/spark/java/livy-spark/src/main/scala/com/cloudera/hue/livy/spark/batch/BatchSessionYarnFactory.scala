@@ -18,7 +18,6 @@
 
 package com.cloudera.hue.livy.spark.batch
 
-import com.cloudera.hue.livy.LivyConf
 import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 import com.cloudera.hue.livy.yarn.Client
 
