@@ -41,7 +41,7 @@ class SessionManagerSpec extends FlatSpec with Matchers {
 
   it should "garbage collect old sessions" in {
     val livyConf = new LivyConf()
-    livyConf.set(SessionManager.LIVY_SERVER_SESSION_TIMEOUT, "100")
+    livyConf.set(SessionManager.SESSION_TIMEOUT, "100")
     val manager = new SessionManager(livyConf, new MockSessionFactory)
     val session = manager.create(JNothing)
     manager.get(session.id).isDefined should be(true)

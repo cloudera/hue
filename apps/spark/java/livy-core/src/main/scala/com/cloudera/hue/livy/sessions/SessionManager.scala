@@ -27,21 +27,20 @@ import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 
 object SessionManager {
-  val LIVY_SERVER_SESSION_TIMEOUT = "livy.server.session.timeout"
+  val SESSION_TIMEOUT = "livy.server.session.timeout"
 }
 
 class SessionManager[S <: Session](livyConf: LivyConf, factory: SessionFactory[S])
   extends Logging {
-
-  import SessionManager._
 
   private implicit def executor: ExecutionContext = ExecutionContext.global
 
   private[this] final val _idCounter = new AtomicInteger()
   private[this] final val _sessions = mutable.Map[Int, S]()
 
-  private[this] final val sessionTimeout = livyConf.getInt(LIVY_SERVER_SESSION_TIMEOUT, 1000 * 60 * 60)
+  private[this] final val sessionTimeout = livyConf.getInt(SessionManager.SESSION_TIMEOUT, 1000 * 60 * 60)
   private[this] final val garbageCollector = new GarbageCollector
+
   garbageCollector.setDaemon(true)
   garbageCollector.start()
 
