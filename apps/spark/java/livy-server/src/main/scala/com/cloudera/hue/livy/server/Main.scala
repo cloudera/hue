@@ -24,13 +24,7 @@ import javax.servlet.ServletContext
 import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.server.batch.BatchSessionServlet
 import com.cloudera.hue.livy.server.interactive.InteractiveSessionServlet
-import com.cloudera.hue.livy.sessions.SessionManager
-import com.cloudera.hue.livy.sessions.batch.BatchSession
-import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
-import com.cloudera.hue.livy.spark.SparkProcessBuilderFactory
-import com.cloudera.hue.livy.spark.batch.{BatchSessionProcessFactory, BatchSessionYarnFactory}
-import com.cloudera.hue.livy.spark.interactive.{InteractiveSessionYarnFactory, InteractiveSessionProcessFactory}
-import com.cloudera.hue.livy.yarn.Client
+import com.cloudera.hue.livy.spark.SparkManager
 import org.scalatra._
 import org.scalatra.metrics.MetricsBootstrap
 import org.scalatra.metrics.MetricsSupportExtensions._
@@ -155,38 +149,15 @@ class ScalatraBootstrap
   with Logging
   with MetricsBootstrap {
 
-  var sessionManager: SessionManager[InteractiveSession] = null
-  var batchManager: SessionManager[BatchSession] = null
+  var sparkManager: SparkManager = null
 
   override def init(context: ServletContext): Unit = {
     try {
       val livyConf = new LivyConf()
-      val sessionFactoryKind = livyConf.sessionKind()
+      sparkManager = SparkManager(livyConf)
 
-      info(f"Using $sessionFactoryKind sessions")
-
-      val processFactory = new SparkProcessBuilderFactory(livyConf)
-
-      val (sessionFactory, batchFactory) = sessionFactoryKind match {
-        case LivyConf.Process() =>
-          val interactiveFactory = new InteractiveSessionProcessFactory(processFactory)
-          val batchFactory = new BatchSessionProcessFactory(processFactory)
-
-          (interactiveFactory, batchFactory)
-
-        case LivyConf.Yarn() =>
-          val client = new Client(livyConf)
-          val interactiveFactory = new InteractiveSessionYarnFactory(client, processFactory)
-          val batchFactory = new BatchSessionYarnFactory(client, processFactory)
-
-          (interactiveFactory, batchFactory)
-      }
-
-      sessionManager = new SessionManager(livyConf, sessionFactory)
-      batchManager = new SessionManager(livyConf, batchFactory)
-
-      context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")
-      context.mount(new BatchSessionServlet(batchManager), "/batches/*")
+      context.mount(new InteractiveSessionServlet(sparkManager.interactiveManager), "/sessions/*")
+      context.mount(new BatchSessionServlet(sparkManager.batchManager), "/batches/*")
       context.mountMetricsAdminServlet("/")
 
       context.initParameters(org.scalatra.EnvironmentKey) = livyConf.get("livy.environment", "development")
@@ -198,12 +169,9 @@ class ScalatraBootstrap
   }
 
   override def destroy(context: ServletContext): Unit = {
-    if (sessionManager != null) {
-      sessionManager.shutdown()
-    }
-
-    if (batchManager != null) {
-      batchManager.shutdown()
+    if (sparkManager != null) {
+      sparkManager.shutdown()
+      sparkManager = null
     }
   }
 }

@@ -29,13 +29,9 @@ class InteractiveSessionYarnFactory(client: Client, processFactory: SparkProcess
 
    implicit def executor: ExecutionContext = ExecutionContext.global
 
-   protected  override def create(id: Int,
-                                  process: SparkProcess,
-                                  request: CreateInteractiveRequest): InteractiveSession = {
+   protected override def create(id: Int,
+                                 process: SparkProcess,
+                                 request: CreateInteractiveRequest): InteractiveSession = {
      InteractiveSessionYarn(client, id, process, request)
-   }
-
-   override def close(): Unit = {
-     client.close()
    }
  }
