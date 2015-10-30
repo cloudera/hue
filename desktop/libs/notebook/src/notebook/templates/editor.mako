@@ -40,6 +40,7 @@ ${ editorComponents.commonHTML() }
 ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.assistPanel() }
+${ koComponents.downloadSnippetResults() }
 
 ${ editorComponents.commonJS() }
 
