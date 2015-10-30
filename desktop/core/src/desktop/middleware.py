@@ -341,21 +341,57 @@ class AuditLoggingMiddleware(object):
   groupname_re = get_groupname_re_rule()
 
   operations = {
-    '/accounts/login': 'USER_LOGIN',
-    '/accounts/logout': 'USER_LOGOUT',
-    '/useradmin/users/add_ldap_users': 'ADD_LDAP_USERS',
-    '/useradmin/users/add_ldap_groups': 'ADD_LDAP_GROUPS',
-    '/useradmin/users/sync_ldap_users_groups': 'SYNC_LDAP_USERS_GROUPS',
-    '/useradmin/users/new': 'CREATE_USER',
-    '/useradmin/groups/new': 'CREATE_GROUP',
-    '/useradmin/users/delete': 'DELETE_USER',
-    '/useradmin/groups/delete': 'DELETE_GROUP'
+    '/accounts/login': {
+      'operation': 'USER_LOGIN',
+      'success_status': 302
+    },
+    '/accounts/logout': {
+      'operation': 'USER_LOGOUT',
+      'success_status': 302
+    },
+    '/useradmin/users/add_ldap_users': {
+      'operation': 'ADD_LDAP_USERS',
+      'success_status': 302
+    },
+    '/useradmin/users/add_ldap_groups': {
+      'operation': 'ADD_LDAP_GROUPS',
+      'success_status': 302
+    },
+    '/useradmin/users/sync_ldap_users_groups': {
+      'operation': 'SYNC_LDAP_USERS_GROUPS',
+      'success_status': 302
+    },
+    '/useradmin/users/new': {
+      'operation': 'CREATE_USER',
+      'success_status': 302
+    },
+    '/useradmin/groups/new': {
+      'operation': 'CREATE_GROUP',
+      'success_status': 200
+    },
+    '/useradmin/users/delete': {
+      'operation': 'DELETE_USER',
+      'success_status': 302
+    },
+    '/useradmin/groups/delete': {
+      'operation': 'DELETE_GROUP',
+      'success_status': 302
+    }
   }
 
   operation_patterns = {
-    '/useradmin/permissions/edit/(?P<app>.*)/(?P<priv>.*)': 'EDIT_PERMISSION',
-    '/useradmin/users/edit/(?P<username>%s)' % (username_re,): 'EDIT_USER',
-    '/useradmin/groups/edit/(?P<name>%s)' % (groupname_re,): 'EDIT_GROUP'
+    '/useradmin/permissions/edit/(?P<app>.*)/(?P<priv>.*)': {
+      'operation': 'EDIT_PERMISSION',
+      'success_status': 200
+    },
+    '/useradmin/users/edit/(?P<username>%s)' % (username_re,): {
+      'operation': 'EDIT_USER',
+      'success_status': 302
+    },
+    '/useradmin/groups/edit/(?P<name>%s)' % (groupname_re,): {
+      'operation': 'EDIT_GROUP',
+      'success_status': 200
+    }
   }
 
   process_view_operations = ('USER_LOGOUT', 'DELETE_USER')
@@ -372,7 +408,7 @@ class AuditLoggingMiddleware(object):
   def process_view(self, request, view_func, view_args, view_kwargs):
     try:
       operation = self._get_operation(request.path)
-      if operation in self.process_view_operations:
+      if self._is_valid_request(operation):
         self._log_message(operation, request)
     except Exception, e:
       LOG.error('Could not audit the request: %s' % e)
@@ -383,12 +419,26 @@ class AuditLoggingMiddleware(object):
     response['audited'] = False
     try:
       operation = self._get_operation(request.path)
-      if request.method == 'POST' and operation not in self.process_view_operations:
+      if self._is_valid_response(operation, request, response):
         self._log_message(operation, request, response)
         response['audited'] = True
     except Exception, e:
       LOG.error('Could not audit the request: %s' % e)
     return response
+
+  def _is_valid_request(self, operation):
+    return operation and (operation in self.process_view_operations)
+
+  def _is_valid_response(self, operation, request, response):
+    success_status = self._get_success_status(request.path)
+    is_valid = False
+    if self._is_invalid_login(operation, request):
+      is_valid = True
+    elif request.method == 'POST' and \
+       operation and (operation not in self.process_view_operations) and \
+       (response.status_code == success_status or response.status_code == 401):  # also log unauthorized operations
+      is_valid = True
+    return is_valid
 
   def _log_message(self, operation, request, response=None):
     audit_logger = get_audit_logger()
@@ -436,18 +486,31 @@ class AuditLoggingMiddleware(object):
     else:
       return True
 
-  def _get_operation(self, path):
+  def _get_operation_dict(self, path):
     url = path.rstrip('/')
 
     if url in AuditLoggingMiddleware.operations:
       return AuditLoggingMiddleware.operations[url]
     else:
-      for regex, operation in AuditLoggingMiddleware.operation_patterns.items():
+      for regex, operation_dict in AuditLoggingMiddleware.operation_patterns.items():
         pattern = re.compile(regex)
         if pattern.match(url):
-          return operation
+          return operation_dict
+    return None
 
-    return ''
+  def _get_operation(self, path):
+    operation_dict = self._get_operation_dict(path)
+    if operation_dict:
+      return operation_dict['operation']
+    else:
+      return None
+
+  def _get_success_status(self, path):
+    operation_dict = self._get_operation_dict(path)
+    if operation_dict:
+      return operation_dict['success_status']
+    else:
+      return None
 
   def _get_operation_text(self, operation, request):
     if request.method == 'POST':
@@ -457,7 +520,7 @@ class AuditLoggingMiddleware(object):
         return 'Edited User with username: %s' % request.POST.get('username', '')
       elif operation == 'DELETE_USER':
         usernames = self._get_usernames(request.POST.getlist('user_ids', []))
-        return 'Deleted User ID(s): %s' % ', '.join(usernames)
+        return 'Deleted User(s): %s' % ', '.join(usernames)
       elif operation == 'ADD_LDAP_USERS':
         return 'Added/Synced LDAP username(s): %s' % ', '.join(request.POST.getlist('username_pattern', []))
       elif operation == 'CREATE_GROUP':
@@ -470,7 +533,6 @@ class AuditLoggingMiddleware(object):
         return 'Deleted Group(s): %s' % ', '.join(request.POST.getlist('group_names', []))
       elif operation == 'ADD_LDAP_GROUPS':
         return 'Added LDAP Group(s): %s' % ', '.join(request.POST.getlist('groupname_pattern', []))
-
     return ''
 
   def _get_usernames(self, user_ids):
