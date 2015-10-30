@@ -83,6 +83,14 @@ QUERY_TIMEOUT_S = Config(
   default=600
 )
 
+SESSION_TIMEOUT_S = Config(
+  key="session_timeout_s",
+  help=_t("If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work"
+          " (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."),
+  type=int,
+  default=12 * 60 * 60
+)
+
 SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),

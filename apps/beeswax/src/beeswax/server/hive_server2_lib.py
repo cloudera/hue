@@ -544,6 +544,9 @@ class HiveServerClient:
     if self.query_server['server_name'] == 'sparksql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
 
+    if self.query_server['server_name'] == 'impala' and self.query_server['SESSION_TIMEOUT_S'] > 0:
+      kwargs['configuration'].update({'idle_session_timeout': str(self.query_server['SESSION_TIMEOUT_S'])})
+
     LOG.info('Opening %s thrift session for user %s' % (self.query_server['server_name'], user.username))
 
     req = TOpenSessionReq(**kwargs)
