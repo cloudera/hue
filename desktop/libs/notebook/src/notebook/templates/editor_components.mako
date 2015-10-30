@@ -741,7 +741,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-footer-actions">
-  <div class="snippet-progress-container" data-bind="slideVisible: progress() > 0 || errors().length > 0, click: function(snippet, e){ setAceFocus(e, ace()); }">
+  <div class="snippet-progress-container" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
     <div class="progress progress-striped active" data-bind="css: {
       'progress-warning': progress() > 0 && progress() < 100,
       'progress-success': progress() == 100,
@@ -762,59 +762,59 @@ ${ require.config() }
     <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
       <i class="fa fa-stop"></i>
     </a>
-    <div class="hover-actions">
+    <div class="hover-actions" style="display:inline-block;">
       <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
 
       <div style="display: inline-block; margin-left: 15px;">
-        <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
+        <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }" style="display:none;">
           <i class="fa fa-th"></i>
         </a>
 
         <div class="btn-group">
-        <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }">
-          <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-          <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
-          <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
-          <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
-          <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
-          <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
-        </a>
-        <a style="min-width: 12px; width: 12px;" class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}">
-          <i class="fa fa-caret-down"></i>
-        </a>
+          <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }" style="display:none;">
+            <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
+            <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
+            <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+            <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+            <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
+          </a>
+          <a style="min-width: 12px; width: 12px;" class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}">
+            <i class="fa fa-caret-down"></i>
+          </a>
 
-        <ul class="dropdown-menu">
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
-              <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-              <i class="hcha hcha-line-chart"></i> ${_('Lines')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-              <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-              <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-              <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
-            </a>
-          </li>
-          <li>
-            <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-              <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
-            </a>
-          </li>
-        </ul>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
+                <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+                <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+                <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+                <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -1734,7 +1734,7 @@ ${ require.config() }
       window.hueDebug = {
         viewModel: viewModel,
         ko: ko
-      }
+      };
 
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();
