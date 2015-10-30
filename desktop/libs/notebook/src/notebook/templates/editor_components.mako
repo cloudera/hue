@@ -380,17 +380,15 @@ ${ require.config() }
 
       </h2>
 
-      <div>
-        <div style="float: left; width: 50%">
-          <div class="snippet-body" style="position: relative; z-index: 90;">
-            <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
-          </div>
+      <div style="position: relative;">
+        <div class="snippet-body" style="position: relative; z-index: 90;">
+          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+          <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+          <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
+          <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
         </div>
 
-        <div style="float: left; width: 50%">
+        <div style="position: absolute; top:0; z-index: 301; width: 100%;">
           <!-- ko template: 'snippet-settings' --><!-- /ko -->
         </div>
 

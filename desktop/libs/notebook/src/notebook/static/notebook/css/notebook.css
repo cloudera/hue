@@ -108,8 +108,6 @@ body {
 }
 
 .snippet-settings {
-  width: 200%;
-  margin-left: -100%;
   background-color: #FFF;
   border-left: 1px solid #e5e5e5;
   border-right: 1px solid #e5e5e5;
