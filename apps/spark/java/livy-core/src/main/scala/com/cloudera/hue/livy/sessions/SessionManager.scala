@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.sessions
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.cloudera.hue.livy.sessions.{SessionFactory, Session}
 import com.cloudera.hue.livy.{LivyConf, Logging}
 import org.json4s.JValue
 

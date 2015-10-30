@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.server
+package com.cloudera.hue.livy.sessions
 
 import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JNothing, JValue}
 import org.scalatest.{FlatSpec, Matchers}
 

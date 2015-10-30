@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
+import com.cloudera.hue.livy.server.SessionServlet
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement, StatementState}
 import org.json4s.JsonAST.JString
