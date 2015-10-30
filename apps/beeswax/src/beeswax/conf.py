@@ -74,6 +74,12 @@ BROWSE_PARTITIONED_TABLE_LIMIT = Config(
   type=int,
   help=_t('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
 
+SAMPLE_TABLE_MAX_PARTITIONS = Config(
+  key='sample_table_max_partitions',
+  default=10,
+  type=int,
+  help=_t('The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.'))
+
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
   default=1000000,

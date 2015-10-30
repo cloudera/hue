@@ -24,8 +24,7 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT,\
-  BROWSE_PARTITIONED_TABLE_LIMIT
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SAMPLE_TABLE_MAX_PARTITIONS
 from beeswax.design import hql_query
 from beeswax.models import QueryHistory, QUERY_TYPES
 
@@ -177,17 +176,40 @@ class HiveServer2Dbms(object):
 
 
   def get_sample(self, database, table):
+    result = None
+
     """No samples if it's a view (HUE-526)"""
     if not table.is_view:
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
-      hql = "SELECT * FROM %s.%s LIMIT %s" % (database, table.name, limit)
-      query = hql_query(hql)
-      handle = self.execute_and_wait(query, timeout_sec=5.0)
 
-      if handle:
-        result = self.fetch(handle, rows=100)
-        self.close(handle)
-        return result
+      if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+        hql = self._get_sample_partition_query(database, table, limit)
+      else:
+        hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
+
+      if hql:
+        query = hql_query(hql)
+        handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+        if handle:
+          result = self.fetch(handle, rows=100)
+          self.close(handle)
+
+    return result
+
+
+  def _get_sample_partition_query(self, database, table, limit):
+    partitions = self.get_partitions(database, table, max_parts=SAMPLE_TABLE_MAX_PARTITIONS.get())
+
+    if partitions:
+      # Need to reformat partition specs for where clause syntax
+      partition_specs = [part.partition_spec.replace(',', ' AND ') for part in partitions]
+      partition_filters = ' OR '.join(['(%s)' % partition_spec for partition_spec in partition_specs])
+      partition_clause = 'WHERE %s' % partition_filters
+    else:
+      partition_clause = ''
+
+    return "SELECT * FROM `%s`.`%s` %s LIMIT %s" % (database, table.name, partition_clause, limit)
 
 
   def analyze_table_table(self, database, table):
