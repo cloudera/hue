@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.spark
 
-import com.cloudera.hue.livy.spark.SparkProcessBuilder.{RelativePath, AbsolutePath, Path}
+import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, Path, RelativePath}
 import com.cloudera.hue.livy.{LivyConf, Logging}
 
 import scala.collection.JavaConversions._
