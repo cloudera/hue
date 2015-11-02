@@ -835,10 +835,13 @@ class PartitionKeyCompatible:
 
 class PartitionValueCompatible:
 
-  def __init__(self, partition, table):
+  def __init__(self, partition_row, table):
+    partition = partition_row[0]
+    parts = partition.split('/')
+    self.partition_spec = ','.join(["%s='%s'" % (pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
     # Parses: ['datehour=2013022516'] or ['month=2011-07/dt=2011-07-01/hr=12']
-    self.values = [val.split('=')[1] for part in partition for val in part.split('/')]
-    self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition)),})
+    self.values = [val.split('=')[1] for part in partition_row for val in part.split('/')]
+    self.sd = type('Sd', (object,), {'location': '%s/%s' % (table.path_location, ','.join(partition_row)),})
 
 
 class ExplainCompatible:
