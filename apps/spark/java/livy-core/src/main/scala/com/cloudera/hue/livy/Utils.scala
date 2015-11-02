@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy
 
-import java.io.{FileInputStream, InputStreamReader, File}
+import java.io.{File, FileInputStream, InputStreamReader}
 import java.util.Properties
 
 import scala.annotation.tailrec
@@ -27,11 +27,7 @@ import scala.concurrent.TimeoutException
 import scala.concurrent.duration.Duration
 
 object Utils {
-  def getPropertiesFromFile(filename: String): Map[String, String] = {
-    val file = new File(filename)
-    require(file.exists(), s"Properties file $file does not exist")
-    require(file.isFile, s"Properties file $file is not a normal file")
-
+  def getPropertiesFromFile(file: File): Map[String, String] = {
     val inReader = new InputStreamReader(new FileInputStream(file), "UTF-8")
     try {
       val properties = new Properties()
@@ -42,24 +38,39 @@ object Utils {
     }
   }
 
-  def getDefaultPropertiesFile(env: Map[String, String] = sys.env): String = {
+  def getLivyConfDir(env: Map[String, String] = sys.env): Option[File] = {
     env.get("LIVY_CONF_DIR")
       .orElse(env.get("LIVY_HOME").map(path => s"$path${File.separator}conf"))
-      .map(path => new File(s"$path${File.separator}livy-defaults.conf"))
-      .filter(_.isFile)
-      .map(_.getAbsolutePath)
-      .orNull
+      .map(new File(_))
+      .filter(_.exists())
+  }
+
+  def getLivyConfigFile(name: String): Option[File] = {
+    getLivyConfDir().map(new File(_, name)).filter(_.exists())
+  }
+
+  def getLivyConfigFileOrError(name: String): File = {
+    getLivyConfigFile(name).getOrElse {
+      throw new Exception(s"$name does not exist")
+    }
+  }
+
+  def getDefaultPropertiesFile: Option[File] = {
+    getLivyConfigFile("livy-defaults.conf")
   }
 
   def loadDefaultLivyProperties(conf: LivyConf, filePath: String = null) = {
-    val path = Option(filePath).getOrElse(getDefaultPropertiesFile())
-    Option(path).foreach { path =>
-      getPropertiesFromFile(path).filter { case (k, v) =>
-        k.startsWith("livy.")
-      }.foreach { case (k, v) =>
-        conf.setIfMissing(k, v)
-        sys.props.getOrElseUpdate(k, v)
-      }
+    val file: Option[File] = Option(filePath)
+      .map(new File(_))
+      .orElse(getDefaultPropertiesFile)
+
+    file.foreach { f =>
+      getPropertiesFromFile(f)
+        .filterKeys(_.startsWith("livy."))
+        .foreach { case (k, v) =>
+          conf.setIfMissing(k, v)
+          sys.props.getOrElseUpdate(k, v)
+        }
     }
   }
 

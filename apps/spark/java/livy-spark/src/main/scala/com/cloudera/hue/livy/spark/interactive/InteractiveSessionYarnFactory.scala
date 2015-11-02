@@ -27,11 +27,17 @@ import scala.concurrent.ExecutionContext
 class InteractiveSessionYarnFactory(client: Client, processFactory: SparkProcessBuilderFactory)
   extends InteractiveSessionFactory(processFactory) {
 
-   implicit def executor: ExecutionContext = ExecutionContext.global
+  implicit def executor: ExecutionContext = ExecutionContext.global
 
-   protected override def create(id: Int,
-                                 process: SparkProcess,
-                                 request: CreateInteractiveRequest): InteractiveSession = {
-     InteractiveSessionYarn(client, id, process, request)
-   }
+  protected override def create(id: Int,
+                                process: SparkProcess,
+                                request: CreateInteractiveRequest): InteractiveSession = {
+    InteractiveSessionYarn(client, id, process, request)
+  }
+
+  override def sparkBuilder(id: Int, request: CreateInteractiveRequest) = {
+    val builder = super.sparkBuilder(id, request)
+    builder.master("yarn-cluster")
+    builder
+  }
  }

@@ -33,5 +33,5 @@ case class CreateInteractiveRequest(
     numExecutors: Option[Int] = None,
     archives: List[String] = List(),
     queue: Option[String] = None,
-    name: Option[String] = None)
-
+    name: Option[String] = None,
+    conf: Map[String, String] = Map())

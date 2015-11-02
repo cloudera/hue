@@ -33,3 +33,11 @@
 
 # If livy should use proxy users when submitting a job.
 ## livy.impersonation.enabled = true
+
+# Allow spark to reference files found in this directory. This may either be a local directory
+# or an hdfs:// directory. Be careful setting this option, as it may allow users to access
+# any file the Livy process can access, such as Livy's SSL certificate.
+## livy.files.dir = /var/run/livy/uploaded-files
+
+# Optional list of Spark options that can be configured by the user.
+## livy.spark.user-configurable-options = spark.serializer,spark.logConf

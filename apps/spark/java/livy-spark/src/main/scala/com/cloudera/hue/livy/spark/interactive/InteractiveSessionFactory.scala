@@ -53,6 +53,7 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
     val builder = processFactory.builder()
 
     builder.className("com.cloudera.hue.livy.repl.Main")
+    builder.conf(request.conf)
     request.archives.map(RelativePath).foreach(builder.archive)
     request.driverCores.foreach(builder.driverCores)
     request.driverMemory.foreach(builder.driverMemory)
@@ -67,12 +68,18 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
     request.name.foreach(builder.name)
 
     val callbackUrl = System.getProperty("livy.server.callback-url")
-    val url = f"$callbackUrl/sessions/$id/callback"
+    val driverOptions =
+      f"-Dlivy.repl.callback-url=$callbackUrl/sessions/$id/callback " +
+      "-Dlivy.repl.port=0"
 
-    builder.driverJavaOptions(f"-Dlivy.repl.callback-url=$url -Dlivy.repl.port=0")
+    builder.conf(
+      "spark.driver.extraJavaOptions",
+      builder.conf("spark.driver.extraJavaOptions")
+        .getOrElse("") + driverOptions,
+        admin = true)
 
     request.kind match {
-      case PySpark() => builder.conf("spark.yarn.isPython", "true")
+      case PySpark() => builder.conf("spark.yarn.isPython", "true", admin = true)
       case _ =>
     }
 

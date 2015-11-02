@@ -21,6 +21,7 @@ package com.cloudera.hue.livy.server
 import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.sessions.{SessionManager, Session}
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession.SessionFailedToStart
+import com.cloudera.hue.livy.spark.ConfigOptionNotAllowed
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonDSL._
 import org.json4s.{DefaultFormats, Formats, JValue, MappingException}
@@ -122,6 +123,7 @@ abstract class SessionServlet[S <: Session](sessionManager: SessionManager[S])
   error {
     case e: JsonParseException => BadRequest(e.getMessage)
     case e: MappingException => BadRequest(e.getMessage)
+    case e: ConfigOptionNotAllowed => BadRequest(e.getMessage)
     case e: SessionFailedToStart => InternalServerError(e.getMessage)
     case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
     case e =>

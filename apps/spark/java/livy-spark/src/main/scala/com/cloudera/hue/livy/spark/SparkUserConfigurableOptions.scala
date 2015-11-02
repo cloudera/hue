@@ -16,22 +16,27 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.spark.batch
+package com.cloudera.hue.livy.spark
 
-case class CreateBatchRequest(
-    file: String,
-    proxyUser: Option[String] = None,
-    args: List[String] = List(),
-    className: Option[String] = None,
-    jars: List[String] = List(),
-    pyFiles: List[String] = List(),
-    files: List[String] = List(),
-    driverMemory: Option[String] = None,
-    driverCores: Option[Int] = None,
-    executorMemory: Option[String] = None,
-    executorCores: Option[Int] = None,
-    numExecutors: Option[Int] = None,
-    archives: List[String] = List(),
-    queue: Option[String] = None,
-    name: Option[String] = None,
-    conf: Map[String, String] = Map())
+import java.io.File
+
+import com.cloudera.hue.livy.Utils
+
+import scala.io.Source
+
+object SparkUserConfigurableOptions {
+  def apply(): Set[String] = {
+    val file = Utils.getLivyConfDir()
+      .map(path => new File(path, "spark-user-configurable-options.conf"))
+      .get
+
+    apply(file)
+  }
+
+  def apply(configFile: File): Set[String] = {
+    Source.fromFile(configFile).getLines()
+      .map(_.trim)
+      .filter(_.startsWith("//"))
+      .toSet
+  }
+}
