@@ -1927,6 +1927,7 @@ ${ require.config() }
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
           resizeToggleResultSettings(snippet);
+          forceChartDraws();
         }, 50);
       });
 
