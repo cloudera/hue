@@ -257,9 +257,9 @@ ${ components.menubar() }
   $(document).ready(function () {
 
     function selectColumn(col) {
-      var _t = $("#sample");
+      var _t = $("#sampleTable");
       var _col = _t.find("th").filter(function() {
-        return $.trim($(this).text()) == col;
+        return $.trim($(this).text()).indexOf(col) > -1;
       });
       _t.find(".columnSelected").removeClass("columnSelected");
       _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
@@ -305,6 +305,7 @@ ${ components.menubar() }
 
       for (var id in sortables) {
         $("#" + id).addClass("initialized");
+        % if len(table.cols) < 1000:
         $("#" + id).dataTable({
           "aoColumns": sortables[id],
           "bPaginate": false,
@@ -326,6 +327,7 @@ ${ components.menubar() }
             "sZeroRecords": "${_('No matching records')}"
           }
         });
+        % endif
       }
       if ($(e.target).attr("href") == "#columnAnalysisTerms") {
         $("#columnAnalysis .filter").removeClass("hide");
