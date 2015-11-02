@@ -229,6 +229,7 @@ ${ header.menubar() }
       <div class="form-actions">
         <a id="backBtn" class="btn disabled">${ _('Back') }</a>
         <a id="nextBtn" class="btn btn-primary disable-feedback">${ _('Next') }</a>
+        <a id="doneBtn" class="btn btn-primary disable-feedback hide">${ _('Done') }</a>
         <div class="pull-right muted">${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }</div>
       </div>
       % else:
@@ -355,9 +356,11 @@ $(document).ready(function(){
     }
 
     if (step != $(".stepDetails:last").attr("id")) {
-      $("#nextBtn").removeClass("disabled");
+      $("#nextBtn").removeClass("hide");
+      $("#doneBtn").addClass("hide");
     } else {
-      $("#nextBtn").addClass("disabled");
+      $("#nextBtn").addClass("hide");
+      $("#doneBtn").removeClass("hide");
     }
 
     $("a.step").parent().removeClass("active");
@@ -381,6 +384,10 @@ $(document).ready(function(){
     if (nextStep <= $(".step").length) {
       routie("step" + nextStep);
     }
+  });
+
+  $("#doneBtn").click(function () {
+    location.href = "${ url('desktop.views.home') }";
   });
 
   $(".updatePreferences").click(function () {
