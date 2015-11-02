@@ -388,6 +388,11 @@ ${ require.config() }
           <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
         </div>
 
+        <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
+        <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-footer-actions' } --><!-- /ko -->
+
+        <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+
         <div style="position: absolute; top:0; z-index: 301; width: 100%;">
           <!-- ko template: 'snippet-settings' --><!-- /ko -->
         </div>
@@ -502,8 +507,6 @@ ${ require.config() }
   </div>
   <div class="clearfix"></div>
 
-  <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
-  <!-- ko template: 'snippet-results' --><!-- /ko -->
 </script>
 
 <script type="text/html" id="snippet-results">
@@ -734,11 +737,9 @@ ${ require.config() }
       <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties().arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
     </form>
   </div>
-
-  <!-- ko template: 'snippet-footer-actions' --><!-- /ko -->
 </script>
 
-<script type="text/html" id="snippet-footer-actions">
+<script type="text/html" id="snippet-execution-status">
   <div class="snippet-progress-container" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
     <div class="progress progress-striped active" data-bind="css: {
       'progress-warning': progress() > 0 && progress() < 100,
@@ -752,79 +753,93 @@ ${ require.config() }
       <li data-bind="text: message"></li>
     </ul>
   </div>
+</script>
 
+<script type="text/html" id="snippet-footer-actions">
   <div class="snippet-footer-actions-bar" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
-    <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
-      <i class="fa fa-spinner fa-spin"></i>
-    </a>
-    <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
-      <i class="fa fa-stop"></i>
-    </a>
-    <div class="hover-actions" style="display:inline-block;">
-      <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
 
-      <div style="display: inline-block; margin-left: 15px;">
-        <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }" style="display:none;">
-          <i class="fa fa-th"></i>
-        </a>
+    <!-- ko template: 'snippet-execution-controls' --><!-- /ko -->
+    <!-- ko template: 'snippet-result-controls' --><!-- /ko -->
 
-        <div class="btn-group">
-          <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }" style="display:none;">
-            <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-            <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
-            <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
-            <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
-            <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
-            <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
-          </a>
-          <a style="min-width: 12px; width: 12px;" class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}">
-            <i class="fa fa-caret-down"></i>
-          </a>
-
-          <ul class="dropdown-menu">
-            <li>
-              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
-                <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-                <i class="hcha hcha-line-chart"></i> ${_('Lines')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-                <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-                <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-                <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-                <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
 
     <div class="pull-right hover-actions inline" style="padding-top: 8px; font-size: 15px;">
-      <span style="color: #CCC; padding-right: 10px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
+      <!-- ko template: 'snippet-execution-stats' --><!-- /ko -->
+      <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
+    </div>
+  </div>
+</script>
 
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
-        <i class="fa fa-file-text-o"></i>
+<script type ="text/html" id="snippet-execution-controls">
+  <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
+    <i class="fa fa-spinner fa-spin"></i>
+  </a>
+  <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
+    <i class="fa fa-stop"></i>
+  </a>
+  <div class="hover-actions" style="display:inline-block;">
+    <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
+  </div>
+</script>
+
+<script type ="text/html" id="snippet-execution-stats">
+  <span style="color: #CCC; padding-right: 10px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
+
+  <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
+    <i class="fa fa-file-text-o"></i>
+  </a>
+</script>
+
+<script type="text/html" id="snippet-result-controls">
+  <div style="display: inline-block; margin-left: 15px;">
+    <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }" style="display:none;">
+      <i class="fa fa-th"></i>
+    </a>
+
+    <div class="btn-group">
+      <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }" style="display:none;">
+        <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+        <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
+        <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
+        <i class="fa fa-fw fa-dot-circle-o" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART"></i>
+        <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
+        <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
+      </a>
+      <a style="min-width: 12px; width: 12px;" class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}">
+        <i class="fa fa-caret-down"></i>
       </a>
 
-      <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
+      <ul class="dropdown-menu">
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.BARCHART); }">
+            <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+            <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+            <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+            <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+            <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="css: {'active': chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $data.showChart(true); chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+            <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </script>
