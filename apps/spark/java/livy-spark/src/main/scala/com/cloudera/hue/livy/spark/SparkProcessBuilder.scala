@@ -18,17 +18,13 @@
 
 package com.cloudera.hue.livy.spark
 
-import com.cloudera.hue.livy.spark.SparkProcessBuilder.{AbsolutePath, Path, RelativePath}
 import com.cloudera.hue.livy.{LivyConf, Logging}
 
 import scala.collection.JavaConversions._
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object SparkProcessBuilder {
-  def apply(livyConf: LivyConf): SparkProcessBuilder = {
-    new SparkProcessBuilder(livyConf)
-  }
-
   /**
    * Represents a path that is either allowed to reference a local file, or must exist in our
    * cache directory or on hdfs.
@@ -38,7 +34,9 @@ object SparkProcessBuilder {
   case class RelativePath(path: String) extends Path
 }
 
-class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
+class SparkProcessBuilder(livyConf: LivyConf, userConfigurableOptions: Set[String]) extends Logging {
+  import SparkProcessBuilder._
+
   private[this] val fsRoot = livyConf.filesystemRoot()
 
   private[this] var _executable: Path = AbsolutePath(livyConf.sparkSubmit())
@@ -49,8 +47,7 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
   private[this] var _jars: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _pyFiles: ArrayBuffer[Path] = ArrayBuffer()
   private[this] var _files: ArrayBuffer[Path] = ArrayBuffer()
-  private[this] var _conf: ArrayBuffer[(String, String)] = ArrayBuffer()
-  private[this] var _driverJavaOptions: Option[String] = None
+  private[this] val _conf = mutable.HashMap[String, String]()
   private[this] var _driverClassPath: ArrayBuffer[String] = ArrayBuffer()
   private[this] var _proxyUser: Option[String] = None
 
@@ -117,13 +114,22 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
     this
   }
 
-  def conf(key: String, value: String): SparkProcessBuilder = {
-    this._conf += ((key, value))
+  def conf(key: String): Option[String] = {
+    _conf.get(key)
+  }
+
+  def conf(key: String, value: String, admin: Boolean = false): SparkProcessBuilder = {
+    if (admin || userConfigurableOptions.contains(key)) {
+      this._conf(key) = value
+    } else {
+      throw new ConfigOptionNotAllowed(key, value)
+    }
+
     this
   }
 
   def conf(conf: Traversable[(String, String)]): SparkProcessBuilder = {
-    this._conf ++= conf
+    conf.foreach { case (key, value) => this.conf(key, value) }
     this
   }
 
@@ -214,19 +220,19 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
   }
 
   def start(file: Path, args: Traversable[String]): SparkProcess = {
-    var args_ = ArrayBuffer(fromPath(_executable))
+    var arguments = ArrayBuffer(fromPath(_executable))
 
     def addOpt(option: String, value: Option[String]): Unit = {
       value.foreach { v =>
-        args_ += option
-        args_ += v
+        arguments += option
+        arguments += v
       }
     }
 
     def addList(option: String, values: Traversable[String]): Unit = {
       if (values.nonEmpty) {
-        args_ += option
-        args_ += values.mkString(",")
+        arguments += option
+        arguments += values.mkString(",")
       }
     }
 
@@ -237,8 +243,10 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
     addList("--py-files", _pyFiles.map(fromPath))
     addList("--files", _files.map(fromPath))
     addOpt("--class", _className)
-    addList("--conf", _conf.map { case (key, value) => f"$key=$value" })
-    addOpt("--driver-java-options", _driverJavaOptions)
+    _conf.foreach { case (key, value) =>
+      arguments += "--conf"
+      arguments += f"$key=$value"
+    }
     addList("--driver-class-path", _driverClassPath)
 
     if (livyConf.getBoolean(LivyConf.IMPERSONATION_ENABLED_KEY, true)) {
@@ -248,16 +256,16 @@ class SparkProcessBuilder(livyConf: LivyConf) extends Logging {
     addOpt("--queue", _queue)
     addList("--archives", _archives.map(fromPath))
 
-    args_ += fromPath(file)
-    args_ ++= args
+    arguments += fromPath(file)
+    arguments ++= args
 
-    val argsString = args_
+    val argsString = arguments
       .map("'" + _.replace("'", "\\'") + "'")
       .mkString(" ")
 
     info(s"Running $argsString")
 
-    val pb = new ProcessBuilder(args_)
+    val pb = new ProcessBuilder(arguments)
     val env = pb.environment()
 
     for ((key, value) <- _env) {

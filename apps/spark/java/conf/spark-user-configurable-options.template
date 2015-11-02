@@ -1,0 +1,123 @@
+// Application properties
+spark.app.name
+spark.driver.cores
+spark.driver.maxResultSize
+spark.driver.memory
+spark.executor.memory
+spark.extraListeners
+// spark.local.dir
+spark.logConf
+// spark.master
+
+// Runtime Environment
+spark.driver.extraClassPath
+// spark.driver.extraJavaOptions
+spark.driver.extraLibraryPath
+spark.driver.userClassPathFirst
+spark.executor.extraClassPath
+// spark.executor.extraJavaOptions
+spark.executor.extraLibraryPath
+spark.executor.instances
+spark.executor.logs.rolling.maxRetainedFiles
+spark.executor.logs.rolling.maxSize
+spark.executor.logs.rolling.strategy
+spark.executor.logs.rolling.time.interval
+spark.executor.userClassPathFirst
+// spark.executorEnv.[EnvironmentVariableName]
+spark.python.profile
+spark.python.profile.dump
+spark.python.worker.memory
+spark.python.worker.reuse
+spark.reducer.maxSizeInFlight
+
+// Shuffle Behavior
+spark.shuffle.blockTransferService
+spark.shuffle.compress
+spark.shuffle.consolidateFiles
+spark.shuffle.file.buffer
+spark.shuffle.io.maxRetries
+spark.shuffle.io.numConnectionsPerPeer
+spark.shuffle.io.preferDirectBufs
+spark.shuffle.io.retryWait
+spark.shuffle.manager
+spark.shuffle.memoryFraction
+spark.shuffle.service.enabled
+spark.shuffle.service.port
+spark.shuffle.sort.bypassMergeThreshold
+spark.shuffle.spill
+spark.shuffle.spill.compress
+
+// Spark UI
+spark.eventLog.compress
+spark.eventLog.dir
+spark.eventLog.enabled
+spark.ui.killEnabled
+spark.ui.port
+spark.ui.retainedJobs
+spark.ui.retainedStages
+spark.worker.ui.retainedExecutors
+spark.worker.ui.retainedDrivers
+
+// Compression and Serialization
+spark.broadcast.compress
+spark.closure.serializer
+spark.io.compression.codec
+spark.io.compression.lz4.blockSize
+spark.io.compression.snappy.blockSize
+spark.kryo.classesToRegister
+spark.kryo.referenceTracking
+spark.kryo.registrationRequired
+spark.kryo.registrator
+spark.kryoserializer.buffer.max
+spark.kryoserializer.buffer
+spark.rdd.compress
+spark.serializer
+spark.serializer.objectStreamReset
+
+// Execution Behavior
+spark.broadcast.blockSize
+spark.broadcast.factory
+spark.cleaner.ttl
+spark.executor.cores
+spark.default.parallelism
+spark.executor.heartbeatInterval
+spark.files.fetchTimeout
+spark.files.useFetchCache
+spark.files.overwrite
+spark.hadoop.cloneConf
+spark.hadoop.validateOutputSpecs
+spark.storage.memoryFraction
+spark.storage.memoryMapThreshold
+spark.storage.unrollFraction
+spark.externalBlockStore.blockManager
+spark.externalBlockStore.baseDir
+spark.externalBlockStore.url
+
+// Networking
+
+// Dynamic Allocation
+spark.dynamicAllocation.enabled
+spark.dynamicAllocation.executorIdleTimeout
+spark.dynamicAllocation.cachedExecutorIdleTimeout
+spark.dynamicAllocation.initialExecutors
+spark.dynamicAllocation.maxExecutors
+spark.dynamicAllocation.minExecutors
+spark.dynamicAllocation.schedulerBacklogTimeout
+spark.dynamicAllocation.sustainedSchedulerBacklogTimeout
+
+// Security
+
+// Encryption
+
+// Spark Streaming
+spark.streaming.backpressure.enabled
+spark.streaming.blockInterval
+spark.streaming.receiver.maxRate
+spark.streaming.receiver.writeAheadLog.enable
+spark.streaming.unpersist
+spark.streaming.kafka.maxRatePerPartition
+spark.streaming.kafka.maxRetries
+spark.streaming.ui.retainedBatches
+
+// SparkR
+spark.r.numRBackendThreads

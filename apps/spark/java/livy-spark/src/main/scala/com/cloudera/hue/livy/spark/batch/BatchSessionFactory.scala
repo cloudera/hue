@@ -40,7 +40,7 @@ abstract class BatchSessionFactory(factory: SparkProcessBuilderFactory) extends 
 
   protected def sparkBuilder(request: CreateBatchRequest): SparkProcessBuilder = {
     val builder = factory.builder()
-
+    builder.conf(request.conf)
     request.proxyUser.foreach(builder.proxyUser)
     request.className.foreach(builder.className)
     request.jars.map(RelativePath).foreach(builder.jar)

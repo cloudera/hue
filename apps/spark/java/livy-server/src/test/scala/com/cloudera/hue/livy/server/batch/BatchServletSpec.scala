@@ -54,7 +54,7 @@ class BatchServletSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfte
   }
 
   val livyConf = new LivyConf()
-  val batchFactory = new BatchSessionProcessFactory(SparkProcessBuilderFactory(livyConf))
+  val batchFactory = new BatchSessionProcessFactory(new SparkProcessBuilderFactory(livyConf))
   val batchManager = new SessionManager(livyConf, batchFactory)
   val servlet = new BatchSessionServlet(batchManager)
 

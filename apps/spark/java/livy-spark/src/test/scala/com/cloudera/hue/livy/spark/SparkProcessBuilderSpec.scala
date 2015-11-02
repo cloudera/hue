@@ -16,22 +16,28 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.spark.batch
+package com.cloudera.hue.livy.spark
 
-case class CreateBatchRequest(
-    file: String,
-    proxyUser: Option[String] = None,
-    args: List[String] = List(),
-    className: Option[String] = None,
-    jars: List[String] = List(),
-    pyFiles: List[String] = List(),
-    files: List[String] = List(),
-    driverMemory: Option[String] = None,
-    driverCores: Option[Int] = None,
-    executorMemory: Option[String] = None,
-    executorCores: Option[Int] = None,
-    numExecutors: Option[Int] = None,
-    archives: List[String] = List(),
-    queue: Option[String] = None,
-    name: Option[String] = None,
-    conf: Map[String, String] = Map())
+import com.cloudera.hue.livy.LivyConf
+import org.scalatest.{FlatSpec, Matchers}
+
+class SparkProcessBuilderSpec
+  extends FlatSpec
+  with Matchers {
+
+  it should "not error if passed an allowed config option" in {
+    val allowed = Set("spark.app.name")
+    val builder = new SparkProcessBuilder(new LivyConf(), allowed)
+
+    builder.conf("spark.app.name", "hello")
+  }
+
+  it should "raise an exception if passed an illegal config option" in {
+    val allowed = Set("spark.app.name")
+    val builder = new SparkProcessBuilder(new LivyConf(), allowed)
+
+    intercept[ConfigOptionNotAllowed] {
+      builder.conf("spark.master", "local")
+    }
+  }
+}
