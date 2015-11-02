@@ -381,11 +381,17 @@ ${ require.config() }
       </h2>
 
       <div style="position: relative;">
-        <div class="snippet-body" style="position: relative; z-index: 90;">
-          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
-          <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
-          <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-          <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+        <div class="snippet-row">
+          <div class="snippet-left-bar" style="vertical-align: bottom;">
+            <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
+          </div>
+          <div class="snippet-body">
+            <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
+            <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+
+          </div>
         </div>
 
         <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
@@ -757,11 +763,7 @@ ${ require.config() }
 
 <script type="text/html" id="snippet-footer-actions">
   <div class="snippet-footer-actions-bar" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
-
-    <!-- ko template: 'snippet-execution-controls' --><!-- /ko -->
     <!-- ko template: 'snippet-result-controls' --><!-- /ko -->
-
-
     <div class="pull-right hover-actions inline" style="padding-top: 8px; font-size: 15px;">
       <!-- ko template: 'snippet-execution-stats' --><!-- /ko -->
       <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
@@ -770,14 +772,16 @@ ${ require.config() }
 </script>
 
 <script type ="text/html" id="snippet-execution-controls">
-  <a data-bind="visible: status() == 'loading'" class="btn btn-primary spark-btn" style="cursor: default;" title="${ _('Creating session') }">
-    <i class="fa fa-spinner fa-spin"></i>
-  </a>
-  <a title="${ _('Cancel') }" data-bind="click: cancel, visible: status() == 'running'" class="btn btn-danger disable-feedback spark-btn pointer">
-    <i class="fa fa-stop"></i>
-  </a>
   <div class="hover-actions" style="display:inline-block;">
-    <a title="${ _('CTRL + ENTER') }" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" class="run-button btn btn-primary disable-feedback spark-btn pointer" style="color: #FFF;"><i class="fa fa-play"></i></a>
+    <a class="snippet-side-btn" style="cursor: default; color: #338bb8;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
+      <i class="fa fa-spinner fa-spin"></i>
+    </a>
+    <a class="snippet-side-btn" style="color: #338bb8;"data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
+      <i class="fa fa-stop"></i>
+    </a>
+    <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" title="${ _('CTRL + ENTER') }">
+      <i class="fa fa-play"></i>
+    </a>
   </div>
 </script>
 

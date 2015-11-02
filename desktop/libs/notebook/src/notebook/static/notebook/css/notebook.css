@@ -165,10 +165,6 @@ body {
   border-radius: 7px;
 }
 
-.select-snippet-button:hover {
-
-}
-
 .add-snippet-alt {
   z-index: 400;
   position: absolute;
@@ -677,4 +673,41 @@ table.airy tr td {
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
+}
+
+.snippet-row {
+  position: relative;
+  display: table;
+  width: 100%;
+}
+
+.snippet-left-bar {
+  display: table-cell;
+  padding-bottom: 5px;
+}
+
+.snippet-body {
+  display: table-cell;
+  position: relative;
+  z-index: 90;
+}
+
+.snippet-side-btn {
+  color: #DBE8F1;
+  display: inline-block;
+  line-height: 27px;
+  height: 27px;
+  min-height: 27px;
+  padding: 0 7px;
+  margin: 0;
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+.snippet-side-btn:hover {
+  color: #338bb8 !important;
 }
