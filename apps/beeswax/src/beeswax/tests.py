@@ -1684,8 +1684,7 @@ for x in sys.stdin:
       INSERT OVERWRITE TABLE test_partitions_int PARTITION (b=300)
         SELECT 301 AS a FROM test_partitions LIMIT 1;
     """
-    resp = _make_query(self.client, hql, database=self.db_name)
-    wait_for_query_to_finish(self.client, resp, max=30.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
 
     finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
     try:
@@ -1701,8 +1700,7 @@ for x in sys.stdin:
     hql = """
       CREATE TABLE test_partitions_empty (a STRING) PARTITIONED BY (b STRING);
     """
-    resp = _make_query(self.client, hql, database=self.db_name)
-    wait_for_query_to_finish(self.client, resp, max=30.0)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=60.0, database=self.db_name)
 
     finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
     try:
