@@ -63,6 +63,7 @@ from django.utils.translation import ugettext as _
   }
 </style>
 
+% if len(sample.cols()) < 1000:
 <script type="text/javascript" charset="utf-8">
   $(document).ready(function () {
     $(".sampleTable").dataTable({
@@ -77,3 +78,4 @@ from django.utils.translation import ugettext as _
     });
   });
 </script>
+% endif
