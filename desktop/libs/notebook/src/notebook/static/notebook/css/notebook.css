@@ -711,3 +711,10 @@ table.airy tr td {
 .snippet-side-btn:hover {
   color: #338bb8 !important;
 }
+
+.execution-timer {
+  color: #d1d1d1;
+  padding-right: 10px;
+  font-size: 12px;
+  font-weight: lighter;
+}

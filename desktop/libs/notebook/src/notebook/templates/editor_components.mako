@@ -371,13 +371,13 @@ ${ require.config() }
 
         <div class="inactive-action hover-actions inline"><span data-bind="editable: name, editableOptions: { emptytext: '${_ko('Untitled')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;"></span></div>
 
-        <div class="hover-actions inline pull-right" style="font-size: 15px;">
+        <div class=" inline pull-right" style="font-size: 15px;">
+          <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
           <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
         </div>
-
       </h2>
 
       <div style="position: relative;">
@@ -786,8 +786,6 @@ ${ require.config() }
 </script>
 
 <script type ="text/html" id="snippet-execution-stats">
-  <span style="color: #CCC; padding-right: 10px;" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
-
   <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
     <i class="fa fa-file-text-o"></i>
   </a>
