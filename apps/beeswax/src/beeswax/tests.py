@@ -1686,7 +1686,7 @@ for x in sys.stdin:
         SELECT 301 AS a FROM test_partitions LIMIT 1;
     """
     resp = _make_query(self.client, hql, database=self.db_name)
-    wait_for_query_to_finish(self.client, resp, max=30.0)
+    wait_for_query_to_finish(self.client, resp, max=120.0)
 
     finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
     try:
@@ -1703,7 +1703,7 @@ for x in sys.stdin:
       CREATE TABLE test_partitions_empty (a STRING) PARTITIONED BY (b STRING);
     """
     resp = _make_query(self.client, hql, database=self.db_name)
-    wait_for_query_to_finish(self.client, resp, max=30.0)
+    wait_for_query_to_finish(self.client, resp, max=60.0)
 
     finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
     try:
