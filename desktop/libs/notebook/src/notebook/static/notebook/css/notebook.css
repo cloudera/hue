@@ -90,8 +90,23 @@ body {
   margin-right: 30px;
 }
 
+.snippet-left-bar {
+  position:absolute;
+  display:inline-block;
+  height:auto;
+  left:0;
+  top:0;
+  bottom:0;
+  width: 35px;
+}
+
+.result-body {
+  margin-left: 35px;
+}
+
 .snippet-body {
-  width: 200%;
+  margin-left: 35px;
+  z-index: 90;
   min-height: 40px;
 }
 
@@ -627,7 +642,6 @@ table.airy tr td {
 
 .hover-dropdown {
   display: inline-block;
-  margin: 0 5px;
   position: relative;
 }
 
@@ -677,19 +691,9 @@ table.airy tr td {
 
 .snippet-row {
   position: relative;
-  display: table;
+  display: block;
+  height: auto;
   width: 100%;
-}
-
-.snippet-left-bar {
-  display: table-cell;
-  padding-bottom: 5px;
-}
-
-.snippet-body {
-  display: table-cell;
-  position: relative;
-  z-index: 90;
 }
 
 .snippet-side-btn {
@@ -706,6 +710,10 @@ table.airy tr td {
   -moz-transition: color 0.2s ease;
   -ms-transition: color 0.2s ease;
   transition: color 0.2s ease;
+}
+
+.snippet-side-btn.active {
+  color: #338bb8 !important;
 }
 
 .snippet-side-btn:hover {

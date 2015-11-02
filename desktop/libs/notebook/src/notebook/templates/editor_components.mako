@@ -355,7 +355,7 @@ ${ require.config() }
 
       <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-      <h2 class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }">
+      <h2 style="margin-left:35px;" class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }">
 
         <div class="inactive-action hover-actions dropdown inline widget-type">
           <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
@@ -371,7 +371,8 @@ ${ require.config() }
 
         <div class="inactive-action hover-actions inline"><span data-bind="editable: name, editableOptions: { emptytext: '${_ko('Untitled')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;"></span></div>
 
-        <div class=" inline pull-right" style="font-size: 15px;">
+        <div class="hover-actions inline pull-right" style="font-size: 15px;">
+          <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
           <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
           <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
@@ -395,7 +396,6 @@ ${ require.config() }
         </div>
 
         <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-        <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-footer-actions' } --><!-- /ko -->
 
         <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
 
@@ -598,7 +598,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-grid-settings">
-  <div>
+  <div style="overflow:auto">
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
       <li class="nav-header pointer" data-bind="click: toggleResultSettings" title="${_('Hide columns')}">${_('columns')}</li>
       </a>
@@ -613,10 +613,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-settings-toggle">
-  <div data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id() }, click: toggleResultSettings" class="hover-actions toggle-result-settings show-result-settings">
-    <a class="inactive-action pointer" title="${_('Show settings')}" data-bind="visible: !isResultSettingsVisible()">
-      <i class="fa fa-chevron-right"></i>
-    </a>
+  <div style="position:absolute;right:0;top:0;margin-top:130px;" data-bind="attr: { 'id': 'toggleResultSettingsGrid' + id() }, click: toggleResultSettings" class="hover-actions toggle-result-settings show-result-settings">
     <a class="inactive-action pointer" title="${_('Hide settings')}" data-bind="visible: isResultSettingsVisible">
       <i class="fa fa-chevron-left"></i>
     </a>
@@ -624,64 +621,70 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-results">
-  <div class="row-fluid" data-bind="slideVisible: result.hasSomeResults() && result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
-    <!-- ko if: result.data().length != 0 && result.data()[0][1] != "" -->
-    <pre data-bind="text: result.data()[0][1]" class="no-margin-bottom"></pre>
-    <!-- /ko -->
-    <!-- ko ifnot: result.data().length != 0 && result.data()[0][1] != "" -->
-    <pre class="no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done.") }</pre>
-    <!-- /ko -->
-    <!-- ko if: result.images().length != 0 -->
-    <ul class="unstyled results-images" data-bind="foreach: result.images()">
-      <li>
-        <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10" />
-      </li>
-    </ul>
-    <!-- /ko -->
-  </div>
-
-  <div class="row-fluid table-results" data-bind="visible: result.hasSomeResults() && result.type() == 'table'" style="display: none; max-height: 400px; margin-top: 4px;">
-    <div>
-      <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}">
-        <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
-        <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
+  <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
+    <div class="snippet-left-bar">
+      <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls' }--><!-- /ko -->
+    </div>
+    <div class="result-body ">
+      <div class="row-fluid" data-bind="visible: result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
+        <!-- ko if: result.data().length != 0 && result.data()[0][1] != "" -->
+        <pre data-bind="text: result.data()[0][1]" class="no-margin-bottom"></pre>
+        <!-- /ko -->
+        <!-- ko ifnot: result.data().length != 0 && result.data()[0][1] != "" -->
+        <pre class="no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done.") }</pre>
+        <!-- /ko -->
+        <!-- ko if: result.images().length != 0 -->
+        <ul class="unstyled results-images" data-bind="foreach: result.images()">
+          <li>
+            <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10" />
+          </li>
+        </ul>
+        <!-- /ko -->
       </div>
-      <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
-        <!-- ko template: 'snippet-settings-toggle' --><!-- /ko -->
 
-        <div data-bind="visible: showGrid; delayedOverflow, css: resultsKlass" style="display: none;">
-          <table class="table table-condensed resultTable">
-            <thead>
-            <tr data-bind="foreach: result.meta">
-              <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
-            </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
+      <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 130px;">
+        <div>
+          <div data-bind="visible: isResultSettingsVisible, css:{'span2 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;padding-right:15px;white-space: nowrap;overflow:auto;">
+            <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
+            <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
+            <!-- ko template: 'snippet-settings-toggle' --><!-- /ko -->
+          </div>
+          <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
+            <div data-bind="visible: showGrid; delayedOverflow, css: resultsKlass" style="display: none;">
+              <table class="table table-condensed resultTable">
+                <thead>
+                <tr data-bind="foreach: result.meta">
+                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
 
-        <div data-bind="visible: showChart" class="chart-container" style="display:none;">
-          <h1 class="empty" data-bind="visible: !hasDataForChart()">${ _('Select the chart parameters on the left') }</h1>
+            <div data-bind="visible: showChart" class="chart-container" style="display:none;">
+              <h1 class="empty" data-bind="visible: !hasDataForChart()">${ _('Select the chart parameters on the left') }</h1>
 
-          <div data-bind="visible: hasDataForChart()">
-            <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
+              <div data-bind="visible: hasDataForChart">
+                <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                       transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }, visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+                <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
                       transformer: multiSerieDataTransformer, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: multiSerieDataTransformer, showControls: false }, visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: leafletMapChartDataTransformer, showControls: false, height: 380, visible: chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, scope: chartScope()},
+                <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: result.data, sorting: chartSorting(), snippet: $data, scope: chartScope()},
                       transformer: mapChartDataTransformer, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
 
-            <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
+                <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: result.data, sorting: chartSorting(), snippet: $data},
                       transformer: scatterChartDataTransformer, maxWidth: 350 }, visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -759,18 +762,8 @@ ${ require.config() }
   </div>
 </script>
 
-<script type="text/html" id="snippet-footer-actions">
-  <div class="snippet-footer-actions-bar" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
-    <!-- ko template: 'snippet-result-controls' --><!-- /ko -->
-    <div class="pull-right hover-actions inline" style="padding-top: 8px; font-size: 15px;">
-      <!-- ko template: 'snippet-execution-stats' --><!-- /ko -->
-      <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
-    </div>
-  </div>
-</script>
-
 <script type ="text/html" id="snippet-execution-controls">
-  <div class="hover-actions" style="display:inline-block;">
+  <div class="hover-actions" style="position:absolute; bottom: 0">
     <a class="snippet-side-btn" style="cursor: default; color: #338bb8;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
@@ -783,20 +776,16 @@ ${ require.config() }
   </div>
 </script>
 
-<script type ="text/html" id="snippet-execution-stats">
-  <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }">
-    <i class="fa fa-file-text-o"></i>
-  </a>
-</script>
-
 <script type="text/html" id="snippet-result-controls">
-  <div style="display: inline-block; margin-left: 15px;">
-    <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }" style="display:none;">
-      <i class="fa fa-th"></i>
-    </a>
+  <div class="hover-actions" style="opacity:1">
+    <div style="margin-top:25px;">
+      <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
+        <i class="fa fa-th"></i>
+      </a>
+    </div>
 
-    <div class="btn-group">
-      <a class="btn" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}, click: function(){ $data.showChart(true); }" style="display:none;">
+    <div class="dropdown">
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="css: {'active': $data.showChart }, click: function() { $data.showChart(true); }">
         <i class="hcha hcha-bar-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
         <i class="hcha hcha-line-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.LINECHART"></i>
         <i class="hcha hcha-pie-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART"></i>
@@ -804,7 +793,7 @@ ${ require.config() }
         <i class="fa fa-fw fa-map-marker" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP"></i>
         <i class="hcha hcha-map-chart" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"></i>
       </a>
-      <a style="min-width: 12px; width: 12px;" class="btn dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)" data-bind="visible: result.type() == 'table' && result.hasSomeResults(), css: {'active': $data.showChart}">
+      <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'active': $data.showChart}">
         <i class="fa fa-caret-down"></i>
       </a>
 
@@ -841,6 +830,12 @@ ${ require.config() }
         </li>
       </ul>
     </div>
+
+    <div>
+      <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }"><i class="fa fa-cog"></i></a>
+    </div>
+
+    <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data, notebook: $parent } }" style="display:inline-block;"></div>
   </div>
 </script>
 
