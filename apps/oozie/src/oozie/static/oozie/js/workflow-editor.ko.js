@@ -1226,6 +1226,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableStreamingAction = ko.observable(bareWidgetBuilder("Streaming", "streaming-widget"));
   self.draggableDistCpAction = ko.observable(bareWidgetBuilder("Distcp", "distcp-widget"));
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
+  self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
 
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
