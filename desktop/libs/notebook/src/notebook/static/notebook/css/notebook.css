@@ -399,10 +399,15 @@ body {
 }
 
 .snippet-progress-container {
-  height: 4px;
+  height: 3px;
   width: 100%;
   overflow: hidden;
-  padding: 3px;
+}
+
+.snippet-execution-status {
+  margin-top: 2px;
+  margin-left: 35px;
+  margin-right: 20px;
 }
 
 .snippet-footer-actions-bar {

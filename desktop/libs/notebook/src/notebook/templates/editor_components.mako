@@ -747,18 +747,20 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-execution-status">
-  <div class="snippet-progress-container" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
-    <div class="progress progress-striped active" data-bind="css: {
-      'progress-warning': progress() > 0 && progress() < 100,
-      'progress-success': progress() == 100,
-      'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
-      <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : progress()) + '%'}"></div>
+  <div class="snippet-execution-status">
+    <div class="snippet-progress-container" data-bind="click: function (snippet, e) { setAceFocus(e, ace()); }">
+      <div class="progress progress-striped active" data-bind="css: {
+        'progress-warning': progress() > 0 && progress() < 100,
+        'progress-success': progress() == 100,
+        'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
+        <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : progress()) + '%'}"></div>
+      </div>
     </div>
-  </div>
-  <div data-bind="visible: errors().length > 0, css: errorsKlass" style="margin-left: 3px">
-    <ul class="unstyled" data-bind="foreach: errors">
-      <li data-bind="text: message"></li>
-    </ul>
+    <div class="snippet-error-container alert alert-error" data-bind="visible: errors().length > 0">
+      <ul class="unstyled" data-bind="foreach: errors">
+        <li data-bind="text: message"></li>
+      </ul>
+    </div>
   </div>
 </script>
 
@@ -1843,7 +1845,7 @@ ${ require.config() }
       $(document).on("executeStarted", function (e, snippet) {
         var _el = $("#snippet_" + snippet.id()).find(".resultTable");
         $("#snippet_" + snippet.id()).find(".progress").animate({
-          height: "4px"
+          height: "3px"
         }, 100);
         if (_el.hasClass("dt")) {
           _el.removeClass("dt");
