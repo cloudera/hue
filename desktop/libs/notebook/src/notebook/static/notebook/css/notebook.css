@@ -102,10 +102,12 @@ body {
 
 .result-body {
   margin-left: 35px;
+  margin-right: 20px;
 }
 
 .snippet-body {
   margin-left: 35px;
+  margin-right: 20px;
   z-index: 90;
   min-height: 40px;
 }
