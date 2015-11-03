@@ -213,8 +213,8 @@ nv.models.scatter = function() {
                 .attr('r', clipRadius);
             pointClips.exit().remove();
             pointClips
-                .attr('cx', function(d) { return d[0] })
-                .attr('cy', function(d) { return d[1] });
+                .attr('cx', function(d) { return isNaN(d[0]) ? 0 : d[0] })
+                .attr('cy', function(d) { return isNaN(d[1]) ? 0 : d[1] });
 
             wrap.select('.nv-point-paths')
                 .attr('clip-path', 'url(#nv-points-clip-' + id + ')');
