@@ -1485,6 +1485,23 @@ class JoinAction(Action):
     return []
 
 
+class GenericAction(Action):
+  TYPE = 'generic'
+  FIELDS = {
+     'xml': {
+          'name': 'xml',
+          'label': _('XML of the action'),
+          'value': '<my_action>\n</my_action>',
+          'help_text': _('Insert verbatim the XML of the action to insert into the workflow.'),
+          'type': 'textarea'
+     }
+  }
+
+  @classmethod
+  def get_mandatory_fields(cls):
+    return [cls.FIELDS['xml']]
+
+
 class ForkNode(Action):
   TYPE = 'fork'
   FIELDS = {}
@@ -1523,7 +1540,8 @@ NODES = {
   'join-widget': JoinAction,
   'fork-widget': ForkNode,
   'decision-widget': DecisionNode,
-  'spark-widget': SparkAction
+  'spark-widget': SparkAction,
+  'generic-widget': GenericAction
 }
 
 

@@ -209,6 +209,10 @@
       <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon">
       <!-- /ko -->
 
+      <!-- ko if: widgetType() == 'generic-widget' -->
+      <a class="widget-icon"><i class="fa fa-code"></i></a>
+      <!-- /ko -->
+
       <!-- ko if: widgetType() == 'kill-widget' -->
       <a class="widget-icon"><i class="fa fa-stop"></i></a>
       <!-- /ko -->
@@ -834,6 +838,50 @@
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
+          <span data-bind="template: { name: 'common-action-sla' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'credentials-' + id() }">
+          <span data-bind="template: { name: 'common-action-credentials' }"></span>
+        </div>
+
+        <div class="tab-pane" data-bind="attr: { id: 'transitions-' + id() }">
+          <span data-bind="template: { name: 'common-action-transition' }"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="generic-widget">
+  <!-- ko if: $root.workflow.getNodeById(id()) -->
+  <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="padding: 10px">
+
+    <div data-bind="visible: ! $root.isEditing()">
+      <span data-bind="template: { name: 'logs-icon' }"></span>
+    </div>
+
+    <div data-bind="visible: $root.isEditing">
+      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+
+        <div class="airy">
+          <span class="widget-label" data-bind="text: $root.workflow_properties.xml.label"></span>
+          <textarea class="input-xlarge seventy" style="resize:both" data-bind="value: properties.xml, attr: { placeholder: $root.workflow_properties.xml.help_text }"></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <div data-bind="visible: $parent.ooziePropertiesExpanded">
+      <ul class="nav nav-tabs">
+        <li class="active"><a data-bind="attr: { href: '#sla-' + id()}" href="#sla" data-toggle="tab">${ _('SLA') }</a></li>
+        <li><a data-bind="attr: { href: '#credentials-' + id()}" data-toggle="tab">${ _('Credentials') }</a></li>
+        <li><a data-bind="attr: { href: '#transitions-' + id()}" data-toggle="tab">${ _('Transitions') }</a></li>
+      </ul>
+      <div class="tab-content">
+        <div class="tab-pane active" data-bind="attr: { id: 'sla-' + id() }">
           <span data-bind="template: { name: 'common-action-sla' }"></span>
         </div>
 

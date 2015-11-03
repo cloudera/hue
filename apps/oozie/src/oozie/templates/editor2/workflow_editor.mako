@@ -206,6 +206,13 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableGenericAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableGenericAction());}}}"
+         title="${_('Generic')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-code"></i></a>
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableKillNode());}}}"
          title="${_('Kill')}" rel="tooltip" data-placement="top">
