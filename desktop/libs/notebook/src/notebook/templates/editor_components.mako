@@ -337,7 +337,6 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippetIcon">
-
   <!-- ko if: viewSettings().snippetImage -->
   <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }">
   <!-- /ko -->
@@ -348,6 +347,29 @@ ${ require.config() }
   <sup style="margin-left: -2px" data-bind="text: $root.getSnippetName(type())"></sup>
 </script>
 
+<script type="text/html" id="snippet-log">
+  <div class="snippet-log-container" data-bind="slideVisible: showLogs" style="display: none;">
+    <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
+      <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
+        <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
+      </ul>
+      <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+      <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
+    </div>
+
+    <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass" style="display:none;">
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
+    </div>
+
+    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass" style="display:none;">
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
+    </div>
+
+    <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
+    </div>
+  </div>
+</script>
 
 <script type="text/html" id="snippet">
   <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
@@ -393,36 +415,14 @@ ${ require.config() }
             <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
           </div>
         </div>
-
         <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-
+        <!-- ko template: 'snippet-log' --><!-- /ko -->
         <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
-
         <div style="position: absolute; top:0; z-index: 301; width: 100%;">
           <!-- ko template: 'snippet-settings' --><!-- /ko -->
         </div>
 
         <div class="clearfix"></div>
-      </div>
-
-      <div data-bind="delayedOverflow, visible: showLogs, css: resultsKlass" style="margin-top: 5px; position: relative; display: none;">
-        <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
-          <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
-        </ul>
-        <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
-      </div>
-
-      <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass" style="display:none;">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
-      </div>
-
-      <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass" style="display:none;">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
-      </div>
-
-      <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
-        <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
       </div>
     </div>
   </div>

@@ -410,6 +410,11 @@ body {
   margin-right: 20px;
 }
 
+.snippet-log-container {
+  margin-left: 35px;
+  margin-right: 20px;
+}
+
 .snippet-footer-actions-bar {
   padding: 0 3px;
   height: 29px;
