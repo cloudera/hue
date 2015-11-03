@@ -31,10 +31,12 @@ __all__ = (
 
 
 def config_settings_loader(request):
-  base_url = "%(protocol)s%(host)s" % {
-    'protocol': 'https://' if request.is_secure() else 'http://',
-    'host':  request.get_host(),
-  }
+  base_url = libsaml.conf.BASE_URL.get()
+  if base_url is None:
+    base_url = "%(protocol)s%(host)s" % {
+      'protocol': 'https://' if request.is_secure() else 'http://',
+      'host':  request.get_host(),
+    }
 
   entity_id = libsaml.conf.ENTITY_ID.get().replace('<base_url>', base_url)
 

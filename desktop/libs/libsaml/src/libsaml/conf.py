@@ -57,6 +57,12 @@ XMLSEC_BINARY = Config(
   type=str,
   help=_t("Xmlsec1 binary path. This program should be executable by the user running Hue."))
 
+BASE_URL = Config(
+  key="base_url",
+  default=None,
+  type=str,
+  help=_t("Optional base url the SAML IdP should use for responses."))
+
 ENTITY_ID = Config(
   key="entity_id",
   default="<base_url>/saml2/metadata/",
