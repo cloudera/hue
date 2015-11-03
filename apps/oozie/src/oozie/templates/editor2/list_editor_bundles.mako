@@ -86,7 +86,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
     <tbody data-bind="foreach: { data: jobs }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
+          <div data-bind="multiCheck: '#workflowTable', css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <!-- ko if: ! uuid() -->
             <a data-bind="attr: { 'href': '${ url('oozie:open_old_bundle') }?bundle=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->

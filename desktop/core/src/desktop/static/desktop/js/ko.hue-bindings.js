@@ -192,7 +192,7 @@
 
       var $container = $(ko.unwrap(valueAccessor()));
       $(element).click(function (e, shouldIgnore) {
-        var $self = $(this);
+        var $self = $(e.target);
         if ($self.data('noMultiCheck')) {
           $self.data('noMultiCheck', false);
           return;
@@ -206,7 +206,7 @@
           }
           for (var i = 0; i < allCheckboxes.length; i++) {
             var checkbox = allCheckboxes[i];
-            if (checkbox === this || checkbox === $container.data('last-clicked-checkbox')) {
+            if (checkbox === e.target || checkbox === $container.data('last-clicked-checkbox')) {
               if (insideGroup) {
                 break;
               }
@@ -222,7 +222,7 @@
             }
           }
         }
-        $container.data('last-clicked-checkbox', this);
+        $container.data('last-clicked-checkbox', e.target);
         $container.data('last-clicked-checkbox-state', shouldCheck);
       });
     },

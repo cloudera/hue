@@ -180,6 +180,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 }
 </style>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -499,6 +502,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
         runningTable.fnDraw();
         runningTimeout = window.setTimeout(refreshRunning, 5000);
+        ko.bindingHandlers.multiCheck.init(runningTable[0], function() { return '#' + runningTable[0].id})
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseJSON['detail']);
       });

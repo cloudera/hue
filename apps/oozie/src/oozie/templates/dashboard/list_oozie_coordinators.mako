@@ -174,6 +174,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   </div>
 </div>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -594,6 +597,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               }
             }
           });
+        ko.bindingHandlers.multiCheck.init(runningTable[0], function() { return '#' + runningTable[0].id})
         window.setTimeout(refreshProgress, 30000);
       });
     }
