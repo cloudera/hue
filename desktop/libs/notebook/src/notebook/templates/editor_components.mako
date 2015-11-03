@@ -386,12 +386,11 @@ ${ require.config() }
           <div class="snippet-left-bar" style="vertical-align: bottom;">
             <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
           </div>
-          <div class="snippet-body">
+          <div class="snippet-body" data-bind="verticalSlide: codeVisible">
             <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
-
           </div>
         </div>
 
@@ -495,7 +494,7 @@ ${ require.config() }
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
-    <div class="editor span12" data-bind="verticalSlide: codeVisible, click: function(snippet, e){ setAceFocus(e, ace()); }">
+    <div class="editor span12" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
       <div class="ace-editor" data-bind="css: {'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
