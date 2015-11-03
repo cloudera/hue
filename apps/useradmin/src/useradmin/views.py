@@ -698,7 +698,7 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1):
     return None
 
   # Find all users and groups of group.
-  uusers_info, groups_info = [], []
+  users_info, groups_info = [], []
 
   try:
     users_info = connection.find_users_of_group(ldap_info['dn'])
