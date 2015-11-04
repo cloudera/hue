@@ -76,7 +76,7 @@ object PythonInterpreter extends Logging {
 
         require(py4jFile.exists(),
           "py4j-*-src.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
-        Seq(pyArchivesFile.getAbsolutePath(), py4jFile.getAbsolutePath())
+        Seq(pyArchivesFile.getAbsolutePath, py4jFile.getAbsolutePath)
       }.getOrElse(Seq())
     }
   }
@@ -86,29 +86,6 @@ object PythonInterpreter extends Logging {
 
     val file = Files.createTempFile("", "").toFile
     file.deleteOnExit()
-
-    val sink = new FileOutputStream(file)
-    val buf = new Array[Byte](1024)
-    var n = source.read(buf)
-
-    while (n > 0) {
-      sink.write(buf, 0, n)
-      n = source.read(buf)
-    }
-
-    source.close()
-    sink.close()
-
-    file
-  }
-
-  private def createFakePySpark(): File = {
-    val source: InputStream = getClass.getClassLoader.getResourceAsStream("fake_pyspark.sh")
-
-    val file = Files.createTempFile("", "").toFile
-    file.deleteOnExit()
-
-    file.setExecutable(true)
 
     val sink = new FileOutputStream(file)
     val buf = new Array[Byte](1024)

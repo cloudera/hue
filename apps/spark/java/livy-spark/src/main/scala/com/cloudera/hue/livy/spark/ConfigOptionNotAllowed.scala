@@ -26,7 +26,7 @@ package com.cloudera.hue.livy.spark
  *
  */
 case class ConfigOptionNotAllowed(key: String, value: String) extends Exception {
-  override def getMessage(): String = {
+  override def getMessage: String = {
     s"Not allowed to specify the '$key' configuration variable"
   }
 }
