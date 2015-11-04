@@ -58,7 +58,9 @@ object Main {
     server.start()
 
     try {
-      System.setProperty("livy.server.serverUrl", f"http://${server.host}:${server.port}")
+      if (!sys.props.contains("livy.server.serverUrl")) {
+        sys.props("livy.server.serverUrl") = f"http://${server.host}:${server.port}"
+      }
     } finally {
       server.join()
       server.stop()
