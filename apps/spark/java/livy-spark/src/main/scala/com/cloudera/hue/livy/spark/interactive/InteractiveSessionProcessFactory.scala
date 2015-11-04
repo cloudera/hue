@@ -31,12 +31,4 @@ class InteractiveSessionProcessFactory(processFactory: SparkProcessBuilderFactor
   protected override def create(id: Int, process: SparkProcess, createInteractiveRequest: CreateInteractiveRequest): InteractiveSession = {
     InteractiveSessionProcess(id, process, createInteractiveRequest)
   }
-
-  override def sparkBuilder(id: Int, request: CreateInteractiveRequest) = {
-    val builder = super.sparkBuilder(id, request)
-
-    sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
-
-    builder
-  }
 }
