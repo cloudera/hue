@@ -403,6 +403,46 @@ from django.utils.translation import ugettext as _
     </form>
   </div>
 
+  <!-- content summary modal -->
+  <div id="contentSummaryModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3 style="word-break: break-all">${_('Summary for')} <span data-bind="text: currentPath"></span></h3>
+    </div>
+    <div class="modal-body">
+      <div data-bind="visible: isLoadingSummary"><i class="fa fa-spin fa-spinner fa-2x fa-fw" style="color: #CCC"></i></div>
+      <table class="table table-striped" data-bind="visible: !isLoadingSummary()">
+        <tr>
+          <th>${ _('Disk space consumed') }</th>
+          <td data-bind="text: formatBytes(contentSummary().spaceConsumed(), 4)"></td>
+        </tr>
+        <tr>
+          <th>${ _('Bytes used') }</th>
+          <td data-bind="text: formatBytes(contentSummary().length(), 4)"></td>
+        </tr>
+        <tr>
+          <th>${ _('Namespace quota') }</th>
+          <td data-bind="text: formatBytes(contentSummary().quota(), 4)"></td>
+        </tr>
+        <tr>
+          <th>${ _('Disk space quota') }</th>
+          <td data-bind="text: formatBytes(contentSummary().spaceQuota(), 4)"></td>
+        </tr>
+        <tr>
+          <th>${ _('Number of directories') }</th>
+          <td data-bind="text: contentSummary().directoryCount()"></td>
+        </tr>
+        <tr>
+          <th>${ _('Number of files') }</th>
+          <td data-bind="text: contentSummary().fileCount()"></td>
+        </tr>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('Close')}</a>
+    </div>
+  </div>
+
   <!-- actions context menu -->
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
@@ -505,6 +545,7 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/jquery.hdfstree.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/dropzone.js') }" type="text/javascript" charset="utf-8"></script>
@@ -659,6 +700,16 @@ from django.utils.translation import ugettext as _
     var stripHashes = function (str) {
       return str.replace(/#/gi, encodeURIComponent("#"));
     };
+
+    var formatBytes = function (bytes, decimals) {
+      if (bytes == -1) return "${ _('Not available.') }";
+      if (bytes == 0) return "0 Byte";
+      var k = 1024;
+      var dm = decimals + 1 || 3;
+      var sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+      var i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toPrecision(dm) + ' ' + sizes[i];
+    }
 
     var Page = function (page) {
       if (page != null) {
@@ -870,6 +921,24 @@ from django.utils.translation import ugettext as _
       self.inRestorableTrash = ko.computed(function() {
         return self.currentPath().match(/^\/user\/.+?\/\.Trash\/.+?/);
       });
+
+      self.isLoadingSummary = ko.observable(true);
+      self.contentSummary = ko.observable(ko.mapping.fromJS({
+        spaceConsumed: -1,
+        quota: -1,
+        spaceQuota: -1,
+        length: 0,
+        directoryCount: 0,
+        fileCount: 0
+      }));
+      self.showSummary = function () {
+        self.isLoadingSummary(true);
+        $("#contentSummaryModal").modal("show");
+        $.getJSON("${url('filebrowser.views.content_summary', path='')}" + self.currentPath(), function (data) {
+          self.contentSummary(ko.mapping.fromJS(data));
+          self.isLoadingSummary(false);
+        });
+      }
 
       self.getStats = function (callback) {
         $.getJSON(self.targetPath() + "?pagesize=1&format=json", callback);

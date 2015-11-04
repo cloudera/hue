@@ -106,6 +106,9 @@ ${ fb_components.menubar() }
       <%def name="creation()">
         <button class="btn fileToolbarBtn" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="fa fa-fire"></i> ${_('Empty trash')}</button>
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          <a class="btn" data-bind="visible: !inTrash(), click: showSummary">
+            <i class="fa fa-pie-chart"></i> ${_('Summary')}
+          </a>
           % if show_upload_button:
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
             <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash()">
