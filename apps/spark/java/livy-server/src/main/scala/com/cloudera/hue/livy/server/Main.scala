@@ -58,7 +58,7 @@ object Main {
     server.start()
 
     try {
-      System.setProperty("livy.server.callback-url", f"http://${server.host}:${server.port}")
+      System.setProperty("livy.server.serverUrl", f"http://${server.host}:${server.port}")
     } finally {
       server.join()
       server.stop()

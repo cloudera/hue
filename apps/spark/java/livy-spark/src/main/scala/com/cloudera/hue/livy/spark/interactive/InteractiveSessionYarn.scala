@@ -45,14 +45,7 @@ private class InteractiveSessionYarn(id: Int,
                                      client: Client,
                                      process: SparkProcess,
                                      request: CreateInteractiveRequest)
-  extends InteractiveWebSession(id, request) {
-
-  // Error out the job if the process errors out.
-  Future {
-    if (process.waitFor() != 0) {
-      _state = SessionState.Error()
-    }
-  }
+  extends InteractiveWebSession(id, process, request) {
 
   private val job = Future {
     val job = client.getJobFromProcess(process)
@@ -67,8 +60,6 @@ private class InteractiveSessionYarn(id: Int,
   override def logLines() = process.inputLines
 
   override def stop(): Future[Unit] = {
-    process.destroy()
-
     super.stop().andThen {
       case _ =>
         try {

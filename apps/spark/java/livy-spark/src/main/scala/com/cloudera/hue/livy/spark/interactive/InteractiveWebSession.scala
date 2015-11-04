@@ -25,6 +25,7 @@ import com.cloudera.hue.livy._
 import com.cloudera.hue.livy.msgs.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{Statement, InteractiveSession}
+import com.cloudera.hue.livy.spark.SparkProcess
 import dispatch._
 import org.json4s.JsonAST.{JNull, JString}
 import org.json4s.jackson.Serialization.write
@@ -34,7 +35,11 @@ import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Future, _}
 
-abstract class InteractiveWebSession(val id: Int, request: CreateInteractiveRequest) extends InteractiveSession with Logging {
+abstract class InteractiveWebSession(val id: Int,
+                                     process: SparkProcess,
+                                     request: CreateInteractiveRequest)
+  extends InteractiveSession
+  with Logging {
 
   protected implicit def executor: ExecutionContextExecutor = ExecutionContext.global
   protected implicit def jsonFormats: Formats = DefaultFormats
@@ -48,6 +53,8 @@ abstract class InteractiveWebSession(val id: Int, request: CreateInteractiveRequ
   private[this] var _statements = IndexedSeq[Statement]()
 
   override def kind = request.kind
+
+  override def logLines() = process.inputLines
 
   override def proxyUser = request.proxyUser
 
@@ -143,7 +150,7 @@ abstract class InteractiveWebSession(val id: Int, request: CreateInteractiveRequ
   }
 
   override def stop(): Future[Unit] = {
-    synchronized {
+    val future: Future[Unit] = synchronized {
       _state match {
         case SessionState.Idle() =>
           _state = SessionState.Busy()
@@ -185,6 +192,11 @@ abstract class InteractiveWebSession(val id: Int, request: CreateInteractiveRequ
           Future.successful(Unit)
       }
     }
+
+    future.andThen { case r =>
+      process.waitFor()
+      r
+    }
   }
 
   private def transition(state: SessionState) = synchronized {
@@ -213,6 +225,20 @@ abstract class InteractiveWebSession(val id: Int, request: CreateInteractiveRequ
         case _ =>
           throw new IllegalStateException("Session is in state %s" format _state)
       }
+    }
+  }
+
+  // Error out the job if the process errors out.
+  Future {
+    if (process.waitFor() == 0) {
+      // Set the state to done if the session shut down before contacting us.
+      _state match {
+        case (SessionState.Dead(_) | SessionState.Error(_) | SessionState.Success(_)) =>
+        case _ =>
+          _state = SessionState.Success()
+      }
+    } else {
+      _state = SessionState.Error()
     }
   }
 }

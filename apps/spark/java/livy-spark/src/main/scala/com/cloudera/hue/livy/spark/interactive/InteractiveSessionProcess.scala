@@ -21,18 +21,12 @@ package com.cloudera.hue.livy.spark.interactive
 import java.net.URL
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.sessions.SessionState
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.spark.SparkProcess
 
 import scala.annotation.tailrec
-import scala.concurrent.Future
 
 object InteractiveSessionProcess extends Logging {
-
-  val CONF_LIVY_REPL_JAR = "livy.repl.jar"
-  val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
-  val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
 
   def apply(id: Int,
             process: SparkProcess,
@@ -43,8 +37,8 @@ object InteractiveSessionProcess extends Logging {
 
 private class InteractiveSessionProcess(id: Int,
                                         process: SparkProcess,
-                                        createInteractiveRequest: CreateInteractiveRequest)
-  extends InteractiveWebSession(id, createInteractiveRequest) {
+                                        request: CreateInteractiveRequest)
+  extends InteractiveWebSession(id, process, request) {
 
   val stdoutThread = new Thread {
     override def run() = {
@@ -81,29 +75,4 @@ private class InteractiveSessionProcess(id: Int,
   stdoutThread.setName("process session stdout reader")
   stdoutThread.setDaemon(true)
   stdoutThread.start()
-
-  // Error out the job if the process errors out.
-  Future {
-    if (process.waitFor() != 0) {
-      _state = SessionState.Error()
-    } else {
-      // Set the state to done if the session shut down before contacting us.
-      _state match {
-        case (SessionState.Dead(_) | SessionState.Error(_) | SessionState.Success(_)) =>
-        case _ =>
-          _state = SessionState.Success()
-      }
-    }
-  }
-
-  override def logLines() = process.inputLines
-
-  override def stop(): Future[Unit] = {
-    super.stop().andThen { case r =>
-      // Make sure the process is reaped.
-      process.waitFor()
-      stdoutThread.join()
-      r
-    }
-  }
 }

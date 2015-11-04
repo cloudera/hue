@@ -28,11 +28,19 @@ import com.cloudera.hue.livy.{LivyConf, Utils}
 import org.json4s.{DefaultFormats, Formats, JValue}
 
 object InteractiveSessionFactory {
-  private val CONF_LIVY_JAR = "livy.repl.jar"
+  private val LivyReplDriverClassPath = "livy.repl.driverClassPath"
+  private val LivyReplJar = "livy.repl.jar"
+  private val LivyServerUrl = "livy.server.serverUrl"
+  private val SparkDriverExtraJavaOptions = "spark.driver.extraDriverOptions"
+  private val SparkLivyCallbackUrl = "spark.livy.callbackUrl"
+  private val SparkLivyPort = "spark.livy.port"
+  private val SparkYarnIsPython = "spark.yarn.isPython"
 }
 
 abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFactory)
   extends SessionFactory[InteractiveSession] {
+
+  import InteractiveSessionFactory._
 
   override protected implicit def jsonFormats: Formats = DefaultFormats ++ List(SessionKindSerializer)
 
@@ -67,23 +75,20 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
     request.queue.foreach(builder.queue)
     request.name.foreach(builder.name)
 
-    val callbackUrl = System.getProperty("livy.server.callback-url")
-    val driverOptions =
-      f"-Dlivy.repl.callback-url=$callbackUrl/sessions/$id/callback " +
-      "-Dlivy.repl.port=0"
-
-    builder.conf(
-      "spark.driver.extraJavaOptions",
-      builder.conf("spark.driver.extraJavaOptions")
-        .getOrElse("") + driverOptions,
-        admin = true)
-
     request.kind match {
-      case PySpark() => builder.conf("spark.yarn.isPython", "true", admin = true)
+      case PySpark() => builder.conf(SparkYarnIsPython, "true", admin = true)
       case _ =>
     }
 
-    builder.env("LIVY_PORT", "0")
+    processFactory.livyConf.getOption(LivyReplDriverClassPath)
+      .foreach(builder.driverClassPath)
+
+    sys.props.get(LivyServerUrl).foreach { serverUrl =>
+      val callbackUrl = f"$serverUrl/sessions/$id/callback"
+      builder.conf(SparkLivyCallbackUrl, callbackUrl, admin = true)
+    }
+
+    builder.conf(SparkLivyPort, "0", admin = true)
 
     builder.redirectOutput(Redirect.PIPE)
     builder.redirectErrorStream(true)
@@ -92,7 +97,7 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
   }
 
   private def livyJar(livyConf: LivyConf) = {
-    livyConf.getOption(InteractiveSessionFactory.CONF_LIVY_JAR)
+    livyConf.getOption(LivyReplJar)
       .getOrElse(Utils.jarOfClass(getClass).head)
   }
 }
