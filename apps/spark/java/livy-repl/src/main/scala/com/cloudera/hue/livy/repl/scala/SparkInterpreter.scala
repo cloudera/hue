@@ -180,22 +180,22 @@ class SparkInterpreter extends Interpreter {
           case value: JValue => List(JField("0", value))
         }
 
-        cols.map { case (name, value) =>
-          val typeName = convertTableType(value)
+        cols.map { case (k, v) =>
+          val typeName = convertTableType(v)
 
-          headers.get(name) match {
+          headers.get(k) match {
             case Some(header) =>
               if (header.get("type").get != typeName) {
                 throw new TypesDoNotMatch
               }
             case None =>
-              headers.put(name, Map(
+              headers.put(k, Map(
                 "type" -> typeName,
-                "name" -> name
+                "name" -> k
               ))
           }
 
-          value
+          v
         }
       }
 
