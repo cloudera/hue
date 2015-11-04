@@ -155,6 +155,7 @@ class HiveServer2Dbms(object):
       cleaned = "*%s*" % identifier.strip().strip("*")
     return cleaned
 
+
   def get_databases(self, database_names='*'):
     identifier = self.to_matching_wildcard(database_names)
 
@@ -180,7 +181,10 @@ class HiveServer2Dbms(object):
 
 
   def get_tables_meta(self, database='default', table_names='*'):
-    identifier = self.to_matching_wildcard(table_names)
+    if self.server_name == 'beeswax':
+      identifier = self.to_matching_wildcard(table_names)
+    else:
+      identifier = None
     tables = self.client.get_tables_meta(database, identifier)
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables, key='name')
@@ -188,24 +192,14 @@ class HiveServer2Dbms(object):
 
 
   def get_tables(self, database='default', table_names='*'):
-    identifier = self.to_matching_wildcard(table_names)
-    identifier = "'%s'" % identifier if identifier != '*' else '' # Filter not supported in SparkSql
-
-    hql = "SHOW TABLES IN `%s` %s" % (database, identifier) # self.client.get_tables(database, table_names) is too slow
-    query = hql_query(hql)
-    timeout = SERVER_CONN_TIMEOUT.get()
-
-    handle = self.execute_and_wait(query, timeout_sec=timeout)
-
-    if handle:
-      result = self.fetch(handle, rows=5000)
-      self.close(handle)
-      tables = [table[0] for table in result.rows()] # We only keep the first column as the name, SparkSql returns multiple columns
-      if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
-        tables = apply_natural_sort(tables)
-      return tables
+    if self.server_name == 'beeswax':
+      identifier = self.to_matching_wildcard(table_names)
     else:
-      return []
+      identifier = None
+    tables = self.client.get_tables(database, identifier)
+    if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
+      tables = apply_natural_sort(tables)
+    return tables
 
 
   def get_table(self, database, table_name):

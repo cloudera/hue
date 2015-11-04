@@ -660,7 +660,6 @@ class HiveServerClient:
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
     self.close_operation(res.operationHandle)
-
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
 
