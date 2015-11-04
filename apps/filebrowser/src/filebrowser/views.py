@@ -509,6 +509,13 @@ def stat(request, path):
     return JsonResponse(_massage_stats(request, stats))
 
 
+def content_summary(request, path):
+    if not request.fs.exists(path):
+        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
+    stats = request.fs.get_content_summary(path)
+    return JsonResponse(stats.summary)
+
+
 def display(request, path):
     """
     Implements displaying part of a file.
