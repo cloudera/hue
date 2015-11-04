@@ -22,7 +22,7 @@ import java.net.{ConnectException, URL}
 import java.util.concurrent.TimeUnit
 
 import com.cloudera.hue.livy._
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.ExecuteRequest
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{Statement, InteractiveSession}
 import com.cloudera.hue.livy.spark.SparkProcess

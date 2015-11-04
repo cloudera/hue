@@ -21,8 +21,7 @@ package com.cloudera.hue.livy.server.interactive
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.{ExecuteRequest, Logging}
 import com.cloudera.hue.livy.server.SessionServlet
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement, StatementState}

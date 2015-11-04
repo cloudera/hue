@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-package com.cloudera.hue.livy.msgs
+package com.cloudera.hue.livy
 
-sealed trait MsgType {
-}
+sealed trait MsgType
+
 object MsgType {
   case object execute_request extends MsgType
   case object execute_reply extends MsgType
