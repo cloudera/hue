@@ -176,7 +176,7 @@ class Workflow(Job):
           node['properties']['retry_interval'] = []
 
       # Backward compatibility
-      _upgrade_sqoop_node(node)
+      _upgrade_older_node(node)
 
     return _data
 
@@ -372,7 +372,7 @@ class Node():
       self.data['properties']['retry_interval'] = []
 
     # Backward compatibility
-    _upgrade_sqoop_node(self.data)
+    _upgrade_older_node(self.data)
 
   def get_template_name(self):
     return 'editor2/gen/workflow-%s.xml.mako' % self.data['type']
@@ -381,9 +381,16 @@ class Node():
     return find_parameters(self) + (find_parameters(self, ['sla']) if self.sla_enabled else [])
 
 
-def _upgrade_sqoop_node(node):
+def _upgrade_older_node(node):
   if node['type'] in ('sqoop', 'sqoop-widget') and 'arguments' not in node['properties']:
     node['properties']['arguments'] = node['properties']['parameters']
+
+  if node['type'] in ('kill', 'kill-widget') and 'to' not in node['properties']:
+    node['properties']['enableMail'] = False
+    node['properties']['to'] = ''
+    node['properties']['cc'] = ''
+    node['properties']['subject'] = ''
+    node['properties']['body'] = ''
 
 
 class Action(object):
