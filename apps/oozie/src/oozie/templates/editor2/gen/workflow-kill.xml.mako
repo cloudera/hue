@@ -15,6 +15,25 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
+%if node['properties']['enableMail']:
+    <action name="${ node['name'] }">
+        <email xmlns="uri:oozie:email-action:0.1">
+            <to>${ node['properties']['to'] }</to>
+            % if node['properties']['cc']:
+            <cc>${ node['properties']['cc'] }</cc>
+            % endif
+            <subject>${ node['properties']['subject'] }</subject>
+            <body>${ node['properties']['body'] }</body>
+        </email>
+        <ok to="${ node['name'] }-kill"/>
+        <error to="${ node['name'] }-kill"/>
+    </action>
+
+    <kill name="${ node['name'] }-kill">
+        <message>${ node['properties']['message'] }</message>
+    </kill>
+%else:
     <kill name="${ node['name'] }">
         <message>${ node['properties']['message'] }</message>
     </kill>
+%endif
