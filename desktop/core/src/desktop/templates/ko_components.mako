@@ -408,6 +408,7 @@ from desktop.views import _ko
                     type: data.value.type
                   })
                 ]);
+                self.entries()[1].open(true);
               } else if (data.type == "struct") {
                 self.entries($.map(data.fields, function(field) {
                   return self.createEntry({
@@ -427,6 +428,7 @@ from desktop.views import _ko
                     type: data.item.type
                   })
                 ]);
+                self.entries()[0].open(true);
               }
             }
             self.loading(false);
