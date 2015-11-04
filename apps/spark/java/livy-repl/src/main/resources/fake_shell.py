@@ -248,7 +248,7 @@ def magic_table_convert_map(m):
 
         converted_items[key] = value
 
-    return 'MAP_TYPE', items
+    return 'MAP_TYPE', converted_items
 
 
 magic_table_types = {
