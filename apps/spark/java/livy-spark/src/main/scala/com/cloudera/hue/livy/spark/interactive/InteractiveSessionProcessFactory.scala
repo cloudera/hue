@@ -23,12 +23,6 @@ import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 
 import scala.concurrent.ExecutionContext
 
-object InteractiveSessionProcessFactory {
-  val CONF_LIVY_REPL_JAR = "livy.repl.jar"
-  val CONF_LIVY_REPL_CALLBACK_URL = "livy.repl.callback-url"
-  val CONF_LIVY_REPL_DRIVER_CLASS_PATH = "livy.repl.driverClassPath"
-}
-
 class InteractiveSessionProcessFactory(processFactory: SparkProcessBuilderFactory)
   extends InteractiveSessionFactory(processFactory) {
 
@@ -42,15 +36,7 @@ class InteractiveSessionProcessFactory(processFactory: SparkProcessBuilderFactor
     val builder = super.sparkBuilder(id, request)
 
     sys.env.get("LIVY_REPL_JAVA_OPTS").foreach(builder.driverJavaOptions)
-    processFactory.livyConf.getOption(InteractiveSessionProcessFactory.CONF_LIVY_REPL_DRIVER_CLASS_PATH)
-      .foreach(builder.driverClassPath)
 
-    processFactory.livyConf.getOption(InteractiveSessionProcessFactory.CONF_LIVY_REPL_CALLBACK_URL)
-      .foreach { case callbackUrl =>
-        builder.env("LIVY_CALLBACK_URL", f"$callbackUrl/sessions/$id/callback")
-      }
-
-    builder.env("LIVY_PORT", "0")
     builder
   }
 }

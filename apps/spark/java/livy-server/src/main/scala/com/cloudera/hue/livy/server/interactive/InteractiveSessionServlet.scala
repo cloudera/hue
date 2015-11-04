@@ -51,6 +51,8 @@ class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSessio
         if (session.state == SessionState.Starting()) {
           session.url = new URL(callback.url)
           Accepted()
+        } else if (session.state.isActive) {
+          Ok()
         } else {
           BadRequest("Session is in wrong state")
         }

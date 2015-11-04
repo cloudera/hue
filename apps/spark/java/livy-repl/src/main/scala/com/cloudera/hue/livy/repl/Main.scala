@@ -37,22 +37,17 @@ import _root_.scala.concurrent.duration._
 import _root_.scala.concurrent.{Await, ExecutionContext}
 
 object Main extends Logging {
-
   val SESSION_KIND = "livy.repl.session.kind"
+  val CALLBACK_URL = "livy.repl.callbackUrl"
   val PYSPARK_SESSION = "pyspark"
   val SPARK_SESSION = "spark"
   val SPARKR_SESSION = "sparkr"
 
   def main(args: Array[String]): Unit = {
 
-    val host = Option(System.getProperty("livy.repl.host"))
-      .orElse(sys.env.get("LIVY_HOST"))
-      .getOrElse("0.0.0.0")
-
-    val port = Option(System.getProperty("livy.repl.port"))
-      .orElse(sys.env.get("LIVY_PORT"))
-      .getOrElse("8999").toInt
-
+    val host = sys.props.getOrElse("spark.livy.host", "0.0.0.0")
+    val port = sys.props.getOrElse("spark.livy.port", "8999").toInt
+    val callbackUrl = sys.props.get("spark.livy.callbackUrl")
 
     if (args.length != 1) {
       println("Must specify either `pyspark`/`spark`/`sparkr` for the session kind")
@@ -74,6 +69,7 @@ object Main extends Logging {
     server.context.addEventListener(new ScalatraListener)
     server.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
     server.context.setInitParameter(SESSION_KIND, session_kind)
+    callbackUrl.foreach(server.context.setInitParameter(CALLBACK_URL, _))
 
     server.start()
 
@@ -112,11 +108,8 @@ class ScalatraBootstrap extends LifeCycle with Logging {
 
       context.mount(new WebApp(session), "/*")
 
-      val callbackUrl = Option(System.getProperty("livy.repl.callback-url"))
-        .orElse(sys.env.get("LIVY_CALLBACK_URL"))
-
       // See if we want to notify someone that we've started on a url
-      callbackUrl.foreach(notifyCallback)
+      Option(context.getInitParameter(Main.CALLBACK_URL)).foreach(notifyCallback)
     } catch {
       case e: Throwable =>
         println(f"Exception thrown when initializing server: $e")
