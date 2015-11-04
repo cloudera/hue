@@ -38,10 +38,12 @@ def execute_reply(status, content):
         )
     }
 
+
 def execute_reply_ok(data):
     return execute_reply('ok', {
         'data': data,
     })
+
 
 def execute_reply_error(exc_type, exc_value, tb):
     LOG.error('execute_reply', exc_info=True)
@@ -101,17 +103,16 @@ class MagicNode(object):
         else:
             self.magic, self.rest = parts[0], (parts[1],)
 
-
     def execute(self):
         if not self.magic:
             raise UnknownMagic('magic command not specified')
 
         try:
-            self.handler = magic_router[self.magic]
+            handler = magic_router[self.magic]
         except KeyError:
             raise UnknownMagic("unknown magic command '%s'" % self.magic)
 
-        return self.handler(*self.rest)
+        return handler(*self.rest)
 
 
 def parse_code_into_nodes(code):
@@ -126,7 +127,8 @@ def parse_code_into_nodes(code):
         # line
         # .
 
-        # Split the code into chunks of normal code, and possibly magic code, which starts with a '%'.
+        # Split the code into chunks of normal code, and possibly magic code, which starts with
+        # a '%'.
         normal = []
         chunks = []
         for i, line in enumerate(code.rstrip().split('\n')):
@@ -165,6 +167,8 @@ def execute_request(content):
     except SyntaxError:
         exc_type, exc_value, tb = sys.exc_info()
         return execute_reply_error(exc_type, exc_value, [])
+
+    result = None
 
     try:
         for node in nodes:
@@ -335,7 +339,7 @@ def magic_json(name):
     }
 
 
-def shutdown_request(content):
+def shutdown_request(_content):
     sys.exit()
 
 
@@ -344,94 +348,99 @@ magic_router = {
     'json': magic_json,
 }
 
-
 msg_type_router = {
     'execute_request': execute_request,
     'shutdown_request': shutdown_request,
 }
 
-sys_stdin = sys.stdin
-sys_stdout = sys.stdout
-sys_stderr = sys.stderr
-
 fake_stdin = cStringIO.StringIO()
 fake_stdout = cStringIO.StringIO()
 fake_stderr = cStringIO.StringIO()
 
-sys.stdin = fake_stdin
-sys.stdout = fake_stdout
-sys.stderr = fake_stderr
 
-try:
-    # Load spark into the context
-    exec 'from pyspark.shell import sc' in global_dict
+def main():
+    sys_stdin = sys.stdin
+    sys_stdout = sys.stdout
+    sys_stderr = sys.stderr
 
-    print >> sys_stderr, fake_stdout.getvalue()
-    print >> sys_stderr, fake_stderr.getvalue()
+    sys.stdin = fake_stdin
+    sys.stdout = fake_stdout
+    sys.stderr = fake_stderr
 
-    fake_stdout.truncate(0)
-    fake_stderr.truncate(0)
+    try:
+        # Load spark into the context
+        exec 'from pyspark.shell import sc' in global_dict
 
-    print >> sys_stdout, 'READY'
-    sys_stdout.flush()
+        print >> sys_stderr, fake_stdout.getvalue()
+        print >> sys_stderr, fake_stderr.getvalue()
 
-    while True:
-        line = sys_stdin.readline()
+        fake_stdout.truncate(0)
+        fake_stderr.truncate(0)
 
-        if line == '':
-            break
-        elif line == '\n':
-            continue
-
-        try:
-            msg = json.loads(line)
-        except ValueError:
-            LOG.error('failed to parse message', exc_info=True)
-            continue
-
-        try:
-            msg_type = msg['msg_type']
-        except KeyError:
-            LOG.error('missing message type', exc_info=True)
-            continue
-
-        try:
-            content = msg['content']
-        except KeyError:
-            LOG.error('missing content', exc_info=True)
-            continue
-
-        if not isinstance(content, dict):
-            LOG.error('content is not a dictionary')
-            continue
-
-        try:
-            handler = msg_type_router[msg_type]
-        except KeyError:
-            LOG.error('unknown message type: %s', msg_type)
-            continue
-
-        response = handler(content)
-
-        try:
-            response = json.dumps(response)
-        except ValueError, e:
-            response = json.dumps({
-                'msg_type': 'inspect_reply',
-                'content': {
-                    'status': 'error',
-                    'ename': 'ValueError',
-                    'evalue': 'cannot json-ify %s' % response,
-                    'traceback': [],
-                }
-            })
-
-        print >> sys_stdout, response
+        print >> sys_stdout, 'READY'
         sys_stdout.flush()
-finally:
-    if 'sc' in global_dict:
-        global_dict['sc'].stop()
 
-    sys.stdin = sys_stdin
-    sys.stdout = sys_stdout
-    sys.stderr = sys_stderr
+        while True:
+            line = sys_stdin.readline()
+
+            if line == '':
+                break
+            elif line == '\n':
+                continue
+
+            try:
+                msg = json.loads(line)
+            except ValueError:
+                LOG.error('failed to parse message', exc_info=True)
+                continue
+
+            try:
+                msg_type = msg['msg_type']
+            except KeyError:
+                LOG.error('missing message type', exc_info=True)
+                continue
+
+            try:
+                content = msg['content']
+            except KeyError:
+                LOG.error('missing content', exc_info=True)
+                continue
+
+            if not isinstance(content, dict):
+                LOG.error('content is not a dictionary')
+                continue
+
+            try:
+                handler = msg_type_router[msg_type]
+            except KeyError:
+                LOG.error('unknown message type: %s', msg_type)
+                continue
+
+            response = handler(content)
+
+            try:
+                response = json.dumps(response)
+            except ValueError:
+                response = json.dumps({
+                    'msg_type': 'inspect_reply',
+                    'content': {
+                        'status': 'error',
+                        'ename': 'ValueError',
+                        'evalue': 'cannot json-ify %s' % response,
+                        'traceback': [],
+                    }
+                })
+
+            print >> sys_stdout, response
+            sys_stdout.flush()
+    finally:
+        if 'sc' in global_dict:
+            global_dict['sc'].stop()
+
+        sys.stdin = sys_stdin
+        sys.stdout = sys_stdout
+        sys.stderr = sys_stderr
+
+
+if __name__ == '__main__':
+    sys.exit(main())
