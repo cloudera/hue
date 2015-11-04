@@ -322,7 +322,7 @@
 <script type="text/html" id="kill-widget">
   <!-- ko if: $root.workflow.getNodeById(id()) -->
   <div class="row-fluid" data-bind="with: $root.workflow.getNodeById(id())" style="min-height: 40px">
-    <div class="big-icon" data-bind="visible: id() == '17c9c895-5a16-7443-bb81-f34b30b21548'" title="${ _('It is where we finish if failure!') }"><i class="fa fa-stop"></i></div>
+    <div class="big-icon" data-bind="visible: id() == '17c9c895-5a16-7443-bb81-f34b30b21548', attr: {'id': 'wdg_Kill'}" title="${ _('It is where we finish if failure!') }"><i class="fa fa-stop"></i></div>
 
     <div data-bind="visible: $root.isEditing" style="margin: 10px">
       <div data-bind="visible: $parent.ooziePropertiesExpanded">
