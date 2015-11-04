@@ -765,10 +765,10 @@ ${ require.config() }
 
 <script type ="text/html" id="snippet-execution-controls">
   <div class="hover-actions" style="position:absolute; bottom: 0">
-    <a class="snippet-side-btn" style="cursor: default; color: #338bb8;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
+    <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-spinner fa-spin"></i>
     </a>
-    <a class="snippet-side-btn" style="color: #338bb8;"data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
+    <a class="snippet-side-btn" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
       <i class="fa fa-stop"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" title="${ _('CTRL + ENTER') }">
