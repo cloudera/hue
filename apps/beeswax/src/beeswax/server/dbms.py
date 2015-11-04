@@ -165,23 +165,23 @@ class HiveServer2Dbms(object):
     return self.client.get_database(database)
 
 
-  def get_tables_meta(self, database='default', table_names='*'):
+  def get_tables_meta(self, database='default', table_names='*', table_types=None):
     if self.server_name == 'beeswax':
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
-    tables = self.client.get_tables_meta(database, identifier)
+    tables = self.client.get_tables_meta(database, identifier, table_types)
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables, key='name')
     return tables
 
 
-  def get_tables(self, database='default', table_names='*'):
+  def get_tables(self, database='default', table_names='*', table_types=None):
     if self.server_name == 'beeswax':
       identifier = self.to_matching_wildcard(table_names)
     else:
       identifier = None
-    tables = self.client.get_tables(database, identifier)
+    tables = self.client.get_tables(database, identifier, table_types)
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables)
     return tables
