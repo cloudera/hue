@@ -53,7 +53,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <i class="fa fa-fw fa-cog"></i>
     </a>
 
-    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}, visible: workflow.id() != null">
+    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}, visible: workflow.id() != null && history().length > 0">
       <i class="fa fa-fw fa-history"></i>
     </a>
 
@@ -358,11 +358,40 @@ ${ workflow.render() }
     <h3>${ _('Submission History') }</h3>
   </div>
   <div class="modal-body">
-    <ul data-bind="foreach: $root.history" class="unstyled">
-      <li>
-        <span data-bind="text: ko.mapping.toJSON($data)"></span>
-      </li>
-    </ul>
+    <table class="table table-condensed margin-top-20">
+      <tr>
+        <th width="30%">${ _('Date') }</th>
+        <th>${ _('ID') }</th>
+        <th width="20">&nbsp;</th>
+      </tr>
+      <!-- ko foreach: $root.history -->
+      <tr>
+        <td data-bind="text: $data.date"></td>
+        <td><a data-bind="attr:{'href': '/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/' }, text: $data.history.oozie_id" target="_blank"></a></td>
+        <td><a class="pointer" data-bind="click: function(){$data.expanded(!$data.expanded())}"><i class="fa fa-info-circle"></i></a></td>
+      </tr>
+      <tr data-bind="slideVisible: $data.expanded">
+        <td colspan="3" style="padding-left: 20px;border-left: 5px solid #DDD;">
+        <dl>
+          <!-- ko foreach: Object.keys($data.history.properties) -->
+          <dt data-bind="text: $data"></dt>
+          <dd>
+            <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
+              <a data-bind="text: $parent.history.properties[$data], attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
+            <!-- /ko -->
+            <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
+            <span data-bind="text: $parent.history.properties[$data]"></span>
+            <!-- /ko -->
+          </dd>
+          <!-- /ko -->
+          </dl>
+        </td>
+      </tr>
+      <!-- /ko -->
+    </table>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
