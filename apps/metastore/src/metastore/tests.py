@@ -144,6 +144,16 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
       assert_true('name' in response.context["tables"][0])
       assert_false('comment' in response.context["tables"][0], response.context["tables"])
       assert_false('type' in response.context["tables"][0])
+
+      hql = """
+        CREATE INDEX test_index ON TABLE test_show_tables_1 (a) AS 'COMPACT' WITH DEFERRED REBUILD;
+      """
+      resp = _make_query(self.client, hql, wait=True, local=False, max=30.0, database=self.db_name)
+
+      # By default, index table should not appear in show tables view
+      response = self.client.get("/metastore/tables/%s" % self.db_name)
+      assert_equal(200, response.status_code)
+      assert_false('test_index' in response.context['tables'])
     finally:
       for reset in resets:
         reset()

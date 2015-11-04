@@ -438,6 +438,11 @@ class HiveServerClient:
       'PAM': 'PLAIN'
   }
 
+  DEFAULT_TABLE_TYPES = [
+    'TABLE',
+    'VIEW',
+  ]
+
   def __init__(self, query_server, user):
     self.query_server = query_server
     self.user = user
@@ -635,8 +640,10 @@ class HiveServerClient:
     return HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)[0]  # Should only contain one row
 
 
-  def get_tables_meta(self, database, table_names):
-    req = TGetTablesReq(schemaName=database, tableName=table_names)
+  def get_tables_meta(self, database, table_names, table_types=None):
+    if not table_types:
+      table_types = self.DEFAULT_TABLE_TYPES
+    req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
     res = self.call(self._client.GetTables, req)
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
@@ -646,12 +653,15 @@ class HiveServerClient:
     return HiveServerTRowSet(results.results, schema.schema).cols(cols)
 
 
-  def get_tables(self, database, table_names):
-    req = TGetTablesReq(schemaName=database, tableName=table_names)
+  def get_tables(self, database, table_names, table_types=None):
+    if not table_types:
+      table_types = self.DEFAULT_TABLE_TYPES
+    req = TGetTablesReq(schemaName=database, tableName=table_names, tableTypes=table_types)
     res = self.call(self._client.GetTables, req)
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
     self.close_operation(res.operationHandle)
+
     return HiveServerTRowSet(results.results, schema.schema).cols(('TABLE_NAME',))
 
 
@@ -1007,8 +1017,8 @@ class HiveServerClientCompatible(object):
     return self._client.get_database(database)
 
 
-  def get_tables_meta(self, database, table_names):
-    tables = self._client.get_tables_meta(database, table_names)
+  def get_tables_meta(self, database, table_names, table_types=None):
+    tables = self._client.get_tables_meta(database, table_names, table_types)
     massaged_tables = []
     for table in tables:
       massaged_tables.append({
@@ -1019,8 +1029,8 @@ class HiveServerClientCompatible(object):
     return massaged_tables
 
 
-  def get_tables(self, database, table_names):
-    tables = [table['TABLE_NAME'] for table in self._client.get_tables(database, table_names)]
+  def get_tables(self, database, table_names, table_types=None):
+    tables = [table['TABLE_NAME'] for table in self._client.get_tables(database, table_names, table_types)]
     tables.sort()
     return tables
 
