@@ -80,6 +80,14 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
       case _ =>
     }
 
+    sys.env.get("LIVY_REPL_JAVA_OPTS").foreach { replJavaOpts =>
+      val javaOpts = builder.conf(SparkDriverExtraJavaOptions) match {
+        case Some(javaOptions) => f"$javaOptions $replJavaOpts"
+        case None => replJavaOpts
+      }
+      builder.conf(SparkDriverExtraJavaOptions, javaOpts)
+    }
+
     processFactory.livyConf.getOption(LivyReplDriverClassPath)
       .foreach(builder.driverClassPath)
 
