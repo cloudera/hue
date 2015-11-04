@@ -23,5 +23,5 @@ exec $RBT post \
 	--target-groups=hue \
 	--target-people="$REVIEWER" \
 	--summary="$SUMMARY" \
-	$REVLIST \
-	$@
+	$@ \
+	$REVLIST
