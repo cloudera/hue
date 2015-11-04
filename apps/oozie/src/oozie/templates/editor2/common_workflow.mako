@@ -436,32 +436,36 @@
     <em data-bind="visible: properties.archives().length == 0">${ _('No archives defined.') }</em>
     <!-- /ko -->
 
-
-    <h6>${ _('Retry ') }</h6>
-    <a class="pointer" data-bind="click: function(){ properties.retry_max.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }, visible: properties.retry_max().length < 1">
-      ${ _('Max') } <i class="fa fa-plus"></i>
-    </a>
-    <a class="pointer" data-bind="click: function(){ properties.retry_interval.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }, visible: properties.retry_interval().length < 1">
-      ${ _('Interval') } <i class="fa fa-plus"></i>
-    </a>
-
-    <ul data-bind="visible: properties.retry_max().length > 0, foreach: properties.retry_max" class="unstyled">
-      <li>
-        ${ _('Max') } <input type="number" data-bind="value: value, attr: { placeholder: $root.workflow_properties.retry_max.help_text }"/>
-        <a href="#" data-bind="click: function(){ $parent.properties.retry_max.remove(this); $(document).trigger('drawArrows') }">
-          <i class="fa fa-minus"></i>
-        </a>
-      </li>
-    </ul>
-    <ul data-bind="visible: properties.retry_interval().length > 0, foreach: properties.retry_interval" class="unstyled">
-      <li>
-        ${ _('Interval') } <input type="number" class="small" data-bind="value: value, attr: { placeholder: $root.workflow_properties.retry_interval.help_text }"/>
-        <a href="#" data-bind="click: function(){ $parent.properties.retry_interval.remove(this); $(document).trigger('drawArrows') }">
-          <i class="fa fa-minus"></i>
-        </a>
-      </li>
-    </ul>
+    <span data-bind="template: { name: 'common-properties-retry' }"></span>
   </div>
+</script>
+
+
+<script type="text/html" id="common-properties-retry">
+  <h6>${ _('Retry ') }</h6>
+  <a class="pointer" data-bind="click: function(){ properties.retry_max.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }, visible: properties.retry_max().length < 1">
+    ${ _('Max') } <i class="fa fa-plus"></i>
+  </a>
+  <a class="pointer" data-bind="click: function(){ properties.retry_interval.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }, visible: properties.retry_interval().length < 1">
+    ${ _('Interval') } <i class="fa fa-plus"></i>
+  </a>
+
+  <ul data-bind="visible: properties.retry_max().length > 0, foreach: properties.retry_max" class="unstyled">
+    <li>
+      ${ _('Max') } <input type="number" data-bind="value: value, attr: { placeholder: $root.workflow_properties.retry_max.help_text }"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.retry_max.remove(this); $(document).trigger('drawArrows') }">
+        <i class="fa fa-minus"></i>
+      </a>
+    </li>
+  </ul>
+  <ul data-bind="visible: properties.retry_interval().length > 0, foreach: properties.retry_interval" class="unstyled">
+    <li>
+      ${ _('Interval') } <input type="number" class="small" data-bind="value: value, attr: { placeholder: $root.workflow_properties.retry_interval.help_text }"/>
+      <a href="#" data-bind="click: function(){ $parent.properties.retry_interval.remove(this); $(document).trigger('drawArrows') }">
+        <i class="fa fa-minus"></i>
+      </a>
+    </li>
+  </ul>
 </script>
 
 
@@ -1097,46 +1101,48 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
-      <div class="properties">
-        <h6>${ _('Prepare') }</h6>
-        <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
-          <li>
-            <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
-            <input type="text" class="filechooser-input input-xlarge"
-                data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }" validate="nonempty"/>
-            <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
-              <i class="fa fa-minus"></i>
+          <div class="properties">
+            <h6>${ _('Prepare') }</h6>
+            <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
+              <li>
+                <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
+                <input type="text" class="filechooser-input input-xlarge"
+                    data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }" validate="nonempty"/>
+                <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
+                  <i class="fa fa-minus"></i>
+                </a>
+              </li>
+            </ul>
+            <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); $(document).trigger('drawArrows') }">
+              ${ _('Directory') } <i class="fa fa-plus"></i>
             </a>
-          </li>
-        </ul>
-        <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); $(document).trigger('drawArrows') }">
-          ${ _('Directory') } <i class="fa fa-plus"></i>
-        </a>
-        <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
-          ${ _('Delete') } <i class="fa fa-plus"></i>
-        </a>
-
-        <!-- ko if: properties.job_xml -->
-          <h6>${ _('Job XML') }</h6>
-          <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.job_xml, attr: { placeholder: $root.workflow_properties.job_xml.help_text }" validate="nonempty"/>
-        <!-- /ko -->
-
-        <h6>
-          <a class="pointer" data-bind="click: function(){ properties.archives.push(ko.mapping.fromJS({'name': ''})); $(document).trigger('drawArrows') }">
-            ${ _('Archives') } <i class="fa fa-plus"></i>
-          </a>
-        </h6>
-        <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
-          <li>
-            <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz,jar', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }" validate="nonempty"/>
-            <span data-bind='template: { name: "common-fs-link", data: { path: name(), with_label: false} }'></span>
-            <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
-              <i class="fa fa-minus"></i>
+            <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
+              ${ _('Delete') } <i class="fa fa-plus"></i>
             </a>
-          </li>
-        </ul>
-        <em data-bind="visible: properties.archives().length == 0">${ _('No archives defined.') }</em>
-      </div>
+
+            <!-- ko if: properties.job_xml -->
+              <h6>${ _('Job XML') }</h6>
+              <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: properties.job_xml, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.job_xml, attr: { placeholder: $root.workflow_properties.job_xml.help_text }" validate="nonempty"/>
+            <!-- /ko -->
+
+            <h6>
+              <a class="pointer" data-bind="click: function(){ properties.archives.push(ko.mapping.fromJS({'name': ''})); $(document).trigger('drawArrows') }">
+                ${ _('Archives') } <i class="fa fa-plus"></i>
+              </a>
+            </h6>
+            <ul data-bind="visible: properties.archives().length > 0, foreach: properties.archives" class="unstyled">
+              <li>
+                <input type="text" class="filechooser-input input-xlarge" data-bind="filechooser: name(), filechooserFilter: 'zip,tar,tgz,tar.gz,jar', filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: name, value: name, attr: { placeholder: $root.workflow_properties.archives.help_text }" validate="nonempty"/>
+                <span data-bind='template: { name: "common-fs-link", data: { path: name(), with_label: false} }'></span>
+                <a href="#" data-bind="click: function(){ $parent.properties.archives.remove(this); $(document).trigger('drawArrows') }">
+                  <i class="fa fa-minus"></i>
+                </a>
+              </li>
+            </ul>
+            <em data-bind="visible: properties.archives().length == 0">${ _('No archives defined.') }</em>
+
+            <span data-bind="template: { name: 'common-properties-retry' }"></span>
+          </div>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1482,7 +1488,6 @@
             </a>
           </li>
         </ul>
-
       </div>
     </div>
 
@@ -1496,48 +1501,49 @@
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
 
-        <h6>
-          <a class="pointer" data-bind="click: function(){ properties.chmods.push(ko.mapping.fromJS({'value': '', 'permissions': '755', 'dir_files': false, 'recursive': false})); }">
-            <span data-bind="text: $root.workflow_properties.chmods.label"></span> <i class="fa fa-plus"></i>
-          </a>
-        </h6>
-        <ul data-bind="foreach: properties.chmods" class="unstyled">
-          <li>
-            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.chmods.help_text }"/>
-            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
-
-            <input type="text" class="input-small" data-bind="value: permissions" placeholder="${ _('755, -rwxrw-rw-') }"/>
-            ${ _('Only for directories') }
-            <input type="checkbox" data-bind="checked: dir_files"/>
-            ${ _('Recursive to sub directories') }
-            <input type="checkbox" data-bind="checked: recursive"/>
-            <a href="#" data-bind="click: function(){ $parent.properties.chmods.remove(this); }">
-              <i class="fa fa-minus"></i>
+          <h6>
+            <a class="pointer" data-bind="click: function(){ properties.chmods.push(ko.mapping.fromJS({'value': '', 'permissions': '755', 'dir_files': false, 'recursive': false})); }">
+              <span data-bind="text: $root.workflow_properties.chmods.label"></span> <i class="fa fa-plus"></i>
             </a>
-          </li>
-        </ul>
+          </h6>
+          <ul data-bind="foreach: properties.chmods" class="unstyled">
+            <li>
+              <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.chmods.help_text }"/>
+              <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
 
-        <h6>
-          <a class="pointer" data-bind="click: function(){ properties.chgrps.push(ko.mapping.fromJS({'value': '', 'group': '', 'dir_files': false, 'recursive': false})); }">
-            <span data-bind="text: $root.workflow_properties.chgrps.label"></span> <i class="fa fa-plus"></i>
-          </a>
-        </h6>
-        <ul data-bind="foreach: properties.chgrps" class="unstyled">
-          <li>
-            <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.chgrps.help_text }"/>
-            <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
+              <input type="text" class="input-small" data-bind="value: permissions" placeholder="${ _('755, -rwxrw-rw-') }"/>
+              ${ _('Only for directories') }
+              <input type="checkbox" data-bind="checked: dir_files"/>
+              ${ _('Recursive to sub directories') }
+              <input type="checkbox" data-bind="checked: recursive"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.chmods.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
 
-            <input type="text" class="input-small" data-bind="value: group" placeholder="${ _('e.g. newgroup') }"/>
-            ${ _('Only for directories') }
-            <input type="checkbox" data-bind="checked: dir_files"/>
-            ${ _('Recursive to sub directories') }
-            <input type="checkbox" data-bind="checked: recursive"/>
-            <a href="#" data-bind="click: function(){ $parent.properties.chgrps.remove(this); }">
-              <i class="fa fa-minus"></i>
+          <h6>
+            <a class="pointer" data-bind="click: function(){ properties.chgrps.push(ko.mapping.fromJS({'value': '', 'group': '', 'dir_files': false, 'recursive': false})); }">
+              <span data-bind="text: $root.workflow_properties.chgrps.label"></span> <i class="fa fa-plus"></i>
             </a>
-          </li>
-        </ul>
+          </h6>
+          <ul data-bind="foreach: properties.chgrps" class="unstyled">
+            <li>
+              <input type="text" class="input-xlarge filechooser-input" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.chgrps.help_text }"/>
+              <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
 
+              <input type="text" class="input-small" data-bind="value: group" placeholder="${ _('e.g. newgroup') }"/>
+              ${ _('Only for directories') }
+              <input type="checkbox" data-bind="checked: dir_files"/>
+              ${ _('Recursive to sub directories') }
+              <input type="checkbox" data-bind="checked: recursive"/>
+              <a href="#" data-bind="click: function(){ $parent.properties.chgrps.remove(this); }">
+                <i class="fa fa-minus"></i>
+              </a>
+            </li>
+          </ul>
+
+          <span data-bind="template: { name: 'common-properties-retry' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1599,7 +1605,9 @@
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
           <span data-bind="text: $root.workflow_properties.cc.label"></span>
-          <input type="text" data-bind="value: properties.cc, attr: { placeholder: $root.workflow_properties.cc.help_text }" />
+          <input type="text" class="seventy" data-bind="value: properties.cc, attr: { placeholder: $root.workflow_properties.cc.help_text }" />
+
+          <span data-bind="template: { name: 'common-properties-retry' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
@@ -1722,29 +1730,29 @@
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
 
-     <h6>${ _('Prepare') }</h6>
-       <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
-         <li>
-           <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
-           <input type="text" class="filechooser-input input-xlarge seventy"
-                data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }" validate="nonempty"/>
-            <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
-              <i class="fa fa-minus"></i>
-            </a>
-          </li>
-       </ul>
-       <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); $(document).trigger('drawArrows') }">
-         ${ _('Directory') } <i class="fa fa-plus"></i>
-       </a>
-       <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
-         ${ _('Delete') } <i class="fa fa-plus"></i>
-       </a>
+         <h6>${ _('Prepare') }</h6>
+           <ul data-bind="visible: properties.prepares().length > 0, foreach: properties.prepares" class="unstyled">
+             <li>
+               <div style="display: inline-block; width: 60px" data-bind="text: type"></div>
+               <input type="text" class="filechooser-input input-xlarge seventy"
+                    data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.prepares.help_text }" validate="nonempty"/>
+                <a href="#" data-bind="click: function(){ $parent.properties.prepares.remove(this); $(document).trigger('drawArrows') }">
+                  <i class="fa fa-minus"></i>
+                </a>
+              </li>
+           </ul>
+           <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'mkdir', 'value': ''}); $(document).trigger('drawArrows') }">
+             ${ _('Directory') } <i class="fa fa-plus"></i>
+           </a>
+           <a class="pointer" data-bind="click: function(){ properties.prepares.push({'type': 'delete', 'value': ''}); $(document).trigger('drawArrows') }">
+             ${ _('Delete') } <i class="fa fa-plus"></i>
+           </a>
 
-       <h6>
-         <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
-           ${ _('Properties') } <i class="fa fa-plus"></i>
-         </a>
-       </h6>
+           <h6>
+             <a class="pointer" data-bind="click: function(){ properties.job_properties.push({'name': '', 'value': ''}); $(document).trigger('drawArrows') }">
+               ${ _('Properties') } <i class="fa fa-plus"></i>
+             </a>
+           </h6>
            <ul data-bind="visible: properties.job_properties().length > 0, foreach: properties.job_properties" class="unstyled">
            <li>
              <input type="text" data-bind="value: name" placeholder="${ _('name, e.g. mapred.job.queue.name') }" validate="nonempty"/>
@@ -1760,6 +1768,8 @@
              <span data-bind="text: $root.workflow_properties.java_opts.label"></span>
            </h6>
            <input type="text" class="input-xlarge seventy" data-bind="value: properties.java_opts, attr: { placeholder: $root.workflow_properties.java_opts.help_text }" />
+
+           <span data-bind="template: { name: 'common-properties-retry' }"></span>
         </div>
 
         <div class="tab-pane" data-bind="attr: { id: 'sla-' + id() }">
