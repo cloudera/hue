@@ -53,7 +53,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <i class="fa fa-fw fa-cog"></i>
     </a>
 
-    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}">
+    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}, visible: workflow.id() != null">
       <i class="fa fa-fw fa-history"></i>
     </a>
 

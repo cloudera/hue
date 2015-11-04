@@ -334,7 +334,7 @@
         <span data-bind="visible: properties.enableMail">
           <div class="airy">
             <span class="widget-label" data-bind="text: $root.workflow_properties.to.label"></span>
-            <input type="text" class="seventy" data-bind="value: properties.to, attr: { placeholder: $root.workflow_properties.to.help_text }" validate="nonempty"/>
+            <input type="text" class="seventy" data-bind="value: properties.to, attr: { placeholder: $root.workflow_properties.to.help_text }"/>
           </div>
 
           <div class="airy">

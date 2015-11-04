@@ -108,7 +108,7 @@ def _edit_workflow(request, doc, workflow):
           'history': hist.data_dict.get('history', '{}'),
           'id': hist.id,
           'date': hist.last_modified.strftime('%Y-%m-%dT%H:%M')
-        } for hist in doc.get_history()], cls=JSONEncoderForHTML)
+        } for hist in doc.get_history()] if doc else [], cls=JSONEncoderForHTML)
   })
 
 
