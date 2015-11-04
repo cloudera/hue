@@ -18,7 +18,7 @@
 
 package com.cloudera.hue.livy.sessions.interactive
 
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.ExecuteRequest
 import org.json4s.JValue
 import org.json4s.JsonAST.{JArray, JField, JObject, JString}
 

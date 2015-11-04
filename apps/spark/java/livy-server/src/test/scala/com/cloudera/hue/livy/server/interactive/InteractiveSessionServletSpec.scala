@@ -21,12 +21,11 @@ package com.cloudera.hue.livy.server.interactive
 import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.cloudera.hue.livy.LivyConf
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.{ExecuteRequest, LivyConf}
 import com.cloudera.hue.livy.sessions._
 import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement}
-import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 import com.cloudera.hue.livy.spark.interactive.{CreateInteractiveRequest, InteractiveSessionFactory}
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
 import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write

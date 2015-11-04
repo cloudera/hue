@@ -20,8 +20,7 @@ package com.cloudera.hue.livy.repl
 
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.{ExecuteRequest, Logging}
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, JsonDSL, MappingException, _}

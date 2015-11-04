@@ -20,7 +20,7 @@ package com.cloudera.hue.livy.sessions
 
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.ExecuteRequest
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import org.json4s.{DefaultFormats, Extraction}
 import org.scalatest.{BeforeAndAfter, FunSpec, Matchers}

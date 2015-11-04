@@ -21,9 +21,8 @@ package com.cloudera.hue.livy.sessions.interactive
 import java.net.URL
 import java.util.concurrent.TimeoutException
 
-import com.cloudera.hue.livy.Utils
-import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.sessions.{Session, Kind, SessionState}
+import com.cloudera.hue.livy.{ExecuteRequest, Utils}
+import com.cloudera.hue.livy.sessions.{Kind, Session, SessionState}
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration
