@@ -404,7 +404,7 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
     if 'Max retries exceeded with url' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
     LOG.exception('Error submitting workflow: %s' % smart_str(detail))
-    raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
+    raise PopupException(_("Error submitting workflow %s: %s") % (workflow, detail))
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
