@@ -328,6 +328,30 @@
       <div data-bind="visible: $parent.ooziePropertiesExpanded">
         <h6 class="field-title">${ _('Message') }</h6>
         <textarea class="span12" data-bind="value: properties.message" />
+
+        <h6 class="field-title">${ _('Email on error') }</h6>
+        <input type="checkbox" data-bind="checked: properties.enableMail" />
+        <span data-bind="visible: properties.enableMail">
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.to.label"></span>
+            <input type="text" class="seventy" data-bind="value: properties.to, attr: { placeholder: $root.workflow_properties.to.help_text }" validate="nonempty"/>
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.cc.label"></span>
+            <input type="text" class="seventy" data-bind="value: properties.cc, attr: { placeholder: $root.workflow_properties.cc.help_text }" />
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.subject.label"></span>
+            <input type="text" class="seventy" data-bind="value: properties.subject, attr: { placeholder: $root.workflow_properties.subject.help_text }" />
+          </div>
+
+          <div class="airy">
+            <span class="widget-label" data-bind="text: $root.workflow_properties.body.label"></span>
+            <textarea class="seventy" style="resize:both" data-bind="value: properties.body, attr: { placeholder: $root.workflow_properties.body.help_text }"></textarea>
+          </div>
+        </span>
       </div>
     </div>
   </div>
@@ -556,12 +580,12 @@
 
 
 <script type="text/html" id="common-fs-link">
-<!-- ko if: $data.path.length > 0 -->
-  <!-- ko if: with_label -->
-    <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _ko('Open') } '+ $data.path }" target="_blank">
+ <!-- ko if: $data.path.length > 0 -->
+   <!-- ko if: with_label -->
+     <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path , title: '${ _ko('Open') } '+ $data.path }" target="_blank">
       <span data-bind="text: $data.path.lastIndexOf('/') == $data.path.length - 1 ? $data.path : $data.path.split('/').pop()"></span>
-    </a>
-  <!-- /ko -->
+     </a>
+   <!-- /ko -->
 
    <!-- ko if: ! with_label -->
      <a data-bind="attr: {href: '/filebrowser/view=' + ($data.path[0] != '/' ? $root.workflow.properties.deployment_dir() + '/' : '') + $data.path }" target="_blank" title="${ _('Open') }">
@@ -579,6 +603,7 @@
     </a>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="logs-icon">
   <!-- ko if: $parent.logsURL() != '' && $parent.logsURL() != null -->
@@ -665,7 +690,6 @@
         </div>
       </div>
     </div>
-
 
     <div data-bind="visible: $parent.ooziePropertiesExpanded">
       <ul class="nav nav-tabs">
@@ -1551,7 +1575,7 @@
 
         <div class="airy">
           <span class="widget-label" data-bind="text: $root.workflow_properties.body.label"></span>
-          <textarea class="seventy" data-bind="value: properties.body, attr: { placeholder: $root.workflow_properties.body.help_text }"></textarea>
+          <textarea class="seventy" style="resize:both" data-bind="value: properties.body, attr: { placeholder: $root.workflow_properties.body.help_text }"></textarea>
         </div>
       </div>
     </div>
