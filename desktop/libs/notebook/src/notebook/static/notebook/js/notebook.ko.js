@@ -501,7 +501,7 @@
         setTimeout(function () {
           self.fetchResultData(rows, false);
         }, 500);
-      } else if (notebook.snippets()[notebook.snippets().length - 1] == self) {
+      } else if (! self.isSqlDialect() && notebook.snippets()[notebook.snippets().length - 1] == self) {
         notebook.newSnippet();
       }
     };
