@@ -166,7 +166,10 @@ class HiveServer2Dbms(object):
 
 
   def get_tables_meta(self, database='default', table_names='*'):
-    identifier = self.to_matching_wildcard(table_names)
+    if self.server_name == 'beeswax':
+      identifier = self.to_matching_wildcard(table_names)
+    else:
+      identifier = None
     tables = self.client.get_tables_meta(database, identifier)
     if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
       tables = apply_natural_sort(tables, key='name')
@@ -174,23 +177,14 @@ class HiveServer2Dbms(object):
 
 
   def get_tables(self, database='default', table_names='*'):
-    identifier = self.to_matching_wildcard(table_names)
-
-    hql = "SHOW TABLES IN `%s` '%s'" % (database, identifier) # self.client.get_tables(database, table_names) is too slow
-    query = hql_query(hql)
-    timeout = SERVER_CONN_TIMEOUT.get()
-
-    handle = self.execute_and_wait(query, timeout_sec=timeout)
-
-    if handle:
-      result = self.fetch(handle, rows=5000)
-      self.close(handle)
-      tables = [name for table in result.rows() for name in table]
-      if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
-        tables = apply_natural_sort(tables)
-      return tables
+    if self.server_name == 'beeswax':
+      identifier = self.to_matching_wildcard(table_names)
     else:
-      return []
+      identifier = None
+    tables = self.client.get_tables(database, identifier)
+    if len(tables) <= APPLY_NATURAL_SORT_MAX.get():
+      tables = apply_natural_sort(tables)
+    return tables
 
 
   def get_table(self, database, table_name):
