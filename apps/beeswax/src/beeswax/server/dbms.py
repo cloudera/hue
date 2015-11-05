@@ -146,7 +146,11 @@ class HiveServer2Dbms(object):
 
 
   def select_star_from(self, database, table):
-    hql = "SELECT * FROM `%s`.`%s` %s" % (database, table.name, self._get_browse_limit_clause(table))
+    if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+      limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
+      hql = self._get_sample_partition_query(database, table, limit)
+    else:
+      hql = "SELECT * FROM `%s`.`%s`" % (database, table.name)
     return self.execute_statement(hql)
 
 
@@ -218,7 +222,8 @@ class HiveServer2Dbms(object):
     else:
       partition_clause = ''
 
-    return "SELECT * FROM `%s`.`%s` %s LIMIT %s" % (database, table.name, partition_clause, limit)
+    return "SELECT * FROM `%(database)s`.`%(table)s` %(partition_clause)s LIMIT %(limit)s" % \
+      {'database': database, 'table': table.name, 'partition_clause': partition_clause, 'limit': limit}
 
 
   def analyze_table_table(self, database, table):
@@ -534,15 +539,6 @@ class HiveServer2Dbms(object):
 
   def get_default_configuration(self, include_hadoop):
     return self.client.get_default_configuration(include_hadoop)
-
-
-  def _get_browse_limit_clause(self, table):
-    """Get the limit clause when browsing a partitioned table"""
-    if table.partition_keys:
-      limit = BROWSE_PARTITIONED_TABLE_LIMIT.get()
-      if limit > 0:
-        return "LIMIT %d" % (limit,)
-    return ""
 
 
 class Table:
