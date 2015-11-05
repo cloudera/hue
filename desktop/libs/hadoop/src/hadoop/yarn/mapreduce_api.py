@@ -41,7 +41,8 @@ def get_mapreduce_api(user):
     try:
       if _api_cache is None:
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
-        _api_cache = MapreduceApi(user, yarn_cluster.PROXY_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        if yarn_cluster is not None:
+          _api_cache = MapreduceApi(user, yarn_cluster.PROXY_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       _api_cache_lock.release()
   return _api_cache
