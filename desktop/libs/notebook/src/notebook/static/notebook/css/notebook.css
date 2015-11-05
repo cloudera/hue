@@ -325,11 +325,13 @@ body {
   border-right: 1px solid #dddddd;
 }
 
+.empty-title {
+  font-weight: normal;
+}
+
 .snippet-icon-image {
   height: 16px;
   width: 16px;
-  margin-left: 3px;
-  margin-right: 3px;
   -webkit-filter: grayscale(1)  brightness(1.5);
   -webkit-filter: grayscale(100%) brightness(150%);
   filter: grayscale(100%) brightness(150%);
@@ -348,8 +350,6 @@ body {
   color: #d1d1d1;
   height: 16px;
   width: 16px;
-  margin-left: 3px;
-  margin-right: 3px;
   -webkit-transition: color 0.2s ease;
   -moz-transition: color 0.2s ease;
   -ms-transition: color 0.2s ease;
@@ -376,10 +376,6 @@ body {
 
 .assist-main {
   overflow-y: auto;
-}
-
-.editable-empty, .editable-empty:hover {
-  color: #DDD !important;
 }
 
 .editable-click, a.editable-click, a.editable-click:hover {
@@ -596,15 +592,6 @@ h1.empty {
     display: block;
     font-weight: bold;
   }
-}
-
-.widget-type.dropdown a.dropdown-toggle {
-  padding-left: 0;
-  padding-right: 0;
-}
-
-.widget-type.dropdown .dropdown-toggle .caret {
-  margin-top: 0;
 }
 
 .no-underline:hover {
