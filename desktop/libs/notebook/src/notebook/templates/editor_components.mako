@@ -373,11 +373,11 @@ ${ require.config() }
 
 <script type="text/html" id="snippet">
   <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
-    <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}">
+    <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
 
       <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-      <h2 style="margin-left:35px;" class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }">
+      <h2 style="margin-left:35px;" class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }, clickForAceFocus: ace">
 
         <div class="inactive-action hover-actions dropdown inline widget-type">
           <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
@@ -408,7 +408,7 @@ ${ require.config() }
           <div class="snippet-left-bar" style="vertical-align: bottom;">
             <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
           </div>
-          <div class="snippet-body" data-bind="verticalSlide: codeVisible">
+          <div class="snippet-body" data-bind="verticalSlide: codeVisible, clickForAceFocus: ace">
             <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
@@ -494,7 +494,7 @@ ${ require.config() }
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
-    <div class="editor span12" data-bind="click: function(snippet, e){ setAceFocus(e, ace()); }">
+    <div class="editor span12" data-bind="clickForAceFocus: ace">
       <div class="ace-editor" data-bind="css: {'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
@@ -746,8 +746,8 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-execution-status">
-  <div class="snippet-execution-status">
-    <div class="snippet-progress-container" data-bind="click: function (snippet, e) { setAceFocus(e, ace()); }">
+  <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
+    <div class="snippet-progress-container">
       <div class="progress progress-striped active" data-bind="css: {
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
@@ -1064,13 +1064,6 @@ ${ require.config() }
   }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
-
-  function setAceFocus(event, editor) {
-    if (!$(event.target).hasClass("ace_content")) {
-      editor.focus();
-      editor.execCommand("gotolineend");
-    }
-  }
 
   $.scrollbarWidth = function() {
     var _parent, _child, _width;
