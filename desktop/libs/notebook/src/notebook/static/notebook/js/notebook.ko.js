@@ -97,6 +97,7 @@
 
     self.clear = function () {
       self.fetchedOnce(false);
+      self.meta.removeAll();
       self.data.removeAll();
       self.images.removeAll();
       self.logs('');
@@ -197,6 +198,7 @@
       } else {
         self.properties(ko.mapping.fromJS(getDefaultSnippetProperties(newValue)));
       }
+      self.result.clear();
     });
 
     self.variables = ko.observableArray([]);
