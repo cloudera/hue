@@ -1895,6 +1895,22 @@ for x in sys.stdin:
       _make_query(c, "DROP DATABASE IF EXISTS `%s`" % db_name, database=self.db_name)
 
 
+  def test_hs2_log_verbose(self):
+    """
+    Test that the HS2 logs send back the ql.Driver log output with JobID
+    """
+    hql = "SELECT foo FROM `%(db)s`.`test` GROUP BY foo" % {'db': self.db_name}  # GROUP BY forces the MR job
+    response = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
+    content = fetch_query_result_data(self.client, response)
+
+    log = content['log']
+    assert_true(search_log_line('Starting Job = ', log), log)
+    assert_true(search_log_line('Ended Job = ', log), log)
+    # Test job extraction while we're at it
+    assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
+
+
+
 def test_import_gzip_reader():
   """Test the gzip reader in create table"""
   # Make gzipped data
