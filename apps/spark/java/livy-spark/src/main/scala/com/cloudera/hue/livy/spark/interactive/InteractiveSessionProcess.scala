@@ -25,6 +25,7 @@ import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.spark.SparkProcess
 
 import scala.annotation.tailrec
+import scala.concurrent.Future
 
 object InteractiveSessionProcess extends Logging {
 
@@ -48,31 +49,29 @@ private class InteractiveSessionProcess(id: Int,
 
       // Loop until we find the ip address to talk to livy-repl.
       @tailrec
-      def readUntilURL(): Boolean = {
+      def readUntilURL(): Unit = {
         if (lines.hasNext) {
           val line = lines.next()
-          println(line)
 
           line match {
-            case regex(url_) =>
-              url = new URL(url_)
-              true
+            case regex(url_) => url = new URL(url_)
             case _ => readUntilURL()
           }
-        } else {
-          false
         }
       }
 
-      if (readUntilURL()) {
-        for (line <- lines) {
-          println(line)
-        }
-      }
+      readUntilURL()
     }
   }
 
   stdoutThread.setName("process session stdout reader")
   stdoutThread.setDaemon(true)
   stdoutThread.start()
+
+  override def stop(): Future[Unit] = {
+    super.stop().andThen { case r =>
+      stdoutThread.join()
+      r
+    }
+  }
 }
