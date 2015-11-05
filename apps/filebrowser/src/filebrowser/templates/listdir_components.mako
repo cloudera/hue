@@ -407,7 +407,9 @@ from django.utils.translation import ugettext as _
   <div id="contentSummaryModal" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 style="word-break: break-all">${_('Summary for')} <span data-bind="text: currentPath"></span></h3>
+      <!-- ko if: selectedFile -->
+      <h3 style="word-break: break-all">${_('Summary for')} <span data-bind="text: selectedFile().path"></span></h3>
+      <!--/ko -->
     </div>
     <div class="modal-body">
       <div data-bind="visible: isLoadingSummary"><i class="fa fa-spin fa-spinner fa-2x fa-fw" style="color: #CCC"></i></div>
@@ -447,37 +449,41 @@ from django.utils.translation import ugettext as _
   <ul class="context-menu dropdown-menu">
   <!-- ko ifnot: $root.inTrash -->
     <li><a href="#" title="${_('Rename')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1, click: $root.renameFile,
-    enable: $root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-font"></i>
+    enable: $root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
     <li><a href="#"title="${_('Move')}" data-bind="click: $root.move, enable: $root.selectedFiles().length > 0 &&
-    isCurrentDirSelected().length == 0"><i class="fa fa-random"></i> ${_('Move')}</a></li>
+    isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
     <li><a href="#" title="${_('Copy')}" data-bind="click: $root.copy, enable: $root.selectedFiles().length > 0 &&
-    isCurrentDirSelected().length == 0"><i class="fa fa-files-o"></i> ${_('Copy')}</a></li>
+    isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
     % if show_download_button:
-    <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
+    <li><a href="#" title="${_('Download')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1 && selectedFile().type == 'file', click: $root.downloadFile"><i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}</a></li>
     % endif
     <li class="divider"></li>
     % if is_fs_superuser:
     <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged || selectedSentryFiles().length > 0 }">
       <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changeOwner, enable: $root.selectedFiles().length > 0">
-        <i class="fa fa-user"></i> ${_('Change owner / group')}
+        <i class="fa fa-fw fa-user"></i> ${_('Change owner / group')}
       </a>
     </li>
     % endif
     <li data-bind="css: {'disabled': $root.isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
       <a href="#" data-bind="visible: !$root.inTrash(), click: $root.changePermissions, enable: $root.selectedFiles().length > 0">
-        <i class="fa fa-list-alt"></i> ${_('Change permissions')}
+        <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
       </a>
     </li>
     <li class="divider"></li>
-    <li><a href="#"  data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0,
-    click: $root.trashSelected"><i class="fa fa-times"></i> ${_('Move to trash')}</a></li>
-    <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
+    <li><a href="#" data-bind="enable: $root.selectedFiles().length > 0 && isCurrentDirSelected().length == 0,
+    click: $root.trashSelected"><i class="fa fa-fw fa-times"></i> ${_('Move to trash')}</a></li>
+    <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: $root.selectedFiles().length > 0, click: $root.deleteSelected"><i class="fa fa-fw fa-bolt"></i> ${_('Delete forever')}</a></li>
+    <li class="divider"></li>
+    <li data-bind="css: {'disabled': selectedFiles().length > 1 }">
+      <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
+    </li>
   <!-- /ko -->
   <!-- ko if: $root.inTrash -->
-    <li><a href="#" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash() &&  selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: restoreTrashSelected"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</a></li>
+    <li><a href="#" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash() &&  selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: restoreTrashSelected"><i class="fa fa-fw fa-cloud-upload"></i> ${_('Restore')}</a></li>
     <li class="divider"></li>
-    <li><a href="#" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="fa fa-fire"></i> ${_('Empty trash')}</a></li>
+    <li><a href="#" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="fa fa-fw fa-fire"></i> ${_('Empty trash')}</a></li>
   <!-- /ko -->
   </ul>
 
@@ -934,7 +940,7 @@ from django.utils.translation import ugettext as _
       self.showSummary = function () {
         self.isLoadingSummary(true);
         $("#contentSummaryModal").modal("show");
-        $.getJSON("${url('filebrowser.views.content_summary', path='')}" + self.currentPath(), function (data) {
+        $.getJSON("${url('filebrowser.views.content_summary', path='')}" + self.selectedFile().path, function (data) {
           self.contentSummary(ko.mapping.fromJS(data));
           self.isLoadingSummary(false);
         });
