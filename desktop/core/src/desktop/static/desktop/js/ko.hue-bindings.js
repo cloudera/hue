@@ -1754,6 +1754,18 @@
     }
   };
 
+  ko.bindingHandlers.clickForAceFocus = {
+    init: function (element, valueAccessor) {
+      var editor = valueAccessor();
+      $(element).on("click", function(e) {
+        if (e.target === element) {
+          editor().focus();
+          editor().execCommand("gotolineend");
+        }
+      });
+    }
+  };
+
   ko.bindingHandlers.aceEditor = {
     init: function (element, valueAccessor) {
 
