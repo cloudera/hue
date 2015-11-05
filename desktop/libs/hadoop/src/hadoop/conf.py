@@ -160,8 +160,8 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
-  from hadoop.fs import webhdfs
   from hadoop import job_tracker
+  from hadoop.fs import webhdfs
 
   res = []
   submit_to = []
@@ -188,10 +188,11 @@ def config_validator(user):
     res.extend(mr_down)
 
   # YARN_CLUSTERS
+  if YARN_CLUSTERS.keys():
+    res.extend(test_yarn_configurations(user))
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
-      res.extend(test_yarn_configurations(user))
       submit_to.append('yarn_clusters.' + name)
 
   if not submit_to:
@@ -202,18 +203,18 @@ def config_validator(user):
 
 
 def test_yarn_configurations(user):
-  # Single cluster for now
-  from hadoop.yarn.resource_manager_api import get_resource_manager
-
   result = []
 
   try:
-    url = ''
-    api = get_resource_manager(user.username)
-    url = api._url
-    api.apps()
+    from jobbrowser.api import get_api # Required for cluster HA testing
   except Exception, e:
-    msg = 'Failed to contact Resource Manager at %s: %s' % (url, e)
+    LOG.warn('Jobbrowser is disabled, skipping test_yarn_configurations')
+    return result
+
+  try:
+    get_api(user, None).get_jobs(user, username=user.username, state='all', text='')
+  except Exception, e:
+    msg = 'Failed to contact an active Resource Manager: %s' % e
     LOG.exception(msg)
     result.append(('Resource Manager', msg))
 
