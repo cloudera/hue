@@ -9,13 +9,14 @@ Livy is an open source REST interface for interacting with Spark from anywhere. 
 * Can be used for submitting jobs from anywhere with REST
 * Does not require any code change to your programs
 
-The code is currently incubating in Hue but hopefully will eventually graduate in its top project. `Pull requests` are welcomed!
+The code is currently incubating in Hue but hopefully will eventually graduate in its top
+project. `Pull requests`_ are welcomed!
 
 .. _Pull requests: https://github.com/cloudera/hue/pulls
 
 
 Quick Start
-=============
+===========
 
 Livy is used for powering the Spark snippets of the `Hadoop Notebook`_ of `Hue 3.8`_, which you can see the
 `implementation here`_.
@@ -124,20 +125,49 @@ Or with YARN sessions by running:
    % env \
      LIVY_SERVER_JAVA_OPTS="-Dlivy.server.session.factory=yarn" \
      CLASSPATH=`hadoop classpath` \
-     ./bin/livy-server
+     $LIVY_HOME/bin/livy-server
 
 
 Livy Configuration
 ==================
 
-The properties of the server can be modified by copying <https://github.com/cloudera/hue/blob/master/apps/spark/java/conf/livy-defaults.conf.tmpl>
-and renaming it ``livy-defaults.conf``.
+The properties of the server can be modified by copying
+`livy-defaults.conf.template`_ and renaming it ``conf/livy-defaults.conf``. The
+Livy configuration directory can be placed in an alternative directory by defining
+``LIVY_CONF_DIR``.
 
 In particular the ``YARN mode`` (default is ``local`` process for development) can be set with:
 
 .. code:: shell
 
     livy.server.session.factory = yarn
+
+.. _livy-defaults.conf.template: https://github.com/cloudera/hue/blob/master/apps/spark/java/conf/livy-defaults.conf.template
+
+Spark Configuration
+===================
+
+Livy's Spark sessions are configured through two mechanisms. First, is by way of the local
+`Spark configuration`_. Create, or modify the Spark configuration files as directed, and point
+Livy at this directory with:
+
+.. code:: shell
+
+    % env \
+      SPARK_CONF_DIR=... \
+      $LIVY_HOME/bin/livy-server
+
+The second mechanism is by white listing `Spark configuration`_ options that can be set by the user
+creating a Spark session. This list can be created by copying
+`spark-user-configurable-options.template`_ to ``spark-user-configurable-options`` and listing
+the options the user may specify in the ``conf`` session field.
+
+*warning*: Be careful before enabling options. Some options may allow a malicious user to
+read files that are accessible by the Livy Server process user. Among other things, this might
+allow a user to access the Livy TLS private key, Kerberos tickets, or more.
+
+.. _Spark configuration: https://spark.apache.org/docs/latest/configuration.html
+.. _spark-user-configurable-options.template: https://github.com/cloudera/hue/blob/master/apps/spark/java/conf/spark-user-configurable-options.template
 
 
 Spark Example
@@ -347,37 +377,37 @@ Creates a new interative Scala, Python or R shell in the cluster.
 Request Body
 ^^^^^^^^^^^^
 
-+----------------+--------------------------------------------------------------------------------+------------------+
-| name           | description                                                                    | type             |
-+================+================================================================================+==================+
-| kind           | The session kind (required)                                                    | `session kind`_  |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| proxyUser      | The user to impersonate that will run this session (e.g. bob)                  | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| jars           | Files to be placed on the java classpath                                       | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| pyFiles        | Files to be placed on the PYTHONPATH                                           | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| files          | Files to be placed in executor working directory                               | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| driverMemory   | Memory for driver (e.g. 1000M, 2G)                                             | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| driverCores    | Number of cores used by driver (YARN mode only)                                | int              |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| executorMemory | Memory for executor (e.g. 1000M, 2G)                                           | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| executorCores  | Number of cores used by executor                                               | int              |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| numExecutors   | Number of executors (YARN mode only)                                           | int              |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths    |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| queue          | The YARN queue to submit too (YARN mode only)                                  | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| name           | Name of the application                                                        | string           |
-+----------------+--------------------------------------------------------------------------------+------------------+
-| conf           | Spark configuration property                                                   | list of key=val  |
-+----------------+--------------------------------------------------------------------------------+------------------+
++----------------+--------------------------------------------------------------------------------+-----------------+
+| name           | description                                                                    | type            |
++================+================================================================================+=================+
+| kind           | The session kind (required)                                                    | `session kind`_ |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| proxyUser      | The user to impersonate that will run this session (e.g. bob)                  | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| jars           | Files to be placed on the java classpath                                       | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| pyFiles        | Files to be placed on the PYTHONPATH                                           | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| files          | Files to be placed in executor working directory                               | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| driverMemory   | Memory for driver (e.g. 1000M, 2G)                                             | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| driverCores    | Number of cores used by driver (YARN mode only)                                | int             |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| executorMemory | Memory for executor (e.g. 1000M, 2G)                                           | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| executorCores  | Number of cores used by executor                                               | int             |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| numExecutors   | Number of executors (YARN mode only)                                           | int             |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| archives       | Archives to be uncompressed in the executor working directory (YARN mode only) | list of paths   |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| queue          | The YARN queue to submit too (YARN mode only)                                  | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| name           | Name of the application                                                        | string          |
++----------------+--------------------------------------------------------------------------------+-----------------+
+| conf           | Spark configuration property                                                   | Map of key=val  |
++----------------+--------------------------------------------------------------------------------+-----------------+
 
 
 Response Body
@@ -398,13 +428,13 @@ The `Session`_.
 
 
 DELETE /sessions/{sessionId}
--------------------------
+----------------------------
 
 Kill the `Session`_ job.
 
 
 GET /sessions/{sessionId}/logs
----------------------------
+------------------------------
 
 Get the log lines from this session.
 
@@ -491,41 +521,41 @@ POST /batches
 Request Body
 ^^^^^^^^^^^^
 
-+----------------+--------------------------------------------------+-----------------+
-| name           | description                                      | type            |
-+================+==================================================+=================+
-| proxyUser      | The user to impersonate that will execute the job| string          |
-+----------------+--------------------------------------------------+-----------------+
-| file           | Archive holding the file                         | path (required) |
-+----------------+--------------------------------------------------+-----------------+
-| args           | Command line arguments                           | list of strings |
-+----------------+--------------------------------------------------+-----------------+
-| className      | Application's java/spark main class              | string          |
-+----------------+--------------------------------------------------+-----------------+
-| jars           | Files to be placed on the java classpath         | list of paths   |
-+----------------+--------------------------------------------------+-----------------+
-| pyFiles        | Files to be placed on the PYTHONPATH             | list of paths   |
-+----------------+--------------------------------------------------+-----------------+
-| files          | Files to be placed in executor working directory | list of paths   |
-+----------------+--------------------------------------------------+-----------------+
-| driverMemory   | Memory for driver (e.g. 1000M, 2G)               | string          |
-+----------------+--------------------------------------------------+-----------------+
-| driverCores    | Number of cores used by driver                   | int             |
-+----------------+--------------------------------------------------+-----------------+
-| executorMemory | Memory for executor (e.g. 1000M, 2G)             | string          |
-+----------------+--------------------------------------------------+-----------------+
-| executorCores  | Number of cores used by executor                 | int             |
-+----------------+--------------------------------------------------+-----------------+
-| numExecutors   | Number of executor                               | int             |
-+----------------+--------------------------------------------------+-----------------+
-| archives       | Archives to be uncompressed (YARN mode only)     | list of paths   |
-+----------------+--------------------------------------------------+-----------------+
-| queue          | The YARN queue to submit too (YARN mode only)    | string          |
-+----------------+--------------------------------------------------+-----------------+
-| name           | Name of the application                          | string          |
-+----------------+--------------------------------------------------+-----------------+
-| conf           | Spark configuration property                     | list of key=val |
-+----------------+--------------------------------------------------+-----------------+
++----------------+---------------------------------------------------+-----------------+
+| name           | description                                       | type            |
++================+===================================================+=================+
+| proxyUser      | The user to impersonate that will execute the job | string          |
++----------------+---------------------------------------------------+-----------------+
+| file           | Archive holding the file                          | path (required) |
++----------------+---------------------------------------------------+-----------------+
+| args           | Command line arguments                            | list of strings |
++----------------+---------------------------------------------------+-----------------+
+| className      | Application's java/spark main class               | string          |
++----------------+---------------------------------------------------+-----------------+
+| jars           | Files to be placed on the java classpath          | list of paths   |
++----------------+---------------------------------------------------+-----------------+
+| pyFiles        | Files to be placed on the PYTHONPATH              | list of paths   |
++----------------+---------------------------------------------------+-----------------+
+| files          | Files to be placed in executor working directory  | list of paths   |
++----------------+---------------------------------------------------+-----------------+
+| driverMemory   | Memory for driver (e.g. 1000M, 2G)                | string          |
++----------------+---------------------------------------------------+-----------------+
+| driverCores    | Number of cores used by driver                    | int             |
++----------------+---------------------------------------------------+-----------------+
+| executorMemory | Memory for executor (e.g. 1000M, 2G)              | string          |
++----------------+---------------------------------------------------+-----------------+
+| executorCores  | Number of cores used by executor                  | int             |
++----------------+---------------------------------------------------+-----------------+
+| numExecutors   | Number of executor                                | int             |
++----------------+---------------------------------------------------+-----------------+
+| archives       | Archives to be uncompressed (YARN mode only)      | list of paths   |
++----------------+---------------------------------------------------+-----------------+
+| queue          | The YARN queue to submit too (YARN mode only)     | string          |
++----------------+---------------------------------------------------+-----------------+
+| name           | Name of the application                           | string          |
++----------------+---------------------------------------------------+-----------------+
+| conf           | Spark configuration property                      | Map of key=val  |
++----------------+---------------------------------------------------+-----------------+
 
 
 Response Body
