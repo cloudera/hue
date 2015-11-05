@@ -68,7 +68,7 @@ def rm_ha(funct):
       return funct(api, *args, **kwargs)
     except Exception, ex:
       ex_message = str(ex)
-      if 'Connection refused' in ex_message or 'standby RM' in ex_message:
+      if 'Connection refused' in ex_message or 'Connection aborted' in ex_message or 'standby RM' in ex_message:
         LOG.info('Resource Manager not available, trying another RM: %s.' % ex)
         rm_ha = get_next_ha_yarncluster()
         if rm_ha is not None:
