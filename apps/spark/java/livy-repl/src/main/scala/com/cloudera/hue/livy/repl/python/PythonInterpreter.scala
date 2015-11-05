@@ -41,13 +41,16 @@ object PythonInterpreter extends Logging {
     val gatewayServer = new GatewayServer(null, 0)
     gatewayServer.start()
 
-    val pySparkArchives = findPySparkArchives()
-
     val builder = new ProcessBuilder(Seq(pythonExec, createFakeShell().toString))
 
     val env = builder.environment()
 
-    env.put("PYTHONPATH", (sys.env.get("PYTHONPATH") ++ pySparkArchives).mkString(File.pathSeparator))
+    val pythonPath = sys.env.getOrElse("PYTHONPATH", "")
+      .split(File.pathSeparator)
+      .++(findPySparkArchives())
+      .++(findPyFiles())
+
+    env.put("PYTHONPATH", pythonPath.mkString(File.pathSeparator))
     env.put("PYTHONUNBUFFERED", "YES")
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
@@ -63,21 +66,35 @@ object PythonInterpreter extends Logging {
     sys.env.get("PYSPARK_ARCHIVES_PATH")
       .map(_.split(",").toSeq)
       .getOrElse {
-      sys.env.get("SPARK_HOME") .map { case sparkHome =>
-        val pyLibPath = Seq(sparkHome, "python", "lib").mkString(File.separator)
-        val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
-        require(pyArchivesFile.exists(),
-          "pyspark.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
+        sys.env.get("SPARK_HOME").map { sparkHome =>
+          val pyLibPath = Seq(sparkHome, "python", "lib").mkString(File.separator)
+          val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
+          require(pyArchivesFile.exists(),
+            "pyspark.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
 
-        val py4jFile = Files.newDirectoryStream(Paths.get(pyLibPath), "py4j-*-src.zip")
-          .iterator()
-          .next()
-          .toFile
+          val py4jFile = Files.newDirectoryStream(Paths.get(pyLibPath), "py4j-*-src.zip")
+            .iterator()
+            .next()
+            .toFile
 
-        require(py4jFile.exists(),
-          "py4j-*-src.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
-        Seq(pyArchivesFile.getAbsolutePath, py4jFile.getAbsolutePath)
-      }.getOrElse(Seq())
+          require(py4jFile.exists(),
+            "py4j-*-src.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
+          Seq(pyArchivesFile.getAbsolutePath, py4jFile.getAbsolutePath)
+        }.getOrElse(Seq())
+      }
+  }
+
+  private def findPyFiles(): Seq[String] = {
+    val pyFiles = sys.props.getOrElse("spark.submit.pyFiles", "").split(",")
+
+    if (sys.env.getOrElse("SPARK_YARN_MODE", "") == "true") {
+      // In spark mode, these files have been localized into the current directory.
+      pyFiles.map { file =>
+        val name = new File(file).getName
+        new File(name).getAbsolutePath
+      }
+    } else {
+      pyFiles
     }
   }
 

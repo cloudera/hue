@@ -52,10 +52,11 @@
         <dispatch.version>0.11.2</dispatch.version>
         <httpclient.version>4.5</httpclient.version>
         <httpcore.version>4.4.1</httpcore.version>
-        <jackson.version>2.2.3</jackson.version>
+        <jackson.version>2.4.4</jackson.version>
+        <jackson-module-scala.version>2.4.4</jackson-module-scala.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <jetty.version>9.2.10.v20150310</jetty.version>
-        <json4s.version>3.2.5</json4s.version>
+        <json4s.version>3.2.11</json4s.version>
         <logback.version>1.1.2</logback.version>
         <metrics.version>3.1.0</metrics.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -102,6 +103,13 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-scala_${scala.binary.version}</artifactId>
+                <version>${jackson-module-scala.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>

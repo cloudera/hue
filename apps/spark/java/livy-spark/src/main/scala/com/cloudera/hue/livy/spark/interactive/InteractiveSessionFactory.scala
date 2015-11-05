@@ -18,7 +18,9 @@
 
 package com.cloudera.hue.livy.spark.interactive
 
+import java.io.File
 import java.lang.ProcessBuilder.Redirect
+import java.nio.file.{Paths, Files}
 
 import com.cloudera.hue.livy.sessions.interactive.InteractiveSession
 import com.cloudera.hue.livy.sessions.{PySpark, SessionFactory, SessionKindSerializer}
@@ -31,9 +33,10 @@ object InteractiveSessionFactory {
   private val LivyReplDriverClassPath = "livy.repl.driverClassPath"
   private val LivyReplJar = "livy.repl.jar"
   private val LivyServerUrl = "livy.server.serverUrl"
-  private val SparkDriverExtraJavaOptions = "spark.driver.extraDriverOptions"
+  private val SparkDriverExtraJavaOptions = "spark.driver.extraJavaOptions"
   private val SparkLivyCallbackUrl = "spark.livy.callbackUrl"
   private val SparkLivyPort = "spark.livy.port"
+  private val SparkSubmitPyFiles = "spark.submit.pyFiles"
   private val SparkYarnIsPython = "spark.yarn.isPython"
 }
 
@@ -71,12 +74,25 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
     request.files.map(RelativePath).foreach(builder.file)
     request.jars.map(RelativePath).foreach(builder.jar)
     request.proxyUser.foreach(builder.proxyUser)
-    request.pyFiles.map(RelativePath).foreach(builder.pyFile)
     request.queue.foreach(builder.queue)
     request.name.foreach(builder.name)
 
     request.kind match {
-      case PySpark() => builder.conf(SparkYarnIsPython, "true", admin = true)
+      case PySpark() =>
+        builder.conf(SparkYarnIsPython, "true", admin = true)
+
+        // FIXME: Spark-1.4 seems to require us to manually upload the PySpark support files.
+        // We should only do this for Spark 1.4.x
+        val pySparkFiles = findPySparkArchives()
+        builder.files(pySparkFiles.map(AbsolutePath))
+
+        // We can't actually use `builder.pyFiles`, because livy-repl is a Jar, and
+        // spark-submit will reject it because it isn't a Python file. Instead we'll pass it
+        // through a special property that the livy-repl will use to expose these libraries in
+        // the Python shell.
+        builder.files(request.pyFiles.map(RelativePath))
+
+        builder.conf(SparkSubmitPyFiles, (pySparkFiles ++ request.pyFiles).mkString(","), admin = true)
       case _ =>
     }
 
@@ -85,7 +101,7 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
         case Some(javaOptions) => f"$javaOptions $replJavaOpts"
         case None => replJavaOpts
       }
-      builder.conf(SparkDriverExtraJavaOptions, javaOpts)
+      builder.conf(SparkDriverExtraJavaOptions, javaOpts, admin = true)
     }
 
     processFactory.livyConf.getOption(LivyReplDriverClassPath)
@@ -107,5 +123,27 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
   private def livyJar(livyConf: LivyConf) = {
     livyConf.getOption(LivyReplJar)
       .getOrElse(Utils.jarOfClass(getClass).head)
+  }
+
+  private def findPySparkArchives(): Seq[String] = {
+    sys.env.get("PYSPARK_ARCHIVES_PATH")
+      .map(_.split(",").toSeq)
+      .getOrElse {
+        sys.env.get("SPARK_HOME") .map { case sparkHome =>
+          val pyLibPath = Seq(sparkHome, "python", "lib").mkString(File.separator)
+          val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
+          require(pyArchivesFile.exists(),
+            "pyspark.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
+
+          val py4jFile = Files.newDirectoryStream(Paths.get(pyLibPath), "py4j-*-src.zip")
+            .iterator()
+            .next()
+            .toFile
+
+          require(py4jFile.exists(),
+            "py4j-*-src.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
+          Seq(pyArchivesFile.getAbsolutePath, py4jFile.getAbsolutePath)
+        }.getOrElse(Seq())
+      }
   }
 }
