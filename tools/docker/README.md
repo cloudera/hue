@@ -28,5 +28,26 @@ docker build --rm -t gethue/hue:latest .
 ```
 docker run -it -p 8888:8888 gethue/hue:latest bash
 ```
-This opens a bash to the root of the project. You can then configure Hue and start using it! Read more about configuring Hue on our [blog](http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/).
+This opens a bash to the root of the project. From there you can run the development version of Hue with the command
+
+```
+./build/env/bin/hue runserver_plus 0.0.0.0:8888
+```
+
+Hue should then be up and running on your default Docker IP on the port 8888, so usually [http://192.168.99.100:8888](http://192.168.99.100:8888).
+
+You can then configure Hue and start using it! Read more about configuring Hue on our [blog](http://gethue.com/how-to-configure-hue-in-your-hadoop-cluster/). The development version uses the configuration file ``desktop/conf/pseudo-distributed.ini``
+
+In case you don't want to have the development server running, you can change the two run commands like this
+
+```
+docker run -it -p 8000:8000 gethue/hue:latest bash
+```
+
+and
+
+```
+./build/env/bin/hue runcpserver 0.0.0.0:8000
+```
+
 
