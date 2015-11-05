@@ -129,6 +129,11 @@ def massage_groups_for_json(groups):
 
 def delete_user(request):
   if not request.user.is_superuser:
+    request.audit = {
+      'operation': 'DELETE_USER',
+      'operationText': _get_failed_operation_text(request.user.username, 'DELETE_USER'),
+      'allowed': False
+    }
     raise PopupException(_("You must be a superuser to delete users."), error_code=401)
 
   if request.method != 'POST':
@@ -141,8 +146,14 @@ def delete_user(request):
     if str(request.user.id) in ids:
       raise PopupException(_("You cannot remove yourself."), error_code=401)
 
+    usernames = list(User.objects.filter(id__in=ids).values_list('username', flat=True))
     UserProfile.objects.filter(user__id__in=ids).delete()
     User.objects.filter(id__in=ids).delete()
+
+    request.audit = {
+      'operation': 'DELETE_USER',
+      'operationText': 'Deleted User(s): %s' % ', '.join(usernames)
+    }
   finally:
     __users_lock.release()
 
@@ -152,6 +163,11 @@ def delete_user(request):
 
 def delete_group(request):
   if not request.user.is_superuser:
+    request.audit = {
+      'operation': 'DELETE_GROUP',
+       'operationText': _get_failed_operation_text(request.user.username, 'DELETE_GROUP'),
+      'allowed': False
+    }
     raise PopupException(_("You must be a superuser to delete groups."), error_code=401)
 
   if request.method == 'POST':
@@ -165,6 +181,10 @@ def delete_group(request):
       Group.objects.filter(name__in=group_names).delete()
 
       request.info(_('The groups were deleted.'))
+      request.audit = {
+        'operation': 'DELETE_GROUP',
+        'operationText': 'Deleted Group(s): %s' % ', '.join(group_names)
+      }
       return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
@@ -189,6 +209,13 @@ def edit_user(request, username=None):
   @param username:      Default to None, when creating a new user
   """
   if request.user.username != username and not request.user.is_superuser:
+    request.audit = {'allowed': False}
+    if username is not None:
+      request.audit['operation'] = 'EDIT_USER'
+      request.audit['operationText'] = _get_failed_operation_text(request.user.username, 'EDIT_USER')
+    else:
+      request.audit['operation'] = 'CREATE_USER'
+      request.audit['operationText'] = _get_failed_operation_text(request.user.username, 'CREATE_USER')
     raise PopupException(_("You must be a superuser to add or edit another user."), error_code=401)
 
   userprofile = get_profile(request.user)
@@ -244,9 +271,22 @@ def edit_user(request, username=None):
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
 
+      # Audit log
+      if username is not None:
+        request.audit = {
+          'operation': 'EDIT_USER',
+          'operationText': 'Edited User with username: %s' % username
+        }
+      else:
+        request.audit = {
+          'operation': 'CREATE_USER',
+          'operationText': 'Created User with username: %s' % instance.username
+        }
+
       if require_change_password(userprofile):
         userprofile.first_login = False
         userprofile.save()
+
         if request.user.is_superuser:
           return redirect(reverse('about:index'))
         else:
@@ -282,6 +322,14 @@ def edit_group(request, name=None):
   Only superusers may create a group
   """
   if not request.user.is_superuser:
+    request.audit = {'allowed': False}
+    if name is not None:
+      request.audit['operation'] = 'EDIT_GROUP'
+      request.audit['operationText'] = _get_failed_operation_text(request.user.username, 'EDIT_GROUP')
+    else:
+      request.audit['operation'] = 'CREATE_GROUP'
+      request.audit['operationText'] = _get_failed_operation_text(request.user.username, 'CREATE_GROUP')
+
     raise PopupException(_("You must be a superuser to add or edit a group."), error_code=401)
 
   if name is not None:
@@ -294,6 +342,21 @@ def edit_group(request, name=None):
     if form.is_valid():
       form.save()
       request.info(_('Group information updated'))
+
+      # Audit log
+      if name is not None:
+        usernames = instance.user_set.all().values_list('username', flat=True)
+        request.audit = {
+          'operation': 'EDIT_GROUP',
+          'operationText': 'Edited Group: %s, with member(s): %s' % (name, ', '.join(usernames))
+        }
+      else:
+        user_ids = request.POST.getlist('members', [])
+        usernames = User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
+        request.audit = {
+          'operation': 'CREATE_GROUP',
+          'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
+        }
       return list_groups(request)
 
   else:
@@ -316,6 +379,11 @@ def edit_permission(request, app=None, priv=None):
   Only superusers may modify permissions
   """
   if not request.user.is_superuser:
+    request.audit = {
+      'operation': 'EDIT_PERMISSION',
+      'operationText': _get_failed_operation_text(request.user.username, 'EDIT_PERMISSION'),
+      'allowed': False
+    }
     raise PopupException(_("You must be a superuser to change permissions."), error_code=401)
 
   instance = HuePermission.objects.get(app=app, action=priv)
@@ -325,6 +393,10 @@ def edit_permission(request, app=None, priv=None):
     if form.is_valid():
       form.save()
       request.info(_('Permission information updated'))
+      request.audit = {
+        'operation': 'EDIT_PERMISSION',
+        'operationText': 'Successfully edited permissions: %(app)s/%(priv)s' % {'app': app, 'priv': priv}
+      }
       return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
 
   else:
@@ -343,6 +415,11 @@ def add_ldap_users(request):
   If the LDAP request failed, the error message is generic right now.
   """
   if not request.user.is_superuser:
+    request.audit = {
+      'operation': 'ADD_LDAP_USERS',
+      'operationText': _get_failed_operation_text(request.user.username, 'ADD_LDAP_USERS'),
+      'allowed': False,
+    }
     raise PopupException(_("You must be a superuser to add another user."), error_code=401)
 
   if request.method == 'POST':
@@ -371,6 +448,10 @@ def add_ldap_users(request):
         errors = form._errors.setdefault('username_pattern', ErrorList())
         errors.append(_('Could not get LDAP details for users in pattern %s.') % username_pattern)
       else:
+        request.audit = {
+          'operation': 'ADD_LDAP_USERS',
+          'operationText': 'Added/Synced LDAP username(s): %s' % username_pattern
+        }
         return redirect(reverse(list_users))
   else:
     form = AddLdapUsersForm()
@@ -389,6 +470,11 @@ def add_ldap_groups(request):
   all unimported users.
   """
   if not request.user.is_superuser:
+    request.audit = {
+      'operation': 'ADD_LDAP_GROUPS',
+      'operationText': _get_failed_operation_text(request.user.username, 'ADD_LDAP_GROUPS'),
+      'allowed': False,
+    }
     raise PopupException(_("You must be a superuser to add another group."), error_code=401)
 
   if request.method == 'POST':
@@ -424,6 +510,10 @@ def add_ldap_groups(request):
             raise PopupException(_("Exception creating home directory for LDAP user %s in group %s.") % (user, group), detail=e)
 
       if groups:
+        request.audit = {
+          'operation': 'ADD_LDAP_GROUPS',
+          'operationText': 'Added LDAP Group(s): %s' % groupname_pattern
+        }
         return redirect(reverse(list_groups))
       else:
         errors = form._errors.setdefault('groupname_pattern', ErrorList())
@@ -444,6 +534,11 @@ def sync_ldap_users_groups(request):
   server's current state.
   """
   if not request.user.is_superuser:
+    request.audit = {
+      'operation': 'SYNC_LDAP_USERS_GROUPS',
+      'operationText': _get_failed_operation_text(request.user.username, 'SYNC_LDAP_USERS_GROUPS'),
+      'allowed': False
+    }
     raise PopupException(_("You must be a superuser to sync the LDAP users/groups."), error_code=401)
 
   if request.method == 'POST':
@@ -455,6 +550,10 @@ def sync_ldap_users_groups(request):
 
       sync_ldap_users_and_groups(connection, is_ensuring_home_directory, request.fs)
 
+      request.audit = {
+        'operation': 'SYNC_LDAP_USERS_GROUPS',
+        'operationText': 'Successfully synced LDAP users/groups'
+      }
       return redirect(reverse(list_users))
   else:
     form = SyncLdapUsersGroupsForm()
@@ -1000,3 +1099,7 @@ def _import_ldap_groups(connection, groupname_pattern, import_members=False, rec
                                       recursive_import_members=recursive_import_members,
                                       sync_users=sync_users,
                                       import_by_dn=import_by_dn)
+
+
+def _get_failed_operation_text(username, operation):
+    return '%(username)s is not allowed to perform %(operation)s' % {'username': username, 'operation': operation}
