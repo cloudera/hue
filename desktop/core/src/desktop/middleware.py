@@ -337,65 +337,6 @@ class JsonMessage(object):
 
 class AuditLoggingMiddleware(object):
 
-  username_re = get_username_re_rule()
-  groupname_re = get_groupname_re_rule()
-
-  operations = {
-    '/accounts/login': {
-      'operation': 'USER_LOGIN',
-      'success_status': 302
-    },
-    '/accounts/logout': {
-      'operation': 'USER_LOGOUT',
-      'success_status': 302
-    },
-    '/useradmin/users/add_ldap_users': {
-      'operation': 'ADD_LDAP_USERS',
-      'success_status': 302
-    },
-    '/useradmin/users/add_ldap_groups': {
-      'operation': 'ADD_LDAP_GROUPS',
-      'success_status': 302
-    },
-    '/useradmin/users/sync_ldap_users_groups': {
-      'operation': 'SYNC_LDAP_USERS_GROUPS',
-      'success_status': 302
-    },
-    '/useradmin/users/new': {
-      'operation': 'CREATE_USER',
-      'success_status': 302
-    },
-    '/useradmin/groups/new': {
-      'operation': 'CREATE_GROUP',
-      'success_status': 200
-    },
-    '/useradmin/users/delete': {
-      'operation': 'DELETE_USER',
-      'success_status': 302
-    },
-    '/useradmin/groups/delete': {
-      'operation': 'DELETE_GROUP',
-      'success_status': 302
-    }
-  }
-
-  operation_patterns = {
-    '/useradmin/permissions/edit/(?P<app>.*)/(?P<priv>.*)': {
-      'operation': 'EDIT_PERMISSION',
-      'success_status': 200
-    },
-    '/useradmin/users/edit/(?P<username>%s)' % (username_re,): {
-      'operation': 'EDIT_USER',
-      'success_status': 302
-    },
-    '/useradmin/groups/edit/(?P<name>%s)' % (groupname_re,): {
-      'operation': 'EDIT_GROUP',
-      'success_status': 200
-    }
-  }
-
-  process_view_operations = ('USER_LOGOUT', 'DELETE_USER')
-
   def __init__(self):
     from desktop.conf import AUDIT_EVENT_LOG_DIR, SERVER_USER
 
@@ -405,58 +346,30 @@ class AuditLoggingMiddleware(object):
       LOG.info('Unloading AuditLoggingMiddleware')
       raise exceptions.MiddlewareNotUsed
 
-  def process_view(self, request, view_func, view_args, view_kwargs):
-    try:
-      operation = self._get_operation(request.path)
-      if self._is_valid_request(operation):
-        self._log_message(operation, request)
-    except Exception, e:
-      LOG.error('Could not audit the request: %s' % e)
-
-    return None
-
   def process_response(self, request, response):
     response['audited'] = False
     try:
-      operation = self._get_operation(request.path)
-      if self._is_valid_response(operation, request, response):
-        self._log_message(operation, request, response)
+      if hasattr(request, 'audit') and request.audit is not None:
+        self._log_message(request, response)
         response['audited'] = True
     except Exception, e:
       LOG.error('Could not audit the request: %s' % e)
     return response
 
-  def _is_valid_request(self, operation):
-    return operation and (operation in self.process_view_operations)
-
-  def _is_valid_response(self, operation, request, response):
-    success_status = self._get_success_status(request.path)
-    is_valid = False
-    if self._is_invalid_login(operation, request):
-      is_valid = True
-    elif request.method == 'POST' and \
-       operation and (operation not in self.process_view_operations) and \
-       (response.status_code == success_status or response.status_code == 401):  # also log unauthorized operations
-      is_valid = True
-    return is_valid
-
-  def _log_message(self, operation, request, response=None):
+  def _log_message(self, request, response=None):
     audit_logger = get_audit_logger()
 
     audit_logger.debug(JsonMessage(**{
-      'username': self._get_username(operation, request),
+      'username': self._get_username(request),
       'impersonator': self.impersonator,
       'ipAddress': self._get_client_ip(request),
-      'operation': operation,
-      'operationText': self._get_operation_text(operation, request),
+      'operation': request.audit['operation'],
+      'operationText': request.audit.get('operationText', ''),
       'eventTime': self._milliseconds_since_epoch(),
-      'allowed': self._get_allowed(operation, request, response),
+      'allowed': self._get_allowed(request, response),
       'service': get_app_name(request),
       'url': request.path
     }))
-
-  def _is_invalid_login(self, operation, request):
-    return request.method == 'POST' and operation == 'USER_LOGIN' and not request.user.is_authenticated()
 
   def _get_client_ip(self, request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -464,79 +377,22 @@ class AuditLoggingMiddleware(object):
         x_forwarded_for = x_forwarded_for.split(',')[0]
     return request.META.get('HTTP_CLIENT_IP') or x_forwarded_for or request.META.get('REMOTE_ADDR')
 
-  def _get_username(self, operation, request):
-    # On invalid login attempt, get username from form
-    if self._is_invalid_login(operation, request):
-      return request.POST.get('username', 'anonymous')
+  def _get_username(self, request):
+    username = 'anonymous'
+    if request.audit.get('username', None):
+      username = request.audit.get('username')
     elif hasattr(request, 'user') and not request.user.is_anonymous():
-      return request.user.get_username()
-    else:
-      return 'anonymous'
+      username = request.user.get_username()
+    return username
 
   def _milliseconds_since_epoch(self):
     return int(time.time() * 1000)
 
-  def _get_allowed(self, operation, request, response=None):
-    # Set allowed to False on failed login attempts since returned status_code is actually 200
-    if self._is_invalid_login(operation, request):
-      return False
-    # No response on logout
-    elif response is not None:
-      return response.status_code != 401
-    else:
-      return True
-
-  def _get_operation_dict(self, path):
-    url = path.rstrip('/')
-
-    if url in AuditLoggingMiddleware.operations:
-      return AuditLoggingMiddleware.operations[url]
-    else:
-      for regex, operation_dict in AuditLoggingMiddleware.operation_patterns.items():
-        pattern = re.compile(regex)
-        if pattern.match(url):
-          return operation_dict
-    return None
-
-  def _get_operation(self, path):
-    operation_dict = self._get_operation_dict(path)
-    if operation_dict:
-      return operation_dict['operation']
-    else:
-      return None
-
-  def _get_success_status(self, path):
-    operation_dict = self._get_operation_dict(path)
-    if operation_dict:
-      return operation_dict['success_status']
-    else:
-      return None
-
-  def _get_operation_text(self, operation, request):
-    if request.method == 'POST':
-      if operation == 'CREATE_USER':
-        return 'Created User with username: %s' % request.POST.get('username', '')
-      elif operation == 'EDIT_USER':
-        return 'Edited User with username: %s' % request.POST.get('username', '')
-      elif operation == 'DELETE_USER':
-        usernames = self._get_usernames(request.POST.getlist('user_ids', []))
-        return 'Deleted User(s): %s' % ', '.join(usernames)
-      elif operation == 'ADD_LDAP_USERS':
-        return 'Added/Synced LDAP username(s): %s' % ', '.join(request.POST.getlist('username_pattern', []))
-      elif operation == 'CREATE_GROUP':
-        usernames = self._get_usernames(request.POST.getlist('members', []))
-        return 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
-      elif operation == 'EDIT_GROUP':
-        usernames = self._get_usernames(request.POST.getlist('members', []))
-        return 'Edited Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
-      elif operation == 'DELETE_GROUP':
-        return 'Deleted Group(s): %s' % ', '.join(request.POST.getlist('group_names', []))
-      elif operation == 'ADD_LDAP_GROUPS':
-        return 'Added LDAP Group(s): %s' % ', '.join(request.POST.getlist('groupname_pattern', []))
-    return ''
-
-  def _get_usernames(self, user_ids):
-    return User.objects.filter(pk__in=user_ids).values_list('username', flat=True)
+  def _get_allowed(self, request, response=None):
+    allowed = response.status_code != 401
+    if 'allowed' in request.audit:
+      return request.audit['allowed']
+    return allowed
 
 
 try:

@@ -97,6 +97,11 @@ def dt_login(request):
     AuthenticationForm = auth_forms.AuthenticationForm
 
   if request.method == 'POST':
+    request.audit = {
+      'operation': 'USER_LOGIN',
+      'username': request.POST.get('username')
+    }
+
     # For first login, need to validate user info!
     first_user_form = is_first_login_ever and UserCreationForm(data=request.POST) or None
     first_user = first_user_form and first_user_form.is_valid()
@@ -129,11 +134,15 @@ def dt_login(request):
         userprofile.first_login = False
         userprofile.save()
 
-        access_warn(request, '"%s" login ok' % (user.username,))
+        msg = 'Successful login for user: %s' % user.username
+        request.audit['operationText'] = msg
+        access_warn(request, msg)
         return HttpResponseRedirect(redirect_to)
-
       else:
-        access_warn(request, 'Failed login for user "%s"' % (request.POST.get('username'),))
+        request.audit['allowed'] = False
+        msg = 'Failed login for user: %s' % request.POST.get('username')
+        request.audit['operationText'] = msg
+        access_warn(request, msg)
 
   else:
     first_user_form = None
@@ -159,6 +168,12 @@ def dt_login(request):
 
 def dt_logout(request, next_page=None):
   """Log out the user"""
+  username = request.user.get_username()
+  request.audit = {
+    'username': username,
+    'operation': 'USER_LOGOUT',
+    'operationText': 'Logged out user: %s' % username
+  }
   backends = get_backends()
   if backends:
     for backend in backends:
