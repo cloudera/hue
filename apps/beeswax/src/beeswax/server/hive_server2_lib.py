@@ -545,6 +545,8 @@ class HiveServerClient:
 
     if self.query_server['server_name'] == 'beeswax': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
+      kwargs['configuration'].update({'hive.server2.logging.operation.verbose': 'true'})
+      kwargs['configuration'].update({'hive.server2.logging.operation.level': 'VERBOSE'})
 
     if self.query_server['server_name'] == 'sparksql': # All the time
       kwargs['configuration'].update({'hive.server2.proxy.user': user.username})
