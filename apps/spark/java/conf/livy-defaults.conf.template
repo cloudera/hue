@@ -38,6 +38,3 @@
 # or an hdfs:// directory. Be careful setting this option, as it may allow users to access
 # any file the Livy process can access, such as Livy's SSL certificate.
 ## livy.files.dir = /var/run/livy/uploaded-files
-
-# Optional list of Spark options that can be configured by the user.
-## livy.spark.user-configurable-options = spark.serializer,spark.logConf
