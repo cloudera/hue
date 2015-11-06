@@ -1058,6 +1058,9 @@ ${ koComponents.assistPanel() }
     border-right: 0 !important;
   }
 
+  .pull-right.hover-actions, .pull-right.blue {
+    margin-top: -4px;
+  }
 
 </style>
 
