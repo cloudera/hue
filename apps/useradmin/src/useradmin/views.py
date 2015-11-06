@@ -27,18 +27,19 @@ import ldap_access
 from ldap_access import LdapSearchException
 
 from django.contrib.auth.models import User, Group
-
-from desktop.lib.django_util import JsonResponse, render
-from desktop.lib.exceptions_renderable import PopupException
 from django.core.urlresolvers import reverse
+from django.forms import ValidationError
+from django.forms.util import ErrorList
+from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
-from django.forms.util import ErrorList
-from django.shortcuts import redirect
-from django.http import HttpResponse
 
 import desktop.conf
 from desktop.conf import LDAP
+from desktop.lib.django_util import JsonResponse, render
+from desktop.lib.exceptions_renderable import PopupException
+
 from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
@@ -356,7 +357,7 @@ def add_ldap_users(request):
       except ldap.LDAPError, e:
         LOG.error("LDAP Exception: %s" % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
-      except AssertionError, e:
+      except ValidationError, e:
         raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       if users and form.cleaned_data['ensure_home_directory']:
@@ -408,7 +409,7 @@ def add_ldap_groups(request):
       except ldap.LDAPError, e:
         LOG.error(_("LDAP Exception: %s") % e)
         raise PopupException(_('There was an error when communicating with LDAP'), detail=str(e))
-      except AssertionError, e:
+      except ValidationError, e:
         raise PopupException(_('There was a problem with some of the LDAP information'), detail=str(e))
 
       unique_users = set()
@@ -591,7 +592,8 @@ def _check_remove_last_super(user_obj):
   all_active_su = User.objects.filter(is_superuser__exact = True,
                                       is_active__exact = True)
   num_active_su = all_active_su.count()
-  assert num_active_su >= 1, _("No active superuser configured.")
+  if num_active_su < 1:
+    raise PopupException(_("No active superuser configured."))
   if num_active_su == 1:
     raise PopupException(_("You cannot remove the last active superuser from the configuration."), error_code=401)
 
@@ -687,7 +689,7 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
           user.groups.remove(group)
         user.groups.add(*new_groups)
         Group.objects.filter(group__in=remove_groups_filtered).delete()
-    except (AssertionError, LdapSearchException) as e:
+    except (ValidationError, LdapSearchException) as e:
       LOG.warn('Could not import %s: %s' % (ldap_info['username'], e.message))
 
   return imported_users
@@ -926,7 +928,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
               validate_username(ldap_info['username'])
               user = ldap_access.get_ldap_user(username=ldap_info['username'])
               group.user_set.add(user)
-            except AssertionError, e:
+            except ValidationError, e:
               LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
             except User.DoesNotExist:
               pass
@@ -967,7 +969,7 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
                 validate_username(ldap_info['username'])
                 user = ldap_access.get_ldap_user(username=ldap_info['username'])
                 group.user_set.add(user)
-              except AssertionError, e:
+              except ValidationError, e:
                 LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
               except User.DoesNotExist:
                 pass

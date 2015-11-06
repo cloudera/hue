@@ -21,6 +21,7 @@ import re
 import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
+from django.forms import ValidationError
 from django.forms.util import ErrorList
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -43,21 +44,28 @@ def get_server_choices():
     return []
 
 def validate_dn(dn):
-  assert dn is not None, _('Full Distinguished Name required.')
+  if not dn:
+    raise ValidationError(_('Full Distinguished Name required.'))
 
 def validate_username(username_pattern):
   validator = re.compile(r"^%s$" % get_username_re_rule())
 
-  assert username_pattern is not None, _('Username is required.')
-  assert len(username_pattern) <= 30, _('Username must be fewer than 30 characters.')
-  assert validator.match(username_pattern), _("Username must not contain whitespaces and ':'")
+  if not username_pattern:
+    raise ValidationError(_('Username is required.'))
+  if len(username_pattern) > 30:
+    raise ValidationError(_('Username must be fewer than 30 characters.'))
+  if not validator.match(username_pattern):
+    raise ValidationError(_("Username must not contain whitespaces and ':'"))
 
 def validate_groupname(groupname_pattern):
   validator = re.compile(r"^%s$" % get_groupname_re_rule())
 
-  assert groupname_pattern is not None, _('Group name required.')
-  assert len(groupname_pattern) <= 80, _('Group name must be 80 characters or fewer.')
-  assert validator.match(groupname_pattern), _("Group name can be any character as long as it's 80 characters or fewer.")
+  if not groupname_pattern:
+    raise ValidationError(_('Group name required.'))
+  if len(groupname_pattern) > 80:
+    raise ValidationError(_('Group name must be 80 characters or fewer.'))
+  if not validator.match(groupname_pattern):
+    raise ValidationError(_("Group name can be any character as long as it's 80 characters or fewer."))
 
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
@@ -208,7 +216,7 @@ class AddLdapUsersForm(forms.Form):
         validate_dn(username_pattern)
       else:
         validate_username(username_pattern)
-    except AssertionError, e:
+    except ValidationError, e:
       errors = self._errors.setdefault('username_pattern', ErrorList())
       errors.append(e.message)
       raise forms.ValidationError(e.message)
@@ -255,7 +263,7 @@ class AddLdapGroupsForm(forms.Form):
         validate_dn(groupname_pattern)
       else:
         validate_groupname(groupname_pattern)
-    except AssertionError, e:
+    except ValidationError, e:
       errors = self._errors.setdefault('groupname_pattern', ErrorList())
       errors.append(e.message)
       raise forms.ValidationError(e.message)
