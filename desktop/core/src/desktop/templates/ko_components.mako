@@ -43,6 +43,11 @@ from desktop.views import _ko
       padding-bottom: 2px;
     }
 
+    .assist-tables-counter {
+      color: #d1d1d1;
+      font-weight: normal;
+    }
+
     .assist-table-link {
       font-size: 13px;
     }
@@ -202,6 +207,9 @@ from desktop.views import _ko
       <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! assistHelper.loading() && ! hasErrors()">
         ${_('tables')}
         <div class="pull-right" data-bind="visible: selectedDatabase() != null && selectedDatabase().hasEntries(), css: { 'hover-actions': ! filter(), 'blue': filter }">
+          <!-- ko if: selectedDatabase() != null -->
+          <span class="assist-tables-counter">(<span data-bind="text: selectedDatabase().filteredEntries().length"></span>)</span>
+          <!-- /ko -->
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
         </div>
       </li>
