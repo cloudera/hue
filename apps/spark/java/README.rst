@@ -43,14 +43,14 @@ To build/run Livy, you will need:
 Debian/Ubuntu:
   * mvn (from ``maven`` package or maven3 tarball)
   * openjdk-7-jdk (or Oracle Java7 jdk)
-  * spark 1.5 from (from `Apache Spark tarball`_)
+  * spark 1.4+ from (from `Apache Spark tarball`_)
   * Python 2.6+
   * R 3.x
 
 Redhat/CentOS:
   * mvn (from ``maven`` package or maven3 tarball)
   * java-1.7.0-openjdk (or Oracle Java7 jdk)
-  * spark 1.5 (from `Apache Spark tarball`_)
+  * spark 1.4+ (from `Apache Spark tarball`_)
   * Python 2.6+
   * R 3.x
 
@@ -71,19 +71,23 @@ Building Livy
 =============
 
 Livy is currently built by the `Hue Build System`_, it can also be built on
-it's own (aka without any other Hue dependency) with `Apache Maven`_. To build,
-checks out the code, go to the Livy directory and run:
+it's own (aka without any other Hue dependency) with `Apache Maven`_. To
+checkout and build Livy, run:
 
 .. code:: shell
 
-    git clone git@github.com:cloudera/hue.git
-    cd hue
-
-
-.. code:: shell
-
+    % git clone git@github.com:cloudera/hue.git
+    % cd hue
     % cd apps/spark/java
     % mvn -DskipTests clean package
+
+By default Livy is built with the Cloudera distribution of Spark (currently
+based off Spark 1.5.0), but it is simple to support other versions, such as
+Spark 1.4.1, by compiling Livy with:
+
+.. code:: shell
+
+    % mvn -DskipTests -Dspark.version=1.4.1 clean package
 
 .. _Hue Build System: https://github.com/cloudera/hue/#getting-started
 .. _Apache Maven: http://maven.apache.org
