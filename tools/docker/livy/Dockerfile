@@ -28,6 +28,7 @@ USER ellie
 WORKDIR /home/ellie
 RUN yes |ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/linuxbrew/go/install)"
 ENV PATH="/home/ellie/.linuxbrew/bin:$PATH"
+ENV SPARK_HOME="/home/ellie/.linuxbrew/Cellar/apache-spark/1.5.1"
 RUN brew update
 RUN brew install apache-spark
 
@@ -38,4 +39,4 @@ WORKDIR hue/apps/spark/java
 RUN mvn clean install -DskipTests
 
 EXPOSE 8998
-CMD ["apps/spark/java/bin/livy-server"]
+CMD ["./bin/livy-server"]
