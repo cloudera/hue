@@ -64,7 +64,7 @@
       return;
     }
 
-    var before = editor.getTextBeforeCursor(";");
+    var before = editor.getTextBeforeCursor();
     var after = editor.getTextAfterCursor(";");
 
     self.autocomplete(before, after, function(result) {

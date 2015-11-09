@@ -1530,7 +1530,7 @@ $(document).ready(function () {
     $(".CodeMirror-spinner").css("top", pos.top + "px").css("left", (pos.left - 4) + "px").show();
 
     var _statementAtCursor = getStatementAtCursor();
-    var _before = _statementAtCursor.statement.substr(0, _statementAtCursor.relativeIndex).replace(/;+$/, "");
+    var _before = codeMirror.getValue().substr(0, codeMirror.indexFromPos(codeMirror.getCursor()));
     var _after = _statementAtCursor.statement.substr(_statementAtCursor.relativeIndex).replace(/;+$/, "");
 
     autocompleter.autocomplete(_before, _after, function(suggestions) {

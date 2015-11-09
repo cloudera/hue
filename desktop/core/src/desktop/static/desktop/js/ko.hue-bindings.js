@@ -1868,7 +1868,7 @@
       var refreshTables = function() {
         currentAssistTables = {};
         if (typeof assistHelper.activeDatabase() !== "undefined" && assistHelper.activeDatabase() != null) {
-          assistHelper.fetchTables(snippet, function(data) {
+          assistHelper.fetchTables(snippet, assistHelper.activeDatabase(), function(data) {
             $.each(data.tables, function(index, table) {
               currentAssistTables[table] = true;
             });
