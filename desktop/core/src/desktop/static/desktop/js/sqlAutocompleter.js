@@ -22,7 +22,7 @@
   }
 }(this, function () {
 
-  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT)\b/g;
+  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE)\b/g;
 
   /**
    * @param options {object}
@@ -314,6 +314,19 @@
     var keywordBeforeCursor = beforeMatcher[beforeMatcher.length - 1];
 
     var impalaFieldRef = impalaSyntax && beforeCursor.slice(-1) === '.';
+
+    if (keywordBeforeCursor === "USE") {
+      var databases = self.snippet.getAssistHelper().availableDatabases();
+      databases.sort();
+      callback($.map(databases, function(db, idx) {
+        return {
+          value: db,
+          score: 1000 - idx,
+          meta: 'database'
+        };
+      }));
+      return;
+    }
 
     var tableNameAutoComplete = (keywordBeforeCursor === "FROM" ||
       keywordBeforeCursor === "TABLE" ||

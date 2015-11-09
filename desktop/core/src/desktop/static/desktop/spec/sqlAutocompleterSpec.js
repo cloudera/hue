@@ -127,6 +127,17 @@ define([
     });
 
     describe("database awareness", function() {
+      it("should suggest databases after use", function () {
+        assistHelper.availableDatabases(["database_one", "database_two"]);
+        assertAutoComplete({
+          serverResponses: {},
+          beforeCursor: "USE ",
+          afterCursor: "",
+          expectedSuggestions: ["database_one", "database_two"]
+        });
+        assistHelper.availableDatabases(["testDb"]);
+      });
+
       it("should use a use statement before the cursor if present", function () {
         assertAutoComplete({
           serverResponses: {
