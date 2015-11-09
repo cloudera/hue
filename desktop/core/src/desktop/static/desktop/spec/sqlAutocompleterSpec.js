@@ -126,6 +126,47 @@ define([
       });
     });
 
+    describe("database awareness", function() {
+      it("should use a use statement before the cursor if present", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/other_db" : {
+              tables: ["otherTable1", "otherTable2"]
+            }
+          },
+          beforeCursor: "USE other_db; \n\tSELECT ",
+          afterCursor: "",
+          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2"]
+        });
+      });
+
+      it("should use the last use statement before the cursor if multiple are present", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/closest_db" : {
+              tables: ["otherTable1", "otherTable2"]
+            }
+          },
+          beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
+          afterCursor: "",
+          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2"]
+        });
+      });
+
+      it("should use the use statement before the cursor if multiple are present after the cursor", function () {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/closest_db" : {
+              tables: ["otherTable1", "otherTable2"]
+            }
+          },
+          beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
+          afterCursor: "USE some_other_db;",
+          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2"]
+        });
+      });
+    });
+
     describe("table completion", function() {
       it("should suggest table names with no columns", function() {
         assertAutoComplete({

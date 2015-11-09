@@ -184,16 +184,16 @@
     });
   };
 
-  AssistHelper.prototype.fetchTables = function(snippet, successCallback, errorCallback) {
+  AssistHelper.prototype.fetchTables = function(snippet, database, successCallback, errorCallback) {
     var self = this;
-    self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + self.activeDatabase(), successCallback, errorCallback);
+    self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + database, successCallback, errorCallback);
   };
 
-  AssistHelper.prototype.fetchFields = function(snippet, tableName, fields, successCallback, errorCallback, editor) {
+  AssistHelper.prototype.fetchFields = function(snippet, database, tableName, fields, successCallback, errorCallback, editor) {
     var self = this;
 
     var fieldPart = fields.length > 0 ? "/" + fields.join("/") : "";
-    self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + self.activeDatabase() + "/" + tableName + fieldPart, successCallback, errorCallback, editor);
+    self.fetchAssistData(snippet, NOTEBOOK_API_PREFIX + database + "/" + tableName + fieldPart, successCallback, errorCallback, editor);
   };
 
   AssistHelper.prototype.clearCache = function(snippet) {
