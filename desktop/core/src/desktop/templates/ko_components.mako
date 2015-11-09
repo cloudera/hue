@@ -466,7 +466,7 @@ from desktop.views import _ko
 
       AssistEntry.prototype.dblClick = function (data, event) {
         var self = this;
-        huePubSub.publish('assist.dblClickItem', self.editorText());
+        huePubSub.publish('assist.dblClickItem', self);
       };
 
       AssistEntry.prototype.toggleOpen = function () {

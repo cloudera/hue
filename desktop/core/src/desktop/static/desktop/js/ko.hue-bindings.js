@@ -2085,9 +2085,18 @@
         }
       });
 
-      huePubSub.subscribe("assist.dblClickItem", function(value) {
+      huePubSub.subscribe("assist.dblClickItem", function(assistEntry) {
         if ($el.data("last-active-editor")) {
-          editor.session.insert(editor.getCursorPosition(), value);
+          var text = assistEntry.editorText();
+          if (editor.getValue() == "") {
+            if (assistEntry.definition.isTable) {
+              text = "SELECT * FROM " + assistEntry.editorText() + " LIMIT 100";
+            }
+            else if (assistEntry.definition.isColumn) {
+              text = "SELECT " + assistEntry.editorText().split(",")[0] + " FROM " + assistEntry.parent.editorText() + " LIMIT 100";
+            }
+          }
+          editor.session.insert(editor.getCursorPosition(), text);
         }
       });
 

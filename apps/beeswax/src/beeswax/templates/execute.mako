@@ -1610,8 +1610,18 @@ $(document).ready(function () {
     }
   });
 
-  huePubSub.subscribe('assist.dblClickItem', function(value) {
-    codeMirror.replaceSelection(value);
+  huePubSub.subscribe('assist.dblClickItem', function(assistEntry) {
+    var text = assistEntry.editorText();
+    if (codeMirror.getValue() == queryPlaceholder) {
+      codeMirror.setValue("");
+      if (assistEntry.definition.isTable) {
+        text = "SELECT * FROM " + assistEntry.editorText() + " LIMIT 100";
+      }
+      else if (assistEntry.definition.isColumn) {
+        text = "SELECT " + assistEntry.editorText().split(",")[0] + " FROM " + assistEntry.parent.editorText() + " LIMIT 100";
+      }
+    }
+    codeMirror.replaceSelection(text);
     codeMirror.setSelection(codeMirror.getCursor());
     codeMirror.focus();
   });
