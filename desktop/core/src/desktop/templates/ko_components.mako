@@ -335,7 +335,9 @@ from desktop.views import _ko
               break;
             }
             if (entry.definition.isArray || entry.definition.isMapValue) {
-              parts.push("[]");
+              if (self.assistSource.assistHelper.type === 'hive') {
+                parts.push("[]");
+              }
             } else {
               parts.push(entry.definition.name);
               parts.push(".");
