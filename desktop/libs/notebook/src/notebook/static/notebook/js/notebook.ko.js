@@ -199,6 +199,11 @@
         self.properties(ko.mapping.fromJS(getDefaultSnippetProperties(newValue)));
       }
       self.result.clear();
+      window.setTimeout(function () {
+        if (self.ace() !== null) {
+          self.ace().focus();
+        }
+      }, 100);
     });
 
     self.variables = ko.observableArray([]);
