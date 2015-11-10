@@ -22,7 +22,7 @@
   }
 }(this, function () {
 
-  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE)\b/g;
+  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE|LOCATION)\b/g;
 
   /**
    * @param options {object}
@@ -33,6 +33,7 @@
   function SqlAutocompleter(options) {
     var self = this;
     self.snippet = options.snippet;
+    self.hdfsAutocompleter = options.hdfsAutocompleter;
 
     var initDatabases = function () {
       if (! self.snippet.getAssistHelper().loaded()) {
@@ -365,6 +366,33 @@
           meta: 'database'
         };
       }));
+      return;
+    }
+
+    if (keywordBeforeCursor === "LOCATION") {
+      var pathMatch = beforeCursor.match(/.*location\s+('[^']*)$/i);
+      if (pathMatch) {
+        var existingPath = pathMatch[1].length == 1 ? pathMatch[1] + "/" : pathMatch[1];
+        self.hdfsAutocompleter.autocomplete(existingPath, "", function (hdfsSuggestions) {
+          var addLeadingSlash = pathMatch[1].length == 1;
+          var addTrailingSlash = afterCursorU.length == 0 || afterCursorU[0] == "'";
+          var addTrailingApostrophe = afterCursorU.length == 0;
+          $.each(hdfsSuggestions, function (idx, hdfsSuggestion) {
+            if (addLeadingSlash) {
+              hdfsSuggestion.value = "/" + hdfsSuggestion.value;
+            }
+            if (addTrailingSlash && hdfsSuggestion.meta === "dir") {
+              hdfsSuggestion.value += "/";
+            }
+            if (addTrailingApostrophe && hdfsSuggestion.meta === "file") {
+              hdfsSuggestion.value += "'";
+            }
+          });
+          callback(hdfsSuggestions);
+        });
+      } else {
+        onFailure();
+      }
       return;
     }
 

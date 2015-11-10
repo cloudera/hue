@@ -37,14 +37,16 @@
     self.snippet = options.snippet;
 
     var initializeAutocompleter = function () {
+      var hdfsAutocompleter = new HdfsAutocompleter({
+        user: options.user
+      });
       if (self.snippet.isSqlDialect()) {
         self.autocompleter = new SqlAutocompleter({
+          hdfsAutocompleter: hdfsAutocompleter,
           snippet: options.snippet
         })
       } else {
-        self.autocompleter = new HdfsAutocompleter({
-          user: options.user
-        });
+        self.autocompleter = hdfsAutocompleter;
       }
     };
     self.snippet.type.subscribe(function () {
