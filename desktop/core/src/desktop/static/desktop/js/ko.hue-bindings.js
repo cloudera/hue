@@ -2124,8 +2124,10 @@
         if (e.command.name === "insertstring") {
           var triggerAutocomplete = ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") || /["']\/[^\/]*/.test(editor.getTextBeforeCursor());
           if(e.args.toLowerCase().indexOf("? from ") == 0) {
-            editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
-            editor.removeTextBeforeCursor(1);
+            if (e.args[e.args.length - 1] !== '.') {
+              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);
+              editor.removeTextBeforeCursor(1);
+            }
             triggerAutocomplete = true;
           }
 

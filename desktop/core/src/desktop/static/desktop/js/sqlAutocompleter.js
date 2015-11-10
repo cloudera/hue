@@ -48,6 +48,7 @@
   }
 
   SqlAutocompleter.prototype.getFromReferenceIndex = function (statement) {
+    var self = this;
     var result = {
       tables: {},
       complex: {}
@@ -59,21 +60,44 @@
       if (upToMatch) {
         refsRaw = $.trim(refsRaw.substring(0, upToMatch.index));
       }
-      var refs = refsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i);
-      refs.sort();
+      var refs = $.map(refsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i), function (ref) {
+        if (ref.indexOf('.') > 0) {
+          var refParts = ref.split('.');
+          if(self.snippet.getAssistHelper().availableDatabases().indexOf(refParts[0]) > -1) {
+            return {
+              database: refParts.shift(),
+              table: refParts.join('.')
+            }
+          }
+        }
+        return {
+          database: null,
+          table: ref
+        }
+      });
+
+      refs.sort(function (a, b) {
+        return a.table.localeCompare(b.table);
+      });
       $.each(refs, function(index, tableRefRaw) {
-        if (tableRefRaw.indexOf('(') == -1) {
-          var refMatch = tableRefRaw.match(/\s*(\S+)\s*(\S+)?\s*/);
+        if (tableRefRaw.table.indexOf('(') == -1) {
+          var refMatch = tableRefRaw.table.match(/\s*(\S+)\s*(\S+)?\s*/);
 
           var refParts = refMatch[1].split('.');
           if (refMatch[2]) {
             if (refParts.length == 1) {
-              result.tables[refMatch[2]] = refParts[0];
+              result.tables[refMatch[2]] = {
+                table: refParts[0],
+                database: tableRefRaw.database
+              };
             } else {
               result.complex[refMatch[2]] = refParts;
             }
           } else {
-            result.tables[refMatch[1]] = refMatch[1];
+            result.tables[refMatch[1]] = {
+              table: refMatch[1],
+              database: tableRefRaw.database
+            };
           }
         }
       })
@@ -182,7 +206,11 @@
       fields = fromReferences.complex[complexRef].concat(fields);
     }
     if (fields[0] in fromReferences.tables) {
-      tableName = fromReferences.tables[fields.shift()];
+      var tableRef = fromReferences.tables[fields.shift()];
+      tableName = tableRef.table;
+      if (tableRef.database !== null) {
+        database = tableRef.database;
+      }
     }
     if (! tableName && tableAndComplexRefs.length === 1) {
       tableName = tableAndComplexRefs[0].value;
@@ -223,9 +251,11 @@
     }
   };
 
-  SqlAutocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, extraSuggestions) {
+  SqlAutocompleter.prototype.extractFields = function (data, valuePrefix, includeStar, extraSuggestions, excludeDatabases) {
+    var self = this;
     var fields = [];
     var result = [];
+    var prependedFields = extraSuggestions || [];
 
     if (data.type == "struct") {
       fields = $.map(data.fields, function(field) {
@@ -251,17 +281,27 @@
           type: "table"
         }
       });
+      if (! excludeDatabases) {
+        // No FROM prefix
+        prependedFields = prependedFields.concat(fields);
+        fields = $.map(self.snippet.getAssistHelper().availableDatabases(), function(database) {
+          return {
+            name: database + ".",
+            type: "database"
+          }
+        })
+      }
     }
 
     fields.sort(function (a, b) {
       return a.name.localeCompare(b.name);
     });
 
-    if (extraSuggestions) {
-      extraSuggestions.sort(function (a, b) {
+    if (prependedFields) {
+      prependedFields.sort(function (a, b) {
         return a.name.localeCompare(b.name);
       });
-      fields = extraSuggestions.concat(fields);
+      fields = prependedFields.concat(fields);
     }
 
     fields.forEach(function(field, idx) {
@@ -346,6 +386,10 @@
     var fromAfter = afterMatcher != null && afterMatcher[0] === "FROM";
 
     if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
+      var dbRefMatch = beforeCursor.match(/.*from\s+([^\.\s]+).$/i);
+      if (dbRefMatch) {
+        database = dbRefMatch[1];
+      }
 
       self.snippet.getAssistHelper().fetchTables(self.snippet, database, function (data) {
         var fromKeyword = "";
@@ -363,8 +407,9 @@
           }
           fromKeyword += " ";
         }
-        callback(self.extractFields(data, fromKeyword));
+        callback(self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null));
       }, onFailure, editor);
+      return;
     } else if ((selectBefore && fromAfter) || fieldTermBefore || impalaFieldRef) {
       var partialTermsMatch = beforeCursor.match(/([^\s\(\-\+\<\>\,]*)$/);
       var parts = partialTermsMatch ? partialTermsMatch[0].split(".") : [];
@@ -382,11 +427,18 @@
 
       if (parts.length > 0 && fromReferences.tables[parts[0]]) {
         // SELECT tableref.column.
-        tableName = fromReferences.tables[parts.shift()];
+        var tableRef = fromReferences.tables[parts.shift()];
+        tableName = tableRef.table;
+        if (tableRef.database !== null) {
+          database = tableRef.database;
+        }
       } else if (parts.length > 0 && fromReferences.complex[parts[0]]) {
         var complexRefList = fromReferences.complex[parts.shift()];
         if (fromReferences.tables[complexRefList[0]]) {
-          tableName = fromReferences.tables[complexRefList[0]];
+          tableName = fromReferences.tables[complexRefList[0]].table;
+          if (fromReferences.tables[complexRefList[0]].database !== null) {
+            database = fromReferences.tables[complexRefList[0]].database;
+          }
           // The first part is a table ref, the rest are col, struct etc.
           parts = complexRefList.slice(1).concat(parts);
         } else {
@@ -400,7 +452,7 @@
           return {
             value: key + (upToNextStatement.indexOf(".") == 0 ? "" : "."),
             score: 1000 - count++,
-            meta: fromReferences.tables[key] == key ? 'table' : 'alias'
+            meta: fromReferences.tables[key].table == key ? 'table' : 'alias'
           };
         });
 
@@ -422,7 +474,12 @@
         // SELECT column. or just SELECT
         // We use first and only table reference if exist
         // if there are no parts the call to getFields will fetch the columns
-        tableName = fromReferences.tables[Object.keys(fromReferences.tables)[0]];
+        var tableRef = fromReferences.tables[Object.keys(fromReferences.tables)[0]];
+        tableName = tableRef.table;
+        if (tableRef.database !== null) {
+          database = tableRef.database;
+        }
+
         if (conditionMatch && impalaSyntax) {
           var tableRefs = [{
             value: tableName,
@@ -433,7 +490,11 @@
           return;
         }
       } else if (parts.length > 0 && viewReferences.index[parts[0]] && viewReferences.index[parts[0]].leadingPath.length > 0) {
-        tableName = fromReferences.tables[viewReferences.index[parts[0]].leadingPath[0]];
+        var tableRef = fromReferences.tables[viewReferences.index[parts[0]].leadingPath[0]];
+        tableName = tableRef.table;
+        if (tableRef.database !== null) {
+          database = tableRef.database;
+        }
       } else {
         // Can't complete without table reference
         onFailure();

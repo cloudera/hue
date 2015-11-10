@@ -30,7 +30,7 @@ define([
       notebook: {
         getContext: function() { return ko.mapping.fromJS(null) }
       },
-      activeDatabase: "testDb",
+      activeDatabase: "database_one",
       user: "testUser"
     });
 
@@ -48,6 +48,8 @@ define([
       }
       snippet.type(newType);
       assistHelper.load(snippet, $.noop);
+      assistHelper.availableDatabases(["database_one", "database_two"]);
+      assistHelper.activeDatabase("database_one");
       window.setTimeout(function() {
         callback();
       }, 0);
@@ -64,7 +66,7 @@ define([
         var response;
         if (firstUrlPart == "/notebook/api/autocomplete/") {
           response = {
-            databases: ["testDb"]
+            databases: ["database_one"]
           };
         } else {
           expect(ajaxHelper.responseForUrls[firstUrlPart]).toBeDefined("fake response for url " + firstUrlPart + " not found");
@@ -128,14 +130,12 @@ define([
 
     describe("database awareness", function() {
       it("should suggest databases after use", function () {
-        assistHelper.availableDatabases(["database_one", "database_two"]);
         assertAutoComplete({
           serverResponses: {},
           beforeCursor: "USE ",
           afterCursor: "",
           expectedSuggestions: ["database_one", "database_two"]
         });
-        assistHelper.availableDatabases(["testDb"]);
       });
 
       it("should use a use statement before the cursor if present", function () {
@@ -147,7 +147,7 @@ define([
           },
           beforeCursor: "USE other_db; \n\tSELECT ",
           afterCursor: "",
-          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2"]
+          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
         });
       });
 
@@ -160,7 +160,7 @@ define([
           },
           beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
           afterCursor: "",
-          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2"]
+          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
         });
       });
 
@@ -173,7 +173,7 @@ define([
           },
           beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
           afterCursor: "USE some_other_db;",
-          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2"]
+          expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
         });
       });
     });
@@ -182,65 +182,78 @@ define([
       it("should suggest table names with no columns", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb" : {
+            "/notebook/api/autocomplete/database_one" : {
               tables: ["testTable1", "testTable2"]
             }
           },
           beforeCursor: "SELECT ",
           afterCursor: "",
-          expectedSuggestions: ["? FROM testTable1", "? FROM testTable2"]
+          expectedSuggestions: ["? FROM testTable1", "? FROM testTable2", "? FROM database_one.", "? FROM database_two."]
         });
       });
 
       it("should follow keyword case for table name completion", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb" : {
+            "/notebook/api/autocomplete/database_one" : {
               tables: ["testTable1", "testTable2"]
             }
           },
           beforeCursor: "select ",
           afterCursor: "",
-          expectedSuggestions: ["? from testTable1", "? from testTable2"]
+          expectedSuggestions: ["? from testTable1", "? from testTable2", "? from database_one.", "? from database_two."]
         });
       });
 
       it("should suggest table names with *", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb" : {
+            "/notebook/api/autocomplete/database_one" : {
               tables: ["testTable1", "testTable2"]
             }
           },
           beforeCursor: "SELECT *",
           afterCursor: "",
-          expectedSuggestions: [" FROM testTable1", " FROM testTable2"]
+          expectedSuggestions: [" FROM testTable1", " FROM testTable2", " FROM database_one.", " FROM database_two."]
         });
       });
 
       it("should suggest table names with started FROM", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb" : {
+            "/notebook/api/autocomplete/database_one" : {
               tables: ["testTable1", "testTable2"]
             }
           },
           beforeCursor: "SELECT * fr",
           afterCursor: "",
-          expectedSuggestions: ["FROM testTable1", "FROM testTable2"]
+          expectedSuggestions: ["FROM testTable1", "FROM testTable2", "FROM database_one.", "FROM database_two."]
         });
       });
 
       it("should suggest table names after FROM", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb" : {
+            "/notebook/api/autocomplete/database_one" : {
               tables: ["testTable1", "testTable2"]
             }
           },
           beforeCursor: "SELECT * FROM ",
           afterCursor: "",
-          expectedSuggestions: ["testTable1", "testTable2"]
+          expectedSuggestions: ["testTable1", "testTable2", "database_one.", "database_two."]
+        });
+      });
+
+      it("should suggest table names after FROM with database reference", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_two" : {
+              tables: ["testTable3", "testTable4"]
+            }
+          },
+          beforeCursor: "SELECT * FROM database_two.",
+          afterCursor: "",
+          expectedSuggestions: ["testTable3", "testTable4"]
         });
       });
 
@@ -291,10 +304,10 @@ define([
       it("should suggest struct from map values", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" },
@@ -314,10 +327,10 @@ define([
       it("should suggest struct from map values without a given key", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" }
@@ -334,10 +347,10 @@ define([
       it("should suggest struct from structs from map values", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value/fieldC" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value/fieldC" : {
               fields: [
                 {"type": "string", "name": "fieldC_A" },
                 {"type": "boolean", "name": "fieldC_B"}
@@ -354,10 +367,10 @@ define([
       it("should suggest struct from structs from arrays", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testArray" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray" : {
               type: "array"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testArray/item/fieldC" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray/item/fieldC" : {
               fields: [
                 {"type": "string", "name": "fieldC_A" },
                 {"type": "boolean", "name": "fieldC_B"}
@@ -374,13 +387,13 @@ define([
       it("should suggest structs from maps from arrays", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testArray" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray" : {
               type: "array"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testArray/item/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray/item/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testArray/item/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray/item/testMap/value" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "boolean", "name": "fieldB"}
@@ -398,7 +411,7 @@ define([
         it("should suggest structs from exploded item references to arrays", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testArray/item": {
+              "/notebook/api/autocomplete/database_one/testTable/testArray/item": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -415,7 +428,7 @@ define([
         it("should suggest structs from multiple exploded item references to arrays", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testArrayA/item": {
+              "/notebook/api/autocomplete/database_one/testTable/testArrayA/item": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -434,7 +447,7 @@ define([
         it("should support table references as arguments of explode function", function() {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable2/testArrayB/item": {
+              "/notebook/api/autocomplete/database_one/testTable2/testArrayB/item": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -453,7 +466,7 @@ define([
         it("should suggest structs from exploded item references to exploded item references to arrays ", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testArray1/item/testArray2/item": {
+              "/notebook/api/autocomplete/database_one/testTable/testArray1/item/testArray2/item": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -473,7 +486,7 @@ define([
         it("should suggest structs from references to exploded arrays", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testArray/item": {
+              "/notebook/api/autocomplete/database_one/testTable/testArray/item": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -490,7 +503,7 @@ define([
         it("should suggest posexploded references to arrays", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testArray/item": {
+              "/notebook/api/autocomplete/database_one/testTable/testArray/item": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -507,7 +520,7 @@ define([
         it("should suggest exploded references to map values", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testMap/value": {
+              "/notebook/api/autocomplete/database_one/testTable/testMap/value": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -524,7 +537,7 @@ define([
         it("should suggest exploded references to map values from view references", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/testMap/value": {
+              "/notebook/api/autocomplete/database_one/testTable/testMap/value": {
                 fields: [
                   {"type": "string", "name": "fieldA"},
                   {"type": "string", "name": "fieldB"}
@@ -550,7 +563,7 @@ define([
         it("should suggest references to exploded references", function () {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable" : {
+              "/notebook/api/autocomplete/database_one/testTable" : {
                 columns: ["testTableColumn1", "testTableColumn2"]
               }
             },
@@ -571,7 +584,7 @@ define([
       it("should not suggest struct from map values with hive style syntax", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap[\"anyKey\"]" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap[\"anyKey\"]" : {
               someResponse: true
             }
           },
@@ -584,10 +597,10 @@ define([
       it("should suggest fields from nested structs", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/columnA" : {
+            "/notebook/api/autocomplete/database_one/testTable/columnA" : {
               // Impala has to query every part for it's type, for hive '[' and ']' is used to indicate map or array.
             },
-            "/notebook/api/autocomplete/testDb/testTable/columnA/fieldC" : {
+            "/notebook/api/autocomplete/database_one/testTable/columnA/fieldC" : {
               fields: [
                 {"type": "string", "name": "fieldC_A" },
                 {"type": "boolean", "name": "fieldC_B"}
@@ -605,10 +618,10 @@ define([
       it("should suggest fields from map values of type structs", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" }
@@ -625,10 +638,10 @@ define([
       it("should suggest map value if type is scalar", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value" : {
               type: "int"
             }
           },
@@ -641,10 +654,10 @@ define([
       it("should not suggest items from arrays if complex in select clause", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testArray" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray" : {
               type: "array"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testArray/item" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray/item" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" }
@@ -661,10 +674,10 @@ define([
       it("should suggest items from arrays if scalar in select clause", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testArray" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray" : {
               type: "array"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testArray/item" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray/item" : {
               type: "int"
             }
           },
@@ -677,10 +690,10 @@ define([
       it("should suggest items from arrays if complex in from clause", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testArray" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray" : {
               type: "array"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testArray/item" : {
+            "/notebook/api/autocomplete/database_one/testTable/testArray/item" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" }
@@ -698,7 +711,7 @@ define([
       it("should suggest columns from table refs in from clause", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -720,10 +733,10 @@ define([
       it("should suggest fields with key and value in where clause from map values of type structs", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" }
@@ -740,10 +753,10 @@ define([
       it("should suggest fields in where clause from map values of type structs", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value" : {
               fields: [
                 {"type": "string", "name": "fieldA" },
                 {"type": "string", "name": "fieldB" }
@@ -760,7 +773,7 @@ define([
       it("should suggest values for map keys", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap/key" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/key" : {
               sample: ["value1", "value2"],
               type: "string"
             }
@@ -774,7 +787,7 @@ define([
       it("should suggest values for columns in conditions", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/id" : {
+            "/notebook/api/autocomplete/database_one/testTable/id" : {
               sample: [1, 2, 3],
               type: "int"
             }
@@ -788,10 +801,10 @@ define([
       it("should suggest values from fields in map values in conditions", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable/testMap" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap" : {
               type: "map"
             },
-            "/notebook/api/autocomplete/testDb/testTable/testMap/value/field" : {
+            "/notebook/api/autocomplete/database_one/testTable/testMap/value/field" : {
               sample: [1, 2, 3],
               type: "int"
             }
@@ -808,7 +821,7 @@ define([
       it("should suggest columns for table", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -818,10 +831,23 @@ define([
         });
       });
 
+      it("should suggest columns for table with database prefix", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_two/testTable" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT ",
+          afterCursor: " FROM database_two.testTable",
+          expectedSuggestions: ["*", "testTableColumn1", "testTableColumn2"]
+        });
+      });
+
       it("should suggest columns for table after WHERE", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -834,7 +860,7 @@ define([
       it("should suggest columns for table after ORDER BY ", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -844,10 +870,23 @@ define([
         });
       });
 
+      it("should suggest columns for table after ORDER BY with db reference", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_two/testTable" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT * FROM database_two.testTable ORDER BY ",
+          afterCursor: "",
+          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+        });
+      });
+
       it("should suggest columns for table after GROUP BY ", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -860,7 +899,7 @@ define([
       it("should suggest columns for table after ON ", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable1" : {
+            "/notebook/api/autocomplete/database_one/testTable1" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -870,10 +909,23 @@ define([
         });
       });
 
+      it("should suggest columns for table after ON with database reference", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_two/testTable1" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT t1.testTableColumn1, t2.testTableColumn3 FROM database_two.testTable1 t1 JOIN testTable2 t2 ON t1.",
+          afterCursor: "",
+          expectedSuggestions: ["testTableColumn1", "testTableColumn2"]
+        });
+      });
+
       it("should suggest columns for table with table ref", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -886,7 +938,7 @@ define([
       it("should suggest columns with table alias", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable" : {
+            "/notebook/api/autocomplete/database_one/testTable" : {
               columns: ["testTableColumn1", "testTableColumn2"]
             }
           },
@@ -896,12 +948,25 @@ define([
         });
       });
 
+      it("should suggest columns with table alias from database reference", function() {
+        assertAutoComplete({
+          serverResponses: {
+            "/notebook/api/autocomplete/database_two/testTable" : {
+              columns: ["testTableColumn1", "testTableColumn2"]
+            }
+          },
+          beforeCursor: "SELECT tt.",
+          afterCursor: " FROM database_two.testTable tt",
+          expectedSuggestions: ["*", "testTableColumn1", "testTableColumn2"]
+        });
+      });
+
       it("should suggest columns with multiple table aliases", function() {
         var serverResponses = {
-          "/notebook/api/autocomplete/testDb/testTableA": {
+          "/notebook/api/autocomplete/database_one/testTableA": {
             columns: ["testTableColumn1", "testTableColumn2"]
           },
-          "/notebook/api/autocomplete/testDb/testTableB": {
+          "/notebook/api/autocomplete/database_one/testTableB": {
             columns: ["testTableColumn3", "testTableColumn4"]
           }
         };
@@ -923,7 +988,7 @@ define([
         it("should suggest fields from columns that are structs", function() {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/columnA" : {
+              "/notebook/api/autocomplete/database_one/testTable/columnA" : {
                 fields: [
                   {"type": "string", "name": "fieldA" },
                   {"type": "boolean", "name": "fieldB" },
@@ -945,7 +1010,7 @@ define([
         it("should suggest fields from nested structs", function() {
           assertAutoComplete({
             serverResponses: {
-              "/notebook/api/autocomplete/testDb/testTable/columnA/fieldC" : {
+              "/notebook/api/autocomplete/database_one/testTable/columnA/fieldC" : {
                 fields: [
                   {"type": "string", "name": "fieldC_A" },
                   {"type": "boolean", "name": "fieldC_B"}
@@ -959,6 +1024,24 @@ define([
             expectedSuggestions: ["fieldC_A", "fieldC_B"]
           });
         });
+
+        it("should suggest fields from nested structs with database reference", function() {
+          assertAutoComplete({
+            serverResponses: {
+              "/notebook/api/autocomplete/database_two/testTable/columnA/fieldC" : {
+                fields: [
+                  {"type": "string", "name": "fieldC_A" },
+                  {"type": "boolean", "name": "fieldC_B"}
+                ],
+                "type": "struct",
+                "name": "fieldC"
+              }
+            },
+            beforeCursor: "SELECT columnA.fieldC.",
+            afterCursor: " FROM database_two.testTable",
+            expectedSuggestions: ["fieldC_A", "fieldC_B"]
+          });
+        });
       });
     });
 
@@ -967,13 +1050,13 @@ define([
       it("should suggest tables to join with", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb" : {
+            "/notebook/api/autocomplete/database_one" : {
               tables: ["testTable1", "testTable2"]
             }
           },
           beforeCursor: "SELECT * FROM testTable1 JOIN ",
           afterCursor: "",
-          expectedSuggestions: ["testTable1", "testTable2"]
+          expectedSuggestions: ["testTable1", "testTable2", "database_one.", "database_two."]
         });
       });
 
@@ -1007,7 +1090,7 @@ define([
       it("should suggest field references in join condition if table reference is present", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable2" : {
+            "/notebook/api/autocomplete/database_one/testTable2" : {
               columns: ["testColumn3", "testColumn4"]
             }
           },
@@ -1020,7 +1103,7 @@ define([
       it("should suggest field references in join condition if table reference is present from multiple tables", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable2" : {
+            "/notebook/api/autocomplete/database_one/testTable2" : {
               columns: ["testColumn3", "testColumn4"]
             }
           },
@@ -1033,7 +1116,7 @@ define([
       it("should suggest field references in join condition if table reference is present from multiple tables for multiple conditions", function() {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/testDb/testTable1" : {
+            "/notebook/api/autocomplete/database_one/testTable1" : {
               columns: ["testColumn1", "testColumn2"]
             }
           },
