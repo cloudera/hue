@@ -572,6 +572,10 @@ class TestUserAdminLdap(BaseUserAdminTests):
       assert_true('Location' in response, response)
       assert_true('/useradmin/groups' in response['Location'])
 
+      # Test warning notification for failed users on group import
+      response = c.post(URL, dict(server='nonsense', groupname_pattern='TestUsers'), follow=True)
+      assert_true('Failed to import following users: test_toolongusernametoolongusername' in response.content, response.content)
+
       # Test with space
       response = c.post(URL, dict(server='nonsense', groupname_pattern='Test Administrators'))
       assert_true('Location' in response, response)
