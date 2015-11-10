@@ -249,7 +249,7 @@ define([
           serverResponses: {},
           beforeCursor: "SELECT ",
           afterCursor: " FROM testTableA   tta, testTableB",
-          expectedSuggestions: ["testTableB.", "tta."]
+          expectedSuggestions: ["tta.", "testTableB."]
         });
       });
 
@@ -258,7 +258,7 @@ define([
           serverResponses: {},
           beforeCursor: "SELECT * FROM testTableA tta, testTableB GROUP BY ",
           afterCursor: "",
-          expectedSuggestions: ["testTableB.", "tta."]
+          expectedSuggestions: ["tta.", "testTableB."]
         });
       });
 
@@ -556,7 +556,7 @@ define([
             },
             beforeCursor: "SELECT ",
             afterCursor: " FROM testTable LATERAL VIEW explode(testMap) explodedMap AS (testMapKey, testMapValue)",
-            expectedSuggestions: ["*", "explodedMap", "testTableColumn1", "testTableColumn2", "testMapKey", "testMapValue"]
+            expectedSuggestions: ["*", "explodedMap", "testMapKey", "testMapValue", "testTableColumn1", "testTableColumn2"]
           });
         });
       });

@@ -20,17 +20,13 @@ define([
       toEqualAutocompleteValues : function() {
         return {
           compare: function(actualItems, expectedValues) {
-            var itemIndex = {};
-
             if (actualItems.length !== expectedValues.length) {
               return { pass: false };
             }
-            $.each(actualItems, function(i, item) {
-              itemIndex[item.value] = true;
-            });
 
             for (var i = 0; i < expectedValues.length; i++) {
-              if (! itemIndex[expectedValues[i]]) {
+              var stringValue = typeof actualItems[i] !== "string" ? '' + actualItems[i].value : actualItems[i].value;
+              if (stringValue !== expectedValues[i]) {
                 return { pass: false };
               }
             }
