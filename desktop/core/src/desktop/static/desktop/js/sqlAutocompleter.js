@@ -22,7 +22,7 @@
   }
 }(this, function () {
 
-  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE|LOCATION)\b/g;
+  var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE|LOCATION|INPATH)\b/g;
 
   /**
    * @param options {object}
@@ -369,8 +369,8 @@
       return;
     }
 
-    if (keywordBeforeCursor === "LOCATION") {
-      var pathMatch = beforeCursor.match(/.*location\s+('[^']*)$/i);
+    if (keywordBeforeCursor === "LOCATION" || keywordBeforeCursor === "INPATH") {
+      var pathMatch = beforeCursor.match(/.*(?:inpath|location)\s+('[^']*)$/i);
       if (pathMatch) {
         var existingPath = pathMatch[1].length == 1 ? pathMatch[1] + "/" : pathMatch[1];
         self.hdfsAutocompleter.autocomplete(existingPath, "", function (hdfsSuggestions) {
