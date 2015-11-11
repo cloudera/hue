@@ -35,6 +35,33 @@ class XxdTest(unittest.TestCase):
   def test_mask_not_printable(self):
     self.assertEquals( (2, "..@"), xxd.mask_not_alphanumeric("\xff\x90\x40"))
 
+  def _get_offset_width(self, line):
+    offset, match, _ = line.partition(":")
+    if not match:
+      raise ValueError("No offset was found in the xxd output")
+    return len(offset)
+
+  def _is_offset_width_same(self, expected, actual):
+    return self._get_offset_width(expected) == self._get_offset_width(actual)
+
+  def _remove_padding(self, line):
+    for index, c in enumerate(line):
+      if c != '0':
+        return line[index:]
+    return ''
+
+  def _standardize_xxd_output(self, xxd_output):
+    return "\n".join(self._remove_padding(line) for line in xxd_output.splitlines())
+
+  def _verify_content(self, expected, actual):
+    if self._is_offset_width_same(expected, actual):
+      self.assertEquals(expected, actual)
+      return
+    # Not all distributions have the same amount of bits in their 'Offset'
+    # This corrects for this to avoid having this test fail when that is the only problem
+    corrected_expected = self._standardize_xxd_output(expected)
+    corrected_actual = self._standardize_xxd_output(actual)
+    self.assertEquals(corrected_expected, corrected_actual)
 
   def test_compare_to_xxd(self):
     """
@@ -55,7 +82,7 @@ class XxdTest(unittest.TestCase):
 
     output = StringIO.StringIO()
     xxd.main(StringIO.StringIO(random_text), output)
-    self.assertEquals(stdin, output.getvalue())
+    self._verify_content(stdin, output.getvalue())
 
 if __name__ == "__main__":
   unittest.main()
