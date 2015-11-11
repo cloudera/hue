@@ -9,7 +9,8 @@ RUN apt-get update -y
 RUN echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
 RUN apt-get install -y oracle-java8-installer
 
-RUN apt-get install -q -y \
+RUN apt-get update -y
+RUN apt-get install --fix-missing -q -y \
   git \
   ant \
   gcc \
@@ -34,4 +35,5 @@ RUN git clone https://github.com/cloudera/hue.git
 WORKDIR hue
 RUN make apps
 EXPOSE 8888
+VOLUME /hue/desktop/
 CMD ["build/env/bin/hue", "runserver_plus", "0.0.0.0:8888"]
