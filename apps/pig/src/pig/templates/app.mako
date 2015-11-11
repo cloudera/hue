@@ -1107,7 +1107,7 @@ ${ commonshare() | n,unicode }
     });
 
     $(document).on("saving", function () {
-      showAlert("${_('Saving')} <b>" + viewModel.currentScript().name() + "</b>...");
+      showAlert("${_('Saving')} " + viewModel.currentScript().name() + "...");
     });
 
     $(document).on("running", function () {
@@ -1118,7 +1118,7 @@ ${ commonshare() | n,unicode }
     });
 
     $(document).on("saved", function () {
-      showAlert("<b>" + viewModel.currentScript().name() + "</b> ${_('has been saved correctly.')}");
+      showAlert(viewModel.currentScript().name() + " ${_('has been saved correctly.')}");
     });
 
     $(document).on("showDashboard", function () {
