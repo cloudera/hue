@@ -325,8 +325,6 @@ define([
         });
 
         it("should autocomplete hdfs paths in location references without initial /", function () {
-          var beforeCursor = "create external table foo (id int) location '";
-          var afterCursor = "";
           assertAutoComplete({
             serverResponses: {},
             beforeCursor: "CREATE EXTERNAL TABLE foo (id int) LOCATION '",
@@ -336,11 +334,6 @@ define([
         });
 
         it("should autocomplete hdfs paths in location references from root", function () {
-          var beforeCursor = "create external table foo (id int) location '";
-          var afterCursor = "";
-          subject.autocomplete(beforeCursor, afterCursor, function () {
-
-          });
           assertAutoComplete({
             serverResponses: {},
             beforeCursor: "CREATE EXTERNAL TABLE foo (id int) LOCATION '/",
@@ -350,11 +343,6 @@ define([
         });
 
         it("should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor", function () {
-          var beforeCursor = "create external table foo (id int) location '";
-          var afterCursor = "";
-          subject.autocomplete(beforeCursor, afterCursor, function () {
-
-          });
           assertAutoComplete({
             serverResponses: {},
             beforeCursor: "CREATE EXTERNAL TABLE foo (id int) LOCATION '/",
@@ -364,11 +352,6 @@ define([
         });
 
         it("should autocomplete hdfs paths in location references from inside a path", function () {
-          var beforeCursor = "create external table foo (id int) location '";
-          var afterCursor = "";
-          subject.autocomplete(beforeCursor, afterCursor, function () {
-
-          });
           assertAutoComplete({
             serverResponses: {},
             beforeCursor: "CREATE EXTERNAL TABLE foo (id int) LOCATION '/",
@@ -656,6 +639,66 @@ define([
       beforeEach(function (done) {
         changeType("impala", done);
         ajaxHelper.responseForUrls = {};
+      });
+
+      describe("HDFS autocompletion", function () {
+        beforeEach(function() {
+          subject = new SqlAutocompleter({
+            hdfsAutocompleter: {
+              autocomplete: function(before, after, callback) {
+                callback([
+                  {
+                    meta: "file",
+                    score: 1000,
+                    value: "file_one"
+                  },
+                  {
+                    meta: "dir",
+                    score: 999,
+                    value: "folder_one"
+                  }
+                ])
+              }
+            },
+            snippet: snippet
+          });
+        });
+
+        it("should autocomplete hdfs paths in location references without initial /", function () {
+          assertAutoComplete({
+            serverResponses: {},
+            beforeCursor: "LOAD DATA INPATH '",
+            afterCursor: "'",
+            expectedSuggestions: ["/file_one", "/folder_one/"]
+          });
+        });
+
+        it("should autocomplete hdfs paths in location references from root", function () {
+          assertAutoComplete({
+            serverResponses: {},
+            beforeCursor: "LOAD DATA INPATH '/",
+            afterCursor: "'",
+            expectedSuggestions: ["file_one", "folder_one/"]
+          });
+        });
+
+        it("should autocomplete hdfs paths and suggest trailing apostrophe if empty after cursor", function () {
+          assertAutoComplete({
+            serverResponses: {},
+            beforeCursor: "LOAD DATA INPATH '/",
+            afterCursor: "",
+            expectedSuggestions: ["file_one'", "folder_one/"]
+          });
+        });
+
+        it("should autocomplete hdfs paths in location references from inside a path", function () {
+          assertAutoComplete({
+            serverResponses: {},
+            beforeCursor: "LOAD DATA INPATH '/",
+            afterCursor: "/bar' INTO TABLE foo",
+            expectedSuggestions: ["file_one", "folder_one"]
+          });
+        });
       });
 
       it("should not suggest struct from map values with hive style syntax", function() {
