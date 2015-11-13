@@ -2666,6 +2666,40 @@ class TestWithMockedServer(object):
     assert_equal(0, sum([query_id in ids_page for query_id in page_1]))
     assert_equal(1, sum([query_id in ids_page for query_id in page_2]))
 
+  def test_clear_history(self):
+    sql = 'SHOW TABLES'
+    response = _make_query(self.client, sql, submission_type='Save', name='My clear', desc='My Description')
+    content = json.loads(response.content)
+    design_id = content['design_id']
+    design = SavedQuery.objects.get(id=design_id)
+
+    query_history = QueryHistory.build(
+        owner=self.user,
+        query=sql,
+        server_host='server_host',
+        server_port=1,
+        server_name='server_name',
+        server_type=HIVE_SERVER2,
+        last_state=QueryHistory.STATE.submitted.index,
+        design=design,
+        notify=False,
+        query_type=HQL,
+        statement_number=0
+    )
+    query_history.save()
+
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s' % design_id)
+    assert_equal(design_id, resp.context['page'].object_list[0].id)
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s&recent=true' % design_id)
+    assert_equal(design_id, resp.context['page'].object_list[0].id)
+
+    self.client.post(reverse('beeswax:clear_history'))
+
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s' % design_id)
+    assert_equal(design_id, resp.context['page'].object_list[0].id)
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s&recent=true' % design_id)
+    assert_false(list(resp.context['page'].object_list))
+
 
 class TestDesign():
 
