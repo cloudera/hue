@@ -417,6 +417,19 @@ function BeeswaxViewModel(server, assistHelper) {
     $.ajax(request);
   };
 
+  self.clearQueryHistory = function() {
+    var request = {
+      url: '/' + self.server() + '/api/query/clear_history/',
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        $(document).trigger('clear.history', [data]);
+      },
+      error: error_fn,
+      cache: false
+    };
+    $.ajax(request);
+  };
 
   self.fetchParameters = function() {
     $(document).trigger('fetch.parameters');

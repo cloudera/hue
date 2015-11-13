@@ -39,12 +39,13 @@ from beeswax.data_export import upload
 from beeswax.design import HQLdesign
 from beeswax.conf import USE_GET_LOG_API
 from beeswax.forms import QueryForm
+from beeswax.models import Session, QueryHistory
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException, QueryServerTimeoutException
 from beeswax.views import authorized_get_design, authorized_get_query_history, make_parameterization_form,\
                           safe_get_design, save_design, massage_columns_for_json, _get_query_handle_and_state, \
                           _parse_out_hadoop_jobs
-from beeswax.models import Session
+
 
 LOG = logging.getLogger(__name__)
 
@@ -635,6 +636,18 @@ def query_history_to_dict(request, query_history):
     query_history_dict['design'] = design_to_dict(query_history.design)
 
   return query_history_dict
+
+
+def clear_history(request):
+  response = {'status': -1, 'message': ''}
+
+  if request.method != 'POST':
+    response['message'] = _('A POST request is required.')
+  else:
+    response['count'] = QueryHistory.objects.filter(owner=request.user, is_cleared=False).update(is_cleared=True)
+    response['status'] = 0
+
+  return JsonResponse(response)
 
 
 # Proxy API for Metastore App

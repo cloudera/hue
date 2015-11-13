@@ -352,6 +352,7 @@ ${ layout.menubar(section='query') }
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
               <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
+            <i class="fa fa-times" data-bind="click: $root.clearQueryHistory"></i>
             <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
                 <tr>
@@ -1241,7 +1242,7 @@ $(document).ready(function () {
     recentQueries.fnClearTable();
     var locale = window.navigator.userLanguage || window.navigator.language;
     moment.locale(locale);
-    $.getJSON("${ url(app_name + ':list_query_history') }?format=json", function(data) {
+    $.getJSON("${ url(app_name + ':list_query_history') }?format=json&recent=true", function(data) {
       if (data && data.queries) {
         var _rows = [];
         $(data.queries).each(function(cnt, item){
@@ -1324,6 +1325,10 @@ $(document).ready(function () {
 
   $(document).on("click", "#columnAnalysis .close-popover", function () {
     $("#columnAnalysis").hide();
+  });
+
+  $(document).on("clear.history", function() {
+    recentQueries.fnClearTable();
   });
 
   $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {

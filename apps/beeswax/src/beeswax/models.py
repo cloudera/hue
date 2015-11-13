@@ -84,6 +84,7 @@ class QueryHistory(models.Model):
 
   is_redacted = models.BooleanField(default=False)
   extra = models.TextField(default='{}')                   # Json fields for extra properties
+  is_cleared = models.BooleanField(default=False)
 
   class Meta:
     ordering = ['-submission_date']
