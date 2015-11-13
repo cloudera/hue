@@ -82,6 +82,8 @@ urlpatterns += patterns(
   url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/directory$', 'save_results_hdfs_directory', name='api_save_results_hdfs_directory'),
   url(r'^api/watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
 
+  url(r'^api/query/clear_history/$', 'clear_history', name='clear_history'),
+
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
   url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', 'analyze_table', name='analyze_table'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', 'get_table_stats', name='get_table_stats'),

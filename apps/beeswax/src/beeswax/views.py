@@ -940,6 +940,11 @@ def _list_query_history(user, querydict, page_size, prefix=""):
     else:
       db_queryset = db_queryset.filter(design__type=SavedQuery.TYPES_MAPPING[d_type])
 
+  # If recent query
+  recent = querydict.get('recent')
+  if recent:
+    db_queryset = db_queryset.filter(is_cleared=False)
+
   # Ordering
   sort_key = querydict.get(prefix + 'sort')
   if sort_key:
