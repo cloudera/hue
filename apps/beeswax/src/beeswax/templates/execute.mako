@@ -313,20 +313,23 @@ ${ layout.menubar(section='query') }
     <div id="resizePanel"><a href="javascript:void(0)"><i class="fa fa-ellipsis-h"></i></a></div>
 
     <div class="card card-small scrollable resultsContainer">
-      <div data-bind="visible: !design.explain() && $root.hasResults()">
+      <div class="query-right-actions" data-bind="visible: !design.explain()">
+        <!-- ko if: $root.hasResults() -->
         <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
-          class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-expand"></i></h4></a>
+          class="view-query-results hide pull-right"><h4><i class="fa fa-expand"></i></h4></a>
 
         <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
-          class="view-query-results hide pull-right"><h4 style="margin-right: 20px"><i class="fa fa-save"></i></h4>
+          class="view-query-results hide pull-right"><h4><i class="fa fa-save"></i></h4>
         </a>
 
         <a id="download-csv" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
-          class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="hfo hfo-file-csv"></i></h4>
+          class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-csv"></i></h4>
         </a>
 
         <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results in XLS format')}" rel="tooltip"
-          class="view-query-results download hide pull-right"><h4 style="margin-right: 20px"><i class="hfo hfo-file-xls"></i></h4></a>
+          class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-xls"></i></h4></a>
+        <!-- /ko -->
+        <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="clear-queries pull-right" data-toggle="modal"><h4><i class="fa fa-calendar-times-o"></i></h4></a>
       </div>
 
       <div class="card-body">
@@ -352,7 +355,6 @@ ${ layout.menubar(section='query') }
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
               <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
-            <i class="fa fa-times" data-bind="click: $root.clearQueryHistory"></i>
             <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
                 <tr>
@@ -781,6 +783,21 @@ ${ layout.menubar(section='query') }
   </div>
 </div>
 
+<div id="clearHistoryModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Confirm History Clear')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Are you sure you want to clear the query history?')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-danger disable-feedback" onclick="viewModel.clearQueryHistory()">${_('Yes')}</a>
+  </div>
+</div>
+
+
 ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1063,6 +1080,14 @@ ${ koComponents.assistPanel() }
     margin-top: -4px;
   }
 
+  .query-right-actions {
+    margin-right: 10px;
+  }
+
+  .query-right-actions h4 {
+    padding: 0 10px;
+  }
+
 </style>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
@@ -1254,6 +1279,12 @@ $(document).ready(function () {
           ]);
         });
         recentQueries.fnAddData(_rows);
+        if (_rows.length > 0){
+          $(".clear-queries").show();
+        }
+        else {
+          $(".clear-queries").hide();
+        }
       }
       $("a[data-row-selector='true']").jHueRowSelector();
       $("#recentLoader").hide();
@@ -1328,7 +1359,8 @@ $(document).ready(function () {
   });
 
   $(document).on("clear.history", function() {
-    recentQueries.fnClearTable();
+    renderRecent();
+    $("#clearHistoryModal").modal("hide");
   });
 
   $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
@@ -2512,6 +2544,9 @@ $(document).ready(function () {
     queryPageComponents();
     $('.resultsContainer .watch-query').hide();
     $('.resultsContainer .view-query-results').show();
+    $(".view-query-results[rel=tooltip]").tooltip({
+      placement: 'bottom'
+    });
   }
 
   function parametersPage() {
