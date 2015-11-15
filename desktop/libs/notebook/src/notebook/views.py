@@ -78,7 +78,6 @@ def editor(request):
     editor = Notebook()
     data = editor.get_data()
     data['name'] = 'Hive SQL Editor'
-    data['snippets'] = json.loads('[{"id":"c111cbb4-f475-4050-c5a1-02df6c31e3d8","name":"","type":"hive","editorMode":"text/x-hiveql","statement_raw":"Example: SELECT * FROM tablename, or press CTRL + space","codemirrorSize":100,"status":"ready","properties":{"settings":[],"files":[]},"variables":[],"variableNames":[],"statement":"Example: SELECT * FROM tablename, or press CTRL + space","result":{"id":"149347d9-3ae7-8d06-4cc8-d4bce5e72dc8","type":"table","hasResultset":true,"handle":{},"meta":[],"cleanedMeta":[],"fetchedOnce":false,"startTime":"2015-07-17T20:38:21.970Z","endTime":"2015-07-17T20:38:21.970Z","executionTime":0,"cleanedNumericMeta":[],"cleanedStringMeta":[],"cleanedDateTimeMeta":[],"data":[],"logs":"","logLines":0,"errors":"","hasSomeResults":false},"showGrid":true,"showChart":false,"showLogs":false,"progress":0,"size":12,"offset":0,"isLoading":false,"klass":"snippet card card-widget","editorKlass":"editor span12","resultsKlass":"results hive","errorsKlass":"results hive alert alert-error","chartType":"bars","chartSorting":"none","chartYMulti":[],"chartData":[],"tempChartOptions":{},"isLeftPanelVisible":false,"codeVisible":true,"settingsVisible":false,"checkStatusTimeout":null}]')
     editor.data = json.dumps(data)
 
   autocomplete_base_url = ''
@@ -90,14 +89,7 @@ def editor(request):
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
-          'languages': [{"name": "Hive SQL", "type": "hive"}],
-          'snippet_placeholders' : {
-              'scala': _('Example: 1 + 1, or press CTRL + space'),
-              'python': _('Example: 1 + 1, or press CTRL + space'),
-              'impala': _('Example: SELECT * FROM tablename, or press CTRL + space'),
-              'hive': _('Example: SELECT * FROM tablename, or press CTRL + space'),
-              'text': _('<h2>This is a text snippet</h2>Type your text here')
-          }
+          'languages': [{"name": "Hive SQL", "type": "hive"}]
       }),
       'autocomplete_base_url': autocomplete_base_url,
   })
