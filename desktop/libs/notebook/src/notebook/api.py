@@ -23,12 +23,12 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
 from desktop.decorators import check_document_access_permission
-from desktop.lib.django_util import JsonResponse, HttpResponse
+from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired
 from notebook.decorators import api_error_handler, check_document_modify_permission
-from notebook.github import GithubClient, GithubClientException
+from notebook.github import GithubClient
 from notebook.models import escape_rows
 
 

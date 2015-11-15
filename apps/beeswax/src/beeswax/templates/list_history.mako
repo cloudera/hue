@@ -111,9 +111,9 @@ ${ layout.menubar(section='history') }
             <table class="table table-striped table-condensed datatables" style="padding-left: 0;">
             <thead>
               <tr>
-                <th width="10%">${_('Time')}</th>
+                <th width="15%">${_('Time')}</th>
                 <th width="15%">${_('Name')}</th>
-                <th width="45%">${_('Query')}</th>
+                <th width="40%">${_('Query')}</th>
                 <th width="10%">${_('User')}</th>
                 <th width="5%">${_('State')}</th>
                 <th width="5%">${_('Result')}</th>
