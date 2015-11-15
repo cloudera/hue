@@ -2423,6 +2423,8 @@ class MockDbms:
   def get_tables(self, database):
     return ['table1', 'table2']
 
+  def get_state(self, handle):
+    return 0
 
 class TestWithMockedServer(object):
 
@@ -2689,16 +2691,20 @@ class TestWithMockedServer(object):
     query_history.save()
 
     resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s' % design_id)
-    assert_equal(design_id, resp.context['page'].object_list[0].id)
+    page_ids = [hist.id for hist in resp.context['page'].object_list]
+    assert_true(design_id in page_ids, page_ids)
     resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s&recent=true' % design_id)
-    assert_equal(design_id, resp.context['page'].object_list[0].id)
+    page_ids = [hist.id for hist in resp.context['page'].object_list]
+    assert_true(design_id in page_ids, page_ids)
 
     self.client.post(reverse('beeswax:clear_history'))
 
     resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s' % design_id)
-    assert_equal(design_id, resp.context['page'].object_list[0].id)
+    page_ids = [hist.id for hist in resp.context['page'].object_list]
+    assert_true(design_id in page_ids, page_ids)
     resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s&recent=true' % design_id)
-    assert_false(list(resp.context['page'].object_list))
+    page_ids = [hist.id for hist in resp.context['page'].object_list]
+    assert_false(design_id in page_ids, page_ids)
 
 
 class TestDesign():
