@@ -1060,6 +1060,8 @@
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
+    self.editorMode = self.availableSnippets().length === 1;
+
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
         return options.snippetViewSettings[snippetType];
@@ -1100,6 +1102,9 @@
           self.selectedNotebook(self.notebooks()[0]);
         }
       });
+      if (self.selectedNotebook().snippets().length === 0 && self.editorMode) {
+        self.selectedNotebook().newSnippet();
+      }
     };
 
     self.loadNotebook = function (notebook) {
