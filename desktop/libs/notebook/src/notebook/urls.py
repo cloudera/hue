@@ -56,7 +56,6 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/get_logs', 'get_logs', name='get_logs'),
 
   url(r'^api/notebook/save$', 'save_notebook', name='save_notebook'),
-  url(r'^api/notebook/open$', 'open_notebook', name='open_notebook'),
   url(r'^api/notebook/close$', 'close_notebook', name='close_notebook'),
 )
 

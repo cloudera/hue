@@ -881,7 +881,8 @@
 
     self.save = function () {
       $.post("/notebook/api/notebook/save", {
-        "notebook": ko.mapping.toJSON(self, SPARK_MAPPING)
+        "notebook": ko.mapping.toJSON(self, SPARK_MAPPING),
+        "editorMode": vm.editorMode
       }, function (data) {
         if (data.status == 0) {
           self.id(data.id);
@@ -902,7 +903,8 @@
 
     self.close = function () {
       $.post("/notebook/api/notebook/close", {
-        "notebook": ko.mapping.toJSON(self, SPARK_MAPPING)
+        "notebook": ko.mapping.toJSON(self, SPARK_MAPPING),
+        "editorMode": vm.editorMode
       });
     };
 
