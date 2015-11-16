@@ -78,7 +78,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
           <div class="hueCheckbox fa" data-bind="multiCheck: '#notebookTable', css: {'fa-check': isSelected }" data-row-selector-exclude="true"></div>
-          <a data-bind="attr: { 'href': '${ url('notebook:notebook') }?notebook=' + id() }" data-row-selector="true"></a>
+          <a data-bind="attr: { 'href': absoluteUrl }" data-row-selector="true"></a>
         </td>
         <td data-bind="text: name"></td>
         <td data-bind="text: description"></td>

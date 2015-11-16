@@ -245,7 +245,7 @@ def historify(request):
 
   if parent:
     Document2.objects.get(id=parent['id']).dependencies.add(history_doc)
-    
+
   response['status'] = 0
   response['id'] = history_doc.id
   response['message'] = _('Notebook saved !')
@@ -255,7 +255,7 @@ def historify(request):
 
 def get_history(request):
   response = {'status': -1}
-  
+
   response['status'] = 0
   response['history'] = [{
       'name': doc.name,
