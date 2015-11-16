@@ -835,6 +835,30 @@
     }
   };
 
+  ko.bindingHandlers.aceResizer = {
+    init: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+      var ace = options.ace;
+      var $target = $(options.target);
+      var $resizer = $(element);
+
+      $resizer.draggable({
+        axis: "y",
+        drag: function (event, ui) {
+          var currentHeight = ui.offset.top - 120;
+          $target.css("height", currentHeight + "px");
+          ace().resize();
+          ui.offset.top = 0;
+          ui.position.top = 0;
+        },
+        stop: function (event, ui) {
+          ui.offset.top = 0;
+          ui.position.top = 0;
+        }
+      });
+    }
+  };
+
   ko.bindingHandlers.splitDraggable = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
