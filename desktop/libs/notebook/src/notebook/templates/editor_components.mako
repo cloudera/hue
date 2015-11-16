@@ -402,7 +402,6 @@ ${ require.config() }
   </div>
 </script>
 
-
 <script type="text/html" id="notebook-snippet-header">
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
@@ -424,7 +423,7 @@ ${ require.config() }
 
 <script type="text/html" id="snippet">
   <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
-    <div class="snippet card card-widget" data-bind="css: {'active-editor': inFocus, 'snippet-text' : type() == 'text', 'editor-mode': $root.editorMode}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+    <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
       <div style="position: relative;">
         <div class="snippet-row">
           <div class="snippet-left-bar">
@@ -445,6 +444,7 @@ ${ require.config() }
           </div>
         </div>
         <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
+        <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
         <!-- ko template: 'snippet-log' --><!-- /ko -->
         <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
         <div style="position: absolute; top:0; z-index: 301; width: 100%;">
@@ -523,13 +523,15 @@ ${ require.config() }
 
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
-    <div class="editor span12" data-bind="clickForAceFocus: ace">
-      <div class="ace-editor" data-bind="css: {'single-snippet-editor' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+    <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
+      <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
           aceOptions: {
             showLineNumbers: $root.editorMode,
-            showGutter: $root.editorMode
+            showGutter: $root.editorMode,
+            maxLines: $root.editorMode ? null : 25,
+            minLines: $root.editorMode ? null : 1
           }
         }"></div>
       </div>
@@ -793,6 +795,12 @@ ${ require.config() }
         <li data-bind="text: message"></li>
       </ul>
     </div>
+  </div>
+</script>
+
+<script type="text/html" id="snippet-code-resizer">
+  <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable' }">
+    <i class="fa fa-ellipsis-h"></i>
   </div>
 </script>
 
