@@ -93,10 +93,6 @@ body {
   border-radius: 0;
 }
 
-.ace_gutter {
-  background: #F1F1F1;
-}
-
 .snippet-left-bar {
   position:absolute;
   display:inline-block;

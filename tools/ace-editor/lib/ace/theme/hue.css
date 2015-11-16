@@ -78,6 +78,26 @@
   color: #3E999F
 }
 
+.ace_gutter {
+  background: #F1F1F1;
+}
+
+.ace_gutter > .ace_layer {
+  width: 41px !important;
+  border-left: 1px solid #DBE8F1;
+  color: #737373;
+}
+
+.ace_gutter-cell.ace_error {
+  background-color: #f2dede;
+  border-left:1px solid #eed3d7;
+  background-image: none !important;
+}
+
+.ace_gutter_cell {
+  padding-left: 10px !important;
+}
+
 .ace-hue .ace_constant.ace_character,
 .ace-hue .ace_constant.ace_language,
 .ace-hue .ace_constant.ace_numeric,
