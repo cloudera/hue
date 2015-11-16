@@ -1978,7 +1978,35 @@
             var token = editor.session.getTokenAt(docPos.row, docPos.column);
 
             if (token) {
-              if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
+              var self = this;
+              if (token.value === " * ") {
+                snippet.autocompleter.autocomplete(editor.getValue().substring(0, token.start + 1), editor.getValue().substring(token.start + 2), function (suggestions) {
+                  var cols = [];
+                  $.each(suggestions, function (idx, suggestion) {
+                    if (suggestion.meta === "column" && suggestion.value !== "*") {
+                      cols.push(suggestion.value);
+                    }
+                  });
+                  if (cols.length > 0) {
+                    // add highlight for the clicked token
+                    var start = token.value == " * " ? token.start + 1 : token.start;
+                    var end = token.value == " * " ? token.start + 2 : token.start + token.value.length;
+                    var range = new AceRange(docPos.row, start, docPos.row, end);
+                    token.range = range;
+                    token.columns = cols;
+                    editor.session.removeMarker(self.marker);
+                    self.marker = editor.session.addMarker(range, 'ace_bracket red');
+                    editor.renderer.setCursorStyle("pointer");
+                    self.setText(options.expandStar);
+                    if ($.totalStorage("hue.ace.showLinkTooltips") == null || $.totalStorage("hue.ace.showLinkTooltips")) {
+                      self.show(null, self.x + 10, self.y + 10);
+                    }
+                    self.link = token;
+                    self.isClearable = true
+                  }
+                });
+              }
+              else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1 ||
                   token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1 ||
                   currentAssistTables[token.value]) {
                 // add highlight for the clicked token
@@ -2051,7 +2079,10 @@
       HueLink = ace.require("huelink").HueLink;
       editor.hueLink = new HueLink(editor);
       editor.hueLink.on("open", function (token) {
-        if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
+        if (token.value === " * " && token.columns.length > 0) {
+          editor.session.replace(token.range, token.columns.join(", "))
+        }
+        else if (token.value.indexOf("'/") == 0 && token.value.lastIndexOf("'") == token.value.length - 1) {
           window.open("/filebrowser/#" + token.value.replace(/'/gi, ""));
         }
         else if (token.value.indexOf("\"/") == 0 && token.value.lastIndexOf("\"") == token.value.length - 1) {
