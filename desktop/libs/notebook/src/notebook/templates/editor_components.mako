@@ -527,6 +527,7 @@ ${ require.config() }
       <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
+          expandStar: '${ _ko("Alt or Ctrl + Click to replace with all columns") }',
           aceOptions: {
             showLineNumbers: $root.editorMode,
             showGutter: $root.editorMode,
