@@ -83,7 +83,7 @@
 }
 
 .ace_gutter > .ace_layer {
-  width: 41px !important;
+  width: 30px !important;
   border-left: 1px solid #DBE8F1;
   color: #737373;
 }
@@ -94,8 +94,9 @@
   background-image: none !important;
 }
 
-.ace_gutter_cell {
-  padding-left: 10px !important;
+.ace_gutter-cell {
+  padding-left: 0 !important;
+  padding-right: 3px !important;
 }
 
 .ace-hue .ace_constant.ace_character,
