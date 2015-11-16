@@ -59,7 +59,6 @@ class Notebook(object):
           'name': 'My Notebook',
           'description': '',
           'snippets': [],
-          'type': 'notebook'
       })
 
   def get_json(self):
