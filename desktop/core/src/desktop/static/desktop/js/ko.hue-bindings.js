@@ -842,9 +842,21 @@
       var $target = $(options.target);
       var $resizer = $(element);
 
+      var lastEditorHeight = 7;
+
+      var autoExpandTimeout = window.setInterval(function () {
+        var chunks = Math.floor((ace().session.getLength() - lastEditorHeight) / 8) + 1;
+        if (chunks !== 0) {
+          $target.height($target.height() + 128 * chunks);
+          ace().resize();
+          lastEditorHeight += 8 * chunks;
+        }
+      }, 300);
+
       $resizer.draggable({
         axis: "y",
         drag: function (event, ui) {
+          clearInterval(autoExpandTimeout);
           var currentHeight = ui.offset.top - 120;
           $target.css("height", currentHeight + "px");
           ace().resize();
