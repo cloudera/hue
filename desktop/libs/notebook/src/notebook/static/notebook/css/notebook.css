@@ -93,6 +93,10 @@ body {
   border-radius: 0;
 }
 
+.snippet.editor-mode {
+  border-bottom: none;
+}
+
 .snippet-left-bar {
   position:absolute;
   display:inline-block;
