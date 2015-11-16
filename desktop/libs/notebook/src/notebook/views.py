@@ -71,13 +71,14 @@ def notebook(request):
 @check_document_access_permission()
 def editor(request):
   editor_id = request.GET.get('editor')
+  editor_type = request.GET.get('type', 'hive')
 
   if editor_id:
     editor = Notebook(document=Document2.objects.get(id=editor_id))
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = 'Hive Query'
+    data['name'] = '%s Query' % editor_type.title()
     data['type'] = 'query'    
     editor.data = json.dumps(data)
 
@@ -90,14 +91,10 @@ def editor(request):
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
-          'languages': [{"name": "Hive SQL", "type": "hive"}]
+          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}]
       }),
       'autocomplete_base_url': autocomplete_base_url,
   })
-
-
-def editor_hive(request):
-  return editor(request)
 
 
 def new(request):
