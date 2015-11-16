@@ -222,6 +222,49 @@ def save_notebook(request):
 
   return JsonResponse(response)
 
+
+@require_POST
+# @check_document_modify_permission()
+def historify(request):
+  response = {'status': -1}
+
+  parent = request.POST.get('parent_id')  # If we had an history to a saved notebook
+  history = json.loads(request.POST.get('notebook', '{}'))
+
+  history_doc = Document2.objects.create(name=history['name'], type='notebook', owner=request.user)
+  Document.objects.link(history_doc, owner=history_doc.owner, name=history_doc.name, description=history_doc.description, extra='notebook')
+
+  history_doc1 = history_doc.doc.get()
+  history_doc.update_data(history)
+  history_doc.name = history_doc1.name = history['name']
+  history_doc.description = history_doc1.description = history.get('description', '')
+  history_doc.is_history = True
+  history_doc.save()
+  history_doc1.save()
+
+  if parent:
+    Document2.objects.get(id=parent['id']).dependencies.add(history_doc)
+    
+  response['status'] = 0
+  response['id'] = history_doc.id
+  response['message'] = _('Notebook saved !')
+
+  return JsonResponse(response)
+
+
+def get_history(request):
+  response = {'status': -1}
+  
+  response['status'] = 0
+  response['history'] = [{
+      'name': doc.name,
+      'id': doc.id
+      } for doc in Document2.objects.filter(type='notebook', owner=request.user, is_history=True).order_by('-last_modified')]
+  response['message'] = _('Notebook saved !')
+
+  return JsonResponse(response)
+
+
 @require_GET
 @check_document_access_permission()
 def open_notebook(request):

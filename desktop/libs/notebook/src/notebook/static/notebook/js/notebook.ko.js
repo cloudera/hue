@@ -418,6 +418,10 @@
         self.close();
       }
 
+      $.post("/notebook/api/historify", {
+        notebook: ko.mapping.toJSON(self, SPARK_MAPPING)
+      });
+
       $.post("/notebook/api/execute", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
@@ -940,6 +944,12 @@
       });
     };
 
+    self.fetchHistory = function () {
+      $.get("/notebook/api/get_history", {}, function(data) {
+        console.log(data);
+      });
+    };
+   
     self.exportJupyterNotebook = function () {
       function addCell(type, code) {
         var cell = {
