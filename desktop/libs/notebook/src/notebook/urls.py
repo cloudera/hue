@@ -41,6 +41,7 @@ urlpatterns = patterns('notebook.views',
   url(r'^copy$', 'copy', name='copy'),
 
   url(r'^editor$', 'editor', name='editor'),
+  url(r'^editor/hive$', 'editor_hive', name='editor_hive'),
 )
 
 # APIs

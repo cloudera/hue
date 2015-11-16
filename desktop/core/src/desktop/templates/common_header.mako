@@ -412,6 +412,7 @@ from django.utils.translation import ugettext as _
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
              <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+             <li><a href="${ url('notebook:editor_hive') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('New Hive')}</a></li>
            % endif
            % if 'impala' in apps:
              <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
