@@ -950,7 +950,7 @@
         console.log(data);
       });
     };
-   
+
     self.exportJupyterNotebook = function () {
       function addCell(type, code) {
         var cell = {

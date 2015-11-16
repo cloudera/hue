@@ -170,7 +170,7 @@ class DocumentManager(models.Manager):
         Q(documentpermission__groups__in=user.groups.all())
     ).defer('description', 'extra').distinct()
 
-  def get_docs(self, user, model_class=None, extra=None):
+  def get_docs(self, user, model_class=None, extra=None, qfilter=None):
     docs = Document.objects.documents(user).exclude(name='pig-app-hue-script')
 
     if model_class is not None:
@@ -179,6 +179,9 @@ class DocumentManager(models.Manager):
 
     if extra is not None:
       docs = docs.filter(extra=extra)
+
+    if qfilter is not None:
+      docs = docs.filter(qfilter)
 
     return docs
 
@@ -799,7 +802,7 @@ class Document2(models.Model):
     elif self.type == 'oozie-bundle2':
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
     elif self.type == 'query':
-      return reverse('notebook:query') + '?editor=' + str(self.id)
+      return reverse('notebook:editor') + '?editor=' + str(self.id)
     elif self.type == 'notebook':
       return reverse('notebook:notebook') + '?notebook=' + str(self.id)
     elif self.type == 'search-dashboard':

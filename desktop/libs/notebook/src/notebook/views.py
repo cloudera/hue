@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
@@ -78,8 +79,8 @@ def editor(request):
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = '%s Query' % editor_type.title()    
-    data['type'] = editor_type
+    data['name'] = '%s Query' % editor_type.title()
+    data['type'] = 'query'
     editor.data = json.dumps(data)
 
   autocomplete_base_url = ''
@@ -102,7 +103,7 @@ def new(request):
 
 
 def notebooks(request):
-  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='notebook') if not d.content_object.is_history]
+  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra='query')) if not d.content_object.is_history]
 
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
