@@ -100,7 +100,7 @@ def new(request):
 
 
 def notebooks(request):
-  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='notebook')]
+  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, extra='notebook') if not d.content_object.is_history]
 
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
