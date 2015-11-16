@@ -131,8 +131,8 @@ ${ require.config() }
     <div class="container-fluid">
       <div class="pull-right">
         %if mode == 'editor':
-        <a class="btn" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-          <i class="fa fa-fw fa-expand"></i>
+        <a class="btn" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+          <i class="fa fa-expand"></i>
         </a>
           % if app_name == 'impala':
           <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
