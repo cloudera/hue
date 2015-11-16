@@ -369,29 +369,43 @@ ${ require.config() }
   </div>
 </script>
 
+
+<script type="text/html" id="notebook-snippet-header">
+  <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
+  <div class="hover-actions inline pull-right" style="font-size: 15px;">
+    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
+    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
+    <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
+  </div>
+</script>
+
+<script type="text/html" id="editor-snippet-header">
+  <div class="hover-actions inline pull-right" style="font-size: 15px;">
+    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
+    <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
+  </div>
+</script>
+
 <script type="text/html" id="snippet">
   <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
     <div class="snippet card card-widget" data-bind="css: {'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
       <div style="position: relative;">
         <div class="snippet-row">
           <div class="snippet-left-bar">
-            <!-- ko template: 'snippet-type-controls' --><!-- /ko -->
+            <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-type-controls' } --><!-- /ko -->
             <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
           </div>
           <div class="snippet-body" data-bind="verticalSlide: codeVisible, clickForAceFocus: ace">
             <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
             <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }, clickForAceFocus: ace">
-              <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
-
-              <div class="hover-actions inline pull-right" style="font-size: 15px;">
-                <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
-                <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
-                <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
-                <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ codeVisible(! codeVisible()) }, visible: type() != 'text'"><i class="fa" data-bind="css: {'fa-compress' : codeVisible, 'fa-expand' : ! codeVisible() }"></i></a>
-                <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
-                <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ $root.removeSnippet($parent, $data); }"><i class="fa fa-times"></i></a>
-              </div>
+              <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
+              <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
             </h2>
             <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
             <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
@@ -751,7 +765,7 @@ ${ require.config() }
   </div>
 </script>
 
-<script type="text/html" id="snippet-type-controls">
+<script type="text/html" id="notebook-snippet-type-controls">
   <div class="inactive-action dropdown hover-actions">
     <a class="snippet-side-btn" style="padding-right: 0; padding-left: 2px;" data-toggle="dropdown" href="javascript: void(0);">
       <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
