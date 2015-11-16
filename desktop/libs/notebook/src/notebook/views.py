@@ -77,7 +77,8 @@ def editor(request):
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = 'My SQL query'
+    data['name'] = 'Hive Query'
+    data['type'] = 'query'    
     editor.data = json.dumps(data)
 
   autocomplete_base_url = ''
@@ -93,6 +94,10 @@ def editor(request):
       }),
       'autocomplete_base_url': autocomplete_base_url,
   })
+
+
+def editor_hive(request):
+  return editor(request)
 
 
 def new(request):

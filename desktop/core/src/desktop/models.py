@@ -798,6 +798,8 @@ class Document2(models.Model):
       return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
     elif self.type == 'oozie-bundle2':
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
+    elif self.type == 'query':
+      return reverse('notebook:query') + '?editor=' + str(self.id)
     elif self.type == 'notebook':
       return reverse('notebook:notebook') + '?notebook=' + str(self.id)
     elif self.type == 'search-dashboard':
