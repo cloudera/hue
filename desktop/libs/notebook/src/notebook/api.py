@@ -218,22 +218,7 @@ def save_notebook(request):
 
   response['status'] = 0
   response['id'] = notebook_doc.id
-  response['message'] = _('Notebook saved !')
-
-  return JsonResponse(response)
-
-
-@require_GET
-@check_document_access_permission()
-def open_notebook(request):
-  response = {'status': -1}
-
-  notebook_id = request.GET.get('notebook')
-  notebook = Notebook(document=Document2.objects.get(id=notebook_id))
-
-  response['status'] = 0
-  response['notebook'] = notebook.get_json()
-  response['message'] = _('Notebook saved !')
+  response['message'] = request.POST.get('editorMode') == 'true' and _('Query saved successfully') or _('Notebook saved successfully')
 
   return JsonResponse(response)
 
@@ -254,7 +239,7 @@ def close_notebook(request):
       LOG.exception('Error closing session %s' % str(e))
 
   response['status'] = 0
-  response['message'] = _('Notebook closed !')
+  response['message'] = _('Notebook closed successfully')
 
   return JsonResponse(response)
 
