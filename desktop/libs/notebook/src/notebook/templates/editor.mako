@@ -34,6 +34,7 @@ ${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
 
 
 ${ editorComponents.includes() }
+${ editorComponents.topBar('editor') }
 ${ editorComponents.commonHTML() }
 
 

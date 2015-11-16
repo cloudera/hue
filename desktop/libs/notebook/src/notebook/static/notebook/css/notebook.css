@@ -33,7 +33,7 @@ body {
   height: auto;
   width: 100%;
   position: absolute;
-  top: 70px;
+  top: 82px;
   bottom: 0;
 }
 
@@ -735,4 +735,30 @@ table.airy tr td {
 
 .dataTables_wrapper .resultTable th {
   color: #333;
+}
+
+.navbar .editor-nav > li > a {
+  max-width: 600px;
+}
+
+.navbar .editor-nav > li > a, .navbar .editor-nav > li > a:hover {
+  border-bottom: 2px solid transparent;
+  color: #737373;
+  cursor: default;
+}
+
+.navbar .editor-nav > li.query-name {
+  font-weight: bold;
+}
+
+.editor-nav .editable-click:hover {
+  border-bottom: dashed 1px #0088cc;
+}
+
+.editor-nav .editable-click, .editor-nav a.editable-click {
+  border-bottom: 1px solid transparent;
+}
+
+.editable-empty, .editable-empty:hover {
+  color: #737373 !important;
 }

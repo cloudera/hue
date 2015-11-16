@@ -107,9 +107,7 @@ ${ require.config() }
 
 </%def>
 
-
-<%def name="commonHTML()">
-
+<%def name="topBar(mode='notebook', app_name='hive')">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
@@ -119,7 +117,7 @@ ${ require.config() }
     top: 110px!important;
   }
   .main-content {
-    top: 100px!important;
+    top: 112px!important;
   }
 % endif
 </style>
@@ -128,94 +126,124 @@ ${ require.config() }
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
 </div>
 
-<div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
-  <div class="pull-right" style="padding-right:50px">
-    <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
-      <i class="fa fa-pencil"></i>
-    </a>
+<div class="navbar navbar-inverse navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="pull-right">
+        %if mode=='editor':
+          % if app_name == 'impala':
+          <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
+            <i class="fa fa-cogs"></i>
+          </a>
+          %endif
+        <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
+          <i class="fa fa-save"></i>
+        </a>
 
-    <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
-      <i class="fa fa-cogs"></i>
-    </a>
+        <a class="btn" href="${ url('notebook:new') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
+          <i class="fa fa-file-o"></i>
+        </a>
 
-    <div class="btn-group">
-      <a class="btn dropdown-toggle" data-toggle="dropdown">
-        <i class="fa fa-bars"></i>
-      </a>
-      <ul class="dropdown-menu pull-right">
-        <li>
-          <a class="pointer" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
-            <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
+        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Queries') }" rel="tooltip" data-placement="bottom">
+          <i class="fa fa-tags"></i>
+        </a>
+        %else:
+        <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
+          <i class="fa fa-pencil"></i>
+        </a>
+
+        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
+          <i class="fa fa-cogs"></i>
+        </a>
+
+        <div class="btn-group">
+          <a class="btn dropdown-toggle" data-toggle="dropdown">
+            <i class="fa fa-bars"></i>
           </a>
-        </li>
-        <li>
-          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-            <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
-          </a>
-        </li>
-        <li>
-          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
-            <i class="fa fa-fw fa-eraser"></i> ${ _('Clear all results') }
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
-            <i class="fa fa-fw fa-file-text-o"></i> ${ _('Display all Notebook content') }
-          </a>
-        </li>
-        <li>
-          <a class="pointer" data-toggle="modal" data-target="#importGithubModal">
-            <i class="fa fa-fw fa-github"></i> ${ _('Import from Github') }
-          </a>
-        </li>
-        <li>
-          <a class="pointer" data-bind="click: function() { $root.selectedNotebook().exportJupyterNotebook() }">
-            <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
-          </a>
-        </li>
-      </ul>
+          <ul class="dropdown-menu pull-right">
+            <li>
+              <a class="pointer" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+                <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
+              </a>
+            </li>
+            <li>
+              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+                <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
+              </a>
+            </li>
+            <li>
+              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+                <i class="fa fa-fw fa-eraser"></i> ${ _('Clear all results') }
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="click: displayCombinedContent">
+                <i class="fa fa-fw fa-file-text-o"></i> ${ _('Display all Notebook content') }
+              </a>
+            </li>
+            <li>
+              <a class="pointer" data-toggle="modal" data-target="#importGithubModal">
+                <i class="fa fa-fw fa-github"></i> ${ _('Import from Github') }
+              </a>
+            </li>
+            <li>
+              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().exportJupyterNotebook() }">
+                <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
+              </a>
+            </li>
+          </ul>
+        </div>
+
+
+        &nbsp;&nbsp;&nbsp;
+
+        <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
+          <i class="fa fa-save"></i>
+        </a>
+
+        <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
+          <i class="fa fa-file-o"></i>
+        </a>
+
+        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
+          <i class="fa fa-tags"></i>
+        </a>
+
+        %endif
+      </div>
+
+      <div class="nav-collapse">
+        <ul class="nav editor-nav">
+          <li class="currentApp">
+            <a href="#">
+            %if mode=='editor':
+              % if app_name == 'impala':
+                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                Impala
+              % elif app_name == 'rdbms':
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                DB Query
+              % else:
+                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                Hive Editor
+              % endif
+            %else:
+              <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
+                Notebook
+            %endif
+            </a>
+          </li>
+          <!-- ko foreach: notebooks -->
+          <li class="query-name"><a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right'}"></span></a></li>
+          <li><a href="javascript:void(0)"><span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span></a></li>
+          <!-- /ko -->
+        </ul>
+      </div>
     </div>
-
-
-    &nbsp;&nbsp;&nbsp;
-
-    <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
-      <i class="fa fa-save"></i>
-    </a>
-
-    <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
-      <i class="fa fa-file-o"></i>
-    </a>
-
-    <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
-      <i class="fa fa-tags"></i>
-    </a>
   </div>
-
-
-  <ul class="nav nav-tabs pull-left">
-    <!-- ko foreach: notebooks -->
-      <li data-bind="css: { active: $parent.selectedNotebook() === $data }">
-        <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span></a>
-      </li>
-    <!-- /ko -->
-    <li>
-      ## <a href="javascript:void(0)" data-bind="click: newNotebook"><i class="fa fa-plus" title="${ _('Add a new notebook') }"></i></a>
-    </li>
-  </ul>
-
-  <div class="pull-left" style="padding: 9px">
-    <!-- ko foreach: notebooks -->
-      <!-- ko if: $root.isEditing() -->
-        <span data-bind="editable: description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}" class="muted"></span>
-      <!-- /ko  -->
-      <!-- ko ifnot: $root.isEditing() -->
-        <span data-bind="text: description" class="muted"></span>
-      <!-- /ko  -->
-    <!-- /ko -->
-  </div>
-
 </div>
+
+
 
 <div class="player-toolbar" data-bind="visible: $root.isPlayerMode()" style="display: none;">
   <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
@@ -225,6 +253,10 @@ ${ require.config() }
   <!-- /ko -->
 </div>
 
+</%def>
+
+
+<%def name="commonHTML()">
 
 <div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
@@ -238,7 +270,6 @@ ${ require.config() }
     <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
-
 
 <div id="importGithubModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
@@ -257,13 +288,12 @@ ${ require.config() }
   </div>
 </div>
 
-
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { wasAssistVisible = true; $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
 
 
-<div class="main-content">
+<div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode}">
   <div class="vertical-full container-fluid">
     <div class="vertical-full tab-content" data-bind="foreach: notebooks">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
@@ -1771,7 +1801,11 @@ ${ require.config() }
           viewModel.assistAvailable(isAssistAvailable);
           $(".navigator").show();
           $(".add-snippet").show();
-          $(".main-content").css("top", "70px");
+          % if conf.CUSTOM.BANNER_TOP_HTML.get():
+          $(".main-content").css("top", "112px");
+          %else:
+          $(".main-content").css("top", "82px");
+          %endif
         }
       });
 
