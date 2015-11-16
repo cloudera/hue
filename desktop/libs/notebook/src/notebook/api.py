@@ -259,9 +259,10 @@ def get_history(request):
   response['status'] = 0
   response['history'] = [{
       'name': doc.name,
-      'id': doc.id
-      } for doc in Document2.objects.filter(type='notebook', owner=request.user, is_history=True).order_by('-last_modified')]
-  response['message'] = _('Notebook saved !')
+      'id': doc.id,
+      'data': Notebook(document=doc).get_data()
+      } for doc in Document2.objects.filter(type='notebook', owner=request.user, is_history=True).order_by('-last_modified')[:25]]
+  response['message'] = _('History saved !')
 
   return JsonResponse(response)
 
