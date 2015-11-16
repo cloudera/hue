@@ -88,6 +88,13 @@ body {
 .snippet {
   margin: 10px;
   margin-right: 30px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e5e5;
+  border-radius: 0;
+}
+
+.ace_gutter {
+  background: #F1F1F1;
 }
 
 .snippet-left-bar {

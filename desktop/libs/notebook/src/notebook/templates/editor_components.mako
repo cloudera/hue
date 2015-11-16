@@ -371,7 +371,7 @@ ${ require.config() }
 
 <script type="text/html" id="snippet">
   <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
-    <div data-bind="css: klass, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+    <div class="snippet card card-widget" data-bind="css: {'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
       <div style="position: relative;">
         <div class="snippet-row">
           <div class="snippet-left-bar">

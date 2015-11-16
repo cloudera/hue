@@ -291,9 +291,6 @@
     self.isLoading = ko.computed(function () {
       return self.status() == "loading";
     });
-    self.klass = ko.computed(function () {
-      return "snippet card card-widget" + (self.type() == "text" ? " snippet-text" : "");
-    });
 
     self.resultsKlass = ko.computed(function () {
       return "results " + self.type();

@@ -428,7 +428,3 @@ body.modal-open {
   -ms-transition: border-left-color 0.2s ease;
   transition: border-left-color 0.2s ease;
 }
-
-.active-editor {
-  border-left-color: #3893c2;
-}
