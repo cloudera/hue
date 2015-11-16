@@ -614,8 +614,8 @@ table.airy tr td {
   padding: 4px;
 }
 
-.ace-editor {
-  height: 200px;
+.single-snippet-editor {
+  min-height: 128px;
 }
 
 .ace-filechooser {

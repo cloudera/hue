@@ -491,7 +491,7 @@ ${ require.config() }
 <script type="text/html" id="code-editor-snippet-body">
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="clickForAceFocus: ace">
-      <div class="ace-editor" data-bind="css: {'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+      <div class="ace-editor" data-bind="css: {'single-snippet-editor' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
           aceOptions: {
