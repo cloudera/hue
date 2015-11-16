@@ -222,6 +222,18 @@ def save_notebook(request):
 
   return JsonResponse(response)
 
+@require_GET
+@check_document_access_permission()
+def open_notebook(request):
+  response = {'status': -1}
+
+  notebook_id = request.GET.get('notebook')
+  notebook = Notebook(document=Document2.objects.get(id=notebook_id))
+
+  response['status'] = 0
+  response['notebook'] = notebook.get_json()
+  response['message'] = _('Notebook loaded successfully')
+
 
 @require_POST
 @check_document_access_permission()
