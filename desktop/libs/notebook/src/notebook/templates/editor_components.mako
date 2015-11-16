@@ -130,7 +130,10 @@ ${ require.config() }
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right">
-        %if mode=='editor':
+        %if mode == 'editor':
+        <a class="btn" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+          <i class="fa fa-fw fa-expand"></i>
+        </a>
           % if app_name == 'impala':
           <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
             <i class="fa fa-cogs"></i>
@@ -421,7 +424,7 @@ ${ require.config() }
 
 <script type="text/html" id="snippet">
   <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
-    <div class="snippet card card-widget" data-bind="css: {'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+    <div class="snippet card card-widget" data-bind="css: {'active-editor': inFocus, 'snippet-text' : type() == 'text', 'editor-mode': $root.editorMode}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
       <div style="position: relative;">
         <div class="snippet-row">
           <div class="snippet-left-bar">
@@ -1119,7 +1122,7 @@ ${ require.config() }
     return _width;
   };
 
-  function createDatatable(el, snippet) {
+  function createDatatable(el, snippet, vm) {
     $(el).addClass("dt");
     var _dt = $(el).dataTable({
       "bPaginate": false,
@@ -1132,10 +1135,12 @@ ${ require.config() }
         "sZeroRecords": "${_('No matching records')}"
       },
       "fnDrawCallback": function (oSettings) {
-        $(el).parents(".dataTables_wrapper").jHueTableScroller({
-          maxHeight: 330,
-          heightAfterCorrection: 0
-        });
+        if (vm.availableSnippets().length > 1) { // vm.editorMode is not set yet
+          $(el).parents(".dataTables_wrapper").jHueTableScroller({
+            maxHeight: 330,
+            heightAfterCorrection: 0
+          });
+        }
 
         $(el).jHueTableExtender({
           fixedHeader: true,
@@ -1159,10 +1164,12 @@ ${ require.config() }
         }
       ]
     });
-    $(el).parents(".dataTables_wrapper").jHueTableScroller({
-      maxHeight: 330,
-      heightAfterCorrection: 0
-    });
+    if (vm.availableSnippets().length > 1) {
+      $(el).parents(".dataTables_wrapper").jHueTableScroller({
+        maxHeight: 330,
+        heightAfterCorrection: 0
+      });
+    }
 
     $(el).jHueTableExtender({
       fixedHeader: true,
@@ -1173,22 +1180,27 @@ ${ require.config() }
     $(".dataTables_filter").hide();
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
-    dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
-      if ($(el).closest(".results").css("overflow") == "hidden") {
-        return;
-      }
-      var _e = e.originalEvent,
-          _deltaX = _e.wheelDeltaX || -_e.deltaX,
-          _deltaY = _e.wheelDeltaY || -_e.deltaY;
-      this.scrollTop += -_deltaY / 2;
-      this.scrollLeft += -_deltaX / 2;
+    if (vm.availableSnippets().length > 1) {
+      dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
+        if ($(el).closest(".results").css("overflow") == "hidden") {
+          return;
+        }
+        var _e = e.originalEvent,
+            _deltaX = _e.wheelDeltaX || -_e.deltaX,
+            _deltaY = _e.wheelDeltaY || -_e.deltaY;
+        this.scrollTop += -_deltaY / 2;
+        this.scrollLeft += -_deltaX / 2;
 
-      if (this.scrollTop == 0) {
-        $("body")[0].scrollTop += -_deltaY / 3;
-        $("html")[0].scrollTop += -_deltaY / 3; // for firefox
-      }
-      e.preventDefault();
-    });
+        if (this.scrollTop == 0) {
+          $("body")[0].scrollTop += -_deltaY / 3;
+          $("html")[0].scrollTop += -_deltaY / 3; // for firefox
+        }
+        e.preventDefault();
+      });
+    }
+    else {
+      dataTableEl = $(".right-panel");
+    }
 
     var _scrollTimeout = -1;
     dataTableEl.on("scroll", function () {
@@ -1830,11 +1842,13 @@ ${ require.config() }
         return false;
       });
 
-      $(window).bind("keydown", "ctrl+n alt+n meta+n", function (e) {
-        e.preventDefault();
-        viewModel.selectedNotebook().newSnippet();
-        return false;
-      });
+      if (!viewModel.editorMode) {
+        $(window).bind("keydown", "ctrl+n alt+n meta+n", function (e) {
+          e.preventDefault();
+          viewModel.selectedNotebook().newSnippet();
+          return false;
+        });
+      }
 
       var initialResizePosition = 100;
 
@@ -1912,6 +1926,9 @@ ${ require.config() }
           "height": (_dtElement.height() - 30) + "px",
           "line-height": (_dtElement.height() - 30) + "px"
         });
+        if (viewModel.availableSnippets().length === 1) {
+          $(".right-panel").jHueScrollUp();
+        }
       }
 
       $(document).on("renderData", function (e, options) {
@@ -1922,13 +1939,16 @@ ${ require.config() }
             if (options.initial) {
               options.snippet.result.meta.notifySubscribers();
               $("#snippet_" + options.snippet.id()).find("select").trigger("chosen:updated");
-              _dt = createDatatable(_el, options.snippet);
+              _dt = createDatatable(_el, options.snippet, viewModel);
             }
             else {
               _dt = _el.dataTable();
             }
             _dt.fnAddData(options.data);
             var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+            if (viewModel.availableSnippets().length === 1) {
+              _dtElement = $(".right-panel");
+            }
             _dtElement.animate({opacity: '1'}, 50);
             _dtElement.scrollTop(_dtElement.data("scrollPosition"));
             redrawFixedHeaders();
@@ -1937,16 +1957,28 @@ ${ require.config() }
         }
         else {
           var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+          if (viewModel.availableSnippets().length === 1) {
+            _dtElement = $(".right-panel");
+          }
           _dtElement.animate({opacity: '1'}, 50);
           _dtElement.off("scroll");
+          if (viewModel.availableSnippets().length === 1) {
+            _dtElement.jHueScrollUp();
+          }
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
       });
 
       $(document).on("renderDataError", function (e, options) {
         var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
+        if (viewModel.availableSnippets().length === 1) {
+          _dtElement = $(".right-panel");
+        }
         _dtElement.animate({opacity: '1'}, 50);
         _dtElement.off("scroll");
+        if (viewModel.availableSnippets().length === 1) {
+          _dtElement.jHueScrollUp();
+        }
       });
 
       $(document).on("progress", function (e, options) {
@@ -2010,7 +2042,7 @@ ${ require.config() }
                 var _el = $("#snippet_" + snippet.id()).find(".resultTable");
                 if ($("#snippet_" + snippet.id()).find(".resultTable").length > 0) {
                   try {
-                    var _dt = createDatatable(_el, snippet);
+                    var _dt = createDatatable(_el, snippet, viewModel);
                     _dt.fnClearTable();
                     _dt.fnAddData(snippet.result.data());
                     resizeToggleResultSettings(snippet);
