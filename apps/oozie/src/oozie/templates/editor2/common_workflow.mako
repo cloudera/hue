@@ -298,19 +298,20 @@
       </a>
       <ul data-bind="foreach: children" class="unstyled">
         <li>
-          ${ _('If') } <input type="text" data-bind="value: $data['condition']" />
+          ${ _('If') } <input type="text" class="input-medium" data-bind="value: $data['condition']" />
           ${ _('go to') }
           <select data-bind="options: $root.workflow.nodeIds,
                      optionsText: function(item) {return $root.workflow.nodeNamesMapping()[item]; },
-                     value: $data['to']
+                     value: $data['to'],
+                     event: { change: function(){ $(document).trigger('drawArrows') } }
                      ">
           </select>
-          <a class="pointer" data-bind="click: function(){ $parent.children.remove(this);}">
+          <a class="pointer" data-bind="click: function(){ $parent.children.remove(this); $(document).trigger('drawArrows')}">
             <i class="fa fa-minus"></i>
           </a>
         </li>
       </ul>
-      <a class="pointer" data-bind="click: function(){ children.push({'to': '', 'condition': '${'${'} 1 gt 0 }'});}">
+      <a class="pointer" data-bind="click: function(){ children.push({'to': '', 'condition': '${'${'} 1 gt 0 }'}); $(document).trigger('drawArrows')}">
         ${ _('Jump to another node') } <i class="fa fa-plus"></i>
       </a>
     </div>

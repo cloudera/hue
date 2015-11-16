@@ -565,7 +565,7 @@ ${ dashboard.import_bindings() }
       var $el = $(this);
       if (!$el.is("a") && !$el.is("input") && !$el.is("i") && !$el.is("button")) {
         var w = ko.dataFor($el.parents(".card-widget")[0]);
-        if (!w.oozieExpanded() && !w.ooziePropertiesExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget", "decision-widget"].indexOf(w.widgetType()) == -1 && $el.width() < 500){
+        if (!w.oozieExpanded() && !w.ooziePropertiesExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget"].indexOf(w.widgetType()) == -1 && $el.width() < 500){
           $el.addClass("zoom-in");
         }
       }
@@ -576,7 +576,7 @@ ${ dashboard.import_bindings() }
   var lastExpandedWidget = null;
   function setLastExpandedWidget(widget) {
     lastExpandedWidget = widget;
-    if (! widget.oozieExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget", "decision-widget"].indexOf(widget.widgetType()) == -1){
+    if (! widget.oozieExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget"].indexOf(widget.widgetType()) == -1){
       var _el = $("#wdg_" + widget.id());
       _el.find(".widget-main-section").removeClass("zoom-in");
       if (_el.width() < 500){
