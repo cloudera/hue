@@ -1773,6 +1773,7 @@
       var options = ko.unwrap(valueAccessor());
       var snippet = options.snippet;
       var assistHelper = snippet.getAssistHelper();
+      var aceOptions = options.aceOptions || {};
 
       $el.text(snippet.statement_raw());
 
@@ -1814,8 +1815,7 @@
         maxLines: 25
       };
 
-      var userOptions = $.totalStorage("hue.ace.options") || {};
-      $.extend(editorOptions, userOptions);
+      $.extend(editorOptions, aceOptions);
 
       editor.setOptions(editorOptions);
 

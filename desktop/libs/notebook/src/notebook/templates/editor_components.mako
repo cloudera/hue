@@ -481,7 +481,11 @@ ${ require.config() }
     <div class="editor span12" data-bind="clickForAceFocus: ace">
       <div class="ace-editor" data-bind="css: {'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
           snippet: $data,
-          openIt: '${ _ko("Alt or Ctrl + Click to open it") }'
+          openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
+          aceOptions: {
+            showLineNumbers: $root.editorMode,
+            showGutter: $root.editorMode
+          }
         }"></div>
       </div>
     <div class="clearfix"></div>
