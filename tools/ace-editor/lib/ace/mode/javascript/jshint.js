@@ -349,1556 +349,1560 @@ module.exports = {
   asciiIdentifierPartTable: identifierPartTable
 };
 
-},{}],"/node_modules/jshint/node_modules/underscore/underscore.js":[function(_dereq_,module,exports){
-//     Underscore.js 1.8.3
-//     http://underscorejs.org
-//     (c) 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-//     Underscore may be freely distributed under the MIT license.
+},{}],"/node_modules/jshint/lodash.js":[function(_dereq_,module,exports){
+(function (global){
+;(function() {
 
-(function() {
+  var undefined;
 
-  // Baseline setup
-  // --------------
+  var VERSION = '3.7.0';
 
-  // Establish the root object, `window` in the browser, or `exports` on the server.
-  var root = this;
+  var FUNC_ERROR_TEXT = 'Expected a function';
 
-  // Save the previous value of the `_` variable.
-  var previousUnderscore = root._;
+  var argsTag = '[object Arguments]',
+      arrayTag = '[object Array]',
+      boolTag = '[object Boolean]',
+      dateTag = '[object Date]',
+      errorTag = '[object Error]',
+      funcTag = '[object Function]',
+      mapTag = '[object Map]',
+      numberTag = '[object Number]',
+      objectTag = '[object Object]',
+      regexpTag = '[object RegExp]',
+      setTag = '[object Set]',
+      stringTag = '[object String]',
+      weakMapTag = '[object WeakMap]';
 
-  // Save bytes in the minified (but not gzipped) version:
-  var ArrayProto = Array.prototype, ObjProto = Object.prototype, FuncProto = Function.prototype;
+  var arrayBufferTag = '[object ArrayBuffer]',
+      float32Tag = '[object Float32Array]',
+      float64Tag = '[object Float64Array]',
+      int8Tag = '[object Int8Array]',
+      int16Tag = '[object Int16Array]',
+      int32Tag = '[object Int32Array]',
+      uint8Tag = '[object Uint8Array]',
+      uint8ClampedTag = '[object Uint8ClampedArray]',
+      uint16Tag = '[object Uint16Array]',
+      uint32Tag = '[object Uint32Array]';
 
-  // Create quick reference variables for speed access to core prototypes.
-  var
-    push             = ArrayProto.push,
-    slice            = ArrayProto.slice,
-    toString         = ObjProto.toString,
-    hasOwnProperty   = ObjProto.hasOwnProperty;
+  var reIsDeepProp = /\.|\[(?:[^[\]]+|(["'])(?:(?!\1)[^\n\\]|\\.)*?)\1\]/,
+      reIsPlainProp = /^\w*$/,
+      rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\n\\]|\\.)*?)\2)\]/g;
 
-  // All **ECMAScript 5** native function implementations that we hope to use
-  // are declared here.
-  var
-    nativeIsArray      = Array.isArray,
-    nativeKeys         = Object.keys,
-    nativeBind         = FuncProto.bind,
-    nativeCreate       = Object.create;
+  var reRegExpChars = /[.*+?^${}()|[\]\/\\]/g,
+      reHasRegExpChars = RegExp(reRegExpChars.source);
 
-  // Naked function reference for surrogate-prototype-swapping.
-  var Ctor = function(){};
+  var reEscapeChar = /\\(\\)?/g;
 
-  // Create a safe reference to the Underscore object for use below.
-  var _ = function(obj) {
-    if (obj instanceof _) return obj;
-    if (!(this instanceof _)) return new _(obj);
-    this._wrapped = obj;
+  var reFlags = /\w*$/;
+
+  var reIsHostCtor = /^\[object .+?Constructor\]$/;
+
+  var typedArrayTags = {};
+  typedArrayTags[float32Tag] = typedArrayTags[float64Tag] =
+  typedArrayTags[int8Tag] = typedArrayTags[int16Tag] =
+  typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] =
+  typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] =
+  typedArrayTags[uint32Tag] = true;
+  typedArrayTags[argsTag] = typedArrayTags[arrayTag] =
+  typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] =
+  typedArrayTags[dateTag] = typedArrayTags[errorTag] =
+  typedArrayTags[funcTag] = typedArrayTags[mapTag] =
+  typedArrayTags[numberTag] = typedArrayTags[objectTag] =
+  typedArrayTags[regexpTag] = typedArrayTags[setTag] =
+  typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
+
+  var cloneableTags = {};
+  cloneableTags[argsTag] = cloneableTags[arrayTag] =
+  cloneableTags[arrayBufferTag] = cloneableTags[boolTag] =
+  cloneableTags[dateTag] = cloneableTags[float32Tag] =
+  cloneableTags[float64Tag] = cloneableTags[int8Tag] =
+  cloneableTags[int16Tag] = cloneableTags[int32Tag] =
+  cloneableTags[numberTag] = cloneableTags[objectTag] =
+  cloneableTags[regexpTag] = cloneableTags[stringTag] =
+  cloneableTags[uint8Tag] = cloneableTags[uint8ClampedTag] =
+  cloneableTags[uint16Tag] = cloneableTags[uint32Tag] = true;
+  cloneableTags[errorTag] = cloneableTags[funcTag] =
+  cloneableTags[mapTag] = cloneableTags[setTag] =
+  cloneableTags[weakMapTag] = false;
+
+  var objectTypes = {
+    'function': true,
+    'object': true
   };
 
-  // Export the Underscore object for **Node.js**, with
-  // backwards-compatibility for the old `require()` API. If we're in
-  // the browser, add `_` as a global object.
-  if (typeof exports !== 'undefined') {
-    if (typeof module !== 'undefined' && module.exports) {
-      exports = module.exports = _;
+  var freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports;
+
+  var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
+
+  var freeGlobal = freeExports && freeModule && typeof global == 'object' && global && global.Object && global;
+
+  var freeSelf = objectTypes[typeof self] && self && self.Object && self;
+
+  var freeWindow = objectTypes[typeof window] && window && window.Object && window;
+
+  var moduleExports = freeModule && freeModule.exports === freeExports && freeExports;
+
+  var root = freeGlobal || ((freeWindow !== (this && this.window)) && freeWindow) || freeSelf || this;
+
+  function baseFindIndex(array, predicate, fromRight) {
+    var length = array.length,
+        index = fromRight ? length : -1;
+
+    while ((fromRight ? index-- : ++index < length)) {
+      if (predicate(array[index], index, array)) {
+        return index;
+      }
     }
-    exports._ = _;
-  } else {
-    root._ = _;
+    return -1;
   }
 
-  // Current version.
-  _.VERSION = '1.8.3';
-
-  // Internal function that returns an efficient (for current engines) version
-  // of the passed-in callback, to be repeatedly applied in other Underscore
-  // functions.
-  var optimizeCb = function(func, context, argCount) {
-    if (context === void 0) return func;
-    switch (argCount == null ? 3 : argCount) {
-      case 1: return function(value) {
-        return func.call(context, value);
-      };
-      case 2: return function(value, other) {
-        return func.call(context, value, other);
-      };
-      case 3: return function(value, index, collection) {
-        return func.call(context, value, index, collection);
-      };
-      case 4: return function(accumulator, value, index, collection) {
-        return func.call(context, accumulator, value, index, collection);
-      };
+  function baseIndexOf(array, value, fromIndex) {
+    if (value !== value) {
+      return indexOfNaN(array, fromIndex);
     }
-    return function() {
-      return func.apply(context, arguments);
-    };
-  };
+    var index = fromIndex - 1,
+        length = array.length;
 
-  // A mostly-internal function to generate callbacks that can be applied
-  // to each element in a collection, returning the desired result — either
-  // identity, an arbitrary callback, a property matcher, or a property accessor.
-  var cb = function(value, context, argCount) {
-    if (value == null) return _.identity;
-    if (_.isFunction(value)) return optimizeCb(value, context, argCount);
-    if (_.isObject(value)) return _.matcher(value);
-    return _.property(value);
-  };
-  _.iteratee = function(value, context) {
-    return cb(value, context, Infinity);
-  };
-
-  // An internal function for creating assigner functions.
-  var createAssigner = function(keysFunc, undefinedOnly) {
-    return function(obj) {
-      var length = arguments.length;
-      if (length < 2 || obj == null) return obj;
-      for (var index = 1; index < length; index++) {
-        var source = arguments[index],
-            keys = keysFunc(source),
-            l = keys.length;
-        for (var i = 0; i < l; i++) {
-          var key = keys[i];
-          if (!undefinedOnly || obj[key] === void 0) obj[key] = source[key];
-        }
+    while (++index < length) {
+      if (array[index] === value) {
+        return index;
       }
-      return obj;
-    };
-  };
+    }
+    return -1;
+  }
 
-  // An internal function for creating a new object that inherits from another.
-  var baseCreate = function(prototype) {
-    if (!_.isObject(prototype)) return {};
-    if (nativeCreate) return nativeCreate(prototype);
-    Ctor.prototype = prototype;
-    var result = new Ctor;
-    Ctor.prototype = null;
+  function baseIsFunction(value) {
+    return typeof value == 'function' || false;
+  }
+
+  function baseToString(value) {
+    if (typeof value == 'string') {
+      return value;
+    }
+    return value == null ? '' : (value + '');
+  }
+
+  function indexOfNaN(array, fromIndex, fromRight) {
+    var length = array.length,
+        index = fromIndex + (fromRight ? 0 : -1);
+
+    while ((fromRight ? index-- : ++index < length)) {
+      var other = array[index];
+      if (other !== other) {
+        return index;
+      }
+    }
+    return -1;
+  }
+
+  function isObjectLike(value) {
+    return !!value && typeof value == 'object';
+  }
+
+  var arrayProto = Array.prototype,
+      objectProto = Object.prototype;
+
+  var fnToString = Function.prototype.toString;
+
+  var hasOwnProperty = objectProto.hasOwnProperty;
+
+  var objToString = objectProto.toString;
+
+  var reIsNative = RegExp('^' +
+    escapeRegExp(objToString)
+    .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+  );
+
+  var ArrayBuffer = isNative(ArrayBuffer = root.ArrayBuffer) && ArrayBuffer,
+      bufferSlice = isNative(bufferSlice = ArrayBuffer && new ArrayBuffer(0).slice) && bufferSlice,
+      floor = Math.floor,
+      getOwnPropertySymbols = isNative(getOwnPropertySymbols = Object.getOwnPropertySymbols) && getOwnPropertySymbols,
+      getPrototypeOf = isNative(getPrototypeOf = Object.getPrototypeOf) && getPrototypeOf,
+      push = arrayProto.push,
+      preventExtensions = isNative(Object.preventExtensions = Object.preventExtensions) && preventExtensions,
+      propertyIsEnumerable = objectProto.propertyIsEnumerable,
+      Uint8Array = isNative(Uint8Array = root.Uint8Array) && Uint8Array;
+
+  var Float64Array = (function() {
+    try {
+      var func = isNative(func = root.Float64Array) && func,
+          result = new func(new ArrayBuffer(10), 0, 1) && func;
+    } catch(e) {}
     return result;
-  };
+  }());
 
-  var property = function(key) {
-    return function(obj) {
-      return obj == null ? void 0 : obj[key];
-    };
-  };
+  var nativeAssign = (function() {
+    var object = { '1': 0 },
+        func = preventExtensions && isNative(func = Object.assign) && func;
 
-  // Helper for collection methods to determine whether a collection
-  // should be iterated as an array or as an object
-  // Related: http://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
-  // Avoids a very nasty iOS 8 JIT bug on ARM-64. #2094
-  var MAX_ARRAY_INDEX = Math.pow(2, 53) - 1;
-  var getLength = property('length');
-  var isArrayLike = function(collection) {
-    var length = getLength(collection);
-    return typeof length == 'number' && length >= 0 && length <= MAX_ARRAY_INDEX;
-  };
+    try { func(preventExtensions(object), 'xo'); } catch(e) {}
+    return !object[1] && func;
+  }());
 
-  // Collection Functions
-  // --------------------
+  var nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray,
+      nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys,
+      nativeMax = Math.max,
+      nativeMin = Math.min;
 
-  // The cornerstone, an `each` implementation, aka `forEach`.
-  // Handles raw objects in addition to array-likes. Treats all
-  // sparse array-likes as if they were dense.
-  _.each = _.forEach = function(obj, iteratee, context) {
-    iteratee = optimizeCb(iteratee, context);
-    var i, length;
-    if (isArrayLike(obj)) {
-      for (i = 0, length = obj.length; i < length; i++) {
-        iteratee(obj[i], i, obj);
-      }
-    } else {
-      var keys = _.keys(obj);
-      for (i = 0, length = keys.length; i < length; i++) {
-        iteratee(obj[keys[i]], keys[i], obj);
-      }
-    }
-    return obj;
-  };
+  var NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
 
-  // Return the results of applying the iteratee to each element.
-  _.map = _.collect = function(obj, iteratee, context) {
-    iteratee = cb(iteratee, context);
-    var keys = !isArrayLike(obj) && _.keys(obj),
-        length = (keys || obj).length,
-        results = Array(length);
-    for (var index = 0; index < length; index++) {
-      var currentKey = keys ? keys[index] : index;
-      results[index] = iteratee(obj[currentKey], currentKey, obj);
-    }
-    return results;
-  };
+  var MAX_ARRAY_LENGTH = Math.pow(2, 32) - 1,
+      MAX_ARRAY_INDEX =  MAX_ARRAY_LENGTH - 1,
+      HALF_MAX_ARRAY_LENGTH = MAX_ARRAY_LENGTH >>> 1;
 
-  // Create a reducing function iterating left or right.
-  function createReduce(dir) {
-    // Optimized iterator function as using arguments.length
-    // in the main function will deoptimize the, see #1991.
-    function iterator(obj, iteratee, memo, keys, index, length) {
-      for (; index >= 0 && index < length; index += dir) {
-        var currentKey = keys ? keys[index] : index;
-        memo = iteratee(memo, obj[currentKey], currentKey, obj);
-      }
-      return memo;
-    }
+  var FLOAT64_BYTES_PER_ELEMENT = Float64Array ? Float64Array.BYTES_PER_ELEMENT : 0;
 
-    return function(obj, iteratee, memo, context) {
-      iteratee = optimizeCb(iteratee, context, 4);
-      var keys = !isArrayLike(obj) && _.keys(obj),
-          length = (keys || obj).length,
-          index = dir > 0 ? 0 : length - 1;
-      // Determine the initial value if none is provided.
-      if (arguments.length < 3) {
-        memo = obj[keys ? keys[index] : index];
-        index += dir;
-      }
-      return iterator(obj, iteratee, memo, keys, index, length);
-    };
+  var MAX_SAFE_INTEGER = Math.pow(2, 53) - 1;
+
+  function lodash() {
   }
 
-  // **Reduce** builds up a single result from a list of values, aka `inject`,
-  // or `foldl`.
-  _.reduce = _.foldl = _.inject = createReduce(1);
+  var support = lodash.support = {};
 
-  // The right-associative version of reduce, also known as `foldr`.
-  _.reduceRight = _.foldr = createReduce(-1);
+  (function(x) {
+    var Ctor = function() { this.x = x; },
+        object = { '0': x, 'length': x },
+        props = [];
 
-  // Return the first value which passes a truth test. Aliased as `detect`.
-  _.find = _.detect = function(obj, predicate, context) {
-    var key;
-    if (isArrayLike(obj)) {
-      key = _.findIndex(obj, predicate, context);
-    } else {
-      key = _.findKey(obj, predicate, context);
+    Ctor.prototype = { 'valueOf': x, 'y': x };
+    for (var key in new Ctor) { props.push(key); }
+
+    support.funcDecomp = /\bthis\b/.test(function() { return this; });
+
+    support.funcNames = typeof Function.name == 'string';
+
+    try {
+      support.nonEnumArgs = !propertyIsEnumerable.call(arguments, 1);
+    } catch(e) {
+      support.nonEnumArgs = true;
     }
-    if (key !== void 0 && key !== -1) return obj[key];
-  };
+  }(1, 0));
 
-  // Return all the elements that pass a truth test.
-  // Aliased as `select`.
-  _.filter = _.select = function(obj, predicate, context) {
-    var results = [];
-    predicate = cb(predicate, context);
-    _.each(obj, function(value, index, list) {
-      if (predicate(value, index, list)) results.push(value);
-    });
-    return results;
-  };
+  function arrayCopy(source, array) {
+    var index = -1,
+        length = source.length;
 
-  // Return all the elements for which a truth test fails.
-  _.reject = function(obj, predicate, context) {
-    return _.filter(obj, _.negate(cb(predicate)), context);
-  };
-
-  // Determine whether all of the elements match a truth test.
-  // Aliased as `all`.
-  _.every = _.all = function(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var keys = !isArrayLike(obj) && _.keys(obj),
-        length = (keys || obj).length;
-    for (var index = 0; index < length; index++) {
-      var currentKey = keys ? keys[index] : index;
-      if (!predicate(obj[currentKey], currentKey, obj)) return false;
+    array || (array = Array(length));
+    while (++index < length) {
+      array[index] = source[index];
     }
-    return true;
-  };
+    return array;
+  }
 
-  // Determine if at least one element in the object matches a truth test.
-  // Aliased as `any`.
-  _.some = _.any = function(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var keys = !isArrayLike(obj) && _.keys(obj),
-        length = (keys || obj).length;
-    for (var index = 0; index < length; index++) {
-      var currentKey = keys ? keys[index] : index;
-      if (predicate(obj[currentKey], currentKey, obj)) return true;
+  function arrayEach(array, iteratee) {
+    var index = -1,
+        length = array.length;
+
+    while (++index < length) {
+      if (iteratee(array[index], index, array) === false) {
+        break;
+      }
+    }
+    return array;
+  }
+
+  function arrayFilter(array, predicate) {
+    var index = -1,
+        length = array.length,
+        resIndex = -1,
+        result = [];
+
+    while (++index < length) {
+      var value = array[index];
+      if (predicate(value, index, array)) {
+        result[++resIndex] = value;
+      }
+    }
+    return result;
+  }
+
+  function arrayMap(array, iteratee) {
+    var index = -1,
+        length = array.length,
+        result = Array(length);
+
+    while (++index < length) {
+      result[index] = iteratee(array[index], index, array);
+    }
+    return result;
+  }
+
+  function arrayMax(array) {
+    var index = -1,
+        length = array.length,
+        result = NEGATIVE_INFINITY;
+
+    while (++index < length) {
+      var value = array[index];
+      if (value > result) {
+        result = value;
+      }
+    }
+    return result;
+  }
+
+  function arraySome(array, predicate) {
+    var index = -1,
+        length = array.length;
+
+    while (++index < length) {
+      if (predicate(array[index], index, array)) {
+        return true;
+      }
     }
     return false;
-  };
+  }
 
-  // Determine if the array or object contains a given item (using `===`).
-  // Aliased as `includes` and `include`.
-  _.contains = _.includes = _.include = function(obj, item, fromIndex, guard) {
-    if (!isArrayLike(obj)) obj = _.values(obj);
-    if (typeof fromIndex != 'number' || guard) fromIndex = 0;
-    return _.indexOf(obj, item, fromIndex) >= 0;
-  };
+  function assignWith(object, source, customizer) {
+    var props = keys(source);
+    push.apply(props, getSymbols(source));
 
-  // Invoke a method (with arguments) on every item in a collection.
-  _.invoke = function(obj, method) {
-    var args = slice.call(arguments, 2);
-    var isFunc = _.isFunction(method);
-    return _.map(obj, function(value) {
-      var func = isFunc ? method : value[method];
-      return func == null ? func : func.apply(value, args);
-    });
-  };
+    var index = -1,
+        length = props.length;
 
-  // Convenience version of a common use case of `map`: fetching a property.
-  _.pluck = function(obj, key) {
-    return _.map(obj, _.property(key));
-  };
+    while (++index < length) {
+      var key = props[index],
+          value = object[key],
+          result = customizer(value, source[key], key, object, source);
 
-  // Convenience version of a common use case of `filter`: selecting only objects
-  // containing specific `key:value` pairs.
-  _.where = function(obj, attrs) {
-    return _.filter(obj, _.matcher(attrs));
-  };
-
-  // Convenience version of a common use case of `find`: getting the first object
-  // containing specific `key:value` pairs.
-  _.findWhere = function(obj, attrs) {
-    return _.find(obj, _.matcher(attrs));
-  };
-
-  // Return the maximum element (or element-based computation).
-  _.max = function(obj, iteratee, context) {
-    var result = -Infinity, lastComputed = -Infinity,
-        value, computed;
-    if (iteratee == null && obj != null) {
-      obj = isArrayLike(obj) ? obj : _.values(obj);
-      for (var i = 0, length = obj.length; i < length; i++) {
-        value = obj[i];
-        if (value > result) {
-          result = value;
-        }
+      if ((result === result ? (result !== value) : (value === value)) ||
+          (value === undefined && !(key in object))) {
+        object[key] = result;
       }
-    } else {
-      iteratee = cb(iteratee, context);
-      _.each(obj, function(value, index, list) {
-        computed = iteratee(value, index, list);
-        if (computed > lastComputed || computed === -Infinity && result === -Infinity) {
-          result = value;
-          lastComputed = computed;
-        }
-      });
     }
-    return result;
+    return object;
+  }
+
+  var baseAssign = nativeAssign || function(object, source) {
+    return source == null
+      ? object
+      : baseCopy(source, getSymbols(source), baseCopy(source, keys(source), object));
   };
 
-  // Return the minimum element (or element-based computation).
-  _.min = function(obj, iteratee, context) {
-    var result = Infinity, lastComputed = Infinity,
-        value, computed;
-    if (iteratee == null && obj != null) {
-      obj = isArrayLike(obj) ? obj : _.values(obj);
-      for (var i = 0, length = obj.length; i < length; i++) {
-        value = obj[i];
-        if (value < result) {
-          result = value;
-        }
-      }
-    } else {
-      iteratee = cb(iteratee, context);
-      _.each(obj, function(value, index, list) {
-        computed = iteratee(value, index, list);
-        if (computed < lastComputed || computed === Infinity && result === Infinity) {
-          result = value;
-          lastComputed = computed;
-        }
-      });
+  function baseCopy(source, props, object) {
+    object || (object = {});
+
+    var index = -1,
+        length = props.length;
+
+    while (++index < length) {
+      var key = props[index];
+      object[key] = source[key];
     }
-    return result;
-  };
+    return object;
+  }
 
-  // Shuffle a collection, using the modern version of the
-  // [Fisher-Yates shuffle](http://en.wikipedia.org/wiki/Fisher–Yates_shuffle).
-  _.shuffle = function(obj) {
-    var set = isArrayLike(obj) ? obj : _.values(obj);
-    var length = set.length;
-    var shuffled = Array(length);
-    for (var index = 0, rand; index < length; index++) {
-      rand = _.random(0, index);
-      if (rand !== index) shuffled[index] = shuffled[rand];
-      shuffled[rand] = set[index];
+  function baseCallback(func, thisArg, argCount) {
+    var type = typeof func;
+    if (type == 'function') {
+      return thisArg === undefined
+        ? func
+        : bindCallback(func, thisArg, argCount);
     }
-    return shuffled;
-  };
-
-  // Sample **n** random values from a collection.
-  // If **n** is not specified, returns a single random element.
-  // The internal `guard` argument allows it to work with `map`.
-  _.sample = function(obj, n, guard) {
-    if (n == null || guard) {
-      if (!isArrayLike(obj)) obj = _.values(obj);
-      return obj[_.random(obj.length - 1)];
+    if (func == null) {
+      return identity;
     }
-    return _.shuffle(obj).slice(0, Math.max(0, n));
-  };
+    if (type == 'object') {
+      return baseMatches(func);
+    }
+    return thisArg === undefined
+      ? property(func)
+      : baseMatchesProperty(func, thisArg);
+  }
 
-  // Sort the object's values by a criterion produced by an iteratee.
-  _.sortBy = function(obj, iteratee, context) {
-    iteratee = cb(iteratee, context);
-    return _.pluck(_.map(obj, function(value, index, list) {
-      return {
-        value: value,
-        index: index,
-        criteria: iteratee(value, index, list)
-      };
-    }).sort(function(left, right) {
-      var a = left.criteria;
-      var b = right.criteria;
-      if (a !== b) {
-        if (a > b || a === void 0) return 1;
-        if (a < b || b === void 0) return -1;
-      }
-      return left.index - right.index;
-    }), 'value');
-  };
-
-  // An internal function used for aggregate "group by" operations.
-  var group = function(behavior) {
-    return function(obj, iteratee, context) {
-      var result = {};
-      iteratee = cb(iteratee, context);
-      _.each(obj, function(value, index) {
-        var key = iteratee(value, index, obj);
-        behavior(result, value, key);
-      });
+  function baseClone(value, isDeep, customizer, key, object, stackA, stackB) {
+    var result;
+    if (customizer) {
+      result = object ? customizer(value, key, object) : customizer(value);
+    }
+    if (result !== undefined) {
       return result;
-    };
-  };
+    }
+    if (!isObject(value)) {
+      return value;
+    }
+    var isArr = isArray(value);
+    if (isArr) {
+      result = initCloneArray(value);
+      if (!isDeep) {
+        return arrayCopy(value, result);
+      }
+    } else {
+      var tag = objToString.call(value),
+          isFunc = tag == funcTag;
 
-  // Groups the object's values by a criterion. Pass either a string attribute
-  // to group by, or a function that returns the criterion.
-  _.groupBy = group(function(result, value, key) {
-    if (_.has(result, key)) result[key].push(value); else result[key] = [value];
-  });
-
-  // Indexes the object's values by a criterion, similar to `groupBy`, but for
-  // when you know that your index values will be unique.
-  _.indexBy = group(function(result, value, key) {
-    result[key] = value;
-  });
-
-  // Counts instances of an object that group by a certain criterion. Pass
-  // either a string attribute to count by, or a function that returns the
-  // criterion.
-  _.countBy = group(function(result, value, key) {
-    if (_.has(result, key)) result[key]++; else result[key] = 1;
-  });
-
-  // Safely create a real, live array from anything iterable.
-  _.toArray = function(obj) {
-    if (!obj) return [];
-    if (_.isArray(obj)) return slice.call(obj);
-    if (isArrayLike(obj)) return _.map(obj, _.identity);
-    return _.values(obj);
-  };
-
-  // Return the number of elements in an object.
-  _.size = function(obj) {
-    if (obj == null) return 0;
-    return isArrayLike(obj) ? obj.length : _.keys(obj).length;
-  };
-
-  // Split a collection into two arrays: one whose elements all satisfy the given
-  // predicate, and one whose elements all do not satisfy the predicate.
-  _.partition = function(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var pass = [], fail = [];
-    _.each(obj, function(value, key, obj) {
-      (predicate(value, key, obj) ? pass : fail).push(value);
-    });
-    return [pass, fail];
-  };
-
-  // Array Functions
-  // ---------------
-
-  // Get the first element of an array. Passing **n** will return the first N
-  // values in the array. Aliased as `head` and `take`. The **guard** check
-  // allows it to work with `_.map`.
-  _.first = _.head = _.take = function(array, n, guard) {
-    if (array == null) return void 0;
-    if (n == null || guard) return array[0];
-    return _.initial(array, array.length - n);
-  };
-
-  // Returns everything but the last entry of the array. Especially useful on
-  // the arguments object. Passing **n** will return all the values in
-  // the array, excluding the last N.
-  _.initial = function(array, n, guard) {
-    return slice.call(array, 0, Math.max(0, array.length - (n == null || guard ? 1 : n)));
-  };
-
-  // Get the last element of an array. Passing **n** will return the last N
-  // values in the array.
-  _.last = function(array, n, guard) {
-    if (array == null) return void 0;
-    if (n == null || guard) return array[array.length - 1];
-    return _.rest(array, Math.max(0, array.length - n));
-  };
-
-  // Returns everything but the first entry of the array. Aliased as `tail` and `drop`.
-  // Especially useful on the arguments object. Passing an **n** will return
-  // the rest N values in the array.
-  _.rest = _.tail = _.drop = function(array, n, guard) {
-    return slice.call(array, n == null || guard ? 1 : n);
-  };
-
-  // Trim out all falsy values from an array.
-  _.compact = function(array) {
-    return _.filter(array, _.identity);
-  };
-
-  // Internal implementation of a recursive `flatten` function.
-  var flatten = function(input, shallow, strict, startIndex) {
-    var output = [], idx = 0;
-    for (var i = startIndex || 0, length = getLength(input); i < length; i++) {
-      var value = input[i];
-      if (isArrayLike(value) && (_.isArray(value) || _.isArguments(value))) {
-        //flatten current level of array or arguments object
-        if (!shallow) value = flatten(value, shallow, strict);
-        var j = 0, len = value.length;
-        output.length += len;
-        while (j < len) {
-          output[idx++] = value[j++];
+      if (tag == objectTag || tag == argsTag || (isFunc && !object)) {
+        result = initCloneObject(isFunc ? {} : value);
+        if (!isDeep) {
+          return baseAssign(result, value);
         }
-      } else if (!strict) {
-        output[idx++] = value;
+      } else {
+        return cloneableTags[tag]
+          ? initCloneByTag(value, tag, isDeep)
+          : (object ? value : {});
       }
     }
-    return output;
-  };
+    stackA || (stackA = []);
+    stackB || (stackB = []);
 
-  // Flatten out an array, either recursively (by default), or just one level.
-  _.flatten = function(array, shallow) {
-    return flatten(array, shallow, false);
-  };
-
-  // Return a version of the array that does not contain the specified value(s).
-  _.without = function(array) {
-    return _.difference(array, slice.call(arguments, 1));
-  };
-
-  // Produce a duplicate-free version of the array. If the array has already
-  // been sorted, you have the option of using a faster algorithm.
-  // Aliased as `unique`.
-  _.uniq = _.unique = function(array, isSorted, iteratee, context) {
-    if (!_.isBoolean(isSorted)) {
-      context = iteratee;
-      iteratee = isSorted;
-      isSorted = false;
+    var length = stackA.length;
+    while (length--) {
+      if (stackA[length] == value) {
+        return stackB[length];
+      }
     }
-    if (iteratee != null) iteratee = cb(iteratee, context);
+    stackA.push(value);
+    stackB.push(result);
+
+    (isArr ? arrayEach : baseForOwn)(value, function(subValue, key) {
+      result[key] = baseClone(subValue, isDeep, customizer, key, value, stackA, stackB);
+    });
+    return result;
+  }
+
+  var baseEach = createBaseEach(baseForOwn);
+
+  function baseFilter(collection, predicate) {
     var result = [];
-    var seen = [];
-    for (var i = 0, length = getLength(array); i < length; i++) {
-      var value = array[i],
-          computed = iteratee ? iteratee(value, i, array) : value;
-      if (isSorted) {
-        if (!i || seen !== computed) result.push(value);
-        seen = computed;
-      } else if (iteratee) {
-        if (!_.contains(seen, computed)) {
-          seen.push(computed);
-          result.push(value);
-        }
-      } else if (!_.contains(result, value)) {
+    baseEach(collection, function(value, index, collection) {
+      if (predicate(value, index, collection)) {
         result.push(value);
       }
-    }
-    return result;
-  };
-
-  // Produce an array that contains the union: each distinct element from all of
-  // the passed-in arrays.
-  _.union = function() {
-    return _.uniq(flatten(arguments, true, true));
-  };
-
-  // Produce an array that contains every item shared between all the
-  // passed-in arrays.
-  _.intersection = function(array) {
-    var result = [];
-    var argsLength = arguments.length;
-    for (var i = 0, length = getLength(array); i < length; i++) {
-      var item = array[i];
-      if (_.contains(result, item)) continue;
-      for (var j = 1; j < argsLength; j++) {
-        if (!_.contains(arguments[j], item)) break;
-      }
-      if (j === argsLength) result.push(item);
-    }
-    return result;
-  };
-
-  // Take the difference between one array and a number of other arrays.
-  // Only the elements present in just the first array will remain.
-  _.difference = function(array) {
-    var rest = flatten(arguments, true, true, 1);
-    return _.filter(array, function(value){
-      return !_.contains(rest, value);
     });
-  };
-
-  // Zip together multiple lists into a single array -- elements that share
-  // an index go together.
-  _.zip = function() {
-    return _.unzip(arguments);
-  };
-
-  // Complement of _.zip. Unzip accepts an array of arrays and groups
-  // each array's elements on shared indices
-  _.unzip = function(array) {
-    var length = array && _.max(array, getLength).length || 0;
-    var result = Array(length);
-
-    for (var index = 0; index < length; index++) {
-      result[index] = _.pluck(array, index);
-    }
     return result;
-  };
-
-  // Converts lists into objects. Pass either a single array of `[key, value]`
-  // pairs, or two parallel arrays of the same length -- one of keys, and one of
-  // the corresponding values.
-  _.object = function(list, values) {
-    var result = {};
-    for (var i = 0, length = getLength(list); i < length; i++) {
-      if (values) {
-        result[list[i]] = values[i];
-      } else {
-        result[list[i][0]] = list[i][1];
-      }
-    }
-    return result;
-  };
-
-  // Generator function to create the findIndex and findLastIndex functions
-  function createPredicateIndexFinder(dir) {
-    return function(array, predicate, context) {
-      predicate = cb(predicate, context);
-      var length = getLength(array);
-      var index = dir > 0 ? 0 : length - 1;
-      for (; index >= 0 && index < length; index += dir) {
-        if (predicate(array[index], index, array)) return index;
-      }
-      return -1;
-    };
   }
 
-  // Returns the first index on an array-like that passes a predicate test
-  _.findIndex = createPredicateIndexFinder(1);
-  _.findLastIndex = createPredicateIndexFinder(-1);
+  var baseFor = createBaseFor();
 
-  // Use a comparator function to figure out the smallest index at which
-  // an object should be inserted so as to maintain order. Uses binary search.
-  _.sortedIndex = function(array, obj, iteratee, context) {
-    iteratee = cb(iteratee, context, 1);
-    var value = iteratee(obj);
-    var low = 0, high = getLength(array);
-    while (low < high) {
-      var mid = Math.floor((low + high) / 2);
-      if (iteratee(array[mid]) < value) low = mid + 1; else high = mid;
-    }
-    return low;
-  };
-
-  // Generator function to create the indexOf and lastIndexOf functions
-  function createIndexFinder(dir, predicateFind, sortedIndex) {
-    return function(array, item, idx) {
-      var i = 0, length = getLength(array);
-      if (typeof idx == 'number') {
-        if (dir > 0) {
-            i = idx >= 0 ? idx : Math.max(idx + length, i);
-        } else {
-            length = idx >= 0 ? Math.min(idx + 1, length) : idx + length + 1;
-        }
-      } else if (sortedIndex && idx && length) {
-        idx = sortedIndex(array, item);
-        return array[idx] === item ? idx : -1;
-      }
-      if (item !== item) {
-        idx = predicateFind(slice.call(array, i, length), _.isNaN);
-        return idx >= 0 ? idx + i : -1;
-      }
-      for (idx = dir > 0 ? i : length - 1; idx >= 0 && idx < length; idx += dir) {
-        if (array[idx] === item) return idx;
-      }
-      return -1;
-    };
+  function baseForIn(object, iteratee) {
+    return baseFor(object, iteratee, keysIn);
   }
 
-  // Return the position of the first occurrence of an item in an array,
-  // or -1 if the item is not included in the array.
-  // If the array is large and already in sort order, pass `true`
-  // for **isSorted** to use binary search.
-  _.indexOf = createIndexFinder(1, _.findIndex, _.sortedIndex);
-  _.lastIndexOf = createIndexFinder(-1, _.findLastIndex);
-
-  // Generate an integer Array containing an arithmetic progression. A port of
-  // the native Python `range()` function. See
-  // [the Python documentation](http://docs.python.org/library/functions.html#range).
-  _.range = function(start, stop, step) {
-    if (stop == null) {
-      stop = start || 0;
-      start = 0;
-    }
-    step = step || 1;
-
-    var length = Math.max(Math.ceil((stop - start) / step), 0);
-    var range = Array(length);
-
-    for (var idx = 0; idx < length; idx++, start += step) {
-      range[idx] = start;
-    }
-
-    return range;
-  };
-
-  // Function (ahem) Functions
-  // ------------------
-
-  // Determines whether to execute a function as a constructor
-  // or a normal function with the provided arguments
-  var executeBound = function(sourceFunc, boundFunc, context, callingContext, args) {
-    if (!(callingContext instanceof boundFunc)) return sourceFunc.apply(context, args);
-    var self = baseCreate(sourceFunc.prototype);
-    var result = sourceFunc.apply(self, args);
-    if (_.isObject(result)) return result;
-    return self;
-  };
-
-  // Create a function bound to a given object (assigning `this`, and arguments,
-  // optionally). Delegates to **ECMAScript 5**'s native `Function.bind` if
-  // available.
-  _.bind = function(func, context) {
-    if (nativeBind && func.bind === nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    if (!_.isFunction(func)) throw new TypeError('Bind must be called on a function');
-    var args = slice.call(arguments, 2);
-    var bound = function() {
-      return executeBound(func, bound, context, this, args.concat(slice.call(arguments)));
-    };
-    return bound;
-  };
-
-  // Partially apply a function by creating a version that has had some of its
-  // arguments pre-filled, without changing its dynamic `this` context. _ acts
-  // as a placeholder, allowing any combination of arguments to be pre-filled.
-  _.partial = function(func) {
-    var boundArgs = slice.call(arguments, 1);
-    var bound = function() {
-      var position = 0, length = boundArgs.length;
-      var args = Array(length);
-      for (var i = 0; i < length; i++) {
-        args[i] = boundArgs[i] === _ ? arguments[position++] : boundArgs[i];
-      }
-      while (position < arguments.length) args.push(arguments[position++]);
-      return executeBound(func, bound, this, this, args);
-    };
-    return bound;
-  };
-
-  // Bind a number of an object's methods to that object. Remaining arguments
-  // are the method names to be bound. Useful for ensuring that all callbacks
-  // defined on an object belong to it.
-  _.bindAll = function(obj) {
-    var i, length = arguments.length, key;
-    if (length <= 1) throw new Error('bindAll must be passed function names');
-    for (i = 1; i < length; i++) {
-      key = arguments[i];
-      obj[key] = _.bind(obj[key], obj);
-    }
-    return obj;
-  };
-
-  // Memoize an expensive function by storing its results.
-  _.memoize = function(func, hasher) {
-    var memoize = function(key) {
-      var cache = memoize.cache;
-      var address = '' + (hasher ? hasher.apply(this, arguments) : key);
-      if (!_.has(cache, address)) cache[address] = func.apply(this, arguments);
-      return cache[address];
-    };
-    memoize.cache = {};
-    return memoize;
-  };
-
-  // Delays a function for the given number of milliseconds, and then calls
-  // it with the arguments supplied.
-  _.delay = function(func, wait) {
-    var args = slice.call(arguments, 2);
-    return setTimeout(function(){
-      return func.apply(null, args);
-    }, wait);
-  };
-
-  // Defers a function, scheduling it to run after the current call stack has
-  // cleared.
-  _.defer = _.partial(_.delay, _, 1);
-
-  // Returns a function, that, when invoked, will only be triggered at most once
-  // during a given window of time. Normally, the throttled function will run
-  // as much as it can, without ever going more than once per `wait` duration;
-  // but if you'd like to disable the execution on the leading edge, pass
-  // `{leading: false}`. To disable execution on the trailing edge, ditto.
-  _.throttle = function(func, wait, options) {
-    var context, args, result;
-    var timeout = null;
-    var previous = 0;
-    if (!options) options = {};
-    var later = function() {
-      previous = options.leading === false ? 0 : _.now();
-      timeout = null;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    };
-    return function() {
-      var now = _.now();
-      if (!previous && options.leading === false) previous = now;
-      var remaining = wait - (now - previous);
-      context = this;
-      args = arguments;
-      if (remaining <= 0 || remaining > wait) {
-        if (timeout) {
-          clearTimeout(timeout);
-          timeout = null;
-        }
-        previous = now;
-        result = func.apply(context, args);
-        if (!timeout) context = args = null;
-      } else if (!timeout && options.trailing !== false) {
-        timeout = setTimeout(later, remaining);
-      }
-      return result;
-    };
-  };
-
-  // Returns a function, that, as long as it continues to be invoked, will not
-  // be triggered. The function will be called after it stops being called for
-  // N milliseconds. If `immediate` is passed, trigger the function on the
-  // leading edge, instead of the trailing.
-  _.debounce = function(func, wait, immediate) {
-    var timeout, args, context, timestamp, result;
-
-    var later = function() {
-      var last = _.now() - timestamp;
-
-      if (last < wait && last >= 0) {
-        timeout = setTimeout(later, wait - last);
-      } else {
-        timeout = null;
-        if (!immediate) {
-          result = func.apply(context, args);
-          if (!timeout) context = args = null;
-        }
-      }
-    };
-
-    return function() {
-      context = this;
-      args = arguments;
-      timestamp = _.now();
-      var callNow = immediate && !timeout;
-      if (!timeout) timeout = setTimeout(later, wait);
-      if (callNow) {
-        result = func.apply(context, args);
-        context = args = null;
-      }
-
-      return result;
-    };
-  };
-
-  // Returns the first function passed as an argument to the second,
-  // allowing you to adjust arguments, run code before and after, and
-  // conditionally execute the original function.
-  _.wrap = function(func, wrapper) {
-    return _.partial(wrapper, func);
-  };
-
-  // Returns a negated version of the passed-in predicate.
-  _.negate = function(predicate) {
-    return function() {
-      return !predicate.apply(this, arguments);
-    };
-  };
-
-  // Returns a function that is the composition of a list of functions, each
-  // consuming the return value of the function that follows.
-  _.compose = function() {
-    var args = arguments;
-    var start = args.length - 1;
-    return function() {
-      var i = start;
-      var result = args[start].apply(this, arguments);
-      while (i--) result = args[i].call(this, result);
-      return result;
-    };
-  };
-
-  // Returns a function that will only be executed on and after the Nth call.
-  _.after = function(times, func) {
-    return function() {
-      if (--times < 1) {
-        return func.apply(this, arguments);
-      }
-    };
-  };
-
-  // Returns a function that will only be executed up to (but not including) the Nth call.
-  _.before = function(times, func) {
-    var memo;
-    return function() {
-      if (--times > 0) {
-        memo = func.apply(this, arguments);
-      }
-      if (times <= 1) func = null;
-      return memo;
-    };
-  };
-
-  // Returns a function that will be executed at most one time, no matter how
-  // often you call it. Useful for lazy initialization.
-  _.once = _.partial(_.before, 2);
-
-  // Object Functions
-  // ----------------
-
-  // Keys in IE < 9 that won't be iterated by `for key in ...` and thus missed.
-  var hasEnumBug = !{toString: null}.propertyIsEnumerable('toString');
-  var nonEnumerableProps = ['valueOf', 'isPrototypeOf', 'toString',
-                      'propertyIsEnumerable', 'hasOwnProperty', 'toLocaleString'];
-
-  function collectNonEnumProps(obj, keys) {
-    var nonEnumIdx = nonEnumerableProps.length;
-    var constructor = obj.constructor;
-    var proto = (_.isFunction(constructor) && constructor.prototype) || ObjProto;
-
-    // Constructor is a special case.
-    var prop = 'constructor';
-    if (_.has(obj, prop) && !_.contains(keys, prop)) keys.push(prop);
-
-    while (nonEnumIdx--) {
-      prop = nonEnumerableProps[nonEnumIdx];
-      if (prop in obj && obj[prop] !== proto[prop] && !_.contains(keys, prop)) {
-        keys.push(prop);
-      }
-    }
+  function baseForOwn(object, iteratee) {
+    return baseFor(object, iteratee, keys);
   }
 
-  // Retrieve the names of an object's own properties.
-  // Delegates to **ECMAScript 5**'s native `Object.keys`
-  _.keys = function(obj) {
-    if (!_.isObject(obj)) return [];
-    if (nativeKeys) return nativeKeys(obj);
-    var keys = [];
-    for (var key in obj) if (_.has(obj, key)) keys.push(key);
-    // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
-    return keys;
-  };
-
-  // Retrieve all the property names of an object.
-  _.allKeys = function(obj) {
-    if (!_.isObject(obj)) return [];
-    var keys = [];
-    for (var key in obj) keys.push(key);
-    // Ahem, IE < 9.
-    if (hasEnumBug) collectNonEnumProps(obj, keys);
-    return keys;
-  };
-
-  // Retrieve the values of an object's properties.
-  _.values = function(obj) {
-    var keys = _.keys(obj);
-    var length = keys.length;
-    var values = Array(length);
-    for (var i = 0; i < length; i++) {
-      values[i] = obj[keys[i]];
+  function baseGet(object, path, pathKey) {
+    if (object == null) {
+      return;
     }
-    return values;
-  };
+    if (pathKey !== undefined && pathKey in toObject(object)) {
+      path = [pathKey];
+    }
+    var index = -1,
+        length = path.length;
 
-  // Returns the results of applying the iteratee to each element of the object
-  // In contrast to _.map it returns an object
-  _.mapObject = function(obj, iteratee, context) {
-    iteratee = cb(iteratee, context);
-    var keys =  _.keys(obj),
-          length = keys.length,
-          results = {},
-          currentKey;
-      for (var index = 0; index < length; index++) {
-        currentKey = keys[index];
-        results[currentKey] = iteratee(obj[currentKey], currentKey, obj);
+    while (object != null && ++index < length) {
+      var result = object = object[path[index]];
+    }
+    return result;
+  }
+
+  function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
+    if (value === other) {
+      return value !== 0 || (1 / value == 1 / other);
+    }
+    var valType = typeof value,
+        othType = typeof other;
+
+    if ((valType != 'function' && valType != 'object' && othType != 'function' && othType != 'object') ||
+        value == null || other == null) {
+      return value !== value && other !== other;
+    }
+    return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
+  }
+
+  function baseIsEqualDeep(object, other, equalFunc, customizer, isLoose, stackA, stackB) {
+    var objIsArr = isArray(object),
+        othIsArr = isArray(other),
+        objTag = arrayTag,
+        othTag = arrayTag;
+
+    if (!objIsArr) {
+      objTag = objToString.call(object);
+      if (objTag == argsTag) {
+        objTag = objectTag;
+      } else if (objTag != objectTag) {
+        objIsArr = isTypedArray(object);
       }
-      return results;
-  };
-
-  // Convert an object into a list of `[key, value]` pairs.
-  _.pairs = function(obj) {
-    var keys = _.keys(obj);
-    var length = keys.length;
-    var pairs = Array(length);
-    for (var i = 0; i < length; i++) {
-      pairs[i] = [keys[i], obj[keys[i]]];
     }
-    return pairs;
-  };
-
-  // Invert the keys and values of an object. The values must be serializable.
-  _.invert = function(obj) {
-    var result = {};
-    var keys = _.keys(obj);
-    for (var i = 0, length = keys.length; i < length; i++) {
-      result[obj[keys[i]]] = keys[i];
+    if (!othIsArr) {
+      othTag = objToString.call(other);
+      if (othTag == argsTag) {
+        othTag = objectTag;
+      } else if (othTag != objectTag) {
+        othIsArr = isTypedArray(other);
+      }
     }
+    var objIsObj = objTag == objectTag,
+        othIsObj = othTag == objectTag,
+        isSameTag = objTag == othTag;
+
+    if (isSameTag && !(objIsArr || objIsObj)) {
+      return equalByTag(object, other, objTag);
+    }
+    if (!isLoose) {
+      var valWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
+          othWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+
+      if (valWrapped || othWrapped) {
+        return equalFunc(valWrapped ? object.value() : object, othWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
+      }
+    }
+    if (!isSameTag) {
+      return false;
+    }
+    stackA || (stackA = []);
+    stackB || (stackB = []);
+
+    var length = stackA.length;
+    while (length--) {
+      if (stackA[length] == object) {
+        return stackB[length] == other;
+      }
+    }
+    stackA.push(object);
+    stackB.push(other);
+
+    var result = (objIsArr ? equalArrays : equalObjects)(object, other, equalFunc, customizer, isLoose, stackA, stackB);
+
+    stackA.pop();
+    stackB.pop();
+
     return result;
-  };
+  }
 
-  // Return a sorted list of the function names available on the object.
-  // Aliased as `methods`
-  _.functions = _.methods = function(obj) {
-    var names = [];
-    for (var key in obj) {
-      if (_.isFunction(obj[key])) names.push(key);
-    }
-    return names.sort();
-  };
+  function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
+    var index = -1,
+        length = props.length,
+        noCustomizer = !customizer;
 
-  // Extend a given object with all the properties in passed-in object(s).
-  _.extend = createAssigner(_.allKeys);
-
-  // Assigns a given object with all the own properties in the passed-in object(s)
-  // (https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object/assign)
-  _.extendOwn = _.assign = createAssigner(_.keys);
-
-  // Returns the first key on an object that passes a predicate test
-  _.findKey = function(obj, predicate, context) {
-    predicate = cb(predicate, context);
-    var keys = _.keys(obj), key;
-    for (var i = 0, length = keys.length; i < length; i++) {
-      key = keys[i];
-      if (predicate(obj[key], key, obj)) return key;
-    }
-  };
-
-  // Return a copy of the object only containing the whitelisted properties.
-  _.pick = function(object, oiteratee, context) {
-    var result = {}, obj = object, iteratee, keys;
-    if (obj == null) return result;
-    if (_.isFunction(oiteratee)) {
-      keys = _.allKeys(obj);
-      iteratee = optimizeCb(oiteratee, context);
-    } else {
-      keys = flatten(arguments, false, false, 1);
-      iteratee = function(value, key, obj) { return key in obj; };
-      obj = Object(obj);
-    }
-    for (var i = 0, length = keys.length; i < length; i++) {
-      var key = keys[i];
-      var value = obj[key];
-      if (iteratee(value, key, obj)) result[key] = value;
-    }
-    return result;
-  };
-
-   // Return a copy of the object without the blacklisted properties.
-  _.omit = function(obj, iteratee, context) {
-    if (_.isFunction(iteratee)) {
-      iteratee = _.negate(iteratee);
-    } else {
-      var keys = _.map(flatten(arguments, false, false, 1), String);
-      iteratee = function(value, key) {
-        return !_.contains(keys, key);
-      };
-    }
-    return _.pick(obj, iteratee, context);
-  };
-
-  // Fill in a given object with default properties.
-  _.defaults = createAssigner(_.allKeys, true);
-
-  // Creates an object that inherits from the given prototype object.
-  // If additional properties are provided then they will be added to the
-  // created object.
-  _.create = function(prototype, props) {
-    var result = baseCreate(prototype);
-    if (props) _.extendOwn(result, props);
-    return result;
-  };
-
-  // Create a (shallow-cloned) duplicate of an object.
-  _.clone = function(obj) {
-    if (!_.isObject(obj)) return obj;
-    return _.isArray(obj) ? obj.slice() : _.extend({}, obj);
-  };
-
-  // Invokes interceptor with the obj, and then returns obj.
-  // The primary purpose of this method is to "tap into" a method chain, in
-  // order to perform operations on intermediate results within the chain.
-  _.tap = function(obj, interceptor) {
-    interceptor(obj);
-    return obj;
-  };
-
-  // Returns whether an object has a given set of `key:value` pairs.
-  _.isMatch = function(object, attrs) {
-    var keys = _.keys(attrs), length = keys.length;
-    if (object == null) return !length;
-    var obj = Object(object);
-    for (var i = 0; i < length; i++) {
-      var key = keys[i];
-      if (attrs[key] !== obj[key] || !(key in obj)) return false;
-    }
-    return true;
-  };
-
-
-  // Internal recursive comparison function for `isEqual`.
-  var eq = function(a, b, aStack, bStack) {
-    // Identical objects are equal. `0 === -0`, but they aren't identical.
-    // See the [Harmony `egal` proposal](http://wiki.ecmascript.org/doku.php?id=harmony:egal).
-    if (a === b) return a !== 0 || 1 / a === 1 / b;
-    // A strict comparison is necessary because `null == undefined`.
-    if (a == null || b == null) return a === b;
-    // Unwrap any wrapped objects.
-    if (a instanceof _) a = a._wrapped;
-    if (b instanceof _) b = b._wrapped;
-    // Compare `[[Class]]` names.
-    var className = toString.call(a);
-    if (className !== toString.call(b)) return false;
-    switch (className) {
-      // Strings, numbers, regular expressions, dates, and booleans are compared by value.
-      case '[object RegExp]':
-      // RegExps are coerced to strings for comparison (Note: '' + /a/i === '/a/i')
-      case '[object String]':
-        // Primitives and their corresponding object wrappers are equivalent; thus, `"5"` is
-        // equivalent to `new String("5")`.
-        return '' + a === '' + b;
-      case '[object Number]':
-        // `NaN`s are equivalent, but non-reflexive.
-        // Object(NaN) is equivalent to NaN
-        if (+a !== +a) return +b !== +b;
-        // An `egal` comparison is performed for other numeric values.
-        return +a === 0 ? 1 / +a === 1 / b : +a === +b;
-      case '[object Date]':
-      case '[object Boolean]':
-        // Coerce dates and booleans to numeric primitive values. Dates are compared by their
-        // millisecond representations. Note that invalid dates with millisecond representations
-        // of `NaN` are not equivalent.
-        return +a === +b;
-    }
-
-    var areArrays = className === '[object Array]';
-    if (!areArrays) {
-      if (typeof a != 'object' || typeof b != 'object') return false;
-
-      // Objects with different constructors are not equivalent, but `Object`s or `Array`s
-      // from different frames are.
-      var aCtor = a.constructor, bCtor = b.constructor;
-      if (aCtor !== bCtor && !(_.isFunction(aCtor) && aCtor instanceof aCtor &&
-                               _.isFunction(bCtor) && bCtor instanceof bCtor)
-                          && ('constructor' in a && 'constructor' in b)) {
+    while (++index < length) {
+      if ((noCustomizer && strictCompareFlags[index])
+            ? values[index] !== object[props[index]]
+            : !(props[index] in object)
+          ) {
         return false;
       }
     }
-    // Assume equality for cyclic structures. The algorithm for detecting cyclic
-    // structures is adapted from ES 5.1 section 15.12.3, abstract operation `JO`.
+    index = -1;
+    while (++index < length) {
+      var key = props[index],
+          objValue = object[key],
+          srcValue = values[index];
 
-    // Initializing stack of traversed objects.
-    // It's done here since we only need them for objects and arrays comparison.
-    aStack = aStack || [];
-    bStack = bStack || [];
-    var length = aStack.length;
-    while (length--) {
-      // Linear search. Performance is inversely proportional to the number of
-      // unique nested structures.
-      if (aStack[length] === a) return bStack[length] === b;
-    }
-
-    // Add the first object to the stack of traversed objects.
-    aStack.push(a);
-    bStack.push(b);
-
-    // Recursively compare objects and arrays.
-    if (areArrays) {
-      // Compare array lengths to determine if a deep comparison is necessary.
-      length = a.length;
-      if (length !== b.length) return false;
-      // Deep compare the contents, ignoring non-numeric properties.
-      while (length--) {
-        if (!eq(a[length], b[length], aStack, bStack)) return false;
+      if (noCustomizer && strictCompareFlags[index]) {
+        var result = objValue !== undefined || (key in object);
+      } else {
+        result = customizer ? customizer(objValue, srcValue, key) : undefined;
+        if (result === undefined) {
+          result = baseIsEqual(srcValue, objValue, customizer, true);
+        }
       }
-    } else {
-      // Deep compare objects.
-      var keys = _.keys(a), key;
-      length = keys.length;
-      // Ensure that both objects contain the same number of properties before comparing deep equality.
-      if (_.keys(b).length !== length) return false;
-      while (length--) {
-        // Deep compare each member
-        key = keys[length];
-        if (!(_.has(b, key) && eq(a[key], b[key], aStack, bStack))) return false;
+      if (!result) {
+        return false;
       }
     }
-    // Remove the first object from the stack of traversed objects.
-    aStack.pop();
-    bStack.pop();
     return true;
-  };
+  }
 
-  // Perform a deep comparison to check if two objects are equal.
-  _.isEqual = function(a, b) {
-    return eq(a, b);
-  };
+  function baseMatches(source) {
+    var props = keys(source),
+        length = props.length;
 
-  // Is a given array, string, or object empty?
-  // An "empty" object has no enumerable own-properties.
-  _.isEmpty = function(obj) {
-    if (obj == null) return true;
-    if (isArrayLike(obj) && (_.isArray(obj) || _.isString(obj) || _.isArguments(obj))) return obj.length === 0;
-    return _.keys(obj).length === 0;
-  };
+    if (!length) {
+      return constant(true);
+    }
+    if (length == 1) {
+      var key = props[0],
+          value = source[key];
 
-  // Is a given value a DOM element?
-  _.isElement = function(obj) {
-    return !!(obj && obj.nodeType === 1);
-  };
+      if (isStrictComparable(value)) {
+        return function(object) {
+          if (object == null) {
+            return false;
+          }
+          return object[key] === value && (value !== undefined || (key in toObject(object)));
+        };
+      }
+    }
+    var values = Array(length),
+        strictCompareFlags = Array(length);
 
-  // Is a given value an array?
-  // Delegates to ECMA5's native Array.isArray
-  _.isArray = nativeIsArray || function(obj) {
-    return toString.call(obj) === '[object Array]';
-  };
-
-  // Is a given variable an object?
-  _.isObject = function(obj) {
-    var type = typeof obj;
-    return type === 'function' || type === 'object' && !!obj;
-  };
-
-  // Add some isType methods: isArguments, isFunction, isString, isNumber, isDate, isRegExp, isError.
-  _.each(['Arguments', 'Function', 'String', 'Number', 'Date', 'RegExp', 'Error'], function(name) {
-    _['is' + name] = function(obj) {
-      return toString.call(obj) === '[object ' + name + ']';
+    while (length--) {
+      value = source[props[length]];
+      values[length] = value;
+      strictCompareFlags[length] = isStrictComparable(value);
+    }
+    return function(object) {
+      return object != null && baseIsMatch(toObject(object), props, values, strictCompareFlags);
     };
+  }
+
+  function baseMatchesProperty(path, value) {
+    var isArr = isArray(path),
+        isCommon = isKey(path) && isStrictComparable(value),
+        pathKey = (path + '');
+
+    path = toPath(path);
+    return function(object) {
+      if (object == null) {
+        return false;
+      }
+      var key = pathKey;
+      object = toObject(object);
+      if ((isArr || !isCommon) && !(key in object)) {
+        object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+        if (object == null) {
+          return false;
+        }
+        key = last(path);
+        object = toObject(object);
+      }
+      return object[key] === value
+        ? (value !== undefined || (key in object))
+        : baseIsEqual(value, object[key], null, true);
+    };
+  }
+
+  function baseMerge(object, source, customizer, stackA, stackB) {
+    if (!isObject(object)) {
+      return object;
+    }
+    var isSrcArr = isLength(source.length) && (isArray(source) || isTypedArray(source));
+    if (!isSrcArr) {
+      var props = keys(source);
+      push.apply(props, getSymbols(source));
+    }
+    arrayEach(props || source, function(srcValue, key) {
+      if (props) {
+        key = srcValue;
+        srcValue = source[key];
+      }
+      if (isObjectLike(srcValue)) {
+        stackA || (stackA = []);
+        stackB || (stackB = []);
+        baseMergeDeep(object, source, key, baseMerge, customizer, stackA, stackB);
+      }
+      else {
+        var value = object[key],
+            result = customizer ? customizer(value, srcValue, key, object, source) : undefined,
+            isCommon = result === undefined;
+
+        if (isCommon) {
+          result = srcValue;
+        }
+        if ((isSrcArr || result !== undefined) &&
+            (isCommon || (result === result ? (result !== value) : (value === value)))) {
+          object[key] = result;
+        }
+      }
+    });
+    return object;
+  }
+
+  function baseMergeDeep(object, source, key, mergeFunc, customizer, stackA, stackB) {
+    var length = stackA.length,
+        srcValue = source[key];
+
+    while (length--) {
+      if (stackA[length] == srcValue) {
+        object[key] = stackB[length];
+        return;
+      }
+    }
+    var value = object[key],
+        result = customizer ? customizer(value, srcValue, key, object, source) : undefined,
+        isCommon = result === undefined;
+
+    if (isCommon) {
+      result = srcValue;
+      if (isLength(srcValue.length) && (isArray(srcValue) || isTypedArray(srcValue))) {
+        result = isArray(value)
+          ? value
+          : (getLength(value) ? arrayCopy(value) : []);
+      }
+      else if (isPlainObject(srcValue) || isArguments(srcValue)) {
+        result = isArguments(value)
+          ? toPlainObject(value)
+          : (isPlainObject(value) ? value : {});
+      }
+      else {
+        isCommon = false;
+      }
+    }
+    stackA.push(srcValue);
+    stackB.push(result);
+
+    if (isCommon) {
+      object[key] = mergeFunc(result, srcValue, customizer, stackA, stackB);
+    } else if (result === result ? (result !== value) : (value === value)) {
+      object[key] = result;
+    }
+  }
+
+  function baseProperty(key) {
+    return function(object) {
+      return object == null ? undefined : object[key];
+    };
+  }
+
+  function basePropertyDeep(path) {
+    var pathKey = (path + '');
+    path = toPath(path);
+    return function(object) {
+      return baseGet(object, path, pathKey);
+    };
+  }
+
+  function baseSlice(array, start, end) {
+    var index = -1,
+        length = array.length;
+
+    start = start == null ? 0 : (+start || 0);
+    if (start < 0) {
+      start = -start > length ? 0 : (length + start);
+    }
+    end = (end === undefined || end > length) ? length : (+end || 0);
+    if (end < 0) {
+      end += length;
+    }
+    length = start > end ? 0 : ((end - start) >>> 0);
+    start >>>= 0;
+
+    var result = Array(length);
+    while (++index < length) {
+      result[index] = array[index + start];
+    }
+    return result;
+  }
+
+  function baseSome(collection, predicate) {
+    var result;
+
+    baseEach(collection, function(value, index, collection) {
+      result = predicate(value, index, collection);
+      return !result;
+    });
+    return !!result;
+  }
+
+  function baseValues(object, props) {
+    var index = -1,
+        length = props.length,
+        result = Array(length);
+
+    while (++index < length) {
+      result[index] = object[props[index]];
+    }
+    return result;
+  }
+
+  function binaryIndex(array, value, retHighest) {
+    var low = 0,
+        high = array ? array.length : low;
+
+    if (typeof value == 'number' && value === value && high <= HALF_MAX_ARRAY_LENGTH) {
+      while (low < high) {
+        var mid = (low + high) >>> 1,
+            computed = array[mid];
+
+        if (retHighest ? (computed <= value) : (computed < value)) {
+          low = mid + 1;
+        } else {
+          high = mid;
+        }
+      }
+      return high;
+    }
+    return binaryIndexBy(array, value, identity, retHighest);
+  }
+
+  function binaryIndexBy(array, value, iteratee, retHighest) {
+    value = iteratee(value);
+
+    var low = 0,
+        high = array ? array.length : 0,
+        valIsNaN = value !== value,
+        valIsUndef = value === undefined;
+
+    while (low < high) {
+      var mid = floor((low + high) / 2),
+          computed = iteratee(array[mid]),
+          isReflexive = computed === computed;
+
+      if (valIsNaN) {
+        var setLow = isReflexive || retHighest;
+      } else if (valIsUndef) {
+        setLow = isReflexive && (retHighest || computed !== undefined);
+      } else {
+        setLow = retHighest ? (computed <= value) : (computed < value);
+      }
+      if (setLow) {
+        low = mid + 1;
+      } else {
+        high = mid;
+      }
+    }
+    return nativeMin(high, MAX_ARRAY_INDEX);
+  }
+
+  function bindCallback(func, thisArg, argCount) {
+    if (typeof func != 'function') {
+      return identity;
+    }
+    if (thisArg === undefined) {
+      return func;
+    }
+    switch (argCount) {
+      case 1: return function(value) {
+        return func.call(thisArg, value);
+      };
+      case 3: return function(value, index, collection) {
+        return func.call(thisArg, value, index, collection);
+      };
+      case 4: return function(accumulator, value, index, collection) {
+        return func.call(thisArg, accumulator, value, index, collection);
+      };
+      case 5: return function(value, other, key, object, source) {
+        return func.call(thisArg, value, other, key, object, source);
+      };
+    }
+    return function() {
+      return func.apply(thisArg, arguments);
+    };
+  }
+
+  function bufferClone(buffer) {
+    return bufferSlice.call(buffer, 0);
+  }
+  if (!bufferSlice) {
+    bufferClone = !(ArrayBuffer && Uint8Array) ? constant(null) : function(buffer) {
+      var byteLength = buffer.byteLength,
+          floatLength = Float64Array ? floor(byteLength / FLOAT64_BYTES_PER_ELEMENT) : 0,
+          offset = floatLength * FLOAT64_BYTES_PER_ELEMENT,
+          result = new ArrayBuffer(byteLength);
+
+      if (floatLength) {
+        var view = new Float64Array(result, 0, floatLength);
+        view.set(new Float64Array(buffer, 0, floatLength));
+      }
+      if (byteLength != offset) {
+        view = new Uint8Array(result, offset);
+        view.set(new Uint8Array(buffer, offset));
+      }
+      return result;
+    };
+  }
+
+  function createAssigner(assigner) {
+    return restParam(function(object, sources) {
+      var index = -1,
+          length = object == null ? 0 : sources.length,
+          customizer = length > 2 && sources[length - 2],
+          guard = length > 2 && sources[2],
+          thisArg = length > 1 && sources[length - 1];
+
+      if (typeof customizer == 'function') {
+        customizer = bindCallback(customizer, thisArg, 5);
+        length -= 2;
+      } else {
+        customizer = typeof thisArg == 'function' ? thisArg : null;
+        length -= (customizer ? 1 : 0);
+      }
+      if (guard && isIterateeCall(sources[0], sources[1], guard)) {
+        customizer = length < 3 ? null : customizer;
+        length = 1;
+      }
+      while (++index < length) {
+        var source = sources[index];
+        if (source) {
+          assigner(object, source, customizer);
+        }
+      }
+      return object;
+    });
+  }
+
+  function createBaseEach(eachFunc, fromRight) {
+    return function(collection, iteratee) {
+      var length = collection ? getLength(collection) : 0;
+      if (!isLength(length)) {
+        return eachFunc(collection, iteratee);
+      }
+      var index = fromRight ? length : -1,
+          iterable = toObject(collection);
+
+      while ((fromRight ? index-- : ++index < length)) {
+        if (iteratee(iterable[index], index, iterable) === false) {
+          break;
+        }
+      }
+      return collection;
+    };
+  }
+
+  function createBaseFor(fromRight) {
+    return function(object, iteratee, keysFunc) {
+      var iterable = toObject(object),
+          props = keysFunc(object),
+          length = props.length,
+          index = fromRight ? length : -1;
+
+      while ((fromRight ? index-- : ++index < length)) {
+        var key = props[index];
+        if (iteratee(iterable[key], key, iterable) === false) {
+          break;
+        }
+      }
+      return object;
+    };
+  }
+
+  function createFindIndex(fromRight) {
+    return function(array, predicate, thisArg) {
+      if (!(array && array.length)) {
+        return -1;
+      }
+      predicate = getCallback(predicate, thisArg, 3);
+      return baseFindIndex(array, predicate, fromRight);
+    };
+  }
+
+  function createForEach(arrayFunc, eachFunc) {
+    return function(collection, iteratee, thisArg) {
+      return (typeof iteratee == 'function' && thisArg === undefined && isArray(collection))
+        ? arrayFunc(collection, iteratee)
+        : eachFunc(collection, bindCallback(iteratee, thisArg, 3));
+    };
+  }
+
+  function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stackB) {
+    var index = -1,
+        arrLength = array.length,
+        othLength = other.length,
+        result = true;
+
+    if (arrLength != othLength && !(isLoose && othLength > arrLength)) {
+      return false;
+    }
+    while (result && ++index < arrLength) {
+      var arrValue = array[index],
+          othValue = other[index];
+
+      result = undefined;
+      if (customizer) {
+        result = isLoose
+          ? customizer(othValue, arrValue, index)
+          : customizer(arrValue, othValue, index);
+      }
+      if (result === undefined) {
+        if (isLoose) {
+          var othIndex = othLength;
+          while (othIndex--) {
+            othValue = other[othIndex];
+            result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
+            if (result) {
+              break;
+            }
+          }
+        } else {
+          result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
+        }
+      }
+    }
+    return !!result;
+  }
+
+  function equalByTag(object, other, tag) {
+    switch (tag) {
+      case boolTag:
+      case dateTag:
+        return +object == +other;
+
+      case errorTag:
+        return object.name == other.name && object.message == other.message;
+
+      case numberTag:
+        return (object != +object)
+          ? other != +other
+          : (object == 0 ? ((1 / object) == (1 / other)) : object == +other);
+
+      case regexpTag:
+      case stringTag:
+        return object == (other + '');
+    }
+    return false;
+  }
+
+  function equalObjects(object, other, equalFunc, customizer, isLoose, stackA, stackB) {
+    var objProps = keys(object),
+        objLength = objProps.length,
+        othProps = keys(other),
+        othLength = othProps.length;
+
+    if (objLength != othLength && !isLoose) {
+      return false;
+    }
+    var skipCtor = isLoose,
+        index = -1;
+
+    while (++index < objLength) {
+      var key = objProps[index],
+          result = isLoose ? key in other : hasOwnProperty.call(other, key);
+
+      if (result) {
+        var objValue = object[key],
+            othValue = other[key];
+
+        result = undefined;
+        if (customizer) {
+          result = isLoose
+            ? customizer(othValue, objValue, key)
+            : customizer(objValue, othValue, key);
+        }
+        if (result === undefined) {
+          result = (objValue && objValue === othValue) || equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB);
+        }
+      }
+      if (!result) {
+        return false;
+      }
+      skipCtor || (skipCtor = key == 'constructor');
+    }
+    if (!skipCtor) {
+      var objCtor = object.constructor,
+          othCtor = other.constructor;
+
+      if (objCtor != othCtor &&
+          ('constructor' in object && 'constructor' in other) &&
+          !(typeof objCtor == 'function' && objCtor instanceof objCtor &&
+            typeof othCtor == 'function' && othCtor instanceof othCtor)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function getCallback(func, thisArg, argCount) {
+    var result = lodash.callback || callback;
+    result = result === callback ? baseCallback : result;
+    return argCount ? result(func, thisArg, argCount) : result;
+  }
+
+  function getIndexOf(collection, target, fromIndex) {
+    var result = lodash.indexOf || indexOf;
+    result = result === indexOf ? baseIndexOf : result;
+    return collection ? result(collection, target, fromIndex) : result;
+  }
+
+  var getLength = baseProperty('length');
+
+  var getSymbols = !getOwnPropertySymbols ? constant([]) : function(object) {
+    return getOwnPropertySymbols(toObject(object));
+  };
+
+  function initCloneArray(array) {
+    var length = array.length,
+        result = new array.constructor(length);
+
+    if (length && typeof array[0] == 'string' && hasOwnProperty.call(array, 'index')) {
+      result.index = array.index;
+      result.input = array.input;
+    }
+    return result;
+  }
+
+  function initCloneObject(object) {
+    var Ctor = object.constructor;
+    if (!(typeof Ctor == 'function' && Ctor instanceof Ctor)) {
+      Ctor = Object;
+    }
+    return new Ctor;
+  }
+
+  function initCloneByTag(object, tag, isDeep) {
+    var Ctor = object.constructor;
+    switch (tag) {
+      case arrayBufferTag:
+        return bufferClone(object);
+
+      case boolTag:
+      case dateTag:
+        return new Ctor(+object);
+
+      case float32Tag: case float64Tag:
+      case int8Tag: case int16Tag: case int32Tag:
+      case uint8Tag: case uint8ClampedTag: case uint16Tag: case uint32Tag:
+        var buffer = object.buffer;
+        return new Ctor(isDeep ? bufferClone(buffer) : buffer, object.byteOffset, object.length);
+
+      case numberTag:
+      case stringTag:
+        return new Ctor(object);
+
+      case regexpTag:
+        var result = new Ctor(object.source, reFlags.exec(object));
+        result.lastIndex = object.lastIndex;
+    }
+    return result;
+  }
+
+  function isIndex(value, length) {
+    value = +value;
+    length = length == null ? MAX_SAFE_INTEGER : length;
+    return value > -1 && value % 1 == 0 && value < length;
+  }
+
+  function isIterateeCall(value, index, object) {
+    if (!isObject(object)) {
+      return false;
+    }
+    var type = typeof index;
+    if (type == 'number') {
+      var length = getLength(object),
+          prereq = isLength(length) && isIndex(index, length);
+    } else {
+      prereq = type == 'string' && index in object;
+    }
+    if (prereq) {
+      var other = object[index];
+      return value === value ? (value === other) : (other !== other);
+    }
+    return false;
+  }
+
+  function isKey(value, object) {
+    var type = typeof value;
+    if ((type == 'string' && reIsPlainProp.test(value)) || type == 'number') {
+      return true;
+    }
+    if (isArray(value)) {
+      return false;
+    }
+    var result = !reIsDeepProp.test(value);
+    return result || (object != null && value in toObject(object));
+  }
+
+  function isLength(value) {
+    return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+  }
+
+  function isStrictComparable(value) {
+    return value === value && (value === 0 ? ((1 / value) > 0) : !isObject(value));
+  }
+
+  function shimIsPlainObject(value) {
+    var Ctor,
+        support = lodash.support;
+
+    if (!(isObjectLike(value) && objToString.call(value) == objectTag) ||
+        (!hasOwnProperty.call(value, 'constructor') &&
+          (Ctor = value.constructor, typeof Ctor == 'function' && !(Ctor instanceof Ctor)))) {
+      return false;
+    }
+    var result;
+    baseForIn(value, function(subValue, key) {
+      result = key;
+    });
+    return result === undefined || hasOwnProperty.call(value, result);
+  }
+
+  function shimKeys(object) {
+    var props = keysIn(object),
+        propsLength = props.length,
+        length = propsLength && object.length,
+        support = lodash.support;
+
+    var allowIndexes = length && isLength(length) &&
+      (isArray(object) || (support.nonEnumArgs && isArguments(object)));
+
+    var index = -1,
+        result = [];
+
+    while (++index < propsLength) {
+      var key = props[index];
+      if ((allowIndexes && isIndex(key, length)) || hasOwnProperty.call(object, key)) {
+        result.push(key);
+      }
+    }
+    return result;
+  }
+
+  function toObject(value) {
+    return isObject(value) ? value : Object(value);
+  }
+
+  function toPath(value) {
+    if (isArray(value)) {
+      return value;
+    }
+    var result = [];
+    baseToString(value).replace(rePropName, function(match, number, quote, string) {
+      result.push(quote ? string.replace(reEscapeChar, '$1') : (number || match));
+    });
+    return result;
+  }
+
+  var findLastIndex = createFindIndex(true);
+
+  function indexOf(array, value, fromIndex) {
+    var length = array ? array.length : 0;
+    if (!length) {
+      return -1;
+    }
+    if (typeof fromIndex == 'number') {
+      fromIndex = fromIndex < 0 ? nativeMax(length + fromIndex, 0) : fromIndex;
+    } else if (fromIndex) {
+      var index = binaryIndex(array, value),
+          other = array[index];
+
+      if (value === value ? (value === other) : (other !== other)) {
+        return index;
+      }
+      return -1;
+    }
+    return baseIndexOf(array, value, fromIndex || 0);
+  }
+
+  function last(array) {
+    var length = array ? array.length : 0;
+    return length ? array[length - 1] : undefined;
+  }
+
+  function slice(array, start, end) {
+    var length = array ? array.length : 0;
+    if (!length) {
+      return [];
+    }
+    if (end && typeof end != 'number' && isIterateeCall(array, start, end)) {
+      start = 0;
+      end = length;
+    }
+    return baseSlice(array, start, end);
+  }
+
+  function unzip(array) {
+    var index = -1,
+        length = (array && array.length && arrayMax(arrayMap(array, getLength))) >>> 0,
+        result = Array(length);
+
+    while (++index < length) {
+      result[index] = arrayMap(array, baseProperty(index));
+    }
+    return result;
+  }
+
+  var zip = restParam(unzip);
+
+  var forEach = createForEach(arrayEach, baseEach);
+
+  function includes(collection, target, fromIndex, guard) {
+    var length = collection ? getLength(collection) : 0;
+    if (!isLength(length)) {
+      collection = values(collection);
+      length = collection.length;
+    }
+    if (!length) {
+      return false;
+    }
+    if (typeof fromIndex != 'number' || (guard && isIterateeCall(target, fromIndex, guard))) {
+      fromIndex = 0;
+    } else {
+      fromIndex = fromIndex < 0 ? nativeMax(length + fromIndex, 0) : (fromIndex || 0);
+    }
+    return (typeof collection == 'string' || !isArray(collection) && isString(collection))
+      ? (fromIndex < length && collection.indexOf(target, fromIndex) > -1)
+      : (getIndexOf(collection, target, fromIndex) > -1);
+  }
+
+  function reject(collection, predicate, thisArg) {
+    var func = isArray(collection) ? arrayFilter : baseFilter;
+    predicate = getCallback(predicate, thisArg, 3);
+    return func(collection, function(value, index, collection) {
+      return !predicate(value, index, collection);
+    });
+  }
+
+  function some(collection, predicate, thisArg) {
+    var func = isArray(collection) ? arraySome : baseSome;
+    if (thisArg && isIterateeCall(collection, predicate, thisArg)) {
+      predicate = null;
+    }
+    if (typeof predicate != 'function' || thisArg !== undefined) {
+      predicate = getCallback(predicate, thisArg, 3);
+    }
+    return func(collection, predicate);
+  }
+
+  function restParam(func, start) {
+    if (typeof func != 'function') {
+      throw new TypeError(FUNC_ERROR_TEXT);
+    }
+    start = nativeMax(start === undefined ? (func.length - 1) : (+start || 0), 0);
+    return function() {
+      var args = arguments,
+          index = -1,
+          length = nativeMax(args.length - start, 0),
+          rest = Array(length);
+
+      while (++index < length) {
+        rest[index] = args[start + index];
+      }
+      switch (start) {
+        case 0: return func.call(this, rest);
+        case 1: return func.call(this, args[0], rest);
+        case 2: return func.call(this, args[0], args[1], rest);
+      }
+      var otherArgs = Array(start + 1);
+      index = -1;
+      while (++index < start) {
+        otherArgs[index] = args[index];
+      }
+      otherArgs[start] = rest;
+      return func.apply(this, otherArgs);
+    };
+  }
+
+  function clone(value, isDeep, customizer, thisArg) {
+    if (isDeep && typeof isDeep != 'boolean' && isIterateeCall(value, isDeep, customizer)) {
+      isDeep = false;
+    }
+    else if (typeof isDeep == 'function') {
+      thisArg = customizer;
+      customizer = isDeep;
+      isDeep = false;
+    }
+    customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 1);
+    return baseClone(value, isDeep, customizer);
+  }
+
+  function isArguments(value) {
+    var length = isObjectLike(value) ? value.length : undefined;
+    return isLength(length) && objToString.call(value) == argsTag;
+  }
+
+  var isArray = nativeIsArray || function(value) {
+    return isObjectLike(value) && isLength(value.length) && objToString.call(value) == arrayTag;
+  };
+
+  function isEmpty(value) {
+    if (value == null) {
+      return true;
+    }
+    var length = getLength(value);
+    if (isLength(length) && (isArray(value) || isString(value) || isArguments(value) ||
+        (isObjectLike(value) && isFunction(value.splice)))) {
+      return !length;
+    }
+    return !keys(value).length;
+  }
+
+  var isFunction = !(baseIsFunction(/x/) || (Uint8Array && !baseIsFunction(Uint8Array))) ? baseIsFunction : function(value) {
+    return objToString.call(value) == funcTag;
+  };
+
+  function isObject(value) {
+    var type = typeof value;
+    return type == 'function' || (!!value && type == 'object');
+  }
+
+  function isNative(value) {
+    if (value == null) {
+      return false;
+    }
+    if (objToString.call(value) == funcTag) {
+      return reIsNative.test(fnToString.call(value));
+    }
+    return isObjectLike(value) && reIsHostCtor.test(value);
+  }
+
+  function isNumber(value) {
+    return typeof value == 'number' || (isObjectLike(value) && objToString.call(value) == numberTag);
+  }
+
+  var isPlainObject = !getPrototypeOf ? shimIsPlainObject : function(value) {
+    if (!(value && objToString.call(value) == objectTag)) {
+      return false;
+    }
+    var valueOf = value.valueOf,
+        objProto = isNative(valueOf) && (objProto = getPrototypeOf(valueOf)) && getPrototypeOf(objProto);
+
+    return objProto
+      ? (value == objProto || getPrototypeOf(value) == objProto)
+      : shimIsPlainObject(value);
+  };
+
+  function isString(value) {
+    return typeof value == 'string' || (isObjectLike(value) && objToString.call(value) == stringTag);
+  }
+
+  function isTypedArray(value) {
+    return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[objToString.call(value)];
+  }
+
+  function toPlainObject(value) {
+    return baseCopy(value, keysIn(value));
+  }
+
+  var assign = createAssigner(function(object, source, customizer) {
+    return customizer
+      ? assignWith(object, source, customizer)
+      : baseAssign(object, source);
   });
 
-  // Define a fallback version of the method in browsers (ahem, IE < 9), where
-  // there isn't any inspectable "Arguments" type.
-  if (!_.isArguments(arguments)) {
-    _.isArguments = function(obj) {
-      return _.has(obj, 'callee');
-    };
+  function has(object, path) {
+    if (object == null) {
+      return false;
+    }
+    var result = hasOwnProperty.call(object, path);
+    if (!result && !isKey(path)) {
+      path = toPath(path);
+      object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+      path = last(path);
+      result = object != null && hasOwnProperty.call(object, path);
+    }
+    return result;
   }
 
-  // Optimize `isFunction` if appropriate. Work around some typeof bugs in old v8,
-  // IE 11 (#1621), and in Safari 8 (#1929).
-  if (typeof /./ != 'function' && typeof Int8Array != 'object') {
-    _.isFunction = function(obj) {
-      return typeof obj == 'function' || false;
-    };
+  var keys = !nativeKeys ? shimKeys : function(object) {
+    if (object) {
+      var Ctor = object.constructor,
+          length = object.length;
+    }
+    if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
+        (typeof object != 'function' && isLength(length))) {
+      return shimKeys(object);
+    }
+    return isObject(object) ? nativeKeys(object) : [];
+  };
+
+  function keysIn(object) {
+    if (object == null) {
+      return [];
+    }
+    if (!isObject(object)) {
+      object = Object(object);
+    }
+    var length = object.length;
+    length = (length && isLength(length) &&
+      (isArray(object) || (support.nonEnumArgs && isArguments(object))) && length) || 0;
+
+    var Ctor = object.constructor,
+        index = -1,
+        isProto = typeof Ctor == 'function' && Ctor.prototype === object,
+        result = Array(length),
+        skipIndexes = length > 0;
+
+    while (++index < length) {
+      result[index] = (index + '');
+    }
+    for (var key in object) {
+      if (!(skipIndexes && isIndex(key, length)) &&
+          !(key == 'constructor' && (isProto || !hasOwnProperty.call(object, key)))) {
+        result.push(key);
+      }
+    }
+    return result;
   }
 
-  // Is a given object a finite number?
-  _.isFinite = function(obj) {
-    return isFinite(obj) && !isNaN(parseFloat(obj));
-  };
+  var merge = createAssigner(baseMerge);
 
-  // Is the given value `NaN`? (NaN is the only number which does not equal itself).
-  _.isNaN = function(obj) {
-    return _.isNumber(obj) && obj !== +obj;
-  };
+  function values(object) {
+    return baseValues(object, keys(object));
+  }
 
-  // Is a given value a boolean?
-  _.isBoolean = function(obj) {
-    return obj === true || obj === false || toString.call(obj) === '[object Boolean]';
-  };
+  function escapeRegExp(string) {
+    string = baseToString(string);
+    return (string && reHasRegExpChars.test(string))
+      ? string.replace(reRegExpChars, '\\$&')
+      : string;
+  }
 
-  // Is a given value equal to null?
-  _.isNull = function(obj) {
-    return obj === null;
-  };
+  function callback(func, thisArg, guard) {
+    if (guard && isIterateeCall(func, thisArg, guard)) {
+      thisArg = null;
+    }
+    return baseCallback(func, thisArg);
+  }
 
-  // Is a given variable undefined?
-  _.isUndefined = function(obj) {
-    return obj === void 0;
-  };
-
-  // Shortcut function for checking if an object has a given property directly
-  // on itself (in other words, not on a prototype).
-  _.has = function(obj, key) {
-    return obj != null && hasOwnProperty.call(obj, key);
-  };
-
-  // Utility Functions
-  // -----------------
-
-  // Run Underscore.js in *noConflict* mode, returning the `_` variable to its
-  // previous owner. Returns a reference to the Underscore object.
-  _.noConflict = function() {
-    root._ = previousUnderscore;
-    return this;
-  };
-
-  // Keep the identity function around for default iteratees.
-  _.identity = function(value) {
-    return value;
-  };
-
-  // Predicate-generating functions. Often useful outside of Underscore.
-  _.constant = function(value) {
+  function constant(value) {
     return function() {
       return value;
     };
-  };
+  }
 
-  _.noop = function(){};
+  function identity(value) {
+    return value;
+  }
 
-  _.property = property;
+  function property(path) {
+    return isKey(path) ? baseProperty(path) : basePropertyDeep(path);
+  }
 
-  // Generates a function for a given object that returns a given property.
-  _.propertyOf = function(obj) {
-    return obj == null ? function(){} : function(key) {
-      return obj[key];
-    };
-  };
+  // Add functions that return wrapped values when chaining.
+  lodash.assign = assign;
+  lodash.callback = callback;
+  lodash.constant = constant;
+  lodash.forEach = forEach;
+  lodash.keys = keys;
+  lodash.keysIn = keysIn;
+  lodash.merge = merge;
+  lodash.property = property;
+  lodash.reject = reject;
+  lodash.restParam = restParam;
+  lodash.slice = slice;
+  lodash.toPlainObject = toPlainObject;
+  lodash.unzip = unzip;
+  lodash.values = values;
+  lodash.zip = zip;
 
-  // Returns a predicate for checking whether an object has a given set of
-  // `key:value` pairs.
-  _.matcher = _.matches = function(attrs) {
-    attrs = _.extendOwn({}, attrs);
-    return function(obj) {
-      return _.isMatch(obj, attrs);
-    };
-  };
+  lodash.each = forEach;
+  lodash.extend = assign;
+  lodash.iteratee = callback;
 
-  // Run a function **n** times.
-  _.times = function(n, iteratee, context) {
-    var accum = Array(Math.max(0, n));
-    iteratee = optimizeCb(iteratee, context, 1);
-    for (var i = 0; i < n; i++) accum[i] = iteratee(i);
-    return accum;
-  };
+  // Add functions that return unwrapped values when chaining.
+  lodash.clone = clone;
+  lodash.escapeRegExp = escapeRegExp;
+  lodash.findLastIndex = findLastIndex;
+  lodash.has = has;
+  lodash.identity = identity;
+  lodash.includes = includes;
+  lodash.indexOf = indexOf;
+  lodash.isArguments = isArguments;
+  lodash.isArray = isArray;
+  lodash.isEmpty = isEmpty;
+  lodash.isFunction = isFunction;
+  lodash.isNative = isNative;
+  lodash.isNumber = isNumber;
+  lodash.isObject = isObject;
+  lodash.isPlainObject = isPlainObject;
+  lodash.isString = isString;
+  lodash.isTypedArray = isTypedArray;
+  lodash.last = last;
+  lodash.some = some;
 
-  // Return a random integer between min and max (inclusive).
-  _.random = function(min, max) {
-    if (max == null) {
-      max = min;
-      min = 0;
+  lodash.any = some;
+  lodash.contains = includes;
+  lodash.include = includes;
+
+  lodash.VERSION = VERSION;
+
+  // Some AMD build optimizers like r.js check for condition patterns like the following:
+  if (freeExports && freeModule) {
+    if (moduleExports) {
+      (freeModule.exports = lodash)._ = lodash;
     }
-    return min + Math.floor(Math.random() * (max - min + 1));
-  };
-
-  // A (possibly faster) way to get the current timestamp as an integer.
-  _.now = Date.now || function() {
-    return new Date().getTime();
-  };
-
-   // List of HTML entities for escaping.
-  var escapeMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#x27;',
-    '`': '&#x60;'
-  };
-  var unescapeMap = _.invert(escapeMap);
-
-  // Functions for escaping and unescaping strings to/from HTML interpolation.
-  var createEscaper = function(map) {
-    var escaper = function(match) {
-      return map[match];
-    };
-    // Regexes for identifying a key that needs to be escaped
-    var source = '(?:' + _.keys(map).join('|') + ')';
-    var testRegexp = RegExp(source);
-    var replaceRegexp = RegExp(source, 'g');
-    return function(string) {
-      string = string == null ? '' : '' + string;
-      return testRegexp.test(string) ? string.replace(replaceRegexp, escaper) : string;
-    };
-  };
-  _.escape = createEscaper(escapeMap);
-  _.unescape = createEscaper(unescapeMap);
-
-  // If the value of the named `property` is a function then invoke it with the
-  // `object` as context; otherwise, return it.
-  _.result = function(object, property, fallback) {
-    var value = object == null ? void 0 : object[property];
-    if (value === void 0) {
-      value = fallback;
+    else {
+      freeExports._ = lodash;
     }
-    return _.isFunction(value) ? value.call(object) : value;
-  };
-
-  // Generate a unique integer id (unique within the entire client session).
-  // Useful for temporary DOM ids.
-  var idCounter = 0;
-  _.uniqueId = function(prefix) {
-    var id = ++idCounter + '';
-    return prefix ? prefix + id : id;
-  };
-
-  // By default, Underscore uses ERB-style template delimiters, change the
-  // following template settings to use alternative delimiters.
-  _.templateSettings = {
-    evaluate    : /<%([\s\S]+?)%>/g,
-    interpolate : /<%=([\s\S]+?)%>/g,
-    escape      : /<%-([\s\S]+?)%>/g
-  };
-
-  // When customizing `templateSettings`, if you don't want to define an
-  // interpolation, evaluation or escaping regex, we need one that is
-  // guaranteed not to match.
-  var noMatch = /(.)^/;
-
-  // Certain characters need to be escaped so that they can be put into a
-  // string literal.
-  var escapes = {
-    "'":      "'",
-    '\\':     '\\',
-    '\r':     'r',
-    '\n':     'n',
-    '\u2028': 'u2028',
-    '\u2029': 'u2029'
-  };
-
-  var escaper = /\\|'|\r|\n|\u2028|\u2029/g;
-
-  var escapeChar = function(match) {
-    return '\\' + escapes[match];
-  };
-
-  // JavaScript micro-templating, similar to John Resig's implementation.
-  // Underscore templating handles arbitrary delimiters, preserves whitespace,
-  // and correctly escapes quotes within interpolated code.
-  // NB: `oldSettings` only exists for backwards compatibility.
-  _.template = function(text, settings, oldSettings) {
-    if (!settings && oldSettings) settings = oldSettings;
-    settings = _.defaults({}, settings, _.templateSettings);
-
-    // Combine delimiters into one regular expression via alternation.
-    var matcher = RegExp([
-      (settings.escape || noMatch).source,
-      (settings.interpolate || noMatch).source,
-      (settings.evaluate || noMatch).source
-    ].join('|') + '|$', 'g');
-
-    // Compile the template source, escaping string literals appropriately.
-    var index = 0;
-    var source = "__p+='";
-    text.replace(matcher, function(match, escape, interpolate, evaluate, offset) {
-      source += text.slice(index, offset).replace(escaper, escapeChar);
-      index = offset + match.length;
-
-      if (escape) {
-        source += "'+\n((__t=(" + escape + "))==null?'':_.escape(__t))+\n'";
-      } else if (interpolate) {
-        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-      } else if (evaluate) {
-        source += "';\n" + evaluate + "\n__p+='";
-      }
-
-      // Adobe VMs need the match returned to produce the correct offest.
-      return match;
-    });
-    source += "';\n";
-
-    // If a variable is not specified, place data values in local scope.
-    if (!settings.variable) source = 'with(obj||{}){\n' + source + '}\n';
-
-    source = "var __t,__p='',__j=Array.prototype.join," +
-      "print=function(){__p+=__j.call(arguments,'');};\n" +
-      source + 'return __p;\n';
-
-    try {
-      var render = new Function(settings.variable || 'obj', '_', source);
-    } catch (e) {
-      e.source = source;
-      throw e;
-    }
-
-    var template = function(data) {
-      return render.call(this, data, _);
-    };
-
-    // Provide the compiled source as a convenience for precompilation.
-    var argument = settings.variable || 'obj';
-    template.source = 'function(' + argument + '){\n' + source + '}';
-
-    return template;
-  };
-
-  // Add a "chain" function. Start chaining a wrapped Underscore object.
-  _.chain = function(obj) {
-    var instance = _(obj);
-    instance._chain = true;
-    return instance;
-  };
-
-  // OOP
-  // ---------------
-  // If Underscore is called as a function, it returns a wrapped object that
-  // can be used OO-style. This wrapper holds altered versions of all the
-  // underscore functions. Wrapped objects may be chained.
-
-  // Helper function to continue chaining intermediate results.
-  var result = function(instance, obj) {
-    return instance._chain ? _(obj).chain() : obj;
-  };
-
-  // Add your own custom functions to the Underscore object.
-  _.mixin = function(obj) {
-    _.each(_.functions(obj), function(name) {
-      var func = _[name] = obj[name];
-      _.prototype[name] = function() {
-        var args = [this._wrapped];
-        push.apply(args, arguments);
-        return result(this, func.apply(_, args));
-      };
-    });
-  };
-
-  // Add all of the Underscore functions to the wrapper object.
-  _.mixin(_);
-
-  // Add all mutator Array functions to the wrapper.
-  _.each(['pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'], function(name) {
-    var method = ArrayProto[name];
-    _.prototype[name] = function() {
-      var obj = this._wrapped;
-      method.apply(obj, arguments);
-      if ((name === 'shift' || name === 'splice') && obj.length === 0) delete obj[0];
-      return result(this, obj);
-    };
-  });
-
-  // Add all accessor Array functions to the wrapper.
-  _.each(['concat', 'join', 'slice'], function(name) {
-    var method = ArrayProto[name];
-    _.prototype[name] = function() {
-      return result(this, method.apply(this._wrapped, arguments));
-    };
-  });
-
-  // Extracts the result from a wrapped and chained object.
-  _.prototype.value = function() {
-    return this._wrapped;
-  };
-
-  // Provide unwrapping proxy for some methods used in engine operations
-  // such as arithmetic and JSON stringification.
-  _.prototype.valueOf = _.prototype.toJSON = _.prototype.value;
-
-  _.prototype.toString = function() {
-    return '' + this._wrapped;
-  };
-
-  // AMD registration happens at the end for compatibility with AMD loaders
-  // that may not enforce next-turn semantics on modules. Even though general
-  // practice for AMD registration is to be anonymous, underscore registers
-  // as a named module because, like jQuery, it is a base library that is
-  // popular enough to be bundled in a third party lib, but not be part of
-  // an AMD load request. Those cases could generate an error when an
-  // anonymous define() is called outside of a loader request.
-  if (typeof define === 'function' && define.amd) {
-    define('underscore', [], function() {
-      return _;
-    });
+  }
+  else {
+    root._ = lodash;
   }
 }.call(this));
 
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],"/node_modules/jshint/src/jshint.js":[function(_dereq_,module,exports){
 /*!
  * JSHint, by JSHint Community.
@@ -1934,15 +1938,16 @@ module.exports = {
 /*global console:true */
 /*exported console */
 
-var _        = _dereq_("underscore");
-var events   = _dereq_("events");
-var vars     = _dereq_("./vars.js");
-var messages = _dereq_("./messages.js");
-var Lexer    = _dereq_("./lex.js").Lexer;
-var reg      = _dereq_("./reg.js");
-var state    = _dereq_("./state.js").state;
-var style    = _dereq_("./style.js");
-var options  = _dereq_("./options.js");
+var _            = _dereq_("../lodash");
+var events       = _dereq_("events");
+var vars         = _dereq_("./vars.js");
+var messages     = _dereq_("./messages.js");
+var Lexer        = _dereq_("./lex.js").Lexer;
+var reg          = _dereq_("./reg.js");
+var state        = _dereq_("./state.js").state;
+var style        = _dereq_("./style.js");
+var options      = _dereq_("./options.js");
+var scopeManager = _dereq_("./scope-manager.js");
 
 // We build the application inside a function so that we produce only a singleton
 // variable. That function will be invoked immediately, and its return value is
@@ -1971,7 +1976,6 @@ var JSHINT = (function() {
     },
 
     declared, // Globals that were declared using /*global ... */ syntax.
-    exported, // Variables that are used outside of the current file.
 
     functionicity = [
       "closure", "exception", "global", "label",
@@ -1980,8 +1984,6 @@ var JSHINT = (function() {
 
     functions, // All of the functions
 
-    global, // The global scope
-    implied, // Implied globals
     inblock,
     indent,
     lookahead,
@@ -1990,9 +1992,7 @@ var JSHINT = (function() {
     membersOnly,
     predefined,    // Global variables defined by option
 
-    scope,  // The current scope
     stack,
-    unuseds,
     urls,
 
     extraModules = [],
@@ -2090,26 +2090,35 @@ var JSHINT = (function() {
   function assume() {
     processenforceall();
 
-    if (!state.option.es3) {
+    /**
+     * TODO: Remove in JSHint 3
+     */
+    if (!state.option.esversion && !state.option.moz) {
+      if (state.option.es3) {
+        state.option.esversion = 3;
+      } else if (state.option.esnext) {
+        state.option.esversion = 6;
+      } else {
+        state.option.esversion = 5;
+      }
+    }
+
+    if (state.inES5()) {
       combine(predefined, vars.ecmaIdentifiers[5]);
     }
 
-    if (state.option.esnext) {
+    if (state.inES6()) {
       combine(predefined, vars.ecmaIdentifiers[6]);
     }
 
     if (state.option.module) {
-      /**
-       * TODO: Extend this restriction to *all* "environmental" options.
-       */
-      if (!hasParsedCode(state.funct)) {
-        error("E055", state.tokens.next, "module");
+      if (state.option.strict === true) {
+        state.option.strict = "global";
       }
-
       /**
        * TODO: Extend this restriction to *all* ES6-specific options.
        */
-      if (!state.inESNext()) {
+      if (!state.inES6()) {
         warning("W134", state.tokens.next, "module", 6);
       }
     }
@@ -2136,6 +2145,9 @@ var JSHINT = (function() {
 
     if (state.option.phantom) {
       combine(predefined, vars.phantom);
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
     }
 
     if (state.option.prototypejs) {
@@ -2145,6 +2157,9 @@ var JSHINT = (function() {
     if (state.option.node) {
       combine(predefined, vars.node);
       combine(predefined, vars.typed);
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
     }
 
     if (state.option.devel) {
@@ -2164,6 +2179,9 @@ var JSHINT = (function() {
       combine(predefined, vars.browser);
       combine(predefined, vars.typed);
       combine(predefined, vars.browserify);
+      if (state.option.strict === true) {
+        state.option.strict = "global";
+      }
     }
 
     if (state.option.nonstandard) {
@@ -2191,7 +2209,7 @@ var JSHINT = (function() {
     }
 
     if (state.option.globalstrict && state.option.strict !== false) {
-      state.option.strict = true;
+      state.option.strict = "global";
     }
 
     if (state.option.yui) {
@@ -2216,12 +2234,6 @@ var JSHINT = (function() {
       raw: message,
       code: code
     };
-  }
-
-  function isundef(scope, code, token, a) {
-    if (!state.ignored[code] && state.option.undef !== false) {
-      JSHINT.undefs.push([scope, code, token, a]);
-    }
   }
 
   function removeIgnoredMessages() {
@@ -2308,82 +2320,10 @@ var JSHINT = (function() {
     return i;
   }
 
-  // adds an indentifier to the relevant current scope and creates warnings/errors as necessary
-  // name: string
-  // opts: { type: string, token: token, isblockscoped: bool }
-  function addlabel(name, opts) {
-
-    var type  = opts.type;
-    var token = opts.token;
-    var isblockscoped = opts.isblockscoped;
-
-    // Define label in the current function in the current scope.
-    if (type === "exception") {
-      if (_.has(state.funct["(context)"], name)) {
-        if (state.funct[name] !== true && !state.option.node) {
-          warning("W002", state.tokens.next, name);
-        }
-      }
-    }
-
-    if (_.has(state.funct, name) && !state.funct["(global)"]) {
-      if (state.funct[name] === true) {
-        if (state.option.latedef) {
-          if ((state.option.latedef === true && _.contains([state.funct[name], type], "unction")) ||
-              !_.contains([state.funct[name], type], "unction")) {
-            warning("W003", state.tokens.next, name);
-          }
-        }
-      } else {
-        if ((!state.option.shadow || _.contains([ "inner", "outer" ], state.option.shadow)) &&
-            type !== "exception" || state.funct["(blockscope)"].getlabel(name)) {
-          warning("W004", state.tokens.next, name);
-        }
-      }
-    }
-
-    if (state.funct["(context)"] && _.has(state.funct["(context)"], name) && type !== "function") {
-      if (state.option.shadow === "outer") {
-        warning("W123", state.tokens.next, name);
-      }
-    }
-
-    // if the identifier is blockscoped (a let or a const), add it only to the current blockscope
-    if (isblockscoped) {
-      state.funct["(blockscope)"].current.add(name, type, state.tokens.curr);
-      if (state.funct["(blockscope)"].atTop() && exported[name]) {
-        state.tokens.curr.exported = true;
-      }
-    } else {
-      state.funct["(blockscope)"].shadow(name);
-      state.funct[name] = type;
-
-      if (token) {
-        state.funct["(tokens)"][name] = token;
-      }
-
-      if (state.funct["(global)"]) {
-        global[name] = state.funct;
-        if (_.has(implied, name)) {
-          if (state.option.latedef) {
-            if ((state.option.latedef === true &&
-                _.contains([state.funct[name], type], "unction")) ||
-                !_.contains([state.funct[name], type], "unction")) {
-              warning("W003", state.tokens.next, name);
-            }
-          }
-
-          delete implied[name];
-        }
-      } else {
-        scope[name] = state.funct;
-      }
-    }
-  }
-
   function doOption() {
     var nt = state.tokens.next;
     var body = nt.body.match(/(-\s+)?[^\s,:]+(?:\s*:\s*(-\s+)?[^\s,]+)?/g) || [];
+
     var predef = {};
     if (nt.type === "globals") {
       body.forEach(function(g, idx) {
@@ -2431,7 +2371,7 @@ var JSHINT = (function() {
           return;
         }
 
-        exported[e] = true;
+        state.funct["(scope)"].addExported(e);
       });
     }
 
@@ -2574,18 +2514,90 @@ var JSHINT = (function() {
 
         if (key === "ignore") {
           switch (val) {
-          case "start":
-            state.ignoreLinterErrors = true;
-            break;
-          case "end":
-            state.ignoreLinterErrors = false;
-            break;
           case "line":
             state.ignoredLines[nt.line] = true;
             removeIgnoredMessages();
             break;
           default:
             error("E002", nt);
+          }
+          return;
+        }
+
+        if (key === "strict") {
+          switch (val) {
+          case "true":
+            state.option.strict = true;
+            break;
+          case "false":
+            state.option.strict = false;
+            break;
+          case "func":
+          case "global":
+          case "implied":
+            state.option.strict = val;
+            break;
+          default:
+            error("E002", nt);
+          }
+          return;
+        }
+
+        if (key === "module") {
+          /**
+           * TODO: Extend this restriction to *all* "environmental" options.
+           */
+          if (!hasParsedCode(state.funct)) {
+            error("E055", state.tokens.next, "module");
+          }
+        }
+
+        /**
+         * TODO: Remove in JSHint 3
+         */
+        var esversions = {
+          es3   : 3,
+          es5   : 5,
+          esnext: 6
+        };
+        if (_.has(esversions, key)) {
+          switch (val) {
+          case "true":
+            state.option.moz = false;
+            state.option.esversion = esversions[key];
+            break;
+          case "false":
+            if (!state.option.moz) {
+              state.option.esversion = 5;
+            }
+            break;
+          default:
+            error("E002", nt);
+          }
+          return;
+        }
+
+        if (key === "esversion") {
+          switch (val) {
+          case "5":
+            if (state.inES5(true)) {
+              warning("I003");
+            }
+            /* falls through */
+          case "3":
+          case "6":
+            state.option.moz = false;
+            state.option.esversion = +val;
+            break;
+          case "2015":
+            state.option.moz = false;
+            state.option.esversion = 6;
+            break;
+          default:
+            error("E002", nt);
+          }
+          if (!hasParsedCode(state.funct)) {
+            error("E055", state.tokens.next, "esversion");
           }
           return;
         }
@@ -2630,7 +2642,11 @@ var JSHINT = (function() {
   //     for ( var i = ...
 
   function peek(p) {
-    var i = p || 0, j = 0, t;
+    var i = p || 0, j = lookahead.length, t;
+
+    if (i < j) {
+      return lookahead[i];
+    }
 
     while (j <= i) {
       t = lookahead[j];
@@ -2709,7 +2725,11 @@ var JSHINT = (function() {
       }
 
       if (state.tokens.next.isSpecial) {
-        doOption();
+        if (state.tokens.next.type === "falls through") {
+          state.tokens.curr.caseFallsThrough = true;
+        } else {
+          doOption();
+        }
       } else {
         if (state.tokens.next.id !== "(endline)") {
           break;
@@ -2764,7 +2784,7 @@ var JSHINT = (function() {
       }
       isLetExpr = true;
       // create a new block scope we use only for the current expression
-      state.funct["(blockscope)"].stack();
+      state.funct["(scope)"].stack();
       advance("let");
       advance("(");
       state.tokens.prev.fud();
@@ -2841,7 +2861,7 @@ var JSHINT = (function() {
       }
     }
     if (isLetExpr) {
-      state.funct["(blockscope)"].unstack();
+      state.funct["(scope)"].unstack();
     }
 
     state.nameStack.pop();
@@ -2997,12 +3017,12 @@ var JSHINT = (function() {
           warning("W017", this);
         }
 
+        if (this.right && this.right.isMetaProperty) {
+          error("E031", this);
         // detect increment/decrement of a const
         // in the case of a.b, right will be the "." punctuator
-        if (this.right && this.right.identifier) {
-          if (state.funct["(blockscope)"].labeltype(this.right.value) === "const") {
-            error("E013", this, this.right.value);
-          }
+        } else if (this.right && this.right.identifier) {
+          state.funct["(scope)"].block.modify(this.right.value, this);
         }
       }
 
@@ -3072,7 +3092,6 @@ var JSHINT = (function() {
     };
     return x;
   }
-
 
   function application(s) {
     var x = symbol(s, 42);
@@ -3159,7 +3178,7 @@ var JSHINT = (function() {
     if (!left || !right)
       return false;
 
-    values = state.inESNext() ? typeofValues.es6 : typeofValues.es3;
+    values = state.inES6() ? typeofValues.es6 : typeofValues.es3;
 
     if (right.type === "(identifier)" && right.value === "typeof" && left.type === "(string)")
       return !_.contains(values, left.value);
@@ -3216,67 +3235,85 @@ var JSHINT = (function() {
     if (prototype) return walkNative(prototype);
   }
 
+  /**
+   * Checks the left hand side of an assignment for issues, returns if ok
+   * @param {token} left - the left hand side of the assignment
+   * @param {token=} assignToken - the token for the assignment, used for reporting
+   * @param {object=} options - optional object
+   * @param {boolean} options.allowDestructuring - whether to allow destructuting binding
+   * @returns {boolean} Whether the left hand side is OK
+   */
+  function checkLeftSideAssign(left, assignToken, options) {
+
+    var allowDestructuring = options && options.allowDestructuring;
+
+    assignToken = assignToken || left;
+
+    if (state.option.freeze) {
+      var nativeObject = findNativePrototype(left);
+      if (nativeObject)
+        warning("W121", left, nativeObject);
+    }
+
+    if (left.identifier && !left.isMetaProperty) {
+      // reassign also calls modify
+      // but we are specific in order to catch function re-assignment
+      // and globals re-assignment
+      state.funct["(scope)"].block.reassign(left.value, left);
+    }
+
+    if (left.id === ".") {
+      if (!left.left || left.left.value === "arguments" && !state.isStrict()) {
+        warning("E031", assignToken);
+      }
+
+      state.nameStack.set(state.tokens.prev);
+      return true;
+    } else if (left.id === "{" || left.id === "[") {
+      if (allowDestructuring && state.tokens.curr.left.destructAssign) {
+        state.tokens.curr.left.destructAssign.forEach(function(t) {
+          if (t.id) {
+            state.funct["(scope)"].block.modify(t.id, t.token);
+          }
+        });
+      } else {
+        if (left.id === "{" || !left.left) {
+          warning("E031", assignToken);
+        } else if (left.left.value === "arguments" && !state.isStrict()) {
+          warning("E031", assignToken);
+        }
+      }
+
+      if (left.id === "[") {
+        state.nameStack.set(left.right);
+      }
+
+      return true;
+    } else if (left.isMetaProperty) {
+      error("E031", assignToken);
+      return true;
+    } else if (left.identifier && !isReserved(left)) {
+      if (state.funct["(scope)"].labeltype(left.value) === "exception") {
+        warning("W022", left);
+      }
+      state.nameStack.set(left);
+      return true;
+    }
+
+    if (left === state.syntax["function"]) {
+      warning("W023", state.tokens.curr);
+    }
+
+    return false;
+  }
+
   function assignop(s, f, p) {
     var x = infix(s, typeof f === "function" ? f : function(left, that) {
       that.left = left;
 
-      if (left) {
-        if (state.option.freeze) {
-          var nativeObject = findNativePrototype(left);
-          if (nativeObject)
-            warning("W121", left, nativeObject);
-        }
-
-        if (predefined[left.value] === false &&
-            scope[left.value]["(global)"] === true) {
-          warning("W020", left);
-        } else if (left["function"]) {
-          warning("W021", left, left.value);
-        }
-
-        if (state.funct["(blockscope)"].labeltype(left.value) === "const") {
-          error("E013", left, left.value);
-        }
-
-        if (left.id === ".") {
-          if (!left.left) {
-            warning("E031", that);
-          } else if (left.left.value === "arguments" && !state.isStrict()) {
-            warning("E031", that);
-          }
-
-          state.nameStack.set(state.tokens.prev);
-          that.right = expression(10);
-          return that;
-        } else if (left.id === "[") {
-          if (state.tokens.curr.left.first) {
-            state.tokens.curr.left.first.forEach(function(t) {
-              if (t && state.funct[t.value] === "const") {
-                error("E013", t, t.value);
-              }
-            });
-          } else if (!left.left) {
-            warning("E031", that);
-          } else if (left.left.value === "arguments" && !state.isStrict()) {
-            warning("E031", that);
-          }
-
-          state.nameStack.set(left.right);
-
-          that.right = expression(10);
-          return that;
-        } else if (left.identifier && !isReserved(left)) {
-          if (state.funct[left.value] === "exception") {
-            warning("W022", left);
-          }
-          state.nameStack.set(left);
-          that.right = expression(10);
-          return that;
-        }
-
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
+      if (left && checkLeftSideAssign(left, that, { allowDestructuring: true })) {
+        that.right = expression(10);
+        return that;
       }
 
       error("E031", that);
@@ -3302,22 +3339,14 @@ var JSHINT = (function() {
     return x;
   }
 
-
   function bitwiseassignop(s) {
     return assignop(s, function(left, that) {
       if (state.option.bitwise) {
         warning("W016", that, that.id);
       }
 
-      if (left) {
-        if (left.id === "." || left.id === "[" ||
-            (left.identifier && !isReserved(left))) {
-          expression(10);
-          return that;
-        }
-        if (left === state.syntax["function"]) {
-          warning("W023", state.tokens.curr);
-        }
+      if (left && checkLeftSideAssign(left, that)) {
+        that.right = expression(10);
         return that;
       }
       error("E031", that);
@@ -3336,12 +3365,12 @@ var JSHINT = (function() {
         warning("W017", this);
       }
 
+      if (left.isMetaProperty) {
+        error("E031", this);
       // detect increment/decrement of a const
       // in the case of a.b, left will be the "." punctuator
-      if (left && left.identifier) {
-        if (state.funct["(blockscope)"].labeltype(left.value) === "const") {
-          error("E013", this, left.value);
-        }
+      } else if (left && left.identifier) {
+        state.funct["(scope)"].block.modify(left.value, left);
       }
 
       this.left = left;
@@ -3395,14 +3424,14 @@ var JSHINT = (function() {
 
     // parameter destructuring with rest operator
     if (state.tokens.next.value === "...") {
-      if (!state.option.esnext) {
-        warning("W119", state.tokens.next, "spread/rest operator");
+      if (!state.inES6(true)) {
+        warning("W119", state.tokens.next, "spread/rest operator", "6");
       }
       advance();
 
-      if (checkPunctuators(state.tokens.next, ["..."])) {
+      if (checkPunctuator(state.tokens.next, "...")) {
         warning("E024", state.tokens.next, "...");
-        while (checkPunctuators(state.tokens.next, ["..."])) {
+        while (checkPunctuator(state.tokens.next, "...")) {
           advance();
         }
       }
@@ -3459,12 +3488,18 @@ var JSHINT = (function() {
     if (state.tokens.next.id !== ";") {
       // don't complain about unclosed templates / strings
       if (state.tokens.next.isUnclosed) return advance();
-      if (!state.option.asi) {
+
+      var sameLine = startLine(state.tokens.next) === state.tokens.curr.line &&
+                     state.tokens.next.id !== "(end)";
+      var blockEnd = checkPunctuator(state.tokens.next, "}");
+
+      if (sameLine && !blockEnd) {
+        errorAt("E058", state.tokens.curr.line, state.tokens.curr.character);
+      } else if (!state.option.asi) {
         // If this is the last statement in a block that ends on
         // the same line *and* option lastsemic is on, ignore the warning.
         // Otherwise, complain about missing semicolon.
-        if (!state.option.lastsemic || state.tokens.next.id !== "}" ||
-          startLine(state.tokens.next) !== state.tokens.curr.line) {
+        if ((blockEnd && !state.option.lastsemic) || !sameLine) {
           warningAt("W033", state.tokens.curr.line, state.tokens.curr.character);
         }
       }
@@ -3474,7 +3509,7 @@ var JSHINT = (function() {
   }
 
   function statement() {
-    var i = indent, r, s = scope, t = state.tokens.next;
+    var i = indent, r, t = state.tokens.next, hasOwnScope = false;
 
     if (t.id === ";") {
       advance(";");
@@ -3493,28 +3528,13 @@ var JSHINT = (function() {
       res = false;
     }
 
-    // detect a module import declaration
-    if (t.value === "module" && t.type === "(identifier)") {
-      if (peek().type === "(identifier)") {
-        if (!state.inESNext()) {
-          warning("W119", state.tokens.curr, "module");
-        }
-
-        advance("module");
-        var name = identifier();
-        addlabel(name, { type: "unused", token: state.tokens.curr });
-        advance("from");
-        advance("(string)");
-        parseFinalSemicolon();
-        return;
-      }
-    }
-
     if (t.identifier && !res && peek().id === ":") {
       advance();
       advance(":");
-      scope = Object.create(s);
-      addlabel(t.value, { type: "label" });
+
+      hasOwnScope = true;
+      state.funct["(scope)"].stack();
+      state.funct["(scope)"].block.addBreakLabel(t.value, { token: state.tokens.curr });
 
       if (!state.tokens.next.labelled && state.tokens.next.value !== "{") {
         warning("W028", state.tokens.next, t.value, state.tokens.next.value);
@@ -3543,10 +3563,11 @@ var JSHINT = (function() {
 
     r = expression(0, true);
 
-    if (r && (!r.identifier || r.value !== "function") && (r.type !== "(punctuator)")) {
+    if (r && !(r.identifier && r.value === "function") &&
+        !(r.type === "(punctuator)" && r.left &&
+          r.left.identifier && r.left.value === "function")) {
       if (!state.isStrict() &&
-          state.option.globalstrict &&
-          state.option.strict) {
+          state.option.strict === "global") {
         warning("E007");
       }
     }
@@ -3566,7 +3587,9 @@ var JSHINT = (function() {
     // Restore the indentation.
 
     indent = i;
-    scope = s;
+    if (hasOwnScope) {
+      state.funct["(scope)"].unstack();
+    }
     return r;
   }
 
@@ -3610,35 +3633,37 @@ var JSHINT = (function() {
           p = pn;
         } else if (pn.value === "[" || pn.value === ".") {
           // string -> [ | . is a valid production
-          return;
+          break;
         } else if (!state.option.asi || pn.value === "(") {
           // string -> ( is not a valid production
           warning("W033", state.tokens.next);
         }
       } else if (p.id === "." || p.id === "[") {
-        return;
+        break;
       } else if (p.id !== ";") {
         warning("W033", p);
       }
 
       advance();
-      if (state.directive[state.tokens.curr.value]) {
-        warning("W034", state.tokens.curr, state.tokens.curr.value);
-      }
-
-      if (state.tokens.curr.value === "use strict") {
-        if (!state.option["(explicitNewcap)"]) {
-          state.option.newcap = true;
-        }
-        state.option.undef = true;
+      var directive = state.tokens.curr.value;
+      if (state.directive[directive] ||
+          (directive === "use strict" && state.option.strict === "implied")) {
+        warning("W034", state.tokens.curr, directive);
       }
 
       // there's no directive negation, so always set to true
-      state.directive[state.tokens.curr.value] = true;
+      state.directive[directive] = true;
 
       if (p.id === ";") {
         advance(";");
       }
+    }
+
+    if (state.isStrict()) {
+      if (!state.option["(explicitNewcap)"]) {
+        state.option.newcap = true;
+      }
+      state.option.undef = true;
     }
   }
 
@@ -3658,15 +3683,11 @@ var JSHINT = (function() {
       b = inblock,
       old_indent = indent,
       m,
-      s = scope,
       t,
       line,
       d;
 
     inblock = ordinary;
-
-    if (!ordinary || !state.option.funcscope)
-      scope = Object.create(scope);
 
     t = state.tokens.next;
 
@@ -3678,7 +3699,7 @@ var JSHINT = (function() {
       advance("{");
 
       // create a new block scope
-      state.funct["(blockscope)"].stack();
+      state.funct["(scope)"].stack();
 
       line = state.tokens.curr.line;
       if (state.tokens.next.id !== "}") {
@@ -3707,20 +3728,25 @@ var JSHINT = (function() {
 
         metrics.statementCount += a.length;
 
-        if (isfunc) {
-          state.directive = m;
-        }
-
         indent -= state.option.indent;
       }
 
       advance("}", t);
 
-      state.funct["(blockscope)"].unstack();
+      if (isfunc) {
+        state.funct["(scope)"].validateParams();
+        if (m) {
+          state.directive = m;
+        }
+      }
+
+      state.funct["(scope)"].unstack();
 
       indent = old_indent;
     } else if (!ordinary) {
       if (isfunc) {
+        state.funct["(scope)"].stack();
+
         m = {};
         if (stmt && !isfatarrow && !state.inMoz()) {
           error("W118", state.tokens.curr, "function closure expressions");
@@ -3740,13 +3766,17 @@ var JSHINT = (function() {
             warning("E007");
           }
         }
+
+        state.funct["(scope)"].unstack();
       } else {
         error("E021", state.tokens.next, "{", state.tokens.next.value);
       }
     } else {
 
       // check to avoid let declaration not within a block
-      state.funct["(noblockscopedvar)"] = true;
+      // though is fine inside for loop initializer section
+      state.funct["(noblockscopedvar)"] = state.tokens.next.id !== "for";
+      state.funct["(scope)"].stack();
 
       if (!stmt || state.option.curly) {
         warning("W116", state.tokens.next, "{", state.tokens.next.value);
@@ -3758,6 +3788,7 @@ var JSHINT = (function() {
       a = [statement()];
       indent -= state.option.indent;
 
+      state.funct["(scope)"].unstack();
       delete state.funct["(noblockscopedvar)"];
     }
 
@@ -3776,7 +3807,6 @@ var JSHINT = (function() {
       state.funct["(verb)"] = null;
     }
 
-    if (!ordinary || !state.option.funcscope) scope = s;
     inblock = b;
     if (ordinary && state.option.noempty && (!a || a.length === 0)) {
       warning("W035", state.tokens.prev);
@@ -3797,18 +3827,6 @@ var JSHINT = (function() {
     }
   }
 
-
-  function note_implied(tkn) {
-    var name = tkn.value;
-    var desc = Object.getOwnPropertyDescriptor(implied, name);
-
-    if (!desc)
-      implied[name] = [tkn.line];
-    else
-      desc.value.push(tkn.line);
-  }
-
-
   // Build the syntax table by declaring the syntactic elements of the language.
 
   type("(number)", function() {
@@ -3826,11 +3844,6 @@ var JSHINT = (function() {
 
     nud: function() {
       var v = this.value;
-      // s will be either the function object 'state.funct' that the identifier points at
-      //   or it will be a boolean if it is a predefined variable
-      var s = scope[v];
-      var f;
-      var block;
 
       // If this identifier is the lone parameter to a shorthand "fat arrow"
       // function definition, i.e.
@@ -3844,107 +3857,8 @@ var JSHINT = (function() {
         return this;
       }
 
-      block = state.funct["(blockscope)"].getlabel(v);
-
-      if (typeof s === "function") {
-        // Protection against accidental inheritance.
-        s = undefined;
-      } else if (!block && typeof s === "boolean") {
-        f = state.funct;
-        state.funct = functions[0];
-        addlabel(v, { type: "var" });
-        s = state.funct;
-        state.funct = f;
-      }
-
-      // The name is in scope and defined in the current function or it exists in the blockscope.
-      if (state.funct === s || block) {
-        // Change 'unused' to 'var', and reject labels.
-        // the name is in a block scope.
-        switch (block ? block[v]["(type)"] : state.funct[v]) {
-        case "unused":
-          if (block) block[v]["(type)"] = "var";
-          else state.funct[v] = "var";
-          break;
-        case "unction":
-          if (block) block[v]["(type)"] = "function";
-          else state.funct[v] = "function";
-          this["function"] = true;
-          break;
-        case "const":
-          // consts can only exist inside block
-          // because they are never added to the scope, s
-          block[v]["(unused)"] = false;
-          break;
-        case "function":
-          this["function"] = true;
-          break;
-        case "label":
-          warning("W037", state.tokens.curr, v);
-          break;
-        }
-      } else {
-        // If the name is already defined in the current
-        // function, but not as outer, then there is a scope error.
-
-        switch (state.funct[v]) {
-        case "closure":
-        case "function":
-        case "var":
-        case "unused":
-          warning("W038", state.tokens.curr, v);
-          break;
-        case "label":
-          warning("W037", state.tokens.curr, v);
-          break;
-        case "outer":
-        case "global":
-          break;
-        default:
-          // If the name is defined in an outer function, make an outer entry,
-          // and if it was unused, make it var.
-          if (s === true) {
-            state.funct[v] = true;
-          } else if (s === null) {
-            warning("W039", state.tokens.curr, v);
-            note_implied(state.tokens.curr);
-          } else if (typeof s !== "object") {
-            // if we're in a list comprehension, variables are declared
-            // locally and used before being defined. So we check
-            // the presence of the given variable in the comp array
-            // before declaring it undefined.
-
-            if (!state.funct["(comparray)"].check(v)) {
-              isundef(state.funct, "W117", state.tokens.curr, v);
-            }
-
-            // Explicitly mark the variable as used within function scopes
-            if (!state.funct["(global)"]) {
-              state.funct[v] = true;
-            }
-
-            note_implied(state.tokens.curr);
-          } else {
-            switch (s[v]) {
-            case "function":
-            case "unction":
-              this["function"] = true;
-              s[v] = "closure";
-              state.funct[v] = s["(global)"] ? "global" : "outer";
-              break;
-            case "var":
-            case "unused":
-              s[v] = "closure";
-              state.funct[v] = s["(global)"] ? "global" : "outer";
-              break;
-            case "closure":
-              state.funct[v] = s["(global)"] ? "global" : "outer";
-              break;
-            case "label":
-              warning("W037", state.tokens.curr, v);
-            }
-          }
-        }
+      if (!state.funct["(comparray)"].check(v)) {
+        state.funct["(scope)"].block.use(v, state.tokens.curr);
       }
       return this;
     },
@@ -4088,7 +4002,8 @@ var JSHINT = (function() {
   bitwise("^", "bitxor", 80);
   bitwise("&", "bitand", 90);
   relation("==", function(left, right) {
-    var eqnull = state.option.eqnull && (left.value === "null" || right.value === "null");
+    var eqnull = state.option.eqnull &&
+      ((left && left.value) === "null" || (right && right.value) === "null");
 
     switch (true) {
       case !eqnull && state.option.eqeqeq:
@@ -4121,7 +4036,7 @@ var JSHINT = (function() {
   });
   relation("!=", function(left, right) {
     var eqnull = state.option.eqnull &&
-        (left.value === "null" || right.value === "null");
+        ((left && left.value) === "null" || (right && right.value) === "null");
 
     if (!eqnull && state.option.eqeqeq) {
       this.from = this.character;
@@ -4232,13 +4147,13 @@ var JSHINT = (function() {
       warning("W016", this, "~");
     }
     this.arity = "unary";
-    expression(150);
+    this.right = expression(150);
     return this;
   });
 
   prefix("...", function() {
-    if (!state.option.esnext) {
-      warning("W119", this, "spread/rest operator");
+    if (!state.inES6(true)) {
+      warning("W119", this, "spread/rest operator", "6");
     }
 
     // TODO: Allow all AssignmentExpression
@@ -4298,7 +4213,11 @@ var JSHINT = (function() {
 
   prefix("typeof", (function() {
     var p = expression(150);
-    this.first = p;
+    this.first = this.right = p;
+
+    if (!p) { // 'typeof' followed by nothing? Give up.
+      quit("E041", this.line || 0, this.character || 0);
+    }
 
     // The `typeof` operator accepts unresolvable references, so the operand
     // may be undefined.
@@ -4308,6 +4227,22 @@ var JSHINT = (function() {
     return this;
   }));
   prefix("new", function() {
+    var mp = metaProperty("target", function() {
+      if (!state.inES6(true)) {
+        warning("W119", state.tokens.prev, "new.target", "6");
+      }
+      var inFunction, c = state.funct;
+      while (c) {
+        inFunction = !c["(global)"];
+        if (!c["(arrow)"]) { break; }
+        c = c["(context)"];
+      }
+      if (!inFunction) {
+        warning("W136", state.tokens.prev, "new.target");
+      }
+    });
+    if (mp) { return mp; }
+
     var c = expression(155), i;
     if (c && c.id !== "function") {
       if (c.identifier) {
@@ -4321,7 +4256,7 @@ var JSHINT = (function() {
           warning("W053", state.tokens.prev, c.value);
           break;
         case "Symbol":
-          if (state.option.esnext) {
+          if (state.inES6()) {
             warning("W053", state.tokens.prev, c.value);
           }
           break;
@@ -4337,7 +4272,8 @@ var JSHINT = (function() {
         default:
           if (c.id !== "function") {
             i = c.value.substr(0, 1);
-            if (state.option.newcap && (i < "A" || i > "Z") && !_.has(global, c.value)) {
+            if (state.option.newcap && (i < "A" || i > "Z") &&
+              !state.funct["(scope)"].isPredefined(c.value)) {
               warning("W055", state.tokens.curr);
             }
           }
@@ -4354,7 +4290,7 @@ var JSHINT = (function() {
     if (state.tokens.next.id !== "(" && !state.option.supernew) {
       warning("W058", state.tokens.curr, state.tokens.curr.value);
     }
-    this.first = c;
+    this.first = this.right = c;
     return this;
   });
   state.syntax["new"].exps = true;
@@ -4405,7 +4341,7 @@ var JSHINT = (function() {
     if (left) {
       if (left.type === "(identifier)") {
         if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-          if ("Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
+          if ("Array Number String Boolean Date Object Error Symbol".indexOf(left.value) === -1) {
             if (left.value === "Math") {
               warning("W063", left);
             } else if (state.option.newcap) {
@@ -4430,7 +4366,7 @@ var JSHINT = (function() {
     advance(")");
 
     if (typeof left === "object") {
-      if (state.inES3() && left.value === "parseInt" && n === 1) {
+      if (!state.inES5() && left.value === "parseInt" && n === 1) {
         warning("W065", state.tokens.curr);
       }
       if (!state.option.evil) {
@@ -4457,9 +4393,9 @@ var JSHINT = (function() {
           addInternalSrc(left, p[0].value);
         }
       }
-      if (!left.identifier && left.id !== "." && left.id !== "[" &&
-          left.id !== "(" && left.id !== "&&" && left.id !== "||" &&
-          left.id !== "?" && !(state.option.esnext && left["(name)"])) {
+      if (!left.identifier && left.id !== "." && left.id !== "[" && left.id !== "=>" &&
+          left.id !== "(" && left.id !== "&&" && left.id !== "||" && left.id !== "?" &&
+          !(state.inES6() && left["(name)"])) {
         warning("W067", that);
       }
     }
@@ -4558,7 +4494,11 @@ var JSHINT = (function() {
           // operator.
           (isFunctor(ret) && !isEndOfExpr()) ||
           // Used as the return value of a single-statement arrow function
-          (ret.id === "{" && preceeding.id === "=>");
+          (ret.id === "{" && preceeding.id === "=>") ||
+          // Used to delineate an integer number literal from a dereferencing
+          // punctuator (otherwise interpreted as a decimal point)
+          (ret.type === "(number)" &&
+            checkPunctuator(pn, ".") && /^\d+$/.test(ret.value));
       }
     }
 
@@ -4566,7 +4506,7 @@ var JSHINT = (function() {
       // The operator may be necessary to override the default binding power of
       // neighboring operators (whenever there is an operator in use within the
       // first expression *or* the current group contains multiple expressions)
-      if (!isNecessary && (first.left || ret.exprs)) {
+      if (!isNecessary && (first.left || first.right || ret.exprs)) {
         isNecessary =
           (!isBeginOfExpr(preceeding) && first.lbp <= preceeding.lbp) ||
           (!isEndOfExpr() && last.lbp < state.tokens.next.lbp);
@@ -4668,12 +4608,13 @@ var JSHINT = (function() {
   prefix("[", function() {
     var blocktype = lookupBlockType();
     if (blocktype.isCompArray) {
-      if (!state.inESNext()) {
-        warning("W119", state.tokens.curr, "array comprehension");
+      if (!state.option.esnext && !state.inMoz()) {
+        warning("W118", state.tokens.curr, "array comprehension");
       }
       return comprehensiveArrayExpression();
-    } else if (blocktype.isDestAssign && !state.inESNext()) {
-      warning("W104", state.tokens.curr, "destructuring assignment");
+    } else if (blocktype.isDestAssign) {
+      this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
+      return this;
     }
     var b = state.tokens.curr.line !== startLine(state.tokens.next);
     this.first = [];
@@ -4708,7 +4649,7 @@ var JSHINT = (function() {
       this.first.push(expression(10));
       if (state.tokens.next.id === ",") {
         comma({ allowTrailing: true });
-        if (state.tokens.next.id === "]" && !state.inES5(true)) {
+        if (state.tokens.next.id === "]" && !state.inES5()) {
           warning("W070", state.tokens.curr);
           break;
         }
@@ -4776,20 +4717,22 @@ var JSHINT = (function() {
    *                                  single-argument shorthand.
    * @param {bool} [options.parsedOpening] Whether the opening parenthesis has
    *                                       already been parsed.
+   * @returns {{ arity: number, params: Array.<string>}}
    */
   function functionparams(options) {
     var next;
-    var params = [];
+    var paramsIds = [];
     var ident;
     var tokens = [];
     var t;
     var pastDefault = false;
     var pastRest = false;
+    var arity = 0;
     var loneArg = options && options.loneArg;
 
     if (loneArg && loneArg.identifier === true) {
-      addlabel(loneArg.value, { type: "unused", token: loneArg });
-      return [loneArg.value];
+      state.funct["(scope)"].addParam(loneArg.value, loneArg);
+      return { arity: 1, params: [ loneArg.value ] };
     }
 
     next = state.tokens.next;
@@ -4803,42 +4746,56 @@ var JSHINT = (function() {
       return;
     }
 
+    function addParam(addParamArgs) {
+      state.funct["(scope)"].addParam.apply(state.funct["(scope)"], addParamArgs);
+    }
+
     for (;;) {
+      arity++;
+      // are added to the param scope
+      var currentParams = [];
+
       if (_.contains(["{", "["], state.tokens.next.id)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         for (t in tokens) {
           t = tokens[t];
           if (t.id) {
-            params.push(t.id);
-            addlabel(t.id, { type: "unused", token: t.token });
+            paramsIds.push(t.id);
+            currentParams.push([t.id, t.token]);
           }
         }
       } else {
-        if (checkPunctuators(state.tokens.next, ["..."])) pastRest = true;
+        if (checkPunctuator(state.tokens.next, "...")) pastRest = true;
         ident = identifier(true);
         if (ident) {
-          params.push(ident);
-          addlabel(ident, { type: "unused", token: state.tokens.curr });
+          paramsIds.push(ident);
+          currentParams.push([ident, state.tokens.curr]);
         } else {
           // Skip invalid parameter.
           while (!checkPunctuators(state.tokens.next, [",", ")"])) advance();
         }
       }
 
-      // it is a syntax error to have a regular argument after a default argument
+      // It is valid to have a regular argument after a default argument
+      // since undefined can be used for missing parameters. Still warn as it is
+      // a possible code smell.
       if (pastDefault) {
         if (state.tokens.next.id !== "=") {
-          error("E051", state.tokens.current);
+          error("W138", state.tokens.current);
         }
       }
       if (state.tokens.next.id === "=") {
-        if (!state.inESNext()) {
-          warning("W119", state.tokens.next, "default parameters");
+        if (!state.inES6()) {
+          warning("W119", state.tokens.next, "default parameters", "6");
         }
         advance("=");
         pastDefault = true;
         expression(10);
       }
+
+      // now we have evaluated the default expression, add the variable to the param scope
+      currentParams.forEach(addParam);
+
       if (state.tokens.next.id === ",") {
         if (pastRest) {
           warning("W131", state.tokens.next);
@@ -4846,17 +4803,16 @@ var JSHINT = (function() {
         comma();
       } else {
         advance(")", next);
-        return params;
+        return { arity: arity, params: paramsIds };
       }
     }
   }
 
-  function functor(name, token, scope, overwrites) {
+  function functor(name, token, overwrites) {
     var funct = {
       "(name)"      : name,
       "(breakage)"  : 0,
       "(loopage)"   : 0,
-      "(scope)"     : scope,
       "(tokens)"    : {},
       "(properties)": {},
 
@@ -4868,9 +4824,10 @@ var JSHINT = (function() {
       "(metrics)"   : null,
       "(statement)" : null,
       "(context)"   : null,
-      "(blockscope)": null,
+      "(scope)"     : null,
       "(comparray)" : null,
       "(generator)" : null,
+      "(arrow)"     : null,
       "(params)"    : null
     };
 
@@ -4885,7 +4842,7 @@ var JSHINT = (function() {
     _.extend(funct, overwrites);
 
     if (funct["(context)"]) {
-      funct["(blockscope)"] = funct["(context)"]["(blockscope)"];
+      funct["(scope)"] = funct["(context)"]["(scope)"];
       funct["(comparray)"]  = funct["(context)"]["(comparray)"];
     }
 
@@ -4960,10 +4917,9 @@ var JSHINT = (function() {
    *                                           the body of member functions.
    */
   function doFunction(options) {
-    var f, name, statement, classExprBinding, isGenerator, isArrow;
+    var f, token, name, statement, classExprBinding, isGenerator, isArrow, ignoreLoopFunc;
     var oldOption = state.option;
     var oldIgnored = state.ignored;
-    var oldScope  = scope;
 
     if (options) {
       name = options.name;
@@ -4971,37 +4927,53 @@ var JSHINT = (function() {
       classExprBinding = options.classExprBinding;
       isGenerator = options.type === "generator";
       isArrow = options.type === "arrow";
+      ignoreLoopFunc = options.ignoreLoopFunc;
     }
 
     state.option = Object.create(state.option);
     state.ignored = Object.create(state.ignored);
-    scope = Object.create(scope);
 
-    state.funct = functor(name || state.nameStack.infer(), state.tokens.next, scope, {
+    state.funct = functor(name || state.nameStack.infer(), state.tokens.next, {
       "(statement)": statement,
       "(context)":   state.funct,
+      "(arrow)":     isArrow,
       "(generator)": isGenerator
     });
 
     f = state.funct;
-    state.tokens.curr.funct = state.funct;
+    token = state.tokens.curr;
+    token.funct = state.funct;
 
     functions.push(state.funct);
 
-    if (name) {
-      addlabel(name, { type: "function" });
+    // So that the function is available to itself and referencing itself is not
+    // seen as a closure, add the function name to a new scope, but do not
+    // test for unused (unused: false)
+    // it is a new block scope so that params can override it, it can be block scoped
+    // but declarations inside the function don't cause already declared error
+    state.funct["(scope)"].stack("functionouter");
+    var internallyAccessibleName = name || classExprBinding;
+    if (internallyAccessibleName) {
+      state.funct["(scope)"].block.add(internallyAccessibleName,
+        classExprBinding ? "class" : "function", state.tokens.curr, false);
     }
 
-    if (classExprBinding) {
-      addlabel(classExprBinding, { type: "function" });
-    }
+    // create the param scope (params added in functionparams)
+    state.funct["(scope)"].stack("functionparams");
 
-    state.funct["(params)"] = functionparams(options);
-    state.funct["(metrics)"].verifyMaxParametersPerFunction(state.funct["(params)"]);
+    var paramsInfo = functionparams(options);
+
+    if (paramsInfo) {
+      state.funct["(params)"] = paramsInfo.params;
+      state.funct["(metrics)"].arity = paramsInfo.arity;
+      state.funct["(metrics)"].verifyMaxParametersPerFunction();
+    } else {
+      state.funct["(metrics)"].arity = 0;
+    }
 
     if (isArrow) {
-      if (!state.option.esnext) {
-        warning("W119", state.tokens.curr, "arrow function syntax (=>)");
+      if (!state.inES6(true)) {
+        warning("W119", state.tokens.curr, "arrow function syntax (=>)", "6");
       }
 
       if (!options.loneArg) {
@@ -5019,19 +4991,27 @@ var JSHINT = (function() {
     state.funct["(metrics)"].verifyMaxStatementsPerFunction();
     state.funct["(metrics)"].verifyMaxComplexityPerFunction();
     state.funct["(unusedOption)"] = state.option.unused;
-
-    scope = oldScope;
     state.option = oldOption;
     state.ignored = oldIgnored;
     state.funct["(last)"] = state.tokens.curr.line;
     state.funct["(lastcharacter)"] = state.tokens.curr.character;
 
-    _.map(Object.keys(state.funct), function(key) {
-      if (key[0] === "(") return;
-      state.funct["(blockscope)"].unshadow(key);
-    });
+    // unstack the params scope
+    state.funct["(scope)"].unstack(); // also does usage and label checks
+
+    // unstack the function outer stack
+    state.funct["(scope)"].unstack();
 
     state.funct = state.funct["(context)"];
+
+    if (!ignoreLoopFunc && !state.option.loopfunc && state.funct["(loopage)"]) {
+      // If the function we just parsed accesses any non-local variables
+      // trigger a warning. Otherwise, the function is safe even within
+      // a loop.
+      if (f["(isCapturing)"]) {
+        warning("W083", token);
+      }
+    }
 
     return f;
   }
@@ -5041,6 +5021,7 @@ var JSHINT = (function() {
       statementCount: 0,
       nestedBlockDepth: -1,
       ComplexityCount: 1,
+      arity: 0,
 
       verifyMaxStatementsPerFunction: function() {
         if (state.option.maxstatements &&
@@ -5049,11 +5030,10 @@ var JSHINT = (function() {
         }
       },
 
-      verifyMaxParametersPerFunction: function(params) {
-        params = params || [];
-
-        if (_.isNumber(state.option.maxparams) && params.length > state.option.maxparams) {
-          warning("W072", functionStartToken, params.length);
+      verifyMaxParametersPerFunction: function() {
+        if (_.isNumber(state.option.maxparams) &&
+          this.arity > state.option.maxparams) {
+          warning("W072", functionStartToken, this.arity);
         }
       },
 
@@ -5116,17 +5096,32 @@ var JSHINT = (function() {
     // Check for lonely setters if in the ES5 mode.
     if (state.inES5()) {
       for (var name in props) {
-        if (_.has(props, name) && props[name].setterToken && !props[name].getterToken) {
+        if (props[name] && props[name].setterToken && !props[name].getterToken) {
           warning("W078", props[name].setterToken);
         }
       }
     }
   }
 
+  function metaProperty(name, c) {
+    if (checkPunctuator(state.tokens.next, ".")) {
+      var left = state.tokens.curr.id;
+      advance(".");
+      var id = identifier();
+      state.tokens.curr.isMetaProperty = true;
+      if (name !== id) {
+        error("E057", state.tokens.prev, left, id);
+      } else {
+        c();
+      }
+      return state.tokens.curr;
+    }
+  }
+
   (function(x) {
     x.nud = function() {
       var b, f, i, p, t, isGeneratorMethod = false, nextVal;
-      var props = {}; // All properties, including accessors
+      var props = Object.create(null); // All properties, including accessors
 
       b = state.tokens.curr.line !== startLine(state.tokens.next);
       if (b) {
@@ -5134,6 +5129,12 @@ var JSHINT = (function() {
         if (state.tokens.next.from === indent + state.option.indent) {
           indent += state.option.indent;
         }
+      }
+
+      var blocktype = lookupBlockType();
+      if (blocktype.isDestAssign) {
+        this.destructAssign = destructuringPattern({ openingParsed: true, assignment: true });
+        return this;
       }
 
       for (;;) {
@@ -5144,8 +5145,8 @@ var JSHINT = (function() {
         nextVal = state.tokens.next.value;
         if (state.tokens.next.identifier &&
             (peekIgnoreEOL().id === "," || peekIgnoreEOL().id === "}")) {
-          if (!state.inESNext()) {
-            warning("W104", state.tokens.next, "object short notation");
+          if (!state.inES6()) {
+            warning("W104", state.tokens.next, "object short notation", "6");
           }
           i = propertyName(true);
           saveProperty(props, i, state.tokens.next);
@@ -5163,8 +5164,8 @@ var JSHINT = (function() {
 
           // ES6 allows for get() {...} and set() {...} method
           // definition shorthand syntax, so we don't produce an error
-          // if the esnext option is enabled.
-          if (!i && !state.inESNext()) {
+          // if linting ECMAScript 6 code.
+          if (!i && !state.inES6()) {
             error("E035");
           }
 
@@ -5186,8 +5187,8 @@ var JSHINT = (function() {
           }
         } else {
           if (state.tokens.next.value === "*" && state.tokens.next.type === "(punctuator)") {
-            if (!state.inESNext()) {
-              warning("W104", state.tokens.next, "generator functions");
+            if (!state.inES6()) {
+              warning("W104", state.tokens.next, "generator functions", "6");
             }
             advance("*");
             isGeneratorMethod = true;
@@ -5209,8 +5210,8 @@ var JSHINT = (function() {
           }
 
           if (state.tokens.next.value === "(") {
-            if (!state.inESNext()) {
-              warning("W104", state.tokens.curr, "concise methods");
+            if (!state.inES6()) {
+              warning("W104", state.tokens.curr, "concise methods", "6");
             }
             doFunction({ type: isGeneratorMethod ? "generator" : null });
           } else {
@@ -5225,7 +5226,7 @@ var JSHINT = (function() {
           comma({ allowTrailing: true, property: true });
           if (state.tokens.next.id === ",") {
             warning("W070", state.tokens.curr);
-          } else if (state.tokens.next.id === "}" && !state.inES5(true)) {
+          } else if (state.tokens.next.id === "}" && !state.inES5()) {
             warning("W070", state.tokens.curr);
           }
         } else {
@@ -5246,78 +5247,148 @@ var JSHINT = (function() {
     };
   }(delim("{")));
 
-  function destructuringExpression() {
-    var id, ids;
-    var identifiers = [];
-    if (!state.inESNext()) {
-      warning("W104", state.tokens.curr, "destructuring expression");
+  function destructuringPattern(options) {
+    var isAssignment = options && options.assignment;
+
+    if (!state.inES6()) {
+      warning("W104", state.tokens.curr,
+        isAssignment ? "destructuring assignment" : "destructuring binding", "6");
     }
+
+    return destructuringPatternRecursive(options);
+  }
+
+  function destructuringPatternRecursive(options) {
+    var ids;
+    var identifiers = [];
+    var openingParsed = options && options.openingParsed;
+    var isAssignment = options && options.assignment;
+    var recursiveOptions = isAssignment ? { assignment: isAssignment } : null;
+    var firstToken = openingParsed ? state.tokens.curr : state.tokens.next;
+
     var nextInnerDE = function() {
       var ident;
       if (checkPunctuators(state.tokens.next, ["[", "{"])) {
-        ids = destructuringExpression();
+        ids = destructuringPatternRecursive(recursiveOptions);
         for (var id in ids) {
           id = ids[id];
           identifiers.push({ id: id.id, token: id.token });
         }
-      } else if (checkPunctuators(state.tokens.next, [","])) {
+      } else if (checkPunctuator(state.tokens.next, ",")) {
         identifiers.push({ id: null, token: state.tokens.curr });
-      } else if (checkPunctuators(state.tokens.next, ["("])) {
+      } else if (checkPunctuator(state.tokens.next, "(")) {
         advance("(");
         nextInnerDE();
         advance(")");
       } else {
-        var is_rest = checkPunctuators(state.tokens.next, ["..."]);
-        ident = identifier();
-        if (ident)
+        var is_rest = checkPunctuator(state.tokens.next, "...");
+
+        if (isAssignment) {
+          var identifierToken = is_rest ? peek(0) : state.tokens.next;
+          if (!identifierToken.identifier) {
+            warning("E030", identifierToken, identifierToken.value);
+          }
+          var assignTarget = expression(155);
+          if (assignTarget) {
+            checkLeftSideAssign(assignTarget);
+
+            // if the target was a simple identifier, add it to the list to return
+            if (assignTarget.identifier) {
+              ident = assignTarget.value;
+            }
+          }
+        } else {
+          ident = identifier();
+        }
+        if (ident) {
           identifiers.push({ id: ident, token: state.tokens.curr });
+        }
         return is_rest;
       }
       return false;
     };
-    if (checkPunctuators(state.tokens.next, ["["])) {
-      advance("[");
-      var element_after_rest = false;
-      if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
-          !element_after_rest) {
-        warning("W130", state.tokens.next);
-        element_after_rest = true;
-      }
-      while (!checkPunctuators(state.tokens.next, ["]"])) {
-        advance(",");
-        if (checkPunctuators(state.tokens.next, ["]"])) {
-          // Trailing comma
-          break;
-        }
-        if (nextInnerDE() && checkPunctuators(state.tokens.next, [","]) &&
-            !element_after_rest) {
-          warning("W130", state.tokens.next);
-          element_after_rest = true;
-        }
-      }
-      advance("]");
-    } else if (checkPunctuators(state.tokens.next, ["{"])) {
-      advance("{");
-      id = identifier();
-      if (checkPunctuators(state.tokens.next, [":"])) {
+    var assignmentProperty = function() {
+      var id;
+      if (checkPunctuator(state.tokens.next, "[")) {
+        advance("[");
+        expression(10);
+        advance("]");
+        advance(":");
+        nextInnerDE();
+      } else if (state.tokens.next.id === "(string)" ||
+                 state.tokens.next.id === "(number)") {
+        advance();
         advance(":");
         nextInnerDE();
       } else {
-        identifiers.push({ id: id, token: state.tokens.curr });
-      }
-      while (!checkPunctuators(state.tokens.next, ["}"])) {
-        advance(",");
-        if (checkPunctuators(state.tokens.next, ["}"])) {
-          // Trailing comma
-          // ObjectBindingPattern: { BindingPropertyList , }
-          break;
-        }
+        // this id will either be the property name or the property name and the assigning identifier
         id = identifier();
-        if (checkPunctuators(state.tokens.next, [":"])) {
+        if (checkPunctuator(state.tokens.next, ":")) {
           advance(":");
           nextInnerDE();
-        } else {
+        } else if (id) {
+          // in this case we are assigning (not declaring), so check assignment
+          if (isAssignment) {
+            checkLeftSideAssign(state.tokens.curr);
+          }
           identifiers.push({ id: id, token: state.tokens.curr });
+        }
+      }
+    };
+    if (checkPunctuator(firstToken, "[")) {
+      if (!openingParsed) {
+        advance("[");
+      }
+      if (checkPunctuator(state.tokens.next, "]")) {
+        warning("W137", state.tokens.curr);
+      }
+      var element_after_rest = false;
+      while (!checkPunctuator(state.tokens.next, "]")) {
+        if (nextInnerDE() && !element_after_rest &&
+            checkPunctuator(state.tokens.next, ",")) {
+          warning("W130", state.tokens.next);
+          element_after_rest = true;
+        }
+        if (checkPunctuator(state.tokens.next, "=")) {
+          if (checkPunctuator(state.tokens.prev, "...")) {
+            advance("]");
+          } else {
+            advance("=");
+          }
+          if (state.tokens.next.id === "undefined") {
+            warning("W080", state.tokens.prev, state.tokens.prev.value);
+          }
+          expression(10);
+        }
+        if (!checkPunctuator(state.tokens.next, "]")) {
+          advance(",");
+        }
+      }
+      advance("]");
+    } else if (checkPunctuator(firstToken, "{")) {
+
+      if (!openingParsed) {
+        advance("{");
+      }
+      if (checkPunctuator(state.tokens.next, "}")) {
+        warning("W137", state.tokens.curr);
+      }
+      while (!checkPunctuator(state.tokens.next, "}")) {
+        assignmentProperty();
+        if (checkPunctuator(state.tokens.next, "=")) {
+          advance("=");
+          if (state.tokens.next.id === "undefined") {
+            warning("W080", state.tokens.prev, state.tokens.prev.value);
+          }
+          expression(10);
+        }
+        if (!checkPunctuator(state.tokens.next, "}")) {
+          advance(",");
+          if (checkPunctuator(state.tokens.next, "}")) {
+            // Trailing comma
+            // ObjectBindingPattern: { BindingPropertyList , }
+            break;
+          }
         }
       }
       advance("}");
@@ -5325,7 +5396,7 @@ var JSHINT = (function() {
     return identifiers;
   }
 
-  function destructuringExpressionMatch(tokens, value) {
+  function destructuringPatternMatch(tokens, value) {
     var first = value.first;
 
     if (!first)
@@ -5351,8 +5422,8 @@ var JSHINT = (function() {
     var isConst = type === "const";
     var tokens, lone, value, letblock;
 
-    if (!state.inESNext()) {
-      warning("W104", state.tokens.curr, type);
+    if (!state.inES6()) {
+      warning("W104", state.tokens.curr, type, "6");
     }
 
     if (isLet && state.tokens.next.value === "(") {
@@ -5360,7 +5431,7 @@ var JSHINT = (function() {
         warning("W118", state.tokens.next, "let block");
       }
       advance("(");
-      state.funct["(blockscope)"].stack();
+      state.funct["(scope)"].stack();
       letblock = true;
     } else if (state.funct["(noblockscopedvar)"]) {
       error("E048", state.tokens.curr, isConst ? "Const" : "Let");
@@ -5370,44 +5441,36 @@ var JSHINT = (function() {
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         lone = false;
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
-        if (inexport) {
-          exported[state.tokens.curr.value] = true;
-          state.tokens.curr.exported = true;
-        }
       }
+
+      if (!prefix && isConst && state.tokens.next.id !== "=") {
+        warning("E012", state.tokens.curr, state.tokens.curr.value);
+      }
+
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
-          if (state.inESNext()) {
-            // only look in the latest scope because we can shadow
-            if (state.funct["(blockscope)"].current.labeltype(t.id) === "const") {
-              warning("E011", null, t.id);
-            }
-          }
-          if (state.funct["(global)"]) {
+          if (state.funct["(scope)"].block.isGlobal()) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
             }
           }
           if (t.id && !state.funct["(noblockscopedvar)"]) {
-            addlabel(t.id, {
-              type: isConst ? "const" : "unused",
-              token: t.token,
-              isblockscoped: true });
+            state.funct["(scope)"].addlabel(t.id, {
+              type: type,
+              token: t.token });
             names.push(t.token);
+
+            if (lone && inexport) {
+              state.funct["(scope)"].setExported(t.token.value, t.token);
+            }
           }
         }
-      }
-
-      statement.first = statement.first.concat(names);
-
-      if (!prefix && isConst && state.tokens.next.id !== "=") {
-        warning("E012", state.tokens.curr, state.tokens.curr.value);
       }
 
       if (state.tokens.next.id === "=") {
@@ -5423,9 +5486,11 @@ var JSHINT = (function() {
         if (lone) {
           tokens[0].first = value;
         } else {
-          destructuringExpressionMatch(names, value);
+          destructuringPatternMatch(names, value);
         }
       }
+
+      statement.first = statement.first.concat(names);
 
       if (state.tokens.next.id !== ",") {
         break;
@@ -5436,7 +5501,7 @@ var JSHINT = (function() {
       advance(")");
       block(true, true);
       statement.block = true;
-      state.funct["(blockscope)"].unstack();
+      state.funct["(scope)"].unstack();
     }
 
     return statement;
@@ -5465,69 +5530,59 @@ var JSHINT = (function() {
     for (;;) {
       var names = [];
       if (_.contains(["{", "["], state.tokens.next.value)) {
-        tokens = destructuringExpression();
+        tokens = destructuringPattern();
         lone = false;
       } else {
         tokens = [ { id: identifier(), token: state.tokens.curr } ];
         lone = true;
-        if (inexport) {
-          exported[state.tokens.curr.value] = true;
-          state.tokens.curr.exported = true;
-        }
       }
+
+      if (!(prefix && implied) && report && state.option.varstmt) {
+        warning("W132", this);
+      }
+
+      this.first = this.first.concat(names);
+
       for (var t in tokens) {
         if (tokens.hasOwnProperty(t)) {
           t = tokens[t];
-          if (state.inESNext()) {
-            // because var is function scoped, look in the whole function
-            if (state.funct["(blockscope)"].labeltype(t.id) === "const") {
-              warning("E011", null, t.id);
-            }
-          }
           if (!implied && state.funct["(global)"]) {
             if (predefined[t.id] === false) {
               warning("W079", t.token, t.id);
             } else if (state.option.futurehostile === false) {
               if ((!state.inES5() && vars.ecmaIdentifiers[5][t.id] === false) ||
-                  (!state.inESNext() && vars.ecmaIdentifiers[6][t.id] === false)) {
+                (!state.inES6() && vars.ecmaIdentifiers[6][t.id] === false)) {
                 warning("W129", t.token, t.id);
               }
             }
           }
           if (t.id) {
             if (implied === "for") {
-              var ident = t.token.value;
-              switch (state.funct[ident]) {
-              case "unused":
-                state.funct[ident] = "var";
-                break;
-              case "var":
-                break;
-              default:
-                if (!state.funct["(blockscope)"].getlabel(ident) &&
-                    !(scope[ident] || {})[ident]) {
-                  if (report) warning("W088", t.token, ident);
-                }
+
+              if (!state.funct["(scope)"].has(t.id)) {
+                if (report) warning("W088", t.token, t.id);
               }
+              state.funct["(scope)"].block.use(t.id, t.token);
             } else {
-              addlabel(t.id, { type: "unused", token: t.token });
+              state.funct["(scope)"].addlabel(t.id, {
+                type: "var",
+                token: t.token });
+
+              if (lone && inexport) {
+                state.funct["(scope)"].setExported(t.id, t.token);
+              }
             }
             names.push(t.token);
           }
         }
       }
 
-      if (!prefix && report && state.option.varstmt) {
-        warning("W132", this);
-      }
-
-      this.first = this.first.concat(names);
-
       if (state.tokens.next.id === "=") {
         state.nameStack.set(state.tokens.curr);
 
         advance("=");
-        if (!prefix && report && state.tokens.next.id === "undefined") {
+        if (!prefix && report && !state.funct["(loopage)"] &&
+          state.tokens.next.id === "undefined") {
           warning("W080", state.tokens.prev, state.tokens.prev.value);
         }
         if (peek(0).id === "=" && state.tokens.next.identifier) {
@@ -5542,7 +5597,7 @@ var JSHINT = (function() {
         if (lone) {
           tokens[0].first = value;
         } else {
-          destructuringExpressionMatch(names, value);
+          destructuringPatternMatch(names, value);
         }
       }
 
@@ -5563,13 +5618,16 @@ var JSHINT = (function() {
   function classdef(isStatement) {
 
     /*jshint validthis:true */
-    if (!state.inESNext()) {
-      warning("W104", state.tokens.curr, "class");
+    if (!state.inES6()) {
+      warning("W104", state.tokens.curr, "class", "6");
     }
     if (isStatement) {
       // BindingIdentifier
       this.name = identifier();
-      addlabel(this.name, { type: "unused", token: state.tokens.curr });
+
+      state.funct["(scope)"].addlabel(this.name, {
+        type: "class",
+        token: state.tokens.curr });
     } else if (state.tokens.next.identifier && state.tokens.next.value !== "extends") {
       // BindingIdentifier(opt)
       this.name = identifier();
@@ -5602,8 +5660,8 @@ var JSHINT = (function() {
     var isStatic;
     var isGenerator;
     var getset;
-    var props = {};
-    var staticProps = {};
+    var props = Object.create(null);
+    var staticProps = Object.create(null);
     var computed;
     for (var i = 0; state.tokens.next.id !== "}"; ++i) {
       name = state.tokens.next;
@@ -5633,7 +5691,7 @@ var JSHINT = (function() {
         advance();
         computed = false;
         if (name.identifier && name.value === "static") {
-          if (checkPunctuators(state.tokens.next, ["*"])) {
+          if (checkPunctuator(state.tokens.next, "*")) {
             isGenerator = true;
             advance("*");
           }
@@ -5663,11 +5721,11 @@ var JSHINT = (function() {
         continue;
       }
 
-      if (!checkPunctuators(state.tokens.next, ["("])) {
+      if (!checkPunctuator(state.tokens.next, "(")) {
         // error --- class properties must be methods
         error("E054", state.tokens.next, state.tokens.next.value);
         while (state.tokens.next.id !== "}" &&
-               !checkPunctuators(state.tokens.next, ["("])) {
+               !checkPunctuator(state.tokens.next, "(")) {
           advance();
         }
         if (state.tokens.next.value !== "(") {
@@ -5709,37 +5767,37 @@ var JSHINT = (function() {
     checkProperties(props);
   }
 
-  blockstmt("function", function() {
+  blockstmt("function", function(context) {
+    var inexport = context && context.inexport;
     var generator = false;
     if (state.tokens.next.value === "*") {
       advance("*");
-      if (state.inESNext({ strict: true })) {
+      if (state.inES6({ strict: true })) {
         generator = true;
       } else {
-        warning("W119", state.tokens.curr, "function*");
+        warning("W119", state.tokens.curr, "function*", "6");
       }
     }
     if (inblock) {
       warning("W082", state.tokens.curr);
-
     }
     var i = optionalidentifier();
 
+    state.funct["(scope)"].addlabel(i, {
+      type: "function",
+      token: state.tokens.curr });
+
     if (i === undefined) {
       warning("W025");
+    } else if (inexport) {
+      state.funct["(scope)"].setExported(i, state.tokens.prev);
     }
-
-    // check if a identifier with the same name is already defined
-    // in the blockscope as a const
-    if (state.funct["(blockscope)"].labeltype(i) === "const") {
-      warning("E011", null, i);
-    }
-    addlabel(i, { type: "unction", token: state.tokens.curr });
 
     doFunction({
       name: i,
       statement: this,
-      type: generator ? "generator" : null
+      type: generator ? "generator" : null,
+      ignoreLoopFunc: inblock // a declaration may already have warned
     });
     if (state.tokens.next.id === "(" && state.tokens.next.line === state.tokens.curr.line) {
       error("E039");
@@ -5751,27 +5809,15 @@ var JSHINT = (function() {
     var generator = false;
 
     if (state.tokens.next.value === "*") {
-      if (!state.inESNext()) {
-        warning("W119", state.tokens.curr, "function*");
+      if (!state.inES6()) {
+        warning("W119", state.tokens.curr, "function*", "6");
       }
       advance("*");
       generator = true;
     }
 
     var i = optionalidentifier();
-    var fn = doFunction({ name: i, type: generator ? "generator" : null });
-
-    function isVariable(name) { return name[0] !== "("; }
-    function isLocal(name) { return fn[name] === "var"; }
-
-    if (!state.option.loopfunc && state.funct["(loopage)"]) {
-      // If the function we just parsed accesses any non-local variables
-      // trigger a warning. Otherwise, the function is safe even within
-      // a loop.
-      if (_.some(fn, function(val, name) { return isVariable(name) && !isLocal(name); })) {
-        warning("W083");
-      }
-    }
+    doFunction({ name: i, type: generator ? "generator" : null });
     return this;
   });
 
@@ -5803,7 +5849,7 @@ var JSHINT = (function() {
     // When the if is within a for-in loop and the condition has a negative form,
     // check if the body contains nothing but a continue statement
     if (forinifcheck && forinifcheck.type === "(negative)") {
-      if (s && s.length === 1 && s[0].type === "(identifier)" && s[0].value === "continue") {
+      if (s && s[0] && s[0].type === "(identifier)" && s[0].value === "continue") {
         forinifcheck.type = "(negative-with-continue)";
       }
     }
@@ -5823,32 +5869,23 @@ var JSHINT = (function() {
     var b;
 
     function doCatch() {
-      var oldScope = scope;
-      var e;
-
       advance("catch");
       advance("(");
 
-      scope = Object.create(oldScope);
+      state.funct["(scope)"].stack("catchparams");
 
-      e = state.tokens.next.value;
-      if (state.tokens.next.type !== "(identifier)") {
-        e = null;
-        warning("E030", state.tokens.next, e);
-      }
-
-      advance();
-
-      state.funct = functor("(catch)", state.tokens.next, scope, {
-        "(context)"  : state.funct,
-        "(breakage)" : state.funct["(breakage)"],
-        "(loopage)"  : state.funct["(loopage)"],
-        "(statement)": false,
-        "(catch)"    : true
-      });
-
-      if (e) {
-        addlabel(e, { type: "exception" });
+      if (checkPunctuators(state.tokens.next, ["[", "{"])) {
+        var tokens = destructuringPattern();
+        _.each(tokens, function(token) {
+          if (token.id) {
+            state.funct["(scope)"].addParam(token.id, token, "exception");
+          }
+        });
+      } else if (state.tokens.next.type !== "(identifier)") {
+        warning("E030", state.tokens.next, state.tokens.next.value);
+      } else {
+        // only advance if we have an identifier so we can continue parsing in the most common error - that no param is given.
+        state.funct["(scope)"].addParam(identifier(), state.tokens.curr, "exception");
       }
 
       if (state.tokens.next.value === "if") {
@@ -5861,16 +5898,9 @@ var JSHINT = (function() {
 
       advance(")");
 
-      state.tokens.curr.funct = state.funct;
-      functions.push(state.funct);
-
       block(false);
 
-      scope = oldScope;
-
-      state.funct["(last)"] = state.tokens.curr.line;
-      state.funct["(lastcharacter)"] = state.tokens.curr.character;
-      state.funct = state.funct["(context)"];
+      state.funct["(scope)"].unstack();
     }
 
     block(true);
@@ -5963,7 +5993,7 @@ var JSHINT = (function() {
           // You can tell JSHint that you don't use break intentionally by
           // adding a comment /* falls through */ on a line just before
           // the next `case`.
-          if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+          if (!state.tokens.curr.caseFallsThrough) {
             warning("W086", state.tokens.curr, "case");
           }
         }
@@ -5987,7 +6017,7 @@ var JSHINT = (function() {
           // Do not display a warning if 'default' is the first statement or if
           // there is a special /* falls through */ comment.
           if (this.cases.length) {
-            if (!reg.fallsThrough.test(state.lines[state.tokens.next.line - 2])) {
+            if (!state.tokens.curr.caseFallsThrough) {
               warning("W086", state.tokens.curr, "default");
             }
           }
@@ -6036,6 +6066,7 @@ var JSHINT = (function() {
         indent -= state.option.indent;
       }
     }
+    return this;
   }).labelled = true;
 
   stmt("debugger", function() {
@@ -6078,8 +6109,6 @@ var JSHINT = (function() {
       }
     }
 
-    state.funct["(breakage)"] += 1;
-    state.funct["(loopage)"] += 1;
     increaseComplexityCount();
     advance("(");
 
@@ -6100,16 +6129,16 @@ var JSHINT = (function() {
       else if (checkPunctuators(nextop, ["}", "]"])) --level;
       if (level < 0) break;
       if (level === 0) {
-        if (!comma && checkPunctuators(nextop, [","])) comma = nextop;
-        else if (!initializer && checkPunctuators(nextop, ["="])) initializer = nextop;
+        if (!comma && checkPunctuator(nextop, ",")) comma = nextop;
+        else if (!initializer && checkPunctuator(nextop, "=")) initializer = nextop;
       }
     } while (level > 0 || !_.contains(inof, nextop.value) && nextop.value !== ";" &&
     nextop.type !== "(end)"); // Is this a JSCS bug? This looks really weird.
 
     // if we're in a for (… in|of …) statement
     if (_.contains(inof, nextop.value)) {
-      if (!state.inESNext() && nextop.value === "of") {
-        error("W104", nextop, "for of");
+      if (!state.inES6() && nextop.value === "of") {
+        warning("W104", nextop, "for of", "6");
       }
 
       var ok = !(initializer || comma);
@@ -6128,7 +6157,7 @@ var JSHINT = (function() {
         advance(state.tokens.next.id);
         // create a new block scope
         letscope = true;
-        state.funct["(blockscope)"].stack();
+        state.funct["(scope)"].stack();
         state.tokens.curr.fud({ prefix: true });
       } else {
         // Parse as a var statement, with implied bindings. Ignore errors if an error
@@ -6152,6 +6181,9 @@ var JSHINT = (function() {
           type: "(none)"
         });
       }
+
+      state.funct["(breakage)"] += 1;
+      state.funct["(loopage)"] += 1;
 
       s = block(true, true);
 
@@ -6187,7 +6219,7 @@ var JSHINT = (function() {
           advance("let");
           // create a new block scope
           letscope = true;
-          state.funct["(blockscope)"].stack();
+          state.funct["(scope)"].stack();
           state.tokens.curr.fud();
         } else {
           for (;;) {
@@ -6201,6 +6233,10 @@ var JSHINT = (function() {
       }
       nolinebreak(state.tokens.curr);
       advance(";");
+
+      // start loopage after the first ; as the next two expressions are executed
+      // on every loop
+      state.funct["(loopage)"] += 1;
       if (state.tokens.next.id !== ";") {
         checkCondAssignment(expression(0));
       }
@@ -6219,6 +6255,7 @@ var JSHINT = (function() {
         }
       }
       advance(")", t);
+      state.funct["(breakage)"] += 1;
       block(true, true);
       state.funct["(breakage)"] -= 1;
       state.funct["(loopage)"] -= 1;
@@ -6226,7 +6263,7 @@ var JSHINT = (function() {
     }
     // unstack loop blockscope
     if (letscope) {
-      state.funct["(blockscope)"].unstack();
+      state.funct["(scope)"].unstack();
     }
     return this;
   }).labelled = true;
@@ -6235,22 +6272,19 @@ var JSHINT = (function() {
   stmt("break", function() {
     var v = state.tokens.next.value;
 
-    if (state.funct["(breakage)"] === 0)
-      warning("W052", state.tokens.next, this.value);
-
     if (!state.option.asi)
       nolinebreak(this);
 
-    if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
-      if (state.tokens.curr.line === startLine(state.tokens.next)) {
-        if (state.funct[v] !== "label") {
-          warning("W090", state.tokens.next, v);
-        } else if (scope[v] !== state.funct) {
-          warning("W091", state.tokens.next, v);
-        }
-        this.first = state.tokens.next;
-        advance();
+    if (state.tokens.next.id !== ";" && !state.tokens.next.reach &&
+        state.tokens.curr.line === startLine(state.tokens.next)) {
+      if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
+        warning("W090", state.tokens.next, v);
       }
+      this.first = state.tokens.next;
+      advance();
+    } else {
+      if (state.funct["(breakage)"] === 0)
+        warning("W052", state.tokens.next, this.value);
     }
 
     reachable(this);
@@ -6264,22 +6298,20 @@ var JSHINT = (function() {
 
     if (state.funct["(breakage)"] === 0)
       warning("W052", state.tokens.next, this.value);
+    if (!state.funct["(loopage)"])
+      warning("W052", state.tokens.next, this.value);
 
     if (!state.option.asi)
       nolinebreak(this);
 
     if (state.tokens.next.id !== ";" && !state.tokens.next.reach) {
       if (state.tokens.curr.line === startLine(state.tokens.next)) {
-        if (state.funct[v] !== "label") {
+        if (!state.funct["(scope)"].funct.hasBreakLabel(v)) {
           warning("W090", state.tokens.next, v);
-        } else if (scope[v] !== state.funct) {
-          warning("W091", state.tokens.next, v);
         }
         this.first = state.tokens.next;
         advance();
       }
-    } else if (!state.funct["(loopage)"]) {
-      warning("W052", state.tokens.next, this.value);
     }
 
     reachable(this);
@@ -6316,13 +6348,13 @@ var JSHINT = (function() {
     x.lbp = 25;
   }(prefix("yield", function() {
     var prev = state.tokens.prev;
-    if (state.inESNext(true) && !state.funct["(generator)"]) {
+    if (state.inES6(true) && !state.funct["(generator)"]) {
       // If it's a yield within a catch clause inside a generator then that's ok
       if (!("(catch)" === state.funct["(name)"] && state.funct["(context)"]["(generator)"])) {
         error("E046", state.tokens.curr, "yield");
       }
-    } else if (!state.inESNext()) {
-      warning("W104", state.tokens.curr, "yield");
+    } else if (!state.inES6()) {
+      warning("W104", state.tokens.curr, "yield", "6");
     }
     state.funct["(generator)"] = "yielded";
     var delegatingYield = false;
@@ -6334,7 +6366,8 @@ var JSHINT = (function() {
 
     if (this.line === startLine(state.tokens.next) || !state.inMoz()) {
       if (delegatingYield ||
-          (state.tokens.next.id !== ";" && !state.tokens.next.reach && state.tokens.next.nud)) {
+          (state.tokens.next.id !== ";" && !state.option.asi &&
+           !state.tokens.next.reach && state.tokens.next.nud)) {
 
         nobreaknonadjacent(state.tokens.curr, state.tokens.next);
         this.first = expression(10);
@@ -6366,8 +6399,8 @@ var JSHINT = (function() {
   }).exps = true;
 
   stmt("import", function() {
-    if (!state.inESNext()) {
-      warning("W119", state.tokens.curr, "import");
+    if (!state.inES6()) {
+      warning("W119", state.tokens.curr, "import", "6");
     }
 
     if (state.tokens.next.type === "(string)") {
@@ -6379,7 +6412,11 @@ var JSHINT = (function() {
     if (state.tokens.next.identifier) {
       // ImportClause :: ImportedDefaultBinding
       this.name = identifier();
-      addlabel(this.name, { type: "unused", token: state.tokens.curr });
+      // Import bindings are immutable (see ES6 8.1.1.5.5)
+      state.funct["(scope)"].addlabel(this.name, {
+        type: "const",
+        token: state.tokens.curr });
+
       if (state.tokens.next.value === ",") {
         // ImportClause :: ImportedDefaultBinding , NameSpaceImport
         // ImportClause :: ImportedDefaultBinding , NamedImports
@@ -6401,7 +6438,10 @@ var JSHINT = (function() {
       advance("as");
       if (state.tokens.next.identifier) {
         this.name = identifier();
-        addlabel(this.name, { type: "unused", token: state.tokens.curr });
+        // Import bindings are immutable (see ES6 8.1.1.5.5)
+        state.funct["(scope)"].addlabel(this.name, {
+          type: "const",
+          token: state.tokens.curr });
       }
     } else {
       // ImportClause :: NamedImports
@@ -6422,7 +6462,11 @@ var JSHINT = (function() {
           advance("as");
           importName = identifier();
         }
-        addlabel(importName, { type: "unused", token: state.tokens.curr });
+
+        // Import bindings are immutable (see ES6 8.1.1.5.5)
+        state.funct["(scope)"].addlabel(importName, {
+          type: "const",
+          token: state.tokens.curr });
 
         if (state.tokens.next.value === ",") {
           advance(",");
@@ -6447,12 +6491,12 @@ var JSHINT = (function() {
     var token;
     var identifier;
 
-    if (!state.inESNext()) {
-      warning("W119", state.tokens.curr, "export");
+    if (!state.inES6()) {
+      warning("W119", state.tokens.curr, "export", "6");
       ok = false;
     }
 
-    if (!state.funct["(global)"] || !state.funct["(blockscope)"].atTop()) {
+    if (!state.funct["(scope)"].block.isGlobal()) {
       error("E053", state.tokens.curr);
       ok = false;
     }
@@ -6466,11 +6510,14 @@ var JSHINT = (function() {
     }
 
     if (state.tokens.next.type === "default") {
-      // ExportDeclaration :: export default HoistableDeclaration
-      // ExportDeclaration :: export default ClassDeclaration
+      // ExportDeclaration ::
+      //      export default [lookahead  { function, class }] AssignmentExpression[In] ;
+      //      export default HoistableDeclaration
+      //      export default ClassDeclaration
       state.nameStack.set(state.tokens.next);
       advance("default");
-      if (state.tokens.next.id === "function" || state.tokens.next.id === "class") {
+      var exportType = state.tokens.next.id;
+      if (exportType === "function" || exportType === "class") {
         this.block = true;
       }
 
@@ -6478,15 +6525,15 @@ var JSHINT = (function() {
 
       expression(10);
 
-      if (state.tokens.next.id === "class") {
-        identifier = token.name;
-      } else {
-        identifier = token.value;
-      }
+      identifier = token.value;
 
-      addlabel(identifier, {
-        type: "function", token: token
-      });
+      if (this.block) {
+        state.funct["(scope)"].addlabel(identifier, {
+          type: exportType,
+          token: token });
+
+        state.funct["(scope)"].setExported(identifier, token);
+      }
 
       return this;
     }
@@ -6501,7 +6548,6 @@ var JSHINT = (function() {
         }
         advance();
 
-        state.tokens.curr.exported = ok;
         exportedTokens.push(state.tokens.curr);
 
         if (state.tokens.next.value === "as") {
@@ -6528,11 +6574,7 @@ var JSHINT = (function() {
         advance("(string)");
       } else if (ok) {
         exportedTokens.forEach(function(token) {
-          if (!state.funct[token.value]) {
-            isundef(state.funct, "W117", token, token.value);
-          }
-          exported[token.value] = true;
-          state.funct["(blockscope)"].setExported(token.value);
+          state.funct["(scope)"].setExported(token.value, token);
         });
       }
       return this;
@@ -6554,16 +6596,14 @@ var JSHINT = (function() {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("function");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
-      state.syntax["function"].fud();
+      state.syntax["function"].fud({ inexport:true });
     } else if (state.tokens.next.id === "class") {
       // ExportDeclaration :: export Declaration
       this.block = true;
       advance("class");
-      exported[state.tokens.next.value] = ok;
-      state.tokens.next.exported = true;
+      var classNameToken = state.tokens.next;
       state.syntax["class"].fud();
+      state.funct["(scope)"].setExported(classNameToken.value, classNameToken);
     } else {
       error("E024", state.tokens.next, state.tokens.next.value);
     }
@@ -6606,14 +6646,16 @@ var JSHINT = (function() {
   // expression is a comprehension array, destructuring assignment or a json value.
 
   var lookupBlockType = function() {
-    var pn, pn1;
+    var pn, pn1, prev;
     var i = -1;
     var bracketStack = 0;
     var ret = {};
-    if (checkPunctuators(state.tokens.curr, ["[", "{"]))
+    if (checkPunctuators(state.tokens.curr, ["[", "{"])) {
       bracketStack += 1;
+    }
     do {
-      pn = (i === -1) ? state.tokens.next : peek(i);
+      prev = i === -1 ? state.tokens.curr : pn;
+      pn = i === -1 ? state.tokens.next : peek(i);
       pn1 = peek(i + 1);
       i = i + 1;
       if (checkPunctuators(pn, ["[", "{"])) {
@@ -6621,12 +6663,13 @@ var JSHINT = (function() {
       } else if (checkPunctuators(pn, ["]", "}"])) {
         bracketStack -= 1;
       }
-      if (pn.identifier && pn.value === "for" && bracketStack === 1) {
+      if (bracketStack === 1 && pn.identifier && pn.value === "for" &&
+          !checkPunctuator(prev, ".")) {
         ret.isCompArray = true;
         ret.notJson = true;
         break;
       }
-      if (checkPunctuators(pn, ["}", "]"]) && bracketStack === 0) {
+      if (bracketStack === 0 && checkPunctuators(pn, ["}", "]"])) {
         if (pn1.value === "=") {
           ret.isDestAssign = true;
           ret.notJson = true;
@@ -6636,7 +6679,7 @@ var JSHINT = (function() {
           break;
         }
       }
-      if (pn.value === ";") {
+      if (checkPunctuator(pn, ";")) {
         ret.isBlock = true;
         ret.notJson = true;
       }
@@ -6651,10 +6694,10 @@ var JSHINT = (function() {
       name = tkn.value;
     }
 
-    if (props[name] && _.has(props, name)) {
+    if (props[name] && name !== "__proto__") {
       warning("W075", state.tokens.next, msg, name);
     } else {
-      props[name] = {};
+      props[name] = Object.create(null);
     }
 
     props[name].basic = true;
@@ -6686,12 +6729,12 @@ var JSHINT = (function() {
     state.tokens.curr.accessorType = accessorType;
     state.nameStack.set(tkn);
 
-    if (props[name] && _.has(props, name)) {
-      if (props[name].basic || props[name][flagName]) {
+    if (props[name]) {
+      if ((props[name].basic || props[name][flagName]) && name !== "__proto__") {
         warning("W075", state.tokens.next, msg, name);
       }
     } else {
-      props[name] = {};
+      props[name] = Object.create(null);
     }
 
     props[name][flagName] = tkn;
@@ -6699,29 +6742,47 @@ var JSHINT = (function() {
 
   function computedPropertyName() {
     advance("[");
-    if (!state.option.esnext) {
-      warning("W119", state.tokens.curr, "computed property names");
+    if (!state.inES6()) {
+      warning("W119", state.tokens.curr, "computed property names", "6");
     }
     var value = expression(10);
     advance("]");
     return value;
   }
 
-  // Test whether a given token is a punctuator matching one of the specified values
+  /**
+   * Test whether a given token is a punctuator matching one of the specified values
+   * @param {Token} token
+   * @param {Array.<string>} values
+   * @returns {boolean}
+   */
   function checkPunctuators(token, values) {
-    return token.type === "(punctuator)" && _.contains(values, token.value);
+    if (token.type === "(punctuator)") {
+      return _.contains(values, token.value);
+    }
+    return false;
+  }
+
+  /**
+   * Test whether a given token is a punctuator matching the specified value
+   * @param {Token} token
+   * @param {string} value
+   * @returns {boolean}
+   */
+  function checkPunctuator(token, value) {
+    return token.type === "(punctuator)" && token.value === value;
   }
 
   // Check whether this function has been reached for a destructuring assign with undeclared values
   function destructuringAssignOrJsonValue() {
-    // lookup for the assignment (esnext only)
+    // lookup for the assignment (ECMAScript 6 only)
     // if it has semicolons, it is a block, so go parse it as a block
     // or it's not a block, but there are assignments, check for undeclared variables
 
     var block = lookupBlockType();
     if (block.notJson) {
-      if (!state.inESNext() && block.isDestAssign) {
-        warning("W104", state.tokens.curr, "destructuring assignment");
+      if (!state.inES6() && block.isDestAssign) {
+        warning("W104", state.tokens.curr, "destructuring assignment", "6");
       }
       statements();
     // otherwise parse json value
@@ -6779,7 +6840,7 @@ var JSHINT = (function() {
             if (v.unused)
               warning("W098", v.token, v.raw_text || v.value);
             if (v.undef)
-              isundef(v.state.funct, "W117", v.token, v.value);
+              state.funct["(scope)"].block.use(v.value, v.token);
           });
           _carrays.splice(-1, 1);
           _current = _carrays[_carrays.length - 1];
@@ -6819,14 +6880,14 @@ var JSHINT = (function() {
             return true;
           // When we are in the "generate" state of the list comp,
           } else if (_current && _current.mode === "generate") {
-            isundef(state.funct, "W117", state.tokens.curr, v);
+            state.funct["(scope)"].block.use(v, state.tokens.curr);
             return true;
           // When we are in "filter" state,
           } else if (_current && _current.mode === "filter") {
             // we check whether current variable has been declared
             if (use(v)) {
               // if not we warn about it
-              isundef(state.funct, "W117", state.tokens.curr, v);
+              state.funct["(scope)"].block.use(v, state.tokens.curr);
             }
             return true;
           }
@@ -6921,141 +6982,6 @@ var JSHINT = (function() {
     }
   }
 
-  var warnUnused = function(name, tkn, type, unused_opt) {
-    var line = tkn.line;
-    var chr  = tkn.from;
-    var raw_name = tkn.raw_text || name;
-
-    if (unused_opt === undefined) {
-      unused_opt = state.option.unused;
-    }
-
-    if (unused_opt === true) {
-      unused_opt = "last-param";
-    }
-
-    var warnable_types = {
-      "vars": ["var"],
-      "last-param": ["var", "param"],
-      "strict": ["var", "param", "last-param"]
-    };
-
-    if (unused_opt) {
-      if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
-        if (!tkn.exported) {
-          warningAt("W098", line, chr, raw_name);
-        }
-      }
-    }
-
-    unuseds.push({
-      name: name,
-      line: line,
-      character: chr
-    });
-  };
-
-  var blockScope = function() {
-    var _current = {};
-    var _variables = [_current];
-
-    function _checkBlockLabels() {
-      for (var t in _current) {
-        var label = _current[t],
-            labelType = label["(type)"];
-        if (labelType === "unused" || (labelType === "const" && label["(unused)"])) {
-          if (state.option.unused) {
-            var tkn = _current[t]["(token)"];
-            // Don't report exported labels as unused
-            if (tkn.exported) {
-              continue;
-            }
-
-            warnUnused(t, tkn, "var");
-          }
-        }
-      }
-    }
-
-    function _getLabel(l) {
-      for (var i = _variables.length - 1 ; i >= 0; --i) {
-        if (_.has(_variables[i], l) && !_variables[i][l]["(shadowed)"]) {
-          return _variables[i];
-        }
-      }
-    }
-
-    return {
-      stack: function() {
-        _current = {};
-        _variables.push(_current);
-      },
-
-      unstack: function() {
-        _checkBlockLabels();
-        _variables.splice(_variables.length - 1, 1);
-        _current = _.last(_variables);
-      },
-
-      getlabel: _getLabel,
-
-      labeltype: function(l) {
-        // returns a labels type or null if not present
-        var block = _getLabel(l);
-        if (block) {
-          return block[l]["(type)"];
-        }
-        return null;
-      },
-
-      shadow: function(name) {
-        for (var i = _variables.length - 1; i >= 0; i--) {
-          if (_.has(_variables[i], name)) {
-            _variables[i][name]["(shadowed)"] = true;
-          }
-        }
-      },
-
-      unshadow: function(name) {
-        for (var i = _variables.length - 1; i >= 0; i--) {
-          if (_.has(_variables[i], name)) {
-            _variables[i][name]["(shadowed)"] = false;
-          }
-        }
-      },
-
-      atTop: function() {
-        return _variables.length === 1;
-      },
-
-      setExported: function(id) {
-        if (state.funct["(blockscope)"].atTop()) {
-          var item = _current[id];
-          if (item && item["(token)"]) {
-            item["(token)"].exported = true;
-          }
-        }
-      },
-
-      current: {
-        labeltype: function(t) {
-          if (_current[t]) {
-            return _current[t]["(type)"];
-          }
-          return null;
-        },
-
-        has: function(t) {
-          return _.has(_current, t);
-        },
-
-        add: function(t, type, tok) {
-          _current[t] = { "(type)" : type, "(token)": tok, "(shadowed)": false, "(unused)": true };
-        }
-      }
-    };
-  };
-
   var escapeRegex = function(str) {
     return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
   };
@@ -7087,7 +7013,7 @@ var JSHINT = (function() {
     combine(predefined, g || {});
 
     declared = Object.create(null);
-    exported = Object.create(null);
+    var exported = Object.create(null); // Variables that live outside the current file
 
     function each(obj, cb) {
       if (!obj)
@@ -7128,10 +7054,9 @@ var JSHINT = (function() {
         } else {
           var optionKey = optionKeys[x];
           newOptionObj[optionKey] = o[optionKey];
-          if (optionKey === "es5") {
-            if (o[optionKey]) {
-              warning("I003");
-            }
+          if ((optionKey === "esversion" && o[optionKey] === 5) ||
+              (optionKey === "es5" && o[optionKey])) {
+            warning("I003");
           }
 
           if (optionKeys[x] === "newcap" && o[optionKey] === false)
@@ -7147,12 +7072,19 @@ var JSHINT = (function() {
     state.option.maxerr = state.option.maxerr || 50;
 
     indent = 1;
-    global = Object.create(predefined);
-    scope = global;
 
-    state.funct = functor("(global)", null, scope, {
+    var scopeManagerInst = scopeManager(state, predefined, exported, declared);
+    scopeManagerInst.on("warning", function(ev) {
+      warning.apply(null, [ ev.code, ev.token].concat(ev.data));
+    });
+
+    scopeManagerInst.on("error", function(ev) {
+      error.apply(null, [ ev.code, ev.token ].concat(ev.data));
+    });
+
+    state.funct = functor("(global)", null, {
       "(global)"    : true,
-      "(blockscope)": blockScope(),
+      "(scope)"     : scopeManagerInst,
       "(comparray)" : arrayComprehension(),
       "(metrics)"   : createMetrics(state.tokens.next)
     });
@@ -7162,10 +7094,8 @@ var JSHINT = (function() {
     stack = null;
     member = {};
     membersOnly = null;
-    implied = {};
     inblock = false;
     lookahead = [];
-    unuseds = [];
 
     if (!isString(s) && !Array.isArray(s)) {
       errorAt("E004", 0);
@@ -7282,12 +7212,9 @@ var JSHINT = (function() {
       default:
         directives();
 
-        if (state.isStrict()) {
-          if (!state.option.globalstrict) {
-            if (!(state.option.module || state.option.node || state.option.phantom ||
-              state.option.browserify)) {
-              warning("W097", state.tokens.prev);
-            }
+        if (state.directive["use strict"]) {
+          if (state.option.strict !== "global") {
+            warning("W097", state.tokens.prev);
           }
         }
 
@@ -7298,123 +7225,7 @@ var JSHINT = (function() {
         quit("E041", state.tokens.curr.line);
       }
 
-      state.funct["(blockscope)"].unstack();
-
-      var markDefined = function(name, context) {
-        do {
-          if (typeof context[name] === "string") {
-            // JSHINT marks unused variables as 'unused' and
-            // unused function declaration as 'unction'. This
-            // code changes such instances back 'var' and
-            // 'closure' so that the code in JSHINT.data()
-            // doesn't think they're unused.
-
-            if (context[name] === "unused")
-              context[name] = "var";
-            else if (context[name] === "unction")
-              context[name] = "closure";
-
-            return true;
-          }
-
-          context = context["(context)"];
-        } while (context);
-
-        return false;
-      };
-
-      var clearImplied = function(name, line) {
-        if (!implied[name])
-          return;
-
-        var newImplied = [];
-        for (var i = 0; i < implied[name].length; i += 1) {
-          if (implied[name][i] !== line)
-            newImplied.push(implied[name][i]);
-        }
-
-        if (newImplied.length === 0)
-          delete implied[name];
-        else
-          implied[name] = newImplied;
-      };
-
-      var checkUnused = function(func, key) {
-        var type = func[key];
-        var tkn = func["(tokens)"][key];
-
-        if (key.charAt(0) === "(")
-          return;
-
-        if (type !== "unused" && type !== "unction")
-          return;
-
-        // Params are checked separately from other variables.
-        if (func["(params)"] && func["(params)"].indexOf(key) !== -1)
-          return;
-
-        // Variable is in global scope and defined as exported.
-        if (func["(global)"] && _.has(exported, key))
-          return;
-
-        warnUnused(key, tkn, "var");
-      };
-
-      // Check queued 'x is not defined' instances to see if they're still undefined.
-      for (i = 0; i < JSHINT.undefs.length; i += 1) {
-        k = JSHINT.undefs[i].slice(0);
-
-        if (markDefined(k[2].value, k[0]) || k[2].forgiveUndef) {
-          clearImplied(k[2].value, k[2].line);
-        } else if (state.option.undef) {
-          warning.apply(warning, k.slice(1));
-        }
-      }
-
-      functions.forEach(function(func) {
-        if (func["(unusedOption)"] === false) {
-          return;
-        }
-
-        for (var key in func) {
-          if (_.has(func, key)) {
-            checkUnused(func, key);
-          }
-        }
-
-        if (!func["(params)"])
-          return;
-
-        var params = func["(params)"].slice();
-        var param  = params.pop();
-        var type, unused_opt;
-
-        while (param) {
-          type = func[param];
-          unused_opt = func["(unusedOption)"] || state.option.unused;
-          unused_opt = unused_opt === true ? "last-param" : unused_opt;
-
-          // 'undefined' is a special case for (function(window, undefined) { ... })();
-          // patterns.
-
-          if (param === "undefined")
-            return;
-
-          if (type === "unused" || type === "unction") {
-            warnUnused(param, func["(tokens)"][param], "param", func["(unusedOption)"]);
-          } else if (unused_opt === "last-param") {
-            return;
-          }
-
-          param = params.pop();
-        }
-      });
-
-      for (var key in declared) {
-        if (_.has(declared, key) && !_.has(global, key) && !_.has(exported, key)) {
-          warnUnused(key, declared[key], "var");
-        }
-      }
+      state.funct["(scope)"].unstack();
 
     } catch (err) {
       if (err && err.name === "JSHintError") {
@@ -7461,8 +7272,6 @@ var JSHINT = (function() {
       options: state.option
     };
 
-    var implieds = [];
-    var members = [];
     var fu, f, i, j, n, globals;
 
     if (itself.errors.length) {
@@ -7473,24 +7282,16 @@ var JSHINT = (function() {
       data.json = true;
     }
 
-    for (n in implied) {
-      if (_.has(implied, n)) {
-        implieds.push({
-          name: n,
-          line: implied[n]
-        });
-      }
-    }
-
-    if (implieds.length > 0) {
-      data.implieds = implieds;
+    var impliedGlobals = state.funct["(scope)"].getImpliedGlobals();
+    if (impliedGlobals.length > 0) {
+      data.implieds = impliedGlobals;
     }
 
     if (urls.length > 0) {
       data.urls = urls;
     }
 
-    globals = Object.keys(scope);
+    globals = state.funct["(scope)"].getUsedOrDefinedGlobals();
     if (globals.length > 0) {
       data.globals = globals;
     }
@@ -7518,18 +7319,18 @@ var JSHINT = (function() {
 
       fu.metrics = {
         complexity: f["(metrics)"].ComplexityCount,
-        parameters: (f["(params)"] || []).length,
+        parameters: f["(metrics)"].arity,
         statements: f["(metrics)"].statementCount
       };
 
       data.functions.push(fu);
     }
 
+    var unuseds = state.funct["(scope)"].getUnuseds();
     if (unuseds.length > 0) {
       data.unused = unuseds;
     }
 
-    members = [];
     for (n in member) {
       if (typeof member[n] === "number") {
         data.member = member;
@@ -7550,14 +7351,14 @@ if (typeof exports === "object" && exports) {
   exports.JSHINT = JSHINT;
 }
 
-},{"./lex.js":"/node_modules/jshint/src/lex.js","./messages.js":"/node_modules/jshint/src/messages.js","./options.js":"/node_modules/jshint/src/options.js","./reg.js":"/node_modules/jshint/src/reg.js","./state.js":"/node_modules/jshint/src/state.js","./style.js":"/node_modules/jshint/src/style.js","./vars.js":"/node_modules/jshint/src/vars.js","events":"/node_modules/browserify/node_modules/events/events.js","underscore":"/node_modules/jshint/node_modules/underscore/underscore.js"}],"/node_modules/jshint/src/lex.js":[function(_dereq_,module,exports){
+},{"../lodash":"/node_modules/jshint/lodash.js","./lex.js":"/node_modules/jshint/src/lex.js","./messages.js":"/node_modules/jshint/src/messages.js","./options.js":"/node_modules/jshint/src/options.js","./reg.js":"/node_modules/jshint/src/reg.js","./scope-manager.js":"/node_modules/jshint/src/scope-manager.js","./state.js":"/node_modules/jshint/src/state.js","./style.js":"/node_modules/jshint/src/style.js","./vars.js":"/node_modules/jshint/src/vars.js","events":"/node_modules/browserify/node_modules/events/events.js"}],"/node_modules/jshint/src/lex.js":[function(_dereq_,module,exports){
 /*
  * Lexical analysis and token construction.
  */
 
 "use strict";
 
-var _      = _dereq_("underscore");
+var _      = _dereq_("../lodash");
 var events = _dereq_("events");
 var reg    = _dereq_("./reg.js");
 var state  = _dereq_("./state.js").state;
@@ -7674,6 +7475,9 @@ function Lexer(source) {
   for (var i = 0; i < state.option.indent; i += 1) {
     state.tab += " ";
   }
+
+  // Blank out non-multi-line-commented lines when ignoring linter errors
+  this.ignoreLinterErrors = false;
 }
 
 Lexer.prototype = {
@@ -7950,6 +7754,7 @@ Lexer.prototype = {
     var rest = this.input.substr(2);
     var startLine = this.line;
     var startChar = this.char;
+    var self = this;
 
     // Create a comment token object and make sure it
     // has all the data JSHint needs to work with special
@@ -7967,6 +7772,11 @@ Lexer.prototype = {
       }
 
       body = body.replace(/\n/g, " ");
+
+      if (label === "/*" && reg.fallsThrough.test(body)) {
+        isSpecial = true;
+        commentType = "falls through";
+      }
 
       special.forEach(function(str) {
         if (isSpecial) {
@@ -8004,6 +7814,26 @@ Lexer.prototype = {
           commentType = "globals";
           break;
         default:
+          var options = body.split(":").map(function(v) {
+            return v.replace(/^\s+/, "").replace(/\s+$/, "");
+          });
+
+          if (options.length === 2) {
+            switch (options[0]) {
+            case "ignore":
+              switch (options[1]) {
+              case "start":
+                self.ignoringLinterErrors = true;
+                isSpecial = false;
+                break;
+              case "end":
+                self.ignoringLinterErrors = false;
+                isSpecial = false;
+                break;
+              }
+            }
+          }
+
           commentType = str;
         }
       });
@@ -8318,12 +8148,12 @@ Lexer.prototype = {
           isAllowedDigit = isOctalDigit;
           base = 8;
 
-          if (!state.option.esnext) {
+          if (!state.inES6(true)) {
             this.trigger("warning", {
               code: "W119",
               line: this.line,
               character: this.char,
-              data: [ "Octal integer literal" ]
+              data: [ "Octal integer literal", "6" ]
             });
           }
 
@@ -8336,12 +8166,12 @@ Lexer.prototype = {
           isAllowedDigit = isBinaryDigit;
           base = 2;
 
-          if (!state.option.esnext) {
+          if (!state.inES6(true)) {
             this.trigger("warning", {
               code: "W119",
               line: this.line,
               character: this.char,
-              data: [ "Binary integer literal" ]
+              data: [ "Binary integer literal", "6" ]
             });
           }
 
@@ -8583,7 +8413,7 @@ Lexer.prototype = {
     var startChar = this.char;
     var depth = this.templateStarts.length;
 
-    if (!state.option.esnext) {
+    if (!state.inES6(true)) {
       // Only lex template strings in ESNext mode.
       return null;
     } else if (this.peek() === "`") {
@@ -9057,7 +8887,7 @@ Lexer.prototype = {
 
     // If we are ignoring linter errors, replace the input with empty string
     // if it doesn't already at least start or end a multi-line comment
-    if (state.ignoreLinterErrors === true) {
+    if (this.ignoringLinterErrors === true) {
       if (!startsWith("/*", "//") && !(this.inComment && endsWith("*/"))) {
         this.input = "";
       }
@@ -9078,7 +8908,8 @@ Lexer.prototype = {
     // If there is a limit on line length, warn when lines get too
     // long.
 
-    if (state.option.maxlen && state.option.maxlen < this.input.length) {
+    if (!this.ignoringLinterErrors && state.option.maxlen &&
+      state.option.maxlen < this.input.length) {
       var inComment = this.inComment ||
         startsWith.call(inputTrimmed, "//") ||
         startsWith.call(inputTrimmed, "/*");
@@ -9308,14 +9139,14 @@ Lexer.prototype = {
         return create("(no subst template)", token.value, null, token);
 
       case Token.Identifier:
-        this.trigger("Identifier", {
+        this.triggerAsync("Identifier", {
           line: this.line,
           char: this.char,
           from: this.form,
           name: token.value,
           raw_name: token.text,
           isProperty: state.tokens.curr.id === "."
-        });
+        }, checks, function() { return true; });
 
         /* falls through */
       case Token.Keyword:
@@ -9393,10 +9224,10 @@ Lexer.prototype = {
 exports.Lexer = Lexer;
 exports.Context = Context;
 
-},{"../data/ascii-identifier-data.js":"/node_modules/jshint/data/ascii-identifier-data.js","./reg.js":"/node_modules/jshint/src/reg.js","./state.js":"/node_modules/jshint/src/state.js","events":"/node_modules/browserify/node_modules/events/events.js","underscore":"/node_modules/jshint/node_modules/underscore/underscore.js"}],"/node_modules/jshint/src/messages.js":[function(_dereq_,module,exports){
+},{"../data/ascii-identifier-data.js":"/node_modules/jshint/data/ascii-identifier-data.js","../lodash":"/node_modules/jshint/lodash.js","./reg.js":"/node_modules/jshint/src/reg.js","./state.js":"/node_modules/jshint/src/state.js","events":"/node_modules/browserify/node_modules/events/events.js"}],"/node_modules/jshint/src/messages.js":[function(_dereq_,module,exports){
 "use strict";
 
-var _ = _dereq_("underscore");
+var _ = _dereq_("../lodash");
 
 var errors = {
   // JSHint options
@@ -9416,7 +9247,7 @@ var errors = {
   E010: "'with' is not allowed in strict mode.",
 
   // Constants
-  E011: "const '{a}' has already been declared.",
+  E011: "'{a}' has already been declared.",
   E012: "const '{a}' is initialized to 'undefined'.",
   E013: "Attempting to override '{a}' which is a constant.",
 
@@ -9458,15 +9289,18 @@ var errors = {
   E044: null,
   E045: "Invalid for each loop.",
   E046: "A yield statement shall be within a generator function (with syntax: `function*`)",
-  E047: null, // Vacant
+  E047: null,
   E048: "{a} declaration not directly within block.",
   E049: "A {a} cannot be named '{b}'.",
   E050: "Mozilla requires the yield expression to be parenthesized here.",
-  E051: "Regular parameters cannot come after default parameters.",
+  E051: null,
   E052: "Unclosed template literal.",
   E053: "Export declaration must be in global scope.",
   E054: "Class properties must be methods. Expected '(' but instead saw '{a}'.",
-  E055: "The '{a}' option cannot be set after any executable code."
+  E055: "The '{a}' option cannot be set after any executable code.",
+  E056: "'{a}' was used before it was declared, which is illegal for '{b}' variables.",
+  E057: "Invalid meta property: '{a}.{b}'.",
+  E058: "Missing semicolon."
 };
 
 var warnings = {
@@ -9490,7 +9324,8 @@ var warnings = {
   W018: "Confusing use of '{a}'.",
   W019: "Use the isNaN function to compare with NaN.",
   W020: "Read only.",
-  W021: "'{a}' is a function.",
+  W021: "Reassignment of '{a}', which is is a {b}. " +
+    "Use 'var' or 'let' to declare bindings that may change.",
   W022: "Do not assign to the exception parameter.",
   W023: "Expected an identifier in an assignment and instead saw a function invocation.",
   W024: "Expected an identifier and instead saw '{a}' (a reserved word).",
@@ -9564,7 +9399,7 @@ var warnings = {
   W089: "The body of a for in should be wrapped in an if statement to filter " +
     "unwanted properties from the prototype.",
   W090: "'{a}' is not a statement label.",
-  W091: "'{a}' is out of scope.",
+  W091: null,
   W093: "Did you mean to return a conditional instead of an assignment?",
   W094: "Unexpected comma.",
   W095: "Expected a string and instead saw {a}.",
@@ -9576,7 +9411,7 @@ var warnings = {
   W101: "Line is too long.",
   W102: null,
   W103: "The '{a}' property is deprecated.",
-  W104: "'{a}' is available in ES6 (use esnext option) or Mozilla JS extensions (use moz).",
+  W104: "'{a}' is available in ES{b} (use 'esversion: {b}') or Mozilla JS extensions (use moz).",
   W105: "Unexpected {a} in '{b}'.",
   W106: "Identifier '{a}' is not in camel case.",
   W107: "Script URL.",
@@ -9590,7 +9425,7 @@ var warnings = {
   W116: "Expected '{a}' and instead saw '{b}'.",
   W117: "'{a}' is not defined.",
   W118: "'{a}' is only available in Mozilla JavaScript extensions (use moz option).",
-  W119: "'{a}' is only available in ES6 (use esnext option).",
+  W119: "'{a}' is only available in ES{b} (use 'esversion: {b}').",
   W120: "You might be leaking a variable ({a}) here.",
   W121: "Extending prototype of native object: '{a}'.",
   W122: "Invalid typeof value '{a}'",
@@ -9606,7 +9441,11 @@ var warnings = {
   W131: "Invalid parameter after rest parameter.",
   W132: "`var` declarations are forbidden. Use `let` or `const` instead.",
   W133: "Invalid for-{a} loop left-hand-side: {b}.",
-  W134: "The '{a}' option is only available when linting ECMAScript {b} code."
+  W134: "The '{a}' option is only available when linting ECMAScript {b} code.",
+  W135: "{a} may not be supported by non-browser environments.",
+  W136: "'{a}' must be in function scope.",
+  W137: "Empty destructuring.",
+  W138: "Regular parameters should not come after default parameters."
 };
 
 var info = {
@@ -9631,7 +9470,7 @@ _.each(info, function(desc, code) {
   exports.info[code] = { code: code, desc: desc };
 });
 
-},{"underscore":"/node_modules/jshint/node_modules/underscore/underscore.js"}],"/node_modules/jshint/src/name-stack.js":[function(_dereq_,module,exports){
+},{"../lodash":"/node_modules/jshint/lodash.js"}],"/node_modules/jshint/src/name-stack.js":[function(_dereq_,module,exports){
 "use strict";
 
 function NameStack() {
@@ -9801,6 +9640,8 @@ exports.bool = {
      * specification. Use this option if you need your program to be executable
      * in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
      * JavaScript environments.
+     *
+     * @deprecated Use `esversion: 3` instead.
      */
     es3         : true,
 
@@ -9808,6 +9649,8 @@ exports.bool = {
      * This option enables syntax first defined in [the ECMAScript 5.1
      * specification](http://es5.github.io/). This includes allowing reserved
      * keywords as object properties.
+     *
+     * @deprecated Use `esversion: 5` instead.
      */
     es5         : true,
 
@@ -9969,21 +9812,6 @@ exports.bool = {
     singleGroups: false,
 
     /**
-     * This option requires all functions to run in ECMAScript 5's strict mode.
-     * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
-     * is a way to opt in to a restricted variant of JavaScript. Strict mode
-     * eliminates some JavaScript pitfalls that didn't cause errors by changing
-     * them to produce errors.  It also fixes mistakes that made it difficult
-     * for the JavaScript engines to perform certain optimizations.
-     *
-     * *Note:* This option enables strict mode for function scope only. It
-     * *prohibits* the global scoped strict mode because it might break
-     * third-party widgets on your page. If you really want to use global
-     * strict mode, see the *globalstrict* option.
-     */
-    strict      : true,
-
-    /**
      * When set to true, the use of VariableStatements are forbidden.
      * For example:
      *
@@ -10085,6 +9913,8 @@ exports.bool = {
      * recommended.
      *
      * For more info about strict mode see the `strict` option.
+     *
+     * @deprecated Use `strict: "global"`.
      */
     globalstrict: true,
 
@@ -10265,8 +10095,10 @@ exports.bool = {
      *
      * More info:
      *
-     * * [Draft Specification for ES.next (ECMA-262 Ed.
-     *   6)](http://wiki.ecmascript.org/doku.php?id=harmony:specification_drafts)
+     * * [Specification for ECMAScript
+     *   6](http://www.ecma-international.org/ecma-262/6.0/index.html)
+     *
+     * @deprecated Use `esversion: 6` instead.
      */
     esnext      : true,
 
@@ -10467,7 +10299,18 @@ exports.val = {
    */
   maxerr       : false,
 
-  predef       : false, // predef is deprecated and being replaced by globals
+  /**
+   * This option allows you to control which variables JSHint considers to be
+   * implicitly defined in the environment. Configure it with an array of
+   * string values. Prefixing a variable name with a hyphen (-) character will
+   * remove that name from the collection of predefined variables.
+   *
+   * JSHint will consider variables declared in this way to be read-only.
+   *
+   * This option cannot be specified in-line; it may only be used via the
+   * JavaScript API or from an external configuration file.
+   */
+  predef       : false,
 
   /**
    * This option can be used to specify a white list of global variables that
@@ -10482,6 +10325,9 @@ exports.val = {
    * See also the "environment" options: a set of options to be used as short
    * hand for enabling global variables defined in common JavaScript
    * environments.
+   *
+   * To configure `globals` within an individual file, see [Inline
+   * Configuration](http://jshint.com/docs/#inline-configuration).
    */
   globals      : false,
 
@@ -10582,6 +10428,24 @@ exports.val = {
   shadow       : false,
 
   /**
+   * This option requires the code to run in ECMAScript 5's strict mode.
+   * [Strict mode](https://developer.mozilla.org/en/JavaScript/Strict_mode)
+   * is a way to opt in to a restricted variant of JavaScript. Strict mode
+   * eliminates some JavaScript pitfalls that didn't cause errors by changing
+   * them to produce errors.  It also fixes mistakes that made it difficult
+   * for the JavaScript engines to perform certain optimizations.
+   *
+   * - "func"    - there must be a `"use strict";` directive at function level
+   * - "global"  - there must be a `"use strict";` directive at global level
+   * - "implied" - lint the code as if there is the `"use strict";` directive
+   * - false     - disable warnings about strict mode
+   * - true      - same as `"func"`, but environment options have precedence over
+   *               this (e.g. `node`, `module`, `browserify` and `phantomjs` can
+   *               set `strict: global`)
+   */
+  strict      : true,
+
+  /**
    * This option warns when you define and never use your variables. It is very
    * useful for general code cleanup, especially when used in addition to
    * `undef`.
@@ -10631,8 +10495,24 @@ exports.val = {
                         //   end      - stop ignoring lines, starting on the next line
                         //   line     - ignore warnings / errors for just a single line
                         //              (this option does not bypass the lexer)
-  ignoreDelimiters: false // array of start/end delimiters used to ignore
-                          // certain chunks from code
+
+  ignoreDelimiters: false, // array of start/end delimiters used to ignore
+                           // certain chunks from code
+
+  /**
+   * This option is used to specify the ECMAScript version to which the code
+   * must adhere. It can assume one of the following values:
+   *  - `3` - If you need your program to be executable
+   *    in older browsers—such as Internet Explorer 6/7/8/9—and other legacy
+   *    JavaScript environments
+   *  - `5` - To enable syntax first defined in [the ECMAScript 5.1
+   *    specification](http://www.ecma-international.org/ecma-262/5.1/index.html).
+   *    This includes allowing reserved keywords as object properties.
+   *  - `6` - To tell JSHint that your code uses [ECMAScript
+   *    6](http://www.ecma-international.org/ecma-262/6.0/index.html) specific
+   *    syntax. Note that not all browsers implement them.
+   */
+  esversion: 5
 };
 
 // These are JSHint boolean options which are shared with JSLint
@@ -10715,13 +10595,845 @@ exports.identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
 exports.javascriptURL = /^(?:javascript|jscript|ecmascript|vbscript|livescript)\s*:/i;
 
 // Catches /* falls through */ comments (ft)
-exports.fallsThrough = /^\s*\/\*\s*falls?\sthrough\s*\*\/\s*$/;
+exports.fallsThrough = /^\s*falls?\sthrough\s*$/;
 
 // very conservative rule (eg: only one space between the start of the comment and the first character)
 // to relax the maxlen option
 exports.maxlenException = /^(?:(?:\/\/|\/\*|\*) ?)?[^ ]+$/;
 
-},{}],"/node_modules/jshint/src/state.js":[function(_dereq_,module,exports){
+},{}],"/node_modules/jshint/src/scope-manager.js":[function(_dereq_,module,exports){
+"use strict";
+
+var _      = _dereq_("../lodash");
+var events = _dereq_("events");
+
+// Used to denote membership in lookup tables (a primitive value such as `true`
+// would be silently rejected for the property name "__proto__" in some
+// environments)
+var marker = {};
+
+/**
+ * Creates a scope manager that handles variables and labels, storing usages
+ * and resolving when variables are used and undefined
+ */
+var scopeManager = function(state, predefined, exported, declared) {
+
+  var _current;
+  var _scopeStack = [];
+
+  function _newScope(type) {
+    _current = {
+      "(labels)": Object.create(null),
+      "(usages)": Object.create(null),
+      "(breakLabels)": Object.create(null),
+      "(parent)": _current,
+      "(type)": type,
+      "(params)": (type === "functionparams" || type === "catchparams") ? [] : null
+    };
+    _scopeStack.push(_current);
+  }
+
+  _newScope("global");
+  _current["(predefined)"] = predefined;
+
+  var _currentFunctBody = _current; // this is the block after the params = function
+
+  var usedPredefinedAndGlobals = Object.create(null);
+  var impliedGlobals = Object.create(null);
+  var unuseds = [];
+  var emitter = new events.EventEmitter();
+
+  function warning(code, token) {
+    emitter.emit("warning", {
+      code: code,
+      token: token,
+      data: _.slice(arguments, 2)
+    });
+  }
+
+  function error(code, token) {
+    emitter.emit("warning", {
+      code: code,
+      token: token,
+      data: _.slice(arguments, 2)
+    });
+  }
+
+  function _setupUsages(labelName) {
+    if (!_current["(usages)"][labelName]) {
+      _current["(usages)"][labelName] = {
+        "(modified)": [],
+        "(reassigned)": [],
+        "(tokens)": []
+      };
+    }
+  }
+
+  var _getUnusedOption = function(unused_opt) {
+    if (unused_opt === undefined) {
+      unused_opt = state.option.unused;
+    }
+
+    if (unused_opt === true) {
+      unused_opt = "last-param";
+    }
+
+    return unused_opt;
+  };
+
+  var _warnUnused = function(name, tkn, type, unused_opt) {
+    var line = tkn.line;
+    var chr  = tkn.from;
+    var raw_name = tkn.raw_text || name;
+
+    unused_opt = _getUnusedOption(unused_opt);
+
+    var warnable_types = {
+      "vars": ["var"],
+      "last-param": ["var", "param"],
+      "strict": ["var", "param", "last-param"]
+    };
+
+    if (unused_opt) {
+      if (warnable_types[unused_opt] && warnable_types[unused_opt].indexOf(type) !== -1) {
+        warning("W098", { line: line, from: chr }, raw_name);
+      }
+    }
+
+    // inconsistent - see gh-1894
+    if (unused_opt || type === "var") {
+      unuseds.push({
+        name: name,
+        line: line,
+        character: chr
+      });
+    }
+  };
+
+  /**
+   * Checks the current scope for unused identifiers
+   */
+  function _checkForUnused() {
+    // function params are handled specially
+    // assume that parameters are the only thing declared in the param scope
+    if (_current["(type)"] === "functionparams") {
+      _checkParams();
+      return;
+    }
+    var curentLabels = _current["(labels)"];
+    for (var labelName in curentLabels) {
+      if (curentLabels[labelName]) {
+        if (curentLabels[labelName]["(type)"] !== "exception" &&
+          curentLabels[labelName]["(unused)"]) {
+          _warnUnused(labelName, curentLabels[labelName]["(token)"], "var");
+        }
+      }
+    }
+  }
+
+  /**
+   * Checks the current scope for unused parameters
+   * Must be called in a function parameter scope
+   */
+  function _checkParams() {
+    var params = _current["(params)"];
+
+    if (!params) {
+      return;
+    }
+
+    var param = params.pop();
+    var unused_opt;
+
+    while (param) {
+      var label = _current["(labels)"][param];
+
+      unused_opt = _getUnusedOption(state.funct["(unusedOption)"]);
+
+      // 'undefined' is a special case for (function(window, undefined) { ... })();
+      // patterns.
+      if (param === "undefined")
+        return;
+
+      if (label["(unused)"]) {
+        _warnUnused(param, label["(token)"], "param", state.funct["(unusedOption)"]);
+      } else if (unused_opt === "last-param") {
+        return;
+      }
+
+      param = params.pop();
+    }
+  }
+
+  /**
+   * Finds the relevant label's scope, searching from nearest outwards
+   * @returns {Object} the scope the label was found in
+   */
+  function _getLabel(labelName) {
+    for (var i = _scopeStack.length - 1 ; i >= 0; --i) {
+      var scopeLabels = _scopeStack[i]["(labels)"];
+      if (scopeLabels[labelName]) {
+        return scopeLabels;
+      }
+    }
+  }
+
+  function usedSoFarInCurrentFunction(labelName) {
+    // used so far in this whole function and any sub functions
+    for (var i = _scopeStack.length - 1; i >= 0; i--) {
+      var current = _scopeStack[i];
+      if (current["(usages)"][labelName]) {
+        return current["(usages)"][labelName];
+      }
+      if (current === _currentFunctBody) {
+        break;
+      }
+    }
+    return false;
+  }
+
+  function _checkOuterShadow(labelName, token) {
+
+    // only check if shadow is outer
+    if (state.option.shadow !== "outer") {
+      return;
+    }
+
+    var isGlobal = _currentFunctBody["(type)"] === "global",
+      isNewFunction = _current["(type)"] === "functionparams";
+
+    var outsideCurrentFunction = !isGlobal;
+    for (var i = 0; i < _scopeStack.length; i++) {
+      var stackItem = _scopeStack[i];
+
+      if (!isNewFunction && _scopeStack[i + 1] === _currentFunctBody) {
+        outsideCurrentFunction = false;
+      }
+      if (outsideCurrentFunction && stackItem["(labels)"][labelName]) {
+        warning("W123", token, labelName);
+      }
+      if (stackItem["(breakLabels)"][labelName]) {
+        warning("W123", token, labelName);
+      }
+    }
+  }
+
+  function _latedefWarning(type, labelName, token) {
+    if (state.option.latedef) {
+      // if either latedef is strict and this is a function
+      //    or this is not a function
+      if ((state.option.latedef === true && type === "function") ||
+        type !== "function") {
+        warning("W003", token, labelName);
+      }
+    }
+  }
+
+  var scopeManagerInst = {
+
+    on: function(names, listener) {
+      names.split(" ").forEach(function(name) {
+        emitter.on(name, listener);
+      });
+    },
+
+    isPredefined: function(labelName) {
+      return !this.has(labelName) && _.has(_scopeStack[0]["(predefined)"], labelName);
+    },
+
+    /**
+     * Tell the manager we are entering a new block of code
+     * @param {string} [type] - The type of the block. Valid values are
+     *                          "functionparams", "catchparams" and
+     *                          "functionouter"
+     */
+    stack: function(type) {
+      var previousScope = _current;
+      _newScope(type);
+
+      if (!type && previousScope["(type)"] === "functionparams") {
+
+        _current["(isFuncBody)"] = true;
+        _current["(context)"] = _currentFunctBody;
+        _currentFunctBody = _current;
+      }
+    },
+
+    unstack: function() {
+      // jshint proto: true
+      var subScope = _scopeStack.length > 1 ? _scopeStack[_scopeStack.length - 2] : null;
+      var isUnstackingFunctionBody = _current === _currentFunctBody,
+        isUnstackingFunctionParams = _current["(type)"] === "functionparams",
+        isUnstackingFunctionOuter = _current["(type)"] === "functionouter";
+
+      var i, j;
+      var currentUsages = _current["(usages)"];
+      var currentLabels = _current["(labels)"];
+      var usedLabelNameList = Object.keys(currentUsages);
+
+      if (currentUsages.__proto__ && usedLabelNameList.indexOf("__proto__") === -1) {
+        usedLabelNameList.push("__proto__");
+      }
+
+      for (i = 0; i < usedLabelNameList.length; i++) {
+        var usedLabelName = usedLabelNameList[i];
+
+        var usage = currentUsages[usedLabelName];
+        var usedLabel = currentLabels[usedLabelName];
+        if (usedLabel) {
+          var usedLabelType = usedLabel["(type)"];
+
+          if (usedLabel["(useOutsideOfScope)"] && !state.option.funcscope) {
+            var usedTokens = usage["(tokens)"];
+            if (usedTokens) {
+              for (j = 0; j < usedTokens.length; j++) {
+                // Keep the consistency of https://github.com/jshint/jshint/issues/2409
+                if (usedLabel["(function)"] === usedTokens[j]["(function)"]) {
+                  error("W038", usedTokens[j], usedLabelName);
+                }
+              }
+            }
+          }
+
+          // mark the label used
+          _current["(labels)"][usedLabelName]["(unused)"] = false;
+
+          // check for modifying a const
+          if (usedLabelType === "const" && usage["(modified)"]) {
+            for (j = 0; j < usage["(modified)"].length; j++) {
+              error("E013", usage["(modified)"][j], usedLabelName);
+            }
+          }
+
+          // check for re-assigning a function declaration
+          if ((usedLabelType === "function" || usedLabelType === "class") &&
+              usage["(reassigned)"]) {
+            for (j = 0; j < usage["(reassigned)"].length; j++) {
+              error("W021", usage["(reassigned)"][j], usedLabelName, usedLabelType);
+            }
+          }
+          continue;
+        }
+
+        if (isUnstackingFunctionOuter) {
+          state.funct["(isCapturing)"] = true;
+        }
+
+        if (subScope) {
+          // not exiting the global scope, so copy the usage down in case its an out of scope usage
+          if (!subScope["(usages)"][usedLabelName]) {
+            subScope["(usages)"][usedLabelName] = usage;
+            if (isUnstackingFunctionBody) {
+              subScope["(usages)"][usedLabelName]["(onlyUsedSubFunction)"] = true;
+            }
+          } else {
+            var subScopeUsage = subScope["(usages)"][usedLabelName];
+            subScopeUsage["(modified)"] = subScopeUsage["(modified)"].concat(usage["(modified)"]);
+            subScopeUsage["(tokens)"] = subScopeUsage["(tokens)"].concat(usage["(tokens)"]);
+            subScopeUsage["(reassigned)"] =
+              subScopeUsage["(reassigned)"].concat(usage["(reassigned)"]);
+            subScopeUsage["(onlyUsedSubFunction)"] = false;
+          }
+        } else {
+          // this is exiting global scope, so we finalise everything here - we are at the end of the file
+          if (typeof _current["(predefined)"][usedLabelName] === "boolean") {
+
+            // remove the declared token, so we know it is used
+            delete declared[usedLabelName];
+
+            // note it as used so it can be reported
+            usedPredefinedAndGlobals[usedLabelName] = marker;
+
+            // check for re-assigning a read-only (set to false) predefined
+            if (_current["(predefined)"][usedLabelName] === false && usage["(reassigned)"]) {
+              for (j = 0; j < usage["(reassigned)"].length; j++) {
+                warning("W020", usage["(reassigned)"][j]);
+              }
+            }
+          }
+          else {
+            // label usage is not predefined and we have not found a declaration
+            // so report as undeclared
+            if (usage["(tokens)"]) {
+              for (j = 0; j < usage["(tokens)"].length; j++) {
+                var undefinedToken = usage["(tokens)"][j];
+                // if its not a forgiven undefined (e.g. typof x)
+                if (!undefinedToken.forgiveUndef) {
+                  // if undef is on and undef was on when the token was defined
+                  if (state.option.undef && !undefinedToken.ignoreUndef) {
+                    warning("W117", undefinedToken, usedLabelName);
+                  }
+                  if (impliedGlobals[usedLabelName]) {
+                    impliedGlobals[usedLabelName].line.push(undefinedToken.line);
+                  } else {
+                    impliedGlobals[usedLabelName] = {
+                      name: usedLabelName,
+                      line: [undefinedToken.line]
+                    };
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // if exiting the global scope, we can warn about declared globals that haven't been used yet
+      if (!subScope) {
+        Object.keys(declared)
+          .forEach(function(labelNotUsed) {
+            _warnUnused(labelNotUsed, declared[labelNotUsed], "var");
+          });
+      }
+
+      // if we have a sub scope we can copy too and we are still within the function boundary
+      if (subScope && !isUnstackingFunctionBody &&
+        !isUnstackingFunctionParams && !isUnstackingFunctionOuter) {
+        var labelNames = Object.keys(currentLabels);
+        for (i = 0; i < labelNames.length; i++) {
+
+          var defLabelName = labelNames[i];
+
+          // if its function scoped and
+          // not already defined (caught with shadow, shouldn't also trigger out of scope)
+          if (!currentLabels[defLabelName]["(blockscoped)"] &&
+            currentLabels[defLabelName]["(type)"] !== "exception" &&
+            !this.funct.has(defLabelName, { excludeCurrent: true })) {
+            subScope["(labels)"][defLabelName] = currentLabels[defLabelName];
+            // we do not warn about out of scope usages in the global scope
+            if (_currentFunctBody["(type)"] !== "global") {
+              subScope["(labels)"][defLabelName]["(useOutsideOfScope)"] = true;
+            }
+            delete currentLabels[defLabelName];
+          }
+        }
+      }
+
+      _checkForUnused();
+
+      _scopeStack.pop();
+      if (isUnstackingFunctionBody) {
+        _currentFunctBody = _scopeStack[_.findLastIndex(_scopeStack, function(scope) {
+          // if function or if global (which is at the bottom so it will only return true if we call back)
+          return scope["(isFuncBody)"] || scope["(type)"] === "global";
+        })];
+      }
+
+      _current = subScope;
+    },
+
+    /**
+     * Add a param to the current scope
+     * @param {string} labelName
+     * @param {Token} token
+     * @param {string} [type="param"] param type
+     */
+    addParam: function(labelName, token, type) {
+      type = type || "param";
+
+      if (type === "exception") {
+        // if defined in the current function
+        var previouslyDefinedLabelType = this.funct.labeltype(labelName);
+        if (previouslyDefinedLabelType && previouslyDefinedLabelType !== "exception") {
+          // and has not been used yet in the current function scope
+          if (!state.option.node) {
+            warning("W002", state.tokens.next, labelName);
+          }
+        }
+      }
+
+      // The variable was declared in the current scope
+      if (_.has(_current["(labels)"], labelName)) {
+        _current["(labels)"][labelName].duplicated = true;
+
+      // The variable was declared in an outer scope
+      } else {
+        // if this scope has the variable defined, it's a re-definition error
+        _checkOuterShadow(labelName, token, type);
+
+        _current["(labels)"][labelName] = {
+          "(type)" : type,
+          "(token)": token,
+          "(unused)": true };
+
+        _current["(params)"].push(labelName);
+      }
+
+      if (_.has(_current["(usages)"], labelName)) {
+        var usage = _current["(usages)"][labelName];
+        // if its in a sub function it is not necessarily an error, just latedef
+        if (usage["(onlyUsedSubFunction)"]) {
+          _latedefWarning(type, labelName, token);
+        } else {
+          // this is a clear illegal usage for block scoped variables
+          warning("E056", token, labelName, type);
+        }
+      }
+    },
+
+    validateParams: function() {
+      // This method only concerns errors for function parameters
+      if (_currentFunctBody["(type)"] === "global") {
+        return;
+      }
+
+      var isStrict = state.isStrict();
+      var currentFunctParamScope = _currentFunctBody["(parent)"];
+
+      if (!currentFunctParamScope["(params)"]) {
+        return;
+      }
+
+      currentFunctParamScope["(params)"].forEach(function(labelName) {
+        var label = currentFunctParamScope["(labels)"][labelName];
+
+        if (label && label.duplicated) {
+          if (isStrict) {
+            warning("E011", label["(token)"], labelName);
+          } else if (state.option.shadow !== true) {
+            warning("W004", label["(token)"], labelName);
+          }
+        }
+      });
+    },
+
+    getUsedOrDefinedGlobals: function() {
+      // jshint proto: true
+      var list = Object.keys(usedPredefinedAndGlobals);
+
+      // If `__proto__` is used as a global variable name, its entry in the
+      // lookup table may not be enumerated by `Object.keys` (depending on the
+      // environment).
+      if (usedPredefinedAndGlobals.__proto__ === marker &&
+        list.indexOf("__proto__") === -1) {
+        list.push("__proto__");
+      }
+
+      return list;
+    },
+
+    /**
+     * Gets an array of implied globals
+     * @returns {Array.<{ name: string, line: Array.<number>}>}
+     */
+    getImpliedGlobals: function() {
+      // jshint proto: true
+      var values = _.values(impliedGlobals);
+      var hasProto = false;
+
+      // If `__proto__` is an implied global variable, its entry in the lookup
+      // table may not be enumerated by `_.values` (depending on the
+      // environment).
+      if (impliedGlobals.__proto__) {
+        hasProto = values.some(function(value) {
+          return value.name === "__proto__";
+        });
+
+        if (!hasProto) {
+          values.push(impliedGlobals.__proto__);
+        }
+      }
+
+      return values;
+    },
+
+    /**
+     * Returns a list of unused variables
+     * @returns {Array}
+     */
+    getUnuseds: function() {
+      return unuseds;
+    },
+
+    has: function(labelName) {
+      return Boolean(_getLabel(labelName));
+    },
+
+    labeltype: function(labelName) {
+      // returns a labels type or null if not present
+      var scopeLabels = _getLabel(labelName);
+      if (scopeLabels) {
+        return scopeLabels[labelName]["(type)"];
+      }
+      return null;
+    },
+
+    /**
+     * for the exported options, indicating a variable is used outside the file
+     */
+    addExported: function(labelName) {
+      var globalLabels = _scopeStack[0]["(labels)"];
+      if (_.has(declared, labelName)) {
+        // remove the declared token, so we know it is used
+        delete declared[labelName];
+      } else if (_.has(globalLabels, labelName)) {
+        globalLabels[labelName]["(unused)"] = false;
+      } else {
+        for (var i = 1; i < _scopeStack.length; i++) {
+          var scope = _scopeStack[i];
+          // if `scope.(type)` is not defined, it is a block scope
+          if (!scope["(type)"]) {
+            if (_.has(scope["(labels)"], labelName) &&
+                !scope["(labels)"][labelName]["(blockscoped)"]) {
+              scope["(labels)"][labelName]["(unused)"] = false;
+              return;
+            }
+          } else {
+            break;
+          }
+        }
+        exported[labelName] = true;
+      }
+    },
+
+    /**
+     * Mark an indentifier as es6 module exported
+     */
+    setExported: function(labelName, token) {
+      this.block.use(labelName, token);
+    },
+
+    /**
+     * adds an indentifier to the relevant current scope and creates warnings/errors as necessary
+     * @param {string} labelName
+     * @param {Object} opts
+     * @param {String} opts.type - the type of the label e.g. "param", "var", "let, "const", "function"
+     * @param {Token} opts.token - the token pointing at the declaration
+     */
+    addlabel: function(labelName, opts) {
+
+      var type  = opts.type;
+      var token = opts.token;
+      var isblockscoped = type === "let" || type === "const" || type === "class";
+      var isexported    = (isblockscoped ? _current : _currentFunctBody)["(type)"] === "global" &&
+                          _.has(exported, labelName);
+
+      // outer shadow check (inner is only on non-block scoped)
+      _checkOuterShadow(labelName, token, type);
+
+      // if is block scoped (let or const)
+      if (isblockscoped) {
+
+        var declaredInCurrentScope = _current["(labels)"][labelName];
+        // for block scoped variables, params are seen in the current scope as the root function
+        // scope, so check these too.
+        if (!declaredInCurrentScope && _current === _currentFunctBody &&
+          _current["(type)"] !== "global") {
+          declaredInCurrentScope = !!_currentFunctBody["(parent)"]["(labels)"][labelName];
+        }
+
+        // if its not already defined (which is an error, so ignore) and is used in TDZ
+        if (!declaredInCurrentScope && _current["(usages)"][labelName]) {
+          var usage = _current["(usages)"][labelName];
+          // if its in a sub function it is not necessarily an error, just latedef
+          if (usage["(onlyUsedSubFunction)"]) {
+            _latedefWarning(type, labelName, token);
+          } else {
+            // this is a clear illegal usage for block scoped variables
+            warning("E056", token, labelName, type);
+          }
+        }
+
+        // if this scope has the variable defined, its a re-definition error
+        if (declaredInCurrentScope) {
+          warning("E011", token, labelName);
+        }
+        else if (state.option.shadow === "outer") {
+
+          // if shadow is outer, for block scope we want to detect any shadowing within this function
+          if (scopeManagerInst.funct.has(labelName)) {
+            warning("W004", token, labelName);
+          }
+        }
+
+        scopeManagerInst.block.add(labelName, type, token, !isexported);
+
+      } else {
+
+        var declaredInCurrentFunctionScope = scopeManagerInst.funct.has(labelName);
+
+        // check for late definition, ignore if already declared
+        if (!declaredInCurrentFunctionScope && usedSoFarInCurrentFunction(labelName)) {
+          _latedefWarning(type, labelName, token);
+        }
+
+        // defining with a var or a function when a block scope variable of the same name
+        // is in scope is an error
+        if (scopeManagerInst.funct.has(labelName, { onlyBlockscoped: true })) {
+          warning("E011", token, labelName);
+        } else if (state.option.shadow !== true) {
+          // now since we didn't get any block scope variables, test for var/function
+          // shadowing
+          if (declaredInCurrentFunctionScope && labelName !== "__proto__") {
+
+            // see https://github.com/jshint/jshint/issues/2400
+            if (_currentFunctBody["(type)"] !== "global") {
+              warning("W004", token, labelName);
+            }
+          }
+        }
+
+        scopeManagerInst.funct.add(labelName, type, token, !isexported);
+
+        if (_currentFunctBody["(type)"] === "global") {
+          usedPredefinedAndGlobals[labelName] = marker;
+        }
+      }
+    },
+
+    funct: {
+      /**
+       * Returns the label type given certain options
+       * @param labelName
+       * @param {Object=} options
+       * @param {Boolean=} options.onlyBlockscoped - only include block scoped labels
+       * @param {Boolean=} options.excludeParams - exclude the param scope
+       * @param {Boolean=} options.excludeCurrent - exclude the current scope
+       * @returns {String}
+       */
+      labeltype: function(labelName, options) {
+        var onlyBlockscoped = options && options.onlyBlockscoped;
+        var excludeParams = options && options.excludeParams;
+        var currentScopeIndex = _scopeStack.length - (options && options.excludeCurrent ? 2 : 1);
+        for (var i = currentScopeIndex; i >= 0; i--) {
+          var current = _scopeStack[i];
+          if (current["(labels)"][labelName] &&
+            (!onlyBlockscoped || current["(labels)"][labelName]["(blockscoped)"])) {
+            return current["(labels)"][labelName]["(type)"];
+          }
+          var scopeCheck = excludeParams ? _scopeStack[ i - 1 ] : current;
+          if (scopeCheck && scopeCheck["(type)"] === "functionparams") {
+            return null;
+          }
+        }
+        return null;
+      },
+      /**
+       * Returns if a break label exists in the function scope
+       * @param {string} labelName
+       * @returns {boolean}
+       */
+      hasBreakLabel: function(labelName) {
+        for (var i = _scopeStack.length - 1; i >= 0; i--) {
+          var current = _scopeStack[i];
+
+          if (current["(breakLabels)"][labelName]) {
+            return true;
+          }
+          if (current["(type)"] === "functionparams") {
+            return false;
+          }
+        }
+        return false;
+      },
+      /**
+       * Returns if the label is in the current function scope
+       * See scopeManager.funct.labelType for options
+       */
+      has: function(labelName, options) {
+        return Boolean(this.labeltype(labelName, options));
+      },
+
+      /**
+       * Adds a new function scoped variable
+       * see block.add for block scoped
+       */
+      add: function(labelName, type, tok, unused) {
+        _current["(labels)"][labelName] = {
+          "(type)" : type,
+          "(token)": tok,
+          "(blockscoped)": false,
+          "(function)": _currentFunctBody,
+          "(unused)": unused };
+      }
+    },
+
+    block: {
+
+      /**
+       * is the current block global?
+       * @returns Boolean
+       */
+      isGlobal: function() {
+        return _current["(type)"] === "global";
+      },
+
+      use: function(labelName, token) {
+
+        // if resolves to current function params, then do not store usage just resolve
+        // this is because function(a) { var a; a = a; } will resolve to the param, not
+        // to the unset var
+        // first check the param is used
+        var paramScope = _currentFunctBody["(parent)"];
+        if (paramScope && paramScope["(labels)"][labelName] &&
+          paramScope["(labels)"][labelName]["(type)"] === "param") {
+
+          // then check its not declared by a block scope variable
+          if (!scopeManagerInst.funct.has(labelName,
+                { excludeParams: true, onlyBlockscoped: true })) {
+            paramScope["(labels)"][labelName]["(unused)"] = false;
+          }
+        }
+
+        if (token && (state.ignored.W117 || state.option.undef === false)) {
+          token.ignoreUndef = true;
+        }
+
+        _setupUsages(labelName);
+
+        if (token) {
+          token["(function)"] = _currentFunctBody;
+          _current["(usages)"][labelName]["(tokens)"].push(token);
+        }
+      },
+
+      reassign: function(labelName, token) {
+
+        this.modify(labelName, token);
+
+        _current["(usages)"][labelName]["(reassigned)"].push(token);
+      },
+
+      modify: function(labelName, token) {
+
+        _setupUsages(labelName);
+
+        _current["(usages)"][labelName]["(modified)"].push(token);
+      },
+
+      /**
+       * Adds a new variable
+       */
+      add: function(labelName, type, tok, unused) {
+        _current["(labels)"][labelName] = {
+          "(type)" : type,
+          "(token)": tok,
+          "(blockscoped)": true,
+          "(unused)": unused };
+      },
+
+      addBreakLabel: function(labelName, opts) {
+        var token = opts.token;
+        if (scopeManagerInst.funct.hasBreakLabel(labelName)) {
+          warning("E011", token, labelName);
+        }
+        else if (state.option.shadow === "outer") {
+          if (scopeManagerInst.funct.has(labelName)) {
+            warning("W004", token, labelName);
+          } else {
+            _checkOuterShadow(labelName, token);
+          }
+        }
+        _current["(breakLabels)"][labelName] = token;
+      }
+    }
+  };
+  return scopeManagerInst;
+};
+
+module.exports = scopeManager;
+
+},{"../lodash":"/node_modules/jshint/lodash.js","events":"/node_modules/browserify/node_modules/events/events.js"}],"/node_modules/jshint/src/state.js":[function(_dereq_,module,exports){
 "use strict";
 var NameStack = _dereq_("./name-stack.js");
 
@@ -10735,29 +11447,32 @@ var state = {
    */
   isStrict: function() {
     return this.directive["use strict"] || this.inClassBody ||
-      this.option.module;
+      this.option.module || this.option.strict === "implied";
   },
 
-  // Assumption: chronologically ES3 < ES5 < ES6/ESNext < Moz
+  // Assumption: chronologically ES3 < ES5 < ES6 < Moz
+
   inMoz: function() {
     return this.option.moz;
   },
 
   /**
-   * @param {object} options
-   * @param {boolean} options.strict - When `true`, only consider ESNext when
-   *                                   in "esnext" code and *not* in "moz".
+   * @param {boolean} strict - When `true`, only consider ES6 when in
+   *                           "esversion: 6" code and *not* in "moz".
    */
-  inESNext: function() {
-    return this.option.moz || this.option.esnext;
+  inES6: function() {
+    return this.option.moz || this.option.esversion >= 6;
   },
 
-  inES5: function() {
-    return !this.option.es3;
-  },
-
-  inES3: function() {
-    return this.option.es3;
+  /**
+   * @param {boolean} strict - When `true`, return `true` only when
+   *                           esversion is exactly 5
+   */
+  inES5: function(strict) {
+    if (strict) {
+      return (!this.option.esversion || this.option.esversion === 5) && !this.option.moz;
+    }
+    return !this.option.esversion || this.option.esversion >= 5 || this.option.moz;
   },
 
 
@@ -10781,9 +11496,6 @@ var state = {
     this.forinifcheckneeded = false;
     this.nameStack = new NameStack();
     this.inClassBody = false;
-
-    // Blank out non-multi-line-commented lines when ignoring linter errors
-    this.ignoreLinterErrors = false;
   }
 };
 
@@ -10805,13 +11517,14 @@ exports.register = function(linter) {
       linter.warn("W103", {
         line: data.line,
         char: data.char,
-        data: [ data.name ]
+        data: [ data.name, "6" ]
       });
     }
   });
 
   // Check for properties named __iterator__. This is a special property
-  // available only in browsers with JavaScript 1.7 implementation.
+  // available only in browsers with JavaScript 1.7 implementation, but
+  // it is deprecated for ES6
 
   linter.on("Identifier", function style_scanIterator(data) {
     if (linter.getOption("iterator")) {
@@ -10819,7 +11532,7 @@ exports.register = function(linter) {
     }
 
     if (data.name === "__iterator__") {
-      linter.warn("W104", {
+      linter.warn("W103", {
         line: data.line,
         char: data.char,
         data: [ data.name ]
@@ -11304,6 +12017,7 @@ exports.browser = {
   WebGLUniformLocation : false,
   WebSocket            : false,
   window               : false,
+  Window               : false,
   Worker               : false,
   XDomainRequest       : false,
   XMLHttpRequest       : false,
@@ -11652,7 +12366,8 @@ exports.jasmine = {
   afterAll    : false,
   fail        : false,
   fdescribe   : false,
-  fit         : false
+  fit         : false,
+  pending     : false
 };
 
 },{}]},{},["/node_modules/jshint/src/jshint.js"]);

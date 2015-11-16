@@ -373,7 +373,7 @@ var Mode = function() {
             return {
                 name: word,
                 value: word,
-                score: 1,
+                score: 0,
                 meta: "keyword"
             };
         });
