@@ -886,7 +886,9 @@
         if (data.status == 0) {
           self.id(data.id);
           $(document).trigger("info", data.message);
-          if (window.location.search.indexOf("notebook") == -1) {
+          if (vm.editorMode && window.location.search.indexOf("editor") == -1) {
+            window.location.hash = '#editor=' + data.id;
+          } else if (window.location.search.indexOf("notebook") == -1) {
             window.location.hash = '#notebook=' + data.id;
           }
         }
