@@ -345,18 +345,7 @@
       $(document).trigger("toggleResultSettings", self);
     };
 
-    self.codeVisible = ko.observable(typeof snippet.codeVisible != "undefined" && snippet.codeVisible != null ? snippet.codeVisible : true);
     self.settingsVisible = ko.observable(typeof snippet.settingsVisible != "undefined" && snippet.settingsVisible != null ? snippet.settingsVisible : false);
-
-    // We need to refresh codemirror the first time it's shown if it's initially hidden otherwise it'll be blank
-    if (!self.codeVisible()) {
-      var subscription = self.codeVisible.subscribe(function(newVal) {
-        if (newVal) {
-          $(document).trigger("refreshCodeMirror", self);
-          subscription.dispose();
-        }
-      });
-    }
 
     self.checkStatusTimeout = null;
 
