@@ -995,7 +995,12 @@ ${ require.config() }
 </div>
 
 <div class="hoverMsg hide">
+  <!-- ko if: $root.editorMode -->
+  <p class="hoverText">${_('Drop a SQL file here')}</p>
+  <!-- /ko -->
+  <!-- ko ifnot: $root.editorMode -->
   <p class="hoverText">${_('Drop iPython/Zeppelin notebooks here')}</p>
+  <!-- /ko -->
 </div>
 
 
@@ -1074,8 +1079,13 @@ ${ require.config() }
     $(".hoverMsg").removeClass("hide");
   };
 
-  var hideHoverMsg = function () {
-    $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
+  var hideHoverMsg = function (vm) {
+    if (vm.editorMode){
+      $(".hoverText").html("${_('Drop a SQL file here')}");
+    }
+    else {
+      $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
+    }
     $(".hoverMsg").addClass("hide");
   };
 
@@ -1585,7 +1595,7 @@ ${ require.config() }
         });
         newSnippet.statement_raw(snippet.statement);
       });
-      hideHoverMsg();
+      hideHoverMsg(viewModel);
     };
 
     window.importExternalNotebook = importExternalNotebook;
@@ -1607,116 +1617,128 @@ ${ require.config() }
     window.redrawFixedHeaders = redrawFixedHeaders;
 
     function addAce (content, snippetType) {
-          var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
-          snip.statement_raw(content);
-          aceChecks++;
-          snip.checkForAce = window.setInterval(function () {
-            if (snip.ace()) {
-              window.clearInterval(snip.checkForAce);
-              aceChecks--;
-              if (aceChecks == 0) {
-                hideHoverMsg();
-              }
+      var snip = viewModel.notebooks()[0].addSnippet({type: snippetType, result: {}}, true);
+      snip.statement_raw(content);
+      aceChecks++;
+      snip.checkForAce = window.setInterval(function () {
+        if (snip.ace()) {
+          window.clearInterval(snip.checkForAce);
+          aceChecks--;
+          if (aceChecks == 0) {
+            hideHoverMsg(viewModel);
+          }
+        }
+      }, 100);
+    }
+
+    function replaceAce (content) {
+      var snip = viewModel.notebooks()[0].snippets()[0];
+      snip.statement_raw(content);
+      snip.ace().setValue(content);
+      hideHoverMsg(viewModel);
+    }
+
+    function addMarkdown (content) {
+      var snip = viewModel.notebooks()[0].addSnippet({type: "markdown", result: {}}, true);
+      snip.statement_raw(content);
+    }
+
+    function addPySpark (content) {
+      addAce(content, "pyspark");
+    }
+
+    function addSql (content) {
+      addAce(content, "hive");
+    }
+
+    function addScala (content) {
+      addAce(content, "spark");
+    }
+
+    function parseExternalJSON(raw) {
+      try {
+        if (viewModel.editorMode){
+          replaceAce(raw);
+        }
+        else {
+          var loaded = typeof raw == "string" ? JSON.parse(raw) : raw;
+          if (loaded.nbformat) { //ipython
+            var cells = [];
+            if (loaded.nbformat == 3) {
+              cells = loaded.worksheets[0].cells;
             }
-          }, 100);
-        }
-
-        function addMarkdown (content) {
-          var snip = viewModel.notebooks()[0].addSnippet({type: "markdown", result: {}}, true);
-          snip.statement_raw(content);
-        }
-
-        function addPySpark (content) {
-          addAce(content, "pyspark");
-        }
-
-        function addSql (content) {
-          addAce(content, "hive");
-        }
-
-        function addScala (content) {
-          addAce(content, "spark");
-        }
-
-        function parseExternalJSON(raw) {
-          try {
-            var loaded = typeof raw == "string" ? JSON.parse(raw) : raw;
-            if (loaded.nbformat) { //ipython
-              var cells = [];
-              if (loaded.nbformat == 3) {
-                cells = loaded.worksheets[0].cells;
-              }
-              else if (loaded.nbformat == 4) {
-                cells = loaded.cells;
-              }
-              cells.forEach(function (cell, cellCnt) {
-                window.setTimeout(function () {
-                  if (cell.cell_type == "code") {
-                    if (loaded.nbformat == 3) {
-                      addPySpark($.isArray(cell.input) ? cell.input.join("") : cell.input);
-                    }
-                    else {
-                      addPySpark($.isArray(cell.source) ? cell.source.join("") : cell.source);
-                    }
-                  }
-                  if (cell.cell_type == "heading") {
-                    var heading = $.isArray(cell.source) ? cell.source.join("") : cell.source;
-                    if (cell.level == 1) {
-                      heading += "\n====================";
-                    }
-                    else if (cell.level == 2) {
-                      heading += "\n--------------------";
-                    }
-                    else {
-                      heading = "### " + heading;
-                    }
-                    addMarkdown(heading);
-                  }
-                  if (cell.cell_type == "markdown") {
-                    addMarkdown($.isArray(cell.source) ? cell.source.join("") : cell.source);
-                  }
-                  if (cellCnt == cells.length - 1 && aceChecks == 0) {
-                    hideHoverMsg();
-                  }
-                }, 10);
-              });
+            else if (loaded.nbformat == 4) {
+              cells = loaded.cells;
             }
-
-            if (loaded.paragraphs) { //zeppelin
-              if (loaded.name) {
-                viewModel.notebooks()[0].name(loaded.name);
-              }
-              loaded.paragraphs.forEach(function (paragraph) {
-                if (paragraph.text) {
-                  var content = paragraph.text.split("\n");
-                  if (content[0].indexOf("%md") > -1) {
-                    content.shift();
-                    addMarkdown(content.join("\n"));
-                  }
-                  else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
-                    content.shift();
-                    addSql(content.join("\n"));
-                  }
-                  else if (content[0].indexOf("%pyspark") > -1) {
-                    content.shift();
-                    addPySpark(content.join("\n"));
+            cells.forEach(function (cell, cellCnt) {
+              window.setTimeout(function () {
+                if (cell.cell_type == "code") {
+                  if (loaded.nbformat == 3) {
+                    addPySpark($.isArray(cell.input) ? cell.input.join("") : cell.input);
                   }
                   else {
-                    if (content[0].indexOf("%spark") > -1) {
-                      content.shift();
-                    }
-                    addScala(content.join("\n"));
+                    addPySpark($.isArray(cell.source) ? cell.source.join("") : cell.source);
                   }
                 }
-              });
-            }
+                if (cell.cell_type == "heading") {
+                  var heading = $.isArray(cell.source) ? cell.source.join("") : cell.source;
+                  if (cell.level == 1) {
+                    heading += "\n====================";
+                  }
+                  else if (cell.level == 2) {
+                    heading += "\n--------------------";
+                  }
+                  else {
+                    heading = "### " + heading;
+                  }
+                  addMarkdown(heading);
+                }
+                if (cell.cell_type == "markdown") {
+                  addMarkdown($.isArray(cell.source) ? cell.source.join("") : cell.source);
+                }
+                if (cellCnt == cells.length - 1 && aceChecks == 0) {
+                  hideHoverMsg(viewModel);
+                }
+              }, 10);
+            });
           }
-          catch (e) {
-            hideHoverMsg();
+
+          if (loaded.paragraphs) { //zeppelin
+            if (loaded.name) {
+              viewModel.notebooks()[0].name(loaded.name);
+            }
+            loaded.paragraphs.forEach(function (paragraph) {
+              if (paragraph.text) {
+                var content = paragraph.text.split("\n");
+                if (content[0].indexOf("%md") > -1) {
+                  content.shift();
+                  addMarkdown(content.join("\n"));
+                }
+                else if (content[0].indexOf("%sql") > -1 || content[0].indexOf("%hive") > -1) {
+                  content.shift();
+                  addSql(content.join("\n"));
+                }
+                else if (content[0].indexOf("%pyspark") > -1) {
+                  content.shift();
+                  addPySpark(content.join("\n"));
+                }
+                else {
+                  if (content[0].indexOf("%spark") > -1) {
+                    content.shift();
+                  }
+                  addScala(content.join("\n"));
+                }
+              }
+            });
           }
         }
+      }
+      catch (e) {
+        hideHoverMsg(viewModel);
+      }
+    }
 
-        window.parseExternalJSON = parseExternalJSON;
+    window.parseExternalJSON = parseExternalJSON;
 
     // Drag and drop iPython / Zeppelin notebooks
     if (window.FileReader) {
@@ -1732,7 +1754,7 @@ ${ require.config() }
           showHoverMsg();
         }
         else {
-          hideHoverMsg();
+          hideHoverMsg(viewModel);
         }
 
         for (var i = 0, f; f = files[i]; i++) {
@@ -1776,7 +1798,7 @@ ${ require.config() }
 
       $(".hoverMsg").on("dragleave", function (e) {
         if (!isDraggingOverText) {
-          hideHoverMsg();
+          hideHoverMsg(viewModel);
         }
       });
     }
