@@ -524,6 +524,22 @@ h1.empty {
   background-color: #DDD;
 }
 
+.progress .bar {
+  background-color: #FFF;
+}
+
+.progress-success .bar, .progress .bar-success {
+  background-color: #b5cf6b;
+}
+
+.progress-warning .bar, .progress .bar-warning {
+  background-color: #fdae6b;
+}
+
+.progress-danger .bar, .progress .bar-danger {
+  background-color: #d6616b;
+}
+
 .text-snippet {
   padding-left: 4px;
 }

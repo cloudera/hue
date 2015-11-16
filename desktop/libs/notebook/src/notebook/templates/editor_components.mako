@@ -781,7 +781,7 @@ ${ require.config() }
 <script type="text/html" id="snippet-execution-status">
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
     <div class="snippet-progress-container">
-      <div class="progress progress-striped active" data-bind="css: {
+      <div class="progress active" data-bind="css: {
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
         'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
