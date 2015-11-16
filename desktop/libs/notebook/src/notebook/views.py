@@ -78,8 +78,8 @@ def editor(request):
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = '%s Query' % editor_type.title()
-    data['type'] = 'query'    
+    data['name'] = '%s Query' % editor_type.title()    
+    data['type'] = editor_type
     editor.data = json.dumps(data)
 
   autocomplete_base_url = ''
