@@ -26,7 +26,7 @@ ${ commonheader(_("Notebooks"), "spark", user, "60px") | n,unicode }
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Spark Editor') }</h1>
+  <h1 class="card-heading simple">${ _('Notebooks') }</h1>
 
   <%actionbar:render>
     <%def name="search()">
