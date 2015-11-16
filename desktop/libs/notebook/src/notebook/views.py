@@ -77,7 +77,7 @@ def editor(request):
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = 'Hive SQL Editor'
+    data['name'] = 'My SQL query'
     editor.data = json.dumps(data)
 
   autocomplete_base_url = ''
