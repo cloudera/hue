@@ -20,6 +20,7 @@
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
+<%namespace name="assist" file="/assist.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 
 ${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
@@ -38,9 +39,9 @@ ${ editorComponents.topBar('editor', editor_type) }
 ${ editorComponents.commonHTML() }
 
 
+${ assist.assistPanel() }
 ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
-${ koComponents.assistPanel() }
 ${ koComponents.downloadSnippetResults() }
 
 ${ editorComponents.commonJS() }
