@@ -21,6 +21,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
 from librdbms.server import dbms
+from librdbms.server.mysql_lib import MySQLClient
 
 from notebook.connectors.base import Api, QueryError, QueryExpired
 
@@ -45,18 +46,32 @@ class MySqlApi(Api):
 
   def execute(self, notebook, snippet):
     query_server = dbms.get_query_server_config(server='mysql')
-    db = dbms.get(self.user, query_server)
-    table = db.execute_statement()
+#     db = dbms.get(self.user, query_server)
+    db = MySQLClient(query_server, self.user)
+
+    table = db.execute_statement(snippet['statement'])
     
-    print table
-    
+    data = table.rows()
+    has_result_set = data is not None
+
     return {
-      'result': table
+      'sync': True,
+      'has_result_set': has_result_set,
+      'result': {
+        'has_more': False,
+        'data': data if has_result_set else [],
+        'meta': [{
+          'name': col,
+          'type': '',
+          'comment': ''
+        } for col in table.columns] if has_result_set else [],
+        'type': 'table'
+      }
     }
 
   @query_error_handler
   def check_status(self, notebook, snippet):
-    return {'status': 'running'}
+    return {'status': 'available'}
 
   def _fetch_result(self, cursor):
     return {}
