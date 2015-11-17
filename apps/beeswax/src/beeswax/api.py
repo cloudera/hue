@@ -659,7 +659,7 @@ def analyze_table(request, database, table, columns=None):
   response = {'status': -1, 'message': '', 'redirect': ''}
 
   if request.method == "POST":
-    if columns is not None:
+    if columns is None:
       query_history = db.analyze_table(database, table)
     else:
       query_history = db.analyze_table_columns(database, table)
