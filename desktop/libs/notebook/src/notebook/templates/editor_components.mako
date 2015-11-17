@@ -107,7 +107,7 @@ ${ require.config() }
 
 </%def>
 
-<%def name="topBar(mode='notebook', app_name='hive')">
+<%def name="topBar(mode='notebook', editor_type='hive')">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
@@ -134,7 +134,7 @@ ${ require.config() }
         <a class="btn" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
           <i class="fa fa-expand"></i>
         </a>
-          % if app_name == 'impala':
+          % if editor_type == 'impala':
           <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
             <i class="fa fa-cogs"></i>
           </a>
@@ -143,7 +143,7 @@ ${ require.config() }
           <i class="fa fa-save"></i>
         </a>
 
-        <a class="btn" href="${ url('notebook:new') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:editor') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
 
@@ -220,15 +220,15 @@ ${ require.config() }
           <li class="currentApp">
             <a href="#">
             %if mode=='editor':
-              % if app_name == 'impala':
+              % if editor_type == 'impala':
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
                 Impala
-              % elif app_name == 'rdbms':
+              % elif editor_type == 'rdbms':
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 DB Query
               % else:
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
-                Hive Editor
+                Hive
               % endif
             %else:
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>

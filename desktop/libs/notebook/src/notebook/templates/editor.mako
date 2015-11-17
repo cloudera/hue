@@ -22,7 +22,7 @@
 <%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 
-${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
+${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
 
 <script type="text/javascript">
   if (window.location.hash != "") {
@@ -34,7 +34,7 @@ ${ commonheader(_('Editor'), app_name, user, "68px") | n,unicode }
 
 
 ${ editorComponents.includes() }
-${ editorComponents.topBar('editor') }
+${ editorComponents.topBar('editor', editor_type) }
 ${ editorComponents.commonHTML() }
 
 
