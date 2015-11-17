@@ -94,6 +94,7 @@ def editor(request):
       'options_json': json.dumps({
           'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}]
       }),
+      'editor_type': editor_type,
       'autocomplete_base_url': autocomplete_base_url,
   })
 

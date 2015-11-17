@@ -68,7 +68,7 @@ class TestMockedImpala:
 
   def test_basic_flow(self):
     response = self.client.get("/impala/")
-    assert_true(re.search('Impala Editor', response.content), response.content)
+    assert_true(re.search('Impala', response.content), response.content)
     assert_true('Query Editor' in response.content)
 
     response = self.client.get("/impala/execute/")
