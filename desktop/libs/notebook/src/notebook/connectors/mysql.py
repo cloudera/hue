@@ -46,11 +46,10 @@ class MySqlApi(Api):
 
   def execute(self, notebook, snippet):
     query_server = dbms.get_query_server_config(server='mysql')
-#     db = dbms.get(self.user, query_server)
     db = MySQLClient(query_server, self.user)
 
     table = db.execute_statement(snippet['statement'])
-    
+
     data = table.rows()
     has_result_set = data is not None
 
@@ -94,3 +93,47 @@ class MySqlApi(Api):
   @query_error_handler
   def close_statement(self, snippet):
     return {'status': -1}
+
+  @query_error_handler
+  def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
+    query_server = dbms.get_query_server_config(server='mysql')
+    db = MySQLClient(query_server, self.user)
+
+    assist = Assist(db)
+    response = {'error': 0}
+
+    try:
+      if database is None:
+        response['databases'] = assist.get_databases()
+      elif table is None:
+        response['tables'] = assist.get_tables(database)
+      else:
+        columns = assist.get_columns(database, table)
+        response['columns'] = [col for col in columns]
+        response['extended_columns'] = [{
+            'name': col,
+            'type': '',
+            'comment': ''
+          } for col in columns
+        ]
+    except Exception, e:
+      LOG.warn('Autocomplete data fetching error: %s' % e)
+      response['code'] = -1
+      response['error'] = str(e)
+
+    return response
+
+
+class Assist():
+
+  def __init__(self, db):
+    self.db = db
+
+  def get_databases(self):
+    return self.db.get_databases()
+
+  def get_tables(self, database, table_names=[]):
+    return self.db.get_tables(database, table_names)
+
+  def get_columns(self, database, table):
+    return self.db.get_columns(database, table)
