@@ -16,7 +16,7 @@
 define([
   'knockout',
   'desktop/js/sqlAutocompleter',
-  'desktop/js/assistHelper',
+  'desktop/js/assist/assistHelper',
   'desktop/spec/autocompleterTestUtils'
 ], function(ko, SqlAutocompleter, AssistHelper, testUtils) {
   describe("sqlAutocompleter.js", function() {
