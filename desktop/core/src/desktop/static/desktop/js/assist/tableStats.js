@@ -22,9 +22,9 @@
   }
 }(this, function (ko) {
 
-  function TableStats (assistSource, database, table, column, type) {
+  function TableStats (assistSource, database, table, column, type, i18n) {
     var self = this;
-
+    self.i18n = i18n;
     self.snippet = assistSource.snippet;
     self.database = database;
     self.table = table;
@@ -75,14 +75,14 @@
             $(document).trigger("error", data.message);
             self.hasError(true);
           } else {
-            $(document).trigger("error", "${ _('There was a problem loading the stats.') }");
+            $(document).trigger("error", self.i18n.errorLoadingStats);
             self.hasError(true);
           }
           self.loading(false);
         },
         function (e) {
           if (e.status == 500) {
-            $(document).trigger("error", "${ _('There was a problem loading the stats.') }");
+            $(document).trigger("error", self.i18n.errorLoadingStats);
           }
           self.hasError(true);
           self.loading(false);
@@ -105,7 +105,7 @@
       }
     }, function(message) {
       self.refreshing(false);
-      $(document).trigger("error", message || "${ _('There was a problem refreshing the stats.') }");
+      $(document).trigger("error", message || self.i18n.errorRefreshingStats);
     });
   };
 
@@ -128,12 +128,12 @@
       } else if (data && data.message) {
         $(document).trigger("error", data.message);
       } else {
-        $(document).trigger("error", "${ _('There was a problem loading the terms.') }");
+        $(document).trigger("error", self.i18n.errorLoadingTerms);
       }
       self.loadingTerms(false);
     }, function (e) {
       if (e.status == 500) {
-        $(document).trigger("error", "${ _('There was a problem loading the terms.') }");
+        $(document).trigger("error", self.i18n.errorLoadingTerms);
       }
       self.loadingTerms(false);
     });

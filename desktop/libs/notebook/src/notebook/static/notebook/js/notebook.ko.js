@@ -696,7 +696,7 @@
           notebook: self,
           user: vm.user,
           activeDatabase: self.selectedDatabases[snippetType]
-        });
+        }, vm.i18n);
 
         self.assistHelpers[snippetType].activeDatabase.subscribe(function (newActiveDatabase) {
           self.selectedDatabases[snippetType] = newActiveDatabase;
@@ -993,9 +993,9 @@
   };
 
 
-  function EditorViewModel(notebooks, options) {
+  function EditorViewModel(notebooks, options, i18n) {
     var self = this;
-
+    self.i18n = i18n;
     self.user = options.user;
     self.notebooks = ko.observableArray();
     self.selectedNotebook = ko.observable();

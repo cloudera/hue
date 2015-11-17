@@ -22,8 +22,9 @@
   }
 }(this, function (ko, TableStats) {
 
-  function AssistEntry (definition, parent, assistSource, filter) {
+  function AssistEntry (definition, parent, assistSource, filter, i18n) {
     var self = this;
+    self.i18n = i18n;
     self.definition = definition;
 
     self.assistSource = assistSource;
@@ -234,7 +235,7 @@
       $assistQuickLook.find(".sample").html(data);
     }, function(e) {
       if (e.status == 500) {
-        $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
+        $(document).trigger("error", self.i18n.errorLoadingTablePreview);
         $("#assistQuickLook").modal("hide");
       }
     });

@@ -33,8 +33,9 @@
    *
    * @constructor
    */
-  function AssistHelper (options) {
+  function AssistHelper (options, i18n) {
     var self = this;
+    self.i18n = i18n;
     self.activeDatabase = ko.observable();
     self.initialDatabase = options.activeDatabase;
     self.notebook = options.notebook;
@@ -92,11 +93,11 @@
       if (message.status == 401) {
         $(document).trigger("showAuthModal", {'type': self.type, 'callback': function() { self.load(snippet, callback) }});
       } else if (message.statusText) {
-        $(document).trigger("error", "There was a problem loading the databases:" + message.statusText);
+        $(document).trigger("error", self.i18n.errorLoadingDatabases + ":" + message.statusText);
       } else if (message) {
         $(document).trigger("error", message);
       } else {
-        $(document).trigger("error", "There was a problem loading the databases");
+        $(document).trigger("error", self.i18n.errorLoadingDatabases + ".");
       }
       if (callback) {
         callback();

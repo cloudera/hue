@@ -18,12 +18,13 @@
   if(typeof define === "function" && define.amd) {
     define(['knockout', 'desktop/js/assist/assistEntry'], factory);
   } else {
-    root.AssistHelper = factory(ko, AssistEntry);
+    root.AssistSource = factory(ko, AssistEntry);
   }
 }(this, function (ko, AssistEntry) {
 
-  function AssistSource(snippet) {
+  function AssistSource(snippet, i18n) {
     var self = this;
+    self.i18n = i18n;
     self.snippet = snippet;
     self.assistHelper = snippet.getAssistHelper();
 
@@ -70,7 +71,7 @@
           displayName: name,
           title: name,
           isDatabase: true
-        }, null, self, self.filter);
+        }, null, self, self.filter, self.i18n);
       }));
 
       self.setDatabase(self.assistHelper.activeDatabase());

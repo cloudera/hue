@@ -284,6 +284,12 @@ from desktop.views import _ko
     }(function (ko, AssistSource) {
 
       function AssistPanel(params) {
+        var i18n = {
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
+          errorLoadingStats: "${ _('There was a problem loading the stats.') }",
+          errorRefreshingStats: "${ _('There was a problem refreshing the stats.') }",
+          errorLoadingTerms: "${ _('There was a problem loading the terms.') }"
+        }
         var notebookViewModel = params.notebookViewModel;
         var notebook = notebookViewModel.selectedNotebook();
 
@@ -304,7 +310,7 @@ from desktop.views import _ko
           };
 
           if (settings.sqlDialect) {
-            self.sourceIndex[snippet.name()] = new AssistSource(fakeSnippet);
+            self.sourceIndex[snippet.name()] = new AssistSource(fakeSnippet, i18n);
           }
         });
 

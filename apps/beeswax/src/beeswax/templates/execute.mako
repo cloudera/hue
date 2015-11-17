@@ -1138,7 +1138,11 @@ editorViewModelOptions.languages.push({
   name: snippetType
 });
 
-var editorViewModel = new EditorViewModel([], editorViewModelOptions);
+var i18n = {
+  errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
+}
+
+var editorViewModel = new EditorViewModel([], editorViewModelOptions, i18n);
 var notebook = editorViewModel.newNotebook();
 var snippet = notebook.newSnippet(snippetType);
 var assistHelper = snippet.getAssistHelper();
