@@ -24,6 +24,7 @@
 
   function AssistSource(snippet, i18n) {
     var self = this;
+    self.name = snippet.name();
     self.i18n = i18n;
     self.snippet = snippet;
     self.assistHelper = snippet.getAssistHelper();
@@ -64,27 +65,56 @@
       }
     });
 
+    var dbIndex = {};
     var updateDatabases = function (names) {
+      dbIndex = {};
       self.databases($.map(names, function(name) {
-        return new AssistEntry({
+        var database = new AssistEntry({
           name: name,
           displayName: name,
           title: name,
           isDatabase: true
         }, null, self, self.filter, self.i18n);
+        dbIndex[name] = database;
+        return database;
       }));
-
-      self.setDatabase(self.assistHelper.activeDatabase());
     };
 
-    self.assistHelper.activeDatabase.subscribe(function(newValue) {
-      self.setDatabase(newValue);
+    if (dbIndex[self.assistHelper.activeDatabase()]) {
+      self.selectedDatabase(dbIndex[self.assistHelper.activeDatabase()]);
+    }
+
+    var subscribed = false;
+
+    var updateDbFromAssistHelper = function () {
+      var assistDb = self.assistHelper.activeDatabase();
+      if (dbIndex[assistDb] && (! self.selectedDatabase() || self.selectedDatabase().name !== assistDb)) {
+        self.selectedDatabase(dbIndex[assistDb]);
+      }
+    };
+
+    self.assistHelper.activeDatabase.subscribe(function (newValue) {
+      updateDbFromAssistHelper();
     });
 
-    updateDatabases(self.assistHelper.availableDatabases());
+    var initDatabases = function () {
+      if (self.assistHelper.loaded()) {
+        updateDatabases(self.assistHelper.availableDatabases());
+        updateDbFromAssistHelper();
+      }
+    };
+
     self.assistHelper.loaded.subscribe(function (newValue) {
       if (newValue) {
-        updateDatabases(self.assistHelper.availableDatabases());
+        initDatabases();
+      }
+    });
+
+    initDatabases();
+
+    self.selectedDatabase.subscribe(function (newDatabase) {
+      if (newDatabase !== null) {
+        self.assistHelper.activeDatabase(newDatabase.definition.name);
       }
     });
 
@@ -124,22 +154,6 @@
       }
     };
   }
-
-  AssistSource.prototype.setDatabase = function(name) {
-    var self = this;
-    if (name == null) {
-      return;
-    }
-
-    self.selectedDatabase(ko.utils.arrayFirst(self.databases(), function(database) {
-      return name === database.definition.name;
-    }));
-  };
-
-  AssistSource.prototype.toggleSearch = function () {
-    var self = this;
-    self.options.isSearchVisible(!self.options.isSearchVisible());
-  };
 
   AssistSource.prototype.reloadAssist = function() {
     var self = this;

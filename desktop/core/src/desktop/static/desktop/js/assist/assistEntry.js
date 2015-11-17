@@ -27,6 +27,8 @@
     self.i18n = i18n;
     self.definition = definition;
 
+    self.breadcrumb = assistSource.name + " - " + definition.name;
+
     self.assistSource = assistSource;
     self.parent = parent;
     self.filter = filter;
