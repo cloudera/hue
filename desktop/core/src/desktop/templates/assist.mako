@@ -37,6 +37,30 @@ from desktop.views import _ko
       list-style: none;
     }
 
+    .assist-breadcrumb {
+      position:relative;
+      left: 0;
+      top: 0;
+      right: 0;
+      height:25px;
+      padding-top: 0px;
+      padding-left: 0px;
+    }
+
+    .assist-breadcrumb a  {
+      cursor: pointer;
+      text-decoration: none;
+      color: #737373;
+      -webkit-transition: color 0.2s ease;
+      -moz-transition: color 0.2s ease;
+      -ms-transition: color 0.2s ease;
+      transition: color 0.2s ease;
+    }
+
+    .assist-breadcrumb > a:hover {
+      color: #338bb8;
+    }
+
     .assist-tables > li {
       position: relative;
       padding-top: 2px;
@@ -85,6 +109,8 @@ from desktop.views import _ko
     }
 
     .assist .nav-header {
+      padding-top: 0 !important;
+      margin-top: 0 !important;
       margin-right: 0 !important;
       padding-right: 4px !important;
     }
@@ -166,8 +192,19 @@ from desktop.views import _ko
     <!-- ko template: { if: ! hasEntries() && ! loading(), name: 'assist-no-entries' } --><!-- /ko -->
   </script>
 
+  <script type="text/html" id="assist-breadcrumb">
+    <div class="assist-breadcrumb">
+      <a data-bind="click: back">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i data-bind="visible: selectedSource() && ! selectedSource().selectedDatabase()" style="display:none;font-size: 14px;line-height: 16px;vertical-align: top;" class="fa fa-server"></i>
+        <i data-bind="visible: selectedSource() && selectedSource().selectedDatabase()" style="display:none;font-size: 14px;line-height: 16px;vertical-align: top;" class="fa fa-database"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: breadcrumb"></span></a>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-panel-template">
-    <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
+    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-breadcrumb' } --><!-- /ko -->
+    <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
       <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
       <!-- ko with: selectedSource -->
         <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
@@ -183,16 +220,15 @@ from desktop.views import _ko
       ${_('sources')}
     </li>
     <li>
-      <ul data-bind="foreach: sources">
-        <li data-bind="text: name, click: function () { $parent.selectedSource($data); }"></li>
+      <ul class="assist-tables" data-bind="foreach: sources">
+        <li class="assist-table pointer">
+          <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+        </li>
       </ul>
     </li>
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <li>
-      &lt; <span data-bind="text: name, click: function () { $parent.selectedSource(null) }"></span>
-    </li>
     <li class="nav-header">
       ${_('databases')}
       <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
@@ -200,8 +236,10 @@ from desktop.views import _ko
       </div>
     </li>
     <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
-      <ul data-bind="foreach: databases">
-        <li data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></li>
+      <ul class="assist-tables" data-bind="foreach: databases">
+        <li class="assist-table pointer">
+          <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+        </li>
       </ul>
     </li>
     <li class="center" data-bind="visible: assistHelper.loading()" >
@@ -215,10 +253,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position: relative; width:100%">
-      <li>
-        &lt; <span data-bind="text: breadcrumb, click: function () { $parent.selectedDatabase(null) }"></span>
-      </li>
-      <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! $parent.assistHelper.loading() && ! $parent.hasErrors()">
+      <li class="nav-header" style="margin-top: 0" data-bind="visible: ! $parent.assistHelper.loading() && ! $parent.hasErrors()">
         ${_('tables')}
         <div class="pull-right" data-bind="visible: hasEntries, css: { 'hover-actions': ! filter(), 'blue': filter }">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
@@ -322,7 +357,7 @@ from desktop.views import _ko
           };
 
           if (settings.sqlDialect) {
-            sqlSources.push(new AssistSource(fakeSnippet, i18n));
+            sqlSources.push(new AssistSource(fakeSnippet, self, i18n));
           }
         });
 
@@ -356,7 +391,27 @@ from desktop.views import _ko
             $.totalStorage("hue.assist.lastSelectedSource." + notebookViewModel.user, null);
           }
         });
+
+        self.breadcrumb = ko.computed(function () {
+          if (self.selectedSource()) {
+            if (self.selectedSource().selectedDatabase()) {
+              return self.selectedSource().selectedDatabase().definition.name;
+            }
+            return self.selectedSource().name;
+          }
+          return null;
+        })
       }
+
+      AssistPanel.prototype.back = function () {
+        var self = this;
+        if (self.selectedSource() && self.selectedSource().selectedDatabase()) {
+            self.selectedSource().selectedDatabase(null)
+        } else if (self.selectedSource()) {
+          console.log(self.selectedSource());
+          self.selectedSource(null);
+        }
+      };
 
       ko.components.register('assist-panel', {
         viewModel: AssistPanel,
