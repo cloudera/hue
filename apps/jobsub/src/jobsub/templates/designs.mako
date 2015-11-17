@@ -429,7 +429,7 @@ var global_action_context = {
     'popover': "${ _('Body') }"
   },
   'job_properties': {
-    'title': "${ _('Job properties') }",
+    'title': "${ _('Hadoop job properties') }",
     'name': "${ _('Property name') }",
     'value': "${ _('Value') }",
     'delete': {
