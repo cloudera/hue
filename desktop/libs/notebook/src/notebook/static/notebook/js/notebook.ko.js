@@ -16,7 +16,7 @@
 
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
-    define(['knockout', 'desktop/js/assistHelper', 'desktop/js/autocompleter', 'knockout-mapping', 'ko.charts'], factory);
+    define(['knockout', 'desktop/js/assist/assistHelper', 'desktop/js/autocompleter', 'knockout-mapping', 'ko.charts'], factory);
   } else {
     root.EditorViewModel = factory(ko, AssistHelper, Autocompleter);
   }
