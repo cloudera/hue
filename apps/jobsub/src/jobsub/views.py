@@ -261,7 +261,7 @@ def new_design(request, node_type):
   workflow.save()
 
   doc = workflow.doc.get()
-  doc.extra='jobsub'
+  doc.extra = 'jobsub'
   doc.save()
 
   # Save design again to update all fields.
@@ -277,6 +277,9 @@ def clone_design(request, design_id):
 
   workflow = _get_design(design_id)
   clone = workflow.clone(request.fs, request.user)
+  doc = clone.doc.get()
+  doc.extra = 'jobsub'
+  doc.save()
   cloned_action = clone.start.get_child('to')
   cloned_action.name = clone.name
   cloned_action.save()
