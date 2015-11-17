@@ -23,7 +23,7 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="dashboard" file="common_dashboard.mako" />
-<%namespace name="koComponents" file="/ko_components.mako" />
+<%namespace name="assist" file="/assist.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
 ${ layout.menubar(section='query') }
@@ -837,7 +837,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-${ koComponents.assistPanel() }
+${ assist.assistPanel() }
 
 <style type="text/css">
   h1 {

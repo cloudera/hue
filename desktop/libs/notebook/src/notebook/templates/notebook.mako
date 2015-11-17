@@ -19,6 +19,7 @@
   from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="assist" file="/assist.mako" />
 <%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 
@@ -53,9 +54,9 @@ ${ editorComponents.topBar('notebook') }
   </%def>
 </%editorComponents:commonHTML>
 
+${ assist.assistPanel() }
 ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
-${ koComponents.assistPanel() }
 ${ koComponents.addSnippetMenu() }
 ${ koComponents.downloadSnippetResults() }
 
