@@ -262,6 +262,36 @@ def describe_table(request, database, table):
 
 
 @check_has_write_access_permission
+@require_http_methods(["POST"])
+def alter_column(request, database, table, column):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'data': ''}
+  try:
+    col = db.get_column(database, table, column)
+    if col:
+      new_column_name = request.POST.get('new_column_name', col.name)
+      new_column_type = request.POST.get('new_column_type', col.type)
+      comment = request.POST.get('comment', None)
+      partition_spec = request.POST.get('partition_spec', None)
+
+      column = db.alter_column(database, table, column, new_column_name, new_column_type, comment=comment, partition_spec=partition_spec)
+
+      response['status'] = 0
+      response['data'] = {
+        'name': column.name,
+        'type': column.type,
+        'comment': column.comment
+      }
+    else:
+      raise PopupException(_('Column `%s`.`%s` `%s` not found') % (database, table, column))
+  except Exception, ex:
+    response['status'] = 1
+    response['data'] = _("Failed to alter column `%s`.`%s` `%s`: %s") % (database, table, column, str(ex))
+
+  return JsonResponse(response)
+
+
+@check_has_write_access_permission
 def drop_table(request, database):
   db = dbms.get(request.user)
 

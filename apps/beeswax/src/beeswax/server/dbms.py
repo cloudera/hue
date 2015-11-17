@@ -213,6 +213,35 @@ class HiveServer2Dbms(object):
         return col
     return None
 
+
+  def alter_column(self, database, table_name, column_name, new_column_name, column_type, comment=None,
+                   partition_spec=None, cascade=False):
+    hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
+
+    if partition_spec:
+      hql += ' PARTITION (%s)' % partition_spec
+
+    hql += ' CHANGE COLUMN `%s` `%s` %s' % (column_name, new_column_name, column_type.upper())
+
+    if comment:
+      hql += " COMMENT '%s'" % comment
+
+    if cascade:
+      hql += ' CASCADE'
+
+    timeout = SERVER_CONN_TIMEOUT.get()
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
+
+    if handle:
+      self.close(handle)
+    else:
+      msg = _("Failed to execute alter column statement: %s") % hql
+      raise QueryServerException(msg)
+
+    return self.get_column(database, table_name, new_column_name)
+
+
   def execute_query(self, query, design):
     return self.execute_and_watch(query, design=design)
 

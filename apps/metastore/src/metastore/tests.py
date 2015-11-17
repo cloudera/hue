@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 import urllib
 
@@ -349,6 +350,32 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     GroupPermission.objects.get_or_create(group=group, hue_permission=perm)
 
     check(client, [200, 302]) # Ok
+
+
+  def test_alter_column(self):
+    resp = _make_query(self.client, 'CREATE TABLE test_alter_column (before_alter int);', database=self.db_name)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    resp = self.client.get('/metastore/table/%s/test_alter_column' % self.db_name)
+    assert_true('before_alter', resp.content)
+    assert_true('int', resp.content)
+
+    # Alter name, type and comment
+    resp = self.client.post(reverse("metastore:alter_column",
+                                    kwargs={'database': self.db_name, 'table': 'test_alter_column', 'column': 'before_alter'}),
+                            {'new_column_name': 'after_alter', 'new_column_type': 'string', 'comment': 'alter comment'})
+    json_resp = json.loads(resp.content)
+    assert_equal('after_alter', json_resp['data']['name'], json_resp)
+    assert_equal('string', json_resp['data']['type'], json_resp)
+    assert_equal('alter comment', json_resp['data']['comment'], json_resp)
+
+    # Invalid column type returns error response
+    resp = self.client.post(reverse("metastore:alter_column",
+                                    kwargs={'database': self.db_name, 'table': 'test_alter_column', 'column': 'before_alter'}),
+                            {'new_column_name': 'foo'})
+    json_resp = json.loads(resp.content)
+    assert_equal(1, json_resp['status'], json_resp)
+    assert_true('Failed to alter column' in json_resp['data'], json_resp)
 
 
 class TestParser(object):
