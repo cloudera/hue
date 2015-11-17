@@ -1806,7 +1806,10 @@ ${ require.config() }
 
 
     $(document).ready(function () {
-      viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
+      var i18n = {
+        errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
+      }
+      viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
       ko.applyBindings(viewModel);
       viewModel.init();
 
