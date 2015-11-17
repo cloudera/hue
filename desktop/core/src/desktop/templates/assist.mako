@@ -68,7 +68,7 @@ from desktop.views import _ko
     }
 
     .assist-columns {
-      margin-left: 0px;
+      margin-left: 0;
     }
 
     .assist-columns > li {
@@ -78,7 +78,7 @@ from desktop.views import _ko
 
     .assist-actions  {
       position:absolute;
-      right: 0px;
+      right: 0;
       padding-right:4px;
       padding-left:4px;
       background-color: #FFF;
@@ -168,41 +168,50 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-panel-template">
     <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; width:100%;">
-      <!-- ko if: availableSourceTypes.length > 1 -->
-      <li class="nav-header">
-        ${_('source')}
-      </li>
-      <li>
-        <select data-bind="options: availableSourceTypes, select2: { width: '100%', placeholder: '${ _ko("Choose a source...") }', update: selectedSourceType }" class="input-medium" data-placeholder="${_('Choose a source...')}"></select>
-      </li>
-      <!-- /ko -->
+      <!-- ko template: 'assist-sources-template' --><!-- /ko -->
       <!-- ko with: selectedSource -->
-      <!-- ko template: { name: "assist-type-template" } --><!-- /ko -->
+      <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
       <!-- /ko -->
     </ul>
   </script>
 
-  <script type="text/html" id="assist-type-template">
+  <script type="text/html" id="assist-sources-template">
+    <!-- ko if: availableSourceTypes.length > 1 -->
+    <li class="nav-header">
+      ${_('source')}
+    </li>
+    <li>
+      <ul data-bind="foreach: availableSourceTypes">
+        <li data-bind="text: $data, click: function () { selectedSourceType($data) }"></li>
+      </ul>
+    </li>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="assist-databases-template">
+    <li class="nav-header">
+      ${_('database')}
+      <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
+      </div>
+    </li>
+    <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
+      <ul data-bind="foreach: assistHelper.availableDatabases">
+        <li data-bind="text: $data, click: function () { $parent.assistHelper.activeDatabase($data) }"></li>
+      </ul>
+    </li>
+    <li class="center" data-bind="visible: assistHelper.loading()" >
+      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+    </li>
+    <li data-bind="visible: hasErrors">
+      <span>${ _('The database list cannot be loaded.') }</span>
+    </li>
+  </script>
+
+  <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position: relative; width:100%">
-      <li class="nav-header">
-        ${_('database')}
-        <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
-        </div>
-      </li>
-
-      <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
-        <div data-bind="select2: { options: assistHelper.availableDatabases, value: assistHelper.activeDatabase, width: '100%', placeholder: '${ _ko("Choose a database...") }' }" class="input-medium" data-placeholder="${_('Choose a database...')}"></div>
-      </li>
-
-      <li class="center" data-bind="visible: assistHelper.loading()" >
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-      </li>
-
-      <li data-bind="visible: hasErrors">
-        <span>${ _('The database list cannot be loaded.') }</span>
-      </li>
+      <!-- ko template: 'assist-databases-template' --><!-- /ko -->
 
       <li class="nav-header" style="margin-top:10px;" data-bind="visible: ! assistHelper.loading() && ! hasErrors()">
         ${_('tables')}
@@ -219,12 +228,12 @@ from desktop.views import _ko
           <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
         </li>
 
-      <div class="table-container">
-        <div class="center" data-bind="visible: selectedDatabase() != null && selectedDatabase().loading()">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </div>
-        <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
+        <div class="table-container">
+          <div class="center" data-bind="visible: selectedDatabase() != null && selectedDatabase().loading()">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+          </div>
+          <!-- ko template: { if: selectedDatabase() != null, name: 'assist-entries', data: selectedDatabase } --><!-- /ko -->
         </div>
       <!-- /ko -->
     </div>
