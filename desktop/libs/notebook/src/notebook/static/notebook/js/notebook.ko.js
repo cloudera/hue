@@ -427,6 +427,9 @@
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         if (data.status == 0) {
+          if (self.isSqlDialect() && self.getContext().statement().match(/\bALTER\b|\bDROP\b|\bCREATE\b/i)) {
+            huePubSub.publish('assist.refresh');
+          }
           self.result.clear();
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
