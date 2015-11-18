@@ -132,6 +132,7 @@ from desktop.views import _ko
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
       <span data-bind="component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
+          sourceType: assistSource.type,
           snippet: assistSource.snippet,
           databaseName: databaseName,
           tableName: tableName,

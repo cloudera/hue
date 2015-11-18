@@ -178,6 +178,7 @@ from desktop.views import _ko
           } else {
             self.analysisStats(new TableStats({
               i18n: self.i18n,
+              sourceType: self.params.sourceType,
               snippet: self.params.snippet,
               databaseName: self.params.databaseName,
               tableName: self.params.tableName,

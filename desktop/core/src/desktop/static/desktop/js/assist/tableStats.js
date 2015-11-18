@@ -106,7 +106,7 @@
     };
 
     self.assistHelper.fetchStats({
-      sourceType: self.sourceType,
+      sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
       databaseName: self.database,
       tableName: self.table,
       columnName: self.column,
@@ -124,7 +124,7 @@
     self.refreshing(true);
 
     self.assistHelper.refreshTableStats({
-      sourceType: self.sourceType,
+      sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
       databaseName: self.database,
       tableName: self.table,
       columnName: self.column,
@@ -150,7 +150,7 @@
 
     self.loadingTerms(true);
     self.assistHelper.fetchTerms({
-      sourceType: self.sourceType,
+      sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
       databaseName: self.database,
       tableName: self.table,
       columnName: self.column,
