@@ -166,6 +166,12 @@ from desktop.views import _ko
           }
         });
 
+        $(document).click(function(event) {
+          if(!$(event.target).closest($targetElement).length) {
+            self.analysisStats(null)
+          }
+        })
+
         self.toggleStats = function (data, event) {
           if (self.analysisStats()) {
             self.analysisStats(null);
