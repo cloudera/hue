@@ -389,8 +389,9 @@ ${ require.config() }
       <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
       <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
     </div>
-
-    <div data-bind="visible: ! result.hasResultset() && status() == 'available', css: resultsKlass" style="display:none;">
+  </div>
+  <div class="snippet-log-container">
+    <div data-bind="visible: ! result.hasResultset() && status() == 'available' && result.fetchedOnce(), css: resultsKlass, click: function(){  }" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
     </div>
 
