@@ -178,11 +178,6 @@ class HiveServerTable(Table):
         } 
       }
 
-#       self.details['properties']['format'] = {
-#           'compressed': self.details['properties'].get('Compressed:', 'No') != 'No',
-#           'type': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else serde.rsplit('.', 1)[-1])
-#       } 
-
     return self._details
 
 

@@ -192,9 +192,19 @@ ${ components.menubar() }
 
                 <div class="sample-preview card card-home card-tab card-tab-bordertop card-listcontent">
                   <h3>${ _('Sample') }</h3>
-                  ${ sample_table(3) }
-                  ${_('View more...')}
+                  % if sample:
+                    ${ sample_table(limit=3) }                  
+                    ${_('View more...')}
+                  % endif
                 </div>
+
+                % if table.partition_keys:
+                <div class="partitions-preview card card-home card-tab card-tab-bordertop card-listcontent">
+                  <h3>${ _('Partitions') }</h3>
+                    ${ column_table(table.partition_keys, "partitionTable", limit=3) }                  
+                    ${_('View more...')}
+                </div>
+                % endif                
               </div>
 
               <div class="tab-pane" id="columns">
@@ -212,7 +222,7 @@ ${ components.menubar() }
               % if error_message:
                 <div class="alert alert-error">
                   <h3>${_('Error!')}</h3>
-                  <pre>${ error_message | h }</pre>
+                  <pre>${ error_message }</pre>
                 </div>
               % else:
                 ${ sample_table() }
