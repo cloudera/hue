@@ -17,12 +17,12 @@
 */
 
 .hueBreadcrumb {
-  padding: 12px 14px;
+  /*padding: 12px 14px;*/
 }
 
 .hueBreadcrumbBar {
   padding: 0;
-  margin: 12px;
+  /*margin: 12px;*/
 }
 
 .hueBreadcrumbBar a {
@@ -86,4 +86,8 @@ h2.card-heading {
 
 .metastore-main {
   padding: 20px;
+}
+
+.metastore-main h3 {
+  margin: 0;
 }
