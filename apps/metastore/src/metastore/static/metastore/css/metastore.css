@@ -84,15 +84,6 @@ h2.card-heading {
   margin-right: 4px;
 }
 
-body, .main-content {
-  background-color: #FFF;
-}
-
 .metastore-main {
   padding: 20px;
-}
-
-.navbar-fixed-top .navbar-inner {
-  box-shadow: none;
-  border-bottom: #F1F1F1;
 }
