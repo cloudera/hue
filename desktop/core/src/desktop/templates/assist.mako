@@ -216,7 +216,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <li class="nav-header">
+    <li class="nav-header" data-bind="visibleOnHover: { selector: '.hover-actions' }">
       ${_('sources')}
     </li>
     <li>
@@ -229,10 +229,10 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <li class="nav-header">
+    <li class="nav-header" data-bind="visibleOnHover: { selector: '.hover-actions' }">
       ${_('databases')}
       <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: reloadAssist"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the table list')}"></i></a>
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the databases list')}"></i></a>
       </div>
     </li>
     <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
@@ -252,12 +252,13 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <div data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position: relative; width:100%">
+    <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
       <li class="nav-header" style="margin-top: 0" data-bind="visible: ! $parent.assistHelper.loading() && ! $parent.hasErrors()">
         ${_('tables')}
-        <div class="pull-right" data-bind="visible: hasEntries, css: { 'hover-actions': ! filter(), 'blue': filter }">
+        <div class="pull-right hover-actions" data-bind="visible: hasEntries">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { $parent.options.isSearchVisible(!$parent.options.isSearchVisible()) }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { $parent.options.isSearchVisible(!$parent.options.isSearchVisible()) }, css: { 'blue' : $parent.options.isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
         </div>
       </li>
 
@@ -400,15 +401,14 @@ from desktop.views import _ko
             return self.selectedSource().name;
           }
           return null;
-        })
+        });
       }
 
       AssistPanel.prototype.back = function () {
         var self = this;
         if (self.selectedSource() && self.selectedSource().selectedDatabase()) {
-            self.selectedSource().selectedDatabase(null)
+          self.selectedSource().selectedDatabase(null)
         } else if (self.selectedSource()) {
-          console.log(self.selectedSource());
           self.selectedSource(null);
         }
       };
