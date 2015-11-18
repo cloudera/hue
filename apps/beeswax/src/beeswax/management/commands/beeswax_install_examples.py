@@ -120,22 +120,34 @@ class SampleTable(object):
   """
   def __init__(self, data_dict, app_name):
     self.name = data_dict['table_name']
-    self.filename = data_dict['data_file']
+    if 'partition_files' in data_dict:
+      self.partition_files = data_dict['partition_files']
+    else:
+      self.partition_files = None
+      self.filename = data_dict['data_file']
     self.hql = data_dict['create_hql']
     self.query_server = get_query_server_config(app_name)
     self.app_name = app_name
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
-    self._contents_file = os.path.join(self._data_dir, self.filename)
-    if not os.path.isfile(self._contents_file):
-      msg = _('Cannot find table data in "%(file)s".') % {'file': self._contents_file}
-      LOG.error(msg)
-      raise ValueError(msg)
+    if self.partition_files:
+      for partition_spec, filename in self.partition_files.items():
+        filepath = os.path.join(self._data_dir, filename)
+        self.partition_files[partition_spec] = filepath
+        self._check_file_contents(filepath)
+    else:
+      self._contents_file = os.path.join(self._data_dir, self.filename)
+      self._check_file_contents(self._contents_file)
+
 
   def install(self, django_user):
     if self.create(django_user):
-      self.load(django_user)
+      if self.partition_files:
+        for partition_spec, filepath in self.partition_files.items():
+          self.load_partition(django_user, partition_spec, filepath)
+      else:
+        self.load(django_user)
 
   def create(self, django_user):
     """
@@ -166,6 +178,25 @@ class SampleTable(object):
         LOG.error(msg)
         raise InstallException(msg)
 
+  def load_partition(self, django_user, partition_spec, filepath):
+    """
+    Upload data found at filepath to HDFS home of user, the load intto a specific partition
+    """
+    LOAD_PARTITION_HQL = \
+      """
+      ALTER TABLE %(tablename)s ADD PARTITION(%(partition_spec)s) LOCATION '%(filepath)s'
+      """
+
+    partition_dir = self._get_partition_dir(partition_spec)
+    hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
+    filename = filepath.split('/')[-1]
+    hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
+
+    hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
+    LOG.info('Running load query: %s' % hql)
+    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+
+
   def load(self, django_user):
     """
     Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
@@ -176,6 +207,30 @@ class SampleTable(object):
       '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
       """
 
+    hdfs_root_destination = self._get_hdfs_root_destination(django_user)
+    hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
+
+    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_file_destination}
+    LOG.info('Running load query: %s' % hql)
+    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+
+
+  def _check_file_contents(self, filepath):
+    if not os.path.isfile(filepath):
+      msg = _('Cannot find table data in "%(file)s".') % {'file': filepath}
+      LOG.error(msg)
+      raise ValueError(msg)
+
+
+  def _get_partition_dir(self, partition_spec):
+    parts = partition_spec.split(',')
+    last_part = parts[-1]
+    part_value = last_part.split('=')[-1]
+    part_dir = part_value.strip("'").replace('-', '_')
+    return part_dir
+
+
+  def _get_hdfs_root_destination(self, django_user, subdir=None):
     fs = cluster.get_hdfs()
 
     if self.app_name == 'impala':
@@ -183,18 +238,34 @@ class SampleTable(object):
       from impala.conf import IMPERSONATION_ENABLED
       if not IMPERSONATION_ENABLED.get():
         tmp_public = '/tmp/public_hue_examples'
+        if subdir:
+          tmp_public += '/%s' % subdir
         fs.do_as_user(django_user, fs.mkdir, tmp_public, '0777')
         hdfs_root_destination = tmp_public
     else:
       hdfs_root_destination = fs.do_as_user(django_user, fs.get_home_dir)
+      if subdir:
+        hdfs_root_destination += '/%s' % subdir
+        fs.do_as_user(django_user, fs.mkdir, hdfs_root_destination, '0755')
 
-    hdfs_destination = os.path.join(hdfs_root_destination, self.name)
+    return hdfs_root_destination
 
-    LOG.info('Uploading local data %s to HDFS table "%s"' % (self.name, hdfs_destination))
-    fs.do_as_user(django_user, fs.copyFromLocal, self._contents_file, hdfs_destination)
 
+  def _upload_to_hdfs(self, django_user, local_filepath, hdfs_root_destination, filename=None):
+    fs = cluster.get_hdfs()
+
+    if filename is None:
+      filename = self.name
+    hdfs_destination = '%s/%s' % (hdfs_root_destination, filename)
+
+    LOG.info('Uploading local data %s to HDFS path "%s"' % (self.name, hdfs_destination))
+    fs.do_as_user(django_user, fs.copyFromLocal, local_filepath, hdfs_destination)
+
+    return hdfs_destination
+
+
+  def _load_data_to_table(self, django_user, hql, hdfs_destination):
     LOG.info('Loading data into table "%s"' % (self.name,))
-    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_destination}
     query = hql_query(hql)
 
     try:
