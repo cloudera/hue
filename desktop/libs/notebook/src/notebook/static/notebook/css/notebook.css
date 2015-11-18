@@ -23,6 +23,12 @@ body {
   height:100%;
   margin: 0;
   padding: 0;
+  background-color: #FFF;
+}
+
+.navbar-fixed-top .navbar-inner {
+  box-shadow: none;
+  border-bottom: 1px solid #DDD;
 }
 
 .vertical-full {
@@ -35,6 +41,7 @@ body {
   position: absolute;
   top: 82px;
   bottom: 0;
+  background-color: #FFF;
 }
 
 .snippet-move-placeholder {
