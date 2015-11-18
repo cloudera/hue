@@ -397,6 +397,9 @@
       if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000) {
         return;
       }
+
+      notebook.showHistory(false);
+
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
@@ -691,7 +694,7 @@
     self.selectedDatabases = notebook.selectedDatabases != "undefined" && notebook.selectedDatabases != null ? notebook.selectedDatabases : {};
     self.assistHelpers = {};
     self.history = ko.observableArray([]);
-    self.showHistory = ko.observable(typeof snippet.showHistory != "undefined" && snippet.showHistory != null ? snippet.showHistory : false);
+    self.showHistory = ko.observable(typeof notebook.showHistory != "undefined" && notebook.showHistory != null ? notebook.showHistory : false);
     self.showHistory.subscribe(function (val) {
       if (val) {
         self.fetchHistory();
