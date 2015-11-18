@@ -216,25 +216,25 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
-      <li class="nav-header" style="margin-top: 0" data-bind="visible: ! $parent.assistHelper.loading() && ! $parent.hasErrors()">
+      <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.assistHelper.loading() && !$parent.hasErrors()">
         ${_('tables')}
-        <div class="pull-right hover-actions" data-bind="visible: hasEntries">
+        <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.assistHelper.loading() && !$parent.hasErrors()">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { $parent.options.isSearchVisible(!$parent.options.isSearchVisible()) }, css: { 'blue' : $parent.options.isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
         </div>
       </li>
 
-      <li data-bind="slideVisible: hasEntries() && $parent.options.isSearchVisible()">
+      <li data-bind="slideVisible: hasEntries() && $parent.options.isSearchVisible() && !$parent.assistHelper.loading() && !$parent.hasErrors()">
         <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
       </li>
 
       <div class="table-container">
-        <div class="center" data-bind="visible: loading">
+        <div class="center" data-bind="visible: loading() || $parent.assistHelper.loading()">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
-        <!-- ko template: { name: 'assist-entries' } --><!-- /ko -->
+        <!-- ko template: { ifnot: loading() || $parent.assistHelper.loading(), name: 'assist-entries' } --><!-- /ko -->
       </div>
     </div>
 
