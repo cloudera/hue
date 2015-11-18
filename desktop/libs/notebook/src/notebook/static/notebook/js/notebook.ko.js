@@ -172,6 +172,7 @@
       return notebook.getAssistHelper(self.type());
     };
 
+    self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
@@ -691,7 +692,6 @@
       }
     });
 
-    self.selectedDatabases = notebook.selectedDatabases != "undefined" && notebook.selectedDatabases != null ? notebook.selectedDatabases : {};
     self.assistHelpers = {};
     self.history = ko.observableArray([]);
     self.showHistory = ko.observable(typeof notebook.showHistory != "undefined" && notebook.showHistory != null ? notebook.showHistory : false);
@@ -704,14 +704,9 @@
     self.getAssistHelper = function (snippetType) {
       if (! self.assistHelpers[snippetType]) {
         self.assistHelpers[snippetType] = new AssistHelper({
-          notebook: self,
           user: vm.user,
-          activeDatabase: self.selectedDatabases[snippetType]
+          i18n: vm.i18n
         }, vm.i18n);
-
-        self.assistHelpers[snippetType].activeDatabase.subscribe(function (newActiveDatabase) {
-          self.selectedDatabases[snippetType] = newActiveDatabase;
-        })
       }
       return self.assistHelpers[snippetType]
     };
@@ -1022,6 +1017,22 @@
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
+
+    self.sqlSourceTypes = [];
+
+    $.each(options.languages, function (idx, language) {
+      var viewSettings = options.snippetViewSettings[language.type];
+      if (viewSettings && viewSettings.sqlDialect) {
+        self.sqlSourceTypes.push({
+          type: language.type,
+          name: language.name
+        })
+      }
+    });
+
+    if (self.sqlSourceTypes.length === 1) {
+      self.activeSqlSourceType = self.sqlSourceTypes[0].type;
+    }
 
     self.displayCombinedContent = function () {
       if (! self.selectedNotebook()) {

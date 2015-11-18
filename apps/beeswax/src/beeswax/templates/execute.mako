@@ -45,7 +45,14 @@ ${ layout.menubar(section='query') }
       <div class="tab-pane active" id="navigatorTab">
         <div class="card card-small card-tab">
           <div class="card-body" style="margin-top: 0;">
-            <div class="assist" data-bind="component: { name: 'assist-panel', params: { notebookViewModel: editorViewModel } }"></div>
+            <div class="assist" data-bind="component: {
+              name: 'assist-panel',
+              params: {
+                user: HIVE_AUTOCOMPLETE_USER,
+                sourceTypes: editorViewModel.sqlSourceTypes,
+                activeSourceType: snippetType
+              }
+            }"></div>
           </div>
         </div>
       </div>
@@ -1137,7 +1144,7 @@ editorViewModelOptions.snippetViewSettings[snippetType] = {
 
 editorViewModelOptions.languages.push({
   type: snippetType,
-  name: snippetType
+  name: HIVE_AUTOCOMPLETE_APP == "impala" ? "Impala" : "Hive"
 });
 
 var i18n = {

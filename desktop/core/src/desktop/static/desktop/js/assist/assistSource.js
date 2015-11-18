@@ -22,12 +22,20 @@
   }
 }(this, function (ko, AssistEntry) {
 
-  function AssistSource(snippet, i18n) {
+  /**
+   * @param {Object} options
+   * @param {Object} options.i18n
+   * @param {AssistHelper} options.assistHelper
+   * @param {string} options.type
+   * @param {string} options.name
+   * @constructor
+   */
+  function AssistSource (options) {
     var self = this;
-    self.name = snippet.name();
-    self.i18n = i18n;
-    self.snippet = snippet;
-    self.assistHelper = snippet.getAssistHelper();
+    self.i18n = options.i18n;
+    self.assistHelper = options.assistHelper;
+    self.type = options.type;
+    self.name = options.name;
 
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
@@ -38,16 +46,11 @@
       return self.filter().length !== 0;
     });
 
-    self.options = ko.mapping.fromJS($.extend({
-      isSearchVisible: false
-    }, $.totalStorage(snippet.type() + ".assist.options") || {}));
+    var storageSearchVisible = $.totalStorage(self.type + ".assist.searchVisible");
+    self.searchVisible = ko.observable(storageSearchVisible || false);
 
-    $.each(Object.keys(self.options), function (index, key) {
-      if (ko.isObservable(self.options[key])) {
-        self.options[key].subscribe(function() {
-          $.totalStorage(snippet.type() + ".assist.options", ko.mapping.toJS(self.options))
-        });
-      }
+    self.searchVisible.subscribe(function (newValue) {
+      $.totalStorage(self.type + ".assist.searchVisible", newValue);
     });
 
     self.databases = ko.observableArray();
@@ -65,8 +68,10 @@
       }
     });
 
+    self.loading = ko.observable(false);
     var dbIndex = {};
     var updateDatabases = function (names) {
+      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
       dbIndex = {};
       self.databases($.map(names, function(name) {
         var database = new AssistEntry({
@@ -76,41 +81,22 @@
           isDatabase: true
         }, null, self, self.filter, self.i18n);
         dbIndex[name] = database;
+        if (name === lastSelectedDb) {
+          self.selectedDatabase(database);
+        }
         return database;
       }));
+      self.reloading(false);
+      self.loading(false);
     };
 
-    if (dbIndex[self.assistHelper.activeDatabase()]) {
-      self.selectedDatabase(dbIndex[self.assistHelper.activeDatabase()]);
-    }
-
-    var subscribed = false;
-
-    var updateDbFromAssistHelper = function () {
-      var assistDb = self.assistHelper.activeDatabase();
-      if (dbIndex[assistDb] && (! self.selectedDatabase() || self.selectedDatabase().definition.name !== assistDb)) {
-        self.selectedDatabase(dbIndex[assistDb]);
-      }
+    self.initDatabases = function () {
+      self.loading(true);
+      self.assistHelper.loadDatabases({
+        sourceType: self.type,
+        callback: updateDatabases
+      });
     };
-
-    self.assistHelper.activeDatabase.subscribe(function (newValue) {
-      updateDbFromAssistHelper();
-    });
-
-    var initDatabases = function () {
-      if (self.assistHelper.loaded()) {
-        updateDatabases(self.assistHelper.availableDatabases());
-        updateDbFromAssistHelper();
-      }
-    };
-
-    initDatabases();
-
-    self.selectedDatabase.subscribe(function (newDatabase) {
-      if (newDatabase !== null) {
-        self.assistHelper.activeDatabase(newDatabase.definition.name);
-      }
-    });
 
     self.modalItem = ko.observable();
 
@@ -122,21 +108,9 @@
     };
 
     self.reload = function() {
-      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
       self.reloading(true);
-      self.assistHelper.clearCache(self.snippet);
-      self.assistHelper.load(self.snippet, function() {
-        if (self.assistHelper.loaded()) {
-          updateDatabases(self.assistHelper.availableDatabases());
-          if (lastSelectedDb !== null) {
-            self.selectedDatabase(dbIndex[lastSelectedDb]);
-          } else {
-            self.selectedDatabase(null);
-          }
-        }
-
-        self.reloading(false);
-      });
+      self.assistHelper.clearCache(self.type);
+      self.initDatabases();
     };
 
     huePubSub.subscribe('assist.refresh', self.reload);

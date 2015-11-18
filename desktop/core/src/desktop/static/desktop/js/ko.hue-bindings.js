@@ -1903,15 +1903,20 @@
 
       var refreshTables = function() {
         currentAssistTables = {};
-        if (typeof assistHelper.activeDatabase() !== "undefined" && assistHelper.activeDatabase() != null) {
-          assistHelper.fetchTables(snippet, assistHelper.activeDatabase(), function(data) {
-            $.each(data.tables, function(index, table) {
-              currentAssistTables[table] = true;
-            });
-          })
+        if (snippet.database()) {
+          assistHelper.fetchTables({
+            sourceType: snippet.type(),
+            databaseName: snippet.database(),
+            successCallback: function(data) {
+              $.each(data.tables, function(index, table) {
+                currentAssistTables[table] = true;
+              });
+            },
+            errorCallback: $.noop
+          });
         }
       };
-      assistHelper.activeDatabase.subscribe(refreshTables);
+      snippet.database.subscribe(refreshTables);
       refreshTables();
 
       ace.define("huelink", [], function (require, exports, module) {

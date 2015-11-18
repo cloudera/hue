@@ -25,9 +25,9 @@
   var SQL_TERMS = /\b(FROM|TABLE|STATS|REFRESH|METADATA|DESCRIBE|ORDER BY|JOIN|ON|WHERE|SELECT|LIMIT|GROUP BY|SORT|USE|LOCATION|INPATH)\b/g;
 
   /**
-   * @param options {object}
-   * @param options.assistHelper
-   *
+   * @param {Object} options
+   * @param {Snippet} options.snippet
+   * @param {HdfsAutocompleter} options.hdfsAutocompleter
    * @constructor
    */
   function SqlAutocompleter(options) {
@@ -35,10 +35,12 @@
     self.snippet = options.snippet;
     self.hdfsAutocompleter = options.hdfsAutocompleter;
 
+
     var initDatabases = function () {
-      if (! self.snippet.getAssistHelper().loaded()) {
-        self.snippet.getAssistHelper().load(self.snippet);
-      }
+      self.snippet.getAssistHelper().loadDatabases({
+        sourceType: self.snippet.type(),
+        callback: $.noop
+      });
     };
     self.snippet.type.subscribe(function() {
       if (self.snippet.isSqlDialect()) {
@@ -64,7 +66,8 @@
       var refs = $.map(refsRaw.split(/\s*(?:,|\bJOIN\b)\s*/i), function (ref) {
         if (ref.indexOf('.') > 0) {
           var refParts = ref.split('.');
-          if(self.snippet.getAssistHelper().availableDatabases().indexOf(refParts[0]) > -1) {
+
+          if(self.snippet.getAssistHelper().lastKnownDatabases.indexOf(refParts[0]) > -1) {
             return {
               database: refParts.shift(),
               table: refParts.join('.')
@@ -325,9 +328,7 @@
     var hiveSyntax = self.snippet.type() === "hive";
     var impalaSyntax = self.snippet.type() === "impala";
 
-    if (typeof self.snippet.getAssistHelper().activeDatabase() == "undefined"
-      || self.snippet.getAssistHelper().activeDatabase() == null
-      || self.snippet.getAssistHelper().activeDatabase() == "") {
+    if (! self.snippet.database()) {
       onFailure();
       return;
     }
@@ -343,7 +344,7 @@
       return;
     }
 
-    var database = self.snippet.getAssistHelper().activeDatabase();
+    var database = self.snippet.database();
     for (var i = allStatements.length - 1; i >= 0; i--) {
       var useMatch = allStatements[i].match(/\s*use\s+([^\s;]+)\s*;?/i);
       if (useMatch) {
@@ -584,9 +585,8 @@
             if (!isValueCompletion) {
               fields.push(part);
             }
-            // For impala we have to fetch info about each field as we don't know
-            // whether it's a map or array for hive the [ and ] gives it away...
-            self.snippet.getAssistHelper().fetchFields(self.snippet, database, tableName, fields, function(data) {
+
+            var successCallback = function (data) {
               if (data.type === "map") {
                 remainingParts.unshift("value");
               } else if (data.type === "array") {
@@ -616,7 +616,18 @@
                 return;
               }
               getFields(database, remainingParts, fields);
-            }, onFailure, editor);
+            };
+            // For impala we have to fetch info about each field as we don't know
+            // whether it's a map or array for hive the [ and ] gives it away...
+            self.snippet.getAssistHelper().fetchFields({
+              sourceType: self.snippet.type(),
+              databaseName: database,
+              tableName: tableName,
+              fields: fields,
+              editor: editor,
+              successCallback: successCallback,
+              errorCallback: onFailure
+            });
             return; // break recursion, it'll be async above
           }
           fields.push(part);

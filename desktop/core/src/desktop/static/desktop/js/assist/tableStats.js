@@ -22,10 +22,25 @@
   }
 }(this, function (ko) {
 
+  /**
+   *
+   * @param {Object} options
+   * @param {Object} options.i18n
+   * @param {string} options.i18n.errorLoadingStats
+   * @param {string} options.i18n.errorLoadingTerms
+   * @param {string} options.i18n.errorRefreshingStats
+   * @param {AssistHelper} options.assistHelper
+   * @param {string} options.sourceType
+   * @param {string} options.databaseName
+   * @param {string} options.tableName
+   * @param {string} options.columnName
+   * @param {string} options.type
+   * @constructor
+   */
   function TableStats (options) {
     var self = this;
     self.i18n = options.i18n;
-    self.snippet = options.snippet;
+    self.sourceType = options.sourceType;
     self.database = options.databaseName;
     self.table = options.tableName;
     self.column = options.columnName;
@@ -60,33 +75,44 @@
     var self = this;
     self.loading(true);
     self.hasError(false);
-    self.assistHelper.fetchStats(self.snippet, self.table, self.column != null ? self.column : null, function (data) {
-          if (data && data.status == 0) {
-            self.statRows(data.stats);
-            var inaccurate = true;
-            for(var i = 0; i < data.stats.length; i++) {
-              if (data.stats[i].data_type == "COLUMN_STATS_ACCURATE" && data.stats[i].comment == "true") {
-                inaccurate = false;
-                break;
-              }
-            }
-            self.inaccurate(inaccurate);
-          } else if (data && data.message) {
-            $(document).trigger("error", data.message);
-            self.hasError(true);
-          } else {
-            $(document).trigger("error", self.i18n.errorLoadingStats);
-            self.hasError(true);
+
+    var successCallback = function (data) {
+      if (data && data.status == 0) {
+        self.statRows(data.stats);
+        var inaccurate = true;
+        for(var i = 0; i < data.stats.length; i++) {
+          if (data.stats[i].data_type == "COLUMN_STATS_ACCURATE" && data.stats[i].comment == "true") {
+            inaccurate = false;
+            break;
           }
-          self.loading(false);
-        },
-        function (e) {
-          if (e.status == 500) {
-            $(document).trigger("error", self.i18n.errorLoadingStats);
-          }
-          self.hasError(true);
-          self.loading(false);
-        });
+        }
+        self.inaccurate(inaccurate);
+      } else if (data && data.message) {
+        $(document).trigger("error", data.message);
+        self.hasError(true);
+      } else {
+        $(document).trigger("error", self.i18n.errorLoadingStats);
+        self.hasError(true);
+      }
+      self.loading(false);
+    };
+
+    var errorCallback = function (e) {
+      if (e.status == 500) {
+        $(document).trigger("error", self.i18n.errorLoadingStats);
+      }
+      self.hasError(true);
+      self.loading(false);
+    };
+
+    self.assistHelper.fetchStats({
+      sourceType: self.sourceType,
+      databaseName: self.database,
+      tableName: self.table,
+      columnName: self.column,
+      successCallback: successCallback,
+      errorCallback: errorCallback
+    });
   };
 
   TableStats.prototype.refresh = function () {
@@ -97,45 +123,60 @@
     var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
     self.refreshing(true);
 
-    self.assistHelper.refreshTableStats(self.snippet, self.table, self.column, function() {
-      self.refreshing(false);
-      self.fetchData();
-      if (shouldFetchTerms) {
-        self.fetchTerms();
+    self.assistHelper.refreshTableStats({
+      sourceType: self.sourceType,
+      databaseName: self.database,
+      tableName: self.table,
+      columnName: self.column,
+      successCallback: function() {
+        self.refreshing(false);
+        self.fetchData();
+        if (shouldFetchTerms) {
+          self.fetchTerms();
+        }
+      },
+      errorCallback: function(message) {
+        self.refreshing(false);
+        $(document).trigger("error", message || self.i18n.errorRefreshingStats);
       }
-    }, function(message) {
-      self.refreshing(false);
-      $(document).trigger("error", message || self.i18n.errorRefreshingStats);
     });
   };
 
   TableStats.prototype.fetchTerms = function () {
     var self = this;
-    if (self.column == null || (self.isComplexType && self.snippet.type() == "impala")) {
+    if (self.column == null || (self.isComplexType && self.sourceType == "impala")) {
       return;
     }
 
     self.loadingTerms(true);
-    self.assistHelper.fetchTerms(self.snippet, self.table, self.column, self.prefixFilter(), function (data) {
-      if (data && data.status == 0) {
-        self.terms($.map(data.terms, function (term) {
-          return {
-            name: term[0],
-            count: term[1],
-            percent: (parseFloat(term[1]) / parseFloat(data.terms[0][1])) * 100
-          }
-        }));
-      } else if (data && data.message) {
-        $(document).trigger("error", data.message);
-      } else {
-        $(document).trigger("error", self.i18n.errorLoadingTerms);
+    self.assistHelper.fetchTerms({
+      sourceType: self.sourceType,
+      databaseName: self.database,
+      tableName: self.table,
+      columnName: self.column,
+      prefixFilter: self.prefixFilter(),
+      successCallback: function (data) {
+        if (data && data.status == 0) {
+          self.terms($.map(data.terms, function (term) {
+            return {
+              name: term[0],
+              count: term[1],
+              percent: (parseFloat(term[1]) / parseFloat(data.terms[0][1])) * 100
+            }
+          }));
+        } else if (data && data.message) {
+          $(document).trigger("error", data.message);
+        } else {
+          $(document).trigger("error", self.i18n.errorLoadingTerms);
+        }
+        self.loadingTerms(false);
+      },
+      errorCallback: function (e) {
+        if (e.status == 500) {
+          $(document).trigger("error", self.i18n.errorLoadingTerms);
+        }
+        self.loadingTerms(false);
       }
-      self.loadingTerms(false);
-    }, function (e) {
-      if (e.status == 500) {
-        $(document).trigger("error", self.i18n.errorLoadingTerms);
-      }
-      self.loadingTerms(false);
     });
   };
 

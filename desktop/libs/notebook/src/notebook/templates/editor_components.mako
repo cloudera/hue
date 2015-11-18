@@ -314,7 +314,11 @@ ${ require.config() }
     </a>
     <div class="assist" data-bind="component: {
         name: 'assist-panel',
-        params: { notebookViewModel: $root }
+        params: {
+          user: $root.user,
+          sourceTypes: $root.sqlSourceTypes,
+          activeSourceType: $root.activeSqlSourceType
+        }
       }"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
@@ -1614,7 +1618,6 @@ ${ require.config() }
       var currentNotebook = viewModel.notebooks()[0];
       currentNotebook.name(notebook.name);
       currentNotebook.description(notebook.description);
-      currentNotebook.selectedDatabases = notebook.selectedDatabases;
       currentNotebook.selectedSnippet(notebook.selectedSnippet);
       notebook.snippets.forEach(function(snippet){
         var newSnippet = currentNotebook.addSnippet({

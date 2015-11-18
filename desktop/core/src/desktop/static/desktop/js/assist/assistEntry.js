@@ -22,6 +22,21 @@
   }
 }(this, function (ko) {
 
+  /**
+   * @param {Object} definition
+   * @param {string} definition.type
+   * @param {string} definition.name
+   * @param {boolean} definition.isColumn
+   * @param {boolean} definition.isTable
+   * @param {boolean} definition.isMapValue
+   * @param {boolean} definition.isArray
+   * @param {AssistEntry} parent
+   * @param {AssistSource} assistSource
+   * @param {function} [filter] - ko.observable
+   * @param {Object} i18n
+   * @param {string} i18n.errorLoadingTablePreview
+   * @constructor
+   */
   function AssistEntry (definition, parent, assistSource, filter, i18n) {
     var self = this;
     self.i18n = i18n;
@@ -30,6 +45,7 @@
     self.assistSource = assistSource;
     self.parent = parent;
     self.filter = filter;
+    self.isSearchVisible = ko.observable(false);
 
     self.expandable = typeof definition.type === "undefined" || definition.type === "struct" || definition.type === "array" || definition.type === "map";
 
@@ -87,7 +103,7 @@
           break;
         }
         if (entry.definition.isArray || entry.definition.isMapValue) {
-          if (self.assistSource.assistHelper.type === 'hive') {
+          if (self.assistSource.type === 'hive') {
             parts.push("[]");
           }
         } else {
@@ -110,100 +126,115 @@
     self.loading(true);
     self.entries([]);
 
-    // Defer this part to allow ko to react on empty entries and loading
-    window.setTimeout(function() {
-      self.assistSource.assistHelper.fetchPanelData(self.assistSource.snippet, self.getHierarchy(), function(data) {
-        if (typeof data.tables !== "undefined") {
-          self.entries($.map(data.tables, function(tableName) {
-            return self.createEntry({
-              name: tableName,
-              displayName: tableName,
-              title: tableName,
-              isTable: true
-            });
-          }));
-        } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
-          self.entries($.map(data.extended_columns, function (columnDef) {
-            var displayName = columnDef.name;
-            if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
-              displayName += ' (' + columnDef.type + ')'
-            }
-            var title = displayName;
-            if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
-              title += ' ' + columnDef.comment;
-            }
-            var shortType = null;
-            if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
-              shortType = columnDef.type.match(/^[^<]*/g)[0]; // everything before '<'
-            }
-            return self.createEntry({
-              name: columnDef.name,
-              displayName: displayName,
-              title: title,
-              isColumn: true,
-              type: shortType
-            });
-          }));
-        } else if (typeof data.columns !== "undefined" && data.columns !== null) {
-          self.entries($.map(data.columns, function(columnName) {
-            return self.createEntry({
-              name: columnName,
-              displayName: columnName,
-              title: columnName,
-              isColumn: true
-            });
-          }));
-        } else if (typeof data.type !== "undefined" && data.type !== null) {
-          if (data.type === "map") {
-            self.entries([
-              self.createEntry({
-                name: "key",
-                displayName: "key (" + data.key.type + ")",
-                title: "key (" + data.key.type + ")",
-                type: data.key.type
-              }),
-              self.createEntry({
-                name: "value",
-                displayName: "value (" + data.value.type + ")",
-                title: "value (" + data.value.type + ")",
-                isMapValue: true,
-                type: data.value.type
-              })
-            ]);
-            self.entries()[1].open(true);
-          } else if (data.type == "struct") {
-            self.entries($.map(data.fields, function(field) {
-              return self.createEntry({
-                name: field.name,
-                displayName: field.name + " (" + field.type + ")",
-                title: field.name + " (" + field.type + ")",
-                type: field.type
-              });
-            }));
-          } else if (data.type == "array") {
-            self.entries([
-              self.createEntry({
-                name: "item",
-                displayName: "item (" + data.item.type + ")",
-                title: "item (" + data.item.type + ")",
-                isArray: true,
-                type: data.item.type
-              })
-            ]);
-            self.entries()[0].open(true);
+    var successCallback = function(data) {
+      if (typeof data.tables !== "undefined") {
+        self.entries($.map(data.tables, function(tableName) {
+          return self.createEntry({
+            name: tableName,
+            displayName: tableName,
+            title: tableName,
+            isTable: true
+          });
+        }));
+      } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
+        self.entries($.map(data.extended_columns, function (columnDef) {
+          var displayName = columnDef.name;
+          if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
+            displayName += ' (' + columnDef.type + ')'
           }
+          var title = displayName;
+          if (typeof columnDef.comment !== "undefined" && columnDef.comment !== null) {
+            title += ' ' + columnDef.comment;
+          }
+          var shortType = null;
+          if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
+            shortType = columnDef.type.match(/^[^<]*/g)[0]; // everything before '<'
+          }
+          return self.createEntry({
+            name: columnDef.name,
+            displayName: displayName,
+            title: title,
+            isColumn: true,
+            type: shortType
+          });
+        }));
+      } else if (typeof data.columns !== "undefined" && data.columns !== null) {
+        self.entries($.map(data.columns, function(columnName) {
+          return self.createEntry({
+            name: columnName,
+            displayName: columnName,
+            title: columnName,
+            isColumn: true
+          });
+        }));
+      } else if (typeof data.type !== "undefined" && data.type !== null) {
+        if (data.type === "map") {
+          self.entries([
+            self.createEntry({
+              name: "key",
+              displayName: "key (" + data.key.type + ")",
+              title: "key (" + data.key.type + ")",
+              type: data.key.type
+            }),
+            self.createEntry({
+              name: "value",
+              displayName: "value (" + data.value.type + ")",
+              title: "value (" + data.value.type + ")",
+              isMapValue: true,
+              type: data.value.type
+            })
+          ]);
+          self.entries()[1].open(true);
+        } else if (data.type == "struct") {
+          self.entries($.map(data.fields, function(field) {
+            return self.createEntry({
+              name: field.name,
+              displayName: field.name + " (" + field.type + ")",
+              title: field.name + " (" + field.type + ")",
+              type: field.type
+            });
+          }));
+        } else if (data.type == "array") {
+          self.entries([
+            self.createEntry({
+              name: "item",
+              displayName: "item (" + data.item.type + ")",
+              title: "item (" + data.item.type + ")",
+              isArray: true,
+              type: data.item.type
+            })
+          ]);
+          self.entries()[0].open(true);
         }
-        self.loading(false);
-      }, function() {
-        self.assistSource.hasErrors(true);
-        self.loading(false);
-      });
-    }, 10);
+      }
+      self.loading(false);
+    };
+
+    var errorCallback = function () {
+      self.assistSource.hasErrors(true);
+      self.loading(false);
+    };
+
+    self.assistSource.assistHelper.fetchPanelData({
+      sourceType: self.assistSource.type,
+      hierarchy: self.getHierarchy(),
+      successCallback: successCallback,
+      errorCallback: errorCallback
+    });
   };
 
-  AssistEntry.prototype.createEntry = function(definition) {
+  /**
+   * @param {Object} definition
+   * @param {string} definition.type
+   * @param {string} definition.name
+   * @param {boolean} definition.isColumn
+   * @param {boolean} definition.isTable
+   * @param {boolean} definition.isMapValue
+   * @param {boolean} definition.isArray
+   */
+  AssistEntry.prototype.createEntry = function (definition) {
     var self = this;
-    return new AssistEntry(definition, self, self.assistSource, null)
+    return new AssistEntry(definition, self, self.assistSource, null, self.i18n)
   };
 
   AssistEntry.prototype.getHierarchy = function () {
@@ -218,7 +249,7 @@
     return parts;
   };
 
-  AssistEntry.prototype.dblClick = function (data, event) {
+  AssistEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish('assist.dblClickItem', self);
   };
@@ -237,17 +268,23 @@
     var tableName = hierarchy[1];
 
     $assistQuickLook.find(".tableName").text(self.definition.name);
-    $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + self.assistSource.assistHelper.activeDatabase() + "/" + tableName);
+    $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
     $assistQuickLook.find(".sample").empty("");
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
-    self.assistSource.assistHelper.fetchTableHtmlPreview(self.assistSource.snippet, tableName, function(data) {
-      $assistQuickLook.find(".loader").hide();
-      $assistQuickLook.find(".sample").html(data);
-    }, function(e) {
-      if (e.status == 500) {
-        $(document).trigger("error", self.i18n.errorLoadingTablePreview);
-        $("#assistQuickLook").modal("hide");
+    self.assistSource.assistHelper.fetchTableHtmlPreview({
+      sourceType: self.assistSource.type,
+      databaseName: databaseName,
+      tableName: tableName,
+      successCallback: function(data) {
+        $assistQuickLook.find(".loader").hide();
+        $assistQuickLook.find(".sample").html(data);
+      },
+      errorCallback: function(e) {
+        if (e.status == 500) {
+          $(document).trigger("error", self.i18n.errorLoadingTablePreview);
+          $("#assistQuickLook").modal("hide");
+        }
       }
     });
 

@@ -198,14 +198,14 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="click: reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the databases list')}"></i></a>
       </div>
     </li>
-    <li data-bind="visible: ! hasErrors() && ! assistHelper.loading()" >
+    <li data-bind="visible: ! hasErrors()" >
       <ul class="assist-tables" data-bind="foreach: databases">
         <li class="assist-table pointer">
           <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
         </li>
       </ul>
     </li>
-    <li class="center" data-bind="visible: assistHelper.loading()" >
+    <li class="center" data-bind="visible: loading" >
       <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
       <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
     </li>
@@ -216,25 +216,25 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
-      <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.assistHelper.loading() && !$parent.hasErrors()">
+      <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('tables')}
-        <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.assistHelper.loading() && !$parent.hasErrors()">
+        <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { $parent.options.isSearchVisible(!$parent.options.isSearchVisible()) }, css: { 'blue' : $parent.options.isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { isSearchVisible(!isSearchVisible()) }, css: { 'blue' : isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
         </div>
       </li>
 
-      <li data-bind="slideVisible: hasEntries() && $parent.options.isSearchVisible() && !$parent.assistHelper.loading() && !$parent.hasErrors()">
+      <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
         <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
       </li>
 
       <div class="table-container">
-        <div class="center" data-bind="visible: loading() || $parent.assistHelper.loading()">
+        <div class="center" data-bind="visible: loading() || $parent.loading()">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
-        <!-- ko template: { ifnot: loading() || $parent.assistHelper.loading(), name: 'assist-entries' } --><!-- /ko -->
+        <!-- ko template: { ifnot: loading() || $parent.loading(), name: 'assist-entries' } --><!-- /ko -->
       </div>
     </div>
 
@@ -262,72 +262,58 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
-        require(['knockout', 'desktop/js/assist/assistSource'], factory);
+        require(['knockout', 'desktop/js/assist/assistSource', 'desktop/js/assist/assistHelper'], factory);
       } else {
-        factory(ko, AssistSource);
+        factory(ko, AssistSource, AssistHelper);
       }
-    }(function (ko, AssistSource) {
+    }(function (ko, AssistSource, AssistHelper) {
 
-      function AssistPanel(params) {
+      /**
+       * @param {Object} params
+       * @param {Object[]} params.sourceTypes - All the available SQL source types
+       * @param {string} params.sourceTypes[].name - Example: Hive SQL
+       * @param {string} params.sourceTypes[].type - Example: hive
+       * @param {string} [params.activeSourceType] - Example: hive
+       * @param {string} params.user
+       * @constructor
+       */
+      function AssistPanel (params) {
         var self = this;
         var i18n = {
+          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         };
-        var notebookViewModel = params.notebookViewModel;
-        var notebook = notebookViewModel.selectedNotebook();
 
-        var sqlSources = [];
-        $.each(notebookViewModel.availableSnippets(), function (index, snippet) {
-          var settings = notebookViewModel.getSnippetViewSettings(snippet.type());
-
-          var fakeSnippet = {
-            name: snippet.name,
-            type: snippet.type,
-            getContext: function() {
-              return {
-                type: snippet.type()
-              }
-            },
-            getAssistHelper: function() {
-              return notebook.getAssistHelper(snippet.type());
-            }
-          };
-
-          if (settings.sqlDialect) {
-            sqlSources.push(new AssistSource(fakeSnippet, self, i18n));
-          }
+        var assistHelper = new AssistHelper(i18n, params.user);
+        self.sources = ko.observableArray();
+        var sourceIndex = {};
+        $.each(params.sourceTypes, function (idx, sourceType) {
+          sourceIndex[sourceType.type] = new AssistSource({
+            assistHelper: assistHelper,
+            i18n: i18n,
+            type: sourceType.type,
+            name: sourceType.name
+          });
+          self.sources.push(sourceIndex[sourceType.type]);
         });
 
-        self.sources = ko.observableArray(sqlSources);
+        var storageSourceType =  $.totalStorage("hue.assist.lastSelectedSource." + params.user);
         self.selectedSource = ko.observable(null);
 
-        self.selectedSource.subscribe(function (source) {
-          if (source && ! source.assistHelper.loaded()) {
-            source.assistHelper.load(source.snippet);
-          }
-        });
-
-        var lastSelectedSourceName =  $.totalStorage("hue.assist.lastSelectedSource." + notebookViewModel.user);
-        if (lastSelectedSourceName !== null) {
-          var foundSource = $.grep(self.sources(), function (source) {
-            return source.name === lastSelectedSourceName;
-          });
-          if (foundSource.length === 1) {
-            self.selectedSource(foundSource[0]);
-          }
-        }
-
-        if (! self.selectedSource() && self.sources.length === 1) {
-          self.selectedSource(self.sources[0]);
-        }
-
-        self.selectedSource.subscribe(function (newSourceType) {
-          if (newSourceType !== null) {
-            $.totalStorage("hue.assist.lastSelectedSource." + notebookViewModel.user, newSourceType.name);
+        self.selectedSource.subscribe(function (newSource) {
+          if (newSource) {
+            newSource.initDatabases();
+            $.totalStorage("hue.assist.lastSelectedSource." + self.user, newSource.name);
           } else {
-            $.totalStorage("hue.assist.lastSelectedSource." + notebookViewModel.user, null);
+            $.totalStorage("hue.assist.lastSelectedSource." + self.user, null);
           }
         });
+
+        if (params.activeSourceType) {
+          self.selectedSource(sourceIndex[params.activeSourceType]);
+        } else if (storageSourceType && sourceIndex[storageSourceType]) {
+          self.selectedSource(sourceIndex[storageSourceType]);
+        }
 
         self.breadcrumb = ko.computed(function () {
           if (self.selectedSource()) {
