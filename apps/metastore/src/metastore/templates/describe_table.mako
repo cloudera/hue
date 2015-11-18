@@ -146,8 +146,9 @@ ${ components.menubar() }
               % if sample is not None:
                 <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               % endif
-              <li><a href="#columns" data-toggle="tab">${_('Analyse')}</a></li>
-              <li><a href="#columns" data-toggle="tab">${_('Lineage')}</a></li>
+              <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
+              <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
+              <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
               <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
             </ul>
 
