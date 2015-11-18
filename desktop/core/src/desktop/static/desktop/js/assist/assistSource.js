@@ -165,8 +165,9 @@
         self.reloading(false);
       });
     };
-  }
 
+    huePubSub.subscribe('assist.refresh', self.reload);
+  }
 
   return AssistSource;
 }));
