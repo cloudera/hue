@@ -288,6 +288,7 @@
         self.getLogs();
       }
     });
+
     self.isLoading = ko.computed(function () {
       return self.status() == "loading";
     });
@@ -689,6 +690,13 @@
 
     self.selectedDatabases = notebook.selectedDatabases != "undefined" && notebook.selectedDatabases != null ? notebook.selectedDatabases : {};
     self.assistHelpers = {};
+    self.history = ko.observableArray([]);
+    self.showHistory = ko.observable(typeof snippet.showHistory != "undefined" && snippet.showHistory != null ? snippet.showHistory : false);
+    self.showHistory.subscribe(function (val) {
+      if (val) {
+        self.fetchHistory();
+      }
+    });
 
     self.getAssistHelper = function (snippetType) {
       if (! self.assistHelpers[snippetType]) {
@@ -950,7 +958,17 @@
 
     self.fetchHistory = function () {
       $.get("/notebook/api/get_history", {}, function(data) {
-        console.log(data);
+        var parsedHistory = [];
+        if (data && data.history){
+          data.history.forEach(function(nbk){
+            parsedHistory.push({
+              url: nbk.absoluteUrl,
+              query: nbk.data.statement_raw,
+              lastExecuted: nbk.data.lastExecuted
+            });
+          });
+        }
+        self.history(parsedHistory);
       });
     };
 

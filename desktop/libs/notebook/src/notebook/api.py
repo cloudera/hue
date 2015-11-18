@@ -260,7 +260,8 @@ def get_history(request):
   response['history'] = [{
       'name': doc.name,
       'id': doc.id,
-      'data': Notebook(document=doc).get_data()
+      'data': Notebook(document=doc).get_data(),
+      'absoluteUrl': doc.get_absolute_url()
       } for doc in Document2.objects.filter(type='notebook', owner=request.user, is_history=True).order_by('-last_modified')[:25]]
   response['message'] = _('History saved !')
 

@@ -80,6 +80,8 @@ from desktop.views import _ko
 <script src="${ static('desktop/js/nv.d3.scatter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/nv.d3.scatterChart.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <!--[if IE 9]>
@@ -402,6 +404,23 @@ ${ require.config() }
   </div>
 </script>
 
+<script type="text/html" id="query-history">
+  <!-- ko if: $root.editorMode -->
+  <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
+    <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
+      <table class="table table-compressed">
+        <tbody data-bind="foreach: $parent.history">
+          <tr class="pointer" data-bind="click: function(){ location.href=url }">
+            <td><code data-bind="text: query"></code></td>
+            <td style="width: 200px" class="muted"><span data-bind="text: moment(lastExecuted).format('LLL')"></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
 <script type="text/html" id="notebook-snippet-header">
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
@@ -446,6 +465,7 @@ ${ require.config() }
         <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
         <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
         <!-- ko template: 'snippet-log' --><!-- /ko -->
+        <!-- ko template: 'query-history' --><!-- /ko -->
         <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
         <div style="position: absolute; top:0; z-index: 301; width: 100%;">
           <!-- ko template: 'snippet-settings' --><!-- /ko -->
@@ -821,15 +841,22 @@ ${ require.config() }
 </script>
 
 <script type ="text/html" id="snippet-execution-controls">
+  <!-- ko if: $root.editorMode -->
+  <div class="hover-actions" style="position:absolute; bottom: 26px">
+    <a class="snippet-side-btn" data-bind="click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
+      <i class="fa fa-fw fa-history"></i>
+    </a>
+  </div>
+  <!-- /ko -->
   <div class="hover-actions" style="position:absolute; bottom: 0">
     <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
-      <i class="fa fa-spinner fa-spin"></i>
+      <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
-      <i class="fa fa-stop"></i>
+      <i class="fa fa-fw fa-stop"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" title="${ _('CTRL + ENTER') }">
-      <i class="fa fa-play"></i>
+      <i class="fa fa-fw fa-play"></i>
     </a>
   </div>
 </script>
@@ -1812,6 +1839,10 @@ ${ require.config() }
       viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
       ko.applyBindings(viewModel);
       viewModel.init();
+
+      if (viewModel.editorMode && !viewModel.selectedNotebook().snippets()[0].result.hasSomeResults()) {
+        viewModel.selectedNotebook().showHistory(true);
+      }
 
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
