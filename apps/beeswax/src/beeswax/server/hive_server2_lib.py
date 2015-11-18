@@ -70,6 +70,7 @@ class HiveServerTable(Table):
     self.desc_schema = desc_schema
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    self._details = None
 
   @property
   def name(self):
@@ -161,6 +162,28 @@ class HiveServerTable(Table):
 
     return has_complex
 
+  @property
+  def details(self):
+    if self._details is None:
+      props = dict([(stat['col_name'], stat['data_type']) for stat in self.properties if stat['col_name'] != 'Table Parameters:'])
+      serde = props.get('SerDe Library:', '')
+      
+      self._details = {
+          'stats': dict([(stat['data_type'], stat['comment']) for stat in self.stats]),
+          'properties': {
+            'owner': props.get('Owner:'),
+            'create_time': props.get('CreateTime:'),
+            'compressed': props.get('Compressed:', 'No') != 'No',
+            'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else serde.rsplit('.', 1)[-1])
+        } 
+      }
+
+#       self.details['properties']['format'] = {
+#           'compressed': self.details['properties'].get('Compressed:', 'No') != 'No',
+#           'type': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else serde.rsplit('.', 1)[-1])
+#       } 
+
+    return self._details
 
 
 class HiveServerTRowSet2:
@@ -858,6 +881,7 @@ class HiveServerTableCompatible(HiveServerTable):
     self.desc_schema = hive_table.desc_schema
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
+    self._details = None
 
   @property
   def cols(self):
