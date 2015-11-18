@@ -152,31 +152,31 @@ ${ assist.assistPanel() }
         <div class="right-panel">
 
           <div class="metastore-main">
-            <h1>${ components.breadcrumbs(breadcrumbs) }</h1>
-
-            <div class="row-fluid">
-              <div class="span6">
-                <i class="fa fa-th fa-4x"></i></a>
-                ${ table.name }
-                </br>
-                <div class="alert alert-info">${ smart_unicode(table.comment) if table.comment else _('No description')}</div>
-                <i class="fa fa-pencil"></i></a>
-                <i class="fa fa-star"></i></a>
-              </div>
-              <div class="span6">
-                <a href="#" id="import-data-btn"><i class="fa fa-arrow-circle-o-down"></i> ${_('Import Data')}</a>
-                <a href="${ url('metastore:read_table', database=database, table=table.name) }"><i class="fa fa-list"></i> ${_('Browse Data')}</a>
+            <h3>
+              <ul class="nav nav-pills pull-right" style="margin-top: -8px">
+                <li><a class="pointer"><i class="fa fa-pencil"></i></a></li>
+                <li><a class="pointer"><i class="fa fa-star"></i></a></li>
+                <li><a href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a></li>
+                <li><a href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a></li>
                 % if has_write_access:
-                  <a href="#dropTable" data-toggle="modal"><i class="fa fa-trash-o"></i> ${_('Drop')} ${view_or_table_noun}</a>
+                  <li><a href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-trash-o"></i></a></li>
                 % endif
-                <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('View File Location')}</a>
+                <li><a href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-share-square-o"></i></a></li>
                 % if table.partition_keys:
-                  <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }"><i class="fa fa-sitemap"></i> ${_('Show Partitions')} (${ len(partitions) })</a>
+                  <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a></li>
                 % endif
-              </div>
-            </div>
+              </ul>
+              ${ components.breadcrumbs(breadcrumbs) }
+            </h3>
+            <div class="clearfix"></div>
 
-            <ul class="nav nav-tabs">
+            <i class="fa fa-th fa-4x"></i></a>
+            ${ table.name }
+            <br/>
+            <div class="alert alert-info">${ smart_unicode(table.comment) if table.comment else _('No description')}</div>
+
+
+            <ul class="nav nav-pills">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
               % if table.partition_keys:
