@@ -26,16 +26,11 @@ define([
       responseForUrls: {}
     };
 
-    var assistHelper = new AssistHelper({
-      notebook: {
-        getContext: function() { return ko.mapping.fromJS(null) }
-      },
-      activeDatabase: "database_one",
-      user: "testUser"
-    });
+    var assistHelper = new AssistHelper({}, "testUser");
 
     var snippet = {
       type: ko.observable(),
+      database: ko.observable("database_one"),
       isSqlDialect: function () { return true; },
       getContext: function () { return ko.mapping.fromJS(null) },
       getAssistHelper: function () { return assistHelper }
@@ -47,9 +42,6 @@ define([
         return;
       }
       snippet.type(newType);
-      assistHelper.load(snippet, $.noop);
-      assistHelper.availableDatabases(["database_one", "database_two"]);
-      assistHelper.activeDatabase("database_one");
       window.setTimeout(function() {
         callback();
       }, 0);
@@ -66,7 +58,7 @@ define([
         var response;
         if (firstUrlPart == "/notebook/api/autocomplete/") {
           response = {
-            databases: ["database_one"]
+            databases: ["database_one", "database_two"]
           };
         } else {
           expect(ajaxHelper.responseForUrls[firstUrlPart]).toBeDefined("fake response for url " + firstUrlPart + " not found");
@@ -141,11 +133,11 @@ define([
       it("should use a use statement before the cursor if present", function () {
         assertAutoComplete({
           serverResponses: {
-            "/notebook/api/autocomplete/other_db" : {
+            "/notebook/api/autocomplete/database_two" : {
               tables: ["otherTable1", "otherTable2"]
             }
           },
-          beforeCursor: "USE other_db; \n\tSELECT ",
+          beforeCursor: "USE database_two; \n\tSELECT ",
           afterCursor: "",
           expectedSuggestions: ["? FROM otherTable1", "? FROM otherTable2", "? FROM database_one.", "? FROM database_two."]
         });
