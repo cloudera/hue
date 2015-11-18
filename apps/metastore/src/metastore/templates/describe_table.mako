@@ -36,7 +36,7 @@ ${ components.menubar() }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 
-<%def name="column_table(cols, id, withStats=False)">
+<%def name="column_table(cols, id, withStats=False, limit=10000)">
   <table id="${id}" class="table table-striped table-condensed sampleTable
   %if withStats:
   skip-extender
@@ -54,7 +54,7 @@ ${ components.menubar() }
       </tr>
     </thead>
     <tbody>
-      % for column in cols:
+      % for column in cols[:limit]:
         <tr>
           <td>${ loop.index }</td>
           %if withStats:
@@ -70,6 +70,43 @@ ${ components.menubar() }
     </tbody>
   </table>
 </%def>
+
+<%def name="sample_table(limit=100)">
+  <table id="sampleTable" class="table table-striped table-condensed sampleTable">
+    <thead>
+      <tr>
+        <th style="width: 10px"></th>
+      % for col in sample.cols():
+        <th>${ col }</th>
+      % endfor
+      </tr>
+    </thead>
+    <tbody>
+    % for i, row in enumerate(sample_rows[:limit]):
+      <tr>
+        <td>${ i }</td>
+      % for item in row:
+        <td>
+          % if item is None:
+            NULL
+          % else:
+            ${ escape(smart_unicode(item, errors='ignore')).replace(' ', '&nbsp;') | n,unicode }
+          % endif
+        </td>
+      % endfor
+      </tr>
+    % endfor
+    </tbody>
+  </table>
+  <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>${_('Did you know?')}</strong>
+    <ul>
+      <li>${ _('If the sample contains a large number of columns, click a row to select a column to jump to') }</li>
+    </ul>
+  </div>
+</%def>
+
 
 <div class="container-fluid">
   <div class="row-fluid">
@@ -104,10 +141,10 @@ ${ components.menubar() }
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
               % if table.partition_keys:
-              <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
+                <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
               % endif
               % if sample is not None:
-              <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
+                <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               % endif
               <li><a href="#columns" data-toggle="tab">${_('Analyse')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Lineage')}</a></li>
@@ -117,6 +154,7 @@ ${ components.menubar() }
             <div class="tab-content">
               <div class="tab-pane" id="overview">
                 <div class="meta card card-home card-tab card-tab-bordertop card-listcontent">
+                  <h3>${ _('Knowledge') }</h3>
                   <div>
                     ${ _('Tags') } <i class="fa fa-tags"></i></a>
                   </div>
@@ -127,29 +165,35 @@ ${ components.menubar() }
                     ${ _('Description') } <i class="fa fa-file-text-o"></i></a>
                   </div>
                 </div>
-                
+
                 <div class="stats card card-home card-tab card-tab-bordertop card-listcontent">
-                  ${ _('Owner')  }
-                  ${ _('Created')  }
+                  <h3>${ _('Stats') }</h3>
+                  ${ _('Owner')  } ${ table.details['properties'].get('owner') }
+                  ${ _('Created')  } ${ table.details['properties'].get('create_time') }
                   <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
-                  ${ _('Format')  } Parquet compressed
-                  
+                  ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
+
                   <i class="fa fa-bar-chart"></i></a>
-                  
-                  numFiles, numRows, totalSize, isAccurate
+                  % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
+                  <i class="fa fa-refresh"></i></a>
+                  % endif
+
+                  numFiles ${ table.details['stats'].get('numFiles') }
+                  numRows ${ table.details['stats'].get('numRows') }
+                  totalSize ${ table.details['stats'].get('totalSize') }
                 </div>
-                
-                <div class="sql card card-home card-tab card-tab-bordertop card-listcontent">
-                  ${ 'CREATE ...' }
-                </div>
-                
+
                 <div class="columns-preview card card-home card-tab card-tab-bordertop card-listcontent">
-                  Col
+                  <h3>${ _('Columns') }</h3>
                   <i class="fa fa-star"></i></a>
+                  ${ column_table(table.cols, "columnTable", True, 3) }
+                  ${_('View more...')}
                 </div>
-                
+
                 <div class="sample-preview card card-home card-tab card-tab-bordertop card-listcontent">
-                  Sample
+                  <h3>${ _('Sample') }</h3>
+                  ${ sample_table(3) }
+                  ${_('View more...')}
                 </div>
               </div>
 
@@ -168,42 +212,10 @@ ${ components.menubar() }
               % if error_message:
                 <div class="alert alert-error">
                   <h3>${_('Error!')}</h3>
-                  <pre>${error_message | h}</pre>
+                  <pre>${ error_message | h }</pre>
                 </div>
               % else:
-                <table id="sampleTable" class="table table-striped table-condensed sampleTable">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px"></th>
-                    % for col in sample.cols():
-                      <th>${ col }</th>
-                    % endfor
-                    </tr>
-                  </thead>
-                  <tbody>
-                  % for i, row in enumerate(sample_rows):
-                    <tr>
-                      <td>${ i }</td>
-                    % for item in row:
-                      <td>
-                        % if item is None:
-                          NULL
-                        % else:
-                          ${ escape(smart_unicode(item, errors='ignore')).replace(' ', '&nbsp;') | n,unicode }
-                        % endif
-                      </td>
-                    % endfor
-                    </tr>
-                  % endfor
-                  </tbody>
-                </table>
-                <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
-                  <button type="button" class="close" data-dismiss="alert">&times;</button>
-                  <strong>${_('Did you know?')}</strong>
-                  <ul>
-                    <li>${ _('If the sample contains a large number of columns, click a row to select a column to jump to') }</li>
-                  </ul>
-                </div>
+                ${ sample_table() }
               % endif
               </div>
               % endif
