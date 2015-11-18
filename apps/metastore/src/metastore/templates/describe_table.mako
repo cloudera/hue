@@ -125,13 +125,9 @@ ${ require.config() }
   </div>
 </%def>
 
-${ tableStats.tableStats() }
-${ assist.assistPanel() }
-
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
-
 
 <div class="main-content">
   <div class="vertical-full container-fluid">
@@ -166,17 +162,22 @@ ${ assist.assistPanel() }
                   <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a></li>
                 % endif
               </ul>
-              ${ components.breadcrumbs(breadcrumbs) }
+              <ul class="nav nav-pills" style="margin-top: -8px">
+                <li><i class="fa fa-th muted"></i> ${ table.name }</li>
+              </ul>
             </h3>
             <div class="clearfix"></div>
 
-            <i class="fa fa-th fa-4x"></i></a>
-            ${ table.name }
-            <br/>
-            <div class="alert alert-info">${ smart_unicode(table.comment) if table.comment else _('No description')}</div>
+            <div class="margin-top-10 like-pre">
+              %if table.comment:
+                ${ smart_unicode(table.comment) }
+              %else:
+                ${ _('This table has no description.') } <a href="#">${ _('Add one here...') }</a>
+              %endif
+            </div>
 
 
-            <ul class="nav nav-pills">
+            <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
               % if table.partition_keys:
@@ -191,46 +192,47 @@ ${ assist.assistPanel() }
               <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
             </ul>
 
-            <div class="tab-content">
+            <div class="tab-content" style="border: none">
               <div class="tab-pane" id="overview">
-                <div class="meta card card-home card-tab card-tab-bordertop card-listcontent">
-                  <h3>${ _('Knowledge') }</h3>
-                  <div>
-                    ${ _('Tags') } <i class="fa fa-tags"></i></a>
+
+                <div class="row-fluid margin-top-20">
+                  <div class="span4 tile">
+                    <h3>${ _('Knowledge') }</h3>
+                    <div>
+                      ${ _('Tags') } <i class="fa fa-tags"></i></a>
+                    </div>
+                    <div>
+                      ${ _('Users') } <i class="fa fa-users"></i></a>
+                    </div>
+                    <div>
+                      ${ _('Description') } <i class="fa fa-file-text-o"></i></a>
+                    </div>
                   </div>
-                  <div>
-                    ${ _('Users') } <i class="fa fa-users"></i></a>
+                  <div class="span4 tile">
+                    <h3>${ _('Stats') }</h3>
+                    ${ _('Owner')  } ${ table.details['properties'].get('owner') }
+                    ${ _('Created')  } ${ table.details['properties'].get('create_time') }
+                    <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
+                    ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
+
+                    <i class="fa fa-bar-chart"></i></a>
+                    % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
+                    <i class="fa fa-refresh"></i></a>
+                    % endif
+
+                    numFiles ${ table.details['stats'].get('numFiles') }
+                    numRows ${ table.details['stats'].get('numRows') }
+                    totalSize ${ table.details['stats'].get('totalSize') }
                   </div>
-                  <div>
-                    ${ _('Description') } <i class="fa fa-file-text-o"></i></a>
+                  <div class="span4 tile">
+                    <h3>${ _('Columns') }</h3>
+                    <i class="fa fa-star"></i></a>
+                    ${ column_table(table.cols, "columnTable", True, 3) }
+                    ${_('View more...')}
                   </div>
                 </div>
 
-                <div class="stats card card-home card-tab card-tab-bordertop card-listcontent">
-                  <h3>${ _('Stats') }</h3>
-                  ${ _('Owner')  } ${ table.details['properties'].get('owner') }
-                  ${ _('Created')  } ${ table.details['properties'].get('create_time') }
-                  <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
-                  ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
-
-                  <i class="fa fa-bar-chart"></i></a>
-                  % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
-                  <i class="fa fa-refresh"></i></a>
-                  % endif
-
-                  numFiles ${ table.details['stats'].get('numFiles') }
-                  numRows ${ table.details['stats'].get('numRows') }
-                  totalSize ${ table.details['stats'].get('totalSize') }
-                </div>
-
-                <div class="columns-preview card card-home card-tab card-tab-bordertop card-listcontent">
-                  <h3>${ _('Columns') }</h3>
-                  <i class="fa fa-star"></i></a>
-                  ${ column_table(table.cols, "columnTable", True, 3) }
-                  ${_('View more...')}
-                </div>
-
-                <div class="sample-preview card card-home card-tab card-tab-bordertop card-listcontent">
+                <div class="tile">
                   <h3>${ _('Sample') }</h3>
                   % if sample:
                     ${ sample_table(limit=3) }
@@ -239,7 +241,7 @@ ${ assist.assistPanel() }
                 </div>
 
                 % if table.partition_keys:
-                <div class="partitions-preview card card-home card-tab card-tab-bordertop card-listcontent">
+                <div class="tile">
                   <h3>${ _('Partitions') }</h3>
                     ${ column_table(table.partition_keys, "partitionTable", limit=3) }
                     ${_('View more...')}
@@ -358,14 +360,12 @@ ${ assist.assistPanel() }
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
+${ tableStats.tableStats() }
+${ assist.assistPanel() }
+
 <script type="text/javascript" charset="utf-8">
 
-  var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
-
-
-
 var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
-
 
   require([
     "knockout",
