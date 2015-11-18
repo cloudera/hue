@@ -161,13 +161,11 @@ ${ require.config() }
                   <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a></li>
                 % endif
               </ul>
-              <ul class="nav nav-pills" style="margin-top: -8px">
-                <li><i class="fa fa-th muted"></i> ${ table.name }</li>
-              </ul>
+              ${ components.breadcrumbs(breadcrumbs, 'fa fa-th muted') }
             </h3>
             <div class="clearfix"></div>
 
-            <div class="margin-top-10 like-pre">
+            <div class="like-pre">
               %if table.comment:
                 ${ smart_unicode(table.comment) }
               %else:
