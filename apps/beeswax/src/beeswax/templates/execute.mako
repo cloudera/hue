@@ -23,6 +23,7 @@
 <%namespace name="comps" file="beeswax_components.mako" />
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="dashboard" file="common_dashboard.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="assist" file="/assist.mako" />
 
 ${ commonheader(_('Query'), app_name, user) | n,unicode }
@@ -838,6 +839,7 @@ ${ commonshare() | n,unicode }
 
 
 ${ assist.assistPanel() }
+${ tableStats.tableStats() }
 
 <style type="text/css">
   h1 {

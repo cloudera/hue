@@ -22,14 +22,16 @@
   }
 }(this, function (ko) {
 
-  function TableStats (assistSource, database, table, column, type, i18n) {
+  function TableStats (options) {
     var self = this;
-    self.i18n = i18n;
-    self.snippet = assistSource.snippet;
-    self.database = database;
-    self.table = table;
-    self.column = column;
-    self.assistHelper = assistSource.assistHelper;
+    self.i18n = options.i18n;
+    self.snippet = options.snippet;
+    self.database = options.databaseName;
+    self.table = options.tableName;
+    self.column = options.columnName;
+    self.assistHelper = options.assistHelper;
+    self.type = options.type;
+    self.isComplexType = /^(map|array|struct)/i.test(options.type);
 
     self.loading = ko.observable(false);
     self.hasError = ko.observable(false);
@@ -40,8 +42,6 @@
     self.terms = ko.observableArray();
     self.termsTabActive = ko.observable(false);
     self.prefixFilter = ko.observable().extend({'throttle': 500});
-    self.type = type;
-    self.isComplexType = /^(map|array|struct)/i.test(type);
 
     self.prefixFilter.subscribe(function (newValue) {
       self.fetchTerms();

@@ -116,51 +116,6 @@ from desktop.views import _ko
     }
   </style>
 
-  <script type="text/html" id="assist-panel-table-stats">
-    <div class="content">
-      <!-- ko if: statRows().length -->
-      <table class="table table-striped">
-        <tbody data-bind="foreach: statRows">
-          <tr><th data-bind="text: data_type"></th><td data-bind="text: comment"></td></tr>
-        </tbody>
-      </table>
-      <!-- /ko -->
-    </div>
-  </script>
-
-  <script type="text/html" id="assist-panel-column-stats">
-    <div class="pull-right filter" data-bind="visible: termsTabActive" style="display:none;">
-      <input type="text" data-bind="textInput: prefixFilter" placeholder="${ _('Prefix filter...') }"/>
-    </div>
-    <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 0">
-      <li data-bind="click: function() { termsTabActive(false) }" class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
-      <li data-bind="click: function() { termsTabActive(true) }"><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
-        <div class="alert" data-bind="visible: isComplexType" style="margin: 5px">${ _('Column stats are currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
-        <div class="content" data-bind="ifnot: isComplexType">
-          <table class="table table-striped">
-            <tbody data-bind="foreach: statRows">
-              <tr><th data-bind="text: Object.keys($data)[0]"></th><td data-bind="text: $data[Object.keys($data)[0]]"></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="tab-pane" id="columnAnalysisTerms" style="text-align: left">
-        <i style="margin: 5px;" data-bind="visible: loadingTerms" class='fa fa-spinner fa-spin'></i>
-        <div class="alert" data-bind="visible: ! loadingTerms() && terms().length == 0">${ _('There are no terms to be shown') }</div>
-        <div class="content">
-          <table class="table table-striped" data-bind="visible: ! loadingTerms()">
-            <tbody data-bind="foreach: terms">
-              <tr><td data-bind="text: name"></td><td style="width: 40px"><div class="progress"><div class="bar-label" data-bind="text: count"></div><div class="bar bar-info" style="margin-top: -20px;" data-bind="style: { 'width' : percent + '%' }"></div></div></td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </script>
-
   <script type="text/html" id="assist-no-entries">
     <ul class="assist-tables">
       <li data-bind="visible: definition.isDatabase">
@@ -175,7 +130,15 @@ from desktop.views import _ko
   <script type="text/html" id="assist-entry-actions">
     <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn } " style="opacity: 0">
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable || definition.isColumn, click: showStats, css: { 'blue': statsVisible }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+      <span data-bind="component: { name: 'table-stats', params: {
+          statsVisible: statsVisible,
+          snippet: assistSource.snippet,
+          databaseName: databaseName,
+          tableName: tableName,
+          columnName: columnName,
+          fieldType: definition.type,
+          assistHelper: assistSource.assistHelper
+        } }"></span>
     </div>
   </script>
 
@@ -294,30 +257,6 @@ from desktop.views import _ko
         <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
       </div>
     </div>
-
-    <div id="tableAnalysis" style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="visible: $parent.analysisStats() != null, with: $parent.analysisStats">
-      <div class="arrow"></div>
-      <h3 class="popover-title" style="text-align: left">
-        <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: function() { $parents[1].analysisStats(null) }"><i class="fa fa-times"></i></a>
-        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
-        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
-        <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
-        <!-- ko if: column == null -->
-        <strong class="table-name" data-bind="text: table"></strong> ${ _(' table analysis') }
-        <!-- /ko -->
-        <!-- ko ifnot: column == null -->
-        <strong class="table-name" data-bind="text: column"></strong> ${ _(' column analysis') }
-        <!-- /ko -->
-      </h3>
-      <div class="popover-content">
-        <div class="alert" style="text-align: left; display:none" data-bind="visible: hasError">${ _('There is no analysis available') }</div>
-        <!-- ko if: isComplexType && snippet.type() == 'impala' -->
-        <div class="alert" style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
-        <!-- /ko -->
-        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && snippet.type() == 'impala'), name: 'assist-panel-table-stats' } --><!-- /ko -->
-        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && snippet.type() == 'impala'), name: 'assist-panel-column-stats' } --><!-- /ko -->
-      </div>
-    </div>
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -332,10 +271,7 @@ from desktop.views import _ko
       function AssistPanel(params) {
         var self = this;
         var i18n = {
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
-          errorLoadingStats: "${ _('There was a problem loading the stats.') }",
-          errorRefreshingStats: "${ _('There was a problem refreshing the stats.') }",
-          errorLoadingTerms: "${ _('There was a problem loading the terms.') }"
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         };
         var notebookViewModel = params.notebookViewModel;
         var notebook = notebookViewModel.selectedNotebook();

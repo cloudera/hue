@@ -113,33 +113,6 @@
     });
 
     self.modalItem = ko.observable();
-    self.analysisStats = ko.observable();
-
-    var lastOffset = { top: -1, left: -1 };
-    self.refreshPosition = function () {
-      if (self.analysisStats() == null) {
-        return;
-      }
-      var $tableAnalysis = $("#tableAnalysis");
-      var targetElement = $tableAnalysis.data("targetElement");
-      if (targetElement != null && targetElement.is(":visible")) {
-        var newTop = targetElement.offset().top - $(window).scrollTop();
-        if (targetElement != null && (lastOffset.left != targetElement.offset().left || lastOffset.top != newTop)) {
-          lastOffset.left = targetElement.offset().left;
-          lastOffset.top = newTop;
-          var newCssTop = lastOffset.top - $tableAnalysis.outerHeight() / 2 + targetElement.outerHeight() / 2;
-          $tableAnalysis.css("top", newCssTop).css("left", lastOffset.left + targetElement.outerWidth());
-          if ((newCssTop + $tableAnalysis.outerHeight() / 2) < 70) {
-            $tableAnalysis.hide();
-          } else {
-            $tableAnalysis.show();
-          }
-        }
-      } else {
-        $tableAnalysis.hide();
-      }
-    };
-    window.setInterval(self.refreshPosition, 200);
 
     self.repositionActions = function(data, event) {
       if (data.definition.isDatabase) {
