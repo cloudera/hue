@@ -15,13 +15,16 @@
 ## limitations under the License.
 <%!
 from django.utils.html import escape
-
+from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="components" file="components.mako" />
+<%namespace name="assist" file="/assist.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
+<%namespace name="require" file="/require.mako" />
 
 <%
   if table.is_view:
@@ -33,8 +36,23 @@ from django.utils.translation import ugettext as _
 ${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
 ${ components.menubar() }
 
-<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
+${ require.config() }
 
+<link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<style type="text/css">
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+  .show-assist {
+    top: 110px!important;
+  }
+  .main-content {
+    top: 112px!important;
+  }
+% endif
+</style>
+
+<script src="${ static('notebook/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
 <%def name="column_table(cols, id, withStats=False, limit=10000)">
   <table id="${id}" class="table table-striped table-condensed sampleTable
@@ -107,14 +125,35 @@ ${ components.menubar() }
   </div>
 </%def>
 
+${ tableStats.tableStats() }
+${ assist.assistPanel() }
 
-<div class="container-fluid">
-  <div class="row-fluid">
-    <div class="span12">
-      <div class="card card-small">
-        <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
-        <div class="card-body">
-          <p>
+<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
+  <i class="fa fa-chevron-right"></i>
+</a>
+
+
+<div class="main-content">
+  <div class="vertical-full container-fluid">
+    <div class="vertical-full">
+      <div class="vertical-full row-fluid panel-container">
+
+
+        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+          <div class="assist" data-bind="component: {
+              name: 'assist-panel',
+              params: { notebookViewModel: $root }
+            }"></div>
+        </div>
+        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+        <div class="right-panel">
+
+          <div class="metastore-main">
+            <h1>${ components.breadcrumbs(breadcrumbs) }</h1>
+
             <div class="row-fluid">
               <div class="span6">
                 <i class="fa fa-th fa-4x"></i></a>
@@ -194,7 +233,7 @@ ${ components.menubar() }
                 <div class="sample-preview card card-home card-tab card-tab-bordertop card-listcontent">
                   <h3>${ _('Sample') }</h3>
                   % if sample:
-                    ${ sample_table(limit=3) }                  
+                    ${ sample_table(limit=3) }
                     ${_('View more...')}
                   % endif
                 </div>
@@ -202,10 +241,10 @@ ${ components.menubar() }
                 % if table.partition_keys:
                 <div class="partitions-preview card card-home card-tab card-tab-bordertop card-listcontent">
                   <h3>${ _('Partitions') }</h3>
-                    ${ column_table(table.partition_keys, "partitionTable", limit=3) }                  
+                    ${ column_table(table.partition_keys, "partitionTable", limit=3) }
                     ${_('View more...')}
                 </div>
-                % endif                
+                % endif
               </div>
 
               <div class="tab-pane" id="columns">
@@ -252,12 +291,16 @@ ${ components.menubar() }
                 </table>
               </div>
             </div>
-          </p>
+
+          </div>
+
+
         </div>
-      </div>
     </div>
   </div>
 </div>
+
+
 
 <div id="dropTable" class="modal hide fade">
   <form id="dropTableForm" method="POST" action="${ url('metastore:drop_table', database=database) }">
@@ -316,9 +359,64 @@ ${ components.menubar() }
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
+
   var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
 
+
+
+var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
+
+
+  require([
+    "knockout",
+    "ko.charts",
+    "notebook/js/notebook.ko",
+    "knockout-mapping",
+    "knockout-sortable",
+    "knockout-deferred-updates",
+    "ko.editable",
+    "ko.hue-bindings"
+  ], function (ko, charts, EditorViewModel) {
+
+    var snippetType = "hive";
+
+    var editorViewModelOptions = {
+      snippetViewSettings: {},
+      languages: [],
+      assistAvailable: true,
+      user: "hue"
+    };
+
+    editorViewModelOptions.snippetViewSettings[snippetType] = {
+      sqlDialect: true
+    };
+
+    editorViewModelOptions.languages.push({
+      type: snippetType,
+      name: snippetType
+    });
+
+    var i18n = {
+      errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
+    }
+
+    var editorViewModel = new EditorViewModel([], editorViewModelOptions, i18n);
+    var notebook = editorViewModel.newNotebook();
+    var snippet = notebook.newSnippet(snippetType);
+    var assistHelper = snippet.getAssistHelper();
+
+    $(document).ready(function () {
+      ko.applyBindings(editorViewModel);
+
+      window.hueDebug = {
+        viewModel: editorViewModel,
+        ko: ko
+      };
+    });
+  });
+
   $(document).ready(function () {
+
 
     function selectColumn(col) {
       var _t = $("#sampleTable");
@@ -370,27 +468,27 @@ ${ components.menubar() }
       for (var id in sortables) {
         $("#" + id).addClass("initialized");
         % if len(table.cols) < 1000:
-        $("#" + id).dataTable({
-          "aoColumns": sortables[id],
-          "bPaginate": false,
-          "bLengthChange": false,
-          "bInfo": false,
-          "bFilter": false,
-          "bAutoWidth": false,
-          "fnInitComplete": function () {
-            $(this).parent().jHueTableScroller();
-            if (! $(this).hasClass("skip-extender")) {
-              $(this).jHueTableExtender({
-                hintElement: "#jumpToColumnAlert",
-                fixedHeader: true
-              });
-            }
-          },
-          "oLanguage": {
-            "sEmptyTable": "${_('No data available')}",
-            "sZeroRecords": "${_('No matching records')}"
-          }
-        });
+##         $("#" + id).dataTable({
+##           "aoColumns": sortables[id],
+##           "bPaginate": false,
+##           "bLengthChange": false,
+##           "bInfo": false,
+##           "bFilter": false,
+##           "bAutoWidth": false,
+##           "fnInitComplete": function () {
+##             $(this).parent().jHueTableScroller();
+##             if (! $(this).hasClass("skip-extender")) {
+##               $(this).jHueTableExtender({
+##                 hintElement: "#jumpToColumnAlert",
+##                 fixedHeader: true
+##               });
+##             }
+##           },
+##           "oLanguage": {
+##             "sEmptyTable": "${_('No data available')}",
+##             "sZeroRecords": "${_('No matching records')}"
+##           }
+##         });
         % endif
       }
       if ($(e.target).attr("href") == "#columnAnalysisTerms") {

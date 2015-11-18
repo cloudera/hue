@@ -83,3 +83,12 @@ h2.card-heading {
   margin-left: 0;
   margin-right: 4px;
 }
+
+.left-panel {
+  background-color: #FFF;
+}
+
+.metastore-main {
+  background-color: #FFF;
+  padding: 20px;
+}
