@@ -38,6 +38,10 @@ ${ components.menubar() }
 
 ${ require.config() }
 
+${ tableStats.tableStats() }
+${ assist.assistPanel() }
+
+
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <style type="text/css">
@@ -140,7 +144,13 @@ ${ require.config() }
           </a>
           <div class="assist" data-bind="component: {
               name: 'assist-panel',
-              params: { notebookViewModel: $root }
+              params: {
+              sourceTypes: [{
+                  name: 'hive',
+                  type: 'hive'
+                }],
+                user: '${user.username}'
+              }
             }"></div>
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
@@ -195,7 +205,7 @@ ${ require.config() }
 
                 <div class="row-fluid margin-top-20">
                   <div class="span4 tile">
-                    <h3>${ _('Knowledge') }</h3>
+                    <h4>${ _('Knowledge') }</h4>
                     <div>
                       ${ _('Tags') } <i class="fa fa-tags"></i></a>
                     </div>
@@ -205,9 +215,12 @@ ${ require.config() }
                     <div>
                       ${ _('Description') } <i class="fa fa-file-text-o"></i></a>
                     </div>
+                    <div>
+                    ${ _('Comments') } <i class="fa fa-comments-o"></i></a>
+                    </div>
                   </div>
                   <div class="span4 tile">
-                    <h3>${ _('Stats') }</h3>
+                    <h4>${ _('Stats') }</h4>
                     ${ _('Owner')  } ${ table.details['properties'].get('owner') }
                     ${ _('Created')  } ${ table.details['properties'].get('create_time') }
                     <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
@@ -223,18 +236,15 @@ ${ require.config() }
                     totalSize ${ table.details['stats'].get('totalSize') }
                   </div>
                   <div class="span4 tile">
-                    <h3>${ _('Columns') }</h3>
+                    <h4>${ _('Columns') }</h4>
                     <i class="fa fa-star"></i></a>
                     ${ column_table(table.cols, "columnTable", True, 3) }
                     ${_('View more...')}
                   </div>
-                  <div>
-                    ${ _('Comments') } <i class="fa fa-comments-o"></i></a>
-                  </div>                  
                 </div>
 
                 <div class="tile">
-                  <h3>${ _('Sample') }</h3>
+                  <h4>${ _('Sample') }</h4>
                   % if sample:
                     ${ sample_table(limit=3) }
                     ${_('View more...')}
@@ -243,7 +253,7 @@ ${ require.config() }
 
                 % if table.partition_keys:
                 <div class="tile">
-                  <h3>${ _('Partitions') }</h3>
+                  <h4>${ _('Partitions') }</h4>
                     ${ column_table(table.partition_keys, "partitionTable", limit=3) }
                     ${_('View more...')}
                 </div>
@@ -364,56 +374,37 @@ ${ require.config() }
 
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
-${ tableStats.tableStats() }
-${ assist.assistPanel() }
-
 <script type="text/javascript" charset="utf-8">
 
-var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
+  var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
 
   require([
     "knockout",
     "ko.charts",
-    "notebook/js/notebook.ko",
     "knockout-mapping",
     "knockout-sortable",
     "knockout-deferred-updates",
     "ko.editable",
     "ko.hue-bindings"
-  ], function (ko, charts, EditorViewModel) {
+  ], function (ko, charts) {
 
-    var snippetType = "hive";
+    function MetastoreViewModel() {
+      var self = this;
+      self.assistAvailable = ko.observable(true);
+      self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-    var editorViewModelOptions = {
-      snippetViewSettings: {},
-      languages: [],
-      assistAvailable: true,
-      user: "hue"
-    };
-
-    editorViewModelOptions.snippetViewSettings[snippetType] = {
-      sqlDialect: true
-    };
-
-    editorViewModelOptions.languages.push({
-      type: snippetType,
-      name: snippetType
-    });
-
-    var i18n = {
-      errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
+      self.isLeftPanelVisible.subscribe(function(newValue) {
+        $.totalStorage('spark_left_panel_visible', newValue);
+      });
     }
 
-    var editorViewModel = new EditorViewModel([], editorViewModelOptions, i18n);
-    var notebook = editorViewModel.newNotebook();
-    var snippet = notebook.newSnippet(snippetType);
-    var assistHelper = snippet.getAssistHelper();
+    var viewModel = new MetastoreViewModel();
 
     $(document).ready(function () {
-      ko.applyBindings(editorViewModel);
+      ko.applyBindings(viewModel);
 
       window.hueDebug = {
-        viewModel: editorViewModel,
+        viewModel: viewModel,
         ko: ko
       };
     });
