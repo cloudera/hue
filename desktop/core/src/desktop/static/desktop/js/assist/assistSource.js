@@ -88,7 +88,7 @@
 
     var updateDbFromAssistHelper = function () {
       var assistDb = self.assistHelper.activeDatabase();
-      if (dbIndex[assistDb] && (! self.selectedDatabase() || self.selectedDatabase().name !== assistDb)) {
+      if (dbIndex[assistDb] && (! self.selectedDatabase() || self.selectedDatabase().definition.name !== assistDb)) {
         self.selectedDatabase(dbIndex[assistDb]);
       }
     };
@@ -103,12 +103,6 @@
         updateDbFromAssistHelper();
       }
     };
-
-    self.assistHelper.loaded.subscribe(function (newValue) {
-      if (newValue) {
-        initDatabases();
-      }
-    });
 
     initDatabases();
 
@@ -153,17 +147,26 @@
         $container.find(".assist-actions").css('right', -$container.scrollLeft() + 'px');
       }
     };
+
+    self.reload = function() {
+      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
+      self.reloading(true);
+      self.assistHelper.clearCache(self.snippet);
+      self.assistHelper.load(self.snippet, function() {
+        if (self.assistHelper.loaded()) {
+          updateDatabases(self.assistHelper.availableDatabases());
+          if (lastSelectedDb !== null) {
+            self.selectedDatabase(dbIndex[lastSelectedDb]);
+          } else {
+            self.selectedDatabase(null);
+          }
+        }
+
+        self.reloading(false);
+      });
+    };
   }
 
-  AssistSource.prototype.reloadAssist = function() {
-    var self = this;
-    self.reloading(true);
-    self.selectedDatabase(null);
-    self.assistHelper.clearCache(self.snippet);
-    self.assistHelper.load(self.snippet, function() {
-      self.reloading(false);
-    });
-  };
 
   return AssistSource;
 }));
