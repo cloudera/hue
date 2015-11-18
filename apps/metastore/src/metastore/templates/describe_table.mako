@@ -73,34 +73,35 @@ ${ components.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span3">
-      <div class="sidebar-nav card-small">
-        <ul class="nav nav-list">
-          <li class="nav-header">${_('Actions')}</li>
-          % if has_write_access:
-          <li><a href="#" id="import-data-btn"><i class="fa fa-arrow-circle-o-down"></i> ${_('Import Data')}</a></li>
-          % endif
-          <li><a href="${ url('metastore:read_table', database=database, table=table.name) }"><i class="fa fa-list"></i> ${_('Browse Data')}</a></li>
-          % if has_write_access:
-          <li><a href="#dropTable" data-toggle="modal"><i class="fa fa-trash-o"></i> ${_('Drop')} ${view_or_table_noun}</a></li>
-          % endif
-          <li><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('View File Location')}</a></li>
-          % if table.partition_keys:
-          <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }"><i class="fa fa-sitemap"></i> ${_('Show Partitions')} (${ len(partitions) })</a></li>
-          % endif
-        </ul>
-      </div>
-    </div>
-    <div class="span9">
+    <div class="span12">
       <div class="card card-small">
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
         <div class="card-body">
           <p>
-            % if table.comment:
-            <div class="alert alert-info">${ _('Comment:') } ${ smart_unicode(table.comment) }</div>
-            % endif
+            <div class="row-fluid">
+              <div class="span6">
+                <i class="fa fa-th fa-4x"></i></a>
+                ${ table.name }
+                </br>
+                <div class="alert alert-info">${ smart_unicode(table.comment) if table.comment else _('No description')}</div>
+                <i class="fa fa-pencil"></i></a>
+                <i class="fa fa-star"></i></a>
+              </div>
+              <div class="span6">
+                <a href="#" id="import-data-btn"><i class="fa fa-arrow-circle-o-down"></i> ${_('Import Data')}</a>
+                <a href="${ url('metastore:read_table', database=database, table=table.name) }"><i class="fa fa-list"></i> ${_('Browse Data')}</a>
+                % if has_write_access:
+                  <a href="#dropTable" data-toggle="modal"><i class="fa fa-trash-o"></i> ${_('Drop')} ${view_or_table_noun}</a>
+                % endif
+                <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('View File Location')}</a>
+                % if table.partition_keys:
+                  <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }"><i class="fa fa-sitemap"></i> ${_('Show Partitions')} (${ len(partitions) })</a>
+                % endif
+              </div>
+            </div>
 
             <ul class="nav nav-tabs">
+              <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
               % if table.partition_keys:
               <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
@@ -108,10 +109,50 @@ ${ components.menubar() }
               % if sample is not None:
               <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               % endif
+              <li><a href="#columns" data-toggle="tab">${_('Analyse')}</a></li>
+              <li><a href="#columns" data-toggle="tab">${_('Lineage')}</a></li>
               <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
             </ul>
 
             <div class="tab-content">
+              <div class="tab-pane" id="overview">
+                <div class="meta card card-home card-tab card-tab-bordertop card-listcontent">
+                  <div>
+                    ${ _('Tags') } <i class="fa fa-tags"></i></a>
+                  </div>
+                  <div>
+                    ${ _('Users') } <i class="fa fa-users"></i></a>
+                  </div>
+                  <div>
+                    ${ _('Description') } <i class="fa fa-file-text-o"></i></a>
+                  </div>
+                </div>
+                
+                <div class="stats card card-home card-tab card-tab-bordertop card-listcontent">
+                  ${ _('Owner')  }
+                  ${ _('Created')  }
+                  <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
+                  ${ _('Format')  } Parquet compressed
+                  
+                  <i class="fa fa-bar-chart"></i></a>
+                  
+                  numFiles, numRows, totalSize, isAccurate
+                </div>
+                
+                <div class="sql card card-home card-tab card-tab-bordertop card-listcontent">
+                  ${ 'CREATE ...' }
+                </div>
+                
+                <div class="columns-preview card card-home card-tab card-tab-bordertop card-listcontent">
+                  Col
+                  <i class="fa fa-star"></i></a>
+                </div>
+                
+                <div class="sample-preview card card-home card-tab card-tab-bordertop card-listcontent">
+                  Sample
+                </div>
+              </div>
+
               <div class="tab-pane" id="columns">
                 ${ column_table(table.cols, "columnTable", True) }
               </div>
