@@ -19,6 +19,7 @@ import json
 import logging
 import urllib
 
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 from django.utils.functional import wraps
@@ -28,6 +29,7 @@ from django.views.decorators.http import require_http_methods
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import Document, Document2
 
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
@@ -42,6 +44,7 @@ from metastore.settings import DJANGO_APPS
 LOG = logging.getLogger(__name__)
 
 SAVE_RESULTS_CTAS_TIMEOUT = 300         # seconds
+
 
 def check_has_write_access_permission(view_func):
   """
@@ -110,6 +113,22 @@ def get_database_metadata(request, database):
   except Exception, ex:
     response['status'] = 1
     response['data'] = _("Cannot get metadata for database: %s") % (database,)
+
+  return JsonResponse(response)
+
+
+def table_queries(request, database, table):
+  qfilter = Q(data__icontains=table) | Q(data__icontains='%s.%s' % (database, table))
+
+  response = {'status': -1, 'queries': []}
+  try:
+    queries = [d.to_dict()
+              for d in Document2.objects.filter(qfilter, owner=request.user, type='query', is_history=False)[:50]]
+    response['status'] = 0
+    response['queries'] = queries
+  except Exception, ex:
+    response['status'] = 1
+    response['data'] = _("Cannot get queries related to table %s.%s: %s") % (database, table, ex)
 
   return JsonResponse(response)
 

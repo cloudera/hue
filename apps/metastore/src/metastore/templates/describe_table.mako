@@ -134,7 +134,6 @@ ${ require.config() }
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
 
-
         <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
           <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
             <i class="fa fa-chevron-left"></i>
@@ -187,6 +186,7 @@ ${ require.config() }
                 <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               % endif
               <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
+              <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
               <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
               <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
               <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
@@ -230,6 +230,9 @@ ${ require.config() }
                     ${ column_table(table.cols, "columnTable", True, 3) }
                     ${_('View more...')}
                   </div>
+                  <div>
+                    ${ _('Comments') } <i class="fa fa-comments-o"></i></a>
+                  </div>                  
                 </div>
 
                 <div class="tile">
@@ -272,6 +275,10 @@ ${ require.config() }
               </div>
               % endif
 
+              <div class="tab-pane" id="queries">
+                <pre id="queriesTable"></pre>
+              </div>
+
               <div class="tab-pane" id="properties">
                 <table class="table table-striped table-condensed">
                   <thead>
@@ -295,7 +302,6 @@ ${ require.config() }
             </div>
 
           </div>
-
 
         </div>
     </div>
@@ -416,8 +422,6 @@ var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
   });
 
   $(document).ready(function () {
-
-
     function selectColumn(col) {
       var _t = $("#sampleTable");
       var _col = _t.find("th").filter(function() {
@@ -446,6 +450,12 @@ var STATS_PROBLEMS = "${ _('There was a problem loading the stats.') }";
           $("#dropTableMessage").text(data.title);
         });
     % endif
+
+    
+    // Lazy loading?
+    $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
+      $("#queriesTable").text(data.queries);
+    });
 
     $('a[data-toggle="tab"]').on('shown', function (e) {
       var sortables = [];
