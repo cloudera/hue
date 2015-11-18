@@ -173,6 +173,13 @@
     };
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
+
+    huePubSub.subscribe("assist.database.selected", function (database) {
+      if (database.sourceType === self.type() && self.database() !== database.name) {
+        self.database(database.name);
+      }
+    });
+
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
@@ -1006,6 +1013,19 @@
 
       download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
     }
+
+    huePubSub.subscribe("assist.request.status", function () {
+      if (self.type() == 'query' && self.snippets().length == 1) {
+        huePubSub.publish('assist.select.database', {
+          sourceType: self.snippets()[0].type(),
+          name: self.snippets()[0].database()
+        });
+      }
+      huePubSub.publish('assist.select.database', {
+        sourceType: null,
+        name: null
+      });
+    });
   };
 
 

@@ -297,8 +297,26 @@ from desktop.views import _ko
           self.sources.push(sourceIndex[sourceType.type]);
         });
 
-        var storageSourceType =  $.totalStorage("hue.assist.lastSelectedSource." + params.user);
         self.selectedSource = ko.observable(null);
+
+        huePubSub.subscribe("assist.select.database", function (database) {
+          if (! database.sourceType || ! sourceIndex[database.sourceType]) {
+            return;
+          }
+          self.selectedSource(sourceIndex[database.sourceType]);
+          if (self.selectedSource().loaded()) {
+            self.selectedSource().setDatabase(database.name);
+          } else {
+            var subscription = self.selectedSource().loaded.subscribe(function (newValue) {
+              if (newValue) {
+                self.selectedSource().setDatabase(database.name);
+                subscription.dispose();
+              }
+            });
+          }
+        });
+
+        huePubSub.publish("assist.request.status");
 
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
@@ -309,10 +327,14 @@ from desktop.views import _ko
           }
         });
 
-        if (params.activeSourceType) {
-          self.selectedSource(sourceIndex[params.activeSourceType]);
-        } else if (storageSourceType && sourceIndex[storageSourceType]) {
-          self.selectedSource(sourceIndex[storageSourceType]);
+        var storageSourceType =  $.totalStorage("hue.assist.lastSelectedSource." + params.user);
+
+        if (! self.selectedSource()) {
+          if (params.activeSourceType) {
+            self.selectedSource(sourceIndex[params.activeSourceType]);
+          } else if (storageSourceType && sourceIndex[storageSourceType]) {
+            self.selectedSource(sourceIndex[storageSourceType]);
+          }
         }
 
         self.breadcrumb = ko.computed(function () {

@@ -63,11 +63,22 @@
     });
 
     self.selectedDatabase.subscribe(function (newValue) {
-      if (newValue != null && !newValue.hasEntries() && !newValue.loading()) {
-        newValue.loadEntries()
+      if (newValue) {
+        if (self.selectedDatabase() && self.selectedDatabase().definition.name === newValue) {
+          return;
+        }
+        if (!newValue.hasEntries() && !newValue.loading()) {
+          newValue.loadEntries()
+        }
+        $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix(), newValue.definition.name);
+        huePubSub.publish("assist.database.selected", {
+          sourceType: self.type,
+          name: newValue.definition.name
+        })
       }
     });
 
+    self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
     var dbIndex = {};
     var updateDatabases = function (names) {
@@ -88,6 +99,20 @@
       }));
       self.reloading(false);
       self.loading(false);
+      self.loaded(true);
+    };
+
+    self.setDatabase = function (databaseName) {
+      if (databaseName && dbIndex[databaseName]) {
+        self.selectedDatabase(dbIndex[databaseName]);
+        return;
+      }
+      var lastSelectedDb = $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix());
+      if (lastSelectedDb && dbIndex[lastSelectedDb]) {
+        self.selectedDatabase(dbIndex[lastSelectedDb]);
+      } else if (dbIndex["default"]) {
+        self.selectedDatabase(dbIndex["default"]);
+      }
     };
 
     self.initDatabases = function () {
