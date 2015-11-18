@@ -16,11 +16,11 @@
 
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
-    define(['knockout', 'desktop/js/assist/tableStats'], factory);
+    define(['knockout'], factory);
   } else {
-    root.AssistEntry = factory(ko, TableStats);
+    root.AssistEntry = factory(ko);
   }
-}(this, function (ko, TableStats) {
+}(this, function (ko) {
 
   function AssistEntry (definition, parent, assistSource, filter, i18n) {
     var self = this;
@@ -61,6 +61,17 @@
       });
       return result;
     });
+
+    self.tableName = null;
+    self.columnName = null;
+    self.databaseName = self.getHierarchy()[0];
+    if (self.definition.isTable) {
+      self.tableName = self.definition.name;
+      self.columnName = null;
+    } else if (self.definition.isColumn) {
+      self.tableName = parent.definition.name;
+      self.columnName = self.definition.name;
+    }
 
     self.editorText = ko.computed(function () {
       if (self.definition.isTable) {
@@ -241,32 +252,6 @@
     });
 
     $assistQuickLook.modal("show");
-  };
-
-  AssistEntry.prototype.showStats = function (data, event) {
-    var self = this;
-
-    if (self.statsVisible()) {
-      self.statsVisible(false);
-      self.assistSource.analysisStats(null);
-      return;
-    }
-
-    var hierarchy = self.getHierarchy();
-    var databaseName = hierarchy[0];
-    var tableName = hierarchy[1];
-    var columnName = hierarchy.length == 3 ? hierarchy[2] : null;
-
-    self.statsVisible(true);
-    self.assistSource.analysisStats(new TableStats(self.assistSource, databaseName, tableName, columnName, self.definition.type));
-
-    var catchChange = self.assistSource.analysisStats.subscribe(function(newValue) {
-      if (newValue === null || newValue.database !== databaseName || newValue.table !== tableName || newValue.column !== columnName) {
-        self.statsVisible(false);
-        catchChange.dispose();
-      }
-    });
-    $("#tableAnalysis").data("targetElement", $(event.target));
   };
 
   return AssistEntry;

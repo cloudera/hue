@@ -20,6 +20,7 @@
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
+<%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 
@@ -38,7 +39,7 @@ ${ editorComponents.includes() }
 ${ editorComponents.topBar('editor', editor_type) }
 ${ editorComponents.commonHTML() }
 
-
+${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ koComponents.csvListInput() }
 ${ koComponents.jvmMemoryInput() }
