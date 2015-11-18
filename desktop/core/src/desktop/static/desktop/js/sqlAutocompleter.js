@@ -35,7 +35,7 @@
     self.snippet = options.snippet;
     self.hdfsAutocompleter = options.hdfsAutocompleter;
 
-
+    // Speed up by caching the databases
     var initDatabases = function () {
       self.snippet.getAssistHelper().loadDatabases({
         sourceType: self.snippet.type(),
@@ -200,7 +200,7 @@
     return result;
   };
 
-  SqlAutocompleter.prototype.getValueReferences = function (conditionMatch, database, fromReferences, tableAndComplexRefs, callback) {
+  SqlAutocompleter.prototype.getValueReferences = function (conditionMatch, database, fromReferences, tableAndComplexRefs, callback, editor) {
     var self = this;
 
     var fields = conditionMatch[1].split(".");
@@ -228,24 +228,34 @@
         if (remainingParts.length > 0 && remainingParts[0] == "value" || remainingParts[0] == "key") {
           fetchImpalaFields(remainingParts);
         } else {
-          self.snippet.getAssistHelper().fetchFields(self.snippet, database, tableName, completeFields, function (data) {
-            if (data.type === "map") {
-              completeFields.push("value");
-              fetchImpalaFields(remainingParts);
-            } else if (data.type === "array") {
-              completeFields.push("item");
-              fetchImpalaFields(remainingParts);
-            } else if (remainingParts.length == 0 && data.sample) {
-              var isString = data.type === "string";
-              var values = $.map(data.sample.sort(), function(value, index) {
-                return {
-                  meta: "value",
-                  score: 900 - index,
-                  value: isString ? "'" + value + "'" : new String(value)
-                }
-              });
-              callback(tableAndComplexRefs.concat(values));
-            } else {
+          self.snippet.getAssistHelper().fetchFields({
+            sourceType: self.snippet.type(),
+            databaseName: database,
+            tableName: tableName,
+            fields: completeFields,
+            editor: editor,
+            successCallback: function (data) {
+              if (data.type === "map") {
+                completeFields.push("value");
+                fetchImpalaFields(remainingParts);
+              } else if (data.type === "array") {
+                completeFields.push("item");
+                fetchImpalaFields(remainingParts);
+              } else if (remainingParts.length == 0 && data.sample) {
+                var isString = data.type === "string";
+                var values = $.map(data.sample.sort(), function(value, index) {
+                  return {
+                    meta: "value",
+                    score: 900 - index,
+                    value: isString ? "'" + value + "'" : new String(value)
+                  }
+                });
+                callback(tableAndComplexRefs.concat(values));
+              } else {
+                callback(tableAndComplexRefs);
+              }
+            },
+            errorCallback: function () {
               callback(tableAndComplexRefs);
             }
           });
@@ -288,7 +298,7 @@
       if (! excludeDatabases) {
         // No FROM prefix
         prependedFields = prependedFields.concat(fields);
-        fields = $.map(self.snippet.getAssistHelper().availableDatabases(), function(database) {
+        fields = $.map(self.snippet.getAssistHelper().lastKnownDatabases, function(database) {
           return {
             name: database + ".",
             type: "database"
@@ -328,11 +338,6 @@
     var hiveSyntax = self.snippet.type() === "hive";
     var impalaSyntax = self.snippet.type() === "impala";
 
-    if (! self.snippet.database()) {
-      onFailure();
-      return;
-    }
-
     var beforeCursorU = allStatements.pop().toUpperCase();
     var afterCursorU = upToNextStatement.toUpperCase();
 
@@ -352,13 +357,18 @@
         break;
       }
     }
+    if (! database) {
+      onFailure();
+      return;
+    }
+
 
     var keywordBeforeCursor = beforeMatcher[beforeMatcher.length - 1];
 
     var impalaFieldRef = impalaSyntax && beforeCursor.slice(-1) === '.';
 
     if (keywordBeforeCursor === "USE") {
-      var databases = self.snippet.getAssistHelper().availableDatabases();
+      var databases = self.snippet.getAssistHelper().lastKnownDatabases;
       databases.sort();
       callback($.map(databases, function(db, idx) {
         return {
@@ -420,24 +430,30 @@
         database = dbRefMatch[1];
       }
 
-      self.snippet.getAssistHelper().fetchTables(self.snippet, database, function (data) {
-        var fromKeyword = "";
-        if (selectBefore) {
-          if (beforeCursor.indexOf("SELECT") > -1) {
-            fromKeyword = "FROM";
-          } else {
-            fromKeyword = "from";
+      self.snippet.getAssistHelper().fetchTables({
+        sourceType: self.snippet.type(),
+        databaseName: database,
+        successCallback: function (data) {
+          var fromKeyword = "";
+          if (selectBefore) {
+            if (beforeCursor.indexOf("SELECT") > -1) {
+              fromKeyword = "FROM";
+            } else {
+              fromKeyword = "from";
+            }
+            if (beforeCursor.match(/select\s*$/i)) {
+              fromKeyword = "? " + fromKeyword;
+            }
+            if (!beforeCursor.match(/(\s+|f|fr|fro|from)$/)) {
+              fromKeyword = " " + fromKeyword;
+            }
+            fromKeyword += " ";
           }
-          if (beforeCursor.match(/select\s*$/i)) {
-            fromKeyword = "? " + fromKeyword;
-          }
-          if (!beforeCursor.match(/(\s+|f|fr|fro|from)$/)) {
-            fromKeyword = " " + fromKeyword;
-          }
-          fromKeyword += " ";
-        }
-        callback(self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null));
-      }, onFailure, editor);
+          callback(self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null));
+        },
+        errorCallback: onFailure,
+        editor: editor
+      });
       return;
     } else if ((selectBefore && fromAfter) || fieldTermBefore || impalaFieldRef) {
       var partialTermsMatch = beforeCursor.match(/([^\s\(\-\+\<\>\,]*)$/);
@@ -494,7 +510,7 @@
         });
 
         if (conditionMatch && impalaSyntax) {
-          self.getValueReferences(conditionMatch, database, fromReferences, tableRefs.concat(complexRefs), callback);
+          self.getValueReferences(conditionMatch, database, fromReferences, tableRefs.concat(complexRefs), callback, editor);
         } else {
           callback(tableRefs.concat(complexRefs));
         }
@@ -532,13 +548,21 @@
 
       var getFields = function (database, remainingParts, fields) {
         if (remainingParts.length == 0) {
-          self.snippet.getAssistHelper().fetchFields(self.snippet, database, tableName, fields, function(data) {
-            if (fields.length == 0) {
-              callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
-            } else {
-              callback(self.extractFields(data, "", !fieldTermBefore));
-            }
-          }, onFailure, editor);
+          self.snippet.getAssistHelper().fetchFields({
+            sourceType: self.snippet.type(),
+            databaseName: database,
+            tableName: tableName,
+            fields: fields,
+            editor: editor,
+            successCallback: function (data) {
+              if (fields.length == 0) {
+                callback(self.extractFields(data, "", !fieldTermBefore && !impalaFieldRef, viewReferences.allViewReferences));
+              } else {
+                callback(self.extractFields(data, "", !fieldTermBefore));
+              }
+            },
+            errorCallback: onFailure
+          });
           return; // break recursion
         }
         var part = remainingParts.shift();
@@ -567,17 +591,25 @@
             var mapOrArrayMatch = part.match(/([^\[]*)\[[^\]]*\]$/i);
             if (mapOrArrayMatch !== null) {
               fields.push(mapOrArrayMatch[1]);
-              self.snippet.getAssistHelper().fetchFields(self.snippet, database, tableName, fields, function(data) {
-                if (data.type === "map") {
-                  fields.push("value");
-                  getFields(database, remainingParts, fields);
-                } else if (data.type === "array") {
-                  fields.push("item");
-                  getFields(database, remainingParts, fields);
-                } else {
-                  onFailure();
-                }
-              }, onFailure, editor);
+              self.snippet.getAssistHelper().fetchFields({
+                sourceType: self.snippet.type(),
+                databaseName: database,
+                tableName: tableName,
+                fields: fields,
+                editor: editor,
+                successCallback: function(data) {
+                  if (data.type === "map") {
+                    fields.push("value");
+                    getFields(database, remainingParts, fields);
+                  } else if (data.type === "array") {
+                    fields.push("item");
+                    getFields(database, remainingParts, fields);
+                  } else {
+                    onFailure();
+                  }
+                },
+                errorCallback: onFailure
+              });
               return; // break recursion, it'll be async above
             }
           } else if (impalaSyntax) {

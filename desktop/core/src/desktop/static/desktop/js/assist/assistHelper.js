@@ -196,10 +196,11 @@
    * @param {string} options.databaseName
    * @param {function} options.successCallback
    * @param {function} options.errorCallback
+   * @param {Object} [options.editor] - Ace editor
    */
   AssistHelper.prototype.fetchTables = function (options) {
     var self = this;
-    self.fetchAssistData(options.sourceType, API_PREFIX + options.databaseName, options.successCallback, options.errorCallback);
+    self.fetchAssistData(options.sourceType, API_PREFIX + options.databaseName, options.successCallback, options.errorCallback, options.editor);
   };
 
   /**
@@ -214,7 +215,7 @@
    */
   AssistHelper.prototype.fetchFields = function (options) {
     var self = this;
-    var fieldPart = fields.length > 0 ? "/" + fields.join("/") : "";
+    var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
     self.fetchAssistData(options.sourceType, API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart, options.successCallback, options.errorCallback, options.editor);
   };
 
