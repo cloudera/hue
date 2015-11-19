@@ -28,6 +28,7 @@
   /**
    * @param {Object} i18n
    * @param {string} i18n.errorLoadingDatabases
+   * @param {string} i18n.errorLoadingTablePreview
    * @param {string} user
    *
    * @constructor
