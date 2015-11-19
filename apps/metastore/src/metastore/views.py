@@ -242,6 +242,8 @@ def describe_table(request, database, table):
   renderable = "describe_table.mako"
   if request.REQUEST.get("sample", "false") == "true":
     renderable = "sample.mako"
+    if request.REQUEST.get("format", "html") == "json":
+      return JsonResponse({'status': 0, 'headers': table_data and table_data.cols(), 'rows': table_data and list(table_data.rows())})
 
   return render(renderable, request, {
     'breadcrumbs': [{
