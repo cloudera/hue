@@ -122,6 +122,29 @@
    * @param {string} options.sourceType
    * @param {string} options.databaseName
    * @param {string} options.tableName
+   * @param {function} options.successCallback
+   * @param {function} options.errorCallback
+   */
+  AssistHelper.prototype.fetchTableDetails = function (options) {
+    $.ajax({
+      url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName,
+      data: {
+        "format" : 'json'
+      },
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-Requested-With", "Hue");
+      },
+      success: options.successCallback,
+      error: options.errorCallback
+    });
+  };
+
+
+  /**
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {string} options.databaseName
+   * @param {string} options.tableName
    * @param {string} options.dataType - html or json
    * @param {function} options.successCallback
    * @param {function} options.errorCallback
