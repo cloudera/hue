@@ -310,6 +310,9 @@ from desktop.views import _ko
                 subscription.dispose();
               }
             });
+            if (! self.selectedSource().loaded() && ! self.selectedSource().loading()) {
+              self.selectedSource().initDatabases();
+            }
           }
         };
 

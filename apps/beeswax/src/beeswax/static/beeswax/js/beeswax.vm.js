@@ -72,7 +72,21 @@ function BeeswaxViewModel(server, assistHelper) {
     'isRedacted': false
   };
 
-  self.database = assistHelper.activeDatabase;
+  self.database = ko.observable(null);
+
+  var type = server === "beeswax" ? "hive" : "impala";
+  huePubSub.subscribe("assist.request.status", function () {
+    huePubSub.publish('assist.select.database', {
+      sourceType: type,
+      name: self.database()
+    });
+  });
+
+  huePubSub.subscribe("assist.database.selected", function (database) {
+    if (database.sourceType === type && self.database() !== database.name) {
+      self.database(database.name);
+    }
+  });
 
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
