@@ -86,7 +86,10 @@ ${ assist.assistPanel() }
             <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
           </td>
           <td>${ column.type }</td>
-          <td>${ column.comment != 'None' and smart_unicode(column.comment) or "" }</td>
+          <td>
+            ${ column.comment != 'None' and smart_unicode(column.comment) or "" }
+            <a class="pointer"><i class="fa fa-pencil" data-bind="click: function() { updateColumnComment('${ column.name }', 'new comment') }"></i></a>
+          </td>
         </tr>
       % endfor
     </tbody>
@@ -159,7 +162,6 @@ ${ assist.assistPanel() }
           <div class="metastore-main">
             <h3>
               <ul class="nav nav-pills pull-right" style="margin-top: -8px">
-                <li><a class="pointer"><i class="fa fa-pencil"></i></a></li>
                 <li><a class="pointer"><i class="fa fa-star"></i></a></li>
                 <li><a href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a></li>
                 <li><a href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a></li>
@@ -177,7 +179,7 @@ ${ assist.assistPanel() }
 
             <div class="like-pre">
               %if table.comment:
-                ${ smart_unicode(table.comment) }
+                ${ smart_unicode(table.comment) } <a class="pointer"><i class="fa fa-pencil"></i></a>
               %else:
                 ${ _('This table has no description.') } <a href="#">${ _('Add one here...') }</a>
               %endif
@@ -208,9 +210,9 @@ ${ assist.assistPanel() }
                     <h4>${ _('Stats') }</h4>
                     ${ _('Owner')  } ${ table.details['properties'].get('owner') }
                     ${ _('Created')  } ${ table.details['properties'].get('create_time') }
-                    
+
                     <br/>
-                    
+
                     <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
                     ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
 
@@ -414,6 +416,15 @@ ${ assist.assistPanel() }
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
       });
+
+      self.updateColumnComment = function(column, comment) {
+        $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
+            column: column,
+            comment: comment
+          }, function (data) {
+            alert('changed!');
+        });
+      }
     }
 
     var viewModel = new MetastoreViewModel();
@@ -453,12 +464,11 @@ ${ assist.assistPanel() }
     }
 
     % if has_write_access:
-        $.getJSON("${ url('metastore:drop_table', database=database) }", function (data) {
-          $("#dropTableMessage").text(data.title);
-        });
+      $.getJSON("${ url('metastore:drop_table', database=database) }", function (data) {
+        $("#dropTableMessage").text(data.title);
+      });
     % endif
 
-    
     // Lazy loading?
     $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
       $("#queriesTable").text(data.queries);
