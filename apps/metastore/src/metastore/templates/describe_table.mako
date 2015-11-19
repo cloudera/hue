@@ -55,7 +55,6 @@ ${ assist.assistPanel() }
 % endif
 </style>
 
-<script src="${ static('notebook/js/assist.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
 <%def name="column_table(cols, id, withStats=False, limit=10000)">
