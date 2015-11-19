@@ -434,7 +434,7 @@ from django.utils.translation import ugettext as _
        % endif
        % if 'spark' in apps:
          <% from desktop.models import Document2, Document %>
-         <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook')] %>
+         <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
            <li>
              <a title="${_('Notebook')}" rel="navigator-tooltip" href="${ url('notebook:new') }">${_('Notebooks')}</a>
