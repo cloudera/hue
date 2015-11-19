@@ -269,7 +269,7 @@ ${ assist.assistPanel() }
                       </div>
 
                       <div class="span6">
-                        <div><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('File Location')}</a></div>
+                        <div><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
                         <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> ${ table.details['stats'].get('numFiles') }</div>
                         <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> ${ table.details['stats'].get('numRows') }</div>
                         <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> ${ table.details['properties'].get('totalSize') }</div>
@@ -293,18 +293,18 @@ ${ assist.assistPanel() }
 
                 <div class="tile">
                   <h4>${ _('Columns') }</h4>
-                  <i class="fa fa-star"></i></a>
                   <!-- ko with: favouriteColumns -->
                   <!-- ko template: "columns-table" --><!-- /ko -->
                   <!-- /ko -->
-                  ${_('View more...')}
+
+                  <a class="pointer" data-bind="click: function() { $('li a[href=\'#columns\']').click(); }">${_('View more...')}</a>
                 </div>
 
                 <div class="tile">
                   <h4>${ _('Sample') }</h4>
                   % if sample:
                     ${ sample_table(limit=3) }
-                    ${_('View more...')}
+                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
                   % endif
                 </div>
 
@@ -312,7 +312,7 @@ ${ assist.assistPanel() }
                 <div class="tile">
                   <h4>${ _('Partitions') }</h4>
                     ${ column_table(table.partition_keys, "partitionTable", limit=3) }
-                    ${_('View more...')}
+                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
                 </div>
                 % endif
               </div>
