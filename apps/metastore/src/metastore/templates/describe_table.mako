@@ -235,7 +235,7 @@ ${ assist.assistPanel() }
 
             <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
-              <li><a href="#columns" data-toggle="tab">${_('Columns')}</a></li>
+              <li><a href="#columns" data-toggle="tab">${_('Columns')} <span class="badge" data-bind="text: columns().length" style="padding: 0 9px;"></span></a></li>
               % if table.partition_keys:
                 <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
               % endif
@@ -249,10 +249,10 @@ ${ assist.assistPanel() }
               <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
             </ul>
 
-            <div class="tab-content" style="border: none">
+            <div class="tab-content margin-top-10" style="border: none">
               <div class="tab-pane" id="overview">
 
-                <div class="row-fluid margin-top-20">
+                <div class="row-fluid margin-top-10">
                   <div class="span6 tile">
                     <h4>${ _('Stats') }
                       % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
@@ -291,7 +291,7 @@ ${ assist.assistPanel() }
                 </div>
 
                 <div class="tile">
-                  <h4>${ _('Columns') }</h4>
+                  <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>)</h4>
                   <!-- ko with: favouriteColumns -->
                   <!-- ko template: "columns-table" --><!-- /ko -->
                   <!-- /ko -->
