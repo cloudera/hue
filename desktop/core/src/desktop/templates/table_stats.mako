@@ -94,7 +94,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="table-stats-link">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: enabled, click: toggleStats, css: { 'blue': analysisStats }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: enabled, click: toggleStats, css: { 'blue': analysisStats() || alwaysActive }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
     <!-- ko template: { if: analysisStats, name: 'stats-popover'} --><!-- /ko -->
   </script>
 
@@ -118,6 +118,7 @@ from desktop.views import _ko
         };
 
         self.enabled = params.tableName || params.columnName;
+        self.alwaysActive = params.alwaysActive || false;
         self.analysisStats = ko.observable(null);
 
         if (ko.isObservable(self.params.statsVisible)) {

@@ -77,7 +77,8 @@ ${ assist.assistPanel() }
         <td data-bind="text: $index()"></td>
         ## no stats for partition key type
         <td>
-         <span data-bind="component: { name: 'table-stats', params: {
+         <span class="blue" data-bind="component: { name: 'table-stats', params: {
+            alwaysActive: true,
             statsVisible: true,
             sourceType: 'hive',
             databaseName: $root.activeDatabase(),
