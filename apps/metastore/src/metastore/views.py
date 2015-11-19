@@ -234,7 +234,7 @@ def describe_table(request, database, table):
   if app_name != 'impala' and table.partition_keys:
     partitions = db.get_partitions(database, table, partition_spec=None, max_parts=None)
 
-  if request.REQUEST.get("format", "html") == "json":
+  if request.REQUEST.get("format", "html") == "json" and request.REQUEST.get("sample", "false") == "false":
     return JsonResponse({
         'status': 0,
         'partition_keys': [{'name': part.name, 'type': part.type} for part in table.partition_keys],
