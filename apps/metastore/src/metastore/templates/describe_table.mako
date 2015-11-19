@@ -58,7 +58,7 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/html" id="columns-table">
+<script type="text/html" id="metastore-columns-table">
   <table class="table table-striped table-condensed sampleTable">
     <thead>
     <tr>
@@ -138,7 +138,7 @@ ${ assist.assistPanel() }
   </table>
 </%def>
 
-<script type="text/html" id="sample-table">
+<script type="text/html" id="metastore-samples-table">
   <div style="overflow: auto">
     <table id="sampleTable" class="table table-striped table-condensed sampleTable">
       <tr>
@@ -167,6 +167,34 @@ ${ assist.assistPanel() }
       <li>${ _('If the sample contains a large number of columns, click a row to select a column to jump to') }</li>
     </ul>
   </div>
+</script>
+
+<script type="text/html" id="metastore-table-stats">
+  <!-- ko with: tableDetails -->
+  <h4>${ _('Stats') }
+  </h4>
+  <div class="row-fluid">
+    <div class="span6">
+      <div title="${ _('Owner') }">
+        <a data-bind="{attr: { 'href': '/useradmin/users/view/' + details.properties.owner } }">
+          <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
+        </a>
+      </div>
+      <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: details.properties.create_time"></span></div>
+      <div title="${ _('Format') }"><i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span></div>
+      <div title="${ _('Compressed?') }"><i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span><span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span></div>
+    </div>
+
+    <div class="span6">
+      <div><a data-bind="attr: {'href': hdfs_link, 'rel': path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
+      <!-- ko with: $root.tableStats -->
+      <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
+      <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
+      <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
+      <!-- /ko -->
+    </div>
+  </div>
+  <!-- /ko -->
 </script>
 
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
@@ -242,35 +270,7 @@ ${ assist.assistPanel() }
 
                 <div class="row-fluid margin-top-10">
                   <div class="span6 tile">
-                    <h4>${ _('Stats') }
-                      % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
-                      <a class="pointer"><i class="fa fa-refresh"></i></a>
-                      % endif
-                    </h4>
-                    <div class="row-fluid">
-                      <div class="span6">
-                        <div title="${ _('Owner') }">
-                          <a href="/useradmin/view_user/${ table.details['properties'].get('owner') }">
-                            <i class="fa fa-fw fa-user muted"></i> ${ table.details['properties'].get('owner') }
-                          </a>
-                        </div>
-                        <div><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
-                        <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> ${ table.details['properties'].get('create_time') }</div>
-                        <div title="${ _('Format') }">
-                          <i class="fa fa-fw fa-file-o muted"></i>
-                          ${ table.details['properties'].get('format') }
-                          <i class="fa fa-fw fa-archive muted"></i>
-                          ${ table.details['properties'].get('compressed') and _('uncompressed') or _('compressed') }
-                        </div>                        
-                      </div>
-
-                      <div class="span6">
-                        <div><a><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a> ${ _('Computed') }</div>
-                        <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> ${ table.details['stats'].get('numFiles') }</div>
-                        <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> ${ table.details['stats'].get('numRows') }</div>
-                        <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> ${ table.details['properties'].get('totalSize') }</div>
-                      </div>
-                    </div>
+                    <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
                   </div>
 
                   <div class="span2 tile">
@@ -290,7 +290,7 @@ ${ assist.assistPanel() }
                 <div class="tile">
                   <h4>${ _('Starred columns') } (<span data-bind="text: favouriteColumns().length"></span>)</h4>
                   <!-- ko with: favouriteColumns -->
-                  <!-- ko template: "columns-table" --><!-- /ko -->
+                  <!-- ko template: "metastore-columns-table" --><!-- /ko -->
                   <!-- /ko -->
 
                   <a class="pointer" data-bind="click: function() { $('li a[href=\'#columns\']').click(); }">${_('View more...')}</a>
@@ -300,7 +300,7 @@ ${ assist.assistPanel() }
                   <h4>${ _('Sample') }</h4>
                   % if sample:
                     <!-- ko with: samplesPreview -->
-                    <!-- ko template: 'sample-table' --><!-- /ko -->
+                    <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
                     <!-- /ko -->
                     <a class="pointer" data-bind="click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
                   % else:
@@ -319,7 +319,7 @@ ${ assist.assistPanel() }
 
               <div class="tab-pane" id="columns">
                 <!-- ko with: columns -->
-                <!-- ko template: "columns-table" --><!-- /ko -->
+                <!-- ko template: "metastore-columns-table" --><!-- /ko -->
                 <!-- /ko -->
               </div>
 
@@ -338,7 +338,7 @@ ${ assist.assistPanel() }
                 </div>
               % else:
                 <!-- ko with: samples -->
-                <!-- ko template: 'sample-table' --><!-- /ko -->
+                <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
                 <!-- /ko -->
               % endif
               </div>
@@ -528,14 +528,10 @@ ${ assist.assistPanel() }
           comment: newValue ? newValue : ""
         });
       })
+      self.assistHelper = new AssistHelper(options)
 
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
-
-      self.samplesPreview = ko.observable();
-      self.samples = ko.observable();
-
-      self.assistHelper = new AssistHelper(options)
 
       self.assistHelper.fetchFields({
         sourceType: "hive",
@@ -551,6 +547,9 @@ ${ assist.assistPanel() }
           console.log(data);
         }
       })
+
+      self.samplesPreview = ko.observable();
+      self.samples = ko.observable();
 
       self.assistHelper.fetchTableSample({
         sourceType: "hive",
@@ -569,6 +568,26 @@ ${ assist.assistPanel() }
           console.log(data);
         }
       })
+
+      self.tableDetails = ko.observable();
+      self.tableStats = ko.observable();
+      var fetchDetails = function () {
+        self.assistHelper.fetchTableDetails({
+          sourceType: "hive",
+          databaseName: self.activeDatabase(),
+          tableName: self.activeTable(),
+          successCallback: function (data) {
+            self.tableDetails(data);
+            self.tableStats(data.details.stats);
+          },
+          errorCallback: function (data) {
+            console.log('ERRRROR!');
+            console.log(data);
+          }
+        })
+      }
+
+      fetchDetails();
 
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
