@@ -237,10 +237,13 @@ def describe_table(request, database, table):
   if request.REQUEST.get("format", "html") == "json" and request.REQUEST.get("sample", "false") == "false":
     return JsonResponse({
         'status': 0,
+        'name': table.name,
         'partition_keys': [{'name': part.name, 'type': part.type} for part in table.partition_keys],
         'cols': [{'name': col.name, 'type': col.type, 'comment': col.comment} for col in table.cols],
         'path_location': table.path_location,
+        'hdfs_link': table.hdfs_link,
         'comment': table.comment,
+        'is_view': table.is_view,
         'properties': table.properties, 
         'details': table.details,
         'stats': table.stats
