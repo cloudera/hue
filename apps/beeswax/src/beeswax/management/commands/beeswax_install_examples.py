@@ -246,7 +246,7 @@ class SampleTable(object):
       hdfs_root_destination = fs.do_as_user(django_user, fs.get_home_dir)
       if subdir:
         hdfs_root_destination += '/%s' % subdir
-        fs.do_as_user(django_user, fs.mkdir, hdfs_root_destination, '0755')
+        fs.do_as_user(django_user, fs.mkdir, hdfs_root_destination, '0777')
 
     return hdfs_root_destination
 
