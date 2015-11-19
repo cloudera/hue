@@ -41,7 +41,7 @@ ${ require.config() }
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 
-
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <style type="text/css">
@@ -55,6 +55,7 @@ ${ assist.assistPanel() }
 % endif
 </style>
 
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/html" id="columns-table">
@@ -90,8 +91,7 @@ ${ assist.assistPanel() }
         </td>
         <td data-bind="text: type"></td>
         <td>
-          ## Do all columns support comments?
-          <a class="pointer"><i class="fa fa-pencil" data-bind="click: function() { updateColumnComment(name, 'new comment') }"></i></a>
+          <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: 'Add a comment...' }" class="editable editable-click editable-empty">Add a description...</span>
         </td>
       </tr>
     </tbody>
@@ -457,6 +457,18 @@ ${ assist.assistPanel() }
     "ko.hue-bindings"
   ], function (ko, charts, AssistHelper) {
 
+    function MetastoreColumn(extendedColumn) {
+      var self = this;
+      ko.mapping.fromJS(extendedColumn, {}, self);
+
+      self.comment.subscribe(function (newValue) {
+        $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
+          column: self.name(),
+          comment: newValue
+        });
+      })
+    }
+
     /**
      * @param {Object} options
      * @param {Object} options.i18n
@@ -484,8 +496,8 @@ ${ assist.assistPanel() }
         tableName: self.activeTable(),
         fields: [],
         successCallback: function(data) {
-          self.columns(data.extended_columns);
-          self.favouriteColumns(data.extended_columns.slice(0, 3));
+          self.columns($.map(data.extended_columns, function(column) { return new MetastoreColumn(column) }));
+          self.favouriteColumns(self.columns().slice(0, 3));
         },
         errorCallback: function(message) {
           console.log(message);
