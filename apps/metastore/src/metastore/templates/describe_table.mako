@@ -164,7 +164,7 @@ ${ assist.assistPanel() }
                 <li><a href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a></li>
                 <li><a href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a></li>
                 % if has_write_access:
-                  <li><a href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-trash-o"></i></a></li>
+                  <li><a href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a></li>
                 % endif
                 <li><a href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-share-square-o"></i></a></li>
                 % if table.partition_keys:
@@ -204,7 +204,28 @@ ${ assist.assistPanel() }
               <div class="tab-pane" id="overview">
 
                 <div class="row-fluid margin-top-20">
-                  <div class="span4 tile">
+                  <div class="span6 tile">
+                    <h4>${ _('Stats') }</h4>
+                    ${ _('Owner')  } ${ table.details['properties'].get('owner') }
+                    ${ _('Created')  } ${ table.details['properties'].get('create_time') }
+                    
+                    <br/>
+                    
+                    <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
+                    ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
+
+                    <br/>
+
+                    <i class="fa fa-bar-chart"></i></a>
+                    % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
+                    <i class="fa fa-refresh"></i></a>
+                    % endif
+
+                    numFiles ${ table.details['stats'].get('numFiles') }
+                    numRows ${ table.details['stats'].get('numRows') }
+                    totalSize ${ table.details['stats'].get('totalSize') }
+                  </div>
+                  <div class="span6 tile">
                     <h4>${ _('Knowledge') }</h4>
                     <div>
                       ${ _('Tags') } <i class="fa fa-tags"></i></a>
@@ -219,28 +240,13 @@ ${ assist.assistPanel() }
                     ${ _('Comments') } <i class="fa fa-comments-o"></i></a>
                     </div>
                   </div>
-                  <div class="span4 tile">
-                    <h4>${ _('Stats') }</h4>
-                    ${ _('Owner')  } ${ table.details['properties'].get('owner') }
-                    ${ _('Created')  } ${ table.details['properties'].get('create_time') }
-                    <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
-                    ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
+                </div>
 
-                    <i class="fa fa-bar-chart"></i></a>
-                    % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
-                    <i class="fa fa-refresh"></i></a>
-                    % endif
-
-                    numFiles ${ table.details['stats'].get('numFiles') }
-                    numRows ${ table.details['stats'].get('numRows') }
-                    totalSize ${ table.details['stats'].get('totalSize') }
-                  </div>
-                  <div class="span4 tile">
-                    <h4>${ _('Columns') }</h4>
-                    <i class="fa fa-star"></i></a>
-                    ${ column_table(table.cols, "columnTable", True, 3) }
-                    ${_('View more...')}
-                  </div>
+                <div class="tile">
+                  <h4>${ _('Columns') }</h4>
+                  <i class="fa fa-star"></i></a>
+                  ${ column_table(table.cols, "columnTable", True, 3) }
+                  ${_('View more...')}
                 </div>
 
                 <div class="tile">
@@ -283,8 +289,20 @@ ${ assist.assistPanel() }
               </div>
               % endif
 
+              <div class="tab-pane" id="permissions">
+                ${ _('Not available') }
+              </div>
+
               <div class="tab-pane" id="queries">
                 <pre id="queriesTable"></pre>
+              </div>
+
+              <div class="tab-pane" id="analysis">
+                ${ _('Not available') }
+              </div>
+
+              <div class="tab-pane" id="lineage">
+                ${ _('Not available') }
               </div>
 
               <div class="tab-pane" id="properties">
