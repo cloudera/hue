@@ -94,7 +94,7 @@ ${ assist.assistPanel() }
         </td>
         <td data-bind="text: type"></td>
         <td>
-          <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: 'Add a comment...' }" class="editable editable-click editable-empty">Add a description...</span>
+          <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: 'Add a comment...' }" class="editable editable-click editable-empty">Add a comment...</span>
         </td>
       </tr>
     </tbody>
@@ -224,14 +224,7 @@ ${ assist.assistPanel() }
             </h3>
             <div class="clearfix"></div>
 
-            <div class="like-pre">
-              %if table.comment:
-                ${ smart_unicode(table.comment) } <a class="pointer"><i class="fa fa-pencil"></i></a>
-              %else:
-                ${ _('This table has no description.') }<a>${ _('Add one here...') }</a>
-              %endif
-            </div>
-
+            <span data-bind="editable: tableComment, editableOptions: {enabled: true, placement: 'right', emptytext: 'Add a description...' }" class="editable editable-click editable-empty">Add a description...</span>
 
             <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
@@ -498,6 +491,17 @@ ${ assist.assistPanel() }
 
       self.activeDatabase = ko.observable('${database}');
       self.activeTable = ko.observable('${table.name}');
+      self.tableComment = ko.observable();
+
+      %if table.comment:
+      self.tableComment('${ smart_unicode(table.comment) }');
+      %endif
+
+      self.tableComment.subscribe(function (newValue) {
+        $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
+          comment: newValue ? newValue : ""
+        });
+      })
 
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
