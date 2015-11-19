@@ -206,6 +206,30 @@ class HiveServer2Dbms(object):
     return self.client.get_table(database, table_name)
 
 
+  def alter_table(self, database, table_name, new_table_name=None, comment=None, tblproperties=None):
+    hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
+
+    if new_table_name:
+      table_name = new_table_name
+      hql += ' RENAME TO `%s`' % table_name
+    elif comment:
+      hql += " SET TBLPROPERTIES ('comment' = '%s')" % comment
+    elif tblproperties:
+      hql += " SET TBLPROPERTIES (%s)" % ' ,'.join("'%s' = '%s'" % (k, v) for k, v in tblproperties.items())
+
+    timeout = SERVER_CONN_TIMEOUT.get()
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=timeout)
+
+    if handle:
+      self.close(handle)
+    else:
+      msg = _("Failed to execute alter table statement: %s") % hql
+      raise QueryServerException(msg)
+
+    return self.client.get_table(database, table_name)
+
+
   def get_column(self, database, table_name, column_name):
     table = self.client.get_table(database, table_name)
     for col in table.cols:

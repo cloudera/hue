@@ -352,6 +352,37 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     check(client, [200, 302]) # Ok
 
 
+  def test_alter_table(self):
+    resp = _make_query(self.client, "CREATE TABLE test_alter_table (a int) COMMENT 'Before Alter';", database=self.db_name)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+
+    resp = self.client.get('/metastore/table/%s/test_alter_table' % self.db_name)
+    assert_true('test_alter_table', resp.content)
+    assert_true('Before Alter', resp.content)
+
+    # Alter name
+    resp = self.client.post(reverse("metastore:alter_table",
+                                    kwargs={'database': self.db_name, 'table': 'test_alter_table'}),
+                            {'new_table_name': 'table_altered'})
+    json_resp = json.loads(resp.content)
+    assert_equal('table_altered', json_resp['data']['name'], json_resp)
+
+    # Alter comment
+    resp = self.client.post(reverse("metastore:alter_table",
+                                    kwargs={'database': self.db_name, 'table': 'table_altered'}),
+                            {'comment': 'After Alter'})
+    json_resp = json.loads(resp.content)
+    assert_equal('After Alter', json_resp['data']['comment'], json_resp)
+
+    # Invalid table name returns error response
+    resp = self.client.post(reverse("metastore:alter_table",
+                                    kwargs={'database': self.db_name, 'table': 'table_altered'}),
+                            {'new_table_name': 'bad name'})
+    json_resp = json.loads(resp.content)
+    assert_equal(1, json_resp['status'], json_resp)
+    assert_true('Failed to alter table' in json_resp['data'], json_resp)
+
+
   def test_alter_column(self):
     resp = _make_query(self.client, 'CREATE TABLE test_alter_column (before_alter int);', database=self.db_name)
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)

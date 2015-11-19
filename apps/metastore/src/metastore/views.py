@@ -263,6 +263,36 @@ def describe_table(request, database, table):
 
 @check_has_write_access_permission
 @require_http_methods(["POST"])
+def alter_table(request, database, table):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'data': ''}
+  try:
+    new_table_name = request.POST.get('new_table_name', None)
+    comment = request.POST.get('comment', None)
+
+    # Cannot modify both name and comment at same time, name will get precedence
+    if new_table_name and comment:
+      LOG.warn('Cannot alter both table name and comment at the same time, will perform rename.')
+
+    table_obj = db.alter_table(database, table, new_table_name=new_table_name, comment=comment)
+
+    response['status'] = 0
+    response['data'] = {
+      'name': table_obj.name,
+      'comment': table_obj.comment,
+      'is_view': table_obj.is_view,
+      'location': table_obj.path_location,
+      'properties': table_obj.properties
+    }
+  except Exception, ex:
+    response['status'] = 1
+    response['data'] = _("Failed to alter table `%s`.`%s`: %s") % (database, table, str(ex))
+
+  return JsonResponse(response)
+
+
+@check_has_write_access_permission
+@require_http_methods(["POST"])
 def alter_column(request, database, table):
   db = dbms.get(request.user)
   response = {'status': -1, 'data': ''}
