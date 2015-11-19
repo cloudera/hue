@@ -460,8 +460,9 @@ ${ assist.assistPanel() }
     "ko.hue-bindings"
   ], function (ko, charts, AssistHelper) {
 
-    function MetastoreColumn(extendedColumn) {
+    function MetastoreColumn(vm, extendedColumn) {
       var self = this;
+      self.vm = vm;
       ko.mapping.fromJS(extendedColumn, {}, self);
 
       self.favourite = ko.observable(false);
@@ -470,6 +471,13 @@ ${ assist.assistPanel() }
         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
           column: self.name(),
           comment: newValue
+        }, function () {
+          self.vm.assistHelper.clearCache({
+            sourceType: 'hive',
+            databaseName: self.vm.activeDatabase(),
+            tableName: self.vm.activeTable(),
+            fields: []
+          })
         });
       })
     }
@@ -501,7 +509,7 @@ ${ assist.assistPanel() }
         tableName: self.activeTable(),
         fields: [],
         successCallback: function(data) {
-          self.columns($.map(data.extended_columns, function(column) { return new MetastoreColumn(column) }));
+          self.columns($.map(data.extended_columns, function(column) { return new MetastoreColumn(self, column) }));
           self.favouriteColumns(self.columns().slice(0, 3));
         },
         errorCallback: function(message) {
