@@ -101,7 +101,7 @@ ${ assist.assistPanel() }
   </table>
 </script>
 
-<%def name="column_table(cols, id, withStats=False, limit=10000)">
+<%def name="partition_column_table(cols, id, withStats=False, limit=10000)">
   <table id="${id}" class="table table-striped table-condensed sampleTable
   %if withStats:
   skip-extender
@@ -115,7 +115,6 @@ ${ assist.assistPanel() }
         %endif
         <th>${_('Name')}</th>
         <th>${_('Type')}</th>
-        <th>${_('Comment')}</th>
       </tr>
     </thead>
     <tbody>
@@ -123,16 +122,16 @@ ${ assist.assistPanel() }
         <tr>
           <td>${ loop.index }</td>
           %if withStats:
-            <td class="row-selector-exclude"><a href="javascript:void(0)" data-column="${ column.name }"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+            <td class="row-selector-exclude">
+              <a href="javascript:void(0)" data-column="${ column.name }">
+                <i class="fa fa-bar-chart" title="${ _('View statistics') }"></i>
+              </a>
+            </td>
           %endif
           <td title="${ _("Scroll to the column") }">
             <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
           </td>
           <td>${ column.type }</td>
-          <td>
-            ${ column.comment != 'None' and smart_unicode(column.comment) or "" }
-            <a class="pointer"><i class="fa fa-pencil" data-bind="click: function() { updateColumnComment('${ column.name }', 'new comment') }"></i></a>
-          </td>
         </tr>
       % endfor
     </tbody>
@@ -229,7 +228,7 @@ ${ assist.assistPanel() }
               %if table.comment:
                 ${ smart_unicode(table.comment) } <a class="pointer"><i class="fa fa-pencil"></i></a>
               %else:
-                ${ _('This table has no description.') } <a href="#">${ _('Add one here...') }</a>
+                ${ _('This table has no description.') }<a>${ _('Add one here...') }</a>
               %endif
             </div>
 
@@ -305,14 +304,16 @@ ${ assist.assistPanel() }
                   % if sample:
                     ${ sample_table(limit=3) }
                     <a class="pointer" data-bind="click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
+                  % else:
+                    ${ _('Table sampling took too long.') }
                   % endif
                 </div>
 
                 % if table.partition_keys:
                 <div class="tile">
                   <h4>${ _('Partitions') }</h4>
-                    ${ column_table(table.partition_keys, "partitionTable", limit=3) }
-                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
+                    ${ partition_column_table(table.partition_keys, "partitionTable", limit=3) }
+                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitionColumns\']').click(); }">${_('View more...')}</a>
                 </div>
                 % endif
               </div>
@@ -325,7 +326,7 @@ ${ assist.assistPanel() }
 
               % if table.partition_keys:
               <div class="tab-pane" id="partitionColumns">
-                ${ column_table(table.partition_keys, "partitionTable") }
+                ${ partition_column_table(table.partition_keys, "partitionTable") }
               </div>
               % endif
 
@@ -520,15 +521,6 @@ ${ assist.assistPanel() }
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
       });
-
-      self.updateColumnComment = function(column, comment) {
-        $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
-            column: column,
-            comment: comment
-          }, function (data) {
-            alert('changed!');
-        });
-      }
     }
 
     $(document).ready(function () {
