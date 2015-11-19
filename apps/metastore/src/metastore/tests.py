@@ -362,8 +362,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Alter name, type and comment
     resp = self.client.post(reverse("metastore:alter_column",
-                                    kwargs={'database': self.db_name, 'table': 'test_alter_column', 'column': 'before_alter'}),
-                            {'new_column_name': 'after_alter', 'new_column_type': 'string', 'comment': 'alter comment'})
+                                    kwargs={'database': self.db_name, 'table': 'test_alter_column'}),
+                            {'column': 'before_alter', 'new_column_name': 'after_alter', 'new_column_type': 'string', 'comment': 'alter comment'})
     json_resp = json.loads(resp.content)
     assert_equal('after_alter', json_resp['data']['name'], json_resp)
     assert_equal('string', json_resp['data']['type'], json_resp)
@@ -371,8 +371,8 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
     # Invalid column type returns error response
     resp = self.client.post(reverse("metastore:alter_column",
-                                    kwargs={'database': self.db_name, 'table': 'test_alter_column', 'column': 'before_alter'}),
-                            {'new_column_name': 'foo'})
+                                    kwargs={'database': self.db_name, 'table': 'test_alter_column'}),
+                            {'column': 'before_alter', 'new_column_name': 'foo'})
     json_resp = json.loads(resp.content)
     assert_equal(1, json_resp['status'], json_resp)
     assert_true('Failed to alter column' in json_resp['data'], json_resp)
