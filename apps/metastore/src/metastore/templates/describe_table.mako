@@ -206,39 +206,38 @@ ${ assist.assistPanel() }
 
                 <div class="row-fluid margin-top-20">
                   <div class="span6 tile">
-                    <h4>${ _('Stats') }</h4>
-                    ${ _('Owner')  } ${ table.details['properties'].get('owner') }
-                    ${ _('Created')  } ${ table.details['properties'].get('create_time') }
+                    <h4>${ _('Stats') }
+                      % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
+                      <a class="pointer"><i class="fa fa-refresh"></i></a>
+                      % endif
+                    </h4>
+                    <div class="row-fluid">
+                      <div class="span6">
+                        <div title="${ _('Owner') }"><i class="fa fa-fw fa-user muted"></i> ${ table.details['properties'].get('owner') }</div>
+                        <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> ${ table.details['properties'].get('create_time') }</div>
+                        <div title="${ _('Format') }"><i class="fa fa-fw fa-file-o muted"></i> ${ table.details['properties'].get('format') }</div>
+                        <div title="${ _('Compressed?') }"><i class="fa fa-fw fa-archive muted"></i> ${ table.details['properties'].get('compressed') and _('Not compressed') or _('Compressed') }</div>
+                      </div>
 
-                    <br/>
-
-                    <a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-share-square-o"></i> ${_('File Location')}</a>
-                    ${ _('Format')  } Compressed: ${ table.details['properties'].get('compressed') } Format: ${ table.details['properties'].get('format') }
-
-                    <br/>
-
-                    <i class="fa fa-bar-chart"></i></a>
-                    % if table.details['stats'].get('COLUMN_STATS_ACCURATE') != 'true':
-                    <i class="fa fa-refresh"></i></a>
-                    % endif
-
-                    numFiles ${ table.details['stats'].get('numFiles') }
-                    numRows ${ table.details['stats'].get('numRows') }
-                    totalSize ${ table.details['stats'].get('totalSize') }
+                      <div class="span6">
+                        <div><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('File Location')}</a></div>
+                        <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> ${ table.details['stats'].get('numFiles') }</div>
+                        <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> ${ table.details['stats'].get('numRows') }</div>
+                        <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> ${ table.details['properties'].get('totalSize') }</div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="span6 tile">
-                    <h4>${ _('Knowledge') }</h4>
+
+                  <div class="span2 tile">
+                    <h4>${ _('Sharing') }</h4>
+                    <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
+                    <div title="${ _('Users') }"><i class="fa fa-fw fa-users muted"></i> ${ _('No users') }</div>
+                  </div>
+
+                  <div class="span4 tile">
+                    <h4>${ _('Comments') }</h4>
                     <div>
-                      ${ _('Tags') } <i class="fa fa-tags"></i></a>
-                    </div>
-                    <div>
-                      ${ _('Users') } <i class="fa fa-users"></i></a>
-                    </div>
-                    <div>
-                      ${ _('Description') } <i class="fa fa-file-text-o"></i></a>
-                    </div>
-                    <div>
-                    ${ _('Comments') } <i class="fa fa-comments-o"></i></a>
+                      <i class="fa fa-fw fa-comments-o muted"></i> ${ _('No comments available yet.') }
                     </div>
                   </div>
                 </div>
