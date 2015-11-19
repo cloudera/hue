@@ -263,10 +263,11 @@ def describe_table(request, database, table):
 
 @check_has_write_access_permission
 @require_http_methods(["POST"])
-def alter_column(request, database, table, column):
+def alter_column(request, database, table):
   db = dbms.get(request.user)
   response = {'status': -1, 'data': ''}
   try:
+    column = request.POST.get('column')
     col = db.get_column(database, table, column)
     if col:
       new_column_name = request.POST.get('new_column_name', col.name)
