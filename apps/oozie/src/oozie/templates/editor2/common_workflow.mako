@@ -330,8 +330,8 @@
         <h6 class="field-title">${ _('Message') }</h6>
         <textarea class="span12" data-bind="value: properties.message" />
 
-        <h6 class="field-title">${ _('Email on error') }</h6>
-        <input type="checkbox" data-bind="checked: properties.enableMail" />
+        <h6 class="field-title">${ _('Email on error') } <input type="checkbox" data-bind="checked: properties.enableMail" style="margin-top: -3px;margin-left: 4px;" /></h6>
+
         <span data-bind="visible: properties.enableMail">
           <div class="airy">
             <span class="widget-label" data-bind="text: $root.workflow_properties.to.label"></span>
