@@ -72,9 +72,7 @@ def is_selected(section, matcher):
 </%def>
 
 
-
 <%def name="commons()">
-
   <link href="${ static('useradmin/css/useradmin.css') }" rel="stylesheet">
 
   <script type="text/javascript">
@@ -98,4 +96,3 @@ def is_selected(section, matcher):
     });
   </script>
 </%def>
-

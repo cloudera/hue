@@ -254,7 +254,11 @@ ${ assist.assistPanel() }
                     </h4>
                     <div class="row-fluid">
                       <div class="span6">
-                        <div title="${ _('Owner') }"><i class="fa fa-fw fa-user muted"></i> ${ table.details['properties'].get('owner') }</div>
+                        <div title="${ _('Owner') }">
+                          <a href="/useradmin/users/view/${ table.details['properties'].get('owner') }">
+                            <i class="fa fa-fw fa-user muted"></i> ${ table.details['properties'].get('owner') }
+                          </a>
+                        </div>
                         <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> ${ table.details['properties'].get('create_time') }</div>
                         <div title="${ _('Format') }"><i class="fa fa-fw fa-file-o muted"></i> ${ table.details['properties'].get('format') }</div>
                         <div title="${ _('Compressed?') }"><i class="fa fa-fw fa-archive muted"></i> ${ table.details['properties'].get('compressed') and _('Not compressed') or _('Compressed') }</div>
