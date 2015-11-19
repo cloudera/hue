@@ -315,7 +315,12 @@ ${ require.config() }
         params: {
           user: $root.user,
           sourceTypes: $root.sqlSourceTypes,
-          activeSourceType: $root.activeSqlSourceType
+          activeSourceType: $root.activeSqlSourceType,
+          navigationSettings: {
+            openItem: false,
+            showPreview: true,
+            showStats: true
+          }
         }
       }"></div>
   </div>

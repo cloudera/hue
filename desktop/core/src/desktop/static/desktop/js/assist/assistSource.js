@@ -28,11 +28,14 @@
    * @param {AssistHelper} options.assistHelper
    * @param {string} options.type
    * @param {string} options.name
+   * @param {Object} options.navigationSettings
    * @constructor
    */
   function AssistSource (options) {
+
     var self = this;
     self.i18n = options.i18n;
+    self.navigationSettings = options.navigationSettings;
     self.assistHelper = options.assistHelper;
     self.type = options.type;
     self.name = options.name;
@@ -89,8 +92,8 @@
           name: name,
           displayName: name,
           title: name,
-          isDatabase: true
-        }, null, self, self.filter, self.i18n);
+          isDatabase: true,
+        }, null, self, self.filter, self.i18n, self.navigationSettings);
         dbIndex[name] = database;
         if (name === lastSelectedDb) {
           self.selectedDatabase(database);
