@@ -53,9 +53,34 @@
     return sourceType + "_" + self.user;
   };
 
-  AssistHelper.prototype.clearCache = function (sourceType) {
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {string} [options.databaseName]
+   * @param {string} [options.tableName]
+   * @param {string[]} [options.fields]
+   * @param {boolean} [options.clearAll]
+   */
+  AssistHelper.prototype.clearCache = function (options) {
     var self = this;
-    $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType), {});
+    if (options.clearAll) {
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
+    } else {
+      var url = API_PREFIX;
+      if (options.databaseName) {
+        url += options.databaseName;
+      }
+      if (options.tableName) {
+        url += "/" + options.tableName;
+      }
+      if (options.fields) {
+        url += options.fields.length > 0 ? "/" + options.fields.join("/") : "";
+      }
+      var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+      delete cachedData[url];
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
+    }
   };
 
   /**

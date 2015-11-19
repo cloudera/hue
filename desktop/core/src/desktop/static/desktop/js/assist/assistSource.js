@@ -143,7 +143,10 @@
 
     self.reload = function() {
       self.reloading(true);
-      self.assistHelper.clearCache(self.type);
+      self.assistHelper.clearCache({
+        sourceType: self.type,
+        clearAll: true
+      });
       self.initDatabases();
     };
 
