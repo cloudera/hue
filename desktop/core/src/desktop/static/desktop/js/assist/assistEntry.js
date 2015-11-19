@@ -280,10 +280,11 @@
     $assistQuickLook.find(".sample").empty("");
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
-    self.assistSource.assistHelper.fetchTableHtmlPreview({
+    self.assistSource.assistHelper.fetchTableSample({
       sourceType: self.assistSource.type === "hive" ? "beeswax" : self.assistSource.type,
       databaseName: databaseName,
       tableName: tableName,
+      dataType: "html",
       successCallback: function(data) {
         $assistQuickLook.find(".loader").hide();
         $assistQuickLook.find(".sample").html(data);
