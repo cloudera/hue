@@ -109,6 +109,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
       response['hdfs_link'] = t.hdfs_link
       response['columns'] = [column.name for column in t.cols]
       response['extended_columns'] = massage_columns_for_json(t.cols)
+      response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in t.partition_keys]
     else:
       col = db.get_column(database, table, column)
       if col:
