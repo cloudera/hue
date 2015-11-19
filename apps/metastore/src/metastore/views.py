@@ -394,7 +394,7 @@ def describe_partitions(request, database, table):
                                                                  'partition_spec': urllib.quote(partition.partition_spec)})
     })
 
-  if request.method == "POST":
+  if request.method == "POST" or request.GET.get('format', 'html') == 'json':
     return JsonResponse({
       'partition_keys_json': [partition.name for partition in table_obj.partition_keys],
       'partition_values_json': massaged_partitions,
