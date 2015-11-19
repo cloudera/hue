@@ -84,11 +84,11 @@ from desktop.views import _ko
       </h3>
       <div class="popover-content">
         <div class="alert" style="text-align: left; display:none" data-bind="visible: hasError">${ _('There is no analysis available') }</div>
-        <!-- ko if: isComplexType && snippet.type() == 'impala' -->
+        <!-- ko if: isComplexType && sourceType == 'impala' -->
         <div class="alert" style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
         <!-- /ko -->
-        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && snippet.type() == 'impala'), name: 'table-stats' } --><!-- /ko -->
-        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && snippet.type() == 'impala'), name: 'column-stats' } --><!-- /ko -->
+        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && sourceType == 'impala'), name: 'table-stats' } --><!-- /ko -->
+        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && sourceType == 'impala'), name: 'column-stats' } --><!-- /ko -->
       </div>
     </div>
   </script>
@@ -135,11 +135,15 @@ from desktop.views import _ko
           if ($targetElement.is(":visible")) {
             var newTop = $targetElement.offset().top - $(window).scrollTop();
             if (lastOffset.left != $targetElement.offset().left || lastOffset.top != newTop) {
-              lastOffset.left = $targetElement.offset().left;
-              lastOffset.top = newTop;
-              self.popoverTop(lastOffset.top - ($popover.length ? ($popover.outerHeight()-16) / 2 : 200));
-              self.popoverLeft(lastOffset.left + $targetElement.outerWidth());
-              if ((self.popoverTop()) < -130) {
+              lastOffset.left = $targetElement.offset().left + $targetElement.outerWidth();
+              if ($popover.length) {
+                lastOffset.top = newTop - ($popover.outerHeight() / 2) + ($targetElement.outerHeight() / 2)
+              } else {
+                lastOffset.top = newTop - 210;
+              }
+              self.popoverTop(lastOffset.top);
+              self.popoverLeft(lastOffset.left);
+              if (self.popoverTop() < -130) {
                 $popover.hide();
               } else {
                 $popover.show();
@@ -179,7 +183,6 @@ from desktop.views import _ko
             self.analysisStats(new TableStats({
               i18n: self.i18n,
               sourceType: self.params.sourceType,
-              snippet: self.params.snippet,
               databaseName: self.params.databaseName,
               tableName: self.params.tableName,
               columnName: self.params.columnName,

@@ -74,7 +74,17 @@ ${ assist.assistPanel() }
         ## start at 0
         <td data-bind="text: $index()"></td>
         ## no stats for partition key type
-        <td><a href="javascript:void(0)"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+        <td>
+         <span data-bind="component: { name: 'table-stats', params: {
+            statsVisible: true,
+            sourceType: 'hive',
+            databaseName: $root.activeDatabase(),
+            tableName: $root.activeTable(),
+            columnName: name,
+            fieldType: type,
+            assistHelper: $root.assistHelper
+          } }"></span>
+        </td>
         <td title="${ _("Scroll to the column") }">
           <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
         </td>
@@ -455,7 +465,7 @@ ${ assist.assistPanel() }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-      self.activeDatabse = ko.observable('${database}');
+      self.activeDatabase = ko.observable('${database}');
       self.activeTable = ko.observable('${table.name}');
 
       self.columns = ko.observableArray();
@@ -465,7 +475,7 @@ ${ assist.assistPanel() }
 
       self.assistHelper.fetchFields({
         sourceType: 'hive',
-        databaseName: self.activeDatabse(),
+        databaseName: self.activeDatabase(),
         tableName: self.activeTable(),
         fields: [],
         successCallback: function(data) {
