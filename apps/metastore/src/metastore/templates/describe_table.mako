@@ -341,7 +341,21 @@ ${ assist.assistPanel() }
               </div>
 
               <div class="tab-pane" id="queries">
-                <pre id="queriesTable"></pre>
+                <i class="fa fa-spinner fa-spin" data-bind="visible: loadingQueries"></i>
+                <table data-bind="visible: !loadingQueries()" class="table table-condensed">
+                  <thead>
+                    <tr>
+                      <th width="30%">${ _('Name') }</th>
+                      <th>${ _('Query') }</th>
+                    </tr>
+                  </thead>
+                  <tbody data-bind="foreach: queries">
+                    <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
+                      <td data-bind="text: doc.name"></td>
+                      <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
               <div class="tab-pane" id="analysis">
@@ -527,6 +541,9 @@ ${ assist.assistPanel() }
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
       });
+
+      self.loadingQueries = ko.observable(false);
+      self.queries = ko.observableArray([]);
     }
 
     $(document).ready(function () {
@@ -544,6 +561,16 @@ ${ assist.assistPanel() }
 
       huePubSub.subscribe('assist.openItem', function(item){
         console.log(item);
+      });
+
+      $('a[data-toggle="tab"]').on('shown', function (e) {
+        if ($(e.target).attr("href") == "#queries") {
+          viewModel.loadingQueries(true);
+          $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
+            viewModel.queries(data.queries);
+            viewModel.loadingQueries(false);
+          });
+        }
       });
 
       window.hueDebug = {
@@ -582,11 +609,6 @@ ${ assist.assistPanel() }
         $("#dropTableMessage").text(data.title);
       });
     % endif
-
-    // Lazy loading?
-    $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
-      $("#queriesTable").text(data.queries);
-    });
 
     $('a[data-toggle="tab"]').on('shown', function (e) {
       var sortables = [];
