@@ -39,6 +39,7 @@ from filebrowser.views import location_to_url
 from metastore.conf import HS2_GET_TABLES_MAX
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
+from notebook.connectors.base import Notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -122,7 +123,7 @@ def table_queries(request, database, table):
 
   response = {'status': -1, 'queries': []}
   try:
-    queries = [d.to_dict()
+    queries = [{'doc': d.to_dict(), 'data': Notebook(document=d).get_data()}
               for d in Document2.objects.filter(qfilter, owner=request.user, type='query', is_history=False)[:50]]
     response['status'] = 0
     response['queries'] = queries
