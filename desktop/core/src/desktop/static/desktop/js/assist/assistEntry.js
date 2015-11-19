@@ -35,9 +35,10 @@
    * @param {function} [filter] - ko.observable
    * @param {Object} i18n
    * @param {string} i18n.errorLoadingTablePreview
+   * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistEntry (definition, parent, assistSource, filter, i18n) {
+  function AssistEntry (definition, parent, assistSource, filter, i18n, navigationSettings) {
     var self = this;
     self.i18n = i18n;
     self.definition = definition;
@@ -54,6 +55,8 @@
     self.open = ko.observable(false);
     self.entries = ko.observableArray([]);
     self.statsVisible = ko.observable(false);
+
+    self.navigationSettings = navigationSettings;
 
     self.open.subscribe(function(newValue) {
       if (newValue && self.entries().length == 0) {
@@ -234,7 +237,7 @@
    */
   AssistEntry.prototype.createEntry = function (definition) {
     var self = this;
-    return new AssistEntry(definition, self, self.assistSource, null, self.i18n)
+    return new AssistEntry(definition, self, self.assistSource, null, self.i18n, self.navigationSettings)
   };
 
   AssistEntry.prototype.getHierarchy = function () {
@@ -257,6 +260,11 @@
   AssistEntry.prototype.toggleOpen = function () {
     var self = this;
     self.open(!self.open());
+  };
+
+  AssistEntry.prototype.openItem = function () {
+    var self = this;
+    huePubSub.publish('assist.openItem', self);
   };
 
   AssistEntry.prototype.showPreview = function () {

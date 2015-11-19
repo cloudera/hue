@@ -50,7 +50,12 @@ ${ layout.menubar(section='query') }
               params: {
                 user: HIVE_AUTOCOMPLETE_USER,
                 sourceTypes: editorViewModel.sqlSourceTypes,
-                activeSourceType: snippetType
+                activeSourceType: snippetType,
+                navigationSettings: {
+                  openItem: false,
+                  showPreview: true,
+                  showStats: true
+                }
               }
             }"></div>
           </div>

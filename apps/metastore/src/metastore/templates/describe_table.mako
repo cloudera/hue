@@ -188,11 +188,16 @@ ${ assist.assistPanel() }
           <div class="assist" data-bind="component: {
               name: 'assist-panel',
               params: {
-              sourceTypes: [{
+                sourceTypes: [{
                   name: 'hive',
                   type: 'hive'
                 }],
-                user: '${user.username}'
+                user: '${user.username}',
+                navigationSettings: {
+                  openItem: true,
+                  showPreview: true,
+                  showStats: false
+                }
               }
             }"></div>
         </div>
@@ -513,6 +518,10 @@ ${ assist.assistPanel() }
       var viewModel = new MetastoreViewModel(options);
 
       ko.applyBindings(viewModel);
+
+      huePubSub.subscribe('assist.openItem', function(item){
+        console.log(item);
+      });
 
       window.hueDebug = {
         viewModel: viewModel,

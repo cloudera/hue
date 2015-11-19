@@ -138,8 +138,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-entry-actions">
     <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn } " style="opacity: 0">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-      <span data-bind="component: { name: 'table-stats', params: {
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+      <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
           sourceType: assistSource.type,
           snippet: assistSource.snippet,
@@ -149,6 +149,7 @@ from desktop.views import _ko
           fieldType: definition.type,
           assistHelper: assistSource.assistHelper
         } }"></span>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
   </script>
 
@@ -285,6 +286,10 @@ from desktop.views import _ko
        * @param {string} params.sourceTypes[].type - Example: hive
        * @param {string} [params.activeSourceType] - Example: hive
        * @param {string} params.user
+       * @param {Object} params.navigationSettings - enable/disable the links
+       * @param {boolean} params.navigationSettings.openItem - Example: true
+       * @param {boolean} params.navigationSettings.showPreview - Example: true
+       * @param {boolean} params.navigationSettings.showStats - Example: true
        * @constructor
        */
       function AssistPanel (params) {
@@ -302,7 +307,8 @@ from desktop.views import _ko
             assistHelper: assistHelper,
             i18n: i18n,
             type: sourceType.type,
-            name: sourceType.name
+            name: sourceType.name,
+            navigationSettings: params.navigationSettings
           });
           self.sources.push(sourceIndex[sourceType.type]);
         });
