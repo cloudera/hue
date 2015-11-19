@@ -56,12 +56,12 @@ class XxdTest(unittest.TestCase):
   def _verify_content(self, expected, actual):
     if self._is_offset_width_same(expected, actual):
       self.assertEquals(expected, actual)
-      return
-    # Not all distributions have the same amount of bits in their 'Offset'
-    # This corrects for this to avoid having this test fail when that is the only problem
-    corrected_expected = self._standardize_xxd_output(expected)
-    corrected_actual = self._standardize_xxd_output(actual)
-    self.assertEquals(corrected_expected, corrected_actual)
+    else:
+      # Not all distributions have the same amount of bits in their 'Offset'
+      # This corrects for this to avoid having this test fail when that is the only problem
+      corrected_expected = self._standardize_xxd_output(expected)
+      corrected_actual = self._standardize_xxd_output(actual)
+      self.assertEquals(corrected_expected, corrected_actual)
 
   def test_compare_to_xxd(self):
     """
