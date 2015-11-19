@@ -300,21 +300,25 @@ from desktop.views import _ko
 
         self.selectedSource = ko.observable(null);
 
+        var setDatabaseWhenLoaded = function (databaseName) {
+          if (self.selectedSource().loaded()) {
+            self.selectedSource().setDatabase(databaseName);
+          } else {
+            var subscription = self.selectedSource().loaded.subscribe(function (newValue) {
+              if (newValue) {
+                self.selectedSource().setDatabase(databaseName);
+                subscription.dispose();
+              }
+            });
+          }
+        };
+
         huePubSub.subscribe("assist.select.database", function (database) {
           if (! database.sourceType || ! sourceIndex[database.sourceType]) {
             return;
           }
           self.selectedSource(sourceIndex[database.sourceType]);
-          if (self.selectedSource().loaded()) {
-            self.selectedSource().setDatabase(database.name);
-          } else {
-            var subscription = self.selectedSource().loaded.subscribe(function (newValue) {
-              if (newValue) {
-                self.selectedSource().setDatabase(database.name);
-                subscription.dispose();
-              }
-            });
-          }
+          setDatabaseWhenLoaded(database.name);
         });
 
         huePubSub.publish("assist.request.status");
@@ -322,19 +326,21 @@ from desktop.views import _ko
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
             newSource.initDatabases();
-            $.totalStorage("hue.assist.lastSelectedSource." + self.user, newSource.name);
+            $.totalStorage("hue.assist.lastSelectedSource." + self.user, newSource.type);
           } else {
             $.totalStorage("hue.assist.lastSelectedSource." + self.user, null);
           }
         });
 
-        var storageSourceType =  $.totalStorage("hue.assist.lastSelectedSource." + params.user);
+        var storageSourceType =  $.totalStorage("hue.assist.lastSelectedSource." + self.user);
 
         if (! self.selectedSource()) {
           if (params.activeSourceType) {
             self.selectedSource(sourceIndex[params.activeSourceType]);
+            setDatabaseWhenLoaded();
           } else if (storageSourceType && sourceIndex[storageSourceType]) {
             self.selectedSource(sourceIndex[storageSourceType]);
+            setDatabaseWhenLoaded();
           }
         }
 
