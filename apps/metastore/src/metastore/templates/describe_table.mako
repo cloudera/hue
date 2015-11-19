@@ -348,14 +348,16 @@ ${ assist.assistPanel() }
                 <table data-bind="visible: !loadingQueries()" class="table table-condensed">
                   <thead>
                     <tr>
-                      <th width="30%">${ _('Name') }</th>
+                      <th width="20%">${ _('Name') }</th>
                       <th>${ _('Query') }</th>
+                      <th width="20%">${ _('Owner') }</th>
                     </tr>
                   </thead>
                   <tbody data-bind="foreach: queries">
                     <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
                       <td data-bind="text: doc.name"></td>
                       <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
+                      <td><code data-bind="text: doc.owner"></code></td>
                     </tr>
                   </tbody>
                 </table>
