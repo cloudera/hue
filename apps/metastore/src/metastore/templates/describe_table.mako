@@ -228,7 +228,7 @@ ${ assist.assistPanel() }
 
             <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
-              <li><a href="#columns" data-toggle="tab">${_('Columns')} <span class="badge" data-bind="text: columns().length" style="padding: 0 9px;"></span></a></li>
+              <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
               % if table.partition_keys:
                 <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
               % endif
@@ -284,7 +284,7 @@ ${ assist.assistPanel() }
                 </div>
 
                 <div class="tile">
-                  <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>)</h4>
+                  <h4>${ _('Starred columns') } (<span data-bind="text: favouriteColumns().length"></span>)</h4>
                   <!-- ko with: favouriteColumns -->
                   <!-- ko template: "columns-table" --><!-- /ko -->
                   <!-- /ko -->
