@@ -122,17 +122,20 @@
    * @param {string} options.sourceType
    * @param {string} options.databaseName
    * @param {string} options.tableName
+   * @param {string} options.dataType - html or json
    * @param {function} options.successCallback
    * @param {function} options.errorCallback
    */
-  AssistHelper.prototype.fetchTableHtmlPreview = function (options) {
+  AssistHelper.prototype.fetchTableSample = function (options) {
     $.ajax({
-      url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName,
-      data: { "sample": true },
+      url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName,
+      data: {
+        "sample": true,
+        "format" : options.dataType
+      },
       beforeSend: function (xhr) {
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },
-      dataType: "html",
       success: options.successCallback,
       error: options.errorCallback
     });
