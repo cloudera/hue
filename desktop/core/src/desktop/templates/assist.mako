@@ -26,7 +26,7 @@ from desktop.views import _ko
     .assist-tables {
       overflow-y: hidden;
       overflow-x: auto;
-      margin-left: 7px;
+      margin-left: 3px;
     }
 
     .assist-tables a {
@@ -65,6 +65,11 @@ from desktop.views import _ko
       position: relative;
       padding-top: 2px;
       padding-bottom: 2px;
+      padding-left: 4px;
+    }
+
+    .assist-tables > li.selected {
+      background-color: #EEE;
     }
 
     .assist-tables-counter {
@@ -106,6 +111,10 @@ from desktop.views import _ko
       padding-right:4px;
       padding-left:4px;
       background-color: #FFF;
+    }
+
+    .assist-tables > li.selected .assist-actions {
+      background-color: #EEE;
     }
 
     .assist .nav-header {
