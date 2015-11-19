@@ -172,6 +172,13 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-table-stats">
   <!-- ko with: tableDetails -->
   <h4>${ _('Stats') }
+    <!-- ko if: $root.refreshingTableStats -->
+    <i class="fa fa-refresh fa-spin"></i>
+    <!-- /ko -->
+    <!-- ko ifnot: $root.refreshingTableStats -->
+    <a class="pointer" href="javascript: void(0);" data-bind="click: $root.refreshTableStats"><i class="fa fa-refresh"></i></a>
+    <!-- /ko -->
+    <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
   </h4>
   <div class="row-fluid">
     <div class="span6">
@@ -571,6 +578,7 @@ ${ assist.assistPanel() }
 
       self.tableDetails = ko.observable();
       self.tableStats = ko.observable();
+      self.refreshingTableStats = ko.observable(false);
       var fetchDetails = function () {
         self.assistHelper.fetchTableDetails({
           sourceType: "hive",
@@ -579,8 +587,10 @@ ${ assist.assistPanel() }
           successCallback: function (data) {
             self.tableDetails(data);
             self.tableStats(data.details.stats);
+            self.refreshingTableStats(false);
           },
           errorCallback: function (data) {
+            self.refreshingTableStats(false);
             console.log('ERRRROR!');
             console.log(data);
           }
@@ -588,6 +598,26 @@ ${ assist.assistPanel() }
       }
 
       fetchDetails();
+
+      self.refreshTableStats = function () {
+        if (self.refreshingTableStats()) {
+          return;
+        }
+        self.refreshingTableStats(true);
+        self.assistHelper.refreshTableStats({
+          tableName: self.activeTable(),
+          databaseName: self.activeDatabase(),
+          sourceType: "hive",
+          successCallback: function (data) {
+            fetchDetails();
+          },
+          errorCallback: function (data) {
+            self.refreshingTableStats(false);
+            console.log('ERRRROR!');
+            console.log(data);
+          }
+        })
+      }
 
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);

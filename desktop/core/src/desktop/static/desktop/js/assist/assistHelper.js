@@ -188,7 +188,7 @@
       }).fail(options.errorCallback);
     };
 
-    $.post("/" + options.sourceType + "/api/analyze/" + options.databaseName + "/" + options.tableName + "/"  + (options.columnName || ""), function (data) {
+    $.post("/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/analyze/" + options.databaseName + "/" + options.tableName + "/"  + (options.columnName || ""), function (data) {
       if (data.status == 0 && data.watch_url) {
         pollRefresh(data.watch_url);
       } else {
