@@ -234,6 +234,18 @@ def describe_table(request, database, table):
   if app_name != 'impala' and table.partition_keys:
     partitions = db.get_partitions(database, table, partition_spec=None, max_parts=None)
 
+  if request.REQUEST.get("format", "html") == "json":
+    return JsonResponse({
+        'status': 0,
+        'partition_keys': [{'name': part.name, 'type': part.type} for part in table.partition_keys],
+        'cols': [{'name': col.name, 'type': col.type, 'comment': col.comment} for col in table.cols],
+        'path_location': table.path_location,
+        'comment': table.comment,
+        'properties': table.properties, 
+        'details': table.details,
+        'stats': table.stats
+    })
+
   try:
     table_data = db.get_sample(database, table)
   except Exception, ex:
@@ -245,23 +257,23 @@ def describe_table(request, database, table):
     if request.REQUEST.get("format", "html") == "json":
       return JsonResponse({'status': 0, 'headers': table_data and table_data.cols(), 'rows': table_data and list(table_data.rows())})
 
-  return render(renderable, request, {
-    'breadcrumbs': [{
-        'name': database,
-        'url': reverse('metastore:show_tables', kwargs={'database': database})
-      }, {
-        'name': str(table.name),
-        'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
-      },
-    ],
-    'table': table,
-    'partitions': partitions,
-    'sample': table_data,
-    'sample_rows': table_data and list(table_data.rows()),
-    'error_message': error_message,
-    'database': database,
-    'has_write_access': has_write_access(request.user),
-  })
+    return render(renderable, request, {
+      'breadcrumbs': [{
+          'name': database,
+          'url': reverse('metastore:show_tables', kwargs={'database': database})
+        }, {
+          'name': str(table.name),
+          'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
+        },
+      ],
+      'table': table,
+      'partitions': partitions,
+      'sample': table_data,
+      'sample_rows': table_data and list(table_data.rows()),
+      'error_message': error_message,
+      'database': database,
+      'has_write_access': has_write_access(request.user),
+    })
 
 
 @check_has_write_access_permission
