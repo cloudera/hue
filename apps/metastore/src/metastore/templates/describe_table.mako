@@ -65,6 +65,7 @@ ${ assist.assistPanel() }
       <th width="1%">&nbsp;</th>
       ## no stats for partition key type
       <th width="1%" class="no-sort">&nbsp;</th>
+      <th width="1%">&nbsp;</th>
       <th>${_('Name')}</th>
       <th>${_('Type')}</th>
       <th>${_('Comment')}</th>
@@ -86,6 +87,7 @@ ${ assist.assistPanel() }
             assistHelper: $root.assistHelper
           } }"></span>
         </td>
+        <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
         <td title="${ _("Scroll to the column") }">
           <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
         </td>
@@ -460,6 +462,8 @@ ${ assist.assistPanel() }
     function MetastoreColumn(extendedColumn) {
       var self = this;
       ko.mapping.fromJS(extendedColumn, {}, self);
+
+      self.favourite = ko.observable(false);
 
       self.comment.subscribe(function (newValue) {
         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
