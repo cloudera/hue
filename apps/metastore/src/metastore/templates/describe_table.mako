@@ -447,6 +447,8 @@ ${ assist.assistPanel() }
     "knockout",
     "ko.charts",
     "desktop/js/assist/assistHelper",
+    "assistPanel",
+    "tableStats",
     "knockout-mapping",
     "knockout-sortable",
     "knockout-deferred-updates",

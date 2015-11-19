@@ -101,7 +101,7 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
-        require(['knockout', 'desktop/js/assist/tableStats'], factory);
+        define("tableStats", ['knockout', 'desktop/js/assist/tableStats'], factory);
       } else {
         factory(ko, TableStats);
       }

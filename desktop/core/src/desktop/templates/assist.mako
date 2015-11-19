@@ -273,7 +273,7 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
-        require(['knockout', 'desktop/js/assist/assistSource', 'desktop/js/assist/assistHelper'], factory);
+        define('assistPanel', ['knockout', 'desktop/js/assist/assistSource', 'desktop/js/assist/assistHelper', 'tableStats'], factory);
       } else {
         factory(ko, AssistSource, AssistHelper);
       }
