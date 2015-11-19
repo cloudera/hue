@@ -254,13 +254,18 @@ ${ assist.assistPanel() }
                             <i class="fa fa-fw fa-user muted"></i> ${ table.details['properties'].get('owner') }
                           </a>
                         </div>
+                        <div><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
                         <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> ${ table.details['properties'].get('create_time') }</div>
-                        <div title="${ _('Format') }"><i class="fa fa-fw fa-file-o muted"></i> ${ table.details['properties'].get('format') }</div>
-                        <div title="${ _('Compressed?') }"><i class="fa fa-fw fa-archive muted"></i> ${ table.details['properties'].get('compressed') and _('Not compressed') or _('Compressed') }</div>
+                        <div title="${ _('Format') }">
+                          <i class="fa fa-fw fa-file-o muted"></i>
+                          ${ table.details['properties'].get('format') }
+                          <i class="fa fa-fw fa-archive muted"></i>
+                          ${ table.details['properties'].get('compressed') and _('uncompressed') or _('compressed') }
+                        </div>                        
                       </div>
 
                       <div class="span6">
-                        <div><a href="${ table.hdfs_link }" rel="${ table.path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
+                        <div><a><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a> ${ _('Computed') }</div>
                         <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> ${ table.details['stats'].get('numFiles') }</div>
                         <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> ${ table.details['stats'].get('numRows') }</div>
                         <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> ${ table.details['properties'].get('totalSize') }</div>
