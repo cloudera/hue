@@ -300,7 +300,9 @@ ${ assist.assistPanel() }
               </div>
 
               <div class="tab-pane" id="columns">
-                ${ column_table(table.cols, "columnTable", True) }
+                <!-- ko with: columns -->
+                <!-- ko template: "columns-table" --><!-- /ko -->
+                <!-- /ko -->
               </div>
 
               % if table.partition_keys:
