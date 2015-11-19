@@ -1525,6 +1525,7 @@ ${ require.config() }
     "knockout",
     "ko.charts",
     "notebook/js/notebook.ko",
+    "assistPanel",
     "knockout-mapping",
     "knockout-sortable",
     "knockout-deferred-updates",
