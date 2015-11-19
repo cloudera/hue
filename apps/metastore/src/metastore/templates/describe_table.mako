@@ -138,33 +138,28 @@ ${ assist.assistPanel() }
   </table>
 </%def>
 
-<%def name="sample_table(limit=100)">
-  <table id="sampleTable" class="table table-striped table-condensed sampleTable">
-    <thead>
+<script type="text/html" id="sample-table">
+  <div style="overflow: auto">
+    <table id="sampleTable" class="table table-striped table-condensed sampleTable">
       <tr>
         <th style="width: 10px"></th>
-      % for col in sample.cols():
-        <th>${ col }</th>
-      % endfor
+        <!-- ko foreach: headers -->
+        <th data-bind="text: $data"></th>
+        <!-- /ko -->
       </tr>
-    </thead>
-    <tbody>
-    % for i, row in enumerate(sample_rows[:limit]):
-      <tr>
-        <td>${ i }</td>
-      % for item in row:
-        <td>
-          % if item is None:
-            NULL
-          % else:
-            ${ escape(smart_unicode(item, errors='ignore')).replace(' ', '&nbsp;') | n,unicode }
-          % endif
-        </td>
-      % endfor
-      </tr>
-    % endfor
-    </tbody>
-  </table>
+      <tbody>
+        <!-- ko foreach: rows -->
+          <tr>
+            <td data-bind="text: $index"></td>
+            <!-- ko foreach: $data -->
+              <td data-bind="text: $data"></td>
+            <!-- /ko -->
+          </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
+  </div>
+
   <div id="jumpToColumnAlert" class="alert hide" style="margin-top: 12px;">
     <button type="button" class="close" data-dismiss="alert">&times;</button>
     <strong>${_('Did you know?')}</strong>
@@ -172,7 +167,7 @@ ${ assist.assistPanel() }
       <li>${ _('If the sample contains a large number of columns, click a row to select a column to jump to') }</li>
     </ul>
   </div>
-</%def>
+</script>
 
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
@@ -299,7 +294,9 @@ ${ assist.assistPanel() }
                 <div class="tile">
                   <h4>${ _('Sample') }</h4>
                   % if sample:
-                    ${ sample_table(limit=3) }
+                    <!-- ko with: samplesPreview -->
+                    <!-- ko template: 'sample-table' --><!-- /ko -->
+                    <!-- /ko -->
                     <a class="pointer" data-bind="click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
                   % else:
                     ${ _('Table sampling took too long.') }
@@ -335,7 +332,9 @@ ${ assist.assistPanel() }
                   <pre>${ error_message }</pre>
                 </div>
               % else:
-                ${ sample_table() }
+                <!-- ko with: samples -->
+                <!-- ko template: 'sample-table' --><!-- /ko -->
+                <!-- /ko -->
               % endif
               </div>
               % endif
@@ -526,19 +525,41 @@ ${ assist.assistPanel() }
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
 
+      self.samplesPreview = ko.observable();
+      self.samples = ko.observable();
+
       self.assistHelper = new AssistHelper(options)
 
       self.assistHelper.fetchFields({
-        sourceType: 'hive',
+        sourceType: "hive",
         databaseName: self.activeDatabase(),
         tableName: self.activeTable(),
         fields: [],
-        successCallback: function(data) {
-          self.columns($.map(data.extended_columns, function(column) { return new MetastoreColumn(self, column) }));
+        successCallback: function (data) {
+          self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn(self, column) }));
           self.favouriteColumns(self.columns().slice(0, 3));
         },
-        errorCallback: function(message) {
-          console.log(message);
+        errorCallback: function (data) {
+          console.log('ERRRROR!');
+          console.log(data);
+        }
+      })
+
+      self.assistHelper.fetchTableSample({
+        sourceType: "hive",
+        databaseName: self.activeDatabase(),
+        tableName: self.activeTable(),
+        dataType: "json",
+        successCallback: function (data) {
+          self.samples(data);
+          self.samplesPreview({
+            headers: self.samples().headers,
+            rows: self.samples().rows.slice(0, 3)
+          });
+        },
+        errorCallback: function (data) {
+          console.log('ERRRROR!');
+          console.log(data);
         }
       })
 
