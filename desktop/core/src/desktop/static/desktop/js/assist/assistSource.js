@@ -103,6 +103,9 @@
     };
 
     self.setDatabase = function (databaseName) {
+      if (databaseName && self.selectedDatabase() && databaseName === self.selectedDatabase().definition.name) {
+        return;
+      }
       if (databaseName && dbIndex[databaseName]) {
         self.selectedDatabase(dbIndex[databaseName]);
         return;
@@ -116,6 +119,9 @@
     };
 
     self.initDatabases = function () {
+      if (self.loading()) {
+        return;
+      }
       self.loading(true);
       self.assistHelper.loadDatabases({
         sourceType: self.type,

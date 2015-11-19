@@ -1021,10 +1021,11 @@
           name: self.snippets()[0].database()
         });
       }
-      huePubSub.publish('assist.select.database', {
-        sourceType: null,
-        name: null
-      });
+      // TODO: Uncomment when we switch to the new impala and hive editors
+      //huePubSub.publish('assist.select.database', {
+      //  sourceType: null,
+      //  name: null
+      //});
     });
   };
 
