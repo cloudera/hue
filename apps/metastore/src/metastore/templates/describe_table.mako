@@ -250,7 +250,7 @@ ${ assist.assistPanel() }
                     <div class="row-fluid">
                       <div class="span6">
                         <div title="${ _('Owner') }">
-                          <a href="/useradmin/users/view/${ table.details['properties'].get('owner') }">
+                          <a href="/useradmin/view_user/${ table.details['properties'].get('owner') }">
                             <i class="fa fa-fw fa-user muted"></i> ${ table.details['properties'].get('owner') }
                           </a>
                         </div>
