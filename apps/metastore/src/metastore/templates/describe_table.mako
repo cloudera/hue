@@ -57,6 +57,37 @@ ${ assist.assistPanel() }
 
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script type="text/html" id="columns-table">
+  <table class="table table-striped table-condensed sampleTable">
+    <thead>
+    <tr>
+      <th width="1%">&nbsp;</th>
+      ## no stats for partition key type
+      <th width="1%" class="no-sort">&nbsp;</th>
+      <th>${_('Name')}</th>
+      <th>${_('Type')}</th>
+      <th>${_('Comment')}</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: $data">
+      <tr>
+        ## start at 0
+        <td data-bind="text: $index()"></td>
+        ## no stats for partition key type
+        <td><a href="javascript:void(0)"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+        <td title="${ _("Scroll to the column") }">
+          <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
+        </td>
+        <td data-bind="text: type"></td>
+        <td>
+          ## Do all columns support comments?
+          <a class="pointer"><i class="fa fa-pencil" data-bind="click: function() { updateColumnComment(name, 'new comment') }"></i></a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+
 <%def name="column_table(cols, id, withStats=False, limit=10000)">
   <table id="${id}" class="table table-striped table-condensed sampleTable
   %if withStats:
@@ -245,7 +276,9 @@ ${ assist.assistPanel() }
                 <div class="tile">
                   <h4>${ _('Columns') }</h4>
                   <i class="fa fa-star"></i></a>
-                  ${ column_table(table.cols, "columnTable", True, 3) }
+                  <!-- ko with: favouriteColumns -->
+                  <!-- ko template: "columns-table" --><!-- /ko -->
+                  <!-- /ko -->
                   ${_('View more...')}
                 </div>
 
@@ -399,17 +432,48 @@ ${ assist.assistPanel() }
   require([
     "knockout",
     "ko.charts",
+    "desktop/js/assist/assistHelper",
     "knockout-mapping",
     "knockout-sortable",
     "knockout-deferred-updates",
     "ko.editable",
     "ko.hue-bindings"
-  ], function (ko, charts) {
+  ], function (ko, charts, AssistHelper) {
 
-    function MetastoreViewModel() {
+    /**
+     * @param {Object} options
+     * @param {Object} options.i18n
+     * @param {string} options.i18n.errorLoadingDatabases
+     * @param {string} options.i18n.errorLoadingTablePreview
+     * @param {string} options.user
+     * @constructor
+     */
+    function MetastoreViewModel(options) {
       var self = this;
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
+
+      self.activeDatabse = ko.observable('${database}');
+      self.activeTable = ko.observable('${table.name}');
+
+      self.columns = ko.observableArray();
+      self.favouriteColumns = ko.observableArray();
+
+      self.assistHelper = new AssistHelper(options)
+
+      self.assistHelper.fetchFields({
+        sourceType: 'hive',
+        databaseName: self.activeDatabse(),
+        tableName: self.activeTable(),
+        fields: [],
+        successCallback: function(data) {
+          self.columns(data.extended_columns);
+          self.favouriteColumns(data.extended_columns.slice(0, 3));
+        },
+        errorCallback: function(message) {
+          console.log(message);
+        }
+      })
 
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
@@ -425,9 +489,17 @@ ${ assist.assistPanel() }
       }
     }
 
-    var viewModel = new MetastoreViewModel();
-
     $(document).ready(function () {
+      var options = {
+        user: '${ user.username }',
+        i18n : {
+          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
+        }
+      }
+
+      var viewModel = new MetastoreViewModel(options);
+
       ko.applyBindings(viewModel);
 
       window.hueDebug = {
