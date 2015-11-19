@@ -297,21 +297,25 @@ def alter_column(request, database, table):
   db = dbms.get(request.user)
   response = {'status': -1, 'data': ''}
   try:
-    column = request.POST.get('column')
-    col = db.get_column(database, table, column)
-    if col:
-      new_column_name = request.POST.get('new_column_name', col.name)
-      new_column_type = request.POST.get('new_column_type', col.type)
+    column = request.POST.get('column', None)
+
+    if column is None:
+      raise PopupException(_('alter_column requires a column parameter'))
+
+    column_obj = db.get_column(database, table, column)
+    if column_obj:
+      new_column_name = request.POST.get('new_column_name', column_obj.name)
+      new_column_type = request.POST.get('new_column_type', column_obj.type)
       comment = request.POST.get('comment', None)
       partition_spec = request.POST.get('partition_spec', None)
 
-      column = db.alter_column(database, table, column, new_column_name, new_column_type, comment=comment, partition_spec=partition_spec)
+      column_obj = db.alter_column(database, table, column, new_column_name, new_column_type, comment=comment, partition_spec=partition_spec)
 
       response['status'] = 0
       response['data'] = {
-        'name': column.name,
-        'type': column.type,
-        'comment': column.comment
+        'name': column_obj.name,
+        'type': column_obj.type,
+        'comment': column_obj.comment
       }
     else:
       raise PopupException(_('Column `%s`.`%s` `%s` not found') % (database, table, column))
