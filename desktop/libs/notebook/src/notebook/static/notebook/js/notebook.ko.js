@@ -977,6 +977,12 @@
       });
     };
 
+    self.clearHistory = function () {
+      // TODO
+      console.log("clear history")
+      $(document).trigger("hideHistoryModal");
+    };
+
     self.exportJupyterNotebook = function () {
       function addCell(type, code) {
         var cell = {
