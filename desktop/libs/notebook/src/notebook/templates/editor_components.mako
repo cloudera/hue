@@ -417,6 +417,11 @@ ${ require.config() }
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <table class="table table-compressed">
+        <thead>
+          <tr>
+            <th colspan="2" class="muted">${ _('Query history') } &nbsp; <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="" data-toggle="modal"><i class="fa fa-calendar-times-o"></i></a></th>
+          </tr>
+        </thead>
         <tbody data-bind="foreach: $parent.history">
           <tr class="pointer" data-bind="click: function(){ location.href=url }">
             <td><code data-bind="text: query"></code></td>
@@ -1065,6 +1070,21 @@ ${ require.config() }
     <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: function() { $root.selectedNotebook().authSession(); }">${_('Connect')}</a>
   </div>
 </div>
+
+<div id="clearHistoryModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Confirm History Clear')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Are you sure you want to clear the query history?')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-danger disable-feedback" data-bind="click: function() { $root.selectedNotebook().clearHistory(); }">${_('Yes')}</a>
+  </div>
+</div>
+
   
 </%def>
 
@@ -1900,6 +1920,10 @@ ${ require.config() }
         viewModel.authSessionType(data['type']);
         viewModel.authSessionCallback(data['callback']);
         $("#authModal").modal("show");
+      });
+
+      $(document).on("hideHistoryModal", function (e) {
+        $("#clearHistoryModal").modal("hide");
       });
 
       // Close the notebook snippets when leaving the page
