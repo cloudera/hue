@@ -15,8 +15,8 @@
 // limitations under the License.
 
 (function (factory) {
-  if(typeof require === "function") {
-    require(['knockout'], factory);
+  if(typeof define === "function") {
+    define("ko.hue-bindings", ["knockout"], factory);
   } else {
     factory(ko);
   }
