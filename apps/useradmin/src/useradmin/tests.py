@@ -161,7 +161,8 @@ class LdapTestConnection(object):
                     'posix_person2': {'dn': 'uid=posix_person2,ou=People,dc=example,dc=com', 'username': 'posix_person2', 'first': 'pos', 'last': 'ix', 'email': 'pos@ix.com'},
                     'user with space': {'dn': 'uid=user with space,ou=People,dc=example,dc=com', 'username': 'user with space', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
                     'spaceless': {'dn': 'uid=user without space,ou=People,dc=example,dc=com', 'username': 'spaceless', 'first': 'user', 'last': 'space', 'email': 'user@space.com'},
-                    'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},}
+                    'test_toolongusernametoolongusername': {'dn': 'uid=test_toolongusernametoolongusername,ou=People,dc=example,dc=com', 'username': 'test_toolongusernametoolongusername', 'first': 'toolong', 'last': 'username', 'email': 'toolong@username.com'},
+                    'test_longfirstname': {'dn': 'uid=test_longfirstname,ou=People,dc=example,dc=com', 'username': 'test_longfirstname', 'first': 'test_longfirstname_test_longfirstname', 'last': 'username', 'email': 'toolong@username.com'},}
 
       self.groups = {'TestUsers': {
                         'dn': 'cn=TestUsers,ou=Groups,dc=example,dc=com',
