@@ -225,15 +225,15 @@ def save_notebook(request):
 
 
 @require_POST
-# @check_document_modify_permission()
+@check_document_modify_permission()
 def historify(request):
   response = {'status': -1}
 
-  parent = request.POST.get('parent_id')  # If we had an history to a saved notebook
   history = json.loads(request.POST.get('notebook', '{}'))
+  query_type = history['type']
 
-  history_doc = Document2.objects.create(name=history['name'], type='notebook', owner=request.user)
-  Document.objects.link(history_doc, owner=history_doc.owner, name=history_doc.name, description=history_doc.description, extra='notebook')
+  history_doc = Document2.objects.create(name=history['name'], type=query_type, owner=request.user, is_history=True)
+  Document.objects.link(history_doc, owner=history_doc.owner, name=history_doc.name, description=history_doc.description, extra=query_type)
 
   history_doc1 = history_doc.doc.get()
   history_doc.update_data(history)
@@ -243,18 +243,21 @@ def historify(request):
   history_doc.save()
   history_doc1.save()
 
-  if parent:
-    Document2.objects.get(id=parent['id']).dependencies.add(history_doc)
+  if history.get('id'): # If we come from a saved query
+    Document2.objects.get(id=history['id']).dependencies.add(history_doc)
 
   response['status'] = 0
   response['id'] = history_doc.id
-  response['message'] = _('Notebook saved !')
+  response['message'] = _('Query notebook history saved !')
 
   return JsonResponse(response)
 
 
+@require_GET
 def get_history(request):
   response = {'status': -1}
+
+  doc_type = request.GET.get('doc_type')
 
   response['status'] = 0
   response['history'] = [{
@@ -262,8 +265,26 @@ def get_history(request):
       'id': doc.id,
       'data': Notebook(document=doc).get_data(),
       'absoluteUrl': doc.get_absolute_url()
-      } for doc in Document2.objects.filter(type='notebook', owner=request.user, is_history=True).order_by('-last_modified')[:25]]
-  response['message'] = _('History saved !')
+      } for doc in Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)[:25]]
+  response['message'] = _('History fetched')
+
+  return JsonResponse(response)
+
+
+@require_POST
+@check_document_modify_permission()
+def clear_history(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook'), '{}')
+  doc_type = request.POST.get('doc_type')
+
+  response['status'] = 0
+  history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+  if notebook.get('id'):
+    history = history.exclude(id=notebook.get('id'))
+  response['updated'] = history.delete()
+  response['message'] = _('History cleared !')
 
   return JsonResponse(response)
 

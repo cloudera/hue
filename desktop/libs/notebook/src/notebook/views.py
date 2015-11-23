@@ -62,7 +62,7 @@ def notebook(request):
       'notebooks_json': json.dumps([notebook.get_data()]),
       'options_json': json.dumps({
           'languages': get_interpreters(request.user),
-          'session_properties': SparkApi.PROPERTIES
+          'session_properties': SparkApi.PROPERTIES,
       }),
       'autocomplete_base_url': autocomplete_base_url,
       'is_yarn_mode': is_yarn_mode
@@ -80,7 +80,7 @@ def editor(request):
     editor = Notebook()
     data = editor.get_data()
     data['name'] = '%s Query' % editor_type.title()
-    data['type'] = 'query'
+    data['type'] = 'query-%s' % editor_type
     editor.data = json.dumps(data)
 
   autocomplete_base_url = ''
@@ -92,7 +92,8 @@ def editor(request):
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
-          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}]
+          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
+          'mode': 'editor',
       }),
       'editor_type': editor_type,
       'autocomplete_base_url': autocomplete_base_url,
@@ -104,7 +105,7 @@ def new(request):
 
 
 def notebooks(request):
-  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra='query')) if not d.content_object.is_history]
+  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra__startswith='query')) if not d.content_object.is_history]
 
   return render('notebooks.mako', request, {
       'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)

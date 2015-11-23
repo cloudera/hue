@@ -434,13 +434,15 @@
         self.close();
       }
 
-      $.post("/notebook/api/historify", {
-        notebook: ko.mapping.toJSON(self, SPARK_MAPPING)
-      }, function(data){
-        if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
-          history.pushState(null, null, '/notebook/editor?editor=' + data.id);
-        }
-      });
+      if (notebook.type() != 'notebook') {
+        $.post("/notebook/api/historify", {
+          notebook: ko.mapping.toJSON(self, SPARK_MAPPING)
+        }, function(data){
+          if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
+            history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+          }
+        });
+      }
 
       $.post("/notebook/api/execute", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -697,7 +699,7 @@
     self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
-    self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type: 'notebook');
+    self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
     self.creatingSessionLocks = ko.observableArray();
@@ -945,7 +947,7 @@
     };
 
     self.closeAndRemoveSession = function (session) {
-      self.closeSession (session, false, function() {
+      self.closeSession(session, false, function() {
         self.sessions.remove(session);
       });
     };
@@ -970,13 +972,15 @@
     };
 
     self.fetchHistory = function () {
-      $.get("/notebook/api/get_history", {}, function(data) {
+      $.get("/notebook/api/get_history", {
+        doc_type: self.selectedSnippet()
+      }, function(data) {
         var parsedHistory = [];
         if (data && data.history){
           data.history.forEach(function(nbk){
             parsedHistory.push({
               url: nbk.absoluteUrl,
-              query: nbk.data.statement_raw,
+              query: nbk.data.snippets[0].statement_raw,
               lastExecuted: nbk.data.lastExecuted
             });
           });
@@ -985,9 +989,15 @@
       });
     };
 
-    self.clearHistory = function () {
-      // TODO
-      console.log("clear history")
+    self.clearHistory = function (type) {
+      $.post("/notebook/api/clear_history", {
+        notebook: ko.mapping.toJSON(self.getContext()),
+        doc_type: self.selectedSnippet()
+      }, function (data) {
+          self.history.removeAll();
+        }).fail(function (xhr) {
+           $(document).trigger("error", xhr.responseText);
+        });
       $(document).trigger("hideHistoryModal");
     };
 
@@ -1126,7 +1136,7 @@
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
-    self.editorMode = self.availableSnippets().length === 1;
+    self.editorMode = options.mode == 'editor';
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {

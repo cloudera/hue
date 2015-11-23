@@ -57,6 +57,7 @@ urlpatterns += patterns('notebook.api',
 
   url(r'^api/historify$', 'historify', name='historify'),
   url(r'^api/get_history', 'get_history', name='get_history'),
+  url(r'^api/clear_history', 'clear_history', name='clear_history'),
 
   url(r'^api/notebook/save$', 'save_notebook', name='save_notebook'),
   url(r'^api/notebook/open$', 'open_notebook', name='open_notebook'),
