@@ -845,11 +845,11 @@
       var lastEditorHeight = 7;
 
       var autoExpandTimeout = window.setInterval(function () {
-        var chunks = Math.floor((ace().session.getLength() - lastEditorHeight) / 8) + 1;
+        var chunks = Math.floor((Math.max(ace().session.getLength(), 4) - lastEditorHeight) / 4);
         if (chunks !== 0) {
-          $target.height($target.height() + 128 * chunks);
+          $target.height($target.height() + 64 * chunks);
           ace().resize();
-          lastEditorHeight += 8 * chunks;
+          lastEditorHeight += 4 * chunks;
         }
       }, 300);
 
