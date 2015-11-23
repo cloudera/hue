@@ -26,11 +26,6 @@ body {
   background-color: #FFF;
 }
 
-.navbar-fixed-top .navbar-inner {
-  box-shadow: none;
-  border-bottom: 1px solid #DDD;
-}
-
 .vertical-full {
   height:100%;
 }

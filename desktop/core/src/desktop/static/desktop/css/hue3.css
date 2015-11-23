@@ -2204,3 +2204,22 @@ div.navigator .pull-right .nav {
 .inactive-action:hover > a {
   color: #338bb8 !important;
 }
+
+
+/*
+Transition to Hue 4
+*/
+
+body {
+  background-color: #FFF;
+}
+
+.card, .sidebar-nav .nav-list {
+  border-radius: 0;
+  border: none;
+}
+
+.navbar-fixed-top .navbar-inner {
+  box-shadow: none;
+  border-bottom: 1px solid #DDD;
+}
