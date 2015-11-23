@@ -67,6 +67,14 @@ def validate_groupname(groupname_pattern):
   if not validator.match(groupname_pattern):
     raise ValidationError(_("Group name can be any character as long as it's 80 characters or fewer."))
 
+def validate_first_name(first_name):
+  if first_name and len(first_name) > 30:
+    raise ValidationError(_('first_name must be fewer than 30 characters.'))
+
+def validate_last_name(last_name):
+  if last_name and len(last_name) > 30:
+    raise ValidationError(_('last_name must be fewer than 30 characters.'))
+
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   """
