@@ -160,6 +160,10 @@ from desktop.views import _ko
         <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
+        <div class="center"  data-bind="visible: loading" style="display:none;">
+          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+        </div>
         <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
     </ul>

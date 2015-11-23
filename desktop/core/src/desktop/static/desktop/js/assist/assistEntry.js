@@ -127,9 +127,9 @@
       return;
     }
     self.loading(true);
-    self.entries([]);
 
     var successCallback = function(data) {
+      self.entries([]);
       if (typeof data.tables !== "undefined") {
         self.entries($.map(data.tables, function(tableName) {
           return self.createEntry({
