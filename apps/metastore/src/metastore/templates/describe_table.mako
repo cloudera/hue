@@ -313,7 +313,7 @@ ${ assist.assistPanel() }
                 </div>
 
                 <div class="tile">
-                  <h4>${ _('Starred columns') } (<span data-bind="text: favouriteColumns().length"></span>)</h4>
+                  <h4>${ _('Columns') } (<span data-bind="text: favouriteColumns().length"></span>)</h4>
                   <!-- ko with: favouriteColumns -->
                   <!-- ko template: "metastore-columns-table" --><!-- /ko -->
                   <!-- /ko -->
