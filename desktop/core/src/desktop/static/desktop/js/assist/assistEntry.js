@@ -265,8 +265,12 @@
   AssistEntry.prototype.openItem = function () {
     var self = this;
     if (self.definition.isTable) {
-      huePubSub.publish("assist.table.set", {
+      huePubSub.publish("assist.table.selected", {
         database: self.databaseName,
+        name: self.definition.name
+      })
+    } else if (self.definition.isDatabase) {
+      huePubSub.publish("assist.database.selected", {
         name: self.definition.name
       })
     }

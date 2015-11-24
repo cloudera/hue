@@ -625,10 +625,14 @@ ${ assist.assistPanel() }
 
       self.initialize();
 
-      huePubSub.subscribe("assist.table.set", function (tableDef) {
+      huePubSub.subscribe("assist.table.selected", function (tableDef) {
         self.activeDatabase(tableDef.database);
         self.activeTable(tableDef.name)
         self.initialize();
+      });
+
+      huePubSub.subscribe("assist.database.selected", function (databaseDef) {
+        console.log(databaseDef);
       });
 
       self.refreshTableStats = function () {
