@@ -58,6 +58,23 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 
+<script type="text/html" id="metastore-breadcrumbs">
+  <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
+    <li>
+      <i class="fa fa-th muted"></i>
+    </li>
+    <li>
+      <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
+    </li>
+    <li>
+      <a data-bind="text: activeDatabase, attr: { href: '/metastore/tables/' + activeDatabase() }"></a><span class="divider">&gt;</span>
+    </li>
+    <li>
+      <span style="padding-left:12px" data-bind="text: activeTable"></span>
+    </li>
+  </ul>
+</script>
+
 <script type="text/html" id="metastore-columns-table">
   <table class="table table-striped table-condensed sampleTable">
     <thead>
@@ -250,7 +267,7 @@ ${ assist.assistPanel() }
                   <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a></li>
                 % endif
               </ul>
-              ${ components.breadcrumbs(breadcrumbs, 'fa fa-th muted') }
+              <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
             </h3>
             <div class="clearfix"></div>
 
