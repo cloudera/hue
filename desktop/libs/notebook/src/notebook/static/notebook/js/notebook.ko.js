@@ -436,7 +436,7 @@
 
       if (notebook.type() != 'notebook') {
         $.post("/notebook/api/historify", {
-          notebook: ko.mapping.toJSON(self, SPARK_MAPPING)
+          notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
         }, function(data){
           if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
             history.pushState(null, null, '/notebook/editor?editor=' + data.id);

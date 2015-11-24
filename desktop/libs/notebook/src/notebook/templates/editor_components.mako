@@ -416,9 +416,6 @@ ${ require.config() }
   <!-- ko if: $root.editorMode -->
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
-      <!-- ko ifnot: $parent.history().length > 0 -->
-      <div class="alert alert-notebook"><strong>${ _('There is currently no query history.')}</strong> ${ _('Did you know that you can autocomplete your SQL statement with CTRL+Space and run the query with CTRL+Enter?') }</div>
-      <!-- /ko -->
       <!-- ko if: $parent.history().length > 0 -->
       <table class="table table-compressed">
         <thead>
@@ -861,7 +858,7 @@ ${ require.config() }
 <script type ="text/html" id="snippet-execution-controls">
   <!-- ko if: $root.editorMode -->
   <div class="hover-actions" style="position:absolute; bottom: 26px">
-    <a class="snippet-side-btn" data-bind="click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
+    <a class="snippet-side-btn" data-bind="visible: $parent.history().length > 0, click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
       <i class="fa fa-fw fa-history"></i>
     </a>
   </div>
@@ -873,7 +870,7 @@ ${ require.config() }
     <a class="snippet-side-btn" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
       <i class="fa fa-fw fa-stop"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading'" title="${ _('CTRL + ENTER') }">
+    <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0}" title="${ _('CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
     </a>
   </div>
