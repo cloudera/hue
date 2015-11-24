@@ -272,17 +272,15 @@ ${ assist.assistPanel() }
             </h3>
             <div class="clearfix"></div>
 
-            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: 'Add a description...' }" class="editable editable-click editable-empty">Add a description...</span>
+            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: 'Add a description...' }" class="editable editable-click editable-empty">${ _('Add a description...') }</span>
 
             <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
               % if table.partition_keys:
-                <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')}</a></li>
+                <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')} (${ len(table.partition_keys) })</a></li>
               % endif
-              % if sample is not None:
-                <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
-              % endif
+              <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
               <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
               <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
@@ -323,19 +321,15 @@ ${ assist.assistPanel() }
 
                 <div class="tile">
                   <h4>${ _('Sample') }</h4>
-                  % if sample:
                     <!-- ko with: samplesPreview -->
-                    <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
+                      <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
                     <!-- /ko -->
                     <a class="pointer" data-bind="click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
-                  % else:
-                    ${ _('Table sampling took too long.') }
-                  % endif
                 </div>
 
                 % if table.partition_keys:
                   <div class="tile">
-                    <h4>${ _('Partitions') }</h4>
+                    <h4>${ _('Partitions') } (${ len(table.partition_keys) })</h4>
                     ${ partition_column_table(table.partition_keys, "partitionTable", limit=3) }
                     <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitionColumns\']').click(); }">${_('View more...')}</a>
                   </div>
@@ -354,20 +348,11 @@ ${ assist.assistPanel() }
                 </div>
               % endif
 
-              % if sample is not None:
-                <div class="tab-pane" id="sample">
-                  % if error_message:
-                    <div class="alert alert-error">
-                      <h3>${_('Error!')}</h3>
-                      <pre>${ error_message }</pre>
-                    </div>
-                  % else:
-                    <!-- ko with: samples -->
-                    <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
-                    <!-- /ko -->
-                  % endif
-                </div>
-              % endif
+              <div class="tab-pane" id="sample">
+                <!-- ko with: samples -->
+                <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
+                <!-- /ko -->
+              </div>
 
               <div class="tab-pane" id="permissions">
                 ${ _('Not available') }

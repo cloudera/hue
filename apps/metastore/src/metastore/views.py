@@ -213,9 +213,6 @@ def describe_table(request, database, table):
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
 
-  error_message = ''
-  table_data = ''
-
   try:
     table = db.get_table(database, table)
   except Exception, e:
@@ -244,16 +241,25 @@ def describe_table(request, database, table):
         'stats': table.stats
     })
 
-  try:
-    table_data = db.get_sample(database, table)
-  except Exception, ex:
-    error_message, logs = dbms.expand_exception(ex, db)
-
   renderable = "describe_table.mako"
   if request.REQUEST.get("sample", "false") == "true":
     renderable = "sample.mako"
     if request.REQUEST.get("format", "html") == "json":
-      return JsonResponse({'status': 0, 'headers': table_data and table_data.cols(), 'rows': table_data and list(table_data.rows())})
+      response = {'status': -1, 'error_message': ''}
+      error_message = ''
+      table_data = ''      
+      try:
+        table_data = db.get_sample(database, table)
+        response.update({
+            'status': 0,
+            'headers': table_data and table_data.cols(),
+            'rows': table_data and list(table_data.rows())
+        })
+      except Exception, ex:
+        error_message, logs = dbms.expand_exception(ex, db)
+        response['error_message'] = error_message
+        
+      return JsonResponse(response)
 
   return render(renderable, request, {
     'breadcrumbs': [{
@@ -265,12 +271,9 @@ def describe_table(request, database, table):
       },
     ],
     'table': table,
-    'partitions': partitions,
-    'sample': table_data,
-    'sample_rows': table_data and list(table_data.rows()),
-    'error_message': error_message,
     'database': database,
     'has_write_access': has_write_access(request.user),
+    'partitions': partitions
   })
 
 
