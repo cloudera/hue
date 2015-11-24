@@ -436,6 +436,10 @@
 
       $.post("/notebook/api/historify", {
         notebook: ko.mapping.toJSON(self, SPARK_MAPPING)
+      }, function(data){
+        if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
+          history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+        }
       });
 
       $.post("/notebook/api/execute", {
