@@ -72,10 +72,8 @@ ${ components.menubar() }
                 <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
                 <th>&nbsp;</th>
                 <th>${_('Table Name')}</th>
-                % if has_metadata:
                 <th>${_('Comment')}</th>
                 <th>${_('Type')}</th>
-                % endif
               </tr>
             </thead>
             <tbody>
@@ -92,10 +90,8 @@ ${ components.menubar() }
                 <td>
                   <a class="tableLink" href="${ url('metastore:describe_table', database=database, table=table['name']) }" data-row-selector="true">${ table['name'] }</a>
                 </td>
-                % if has_metadata:
-                <td>${ smart_unicode(table['comment']) }</td>
+                <td>${ smart_unicode(table['comment']) if table['comment'] else '' }</td>
                 <td>${ smart_unicode(table['type']) }</td>
-                % endif
               </tr>
             % endfor
             </tbody>
@@ -169,10 +165,8 @@ ${ components.menubar() }
         {"bSortable": false, "sWidth": "1%" },
         {"bSortable": false, "sWidth": "1%" },
         null,
-        % if has_metadata:
         null,
         null
-        % endif
       ],
       "oLanguage": {
         "sEmptyTable": "${_('No data available')}",
@@ -229,21 +223,6 @@ ${ components.menubar() }
         $("." + $(this).data("selectables")).addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
-    });
-
-      $(".tableLink").mouseover(function() {
-      var _link = $(this);
-      $.ajax({
-        type: "GET",
-        url: "/metastore/table/${database}/" + $(this).text() + "/metadata",
-        dataType: "json",
-        data: {},
-        success: function (response) {
-          if (response && response.status == 0) {
-            _link.attr("title", response.data.comment).tooltip("show");
-          }
-        },
-      });
     });
 
     $(".tableCheck").click(function () {
