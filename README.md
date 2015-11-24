@@ -1,7 +1,7 @@
 ![alt text](https://raw.githubusercontent.com/cloudera/hue/master/docs/images/hue_logo.png "Hue Logo")
 
 
-Welcome to the repository for Hue
+Welcome to the repository for Hue TEST
 -----------
 
 Hue is an open source Web interface for analyzing data with any Apache Hadoop: [gethue.com](http://gethue.com)
