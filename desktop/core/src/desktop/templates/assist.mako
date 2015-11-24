@@ -137,7 +137,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entry-actions">
-    <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn } " style="opacity: 0">
+    <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
       <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
@@ -215,7 +215,8 @@ from desktop.views import _ko
     </li>
     <li data-bind="visible: ! hasErrors()" >
       <ul class="assist-tables" data-bind="foreach: databases">
-        <li class="assist-table pointer">
+        <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
+          <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
           <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
         </li>
       </ul>
