@@ -67,10 +67,10 @@ ${ assist.assistPanel() }
       <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
     </li>
     <li>
-      <a data-bind="text: activeDatabase, attr: { href: '/metastore/tables/' + activeDatabase() }"></a><span class="divider">&gt;</span>
+      <a data-bind="text: database.name, attr: { href: '/metastore/tables/' + name }"></a><span class="divider">&gt;</span>
     </li>
     <li>
-      <span style="padding-left:12px" data-bind="text: activeTable"></span>
+      <span style="padding-left:12px" data-bind="text: name"></span>
     </li>
   </ul>
 </script>
@@ -98,11 +98,11 @@ ${ assist.assistPanel() }
             alwaysActive: true,
             statsVisible: true,
             sourceType: 'hive',
-            databaseName: $root.activeDatabase(),
-            tableName: $root.activeTable(),
+            databaseName: table.database.name,
+            tableName: table.name,
             columnName: name,
             fieldType: type,
-            assistHelper: $root.assistHelper
+            assistHelper: table.assistHelper
           } }"></span>
         </td>
         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
@@ -189,11 +189,11 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-table-stats">
   <!-- ko with: tableDetails -->
   <h4>${ _('Stats') }
-    <!-- ko if: $root.refreshingTableStats -->
+    <!-- ko if: $parent.refreshingTableStats -->
     <i class="fa fa-refresh fa-spin"></i>
     <!-- /ko -->
-    <!-- ko ifnot: $root.refreshingTableStats -->
-    <a class="pointer" href="javascript: void(0);" data-bind="click: $root.refreshTableStats"><i class="fa fa-refresh"></i></a>
+    <!-- ko ifnot: $parent.refreshingTableStats -->
+    <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
     <!-- /ko -->
     <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
   </h4>
@@ -211,7 +211,7 @@ ${ assist.assistPanel() }
 
     <div class="span6">
       <div><a data-bind="attr: {'href': hdfs_link, 'rel': path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
-      <!-- ko with: $root.tableStats -->
+      <!-- ko with: $parent.tableStats -->
       <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
       <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
       <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
@@ -252,7 +252,8 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         <div class="right-panel">
-
+          <!-- ko with: database -->
+          <!-- ko with: table -->
           <div class="metastore-main">
             <h3>
               <ul class="nav nav-pills pull-right" style="margin-top: -8px">
@@ -271,7 +272,7 @@ ${ assist.assistPanel() }
             </h3>
             <div class="clearfix"></div>
 
-            <span data-bind="editable: tableComment, editableOptions: {enabled: true, placement: 'right', emptytext: 'Add a description...' }" class="editable editable-click editable-empty">Add a description...</span>
+            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: 'Add a description...' }" class="editable editable-click editable-empty">Add a description...</span>
 
             <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
@@ -333,11 +334,11 @@ ${ assist.assistPanel() }
                 </div>
 
                 % if table.partition_keys:
-                <div class="tile">
-                  <h4>${ _('Partitions') }</h4>
+                  <div class="tile">
+                    <h4>${ _('Partitions') }</h4>
                     ${ partition_column_table(table.partition_keys, "partitionTable", limit=3) }
                     <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitionColumns\']').click(); }">${_('View more...')}</a>
-                </div>
+                  </div>
                 % endif
               </div>
 
@@ -348,24 +349,24 @@ ${ assist.assistPanel() }
               </div>
 
               % if table.partition_keys:
-              <div class="tab-pane" id="partitionColumns">
-                ${ partition_column_table(table.partition_keys, "partitionTable") }
-              </div>
+                <div class="tab-pane" id="partitionColumns">
+                  ${ partition_column_table(table.partition_keys, "partitionTable") }
+                </div>
               % endif
 
               % if sample is not None:
-              <div class="tab-pane" id="sample">
-              % if error_message:
-                <div class="alert alert-error">
-                  <h3>${_('Error!')}</h3>
-                  <pre>${ error_message }</pre>
+                <div class="tab-pane" id="sample">
+                  % if error_message:
+                    <div class="alert alert-error">
+                      <h3>${_('Error!')}</h3>
+                      <pre>${ error_message }</pre>
+                    </div>
+                  % else:
+                    <!-- ko with: samples -->
+                    <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
+                    <!-- /ko -->
+                  % endif
                 </div>
-              % else:
-                <!-- ko with: samples -->
-                <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
-                <!-- /ko -->
-              % endif
-              </div>
               % endif
 
               <div class="tab-pane" id="permissions">
@@ -373,21 +374,21 @@ ${ assist.assistPanel() }
               </div>
 
               <div class="tab-pane" id="queries">
-                <i class="fa fa-spinner fa-spin" data-bind="visible: loadingQueries"></i>
-                <table data-bind="visible: !loadingQueries()" class="table table-condensed">
+                <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
+                <table data-bind="visible: !$root.loadingQueries()" class="table table-condensed">
                   <thead>
-                    <tr>
-                      <th width="20%">${ _('Name') }</th>
-                      <th>${ _('Query') }</th>
-                      <th width="20%">${ _('Owner') }</th>
-                    </tr>
+                  <tr>
+                    <th width="20%">${ _('Name') }</th>
+                    <th>${ _('Query') }</th>
+                    <th width="20%">${ _('Owner') }</th>
+                  </tr>
                   </thead>
-                  <tbody data-bind="foreach: queries">
-                    <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
-                      <td data-bind="text: doc.name"></td>
-                      <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
-                      <td><code data-bind="text: doc.owner"></code></td>
-                    </tr>
+                  <tbody data-bind="foreach: $root.queries">
+                  <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
+                    <td data-bind="text: doc.name"></td>
+                    <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
+                    <td><code data-bind="text: doc.owner"></code></td>
+                  </tr>
                   </tbody>
                 </table>
               </div>
@@ -403,11 +404,11 @@ ${ assist.assistPanel() }
               <div class="tab-pane" id="properties">
                 <table class="table table-striped table-condensed">
                   <thead>
-                    <tr>
-                      <th>${ _('Name') }</th>
-                      <th>${ _('Value') }</th>
-                      <th>${ _('Comment') }</th>
-                    </tr>
+                  <tr>
+                    <th>${ _('Name') }</th>
+                    <th>${ _('Value') }</th>
+                    <th>${ _('Comment') }</th>
+                  </tr>
                   </thead>
                   <tbody>
                     % for prop in table.properties:
@@ -416,14 +417,15 @@ ${ assist.assistPanel() }
                         <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
                         <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
                       </tr>
-                     % endfor
+                    % endfor
                   </tbody>
                 </table>
               </div>
             </div>
 
           </div>
-
+          <!-- /ko -->
+          <!-- /ko -->
         </div>
     </div>
   </div>
@@ -504,22 +506,171 @@ ${ assist.assistPanel() }
     "ko.hue-bindings"
   ], function (ko, charts, AssistHelper) {
 
-    function MetastoreColumn(vm, extendedColumn) {
+    /**
+     * @param {Object} options
+     * @param {string} options.name
+     * @param {AssistHelper} options.assistHelper
+     * @param {string} [options.tableName]
+     * @param {string} [options.tableComment]
+     * @constructor
+     */
+    function MetastoreDatabase (options) {
       var self = this;
-      self.vm = vm;
-      ko.mapping.fromJS(extendedColumn, {}, self);
+      self.assistHelper = options.assistHelper;
+      self.name = options.name;
+
+      self.table = ko.observable(options.tableName ? new MetastoreTable({
+        database: self,
+        name: options.tableName,
+        comment: options.tableComment,
+        assistHelper: self.assistHelper
+      }) : null);
+    }
+
+    MetastoreDatabase.prototype.setTable = function (name) {
+      var self = this;
+      if (!self.table() || self.table().name !== name) {
+        self.table(new MetastoreTable({
+          database: self,
+          name: name,
+          comment: '', // TODO: fetch the comment async in the table
+          assistHelper: self.assistHelper
+        }))
+      }
+    }
+
+    /**
+     * @param {Object} options
+     * @param {MetastoreDatabase} options.database
+     * @param {string} options.name
+     * @param {string} options.comment
+     * @param {AssistHelper} options.assistHelper
+     * @constructor
+     */
+    function MetastoreTable (options) {
+      var self = this;
+      self.database = options.database;
+      self.assistHelper = options.assistHelper;
+      self.name = options.name;
+
+      self.columns = ko.observableArray();
+      self.favouriteColumns = ko.observableArray();
+      self.samplesPreview = ko.observable();
+      self.samples = ko.observable();
+      self.tableDetails = ko.observable();
+      self.tableStats = ko.observable();
+      self.refreshingTableStats = ko.observable(false);
+
+      //TODO: Fetch table comment async and don't set it from python
+      self.comment = ko.observable(options.comment);
+
+      self.comment.subscribe(function (newValue) {
+        // TODO: Switch to using the ko observables in the url (self.database.name() and self.name())
+        $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
+          comment: newValue ? newValue : ""
+        });
+      })
+
+      self.assistHelper.fetchFields({
+        sourceType: "hive",
+        databaseName: self.database.name,
+        tableName: self.name,
+        fields: [],
+        successCallback: function (data) {
+          self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn({
+            extendedColumn: column,
+            table: self
+          }) }));
+          self.favouriteColumns(self.columns().slice(0, 3));
+        },
+        errorCallback: function (data) {
+          console.log('ERRRROR!');
+          console.log(data);
+        }
+      })
+
+      self.assistHelper.fetchTableSample({
+        sourceType: "hive",
+        databaseName: self.database.name,
+        tableName: self.name,
+        dataType: "json",
+        successCallback: function (data) {
+          self.samples(data);
+          self.samplesPreview({
+            headers: self.samples().headers,
+            rows: self.samples().rows.slice(0, 3)
+          });
+        },
+        errorCallback: function (data) {
+          console.log('ERRRROR!');
+          console.log(data);
+        }
+      })
+
+      var fetchDetails = function () {
+        self.assistHelper.fetchTableDetails({
+          sourceType: "hive",
+          databaseName: self.database.name,
+          tableName: self.name,
+          successCallback: function (data) {
+            self.tableDetails(data);
+            self.tableStats(data.details.stats);
+            self.refreshingTableStats(false);
+          },
+          errorCallback: function (data) {
+            self.refreshingTableStats(false);
+            console.log('ERRRROR!');
+            console.log(data);
+          }
+        })
+      }
+
+      fetchDetails();
+
+      self.refreshTableStats = function () {
+        if (self.refreshingTableStats()) {
+          return;
+        }
+        self.refreshingTableStats(true);
+        self.assistHelper.refreshTableStats({
+          tableName: self.name,
+          databaseName: self.database.name,
+          sourceType: "hive",
+          successCallback: function (data) {
+            fetchDetails();
+          },
+          errorCallback: function (data) {
+            self.refreshingTableStats(false);
+            console.log('ERRRROR!');
+            console.log(data);
+          }
+        })
+      }
+    }
+
+    /**
+     * @param {Object} options
+     * @param {MetastoreTable} options.table
+     * @param {object} options.extendedColumn
+     * @constructor
+     */
+    function MetastoreColumn(options) {
+      var self = this;
+      self.table = options.table;
+      ko.mapping.fromJS(options.extendedColumn, {}, self);
 
       self.favourite = ko.observable(false);
 
       self.comment.subscribe(function (newValue) {
+        // TODO: Switch to using the ko observables in the url (self.table.name() and self.table.database.name();
         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
           column: self.name(),
           comment: newValue
         }, function () {
           self.vm.assistHelper.clearCache({
             sourceType: 'hive',
-            databaseName: self.vm.activeDatabase(),
-            tableName: self.vm.activeTable(),
+            databaseName: self.table.database.name,
+            tableName: self.table.name,
             fields: []
           })
         });
@@ -539,126 +690,36 @@ ${ assist.assistPanel() }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-      self.activeDatabase = ko.observable('${database}');
-      self.activeTable = ko.observable('${table.name}');
-      self.tableComment = ko.observable();
-
+      var tableComment = null;
       %if table.comment:
-      self.tableComment('${ smart_unicode(table.comment) }');
+        tableComment = '${ smart_unicode(table.comment) }';
       %endif
 
-      self.tableComment.subscribe(function (newValue) {
-        $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
-          comment: newValue ? newValue : ""
-        });
-      })
       self.assistHelper = new AssistHelper(options)
 
-      self.columns = ko.observableArray();
-      self.favouriteColumns = ko.observableArray();
-      self.samplesPreview = ko.observable();
-      self.samples = ko.observable();
-      self.tableDetails = ko.observable();
-      self.tableStats = ko.observable();
-      self.refreshingTableStats = ko.observable(false);
+      self.database = ko.observable(new MetastoreDatabase({
+        name: '${database}',
+        tableName: '${table.name}',
+        tableComment: tableComment,
+        assistHelper: self.assistHelper
+      }));
 
-      var fetchColumns = function () {
-        self.assistHelper.fetchFields({
-          sourceType: "hive",
-          databaseName: self.activeDatabase(),
-          tableName: self.activeTable(),
-          fields: [],
-          successCallback: function (data) {
-            self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn(self, column) }));
-            self.favouriteColumns(self.columns().slice(0, 3));
-          },
-          errorCallback: function (data) {
-            console.log('ERRRROR!');
-            console.log(data);
-          }
-        })
-      }
-
-      var fetchTableSample = function () {
-        self.assistHelper.fetchTableSample({
-          sourceType: "hive",
-          databaseName: self.activeDatabase(),
-          tableName: self.activeTable(),
-          dataType: "json",
-          successCallback: function (data) {
-            self.samples(data);
-            self.samplesPreview({
-              headers: self.samples().headers,
-              rows: self.samples().rows.slice(0, 3)
-            });
-          },
-          errorCallback: function (data) {
-            console.log('ERRRROR!');
-            console.log(data);
-          }
-        })
-      }
-
-      var fetchDetails = function () {
-        self.assistHelper.fetchTableDetails({
-          sourceType: "hive",
-          databaseName: self.activeDatabase(),
-          tableName: self.activeTable(),
-          successCallback: function (data) {
-            self.tableDetails(data);
-            self.tableStats(data.details.stats);
-            self.refreshingTableStats(false);
-          },
-          errorCallback: function (data) {
-            self.refreshingTableStats(false);
-            console.log('ERRRROR!');
-            console.log(data);
-          }
-        })
-      }
-
-      self.initialize = function () {
-        fetchColumns();
-        fetchTableSample();
-        fetchDetails();
-      }
-
-      self.initialize();
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
-        self.activeDatabase(tableDef.database);
-        self.activeTable(tableDef.name)
-        self.initialize();
+        if (self.database() && self.database().name == tableDef.database) {
+          self.database().setTable(tableDef.name);
+        }
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
         console.log(databaseDef);
       });
 
-      self.refreshTableStats = function () {
-        if (self.refreshingTableStats()) {
-          return;
-        }
-        self.refreshingTableStats(true);
-        self.assistHelper.refreshTableStats({
-          tableName: self.activeTable(),
-          databaseName: self.activeDatabase(),
-          sourceType: "hive",
-          successCallback: function (data) {
-            fetchDetails();
-          },
-          errorCallback: function (data) {
-            self.refreshingTableStats(false);
-            console.log('ERRRROR!');
-            console.log(data);
-          }
-        })
-      }
-
       self.isLeftPanelVisible.subscribe(function(newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
       });
 
+      // TODO: Move queries into MetastoreTable
       self.loadingQueries = ko.observable(false);
       self.queries = ko.observableArray([]);
     }
@@ -676,6 +737,7 @@ ${ assist.assistPanel() }
 
       ko.applyBindings(viewModel);
 
+      // TODO: Use ko for this and the put the queries in the MetastoreTable
       $('a[data-toggle="tab"]').on('shown', function (e) {
         if ($(e.target).attr("href") == "#queries") {
           viewModel.loadingQueries(true);
