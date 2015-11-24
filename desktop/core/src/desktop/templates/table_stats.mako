@@ -69,7 +69,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="stats-popover">
     <div style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="style: { 'top': popoverTop() + 'px', 'left': popoverLeft() + 'px' }, visible: analysisStats, with: analysisStats">
-      <div class="arrow"></div>
+      <div class="arrow" data-bind="style: { 'top': $parent.popoverArrowTop() + 'px'}"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: $parent.toggleStats"><i class="fa fa-times"></i></a>
         <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
@@ -128,6 +128,7 @@ from desktop.views import _ko
         }
 
         self.popoverTop = ko.observable(0);
+        self.popoverArrowTop = ko.observable(0);
         self.popoverLeft = ko.observable(0);
 
         var lastOffset = { top: -1, left: -1 };
@@ -142,9 +143,12 @@ from desktop.views import _ko
               } else {
                 lastOffset.top = newTop - 210;
               }
+              self.popoverArrowTop($popover.outerHeight() / 2 + (lastOffset.top < 0 ? lastOffset.top - 10 : 0));
+
+              lastOffset.top = Math.max(lastOffset.top, 10);
               self.popoverTop(lastOffset.top);
               self.popoverLeft(lastOffset.left);
-              if (self.popoverTop() < -130) {
+              if (self.popoverArrowTop() < 80) {
                 $popover.hide();
               } else {
                 $popover.show();
