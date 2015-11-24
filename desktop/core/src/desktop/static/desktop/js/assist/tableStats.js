@@ -107,9 +107,9 @@
 
     self.assistHelper.fetchStats({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
-      databaseName: self.database,
-      tableName: self.table,
-      columnName: self.column,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
       successCallback: successCallback,
       errorCallback: errorCallback
     });
@@ -125,9 +125,9 @@
 
     self.assistHelper.refreshTableStats({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
-      databaseName: self.database,
-      tableName: self.table,
-      columnName: self.column,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
       successCallback: function() {
         self.refreshing(false);
         self.fetchData();
