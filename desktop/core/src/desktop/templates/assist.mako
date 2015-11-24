@@ -335,15 +335,16 @@ from desktop.views import _ko
           }
         };
 
-        huePubSub.subscribe("assist.select.database", function (database) {
-          if (! database.sourceType || ! sourceIndex[database.sourceType]) {
+        huePubSub.subscribe("assist.set.database", function (databaseDef) {
+          if (! databaseDef.source || ! sourceIndex[databaseDef.source]) {
             return;
           }
-          self.selectedSource(sourceIndex[database.sourceType]);
-          setDatabaseWhenLoaded(database.name);
+          self.selectedSource(sourceIndex[databaseDef.source]);
+          setDatabaseWhenLoaded(databaseDef.name);
+        });
         });
 
-        huePubSub.publish("assist.request.status");
+        huePubSub.publish("assist.ready");
 
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
