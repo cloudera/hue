@@ -180,6 +180,10 @@
       }
     });
 
+    if (! self.database()) {
+      huePubSub.publish("assist.get.database", self.type());
+    }
+
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
     self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);

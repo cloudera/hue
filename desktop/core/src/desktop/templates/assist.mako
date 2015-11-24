@@ -342,6 +342,19 @@ from desktop.views import _ko
           self.selectedSource(sourceIndex[databaseDef.source]);
           setDatabaseWhenLoaded(databaseDef.name);
         });
+
+        huePubSub.subscribe("assist.get.database", function (source) {
+          if (sourceIndex[source] && sourceIndex[source].selectedDatabase()) {
+            huePubSub.publish("assist.database.set", {
+              source: source,
+              name: sourceIndex[source].selectedDatabase().databaseName
+            });
+          } else {
+            huePubSub.publish("assist.database.set", {
+              source: source,
+              name: null
+            });
+          }
         });
 
         huePubSub.publish("assist.ready");
