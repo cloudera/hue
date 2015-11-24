@@ -995,6 +995,7 @@
         doc_type: self.selectedSnippet()
       }, function (data) {
           self.history.removeAll();
+          self.showHistory(false);
         }).fail(function (xhr) {
            $(document).trigger("error", xhr.responseText);
         });

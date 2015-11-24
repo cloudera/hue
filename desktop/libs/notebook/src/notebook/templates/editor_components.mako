@@ -416,10 +416,14 @@ ${ require.config() }
   <!-- ko if: $root.editorMode -->
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
+      <!-- ko ifnot: $parent.history().length > 0 -->
+      <div class="alert alert-notebook"><strong>${ _('There is currently no query history.')}</strong> ${ _('Did you know that you can autocomplete your SQL statement with CTRL+Space and run the query with CTRL+Enter?') }</div>
+      <!-- /ko -->
+      <!-- ko if: $parent.history().length > 0 -->
       <table class="table table-compressed">
         <thead>
           <tr>
-            <th colspan="2" class="muted">${ _('Query history') } &nbsp; <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="" data-toggle="modal"><i class="fa fa-calendar-times-o"></i></a></th>
+            <th colspan="2" class="muted">${ _('Query history') } &nbsp; <span class="inactive-action"><a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="snippet-icon" data-toggle="modal"><i class="fa fa-calendar-times-o"></i></a></span></th>
           </tr>
         </thead>
         <tbody data-bind="foreach: $parent.history">
@@ -429,6 +433,7 @@ ${ require.config() }
           </tr>
         </tbody>
       </table>
+      <!-- /ko -->
     </div>
   </div>
   <!-- /ko -->
