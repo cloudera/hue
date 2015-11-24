@@ -74,8 +74,8 @@
           newValue.loadEntries()
         }
         $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix(), newValue.definition.name);
-        huePubSub.publish("assist.database.selected", {
-          sourceType: self.type,
+        huePubSub.publish("assist.database.set", {
+          source: self.type,
           name: newValue.definition.name
         })
       }

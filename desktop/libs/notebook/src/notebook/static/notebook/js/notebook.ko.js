@@ -174,9 +174,9 @@
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
 
-    huePubSub.subscribe("assist.database.selected", function (database) {
-      if (database.sourceType === self.type() && self.database() !== database.name) {
-        self.database(database.name);
+    huePubSub.subscribe("assist.database.set", function (databaseDef) {
+      if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
+        self.database(databaseDef.name);
       }
     });
 
@@ -1020,18 +1020,13 @@
       download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
     }
 
-    huePubSub.subscribe("assist.request.status", function () {
+    huePubSub.subscribe("assist.ready", function () {
       if (self.type() == 'query' && self.snippets().length == 1) {
-        huePubSub.publish('assist.select.database', {
-          sourceType: self.snippets()[0].type(),
+        huePubSub.publish('assist.set.database', {
+          source: self.snippets()[0].type(),
           name: self.snippets()[0].database()
         });
       }
-      // TODO: Uncomment when we switch to the new impala and hive editors
-      //huePubSub.publish('assist.select.database', {
-      //  sourceType: null,
-      //  name: null
-      //});
     });
   };
 
