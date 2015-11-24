@@ -36,7 +36,6 @@ from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
-from metastore.conf import HS2_GET_TABLES_MAX
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 from notebook.connectors.base import Notebook
@@ -158,40 +157,36 @@ def show_tables(request, database=None):
 
     search_filter = request.GET.get('filter', '')
 
-    table_names = db.get_tables(database=database, table_names=search_filter)
-    tables = [{'name': table} for table in table_names]
-
-    has_metadata = False
-
-    if len(table_names) <= HS2_GET_TABLES_MAX.get():  # Only attempt to do a GetTables HS2 call for small result sets
-      try:
-        tables_meta = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
-        if tables_meta:
-          tables = tables_meta
-          table_names = [table['name'] for table in tables_meta]
-          has_metadata = True
-      except Exception, ex:
-        LOG.exception('Unable to fetch table metadata')
+    tables = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
+    table_names = [table['name'] for table in tables]
   except Exception, e:
     raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
-  resp = render("tables.mako", request, {
-    'breadcrumbs': [
-      {
-        'name': database,
-        'url': reverse('metastore:show_tables', kwargs={'database': database})
-      }
-    ],
-    'tables': tables,
-    'db_form': db_form,
-    'search_filter': search_filter,
-    'database': database,
-    'has_metadata': has_metadata,
-    'table_names': json.dumps(table_names),
-    'has_write_access': has_write_access(request.user),
-  })
-  resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
+  if request.REQUEST.get("format", "html") == "json":
+    resp = JsonResponse({
+        'status': 0,
+        'tables': tables,
+        'table_names': table_names,
+        'search_filter': search_filter
+    })
+  else:
+    resp = render("tables.mako", request, {
+      'breadcrumbs': [
+        {
+          'name': database,
+          'url': reverse('metastore:show_tables', kwargs={'database': database})
+        }
+      ],
+      'tables': tables,
+      'db_form': db_form,
+      'search_filter': search_filter,
+      'database': database,
+      'has_metadata': True,
+      'table_names': json.dumps(table_names),
+      'has_write_access': has_write_access(request.user),
+    })
 
+  resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
 
 
