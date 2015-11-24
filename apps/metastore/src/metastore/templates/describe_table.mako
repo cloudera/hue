@@ -539,46 +539,49 @@ ${ assist.assistPanel() }
 
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
-
-      self.assistHelper.fetchFields({
-        sourceType: "hive",
-        databaseName: self.activeDatabase(),
-        tableName: self.activeTable(),
-        fields: [],
-        successCallback: function (data) {
-          self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn(self, column) }));
-          self.favouriteColumns(self.columns().slice(0, 3));
-        },
-        errorCallback: function (data) {
-          console.log('ERRRROR!');
-          console.log(data);
-        }
-      })
-
       self.samplesPreview = ko.observable();
       self.samples = ko.observable();
-
-      self.assistHelper.fetchTableSample({
-        sourceType: "hive",
-        databaseName: self.activeDatabase(),
-        tableName: self.activeTable(),
-        dataType: "json",
-        successCallback: function (data) {
-          self.samples(data);
-          self.samplesPreview({
-            headers: self.samples().headers,
-            rows: self.samples().rows.slice(0, 3)
-          });
-        },
-        errorCallback: function (data) {
-          console.log('ERRRROR!');
-          console.log(data);
-        }
-      })
-
       self.tableDetails = ko.observable();
       self.tableStats = ko.observable();
       self.refreshingTableStats = ko.observable(false);
+
+      var fetchColumns = function () {
+        self.assistHelper.fetchFields({
+          sourceType: "hive",
+          databaseName: self.activeDatabase(),
+          tableName: self.activeTable(),
+          fields: [],
+          successCallback: function (data) {
+            self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn(self, column) }));
+            self.favouriteColumns(self.columns().slice(0, 3));
+          },
+          errorCallback: function (data) {
+            console.log('ERRRROR!');
+            console.log(data);
+          }
+        })
+      }
+
+      var fetchTableSample = function () {
+        self.assistHelper.fetchTableSample({
+          sourceType: "hive",
+          databaseName: self.activeDatabase(),
+          tableName: self.activeTable(),
+          dataType: "json",
+          successCallback: function (data) {
+            self.samples(data);
+            self.samplesPreview({
+              headers: self.samples().headers,
+              rows: self.samples().rows.slice(0, 3)
+            });
+          },
+          errorCallback: function (data) {
+            console.log('ERRRROR!');
+            console.log(data);
+          }
+        })
+      }
+
       var fetchDetails = function () {
         self.assistHelper.fetchTableDetails({
           sourceType: "hive",
@@ -597,7 +600,19 @@ ${ assist.assistPanel() }
         })
       }
 
-      fetchDetails();
+      self.initialize = function () {
+        fetchColumns();
+        fetchTableSample();
+        fetchDetails();
+      }
+
+      self.initialize();
+
+      huePubSub.subscribe("assist.table.set", function (tableDef) {
+        self.activeDatabase(tableDef.database);
+        self.activeTable(tableDef.name)
+        self.initialize();
+      });
 
       self.refreshTableStats = function () {
         if (self.refreshingTableStats()) {
@@ -639,10 +654,6 @@ ${ assist.assistPanel() }
       var viewModel = new MetastoreViewModel(options);
 
       ko.applyBindings(viewModel);
-
-      huePubSub.subscribe('assist.openItem', function(item){
-        console.log(item);
-      });
 
       $('a[data-toggle="tab"]').on('shown', function (e) {
         if ($(e.target).attr("href") == "#queries") {

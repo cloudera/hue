@@ -264,7 +264,12 @@
 
   AssistEntry.prototype.openItem = function () {
     var self = this;
-    huePubSub.publish('assist.openItem', self);
+    if (self.definition.isTable) {
+      huePubSub.publish("assist.table.set", {
+        database: self.databaseName,
+        name: self.definition.name
+      })
+    }
   };
 
   AssistEntry.prototype.showPreview = function () {
