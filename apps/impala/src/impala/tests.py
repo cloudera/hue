@@ -295,15 +295,17 @@ def test_ssl_validate():
         reset()
 
 
-def test_get_impala_nested_select():
-  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
-  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/'),
-               ('email_preferences.categories.promos', '`default`.`customers`'))
-  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key'),
-               ('key', '`default`.`customers`.`addresses`'))
-  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/'),
-               ('street_1', '`default`.`customers`.`addresses`'))
-  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date'),
-               ('order_date', '`default`.`customers`.`orders`'))
-  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
-               ('product_id', '`default`.`customers`.`orders`.`items`'))
+class TestImpalaDbms():
+
+  def test_get_impala_nested_select(self):
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/'),
+                 ('email_preferences.categories.promos', '`default`.`customers`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key'),
+                 ('key', '`default`.`customers`.`addresses`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/'),
+                 ('street_1', '`default`.`customers`.`addresses`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date'),
+                 ('order_date', '`default`.`customers`.`orders`'))
+    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
+                 ('product_id', '`default`.`customers`.`orders`.`items`'))
