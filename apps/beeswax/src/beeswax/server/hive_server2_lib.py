@@ -660,7 +660,7 @@ class HiveServerClient:
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
-    cols = ('db_name', 'comment', 'location')
+    cols = ('db_name', 'comment', 'location','owner_name', 'owner_type', 'parameters')
 
     if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
       raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
