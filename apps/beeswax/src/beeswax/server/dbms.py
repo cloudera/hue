@@ -24,7 +24,6 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import format_preserving_redirect
-from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
@@ -38,11 +37,6 @@ from beeswax.models import QueryHistory, QUERY_TYPES
 
 LOG = logging.getLogger(__name__)
 
-try:
-  from impala.dbms import ImpalaDbms 
-except ImportError, e:
-  LOG.info('Impala app enabled: %s' % e)
-
 
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
@@ -50,9 +44,6 @@ DBMS_CACHE_LOCK = threading.Lock()
 def get(user, query_server=None):
   global DBMS_CACHE
   global DBMS_CACHE_LOCK
-
-  # Avoid circular dependency
-  from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
 
   if query_server is None:
     query_server = get_query_server_config()
@@ -62,7 +53,14 @@ def get(user, query_server=None):
     DBMS_CACHE.setdefault(user.username, {})
 
     if query_server['server_name'] not in DBMS_CACHE[user.username]:
-      DBMS_CACHE[user.username][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+      # Avoid circular dependency
+      from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
+
+      if query_server['server_name'] == 'impala':
+        from impala.dbms import ImpalaDbms
+        DBMS_CACHE[user.username][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+      else:
+        DBMS_CACHE[user.username][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
 
     return DBMS_CACHE[user.username][query_server['server_name']]
   finally:
@@ -71,22 +69,8 @@ def get(user, query_server=None):
 
 def get_query_server_config(name='beeswax', server=None):
   if name == 'impala':
-    from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
-        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS, QUERY_TIMEOUT_S, AUTH_USERNAME as IMPALA_AUTH_USERNAME, AUTH_PASSWORD as IMPALA_AUTH_PASSWORD, \
-        SESSION_TIMEOUT_S
-
-    query_server = {
-        'server_name': 'impala',
-        'server_host': IMPALA_SERVER_HOST.get(),
-        'server_port': IMPALA_SERVER_PORT.get(),
-        'principal': IMPALA_PRINCIPAL.get(),
-        'impersonation_enabled': IMPERSONATION_ENABLED.get(),
-        'querycache_rows': QUERYCACHE_ROWS.get(),
-        'QUERY_TIMEOUT_S': QUERY_TIMEOUT_S.get(),
-        'SESSION_TIMEOUT_S': SESSION_TIMEOUT_S.get(),
-        'auth_username': IMPALA_AUTH_USERNAME.get(),
-        'auth_password': IMPALA_AUTH_PASSWORD.get()
-    }
+    from impala.dbms import get_query_server_config as impala_query_server_config
+    query_server = impala_query_server_config()
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
 
@@ -320,15 +304,10 @@ class HiveServer2Dbms(object):
     if not table.is_view:
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
 
-      if column or nested: # Could do column for any type, then nested with partitions 
-        if self.server_name == 'impala':
-          select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
-          hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
+      if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+        hql = self._get_sample_partition_query(database, table, limit)
       else:
-        if table.partition_keys:  # Filter on max # of partitions for partitioned tables
-          hql = self._get_sample_partition_query(database, table, limit)
-        else:
-          hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
+        hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
 
       if hql:
         query = hql_query(hql)
@@ -500,22 +479,6 @@ class HiveServer2Dbms(object):
     design.save()
 
     return self.execute_query(query, design)
-
-
-  def invalidate_tables(self, database, tables):
-    handle = None
-
-    for table in tables:
-      try:
-        hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table,)
-        query = hql_query(hql, database, query_type=QUERY_TYPES[1])
-
-        handle = self.execute_and_wait(query, timeout_sec=10.0)
-      except Exception, e:
-        LOG.warn('Refresh tables cache out of sync: %s' % smart_str(e))
-      finally:
-        if handle:
-          self.close(handle)
 
 
   def drop_database(self, database):
