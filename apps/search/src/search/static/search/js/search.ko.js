@@ -1421,8 +1421,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 var row = [];
                 var _externalLink = item.externalLink;
                 var _details = item.details;
+                var _id = item.hueId;
                 delete item["externalLink"];
                 delete item["details"];
+                delete item["hueId"];
                 var fields = self.collection.template.fieldsSelected();
                 // Display selected fields or whole json document
                 if (fields.length != 0) {
@@ -1440,7 +1442,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   }
                 }
                 var doc = {
-                  'id': item[self.collection.idField()],
+                  'id': _id,
                   'row': row,
                   'item': ko.mapping.fromJS(item),
                   'showEdit': ko.observable(false),
@@ -1451,7 +1453,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   'showDetails': ko.observable(false),
                   'leafletmap': leafletmap
                 };
-                if (!self.collection.template.isGridLayout()) {
+                if (! self.collection.template.isGridLayout()) {
                   // fix the fields that contain dots in the name
                   addTemplateFunctions(item);
                   if (self.additionalMustache != null && typeof self.additionalMustache == "function"){
