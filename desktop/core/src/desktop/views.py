@@ -39,8 +39,7 @@ import django.views.debug
 import desktop.conf
 import desktop.log.log_buffer
 
-from desktop.api import massaged_tags_for_json, massaged_documents_for_json,\
-  _get_docs
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
 from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
@@ -48,7 +47,7 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences, Settings
+from desktop.models import UserPreferences, Settings, Document2
 from desktop import appmanager
 
 
@@ -69,6 +68,18 @@ def home(request):
     'apps': apps,
     'json_documents': json.dumps(massaged_documents_for_json(docs, request.user)),
     'json_tags': json.dumps(massaged_tags_for_json(docs, request.user)),
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
+
+def home2(request):
+  docs = Document2.objects.filter(owner=request.user)
+
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('home2.mako', request, {
+    'apps': apps,
+    'json_documents': json.dumps([doc.to_dict() for doc in docs]),
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
