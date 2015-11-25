@@ -805,6 +805,7 @@ def augment_solr_response(response, collection, query):
 
   # HTML escaping
   if not query.get('download'):
+    id_field = collection.get('idField', '')
     for doc in response['response']['docs']:
       for field, value in doc.iteritems():
         if isinstance(value, numbers.Number):
@@ -823,6 +824,7 @@ def augment_solr_response(response, collection, query):
 
       doc['externalLink'] = link
       doc['details'] = []
+      doc['hueId'] = doc.get(id_field, '')
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
