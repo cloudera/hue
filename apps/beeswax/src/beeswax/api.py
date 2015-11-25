@@ -661,6 +661,15 @@ def describe_table(request, database, table):
     raise PopupException(_('Problem accessing table metadata'), detail=e)
 
 
+def get_sample_data(request, database, table):
+  try:
+    from metastore.views import get_sample_data
+    return get_sample_data(request, database, table)
+  except Exception, e:
+    LOG.exception('Failed to retrieve sample data for `%s`.`%s`' % (database, table))
+    raise PopupException(_('Problem accessing table metadata'), detail=e)
+
+
 def get_query_form(request):
   try:
     try:

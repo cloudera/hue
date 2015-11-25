@@ -185,7 +185,6 @@ def show_tables(request, database=None):
       'db_form': db_form,
       'search_filter': search_filter,
       'database': database,
-      'has_metadata': True,
       'table_names': json.dumps(table_names),
       'has_write_access': has_write_access(request.user),
     })
@@ -212,6 +211,24 @@ def get_table_metadata(request, database, table):
   return JsonResponse(response)
 
 
+def get_sample_data(request, database, table):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'error_message': ''}
+  try:
+    table_obj = db.get_table(database, table)
+    sample_data = db.get_sample(database, table_obj)
+    response = {
+      'status': 0,
+      'headers': sample_data and sample_data.cols(),
+      'rows': sample_data and list(sample_data.rows())
+    }
+  except Exception, ex:
+    error_message, logs = dbms.expand_exception(ex, db)
+    response['error_message'] = error_message
+
+  return JsonResponse(response)
+
+
 def describe_table(request, database, table):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
@@ -226,11 +243,7 @@ def describe_table(request, database, table):
     else:
       raise PopupException(_("Hive Error"), detail=e)
 
-  partitions = None
-  if app_name != 'impala' and table.partition_keys:
-    partitions = db.get_partitions(database, table, partition_spec=None, max_parts=None)
-
-  if request.REQUEST.get("format", "html") == "json" and request.REQUEST.get("sample", "false") == "false":
+  if request.REQUEST.get("format", "html") == "json":
     return JsonResponse({
         'status': 0,
         'name': table.name,
@@ -244,41 +257,27 @@ def describe_table(request, database, table):
         'details': table.details,
         'stats': table.stats
     })
+  else:  # Render HTML
+    renderable = "describe_table.mako"
 
-  renderable = "describe_table.mako"
-  if request.REQUEST.get("sample", "false") == "true":
-    renderable = "sample.mako"
-    if request.REQUEST.get("format", "html") == "json":
-      response = {'status': -1, 'error_message': ''}
-      error_message = ''
-      table_data = ''
-      try:
-        table_data = db.get_sample(database, table)
-        response.update({
-            'status': 0,
-            'headers': table_data and table_data.cols(),
-            'rows': table_data and list(table_data.rows())
-        })
-      except Exception, ex:
-        error_message, logs = dbms.expand_exception(ex, db)
-        response['error_message'] = error_message
+    partitions = None
+    if app_name != 'impala' and table.partition_keys:
+      partitions = db.get_partitions(database, table, partition_spec=None, max_parts=None)
 
-      return JsonResponse(response)
-
-  return render(renderable, request, {
-    'breadcrumbs': [{
-        'name': database,
-        'url': reverse('metastore:show_tables', kwargs={'database': database})
-      }, {
-        'name': str(table.name),
-        'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
-      },
-    ],
-    'table': table,
-    'database': database,
-    'has_write_access': has_write_access(request.user),
-    'partitions': partitions
-  })
+    return render(renderable, request, {
+      'breadcrumbs': [{
+          'name': database,
+          'url': reverse('metastore:show_tables', kwargs={'database': database})
+        }, {
+          'name': str(table.name),
+          'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
+        },
+      ],
+      'table': table,
+      'partitions': partitions,
+      'database': database,
+      'has_write_access': has_write_access(request.user),
+    })
 
 
 @check_has_write_access_permission

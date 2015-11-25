@@ -106,62 +106,62 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(verify_history(self.client, fragment='test'), history_cnt, 'Implicit queries should not be saved in the history')
 
   def test_show_tables(self):
-    try:
-      hql = """
+    hql = """
         CREATE TABLE test_show_tables_1 (a int) COMMENT 'Test for show_tables';
         CREATE TABLE test_show_tables_2 (a int) COMMENT 'Test for show_tables';
         CREATE TABLE test_show_tables_3 (a int) COMMENT 'Test for show_tables';
       """
-      resp = _make_query(self.client, hql, database=self.db_name)
-      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    resp = _make_query(self.client, hql, database=self.db_name)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-      # Table should have been created
-      response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
-      assert_equal(200, response.status_code)
-      assert_equal(len(response.context['tables']), 3)
-      assert_equal(response.context['has_metadata'], True)
-      assert_true('name' in response.context["tables"][0])
-      assert_true('comment' in response.context["tables"][0])
-      assert_true('type' in response.context["tables"][0])
+    # Table should have been created
+    response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
+    assert_equal(200, response.status_code)
+    assert_equal(len(response.context['tables']), 3)
+    assert_true('name' in response.context["tables"][0])
+    assert_true('comment' in response.context["tables"][0])
+    assert_true('type' in response.context["tables"][0])
 
-      hql = """
+    hql = """
         CREATE TABLE test_show_tables_4 (a int) COMMENT 'Test for show_tables';
         CREATE TABLE test_show_tables_5 (a int) COMMENT 'Test for show_tables';
       """
-      resp = _make_query(self.client, hql, database=self.db_name)
-      resp = wait_for_query_to_finish(self.client, resp, max=30.0)
+    resp = _make_query(self.client, hql, database=self.db_name)
+    resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
-      # Table should have been created
-      response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
-      assert_equal(200, response.status_code)
-      assert_equal(len(response.context['tables']), 5)
-      assert_equal(response.context['has_metadata'], False)
-      assert_true('name' in response.context["tables"][0])
-      assert_false('comment' in response.context["tables"][0], response.context["tables"])
-      assert_false('type' in response.context["tables"][0])
+    # Table should have been created
+    response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
+    assert_equal(200, response.status_code)
+    assert_equal(len(response.context['tables']), 5)
+    assert_true('name' in response.context["tables"][0])
+    assert_true('comment' in response.context["tables"][0])
+    assert_true('type' in response.context["tables"][0])
 
-      hql = """
+    hql = """
         CREATE INDEX test_index ON TABLE test_show_tables_1 (a) AS 'COMPACT' WITH DEFERRED REBUILD;
       """
-      resp = _make_query(self.client, hql, wait=True, local=False, max=30.0, database=self.db_name)
+    resp = _make_query(self.client, hql, wait=True, local=False, max=30.0, database=self.db_name)
 
-      # By default, index table should not appear in show tables view
-      response = self.client.get("/metastore/tables/%s" % self.db_name)
-      assert_equal(200, response.status_code)
-      assert_false('test_index' in response.context['tables'])
-    finally:
-      for reset in resets:
-        reset()
+    # By default, index table should not appear in show tables view
+    response = self.client.get("/metastore/tables/%s" % self.db_name)
+    assert_equal(200, response.status_code)
+    assert_false('test_index' in response.context['tables'])
 
   def test_describe_view(self):
     resp = self.client.get('/metastore/table/%s/myview' % self.db_name)
-    assert_equal(None, resp.context['sample'])
     assert_true(resp.context['table'].is_view)
     assert_true("View" in resp.content)
     assert_true("Drop View" in resp.content)
     # Breadcrumbs
     assert_true(self.db_name in resp.content)
     assert_true("myview" in resp.content)
+
+  def test_get_sample_data(self):
+    resp = self.client.get("/metastore/table/%s/test_partitions/sample" % self.db_name)
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_true('headers' in json_resp, json_resp)
+    assert_true('rows' in json_resp, json_resp)
 
   def test_describe_partitions(self):
     response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
