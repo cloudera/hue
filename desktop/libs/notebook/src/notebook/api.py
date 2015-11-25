@@ -243,7 +243,6 @@ def historify(request):
   history_doc.save()
   history_doc1.save()
 
-  print history
   if history.get('id'): # If we come from a saved query
     Document2.objects.get(id=history['id']).dependencies.add(history_doc)
 
