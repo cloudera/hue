@@ -30,7 +30,6 @@ from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod
 from desktop.lib.test_utils import add_permission, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from metastore import parser
-from metastore.conf import HS2_GET_TABLES_MAX
 from useradmin.models import HuePermission, GroupPermission, group_has_permission
 
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
@@ -107,11 +106,6 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(verify_history(self.client, fragment='test'), history_cnt, 'Implicit queries should not be saved in the history')
 
   def test_show_tables(self):
-    # Set max limit to 3
-    resets = [
-      HS2_GET_TABLES_MAX.set_for_testing(3)
-    ]
-
     try:
       hql = """
         CREATE TABLE test_show_tables_1 (a int) COMMENT 'Test for show_tables';
