@@ -406,7 +406,7 @@
 
     self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000) {
+      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000 || self.statement() == '') {
         return;
       }
 

@@ -870,7 +870,7 @@ ${ require.config() }
     <a class="snippet-side-btn" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
       <i class="fa fa-fw fa-stop"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0}" title="${ _('CTRL + ENTER') }">
+    <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading' && statement() != '', css: {'blue': $parent.history().length == 0}" title="${ _('CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
     </a>
   </div>
