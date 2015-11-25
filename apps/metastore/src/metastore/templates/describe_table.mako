@@ -17,7 +17,7 @@
 from django.utils.html import escape
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, _ko
 from django.utils.translation import ugettext as _
 %>
 
@@ -111,7 +111,8 @@ ${ assist.assistPanel() }
         </td>
         <td data-bind="text: type"></td>
         <td>
-          <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: 'Add a comment...' }" class="editable editable-click editable-empty">Add a comment...</span>
+          <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }' }" class="editable editable-click editable-empty">
+            ${ _('Add a comment...') }</span>
         </td>
       </tr>
     </tbody>
@@ -280,7 +281,9 @@ ${ assist.assistPanel() }
             </h3>
             <div class="clearfix"></div>
 
-            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: 'Add a description...' }" class="editable editable-click editable-empty">${ _('Add a description...') }</span>
+            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: '${ _ko('Add a description...') }' }" class="editable editable-click editable-empty">
+              ${ _('Add a description...') }
+            </span>
 
             <ul class="nav nav-pills margin-top-30">
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
