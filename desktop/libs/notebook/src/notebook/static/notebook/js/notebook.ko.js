@@ -23,7 +23,7 @@
 }(this, function (ko, AssistHelper, Autocompleter) {
 
   var SPARK_MAPPING = {
-    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user", "inFocus"]
+    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user", "inFocus", "history", "availableSnippets"]
   };
 
   var Result = function (snippet, result) {
@@ -434,16 +434,6 @@
         self.close();
       }
 
-      if (notebook.type() != 'notebook') {
-        $.post("/notebook/api/historify", {
-          notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
-        }, function(data){
-          if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
-            history.pushState(null, null, '/notebook/editor?editor=' + data.id);
-          }
-        });
-      }
-
       $.post("/notebook/api/execute", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
@@ -465,6 +455,17 @@
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
         self.status('failed');
+      })
+      .always(function() {
+        if (notebook.type() != 'notebook') {
+          $.post("/notebook/api/historify", {
+            notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
+          }, function(data){
+            if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
+              history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+            }
+          });
+        }
       });
     };
 
@@ -1148,8 +1149,8 @@
 
     self.availableSessionProperties = ko.computed(function () { // Only Spark
       return ko.utils.arrayFilter(options.session_properties, function (item) {
-          return item.name != ''; // Could filter out the ones already selected + yarn only or not
-        });
+        return item.name != ''; // Could filter out the ones already selected + yarn only or not
+      });
     });
     self.getSessionProperties = function(name) {
       var _prop = null;
