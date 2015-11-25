@@ -211,10 +211,18 @@ ${ assist.assistPanel() }
 
     <div class="span6">
       <div><a data-bind="attr: {'href': hdfs_link, 'rel': path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
-      <!-- ko with: $parent.tableStats -->
-      <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
-      <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
-      <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
+      <!-- ko if: $parent.tableStats  -->
+        <!-- ko with: $parent.tableStats -->
+          <!-- ko if: numFiles  -->
+            <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
+          <!-- /ko -->
+          <!-- ko if: numRows  -->
+            <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
+          <!-- /ko -->
+          <!-- ko if: totalSize  -->
+            <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
+          <!-- /ko -->
+        <!-- /ko -->
       <!-- /ko -->
     </div>
   </div>
@@ -569,8 +577,9 @@ ${ assist.assistPanel() }
           self.favouriteColumns(self.columns().slice(0, 3));
         },
         errorCallback: function (data) {
-          console.log('ERRRROR!');
-          console.log(data);
+          $.jHueNotify.error('${_('An error occurred fetching the table fields. Please try again.')}');
+          console.error('assistHelper.fetchFields error');
+          console.error(data);
         }
       })
 
@@ -587,8 +596,9 @@ ${ assist.assistPanel() }
           });
         },
         errorCallback: function (data) {
-          console.log('ERRRROR!');
-          console.log(data);
+          $.jHueNotify.error('${_('An error occurred fetching the table sample. Please try again.')}');
+          console.error('assistHelper.fetchTableSample error');
+          console.error(data);
         }
       })
 
@@ -604,8 +614,9 @@ ${ assist.assistPanel() }
           },
           errorCallback: function (data) {
             self.refreshingTableStats(false);
-            console.log('ERRRROR!');
-            console.log(data);
+            $.jHueNotify.error('${_('An error occurred fetching the table details. Please try again.')}');
+            console.error('assistHelper.fetchTableDetails error');
+            console.error(data);
           }
         })
       }
@@ -626,8 +637,9 @@ ${ assist.assistPanel() }
           },
           errorCallback: function (data) {
             self.refreshingTableStats(false);
-            console.log('ERRRROR!');
-            console.log(data);
+            $.jHueNotify.error('${_('An error occurred refreshing the table stats. Please try again.')}');
+            console.error('assistHelper.refreshTableStats error');
+            console.error(data);
           }
         })
       }
