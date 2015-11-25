@@ -20,7 +20,7 @@ from django.conf.urls import patterns, url
 from beeswax.urls import urlpatterns as beeswax_urls
 
 
-urlpatterns = patterns('impala.views',
+urlpatterns = patterns('impala.api',
   url(r'^api/refresh_tables$', 'refresh_tables', name='refresh_tables'),
 )
 

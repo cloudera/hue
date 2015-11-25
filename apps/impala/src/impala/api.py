@@ -23,27 +23,26 @@ import logging
 import json
 
 from desktop.lib.django_util import JsonResponse
-from desktop.context_processors import get_app_name
 
-from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config
+from beeswax.server import dbms as beeswax_dbms
+
+from impala import dbms
 
 
 LOG = logging.getLogger(__name__)
 
 
 def refresh_tables(request):
-  app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
-  db = dbms.get(request.user, query_server=query_server)
+  query_server = dbms.get_query_server_config()
+  db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
   if request.method == "POST":
     try:
       database = json.loads(request.POST['database'])
-      added = json.loads(request.POST['added'])
-      removed = json.loads(request.POST['removed'])
+      added = json.loads(request.POST.get('added', []))
+      removed = json.loads(request.POST.get('removed', []))
 
       db.invalidate_tables(database, added + removed)
     except Exception, e:

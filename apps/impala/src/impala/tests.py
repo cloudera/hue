@@ -39,7 +39,6 @@ from beeswax.tests import _make_query
 from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
 from impala import conf
-from impala.conf import SERVER_HOST
 from impala.dbms import ImpalaDbms
 
 
@@ -232,6 +231,7 @@ class TestImpalaIntegration:
     assert_true(data['properties'].get('http_addr'))
 
 
+
 # Could be refactored with SavedQuery.create_empty()
 def create_saved_query(app_name, owner):
     query_type = SavedQuery.TYPES_MAPPING[app_name]
@@ -295,17 +295,15 @@ def test_ssl_validate():
         reset()
 
 
-class TestImpalaDbms():
-
-  def test_get_impala_nested_select(self):
-    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
-    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/'),
-                 ('email_preferences.categories.promos', '`default`.`customers`'))
-    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key'),
-                 ('key', '`default`.`customers`.`addresses`'))
-    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/'),
-                 ('street_1', '`default`.`customers`.`addresses`'))
-    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date'),
-                 ('order_date', '`default`.`customers`.`orders`'))
-    assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
-                 ('product_id', '`default`.`customers`.`orders`.`items`'))
+def test_get_impala_nested_select():
+  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'id', None), ('id', '`default`.`customers`'))
+  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'email_preferences', 'categories/promos/'),
+               ('email_preferences.categories.promos', '`default`.`customers`'))
+  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'key'),
+               ('key', '`default`.`customers`.`addresses`'))
+  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'addresses', 'value/street_1/'),
+               ('street_1', '`default`.`customers`.`addresses`'))
+  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/order_date'),
+               ('order_date', '`default`.`customers`.`orders`'))
+  assert_equal(ImpalaDbms.get_nested_select('default', 'customers', 'orders', 'item/items/item/product_id'),
+               ('product_id', '`default`.`customers`.`orders`.`items`'))
