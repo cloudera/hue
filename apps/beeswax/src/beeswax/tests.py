@@ -1211,8 +1211,9 @@ for x in sys.stdin:
     }, follow=True)
 
     # Ensure we can see table.
-    response = self.client.get("/metastore/table/%s/my_table" % self.db_name)
-    assert_true("my_col" in response.content)
+    response = self.client.get("/metastore/table/%s/my_table?format=json" % self.db_name)
+    data = json.loads(response.content)
+    assert_true("my_col" in [col['name'] for col in data['cols']], data)
 
 
   def test_create_table_timestamp(self):

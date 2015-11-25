@@ -236,7 +236,7 @@ def describe_table(request, database, table):
         'hdfs_link': table.hdfs_link,
         'comment': table.comment,
         'is_view': table.is_view,
-        'properties': table.properties, 
+        'properties': table.properties,
         'details': table.details,
         'stats': table.stats
     })
@@ -247,7 +247,7 @@ def describe_table(request, database, table):
     if request.REQUEST.get("format", "html") == "json":
       response = {'status': -1, 'error_message': ''}
       error_message = ''
-      table_data = ''      
+      table_data = ''
       try:
         table_data = db.get_sample(database, table)
         response.update({
@@ -258,7 +258,7 @@ def describe_table(request, database, table):
       except Exception, ex:
         error_message, logs = dbms.expand_exception(ex, db)
         response['error_message'] = error_message
-        
+
       return JsonResponse(response)
 
   return render(renderable, request, {
