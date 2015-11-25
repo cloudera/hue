@@ -162,9 +162,12 @@ def show_tables(request, database=None):
   except Exception, e:
     raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
+  database_meta = db.get_database(database)
+
   if request.REQUEST.get("format", "html") == "json":
     resp = JsonResponse({
         'status': 0,
+        'database_meta': database_meta,
         'tables': tables,
         'table_names': table_names,
         'search_filter': search_filter
@@ -177,6 +180,7 @@ def show_tables(request, database=None):
           'url': reverse('metastore:show_tables', kwargs={'database': database})
         }
       ],
+      'database_meta': database_meta,
       'tables': tables,
       'db_form': db_form,
       'search_filter': search_filter,

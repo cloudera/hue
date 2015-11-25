@@ -53,6 +53,14 @@ ${ components.menubar() }
         <h1 class="card-heading simple">${ components.breadcrumbs(breadcrumbs) }</h1>
         <%actionbar:render>
           <%def name="search()">
+            <div>
+              ## Also available in Ajax, so ko-ifable
+              ${ database_meta.get('comment') }
+              ${ database_meta.get('location') }
+              ${ database_meta.get('owner_name') }
+              ${ database_meta.get('owner_type') }
+              ${ database_meta.get('parameters') }
+            </div>
             <form id="searchQueryForm" action="${ url('metastore:show_tables') }" method="GET" class="inline">
               <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="${ search_filter }" placeholder="${_('Search for table name')}" />
             </form>
