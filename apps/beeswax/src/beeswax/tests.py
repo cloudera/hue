@@ -1473,7 +1473,6 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
-    assert_equal([['ta\tb', 'nada', 'sp ace'], ['f\too', 'bar', 'fred'], ['a\ta', 'bb', 'cc']], resp.context['sample_rows'])
     assert_true("nada" in resp.content, resp.content)
     assert_true("sp&nbsp;ace" in resp.content, resp.content)
 
@@ -1645,11 +1644,11 @@ for x in sys.stdin:
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
-    resp = client.get(reverse('beeswax:describe_table', kwargs={'database': self.db_name, 'table': 'test'}) + '?sample=true')
-
-    assert_equal(resp.status_code, 200)
-    assert_true('<th>test.foo</th>' in resp.content, resp.content)
-    assert_true([0, '0x0'] in resp.context['sample_rows'], resp.context['sample_rows'])
+    resp = client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test'}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_true('test.foo' in json_resp['headers'], json_resp)
+    assert_true([0, '0x0'] in json_resp['rows'], json_resp)
 
 
   def test_get_sample_partitioned(self):

@@ -156,13 +156,6 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true(self.db_name in resp.content)
     assert_true("myview" in resp.content)
 
-  def test_get_sample_data(self):
-    resp = self.client.get("/metastore/table/%s/test_partitions/sample" % self.db_name)
-    json_resp = json.loads(resp.content)
-    assert_equal(0, json_resp['status'], json_resp)
-    assert_true('headers' in json_resp, json_resp)
-    assert_true('rows' in json_resp, json_resp)
-
   def test_describe_partitions(self):
     response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
     assert_true("Show Partitions (2)" in response.content, response.content)
