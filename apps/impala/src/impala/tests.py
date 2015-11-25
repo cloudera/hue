@@ -218,11 +218,11 @@ class TestImpalaIntegration:
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
-    resp = client.get(reverse('impala:describe_table', kwargs={'database': self.DATABASE, 'table': 'tweets'}) + '?sample=true')
-
-    assert_equal(resp.status_code, 200)
-    assert_true('531091827' in resp.content, resp.content) # We are getting one or two random rows
-    assert_true(len(resp.context['sample_rows']) > 0, resp.context['sample_rows'])
+    resp = client.get(reverse('impala:get_sample_data', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_equal([u'tweets.row_num', u'tweets.id_str', u'tweets.text'], data['headers'], data)
+    assert_true(len(data['rows']), data)
 
   def test_get_session(self):
     resp = self.client.get(reverse("impala:api_get_session"))
