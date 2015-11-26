@@ -54,12 +54,14 @@ def get(user, query_server=None):
 
     if query_server['server_name'] not in DBMS_CACHE[user.username]:
       # Avoid circular dependency
-      from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
+      from beeswax.server.hive_server2_lib import HiveServerClientCompatible
 
       if query_server['server_name'] == 'impala':
         from impala.dbms import ImpalaDbms
-        DBMS_CACHE[user.username][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+        from impala.server import ImpalaServerClient
+        DBMS_CACHE[user.username][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(ImpalaServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
       else:
+        from beeswax.server.hive_server2_lib import HiveServerClient
         DBMS_CACHE[user.username][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
 
     return DBMS_CACHE[user.username][query_server['server_name']]

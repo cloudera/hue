@@ -497,7 +497,12 @@ class HiveServerClient:
       username = user.username
       password = None
 
-    self._client = thrift_util.get_client(TCLIService.Client,
+    thrift_class = TCLIService
+    if self.query_server['server_name'] == 'impala':
+      from ImpalaService import ImpalaHiveServer2Service
+      thrift_class = ImpalaHiveServer2Service
+
+    self._client = thrift_util.get_client(thrift_class.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
                                           service_name=query_server['server_name'],
@@ -513,8 +518,7 @@ class HiveServerClient:
                                           certfile=certfile,
                                           validate=validate,
                                           transport_mode=query_server.get('transport_mode', 'socket'),
-                                          http_url=query_server.get('http_url', '')
-    )
+                                          http_url=query_server.get('http_url', ''))
 
 
   def get_security(self):
