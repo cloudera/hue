@@ -88,6 +88,12 @@ function BeeswaxViewModel(server, assistHelper) {
     }
   });
 
+  huePubSub.subscribe("assist.database.set", function (database) {
+    if (database.source === type && self.database() !== database.name) {
+      self.database(database.name);
+    }
+  });
+
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
   self.design.inlineErrors = ko.computed(function() {
