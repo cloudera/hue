@@ -2123,6 +2123,7 @@
       });
 
       editor.on("change", function (e) {
+        snippet.statement_raw(editor.getValue());
         editor.clearErrors();
         editor.session.getMode().$id = snippet.getAceMode();
         var currentSize = editor.session.getLength();
