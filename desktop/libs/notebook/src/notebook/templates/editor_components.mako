@@ -39,6 +39,7 @@ from desktop.views import _ko
 
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.kinetic.min.js') }"></script>
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1199,6 +1200,8 @@ ${ require.config() }
   };
 
   function createDatatable(el, snippet, vm) {
+    var DATATABLES_MAX_HEIGHT = 330;
+
     $(el).addClass("dt");
     var _dt = $(el).dataTable({
       "bPaginate": false,
@@ -1211,12 +1214,13 @@ ${ require.config() }
         "sZeroRecords": "${_('No matching records')}"
       },
       "fnDrawCallback": function (oSettings) {
-        if (vm.availableSnippets().length > 1) { // vm.editorMode is not set yet
-          $(el).parents(".dataTables_wrapper").jHueTableScroller({
-            maxHeight: 330,
-            heightAfterCorrection: 0
-          });
+        if (vm.editorMode){
+          DATATABLES_MAX_HEIGHT = $(window).height() - $(el).offset().top - 40;
         }
+        $(el).parents(".dataTables_wrapper").jHueTableScroller({
+          maxHeight: DATATABLES_MAX_HEIGHT,
+          heightAfterCorrection: 0
+        });
 
         $(el).jHueTableExtender({
           fixedHeader: true,
@@ -1224,6 +1228,8 @@ ${ require.config() }
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "absolute"
         });
+
+        $('.dataTables_wrapper').kinetic();
       },
       "aoColumnDefs": [
         {
@@ -1240,12 +1246,10 @@ ${ require.config() }
         }
       ]
     });
-    if (vm.availableSnippets().length > 1) {
-      $(el).parents(".dataTables_wrapper").jHueTableScroller({
-        maxHeight: 330,
-        heightAfterCorrection: 0
-      });
-    }
+    $(el).parents(".dataTables_wrapper").jHueTableScroller({
+      maxHeight: DATATABLES_MAX_HEIGHT,
+      heightAfterCorrection: 0
+    });
 
     $(el).jHueTableExtender({
       fixedHeader: true,
@@ -1256,27 +1260,22 @@ ${ require.config() }
     $(".dataTables_filter").hide();
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
-    if (vm.availableSnippets().length > 1) {
-      dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
-        if ($(el).closest(".results").css("overflow") == "hidden") {
-          return;
-        }
-        var _e = e.originalEvent,
-            _deltaX = _e.wheelDeltaX || -_e.deltaX,
-            _deltaY = _e.wheelDeltaY || -_e.deltaY;
-        this.scrollTop += -_deltaY / 2;
-        this.scrollLeft += -_deltaX / 2;
+    dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
+      if ($(el).closest(".results").css("overflow") == "hidden") {
+        return;
+      }
+      var _e = e.originalEvent,
+          _deltaX = _e.wheelDeltaX || -_e.deltaX,
+          _deltaY = _e.wheelDeltaY || -_e.deltaY;
+      this.scrollTop += -_deltaY / 2;
+      this.scrollLeft += -_deltaX / 2;
 
-        if (this.scrollTop == 0) {
-          $("body")[0].scrollTop += -_deltaY / 3;
-          $("html")[0].scrollTop += -_deltaY / 3; // for firefox
-        }
-        e.preventDefault();
-      });
-    }
-    else {
-      dataTableEl = $(".right-panel");
-    }
+      if (this.scrollTop == 0) {
+        $("body")[0].scrollTop += -_deltaY / 3;
+        $("html")[0].scrollTop += -_deltaY / 3; // for firefox
+      }
+      e.preventDefault();
+    });
 
     var _scrollTimeout = -1;
     dataTableEl.on("scroll", function () {
@@ -1993,7 +1992,7 @@ ${ require.config() }
       });
 
       $(document).on("editorSizeChanged", function () {
-        window.setTimeout(redrawFixedHeaders, 50);
+        window.setTimeout(forceChartDraws, 50);
       });
 
       $(document).on("executeStarted", function (e, snippet) {

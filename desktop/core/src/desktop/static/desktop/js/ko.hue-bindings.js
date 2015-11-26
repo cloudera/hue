@@ -866,6 +866,7 @@
         stop: function (event, ui) {
           ui.offset.top = 0;
           ui.position.top = 0;
+          $(document).trigger("editorSizeChanged");
         }
       });
     }

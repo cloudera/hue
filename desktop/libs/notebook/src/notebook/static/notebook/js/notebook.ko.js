@@ -355,8 +355,10 @@
     self.isResultSettingsVisible = ko.observable(typeof snippet.isResultSettingsVisible != "undefined" && snippet.isResultSettingsVisible != null ? snippet.isResultSettingsVisible : false);
     self.toggleResultSettings = function () {
       self.isResultSettingsVisible(!self.isResultSettingsVisible());
-      $(document).trigger("toggleResultSettings", self);
     };
+    self.isResultSettingsVisible.subscribe(function(){
+      $(document).trigger("toggleResultSettings", self);
+    });
 
     self.settingsVisible = ko.observable(typeof snippet.settingsVisible != "undefined" && snippet.settingsVisible != null ? snippet.settingsVisible : false);
 
