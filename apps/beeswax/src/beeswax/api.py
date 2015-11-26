@@ -104,6 +104,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
       response['databases'] = db.get_databases()
     elif table is None:
       response['tables'] = db.get_tables(database=database)
+      response['tables_meta'] = db.get_tables_meta(database=database)
     elif column is None:
       t = db.get_table(database, table)
       response['hdfs_link'] = t.hdfs_link
