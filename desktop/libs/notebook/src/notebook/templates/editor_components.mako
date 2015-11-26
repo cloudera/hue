@@ -1977,10 +1977,10 @@ ${ require.config() }
       function draggableHelper (el, e, ui, setSize) {
         var _snippet = ko.dataFor(el.parents(".snippet")[0]);
         var _cm = $("#snippet_" + _snippet.id()).data("editor");
-        var _newSize = _snippet.codemirrorSize() + (ui.offset.top - initialResizePosition);
+        var _newSize = _snippet.aceSize() + (ui.offset.top - initialResizePosition);
         _cm.setSize("99%", _newSize);
         if (setSize) {
-          _snippet.codemirrorSize(_newSize);
+          _snippet.aceSize(_newSize);
         }
       }
 
@@ -2112,14 +2112,6 @@ ${ require.config() }
         }, 100);
       });
 
-      $(document).on("refreshCodeMirror", function (e, snippet) {
-        window.setTimeout(function () {
-          $("#snippet_" + snippet.id()).find(".CodeMirror").each(function () {
-            $(this)[0].CodeMirror.refresh();
-          });
-        }, 100);
-      });
-
       var hideTimeout = -1;
       $(document).on("hideAutocomplete", function () {
         window.clearTimeout(hideTimeout);
@@ -2157,10 +2149,6 @@ ${ require.config() }
       }
 
       forceChartDraws();
-
-      $(".CodeMirror").each(function () {
-        $(this)[0].CodeMirror.refresh();
-      });
 
       var _resizeTimeout = -1;
       $(window).on("resize", function () {
