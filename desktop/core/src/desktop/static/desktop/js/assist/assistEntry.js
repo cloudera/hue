@@ -286,7 +286,8 @@
 
     $assistQuickLook.find(".tableName").text(self.definition.name);
     $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
-    $assistQuickLook.find(".sample").empty("");
+    self.assistSource.loadingSamples(true);
+    self.assistSource.samples({});
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
     self.assistSource.assistHelper.fetchTableSample({
@@ -295,8 +296,8 @@
       tableName: tableName,
       dataType: "html",
       successCallback: function(data) {
-        $assistQuickLook.find(".loader").hide();
-        $assistQuickLook.find(".sample").html(data);
+        self.assistSource.samples(data);
+        self.assistSource.loadingSamples(false);
       },
       errorCallback: function(e) {
         if (e.status == 500) {

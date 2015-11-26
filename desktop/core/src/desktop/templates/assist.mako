@@ -263,11 +263,41 @@ from desktop.views import _ko
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
       <div class="modal-body" style="min-height: 100px">
+        <!-- ko if: assistSource.loadingSamples -->
         <div class="loader">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
-        <div class="sample"></div>
+        <!-- /ko -->
+        <!-- ko ifnot: assistSource.loadingSamples -->
+        <div style="overflow: auto">
+          <!-- ko with: assistSource.samples -->
+          <!-- ko if: rows.length == 0 -->
+          <div class="alert">${ _('The selected table has no data.') }</div>
+          <!-- /ko -->
+          <!-- ko if: rows.length > 0 -->
+          <table class="table table-striped table-condensed">
+            <tr>
+              <th style="width: 10px"></th>
+              <!-- ko foreach: headers -->
+              <th data-bind="text: $data"></th>
+              <!-- /ko -->
+            </tr>
+            <tbody>
+              <!-- ko foreach: rows -->
+                <tr>
+                  <td data-bind="text: $index()+1"></td>
+                  <!-- ko foreach: $data -->
+                    <td data-bind="text: $data"></td>
+                  <!-- /ko -->
+                </tr>
+              <!-- /ko -->
+            </tbody>
+          </table>
+          <!-- /ko -->
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
