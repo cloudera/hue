@@ -67,7 +67,7 @@ ${ assist.assistPanel() }
       <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
     </li>
     <li>
-      <a data-bind="text: database.name, attr: { href: '/metastore/tables/' + name }"></a><span class="divider">&gt;</span>
+      <a data-bind="text: database.name, attr: { href: '/metastore/tables/' + database.name }"></a><span class="divider">&gt;</span>
     </li>
     <li>
       <span style="padding-left:12px" data-bind="text: name"></span>
@@ -712,7 +712,7 @@ ${ assist.assistPanel() }
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
-        console.log(databaseDef);
+        location.href = '/metastore/tables/' + databaseDef.name;
       });
 
       self.isLeftPanelVisible.subscribe(function(newValue) {
