@@ -91,7 +91,7 @@ ${ assist.assistPanel() }
     <tbody data-bind="foreach: $data">
       <tr>
         ## start at 0
-        <td data-bind="text: $index()"></td>
+        <td data-bind="text: $index()+1"></td>
         ## no stats for partition key type
         <td>
          <span class="blue" data-bind="component: { name: 'table-stats', params: {
@@ -168,7 +168,7 @@ ${ assist.assistPanel() }
       <tbody>
         <!-- ko foreach: rows -->
           <tr>
-            <td data-bind="text: $index"></td>
+            <td data-bind="text: $index()+1"></td>
             <!-- ko foreach: $data -->
               <td data-bind="text: $data"></td>
             <!-- /ko -->
