@@ -170,7 +170,7 @@ ${ require.config() }
               </a>
             </li>
             <li>
-              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().clearResults() }">
+              <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
                 <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
               </a>
             </li>
