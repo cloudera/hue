@@ -945,7 +945,7 @@
       var clock = setInterval(next, 100);
   
       function next() {
-        if (self.snippets()[index].status() == 'available') {
+        if (self.snippets()[index].status() == 'available' || self.snippets()[index].status() == 'failed') {
           index = index + 1;
           if (self.snippets().length > index)
             self.snippets()[index].execute();
