@@ -165,7 +165,7 @@ class TestWithMockedSolr(TestSearchBase):
 
     result = json.loads(response.content)
     assert_equal(
-        [{'id': 'change.me', '_version_': 1513046095083602000, 'title': ['val1', 'val2', '[val3]', 'val4'], 'details': [], 'externalLink': None}],
+        [{'hueId': 'change.me', 'id': 'change.me', '_version_': 1513046095083602000, 'title': ['val1', 'val2', '[val3]', 'val4'], 'details': [], 'externalLink': None}],
         result['response']['docs']
     )
 
