@@ -158,6 +158,14 @@ from desktop.views import _ko
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isTable ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isTable, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
+          <!-- ko if: definition.isTable -->
+            <!-- ko if: definition.type == 'Table' -->
+              <i class="fa fa-fw fa-table muted"></i>
+            <!-- /ko -->
+            <!-- ko if: definition.type == 'View' -->
+              <i class="fa fa-fw fa-eye muted"></i>
+            <!-- /ko -->
+          <!-- /ko -->
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
         <div class="center"  data-bind="visible: loading" style="display:none;">
@@ -233,7 +241,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
       <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
-        ${_('tables')}
+        ${_('tables + views')}
         <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { isSearchVisible(!isSearchVisible()) }, css: { 'blue' : isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>

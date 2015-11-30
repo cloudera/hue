@@ -83,10 +83,12 @@
 
     self.tableName = null;
     self.columnName = null;
+    self.type = null;
     self.databaseName = self.getHierarchy()[0];
     if (self.definition.isTable) {
       self.tableName = self.definition.name;
       self.columnName = null;
+      self.type = self.definition.type;
     } else if (self.definition.isColumn) {
       self.tableName = parent.definition.name;
       self.columnName = self.definition.name;
@@ -130,12 +132,13 @@
 
     var successCallback = function(data) {
       self.entries([]);
-      if (typeof data.tables !== "undefined") {
-        self.entries($.map(data.tables, function(tableName) {
+      if (typeof data.tables_meta !== "undefined") {
+        self.entries($.map(data.tables_meta, function(table) {
           return self.createEntry({
-            name: tableName,
-            displayName: tableName,
-            title: tableName,
+            name: table.name,
+            displayName: table.name,
+            title: table.name,
+            type: table.type,
             isTable: true
           });
         }));
