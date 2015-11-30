@@ -114,6 +114,12 @@ THRIFT_VERSION = Config(
   default=7
 )
 
+USE_NEW_EDITOR = Config( # To remove in Hue 3.10
+  key='use_new_editor',
+  default=False,
+  type=coerce_bool,
+  help=_t('Choose whether to show the new editors for beta testing.')
+)
 
 SSL = ConfigSection(
   key='ssl',
