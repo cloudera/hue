@@ -1294,12 +1294,12 @@ ${ require.config() }
   }
 
   function toggleColumn(linkElement, index) {
-    var _dt = $(linkElement).parents(".snippet").find("table:eq(1)").dataTable();
+    var _dt = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)").dataTable();
     _dt.fnSetColumnVis(index, !_dt.fnSettings().aoColumns[index].bVisible);
   }
 
   function scrollToColumn(linkElement) {
-    var _t = $(linkElement).parents(".snippet").find("table:eq(1)");
+    var _t = $(linkElement).parents(".snippet").find("table.resultTable:eq(0)");
     var _text = $.trim($(linkElement).text().split("(")[0]);
     var _col = _t.find("th").filter(function () {
       return $.trim($(this).text()) == _text;
