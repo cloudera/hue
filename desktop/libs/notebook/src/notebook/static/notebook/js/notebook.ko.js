@@ -984,7 +984,7 @@
             parsedHistory.push({
               url: nbk.absoluteUrl,
               query: nbk.data.snippets[0].statement_raw,
-              lastExecuted: nbk.data.lastExecuted
+              lastExecuted: nbk.data.snippets[0].lastExecuted
             });
           });
         }
