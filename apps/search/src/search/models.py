@@ -824,7 +824,7 @@ def augment_solr_response(response, collection, query):
 
       doc['externalLink'] = link
       doc['details'] = []
-      doc['hueId'] = doc.get(id_field, '')
+      doc['hueId'] = smart_unicode(doc.get(id_field, ''))
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
