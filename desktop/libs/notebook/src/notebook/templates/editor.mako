@@ -26,15 +26,6 @@
 
 ${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
 
-<script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("editor") > -1) {
-      location.href = "/notebook/editor?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
-  }
-</script>
-
-
 ${ editorComponents.includes() }
 ${ editorComponents.topBar('editor', editor_type) }
 ${ editorComponents.commonHTML() }

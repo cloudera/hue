@@ -463,7 +463,7 @@
           $.post("/notebook/api/historify", {
             notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
           }, function(data){
-            if (vm.editorMode && data && data.status == 0 && data.id && typeof history.pushState != 'undefined'){
+            if (vm.editorMode && data && data.status == 0 && data.id){
               history.pushState(null, null, '/notebook/editor?editor=' + data.id);
             }
           });
@@ -921,10 +921,11 @@
         if (data.status == 0) {
           self.id(data.id);
           $(document).trigger("info", data.message);
-          if (vm.editorMode && window.location.search.indexOf("editor") == -1) {
-            window.location.hash = '#editor=' + data.id;
-          } else if (window.location.search.indexOf("notebook") == -1) {
-            window.location.hash = '#notebook=' + data.id;
+          if (vm.editorMode){
+            history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+          }
+          else {
+            history.pushState(null, null, '/notebook/notebook?notebook=' + data.id);
           }
         }
         else {
