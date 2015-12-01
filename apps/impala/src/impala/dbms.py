@@ -22,7 +22,9 @@ from desktop.lib.i18n import smart_str
 from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES
-from beeswax.server.dbms import HiveServer2Dbms
+from beeswax.server import dbms
+from beeswax.server.dbms import HiveServer2Dbms, QueryServerException, QueryServerTimeoutException,\
+  get_query_server_config as beeswax_query_server_config
 
 from impala import conf
 
@@ -86,23 +88,42 @@ class ImpalaDbms(HiveServer2Dbms):
     return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
 
 
-  def invalidate_tables(self, database, tables=None):
+  def invalidate(self, database, flush_all=False):
     handle = None
-
     try:
-      if tables:
-        for table in tables:
-          hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table,)
-          print hql
-          query = hql_query(hql, database, query_type=QUERY_TYPES[1])
-          handle = self.execute_and_wait(query, timeout_sec=10.0)
-      else:  # call INVALIDATE on entire DB to pick up newly created tables
-        hql = "INVALIDATE METADATA `%s`" % database
-        print hql
-        query = hql_query(hql, database, query_type=QUERY_TYPES[1])
+      if flush_all:
+        self.use(database)  # INVALIDATE does not accept database as a single parameter
+        hql = "INVALIDATE METADATA"
+        query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
+      else:
+        diff_tables = self._get_different_tables(database)
+        for table in diff_tables:
+          hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table)
+          query = hql_query(hql, query_type=QUERY_TYPES[1])
+          handle = self.execute_and_wait(query, timeout_sec=10.0)
+    except QueryServerTimeoutException, e:
+      # Allow timeout exceptions to propagate
+      raise e
     except Exception, e:
-      LOG.warn('Refresh tables cache out of sync: %s' % smart_str(e))
+      LOG.error('Failed to invalidate `%s`: %s' % (database, smart_str(e)))
+      msg = 'Failed to invalidate `%s`' % database
+      raise QueryServerException(msg)
+    finally:
+      if handle:
+        self.close(handle)
+
+
+  def refresh_table(self, database, table):
+    handle = None
+    try:
+      hql = "REFRESH `%s`.`%s`" % (database, table)
+      query = hql_query(hql, database, query_type=QUERY_TYPES[1])
+      handle = self.execute_and_wait(query, timeout_sec=10.0)
+    except Exception, e:
+      LOG.error('Failed to refresh `%s`.`%s`: %s' % (database, table, smart_str(e)))
+      msg = 'Failed to refresh `%s`.`%s`' % (database, table)
+      raise QueryServerException(msg)
     finally:
       if handle:
         self.close(handle)
@@ -159,3 +180,14 @@ class ImpalaDbms(HiveServer2Dbms):
         self.close(handle)
 
     return results
+
+
+  def _get_beeswax_tables(self, database):
+    beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name='beeswax'))
+    return beeswax_query_server.get_tables(database=database)
+
+
+  def _get_different_tables(self, database):
+    beeswax_tables = self._get_beeswax_tables(database)
+    impala_tables = self.get_tables(database=database)
+    return set(beeswax_tables).symmetric_difference(impala_tables)
