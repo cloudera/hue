@@ -72,8 +72,8 @@ from desktop.views import _ko
       <div class="arrow" data-bind="style: { 'top': $parent.popoverArrowTop() + 'px'}"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: $parent.toggleStats"><i class="fa fa-times"></i></a>
-        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
-        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
+        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType && !isView, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
+        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
         <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
         <strong class="table-name" data-bind="text: table"></strong> ${ _(' table analysis') }
