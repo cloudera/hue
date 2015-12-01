@@ -138,7 +138,7 @@ ${ assist.assistPanel() }
     <tbody>
       % for column in cols[:limit]:
         <tr>
-          <td>${ loop.index }</td>
+          <td>${ loop.index + 1 }</td>
           %if withStats:
             <td class="row-selector-exclude">
               <a href="javascript:void(0)" data-column="${ column.name }">
@@ -155,6 +155,45 @@ ${ assist.assistPanel() }
     </tbody>
   </table>
 </%def>
+
+
+<%def name="partition_values(cols, id, withStats=False, limit=1000)">
+  <table id="${id}" class="table table-striped table-condensed sampleTable
+  %if withStats:
+  skip-extender
+  %endif
+  ">
+    <thead>
+      <tr>
+        <th width="1%">&nbsp;</th>
+        %if withStats:
+          <th width="1%" class="no-sort">&nbsp;</th>
+        %endif
+        <th>${_('Values')}</th>
+        <th>${_('Spec')}</th>
+        <th>${_('Sd')}</th>
+      </tr>
+    </thead>
+    <tbody>
+      % for column in cols[:limit]:
+        <tr>
+          <td>${ loop.index + 1 }</td>
+          %if withStats:
+            <td class="row-selector-exclude">
+              <a href="javascript:void(0)" data-column="${ column.name }">
+                <i class="fa fa-bar-chart" title="${ _('View statistics') }"></i>
+              </a>
+            </td>
+          %endif
+          <td>${ column.values }</td>
+          <td>${ column.partition_spec }</td>
+          <td>${ column.sd }</td>
+        </tr>
+      % endfor
+    </tbody>
+  </table>
+</%def>
+
 
 <script type="text/html" id="metastore-samples-table">
   <div style="overflow: auto">
@@ -289,7 +328,7 @@ ${ assist.assistPanel() }
               <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
               <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
               % if table.partition_keys:
-                <li><a href="#partitionColumns" data-toggle="tab">${_('Partition Columns')} (${ len(table.partition_keys) })</a></li>
+                <li><a href="#partitions" data-toggle="tab">${_('Partitions')} (${ len(partitions) })</a></li>
               % endif
               <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
               <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
@@ -340,9 +379,9 @@ ${ assist.assistPanel() }
 
                 % if table.partition_keys:
                   <div class="tile">
-                    <h4>${ _('Partitions') } (${ len(table.partition_keys) })</h4>
-                    ${ partition_column_table(table.partition_keys, "partitionTable", limit=3) }
-                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitionColumns\']').click(); }">${_('View more...')}</a>
+                    <h4>${ _('Partitions') } (${ len(partitions) })</h4>
+                    ${ partition_values(partitions, "partitionTable", limit=3) }
+                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
                   </div>
                 % endif
               </div>
@@ -354,10 +393,18 @@ ${ assist.assistPanel() }
               </div>
 
               % if table.partition_keys:
-                <div class="tab-pane" id="partitionColumns">
+                <div class="tab-pane" id="partitions">
+                  <h4>${ _('Columns') } (${ len(table.partition_keys) })</h4>
                   ${ partition_column_table(table.partition_keys, "partitionTable") }
+
+                  <h4>${ _('Values') } (${ len(partitions) })</h4>
+                  ${ partition_values(partitions, "partitionTable", limit=25) }
+
+                  <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
+                    ${ _('View all') }
+                  </a>
                 </div>
-              % endif
+              %endif
 
               <div class="tab-pane" id="sample">
                 <!-- ko with: samples -->

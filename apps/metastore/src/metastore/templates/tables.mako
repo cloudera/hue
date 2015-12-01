@@ -224,7 +224,6 @@ ${ assist.assistPanel() }
     "ko.hue-bindings"
   ], function (ko, charts, AssistHelper) {
 
-
     function MetastoreViewModel(options) {
       var self = this;
       self.assistAvailable = ko.observable(true);
