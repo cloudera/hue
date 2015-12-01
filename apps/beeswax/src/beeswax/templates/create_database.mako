@@ -281,11 +281,6 @@ ${ assist.assistPanel() }
 
       ko.applyBindings(viewModel);
 
-      window.hueDebug = {
-        viewModel: viewModel,
-        ko: ko
-      };
-
       // Routing
       var step = 1;
       routie({

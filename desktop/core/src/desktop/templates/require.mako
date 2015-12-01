@@ -52,6 +52,12 @@ DEBUG = DJANGO_DEBUG_MODE.get()
       deps: ["knockout", "knockout-mapping"],
       callback: function(ko, mapping) {
         ko.mapping = mapping;
+        window.hueDebug = {
+          ko: ko,
+          viewModel: function () {
+            return ko.dataFor(document.body);
+          }
+        }
       }
     });
   </script>

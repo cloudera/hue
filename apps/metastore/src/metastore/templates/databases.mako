@@ -222,11 +222,6 @@ ${ assist.assistPanel() }
 
       ko.applyBindings(viewModel);
 
-      window.hueDebug = {
-        viewModel: viewModel,
-        ko: ko
-      };
-
       if (location.getParameter("error") != "") {
         $.jHueNotify.error(location.getParameter("error"));
       }
