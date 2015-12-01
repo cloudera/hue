@@ -1228,16 +1228,19 @@ for x in sys.stdin:
     self._make_custom_data_file(filename, [0, 0, 0])
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/metastore/table/%s/timestamp_invalid_data" % self.db_name)
-    assert_true('NULL' in response.content, response.content)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'timestamp_invalid_data'}))
+    rows = json.loads(resp.content)['rows']
+    flat_rows = sum(rows, [])
+    assert_true("NULL" in flat_rows, flat_rows)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/metastore/table/%s/timestamp_valid_data" % self.db_name)
-    assert_true('2012-01-01&nbsp;10:11:30' in response.content, response.content)
-
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'timestamp_valid_data'}))
+    rows = json.loads(resp.content)['rows']
+    flat_rows = sum(rows, [])
+    assert_true("2012-01-01 10:11:30.0" in flat_rows, flat_rows)
 
   def test_partitioned_create_table(self):
     # Make sure we get a form
