@@ -241,7 +241,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
       <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
-        ${_('tables + views')}
+        ${_('tables')}
         <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { isSearchVisible(!isSearchVisible()) }, css: { 'blue' : isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
