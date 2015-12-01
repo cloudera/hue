@@ -369,15 +369,17 @@ ${ assist.assistPanel() }
                   <a class="pointer" data-bind="click: function() { $('li a[href=\'#columns\']').click(); }">${_('View more...')}</a>
                 </div>
 
-                <div class="tile">
-                  <h4>${ _('Sample') }</h4>
+                <div class="tile" data-bind="visible: true" style="display: none;">
                   <!-- ko with: samples -->
-                    <!-- ko with: preview -->
-                      <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
-                      <a class="pointer" data-bind="visible: rows.length, click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
-                    <!-- /ko -->
-                    <span data-bind="visible: !rows.length && isView">${ _('The view does not contain any data') }</span>
-                    <span data-bind="visible: !rows.length && !isView">${ _('The table does not contain any data') }</span>
+                  <h4>${ _('Sample') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
+                  <!-- ko if: loaded -->
+                  <!-- ko with: preview -->
+                  <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
+                  <a class="pointer" data-bind="visible: rows.length, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">${_('View more...')}</a>
+                  <!-- /ko -->
+                  <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+                  <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+                  <!-- /ko -->
                   <!-- /ko -->
                 </div>
 
@@ -412,9 +414,11 @@ ${ assist.assistPanel() }
 
               <div class="tab-pane" id="sample">
                 <!-- ko with: samples -->
-                <!-- ko template: { if: rows.length, name: 'metastore-samples-table' }--><!-- /ko -->
-                <span data-bind="visible: !rows.length && isView">${ _('The view does not contain any data') }</span>
-                <span data-bind="visible: !rows.length && !isView">${ _('The table does not contain any data') }</span>
+                <!-- ko if: loaded -->
+                <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
+                <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+                <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+                <!-- /ko -->
                 <!-- /ko -->
               </div>
 
@@ -590,21 +594,53 @@ ${ assist.assistPanel() }
 
     /**
      * @param {Object} options
-     * @param {string[]} options.headers
-     * @param {string[]} options.rows
-     * @param {boolean} isView
+     * @param {AssistHelper} options.assistHelper
+     * @param {MetastoreTable} options.metastoreTable
      */
     function MetastoreTableSamples (options) {
       var self = this;
-      self.rows = options.rows || [];
-      self.headers = options.headers || [];
-      self.isView = options.isView;
+      self.rows = ko.observableArray();
+      self.headers = ko.observableArray();
+      self.metastoreTable = options.metastoreTable;
+      self.assistHelper = options.assistHelper;
+
+      self.loaded = ko.observable(false);
+      self.loading = ko.observable(true);
 
       self.preview = {
-        headers: self.headers,
-        rows: self.rows.slice(0, 3)
+        headers: ko.observableArray(),
+        rows: ko.observableArray()
       }
     }
+
+    MetastoreTableSamples.prototype.load = function () {
+      var self = this;
+      if (self.loaded()) {
+        return;
+      }
+      self.assistHelper.fetchTableSample({
+        sourceType: "hive",
+        databaseName: self.metastoreTable.database.name,
+        tableName: self.metastoreTable.name,
+        dataType: "json",
+        successCallback: function (data) {
+          self.rows = data.rows || [];
+          self.headers = data.headers || [];
+          self.preview.rows = self.rows.slice(0, 3);
+          self.preview.headers = self.headers
+          self.loading(false);
+          self.loaded(true);
+        },
+        errorCallback: function (data) {
+          $.jHueNotify.error('${_('An error occurred fetching the table sample. Please try again.')}');
+          console.error('assistHelper.fetchTableSample error');
+          console.error(data);
+          self.loading(false);
+          self.loaded(true);
+        }
+      });
+    }
+
 
     /**
      * @param {Object} options
@@ -622,7 +658,10 @@ ${ assist.assistPanel() }
 
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
-      self.samples = ko.observable();
+      self.samples = new MetastoreTableSamples({
+        assistHelper: self.assistHelper,
+        metastoreTable: self
+      });
       self.tableDetails = ko.observable();
       self.tableStats = ko.observable();
       self.refreshingTableStats = ko.observable(false);
@@ -656,27 +695,6 @@ ${ assist.assistPanel() }
         }
       })
 
-      var fetchSamples = function () {
-        self.assistHelper.fetchTableSample({
-          sourceType: "hive",
-          databaseName: self.database.name,
-          tableName: self.name,
-          dataType: "json",
-          successCallback: function (data) {
-            self.samples(new MetastoreTableSamples({
-              rows: data.rows,
-              headers: data.headers,
-              isView: self.tableDetails().is_view
-            }));
-          },
-          errorCallback: function (data) {
-            $.jHueNotify.error('${_('An error occurred fetching the table sample. Please try again.')}');
-            console.error('assistHelper.fetchTableSample error');
-            console.error(data);
-          }
-        })
-      }
-
       var fetchDetails = function () {
         self.assistHelper.fetchTableDetails({
           sourceType: "hive",
@@ -686,7 +704,7 @@ ${ assist.assistPanel() }
             self.tableDetails(data);
             self.tableStats(data.details.stats);
             self.refreshingTableStats(false);
-            fetchSamples();
+            self.samples.load();
           },
           errorCallback: function (data) {
             self.refreshingTableStats(false);
