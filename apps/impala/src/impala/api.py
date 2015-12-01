@@ -18,9 +18,10 @@
 
 ## Main views are inherited from Beeswax.
 
-
 import logging
-import json
+
+from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 
@@ -32,20 +33,37 @@ from impala import dbms
 LOG = logging.getLogger(__name__)
 
 
-def refresh_tables(request):
+@require_POST
+def invalidate(request, database):
   query_server = dbms.get_query_server_config()
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
-  if request.method == "POST":
-    try:
-      database = json.loads(request.POST['database'])
-      added = json.loads(request.POST.get('added', []))
-      removed = json.loads(request.POST.get('removed', []))
+  try:
+    flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
+    db.invalidate(database, flush_all=flush_all)
+    response['message'] = _('Successfully invalidated metadata for `%s`') % database
+  except Exception, e:
+    response['status'] = -1
+    response['message'] = _(str(e))
 
-      db.invalidate_tables(database, added + removed)
-    except Exception, e:
-      response['message'] = str(e)
+  return JsonResponse(response)
+
+
+
+@require_POST
+def refresh_table(request, database, table):
+  query_server = dbms.get_query_server_config()
+  db = beeswax_dbms.get(request.user, query_server=query_server)
+
+  response = {'status': 0, 'message': ''}
+
+  try:
+    db.refresh_table(database, table)
+    response['message'] = _('Successfully refreshed metadata for `%s`.`%s`') % (database, table)
+  except Exception, e:
+    response['status'] = -1
+    response['message'] = _(str(e))
 
   return JsonResponse(response)

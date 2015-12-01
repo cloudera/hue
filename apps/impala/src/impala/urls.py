@@ -21,7 +21,8 @@ from beeswax.urls import urlpatterns as beeswax_urls
 
 
 urlpatterns = patterns('impala.api',
-  url(r'^api/refresh_tables$', 'refresh_tables', name='refresh_tables'),
+  url(r'^api/invalidate/(?P<database>\w+)$', 'invalidate', name='invalidate'),
+  url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', 'refresh_table', name='refresh_table'),
 )
 
 urlpatterns += patterns('impala.dashboards',

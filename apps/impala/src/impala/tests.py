@@ -119,7 +119,7 @@ class TestImpalaIntegration:
     hql = """
       USE default;
       DROP TABLE IF EXISTS %(db)s.tweets;
-      DROP DATABASE IF EXISTS %(db)s;
+      DROP DATABASE IF EXISTS %(db)s CASCADE;
       CREATE DATABASE %(db)s;
 
       USE %(db)s;
@@ -153,7 +153,7 @@ class TestImpalaIntegration:
     hql = """
     USE default;
     DROP TABLE IF EXISTS %(db)s.tweets;
-    DROP DATABASE %(db)s;
+    DROP DATABASE %(db)s CASCADE;
     """ % {'db': cls.DATABASE}
     resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
     resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
@@ -230,6 +230,69 @@ class TestImpalaIntegration:
     assert_true('properties' in data)
     assert_true(data['properties'].get('http_addr'))
 
+
+  def test_invalidate(self):
+    # Helper function to get Impala and Beeswax (HMS) tables
+    def get_impala_beeswax_tables():
+      impala_resp = self.client.get(reverse('impala:api_autocomplete_tables', kwargs={'database': self.DATABASE}))
+      impala_tables_meta = json.loads(impala_resp.content)['tables_meta']
+      impala_tables = [table['name'] for table in impala_tables_meta]
+      beeswax_resp = self.client.get(reverse('beeswax:api_autocomplete_tables', kwargs={'database': self.DATABASE}))
+      beeswax_tables_meta = json.loads(beeswax_resp.content)['tables_meta']
+      beeswax_tables = [table['name'] for table in beeswax_tables_meta]
+      return impala_tables, beeswax_tables
+
+    impala_tables, beeswax_tables = get_impala_beeswax_tables()
+    assert_equal(impala_tables, beeswax_tables,
+      "\ntest_invalidate: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+
+    hql = """
+      CREATE TABLE new_table (a INT);
+    """
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.DATABASE)
+
+    impala_tables, beeswax_tables = get_impala_beeswax_tables()
+    # New table is not found by Impala
+    assert_true('new_table' in beeswax_tables, beeswax_tables)
+    assert_false('new_table' in impala_tables, impala_tables)
+
+    resp = self.client.post(reverse('impala:invalidate', kwargs={'database': self.DATABASE}))
+
+    impala_tables, beeswax_tables = get_impala_beeswax_tables()
+    # Invalidate picks up new table
+    assert_equal(impala_tables, beeswax_tables,
+      "\ntest_invalidate: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+
+
+  def test_refresh_table(self):
+    # Helper function to get Impala and Beeswax (HMS) columns
+    def get_impala_beeswax_columns():
+      impala_resp = self.client.get(reverse('impala:api_autocomplete_columns', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+      impala_columns = json.loads(impala_resp.content)['columns']
+      beeswax_resp = self.client.get(reverse('beeswax:api_autocomplete_columns', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+      beeswax_columns = json.loads(beeswax_resp.content)['columns']
+      return impala_columns, beeswax_columns
+
+    impala_columns, beeswax_columns = get_impala_beeswax_columns()
+    assert_equal(impala_columns, beeswax_columns,
+      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+
+    hql = """
+      ALTER TABLE tweets ADD COLUMNS (new_column INT);
+    """
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.DATABASE)
+
+    impala_columns, beeswax_columns = get_impala_beeswax_columns()
+    # New column is not found by Impala
+    assert_true('new_column' in beeswax_columns, beeswax_columns)
+    assert_false('new_column' in impala_columns, impala_columns)
+
+    resp = self.client.post(reverse('impala:refresh_table', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+
+    impala_columns, beeswax_columns = get_impala_beeswax_columns()
+    # Invalidate picks up new column
+    assert_equal(impala_columns, beeswax_columns,
+      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
 
 
 # Could be refactored with SavedQuery.create_empty()
