@@ -299,6 +299,11 @@
       tableName: tableName,
       dataType: "html",
       successCallback: function(data) {
+        if (! data.rows) {
+          data.rows = [];
+        } else if (! data.headers) {
+          data.headers = [];
+        }
         self.assistSource.samples(data);
         self.assistSource.loadingSamples(false);
       },
