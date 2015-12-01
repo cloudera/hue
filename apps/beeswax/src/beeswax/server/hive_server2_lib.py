@@ -935,6 +935,9 @@ class PartitionValueCompatible:
     self.values = [pv[1] for pv in [part.split('=') for part in parts]]
     self.sd = type('Sd', (object,), properties,)
 
+  def __repr__(self):
+    return 'PartitionValueCompatible(spec:%s, values:%s, sd:%s)' % (self.partition_spec, self.values, self.sd)
+
 
 class ExplainCompatible:
 

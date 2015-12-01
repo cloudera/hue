@@ -175,12 +175,20 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_true("is not partitioned." in response.content)
 
   def test_describe_partitioned_table_with_limit(self):
-    # Limit to 90
-    finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("90")
+    # We have 2 partitions in the test table
+    finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("1")
     try:
-      response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
-      assert_true("0x%x" % 89 in response.content, response.content)
-      assert_false("0x%x" % 90 in response.content, response.content)
+      response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
+      partition_values_json = json.loads(response.context['partition_values_json'])
+      assert_equal(1, len(partition_values_json))
+    finally:
+      finish()
+
+    finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("3")
+    try:
+      response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
+      partition_values_json = json.loads(response.context['partition_values_json'])
+      assert_equal(2, len(partition_values_json))
     finally:
       finish()
 
