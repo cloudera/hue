@@ -663,12 +663,23 @@ def describe_table(request, database, table):
 
 
 def get_sample_data(request, database, table):
+  db = dbms.get(request.user)
+  response = {'status': -1, 'error_message': ''}
+
   try:
-    from metastore.views import get_sample_data
-    return get_sample_data(request, database, table)
-  except Exception, e:
-    LOG.exception('Failed to retrieve sample data for `%s`.`%s`' % (database, table))
-    raise PopupException(_('Problem accessing table metadata'), detail=e)
+    table_obj = db.get_table(database, table)
+    sample_data = db.get_sample(database, table_obj)
+    if sample_data:
+      response['status'] = 0
+      response['headers'] = sample_data.cols()
+      response['rows'] = list(sample_data.rows())
+    else:
+      response['error_message'] = _('Sample data took too long to be generated')
+  except Exception, ex:
+    error_message, logs = dbms.expand_exception(ex, db)
+    response['error_message'] = error_message
+
+  return JsonResponse(response)
 
 
 def get_query_form(request):

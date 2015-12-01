@@ -211,24 +211,6 @@ def get_table_metadata(request, database, table):
   return JsonResponse(response)
 
 
-def get_sample_data(request, database, table):
-  db = dbms.get(request.user)
-  response = {'status': -1, 'error_message': ''}
-  try:
-    table_obj = db.get_table(database, table)
-    sample_data = db.get_sample(database, table_obj)
-    response = {
-      'status': 0,
-      'headers': sample_data and sample_data.cols(),
-      'rows': sample_data and list(sample_data.rows())
-    }
-  except Exception, ex:
-    error_message, logs = dbms.expand_exception(ex, db)
-    response['error_message'] = error_message
-
-  return JsonResponse(response)
-
-
 def describe_table(request, database, table):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
