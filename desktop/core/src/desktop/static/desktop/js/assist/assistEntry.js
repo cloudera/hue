@@ -48,7 +48,7 @@
     self.filter = filter;
     self.isSearchVisible = ko.observable(false);
 
-    self.expandable = typeof definition.type === "undefined" || definition.type === "struct" || definition.type === "array" || definition.type === "map";
+    self.expandable = typeof definition.type === "undefined" || /table|struct|array|map/i.test(definition.type);
 
     self.loaded = false;
     self.loading = ko.observable(false);
