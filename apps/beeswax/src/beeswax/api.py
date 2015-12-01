@@ -32,6 +32,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.parameterization import substitute_variables
 from metastore import parser
+from notebook.models import escape_rows
 
 import beeswax.models
 
@@ -672,7 +673,7 @@ def get_sample_data(request, database, table):
     if sample_data:
       response['status'] = 0
       response['headers'] = sample_data.cols()
-      response['rows'] = list(sample_data.rows())
+      response['rows'] = escape_rows(sample_data.rows(), nulls_only=True)
     else:
       response['error_message'] = _('Sample data took too long to be generated')
   except Exception, ex:
