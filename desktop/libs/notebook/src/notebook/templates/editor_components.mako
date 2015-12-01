@@ -1884,14 +1884,8 @@ ${ require.config() }
         }
       }
 
-      window.hueDebug = {
-        viewModel: viewModel,
-        ko: ko
-      };
-
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();
-
 
       viewModel.isPlayerMode.subscribe(function (value) {
         if (value){

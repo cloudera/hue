@@ -795,10 +795,6 @@ ${ assist.assistPanel() }
         }
       });
 
-      window.hueDebug = {
-        viewModel: viewModel,
-        ko: ko
-      };
     });
   });
 
