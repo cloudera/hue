@@ -232,10 +232,10 @@ ${ assist.assistPanel() }
     <!-- ko if: $parent.refreshingTableStats -->
     <i class="fa fa-refresh fa-spin"></i>
     <!-- /ko -->
-    <!-- ko ifnot: $parent.refreshingTableStats -->
+    <!-- ko ifnot: $parent.refreshingTableStats && is_view  -->
     <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
     <!-- /ko -->
-    <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
+    <span data-bind="visible: !details.stats.COLUMN_STATS_ACCURATE && !is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
   </h4>
   <div class="row-fluid">
     <div class="span6">
@@ -253,13 +253,13 @@ ${ assist.assistPanel() }
       <div><a data-bind="attr: {'href': hdfs_link, 'rel': path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
       <!-- ko if: $parent.tableStats  -->
         <!-- ko with: $parent.tableStats -->
-          <!-- ko if: numFiles  -->
+          <!-- ko if: typeof numFiles !== 'undefined'  -->
             <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
           <!-- /ko -->
-          <!-- ko if: numRows  -->
+          <!-- ko if: typeof numRows !== 'undefined'  -->
             <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
           <!-- /ko -->
-          <!-- ko if: totalSize  -->
+          <!-- ko if: typeof totalSize !== 'undefined'  -->
             <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
           <!-- /ko -->
         <!-- /ko -->
