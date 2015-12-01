@@ -1200,9 +1200,8 @@ ${ require.config() }
   };
 
   function createDatatable(el, snippet, vm) {
-    var DATATABLES_MAX_HEIGHT = 330;
-
     $(el).addClass("dt");
+    var DATATABLES_MAX_HEIGHT = 330;
     var _dt = $(el).dataTable({
       "bPaginate": false,
       "bLengthChange": false,
@@ -1215,7 +1214,7 @@ ${ require.config() }
       },
       "fnDrawCallback": function (oSettings) {
         if (vm.editorMode){
-          DATATABLES_MAX_HEIGHT = $(window).height() - $(el).offset().top - 40;
+          DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
         }
         $(el).parents(".dataTables_wrapper").jHueTableScroller({
           maxHeight: DATATABLES_MAX_HEIGHT,
@@ -1246,6 +1245,7 @@ ${ require.config() }
         }
       ]
     });
+
     $(el).parents(".dataTables_wrapper").jHueTableScroller({
       maxHeight: DATATABLES_MAX_HEIGHT,
       heightAfterCorrection: 0
@@ -1281,8 +1281,8 @@ ${ require.config() }
     dataTableEl.on("scroll", function () {
       var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
+      dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
       _scrollTimeout = window.setTimeout(function () {
-        dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
         if (_lastScrollPosition != dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt) {
           dataTableEl.animate({opacity: '0.55'}, 200);
           snippet.fetchResult(100, false);
@@ -2018,9 +2018,6 @@ ${ require.config() }
           "height": (_dtElement.height() - 30) + "px",
           "line-height": (_dtElement.height() - 30) + "px"
         });
-        if (viewModel.availableSnippets().length === 1) {
-          $(".right-panel").jHueScrollUp();
-        }
       }
 
       $(document).on("renderData", function (e, options) {
@@ -2038,9 +2035,6 @@ ${ require.config() }
             }
             _dt.fnAddData(options.data);
             var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-            if (viewModel.availableSnippets().length === 1) {
-              _dtElement = $(".right-panel");
-            }
             _dtElement.animate({opacity: '1'}, 50);
             _dtElement.scrollTop(_dtElement.data("scrollPosition"));
             redrawFixedHeaders();
@@ -2049,28 +2043,16 @@ ${ require.config() }
         }
         else {
           var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-          if (viewModel.availableSnippets().length === 1) {
-            _dtElement = $(".right-panel");
-          }
           _dtElement.animate({opacity: '1'}, 50);
           _dtElement.off("scroll");
-          if (viewModel.availableSnippets().length === 1) {
-            _dtElement.jHueScrollUp();
-          }
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
       });
 
       $(document).on("renderDataError", function (e, options) {
         var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-        if (viewModel.availableSnippets().length === 1) {
-          _dtElement = $(".right-panel");
-        }
         _dtElement.animate({opacity: '1'}, 50);
         _dtElement.off("scroll");
-        if (viewModel.availableSnippets().length === 1) {
-          _dtElement.jHueScrollUp();
-        }
       });
 
       $(document).on("progress", function (e, options) {
