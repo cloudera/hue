@@ -106,7 +106,6 @@ class ImpalaDbms(HiveServer2Dbms):
       # Allow timeout exceptions to propagate
       raise e
     except Exception, e:
-      LOG.error('Failed to invalidate `%s`: %s' % (database, smart_str(e)))
       msg = 'Failed to invalidate `%s`' % database
       raise QueryServerException(msg)
     finally:
@@ -121,7 +120,6 @@ class ImpalaDbms(HiveServer2Dbms):
       query = hql_query(hql, database, query_type=QUERY_TYPES[1])
       handle = self.execute_and_wait(query, timeout_sec=10.0)
     except Exception, e:
-      LOG.error('Failed to refresh `%s`.`%s`: %s' % (database, table, smart_str(e)))
       msg = 'Failed to refresh `%s`.`%s`' % (database, table)
       raise QueryServerException(msg)
     finally:
