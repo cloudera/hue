@@ -1473,8 +1473,11 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
-    assert_true("nada" in resp.content, resp.content)
-    assert_true("sp&nbsp;ace" in resp.content, resp.content)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test_create_import'}))
+    rows = json.loads(resp.content)['rows']
+    flat_rows = sum(rows, [])
+    assert_true("nada" in flat_rows, flat_rows)
+    assert_true("sp&nbsp;ace" in flat_rows, flat_rows)
 
     # Test table creation and data loading and removing header
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
@@ -1528,11 +1531,14 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([col.name for col in cols], ['col_a', 'col_b', 'col_c'])
-    assert_equal(resp.context['sample_rows'], [
+
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test_create_import_with_header'}))
+    rows = json.loads(resp.content)['rows']
+    assert_equal([
       #['a', 'b', 'c'], # Gone as told to be header
       ['"a', 'a"', '"b'], # Hive does not support natively quoted CSV
       ['"a', '""a"', '"b']
-    ] )
+    ], rows)
 
 
   def test_select_invalid_data(self):
