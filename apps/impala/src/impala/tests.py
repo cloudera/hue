@@ -231,7 +231,7 @@ class TestImpalaIntegration:
     assert_true(data['properties'].get('http_addr'))
 
 
-  def test_invalidate(self):
+  def test_invalidate_tables(self):
     # Helper function to get Impala and Beeswax (HMS) tables
     def get_impala_beeswax_tables():
       impala_resp = self.client.get(reverse('impala:api_autocomplete_tables', kwargs={'database': self.DATABASE}))
@@ -244,7 +244,7 @@ class TestImpalaIntegration:
 
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     assert_equal(impala_tables, beeswax_tables,
-      "\ntest_invalidate: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
 
     hql = """
       CREATE TABLE new_table (a INT);
@@ -261,7 +261,7 @@ class TestImpalaIntegration:
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     # Invalidate picks up new table
     assert_equal(impala_tables, beeswax_tables,
-      "\ntest_invalidate: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
 
 
   def test_refresh_table(self):

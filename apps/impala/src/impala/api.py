@@ -25,6 +25,7 @@ from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 
+from beeswax.api import error_handler
 from beeswax.server import dbms as beeswax_dbms
 
 from impala import dbms
@@ -34,36 +35,30 @@ LOG = logging.getLogger(__name__)
 
 
 @require_POST
+@error_handler
 def invalidate(request, database):
   query_server = dbms.get_query_server_config()
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
-  try:
-    flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
-    db.invalidate(database, flush_all=flush_all)
-    response['message'] = _('Successfully invalidated metadata for `%s`') % database
-  except Exception, e:
-    response['status'] = -1
-    response['message'] = _(str(e))
+  flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
+  db.invalidate(database, flush_all=flush_all)
+  response['message'] = _('Successfully invalidated metadata for `%s`') % database
 
   return JsonResponse(response)
 
 
 
 @require_POST
+@error_handler
 def refresh_table(request, database, table):
   query_server = dbms.get_query_server_config()
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
-  try:
-    db.refresh_table(database, table)
-    response['message'] = _('Successfully refreshed metadata for `%s`.`%s`') % (database, table)
-  except Exception, e:
-    response['status'] = -1
-    response['message'] = _(str(e))
+  db.refresh_table(database, table)
+  response['message'] = _('Successfully refreshed metadata for `%s`.`%s`') % (database, table)
 
   return JsonResponse(response)
