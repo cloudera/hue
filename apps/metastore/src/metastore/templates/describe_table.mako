@@ -371,10 +371,14 @@ ${ assist.assistPanel() }
 
                 <div class="tile">
                   <h4>${ _('Sample') }</h4>
-                    <!-- ko with: samplesPreview -->
-                      <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
+                  <!-- ko with: samples -->
+                    <!-- ko with: preview -->
+                      <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
+                      <a class="pointer" data-bind="visible: rows.length, click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
                     <!-- /ko -->
-                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#sample\']').click(); }">${_('View more...')}</a>
+                    <span data-bind="visible: !rows.length && isView">${ _('The view does not contain any data') }</span>
+                    <span data-bind="visible: !rows.length && !isView">${ _('The table does not contain any data') }</span>
+                  <!-- /ko -->
                 </div>
 
                 % if table.partition_keys:
@@ -408,7 +412,9 @@ ${ assist.assistPanel() }
 
               <div class="tab-pane" id="sample">
                 <!-- ko with: samples -->
-                <!-- ko template: 'metastore-samples-table' --><!-- /ko -->
+                <!-- ko template: { if: rows.length, name: 'metastore-samples-table' }--><!-- /ko -->
+                <span data-bind="visible: !rows.length && isView">${ _('The view does not contain any data') }</span>
+                <span data-bind="visible: !rows.length && !isView">${ _('The table does not contain any data') }</span>
                 <!-- /ko -->
               </div>
 
@@ -584,6 +590,24 @@ ${ assist.assistPanel() }
 
     /**
      * @param {Object} options
+     * @param {string[]} options.headers
+     * @param {string[]} options.rows
+     * @param {boolean} isView
+     */
+    function MetastoreTableSamples (options) {
+      var self = this;
+      self.rows = options.rows || [];
+      self.headers = options.headers || [];
+      self.isView = options.isView;
+
+      self.preview = {
+        headers: self.headers,
+        rows: self.rows.slice(0, 3)
+      }
+    }
+
+    /**
+     * @param {Object} options
      * @param {MetastoreDatabase} options.database
      * @param {string} options.name
      * @param {string} options.comment
@@ -598,7 +622,6 @@ ${ assist.assistPanel() }
 
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
-      self.samplesPreview = ko.observable();
       self.samples = ko.observable();
       self.tableDetails = ko.observable();
       self.tableStats = ko.observable();
@@ -633,24 +656,26 @@ ${ assist.assistPanel() }
         }
       })
 
-      self.assistHelper.fetchTableSample({
-        sourceType: "hive",
-        databaseName: self.database.name,
-        tableName: self.name,
-        dataType: "json",
-        successCallback: function (data) {
-          self.samples(data);
-          self.samplesPreview({
-            headers: self.samples().headers,
-            rows: self.samples().rows.slice(0, 3)
-          });
-        },
-        errorCallback: function (data) {
-          $.jHueNotify.error('${_('An error occurred fetching the table sample. Please try again.')}');
-          console.error('assistHelper.fetchTableSample error');
-          console.error(data);
-        }
-      })
+      var fetchSamples = function () {
+        self.assistHelper.fetchTableSample({
+          sourceType: "hive",
+          databaseName: self.database.name,
+          tableName: self.name,
+          dataType: "json",
+          successCallback: function (data) {
+            self.samples(new MetastoreTableSamples({
+              rows: data.rows,
+              headers: data.headers,
+              isView: self.tableDetails().is_view
+            }));
+          },
+          errorCallback: function (data) {
+            $.jHueNotify.error('${_('An error occurred fetching the table sample. Please try again.')}');
+            console.error('assistHelper.fetchTableSample error');
+            console.error(data);
+          }
+        })
+      }
 
       var fetchDetails = function () {
         self.assistHelper.fetchTableDetails({
@@ -661,6 +686,7 @@ ${ assist.assistPanel() }
             self.tableDetails(data);
             self.tableStats(data.details.stats);
             self.refreshingTableStats(false);
+            fetchSamples();
           },
           errorCallback: function (data) {
             self.refreshingTableStats(false);
