@@ -43,13 +43,14 @@ LOG = logging.getLogger(__name__)
 
 STARTUP_DEADLINE = 60.0
 CLEANUP_TMP_DIR = os.environ.get('MINI_CLUSTER_CLEANUP', 'true')
+TEST_HDFS_TMP_DIR = os.environ.get('TEST_HDFS_TMP_DIR')
 
 
 class PseudoHdfs4(object):
   """Run HDFS and MR2 locally, in pseudo-distributed mode"""
 
   def __init__(self):
-    self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_')
+    self._tmpdir = tempfile.mkdtemp(prefix='tmp_hue_', dir=TEST_HDFS_TMP_DIR)
     os.chmod(self._tmpdir, 0755)
     self._superuser = getpass.getuser()
 
