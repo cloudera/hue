@@ -1477,7 +1477,7 @@ for x in sys.stdin:
     rows = json.loads(resp.content)['rows']
     flat_rows = sum(rows, [])
     assert_true("nada" in flat_rows, flat_rows)
-    assert_true("sp&nbsp;ace" in flat_rows, flat_rows)
+    assert_true("sp ace" in flat_rows, flat_rows)
 
     # Test table creation and data loading and removing header
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {

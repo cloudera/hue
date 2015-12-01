@@ -25,7 +25,7 @@ from desktop.lib.i18n import smart_unicode
 
 
 # Materialize and HTML escape results
-def escape_rows(rows):
+def escape_rows(rows, nulls_only=False):
   data = []
 
   for row in rows:
@@ -39,8 +39,9 @@ def escape_rows(rows):
       elif field is None:
         escaped_field = 'NULL'
       else:
-        field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
-        escaped_field = escape(field).replace(' ', '&nbsp;')
+        escaped_field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
+        if not nulls_only:
+          escaped_field = escape(escaped_field).replace(' ', '&nbsp;')
       escaped_row.append(escaped_field)
     data.append(escaped_row)
 
