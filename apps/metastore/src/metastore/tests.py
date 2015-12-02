@@ -32,7 +32,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from metastore import parser
 from useradmin.models import HuePermission, GroupPermission, group_has_permission
 
-from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
+from beeswax.conf import LIST_PARTITIONS_LIMIT
 from beeswax.views import collapse_whitespace
 from beeswax.test_base import make_query, wait_for_query_to_finish, verify_history, get_query_server_config, fetch_query_result_data
 from beeswax.models import QueryHistory
@@ -176,7 +176,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
   def test_describe_partitioned_table_with_limit(self):
     # We have 2 partitions in the test table
-    finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("1")
+    finish = LIST_PARTITIONS_LIMIT.set_for_testing("1")
     try:
       response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
       partition_values_json = json.loads(response.context['partition_values_json'])
@@ -184,7 +184,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     finally:
       finish()
 
-    finish = BROWSE_PARTITIONED_TABLE_LIMIT.set_for_testing("3")
+    finish = LIST_PARTITIONS_LIMIT.set_for_testing("3")
     try:
       response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
       partition_values_json = json.loads(response.context['partition_values_json'])

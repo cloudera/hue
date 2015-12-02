@@ -39,6 +39,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
 from beeswax import conf as beeswax_conf
 from beeswax import hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
+from beeswax.conf import LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
@@ -848,15 +849,13 @@ class HiveServerClient:
     table = self.get_table(database, table_name)
 
     if max_parts is None or max_parts <= 0:
-      max_rows = 10000
-    else:
-      max_rows = 1000 if max_parts <= 250 else max_parts
+      max_parts = LIST_PARTITIONS_LIMIT.get()
 
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
     if partition_spec:
       query += ' PARTITION(%s)' % partition_spec
 
-    partition_table = self.execute_query_statement(query, max_rows=max_rows)
+    partition_table = self.execute_query_statement(query, max_rows=max_parts)
 
     partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
 
