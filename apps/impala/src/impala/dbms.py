@@ -151,6 +151,10 @@ class ImpalaDbms(HiveServer2Dbms):
     return results
 
 
+  def get_exec_summary(self, query_handle, session_handle):
+    return self.client._client.get_exec_summary(query_handle, session_handle)
+
+
   def _get_beeswax_tables(self, database):
     beeswax_query_server = dbms.get(user=self.client.user, query_server=beeswax_query_server_config(name='beeswax'))
     return beeswax_query_server.get_tables(database=database)

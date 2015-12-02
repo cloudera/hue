@@ -23,6 +23,7 @@ from beeswax.urls import urlpatterns as beeswax_urls
 urlpatterns = patterns('impala.api',
   url(r'^api/invalidate$', 'invalidate', name='invalidate'),
   url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', 'refresh_table', name='refresh_table'),
+  url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', 'get_exec_summary', name='get_exec_summary'),
 )
 
 urlpatterns += patterns('impala.dashboards',
