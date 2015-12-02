@@ -244,7 +244,7 @@ def describe_table(request, database, table):
 
     partitions = None
     if app_name != 'impala' and table.partition_keys:
-      partitions = db.get_partitions(database, table, partition_spec=None, max_parts=None)
+      partitions = db.get_partitions(database, table)
 
     return render(renderable, request, {
       'breadcrumbs': [{
@@ -416,7 +416,7 @@ def describe_partitions(request, database, table):
   else:
     partition_spec = ''
 
-  partitions = db.get_partitions(database, table_obj, partition_spec, max_parts=None, reverse_sort=reverse_sort)
+  partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
 
   massaged_partitions = []
   for partition in partitions:

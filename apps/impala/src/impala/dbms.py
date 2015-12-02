@@ -19,7 +19,6 @@ import logging
 
 from desktop.lib.i18n import smart_str
 
-from beeswax.conf import BROWSE_PARTITIONED_TABLE_LIMIT
 from beeswax.design import hql_query
 from beeswax.models import QUERY_TYPES
 from beeswax.server import dbms
