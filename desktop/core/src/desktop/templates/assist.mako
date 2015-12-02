@@ -296,7 +296,7 @@ from desktop.views import _ko
                 <tr>
                   <td data-bind="text: $index()+1"></td>
                   <!-- ko foreach: $data -->
-                    <td data-bind="text: $data"></td>
+                    <td style="white-space: pre;" data-bind="text: $data"></td>
                   <!-- /ko -->
                 </tr>
               <!-- /ko -->
