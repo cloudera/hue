@@ -23,6 +23,10 @@ from desktop.views import _ko
 
 <%def name="assistPanel()">
   <style>
+    .assist-entry,a {
+      white-space: nowrap;
+    }
+
     .assist-tables {
       overflow-y: hidden;
       overflow-x: auto;
@@ -35,6 +39,21 @@ from desktop.views import _ko
 
     .assist-tables li {
       list-style: none;
+    }
+
+    .assist-breadcrumb > a:hover {
+      color: #338bb8;
+    }
+
+    .assist-tables > li {
+      position: relative;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      padding-left: 4px;
+    }
+
+    .assist-tables > li.selected {
+      background-color: #EEE;
     }
 
     .assist-breadcrumb {
@@ -55,21 +74,6 @@ from desktop.views import _ko
       -moz-transition: color 0.2s ease;
       -ms-transition: color 0.2s ease;
       transition: color 0.2s ease;
-    }
-
-    .assist-breadcrumb > a:hover {
-      color: #338bb8;
-    }
-
-    .assist-tables > li {
-      position: relative;
-      padding-top: 2px;
-      padding-bottom: 2px;
-      padding-left: 4px;
-    }
-
-    .assist-tables > li.selected {
-      background-color: #EEE;
     }
 
     .assist-tables-counter {
@@ -94,15 +98,6 @@ from desktop.views import _ko
     .assist-field-link:focus {
       white-space: nowrap;
       color: #737373;
-    }
-
-    .assist-columns {
-      margin-left: 0;
-    }
-
-    .assist-columns > li {
-      padding: 6px 5px;
-      white-space: nowrap;
     }
 
     .assist-actions  {
@@ -157,7 +152,7 @@ from desktop.views import _ko
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistSource.repositionActions }">
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isTable ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isTable, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
-        <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
+        <a class="assist-entry" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
           <!-- ko if: definition.isTable -->
             <!-- ko if: definition.type == 'Table' -->
               <i class="fa fa-fw fa-table muted"></i>
@@ -208,7 +203,7 @@ from desktop.views import _ko
     <li>
       <ul class="assist-tables" data-bind="foreach: sources">
         <li class="assist-table pointer">
-          <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
         </li>
       </ul>
     </li>
@@ -225,7 +220,7 @@ from desktop.views import _ko
       <ul class="assist-tables" data-bind="foreach: databases">
         <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
           <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
-          <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
         </li>
       </ul>
     </li>
