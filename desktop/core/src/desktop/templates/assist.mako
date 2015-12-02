@@ -244,13 +244,13 @@ from desktop.views import _ko
         ${_('tables')}
         <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { isSearchVisible(!isSearchVisible()) }, css: { 'blue' : isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
         </div>
       </li>
 
       <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
-        <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
+        <div><input id="searchInput" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
       </li>
 
       <div class="table-container">
