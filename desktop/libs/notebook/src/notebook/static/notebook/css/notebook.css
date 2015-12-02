@@ -776,12 +776,17 @@ table.airy tr td {
   transition: color 0.2s ease;
 }
 
+.snippet-side-btn.disabled {
+  cursor: default !important;
+  color: #DBE8F1 !important;
+}
+
 .snippet-side-btn.active {
-  color: #338bb8 !important;
+  color: #338bb8;
 }
 
 .snippet-side-btn:hover {
-  color: #338bb8 !important;
+  color: #338bb8;
 }
 
 .execution-timer {
