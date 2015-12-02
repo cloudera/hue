@@ -36,15 +36,17 @@ LOG = logging.getLogger(__name__)
 
 @require_POST
 @error_handler
-def invalidate(request, database):
+def invalidate(request):
   query_server = dbms.get_query_server_config()
   db = beeswax_dbms.get(request.user, query_server=query_server)
 
   response = {'status': 0, 'message': ''}
 
+  database = request.POST.get('database', None)
   flush_all = request.POST.get('flush_all', 'false').lower() == 'true'
-  db.invalidate(database, flush_all=flush_all)
-  response['message'] = _('Successfully invalidated metadata for `%s`') % database
+
+  db.invalidate(database=database, flush_all=flush_all)
+  response['message'] = _('Successfully invalidated metadata')
 
   return JsonResponse(response)
 

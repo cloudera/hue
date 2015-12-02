@@ -88,11 +88,10 @@ class ImpalaDbms(HiveServer2Dbms):
     return 'SELECT histogram(%s) FROM %s' % (select_clause, from_clause)
 
 
-  def invalidate(self, database, flush_all=False):
+  def invalidate(self, database=None, flush_all=False):
     handle = None
     try:
-      if flush_all:
-        self.use(database)  # INVALIDATE does not accept database as a single parameter
+      if flush_all or database is None:
         hql = "INVALIDATE METADATA"
         query = hql_query(hql, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
