@@ -1863,8 +1863,8 @@ for x in sys.stdin:
 
     # Autocomplete tables for a given database
     resp = self.client.get(reverse("beeswax:api_autocomplete_tables", kwargs={'database': self.db_name}))
-    tables = json.loads(resp.content)['tables']
-    assert_true("nested_table" in tables)
+    tables = json.loads(resp.content)['tables_meta']
+    assert_true("nested_table" in [table['name'] for table in tables])
 
     # Autocomplete columns for a given table
     resp = self.client.get(reverse("beeswax:api_autocomplete_columns", kwargs={'database': self.db_name, 'table': 'nested_table'}))
