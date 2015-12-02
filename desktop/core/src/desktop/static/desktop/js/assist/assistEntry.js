@@ -47,6 +47,7 @@
     self.parent = parent;
     self.filter = filter;
     self.isSearchVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -121,6 +122,12 @@
       parts.push(", ");
       return parts.slice(1).join("");
     });
+  }
+
+  AssistEntry.prototype.toggleSearch = function() {
+    var self = this;
+    self.isSearchVisible(!self.isSearchVisible());
+    self.editingSearch(self.isSearchVisible());
   }
 
   AssistEntry.prototype.loadEntries = function() {
