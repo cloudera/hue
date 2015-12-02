@@ -346,7 +346,8 @@ def submit_workflow(request, doc_id):
 @check_document_access_permission()
 def submit_single_action(request, doc_id, node_id):
   parent_doc = Document2.objects.get(id=doc_id)
-  workflow_data = Workflow(document=parent_doc).create_single_action_workflow_data(node_id)
+  parent_wf = Workflow(document=parent_doc)
+  workflow_data = parent_wf.create_single_action_workflow_data(node_id)
   _data = json.loads(workflow_data)
 
   # Create separate wf object for the submit node with new deployment_dir
@@ -354,8 +355,8 @@ def submit_single_action(request, doc_id, node_id):
   workflow.set_workspace(request.user)
 
   workflow.check_workspace(request.fs, request.user)
-  workflow.document = wf_doc = Document2.objects.create(name=_data['workflow']['name'], type='oozie-workflow2', owner=parent_doc.owner, data=workflow_data)
-  Document.objects.link(wf_doc, owner=wf_doc.owner, name=wf_doc.name, description=wf_doc.description, extra='workflow2')
+  workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
+  workflow.document = parent_doc
 
   return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
 

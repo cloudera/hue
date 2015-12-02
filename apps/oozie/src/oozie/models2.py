@@ -305,15 +305,27 @@ class Workflow(Job):
     submit_node['children'] = [{'to': end_node['id']}, {'error': kill_node['id']}]
     _data['workflow']['properties']['deployment_dir'] = None
 
+    # Recursively find the widget node
+    def _get_node(rows, node_id):
+      for row in rows:
+        if not row['widgets']:
+          for col in row['columns']:
+            node = _get_node(col['rows'], node_id)
+            if node:
+              return node
+        elif row['widgets'][0]['id'] == node_id:
+          return row
+
+
     # Create wf data with above nodes
     return json.dumps({
       'layout': [{
           "size": 12,
           "rows": [
-              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['name'] == 'Start'][0],
-              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['id'] == node_id][0],
-              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['name'] == 'End'][0],
-              [row for row in _data['layout'][0]['rows'] if row['widgets'][0]['name'] == 'Kill'][0]
+              [row for row in _data['layout'][0]['rows'] if row['widgets'] and row['widgets'][0]['name'] == 'Start'][0],
+              _get_node(_data['layout'][0]['rows'], node_id),
+              [row for row in _data['layout'][0]['rows'] if row['widgets'] and row['widgets'][0]['name'] == 'End'][0],
+              [row for row in _data['layout'][0]['rows'] if row['widgets'] and row['widgets'][0]['name'] == 'Kill'][0]
           ],
           "drops": ["temp"],
           "klass": "card card-home card-column span12"
