@@ -256,7 +256,7 @@ class TestImpalaIntegration:
     assert_true('new_table' in beeswax_tables, beeswax_tables)
     assert_false('new_table' in impala_tables, impala_tables)
 
-    resp = self.client.post(reverse('impala:invalidate', kwargs={'database': self.DATABASE}))
+    resp = self.client.post(reverse('impala:invalidate'), {'database': self.DATABASE})
 
     impala_tables, beeswax_tables = get_impala_beeswax_tables()
     # Invalidate picks up new table
