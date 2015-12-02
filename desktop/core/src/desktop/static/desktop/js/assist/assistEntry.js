@@ -144,7 +144,7 @@
           return self.createEntry({
             name: table.name,
             displayName: table.name,
-            title: table.name,
+            title: table.name + (table.comment ? ' - ' + table.comment : ''),
             type: table.type,
             isTable: true
           });
