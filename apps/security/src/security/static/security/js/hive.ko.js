@@ -458,7 +458,7 @@ var Assist = function (vm, initial) {
     }
   }
 
-  self.addTables = function (path, tables, skipLoading) {
+  self.addTables = function (path, tablesMeta, skipLoading) {
     var _branch = self.growingTree().nodes[0];
     _branch.nodes.forEach(function (node) {
       if (node.path == path) {
@@ -466,9 +466,9 @@ var Assist = function (vm, initial) {
       }
     });
 
-    tables.forEach(function (table) {
+    tablesMeta.forEach(function (tableMeta) {
       var _mainFound = false;
-      var _path = path + "." + table;
+      var _path = path + "." + tableMeta.name;
       _branch.nodes.forEach(function (node) {
         if (node.path == _path) {
           _mainFound = true;
@@ -477,7 +477,7 @@ var Assist = function (vm, initial) {
       if (!_mainFound) {
         var _item = {
           path: _path,
-          name: table,
+          name: tableMeta.name,
           withPrivileges: false,
           isServer: false,
           isDb: false,
@@ -770,8 +770,8 @@ var Assist = function (vm, initial) {
               self.setPath(self.treeData().nodes()[0], false, true);
             }
           }
-          else if (data.tables && data.tables.length > 0) {
-            self.addTables(_originalPath, data.tables, _hasCallback);
+          else if (data.tables_meta && data.tables_meta.length > 0) {
+            self.addTables(_originalPath, data.tables_meta, _hasCallback);
           }
           else if (data.columns && data.columns.length > 0) {
             self.addColumns(_originalPath, data.columns, _hasCallback);
