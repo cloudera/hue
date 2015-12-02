@@ -42,7 +42,7 @@
 
       var selector = options.selector;
       var hideTimeout = -1;
-      var override = false;
+      var override = options.override && ! ko.isObservable(options.override);
       var inside = false;
 
       var show = function () {
@@ -57,6 +57,7 @@
       };
 
       if (ko.isObservable(options.override)) {
+        override = options.override();
         options.override.subscribe(function (newValue) {
           override = newValue;
           if (newValue) {
@@ -65,6 +66,10 @@
             hide();
           }
         })
+      }
+
+      if (override) {
+        window.setTimeout(show, 1);
       }
 
       $element.mouseenter(function () {

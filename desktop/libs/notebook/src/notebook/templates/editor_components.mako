@@ -357,8 +357,9 @@ ${ require.config() }
                 .addClass('card-heading')
                 .html($element.parents('h2').html())
                 .appendTo(_par)
-                .find('.hover-actions')
-                .removeClass('hover-actions');
+                .find('.hover-actions, .snippet-actions')
+                .removeClass('hover-actions')
+                .removeClass('snippet-actions');
               $('<pre>')
                 .addClass('dragging-pre muted')
                 .html(ko.dataFor($element.parents('.card-widget')[0]).statement())
@@ -457,7 +458,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet">
-  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
+  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }, visibleOnHover: { override: $root.editorMode, selector: '.snippet-actions' }">
     <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
       <div style="position: relative;">
         <div class="snippet-row">
@@ -858,13 +859,13 @@ ${ require.config() }
 
 <script type ="text/html" id="snippet-execution-controls">
   <!-- ko if: $root.editorMode -->
-  <div class="hover-actions" style="position:absolute; bottom: 26px">
+  <div class="snippet-actions" style="position:absolute; bottom: 26px">
     <a class="snippet-side-btn" data-bind="visible: $parent.history().length > 0, click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
       <i class="fa fa-fw fa-history"></i>
     </a>
   </div>
   <!-- /ko -->
-  <div class="hover-actions" style="position:absolute; bottom: 0">
+  <div class="snippet-actions" style="position:absolute; bottom: 0">
     <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
@@ -878,7 +879,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-result-controls">
-  <div class="hover-actions" style="opacity:1">
+  <div class="snippet-actions" style="opacity:1">
     <div style="margin-top:25px;">
       <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
         <i class="fa fa-th"></i>

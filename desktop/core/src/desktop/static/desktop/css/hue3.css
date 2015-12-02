@@ -2183,10 +2183,12 @@ div.navigator .pull-right .nav {
   background: transparent;
 }
 
+.snippet-actions,
 .hover-actions {
   opacity: 0;
 }
 
+.snippet-actions *,
 .hover-actions * {
   text-decoration: none !important;
 }
