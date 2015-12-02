@@ -228,8 +228,10 @@
             _iterable = data.databases;
             _ico = "fa-database";
           }
-          else if (data.tables != null) { // it's a table
-            _iterable = data.tables;
+          else if (data.tables_meta != null) { // it's a table
+            _iterable = $.map(data.tables_meta, function (tablesMeta) {
+              return tablesMeta.name;
+            });
             _ico = "fa-table";
           }
           else {

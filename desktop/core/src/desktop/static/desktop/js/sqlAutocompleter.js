@@ -288,10 +288,10 @@
       if (includeStar) {
         result.push({value: '*', score: 10000, meta: "column"});
       }
-    } else if (typeof data.tables != "undefined") {
-      fields = $.map(data.tables, function(table) {
+    } else if (typeof data.tables_meta != "undefined") {
+      fields = $.map(data.tables_meta, function(tableMeta) {
         return {
-          name: table,
+          name: tableMeta.name,
           type: "table"
         }
       });

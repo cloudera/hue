@@ -1914,8 +1914,8 @@
             sourceType: snippet.type(),
             databaseName: snippet.database(),
             successCallback: function(data) {
-              $.each(data.tables, function(index, table) {
-                currentAssistTables[table] = true;
+              $.each(data.tables_meta, function(index, tableMeta) {
+                currentAssistTables[tableMeta.name] = true;
               });
             },
             errorCallback: $.noop
