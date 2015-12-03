@@ -563,6 +563,10 @@ h1.empty {
   background-color: #FFF;
 }
 
+.progress .bar-info {
+  background-color: #338bb8;
+}
+
 .progress-success .bar, .progress .bar-success {
   background-color: #b5cf6b;
 }
