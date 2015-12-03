@@ -24,6 +24,7 @@ urlpatterns = patterns('impala.api',
   url(r'^api/invalidate$', 'invalidate', name='invalidate'),
   url(r'^api/refresh/(?P<database>\w+)/(?P<table>\w+)$', 'refresh_table', name='refresh_table'),
   url(r'^api/query/(?P<query_history_id>\d+)/exec_summary$', 'get_exec_summary', name='get_exec_summary'),
+  url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', 'get_runtime_profile', name='get_runtime_profile'),
 )
 
 urlpatterns += patterns('impala.dashboards',

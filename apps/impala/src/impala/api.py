@@ -88,3 +88,26 @@ def get_exec_summary(request, query_history_id):
     response['summary'] = summary
 
   return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def get_runtime_profile(request, query_history_id):
+  query_server = dbms.get_query_server_config()
+  db = beeswax_dbms.get(request.user, query_server=query_server)
+
+  response = {'status': -1}
+  query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
+
+  if query_history is None:
+    response['message'] = _('get_runtime_profile requires a valid query_history_id')
+  else:
+    session = Session.objects.get_session(request.user, query_server['server_name'])
+    operation_handle = query_history.get_handle().get_rpc_handle()
+    session_handle = session.get_handle()
+    profile = db.get_runtime_profile(operation_handle, session_handle)
+    response['status'] = 0
+    response['profile'] = profile
+
+  return JsonResponse(response)
+
