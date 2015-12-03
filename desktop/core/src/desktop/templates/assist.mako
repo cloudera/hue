@@ -120,13 +120,18 @@ from desktop.views import _ko
     }
   </style>
 
-  <script type="text/html" id="assist-no-entries">
+  <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
-      <li data-bind="visible: definition.isDatabase">
-        <span>${_('The selected database has no tables.')}</span>
+      <li>
+        <span style="font-style: italic">${_('The database has no tables')}</span>
       </li>
-      <li data-bind="visible: definition.isTable">
-        <span>${_('The selected table has no columns.')}</span>
+    </ul>
+  </script>
+
+  <script type="text/html" id="assist-no-table-entries">
+    <ul>
+      <li>
+        <span style="font-style: italic" class="assist-entry assist-field-link">${_('The table has no columns')}</span>
       </li>
     </ul>
   </script>
@@ -170,7 +175,8 @@ from desktop.views import _ko
         <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
     </ul>
-    <!-- ko template: { if: ! hasEntries() && ! loading(), name: 'assist-no-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isTable, name: 'assist-no-table-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-breadcrumb">
