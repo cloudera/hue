@@ -244,7 +244,7 @@ def describe_table(request, database, table):
 
     partitions = None
     if app_name != 'impala' and table.partition_keys:
-      partitions = db.get_partitions(database, table)
+      partitions = [_massage_partition(database, table, partition) for partition in db.get_partitions(database, table)]
 
     return render(renderable, request, {
       'breadcrumbs': [{
@@ -418,16 +418,7 @@ def describe_partitions(request, database, table):
 
   partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
 
-  massaged_partitions = []
-  for partition in partitions:
-    massaged_partitions.append({
-      'columns': partition.values,
-      'partitionSpec': partition.partition_spec,
-      'readUrl': reverse('metastore:read_partition', kwargs={'database': database, 'table': table_obj.name,
-                                                             'partition_spec': urllib.quote(partition.partition_spec)}),
-      'browseUrl': reverse('metastore:browse_partition', kwargs={'database': database, 'table': table_obj.name,
-                                                                 'partition_spec': urllib.quote(partition.partition_spec)})
-    })
+  massaged_partitions = [_massage_partition(database, table_obj, partition) for partition in partitions]
 
   if request.method == "POST" or request.GET.get('format', 'html') == 'json':
     return JsonResponse({
@@ -455,6 +446,23 @@ def describe_partitions(request, database, table):
         'request': request,
         'has_write_access': has_write_access(request.user)
     })
+
+
+def _massage_partition(database, table, partition):
+  return {
+    'columns': partition.values,
+    'partitionSpec': partition.partition_spec,
+    'readUrl': reverse('metastore:read_partition', kwargs={
+        'database': database,
+        'table': table.name,
+        'partition_spec': urllib.quote(partition.partition_spec)
+    }),
+    'browseUrl': reverse('metastore:browse_partition', kwargs={
+        'database': database,
+        'table': table.name,
+        'partition_spec': urllib.quote(partition.partition_spec)
+    })
+  }
 
 
 def browse_partition(request, database, table, partition_spec):

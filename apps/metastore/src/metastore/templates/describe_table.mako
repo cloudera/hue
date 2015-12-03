@@ -171,7 +171,7 @@ ${ assist.assistPanel() }
         %endif
         <th>${_('Values')}</th>
         <th>${_('Spec')}</th>
-        <th>${_('Sd')}</th>
+        <th>${_('Browse')}</th>
       </tr>
     </thead>
     <tbody>
@@ -185,9 +185,12 @@ ${ assist.assistPanel() }
               </a>
             </td>
           %endif
-          <td>${ column.values }</td>
-          <td>${ column.partition_spec }</td>
-          <td>${ column.sd }</td>
+          <td><a href="${ column['readUrl'] }">${ column['columns'] }</a></td>
+          <td>${ column['partitionSpec'] }</td>
+          <td>
+            <a href="${ column['readUrl'] }"><i class="fa fa-th"></i> ${_('Data')}</a>
+            <a href="${ column['browseUrl'] }"><i class="fa fa-file-o"></i> ${_('Files')}</a>
+        </td>
         </tr>
       % endfor
     </tbody>

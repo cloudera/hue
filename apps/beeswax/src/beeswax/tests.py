@@ -1662,7 +1662,7 @@ for x in sys.stdin:
 
   def test_get_sample_partitioned(self):
     # Test limit of one partition
-    finish = conf.LIST_PARTITIONS_LIMIT.set_for_testing(1)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(1)
     try:
       table_name = 'test_partitions'
       partition_spec = "(baz='baz_one' AND boom='boom_two')"
@@ -1673,7 +1673,7 @@ for x in sys.stdin:
       finish()
 
     # Test limit of more than one partition
-    finish = conf.LIST_PARTITIONS_LIMIT.set_for_testing(2)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions'
       partition_spec = "(baz='baz_one' AND boom='boom_two') OR (baz='baz_foo' AND boom='boom_bar')"
@@ -1696,7 +1696,7 @@ for x in sys.stdin:
     """
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
 
-    finish = conf.LIST_PARTITIONS_LIMIT.set_for_testing(2)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions_int'
       table = self.db.get_table(database=self.db_name, table_name=table_name)
@@ -1712,7 +1712,7 @@ for x in sys.stdin:
     """
     resp = _make_query(self.client, hql, wait=True, local=False, max=60.0, database=self.db_name)
 
-    finish = conf.LIST_PARTITIONS_LIMIT.set_for_testing(2)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions_empty'
       table = self.db.get_table(database=self.db_name, table_name=table_name)
