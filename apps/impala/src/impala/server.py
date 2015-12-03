@@ -41,16 +41,12 @@ class ImpalaServerClient(HiveServerClient):
     req = ImpalaHiveServer2Service.TGetExecSummaryReq(operationHandle=operation_handle, sessionHandle=session_handle)
 
     # GetExecSummary() only works for closed queries
-    self.close_operation(operation_handle)
+    try:
+      self.close_operation(operation_handle)
+    except QueryServerException, e:
+      LOG.warn('Failed to close operation for query handle, query may be invalid or already closed.')
 
     resp = self.call(self._client.GetExecSummary, req)
-
-    if resp.status is not None and resp.status.statusCode not in (TStatusCode.SUCCESS_STATUS,):
-      if hasattr(resp.status, 'errorMessage') and resp.status.errorMessage:
-        message = resp.status.errorMessage
-      else:
-        message = ''
-      raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, resp)), message=message)
 
     return self._serialize_exec_summary(resp.summary)
 

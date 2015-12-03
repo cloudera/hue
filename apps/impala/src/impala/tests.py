@@ -314,6 +314,13 @@ class TestImpalaIntegration:
     assert_true('nodes' in data['summary'], data)
     assert_true(len(data['summary']['nodes']) > 0, data['summary']['nodes'])
 
+    # Attempt to call get_exec_summary on a closed query
+    resp = self.client.post(reverse('impala:get_exec_summary', kwargs={'query_history_id': query_history.id}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_true('nodes' in data['summary'], data)
+    assert_true(len(data['summary']['nodes']) > 0, data['summary']['nodes'])
+
 
 # Could be refactored with SavedQuery.create_empty()
 def create_saved_query(app_name, owner):
