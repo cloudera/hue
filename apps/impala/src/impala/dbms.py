@@ -126,33 +126,6 @@ class ImpalaDbms(HiveServer2Dbms):
         self.close(handle)
 
 
-  def get_sample(self, database, table, column=None, nested=None):
-    result = None
-    hql = None
-
-    if not table.is_view:
-      limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
-
-      if column or nested: # Could do column for any type, then nested with partitions
-        select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
-        hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
-      else:
-        if table.partition_keys:  # Filter on max # of partitions for partitioned tables
-          hql = self._get_sample_partition_query(database, table, limit)
-        else:
-          hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
-
-      if hql:
-        query = hql_query(hql)
-        handle = self.execute_and_wait(query, timeout_sec=5.0)
-
-        if handle:
-          result = self.fetch(handle, rows=100)
-          self.close(handle)
-
-    return result
-
-
   def get_histogram(self, database, table, column, nested=None):
     """
     Returns the results of an Impala SELECT histogram() FROM query for a given column or nested type.
