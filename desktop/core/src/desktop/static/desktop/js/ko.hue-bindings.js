@@ -1861,7 +1861,15 @@
 
       editor.setOptions(editorOptions);
 
-      editor.session.setCompleters([snippet.autocompleter]);
+      var AceAutocomplete = ace.require("ace/autocomplete").Autocomplete;
+
+      if (!editor.completer) {
+        editor.completer = new AceAutocomplete();
+      }
+      editor.completer.exactMatch = ! snippet.isSqlDialect();
+
+      var langTools = ace.require("ace/ext/language_tools")
+      langTools.addCompleter(snippet.autocompleter);
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
