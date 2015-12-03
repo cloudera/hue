@@ -223,7 +223,7 @@ class TestImpalaIntegration:
     resp = client.get(reverse('impala:get_sample_data', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
     data = json.loads(resp.content)
     assert_equal(0, data['status'], data)
-    assert_equal([u'tweets.row_num', u'tweets.id_str', u'tweets.text'], data['headers'], data)
+    assert_equal([u'row_num', u'id_str', u'text'], data['headers'], data)
     assert_true(len(data['rows']), data)
 
   def test_get_session(self):
