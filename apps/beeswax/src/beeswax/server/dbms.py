@@ -384,7 +384,7 @@ class HiveServer2Dbms(object):
     if self.server_name == 'impala':
       hql = 'SHOW COLUMN STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
-      hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` %(column)s' % {'database': database, 'table': table, 'column': column}
+      hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` `%(column)s`' % {'database': database, 'table': table, 'column': column}
 
     query = hql_query(hql)
     handle = self.execute_and_wait(query, timeout_sec=5.0)
