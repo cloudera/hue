@@ -386,6 +386,10 @@ ${ require.config() }
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
     </div>
 
+    <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Result has expired.") }</pre>
+    </div>
+
     <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
     </div>

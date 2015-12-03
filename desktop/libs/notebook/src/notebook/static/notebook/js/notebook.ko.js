@@ -568,6 +568,8 @@
           else if (self.status() == 'success') {
             self.progress(99);
           }
+        } else if (data.status == -3) {
+          self.status('expired');
         } else {
           self._ajaxError(data);
         }
