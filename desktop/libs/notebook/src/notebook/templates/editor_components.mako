@@ -1229,7 +1229,33 @@ ${ require.config() }
           clonedContainerPosition: "absolute"
         });
 
-        $('.dataTables_wrapper').kinetic();
+        var originialAttachListeners = $.Kinetic.prototype._attachListeners;
+        $.Kinetic.prototype._attachListeners = function($el, listeners) {
+          var kinetic = this;
+          var altDown = false;
+          $(window).bind("keydown", "alt", function (e) {
+            kinetic.$el.css('cursor', 'move');
+            altDown = true;
+          });
+          $(window).bind("keyup", "alt", function (e) {
+            altDown = false;
+            kinetic.$el.css('cursor', '');
+          });
+          var altDownListener = function (listener) {
+            return function(e) {
+              if (altDown) {
+                listener.apply(this, arguments);
+              }
+            }
+          }
+          listeners.events.inputDown = altDownListener(listeners.events.inputDown);
+          listeners.events.selectStart = altDownListener(listeners.events.selectStart);
+          originialAttachListeners.apply(this, arguments)
+        }
+
+        $('.dataTables_wrapper').kinetic({
+          cursor: ''
+        });
       },
       "aoColumnDefs": [
         {
