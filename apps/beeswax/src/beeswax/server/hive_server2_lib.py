@@ -848,19 +848,21 @@ class HiveServerClient:
   def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True):
     table = self.get_table(database, table_name)
 
-    if max_parts is None or max_parts <= 0:
-      max_parts = LIST_PARTITIONS_LIMIT.get()
-
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
     if partition_spec:
       query += ' PARTITION(%s)' % partition_spec
 
-    partition_table = self.execute_query_statement(query, max_rows=max_parts)
+    # We fetch N partitions then reverse the order later and get the max_parts. Use partition_spec to refine more the initial list.
+    # Need to fetch more like this until SHOW PARTITIONS offers a LIMIT and ORDER BY
+    partition_table = self.execute_query_statement(query, max_rows=10000)
 
     partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
 
     if reverse_sort:
       partitions.reverse()
+
+    if max_parts is None or max_parts <= 0:
+      max_parts = LIST_PARTITIONS_LIMIT.get()
 
     return partitions[:max_parts]
 
