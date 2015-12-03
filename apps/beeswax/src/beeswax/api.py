@@ -664,7 +664,8 @@ def describe_table(request, database, table):
 
 
 def get_sample_data(request, database, table):
-  db = dbms.get(request.user)
+  query_server = dbms.get_query_server_config(get_app_name(request))
+  db = dbms.get(request.user, query_server)
   response = {'status': -1, 'error_message': ''}
 
   try:
