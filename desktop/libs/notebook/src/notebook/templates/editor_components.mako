@@ -1876,7 +1876,7 @@ ${ require.config() }
       viewModel.init();
 
       if (viewModel.editorMode && !viewModel.selectedNotebook().snippets()[0].result.hasSomeResults()) {
-        viewModel.selectedNotebook().showHistory(true);
+        viewModel.selectedNotebook().fetchHistory();
       }
 
       if (location.getParameter("github_status") != "") {
