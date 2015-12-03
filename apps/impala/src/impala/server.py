@@ -51,6 +51,24 @@ class ImpalaServerClient(HiveServerClient):
     return self._serialize_exec_summary(resp.summary)
 
 
+  def get_runtime_profile(self, operation_handle, session_handle):
+    """
+    Calls Impala HS2 API's GetRuntimeProfile method on the given query handle
+    :return: TExecSummary object serialized as a dict
+    """
+    req = ImpalaHiveServer2Service.TGetRuntimeProfileReq(operationHandle=operation_handle, sessionHandle=session_handle)
+
+    # TGetRuntimeProfileReq() only works for closed queries
+    try:
+      self.close_operation(operation_handle)
+    except QueryServerException, e:
+      LOG.warn('Failed to close operation for query handle, query may be invalid or already closed.')
+
+    resp = self.call(self._client.GetRuntimeProfile, req)
+
+    return resp.profile
+
+
   def _serialize_exec_summary(self, summary):
     try:
       summary_dict = {

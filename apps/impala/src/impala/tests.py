@@ -322,6 +322,23 @@ class TestImpalaIntegration:
     assert_true(len(data['summary']['nodes']) > 0, data['summary']['nodes'])
 
 
+  def test_get_runtime_profile(self):
+    query = """
+      SELECT COUNT(1) FROM tweets;
+    """
+
+    response = _make_query(self.client, query, database=self.DATABASE, local=False, server_name='impala')
+    content = json.loads(response.content)
+    query_history = QueryHistory.get(content['id'])
+
+    wait_for_query_to_finish(self.client, response, max=180.0)
+
+    resp = self.client.post(reverse('impala:get_runtime_profile', kwargs={'query_history_id': query_history.id}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_true('Execution Profile' in data['profile'], data)
+
+
 # Could be refactored with SavedQuery.create_empty()
 def create_saved_query(app_name, owner):
     query_type = SavedQuery.TYPES_MAPPING[app_name]
