@@ -314,7 +314,7 @@ ${ assist.assistPanel() }
                 % if has_write_access:
                   <li><a href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a></li>
                 % endif
-                <li><a href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-share-square-o"></i></a></li>
+                <li><a href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a></li>
                 % if table.partition_keys:
                   <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a></li>
                 % endif
