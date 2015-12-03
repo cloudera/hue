@@ -469,7 +469,7 @@ ${ require.config() }
           <div class="snippet-body" data-bind="clickForAceFocus: ace">
             <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-            <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ $parent.newSnippetAbove(id()) }, clickForAceFocus: ace">
+            <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
               <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
               <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
             </h2>
