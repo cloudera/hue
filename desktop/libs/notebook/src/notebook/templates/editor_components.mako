@@ -131,34 +131,11 @@ ${ require.config() }
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right">
-        %if mode == 'editor':
-        <a class="btn" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-          <i class="fa fa-expand"></i>
-        </a>
-          % if editor_type == 'impala':
-          <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
-            <i class="fa fa-cogs"></i>
-          </a>
-          %endif
         <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
           <i class="fa fa-save"></i>
         </a>
 
-        <a class="btn" href="${ url('notebook:editor') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-file-o"></i>
-        </a>
-
-        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Queries') }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-tags"></i>
-        </a>
-        %else:
-        <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
-          <i class="fa fa-pencil"></i>
-        </a>
-
-        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
-          <i class="fa fa-cogs"></i>
-        </a>
+        &nbsp;&nbsp;&nbsp;
 
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
@@ -170,6 +147,7 @@ ${ require.config() }
                 <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
               </a>
             </li>
+            % if mode != 'editor':
             <li>
               <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
                 <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
@@ -195,25 +173,25 @@ ${ require.config() }
                 <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
               </a>
             </li>
+            % endif
           </ul>
         </div>
 
-
         &nbsp;&nbsp;&nbsp;
 
-        <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
-          <i class="fa fa-save"></i>
-        </a>
-
+        % if mode == 'editor':
         <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
+        % else:
+        <a class="btn" href="${ url('notebook:editor') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
+          <i class="fa fa-file-o"></i>
+        </a>
+        % endif
 
         <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
-
-        %endif
       </div>
 
       <div class="nav-collapse">
@@ -1091,7 +1069,6 @@ ${ require.config() }
   </div>
 </div>
 
-  
 </%def>
 
 
