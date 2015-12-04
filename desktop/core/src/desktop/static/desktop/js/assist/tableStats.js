@@ -47,6 +47,7 @@
     self.assistHelper = options.assistHelper;
     self.type = options.type;
     self.isComplexType = /^(map|array|struct)/i.test(options.type);
+    self.isView = /view/i.test(options.type);
 
     self.loading = ko.observable(false);
     self.hasError = ko.observable(false);
@@ -107,9 +108,9 @@
 
     self.assistHelper.fetchStats({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
-      databaseName: self.database,
-      tableName: self.table,
-      columnName: self.column,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
       successCallback: successCallback,
       errorCallback: errorCallback
     });
@@ -125,9 +126,9 @@
 
     self.assistHelper.refreshTableStats({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
-      databaseName: self.database,
-      tableName: self.table,
-      columnName: self.column,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
       successCallback: function() {
         self.refreshing(false);
         self.fetchData();
@@ -144,16 +145,16 @@
 
   TableStats.prototype.fetchTerms = function () {
     var self = this;
-    if (self.column == null || (self.isComplexType && self.sourceType == "impala")) {
+    if ((ko.isObservable(self.column) && self.column() == null) || self.column == null || (self.isComplexType && self.sourceType == "impala")) {
       return;
     }
 
     self.loadingTerms(true);
     self.assistHelper.fetchTerms({
       sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
-      databaseName: self.database,
-      tableName: self.table,
-      columnName: self.column,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
       prefixFilter: self.prefixFilter(),
       successCallback: function (data) {
         if (data && data.status == 0) {

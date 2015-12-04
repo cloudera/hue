@@ -13,6 +13,11 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+<%!
+from desktop.conf import DJANGO_DEBUG_MODE
+DEBUG = DJANGO_DEBUG_MODE.get()
+%>
+
 
 <%def name="config()">
   <script src="${ static('desktop/ext/js/require.js') }"></script>
@@ -21,6 +26,9 @@
       return jQuery;
     });
     require.config({
+      %if DEBUG:
+      urlArgs: "bust=" + (new Date()).getTime(),
+      %endif
       baseUrl: "${ static('') }",
       paths: {
         "jquery.ui.sortable": "desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min",
@@ -44,6 +52,12 @@
       deps: ["knockout", "knockout-mapping"],
       callback: function(ko, mapping) {
         ko.mapping = mapping;
+        window.hueDebug = {
+          ko: ko,
+          viewModel: function () {
+            return ko.dataFor(document.body);
+          }
+        }
       }
     });
   </script>

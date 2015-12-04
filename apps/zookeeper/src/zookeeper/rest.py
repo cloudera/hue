@@ -171,8 +171,10 @@ class ZooKeeper(object):
     def _do_get(self, uri):
         """ Send a GET request and convert errors to exceptions """
         try:
-            req = urllib2.urlopen(uri)
-            resp = json.load(req)
+            req = urllib2.Request(uri)
+            req.add_header("Accept", "application/json");
+            r = urllib2.urlopen(req)
+            resp = json.load(r)
 
             if 'Error' in resp:
                raise ZooKeeper.Error(resp['Error'])

@@ -23,7 +23,7 @@
 }(this, function (ko, AssistHelper, Autocompleter) {
 
   var SPARK_MAPPING = {
-    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user", "inFocus"]
+    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user", "inFocus", "history", "availableSnippets"]
   };
 
   var Result = function (snippet, result) {
@@ -174,15 +174,19 @@
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
 
-    huePubSub.subscribe("assist.database.selected", function (database) {
-      if (database.sourceType === self.type() && self.database() !== database.name) {
-        self.database(database.name);
+    huePubSub.subscribe("assist.database.set", function (databaseDef) {
+      if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
+        self.database(databaseDef.name);
       }
     });
 
+    if (! self.database()) {
+      huePubSub.publish("assist.get.database", self.type());
+    }
+
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
-    self.codemirrorSize = ko.observable(typeof snippet.codemirrorSize != "undefined" && snippet.codemirrorSize != null ? snippet.codemirrorSize : 100);
+    self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
 
@@ -351,8 +355,10 @@
     self.isResultSettingsVisible = ko.observable(typeof snippet.isResultSettingsVisible != "undefined" && snippet.isResultSettingsVisible != null ? snippet.isResultSettingsVisible : false);
     self.toggleResultSettings = function () {
       self.isResultSettingsVisible(!self.isResultSettingsVisible());
-      $(document).trigger("toggleResultSettings", self);
     };
+    self.isResultSettingsVisible.subscribe(function(){
+      $(document).trigger("toggleResultSettings", self);
+    });
 
     self.settingsVisible = ko.observable(typeof snippet.settingsVisible != "undefined" && snippet.settingsVisible != null ? snippet.settingsVisible : false);
 
@@ -402,7 +408,7 @@
 
     self.execute = function () {
       var now = (new Date()).getTime(); // We don't allow fast clicks
-      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000) {
+      if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted < 1000 || self.statement() == '') {
         return;
       }
 
@@ -430,10 +436,6 @@
         self.close();
       }
 
-      $.post("/notebook/api/historify", {
-        notebook: ko.mapping.toJSON(self, SPARK_MAPPING)
-      });
-
       $.post("/notebook/api/execute", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
@@ -455,6 +457,17 @@
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
         self.status('failed');
+      })
+      .always(function() {
+        if (notebook.type() != 'notebook') {
+          $.post("/notebook/api/historify", {
+            notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
+          }, function(data){
+            if (vm.editorMode && data && data.status == 0 && data.id){
+              history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+            }
+          });
+        }
       });
     };
 
@@ -689,7 +702,7 @@
     self.uuid = ko.observable(typeof notebook.uuid != "undefined" && notebook.uuid != null ? notebook.uuid : UUID());
     self.name = ko.observable(typeof notebook.name != "undefined" && notebook.name != null ? notebook.name : 'My Notebook');
     self.description = ko.observable(typeof notebook.description != "undefined" && notebook.description != null ? notebook.description: '');
-    self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type: 'notebook');
+    self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.availableSnippets().length > 0 ? vm.availableSnippets()[0].type() : 'NO_SNIPPETS');
     self.creatingSessionLocks = ko.observableArray();
@@ -908,10 +921,11 @@
         if (data.status == 0) {
           self.id(data.id);
           $(document).trigger("info", data.message);
-          if (vm.editorMode && window.location.search.indexOf("editor") == -1) {
-            window.location.hash = '#editor=' + data.id;
-          } else if (window.location.search.indexOf("notebook") == -1) {
-            window.location.hash = '#notebook=' + data.id;
+          if (vm.editorMode){
+            history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+          }
+          else {
+            history.pushState(null, null, '/notebook/notebook?notebook=' + data.id);
           }
         }
         else {
@@ -955,8 +969,29 @@
       }
     };
 
+    self.executeAll = function () {
+      if (self.snippets().length < 1) {
+        return;
+      }
+
+      var index = 0;
+      self.snippets()[index].execute();
+      var clock = setInterval(next, 100);
+
+      function next() {
+        if (self.snippets()[index].status() == 'available' || self.snippets()[index].status() == 'failed') {
+          index = index + 1;
+          if (self.snippets().length > index) {
+            self.snippets()[index].execute();
+          } else {
+            clearInterval(clock);
+          }
+        }
+      }
+    };
+
     self.closeAndRemoveSession = function (session) {
-      self.closeSession (session, false, function() {
+      self.closeSession(session, false, function() {
         self.sessions.remove(session);
       });
     };
@@ -981,14 +1016,16 @@
     };
 
     self.fetchHistory = function () {
-      $.get("/notebook/api/get_history", {}, function(data) {
+      $.get("/notebook/api/get_history", {
+        doc_type: self.selectedSnippet()
+      }, function(data) {
         var parsedHistory = [];
         if (data && data.history){
           data.history.forEach(function(nbk){
             parsedHistory.push({
               url: nbk.absoluteUrl,
-              query: nbk.data.statement_raw,
-              lastExecuted: nbk.data.lastExecuted
+              query: nbk.data.snippets[0].statement_raw,
+              lastExecuted: nbk.data.snippets[0].lastExecuted
             });
           });
         }
@@ -996,9 +1033,16 @@
       });
     };
 
-    self.clearHistory = function () {
-      // TODO
-      console.log("clear history")
+    self.clearHistory = function (type) {
+      $.post("/notebook/api/clear_history", {
+        notebook: ko.mapping.toJSON(self.getContext()),
+        doc_type: self.selectedSnippet()
+      }, function (data) {
+          self.history.removeAll();
+          self.showHistory(false);
+        }).fail(function (xhr) {
+           $(document).trigger("error", xhr.responseText);
+        });
       $(document).trigger("hideHistoryModal");
     };
 
@@ -1039,18 +1083,13 @@
       download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
     }
 
-    huePubSub.subscribe("assist.request.status", function () {
+    huePubSub.subscribe("assist.ready", function () {
       if (self.type() == 'query' && self.snippets().length == 1) {
-        huePubSub.publish('assist.select.database', {
-          sourceType: self.snippets()[0].type(),
+        huePubSub.publish('assist.set.database', {
+          source: self.snippets()[0].type(),
           name: self.snippets()[0].database()
         });
       }
-      // TODO: Uncomment when we switch to the new impala and hive editors
-      //huePubSub.publish('assist.select.database', {
-      //  sourceType: null,
-      //  name: null
-      //});
     });
   };
 
@@ -1142,7 +1181,7 @@
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
-    self.editorMode = self.availableSnippets().length === 1;
+    self.editorMode = options.mode == 'editor';
 
     self.getSnippetViewSettings = function (snippetType) {
       if (options.snippetViewSettings[snippetType]) {
@@ -1153,8 +1192,8 @@
 
     self.availableSessionProperties = ko.computed(function () { // Only Spark
       return ko.utils.arrayFilter(options.session_properties, function (item) {
-          return item.name != ''; // Could filter out the ones already selected + yarn only or not
-        });
+        return item.name != ''; // Could filter out the ones already selected + yarn only or not
+      });
     });
     self.getSessionProperties = function(name) {
       var _prop = null;

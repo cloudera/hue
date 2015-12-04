@@ -602,25 +602,25 @@ table.display td.center {
 
 .sorting_asc {
   cursor: pointer;
-  background: url('../art/datatables/sort_asc.png') no-repeat center left;
+  background: url('../art/datatables/sort_asc.png') no-repeat center right;
   border-top: 3px solid #FFFFFF !important;
-  padding-left: 20px !important;
+  padding-right: 20px !important;
   vertical-align: middle!important;
 }
 
 .sorting_desc {
   cursor: pointer;
-  background: url('../art/datatables/sort_desc.png') no-repeat center left;
+  background: url('../art/datatables/sort_desc.png') no-repeat center right;
   border-top: 3px solid #FFFFFF !important;
-  padding-left: 20px !important;
+  padding-right: 20px !important;
   vertical-align: middle!important;
 }
 
 .sorting {
   cursor: pointer;
-  background: url('../art/datatables/sort_both.png') no-repeat center left;
+  background: url('../art/datatables/sort_both.png') no-repeat center right;
   border-top: 3px solid #FFFFFF !important;
-  padding-left: 20px !important;
+  padding-right: 20px !important;
   vertical-align: middle!important;
 }
 
@@ -2183,10 +2183,12 @@ div.navigator .pull-right .nav {
   background: transparent;
 }
 
+.snippet-actions,
 .hover-actions {
   opacity: 0;
 }
 
+.snippet-actions *,
 .hover-actions * {
   text-decoration: none !important;
 }

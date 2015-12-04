@@ -75,15 +75,21 @@ function BeeswaxViewModel(server, assistHelper) {
   self.database = ko.observable(null);
 
   var type = server === "beeswax" ? "hive" : "impala";
-  huePubSub.subscribe("assist.request.status", function () {
-    huePubSub.publish('assist.select.database', {
-      sourceType: type,
+  huePubSub.subscribe("assist.ready", function () {
+    huePubSub.publish('assist.set.database', {
+      source: type,
       name: self.database()
     });
   });
 
   huePubSub.subscribe("assist.database.selected", function (database) {
     if (database.sourceType === type && self.database() !== database.name) {
+      self.database(database.name);
+    }
+  });
+
+  huePubSub.subscribe("assist.database.set", function (database) {
+    if (database.source === type && self.database() !== database.name) {
       self.database(database.name);
     }
   });

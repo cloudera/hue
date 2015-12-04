@@ -39,6 +39,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
 from beeswax import conf as beeswax_conf
 from beeswax import hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
+from beeswax.conf import LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
@@ -497,7 +498,12 @@ class HiveServerClient:
       username = user.username
       password = None
 
-    self._client = thrift_util.get_client(TCLIService.Client,
+    thrift_class = TCLIService
+    if self.query_server['server_name'] == 'impala':
+      from ImpalaService import ImpalaHiveServer2Service
+      thrift_class = ImpalaHiveServer2Service
+
+    self._client = thrift_util.get_client(thrift_class.Client,
                                           query_server['server_host'],
                                           query_server['server_port'],
                                           service_name=query_server['server_name'],
@@ -513,8 +519,7 @@ class HiveServerClient:
                                           certfile=certfile,
                                           validate=validate,
                                           transport_mode=query_server.get('transport_mode', 'socket'),
-                                          http_url=query_server.get('http_url', '')
-    )
+                                          http_url=query_server.get('http_url', ''))
 
 
   def get_security(self):
@@ -660,7 +665,7 @@ class HiveServerClient:
     (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=5000, orientation=TFetchOrientation.FETCH_NEXT)
     self.close_operation(operation_handle)
 
-    cols = ('db_name', 'comment', 'location')
+    cols = ('db_name', 'comment', 'location','owner_name', 'owner_type', 'parameters')
 
     if len(HiveServerTRowSet(desc_results.results, desc_schema.schema).cols(cols)) != 1:
       raise ValueError(_("%(query)s returned more than 1 row") % {'query': query})
@@ -843,21 +848,21 @@ class HiveServerClient:
   def get_partitions(self, database, table_name, partition_spec=None, max_parts=None, reverse_sort=True):
     table = self.get_table(database, table_name)
 
-    if max_parts is None or max_parts <= 0:
-      max_rows = 10000
-    else:
-      max_rows = 1000 if max_parts <= 250 else max_parts
-
     query = 'SHOW PARTITIONS `%s`.`%s`' % (database, table_name)
     if partition_spec:
       query += ' PARTITION(%s)' % partition_spec
 
-    partition_table = self.execute_query_statement(query, max_rows=max_rows)
+    # We fetch N partitions then reverse the order later and get the max_parts. Use partition_spec to refine more the initial list.
+    # Need to fetch more like this until SHOW PARTITIONS offers a LIMIT and ORDER BY
+    partition_table = self.execute_query_statement(query, max_rows=10000)
 
     partitions = [PartitionValueCompatible(partition, table) for partition in partition_table.rows()]
 
     if reverse_sort:
       partitions.reverse()
+
+    if max_parts is None or max_parts <= 0:
+      max_parts = LIST_PARTITIONS_LIMIT.get()
 
     return partitions[:max_parts]
 
@@ -934,6 +939,9 @@ class PartitionValueCompatible:
     self.partition_spec = ','.join(["%s='%s'" % (pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
     self.values = [pv[1] for pv in [part.split('=') for part in parts]]
     self.sd = type('Sd', (object,), properties,)
+
+  def __repr__(self):
+    return 'PartitionValueCompatible(spec:%s, values:%s, sd:%s)' % (self.partition_spec, self.values, self.sd)
 
 
 class ExplainCompatible:

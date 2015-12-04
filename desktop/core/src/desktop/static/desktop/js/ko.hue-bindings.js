@@ -42,7 +42,7 @@
 
       var selector = options.selector;
       var hideTimeout = -1;
-      var override = false;
+      var override = options.override && ! ko.isObservable(options.override);
       var inside = false;
 
       var show = function () {
@@ -57,6 +57,7 @@
       };
 
       if (ko.isObservable(options.override)) {
+        override = options.override();
         options.override.subscribe(function (newValue) {
           override = newValue;
           if (newValue) {
@@ -65,6 +66,10 @@
             hide();
           }
         })
+      }
+
+      if (override) {
+        window.setTimeout(show, 1);
       }
 
       $element.mouseenter(function () {
@@ -866,6 +871,7 @@
         stop: function (event, ui) {
           ui.offset.top = 0;
           ui.position.top = 0;
+          $(document).trigger("editorSizeChanged");
         }
       });
     }
@@ -1855,7 +1861,15 @@
 
       editor.setOptions(editorOptions);
 
-      editor.session.setCompleters([snippet.autocompleter]);
+      var AceAutocomplete = ace.require("ace/autocomplete").Autocomplete;
+
+      if (!editor.completer) {
+        editor.completer = new AceAutocomplete();
+      }
+      editor.completer.exactMatch = ! snippet.isSqlDialect();
+
+      var langTools = ace.require("ace/ext/language_tools")
+      langTools.addCompleter(snippet.autocompleter);
 
       var placeHolderElement = null;
       var placeHolderVisible = false;
@@ -1908,8 +1922,8 @@
             sourceType: snippet.type(),
             databaseName: snippet.database(),
             successCallback: function(data) {
-              $.each(data.tables, function(index, table) {
-                currentAssistTables[table] = true;
+              $.each(data.tables_meta, function(index, tableMeta) {
+                currentAssistTables[tableMeta.name] = true;
               });
             },
             errorCallback: $.noop
@@ -2123,6 +2137,7 @@
       });
 
       editor.on("change", function (e) {
+        snippet.statement_raw(editor.getValue());
         editor.clearErrors();
         editor.session.getMode().$id = snippet.getAceMode();
         var currentSize = editor.session.getLength();
@@ -2194,7 +2209,7 @@
 
       editor.commands.on("afterExec", function (e) {
         if (e.command.name === "insertstring") {
-          var triggerAutocomplete = ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && e.args == ".") || /["']\/[^\/]*/.test(editor.getTextBeforeCursor());
+          var triggerAutocomplete = ((editor.session.getMode().$id == "ace/mode/hive" || editor.session.getMode().$id == "ace/mode/impala") && (e.args == "." || e.args == " ")) || /["']\/[^\/]*/.test(editor.getTextBeforeCursor());
           if(e.args.toLowerCase().indexOf("? from ") == 0) {
             if (e.args[e.args.length - 1] !== '.') {
               editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - e.args.length + 1);

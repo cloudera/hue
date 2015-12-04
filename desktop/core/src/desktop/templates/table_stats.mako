@@ -42,13 +42,13 @@ from desktop.views import _ko
       <li data-bind="click: function() { termsTabActive(false) }" class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
       <li data-bind="click: function() { termsTabActive(true) }"><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
     </ul>
-    <div class="tab-content">
+    <div class="tab-content" style="border: none; margin-top: 10px">
       <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
         <div class="alert" data-bind="visible: isComplexType" style="margin: 5px">${ _('Column stats are currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
         <div class="content" data-bind="ifnot: isComplexType">
-          <table class="table table-striped">
+          <table class="table table-condensed">
             <tbody data-bind="foreach: statRows">
-              <tr><th data-bind="text: Object.keys($data)[0]"></th><td data-bind="text: $data[Object.keys($data)[0]]"></td></tr>
+              <tr><th data-bind="text: Object.keys($data)[0], style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th><td data-bind="text: $data[Object.keys($data)[0]], style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td></tr>
             </tbody>
           </table>
         </div>
@@ -69,11 +69,11 @@ from desktop.views import _ko
 
   <script type="text/html" id="stats-popover">
     <div style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="style: { 'top': popoverTop() + 'px', 'left': popoverLeft() + 'px' }, visible: analysisStats, with: analysisStats">
-      <div class="arrow"></div>
+      <div class="arrow" data-bind="style: { 'top': $parent.popoverArrowTop() + 'px'}"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: $parent.toggleStats"><i class="fa fa-times"></i></a>
-        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
-        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
+        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType && !isView, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
+        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
         <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
         <strong class="table-name" data-bind="text: table"></strong> ${ _(' table analysis') }
@@ -128,6 +128,7 @@ from desktop.views import _ko
         }
 
         self.popoverTop = ko.observable(0);
+        self.popoverArrowTop = ko.observable(0);
         self.popoverLeft = ko.observable(0);
 
         var lastOffset = { top: -1, left: -1 };
@@ -142,9 +143,12 @@ from desktop.views import _ko
               } else {
                 lastOffset.top = newTop - 210;
               }
+              self.popoverArrowTop($popover.outerHeight() / 2 + (lastOffset.top < 0 ? lastOffset.top - 10 : 0));
+
+              lastOffset.top = Math.max(lastOffset.top, 10);
               self.popoverTop(lastOffset.top);
               self.popoverLeft(lastOffset.left);
-              if (self.popoverTop() < -130) {
+              if (self.popoverArrowTop() < 80) {
                 $popover.hide();
               } else {
                 $popover.show();

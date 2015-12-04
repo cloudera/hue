@@ -44,8 +44,8 @@ from hadoop.fs.exceptions import WebHdfsException
 from useradmin.models import HuePermission, UserProfile, LdapGroup
 from useradmin.models import get_profile, get_default_user_group
 from useradmin.forms import SyncLdapUsersGroupsForm, AddLdapGroupsForm, AddLdapUsersForm,\
-  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username,\
-  PasswordChangeForm
+  PermissionsEditForm, GroupEditForm, SuperUserChangeForm, UserChangeForm, validate_username, validate_first_name, \
+  validate_last_name, PasswordChangeForm
 
 
 LOG = logging.getLogger(__name__)
@@ -771,8 +771,10 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
         user.groups.add(default_group)
 
       if 'first' in ldap_info:
+        validate_first_name(ldap_info['first'])
         user.first_name = ldap_info['first']
       if 'last' in ldap_info:
+        validate_last_name(ldap_info['last'])
         user.last_name = ldap_info['last']
       if 'email' in ldap_info:
         user.email = ldap_info['email']

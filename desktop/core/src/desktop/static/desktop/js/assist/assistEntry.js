@@ -47,8 +47,9 @@
     self.parent = parent;
     self.filter = filter;
     self.isSearchVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
 
-    self.expandable = typeof definition.type === "undefined" || definition.type === "struct" || definition.type === "array" || definition.type === "map";
+    self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
     self.loaded = false;
     self.loading = ko.observable(false);
@@ -83,10 +84,12 @@
 
     self.tableName = null;
     self.columnName = null;
+    self.type = null;
     self.databaseName = self.getHierarchy()[0];
     if (self.definition.isTable) {
       self.tableName = self.definition.name;
       self.columnName = null;
+      self.type = self.definition.type;
     } else if (self.definition.isColumn) {
       self.tableName = parent.definition.name;
       self.columnName = self.definition.name;
@@ -121,6 +124,12 @@
     });
   }
 
+  AssistEntry.prototype.toggleSearch = function() {
+    var self = this;
+    self.isSearchVisible(!self.isSearchVisible());
+    self.editingSearch(self.isSearchVisible());
+  }
+
   AssistEntry.prototype.loadEntries = function() {
     var self = this;
     if (!self.expandable || self.loading()) {
@@ -130,12 +139,13 @@
 
     var successCallback = function(data) {
       self.entries([]);
-      if (typeof data.tables !== "undefined") {
-        self.entries($.map(data.tables, function(tableName) {
+      if (typeof data.tables_meta !== "undefined") {
+        self.entries($.map(data.tables_meta, function(table) {
           return self.createEntry({
-            name: tableName,
-            displayName: tableName,
-            title: tableName,
+            name: table.name,
+            displayName: table.name,
+            title: table.name + (table.comment ? ' - ' + table.comment : ''),
+            type: table.type,
             isTable: true
           });
         }));
@@ -264,7 +274,16 @@
 
   AssistEntry.prototype.openItem = function () {
     var self = this;
-    huePubSub.publish('assist.openItem', self);
+    if (self.definition.isTable) {
+      huePubSub.publish("assist.table.selected", {
+        database: self.databaseName,
+        name: self.definition.name
+      })
+    } else if (self.definition.isDatabase) {
+      huePubSub.publish("assist.database.selected", {
+        name: self.definition.name
+      })
+    }
   };
 
   AssistEntry.prototype.showPreview = function () {
@@ -277,7 +296,8 @@
 
     $assistQuickLook.find(".tableName").text(self.definition.name);
     $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
-    $assistQuickLook.find(".sample").empty("");
+    self.assistSource.loadingSamples(true);
+    self.assistSource.samples({});
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
     self.assistSource.assistHelper.fetchTableSample({
@@ -286,8 +306,13 @@
       tableName: tableName,
       dataType: "html",
       successCallback: function(data) {
-        $assistQuickLook.find(".loader").hide();
-        $assistQuickLook.find(".sample").html(data);
+        if (! data.rows) {
+          data.rows = [];
+        } else if (! data.headers) {
+          data.headers = [];
+        }
+        self.assistSource.samples(data);
+        self.assistSource.loadingSamples(false);
       },
       errorCallback: function(e) {
         if (e.status == 500) {

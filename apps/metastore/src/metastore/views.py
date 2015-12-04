@@ -36,7 +36,6 @@ from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
-from metastore.conf import HS2_GET_TABLES_MAX
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
 from notebook.connectors.base import Notebook
@@ -158,40 +157,39 @@ def show_tables(request, database=None):
 
     search_filter = request.GET.get('filter', '')
 
-    table_names = db.get_tables(database=database, table_names=search_filter)
-    tables = [{'name': table} for table in table_names]
-
-    has_metadata = False
-
-    if len(table_names) <= HS2_GET_TABLES_MAX.get():  # Only attempt to do a GetTables HS2 call for small result sets
-      try:
-        tables_meta = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
-        if tables_meta:
-          tables = tables_meta
-          table_names = [table['name'] for table in tables_meta]
-          has_metadata = True
-      except Exception, ex:
-        LOG.exception('Unable to fetch table metadata')
+    tables = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
+    table_names = [table['name'] for table in tables]
   except Exception, e:
     raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
 
-  resp = render("tables.mako", request, {
-    'breadcrumbs': [
-      {
-        'name': database,
-        'url': reverse('metastore:show_tables', kwargs={'database': database})
-      }
-    ],
-    'tables': tables,
-    'db_form': db_form,
-    'search_filter': search_filter,
-    'database': database,
-    'has_metadata': has_metadata,
-    'table_names': json.dumps(table_names),
-    'has_write_access': has_write_access(request.user),
-  })
-  resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
+  database_meta = db.get_database(database)
 
+  if request.REQUEST.get("format", "html") == "json":
+    resp = JsonResponse({
+        'status': 0,
+        'database_meta': database_meta,
+        'tables': tables,
+        'table_names': table_names,
+        'search_filter': search_filter
+    })
+  else:
+    resp = render("tables.mako", request, {
+      'breadcrumbs': [
+        {
+          'name': database,
+          'url': reverse('metastore:show_tables', kwargs={'database': database})
+        }
+      ],
+      'database_meta': database_meta,
+      'tables': tables,
+      'db_form': db_form,
+      'search_filter': search_filter,
+      'database': database,
+      'table_names': json.dumps(table_names),
+      'has_write_access': has_write_access(request.user),
+    })
+
+  resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
 
 
@@ -218,9 +216,6 @@ def describe_table(request, database, table):
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
 
-  error_message = ''
-  table_data = ''
-
   try:
     table = db.get_table(database, table)
   except Exception, e:
@@ -230,11 +225,7 @@ def describe_table(request, database, table):
     else:
       raise PopupException(_("Hive Error"), detail=e)
 
-  partitions = None
-  if app_name != 'impala' and table.partition_keys:
-    partitions = db.get_partitions(database, table, partition_spec=None, max_parts=None)
-
-  if request.REQUEST.get("format", "html") == "json" and request.REQUEST.get("sample", "false") == "false":
+  if request.REQUEST.get("format", "html") == "json":
     return JsonResponse({
         'status': 0,
         'name': table.name,
@@ -244,39 +235,31 @@ def describe_table(request, database, table):
         'hdfs_link': table.hdfs_link,
         'comment': table.comment,
         'is_view': table.is_view,
-        'properties': table.properties, 
+        'properties': table.properties,
         'details': table.details,
         'stats': table.stats
     })
+  else:  # Render HTML
+    renderable = "describe_table.mako"
 
-  try:
-    table_data = db.get_sample(database, table)
-  except Exception, ex:
-    error_message, logs = dbms.expand_exception(ex, db)
+    partitions = None
+    if app_name != 'impala' and table.partition_keys:
+      partitions = [_massage_partition(database, table, partition) for partition in db.get_partitions(database, table)]
 
-  renderable = "describe_table.mako"
-  if request.REQUEST.get("sample", "false") == "true":
-    renderable = "sample.mako"
-    if request.REQUEST.get("format", "html") == "json":
-      return JsonResponse({'status': 0, 'headers': table_data and table_data.cols(), 'rows': table_data and list(table_data.rows())})
-
-  return render(renderable, request, {
-    'breadcrumbs': [{
-        'name': database,
-        'url': reverse('metastore:show_tables', kwargs={'database': database})
-      }, {
-        'name': str(table.name),
-        'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
-      },
-    ],
-    'table': table,
-    'partitions': partitions,
-    'sample': table_data,
-    'sample_rows': table_data and list(table_data.rows()),
-    'error_message': error_message,
-    'database': database,
-    'has_write_access': has_write_access(request.user),
-  })
+    return render(renderable, request, {
+      'breadcrumbs': [{
+          'name': database,
+          'url': reverse('metastore:show_tables', kwargs={'database': database})
+        }, {
+          'name': str(table.name),
+          'url': reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
+        },
+      ],
+      'table': table,
+      'partitions': partitions,
+      'database': database,
+      'has_write_access': has_write_access(request.user),
+    })
 
 
 @check_has_write_access_permission
@@ -433,18 +416,9 @@ def describe_partitions(request, database, table):
   else:
     partition_spec = ''
 
-  partitions = db.get_partitions(database, table_obj, partition_spec, max_parts=None, reverse_sort=reverse_sort)
+  partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
 
-  massaged_partitions = []
-  for partition in partitions:
-    massaged_partitions.append({
-      'columns': partition.values,
-      'partitionSpec': partition.partition_spec,
-      'readUrl': reverse('metastore:read_partition', kwargs={'database': database, 'table': table_obj.name,
-                                                             'partition_spec': urllib.quote(partition.partition_spec)}),
-      'browseUrl': reverse('metastore:browse_partition', kwargs={'database': database, 'table': table_obj.name,
-                                                                 'partition_spec': urllib.quote(partition.partition_spec)})
-    })
+  massaged_partitions = [_massage_partition(database, table_obj, partition) for partition in partitions]
 
   if request.method == "POST" or request.GET.get('format', 'html') == 'json':
     return JsonResponse({
@@ -472,6 +446,23 @@ def describe_partitions(request, database, table):
         'request': request,
         'has_write_access': has_write_access(request.user)
     })
+
+
+def _massage_partition(database, table, partition):
+  return {
+    'columns': partition.values,
+    'partitionSpec': partition.partition_spec,
+    'readUrl': reverse('metastore:read_partition', kwargs={
+        'database': database,
+        'table': table.name,
+        'partition_spec': urllib.quote(partition.partition_spec)
+    }),
+    'browseUrl': reverse('metastore:browse_partition', kwargs={
+        'database': database,
+        'table': table.name,
+        'partition_spec': urllib.quote(partition.partition_spec)
+    })
+  }
 
 
 def browse_partition(request, database, table, partition_spec):

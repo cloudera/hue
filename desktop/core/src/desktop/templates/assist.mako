@@ -23,6 +23,10 @@ from desktop.views import _ko
 
 <%def name="assistPanel()">
   <style>
+    .assist-entry,a {
+      white-space: nowrap;
+    }
+
     .assist-tables {
       overflow-y: hidden;
       overflow-x: auto;
@@ -35,6 +39,21 @@ from desktop.views import _ko
 
     .assist-tables li {
       list-style: none;
+    }
+
+    .assist-breadcrumb > a:hover {
+      color: #338bb8;
+    }
+
+    .assist-tables > li {
+      position: relative;
+      padding-top: 2px;
+      padding-bottom: 2px;
+      padding-left: 4px;
+    }
+
+    .assist-tables > li.selected {
+      background-color: #EEE;
     }
 
     .assist-breadcrumb {
@@ -55,21 +74,6 @@ from desktop.views import _ko
       -moz-transition: color 0.2s ease;
       -ms-transition: color 0.2s ease;
       transition: color 0.2s ease;
-    }
-
-    .assist-breadcrumb > a:hover {
-      color: #338bb8;
-    }
-
-    .assist-tables > li {
-      position: relative;
-      padding-top: 2px;
-      padding-bottom: 2px;
-      padding-left: 4px;
-    }
-
-    .assist-tables > li.selected {
-      background-color: #EEE;
     }
 
     .assist-tables-counter {
@@ -96,15 +100,6 @@ from desktop.views import _ko
       color: #737373;
     }
 
-    .assist-columns {
-      margin-left: 0;
-    }
-
-    .assist-columns > li {
-      padding: 6px 5px;
-      white-space: nowrap;
-    }
-
     .assist-actions  {
       position:absolute;
       right: 0;
@@ -125,19 +120,24 @@ from desktop.views import _ko
     }
   </style>
 
-  <script type="text/html" id="assist-no-entries">
+  <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
-      <li data-bind="visible: definition.isDatabase">
-        <span>${_('The selected database has no tables.')}</span>
+      <li>
+        <span style="font-style: italic">${_('The database has no tables')}</span>
       </li>
-      <li data-bind="visible: definition.isTable">
-        <span>${_('The selected table has no columns.')}</span>
+    </ul>
+  </script>
+
+  <script type="text/html" id="assist-no-table-entries">
+    <ul>
+      <li>
+        <span style="font-style: italic" class="assist-entry assist-field-link">${_('The table has no columns')}</span>
       </li>
     </ul>
   </script>
 
   <script type="text/html" id="assist-entry-actions">
-    <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn } " style="opacity: 0">
+    <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: definition.isTable && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
       <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
@@ -157,7 +157,15 @@ from desktop.views import _ko
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistSource.repositionActions }">
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isTable ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isTable, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
-        <a class="assist-column-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
+        <a class="assist-entry" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! definition.isTable, 'assist-table-link': definition.isTable }" href="javascript:void(0)">
+          <!-- ko if: definition.isTable -->
+            <!-- ko if: definition.type == 'Table' -->
+              <i class="fa fa-fw fa-table muted"></i>
+            <!-- /ko -->
+            <!-- ko if: definition.type == 'View' -->
+              <i class="fa fa-fw fa-eye muted"></i>
+            <!-- /ko -->
+          <!-- /ko -->
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
         <div class="center"  data-bind="visible: loading" style="display:none;">
@@ -167,7 +175,8 @@ from desktop.views import _ko
         <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
     </ul>
-    <!-- ko template: { if: ! hasEntries() && ! loading(), name: 'assist-no-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isTable, name: 'assist-no-table-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-breadcrumb">
@@ -200,7 +209,7 @@ from desktop.views import _ko
     <li>
       <ul class="assist-tables" data-bind="foreach: sources">
         <li class="assist-table pointer">
-          <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
         </li>
       </ul>
     </li>
@@ -215,8 +224,9 @@ from desktop.views import _ko
     </li>
     <li data-bind="visible: ! hasErrors()" >
       <ul class="assist-tables" data-bind="foreach: databases">
-        <li class="assist-table pointer">
-          <a class="assist-column-link assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+        <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
+          <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
         </li>
       </ul>
     </li>
@@ -235,13 +245,13 @@ from desktop.views import _ko
         ${_('tables')}
         <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
           <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { isSearchVisible(!isSearchVisible()) }, css: { 'blue' : isSearchVisible() }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
         </div>
       </li>
 
       <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
-        <div><input type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="value: filter, valueUpdate: 'afterkeydown'"/></div>
+        <div><input id="searchInput" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
       </li>
 
       <div class="table-container">
@@ -262,11 +272,41 @@ from desktop.views import _ko
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
       <div class="modal-body" style="min-height: 100px">
+        <!-- ko if: assistSource.loadingSamples -->
         <div class="loader">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
-        <div class="sample"></div>
+        <!-- /ko -->
+        <!-- ko ifnot: assistSource.loadingSamples -->
+        <div style="overflow: auto">
+          <!-- ko with: assistSource.samples -->
+          <!-- ko if: rows.length == 0 -->
+          <div class="alert">${ _('The selected table has no data.') }</div>
+          <!-- /ko -->
+          <!-- ko if: rows.length > 0 -->
+          <table class="table table-striped table-condensed">
+            <tr>
+              <th style="width: 10px"></th>
+              <!-- ko foreach: headers -->
+              <th data-bind="text: $data"></th>
+              <!-- /ko -->
+            </tr>
+            <tbody>
+              <!-- ko foreach: rows -->
+                <tr>
+                  <td data-bind="text: $index()+1"></td>
+                  <!-- ko foreach: $data -->
+                    <td style="white-space: pre;" data-bind="text: $data"></td>
+                  <!-- /ko -->
+                </tr>
+              <!-- /ko -->
+            </tbody>
+          </table>
+          <!-- /ko -->
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
       </div>
       <div class="modal-footer">
         <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
@@ -335,15 +375,29 @@ from desktop.views import _ko
           }
         };
 
-        huePubSub.subscribe("assist.select.database", function (database) {
-          if (! database.sourceType || ! sourceIndex[database.sourceType]) {
+        huePubSub.subscribe("assist.set.database", function (databaseDef) {
+          if (! databaseDef.source || ! sourceIndex[databaseDef.source]) {
             return;
           }
-          self.selectedSource(sourceIndex[database.sourceType]);
-          setDatabaseWhenLoaded(database.name);
+          self.selectedSource(sourceIndex[databaseDef.source]);
+          setDatabaseWhenLoaded(databaseDef.name);
         });
 
-        huePubSub.publish("assist.request.status");
+        huePubSub.subscribe("assist.get.database", function (source) {
+          if (sourceIndex[source] && sourceIndex[source].selectedDatabase()) {
+            huePubSub.publish("assist.database.set", {
+              source: source,
+              name: sourceIndex[source].selectedDatabase().databaseName
+            });
+          } else {
+            huePubSub.publish("assist.database.set", {
+              source: source,
+              name: null
+            });
+          }
+        });
+
+        huePubSub.publish("assist.ready");
 
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {

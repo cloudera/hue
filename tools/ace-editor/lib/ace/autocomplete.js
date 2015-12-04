@@ -425,7 +425,7 @@ var FilteredList = function(array, filterText) {
     this.all = array;
     this.filtered = array;
     this.filterText = filterText || "";
-    this.exactMatch = true;
+    this.exactMatch = false;
 };
 (function(){
     this.setFilter = function(str) {

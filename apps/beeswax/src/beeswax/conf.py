@@ -74,17 +74,27 @@ USE_GET_LOG_API = Config( # To remove in Hue 4
           'If false, use the FetchResults() thrift call from Hive 1.0 or more instead.')
 )
 
-BROWSE_PARTITIONED_TABLE_LIMIT = Config(
+BROWSE_PARTITIONED_TABLE_LIMIT = Config( # Deprecated, to remove in Hue 4
   key='browse_partitioned_table_limit',
-  default=250,
+  default=1000,
   type=int,
-  help=_t('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
+  help=_t('Limit the number of partitions to list on the partitions page. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
 
-SAMPLE_TABLE_MAX_PARTITIONS = Config(
-  key='sample_table_max_partitions',
+QUERY_PARTITIONS_LIMIT = Config(
+  key='query_partitions_limit',
   default=10,
   type=int,
   help=_t('The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.'))
+
+def get_browse_partitioned_table_limit():
+  """Get the old default"""
+  return BROWSE_PARTITIONED_TABLE_LIMIT.get()
+
+LIST_PARTITIONS_LIMIT = Config(
+  key='list_partitions_limit',
+  dynamic_default=get_browse_partitioned_table_limit,
+  type=int,
+  help=_t('Limit the number of partitions that can be listed. A positive value will be set as the LIMIT.'))
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
@@ -114,6 +124,12 @@ THRIFT_VERSION = Config(
   default=7
 )
 
+USE_NEW_EDITOR = Config( # To remove in Hue 3.10
+  key='use_new_editor',
+  default=False,
+  type=coerce_bool,
+  help=_t('Choose whether to show the new editors for beta testing.')
+)
 
 SSL = ConfigSection(
   key='ssl',

@@ -151,11 +151,8 @@
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     $.ajax({
-      url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName,
-      data: {
-        "sample": true,
-        "format" : options.dataType
-      },
+      url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName + "/sample",
+      data: {},
       beforeSend: function (xhr) {
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },

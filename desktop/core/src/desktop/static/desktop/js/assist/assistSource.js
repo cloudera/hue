@@ -65,6 +65,9 @@
       return typeof self.selectedDatabase() != "undefined" && self.selectedDatabase() !== null && self.selectedDatabase().loading();
     });
 
+    self.loadingSamples = ko.observable(true);
+    self.samples = ko.observable();
+
     self.selectedDatabase.subscribe(function (newValue) {
       if (newValue) {
         if (self.selectedDatabase() && self.selectedDatabase().definition.name === newValue) {
@@ -74,8 +77,8 @@
           newValue.loadEntries()
         }
         $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix(), newValue.definition.name);
-        huePubSub.publish("assist.database.selected", {
-          sourceType: self.type,
+        huePubSub.publish("assist.database.set", {
+          source: self.type,
           name: newValue.definition.name
         })
       }

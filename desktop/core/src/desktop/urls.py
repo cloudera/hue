@@ -64,6 +64,7 @@ dynamic_patterns = patterns('desktop.auth.views',
 dynamic_patterns += patterns('desktop.views',
   (r'^logs$','log_view'),
   (r'^home$','home'),
+  (r'^home2$','home2'),
   (r'^desktop/dump_config$','dump_config'),
   (r'^desktop/download_logs$','download_log_view'),
   (r'^bootstrap.js$', 'bootstrap'), # unused

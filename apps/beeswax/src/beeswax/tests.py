@@ -1211,8 +1211,9 @@ for x in sys.stdin:
     }, follow=True)
 
     # Ensure we can see table.
-    response = self.client.get("/metastore/table/%s/my_table" % self.db_name)
-    assert_true("my_col" in response.content)
+    response = self.client.get("/metastore/table/%s/my_table?format=json" % self.db_name)
+    data = json.loads(response.content)
+    assert_true("my_col" in [col['name'] for col in data['cols']], data)
 
 
   def test_create_table_timestamp(self):
@@ -1227,16 +1228,19 @@ for x in sys.stdin:
     self._make_custom_data_file(filename, [0, 0, 0])
     self._make_table('timestamp_invalid_data', 'CREATE TABLE timestamp_invalid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/metastore/table/%s/timestamp_invalid_data" % self.db_name)
-    assert_true('NULL' in response.content, response.content)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'timestamp_invalid_data'}))
+    rows = json.loads(resp.content)['rows']
+    flat_rows = sum(rows, [])
+    assert_true("NULL" in flat_rows, flat_rows)
 
     # Good format
     self._make_custom_data_file(filename, ['2012-01-01 10:11:30', '2012-01-01 10:11:31'])
     self._make_table('timestamp_valid_data', 'CREATE TABLE timestamp_valid_data (timestamp1 TIMESTAMP)', filename)
 
-    response = self.client.get("/metastore/table/%s/timestamp_valid_data" % self.db_name)
-    assert_true('2012-01-01&nbsp;10:11:30' in response.content, response.content)
-
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'timestamp_valid_data'}))
+    rows = json.loads(resp.content)['rows']
+    flat_rows = sum(rows, [])
+    assert_true("2012-01-01 10:11:30.0" in flat_rows, flat_rows)
 
   def test_partitioned_create_table(self):
     # Make sure we get a form
@@ -1472,9 +1476,11 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([ col.name for col in cols ], [ 'col_a', 'col_b', 'col_c' ])
-    assert_equal([['ta\tb', 'nada', 'sp ace'], ['f\too', 'bar', 'fred'], ['a\ta', 'bb', 'cc']], resp.context['sample_rows'])
-    assert_true("nada" in resp.content, resp.content)
-    assert_true("sp&nbsp;ace" in resp.content, resp.content)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test_create_import'}))
+    rows = json.loads(resp.content)['rows']
+    flat_rows = sum(rows, [])
+    assert_true("nada" in flat_rows, flat_rows)
+    assert_true("sp ace" in flat_rows, flat_rows)
 
     # Test table creation and data loading and removing header
     resp = self.client.post('/beeswax/create/import_wizard/%s' % self.db_name, {
@@ -1528,11 +1534,14 @@ for x in sys.stdin:
     cols = resp.context['table'].cols
     assert_equal(len(cols), 3)
     assert_equal([col.name for col in cols], ['col_a', 'col_b', 'col_c'])
-    assert_equal(resp.context['sample_rows'], [
+
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test_create_import_with_header'}))
+    rows = json.loads(resp.content)['rows']
+    assert_equal([
       #['a', 'b', 'c'], # Gone as told to be header
       ['"a', 'a"', '"b'], # Hive does not support natively quoted CSV
       ['"a', '""a"', '"b']
-    ] )
+    ], rows)
 
 
   def test_select_invalid_data(self):
@@ -1644,33 +1653,33 @@ for x in sys.stdin:
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
-    resp = client.get(reverse('beeswax:describe_table', kwargs={'database': self.db_name, 'table': 'test'}) + '?sample=true')
-
-    assert_equal(resp.status_code, 200)
-    assert_true('<th>test.foo</th>' in resp.content, resp.content)
-    assert_true([0, '0x0'] in resp.context['sample_rows'], resp.context['sample_rows'])
+    resp = client.get(reverse('beeswax:get_sample_data', kwargs={'database': self.db_name, 'table': 'test'}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_true('test.foo' in json_resp['headers'], json_resp)
+    assert_true([0, '0x0'] in json_resp['rows'], json_resp)
 
 
   def test_get_sample_partitioned(self):
     # Test limit of one partition
-    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(1)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(1)
     try:
       table_name = 'test_partitions'
       partition_spec = "(baz='baz_one' AND boom='boom_two')"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
-      assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec), hql)
+      assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
     finally:
       finish()
 
     # Test limit of more than one partition
-    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions'
       partition_spec = "(baz='baz_one' AND boom='boom_two') OR (baz='baz_foo' AND boom='boom_bar')"
       table = self.db.get_table(database=self.db_name, table_name=table_name)
       hql = self.db._get_sample_partition_query(self.db_name, table, limit=10)
-      assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec), hql)
+      assert_equal(hql, 'SELECT * FROM `%s`.`%s` WHERE %s LIMIT 10' % (self.db_name, table_name, partition_spec))
     finally:
       finish()
 
@@ -1687,7 +1696,7 @@ for x in sys.stdin:
     """
     resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
 
-    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions_int'
       table = self.db.get_table(database=self.db_name, table_name=table_name)
@@ -1703,7 +1712,7 @@ for x in sys.stdin:
     """
     resp = _make_query(self.client, hql, wait=True, local=False, max=60.0, database=self.db_name)
 
-    finish = conf.SAMPLE_TABLE_MAX_PARTITIONS.set_for_testing(2)
+    finish = conf.QUERY_PARTITIONS_LIMIT.set_for_testing(2)
     try:
       table_name = 'test_partitions_empty'
       table = self.db.get_table(database=self.db_name, table_name=table_name)
@@ -1854,8 +1863,8 @@ for x in sys.stdin:
 
     # Autocomplete tables for a given database
     resp = self.client.get(reverse("beeswax:api_autocomplete_tables", kwargs={'database': self.db_name}))
-    tables = json.loads(resp.content)['tables']
-    assert_true("nested_table" in tables)
+    tables = json.loads(resp.content)['tables_meta']
+    assert_true("nested_table" in [table['name'] for table in tables])
 
     # Autocomplete columns for a given table
     resp = self.client.get(reverse("beeswax:api_autocomplete_columns", kwargs={'database': self.db_name, 'table': 'nested_table'}))

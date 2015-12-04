@@ -134,7 +134,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_two" : {
-              tables: ["otherTable1", "otherTable2"]
+              tables_meta: [{ name: "otherTable1" }, { name: "otherTable2" }]
             }
           },
           beforeCursor: "USE database_two; \n\tSELECT ",
@@ -147,7 +147,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/closest_db" : {
-              tables: ["otherTable1", "otherTable2"]
+              tables_meta: [{ name: "otherTable1" }, { name:  "otherTable2" }]
             }
           },
           beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
@@ -160,7 +160,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/closest_db" : {
-              tables: ["otherTable1", "otherTable2"]
+              tables_meta: [{ name: "otherTable1" }, { name: "otherTable2" }]
             }
           },
           beforeCursor: "USE other_db; USE closest_db; \n\tSELECT ",
@@ -175,7 +175,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one" : {
-              tables: ["testTable1", "testTable2"]
+              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
             }
           },
           beforeCursor: "SELECT ",
@@ -188,7 +188,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one" : {
-              tables: ["testTable1", "testTable2"]
+              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
             }
           },
           beforeCursor: "select ",
@@ -201,7 +201,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one" : {
-              tables: ["testTable1", "testTable2"]
+              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
             }
           },
           beforeCursor: "SELECT *",
@@ -214,7 +214,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one" : {
-              tables: ["testTable1", "testTable2"]
+              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
             }
           },
           beforeCursor: "SELECT * fr",
@@ -227,7 +227,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one" : {
-              tables: ["testTable1", "testTable2"]
+              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
             }
           },
           beforeCursor: "SELECT * FROM ",
@@ -240,7 +240,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_two" : {
-              tables: ["testTable3", "testTable4"]
+              tables_meta: [{ name: "testTable3" }, { name: "testTable4" }]
             }
           },
           beforeCursor: "SELECT * FROM database_two.",
@@ -1163,7 +1163,7 @@ define([
         assertAutoComplete({
           serverResponses: {
             "/notebook/api/autocomplete/database_one" : {
-              tables: ["testTable1", "testTable2"]
+              tables_meta: [{ name: "testTable1" }, { name: "testTable2" }]
             }
           },
           beforeCursor: "SELECT * FROM testTable1 JOIN ",

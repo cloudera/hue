@@ -732,6 +732,9 @@ class Document2Manager(models.Manager):
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
+  def get_history(self, user, doc_type):
+    return self.filter(owner=user, type=doc_type, is_history=True).order_by('-last_modified') # To do perm sharing
+
 
 def uuid_default():
   return str(uuid.uuid4())
@@ -801,7 +804,7 @@ class Document2(models.Model):
       return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
     elif self.type == 'oozie-bundle2':
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
-    elif self.type == 'query':
+    elif self.type.startswith('query'):
       return reverse('notebook:editor') + '?editor=' + str(self.id)
     elif self.type == 'notebook':
       return reverse('notebook:notebook') + '?notebook=' + str(self.id)

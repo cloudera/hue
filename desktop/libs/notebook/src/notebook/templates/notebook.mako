@@ -26,14 +26,6 @@
 
 ${ commonheader(_('Notebook'), app_name, user, "68px") | n,unicode }
 
-<script type="text/javascript">
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("notebook") > -1) {
-      location.href = "/notebook/notebook?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
-    }
-  }
-</script>
-
 ${ editorComponents.includes() }
 ${ editorComponents.topBar('notebook') }
 <%editorComponents:commonHTML>

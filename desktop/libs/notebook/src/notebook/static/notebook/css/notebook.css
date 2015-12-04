@@ -563,6 +563,10 @@ h1.empty {
   background-color: #FFF;
 }
 
+.progress .bar-info {
+  background-color: #338bb8;
+}
+
 .progress-success .bar, .progress .bar-success {
   background-color: #b5cf6b;
 }
@@ -715,6 +719,17 @@ table.airy tr td {
   padding: 5px;
 }
 
+.alert-notebook {
+  border: none;
+  margin-top: -3px;
+  background: -moz-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -webkit-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -o-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: -ms-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(to right, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcf8e3', endColorstr='#00ffffff', GradientType=1)
+}
+
 .hoverMsg {
   background: #000;
   height: 100%;
@@ -765,12 +780,17 @@ table.airy tr td {
   transition: color 0.2s ease;
 }
 
+.snippet-side-btn.disabled {
+  cursor: default !important;
+  color: #DBE8F1 !important;
+}
+
 .snippet-side-btn.active {
-  color: #338bb8 !important;
+  color: #338bb8;
 }
 
 .snippet-side-btn:hover {
-  color: #338bb8 !important;
+  color: #338bb8;
 }
 
 .execution-timer {

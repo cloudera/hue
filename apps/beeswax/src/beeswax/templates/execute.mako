@@ -728,29 +728,6 @@ ${ layout.menubar(section='query') }
       <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
     </div>
   </div>
-
-  <div id="navigatorQuicklook" class="modal hide fade">
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      % if has_metastore:
-      <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
-        <i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
-      </a>
-      % endif
-
-      <h3>${_('Data sample for')} <span class="tableName"></span></h3>
-    </div>
-    <div class="modal-body" style="min-height: 100px">
-      <div class="loader">
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-      </div>
-      <div class="sample"></div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
-    </div>
-  </div>
 </div>
 
 
@@ -1315,10 +1292,6 @@ $(document).ready(function () {
   };
 
   renderRecent();
-
-  $("#navigatorQuicklook").modal({
-    show: false
-  });
 
   $("#navigatorSearch").jHueDelayedInput(function(){
     $("#navigatorTables li").removeClass("hide");

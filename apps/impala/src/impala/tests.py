@@ -19,28 +19,29 @@ import json
 import logging
 import re
 
-import desktop.conf as desktop_conf
-
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+import desktop.conf as desktop_conf
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group
 from desktop.models import Document
+from hadoop import cluster
+from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
+from beeswax import hive_site
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, QueryHistory
 from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config, wait_for_query_to_finish, fetch_query_result_data
 from beeswax.tests import _make_query
-from hadoop.pseudo_hdfs4 import get_db_prefix, is_live_cluster
 
 from impala import conf
-from impala.conf import SERVER_HOST
 from impala.dbms import ImpalaDbms
+from impala.server import ImpalaServerClient
 
 
 LOG = logging.getLogger(__name__)
@@ -120,7 +121,7 @@ class TestImpalaIntegration:
     hql = """
       USE default;
       DROP TABLE IF EXISTS %(db)s.tweets;
-      DROP DATABASE IF EXISTS %(db)s;
+      DROP DATABASE IF EXISTS %(db)s CASCADE;
       CREATE DATABASE %(db)s;
 
       USE %(db)s;
@@ -154,7 +155,7 @@ class TestImpalaIntegration:
     hql = """
     USE default;
     DROP TABLE IF EXISTS %(db)s.tweets;
-    DROP DATABASE %(db)s;
+    DROP DATABASE %(db)s CASCADE;
     """ % {'db': cls.DATABASE}
     resp = _make_query(cls.client, hql, database='default', local=False, server_name='impala')
     resp = wait_for_query_to_finish(cls.client, resp, max=180.0)
@@ -219,17 +220,123 @@ class TestImpalaIntegration:
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
-    resp = client.get(reverse('impala:describe_table', kwargs={'database': self.DATABASE, 'table': 'tweets'}) + '?sample=true')
-
-    assert_equal(resp.status_code, 200)
-    assert_true('531091827' in resp.content, resp.content) # We are getting one or two random rows
-    assert_true(len(resp.context['sample_rows']) > 0, resp.context['sample_rows'])
+    resp = client.get(reverse('impala:get_sample_data', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_equal([u'row_num', u'id_str', u'text'], data['headers'], data)
+    assert_true(len(data['rows']), data)
 
   def test_get_session(self):
     resp = self.client.get(reverse("impala:api_get_session"))
     data = json.loads(resp.content)
     assert_true('properties' in data)
     assert_true(data['properties'].get('http_addr'))
+
+
+  def test_invalidate_tables(self):
+    # Helper function to get Impala and Beeswax (HMS) tables
+    def get_impala_beeswax_tables():
+      impala_resp = self.client.get(reverse('impala:api_autocomplete_tables', kwargs={'database': self.DATABASE}))
+      impala_tables_meta = json.loads(impala_resp.content)['tables_meta']
+      impala_tables = [table['name'] for table in impala_tables_meta]
+      beeswax_resp = self.client.get(reverse('beeswax:api_autocomplete_tables', kwargs={'database': self.DATABASE}))
+      beeswax_tables_meta = json.loads(beeswax_resp.content)['tables_meta']
+      beeswax_tables = [table['name'] for table in beeswax_tables_meta]
+      return impala_tables, beeswax_tables
+
+    impala_tables, beeswax_tables = get_impala_beeswax_tables()
+    assert_equal(impala_tables, beeswax_tables,
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+
+    hql = """
+      CREATE TABLE new_table (a INT);
+    """
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.DATABASE)
+
+    impala_tables, beeswax_tables = get_impala_beeswax_tables()
+    # New table is not found by Impala
+    assert_true('new_table' in beeswax_tables, beeswax_tables)
+    assert_false('new_table' in impala_tables, impala_tables)
+
+    resp = self.client.post(reverse('impala:invalidate'), {'database': self.DATABASE})
+
+    impala_tables, beeswax_tables = get_impala_beeswax_tables()
+    # Invalidate picks up new table
+    assert_equal(impala_tables, beeswax_tables,
+      "\ntest_invalidate_tables: `%s`\nImpala Tables: %s\nBeeswax Tables: %s" % (self.DATABASE, ','.join(impala_tables), ','.join(beeswax_tables)))
+
+
+  def test_refresh_table(self):
+    # Helper function to get Impala and Beeswax (HMS) columns
+    def get_impala_beeswax_columns():
+      impala_resp = self.client.get(reverse('impala:api_autocomplete_columns', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+      impala_columns = json.loads(impala_resp.content)['columns']
+      beeswax_resp = self.client.get(reverse('beeswax:api_autocomplete_columns', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+      beeswax_columns = json.loads(beeswax_resp.content)['columns']
+      return impala_columns, beeswax_columns
+
+    impala_columns, beeswax_columns = get_impala_beeswax_columns()
+    assert_equal(impala_columns, beeswax_columns,
+      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+
+    hql = """
+      ALTER TABLE tweets ADD COLUMNS (new_column INT);
+    """
+    resp = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.DATABASE)
+
+    impala_columns, beeswax_columns = get_impala_beeswax_columns()
+    # New column is not found by Impala
+    assert_true('new_column' in beeswax_columns, beeswax_columns)
+    assert_false('new_column' in impala_columns, impala_columns)
+
+    resp = self.client.post(reverse('impala:refresh_table', kwargs={'database': self.DATABASE, 'table': 'tweets'}))
+
+    impala_columns, beeswax_columns = get_impala_beeswax_columns()
+    # Invalidate picks up new column
+    assert_equal(impala_columns, beeswax_columns,
+      "\ntest_refresh_table: `%s`.`%s`\nImpala Columns: %s\nBeeswax Columns: %s" % (self.DATABASE, 'tweets', ','.join(impala_columns), ','.join(beeswax_columns)))
+
+
+  def test_get_exec_summary(self):
+    query = """
+      SELECT COUNT(1) FROM tweets;
+    """
+
+    response = _make_query(self.client, query, database=self.DATABASE, local=False, server_name='impala')
+    content = json.loads(response.content)
+    query_history = QueryHistory.get(content['id'])
+
+    wait_for_query_to_finish(self.client, response, max=180.0)
+
+    resp = self.client.post(reverse('impala:get_exec_summary', kwargs={'query_history_id': query_history.id}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_true('nodes' in data['summary'], data)
+    assert_true(len(data['summary']['nodes']) > 0, data['summary']['nodes'])
+
+    # Attempt to call get_exec_summary on a closed query
+    resp = self.client.post(reverse('impala:get_exec_summary', kwargs={'query_history_id': query_history.id}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_true('nodes' in data['summary'], data)
+    assert_true(len(data['summary']['nodes']) > 0, data['summary']['nodes'])
+
+
+  def test_get_runtime_profile(self):
+    query = """
+      SELECT COUNT(1) FROM tweets;
+    """
+
+    response = _make_query(self.client, query, database=self.DATABASE, local=False, server_name='impala')
+    content = json.loads(response.content)
+    query_history = QueryHistory.get(content['id'])
+
+    wait_for_query_to_finish(self.client, response, max=180.0)
+
+    resp = self.client.post(reverse('impala:get_runtime_profile', kwargs={'query_history_id': query_history.id}))
+    data = json.loads(resp.content)
+    assert_equal(0, data['status'], data)
+    assert_true('Execution Profile' in data['profile'], data)
 
 
 # Could be refactored with SavedQuery.create_empty()

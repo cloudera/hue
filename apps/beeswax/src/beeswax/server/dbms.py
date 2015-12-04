@@ -24,24 +24,18 @@ from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import format_preserving_redirect
-from desktop.lib.i18n import smart_str
 from desktop.lib.parameterization import substitute_variables
 from filebrowser.views import location_to_url
 
 from beeswax import hive_site
-from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, BROWSE_PARTITIONED_TABLE_LIMIT, SERVER_CONN_TIMEOUT, \
-  AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, SAMPLE_TABLE_MAX_PARTITIONS
+from beeswax.conf import HIVE_SERVER_HOST, HIVE_SERVER_PORT, LIST_PARTITIONS_LIMIT, SERVER_CONN_TIMEOUT, \
+  AUTH_USERNAME, AUTH_PASSWORD, APPLY_NATURAL_SORT_MAX, QUERY_PARTITIONS_LIMIT
 from beeswax.common import apply_natural_sort
 from beeswax.design import hql_query
 from beeswax.hive_site import hiveserver2_use_ssl
 from beeswax.models import QueryHistory, QUERY_TYPES
 
 LOG = logging.getLogger(__name__)
-
-try:
-  from impala.dbms import ImpalaDbms 
-except ImportError, e:
-  LOG.info('Impala app enabled: %s' % e)
 
 
 DBMS_CACHE = {}
@@ -51,9 +45,6 @@ def get(user, query_server=None):
   global DBMS_CACHE
   global DBMS_CACHE_LOCK
 
-  # Avoid circular dependency
-  from beeswax.server.hive_server2_lib import HiveServerClientCompatible, HiveServerClient
-
   if query_server is None:
     query_server = get_query_server_config()
 
@@ -62,7 +53,16 @@ def get(user, query_server=None):
     DBMS_CACHE.setdefault(user.username, {})
 
     if query_server['server_name'] not in DBMS_CACHE[user.username]:
-      DBMS_CACHE[user.username][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+      # Avoid circular dependency
+      from beeswax.server.hive_server2_lib import HiveServerClientCompatible
+
+      if query_server['server_name'] == 'impala':
+        from impala.dbms import ImpalaDbms
+        from impala.server import ImpalaServerClient
+        DBMS_CACHE[user.username][query_server['server_name']] = ImpalaDbms(HiveServerClientCompatible(ImpalaServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
+      else:
+        from beeswax.server.hive_server2_lib import HiveServerClient
+        DBMS_CACHE[user.username][query_server['server_name']] = HiveServer2Dbms(HiveServerClientCompatible(HiveServerClient(query_server, user)), QueryHistory.SERVER_TYPE[1][0])
 
     return DBMS_CACHE[user.username][query_server['server_name']]
   finally:
@@ -71,22 +71,8 @@ def get(user, query_server=None):
 
 def get_query_server_config(name='beeswax', server=None):
   if name == 'impala':
-    from impala.conf import SERVER_HOST as IMPALA_SERVER_HOST, SERVER_PORT as IMPALA_SERVER_PORT, \
-        IMPALA_PRINCIPAL, IMPERSONATION_ENABLED, QUERYCACHE_ROWS, QUERY_TIMEOUT_S, AUTH_USERNAME as IMPALA_AUTH_USERNAME, AUTH_PASSWORD as IMPALA_AUTH_PASSWORD, \
-        SESSION_TIMEOUT_S
-
-    query_server = {
-        'server_name': 'impala',
-        'server_host': IMPALA_SERVER_HOST.get(),
-        'server_port': IMPALA_SERVER_PORT.get(),
-        'principal': IMPALA_PRINCIPAL.get(),
-        'impersonation_enabled': IMPERSONATION_ENABLED.get(),
-        'querycache_rows': QUERYCACHE_ROWS.get(),
-        'QUERY_TIMEOUT_S': QUERY_TIMEOUT_S.get(),
-        'SESSION_TIMEOUT_S': SESSION_TIMEOUT_S.get(),
-        'auth_username': IMPALA_AUTH_USERNAME.get(),
-        'auth_password': IMPALA_AUTH_PASSWORD.get()
-    }
+    from impala.dbms import get_query_server_config as impala_query_server_config
+    query_server = impala_query_server_config()
   else:
     kerberos_principal = hive_site.get_hiveserver2_kerberos_principal(HIVE_SERVER_HOST.get())
 
@@ -271,9 +257,8 @@ class HiveServer2Dbms(object):
 
 
   def select_star_from(self, database, table):
-    if table.partition_keys:  # Filter on max # of partitions for partitioned tables
-      limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
-      hql = self._get_sample_partition_query(database, table, limit)
+    if table.partition_keys:  # Filter on max number of partitions for partitioned tables
+      hql = self._get_sample_partition_query(database, table, limit=10000) # Currently need a limit
     else:
       hql = "SELECT * FROM `%s`.`%s`" % (database, table.name)
     return self.execute_statement(hql)
@@ -317,34 +302,35 @@ class HiveServer2Dbms(object):
     result = None
     hql = None
 
-    if not table.is_view:
-      limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
+    limit = 100
 
-      if column or nested: # Could do column for any type, then nested with partitions 
-        if self.server_name == 'impala':
-          select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
-          hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
+    if column or nested: # Could do column for any type, then nested with partitions
+      if self.server_name == 'impala':
+        from impala.dbms import ImpalaDbms
+        select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
+        hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
+    else:
+      if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+        hql = self._get_sample_partition_query(database, table, limit)
       else:
-        if table.partition_keys:  # Filter on max # of partitions for partitioned tables
-          hql = self._get_sample_partition_query(database, table, limit)
-        else:
-          hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
+        hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
 
-      if hql:
-        query = hql_query(hql)
-        handle = self.execute_and_wait(query, timeout_sec=5.0)
+    if hql:
+      query = hql_query(hql)
+      handle = self.execute_and_wait(query, timeout_sec=5.0)
 
-        if handle:
-          result = self.fetch(handle, rows=100)
-          self.close(handle)
+      if handle:
+        result = self.fetch(handle, rows=100)
+        self.close(handle)
 
     return result
 
 
   def _get_sample_partition_query(self, database, table, limit):
-    partitions = self.get_partitions(database, table, partition_spec=None, max_parts=SAMPLE_TABLE_MAX_PARTITIONS.get())
+    max_parts = QUERY_PARTITIONS_LIMIT.get()
+    partitions = self.get_partitions(database, table, partition_spec=None, max_parts=max_parts)
 
-    if partitions:
+    if partitions and max_parts:
       # Need to reformat partition specs for where clause syntax
       partition_specs = [part.partition_spec.replace(',', ' AND ') for part in partitions]
       partition_filters = ' OR '.join(['(%s)' % partition_spec for partition_spec in partition_specs])
@@ -398,7 +384,7 @@ class HiveServer2Dbms(object):
     if self.server_name == 'impala':
       hql = 'SHOW COLUMN STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
-      hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` %(column)s' % {'database': database, 'table': table, 'column': column}
+      hql = 'DESCRIBE FORMATTED `%(database)s`.`%(table)s` `%(column)s`' % {'database': database, 'table': table, 'column': column}
 
     query = hql_query(hql)
     handle = self.execute_and_wait(query, timeout_sec=5.0)
@@ -500,22 +486,6 @@ class HiveServer2Dbms(object):
     design.save()
 
     return self.execute_query(query, design)
-
-
-  def invalidate_tables(self, database, tables):
-    handle = None
-
-    for table in tables:
-      try:
-        hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table,)
-        query = hql_query(hql, database, query_type=QUERY_TYPES[1])
-
-        handle = self.execute_and_wait(query, timeout_sec=10.0)
-      except Exception, e:
-        LOG.warn('Refresh tables cache out of sync: %s' % smart_str(e))
-      finally:
-        if handle:
-          self.close(handle)
 
 
   def drop_database(self, database):
@@ -741,15 +711,15 @@ class HiveServer2Dbms(object):
 
 
   def get_partitions(self, db_name, table, partition_spec=None, max_parts=None, reverse_sort=True):
-    if max_parts is None or max_parts > BROWSE_PARTITIONED_TABLE_LIMIT.get():
-      max_parts = BROWSE_PARTITIONED_TABLE_LIMIT.get()
+    if max_parts is None or max_parts > LIST_PARTITIONS_LIMIT.get():
+      max_parts = LIST_PARTITIONS_LIMIT.get()
 
-    return self.client.get_partitions(db_name, table.name, partition_spec, max_parts, reverse_sort)
+    return self.client.get_partitions(db_name, table.name, partition_spec, max_parts=max_parts, reverse_sort=reverse_sort)
 
 
   def get_partition(self, db_name, table_name, partition_spec):
     table = self.get_table(db_name, table_name)
-    partitions = self.get_partitions(db_name, table, partition_spec=partition_spec, max_parts=None)
+    partitions = self.get_partitions(db_name, table, partition_spec=partition_spec)
 
     if len(partitions) != 1:
       raise NoSuchObjectException(_("Query did not return exactly one partition result"))
