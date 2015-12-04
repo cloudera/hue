@@ -43,10 +43,14 @@
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
 
-    self.filter = ko.observable("").extend({ rateLimit: 150 });
+    self.filter = {
+      query: ko.observable("").extend({ rateLimit: 150 }),
+      showTables: ko.observable(true),
+      showViews: ko.observable(true)
+    };
 
     self.filterActive = ko.computed(function () {
-      return self.filter().length !== 0;
+      return self.filter.query().length !== 0 || !self.filter.showViews() || !self.filter.showTables();
     });
 
     var storageSearchVisible = $.totalStorage(self.type + ".assist.searchVisible");
