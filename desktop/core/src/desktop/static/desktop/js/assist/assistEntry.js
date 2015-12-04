@@ -26,13 +26,18 @@
    * @param {Object} definition
    * @param {string} definition.type
    * @param {string} definition.name
-   * @param {boolean} definition.isColumn
-   * @param {boolean} definition.isTable
-   * @param {boolean} definition.isMapValue
-   * @param {boolean} definition.isArray
+   * @param {boolean} [definition.isColumn]
+   * @param {boolean} [definition.isTable]
+   * @param {boolean} [definition.isView]
+   * @param {boolean} [definition.isDatabase]
+   * @param {boolean} [definition.isMapValue]
+   * @param {boolean} [definition.isArray]
    * @param {AssistEntry} parent
    * @param {AssistSource} assistSource
-   * @param {function} [filter] - ko.observable
+   * @param {Object} filter
+   * @param {function} filter.query (observable)
+   * @param {function} filter.showViews (observable)
+   * @param {function} filter.showTables (observable)
    * @param {Object} i18n
    * @param {string} i18n.errorLoadingTablePreview
    * @param {Object} navigationSettings
@@ -70,12 +75,15 @@
     });
 
     self.filteredEntries = ko.computed(function () {
-      if (self.filter == null || self.filter().length === 0) {
+      if (self.filter == null || (self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
         return self.entries();
       }
       var result = [];
       $.each(self.entries(), function (index, entry) {
-        if (entry.definition.name.toLowerCase().indexOf(self.filter()) > -1) {
+        if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
+          return;
+        }
+        if (entry.definition.name.toLowerCase().indexOf(self.filter.query()) > -1) {
           result.push(entry);
         }
       });
@@ -86,7 +94,7 @@
     self.columnName = null;
     self.type = null;
     self.databaseName = self.getHierarchy()[0];
-    if (self.definition.isTable) {
+    if (self.definition.isTable || self.definition.isView) {
       self.tableName = self.definition.name;
       self.columnName = null;
       self.type = self.definition.type;
@@ -96,7 +104,7 @@
     }
 
     self.editorText = ko.computed(function () {
-      if (self.definition.isTable) {
+      if (self.definition.isTable || self.definition.isView) {
         return self.definition.name;
       }
       if (self.definition.isColumn) {
@@ -105,7 +113,7 @@
       var parts = [];
       var entry = self;
       while (entry != null) {
-        if (entry.definition.isTable) {
+        if (entry.definition.isTable || self.definition.isView) {
           break;
         }
         if (entry.definition.isArray || entry.definition.isMapValue) {
@@ -146,7 +154,8 @@
             displayName: table.name,
             title: table.name + (table.comment ? ' - ' + table.comment : ''),
             type: table.type,
-            isTable: true
+            isTable: /table/i.test(table.type),
+            isView: /view/i.test(table.type)
           });
         }));
       } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
@@ -240,10 +249,12 @@
    * @param {Object} definition
    * @param {string} definition.type
    * @param {string} definition.name
-   * @param {boolean} definition.isColumn
-   * @param {boolean} definition.isTable
-   * @param {boolean} definition.isMapValue
-   * @param {boolean} definition.isArray
+   * @param {boolean} [definition.isDatabase]
+   * @param {boolean} [definition.isColumn]
+   * @param {boolean} [definition.isTable]
+   * @param {boolean} [definition.isView]
+   * @param {boolean} [definition.isMapValue]
+   * @param {boolean} [definition.isArray]
    */
   AssistEntry.prototype.createEntry = function (definition) {
     var self = this;
@@ -274,7 +285,7 @@
 
   AssistEntry.prototype.openItem = function () {
     var self = this;
-    if (self.definition.isTable) {
+    if (self.definition.isTable || self.definition.isView) {
       huePubSub.publish("assist.table.selected", {
         database: self.databaseName,
         name: self.definition.name
