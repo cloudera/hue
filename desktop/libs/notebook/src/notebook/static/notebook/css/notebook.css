@@ -785,6 +785,10 @@ table.airy tr td {
   color: #DBE8F1 !important;
 }
 
+.snippet-side-btn:focus {
+  color: #DBE8F1;
+}
+
 .snippet-side-btn.active {
   color: #338bb8;
 }
