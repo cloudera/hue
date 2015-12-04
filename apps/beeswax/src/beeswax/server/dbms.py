@@ -264,6 +264,14 @@ class HiveServer2Dbms(object):
     return self.execute_statement(hql)
 
 
+  def get_select_star_query(self, database, table):
+    if table.partition_keys:  # Filter on max number of partitions for partitioned tables
+      hql = self._get_sample_partition_query(database, table, limit=10000) # Currently need a limit
+    else:
+      hql = "SELECT * FROM `%s`.`%s`" % (database, table.name)
+    return hql
+
+
   def execute_statement(self, hql):
     if self.server_name == 'impala':
       query = hql_query(hql, QUERY_TYPES[1])

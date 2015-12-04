@@ -202,3 +202,8 @@ class HS2Api(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
     return _autocomplete(db, database, table, column, nested)
+
+  def get_select_star_query(self, snippet, database, table):
+    db = self._get_db(snippet)
+    table = db.get_table(database, table)
+    return db.get_select_star_query(database, table)

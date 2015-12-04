@@ -90,19 +90,20 @@ def new(request):
   return notebook(request)
 
 
-def browse(request):
-  database = request.GET.get('database', 'default')
-  table = request.GET.get('table')
+def browse(request, database, table):
   editor_type = request.GET.get('type', 'hive')
-    
+
+  snippet = {'type': editor_type}
+  sql_select = get_api(request.user, snippet, request.fs, request.jt).get_select_star_query(snippet, database, table)
+
   editor = Notebook()
-  editor.data = json.dumps({  
+  editor.data = json.dumps({
     'description':'',
-    'sessions':[  
-      {  
+    'sessions':[
+      {
          'type':'hive',
-         'properties':[  
- 
+         'properties':[
+
          ],
          'id':None
       }
@@ -110,17 +111,17 @@ def browse(request):
     'selectedSnippet':'hive',
     'type': 'query-%s' % editor_type,
 
-    'snippets':[  
-      {  
+    'snippets':[
+      {
          'status':'ready-execute',
          'id':'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
-         'statement_raw':'select * from %(database)s',
-         'statement':'select * from sample_07',
-         'type':'hive',
-         'properties':{  
-            'files':[  
+         'statement_raw': sql_select,
+         'statement': sql_select,
+         'type': editor_type,
+         'properties':{
+            'files':[
             ],
-            'settings':[  
+            'settings':[
             ]
          },
          'name': 'Browse',
