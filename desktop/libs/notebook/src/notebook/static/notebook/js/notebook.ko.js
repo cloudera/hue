@@ -1212,11 +1212,11 @@
     };
 
     self.loadNotebook = function (notebook) {
-      var _n = new Notebook(self, notebook);
-      self.notebooks.push(_n);
-      if (_n.snippets().length > 0) {
-        _n.selectedSnippet(_n.snippets()[_n.snippets().length - 1].type());
-        _n.snippets().forEach(function(snippet){
+      var notebook = new Notebook(self, notebook);
+      self.notebooks.push(notebook);
+      if (notebook.snippets().length > 0) {
+        notebook.selectedSnippet(notebook.snippets()[notebook.snippets().length - 1].type());
+        notebook.snippets().forEach(function(snippet){
           snippet.statement_raw.valueHasMutated();
         });
       }
