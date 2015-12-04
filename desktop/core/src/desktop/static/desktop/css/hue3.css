@@ -2207,6 +2207,9 @@ div.navigator .pull-right .nav {
   color: #338bb8 !important;
 }
 
+.inactive-action:focus {
+  color: #d1d1d1;
+}
 
 /*
 Transition to Hue 4
