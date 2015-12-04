@@ -154,6 +154,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-entries">
+    <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
+    <ul class="assist-tables">
+      <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
+    </ul>
+    <!-- /ko -->
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistSource.repositionActions }">
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isTable ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isTable, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
