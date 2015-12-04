@@ -41,6 +41,7 @@ urlpatterns = patterns('notebook.views',
   url(r'^copy$', 'copy', name='copy'),
 
   url(r'^editor$', 'editor', name='editor'),
+  url(r'^browse(?P<database>\w+)/(?P<table>\w+)$', 'browse', name='browse'),
 )
 
 # APIs

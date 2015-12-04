@@ -666,11 +666,13 @@
       if (self.status() == 'running') {
         self.checkStatus();
       }
-
-      if (self.status() == 'loading') {
+      else if (self.status() == 'loading') {
         self.status('failed');
         self.progress(0);
         self.jobs([]);
+      }
+      else if (self.status() == 'ready-execute') {
+        self.execute();
       }
     };
   };
@@ -861,13 +863,13 @@
 
     self.authSession = function () {
       self.createSession(new Session(vm, {
-            'type': vm.authSessionType(),
-            'properties': [
-              {'name': 'user', 'value': vm.authSessionUsername()},
-              {'name': 'password', 'value': vm.authSessionPassword()}
-            ]
-          }),
-          vm.authSessionCallback()  // On new session we don't automatically execute the snippet after the aut. On session expiration we do or we refresh assist DB when login-in.
+          'type': vm.authSessionType(),
+          'properties': [
+            {'name': 'user', 'value': vm.authSessionUsername()},
+            {'name': 'password', 'value': vm.authSessionPassword()}
+          ]
+        }),
+        vm.authSessionCallback()  // On new session we don't automatically execute the snippet after the aut. On session expiration we do or we refresh assist DB when login-in.
       );
     };
 
@@ -1206,7 +1208,7 @@
           self.selectedNotebook(self.notebooks()[0]);
         }
       });
-      if (self.selectedNotebook().snippets().length === 0 && self.editorMode) {
+      if (self.selectedNotebook().snippets().length === 0 && self.editorMode) { // Add snippet in new Editor
         self.selectedNotebook().newSnippet();
       }
     };
