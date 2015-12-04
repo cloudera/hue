@@ -307,18 +307,18 @@ ${ assist.assistPanel() }
           <!-- ko with: table -->
           <div class="metastore-main">
             <h3>
-              <ul class="nav nav-pills pull-right" style="margin-top: -8px">
-                <li><a class="pointer"><i class="fa fa-star"></i></a></li>
-                <li><a href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a></li>
-                <li><a href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a></li>
+              <div class="inline-block pull-right">
+                <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
+                <a class="inactive-action margin-left-5" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
+                <a class="inactive-action margin-left-5" href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
                 % if has_write_access:
-                  <li><a href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a></li>
+                  <a class="inactive-action margin-left-5" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
                 % endif
-                <li><a href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a></li>
+                <a class="inactive-action margin-left-5" href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
                 % if table.partition_keys:
-                  <li><a href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a></li>
+                  <a class="inactive-action margin-left-5" href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
                 % endif
-              </ul>
+              </div>
               <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
             </h3>
             <div class="clearfix"></div>
