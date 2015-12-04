@@ -684,6 +684,26 @@ def get_sample_data(request, database, table):
   return JsonResponse(response)
 
 
+def get_indexes(request, database, table):
+  query_server = dbms.get_query_server_config(get_app_name(request))
+  db = dbms.get(request.user, query_server)
+  response = {'status': -1, 'error_message': ''}
+
+  try:
+    indexes = db.get_indexes(database, table)
+    if indexes:
+      response['status'] = 0
+      response['headers'] = indexes.cols()
+      response['rows'] = escape_rows(indexes.rows(), nulls_only=True)
+    else:
+      response['error_message'] = _('Index data took too long to be generated')
+  except Exception, ex:
+    error_message, logs = dbms.expand_exception(ex, db)
+    response['error_message'] = error_message
+
+  return JsonResponse(response)
+
+
 def get_query_form(request):
   try:
     try:
