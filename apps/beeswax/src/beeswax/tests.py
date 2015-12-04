@@ -1891,6 +1891,23 @@ for x in sys.stdin:
     assert_true("fields" in json_resp)
 
 
+  def test_get_indexes(self):
+    table_name = 'indexed_table'
+
+    hql = """
+      CREATE TABLE `%(db)s`.`%(table)s` (id INT, name STRING, age INT, state STRING);
+      CREATE INDEX `id_idx` ON TABLE `%(db)s`.`%(table)s` (`id`) AS 'COMPACT' WITH DEFERRED REBUILD;
+      CREATE INDEX `state_idx` ON TABLE `%(db)s`.`%(table)s` (`state`) AS 'COMPACT' WITH DEFERRED REBUILD;
+    """ % {'db': self.db_name, 'table': table_name}
+    _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
+
+    resp = self.client.get(reverse("beeswax:get_indexes", kwargs={'database': self.db_name, 'table': table_name}))
+    json_resp = json.loads(resp.content)
+    assert_true('headers' in json_resp, json_resp)
+    assert_true('rows' in json_resp, json_resp)
+    assert_equal(2, len(json_resp['rows']), json_resp['rows'])
+
+
   def test_databases_quote(self):
     c = self.client
     db_name = '__%s' % self.db_name

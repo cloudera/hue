@@ -760,6 +760,18 @@ class HiveServer2Dbms(object):
     return self.execute_query(query, design)
 
 
+  def get_indexes(self, db_name, table_name):
+    hql = 'SHOW FORMATTED INDEXES ON `%(table)s` IN `%(database)s`' % {'table': table_name, 'database': db_name}
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=15.0)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+
+    return result
+
+
   def explain(self, query):
     return self.client.explain(query)
 
