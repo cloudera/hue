@@ -458,37 +458,39 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet">
-  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }, visibleOnHover: { override: $root.editorMode, selector: '.snippet-actions' }">
-    <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
-      <div style="position: relative;">
-        <div class="snippet-row">
-          <div class="snippet-left-bar">
-            <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-type-controls' } --><!-- /ko -->
-            <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
-          </div>
-          <div class="snippet-body" data-bind="clickForAceFocus: ace">
-            <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
+  <div data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
+    <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode || inFocus, selector: '.snippet-actions' }">
+      <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+        <div style="position: relative;">
+          <div class="snippet-row">
+            <div class="snippet-left-bar">
+              <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-type-controls' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
+            </div>
+            <div class="snippet-body" data-bind="clickForAceFocus: ace">
+              <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-            <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
-              <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
-              <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
-            </h2>
-            <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+                <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
+                <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
+              </h2>
+              <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+            </div>
           </div>
-        </div>
-        <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-        <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
-        <!-- ko template: 'snippet-log' --><!-- /ko -->
-        <!-- ko template: 'query-history' --><!-- /ko -->
-        <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
-        <div style="position: absolute; top:0; z-index: 301; width: 100%;">
-          <!-- ko template: 'snippet-settings' --><!-- /ko -->
-        </div>
+          <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: 'snippet-log' --><!-- /ko -->
+          <!-- ko template: 'query-history' --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <div style="position: absolute; top:0; z-index: 301; width: 100%;">
+            <!-- ko template: 'snippet-settings' --><!-- /ko -->
+          </div>
 
-        <div class="clearfix"></div>
+          <div class="clearfix"></div>
+        </div>
       </div>
     </div>
   </div>
