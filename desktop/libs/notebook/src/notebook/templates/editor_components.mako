@@ -1566,7 +1566,7 @@ ${ require.config() }
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
-      assistAvailable: '${ autocomplete_base_url | n,unicode }' !== '',
+      assistAvailable: true,
       snippetViewSettings: {
         default: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
