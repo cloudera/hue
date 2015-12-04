@@ -21,6 +21,11 @@ Configuration options for the "user admin" application
 from desktop.lib.conf import Config, ConfigSection, coerce_bool
 from django.utils.translation import ugettext_lazy as _
 
+HOME_DIR_PERMISSIONS = Config(
+    key="home_dir_permissions",
+    help=_("New user home directory is created with these permissions"),
+    type=str,
+    default="0755")
 
 DEFAULT_USER_GROUP = Config(
     key="default_user_group",
