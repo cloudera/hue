@@ -431,6 +431,7 @@
       self.result.logLines = 0;
       self.progress(0);
       self.jobs([]);
+      self.result.logs('');
 
       if (self.result.fetchedOnce()) {
         self.close();
@@ -623,7 +624,8 @@
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         from: self.result.logLines,
-        jobs: ko.mapping.toJSON(self.jobs)
+        jobs: ko.mapping.toJSON(self.jobs),
+        full_log: self.result.logs
       }, function (data) {
         if (data.status == 1) { // Append errors to the logs
           data.status = 0;

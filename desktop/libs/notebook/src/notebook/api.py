@@ -188,8 +188,11 @@ def get_logs(request):
     all_jobs = jobs + new_jobs
     jobs = dict((job['name'], job) for job in all_jobs).values()
 
+  # Retrieve full log for job progress parsing
+  full_log = request.POST.get('full_log', logs)
+
   response['logs'] = logs
-  response['progress'] = db.progress(snippet, logs) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+  response['progress'] = db.progress(snippet, full_log) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
   response['status'] = 0
 
