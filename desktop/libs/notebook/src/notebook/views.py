@@ -45,12 +45,6 @@ def notebook(request):
   else:
     notebook = Notebook()
 
-  autocomplete_base_url = ''
-  try:
-    autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
-  except:
-    LOG.exception('failed to get autocomplete base url')
-
   is_yarn_mode = False
   try:
     from spark.conf import LIVY_SERVER_SESSION_KIND
@@ -64,7 +58,6 @@ def notebook(request):
           'languages': get_interpreters(request.user),
           'session_properties': SparkApi.PROPERTIES,
       }),
-      'autocomplete_base_url': autocomplete_base_url,
       'is_yarn_mode': is_yarn_mode
   })
 
@@ -83,11 +76,60 @@ def editor(request):
     data['type'] = 'query-%s' % editor_type
     editor.data = json.dumps(data)
 
-  autocomplete_base_url = ''
-  try:
-    autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
-  except:
-    LOG.exception('failed to get autocomplete base url')
+  return render('editor.mako', request, {
+      'notebooks_json': json.dumps([editor.get_data()]),
+      'options_json': json.dumps({
+          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
+          'mode': 'editor',
+      }),
+      'editor_type': editor_type,
+  })
+
+
+def new(request):
+  return notebook(request)
+
+
+def browse(request):
+  database = request.GET.get('database', 'default')
+  table = request.GET.get('table')
+  editor_type = request.GET.get('type', 'hive')
+    
+  editor = Notebook()
+  editor.data = json.dumps({  
+    'description':'',
+    'sessions':[  
+      {  
+         'type':'hive',
+         'properties':[  
+ 
+         ],
+         'id':None
+      }
+    ],
+    'selectedSnippet':'hive',
+    'type': 'query-%s' % editor_type,
+
+    'snippets':[  
+      {  
+         'status':'ready-execute',
+         'id':'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
+         'statement_raw':'select * from %(database)s',
+         'statement':'select * from sample_07',
+         'type':'hive',
+         'properties':{  
+            'files':[  
+            ],
+            'settings':[  
+            ]
+         },
+         'name': 'Browse',
+         'database':'default',
+         'result':{  }
+      }
+    ],
+    'name':'Browse'
+  })
 
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
@@ -96,12 +138,7 @@ def editor(request):
           'mode': 'editor',
       }),
       'editor_type': editor_type,
-      'autocomplete_base_url': autocomplete_base_url,
   })
-
-
-def new(request):
-  return notebook(request)
 
 
 def notebooks(request):

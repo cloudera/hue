@@ -131,34 +131,11 @@ ${ require.config() }
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right">
-        %if mode == 'editor':
-        <a class="btn" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-          <i class="fa fa-expand"></i>
-        </a>
-          % if editor_type == 'impala':
-          <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
-            <i class="fa fa-cogs"></i>
-          </a>
-          %endif
         <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
           <i class="fa fa-save"></i>
         </a>
 
-        <a class="btn" href="${ url('notebook:editor') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-file-o"></i>
-        </a>
-
-        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Queries') }" rel="tooltip" data-placement="bottom">
-          <i class="fa fa-tags"></i>
-        </a>
-        %else:
-        <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn-inverse': isEditing}">
-          <i class="fa fa-pencil"></i>
-        </a>
-
-        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
-          <i class="fa fa-cogs"></i>
-        </a>
+        &nbsp;&nbsp;&nbsp;
 
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
@@ -170,6 +147,7 @@ ${ require.config() }
                 <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
               </a>
             </li>
+            % if mode != 'editor':
             <li>
               <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
                 <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
@@ -195,25 +173,25 @@ ${ require.config() }
                 <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
               </a>
             </li>
+            % endif
           </ul>
         </div>
 
-
         &nbsp;&nbsp;&nbsp;
 
-        <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
-          <i class="fa fa-save"></i>
-        </a>
-
+        % if mode == 'editor':
         <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
+        % else:
+        <a class="btn" href="${ url('notebook:editor') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
+          <i class="fa fa-file-o"></i>
+        </a>
+        % endif
 
         <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
-
-        %endif
       </div>
 
       <div class="nav-collapse">
@@ -408,6 +386,10 @@ ${ require.config() }
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
     </div>
 
+    <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Result has expired.") }</pre>
+    </div>
+
     <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
     </div>
@@ -426,7 +408,7 @@ ${ require.config() }
           </tr>
         </thead>
         <tbody data-bind="foreach: $parent.history">
-          <tr class="pointer" data-bind="click: function(){ $parent.ace().setValue(query); history.pushState(null, null, url); $('.right-panel').animate({ scrollTop: '0px' }); }">
+          <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $parent.ace().setValue(query); history.pushState(null, null, url); $('.right-panel').animate({ scrollTop: '0px' }); } }">
             <td><code data-bind="text: query" style="white-space: normal"></code></td>
             <td style="width: 200px" class="muted"><span data-bind="text: moment(lastExecuted).format('LLL')"></span></td>
           </tr>
@@ -458,37 +440,39 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet">
-  <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }, visibleOnHover: { override: $root.editorMode, selector: '.snippet-actions' }">
-    <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
-      <div style="position: relative;">
-        <div class="snippet-row">
-          <div class="snippet-left-bar">
-            <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-type-controls' } --><!-- /ko -->
-            <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
-          </div>
-          <div class="snippet-body" data-bind="clickForAceFocus: ace">
-            <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
+  <div data-bind="visibleOnHover: { override: inFocus, selector: '.hover-actions' }">
+    <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode || inFocus, selector: '.snippet-actions' }">
+      <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
+        <div style="position: relative;">
+          <div class="snippet-row">
+            <div class="snippet-left-bar">
+              <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-type-controls' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
+            </div>
+            <div class="snippet-body" data-bind="clickForAceFocus: ace">
+              <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
-            <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
-              <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
-              <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
-            </h2>
-            <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-            <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+              <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
+                <!-- ko template: { if: $root.editorMode, name: 'editor-snippet-header' } --><!-- /ko -->
+                <!-- ko template: { if: ! $root.editorMode, name: 'notebook-snippet-header' } --><!-- /ko -->
+              </h2>
+              <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'jar' || type() == 'py', name: 'executable-snippet-body' } --><!-- /ko -->
+            </div>
           </div>
-        </div>
-        <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-        <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
-        <!-- ko template: 'snippet-log' --><!-- /ko -->
-        <!-- ko template: 'query-history' --><!-- /ko -->
-        <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
-        <div style="position: absolute; top:0; z-index: 301; width: 100%;">
-          <!-- ko template: 'snippet-settings' --><!-- /ko -->
-        </div>
+          <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode, name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: 'snippet-log' --><!-- /ko -->
+          <!-- ko template: 'query-history' --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <div style="position: absolute; top:0; z-index: 301; width: 100%;">
+            <!-- ko template: 'snippet-settings' --><!-- /ko -->
+          </div>
 
-        <div class="clearfix"></div>
+          <div class="clearfix"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1089,7 +1073,6 @@ ${ require.config() }
   </div>
 </div>
 
-  
 </%def>
 
 
@@ -1583,7 +1566,7 @@ ${ require.config() }
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',
-      assistAvailable: '${ autocomplete_base_url | n,unicode }' !== '',
+      assistAvailable: true,
       snippetViewSettings: {
         default: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
@@ -1897,7 +1880,7 @@ ${ require.config() }
       viewModel.init();
 
       if (viewModel.editorMode && !viewModel.selectedNotebook().snippets()[0].result.hasSomeResults()) {
-        viewModel.selectedNotebook().showHistory(true);
+        viewModel.selectedNotebook().fetchHistory();
       }
 
       if (location.getParameter("github_status") != "") {

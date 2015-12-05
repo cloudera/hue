@@ -175,12 +175,13 @@ class HS2Api(Api):
   def progress(self, snippet, logs):
     if snippet['type'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
-      total = (int(match.group(1)) if match else 1) * 2
+      total = int(match.group(1)) if match else 1
 
       started = logs.count('Starting Job')
       ended = logs.count('Ended Job')
 
-      return int((started + ended) * 100 / total)
+      progress = int((started + ended) * 100 / (total * 2))
+      return max(progress, 5)  # Return 5% progress as a minimum
     elif snippet['type'] == 'impala':
       match = re.search('(\d+)% Complete', logs, re.MULTILINE)
       return int(match.group(1)) if match else 0

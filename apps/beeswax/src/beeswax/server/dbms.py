@@ -346,7 +346,14 @@ class HiveServer2Dbms(object):
     if self.server_name == 'impala':
       hql = 'COMPUTE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
-      hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS' % {'database': database, 'table': table}
+      table_obj = self.get_table(database, table)
+      partition_spec = ''
+      if table_obj.partition_keys:
+        partition_keys = ','.join([part.name for part in table_obj.partition_keys])
+        partition_spec = 'PARTITION(%(partition_keys)s)' % {'partition_keys': partition_keys}
+
+      hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` %(partition_spec)s COMPUTE STATISTICS' % \
+            {'database': database, 'table': table, 'partition_spec': partition_spec}
 
     return self.execute_statement(hql)
 
@@ -355,7 +362,11 @@ class HiveServer2Dbms(object):
     if self.server_name == 'impala':
       hql = 'COMPUTE STATS `%(database)s`.`%(table)s`' % {'database': database, 'table': table}
     else:
-      hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS FOR COLUMNS' % {'database': database, 'table': table}
+      table_obj = self.get_table(database, table)
+      if table_obj.partition_keys:
+        raise NotImplementedError('HIVE-4861: COMPUTE STATISTICS FOR COLUMNS not supported for partitioned-tables.')
+      else:
+        hql = 'ANALYZE TABLE `%(database)s`.`%(table)s` COMPUTE STATISTICS FOR COLUMNS' % {'database': database, 'table': table}
 
     return self.execute_statement(hql)
 
@@ -747,6 +758,18 @@ class HiveServer2Dbms(object):
     design.save()
 
     return self.execute_query(query, design)
+
+
+  def get_indexes(self, db_name, table_name):
+    hql = 'SHOW FORMATTED INDEXES ON `%(table)s` IN `%(database)s`' % {'table': table_name, 'database': db_name}
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=15.0)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+
+    return result
 
 
   def explain(self, query):

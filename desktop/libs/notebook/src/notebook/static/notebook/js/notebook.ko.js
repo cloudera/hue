@@ -431,6 +431,7 @@
       self.result.logLines = 0;
       self.progress(0);
       self.jobs([]);
+      self.result.logs('');
 
       if (self.result.fetchedOnce()) {
         self.close();
@@ -567,6 +568,8 @@
           else if (self.status() == 'success') {
             self.progress(99);
           }
+        } else if (data.status == -3) {
+          self.status('expired');
         } else {
           self._ajaxError(data);
         }
@@ -623,7 +626,8 @@
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         from: self.result.logLines,
-        jobs: ko.mapping.toJSON(self.jobs)
+        jobs: ko.mapping.toJSON(self.jobs),
+        full_log: self.result.logs
       }, function (data) {
         if (data.status == 1) { // Append errors to the logs
           data.status = 0;
@@ -800,8 +804,6 @@
           _snippet.status('loading');
           self.createSession(new Session(vm, {'type': _snippet.type()}));
         }, 200);
-      } else {
-        _snippet.status('ready');
       }
 
       _snippet.init();
@@ -832,30 +834,30 @@
       $.post("/notebook/api/create_session", {
         notebook: ko.mapping.toJSON(self.getContext()),
         session: ko.mapping.toJSON(session) // e.g. {'type': 'hive', 'properties': [{'name': driverCores', 'value', '2'}]}
-      }, function (data) {
-        if (data.status == 0) {
-          ko.mapping.fromJS(data.session, {}, session);
-          if (self.getSession(session.type()) == null) {
-            self.addSession(session);
+        }, function (data) {
+          if (data.status == 0) {
+            ko.mapping.fromJS(data.session, {}, session);
+            if (self.getSession(session.type()) == null) {
+              self.addSession(session);
+            }
+            $.each(self.getSnippets(session.type()), function(index, snippet) {
+              snippet.status('ready');
+            });
+            if (callback) {
+              setTimeout(callback, 500);
+            }
+          } else if (data.status == 401) {
+            $(document).trigger("showAuthModal", {'type': session.type()});
           }
-          $.each(self.getSnippets(session.type()), function(index, snippet) {
-            snippet.status('ready');
-          });
-          if (callback) {
-            setTimeout(callback, 500);
+          else {
+            fail(data.message);
           }
-        } else if (data.status == 401) {
-          $(document).trigger("showAuthModal", {'type': session.type()});
-        }
-        else {
-          fail(data.message);
-        }
-      }).fail(function (xhr) {
-        fail(xhr.responseText);
-      }).complete(function(xhr, status) {
-        self.creatingSessionLocks.remove(session.type());
-      })
-    };
+        }).fail(function (xhr) {
+          fail(xhr.responseText);
+        }).complete(function(xhr, status) {
+          self.creatingSessionLocks.remove(session.type());
+        })
+      };
 
     self.authSession = function () {
       self.createSession(new Session(vm, {
@@ -1142,7 +1144,7 @@
       $(document).trigger("editingToggled");
     });
     self.toggleEditing = function () {
-      self.isEditing(!self.isEditing());
+      self.isEditing(! self.isEditing());
     };
 
     self.authSessionUsername = ko.observable(); // UI popup
