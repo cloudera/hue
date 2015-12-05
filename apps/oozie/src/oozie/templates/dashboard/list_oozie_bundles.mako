@@ -333,7 +333,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     }
 
     function getStatuses(type) {
-      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED'] : ['SUCCEEDED', 'KILLED', 'FAILED'];
+      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR'] : ['SUCCEEDED', 'KILLED', 'FAILED', 'DONEWITHERROR'];
       var btnStatuses = [];
       var statusBtns = $("a.btn-status.active");
       $.each(statusBtns, function () {
@@ -341,9 +341,9 @@ ${layout.menubar(section='bundles', dashboard=True)}
         if (val == 'SUCCEEDED') {
           btnStatuses = btnStatuses.concat(['SUCCEEDED']);
         } else if (val == 'RUNNING') {
-          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED']);
+          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']);
         } else if (val == 'ERROR') {
-          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED']);
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'DONEWITHERROR']);
         }
       });
       if (btnStatuses.length > 0) {
