@@ -303,6 +303,21 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables">
+  <div class="actionbar-actions">
+    ## Also available in Ajax, so ko-ifable
+    ## ${ database_meta.get('comment') }
+    ## ${ database_meta.get('location') }
+    ## ${ database_meta.get('owner_name') }
+    ## ${ database_meta.get('owner_type') }
+    ## ${ database_meta.get('parameters') }
+    <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
+    <button id="viewBtn" class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-eye"></i> ${_('View')}</button>
+    <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
+    % if has_write_access:
+      <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+    % endif
+  </div>
+
   <table class="table table-condensed datatables" data-tablescroller-disable="true">
     <thead>
     <tr>
@@ -313,7 +328,7 @@ ${ assist.assistPanel() }
       <th>${ _('Type') }</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: tables">
+    <tbody data-bind="foreach: filteredTables">
       <tr>
         <td data-row-selector-exclude="true" width="1%">
           <div class="hueCheckbox tableCheck fa"></div>
@@ -342,17 +357,6 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables-actions">
-  <div class="inline-block pull-right">
-    <form id="searchQueryForm" action="/metastore/tables/" method="GET" class="inline">
-      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="${ _('Search for table name') }" />
-    </form>
-
-    &nbsp;&nbsp;&nbsp;&nbsp;
-
-    <button id="viewBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-eye"></i> ${ _('View') }</button>
-    <button id="browseBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-list"></i> ${ _('Browse Data') }</button>
-    <button id="dropBtn" class="btn toolbarBtn" title="Delete the selected tables" disabled="disabled"><i class="fa fa-trash-o"></i>  ${ _('Drop') }</button>
-  </div>
 </script>
 
 <script type="text/html" id="metastore-describe-table-actions">
@@ -669,6 +673,19 @@ ${ assist.assistPanel() }
       self.loaded = ko.observable(false);
       self.loading = ko.observable(false);
       self.tables = ko.observableArray();
+
+      self.tableQuery = ko.observable('').extend({ rateLimit: 150 });
+
+      self.filteredTables = ko.computed(function () {
+        if (self.tableQuery() === '') {
+          return self.tables();
+        }
+        return $.grep(self.tables(), function (table) {
+          return table.name.toLowerCase().indexOf(self.tableQuery()) > -1
+              || (table.comment() && table.comment().toLowerCase().indexOf(self.tableQuery()) > -1);
+        });
+      });
+
       self.table = ko.observable(null);
     }
 
