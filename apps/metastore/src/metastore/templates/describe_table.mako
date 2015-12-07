@@ -282,6 +282,12 @@ ${ assist.assistPanel() }
 </a>
 
 <script type="text/html" id="metastore-databases">
+  <div class="actionbar-actions">
+    <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
+    % if has_write_access:
+      <button id="dropBtn" class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+    % endif
+  </div>
   <table class="table table-condensed datatables">
     <thead>
     <tr>
@@ -289,7 +295,7 @@ ${ assist.assistPanel() }
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: databases">
+    <tbody data-bind="foreach: filteredDatabases">
     <tr>
       <td data-row-selector-exclude="true" width="1%">
         <div class="hueCheckbox databaseCheck fa"></div>
@@ -345,15 +351,11 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-databases-actions">
+  % if has_write_access:
   <div class="inline-block pull-right">
-    <form id="searchQueryForm" action="/metastore/databases" method="GET" class="inline">
-      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="${ _('Search for database name') }" />
-    </form>
-
-    &nbsp;&nbsp;&nbsp;&nbsp;
-
-    <button id="dropBtn" class="btn toolbarBtn" title="${ _('Drop the selected databases') }" disabled="disabled"><i class="fa fa-trash-o"></i>  ${ _('Drop') }</button>
+    <a class="inactive-action" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus-circle"></i></a>
   </div>
+  % endif
 </script>
 
 <script type="text/html" id="metastore-tables-actions">
@@ -952,6 +954,17 @@ ${ assist.assistPanel() }
 
       self.loading = ko.observable(true);
       self.databases = ko.observableArray();
+
+      self.databaseQuery = ko.observable('').extend({ rateLimit: 150 });
+
+      self.filteredDatabases = ko.computed(function () {
+        if (self.databaseQuery() === '') {
+          return self.databases();
+        }
+        return $.grep(self.databases(), function (database) {
+          return database.name.toLowerCase().indexOf(self.databaseQuery()) > -1;
+        });
+      });
 
       self.database = ko.observable(null);
 
