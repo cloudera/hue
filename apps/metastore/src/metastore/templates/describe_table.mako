@@ -21,6 +21,7 @@ from desktop.views import commonheader, commonfooter, _ko
 from django.utils.translation import ugettext as _
 %>
 
+<%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="components" file="components.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="tableStats" file="/table_stats.mako" />
@@ -64,14 +65,18 @@ ${ assist.assistPanel() }
       <i class="fa fa-th muted"></i>
     </li>
     <li>
-      <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
+      <a href="javascript:void(0);" data-bind="click: function() { database(null) }">${_('Databases')}</a><span class="divider">&gt;</span>
     </li>
+    <!-- ko with: database -->
     <li>
-      <a data-bind="text: database.name, attr: { href: '/metastore/tables/' + database.name }"></a><span class="divider">&gt;</span>
+      <a href="javascript:void(0);" data-bind="text: name, click: function() { $root.database().table(null) }"></a><span class="divider">&gt;</span>
     </li>
+    <!-- ko with: table -->
     <li>
       <span style="padding-left:12px" data-bind="text: name"></span>
     </li>
+    <!-- /ko -->
+    <!-- /ko -->
   </ul>
 </script>
 
@@ -276,6 +281,255 @@ ${ assist.assistPanel() }
   <i class="fa fa-chevron-right"></i>
 </a>
 
+<script type="text/html" id="metastore-databases">
+  <table class="table table-condensed datatables">
+    <thead>
+    <tr>
+      <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="databaseCheck"></div></th>
+      <th>Database Name</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: databases">
+    <tr>
+      <td data-row-selector-exclude="true" width="1%">
+        <div class="hueCheckbox databaseCheck fa"></div>
+      </td>
+      <td>
+        <a href="javascript: void(0);" data-bind="text: name, click: function () { $parent.setDatabase($data) }"></a>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</script>
+
+<script type="text/html" id="metastore-tables">
+  <table class="table table-condensed datatables" data-tablescroller-disable="true">
+    <thead>
+    <tr>
+      <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
+      <th>&nbsp;</th>
+      <th>Table Name</th>
+      <th>Comment</th>
+      <th>Type</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: tables">
+      <tr>
+        <td data-row-selector-exclude="true" width="1%">
+          <div class="hueCheckbox tableCheck fa"></div>
+        </td>
+        <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="View statistics"></i></a></td>
+        <td>
+          <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
+        </td>
+        <td data-bind="text: comment"></td>
+        <td data-bind="text: type"></td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+
+<script type="text/html" id="metastore-databases-actions">
+  <div class="inline-block pull-right">
+    <form id="searchQueryForm" action="/metastore/databases" method="GET" class="inline">
+      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="Search for database name" />
+    </form>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;
+
+    <button id="dropBtn" class="btn toolbarBtn" title="Drop the selected databases" disabled="disabled"><i class="fa fa-trash-o"></i>  Drop</button>
+  </div>
+</script>
+
+<script type="text/html" id="metastore-tables-actions">
+  <div class="inline-block pull-right">
+    <form id="searchQueryForm" action="/metastore/tables/" method="GET" class="inline">
+      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="Search for table name" />
+    </form>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;
+
+    <button id="viewBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-eye"></i> View</button>
+    <button id="browseBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-list"></i> Browse Data</button>
+    <button id="dropBtn" class="btn toolbarBtn" title="Delete the selected tables" disabled="disabled"><i class="fa fa-trash-o"></i>  Drop</button>
+  </div>
+</script>
+
+<script type="text/html" id="metastore-describe-table-actions">
+  <div class="inline-block pull-right">
+    <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
+    <a class="inactive-action margin-left-5" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
+    <a class="inactive-action margin-left-5" href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    % if has_write_access:
+      <a class="inactive-action margin-left-5" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
+    % endif
+    <a class="inactive-action margin-left-5" href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
+    % if table.partition_keys:
+      <a class="inactive-action margin-left-5" href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
+    % endif
+  </div>
+</script>
+
+<script type="text/html" id="metastore-describe-table">
+  <div class="clearfix"></div>
+
+  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: '${ _ko('Add a description...') }' }" class="editable editable-click editable-empty">
+    ${ _('Add a description...') }
+  </span>
+
+  <ul class="nav nav-pills margin-top-30">
+    <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
+    <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
+    % if table.partition_keys:
+      <li><a href="#partitions" data-toggle="tab">${_('Partitions')} (${ len(partitions) })</a></li>
+    % endif
+    <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
+    <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
+    <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
+    <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
+    <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
+    <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
+  </ul>
+
+  <div class="tab-content margin-top-10" style="border: none">
+    <div class="tab-pane" id="overview">
+
+      <div class="row-fluid margin-top-10">
+        <div class="span6 tile">
+          <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
+        </div>
+
+        <div class="span2 tile">
+          <h4>${ _('Sharing') }</h4>
+          <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
+          <div title="${ _('Users') }"><i class="fa fa-fw fa-users muted"></i> ${ _('No users') }</div>
+        </div>
+
+        <div class="span4 tile">
+          <h4>${ _('Comments') }</h4>
+          <div>
+            <i class="fa fa-fw fa-comments-o muted"></i> ${ _('No comments available yet.') }
+          </div>
+        </div>
+      </div>
+
+      <div class="tile">
+        <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>)</h4>
+        <!-- ko with: favouriteColumns -->
+        <!-- ko template: "metastore-columns-table" --><!-- /ko -->
+        <!-- /ko -->
+
+        <a class="pointer" data-bind="click: function() { $('li a[href=\'#columns\']').click(); }">${_('View more...')}</a>
+      </div>
+
+      <div class="tile" data-bind="visible: true" style="display: none;">
+        <!-- ko with: samples -->
+        <h4>${ _('Sample') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
+        <!-- ko if: loaded -->
+        <!-- ko with: preview -->
+        <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
+        <a class="pointer" data-bind="visible: rows.length, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">${_('View more...')}</a>
+        <!-- /ko -->
+        <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+        <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+
+      % if table.partition_keys:
+        <div class="tile">
+          <h4>${ _('Partitions') } (${ len(partitions) })</h4>
+          ${ partition_values(partitions, "partitionTable", limit=3) }
+          <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
+        </div>
+      % endif
+    </div>
+
+    <div class="tab-pane" id="columns">
+      <!-- ko with: columns -->
+      <!-- ko template: "metastore-columns-table" --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    % if table.partition_keys:
+      <div class="tab-pane" id="partitions">
+        <h4>${ _('Columns') } (${ len(table.partition_keys) })</h4>
+        ${ partition_column_table(table.partition_keys, "partitionTable") }
+
+        <h4>${ _('Values') } (${ len(partitions) })</h4>
+        ${ partition_values(partitions, "partitionTable", limit=25) }
+
+        <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
+          ${ _('View all') }
+        </a>
+      </div>
+    %endif
+
+    <div class="tab-pane" id="sample">
+      <!-- ko with: samples -->
+      <!-- ko if: loaded -->
+      <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
+      <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+      <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="permissions">
+      ${ _('Not available') }
+    </div>
+
+    <div class="tab-pane" id="queries">
+      <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
+      <table data-bind="visible: !$root.loadingQueries()" class="table table-condensed">
+        <thead>
+        <tr>
+          <th width="20%">${ _('Name') }</th>
+          <th>${ _('Query') }</th>
+          <th width="20%">${ _('Owner') }</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: $root.queries">
+        <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
+          <td data-bind="text: doc.name"></td>
+          <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
+          <td><code data-bind="text: doc.owner"></code></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tab-pane" id="analysis">
+      ${ _('Not available') }
+    </div>
+
+    <div class="tab-pane" id="lineage">
+      ${ _('Not available') }
+    </div>
+
+    <div class="tab-pane" id="properties">
+      <table class="table table-striped table-condensed">
+        <thead>
+        <tr>
+          <th>${ _('Name') }</th>
+          <th>${ _('Value') }</th>
+          <th>${ _('Comment') }</th>
+        </tr>
+        </thead>
+        <tbody>
+          % for prop in table.properties:
+            <tr>
+              <td>${ smart_unicode(prop['col_name']) }</td>
+              <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
+              <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
+            </tr>
+          % endfor
+        </tbody>
+      </table>
+    </div>
+  </div>
+</script>
+
 <div class="main-content">
   <div class="vertical-full container-fluid">
     <div class="vertical-full">
@@ -303,185 +557,22 @@ ${ assist.assistPanel() }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         <div class="right-panel">
-          <!-- ko with: database -->
-          <!-- ko with: table -->
           <div class="metastore-main">
             <h3>
-              <div class="inline-block pull-right">
-                <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
-                <a class="inactive-action margin-left-5" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
-                <a class="inactive-action margin-left-5" href="${ url('notebook:browse', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
-                % if has_write_access:
-                  <a class="inactive-action margin-left-5" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
-                % endif
-                <a class="inactive-action margin-left-5" href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
-                % if table.partition_keys:
-                  <a class="inactive-action margin-left-5" href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
-                % endif
-              </div>
+              <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
+              <!-- ko template: { if: database() !== null && database().table() === null, name: 'metastore-tables-actions' }--><!-- /ko -->
+              <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
               <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
             </h3>
-            <div class="clearfix"></div>
 
-            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'right', emptytext: '${ _ko('Add a description...') }' }" class="editable editable-click editable-empty">
-              ${ _('Add a description...') }
-            </span>
-
-            <ul class="nav nav-pills margin-top-30">
-              <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
-              <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
-              % if table.partition_keys:
-                <li><a href="#partitions" data-toggle="tab">${_('Partitions')} (${ len(partitions) })</a></li>
-              % endif
-              <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
-              <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
-              <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
-              <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
-              <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
-              <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
-            </ul>
-
-            <div class="tab-content margin-top-10" style="border: none">
-              <div class="tab-pane" id="overview">
-
-                <div class="row-fluid margin-top-10">
-                  <div class="span6 tile">
-                    <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
-                  </div>
-
-                  <div class="span2 tile">
-                    <h4>${ _('Sharing') }</h4>
-                    <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
-                    <div title="${ _('Users') }"><i class="fa fa-fw fa-users muted"></i> ${ _('No users') }</div>
-                  </div>
-
-                  <div class="span4 tile">
-                    <h4>${ _('Comments') }</h4>
-                    <div>
-                      <i class="fa fa-fw fa-comments-o muted"></i> ${ _('No comments available yet.') }
-                    </div>
-                  </div>
-                </div>
-
-                <div class="tile">
-                  <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>)</h4>
-                  <!-- ko with: favouriteColumns -->
-                  <!-- ko template: "metastore-columns-table" --><!-- /ko -->
-                  <!-- /ko -->
-
-                  <a class="pointer" data-bind="click: function() { $('li a[href=\'#columns\']').click(); }">${_('View more...')}</a>
-                </div>
-
-                <div class="tile" data-bind="visible: true" style="display: none;">
-                  <!-- ko with: samples -->
-                  <h4>${ _('Sample') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
-                  <!-- ko if: loaded -->
-                  <!-- ko with: preview -->
-                  <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
-                  <a class="pointer" data-bind="visible: rows.length, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">${_('View more...')}</a>
-                  <!-- /ko -->
-                  <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-                  <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
-                  <!-- /ko -->
-                  <!-- /ko -->
-                </div>
-
-                % if table.partition_keys:
-                  <div class="tile">
-                    <h4>${ _('Partitions') } (${ len(partitions) })</h4>
-                    ${ partition_values(partitions, "partitionTable", limit=3) }
-                    <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
-                  </div>
-                % endif
-              </div>
-
-              <div class="tab-pane" id="columns">
-                <!-- ko with: columns -->
-                <!-- ko template: "metastore-columns-table" --><!-- /ko -->
-                <!-- /ko -->
-              </div>
-
-              % if table.partition_keys:
-                <div class="tab-pane" id="partitions">
-                  <h4>${ _('Columns') } (${ len(table.partition_keys) })</h4>
-                  ${ partition_column_table(table.partition_keys, "partitionTable") }
-
-                  <h4>${ _('Values') } (${ len(partitions) })</h4>
-                  ${ partition_values(partitions, "partitionTable", limit=25) }
-
-                  <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
-                    ${ _('View all') }
-                  </a>
-                </div>
-              %endif
-
-              <div class="tab-pane" id="sample">
-                <!-- ko with: samples -->
-                <!-- ko if: loaded -->
-                <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
-                <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-                <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
-                <!-- /ko -->
-                <!-- /ko -->
-              </div>
-
-              <div class="tab-pane" id="permissions">
-                ${ _('Not available') }
-              </div>
-
-              <div class="tab-pane" id="queries">
-                <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
-                <table data-bind="visible: !$root.loadingQueries()" class="table table-condensed">
-                  <thead>
-                  <tr>
-                    <th width="20%">${ _('Name') }</th>
-                    <th>${ _('Query') }</th>
-                    <th width="20%">${ _('Owner') }</th>
-                  </tr>
-                  </thead>
-                  <tbody data-bind="foreach: $root.queries">
-                  <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
-                    <td data-bind="text: doc.name"></td>
-                    <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
-                    <td><code data-bind="text: doc.owner"></code></td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <div class="tab-pane" id="analysis">
-                ${ _('Not available') }
-              </div>
-
-              <div class="tab-pane" id="lineage">
-                ${ _('Not available') }
-              </div>
-
-              <div class="tab-pane" id="properties">
-                <table class="table table-striped table-condensed">
-                  <thead>
-                  <tr>
-                    <th>${ _('Name') }</th>
-                    <th>${ _('Value') }</th>
-                    <th>${ _('Comment') }</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                    % for prop in table.properties:
-                      <tr>
-                        <td>${ smart_unicode(prop['col_name']) }</td>
-                        <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
-                        <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
-                      </tr>
-                    % endfor
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
+            <!-- ko template: { if: database() === null, name: 'metastore-databases' } --><!-- /ko -->
+            <!-- ko with: database -->
+            <!-- ko template: { if: table() === null, name: 'metastore-tables' } --><!-- /ko -->
+            <!-- ko with: table -->
+              <!-- ko template: 'metastore-describe-table' --><!-- /ko -->
+            <!-- /ko -->
+            <!-- /ko -->
           </div>
-          <!-- /ko -->
-          <!-- /ko -->
         </div>
     </div>
   </div>
@@ -575,23 +666,48 @@ ${ assist.assistPanel() }
       self.assistHelper = options.assistHelper;
       self.name = options.name;
 
-      self.table = ko.observable(options.tableName ? new MetastoreTable({
-        database: self,
-        name: options.tableName,
-        comment: options.tableComment,
-        assistHelper: self.assistHelper
-      }) : null);
+      self.loaded = ko.observable(false);
+      self.loading = ko.observable(false);
+      self.tables = ko.observableArray();
+      self.table = ko.observable(null);
     }
 
-    MetastoreDatabase.prototype.setTable = function (name) {
+    MetastoreDatabase.prototype.load = function () {
       var self = this;
-      if (!self.table() || self.table().name !== name) {
-        self.table(new MetastoreTable({
-          database: self,
-          name: name,
-          comment: '', // TODO: fetch the comment async in the table
-          assistHelper: self.assistHelper
-        }))
+      if (self.loading()) {
+        return;
+      }
+
+      self.loading(true);
+      self.assistHelper.fetchTables({
+        sourceType: 'hive',
+        databaseName: self.name,
+        successCallback: function (data) {
+          self.tables($.map(data.tables_meta, function(tableMeta) {
+            return new MetastoreTable({
+              database: self,
+              name: tableMeta.name,
+              type: tableMeta.type,
+              comment: tableMeta.comment,
+              assistHelper: self.assistHelper
+            })
+          }));
+          self.loaded(true);
+          self.loading(false);
+        },
+        errorCallback: function (response) {
+          console.log(response);
+          self.loading(false);
+        }
+      })
+    }
+
+
+    MetastoreDatabase.prototype.setTable = function (metastoreTable) {
+      var self = this;
+      self.table(metastoreTable);
+      if (! metastoreTable.loaded()) {
+        metastoreTable.load();
       }
     }
 
@@ -649,6 +765,7 @@ ${ assist.assistPanel() }
      * @param {Object} options
      * @param {MetastoreDatabase} options.database
      * @param {string} options.name
+     * @param {string} options.type
      * @param {string} options.comment
      * @param {AssistHelper} options.assistHelper
      * @constructor
@@ -658,6 +775,10 @@ ${ assist.assistPanel() }
       self.database = options.database;
       self.assistHelper = options.assistHelper;
       self.name = options.name;
+      self.type = options.type;
+
+      self.loaded = ko.observable(false);
+      self.loading = ko.observable(false);
 
       self.columns = ko.observableArray();
       self.favouriteColumns = ko.observableArray();
@@ -679,47 +800,6 @@ ${ assist.assistPanel() }
         });
       })
 
-      self.assistHelper.fetchFields({
-        sourceType: "hive",
-        databaseName: self.database.name,
-        tableName: self.name,
-        fields: [],
-        successCallback: function (data) {
-          self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn({
-            extendedColumn: column,
-            table: self
-          }) }));
-          self.favouriteColumns(self.columns().slice(0, 3));
-        },
-        errorCallback: function (data) {
-          $.jHueNotify.error('${_('An error occurred fetching the table fields. Please try again.')}');
-          console.error('assistHelper.fetchFields error');
-          console.error(data);
-        }
-      })
-
-      var fetchDetails = function () {
-        self.assistHelper.fetchTableDetails({
-          sourceType: "hive",
-          databaseName: self.database.name,
-          tableName: self.name,
-          successCallback: function (data) {
-            self.tableDetails(data);
-            self.tableStats(data.details.stats);
-            self.refreshingTableStats(false);
-            self.samples.load();
-          },
-          errorCallback: function (data) {
-            self.refreshingTableStats(false);
-            $.jHueNotify.error('${_('An error occurred fetching the table details. Please try again.')}');
-            console.error('assistHelper.fetchTableDetails error');
-            console.error(data);
-          }
-        })
-      }
-
-      fetchDetails();
-
       self.refreshTableStats = function () {
         if (self.refreshingTableStats()) {
           return;
@@ -730,7 +810,7 @@ ${ assist.assistPanel() }
           databaseName: self.database.name,
           sourceType: "hive",
           successCallback: function (data) {
-            fetchDetails();
+            self.fetchDetails();
           },
           errorCallback: function (data) {
             self.refreshingTableStats(false);
@@ -740,6 +820,62 @@ ${ assist.assistPanel() }
           }
         })
       }
+
+      self.fetchFields = function () {
+        var self = this;
+        self.assistHelper.fetchFields({
+          sourceType: "hive",
+          databaseName: self.database.name,
+          tableName: self.name,
+          fields: [],
+          successCallback: function (data) {
+            self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn({
+              extendedColumn: column,
+              table: self
+            }) }));
+            self.favouriteColumns(self.columns().slice(0, 3));
+          },
+          errorCallback: function (data) {
+            $.jHueNotify.error('${_('An error occurred fetching the table fields. Please try again.')}');
+            console.error('assistHelper.fetchFields error');
+            console.error(data);
+          }
+        })
+      }
+
+      self.fetchDetails = function () {
+        var self = this;
+        self.assistHelper.fetchTableDetails({
+          sourceType: "hive",
+          databaseName: self.database.name,
+          tableName: self.name,
+          successCallback: function (data) {
+            self.tableDetails(data);
+            self.tableStats(data.details.stats);
+            self.refreshingTableStats(false);
+            self.samples.load();
+            self.loaded(true);
+            self.loading(false);
+          },
+          errorCallback: function (data) {
+            self.refreshingTableStats(false);
+            $.jHueNotify.error('${_('An error occurred fetching the table details. Please try again.')}');
+            console.error('assistHelper.fetchTableDetails error');
+            console.error(data);
+            self.loading(false);
+          }
+        })
+      }
+    }
+
+    MetastoreTable.prototype.load = function () {
+      var self = this;
+      if (self.loading()) {
+        return;
+      }
+      self.loading(true);
+      self.fetchFields();
+      self.fetchDetails();
     }
 
     /**
@@ -791,13 +927,23 @@ ${ assist.assistPanel() }
 
       self.assistHelper = new AssistHelper(options)
 
-      self.database = ko.observable(new MetastoreDatabase({
-        name: '${database}',
-        tableName: '${table.name}',
-        tableComment: tableComment,
-        assistHelper: self.assistHelper
-      }));
+      self.loading = ko.observable(true);
+      self.databases = ko.observableArray();
 
+      self.database = ko.observable(null);
+
+      self.assistHelper.loadDatabases({
+        sourceType: 'hive',
+        callback: function (databaseNames) {
+          self.databases($.map(databaseNames, function(name) {
+            return new MetastoreDatabase({
+              name: name,
+              assistHelper: self.assistHelper
+            })
+          }));
+          self.loading(false);
+        }
+      });
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
         if (self.database() && self.database().name == tableDef.database) {
@@ -816,6 +962,15 @@ ${ assist.assistPanel() }
       // TODO: Move queries into MetastoreTable
       self.loadingQueries = ko.observable(false);
       self.queries = ko.observableArray([]);
+    }
+
+    MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase) {
+      var self = this;
+      self.database(metastoreDatabase);
+
+      if (! metastoreDatabase.loaded()) {
+        metastoreDatabase.load();
+      }
     }
 
     $(document).ready(function () {
