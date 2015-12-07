@@ -704,6 +704,27 @@ def get_indexes(request, database, table):
   return JsonResponse(response)
 
 
+def get_functions(request):
+  query_server = dbms.get_query_server_config(get_app_name(request))
+  db = dbms.get(request.user, query_server)
+  response = {'status': -1, 'error_message': ''}
+
+  try:
+    prefix = request.GET.get('prefix', None)
+    functions = db.get_functions(prefix)
+    if functions:
+      response['status'] = 0
+      rows = escape_rows(functions.rows(), nulls_only=True)
+      response['functions'] = [row[0] for row in rows]
+    else:
+      response['error_message'] = _('Fetching functions timed out.')
+  except Exception, ex:
+    error_message, logs = dbms.expand_exception(ex, db)
+    response['error_message'] = error_message
+
+  return JsonResponse(response)
+
+
 def get_query_form(request):
   try:
     try:

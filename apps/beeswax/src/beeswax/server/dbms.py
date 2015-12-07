@@ -772,6 +772,19 @@ class HiveServer2Dbms(object):
     return result
 
 
+  def get_functions(self, prefix=None):
+    filter = '"%s.*"' % prefix if prefix else '".*"'
+    hql = 'SHOW FUNCTIONS %s' % filter
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=15.0)
+
+    if handle:
+      result = self.fetch(handle, rows=5000)
+
+    return result
+
+
   def explain(self, query):
     return self.client.explain(query)
 

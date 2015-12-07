@@ -1908,6 +1908,19 @@ for x in sys.stdin:
     assert_equal(2, len(json_resp['rows']), json_resp['rows'])
 
 
+  def test_get_functions(self):
+    resp = self.client.get(reverse("beeswax:get_functions"))
+    json_resp = json.loads(resp.content)
+    assert_true('functions' in json_resp, json_resp)
+    assert_true('coalesce' in json_resp['functions'], json_resp['functions'])
+
+    resp = self.client.get(reverse("beeswax:get_functions"), {'prefix': 'a'})
+    json_resp = json.loads(resp.content)
+    assert_true('functions' in json_resp, json_resp)
+    assert_true('avg' in json_resp['functions'], json_resp['functions'])
+    assert_false('coalesce' in json_resp['functions'], json_resp['functions'])
+
+
   def test_databases_quote(self):
     c = self.client
     db_name = '__%s' % self.db_name
