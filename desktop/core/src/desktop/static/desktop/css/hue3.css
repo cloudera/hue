@@ -1116,6 +1116,10 @@ a#advanced-btn:hover {
   display: none!important;
 }
 
+.hue-uncheck::before {
+  line-height: 16px;
+}
+
 .modal form {
   margin: 0;
 }
