@@ -460,7 +460,8 @@ class Workflow(Job):
       if full_node_list is not None:            # Should remove the un-reached branches if decision node
         total_actions = len(full_node_list) - 1 # -1 because of Kill node
       else:
-        total_actions = len(self.actions)
+	    job_definition = self._get_definition()
+        total_actions = job_definition.count("</action>") + job_definition.count("</fork>") + job_definition.count("</decision>") + job_definition.count("<join") + 2
       return int(sum([action.is_finished() for action in self.actions]) / float(max(total_actions, 1)) * 100)
 
 
