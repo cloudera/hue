@@ -286,7 +286,7 @@ ${ assist.assistPanel() }
     <thead>
     <tr>
       <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="databaseCheck"></div></th>
-      <th>Database Name</th>
+      <th>${ _('Database Name') }</th>
     </tr>
     </thead>
     <tbody data-bind="foreach: databases">
@@ -308,9 +308,9 @@ ${ assist.assistPanel() }
     <tr>
       <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
       <th>&nbsp;</th>
-      <th>Table Name</th>
-      <th>Comment</th>
-      <th>Type</th>
+      <th>${ _('Table Name') }</th>
+      <th>${ _('Comment') }</th>
+      <th>${ _('Type') }</th>
     </tr>
     </thead>
     <tbody data-bind="foreach: tables">
@@ -318,7 +318,7 @@ ${ assist.assistPanel() }
         <td data-row-selector-exclude="true" width="1%">
           <div class="hueCheckbox tableCheck fa"></div>
         </td>
-        <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="View statistics"></i></a></td>
+        <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
         <td>
           <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
         </td>
@@ -332,26 +332,26 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
     <form id="searchQueryForm" action="/metastore/databases" method="GET" class="inline">
-      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="Search for database name" />
+      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="${ _('Search for database name') }" />
     </form>
 
     &nbsp;&nbsp;&nbsp;&nbsp;
 
-    <button id="dropBtn" class="btn toolbarBtn" title="Drop the selected databases" disabled="disabled"><i class="fa fa-trash-o"></i>  Drop</button>
+    <button id="dropBtn" class="btn toolbarBtn" title="${ _('Drop the selected databases') }" disabled="disabled"><i class="fa fa-trash-o"></i>  ${ _('Drop') }</button>
   </div>
 </script>
 
 <script type="text/html" id="metastore-tables-actions">
   <div class="inline-block pull-right">
     <form id="searchQueryForm" action="/metastore/tables/" method="GET" class="inline">
-      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="Search for table name" />
+      <input id="filterInput" type="text" name="filter" class="input-xlarge search-query" value="" placeholder="${ _('Search for table name') }" />
     </form>
 
     &nbsp;&nbsp;&nbsp;&nbsp;
 
-    <button id="viewBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-eye"></i> View</button>
-    <button id="browseBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-list"></i> Browse Data</button>
-    <button id="dropBtn" class="btn toolbarBtn" title="Delete the selected tables" disabled="disabled"><i class="fa fa-trash-o"></i>  Drop</button>
+    <button id="viewBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-eye"></i> ${ _('View') }</button>
+    <button id="browseBtn" class="btn toolbarBtn" title="Browse the selected table" disabled="disabled"><i class="fa fa-list"></i> ${ _('Browse Data') }</button>
+    <button id="dropBtn" class="btn toolbarBtn" title="Delete the selected tables" disabled="disabled"><i class="fa fa-trash-o"></i>  ${ _('Drop') }</button>
   </div>
 </script>
 
