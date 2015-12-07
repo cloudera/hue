@@ -734,6 +734,9 @@ ${ assist.assistPanel() }
       if (! metastoreTable.loaded()) {
         metastoreTable.load();
       }
+      window.setTimeout(function () {
+        $('a[href="#overview"]').click();
+      }, 200);
       huePubSub.publish('metastore.url.change');
     }
 
