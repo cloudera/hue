@@ -1004,7 +1004,7 @@ ${ assist.assistPanel() }
         }
       }
 
-      huePubSub.subscribe("assist.table.selected", function (tableDef) {
+      var loadTableDef = function (tableDef) {
         setDatabaseByName(tableDef.database);
         if (self.database()) {
           if (self.database().table() && self.database().table().name == tableDef.name) {
@@ -1030,7 +1030,9 @@ ${ assist.assistPanel() }
             setTableAfterLoad();
           }
         }
-      });
+      }
+
+      huePubSub.subscribe("assist.table.selected", loadTableDef);
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
         setDatabaseByName(databaseDef.name);
@@ -1048,13 +1050,38 @@ ${ assist.assistPanel() }
           hueUtils.changeURL('/metastore/tables/' + self.database().name);
         }
         else {
-          hueUtils.changeURL('metastore/databases');
+          hueUtils.changeURL('/metastore/databases');
         }
       });
 
       // TODO: Move queries into MetastoreTable
       self.loadingQueries = ko.observable(false);
       self.queries = ko.observableArray([]);
+
+
+      function loadURL() {
+        var path = window.location.pathname.split('/');
+        switch (path[2]) {
+          case 'databases':
+            self.database().table(null);
+            self.database(null);
+            break;
+          case 'tables':
+            self.database().table(null);
+            setDatabaseByName(path[3]);
+            break;
+          case 'table':
+            loadTableDef({
+              name: path[4],
+              database: path[3]
+            });
+            break;
+        }
+      }
+
+      loadURL();
+
+      window.onpopstate = loadURL;
     }
 
     MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase) {
