@@ -296,6 +296,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       </p>
     </div>
     <div class="modal-footer">
+	  <div id="saveProjectAlert" class="alert-message error hide" style="position: absolute; left: 78px;">
+          <span class="label label-important"></span>
+      </div>
       <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
       <a id="tagsNewBtn" href="#" class="btn btn-primary disable-feedback">${ _('Add') }</a>
     </div>
@@ -378,6 +381,15 @@ ${ commonshare() | n,unicode }
 
     $("#tagsNewBtn").on("click", function () {
       var tag_name = $("#tagsNew").val();
+	  
+	  if ($.trim(tag_name) == "") {
+       $("#saveProjectAlert span").text("${_('File name is required.')}");
+       $("#saveProjectAlert").show();
+       $("#tagsNew").addClass("fieldError");
+       resetPrimaryButtonsStatus(); //globally available
+       return false;
+      }
+
       $.post("/desktop/api/tag/add_tag", {
         name: tag_name
       },function (data) {
