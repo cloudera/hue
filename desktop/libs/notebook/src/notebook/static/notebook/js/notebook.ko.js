@@ -465,7 +465,7 @@
             notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
           }, function(data){
             if (vm.editorMode && data && data.status == 0 && data.id){
-              history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+              hueUtils.changeURL('/notebook/editor?editor=' + data.id);
             }
           });
         }
@@ -926,10 +926,10 @@
           self.id(data.id);
           $(document).trigger("info", data.message);
           if (vm.editorMode){
-            history.pushState(null, null, '/notebook/editor?editor=' + data.id);
+            hueUtils.changeURL('/notebook/editor?editor=' + data.id);
           }
           else {
-            history.pushState(null, null, '/notebook/notebook?notebook=' + data.id);
+            hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
           }
         }
         else {
