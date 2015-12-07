@@ -945,14 +945,47 @@ ${ assist.assistPanel() }
         }
       });
 
+      var setDatabaseByName = function (databaseName) {
+        if (self.database() && self.database().name == databaseName) {
+          return;
+        }
+        var foundDatabases = $.grep(self.databases(), function (database) {
+          return database.name === databaseName;
+        });
+        if (foundDatabases.length === 1) {
+          self.setDatabase(foundDatabases[0]);
+        }
+      }
+
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
-        if (self.database() && self.database().name == tableDef.database) {
-          self.database().setTable(tableDef.name);
+        setDatabaseByName(tableDef.database);
+        if (self.database()) {
+          if (self.database().table() && self.database().table().name == tableDef.name) {
+            return;
+          }
+
+          var setTableAfterLoad = function () {
+            var foundTables = $.grep(self.database().tables(), function (table) {
+              return table.name === tableDef.name;
+            });
+            if (foundTables.length === 1) {
+              self.database().setTable(foundTables[0]);
+            }
+          }
+
+          if (! self.database().loaded()) {
+            var doOnce = self.database().loaded.subscribe(function () {
+              setTableAfterLoad();
+              doOnce.dispose();
+            })
+          } else {
+            setTableAfterLoad();
+          }
         }
       });
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
-        location.href = '/metastore/tables/' + databaseDef.name;
+        setDatabaseByName(databaseDef.name);
       });
 
       self.isLeftPanelVisible.subscribe(function(newValue) {
