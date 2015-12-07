@@ -2322,4 +2322,52 @@
     }
   };
 
+  ko.bindingHandlers.hueChecked = {
+    after: ['value', 'attr'],
+    init: function (element, valueAccessor, allBindings) {
+      element.type = 'checkbox';
+      element.checked = false;
+      ko.utils.registerEventHandler(element, 'click', function () {
+        element.checked = ! element.checked;
+        ko.utils.toggleDomNodeCssClass(element, 'fa-check', element.checked);
+      });
+      ko.bindingHandlers.checked.init(element, valueAccessor, allBindings);
+
+      ko.utils.toggleDomNodeCssClass(element, 'fa-check', element.checked);
+
+      valueAccessor().subscribe(function () {
+        ko.utils.toggleDomNodeCssClass(element, 'fa-check', element.checked);
+      })
+    }
+  };
+
+  ko.bindingHandlers.hueCheckAll = {
+    init: function (element, valueAccessor, allBindings) {
+      var allSelected = ko.observable(false);
+      var allValues = ko.utils.unwrapObservable(valueAccessor()).allValues;
+      var selectedValues = ko.utils.unwrapObservable(valueAccessor()).selectedValues;
+
+      ko.bindingHandlers.hueChecked.init(element, function () {
+        return allSelected;
+      }, allBindings);
+
+      self.allTablesSelected = ko.observable(false);
+      self.selectedTables = ko.observableArray();
+
+      ko.utils.registerEventHandler(element, 'click', function () {
+        if (allSelected() && selectedValues().length == 0) {
+          selectedValues(allValues().slice(0));
+        } else {
+          selectedValues([]);
+        }
+      });
+
+      selectedValues.subscribe(function (newValue) {
+        allSelected(newValue.length === allValues().length);
+        ko.utils.toggleDomNodeCssClass(element, 'fa-minus hue-uncheck', newValue.length > 0 && newValue.length !== allValues().length);
+      })
+      ko.utils.toggleDomNodeCssClass(element, 'fa-minus hue-uncheck', selectedValues().length > 0 && selectedValues().length !== allValues().length);
+    }
+  };
+
 }));
