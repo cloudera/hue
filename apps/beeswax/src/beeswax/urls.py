@@ -87,6 +87,7 @@ urlpatterns += patterns(
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/sample$', 'get_sample_data', name='get_sample_data'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/indexes$', 'get_indexes', name='get_indexes'),
+  url(r'^api/functions$', 'get_functions', name='get_functions'),
 
   url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', 'analyze_table', name='analyze_table'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', 'get_table_stats', name='get_table_stats'),
