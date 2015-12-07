@@ -145,6 +145,10 @@ Array.prototype.diff = function (a) {
     }
   }
 
+  hueUtils.changeURL = function (newURL) {
+    window.history.pushState(null, null, newURL);
+  }
+
 }(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {

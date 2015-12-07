@@ -65,11 +65,11 @@ ${ assist.assistPanel() }
       <i class="fa fa-th muted"></i>
     </li>
     <li>
-      <a href="javascript:void(0);" data-bind="click: function() { database(null) }">${_('Databases')}</a><span class="divider">&gt;</span>
+      <a href="javascript:void(0);" data-bind="click: function() { database(null); huePubSub.publish('metastore.url.change'); }">${_('Databases')}</a><span class="divider">&gt;</span>
     </li>
     <!-- ko with: database -->
     <li>
-      <a href="javascript:void(0);" data-bind="text: name, click: function() { $root.database().table(null) }"></a><span class="divider">&gt;</span>
+      <a href="javascript:void(0);" data-bind="text: name, click: function() { $root.database().table(null); huePubSub.publish('metastore.url.change'); }"></a><span class="divider">&gt;</span>
     </li>
     <!-- ko with: table -->
     <li>
@@ -734,6 +734,7 @@ ${ assist.assistPanel() }
       if (! metastoreTable.loaded()) {
         metastoreTable.load();
       }
+      huePubSub.publish('metastore.url.change');
     }
 
     /**
@@ -983,6 +984,7 @@ ${ assist.assistPanel() }
 
       var setDatabaseByName = function (databaseName) {
         if (self.database() && self.database().name == databaseName) {
+          huePubSub.publish('metastore.url.change');
           return;
         }
         var foundDatabases = $.grep(self.databases(), function (database) {
@@ -997,6 +999,7 @@ ${ assist.assistPanel() }
         setDatabaseByName(tableDef.database);
         if (self.database()) {
           if (self.database().table() && self.database().table().name == tableDef.name) {
+            huePubSub.publish('metastore.url.change');
             return;
           }
 
@@ -1028,6 +1031,18 @@ ${ assist.assistPanel() }
         $.totalStorage('spark_left_panel_visible', newValue);
       });
 
+      huePubSub.subscribe('metastore.url.change', function () {
+        if (self.database() && self.database().table()) {
+          hueUtils.changeURL('/metastore/table/' + self.database().name + '/' + self.database().table().name);
+        }
+        else if (self.database()){
+          hueUtils.changeURL('/metastore/tables/' + self.database().name);
+        }
+        else {
+          hueUtils.changeURL('metastore/databases');
+        }
+      });
+
       // TODO: Move queries into MetastoreTable
       self.loadingQueries = ko.observable(false);
       self.queries = ko.observableArray([]);
@@ -1040,6 +1055,7 @@ ${ assist.assistPanel() }
       if (! metastoreDatabase.loaded()) {
         metastoreDatabase.load();
       }
+      huePubSub.publish('metastore.url.change');
     }
 
     $(document).ready(function () {
