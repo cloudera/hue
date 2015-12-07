@@ -357,19 +357,25 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables-actions">
+  % if has_write_access:
+  <div class="inline-block pull-right">
+    <a class="inactive-action" href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}"><i class="fa fa-files-o"></i></a>
+    <a class="inactive-action margin-left-10" href="${ url('beeswax:create_table', database=database) }" title="${_('Create a new table manually')}"><i class="fa fa-wrench"></i></a>
+  </div>
+  % endif
 </script>
 
 <script type="text/html" id="metastore-describe-table-actions">
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
-    <a class="inactive-action margin-left-5" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
-    <a class="inactive-action margin-left-5" href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
+    <a class="inactive-action margin-left-10" href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
-      <a class="inactive-action margin-left-5" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
+      <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
     % endif
-    <a class="inactive-action margin-left-5" href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
+    <a class="inactive-action margin-left-10" href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
     % if table.partition_keys:
-      <a class="inactive-action margin-left-5" href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
+      <a class="inactive-action margin-left-10" href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
     % endif
   </div>
 </script>
