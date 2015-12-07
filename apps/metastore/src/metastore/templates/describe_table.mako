@@ -65,11 +65,17 @@ ${ assist.assistPanel() }
       <i class="fa fa-th muted"></i>
     </li>
     <li>
-      <a href="javascript:void(0);" data-bind="click: function() { database(null); huePubSub.publish('metastore.url.change'); }">${_('Databases')}</a><span class="divider">&gt;</span>
+      <a href="javascript:void(0);" data-bind="click: function() { database(null); huePubSub.publish('metastore.url.change'); }">${_('Databases')}</a>
+      <!-- ko if: database -->
+      <span class="divider">&gt;</span>
+      <!-- /ko -->
     </li>
     <!-- ko with: database -->
     <li>
-      <a href="javascript:void(0);" data-bind="text: name, click: function() { $root.database().table(null); huePubSub.publish('metastore.url.change'); }"></a><span class="divider">&gt;</span>
+      <a href="javascript:void(0);" data-bind="text: name, click: function() { $root.database().table(null); huePubSub.publish('metastore.url.change'); }"></a>
+      <!-- ko if: table -->
+      <span class="divider">&gt;</span>
+      <!-- /ko -->
     </li>
     <!-- ko with: table -->
     <li>
