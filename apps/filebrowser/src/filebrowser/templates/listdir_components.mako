@@ -1782,6 +1782,7 @@ from django.utils.translation import ugettext as _
       });
 
       $(".create-file-link").click(function () {
+	    $("#newFileNameInput").val('');
         $("#createFileModal").modal({
           keyboard:true,
           show:true
