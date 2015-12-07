@@ -393,11 +393,20 @@ ${ commonshare() | n,unicode }
       $.post("/desktop/api/tag/add_tag", {
         name: tag_name
       },function (data) {
-        data.name = hueUtils.htmlEncode(data.name);
-        viewModel.createTag(data);
-        $("#tagsNew").val("");
-        $(document).trigger("info", "${_('Project created')}");
-        $("#addTagModal").modal("hide");
+	  if(data.status==-1)
+          {
+            $("#saveProjectAlert span").text("${_('project name already exists')}");
+            $("#saveProjectAlert").show();
+            resetPrimaryButtonsStatus(); //globally available
+          }
+        else
+		  {
+            data.name = hueUtils.htmlEncode(data.name);
+            viewModel.createTag(data);
+            $("#tagsNew").val("");
+            $(document).trigger("info", "${_('Project created')}");
+            $("#addTagModal").modal("hide");
+		  }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", "${_("There was an error processing your action: ")}" + xhr.responseText); // reserved name, duplicate etc
       });
@@ -412,7 +421,9 @@ ${ commonshare() | n,unicode }
   });
 
   function addTag() {
+    $("#tagsNew").val('');
     $("#addTagModal").modal("show");
+	$("#saveProjectAlert").hide();
   }
 
   function removeTag() {
