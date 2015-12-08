@@ -762,7 +762,7 @@ def _submit_bundle(request, bundle, properties):
 
       coordinator = Coordinator(document=coord)
       coord_dir = Submission(request.user, coordinator, request.fs, request.jt, properties).deploy()
-      deployment_mapping['coord_%s_dir' % i] = coord_dir
+      deployment_mapping['coord_%s_dir' % i] = request.fs.get_hdfs_path(coord_dir)
       deployment_mapping['coord_%s' % i] = coord
 
     properties.update(deployment_mapping)
