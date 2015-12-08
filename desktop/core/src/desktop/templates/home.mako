@@ -296,6 +296,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       </p>
     </div>
     <div class="modal-footer">
+	  <div id="saveProjectAlert" class="alert-message error hide" style="position: absolute; left: 78px;">
+          <span class="label label-important"></span>
+      </div>
       <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
       <a id="tagsNewBtn" href="#" class="btn btn-primary disable-feedback">${ _('Add') }</a>
     </div>
@@ -378,14 +381,32 @@ ${ commonshare() | n,unicode }
 
     $("#tagsNewBtn").on("click", function () {
       var tag_name = $("#tagsNew").val();
+	  
+	  if ($.trim(tag_name) == "") {
+       $("#saveProjectAlert span").text("${_('File name is required.')}");
+       $("#saveProjectAlert").show();
+       $("#tagsNew").addClass("fieldError");
+       resetPrimaryButtonsStatus(); //globally available
+       return false;
+      }
+
       $.post("/desktop/api/tag/add_tag", {
         name: tag_name
       },function (data) {
-        data.name = hueUtils.htmlEncode(data.name);
-        viewModel.createTag(data);
-        $("#tagsNew").val("");
-        $(document).trigger("info", "${_('Project created')}");
-        $("#addTagModal").modal("hide");
+	  if(data.status==-1)
+          {
+            $("#saveProjectAlert span").text("${_('project name already exists')}");
+            $("#saveProjectAlert").show();
+            resetPrimaryButtonsStatus(); //globally available
+          }
+        else
+		  {
+            data.name = hueUtils.htmlEncode(data.name);
+            viewModel.createTag(data);
+            $("#tagsNew").val("");
+            $(document).trigger("info", "${_('Project created')}");
+            $("#addTagModal").modal("hide");
+		  }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", "${_("There was an error processing your action: ")}" + xhr.responseText); // reserved name, duplicate etc
       });
@@ -400,7 +421,9 @@ ${ commonshare() | n,unicode }
   });
 
   function addTag() {
+    $("#tagsNew").val('');
     $("#addTagModal").modal("show");
+	$("#saveProjectAlert").hide();
   }
 
   function removeTag() {
