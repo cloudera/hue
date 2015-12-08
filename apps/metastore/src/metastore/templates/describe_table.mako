@@ -310,7 +310,7 @@ ${ assist.assistPanel() }
       </div>
     % endif
   </div>
-  <table id="databasesTable" class="table table-condensed datatables">
+  <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px">
     <thead>
     <tr>
       <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
@@ -328,6 +328,7 @@ ${ assist.assistPanel() }
     </tr>
     </tbody>
   </table>
+  <span class="margin-left-10" data-bind="visible: filteredDatabases().length === 0" style="font-style: italic; display: none;">${_('No databases found')}</span>
 </script>
 
 <script type="text/html" id="metastore-tables">
@@ -362,7 +363,7 @@ ${ assist.assistPanel() }
     % endif
   </div>
 
-  <table id="tablesTable" class="table table-condensed datatables" data-tablescroller-disable="true">
+  <table id="tablesTable" class="table table-condensed datatables" style="margin-bottom: 10px">
     <thead>
     <tr>
       <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
@@ -394,6 +395,7 @@ ${ assist.assistPanel() }
       </tr>
     </tbody>
   </table>
+  <span class="margin-left-10" data-bind="visible: filteredTables().length === 0" style="font-style: italic; display: none;">${_('No tables found')}</span>
 </script>
 
 <script type="text/html" id="metastore-databases-actions">
