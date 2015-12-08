@@ -310,7 +310,7 @@ ${ assist.assistPanel() }
       </div>
     % endif
   </div>
-  <table class="table table-condensed datatables">
+  <table id="databasesTable" class="table table-condensed datatables">
     <thead>
     <tr>
       <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
@@ -320,7 +320,7 @@ ${ assist.assistPanel() }
     <tbody data-bind="foreach: filteredDatabases">
     <tr>
       <td width="1%" style="text-align: center">
-        <div class="hueCheckbox fa" data-bind="value: $data, hueChecked: $parent.selectedDatabases"></div>
+        <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
       </td>
       <td>
         <a href="javascript: void(0);" data-bind="text: name, click: function () { $parent.setDatabase($data) }"></a>
@@ -362,7 +362,7 @@ ${ assist.assistPanel() }
     % endif
   </div>
 
-  <table class="table table-condensed datatables" data-tablescroller-disable="true">
+  <table id="tablesTable" class="table table-condensed datatables" data-tablescroller-disable="true">
     <thead>
     <tr>
       <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
@@ -374,10 +374,10 @@ ${ assist.assistPanel() }
     </thead>
     <tbody data-bind="foreach: filteredTables">
       <tr>
-        <td data-row-selector-exclude="true" width="1%" style="text-align: center">
-          <div class="hueCheckbox fa" data-bind="value: $data, hueChecked: $parent.selectedTables"></div>
+        <td width="1%" style="text-align: center">
+          <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
         </td>
-        <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+        <td><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
         <td>
           <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
         </td>
