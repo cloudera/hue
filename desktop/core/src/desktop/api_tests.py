@@ -45,12 +45,12 @@ class TestDocModelTags():
     grant_access(self.user.username, self.user.username, "desktop")
     grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
 
-  def add_tag(self, name):
+  def add_tag(self, name, expected_status=0):
     response = self.client.post("/desktop/api/tag/add_tag", {'name': name})
     content = json.loads(response.content)
-    assert_equal(content['status'], 0, content)
+    assert_equal(content['status'], expected_status, content)
 
-    return content['id']
+    return content.get('id')
 
   def add_doc(self, name):
     script = PigScript.objects.create(owner=self.user)
@@ -97,7 +97,7 @@ class TestDocModelTags():
     tag_id = self.add_tag(tag_name)
     assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
 
-    tag_id = self.add_tag(tag_name)
+    tag_id = self.add_tag(tag_name, expected_status=-1)
     assert_equal(n + 1, DocumentTag.objects.filter(owner=self.user, tag=tag_name).count())
 
   def test_add_and_clean_duplicate_tag(self):
