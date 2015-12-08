@@ -377,7 +377,15 @@ ${ assist.assistPanel() }
         <td width="1%" style="text-align: center">
           <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
         </td>
-        <td><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
+        <td><span class="blue" data-bind="component: { name: 'table-stats', params: {
+            alwaysActive: true,
+            statsVisible: true,
+            sourceType: 'hive',
+            databaseName: database.name,
+            tableName: name,
+            fieldType: type,
+            assistHelper: assistHelper
+          } }"></span></td>
         <td>
           <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
         </td>
