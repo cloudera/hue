@@ -291,20 +291,36 @@ ${ assist.assistPanel() }
   <div class="actionbar-actions">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
     % if has_write_access:
-      <button id="dropBtn" class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+      <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+      <div id="dropDatabase" class="modal hide fade">
+        <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
+          ${ csrf_token(request) | n,unicode }
+          <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">×</a>
+            <h3 id="dropDatabaseMessage">${ _('Do you really want to delete the database(s)?') }</h3>
+          </div>
+          <div class="modal-footer">
+            <input type="button" class="btn" data-dismiss="modal" value="Cancel">
+            <input type="submit" data-bind="click: function () { huePubSub.publish('assist.refresh'); selectedDatabases([]); return true; }" class="btn btn-danger" value="${_('Yes')}"/>
+          </div>
+          <!-- ko foreach: selectedDatabases -->
+          <input type="hidden" name="database_selection" data-bind="value: name" />
+          <!-- /ko -->
+        </form>
+      </div>
     % endif
   </div>
   <table class="table table-condensed datatables">
     <thead>
     <tr>
-      <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="databaseCheck"></div></th>
+      <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
     <tbody data-bind="foreach: filteredDatabases">
     <tr>
-      <td data-row-selector-exclude="true" width="1%">
-        <div class="hueCheckbox databaseCheck fa"></div>
+      <td width="1%" style="text-align: center">
+        <div class="hueCheckbox fa" data-bind="value: $data, hueChecked: $parent.selectedDatabases"></div>
       </td>
       <td>
         <a href="javascript: void(0);" data-bind="text: name, click: function () { $parent.setDatabase($data) }"></a>
@@ -982,6 +998,8 @@ ${ assist.assistPanel() }
 
       self.loading = ko.observable(true);
       self.databases = ko.observableArray();
+
+      self.selectedDatabases = ko.observableArray();
 
       self.databaseQuery = ko.observable('').extend({ rateLimit: 150 });
 
