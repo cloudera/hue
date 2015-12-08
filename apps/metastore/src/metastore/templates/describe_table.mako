@@ -323,17 +323,33 @@ ${ assist.assistPanel() }
     ## ${ database_meta.get('owner_type') }
     ## ${ database_meta.get('parameters') }
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
-    <button id="viewBtn" class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-eye"></i> ${_('View')}</button>
-    <button id="browseBtn" class="btn toolbarBtn" title="${_('Browse the selected table')}" disabled="disabled"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
+    <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { table(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
+    <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/metastore/table/' + name + '/' + selectedTables()[0].name + '/read'; }, disable: selectedTables().length !== 1"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
     % if has_write_access:
-      <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" disabled="disabled"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+      <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+      <div id="dropTable" class="modal hide fade">
+        <form id="dropTableForm" data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
+          ${ csrf_token(request) | n,unicode }
+          <div class="modal-header">
+            <a href="#" class="close" data-dismiss="modal">&times;</a>
+            <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
+          </div>
+          <div class="modal-footer">
+            <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+            <input type="submit" data-bind="click: function () { huePubSub.publish('assist.refresh'); selectedTables([]); return true; }" class="btn btn-danger" value="${_('Yes')}"/>
+          </div>
+          <!-- ko foreach: selectedTables -->
+          <input type="hidden" name="table_selection" data-bind="value: name" />
+          <!-- /ko -->
+        </form>
+      </div>
     % endif
   </div>
 
   <table class="table table-condensed datatables" data-tablescroller-disable="true">
     <thead>
     <tr>
-      <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="tableCheck"></div></th>
+      <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
       <th>&nbsp;</th>
       <th>${ _('Table Name') }</th>
       <th>${ _('Comment') }</th>
@@ -342,8 +358,8 @@ ${ assist.assistPanel() }
     </thead>
     <tbody data-bind="foreach: filteredTables">
       <tr>
-        <td data-row-selector-exclude="true" width="1%">
-          <div class="hueCheckbox tableCheck fa"></div>
+        <td data-row-selector-exclude="true" width="1%" style="text-align: center">
+          <div class="hueCheckbox fa" data-bind="value: $data, hueChecked: $parent.selectedTables"></div>
         </td>
         <td class="row-selector-exclude"><a href="javascript:void(0)" data-table="customers"><i class="fa fa-bar-chart" title="${ _('View statistics') }"></i></a></td>
         <td>
@@ -700,6 +716,8 @@ ${ assist.assistPanel() }
         });
       });
 
+      self.selectedTables = ko.observableArray();
+
       self.table = ko.observable(null);
     }
 
@@ -1031,6 +1049,13 @@ ${ assist.assistPanel() }
           }
         }
       }
+
+      huePubSub.subscribe('assist.refresh', function () {
+        self.assistHelper.clearCache({
+          sourceType: 'hive',
+          clearAll: true
+        });
+      });
 
       huePubSub.subscribe("assist.table.selected", loadTableDef);
 
