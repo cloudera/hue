@@ -30,6 +30,7 @@ case class CreateBatchRequest(
     driverCores: Option[Int] = None,
     executorMemory: Option[String] = None,
     executorCores: Option[Int] = None,
+    totalExecutorCores: Option[Int] = None,
     numExecutors: Option[Int] = None,
     archives: List[String] = List(),
     queue: Option[String] = None,

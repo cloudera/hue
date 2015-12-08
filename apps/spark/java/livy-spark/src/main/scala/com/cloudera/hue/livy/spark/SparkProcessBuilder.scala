@@ -167,6 +167,14 @@ class SparkProcessBuilder(livyConf: LivyConf, userConfigurableOptions: Set[Strin
     conf("spark.executor.cores", executorCores)
   }
 
+  def totalExecutorCores(totalExecutorCores: Int): SparkProcessBuilder = {
+    this.totalExecutorCores(totalExecutorCores.toString)
+  }
+
+  def totalExecutorCores(totalExecutorCores: String): SparkProcessBuilder = {
+    conf("spark.totalExecutor.cores", totalExecutorCores)
+  }
+
   def executorMemory(executorMemory: String): SparkProcessBuilder = {
     conf("spark.executor.memory", executorMemory)
   }
