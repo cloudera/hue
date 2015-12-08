@@ -417,16 +417,20 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-describe-table-actions">
   <div class="inline-block pull-right">
+    <!-- ko with: database -->
+    <!-- ko with: table -->
     <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
-    <a class="inactive-action margin-left-10" href="${ url('metastore:read_table', database=database, table='a') }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
     % endif
     <a class="inactive-action margin-left-10" href="${ 'table.hdfs_link' }" rel="${ 'table.path_location' }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
-##     % if table.partition_keys:
-##       <a class="inactive-action margin-left-10" href="${ url('metastore:describe_partitions', database=database, table='a') }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
-##     % endif
+    <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap"></i></a>
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
   </div>
 </script>
 
@@ -440,9 +444,9 @@ ${ assist.assistPanel() }
   <ul class="nav nav-pills margin-top-30">
     <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
-##     % if table.partition_keys:
-##       <li><a href="#partitions" data-toggle="tab">${_('Partitions')} (${ len(partitions) })</a></li>
-##     % endif
+    <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
+       <li><a href="#partitions" data-toggle="tab">${_('Partitions')} <span data-bind="text: '(' + tableDetails().partition_keys.length + ')'"></span></a></li>
+    <!-- /ko -->
     <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
     <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
     <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
