@@ -180,11 +180,11 @@ ${ require.config() }
         &nbsp;&nbsp;&nbsp;
 
         % if mode == 'editor':
-        <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('New %s Query') % editor_type.title() }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         % else:
-        <a class="btn" href="${ url('notebook:editor') }" title="${ _('New Query') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:new') }" title="${ _('New Notebook') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         % endif
@@ -197,8 +197,9 @@ ${ require.config() }
       <div class="nav-collapse">
         <ul class="nav editor-nav">
           <li class="currentApp">
-            <a href="#">
-            %if mode=='editor':
+
+            % if mode == 'editor':
+              <a href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('%s Editor') % editor_type.title() }" style="cursor: pointer">
               % if editor_type == 'impala':
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
                 Impala
@@ -209,15 +210,22 @@ ${ require.config() }
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               % endif
-            %else:
+              </a>
+            % else:
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
                 Notebook
-            %endif
-            </a>
+            % endif
           </li>
           <!-- ko foreach: notebooks -->
-          <li class="query-name"><a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right'}"></span></a></li>
-          <li><a href="javascript:void(0)"><span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span></a></li>
+          <li class="query-name">
+            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right'}"></span></a>
+          </li>
+          <li>
+            <a href="javascript:void(0)">
+              <span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}">
+              </span>
+            </a>
+          </li>
           <!-- /ko -->
         </ul>
       </div>
@@ -959,6 +967,7 @@ ${ require.config() }
     <input type="submit" data-dismiss="modal" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); window.setTimeout(redrawFixedHeaders, 100); $root.removeSnippetConfirmation(null); }" />
   </div>
 </div>
+
 
 <div id="sessionsDemiModal" class="demi-modal fade" data-backdrop="false">
   <a href="javascript: void(0)" data-dismiss="modal" class="pull-right" style="margin: 10px"><i class="fa fa-times"></i></a>
