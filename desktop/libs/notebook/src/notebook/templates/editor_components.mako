@@ -408,7 +408,7 @@ ${ require.config() }
           </tr>
         </thead>
         <tbody data-bind="foreach: $parent.history">
-          <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { $parent.ace().setValue(query); history.pushState(null, null, url); $('.right-panel').animate({ scrollTop: '0px' }); } }">
+          <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { history.pushState(null, null, url); location.href=url; } }">
             <td><code data-bind="text: query" style="white-space: normal"></code></td>
             <td style="width: 200px" class="muted"><span data-bind="text: moment(lastExecuted).format('LLL')"></span></td>
           </tr>
