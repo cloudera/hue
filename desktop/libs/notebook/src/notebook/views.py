@@ -72,7 +72,7 @@ def editor(request):
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = 'Untitled %s Query' % editor_type.title()
+    data['name'] = 'Unsaved %s Query' % editor_type.title()
     data['type'] = 'query-%s' % editor_type
     editor.data = json.dumps(data)
 
