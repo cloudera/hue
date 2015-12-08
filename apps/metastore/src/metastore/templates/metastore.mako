@@ -28,13 +28,13 @@ from django.utils.translation import ugettext as _
 <%namespace name="require" file="/require.mako" />
 
 <%
-  if table.is_view:
+  if table and table.is_view:
     view_or_table_noun = _("View")
   else:
     view_or_table_noun = _("Table")
 %>
 
-${ commonheader(_("%s : %s") % (view_or_table_noun, table.name), app_name, user) | n,unicode }
+${ commonheader(_("Metastore"), app_name, user) | n,unicode }
 ${ components.menubar() }
 
 ${ require.config() }
@@ -378,7 +378,7 @@ ${ assist.assistPanel() }
         <td width="1%" style="text-align: center">
           <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
         </td>
-        <td><span class="blue" data-bind="component: { name: 'table-stats', params: {
+        <td width="1%"><span class="blue" data-bind="component: { name: 'table-stats', params: {
             alwaysActive: true,
             statsVisible: true,
             sourceType: 'hive',
@@ -419,14 +419,14 @@ ${ assist.assistPanel() }
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
-    <a class="inactive-action margin-left-10" href="${ url('metastore:read_table', database=database, table=table.name) }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    <a class="inactive-action margin-left-10" href="${ url('metastore:read_table', database=database, table='a') }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
     % endif
-    <a class="inactive-action margin-left-10" href="${ table.hdfs_link }" rel="${ table.path_location }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
-    % if table.partition_keys:
-      <a class="inactive-action margin-left-10" href="${ url('metastore:describe_partitions', database=database, table=table.name) }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
-    % endif
+    <a class="inactive-action margin-left-10" href="${ 'table.hdfs_link' }" rel="${ 'table.path_location' }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
+##     % if table.partition_keys:
+##       <a class="inactive-action margin-left-10" href="${ url('metastore:describe_partitions', database=database, table='a') }" title="${_('Show Partitions')} (${ len(partitions) })"><i class="fa fa-sitemap"></i></a>
+##     % endif
   </div>
 </script>
 
@@ -440,9 +440,9 @@ ${ assist.assistPanel() }
   <ul class="nav nav-pills margin-top-30">
     <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
-    % if table.partition_keys:
-      <li><a href="#partitions" data-toggle="tab">${_('Partitions')} (${ len(partitions) })</a></li>
-    % endif
+##     % if table.partition_keys:
+##       <li><a href="#partitions" data-toggle="tab">${_('Partitions')} (${ len(partitions) })</a></li>
+##     % endif
     <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
     <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
     <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
@@ -496,13 +496,13 @@ ${ assist.assistPanel() }
         <!-- /ko -->
       </div>
 
-      % if table.partition_keys:
-        <div class="tile">
-          <h4>${ _('Partitions') } (${ len(partitions) })</h4>
-          ${ partition_values(partitions, "partitionTable", limit=3) }
-          <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
-        </div>
-      % endif
+##       % if table.partition_keys:
+##         <div class="tile">
+##           <h4>${ _('Partitions') } (${ len(partitions) })</h4>
+##           ${ partition_values(partitions, "partitionTable", limit=3) }
+##           <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
+##         </div>
+##       % endif
     </div>
 
     <div class="tab-pane" id="columns">
@@ -511,19 +511,19 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
-    % if table.partition_keys:
-      <div class="tab-pane" id="partitions">
-        <h4>${ _('Columns') } (${ len(table.partition_keys) })</h4>
-        ${ partition_column_table(table.partition_keys, "partitionTable") }
-
-        <h4>${ _('Values') } (${ len(partitions) })</h4>
-        ${ partition_values(partitions, "partitionTable", limit=25) }
-
-        <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
-          ${ _('View all') }
-        </a>
-      </div>
-    %endif
+##     % if table.partition_keys:
+##       <div class="tab-pane" id="partitions">
+##         <h4>${ _('Columns') } (${ len(table.partition_keys) })</h4>
+##         ${ partition_column_table(table.partition_keys, "partitionTable") }
+##
+##         <h4>${ _('Values') } (${ len(partitions) })</h4>
+##         ${ partition_values(partitions, "partitionTable", limit=25) }
+##
+##         <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
+##           ${ _('View all') }
+##         </a>
+##       </div>
+##     %endif
 
     <div class="tab-pane" id="sample">
       <!-- ko with: samples -->
@@ -577,13 +577,13 @@ ${ assist.assistPanel() }
         </tr>
         </thead>
         <tbody>
-          % for prop in table.properties:
-            <tr>
-              <td>${ smart_unicode(prop['col_name']) }</td>
-              <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
-              <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
-            </tr>
-          % endfor
+##           % for prop in table.properties:
+##             <tr>
+##               <td>${ smart_unicode(prop['col_name']) }</td>
+##               <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
+##               <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
+##             </tr>
+##           % endfor
         </tbody>
       </table>
     </div>
@@ -658,7 +658,7 @@ ${ assist.assistPanel() }
     </div>
     <div class="hide">
       <select name="table_selection">
-        <option value="${ table.name }" selected>${ table.name }</option>
+##         <option value="${ table.name }" selected>${ table.name }</option>
       </select>
     </div>
   </form>
@@ -874,9 +874,9 @@ ${ assist.assistPanel() }
 
       self.comment.subscribe(function (newValue) {
         // TODO: Switch to using the ko observables in the url (self.database.name() and self.name())
-        $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
-          comment: newValue ? newValue : ""
-        });
+##         $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
+##           comment: newValue ? newValue : ""
+##         });
       })
 
       self.refreshTableStats = function () {
@@ -972,17 +972,17 @@ ${ assist.assistPanel() }
 
       self.comment.subscribe(function (newValue) {
         // TODO: Switch to using the ko observables in the url (self.table.name() and self.table.database.name();
-        $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
-          column: self.name(),
-          comment: newValue
-        }, function () {
-          self.vm.assistHelper.clearCache({
-            sourceType: 'hive',
-            databaseName: self.table.database.name,
-            tableName: self.table.name,
-            fields: []
-          })
-        });
+##         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
+##           column: self.name(),
+##           comment: newValue
+##         }, function () {
+##           self.vm.assistHelper.clearCache({
+##             sourceType: 'hive',
+##             databaseName: self.table.database.name,
+##             tableName: self.table.name,
+##             fields: []
+##           })
+##         });
       })
     }
 
@@ -1000,9 +1000,9 @@ ${ assist.assistPanel() }
       self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
       var tableComment = null;
-      %if table.comment:
-        tableComment = '${ smart_unicode(table.comment) }';
-      %endif
+##       %if table.comment:
+##         tableComment = '${ smart_unicode(table.comment) }';
+##       %endif
 
       self.assistHelper = new AssistHelper(options)
 
@@ -1116,11 +1116,15 @@ ${ assist.assistPanel() }
         var path = window.location.pathname.split('/');
         switch (path[2]) {
           case 'databases':
-            self.database().table(null);
-            self.database(null);
+            if (self.database()){
+              self.database().table(null);
+              self.database(null);
+            }
             break;
           case 'tables':
-            self.database().table(null);
+            if (self.database()) {
+              self.database().table(null);
+            }
             setDatabaseByName(path[3]);
             break;
           case 'table':
@@ -1164,10 +1168,10 @@ ${ assist.assistPanel() }
       $('a[data-toggle="tab"]').on('shown', function (e) {
         if ($(e.target).attr("href") == "#queries") {
           viewModel.loadingQueries(true);
-          $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
-            viewModel.queries(data.queries);
-            viewModel.loadingQueries(false);
-          });
+##           $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
+##             viewModel.queries(data.queries);
+##             viewModel.loadingQueries(false);
+##           });
         }
       });
 
@@ -1224,7 +1228,7 @@ ${ assist.assistPanel() }
 
       for (var id in sortables) {
         $("#" + id).addClass("initialized");
-        % if len(table.cols) < 1000:
+##         % if len(table.cols) < 1000:
 ##         $("#" + id).dataTable({
 ##           "aoColumns": sortables[id],
 ##           "bPaginate": false,
@@ -1246,7 +1250,7 @@ ${ assist.assistPanel() }
 ##             "sZeroRecords": "${_('No matching records')}"
 ##           }
 ##         });
-        % endif
+##         % endif
       }
       if ($(e.target).attr("href") == "#columnAnalysisTerms") {
         $("#columnAnalysis .filter").removeClass("hide");
@@ -1257,11 +1261,11 @@ ${ assist.assistPanel() }
     });
 
     $("#import-data-btn").click(function () {
-      $.get("${ url('metastore:load_table', database=database, table=table.name) }", function (response) {
-          $("#import-data-modal").html(response['data']);
-          $("#import-data-modal").modal("show");
-        }
-      );
+##       $.get("${ url('metastore:load_table', database=database, table=table.name) }", function (response) {
+##           $("#import-data-modal").html(response['data']);
+##           $("#import-data-modal").modal("show");
+##         }
+##       );
     });
 
     // convert link text to URLs in comment column (Columns tab)
@@ -1269,18 +1273,18 @@ ${ assist.assistPanel() }
 
     $('a[data-toggle="tab"]:eq(0)').click();
 
-    $("a[data-column]").on("click", function () {
-      var _link = $(this);
-      var _col = _link.data("column");
-      var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
-      var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/" + _col;
-      var termsUrl = "/beeswax/api/table/${database}/${table.name}/terms/" + _col + "/";
-      $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
-      $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-      showColumnStats(statsUrl, refreshUrl, termsUrl, _col, STATS_PROBLEMS, function () {
-        $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-      });
-    });
+##     $("a[data-column]").on("click", function () {
+##       var _link = $(this);
+##       var _col = _link.data("column");
+##       var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
+##       var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/" + _col;
+##       var termsUrl = "/beeswax/api/table/${database}/${table.name}/terms/" + _col + "/";
+##       $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
+##       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+##       showColumnStats(statsUrl, refreshUrl, termsUrl, _col, STATS_PROBLEMS, function () {
+##         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+##       });
+##     });
 
     $(document).on("click", "#columnAnalysis .close-popover", function () {
       $("#columnAnalysis").hide();

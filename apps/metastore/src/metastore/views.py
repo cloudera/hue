@@ -72,13 +72,20 @@ def databases(request):
   db = dbms.get(request.user)
   databases = db.get_databases(search_filter)
 
-  return render("databases.mako", request, {
+  return render("metastore.mako", request, {
     'breadcrumbs': [],
-    'search_filter': search_filter,
-    'databases': databases,
-    'databases_json': json.dumps(databases),
+    'database': None,
+    'partitions': [],
     'has_write_access': has_write_access(request.user),
   })
+
+  # return render("databases.mako", request, {
+  #   'breadcrumbs': [],
+  #   'search_filter': search_filter,
+  #   'databases': databases,
+  #   'databases_json': json.dumps(databases),
+  #   'has_write_access': has_write_access(request.user),
+  # })
 
 
 @check_has_write_access_permission
@@ -173,21 +180,27 @@ def show_tables(request, database=None):
         'search_filter': search_filter
     })
   else:
-    resp = render("tables.mako", request, {
-      'breadcrumbs': [
-        {
-          'name': database,
-          'url': reverse('metastore:show_tables', kwargs={'database': database})
-        }
-      ],
-      'database_meta': database_meta,
-      'tables': tables,
-      'db_form': db_form,
-      'search_filter': search_filter,
-      'database': database,
-      'table_names': json.dumps(table_names),
-      'has_write_access': has_write_access(request.user),
+    resp = render("metastore.mako", request, {
+    'breadcrumbs': [],
+    'database': None,
+    'partitions': [],
+    'has_write_access': has_write_access(request.user),
     })
+    # resp = render("tables.mako", request, {
+    #   'breadcrumbs': [
+    #     {
+    #       'name': database,
+    #       'url': reverse('metastore:show_tables', kwargs={'database': database})
+    #     }
+    #   ],
+    #   'database_meta': database_meta,
+    #   'tables': tables,
+    #   'db_form': db_form,
+    #   'search_filter': search_filter,
+    #   'database': database,
+    #   'table_names': json.dumps(table_names),
+    #   'has_write_access': has_write_access(request.user),
+    # })
 
   resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
@@ -240,7 +253,7 @@ def describe_table(request, database, table):
         'stats': table.stats
     })
   else:  # Render HTML
-    renderable = "describe_table.mako"
+    renderable = "metastore.mako"
 
     partitions = None
     if app_name != 'impala' and table.partition_keys:
