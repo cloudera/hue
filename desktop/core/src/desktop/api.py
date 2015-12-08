@@ -214,29 +214,24 @@ def massage_doc_for_json(document, user, url=''):
 
 def valid_project(name):
   project_doc = DocumentTag.objects.filter(tag=name)
-  num = len(project_doc)
-  if num > 1:
-    return -1
-  if num == 0:
-    return 0
-  return -1
-  
+  return len(project_doc) == 0
+
+
 @require_POST
 def add_tag(request):
   response = {'status': -1, 'message': ''}
-  
 
   try:
     validstatus = valid_project(name=request.POST['name'])
-    if validstatus == 0:
-         tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
-         response['name'] = request.POST['name']
-         response['id'] = tag.id
-         response['docs'] = []
-         response['owner'] = request.user.username
-         response['status'] = 0
-	else:
-         response['status'] = -1
+    if validstatus:
+      tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
+      response['name'] = request.POST['name']
+      response['id'] = tag.id
+      response['docs'] = []
+      response['owner'] = request.user.username
+      response['status'] = 0
+    else:
+      response['status'] = -1
   except KeyError, e:
     response['message'] = _('Form is missing %s field') % e.message
   except Exception, e:
