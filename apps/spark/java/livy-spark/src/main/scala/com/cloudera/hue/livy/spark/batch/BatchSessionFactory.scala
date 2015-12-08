@@ -50,6 +50,7 @@ abstract class BatchSessionFactory(factory: SparkProcessBuilderFactory) extends 
     request.driverCores.foreach(builder.driverCores)
     request.executorMemory.foreach(builder.executorMemory)
     request.executorCores.foreach(builder.executorCores)
+	request.totalExecutorCores.foreach(builder.totalExecutorCores)
     request.numExecutors.foreach(builder.numExecutors)
     request.archives.map(RelativePath).foreach(builder.archive)
     request.queue.foreach(builder.queue)

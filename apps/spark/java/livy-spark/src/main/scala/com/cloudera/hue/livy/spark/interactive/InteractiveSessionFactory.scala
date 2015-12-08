@@ -69,6 +69,7 @@ abstract class InteractiveSessionFactory(processFactory: SparkProcessBuilderFact
     request.driverCores.foreach(builder.driverCores)
     request.driverMemory.foreach(builder.driverMemory)
     request.executorCores.foreach(builder.executorCores)
+	request.totalExecutorCores.foreach(builder.totalExecutorCores)
     request.executorMemory.foreach(builder.executorMemory)
     request.numExecutors.foreach(builder.numExecutors)
     request.files.map(RelativePath).foreach(builder.file)

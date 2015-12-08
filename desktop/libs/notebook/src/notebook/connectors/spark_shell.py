@@ -52,6 +52,7 @@ class SparkApi(Api):
     {'name': 'driverCores', 'nice_name': _('Driver Cores'), 'default': '1', 'type': 'number', 'is_yarn': True},
     {'name': 'executorMemory', 'nice_name': _('Executors Memory'), 'default': '1', 'type': 'jvm', 'is_yarn': True},
     {'name': 'executorCores', 'nice_name': _('Executor Cores'), 'default': '1', 'type': 'number', 'is_yarn': True},
+	{'name': 'totalExecutorCores', 'nice_name': _('Total Executor Cores'), 'default': '1', 'type': 'number', 'is_yarn': True},
     {'name': 'queue', 'nice_name': _('Queue'), 'default': '1', 'type': 'string', 'is_yarn': True},
     {'name': 'archives', 'nice_name': _('Archives'), 'default': '', 'type': 'csv-hdfs-files', 'is_yarn': True},
     {'name': 'numExecutors', 'nice_name': _('Executors Numbers'), 'default': '1', 'type': 'number', 'is_yarn': True},
