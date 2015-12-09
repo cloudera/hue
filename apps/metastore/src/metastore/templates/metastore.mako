@@ -1039,11 +1039,6 @@ ${ assist.assistPanel() }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-      var tableComment = null;
-##       %if table.comment:
-##         tableComment = '${ smart_unicode(table.comment) }';
-##       %endif
-
       self.assistHelper = new AssistHelper(options);
 
       self.loading = ko.observable(true);
