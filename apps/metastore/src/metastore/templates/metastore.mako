@@ -486,7 +486,9 @@ ${ assist.assistPanel() }
         <!-- ko template: "metastore-columns-table" --><!-- /ko -->
         <!-- /ko -->
 
-        <a class="pointer" data-bind="click: function() { $('li a[href=\'#columns\']').click(); }">${_('View more...')}</a>
+        <a class="pointer" data-bind="visible: columns().length > 3, click: function() { $('li a[href=\'#columns\']').click(); }">
+          ${_('View more...')}
+        </a>
       </div>
 
       <div class="tile" data-bind="visible: true" style="display: none;">
@@ -495,7 +497,9 @@ ${ assist.assistPanel() }
         <!-- ko if: loaded -->
         <!-- ko with: preview -->
         <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
-        <a class="pointer" data-bind="visible: rows().length, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">${_('View more...')}</a>
+        <a class="pointer" data-bind="visible: rows().length > 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
+          ${_('View more...')}
+        </a>
         <!-- /ko -->
         <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
         <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
@@ -509,7 +513,9 @@ ${ assist.assistPanel() }
         <!-- ko if: loaded -->
         <!-- ko with: preview -->
         <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
-        <a class="pointer" data-bind="visible: values().length, click: function() { $('li a[href=\'#partitions\']').click(); }"  style="display: none;">${_('View more...')}</a>
+        <a class="pointer" data-bind="visible: values().length > 3, click: function() { $('li a[href=\'#partitions\']').click(); }"  style="display: none;">
+          ${_('View more...')}
+      </a>
         <!-- /ko -->
         <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
         <!-- /ko -->
