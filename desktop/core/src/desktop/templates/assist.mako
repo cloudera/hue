@@ -222,7 +222,7 @@ from desktop.views import _ko
     <li class="nav-header" data-bind="visibleOnHover: { selector: '.hover-actions' }">
       ${_('databases')}
       <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: reload"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the databases list')}"></i></a>
+        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the databases list')}"></i></a>
       </div>
     </li>
     <li data-bind="visible: ! hasErrors()" >
