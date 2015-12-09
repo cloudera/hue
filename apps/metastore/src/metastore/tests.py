@@ -115,12 +115,13 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     # Table should have been created
-    response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
+    response = self.client.get("/metastore/tables/%s?filter=show_tables&format=json" % self.db_name)
     assert_equal(200, response.status_code)
-    assert_equal(len(response.context['tables']), 3)
-    assert_true('name' in response.context["tables"][0])
-    assert_true('comment' in response.context["tables"][0])
-    assert_true('type' in response.context["tables"][0])
+    data = json.loads(response.content)
+    assert_equal(len(data['tables']), 3)
+    assert_true('name' in data["tables"][0])
+    assert_true('comment' in data["tables"][0])
+    assert_true('type' in data["tables"][0])
 
     hql = """
         CREATE TABLE test_show_tables_4 (a int) COMMENT 'Test for show_tables';
@@ -130,12 +131,13 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     resp = wait_for_query_to_finish(self.client, resp, max=30.0)
 
     # Table should have been created
-    response = self.client.get("/metastore/tables/%s?filter=show_tables" % self.db_name)
+    response = self.client.get("/metastore/tables/%s?filter=show_tables&format=json" % self.db_name)
     assert_equal(200, response.status_code)
-    assert_equal(len(response.context['tables']), 5)
-    assert_true('name' in response.context["tables"][0])
-    assert_true('comment' in response.context["tables"][0])
-    assert_true('type' in response.context["tables"][0])
+    data = json.loads(response.content)
+    assert_equal(len(data['tables']), 5)
+    assert_true('name' in data["tables"][0])
+    assert_true('comment' in data["tables"][0])
+    assert_true('type' in data["tables"][0])
 
     hql = """
         CREATE INDEX test_index ON TABLE test_show_tables_1 (a) AS 'COMPACT' WITH DEFERRED REBUILD;
@@ -143,9 +145,10 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     resp = _make_query(self.client, hql, wait=True, local=False, max=30.0, database=self.db_name)
 
     # By default, index table should not appear in show tables view
-    response = self.client.get("/metastore/tables/%s" % self.db_name)
+    response = self.client.get("/metastore/tables/%s?format=json" % self.db_name)
     assert_equal(200, response.status_code)
-    assert_false('test_index' in response.context['tables'])
+    data = json.loads(response.content)
+    assert_false('test_index' in data['tables'])
 
   def test_describe_view(self):
     resp = self.client.get('/metastore/table/%s/myview' % self.db_name)
