@@ -631,6 +631,7 @@ ${ assist.assistPanel() }
       <h3>${_('Drop Table')}</h3>
     </div>
     <div class="modal-body">
+      <a data-bind="click: function () { console.log($data) }">Click me</a>
       <div id="dropTableMessage">
       </div>
     </div>
@@ -639,9 +640,7 @@ ${ assist.assistPanel() }
       <input type="submit" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
     </div>
     <div class="hide">
-      <select name="table_selection">
-##         <option value="${ table.name }" selected>${ table.name }</option>
-      </select>
+      <input type="hidden" name="table_selection" data-bind="value: database().table().name" />
     </div>
   </form>
 </div>
