@@ -640,7 +640,11 @@ ${ assist.assistPanel() }
       <input type="submit" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
     </div>
     <div class="hide">
-      <input type="hidden" name="table_selection" data-bind="value: database().table().name" />
+      <!-- ko with: database -->
+      <!-- ko with: table -->
+      <input type="hidden" name="table_selection" data-bind="value: name" />
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
   </form>
 </div>
