@@ -229,16 +229,17 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
   while content:
     last_newline = content.rfind('\n')
     if last_newline > -1:
+      next_chunk = fh.read()
       # If new line is quoted, skip this iteration and try again.
-      if content[:last_newline].count('"') % 2 != 0:
-        content += fh.read()
+      if content[last_newline - 1] == '"' and next_chunk:
+        content += next_chunk
         continue
       else:
         if headers is None:
           csvfile = StringIO.StringIO(content[:last_newline])
         else:
           csvfile = StringIO.StringIO('\n' + content[:last_newline])
-        content = content[last_newline + 1:] + fh.read()
+        content = content[last_newline + 1:] + next_chunk
     else:
       if headers is None:
         csvfile = StringIO.StringIO(content)
