@@ -134,6 +134,9 @@ ${ require.config() }
         <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
           <i class="fa fa-save"></i>
         </a>
+        <a class="btn" title="${ _('Save As') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { $('#saveAsModal').modal('show'); }">
+          <i class="fa fa-save"></i>
+        </a>
 
         &nbsp;&nbsp;&nbsp;
 
@@ -226,8 +229,7 @@ ${ require.config() }
           </li>
           <li>
             <a href="javascript:void(0)">
-              <span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}">
-              </span>
+              <span data-bind="editable: description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
             </a>
           </li>
           <!-- /ko -->
@@ -1035,6 +1037,7 @@ ${ require.config() }
   <div style="position:absolute; width:100%; bottom: 0;"><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
 </div>
 
+
 <div class="hoverMsg hide">
   <!-- ko if: $root.editorMode -->
   <p class="hoverText">${_('Drop a SQL file here')}</p>
@@ -1042,6 +1045,27 @@ ${ require.config() }
   <!-- ko ifnot: $root.editorMode -->
   <p class="hoverText">${_('Drop iPython/Zeppelin notebooks here')}</p>
   <!-- /ko -->
+</div>
+
+
+<div id="saveAsModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Save as')}</h3>
+  </div>
+  <div class="modal-body">
+    <!-- ko if: $root.selectedNotebook() -->
+      <a href="javascript:void(0)"><span data-bind="editable: $root.selectedNotebook().name, editableOptions: {enabled: true, placement: 'right'}"></span></a>
+      <br/>
+      <a href="javascript:void(0)">
+        <span data-bind="editable: $root.selectedNotebook().description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
+      </a>
+    <!-- /ko -->
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: saveAsNotebook">${_('Save')}</a> 
+  </div>
 </div>
 
 
