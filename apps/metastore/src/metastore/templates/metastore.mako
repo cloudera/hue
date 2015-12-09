@@ -388,7 +388,7 @@ ${ assist.assistPanel() }
     <!-- ko with: database -->
     <!-- ko with: table -->
     <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
-    <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-arrow-circle-o-down"></i></a>
+    <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
