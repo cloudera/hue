@@ -448,7 +448,7 @@ ${ assist.assistPanel() }
     <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-       <li><a href="#partitions" data-toggle="tab">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
+      <li><a href="#partitions" data-toggle="tab">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
     <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
@@ -503,7 +503,7 @@ ${ assist.assistPanel() }
         <!-- /ko -->
       </div>
 
-      <div class="tile" data-bind="visible: true" style="display: none;">
+      <div class="tile" data-bind="visible: tableDetails() && tableDetails().partition_keys.length" style="display: none;">
         <!-- ko with: partitions -->
         <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
         <!-- ko if: loaded -->
