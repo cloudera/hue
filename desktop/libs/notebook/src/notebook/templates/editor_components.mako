@@ -137,6 +137,10 @@ ${ require.config() }
 
         &nbsp;&nbsp;&nbsp;
 
+        <a class="btn pointer" title="${ _('Sessions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#sessionsDemiModal">
+          <i class="fa fa-cogs"></i>
+        </a>
+
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-bars"></i>
