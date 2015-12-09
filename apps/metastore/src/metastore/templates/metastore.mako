@@ -502,9 +502,9 @@ ${ assist.assistPanel() }
         <!-- /ko -->
       </div>
       <!-- /ko -->
-      <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
-        ${ _('View all') }
-      </a>
+##       <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
+##         ${ _('View all') }
+##       </a>
     </div>
 
     <div class="tab-pane" id="sample">
@@ -711,6 +711,7 @@ ${ assist.assistPanel() }
       self.loaded = ko.observable(false);
       self.loading = ko.observable(false);
       self.tables = ko.observableArray();
+      self.stats = ko.observable();
 
       self.tableQuery = ko.observable('').extend({ rateLimit: 150 });
 
@@ -756,7 +757,12 @@ ${ assist.assistPanel() }
           console.log(response);
           self.loading(false);
         }
-      })
+      });
+      $.getJSON('/metastore/databases/'+ self.name +'/metadata', function(data){
+        if (data && data.status == 0){
+          self.stats(data.data);
+        }
+      });
     };
 
 
