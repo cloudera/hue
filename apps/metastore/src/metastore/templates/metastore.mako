@@ -779,7 +779,7 @@ ${ assist.assistPanel() }
           self.loading(false);
         }
       })
-    }
+    };
 
 
     MetastoreDatabase.prototype.setTable = function (metastoreTable) {
@@ -792,7 +792,53 @@ ${ assist.assistPanel() }
         $('a[href="#overview"]').click();
       }, 200);
       huePubSub.publish('metastore.url.change');
+    };
+
+    /**
+     * @param {Object} options
+     * @param {AssistHelper} options.assistHelper
+     * @param {MetastoreTable} options.metastoreTable
+     */
+    function MetastoreTablePartitions (options) {
+      var self = this;
+      self.rows = ko.observableArray();
+      self.headers = ko.observableArray();
+      self.metastoreTable = options.metastoreTable;
+      self.assistHelper = options.assistHelper;
+
+      self.loaded = ko.observable(false);
+      self.loading = ko.observable(true);
+
+      self.preview = {
+        headers: ko.observableArray(),
+        rows: ko.observableArray()
+      }
     }
+
+    MetastoreTablePartitions.prototype.load = function () {
+      var self = this;
+      if (self.loaded()) {
+        return;
+      }
+      self.assistHelper.fetchPartitions({
+        databaseName: self.metastoreTable.database.name,
+        tableName: self.metastoreTable.name,
+        successCallback: function (data) {
+          self.rows(data.partition_values_json);
+          self.headers(data.partition_keys_json);
+          self.preview.rows(self.rows().slice(0, 3));
+          self.preview.headers(self.headers());
+          self.loading(false);
+          self.loaded(true);
+        },
+        errorCallback: function (data) {
+          console.error('assistHelper.fetchPartitions error');
+          console.error(data);
+          self.loading(false);
+          self.loaded(true);
+        }
+      })
+    };
 
     /**
      * @param {Object} options
@@ -841,7 +887,7 @@ ${ assist.assistPanel() }
           self.loaded(true);
         }
       });
-    }
+    };
 
 
     /**
@@ -869,6 +915,10 @@ ${ assist.assistPanel() }
         assistHelper: self.assistHelper,
         metastoreTable: self
       });
+      self.partitions = new MetastoreTablePartitions({
+        assistHelper: self.assistHelper,
+        metastoreTable: self
+      });
       self.tableDetails = ko.observable();
       self.tableStats = ko.observable();
       self.refreshingTableStats = ko.observable(false);
@@ -881,7 +931,7 @@ ${ assist.assistPanel() }
 ##         $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
 ##           comment: newValue ? newValue : ""
 ##         });
-      })
+      });
 
       self.refreshTableStats = function () {
         if (self.refreshingTableStats()) {
@@ -902,7 +952,7 @@ ${ assist.assistPanel() }
             console.error(data);
           }
         })
-      }
+      };
 
       self.fetchFields = function () {
         var self = this;
@@ -924,7 +974,7 @@ ${ assist.assistPanel() }
             console.error(data);
           }
         })
-      }
+      };
 
       self.fetchDetails = function () {
         var self = this;
@@ -939,6 +989,12 @@ ${ assist.assistPanel() }
             self.samples.load();
             self.loaded(true);
             self.loading(false);
+            if (data.partition_keys.length) {
+              self.partitions.load();
+            } else {
+              self.partitions.loading(false);
+              self.partitions.loaded(true);
+            }
           },
           errorCallback: function (data) {
             self.refreshingTableStats(false);
