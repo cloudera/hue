@@ -116,6 +116,7 @@ def get_database_metadata(request, database):
   try:
     db_metadata = db.get_database(database)
     response['status'] = 0
+    db_metadata['hdfs_link'] = location_to_url(db_metadata['location'])
     response['data'] = db_metadata
   except Exception, ex:
     response['status'] = 1

@@ -300,70 +300,108 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables">
-  <div class="actionbar-actions">
-    ## Also available in Ajax, so ko-ifable
-    ## ${ database_meta.get('comment') }
-    ## ${ database_meta.get('location') }
-    ## ${ database_meta.get('owner_name') }
-    ## ${ database_meta.get('owner_type') }
-    ## ${ database_meta.get('parameters') }
-    <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
-    <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { table(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
-    <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/metastore/table/' + name + '/' + selectedTables()[0].name + '/read'; }, disable: selectedTables().length !== 1"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
-    % if has_write_access:
-      <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
-      <div id="dropTable" class="modal hide fade">
-        <form id="dropTableForm" data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
-          ${ csrf_token(request) | n,unicode }
-          <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">&times;</a>
-            <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
+    <!-- ko if: stats  -->
+    <div class="row-fluid">
+      <div class="span12 tile">
+        <h4>${ _('Stats') }</h4>
+        <div class="row-fluid">
+          <div class="span3">
+            <div title="${ _('Comment') }"><i class="fa fa-fw fa-comment muted"></i>
+              <!-- ko if: stats().comment -->
+              <span data-bind="text: stats().comment"></span>
+              <!-- /ko -->
+              <!-- ko ifnot: stats().comment -->
+              <i>${_('No comment.')}</i>
+              <!-- /ko -->
+            </div>
           </div>
-          <div class="modal-footer">
-            <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
-            <input type="submit" data-bind="click: function () { huePubSub.publish('assist.refresh'); selectedTables([]); return true; }" class="btn btn-danger" value="${_('Yes')}"/>
+          <div class="span3">
+            <div title="${ _('Owner') }">
+              <a data-bind="{attr: { 'href': '/useradmin/users/view/' + stats().owner_name } }">
+                <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: stats().owner_name"></span> (<span data-bind="text: stats().owner_type"></span>)
+              </a>
+            </div>
           </div>
-          <!-- ko foreach: selectedTables -->
-          <input type="hidden" name="table_selection" data-bind="value: name" />
-          <!-- /ko -->
-        </form>
+          <div class="span3">
+            <div><a data-bind="attr: {'href': stats().hdfs_link, 'rel': stats().location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
+          </div>
+          <div class="span3">
+            <div title="${ _('Parameters') }"><i class="fa fa-fw fa-cog muted"></i>
+              <!-- ko if: stats().parameters -->
+              <span data-bind="text: stats().parameters"></span>
+              <!-- /ko -->
+              <!-- ko ifnot: stats().parameters -->
+              <i>${_('No parameters.')}</i>
+              <!-- /ko -->
+            </div>
+          </div>
+        </div>
       </div>
-    % endif
-  </div>
+    </div>
+    <!-- /ko -->
+    <div class="row-fluid">
+      <div class="span12 tile">
+        <h4>${ _('Tables') }</h4>
+        <div class="actionbar-actions">
+          <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
+          <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { table(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
+          <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/metastore/table/' + name + '/' + selectedTables()[0].name + '/read'; }, disable: selectedTables().length !== 1"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
+          % if has_write_access:
+            <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+            <div id="dropTable" class="modal hide fade">
+              <form id="dropTableForm" data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
+                ${ csrf_token(request) | n,unicode }
+                <div class="modal-header">
+                  <a href="#" class="close" data-dismiss="modal">&times;</a>
+                  <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
+                </div>
+                <div class="modal-footer">
+                  <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+                  <input type="submit" data-bind="click: function () { huePubSub.publish('assist.refresh'); selectedTables([]); return true; }" class="btn btn-danger" value="${_('Yes')}"/>
+                </div>
+                <!-- ko foreach: selectedTables -->
+                <input type="hidden" name="table_selection" data-bind="value: name" />
+                <!-- /ko -->
+              </form>
+            </div>
+          % endif
+        </div>
 
-  <table id="tablesTable" class="table table-condensed datatables" style="margin-bottom: 10px">
-    <thead>
-    <tr>
-      <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
-      <th>&nbsp;</th>
-      <th>${ _('Table Name') }</th>
-      <th>${ _('Comment') }</th>
-      <th>${ _('Type') }</th>
-    </tr>
-    </thead>
-    <tbody data-bind="foreach: filteredTables">
-      <tr>
-        <td width="1%" style="text-align: center">
-          <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
-        </td>
-        <td width="1%"><span class="blue" data-bind="component: { name: 'table-stats', params: {
-            alwaysActive: true,
-            statsVisible: true,
-            sourceType: 'hive',
-            databaseName: database.name,
-            tableName: name,
-            fieldType: type,
-            assistHelper: assistHelper
-          } }"></span></td>
-        <td>
-          <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
-        </td>
-        <td data-bind="text: comment"></td>
-        <td data-bind="text: type"></td>
-      </tr>
-    </tbody>
-  </table>
-  <span class="margin-left-10" data-bind="visible: filteredTables().length === 0" style="font-style: italic; display: none;">${_('No tables found')}</span>
+        <table id="tablesTable" class="table table-condensed datatables" style="margin-bottom: 10px">
+          <thead>
+          <tr>
+            <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
+            <th>&nbsp;</th>
+            <th>${ _('Table Name') }</th>
+            <th>${ _('Comment') }</th>
+            <th>${ _('Type') }</th>
+          </tr>
+          </thead>
+          <tbody data-bind="foreach: filteredTables">
+            <tr>
+              <td width="1%" style="text-align: center">
+                <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
+              </td>
+              <td width="1%"><span class="blue" data-bind="component: { name: 'table-stats', params: {
+                  alwaysActive: true,
+                  statsVisible: true,
+                  sourceType: 'hive',
+                  databaseName: database.name,
+                  tableName: name,
+                  fieldType: type,
+                  assistHelper: assistHelper
+                } }"></span></td>
+              <td>
+                <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
+              </td>
+              <td data-bind="text: comment"></td>
+              <td data-bind="text: type"></td>
+            </tr>
+          </tbody>
+        </table>
+        <span class="margin-left-10" data-bind="visible: filteredTables().length === 0" style="font-style: italic; display: none;">${_('No tables found')}</span>
+      </div>
+    </div>
 </script>
 
 <script type="text/html" id="metastore-databases-actions">
