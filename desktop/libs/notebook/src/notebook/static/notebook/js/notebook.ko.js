@@ -561,7 +561,7 @@
           else if (self.status() == 'available') {
             self.fetchResult(100);
             self.progress(100);
-            if (self.isSqlDialect() && self.getContext().statement().match(/\bALTER\b|\bDROP\b|\bCREATE\b/i)) {
+            if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
               huePubSub.publish('assist.refresh');
             }
           }
