@@ -119,6 +119,28 @@
 
   /**
    * @param {Object} options
+   * @param {string} options.databaseName
+   * @param {string} options.tableName
+   * @param {function} options.successCallback
+   * @param {function} options.errorCallback
+   */
+  AssistHelper.prototype.fetchPartitions = function (options) {
+    // http://127.0.0.1:8000/metastore/table/default/blog/partitions?format=json
+    $.ajax({
+      url: "/metastore/table/" + options.databaseName + "/" + options.tableName + "/partitions",
+      data: {
+        "format" : 'json'
+      },
+      beforeSend: function (xhr) {
+        xhr.setRequestHeader("X-Requested-With", "Hue");
+      },
+      success: options.successCallback,
+      error: options.errorCallback
+    });
+  };
+
+  /**
+   * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.databaseName
    * @param {string} options.tableName
