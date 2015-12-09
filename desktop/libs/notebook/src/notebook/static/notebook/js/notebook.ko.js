@@ -1234,6 +1234,12 @@
     self.saveNotebook = function () {
       self.selectedNotebook().save();
     };
+
+    self.saveAsNotebook = function () {
+      self.selectedNotebook().id(null);
+      self.selectedNotebook().uuid(UUID());
+      self.saveNotebook();
+    };
   }
 
 
