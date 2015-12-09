@@ -920,6 +920,9 @@
       $.each(notebook.snippets, function (index, snippet) {
         self.addSnippet(snippet);
       });
+      if (vm.editorMode && ! notebook.snippets.length) {
+        self.showHistory(true); // Show history when new query
+      }      
     }
 
     self.save = function () {
