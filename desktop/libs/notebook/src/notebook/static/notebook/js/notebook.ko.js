@@ -563,6 +563,11 @@
             self.progress(100);
             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
               huePubSub.publish('assist.refresh');
+              if (self.result.handle().has_more) {
+                setTimeout(function () {
+                  self.execute(); // Execute next, need to wait as we disabled fast click
+                }, 1000);
+              }
             }
           }
           else if (self.status() == 'success') {
