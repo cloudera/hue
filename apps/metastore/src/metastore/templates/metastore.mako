@@ -130,84 +130,52 @@ ${ assist.assistPanel() }
   </table>
 </script>
 
-<%def name="partition_column_table(cols, id, withStats=False, limit=10000)">
-  <table id="${id}" class="table table-striped table-condensed sampleTable
-  %if withStats:
-  skip-extender
-  %endif
-  ">
-    <thead>
+<script type="text/html" id="metastore-partition-columns-table">
+  <div style="overflow: auto">
+    <table id="sampleTable" class="table table-striped table-condensed sampleTable">
       <tr>
-        <th width="1%">&nbsp;</th>
-        %if withStats:
-          <th width="1%" class="no-sort">&nbsp;</th>
-        %endif
+        <th style="width: 10px"></th>
         <th>${_('Name')}</th>
         <th>${_('Type')}</th>
       </tr>
-    </thead>
-    <tbody>
-      % for column in cols[:limit]:
-        <tr>
-          <td>${ loop.index + 1 }</td>
-          %if withStats:
-            <td class="row-selector-exclude">
-              <a href="javascript:void(0)" data-column="${ column.name }">
-                <i class="fa fa-bar-chart" title="${ _('View statistics') }"></i>
-              </a>
-            </td>
-          %endif
-          <td title="${ _("Scroll to the column") }">
-            <a href="javascript:void(0)" data-row-selector="true" class="column-selector">${ column.name }</a>
-          </td>
-          <td>${ column.type }</td>
-        </tr>
-      % endfor
-    </tbody>
-  </table>
-</%def>
-
-
-<%def name="partition_values(cols, id, withStats=False, limit=1000)">
-  <table id="${id}" class="table table-striped table-condensed sampleTable
-  %if withStats:
-  skip-extender
-  %endif
-  ">
-    <thead>
+      <tbody>
+      <!-- ko foreach: detailedKeys -->
       <tr>
-        <th width="1%">&nbsp;</th>
-        %if withStats:
-          <th width="1%" class="no-sort">&nbsp;</th>
-        %endif
+        <td data-bind="text: $index()+1"></td>
+        <td data-bind="text: $data.name"></td>
+        <td data-bind="text: $data.type"></td>
+      </tr>
+      <!-- /ko -->
+      </tbody>
+    </table>
+  </div>
+</script>
+
+<script type="text/html" id="metastore-partition-values-table">
+  <div style="overflow: auto">
+    <table id="sampleTable" class="table table-striped table-condensed sampleTable">
+      <tr>
+        <th style="width: 10px"></th>
         <th>${_('Values')}</th>
         <th>${_('Spec')}</th>
         <th>${_('Browse')}</th>
       </tr>
-    </thead>
-    <tbody>
-      % for column in cols[:limit]:
-        <tr>
-          <td>${ loop.index + 1 }</td>
-          %if withStats:
-            <td class="row-selector-exclude">
-              <a href="javascript:void(0)" data-column="${ column.name }">
-                <i class="fa fa-bar-chart" title="${ _('View statistics') }"></i>
-              </a>
-            </td>
-          %endif
-          <td><a href="${ column['readUrl'] }">${ column['columns'] }</a></td>
-          <td>${ column['partitionSpec'] }</td>
-          <td>
-            <a href="${ column['readUrl'] }"><i class="fa fa-th"></i> ${_('Data')}</a>
-            <a href="${ column['browseUrl'] }"><i class="fa fa-file-o"></i> ${_('Files')}</a>
+      <tbody>
+      <!-- ko foreach: values -->
+      <tr>
+        <td data-bind="text: $index()+1"></td>
+        <td><a data-bind="attr: {'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a></td>
+        <td data-bind="text: partitionSpec"></td>
+        <td>
+          <a data-bind="attr: {'href': readUrl }"><i class="fa fa-th"></i> ${_('Data')}</a>
+          <a data-bind="attr: {'href': browseUrl }"><i class="fa fa-file-o"></i> ${_('Files')}</a>
         </td>
-        </tr>
-      % endfor
-    </tbody>
-  </table>
-</%def>
-
+      </tr>
+      <!-- /ko -->
+      </tbody>
+    </table>
+  </div>
+</script>
 
 <script type="text/html" id="metastore-samples-table">
   <div style="overflow: auto">
@@ -445,7 +413,7 @@ ${ assist.assistPanel() }
     <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
     <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-       <li><a href="#partitions" data-toggle="tab">${_('Partitions')} <span data-bind="text: '(' + tableDetails().partition_keys.length + ')'"></span></a></li>
+       <li><a href="#partitions" data-toggle="tab">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
     <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
     <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
@@ -491,22 +459,27 @@ ${ assist.assistPanel() }
         <h4>${ _('Sample') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
         <!-- ko if: loaded -->
         <!-- ko with: preview -->
-        <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
-        <a class="pointer" data-bind="visible: rows.length, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">${_('View more...')}</a>
+        <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
+        <a class="pointer" data-bind="visible: rows().length, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">${_('View more...')}</a>
         <!-- /ko -->
-        <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-        <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+        <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+        <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
         <!-- /ko -->
         <!-- /ko -->
       </div>
 
-##       % if table.partition_keys:
-##         <div class="tile">
-##           <h4>${ _('Partitions') } (${ len(partitions) })</h4>
-##           ${ partition_values(partitions, "partitionTable", limit=3) }
-##           <a class="pointer" data-bind="click: function() { $('li a[href=\'#partitions\']').click(); }">${_('View more...')}</a>
-##         </div>
-##       % endif
+      <div class="tile" data-bind="visible: true" style="display: none;">
+        <!-- ko with: partitions -->
+        <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
+        <!-- ko if: loaded -->
+        <!-- ko with: preview -->
+        <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
+        <a class="pointer" data-bind="visible: values().length, click: function() { $('li a[href=\'#partitions\']').click(); }"  style="display: none;">${_('View more...')}</a>
+        <!-- /ko -->
+        <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
     </div>
 
     <div class="tab-pane" id="columns">
@@ -515,19 +488,24 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
-##     % if table.partition_keys:
-##       <div class="tab-pane" id="partitions">
-##         <h4>${ _('Columns') } (${ len(table.partition_keys) })</h4>
-##         ${ partition_column_table(table.partition_keys, "partitionTable") }
-##
-##         <h4>${ _('Values') } (${ len(partitions) })</h4>
-##         ${ partition_values(partitions, "partitionTable", limit=25) }
-##
-##         <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
-##           ${ _('View all') }
-##         </a>
-##       </div>
-##     %endif
+    <div class="tab-pane" id="partitions">
+      <!-- ko with: partitions -->
+      <div class="tile" data-bind="visible: true" style="display: none;">
+        <h4>${ _('Columns') }</h4>
+        <!-- ko template: 'metastore-partition-columns-table' --><!-- /ko -->
+      </div>
+      <div class="tile" data-bind="visible: true" style="display: none;">
+        <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
+        <!-- ko if: loaded -->
+        <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
+        <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
+        <!-- /ko -->
+      </div>
+      <!-- /ko -->
+      <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
+        ${ _('View all') }
+      </a>
+    </div>
 
     <div class="tab-pane" id="sample">
       <!-- ko with: samples -->
@@ -801,8 +779,9 @@ ${ assist.assistPanel() }
      */
     function MetastoreTablePartitions (options) {
       var self = this;
-      self.rows = ko.observableArray();
-      self.headers = ko.observableArray();
+      self.detailedKeys = ko.observableArray();
+      self.keys = ko.observableArray();
+      self.values = ko.observableArray();
       self.metastoreTable = options.metastoreTable;
       self.assistHelper = options.assistHelper;
 
@@ -810,8 +789,8 @@ ${ assist.assistPanel() }
       self.loading = ko.observable(true);
 
       self.preview = {
-        headers: ko.observableArray(),
-        rows: ko.observableArray()
+        keys: ko.observableArray(),
+        values: ko.observableArray()
       }
     }
 
@@ -824,10 +803,10 @@ ${ assist.assistPanel() }
         databaseName: self.metastoreTable.database.name,
         tableName: self.metastoreTable.name,
         successCallback: function (data) {
-          self.rows(data.partition_values_json);
-          self.headers(data.partition_keys_json);
-          self.preview.rows(self.rows().slice(0, 3));
-          self.preview.headers(self.headers());
+          self.keys(data.partition_keys_json);
+          self.values(data.partition_values_json);
+          self.preview.values(self.values().slice(0, 3));
+          self.preview.keys(self.keys());
           self.loading(false);
           self.loaded(true);
         },
@@ -872,10 +851,10 @@ ${ assist.assistPanel() }
         tableName: self.metastoreTable.name,
         dataType: "json",
         successCallback: function (data) {
-          self.rows = data.rows || [];
-          self.headers = data.headers || [];
-          self.preview.rows = self.rows.slice(0, 3);
-          self.preview.headers = self.headers
+          self.rows(data.rows);
+          self.headers(data.headers);
+          self.preview.rows(self.rows().slice(0, 3));
+          self.preview.headers(self.headers());
           self.loading(false);
           self.loaded(true);
         },
@@ -990,6 +969,7 @@ ${ assist.assistPanel() }
             self.loaded(true);
             self.loading(false);
             if (data.partition_keys.length) {
+              self.partitions.detailedKeys(data.partition_keys);
               self.partitions.load();
             } else {
               self.partitions.loading(false);
@@ -1015,7 +995,7 @@ ${ assist.assistPanel() }
       self.loading(true);
       self.fetchFields();
       self.fetchDetails();
-    }
+    };
 
     /**
      * @param {Object} options
@@ -1064,7 +1044,7 @@ ${ assist.assistPanel() }
 ##         tableComment = '${ smart_unicode(table.comment) }';
 ##       %endif
 
-      self.assistHelper = new AssistHelper(options)
+      self.assistHelper = new AssistHelper(options);
 
       self.loading = ko.observable(true);
       self.databases = ko.observableArray();
@@ -1108,7 +1088,7 @@ ${ assist.assistPanel() }
         if (foundDatabases.length === 1) {
           self.setDatabase(foundDatabases[0]);
         }
-      }
+      };
 
       var loadTableDef = function (tableDef) {
         setDatabaseByName(tableDef.database);
@@ -1125,7 +1105,7 @@ ${ assist.assistPanel() }
             if (foundTables.length === 1) {
               self.database().setTable(foundTables[0]);
             }
-          }
+          };
 
           if (! self.database().loaded()) {
             var doOnce = self.database().loaded.subscribe(function () {
@@ -1136,7 +1116,7 @@ ${ assist.assistPanel() }
             setTableAfterLoad();
           }
         }
-      }
+      };
 
       huePubSub.subscribe('assist.refresh', function () {
         self.assistHelper.clearCache({
@@ -1209,7 +1189,7 @@ ${ assist.assistPanel() }
         metastoreDatabase.load();
       }
       huePubSub.publish('metastore.url.change');
-    }
+    };
 
     $(document).ready(function () {
       var options = {
@@ -1218,7 +1198,7 @@ ${ assist.assistPanel() }
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         }
-      }
+      };
 
       var viewModel = new MetastoreViewModel(options);
 
