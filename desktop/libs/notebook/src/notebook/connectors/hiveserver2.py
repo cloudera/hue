@@ -24,6 +24,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
 from notebook.connectors.base import Api, QueryError, QueryExpired
+from beeswax.design import strip_trailing_semicolon, split_statements
 
 LOG = logging.getLogger(__name__)
 
@@ -58,6 +59,8 @@ class HS2Api(Api):
 
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    snippet['result']['handle'].pop('statement_id')
+    snippet['result']['handle'].pop('has_more') 
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
   def _get_db(self, snippet):
@@ -72,7 +75,18 @@ class HS2Api(Api):
 
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
-    query = hql_query(snippet['statement'], QUERY_TYPES[0])
+
+    # Multiquery, if not first statement or arrived to the last query
+    statement_id = snippet['result']['handle'].get('statement_id', 0)
+    if snippet['result']['handle'].get('has_more'):
+      statement_id += 1
+    else:
+      statement_id = 0
+
+    statements = self._get_statements(snippet['statement'])
+    statement = statements[statement_id]
+
+    query = hql_query(statement, QUERY_TYPES[0])
 
     try:
       handle = db.client.query(query)
@@ -87,8 +101,14 @@ class HS2Api(Api):
         'operation_type': handle.operation_type,
         'has_result_set': handle.has_result_set,
         'modified_row_count': handle.modified_row_count,
-        'log_context': handle.log_context
+        'log_context': handle.log_context,
+        'statement_id': statement_id,
+        'has_more': statement_id < len(statements) - 1
     }
+
+  def _get_statements(self, hql_query):
+    hql_query = strip_trailing_semicolon(hql_query)
+    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]    
 
   @query_error_handler
   def check_status(self, notebook, snippet):
