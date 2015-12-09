@@ -857,13 +857,13 @@ ${ require.config() }
 
 <script type ="text/html" id="snippet-execution-controls">
   <!-- ko if: $root.editorMode -->
-  <div class="snippet-actions" style="position:absolute; bottom: 26px">
+  <div class="snippet-actions" style="position: absolute; bottom: 26px">
     <a class="snippet-side-btn" data-bind="visible: $parent.history().length > 0, click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
       <i class="fa fa-fw fa-history"></i>
     </a>
   </div>
   <!-- /ko -->
-  <div class="snippet-actions" style="position:absolute; bottom: 0">
+  <div class="snippet-actions" style="position: absolute; bottom: 0">
     <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
@@ -872,6 +872,9 @@ ${ require.config() }
     </a>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
+    </a>
+    <a class="snippet-side-btn" data-bind="click: execute, visible: result && result.handle().has_more, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('CTRL + ENTER') }">
+      <i class="fa fa-fw fa-cog"></i>
     </a>
   </div>
 </script>
