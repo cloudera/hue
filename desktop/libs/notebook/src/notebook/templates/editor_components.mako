@@ -858,7 +858,7 @@ ${ require.config() }
 <script type ="text/html" id="snippet-execution-controls">
   <!-- ko if: $root.editorMode -->
   <div class="snippet-actions" style="position: absolute; bottom: 26px">
-    <a class="snippet-side-btn" data-bind="visible: $parent.history().length > 0, click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
+    <a class="snippet-side-btn" data-bind="visible: $root.editorMode, click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $parent.showHistory}" title="${ _('Show history') }">
       <i class="fa fa-fw fa-history"></i>
     </a>
   </div>
@@ -1918,10 +1918,6 @@ ${ require.config() }
       viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
       ko.applyBindings(viewModel);
       viewModel.init();
-
-      if (viewModel.editorMode && !viewModel.selectedNotebook().snippets()[0].result.hasSomeResults()) {
-        viewModel.selectedNotebook().fetchHistory();
-      }
 
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
