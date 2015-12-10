@@ -414,8 +414,7 @@ class Session(models.Model):
     return TSessionHandle(sessionId=handle_id)
 
   def get_properties(self):
-    props_dict = json.loads(self.properties) if self.properties is not None else None
-    return props_dict
+    return json.loads(self.properties)
 
   def __str__(self):
     return '%s %s' % (self.owner, self.last_used)
