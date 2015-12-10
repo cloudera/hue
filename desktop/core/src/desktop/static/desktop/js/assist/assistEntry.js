@@ -75,7 +75,7 @@
     });
 
     self.filteredEntries = ko.computed(function () {
-      if (self.filter == null || (self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
+      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
         return self.entries();
       }
       var result = [];
