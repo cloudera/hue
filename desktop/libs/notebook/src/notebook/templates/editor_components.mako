@@ -433,7 +433,7 @@ ${ require.config() }
             <td><code data-bind="text: query" style="white-space: normal"></code></td>
             <td style="width: 200px" class="muted"><span data-bind="text: moment(lastExecuted).format('LLL')"></span></td>
             <td style="width: 25px" class="muted">
-              <i class="fa fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}"></i>
+              <i class="fa fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
             </td>
           </tr>
         </tbody>
