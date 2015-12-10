@@ -770,7 +770,7 @@ ${ assist.assistPanel() }
       self.table = ko.observable(null);
     }
 
-    MetastoreDatabase.prototype.load = function () {
+    MetastoreDatabase.prototype.load = function (callback) {
       var self = this;
       if (self.loading()) {
         return;
@@ -792,10 +792,16 @@ ${ assist.assistPanel() }
           }));
           self.loaded(true);
           self.loading(false);
+          if (callback) {
+            callback();
+          }
         },
         errorCallback: function (response) {
           console.log(response);
           self.loading(false);
+          if (callback) {
+            callback();
+          }
         }
       });
       $.getJSON('/metastore/databases/'+ self.name +'/metadata', function(data){
@@ -805,6 +811,17 @@ ${ assist.assistPanel() }
       });
     };
 
+    MetastoreDatabase.prototype.setTableByName = function (tableName) {
+      var self = this;
+      var foundTables = $.grep(self.tables(), function (metastoreTable) {
+        return metastoreTable.name === tableName;
+      });
+
+      if (foundTables.length === 1) {
+        self.setTable(foundTables[0]);
+      }
+      huePubSub.publish('metastore.url.change');
+    };
 
     MetastoreDatabase.prototype.setTable = function (metastoreTable) {
       var self = this;
@@ -1087,7 +1104,8 @@ ${ assist.assistPanel() }
 
       self.assistHelper = new AssistHelper(options);
 
-      self.loading = ko.observable(true);
+      self.reloading = ko.observable(false);
+      self.loading = ko.observable(false);
       self.databases = ko.observableArray();
 
       self.selectedDatabases = ko.observableArray();
@@ -1105,20 +1123,31 @@ ${ assist.assistPanel() }
 
       self.database = ko.observable(null);
 
-      self.assistHelper.loadDatabases({
-        sourceType: 'hive',
-        callback: function (databaseNames) {
-          self.databases($.map(databaseNames, function(name) {
-            return new MetastoreDatabase({
-              name: name,
-              assistHelper: self.assistHelper
-            })
-          }));
-          self.loading(false);
+      var loadDatabases = function (successCallback) {
+        if (self.loading()) {
+          return;
         }
-      });
+        self.loading(true);
+        self.assistHelper.loadDatabases({
+          sourceType: 'hive',
+          callback: function (databaseNames) {
+            self.databases($.map(databaseNames, function(name) {
+              return new MetastoreDatabase({
+                name: name,
+                assistHelper: self.assistHelper
+              })
+            }));
+            self.loading(false);
+            if (successCallback) {
+              successCallback();
+            }
+          }
+        });
+      };
 
-      var setDatabaseByName = function (databaseName) {
+      loadDatabases();
+
+      var setDatabaseByName = function (databaseName, callback) {
         if (self.database() && self.database().name == databaseName) {
           huePubSub.publish('metastore.url.change');
           return;
@@ -1127,7 +1156,7 @@ ${ assist.assistPanel() }
           return database.name === databaseName;
         });
         if (foundDatabases.length === 1) {
-          self.setDatabase(foundDatabases[0]);
+          self.setDatabase(foundDatabases[0], callback);
         }
       };
 
@@ -1160,9 +1189,32 @@ ${ assist.assistPanel() }
       };
 
       huePubSub.subscribe('assist.refresh', function () {
+        self.reloading(true);
         self.assistHelper.clearCache({
           sourceType: 'hive',
           clearAll: true
+        });
+        var currentDatabase = null;
+        var currentTable = null;
+        if (self.database()) {
+          currentDatabase = self.database().name;
+          if (self.database().table()) {
+            currentTable = self.database().table().name;
+            self.database().table(null);
+          }
+          self.database(null);
+        }
+        loadDatabases(function () {
+          if (currentDatabase) {
+            setDatabaseByName(currentDatabase, function () {
+              if (self.database() && currentTable) {
+                self.database().setTableByName(currentTable);
+              }
+              self.reloading(false);
+            });
+          } else {
+            self.reloading(false);
+          }
         });
       });
 
@@ -1222,12 +1274,14 @@ ${ assist.assistPanel() }
       window.onpopstate = loadURL;
     }
 
-    MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase) {
+    MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase, callback) {
       var self = this;
       self.database(metastoreDatabase);
 
       if (! metastoreDatabase.loaded()) {
-        metastoreDatabase.load();
+        metastoreDatabase.load(callback);
+      } else {
+        callback();
       }
       huePubSub.publish('metastore.url.change');
     };
