@@ -291,7 +291,7 @@ ${ assist.assistPanel() }
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
       </td>
       <td>
-        <a href="javascript: void(0);" data-bind="text: name, click: function () { $parent.setDatabase($data) }"></a>
+        <a href="javascript: void(0);" data-bind="text: name, click: function () { $parent.setDatabase($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
       </td>
     </tr>
     </tbody>
@@ -392,7 +392,7 @@ ${ assist.assistPanel() }
                   assistHelper: assistHelper
                 } }"></span></td>
               <td>
-                <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data) }"></a>
+                <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
               <td data-bind="text: type"></td>
@@ -747,7 +747,7 @@ ${ assist.assistPanel() }
      * @param {string} [options.tableComment]
      * @constructor
      */
-    function MetastoreDatabase (options) {
+    function MetastoreDatabase(options) {
       var self = this;
       self.assistHelper = options.assistHelper;
       self.name = options.name;
@@ -757,7 +757,7 @@ ${ assist.assistPanel() }
       self.tables = ko.observableArray();
       self.stats = ko.observable();
 
-      self.tableQuery = ko.observable('').extend({ rateLimit: 150 });
+      self.tableQuery = ko.observable('').extend({rateLimit: 150});
 
       self.filteredTables = ko.computed(function () {
         if (self.tableQuery() === '') {
@@ -785,7 +785,7 @@ ${ assist.assistPanel() }
         sourceType: 'hive',
         databaseName: self.name,
         successCallback: function (data) {
-          self.tables($.map(data.tables_meta, function(tableMeta) {
+          self.tables($.map(data.tables_meta, function (tableMeta) {
             return new MetastoreTable({
               database: self,
               name: tableMeta.name,
@@ -801,15 +801,16 @@ ${ assist.assistPanel() }
           }
         },
         errorCallback: function (response) {
-          console.log(response);
+          console.error('MetastoreDatabase.load error');
+          console.error(response);
           self.loading(false);
           if (callback) {
             callback();
           }
         }
       });
-      $.getJSON('/metastore/databases/'+ self.name +'/metadata', function(data){
-        if (data && data.status == 0){
+      $.getJSON('/metastore/databases/' + self.name + '/metadata', function (data) {
+        if (data && data.status == 0) {
           self.stats(data.data);
         }
       });
@@ -824,19 +825,20 @@ ${ assist.assistPanel() }
       if (foundTables.length === 1) {
         self.setTable(foundTables[0]);
       }
-      huePubSub.publish('metastore.url.change');
     };
 
-    MetastoreDatabase.prototype.setTable = function (metastoreTable) {
+    MetastoreDatabase.prototype.setTable = function (metastoreTable, callback) {
       var self = this;
       self.table(metastoreTable);
-      if (! metastoreTable.loaded()) {
+      if (!metastoreTable.loaded()) {
         metastoreTable.load();
+      }
+      if (callback) {
+        callback();
       }
       window.setTimeout(function () {
         $('a[href="#overview"]').click();
       }, 200);
-      huePubSub.publish('metastore.url.change');
     };
 
     /**
@@ -844,7 +846,7 @@ ${ assist.assistPanel() }
      * @param {AssistHelper} options.assistHelper
      * @param {MetastoreTable} options.metastoreTable
      */
-    function MetastoreTablePartitions (options) {
+    function MetastoreTablePartitions(options) {
       var self = this;
       self.detailedKeys = ko.observableArray();
       self.keys = ko.observableArray();
@@ -891,7 +893,7 @@ ${ assist.assistPanel() }
      * @param {AssistHelper} options.assistHelper
      * @param {MetastoreTable} options.metastoreTable
      */
-    function MetastoreTableSamples (options) {
+    function MetastoreTableSamples(options) {
       var self = this;
       self.rows = ko.observableArray();
       self.headers = ko.observableArray();
@@ -945,7 +947,7 @@ ${ assist.assistPanel() }
      * @param {AssistHelper} options.assistHelper
      * @constructor
      */
-    function MetastoreTable (options) {
+    function MetastoreTable(options) {
       var self = this;
       self.database = options.database;
       self.assistHelper = options.assistHelper;
@@ -974,10 +976,10 @@ ${ assist.assistPanel() }
 
       self.comment.subscribe(function (newValue) {
         // TODO: Switch to using the ko observables in the url (self.database.name() and self.name())
-##         $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
-##           comment: newValue ? newValue : ""
-##         });
-      });
+        ##         $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
+        ##           comment: newValue ? newValue : ""
+        ##         });
+              });
 
       self.refreshTableStats = function () {
         if (self.refreshingTableStats()) {
@@ -1008,10 +1010,12 @@ ${ assist.assistPanel() }
           tableName: self.name,
           fields: [],
           successCallback: function (data) {
-            self.columns($.map(data.extended_columns, function (column) { return new MetastoreColumn({
-              extendedColumn: column,
-              table: self
-            }) }));
+            self.columns($.map(data.extended_columns, function (column) {
+              return new MetastoreColumn({
+                extendedColumn: column,
+                table: self
+              })
+            }));
             self.favouriteColumns(self.columns().slice(0, 3));
           },
           errorCallback: function (data) {
@@ -1079,18 +1083,18 @@ ${ assist.assistPanel() }
 
       self.comment.subscribe(function (newValue) {
         // TODO: Switch to using the ko observables in the url (self.table.name() and self.table.database.name();
-##         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
-##           column: self.name(),
-##           comment: newValue
-##         }, function () {
-##           self.vm.assistHelper.clearCache({
-##             sourceType: 'hive',
-##             databaseName: self.table.database.name,
-##             tableName: self.table.name,
-##             fields: []
-##           })
-##         });
-      })
+        ##         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
+        ##           column: self.name(),
+        ##           comment: newValue
+        ##         }, function () {
+        ##           self.vm.assistHelper.clearCache({
+        ##             sourceType: 'hive',
+        ##             databaseName: self.table.database.name,
+        ##             tableName: self.table.name,
+        ##             fields: []
+        ##           })
+        ##         });
+              })
     }
 
     /**
@@ -1114,7 +1118,7 @@ ${ assist.assistPanel() }
 
       self.selectedDatabases = ko.observableArray();
 
-      self.databaseQuery = ko.observable('').extend({ rateLimit: 150 });
+      self.databaseQuery = ko.observable('').extend({rateLimit: 150});
 
       self.filteredDatabases = ko.computed(function () {
         if (self.databaseQuery() === '') {
@@ -1135,7 +1139,7 @@ ${ assist.assistPanel() }
         self.assistHelper.loadDatabases({
           sourceType: 'hive',
           callback: function (databaseNames) {
-            self.databases($.map(databaseNames, function(name) {
+            self.databases($.map(databaseNames, function (name) {
               return new MetastoreDatabase({
                 name: name,
                 assistHelper: self.assistHelper
@@ -1153,7 +1157,9 @@ ${ assist.assistPanel() }
 
       var setDatabaseByName = function (databaseName, callback) {
         if (self.database() && self.database().name == databaseName) {
-          huePubSub.publish('metastore.url.change');
+          if (callback) {
+            callback();
+          }
           return;
         }
         var foundDatabases = $.grep(self.databases(), function (database) {
@@ -1164,11 +1170,10 @@ ${ assist.assistPanel() }
         }
       };
 
-      var loadTableDef = function (tableDef) {
+      var loadTableDef = function (tableDef, callback) {
         setDatabaseByName(tableDef.database);
         if (self.database()) {
           if (self.database().table() && self.database().table().name == tableDef.name) {
-            huePubSub.publish('metastore.url.change');
             return;
           }
 
@@ -1177,11 +1182,11 @@ ${ assist.assistPanel() }
               return table.name === tableDef.name;
             });
             if (foundTables.length === 1) {
-              self.database().setTable(foundTables[0]);
+              self.database().setTable(foundTables[0], callback);
             }
           };
 
-          if (! self.database().loaded()) {
+          if (!self.database().loaded()) {
             var doOnce = self.database().loaded.subscribe(function () {
               setTableAfterLoad();
               doOnce.dispose();
@@ -1222,13 +1227,22 @@ ${ assist.assistPanel() }
         });
       });
 
-      huePubSub.subscribe("assist.table.selected", loadTableDef);
-
-      huePubSub.subscribe("assist.database.selected", function (databaseDef) {
-        setDatabaseByName(databaseDef.name);
+      huePubSub.subscribe("assist.table.selected", function (tableDef) {
+        loadTableDef(tableDef, function () {
+          huePubSub.publish('metastore.url.change')
+        });
       });
 
-      self.isLeftPanelVisible.subscribe(function(newValue) {
+      huePubSub.subscribe("assist.database.selected", function (databaseDef) {
+        if (self.database()) {
+          self.database().table(null);
+        }
+        setDatabaseByName(databaseDef.name, function () {
+          huePubSub.publish('metastore.url.change')
+        });
+      });
+
+      self.isLeftPanelVisible.subscribe(function (newValue) {
         $.totalStorage('spark_left_panel_visible', newValue);
       });
 
@@ -1236,7 +1250,7 @@ ${ assist.assistPanel() }
         if (self.database() && self.database().table()) {
           hueUtils.changeURL('/metastore/table/' + self.database().name + '/' + self.database().table().name);
         }
-        else if (self.database()){
+        else if (self.database()) {
           hueUtils.changeURL('/metastore/tables/' + self.database().name);
         }
         else {
@@ -1253,7 +1267,7 @@ ${ assist.assistPanel() }
         var path = window.location.pathname.split('/');
         switch (path[2]) {
           case 'databases':
-            if (self.database()){
+            if (self.database()) {
               self.database().table(null);
               self.database(null);
             }
@@ -1282,18 +1296,17 @@ ${ assist.assistPanel() }
       var self = this;
       self.database(metastoreDatabase);
 
-      if (! metastoreDatabase.loaded()) {
+      if (!metastoreDatabase.loaded()) {
         metastoreDatabase.load(callback);
-      } else {
+      } else if (callback) {
         callback();
       }
-      huePubSub.publish('metastore.url.change');
     };
 
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
-        i18n : {
+        i18n: {
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         }
@@ -1307,11 +1320,11 @@ ${ assist.assistPanel() }
       $('a[data-toggle="tab"]').on('shown', function (e) {
         if ($(e.target).attr("href") == "#queries") {
           viewModel.loadingQueries(true);
-##           $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
-##             viewModel.queries(data.queries);
-##             viewModel.loadingQueries(false);
-##           });
-        }
+          ##           $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
+          ##             viewModel.queries(data.queries);
+          ##             viewModel.loadingQueries(false);
+          ##           });
+                  }
       });
 
     });
@@ -1320,7 +1333,7 @@ ${ assist.assistPanel() }
   $(document).ready(function () {
     function selectColumn(col) {
       var _t = $("#sampleTable");
-      var _col = _t.find("th").filter(function() {
+      var _col = _t.find("th").filter(function () {
         return $.trim($(this).text()).indexOf(col) > -1;
       });
       _t.find(".columnSelected").removeClass("columnSelected");
@@ -1335,7 +1348,7 @@ ${ assist.assistPanel() }
 
     if (window.location.hash != "") {
       if (window.location.hash.indexOf("col=") > -1) {
-        window.setTimeout(function(){
+        window.setTimeout(function () {
           selectColumn(window.location.hash.split("=")[1]);
         }, 200)
       }
@@ -1367,30 +1380,30 @@ ${ assist.assistPanel() }
 
       for (var id in sortables) {
         $("#" + id).addClass("initialized");
-##         % if len(table.cols) < 1000:
-##         $("#" + id).dataTable({
-##           "aoColumns": sortables[id],
-##           "bPaginate": false,
-##           "bLengthChange": false,
-##           "bInfo": false,
-##           "bFilter": false,
-##           "bAutoWidth": false,
-##           "fnInitComplete": function () {
-##             $(this).parent().jHueTableScroller();
-##             if (! $(this).hasClass("skip-extender")) {
-##               $(this).jHueTableExtender({
-##                 hintElement: "#jumpToColumnAlert",
-##                 fixedHeader: true
-##               });
-##             }
-##           },
-##           "oLanguage": {
-##             "sEmptyTable": "${_('No data available')}",
-##             "sZeroRecords": "${_('No matching records')}"
-##           }
-##         });
-##         % endif
-      }
+        ##         % if len(table.cols) < 1000:
+        ##         $("#" + id).dataTable({
+        ##           "aoColumns": sortables[id],
+        ##           "bPaginate": false,
+        ##           "bLengthChange": false,
+        ##           "bInfo": false,
+        ##           "bFilter": false,
+        ##           "bAutoWidth": false,
+        ##           "fnInitComplete": function () {
+        ##             $(this).parent().jHueTableScroller();
+        ##             if (! $(this).hasClass("skip-extender")) {
+        ##               $(this).jHueTableExtender({
+        ##                 hintElement: "#jumpToColumnAlert",
+        ##                 fixedHeader: true
+        ##               });
+        ##             }
+        ##           },
+        ##           "oLanguage": {
+        ##             "sEmptyTable": "${_('No data available')}",
+        ##             "sZeroRecords": "${_('No matching records')}"
+        ##           }
+        ##         });
+        ##         % endif
+              }
       if ($(e.target).attr("href") == "#columnAnalysisTerms") {
         $("#columnAnalysis .filter").removeClass("hide");
       }
@@ -1400,30 +1413,30 @@ ${ assist.assistPanel() }
     });
 
     $("#import-data-btn").click(function () {
-##       $.get("${ url('metastore:load_table', database=database, table=table.name) }", function (response) {
-##           $("#import-data-modal").html(response['data']);
-##           $("#import-data-modal").modal("show");
-##         }
-##       );
-    });
+      ##       $.get("${ url('metastore:load_table', database=database, table=table.name) }", function (response) {
+      ##           $("#import-data-modal").html(response['data']);
+      ##           $("#import-data-modal").modal("show");
+      ##         }
+      ##       );
+          });
 
     // convert link text to URLs in comment column (Columns tab)
     hueUtils.text2Url(document.querySelectorAll('.sampleTable td:last-child'));
 
     $('a[data-toggle="tab"]:eq(0)').click();
 
-##     $("a[data-column]").on("click", function () {
-##       var _link = $(this);
-##       var _col = _link.data("column");
-##       var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
-##       var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/" + _col;
-##       var termsUrl = "/beeswax/api/table/${database}/${table.name}/terms/" + _col + "/";
-##       $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
-##       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-##       showColumnStats(statsUrl, refreshUrl, termsUrl, _col, STATS_PROBLEMS, function () {
-##         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
-##       });
-##     });
+    ##     $("a[data-column]").on("click", function () {
+    ##       var _link = $(this);
+    ##       var _col = _link.data("column");
+    ##       var statsUrl = "/beeswax/api/table/${database}/${table.name}/stats/" + _col;
+    ##       var refreshUrl = "/beeswax/api/analyze/${database}/${table.name}/" + _col;
+    ##       var termsUrl = "/beeswax/api/table/${database}/${table.name}/terms/" + _col + "/";
+    ##       $("#columnAnalysisStats .content").html("<i class='fa fa-spinner fa-spin'></i>");
+    ##       $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+    ##       showColumnStats(statsUrl, refreshUrl, termsUrl, _col, STATS_PROBLEMS, function () {
+    ##         $("#columnAnalysis").show().css("top", _link.position().top - $("#columnAnalysis").outerHeight() / 2 + _link.outerHeight() / 2).css("left", _link.position().left + _link.outerWidth());
+    ##       });
+    ##     });
 
     $(document).on("click", "#columnAnalysis .close-popover", function () {
       $("#columnAnalysis").hide();
