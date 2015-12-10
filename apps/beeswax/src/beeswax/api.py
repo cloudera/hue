@@ -245,6 +245,7 @@ def watch_query_refresh_json(request, id):
 
   return JsonResponse(result)
 
+
 def massage_job_urls_for_json(jobs):
   massaged_jobs = []
   for job in jobs:
@@ -255,6 +256,7 @@ def massage_job_urls_for_json(jobs):
   return massaged_jobs
 
 
+@error_handler
 def close_operation(request, query_history_id):
   response = {
     'status': -1,
@@ -264,16 +266,13 @@ def close_operation(request, query_history_id):
   if request.method != 'POST':
     response['message'] = _('A POST request is required.')
   else:
-    try:
-      query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
-      db = dbms.get(query_history.owner, query_history.get_query_server_config())
-      handle = query_history.get_handle()
-      db.close_operation(handle)
-      query_history.set_to_expired()
-      query_history.save()
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = unicode(e)
+    query_history = authorized_get_query_history(request, query_history_id, must_exist=True)
+    db = dbms.get(query_history.owner, query_history.get_query_server_config())
+    handle = query_history.get_handle()
+    db.close_operation(handle)
+    query_history.set_to_expired()
+    query_history.save()
+    response['status'] = 0
 
   return JsonResponse(response)
 
@@ -404,6 +403,7 @@ def fetch_saved_design(request, design_id):
   response['design'] = design_to_dict(design)
   return JsonResponse(response)
 
+
 @error_handler
 def fetch_query_history(request, query_history_id):
   response = {'status': 0, 'message': ''}
@@ -415,6 +415,7 @@ def fetch_query_history(request, query_history_id):
 
   response['query_history'] = query_history_to_dict(request, query)
   return JsonResponse(response)
+
 
 @error_handler
 def cancel_query(request, query_history_id):
@@ -800,6 +801,7 @@ def get_top_terms(request, database, table, column, prefix=None):
   return JsonResponse(response)
 
 
+@error_handler
 def get_session(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)

@@ -19,7 +19,6 @@ import logging
 
 from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient, HiveServerDataTable
-from TCLIService.ttypes import TExecuteStatementReq, TFetchOrientation, TStatusCode
 
 from ImpalaService import ImpalaHiveServer2Service
 
