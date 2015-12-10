@@ -92,7 +92,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     response = self.client.get("/metastore/table/%s/test?format=json" % self.db_name)
     data = json.loads(response.content)
     assert_true("foo" in [col['name'] for col in data['cols']])
-    assert_true("SerDe Library" in [prop['col_name'] for prop in data['properties']], data)
+    assert_true("SerDe Library:" in [prop['col_name'] for prop in data['properties']], data)
 
     # Remember the number of history items. Use a generic fragment 'test' to pass verification.
     history_cnt = verify_history(self.client, fragment='test')
@@ -162,11 +162,11 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
   def test_describe_partitions(self):
     response = self.client.get("/metastore/table/%s/test_partitions?format=json" % self.db_name)
     data = json.loads(response.content)
-    assert_equal(2, len(data['partition_values_json']), data)
+    assert_equal(2, len(data['partition_keys']), data)
 
     response = self.client.get("/metastore/table/%s/test_partitions/partitions?format=json" % self.db_name, follow=True)
     data = json.loads(response.content)
-    partition_columns = [col for cols in data['massaged_partitions'] for col in cols['columns']]
+    partition_columns = [col for cols in data['partition_values_json'] for col in cols['columns']]
     assert_true("baz_one" in partition_columns)
     assert_true("boom_two" in partition_columns)
     assert_true("baz_foo" in partition_columns)
