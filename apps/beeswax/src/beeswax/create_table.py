@@ -180,7 +180,7 @@ def import_wizard(request, database='default'):
                                                             (s2_delim_form.cleaned_data['delimiter'],))
 
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
-        return render('choose_delimiter.mako', request, {
+        return render('import_wizard_choose_delimiter.mako', request, {
           'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
           'delim_readable': DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
           'initial': delim_is_auto,
@@ -210,7 +210,7 @@ def import_wizard(request, database='default'):
           if fields_list_for_json:
             fields_list_for_json[0] = map(lambda a: re.sub('[^\w]', '', a), fields_list_for_json[0]) # Cleaning headers
 
-          return render('define_columns.mako', request, {
+          return render('import_wizard_define_columns.mako', request, {
             'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
             'file_form': s1_file_form,
             'delim_form': s2_delim_form,
@@ -253,7 +253,7 @@ def import_wizard(request, database='default'):
   else:
     s1_file_form = CreateByImportFileForm()
 
-  return render('choose_file.mako', request, {
+  return render('import_wizard_choose_file.mako', request, {
     'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
     'file_form': s1_file_form,
     'database': database,
