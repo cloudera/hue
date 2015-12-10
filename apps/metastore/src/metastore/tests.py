@@ -79,7 +79,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(200, response.status_code)
 
     # Switch databases
-    response = self.client.get("/metastore/tables/%s>format=json" % self.db_name)
+    response = self.client.get("/metastore/tables/%s?format=json" % self.db_name)
     data = json.loads(response.content)
     assert_true('name' in data["tables"][0])
     assert_true("test" in data["table_names"])
@@ -92,7 +92,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     response = self.client.get("/metastore/table/%s/test?format=json" % self.db_name)
     data = json.loads(response.content)
     assert_true("foo" in [col['name'] for col in data['cols']])
-    assert_true("SerDe Library" in data['properties'], data)
+    assert_true("SerDe Library" in [prop['col_name'] for prop in data['properties']], data)
 
     # Remember the number of history items. Use a generic fragment 'test' to pass verification.
     history_cnt = verify_history(self.client, fragment='test')
@@ -154,14 +154,15 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
 
   def test_describe_view(self):
     resp = self.client.get('/metastore/table/%s/myview?format=json' % self.db_name)
-    assert_equal(200, response.status_code, response.content)
-    data = json.loads(response.content)
+    assert_equal(200, resp.status_code, resp.content)
+    data = json.loads(resp.content)
     assert_true(data['is_view'])
     assert_equal("myview", data['name'])
 
   def test_describe_partitions(self):
-    response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
-    assert_true("Show Partitions (2)" in response.content, response.content)
+    response = self.client.get("/metastore/table/%s/test_partitions?format=json" % self.db_name)
+    data = json.loads(response.content)
+    assert_equal(2, len(data['partition_values_json']), data)
 
     response = self.client.get("/metastore/table/%s/test_partitions/partitions?format=json" % self.db_name, follow=True)
     data = json.loads(response.content)
