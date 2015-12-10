@@ -341,8 +341,20 @@ HIVE_PRIMITIVE_TYPES = \
       "float", "double", "timestamp", "date", "char", "varchar")
 
 class PartitionTypeForm(forms.Form):
+    dependencies = [
+    ("column_type", "char", "char_length"),
+    ("column_type", "varchar", "varchar_length")
+  ]
   column_name = common.HiveIdentifierField(required=True)
   column_type = forms.ChoiceField(required=True, choices=common.to_choices(HIVE_PRIMITIVE_TYPES))
+  char_length = forms.IntegerField(required=False, initial=1,
+                                   widget=NumberInput(attrs={'min': 1, 'max': 255}),
+                                   validators=[MinValueValidator(1), MaxValueValidator(255)],
+                                   help_text=_t("Specify if column_type is char"))
+  varchar_length = forms.IntegerField(required=False, initial=1,
+                                      widget=NumberInput(attrs={'min': 1, 'max': 65355}),
+                                      validators=[MinValueValidator(1), MaxValueValidator(65355)],
+                                      help_text=_t("Specify if column_is varchar"))
 
 class ColumnTypeForm(DependencyAwareForm):
   """
