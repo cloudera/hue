@@ -60,7 +60,7 @@ class HS2Api(Api):
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     snippet['result']['handle'].pop('statement_id')
-    snippet['result']['handle'].pop('has_more')
+    snippet['result']['handle'].pop('has_more_statements')
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
   def _get_db(self, snippet):
@@ -78,7 +78,7 @@ class HS2Api(Api):
 
     # Multiquery, if not first statement or arrived to the last query
     statement_id = snippet['result']['handle'].get('statement_id', 0)
-    if snippet['result']['handle'].get('has_more'):
+    if snippet['result']['handle'].get('has_more_statements'):
       try:
         handle = self._get_handle(snippet)
         db.close_operation(handle) # Close all the time past multi queries
@@ -108,7 +108,7 @@ class HS2Api(Api):
         'modified_row_count': handle.modified_row_count,
         'log_context': handle.log_context,
         'statement_id': statement_id,
-        'has_more': statement_id < len(statements) - 1
+        'has_more_statements': statement_id < len(statements) - 1
     }
 
   def _get_statements(self, hql_query):
