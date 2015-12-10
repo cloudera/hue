@@ -418,13 +418,23 @@ ${ require.config() }
       <table class="table table-compressed">
         <thead>
           <tr>
-            <th colspan="2" class="muted">${ _('Query history') } &nbsp; <span class="inactive-action"><a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="snippet-icon" data-toggle="modal"><i class="fa fa-calendar-times-o"></i></a></span></th>
+            <th colspan="2" class="muted">
+              ${ _('Query history') } &nbsp;
+              <span class="inactive-action">
+                <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="snippet-icon" data-toggle="modal">
+                  <i class="fa fa-calendar-times-o"></i>
+                </a>
+              </span>
+            </th>
           </tr>
         </thead>
         <tbody data-bind="foreach: $parent.history">
           <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { location.href=url; } }">
             <td><code data-bind="text: query" style="white-space: normal"></code></td>
             <td style="width: 200px" class="muted"><span data-bind="text: moment(lastExecuted).format('LLL')"></span></td>
+            <td style="width: 25px" class="muted">
+              <i class="fa fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}"></i>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -863,7 +873,7 @@ ${ require.config() }
     <a class="snippet-side-btn" data-bind="click: cancel, visible: status() == 'running'" title="${ _('Cancel') }">
       <i class="fa fa-fw fa-stop"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result && result.handle().has_more, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('CTRL + ENTER') }">
+    <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result && result.handle().has_more, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Restart from beginning') }">
       <i class="fa fa-fw fa-sign-out"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('CTRL + ENTER') }">
