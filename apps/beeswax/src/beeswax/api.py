@@ -810,6 +810,10 @@ def get_session(request):
 
   if session:
     properties = json.loads(session.properties)
+    # Redact passwords
+    for key, value in properties.items():
+      if 'password' in key.lower():
+        properties[key] = '*' * len(value)
   else:
     properties = {}
 
