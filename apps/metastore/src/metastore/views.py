@@ -59,7 +59,7 @@ def check_has_write_access_permission(view_func):
 
 
 def index(request):
-  return redirect(reverse('metastore:show_tables'))
+  return redirect(reverse('metastore:show_tables', kwargs={'database': request.COOKIES.get('hueBeeswaxLastDatabase', 'default')}))
 
 
 """
