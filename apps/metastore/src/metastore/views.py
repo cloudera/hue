@@ -432,7 +432,6 @@ def describe_partitions(request, database, table):
     partition_spec = ''
 
   partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
-
   massaged_partitions = [_massage_partition(database, table_obj, partition) for partition in partitions]
 
   if request.method == "POST" or request.GET.get('format', 'html') == 'json':
