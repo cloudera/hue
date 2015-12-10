@@ -486,7 +486,7 @@ ${ assist.assistPanel() }
         <!-- ko template: "metastore-columns-table" --><!-- /ko -->
         <!-- /ko -->
 
-        <a class="pointer" data-bind="visible: columns().length > 3, click: function() { $('li a[href=\'#columns\']').click(); }">
+        <a class="pointer" data-bind="visible: columns().length >= 3, click: function() { $('li a[href=\'#columns\']').click(); }">
           ${_('View more...')}
         </a>
       </div>
@@ -497,7 +497,7 @@ ${ assist.assistPanel() }
         <!-- ko if: loaded -->
         <!-- ko with: preview -->
         <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
-        <a class="pointer" data-bind="visible: rows().length > 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
+        <a class="pointer" data-bind="visible: rows().length >= 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
           ${_('View more...')}
         </a>
         <!-- /ko -->
@@ -513,9 +513,9 @@ ${ assist.assistPanel() }
         <!-- ko if: loaded -->
         <!-- ko with: preview -->
         <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
-        <a class="pointer" data-bind="visible: values().length > 3, click: function() { $('li a[href=\'#partitions\']').click(); }"  style="display: none;">
+        <a class="pointer" data-bind="visible: values().length >= 3, click: function() { $('li a[href=\'#partitions\']').click(); }"  style="display: none;">
           ${_('View more...')}
-      </a>
+        </a>
         <!-- /ko -->
         <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
         <!-- /ko -->
@@ -543,9 +543,9 @@ ${ assist.assistPanel() }
         <!-- /ko -->
       </div>
       <!-- /ko -->
-##       <a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
-##         ${ _('View all') }
-##       </a>
+       ##<a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
+       ##  ${ _('View all') }
+       ##</a>
     </div>
 
     <div class="tab-pane" id="sample">

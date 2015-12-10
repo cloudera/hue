@@ -1156,18 +1156,20 @@ for x in sys.stdin:
     self.client.post('/beeswax/install_examples')
 
     # New tables exists
-    resp = self.client.get('/metastore/tables/')
-    assert_true('sample_08' in resp.content)
-    assert_true('sample_07' in resp.content)
-    assert_true('customers' in resp.content)
+    resp = self.client.get('/metastore/tables/?format=json')
+    data = json.loads(resp.content)
+    assert_true('sample_08' in data['table_names'])
+    assert_true('sample_07' in data['table_names'])
+    assert_true('customers' in data['table_names'])
 
     # Sample tables contain data (examples are installed in default DB)
-    resp = self.client.get('/metastore/table/default/sample_07')
-    assert_true('<table id="sampleTable' in resp.content, resp.content)
-    resp = self.client.get('/metastore/table/default/sample_08')
-    assert_true('<table id="sampleTable' in resp.content, resp.content)
-    resp = self.client.get('/metastore/table/default/customers')
-    assert_true('<table id="sampleTable' in resp.content, resp.content)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'sample_07'}))
+    data = json.loads(resp.content)
+    assert_true(data['rows'], data)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'sample_08'}))
+    data = json.loads(resp.content)
+    assert_true(data['rows'], data)
+    resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'customers'}))
 
     # New designs exists
     resp = self.client.get('/beeswax/list_designs')
