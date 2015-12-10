@@ -79,6 +79,11 @@ class HS2Api(Api):
     # Multiquery, if not first statement or arrived to the last query
     statement_id = snippet['result']['handle'].get('statement_id', 0)
     if snippet['result']['handle'].get('has_more'):
+      try:
+        handle = self._get_handle(snippet)
+        db.close_operation(handle) # Close all the time past multi queries
+      except:
+        LOG.warn('Could not close previous multiquery query')
       statement_id += 1
     else:
       statement_id = 0
