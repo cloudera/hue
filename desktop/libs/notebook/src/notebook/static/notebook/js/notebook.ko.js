@@ -474,7 +474,7 @@
 
     self.reexecute = function () {
       self.result.handle()['statement_id'] = 0;
-      self.result.handle()['has_more'] = false;
+      self.result.handle()['has_more_statements'] = false;
 
       self.execute();
     };
@@ -570,7 +570,7 @@
             self.progress(100);
             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
               huePubSub.publish('assist.refresh');
-              if (self.result.handle().has_more) {
+              if (self.result.handle().has_more_statements) {
                 setTimeout(function () {
                   self.execute(); // Execute next, need to wait as we disabled fast click
                 }, 1000);
