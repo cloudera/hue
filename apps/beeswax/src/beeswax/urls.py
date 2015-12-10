@@ -35,7 +35,7 @@ urlpatterns = patterns('beeswax.views',
   url(r'^clone_design/(?P<design_id>\d+)$', 'clone_design', name='clone_design'),
   url(r'^query_history$', 'list_query_history', name='list_query_history'),
 
-  url(r'^configuration$', 'configuration', name='configuration'),
+  url(r'^configuration/?$', 'configuration', name='configuration'),
   url(r'^install_examples$', 'install_examples', name='install_examples'),
   url(r'^query_cb/done/(?P<server_id>\S+)$', 'query_done_cb', name='query_done_cb'),
 )
@@ -58,16 +58,14 @@ urlpatterns += patterns(
   'beeswax.api',
 
   url(r'^api/session/$', 'get_session', name='api_get_session'),
+  url(r'^api/functions/?$', 'get_functions', name='get_functions'),
 
   # Deprecated by Notebook API
-  url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete_databases'),
-  url(r'^api/autocomplete/(?P<database>\w+)$', 'autocomplete', name='api_autocomplete_tables'),
-  url(r'^api/autocomplete/(?P<database>\w+)/$', 'autocomplete', name='api_autocomplete_tables'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)$', 'autocomplete', name='api_autocomplete_columns'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/$', 'autocomplete', name='api_autocomplete_columns'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)$', 'autocomplete', name='api_autocomplete_column'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/$', 'autocomplete', name='api_autocomplete_column'),
-  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)$', 'autocomplete', name='api_autocomplete_nested'),
+  url(r'^api/autocomplete/?$', 'autocomplete', name='api_autocomplete_databases'),
+  url(r'^api/autocomplete/(?P<database>\w+/?)$', 'autocomplete', name='api_autocomplete_tables'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/?$', 'autocomplete', name='api_autocomplete_columns'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'autocomplete', name='api_autocomplete_column'),
+  url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)/?$', 'autocomplete', name='api_autocomplete_nested'),
 
   url(r'^api/design/(?P<design_id>\d+)?$', 'save_query_design', name='api_save_design'),
   url(r'^api/design/(?P<design_id>\d+)/get$', 'fetch_saved_design', name='api_fetch_saved_design'),
@@ -75,21 +73,20 @@ urlpatterns += patterns(
   url(r'^api/query/(?P<query_history_id>\d+)/get$', 'fetch_query_history', name='api_fetch_query_history'),
   url(r'^api/query/parameters$', 'parameters', name='api_parameters'),
   url(r'^api/query/execute/(?P<design_id>\d+)?$', 'execute', name='api_execute'),
-  url(r'^api/query/(?P<query_history_id>\d+)/cancel$', 'cancel_query', name='api_cancel_query'),
+  url(r'^api/query/(?P<query_history_id>\d+)/cancel/?$', 'cancel_query', name='api_cancel_query'),
   url(r'^api/query/(?P<query_history_id>\d+)/close/?$', 'close_operation', name='api_close_operation'),
-  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hive/table$', 'save_results_hive_table', name='api_save_results_hive_table'),
-  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/file$', 'save_results_hdfs_file', name='api_save_results_hdfs_file'),
-  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/directory$', 'save_results_hdfs_directory', name='api_save_results_hdfs_directory'),
-  url(r'^api/watch/json/(?P<id>\d+)$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
+  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hive/table/?$', 'save_results_hive_table', name='api_save_results_hive_table'),
+  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/file/?$', 'save_results_hdfs_file', name='api_save_results_hdfs_file'),
+  url(r'^api/query/(?P<query_history_id>\d+)/results/save/hdfs/directory/?$', 'save_results_hdfs_directory', name='api_save_results_hdfs_directory'),
+  url(r'^api/watch/json/(?P<id>\d+)/?$', 'watch_query_refresh_json', name='api_watch_query_refresh_json'),
 
-  url(r'^api/query/clear_history/$', 'clear_history', name='clear_history'),
+  url(r'^api/query/clear_history/?$', 'clear_history', name='clear_history'),
 
-  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)$', 'describe_table', name='describe_table'),
-  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/sample$', 'get_sample_data', name='get_sample_data'),
-  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/indexes$', 'get_indexes', name='get_indexes'),
-  url(r'^api/functions$', 'get_functions', name='get_functions'),
-
-  url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', 'analyze_table', name='analyze_table'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/?$', 'describe_table', name='describe_table'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/indexes/?$', 'get_indexes', name='get_indexes'),
+  url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/sample/?$', 'get_sample_data', name='get_sample_data'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/stats/(?P<column>\w+)?$', 'get_table_stats', name='get_table_stats'),
   url(r'^api/table/(?P<database>\w+)/(?P<table>\w+)/terms/(?P<column>\w+)/(?P<prefix>\w+)?$', 'get_top_terms', name='get_top_terms'),
+
+  url(r'^api/analyze/(?P<database>\w+)/(?P<table>\w+)/(?P<columns>\w+)?$', 'analyze_table', name='analyze_table'),
 )

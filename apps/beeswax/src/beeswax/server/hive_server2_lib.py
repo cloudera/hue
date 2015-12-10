@@ -595,13 +595,20 @@ class HiveServerClient:
     encoded_status, encoded_guid = HiveServerQueryHandle(secret=sessionId.secret, guid=sessionId.guid).get()
     properties = json.dumps(res.configuration)
 
-    return Session.objects.create(owner=user,
-                                  application=self.query_server['server_name'],
-                                  status_code=res.status.statusCode,
-                                  secret=encoded_status,
-                                  guid=encoded_guid,
-                                  server_protocol_version=res.serverProtocolVersion,
-                                  properties=properties)
+    session = Session.objects.create(owner=user,
+                                     application=self.query_server['server_name'],
+                                     status_code=res.status.statusCode,
+                                     secret=encoded_status,
+                                     guid=encoded_guid,
+                                     server_protocol_version=res.serverProtocolVersion,
+                                     properties=properties)
+
+    # HS2 does not return properties in TOpenSessionResp
+    if self.query_server['server_name'] == "beeswax" and not session.get_properties():
+      session.properties = json.dumps(self.get_configuration(include_hadoop=False))
+      session.save()
+
+    return session
 
 
   def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS):
@@ -865,6 +872,19 @@ class HiveServerClient:
       max_parts = LIST_PARTITIONS_LIMIT.get()
 
     return partitions[:max_parts]
+
+
+  def get_configuration(self, include_hadoop=False):
+    configuration = {}
+    query = 'SET'
+    if include_hadoop:
+      query += ' -v'
+
+    results = self.execute_query_statement(query)
+    if results:
+      rows = [row[0] for row in results.rows()]
+      configuration = dict((row.split('=')[0], row.split('=')[1]) for row in rows if '=' in row)
+    return configuration
 
 
   def _get_query_configuration(self, query):
