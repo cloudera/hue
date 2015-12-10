@@ -669,7 +669,6 @@ ${ assist.assistPanel() }
       <h3>${_('Drop Table')}</h3>
     </div>
     <div class="modal-body">
-      <a data-bind="click: function () { console.log($data) }">Click me</a>
       <div id="dropTableMessage">
       </div>
     </div>
