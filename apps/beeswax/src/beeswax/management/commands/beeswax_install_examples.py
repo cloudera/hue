@@ -159,7 +159,7 @@ class SampleTable(object):
     try:
       # Already exists?
       if self.app_name == 'impala':
-        db.invalidate_tables('default', [self.name])
+        db.invalidate(database='default', flush_all=False)
       db.get_table('default', self.name)
       msg = _('Table "%(table)s" already exists.') % {'table': self.name}
       LOG.error(msg)
