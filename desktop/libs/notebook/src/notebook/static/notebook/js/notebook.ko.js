@@ -472,6 +472,13 @@
       });
     };
 
+    self.reexecute = function () {
+      self.result.handle()['statement_id'] = 0;
+      self.result.handle()['has_more'] = false;
+
+      self.execute();
+    };
+
     self.fetchResult = function (rows, startOver) {
       if (typeof startOver == "undefined") {
         startOver = true;
