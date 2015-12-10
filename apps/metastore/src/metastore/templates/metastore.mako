@@ -551,9 +551,9 @@ ${ assist.assistPanel() }
     <div class="tab-pane" id="sample">
       <!-- ko with: samples -->
       <!-- ko if: loaded -->
-      <!-- ko template: { if: rows.length, name: 'metastore-samples-table' } --><!-- /ko -->
-      <span data-bind="visible: !rows.length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-      <span data-bind="visible: !rows.length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+      <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
+      <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+      <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
       <!-- /ko -->
       <!-- /ko -->
     </div>
