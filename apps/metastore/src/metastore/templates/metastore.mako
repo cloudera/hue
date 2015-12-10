@@ -27,13 +27,6 @@ from django.utils.translation import ugettext as _
 <%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="require" file="/require.mako" />
 
-<%
-  if table and table.is_view:
-    view_or_table_noun = _("View")
-  else:
-    view_or_table_noun = _("Table")
-%>
-
 ${ commonheader(_("Metastore"), app_name, user) | n,unicode }
 ${ components.menubar() }
 
@@ -259,7 +252,7 @@ ${ assist.assistPanel() }
   <div class="actionbar-actions">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
     % if has_write_access:
-      <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+      <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
       <div id="dropDatabase" class="modal hide fade">
         <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
           ${ csrf_token(request) | n,unicode }
@@ -347,7 +340,7 @@ ${ assist.assistPanel() }
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { table(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
           <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/metastore/table/' + name + '/' + selectedTables()[0].name + '/read'; }, disable: selectedTables().length !== 1"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
           % if has_write_access:
-            <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop')}</button>
+            <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
             <div id="dropTable" class="modal hide fade">
               <form id="dropTableForm" data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
                 ${ csrf_token(request) | n,unicode }
@@ -433,7 +426,7 @@ ${ assist.assistPanel() }
     <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
-      <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" title="${_('Drop')} ${view_or_table_noun}"><i class="fa fa-times"></i></a>
+      <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
     % endif
     <a class="inactive-action margin-left-10" href="${ 'table.hdfs_link' }" rel="${ 'table.path_location' }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
