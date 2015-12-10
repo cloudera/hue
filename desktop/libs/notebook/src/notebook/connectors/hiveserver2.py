@@ -24,7 +24,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
 from notebook.connectors.base import Api, QueryError, QueryExpired
-from beeswax.design import strip_trailing_semicolon, split_statements
+
 
 LOG = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import data_export
   from beeswax.api import _autocomplete
-  from beeswax.design import hql_query
+  from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
   from beeswax.server import dbms
@@ -60,7 +60,7 @@ class HS2Api(Api):
   def _get_handle(self, snippet):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     snippet['result']['handle'].pop('statement_id')
-    snippet['result']['handle'].pop('has_more') 
+    snippet['result']['handle'].pop('has_more')
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
   def _get_db(self, snippet):
@@ -108,7 +108,7 @@ class HS2Api(Api):
 
   def _get_statements(self, hql_query):
     hql_query = strip_trailing_semicolon(hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]    
+    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
   @query_error_handler
   def check_status(self, notebook, snippet):

@@ -75,6 +75,7 @@ def databases(request):
   return render("metastore.mako", request, {
     'breadcrumbs': [],
     'database': None,
+    'databases': databases,
     'partitions': [],
     'has_write_access': has_write_access(request.user),
   })

@@ -864,8 +864,8 @@ ${ require.config() }
       <i class="fa fa-fw fa-stop"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result && result.handle().has_more, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('CTRL + ENTER') }">
-      <i class="fa fa-fw fa-cog"></i>
-    </a>    
+      <i class="fa fa-fw fa-sign-out"></i>
+    </a>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
     </a>
@@ -873,7 +873,7 @@ ${ require.config() }
       <a class="snippet-side-btn" data-bind="click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': true}" title="${ _('Re-execute from the first statement') }">
         <i class="fa fa-fw fa-history"></i>
       </a>
-    <!-- /ko -->    
+    <!-- /ko -->
   </div>
 </script>
 
@@ -1065,7 +1065,7 @@ ${ require.config() }
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: saveAsNotebook">${_('Save')}</a> 
+    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: saveAsNotebook">${_('Save')}</a>
   </div>
 </div>
 

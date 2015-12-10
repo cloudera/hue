@@ -79,18 +79,20 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_equal(200, response.status_code)
 
     # Switch databases
-    response = self.client.get("/metastore/tables/%s" % self.db_name)
-    assert_true('name' in response.context["tables"][0])
-    assert_true("test" in response.context["table_names"])
+    response = self.client.get("/metastore/tables/%s>format=json" % self.db_name)
+    data = json.loads(response.content)
+    assert_true('name' in data["tables"][0])
+    assert_true("test" in data["table_names"])
 
     # Should default to "default" database
     response = self.client.get("/metastore/tables/not_there")
     assert_equal(200, response.status_code)
 
     # And have detail
-    response = self.client.get("/metastore/table/%s/test" % self.db_name)
-    assert_true("foo" in response.content)
-    assert_true("SerDe Library" in response.content, response.content)
+    response = self.client.get("/metastore/table/%s/test?format=json" % self.db_name)
+    data = json.loads(response.content)
+    assert_true("foo" in [col['name'] for col in data['cols']])
+    assert_true("SerDe Library" in data['properties'], data)
 
     # Remember the number of history items. Use a generic fragment 'test' to pass verification.
     history_cnt = verify_history(self.client, fragment='test')
@@ -151,27 +153,23 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     assert_false('test_index' in data['tables'])
 
   def test_describe_view(self):
-    resp = self.client.get('/metastore/table/%s/myview' % self.db_name)
-    assert_true(resp.context['table'].is_view)
-    assert_true("View" in resp.content)
-    assert_true("Drop View" in resp.content)
-    # Breadcrumbs
-    assert_true(self.db_name in resp.content)
-    assert_true("myview" in resp.content)
+    resp = self.client.get('/metastore/table/%s/myview?format=json' % self.db_name)
+    assert_equal(200, response.status_code, response.content)
+    data = json.loads(response.content)
+    assert_true(data['is_view'])
+    assert_equal("myview", data['name'])
 
   def test_describe_partitions(self):
     response = self.client.get("/metastore/table/%s/test_partitions" % self.db_name)
     assert_true("Show Partitions (2)" in response.content, response.content)
 
-    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name, follow=True)
-    assert_true("baz_one" in response.content)
-    assert_true("boom_two" in response.content)
-    assert_true("baz_foo" in response.content)
-    assert_true("boom_bar" in response.content)
-    # Breadcrumbs
-    assert_true(self.db_name in response.content)
-    assert_true("test_partitions" in response.content)
-    assert_true("partitions" in response.content)
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions?format=json" % self.db_name, follow=True)
+    data = json.loads(response.content)
+    partition_columns = [col for cols in data['massaged_partitions'] for col in cols['columns']]
+    assert_true("baz_one" in partition_columns)
+    assert_true("boom_two" in partition_columns)
+    assert_true("baz_foo" in partition_columns)
+    assert_true("boom_bar" in partition_columns)
 
     # Not partitioned
     response = self.client.get("/metastore/table/%s/test/partitions" % self.db_name, follow=True)
