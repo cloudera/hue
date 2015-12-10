@@ -498,7 +498,9 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
 
         user.save()
 
-    user = rewrite_user(user)
+    if user is not None:
+      user = rewrite_user(user)
+
     return user
 
   def clean_username(self, username):
