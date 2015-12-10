@@ -405,27 +405,31 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-databases-actions">
-  % if has_write_access:
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus-circle"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
+    % if has_write_access:
+    <a class="inactive-action margin-left-10" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus-circle"></i></a>
+    % endif
   </div>
-  % endif
+
 </script>
 
 <script type="text/html" id="metastore-tables-actions">
-  % if has_write_access:
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}"><i class="fa fa-files-o"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
+    % if has_write_access:
+    <a class="inactive-action margin-left-10" href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}"><i class="fa fa-files-o"></i></a>
     <a class="inactive-action margin-left-10" href="${ url('beeswax:create_table', database=database) }" title="${_('Create a new table manually')}"><i class="fa fa-wrench"></i></a>
+    % endif
   </div>
-  % endif
 </script>
 
 <script type="text/html" id="metastore-describe-table-actions">
   <div class="inline-block pull-right">
+    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     <!-- ko with: database -->
     <!-- ko with: table -->
-    <a class="inactive-action" href="javascript: void(0);"><i class="fa fa-star"></i></a>
+    <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
