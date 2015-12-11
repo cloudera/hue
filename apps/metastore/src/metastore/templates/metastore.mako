@@ -647,10 +647,11 @@ ${ assist.assistPanel() }
               <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
               <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
             </h3>
-
-            <!-- ko template: { if: database() === null, name: 'metastore-databases' } --><!-- /ko -->
+            <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
+            <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
             <!-- ko with: database -->
-            <!-- ko template: { if: table() === null, name: 'metastore-tables' } --><!-- /ko -->
+            <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
+            <!-- ko template: { if: !loading() && table() === null, name: 'metastore-tables' } --><!-- /ko -->
             <!-- ko with: table -->
               <!-- ko template: 'metastore-describe-table' --><!-- /ko -->
             <!-- /ko -->
