@@ -45,17 +45,19 @@ class Command(BaseCommand):
 
     self.stdout.write('Closing (all=%s) HiveServer2 sessions older than %s days...\n' % (close_all, days))
 
-    sessions = Session.objects.all()
+    sessions = Session.objects.filter(status_code=0)
 
     if not close_all:
       sessions = sessions.filter(application='beeswax')
 
     sessions = sessions.filter(last_used__lte=datetime.today() - timedelta(days=days))
 
+    self.stdout.write('Found %d open HiveServer2 sessions to close' % len(sessions))
+
     import os
     import beeswax
-    from beeswax import conf
     from beeswax import hive_site
+
     try:
       beeswax.conf.HIVE_CONF_DIR.set_for_testing(os.environ['HIVE_CONF_DIR'])
     except:
@@ -66,21 +68,14 @@ class Command(BaseCommand):
     hive_site.reset()
     hive_site.get_conf()
 
-    closed_sessions = 0
-    already_closed_sessions = 0
-
+    closed = 0
+    skipped = 0
     for session in sessions:
       try:
-        resp = dbms.get(user=session.owner).close_session(session)
-        if not 'Session does not exist!' in str(resp):
-          self.stdout.write('Info: %s\n' % resp)
-          closed_sessions += 1
-        else:
-          already_closed_sessions += 1
+        session = dbms.get(user=session.owner).close_session(session)
+        closed += 1
       except Exception, e:
-        if 'Session does not exist!' in str(e):
-          already_closed_sessions += 1
-        else:
-          self.stdout.write('Info: %s\n' % e)
+        skipped += 1
+        self.stdout.write('Session with ID %d could not be closed: %s' % (session.id, str(e)))
 
-    self.stdout.write('%s sessions closed. %s sessions already closed.\n' % (closed_sessions, already_closed_sessions))
+    self.stdout.write('%d sessions closed.\n%d sessions skipped because already closed.' % (closed, skipped))

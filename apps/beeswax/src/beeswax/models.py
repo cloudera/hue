@@ -385,11 +385,15 @@ class SavedQuery(models.Model):
 
 
 class SessionManager(models.Manager):
-  def get_session(self, user, application='beeswax'):
+
+  def get_session(self, user, application='beeswax', open_sessions=True):
     try:
-      return self.filter(owner=user, application=application).latest("last_used")
-    except Session.DoesNotExist:
-      pass
+      q = self.filter(owner=user, application=application)
+      if open_sessions:
+        q = q.filter(status_code=0)
+      return q.latest("last_used")
+    except Session.DoesNotExist, e:
+      return None
 
 
 class Session(models.Model):
@@ -397,7 +401,7 @@ class Session(models.Model):
   A sessions is bound to a user and an application (e.g. Bob with the Impala application).
   """
   owner = models.ForeignKey(User, db_index=True)
-  status_code = models.PositiveSmallIntegerField()
+  status_code = models.PositiveSmallIntegerField()  # ttypes.TStatusCode
   secret = models.TextField(max_length='100')
   guid = models.TextField(max_length='100')
   server_protocol_version = models.SmallIntegerField(default=0)

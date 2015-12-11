@@ -23,6 +23,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from thrift.transport.TTransport import TTransportException
 from desktop.context_processors import get_app_name
@@ -802,22 +803,53 @@ def get_top_terms(request, database, table, column, prefix=None):
 
 
 @error_handler
-def get_session(request):
+def get_session(request, session_id=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
 
-  session = Session.objects.get_session(request.user, query_server['server_name'])
+  response = {'status': -1, 'message': ''}
 
-  if session:
+  if session_id:
+    session = Session.objects.get(id=session_id, owner=request.user, application=query_server['server_name'])
+  else:  # get the latest session for given user and server type
+    session = Session.objects.get_session(request.user, query_server['server_name'])
+
+  if session is not None:
     properties = json.loads(session.properties)
     # Redact passwords
     for key, value in properties.items():
       if 'password' in key.lower():
         properties[key] = '*' * len(value)
-  else:
-    properties = {}
 
-  return JsonResponse({'properties': properties})
+    response['status'] = 0
+    response['session'] = {'id': session.id, 'application': session.application, 'status': session.status_code}
+    response['properties'] = properties
+  else:
+    response['message'] = _('Could not find session or no open sessions found.')
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def close_session(request, session_id):
+  app_name = get_app_name(request)
+  query_server = get_query_server_config(app_name)
+
+  response = {'status': -1, 'message': ''}
+
+  try:
+    session = Session.objects.get(id=session_id, owner=request.user, application=query_server['server_name'])
+  except Session.DoesNotExist:
+    response['message'] = _('Session does not exist or you do not have permissions to close the session.')
+
+  if session:
+    session = dbms.get(request.user, query_server).close_session(session)
+    response['status'] = 0
+    response['message'] = _('Session successfully closed.')
+    response['session'] = {'id': session_id, 'application': session.application, 'status': session.status_code}
+
+  return JsonResponse(response)
 
 
 """
