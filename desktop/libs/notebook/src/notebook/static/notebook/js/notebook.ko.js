@@ -127,7 +127,7 @@
       properties['py_file'] = '';
       properties['arguments'] = [];
     }
-    else if (snippetType == 'hive') {
+    else if (snippetType == 'hive' || snippetType == 'impala') {
       properties['settings'] = [];
       properties['files'] = [];
     }

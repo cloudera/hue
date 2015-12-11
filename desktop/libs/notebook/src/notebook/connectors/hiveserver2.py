@@ -91,7 +91,9 @@ class HS2Api(Api):
     statements = self._get_statements(snippet['statement'])
     statement = statements[statement_id]
 
-    query = hql_query(statement, QUERY_TYPES[0])
+    settings = snippet['properties'].get('settings', None)
+
+    query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings)
 
     try:
       handle = db.client.query(query)
