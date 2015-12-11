@@ -31,7 +31,7 @@ ${layout.menubar(section='configuration')}
       <p>
         <form class="form-search" method="POST">
           ${ csrf_token(request) | n,unicode }
-          <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key, value, etc.')}">
+          <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${_('Search for key or value.')}">
           <a href="#" id="clearFilterBtn" class="btn">${_('Clear')}</a>
         </form>
         <table class="table table-striped table-condensed datatables">
@@ -39,13 +39,12 @@ ${layout.menubar(section='configuration')}
             <tr>
               <th>${_('Key')}</th>
               <th>${_('Value')}</th>
-              <th>${_('Description')}</th>
             </tr>
           </thead>
           <tbody>
-            % for config_value in config_values:
-              <tr class="confRow" data-search="${config_value.key or ""}${config_value.value or ""}${config_value.description or ""}">
-                  <td>${config_value.key or ""}</td><td>${config_value.value or ""}</td><td>${config_value.description or ""}</td>
+            % for key, value in configuration.items():
+              <tr class="confRow" data-search="${key or ""}${value or ""}">
+                  <td>${key or ""}</td><td>${value or ""}</td>
               </tr>
             % endfor
           </tbody>

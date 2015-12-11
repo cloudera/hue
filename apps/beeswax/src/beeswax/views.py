@@ -47,7 +47,7 @@ import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models
-from beeswax.models import SavedQuery, QueryHistory
+from beeswax.models import QueryHistory, SavedQuery, Session
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
@@ -138,6 +138,7 @@ def _save_design(user, design, type_, design_obj, explicit_save, name=None, desc
     design.doc.get().add_to_history()
 
   return design
+
 
 def delete_design(request):
   if request.method == 'POST':
@@ -348,6 +349,7 @@ def list_query_history(request):
     'filter': filter,
   })
 
+
 def massage_query_history_for_json(app_name, query_history):
   return {
     'query': escape(query_history.query),
@@ -356,6 +358,7 @@ def massage_query_history_for_json(app_name, query_history):
     'designUrl': reverse(app_name + ':execute_design', kwargs={'design_id': query_history.design.id}),
     'resultsUrl': not query_history.is_failure() and reverse(app_name + ':watch_query_history', kwargs={'query_history_id': query_history.id}) or ""
   }
+
 
 def download(request, id, format):
   try:
@@ -550,12 +553,19 @@ def view_results(request, id, first_row=0):
 def configuration(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
-  config_values = dbms.get(request.user, query_server).get_default_configuration(
-                      bool(request.REQUEST.get("include_hadoop", False)))
-  for value in config_values:
-    if 'password' in value.key.lower():
-      value.value = "*" * 10
-  return render("configuration.mako", request, {'config_values': config_values})
+
+  session = Session.objects.get_session(request.user, query_server['server_name'])
+
+  if session:
+    properties = json.loads(session.properties)
+    # Redact passwords
+    for key, value in properties.items():
+      if 'password' in key.lower():
+        properties[key] = '*' * len(value)
+  else:
+    properties = {}
+
+  return render("configuration.mako", request, {'configuration': properties})
 
 
 """
@@ -635,6 +645,7 @@ def massage_columns_for_json(cols):
     })
   return massaged_cols
 
+
 def authorized_get_design(request, design_id, owner_only=False, must_exist=False):
   if design_id is None and not must_exist:
     return None
@@ -653,6 +664,7 @@ def authorized_get_design(request, design_id, owner_only=False, must_exist=False
     design.doc.get().can_read_or_exception(request.user)
 
   return design
+
 
 def authorized_get_query_history(request, query_history_id, owner_only=False, must_exist=False):
   if query_history_id is None and not must_exist:
@@ -981,6 +993,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
 
   return page, filter_params
 
+
 def _update_query_state(query_history):
   """
   Update the last_state for a QueryHistory object. Returns success as True/False.
@@ -1002,12 +1015,14 @@ def _update_query_state(query_history):
     query_history.save_state(state_enum)
   return True
 
+
 def get_db_choices(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
   dbs = db.get_databases()
   return [(db, db) for db in dbs]
+
 
 WHITESPACE = re.compile("\s+", re.MULTILINE)
 def collapse_whitespace(s):
