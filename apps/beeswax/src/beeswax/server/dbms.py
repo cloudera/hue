@@ -195,7 +195,7 @@ class HiveServer2Dbms(object):
     if not table.is_view:
       limit = min(100, BROWSE_PARTITIONED_TABLE_LIMIT.get())
 
-      if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+      if self.server_name != 'impala' and table.partition_keys:  # Filter on max # of partitions for partitioned tables
         hql = self._get_sample_partition_query(database, table, limit)
       else:
         hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
