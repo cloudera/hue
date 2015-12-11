@@ -80,14 +80,6 @@ def databases(request):
     'has_write_access': has_write_access(request.user),
   })
 
-  # return render("databases.mako", request, {
-  #   'breadcrumbs': [],
-  #   'search_filter': search_filter,
-  #   'databases': databases,
-  #   'databases_json': json.dumps(databases),
-  #   'has_write_access': has_write_access(request.user),
-  # })
-
 
 @check_has_write_access_permission
 def drop_database(request):
@@ -188,21 +180,6 @@ def show_tables(request, database=None):
     'partitions': [],
     'has_write_access': has_write_access(request.user),
     })
-    # resp = render("tables.mako", request, {
-    #   'breadcrumbs': [
-    #     {
-    #       'name': database,
-    #       'url': reverse('metastore:show_tables', kwargs={'database': database})
-    #     }
-    #   ],
-    #   'database_meta': database_meta,
-    #   'tables': tables,
-    #   'db_form': db_form,
-    #   'search_filter': search_filter,
-    #   'database': database,
-    #   'table_names': json.dumps(table_names),
-    #   'has_write_access': has_write_access(request.user),
-    # })
 
   resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
