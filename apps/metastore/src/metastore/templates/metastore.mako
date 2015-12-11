@@ -341,7 +341,7 @@ ${ assist.assistPanel() }
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Tables') }</h4>
-        <div class="actionbar-actions">
+        <div class="actionbar-actions" data-bind="visible: tables().length > 0">
           <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
           <button class="btn toolbarBtn" title="${_('Browse the selected table')}" data-bind="click: function () { location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1"><i class="fa fa-list"></i> ${_('Browse Data')}</button>
@@ -366,7 +366,7 @@ ${ assist.assistPanel() }
           % endif
         </div>
 
-        <table id="tablesTable" class="table table-striped table-condensed sampleTable" style="margin-bottom: 10px">
+        <table id="tablesTable" class="table table-striped table-condensed sampleTable" style="margin-bottom: 10px" data-bind="visible: tables().length > 0">
           <thead>
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
@@ -398,7 +398,7 @@ ${ assist.assistPanel() }
             </tr>
           </tbody>
         </table>
-        <span class="margin-left-10" data-bind="visible: filteredTables().length === 0" style="font-style: italic; display: none;">${_('No tables found')}</span>
+        <span data-bind="visible: filteredTables().length === 0, css: {'margin-left-10': tables().length > 0}" style="font-style: italic; display: none;">${_('No tables found.')}</span>
       </div>
     </div>
 </script>
