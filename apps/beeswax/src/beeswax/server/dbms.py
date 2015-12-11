@@ -293,11 +293,24 @@ class HiveServer2Dbms(object):
   def close_operation(self, query_handle):
     return self.client.close_operation(query_handle)
 
+
   def open_session(self, user):
     return self.client.open_session(user)
 
+
   def close_session(self, session):
-    return self.client.close_session(session)
+    resp = self.client.close_session(session)
+
+    if resp.status.statusCode != 0:
+      session.status_code = resp.status.statusCode
+      session.save()
+      raise QueryServerException(_('Failed to close session, session handle may already be closed or timed out.'))
+    else:
+      session.status_code = 4  # Set to ttypes.TStatusCode.INVALID_HANDLE_STATUS
+      session.save()
+
+    return session
+
 
   def cancel_operation(self, query_handle):
     resp = self.client.cancel_operation(query_handle)
