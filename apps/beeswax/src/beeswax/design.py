@@ -38,16 +38,21 @@ LOG = logging.getLogger(__name__)
 SERIALIZATION_VERSION = '0.4.1'
 
 
-def hql_query(hql, database='default', query_type=None):
-  data_dict = json.loads('{"query": {"email_notify": false, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
-                               '"functions": [], "VERSION": "0.4.1", "file_resources": [], "settings": []}')
+def hql_query(hql, database='default', query_type=None, settings=None):
+  data_dict = HQLdesign.get_default_data_dict()
+
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
 
   data_dict['query']['query'] = strip_trailing_semicolon(hql)
   data_dict['query']['database'] = database
+
   if query_type:
     data_dict['query']['type'] = query_type
+
+  if settings is not None and HQLdesign.is_valid_settings(settings):
+    data_dict['query']['settings'] = settings
+
   hql_design = HQLdesign()
   hql_design._data_dict = data_dict
 
@@ -80,12 +85,6 @@ class HQLdesign(object):
       if query_type is not None:
         self._data_dict['query']['type'] = query_type
 
-  def dumps(self):
-    """Returns the serialized form of the design in a string"""
-    dic = self._data_dict.copy()
-    dic['VERSION'] = SERIALIZATION_VERSION
-    return json.dumps(dic)
-
   @property
   def hql_query(self):
     return self._data_dict['query']['query']
@@ -109,6 +108,68 @@ class HQLdesign(object):
   @property
   def functions(self):
     return list(self._data_dict['functions'])
+
+  @property
+  def statement_count(self):
+    return len(self.statements)
+
+  @property
+  def statements(self):
+    hql_query = strip_trailing_semicolon(self.hql_query)
+    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
+
+  @staticmethod
+  def get_default_data_dict():
+    return {
+      'query': {
+        'email_notify': False,
+        'query': None,
+        'type': 0,
+        'is_parameterized': True,
+        'database': 'default'
+      },
+      'functions': [],
+      'VERSION': SERIALIZATION_VERSION,
+      'file_resources': [],
+      'settings': []
+    }
+
+  @staticmethod
+  def loads(data):
+    """Returns an HQLdesign from the serialized form"""
+    dic = json.loads(data)
+    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
+    if dic['VERSION'] != SERIALIZATION_VERSION:
+      LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
+
+    # Convert to latest version
+    del dic['VERSION']
+    if 'type' not in dic['query'] or dic['query']['type'] is None:
+      dic['query']['type'] = 0
+    if 'database' not in dic['query']:
+      dic['query']['database'] = 'default'
+
+    design = HQLdesign()
+    design._data_dict = dic
+    return design
+
+  @staticmethod
+  def is_valid_settings(settings):
+    is_valid = True
+    if isinstance(settings, list) and all(isinstance(item, dict) for item in settings):
+      for item in settings:
+        if not all(attr in item for attr in HQLdesign._SETTINGS_ATTRS):
+          is_valid = False
+          break
+    else:
+      is_valid = False
+    return is_valid
+
+  def dumps(self):
+    """Returns the serialized form of the design in a string"""
+    dic = self._data_dict.copy()
+    dic['VERSION'] = SERIALIZATION_VERSION
+    return json.dumps(dic)
 
   def get_configuration_statements(self):
     configuration = []
@@ -142,39 +203,11 @@ class HQLdesign(object):
                 self._data_dict['functions'], mform.functions, HQLdesign._FUNCTIONS_ATTRS))
     return res
 
-  @staticmethod
-  def loads(data):
-    """Returns an HQLdesign from the serialized form"""
-    dic = json.loads(data)
-    dic = dict(map(lambda k: (str(k), dic.get(k)), dic.keys()))
-    if dic['VERSION'] != SERIALIZATION_VERSION:
-      LOG.error('Design version mismatch. Found %s; expect %s' % (dic['VERSION'], SERIALIZATION_VERSION))
-
-    # Convert to latest version
-    del dic['VERSION']
-    if 'type' not in dic['query'] or dic['query']['type'] is None:
-      dic['query']['type'] = 0
-    if 'database' not in dic['query']:
-      dic['query']['database'] = 'default'
-
-    design = HQLdesign()
-    design._data_dict = dic
-    return design
-
   def get_query(self):
     return self._data_dict["query"]
 
-  @property
-  def statement_count(self):
-    return len(self.statements)
-
   def get_query_statement(self, n=0):
     return self.statements[n]
-
-  @property
-  def statements(self):
-    hql_query = strip_trailing_semicolon(self.hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)
