@@ -950,11 +950,15 @@ ${ assist.assistPanel() }
       self.comment = ko.observable(options.comment);
 
       self.comment.subscribe(function (newValue) {
-        // TODO: Switch to using the ko observables in the url (self.database.name() and self.name())
-        ##         $.post("${ url('metastore:alter_table', database=database, table=table.name) }", {
-        ##           comment: newValue ? newValue : ""
-        ##         });
-              });
+        $.post('/metastore/table/' + self.database.name + '/' + self.name + '/alter', {
+          comment: newValue ? newValue : ""
+        }, function () {
+          self.assistHelper.clearCache({
+            sourceType: 'hive',
+            databaseName: self.database.name
+          })
+        });
+      });
 
       self.refreshTableStats = function () {
         if (self.refreshingTableStats()) {
