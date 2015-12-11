@@ -80,7 +80,7 @@ class MySQLClient(BaseRDMSClient):
       raise RuntimeError(_("Database '%s' is not allowed. Please use database '%s'.") % (database, self._conn_params['db']))
     else:
       cursor = self.connection.cursor()
-      cursor.execute("USE %s" % database)
+      cursor.execute("USE `%s`" % database)
       self.connection.commit()
 
 
