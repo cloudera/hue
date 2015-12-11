@@ -1061,19 +1061,17 @@ ${ assist.assistPanel() }
       self.favourite = ko.observable(false);
 
       self.comment.subscribe(function (newValue) {
-        // TODO: Switch to using the ko observables in the url (self.table.name() and self.table.database.name();
-        ##         $.post("${ url('metastore:alter_column', database=database, table=table.name) }", {
-        ##           column: self.name(),
-        ##           comment: newValue
-        ##         }, function () {
-        ##           self.vm.assistHelper.clearCache({
-        ##             sourceType: 'hive',
-        ##             databaseName: self.table.database.name,
-        ##             tableName: self.table.name,
-        ##             fields: []
-        ##           })
-        ##         });
-              })
+        $.post('/metastore/table/' + self.table.database.name + '/' + self.table.name + '/alter_column', {
+          column: self.name(),
+          comment: newValue
+        }, function () {
+          self.table.assistHelper.clearCache({
+            sourceType: 'hive',
+            databaseName: self.table.database.name,
+            tableName: self.table.name
+          })
+        });
+      })
     }
 
     /**
