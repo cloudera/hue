@@ -304,7 +304,7 @@ ${ assist.assistPanel() }
       <div class="span12 tile">
         <h4>${ _('Stats') }</h4>
         <div class="row-fluid">
-          <div class="span3">
+          <div class="span6">
             <div title="${ _('Comment') }"><i class="fa fa-fw fa-comment muted"></i>
               <!-- ko if: stats().comment -->
               <span data-bind="text: stats().comment"></span>
@@ -324,11 +324,11 @@ ${ assist.assistPanel() }
           <div class="span3">
             <div><a data-bind="attr: {'href': stats().hdfs_link, 'rel': stats().location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
           </div>
-          <div class="span3">
+        </div>
+        <div class="row-fluid">
+          <div class="span12">
             <div title="${ _('Parameters') }"><i class="fa fa-fw fa-cog muted"></i>
-              <!-- ko if: stats().parameters -->
-              <span data-bind="text: stats().parameters"></span>
-              <!-- /ko -->
+              <!-- ko template: { if: stats().parameters, name: 'metastore-databases-parameters', data: hueUtils.parseHivePseudoJson(stats().parameters) }--><!-- /ko -->
               <!-- ko ifnot: stats().parameters -->
               <i>${_('No parameters.')}</i>
               <!-- /ko -->
@@ -403,6 +403,12 @@ ${ assist.assistPanel() }
     </div>
 </script>
 
+<script type="text/html" id="metastore-databases-parameters">
+  <!-- ko foreach: Object.keys($data) -->
+    <div class="inline margin-right-20"><strong data-bind="text: $data"></strong>: <span data-bind="text: $parent[$data]"></span></div>
+  <!-- /ko -->
+</script>
+
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
@@ -410,7 +416,6 @@ ${ assist.assistPanel() }
     <a class="inactive-action margin-left-10" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus-circle"></i></a>
     % endif
   </div>
-
 </script>
 
 <script type="text/html" id="metastore-tables-actions">

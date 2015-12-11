@@ -149,6 +149,25 @@ Array.prototype.diff = function (a) {
     window.history.pushState(null, null, newURL);
   }
 
+  /**
+   * @param {string} pseudoJson
+   * @constructor
+   */
+  hueUtils.parseHivePseudoJson = function (pseudoJson) {
+    // Hive returns a pseudo-json with parameters, like
+    // "{Lead Developer=John Foo, Lead Developer Email=jfoo@somewhere.com, date=2013-07-11 }"
+    var parsedParams = {};
+    if (pseudoJson && pseudoJson.length > 2){
+      var splits = pseudoJson.substring(1, pseudoJson.length-2).split(', ');
+      splits.forEach(function(part){
+        if (part.indexOf('=') > -1){
+          parsedParams[part.split('=')[0]] = part.split('=')[1];
+        }
+      });
+    }
+    return parsedParams;
+  }
+
 }(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {
