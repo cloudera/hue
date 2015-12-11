@@ -417,8 +417,8 @@ ${ assist.assistPanel() }
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     % if has_write_access:
-    <a class="inactive-action margin-left-10" href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}"><i class="fa fa-files-o"></i></a>
-    <a class="inactive-action margin-left-10" href="${ url('beeswax:create_table', database=database) }" title="${_('Create a new table manually')}"><i class="fa fa-wrench"></i></a>
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/beeswax/create/import_wizard/' + database().name }" title="${_('Create a new table from a file')}"><i class="fa fa-files-o"></i></a>
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/beeswax/create/create_table/' + database().name }" title="${_('Create a new table manually')}"><i class="fa fa-wrench"></i></a>
     % endif
   </div>
 </script>
@@ -429,7 +429,7 @@ ${ assist.assistPanel() }
     <!-- ko with: database -->
     <!-- ko with: table -->
     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
-    <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
+    <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
@@ -549,9 +549,7 @@ ${ assist.assistPanel() }
         <!-- /ko -->
       </div>
       <!-- /ko -->
-       ##<a href="${ url('metastore:describe_partitions', database=database, table=table.name) }">
-       ##  ${ _('View all') }
-       ##</a>
+      <a data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }">${ _('View all') }</a>
     </div>
 
     <div class="tab-pane" id="sample">
@@ -1037,6 +1035,14 @@ ${ assist.assistPanel() }
       }
     }
 
+    MetastoreTable.prototype.showImportData = function () {
+      var self = this;
+      $.get('/metastore/table/' + self.database.name + '/' + self.name + '/load', function (response) {
+        $("#import-data-modal").html(response['data']);
+        $("#import-data-modal").modal("show");
+      });
+    };
+
     MetastoreTable.prototype.load = function () {
       var self = this;
       if (self.loading()) {
@@ -1310,11 +1316,11 @@ ${ assist.assistPanel() }
       $('a[data-toggle="tab"]').on('shown', function (e) {
         if ($(e.target).attr("href") == "#queries") {
           viewModel.loadingQueries(true);
-          ##           $.getJSON("${ url('metastore:table_queries', database=database, table=table.name) }", function (data) {
-          ##             viewModel.queries(data.queries);
-          ##             viewModel.loadingQueries(false);
-          ##           });
-                  }
+          $.getJSON('/metastore/table/' + viewModel.database().name + '/' + viewModel.database().table().name + '/queries', function (data) {
+            viewModel.queries(data.queries);
+            viewModel.loadingQueries(false);
+          });
+        }
       });
 
     });
@@ -1389,14 +1395,6 @@ ${ assist.assistPanel() }
         ##         % endif
               }
     });
-
-    $("#import-data-btn").click(function () {
-      ##       $.get("${ url('metastore:load_table', database=database, table=table.name) }", function (response) {
-      ##           $("#import-data-modal").html(response['data']);
-      ##           $("#import-data-modal").modal("show");
-      ##         }
-      ##       );
-          });
 
     $('a[data-toggle="tab"]:eq(0)').click();
   });
