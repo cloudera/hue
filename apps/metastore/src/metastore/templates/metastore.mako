@@ -126,11 +126,13 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-partition-columns-table">
   <div style="overflow: auto">
     <table id="sampleTable" class="table table-striped table-condensed sampleTable">
-      <tr>
-        <th style="width: 10px"></th>
-        <th>${_('Name')}</th>
-        <th>${_('Type')}</th>
-      </tr>
+      <thead>
+        <tr>
+          <th style="width: 10px"></th>
+          <th>${_('Name')}</th>
+          <th>${_('Type')}</th>
+        </tr>
+      </thead>
       <tbody>
       <!-- ko foreach: detailedKeys -->
       <tr>
@@ -147,12 +149,14 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-partition-values-table">
   <div style="overflow: auto">
     <table id="sampleTable" class="table table-striped table-condensed sampleTable">
-      <tr>
-        <th style="width: 10px"></th>
-        <th>${_('Values')}</th>
-        <th>${_('Spec')}</th>
-        <th>${_('Browse')}</th>
-      </tr>
+      <thead>
+        <tr>
+          <th style="width: 10px"></th>
+          <th>${_('Values')}</th>
+          <th>${_('Spec')}</th>
+          <th>${_('Browse')}</th>
+        </tr>
+      </thead>
       <tbody>
       <!-- ko foreach: values -->
       <tr>
@@ -173,12 +177,14 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-samples-table">
   <div style="overflow: auto">
     <table id="sampleTable" class="table table-striped table-condensed sampleTable">
-      <tr>
-        <th style="width: 10px"></th>
-        <!-- ko foreach: headers -->
-        <th data-bind="text: $data"></th>
-        <!-- /ko -->
-      </tr>
+      <thead>
+        <tr>
+          <th style="width: 10px"></th>
+          <!-- ko foreach: headers -->
+          <th data-bind="text: $data"></th>
+          <!-- /ko -->
+        </tr>
+      </thead>
       <tbody>
         <!-- ko foreach: rows -->
           <tr>
@@ -360,7 +366,7 @@ ${ assist.assistPanel() }
           % endif
         </div>
 
-        <table id="tablesTable" class="table table-condensed datatables" style="margin-bottom: 10px">
+        <table id="tablesTable" class="table table-striped table-condensed sampleTable" style="margin-bottom: 10px">
           <thead>
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
@@ -1389,9 +1395,6 @@ ${ assist.assistPanel() }
       ##         }
       ##       );
           });
-
-    // convert link text to URLs in comment column (Columns tab)
-    hueUtils.text2Url(document.querySelectorAll('.sampleTable td:last-child'));
 
     $('a[data-toggle="tab"]:eq(0)').click();
   });
