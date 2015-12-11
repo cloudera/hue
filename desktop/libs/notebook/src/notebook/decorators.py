@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.forms import ValidationError
 from django.http import Http404
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
@@ -81,6 +82,9 @@ def api_error_handler(func):
       response['status'] = -3
     except AuthenticationRequired, e:
       response['status'] = 401
+    except ValidationError, e:
+      response['status'] = -1
+      response['message'] = e.message
     except QueryError, e:
       LOG.exception('error running %s' % func)
       response['status'] = 1

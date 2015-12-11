@@ -130,6 +130,7 @@
     else if (snippetType == 'hive' || snippetType == 'impala') {
       properties['settings'] = [];
       properties['files'] = [];
+      properties['functions'] = [];
     }
     else if (snippetType == 'pig') {
       properties['parameters'] = [];

@@ -27,9 +27,10 @@ import urlparse
 
 import django.http
 from django import forms
+from django.forms import ValidationError
+from django.utils.translation import ugettext as _
 
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
-from desktop.lib.django_mako import render_to_string
 from hadoop.cluster import get_hdfs
 
 
@@ -38,7 +39,7 @@ LOG = logging.getLogger(__name__)
 SERIALIZATION_VERSION = '0.4.1'
 
 
-def hql_query(hql, database='default', query_type=None, settings=None):
+def hql_query(hql, database='default', query_type=None, settings=None, file_resources=None, functions=None):
   data_dict = HQLdesign.get_default_data_dict()
 
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
@@ -50,8 +51,14 @@ def hql_query(hql, database='default', query_type=None, settings=None):
   if query_type:
     data_dict['query']['type'] = query_type
 
-  if settings is not None and HQLdesign.is_valid_settings(settings):
-    data_dict['query']['settings'] = settings
+  if settings is not None and HQLdesign.validate_properties('settings', settings, HQLdesign._SETTINGS_ATTRS):
+    data_dict['settings'] = settings
+
+  if file_resources is not None and HQLdesign.validate_properties('file resources', file_resources, HQLdesign._FILE_RES_ATTRS):
+    data_dict['file_resources'] = file_resources
+
+  if functions is not None and HQLdesign.validate_properties('functions', functions, HQLdesign._FUNCTIONS_ATTRS):
+    data_dict['functions'] = functions
 
   hql_design = HQLdesign()
   hql_design._data_dict = data_dict
@@ -154,16 +161,19 @@ class HQLdesign(object):
     return design
 
   @staticmethod
-  def is_valid_settings(settings):
-    is_valid = True
-    if isinstance(settings, list) and all(isinstance(item, dict) for item in settings):
-      for item in settings:
-        if not all(attr in item for attr in HQLdesign._SETTINGS_ATTRS):
-          is_valid = False
-          break
+  def validate_properties(property_type, properties, req_attr_list):
+    """
+    :param property_type: 'Settings', 'File Resources', or 'Functions'
+    :param properties: list of properties as dict
+    :param req_attr_list: list of attributes that are required keys for each dict item
+    """
+    if isinstance(properties, list) and all(isinstance(item, dict) for item in properties):
+      for item in properties:
+        if not all(attr in item for attr in req_attr_list):
+          raise ValidationError(_("Invalid %s, missing required attributes: %s.") % (property_type, ', '.join(req_attr_list)))
     else:
-      is_valid = False
-    return is_valid
+      raise ValidationError(_('Invalid settings, expected list of dict items.'))
+    return True
 
   def dumps(self):
     """Returns the serialized form of the design in a string"""
@@ -179,10 +189,11 @@ class HQLdesign(object):
         scheme = get_hdfs().fs_defaultfs
       else:
         scheme = ''
-      configuration.append(render_to_string("hql_resource.mako", dict(type=f['type'], path=f['path'], scheme=scheme)))
+      configuration.append('ADD %(type)s %(scheme)s%(path)s' % {'type': f['type'], 'path': f['path'], 'scheme': scheme})
 
     for f in self.functions:
-      configuration.append(render_to_string("hql_function.mako", f))
+      configuration.append("CREATE TEMPORARY FUNCTION %(name)s AS '%(class_name)s'" %
+                           {'name': f['name'], 'class_name': f['class_name']})
 
     return configuration
 

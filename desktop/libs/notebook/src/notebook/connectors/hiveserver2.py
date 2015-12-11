@@ -92,8 +92,10 @@ class HS2Api(Api):
     statement = statements[statement_id]
 
     settings = snippet['properties'].get('settings', None)
+    file_resources = snippet['properties'].get('files', None)
+    functions = snippet['properties'].get('functions', None)
 
-    query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings)
+    query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings, file_resources=file_resources, functions=functions)
 
     try:
       handle = db.client.query(query)
