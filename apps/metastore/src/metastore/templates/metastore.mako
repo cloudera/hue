@@ -342,7 +342,7 @@ ${ assist.assistPanel() }
           % if has_write_access:
             <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
             <div id="dropTable" class="modal hide fade">
-              <form id="dropTableForm" data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
+              <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
                 ${ csrf_token(request) | n,unicode }
                 <div class="modal-header">
                   <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -426,7 +426,7 @@ ${ assist.assistPanel() }
     <a class="inactive-action margin-left-10" href="#" id="import-data-btn" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
-      <a class="inactive-action margin-left-10" href="#dropTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
+      <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
     % endif
     <a class="inactive-action margin-left-10" href="${ 'table.hdfs_link' }" rel="${ 'table.path_location' }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
@@ -664,21 +664,19 @@ ${ assist.assistPanel() }
 
 
 
-<div id="dropTable" class="modal hide fade">
-  <form id="dropTableForm" method="POST" action="${ url('metastore:drop_table', database=database) }">
+<div id="dropSingleTable" class="modal hide fade">
+  <form method="POST" data-bind="attr: { 'action': '/metastore/tables/drop/' + (database() ? database().name : '') }">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-
       <h3>${_('Drop Table')}</h3>
     </div>
     <div class="modal-body">
-      <div id="dropTableMessage">
-      </div>
+      <div>${_('Do you really want to drop the table')} <span style="font-weight: bold;" data-bind="text: database() && database().table() ? database().table().name : ''"></span>?</div>
     </div>
     <div class="modal-footer">
       <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}"/>
-      <input type="submit" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
+      <input type="submit" data-bind="click: function () { huePubSub.publish('assist.refresh'); return true; }" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
     </div>
     <div class="hide">
       <!-- ko with: database -->
@@ -1337,12 +1335,6 @@ ${ assist.assistPanel() }
         }, 200)
       }
     }
-
-    % if has_write_access:
-      $.getJSON("${ url('metastore:drop_table', database=database) }", function (data) {
-        $("#dropTableMessage").text(data.title);
-      });
-    % endif
 
     $('a[data-toggle="tab"]').on('shown', function (e) {
       var sortables = [];
