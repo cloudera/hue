@@ -252,6 +252,49 @@ for x in sys.stdin:
     assert_equal(257, ''.join(response.streaming_content).count("\n"))
 
 
+  def test_api_get_session(self):
+    session = None
+    try:
+      # Create open session
+      session = self.db.open_session(self.user)
+
+      resp = self.client.get(reverse("beeswax:api_get_session"))
+      data = json.loads(resp.content)
+      assert_true('properties' in data, data)
+      assert_true('session' in data, data)
+      assert_true('id' in data['session'], data['session'])
+    finally:
+      if session is not None:
+        try:
+          self.db.close_session(session)
+        except Exception:
+          pass
+
+
+  def test_api_close_session(self):
+    session = None
+    try:
+      # Create open session
+      session = self.db.open_session(self.user)
+
+      resp = self.client.post(reverse("beeswax:api_close_session", kwargs={'session_id': session.id}))
+      data = json.loads(resp.content)
+      assert_equal(0, data['status'])
+      assert_true('session' in data)
+      assert_equal(4, data['session']['status'])
+
+      # Closed sessions will return error response
+      resp = self.client.post(reverse("beeswax:api_close_session", kwargs={'session_id': session.id}))
+      data = json.loads(resp.content)
+      assert_equal(-1, data['status'])
+    finally:
+      if session is not None:
+        try:
+          self.db.close_session(session)
+        except Exception:
+          pass
+
+
   def test_result_escaping(self):
     # Check for XSS and NULL display
     QUERY = """
@@ -774,6 +817,7 @@ for x in sys.stdin:
 
     assert_equal(sheet_data, csv_data)
 
+
   def test_data_upload(self):
     hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
     query = hql_query(hql)
@@ -1243,6 +1287,7 @@ for x in sys.stdin:
     rows = json.loads(resp.content)['rows']
     flat_rows = sum(rows, [])
     assert_true("2012-01-01 10:11:30.0" in flat_rows, flat_rows)
+
 
   def test_partitioned_create_table(self):
     # Make sure we get a form
@@ -2002,6 +2047,7 @@ def test_history_page():
       query_type=HQL
   )
 
+
   def do_view(param, n=1):
     resp = client.get('/beeswax/query_history?' + param)
     if n == 0:
@@ -2055,6 +2101,7 @@ def teststrip_trailing_semicolon():
   # No semicolons
   assert_equal("foo", strip_trailing_semicolon("foo"))
 
+
 def test_hadoop_extraction():
   sample_log = """
 Starting Job = job_201003191517_0002, Tracking URL = http://localhost:50030/jobdetails.jsp?jobid=job_201003191517_0002
@@ -2078,6 +2125,7 @@ Starting Job = job_201003191517_0003, Tracking URL = http://localhost:50030/jobd
   assert_equal(
       ["job_1402269517321_0003"],
       beeswax.views._parse_out_hadoop_jobs(sample_log_no_direct_url))
+
 
 def test_hive_site():
   tmpdir = tempfile.mkdtemp()
@@ -2243,16 +2291,6 @@ ALTER TABLE alltypes ADD IF NOT EXISTS PARTITION(year=2009, month=2);"""
               hql_query(query).statements, hql_query(query).statements)
 
 
-def test_api_get_session():
-  client = make_logged_in_client(is_superuser=False)
-  grant_access("test", "test", "beeswax")
-
-  resp = client.get(reverse("beeswax:api_get_session"))
-
-  data = json.loads(resp.content)
-  assert_true('properties' in data)
-
-
 class MockHiveServerTable(HiveServerTable):
 
   def __init__(self, describe=None):
@@ -2308,6 +2346,7 @@ class TestHiveServer2API():
 
     value = PartitionValueCompatible(['month=2011-07/dt=2011-07-01/hr=12'], table)
     assert_equal(['2011-07', '2011-07-01', '12'], value.values)
+
 
   def test_hiveserver_table(self):
     table = MockHiveServerTable()
@@ -2434,6 +2473,7 @@ class TestHiveServer2API():
     assert_equal([None, 1, 1, 1, 1, 1, 1, 1, None, None, 1, 1, 1, None, 1, 1, None, 1, None, 1, 1, 1, None, 1, None, None, None, 1, 1, None, None, 1, None, 1, 1,
                   None, 1, 1, 1, None, None, None, 1, None, 1, None, 1, None, None, 1, None, None, 1, 1, None, None, None, None, None, None, 1, None, None, None],
                  HiveServerTColumnValue2.set_nulls(data, nulls))
+
 
   def test_column_detect_if_values_nulls(self):
     data = [1, 2, 3]
@@ -2838,40 +2878,40 @@ class MockClient():
     self.open_session_args = args
 
 
-#def test_hive_server2_open_session():
-#  make_logged_in_client()
-#  user = User.objects.get(username='test')
-#
-#  query_server = get_query_server_config()
-#
-#  db_client = HiveServerClient(query_server, user)
-#  mock_hs2_client = MockClient()
-#  setattr(db_client, '_client', mock_hs2_client)
-#
-#  # Regular session
-#  finish = desktop_conf.LDAP_PASSWORD.set_for_testing('')
-#  try:
-#    db_client.open_session(user)
-#  except:
-#    pass
-#  finally:
-#    finish()
-#    req = mock_hs2_client.open_session_args
-#    assert_equal('test', req.username)
-#    assert_equal(None, req.password)
-#    assert_equal('test', req.configuration['hive.server2.proxy.user'])
-#
-#  # LDAP credentials
-#  finish = desktop_conf.LDAP_PASSWORD.set_for_testing('I_love_Hue')
-#  try:
-#    db_client.open_session(user)
-#  except:
-#    pass
-#  finally:
-#    finish()
-#    req = mock_hs2_client.open_session_args
-#    assert_equal('test', req.username) # Same as kerberos, real username is picked from Thrift authentication, this one does not matter
-#    assert_equal(None, req.password)
+  #def test_hive_server2_open_session():
+  #  make_logged_in_client()
+  #  user = User.objects.get(username='test')
+  #
+  #  query_server = get_query_server_config()
+  #
+  #  db_client = HiveServerClient(query_server, user)
+  #  mock_hs2_client = MockClient()
+  #  setattr(db_client, '_client', mock_hs2_client)
+  #
+  #  # Regular session
+  #  finish = desktop_conf.LDAP_PASSWORD.set_for_testing('')
+  #  try:
+  #    db_client.open_session(user)
+  #  except:
+  #    pass
+  #  finally:
+  #    finish()
+  #    req = mock_hs2_client.open_session_args
+  #    assert_equal('test', req.username)
+  #    assert_equal(None, req.password)
+  #    assert_equal('test', req.configuration['hive.server2.proxy.user'])
+  #
+  #  # LDAP credentials
+  #  finish = desktop_conf.LDAP_PASSWORD.set_for_testing('I_love_Hue')
+  #  try:
+  #    db_client.open_session(user)
+  #  except:
+  #    pass
+  #  finally:
+  #    finish()
+  #    req = mock_hs2_client.open_session_args
+  #    assert_equal('test', req.username) # Same as kerberos, real username is picked from Thrift authentication, this one does not matter
+  #    assert_equal(None, req.password)
 
 
 def test_metastore_security():

@@ -48,6 +48,7 @@ LOG = logging.getLogger(__name__)
 
 
 class MockDbms:
+
   def get_databases(self):
     return ['db1', 'db2']
 
@@ -56,6 +57,7 @@ class MockDbms:
 
 
 class TestMockedImpala:
+
   def setUp(self):
     self.client = make_logged_in_client()
 
@@ -149,6 +151,7 @@ class TestImpalaIntegration:
     content = json.loads(resp.content)
     assert_true(content['status'] == 0, resp.content)
 
+
   @classmethod
   def teardown_class(cls):
     # We need to drop tables before dropping the database
@@ -167,6 +170,7 @@ class TestImpalaIntegration:
 
     for f in cls.finish:
       f()
+
 
   def test_basic_flow(self):
     dbs = self.db.get_databases()
@@ -217,6 +221,7 @@ class TestImpalaIntegration:
     assert_true('MERGING-EXCHANGE' in json_response['explanation'], json_response)
     assert_true('SCAN HDFS' in json_response['explanation'], json_response)
 
+
   def test_get_table_sample(self):
     client = make_logged_in_client()
 
@@ -226,11 +231,25 @@ class TestImpalaIntegration:
     assert_equal([u'row_num', u'id_str', u'text'], data['headers'], data)
     assert_true(len(data['rows']), data)
 
+
   def test_get_session(self):
-    resp = self.client.get(reverse("impala:api_get_session"))
-    data = json.loads(resp.content)
-    assert_true('properties' in data)
-    assert_true(data['properties'].get('http_addr'))
+    session = None
+    try:
+      # Create open session
+      session = self.db.open_session(self.user)
+
+      resp = self.client.get(reverse("impala:api_get_session"))
+      data = json.loads(resp.content)
+      assert_true('properties' in data)
+      assert_true(data['properties'].get('http_addr'))
+      assert_true('session' in data, data)
+      assert_true('id' in data['session'], data['session'])
+    finally:
+      if session is not None:
+        try:
+          self.db.close_session(session)
+        except Exception:
+          pass
 
 
   def test_invalidate_tables(self):

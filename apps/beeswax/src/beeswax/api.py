@@ -839,7 +839,10 @@ def close_session(request, session_id):
   response = {'status': -1, 'message': ''}
 
   try:
-    session = Session.objects.get(id=session_id, owner=request.user, application=query_server['server_name'])
+    filters = {'id': session_id, 'application': query_server['server_name']}
+    if not request.user.is_superuser:
+      filters['owner'] = request.user
+    session = Session.objects.get(**filters)
   except Session.DoesNotExist:
     response['message'] = _('Session does not exist or you do not have permissions to close the session.')
 
