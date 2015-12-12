@@ -34,7 +34,7 @@ try:
   from beeswax.api import _autocomplete
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
-  from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, QueryHistory, HiveServerQueryHistory
+  from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
   from beeswax.server import dbms
   from beeswax.server.dbms import get_query_server_config, QueryServerException
   from beeswax.views import _parse_out_hadoop_jobs
@@ -57,22 +57,30 @@ def query_error_handler(func):
 
 class HS2Api(Api):
 
-  def _get_handle(self, snippet):
-    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-    snippet['result']['handle'].pop('statement_id')
-    snippet['result']['handle'].pop('has_more_statements')
-    return HiveServerQueryHandle(**snippet['result']['handle'])
+  SUPPORTED_TYPES = ('hive', 'impala', 'spark-sql')
 
-  def _get_db(self, snippet):
-    if snippet['type'] == 'hive':
-      name = 'beeswax'
-    elif snippet['type'] == 'impala':
-      name = 'impala'
-    else:
-      name = 'spark-sql'
 
-    return dbms.get(self.user, query_server=get_query_server_config(name=name))
+  @query_error_handler
+  def create_session(self, lang='hive', properties=None):
+    if lang.lower() not in self.SUPPORTED_TYPES:
+      raise PopupException(_('Invalid HS2Api session lang.'))
 
+    if lang == 'hive':
+      lang = 'beeswax'
+
+    session = Session.objects.get_session(self.user, application=lang)
+
+    if session is None:
+      session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
+
+    return {
+        'type': lang,
+        'id': session.id,
+        'properties': session.get_formatted_properties()
+    }
+
+
+  @query_error_handler
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
 
@@ -119,6 +127,7 @@ class HS2Api(Api):
     hql_query = strip_trailing_semicolon(hql_query)
     return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
+
   @query_error_handler
   def check_status(self, notebook, snippet):
     response = {}
@@ -134,6 +143,7 @@ class HS2Api(Api):
     response['status'] = 'running' if status.index in (QueryHistory.STATE.running.index, QueryHistory.STATE.submitted.index) else 'available'
 
     return response
+
 
   @query_error_handler
   def fetch_result(self, notebook, snippet, rows, start_over):
@@ -154,9 +164,11 @@ class HS2Api(Api):
         'type': 'table'
     }
 
+
   @query_error_handler
   def fetch_result_metadata(self):
     pass
+
 
   @query_error_handler
   def cancel(self, notebook, snippet):
@@ -166,12 +178,14 @@ class HS2Api(Api):
     db.cancel_operation(handle)
     return {'status': 0}
 
+
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
     return db.get_log(handle, start_over=startFrom == 0)
+
 
   @query_error_handler
   def close_statement(self, snippet):
@@ -187,6 +201,8 @@ class HS2Api(Api):
     else:
       return {'status': -1}  # skipped
 
+
+  @query_error_handler
   def download(self, notebook, snippet, format):
     try:
       db = self._get_db(snippet)
@@ -201,6 +217,8 @@ class HS2Api(Api):
         message = e.message
       raise PopupException(message, detail='')
 
+
+  @query_error_handler
   def progress(self, snippet, logs):
     if snippet['type'] == 'hive':
       match = re.search('Total jobs = (\d+)', logs, re.MULTILINE)
@@ -217,6 +235,8 @@ class HS2Api(Api):
     else:
       return 50
 
+
+  @query_error_handler
   def get_jobs(self, notebook, snippet, logs):
     job_ids = _parse_out_hadoop_jobs(logs)
 
@@ -227,12 +247,32 @@ class HS2Api(Api):
 
     return jobs
 
+
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
     return _autocomplete(db, database, table, column, nested)
 
+
   def get_select_star_query(self, snippet, database, table):
     db = self._get_db(snippet)
     table = db.get_table(database, table)
     return db.get_select_star_query(database, table)
+
+
+  def _get_handle(self, snippet):
+    snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+    snippet['result']['handle'].pop('statement_id')
+    snippet['result']['handle'].pop('has_more_statements')
+    return HiveServerQueryHandle(**snippet['result']['handle'])
+
+
+  def _get_db(self, snippet):
+    if snippet['type'] == 'hive':
+      name = 'beeswax'
+    elif snippet['type'] == 'impala':
+      name = 'impala'
+    else:
+      name = 'spark-sql'
+
+    return dbms.get(self.user, query_server=get_query_server_config(name=name))

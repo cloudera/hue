@@ -420,10 +420,11 @@ class Session(models.Model):
   def get_properties(self):
     return json.loads(self.properties)
 
+  def get_formatted_properties(self):
+    return [dict({'key': key, 'value': value}) for key, value in self.get_properties().items()]
+
   def __str__(self):
     return '%s %s' % (self.owner, self.last_used)
-
-
 
 
 class QueryHandle(object):
