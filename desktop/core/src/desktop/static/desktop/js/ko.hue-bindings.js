@@ -840,6 +840,37 @@
     }
   };
 
+  ko.bindingHandlers.assistVerticalResizer = {
+    init: function (element, valueAccessor) {
+      var $resizer = $(element);
+      var $above = $resizer.prev();
+      var $below = $resizer.next();
+
+      $resizer.parent().height();
+
+      var aboveInitialHeight = ($resizer.parent().height() - $resizer.height()) / 2;
+      var belowInitialHeight = aboveInitialHeight;
+
+      $above.css("height", aboveInitialHeight + 'px');
+      $below.css("height", belowInitialHeight + 'px');
+
+      $resizer.draggable({
+        axis: "y",
+        drag: function (event, ui) {
+          var currentHeight = ui.offset.top - 81;
+          $above.css("height", currentHeight + 'px');
+          $below.css("height", ($resizer.parent().height() - currentHeight - $resizer.height()))
+          ui.offset.top = 0;
+          ui.position.top = 0;
+        },
+        stop: function (event, ui) {
+          ui.offset.top = 0;
+          ui.position.top = 0;
+        }
+      });
+    }
+  };
+
   ko.bindingHandlers.aceResizer = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
