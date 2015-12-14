@@ -227,7 +227,49 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-hdfs-panel">
-    HDFS Goes here
+    <!-- ko with: selectedHdfsEntry -->
+    <div class="assist-breadcrumb">
+      <!-- ko if: parent !== null -->
+      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i class="fa fa-folder" style="font-size: 14px; line-height: 16px; vertical-align: top;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: parent === null -->
+      <div>
+        <i class="fa fa-folder" style="font-size: 14px; line-height: 16px;vertical-align: top;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </div>
+      <!-- /ko -->
+    </div>
+    <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
+
+      <li class="nav-header" style="margin-top: 0">
+        ${_('HDFS')}
+      </li>
+      <li class="center" data-bind="visible: loading">
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      </li>
+
+      <li>
+        <ul class="assist-tables" data-bind="foreach: entries">
+          <li class="assist-entry assist-table-link">
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: function () {} }, attr: {'title': definition.name }">
+              <!-- ko if: definition.type === 'dir' -->
+              <i class="fa fa-fw fa-folder muted"></i>
+              <!-- /ko -->
+              <!-- ko if: definition.type === 'file' -->
+              <i class="fa fa-fw fa-file-o muted"></i>
+              <!-- /ko -->
+              <span data-bind="text: definition.name"></span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-two-panel-layout">
@@ -416,12 +458,19 @@ from desktop.views import _ko
           self.sources.push(sourceIndex[sourceType.type]);
         });
 
-        self.hdfsRoot = new AssistHdfsEntry({
-          name: '',
+        self.selectedHdfsEntry = ko.observable(new AssistHdfsEntry({
+          definition: {
+            name: '/',
+            type: 'dir'
+          },
           parent: null,
           assistHelper: assistHelper
+        }));
+        self.selectedHdfsEntry().open(true);
+
+        huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
+          self.selectedHdfsEntry(entry);
         });
-        self.hdfsRoot.open(true);
 
         self.selectedSource = ko.observable(null);
 
