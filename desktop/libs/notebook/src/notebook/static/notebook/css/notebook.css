@@ -381,15 +381,6 @@ body {
   min-height: 0px;
 }
 
-.assist {
-  margin-top: 2px;
-  padding: 8px;
-}
-
-.assist-main {
-  overflow-y: auto;
-}
-
 .editable-click, a.editable-click, a.editable-click:hover {
   cursor: pointer !important;
 }
