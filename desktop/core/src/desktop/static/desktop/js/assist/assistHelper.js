@@ -23,7 +23,10 @@
 }(this, function (ko) {
 
   var TIME_TO_LIVE_IN_MILLIS = 86400000; // 1 day
-  var API_PREFIX = "/notebook/api/autocomplete/";
+  var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
+  var HDFS_API_PREFIX = "/filebrowser/view=";
+  var HDFS_PARAMETERS = "?pagesize=100&format=json";
+
 
   /**
    * @param {Object} i18n
@@ -54,6 +57,39 @@
   };
 
   /**
+   * @param {string[]} pathParts
+   * @param {function} successCallback
+   * @param {function} errorCallback
+   * @param {Object} [editor] - Ace editor
+   */
+  AssistHelper.prototype.fetchHdfsPath = function (pathParts, successCallback, errorCallback, editor) {
+    var self = this;
+    var url = HDFS_API_PREFIX + "/" + pathParts.join("/") + HDFS_PARAMETERS;
+
+    var fetchFunction = function (successCallback) {
+      $.ajax({
+        dataType: "json",
+        url: url,
+        success: function (data) {
+          if (!data.error) {
+            successCallback(data);
+          } else {
+            errorCallback();
+          }
+        }
+      }).fail(function () {
+        errorCallback();
+      }).always(function () {
+        if (editor) {
+          editor.hideSpinner();
+        }
+      });
+    };
+
+    self.fetchCached('hdfs', url, fetchFunction, successCallback, editor);
+  };
+
+  /**
    *
    * @param {Object} options
    * @param {string} options.sourceType
@@ -67,7 +103,7 @@
     if (options.clearAll) {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
     } else {
-      var url = API_PREFIX;
+      var url = AUTOCOMPLETE_API_PREFIX;
       if (options.databaseName) {
         url += options.databaseName;
       }
@@ -91,7 +127,7 @@
   AssistHelper.prototype.loadDatabases = function (options) {
     var self = this;
 
-    self.fetchAssistData(options.sourceType, API_PREFIX, function(data) {
+    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX, function(data) {
       var databases = data.databases || [];
       // Blacklist of system databases
       self.lastKnownDatabases = $.grep(databases, function(database) {
@@ -271,7 +307,7 @@
    */
   AssistHelper.prototype.fetchTables = function (options) {
     var self = this;
-    self.fetchAssistData(options.sourceType, API_PREFIX + options.databaseName, options.successCallback, options.errorCallback, options.editor);
+    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX + options.databaseName, options.successCallback, options.errorCallback, options.editor);
   };
 
   /**
@@ -287,7 +323,7 @@
   AssistHelper.prototype.fetchFields = function (options) {
     var self = this;
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-    self.fetchAssistData(options.sourceType, API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart, options.successCallback, options.errorCallback, options.editor);
+    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart, options.successCallback, options.errorCallback, options.editor);
   };
 
   /**
@@ -299,7 +335,7 @@
    */
   AssistHelper.prototype.fetchPanelData = function (options) {
     var self = this;
-    self.fetchAssistData(options.sourceType, API_PREFIX + options.hierarchy.join("/"), options.successCallback, options.errorCallback);
+    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"), options.successCallback, options.errorCallback);
   };
 
   /**
@@ -311,13 +347,11 @@
    */
   AssistHelper.prototype.fetchAssistData = function (sourceType, url, successCallback, errorCallback, editor) {
     var self = this;
-    if (!sourceType) { return };
-    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType)) || {};
+    if (!sourceType) {
+      return
+    }
 
-    if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
-      if (editor) {
-        editor.showSpinner();
-      }
+    var fetchFunction = function (successCallback) {
       $.post(url, {
         notebook: {},
         snippet: ko.mapping.toJSON({
@@ -325,11 +359,6 @@
         })
       }, function (data) {
         if (data.status == 0) {
-          cachedData[url] = {
-            timestamp: (new Date()).getTime(),
-            data: data
-          };
-          $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType), cachedData);
           successCallback(data);
         } else {
           errorCallback(data);
@@ -338,6 +367,28 @@
         if (editor) {
           editor.hideSpinner();
         }
+      });
+    };
+
+    self.fetchCached(sourceType, url, fetchFunction, successCallback, editor);
+  };
+
+  AssistHelper.prototype.fetchCached = function (sourceType, url, fetchFunction, successCallback, editor) {
+    var self = this;
+    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType)) || {};
+
+    if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
+      if (editor) {
+        editor.showSpinner();
+      }
+
+      fetchFunction(function (data) {
+        cachedData[url] = {
+          timestamp: (new Date()).getTime(),
+          data: data
+        };
+        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType), cachedData);
+        successCallback(data);
       });
     } else {
       successCallback(cachedData[url].data);

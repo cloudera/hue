@@ -321,11 +321,11 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
-        define('assistPanel', ['knockout', 'desktop/js/assist/assistDbSource', 'desktop/js/assist/assistHelper', 'tableStats'], factory);
+        define('assistPanel', ['knockout', 'desktop/js/assist/assistDbSource', 'desktop/js/assist/assistHdfsEntry', 'desktop/js/assist/assistHelper', 'tableStats'], factory);
       } else {
-        factory(ko, AssistDbSource, AssistHelper);
+        factory(ko, AssistDbSource, AssistHdfsEntry, AssistHelper);
       }
-    }(function (ko, AssistDbSource, AssistHelper) {
+    }(function (ko, AssistDbSource, AssistHdfsEntry, AssistHelper) {
 
       /**
        * @param {Object} params
@@ -360,6 +360,13 @@ from desktop.views import _ko
           });
           self.sources.push(sourceIndex[sourceType.type]);
         });
+
+        self.hdfsRoot = new AssistHdfsEntry({
+          name: '',
+          parent: null,
+          assistHelper: assistHelper
+        });
+        self.hdfsRoot.open(true);
 
         self.selectedSource = ko.observable(null);
 
