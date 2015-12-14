@@ -33,6 +33,13 @@ from desktop.views import _ko
       overflow-y: auto;
     }
 
+    .assist-type-switch {
+      display: inline-block;
+      font-size: 16px;
+      margin: 2px 3px;
+      cursor: pointer;
+    }
+
     .assist-resizer {
       border-top: 1px solid #F1F1F1;
       margin-left: 5px;
@@ -293,9 +300,13 @@ from desktop.views import _ko
       <!-- ko template: { if: showingDb() && ! showingHdfs(), name: 'assist-db-panel' } --><!-- /ko -->
       <!-- ko template: { if: ! showingDb() && showingHdfs(), name: 'assist-hdfs-panel' } --><!-- /ko -->
     </div>
-    <div style="position: absolute; bottom: 2px; left: 2px">
-      <a href="javascript: void(0);" data-bind="click: function () { showingDb(!showingDb()) }, text: showingDb() ? 'Hide DB' : 'Show DB'"></a>
-      <a href="javascript: void(0);" data-bind="click: function () { showingHdfs(!showingHdfs()) }, text: showingHdfs() ? 'Hide HDFS' : 'Show HDFS'"></a>
+    <div style="position: absolute; bottom: 2px; left: 2px;width: 100%; border-top: 1px solid #F1F1F1;padding-top:3px">
+      <div class="inactive-action assist-type-switch" data-bind="click: function () { showingDb(!showingDb()) }, css: { 'blue': showingDb }, attr: { 'title': showingDb() ? '${ _('Hide Databases') }' : '${ _('Show Databases') }' }">
+        <i class="fa fa-database"></i>
+      </div>
+      <div class="inactive-action assist-type-switch" data-bind="click: function () { showingHdfs(!showingHdfs()) }, css: { 'blue': showingHdfs }, attr: { 'title': showingHdfs() ? '${ _('Hide HDFS') }' : '${ _('Show HDFS') }' }">
+        <i class="fa fa-file-o"></i>
+      </div>
     </div>
   </script>
 
