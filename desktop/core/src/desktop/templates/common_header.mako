@@ -206,6 +206,13 @@ from django.utils.translation import ugettext as _
         $.ajaxSetup({ cache: false });
       }
 
+      // global catch for ajax calls after the user has logged out
+      $( document ).ajaxSuccess(function( event, xhr, settings, data) {
+        if (data === '/* login required */'){
+          location.href='/accounts/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search)
+        }
+      });
+
       // prevents framebusting and clickjacking
       if (self == top){
         $("body").css({
