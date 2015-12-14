@@ -363,7 +363,7 @@ from django.utils.translation import ugettext as _
        count += 1
     return found_app, count
 %>
-
+% if not skip_topbar:
 <div class="navigator">
   <div class="pull-right">
 
@@ -590,6 +590,7 @@ from django.utils.translation import ugettext as _
    % endif
 
 </div>
+% endif
 
 % if is_demo:
   <ul class="side-labels unstyled">
