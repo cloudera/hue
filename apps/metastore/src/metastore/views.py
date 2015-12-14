@@ -59,7 +59,7 @@ def check_has_write_access_permission(view_func):
 
 
 def index(request):
-  return redirect(reverse('metastore:show_tables', kwargs={'database': request.COOKIES.get('hueBeeswaxLastDatabase', 'default')}))
+  return redirect(reverse('metastore:show_tables', kwargs={'database': ''}))
 
 
 """
@@ -139,7 +139,7 @@ Table Views
 """
 def show_tables(request, database=None):
   if database is None:
-    database = request.COOKIES.get('hueBeeswaxLastDatabase', 'default') # Assume always 'default'
+    database = 'default' # Assume always 'default'
 
   db = dbms.get(request.user)
 
@@ -181,7 +181,6 @@ def show_tables(request, database=None):
     'has_write_access': has_write_access(request.user),
     })
 
-  resp.set_cookie("hueBeeswaxLastDatabase", database, expires=90)
   return resp
 
 

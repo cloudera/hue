@@ -789,11 +789,14 @@ ${ assist.assistPanel() }
           }
         }
       });
+
       $.getJSON('/metastore/databases/' + self.name + '/metadata', function (data) {
         if (data && data.status == 0) {
           self.stats(data.data);
         }
       });
+
+      $.totalStorage('hue.metastore.lastdb', self.name);
     };
 
     MetastoreDatabase.prototype.setTableByName = function (tableName) {
@@ -1146,6 +1149,9 @@ ${ assist.assistPanel() }
       loadDatabases();
 
       var setDatabaseByName = function (databaseName, callback) {
+        if (databaseName === '') {
+          databaseName = $.totalStorage('hue.metastore.lastdb') || 'default';
+        }
         if (self.database() && self.database().name == databaseName) {
           if (callback) {
             callback();
