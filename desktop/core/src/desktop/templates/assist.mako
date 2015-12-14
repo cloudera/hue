@@ -141,13 +141,13 @@ from desktop.views import _ko
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: (definition.isTable || definition.isView) && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
       <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
-          sourceType: assistSource.type,
-          snippet: assistSource.snippet,
+          sourceType: assistDbSource.type,
+          snippet: assistDbSource.snippet,
           databaseName: databaseName,
           tableName: tableName,
           columnName: columnName,
           fieldType: definition.type,
-          assistHelper: assistSource.assistHelper
+          assistHelper: assistDbSource.assistHelper
         } }"></span>
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
@@ -159,7 +159,7 @@ from desktop.views import _ko
       <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistSource.repositionActions }">
+    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistDbSource.repositionActions }">
       <li data-bind="visibleOnHover: { override: statsVisible, selector: (definition.isTable || definition.isView) ? '.table-actions' : '.column-actions' }, css: { 'assist-table': (definition.isTable || definition.isView), 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-entry" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! (definition.isTable || definition.isView), 'assist-table-link': (definition.isTable || definition.isView) }" href="javascript:void(0)">
@@ -276,15 +276,15 @@ from desktop.views import _ko
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
       <div class="modal-body" style="min-height: 100px">
-        <!-- ko if: assistSource.loadingSamples -->
+        <!-- ko if: assistDbSource.loadingSamples -->
         <div class="loader">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
         <!-- /ko -->
-        <!-- ko ifnot: assistSource.loadingSamples -->
+        <!-- ko ifnot: assistDbSource.loadingSamples -->
         <div style="overflow: auto">
-          <!-- ko with: assistSource.samples -->
+          <!-- ko with: assistDbSource.samples -->
           <!-- ko if: rows.length == 0 -->
           <div class="alert">${ _('The selected table has no data.') }</div>
           <!-- /ko -->
@@ -321,11 +321,11 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
-        define('assistPanel', ['knockout', 'desktop/js/assist/assistSource', 'desktop/js/assist/assistHelper', 'tableStats'], factory);
+        define('assistPanel', ['knockout', 'desktop/js/assist/assistDbSource', 'desktop/js/assist/assistHelper', 'tableStats'], factory);
       } else {
-        factory(ko, AssistSource, AssistHelper);
+        factory(ko, AssistDbSource, AssistHelper);
       }
-    }(function (ko, AssistSource, AssistHelper) {
+    }(function (ko, AssistDbSource, AssistHelper) {
 
       /**
        * @param {Object} params
@@ -351,7 +351,7 @@ from desktop.views import _ko
         self.sources = ko.observableArray();
         var sourceIndex = {};
         $.each(params.sourceTypes, function (idx, sourceType) {
-          sourceIndex[sourceType.type] = new AssistSource({
+          sourceIndex[sourceType.type] = new AssistDbSource({
             assistHelper: assistHelper,
             i18n: i18n,
             type: sourceType.type,
