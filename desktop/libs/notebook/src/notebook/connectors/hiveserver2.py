@@ -81,6 +81,32 @@ class HS2Api(Api):
 
 
   @query_error_handler
+  def close_session(self, session):
+    app_name = session.get('type')
+    session_id = session.get('id')
+
+    query_server = get_query_server_config(name=app_name)
+
+    response = {'status': -1, 'message': ''}
+
+    try:
+      filters = {'id': session_id, 'application': query_server['server_name']}
+      if not self.user.is_superuser:
+        filters['owner'] = self.user
+      session = Session.objects.get(**filters)
+    except Session.DoesNotExist:
+      response['message'] = _('Session does not exist or you do not have permissions to close the session.')
+
+    if session:
+      session = dbms.get(self.user, query_server).close_session(session)
+      response['status'] = 0
+      response['message'] = _('Session successfully closed.')
+      response['session'] = {'id': session_id, 'application': session.application, 'status': session.status_code}
+
+    return response
+
+
+  @query_error_handler
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
 
