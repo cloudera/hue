@@ -275,7 +275,7 @@
 
   AssistDbEntry.prototype.dblClick = function () {
     var self = this;
-    huePubSub.publish('assist.dblClickItem', self);
+    huePubSub.publish('assist.dblClickDbItem', self);
   };
 
   AssistDbEntry.prototype.toggleOpen = function () {
