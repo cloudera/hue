@@ -2172,15 +2172,15 @@
         }
       });
 
-      huePubSub.subscribe("assist.dblClickItem", function(assistEntry) {
+      huePubSub.subscribe("assist.dblClickDbItem", function(assistDbEntry) {
         if ($el.data("last-active-editor")) {
-          var text = assistEntry.editorText();
+          var text = assistDbEntry.editorText();
           if (editor.getValue() == "") {
-            if (assistEntry.definition.isTable) {
-              text = "SELECT * FROM " + assistEntry.editorText() + " LIMIT 100";
+            if (assistDbEntry.definition.isTable) {
+              text = "SELECT * FROM " + assistDbEntry.editorText() + " LIMIT 100";
             }
-            else if (assistEntry.definition.isColumn) {
-              text = "SELECT " + assistEntry.editorText().split(",")[0] + " FROM " + assistEntry.parent.editorText() + " LIMIT 100";
+            else if (assistDbEntry.definition.isColumn) {
+              text = "SELECT " + assistDbEntry.editorText().split(",")[0] + " FROM " + assistDbEntry.parent.editorText() + " LIMIT 100";
             }
           }
           editor.session.insert(editor.getCursorPosition(), text);
