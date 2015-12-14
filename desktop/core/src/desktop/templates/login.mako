@@ -21,12 +21,13 @@
   from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
 
-${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
+${ commonheader("Welcome to Hue", "login", user, "50px", True) | n,unicode }
 
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <style type="text/css">
   body {
-    background-color: #FFF;
+    background-color: #EEE;
+    padding-top: 150px;
   }
 
   @-webkit-keyframes spinner {
@@ -38,28 +39,23 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     }
   }
 
-  #logo {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 10px;
-    background: #FFF url("${ static('desktop/art/hue-login-logo-ellie.png') }") 50% 2px no-repeat;
-    width: 130px;
-    height: 130px;
-    -webkit-border-radius: 65px;
-    -moz-border-radius: 65px;
-    border-radius: 65px;
-    border: 1px solid #EEE;
+  .logo {
+    background-color: #338BB8;
+    width: 60px;
+    height: 60px;
+    text-align: center;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    margin-left: 400px;
+    margin-top: -30px;
   }
 
-  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-    #logo {
-      background: #FFF url("${ static('desktop/art/hue-login-logo-ellie@2x.png') }") 50% 2px no-repeat;
-      background-size: 114px 114px;
-    }
+  .logo img {
+    margin-top: 2px;
   }
 
-  #logo.waiting {
+  .logo img.waiting {
     -webkit-animation-name: spinner;
     -webkit-animation-timing-function: linear;
     -webkit-animation-iteration-count: infinite;
@@ -67,51 +63,56 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     -webkit-transform-style: preserve-3d;
   }
 
-  .login-content {
-    width: 360px;
+  .login-box {
+    width: 500px;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
+    margin-bottom: 50px;
+    background: #fff;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   }
 
-  .input-prepend {
-    width: 100%;
-  }
-
-  .input-prepend .add-on {
-    min-height: 38px;
-    line-height: 38px;
-    color: #999;
-  }
-
-  .login-content input {
-    width: 85%;
-    min-height: 38px;
-    font-size: 18px;
-  }
-
-  .login-content .input-prepend.error input, .login-content .input-prepend.error .add-on {
+  .login-box .input-prepend.error input, .login-box .input-prepend.error .add-on {
     border-top-color: #dd4b39;
     border-bottom-color: #dd4b39;
   }
 
-  .login-content .input-prepend.error input {
+  .login-box .input-prepend.error input {
     border-right-color: #dd4b39;
   }
 
-  .login-content .input-prepend.error .add-on {
+  .login-box .input-prepend.error .add-on {
     border-left-color: #dd4b39;
   }
 
-  .login-content input[type='submit'] {
+  .login-box input[type='submit'] {
     height: 44px;
     min-height: 44px;
     font-weight: normal;
     text-shadow: none;
   }
 
-  hr {
-    border-top-color: #DEDEDE;
+  .login-header {
+    background-color: #fafafa !important;
+    padding: 35px;
+  }
+
+  .login-header h1 {
+    margin: 0;
+    font-size: 18px;
+    line-height: 18px;
+  }
+
+  .login-header h2 {
+    margin: 5px 0 0 0;
+    color: #757575;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 14px;
+  }
+
+  .login-content {
+    padding: 35px;
   }
 
   ul.errorlist {
@@ -131,31 +132,34 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
     font-style: normal;
   }
 
-  input.error {
+  .login-content input[type='text'], .login-content input[type='password'], .login-content input[type='text']:hover, .login-content input[type='password']:hover {
+    padding: 0 10px 2px 0;
+    height: auto;
+    border: none;
+    border-bottom: 2px solid #eeeeee;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    color: #9e9e9e;
+    font-weight: 400;
+    resize: none;
+    width: 100%;
+  }
+
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset!important;
+  }
+
+  .login-content input.error {
     border-color: #b94a48;
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   }
 
-  .well {
-    border: none; 
-    background-color: #FFF;
-  }
-
-  .footer {
-    position: fixed;
-    bottom: 0;
-    background-color: #338BB8;
-    height: 6px;
+  .btn-large.btn-primary {
     width: 100%;
-  }
-
-  h3 {
-    color: #666;
-    font-size: 24px;
-    font-weight: 400;
-    margin-bottom: 20px;
+    margin-top: 20px;
   }
 
   .chosen-single {
@@ -183,55 +187,57 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 </style>
 
 
-<div class="footer"></div>
-
 <div class="container">
   <div class="row">
-    <div class="login-content center">
-      <div id="logo"></div>
+    <div class="login-box">
+      <form method="POST" action="${action}">
+      ${ csrf_token(request) | n,unicode }
 
-      <form method="POST" action="${action}" class="well">
-        ${ csrf_token(request) | n,unicode }
+      <div class="login-header">
+        <h1>${ _('Welcome to Hue') }</h1>
         %if first_login_ever:
-          <h3>${_('Create your Hue account')}</h3>
+          <h2>${_('Create your Hue account')}</h2>
         %else:
-          <h3>${_('Sign in to continue to Hue')}</h3>
+          <h2>${_('Sign in to continue to your dashboard')}</h2>
         %endif
+      </div>
+
+      <div class="logo"><img src="${ static('desktop/art/hue-login-white.png') }" width="50" height="50" /> </div>
+
+      <div class="login-content">
 
         %if first_login_ever:
           <div class="alert alert-block">
             ${_('Since this is your first time logging in, pick any username and password. Be sure to remember these, as')}
             <strong>${_('they will become your Hue superuser credentials.')}</strong>
             %if is_password_policy_enabled():
-	      <p>${get_password_hint()}</p>
+	          <p>${get_password_hint()}</p>
             %endif
           </div>
         %endif
 
-        <div class="input-prepend
+        <div class="
           %if backend_names == ['OAuthBackend']:
             hide
           %endif
         ">
-          <span class="add-on"><i class="fa fa-user"></i></span>
           ${ form['username'] | n,unicode }
         </div>
 
         ${ form['username'].errors | n,unicode }
 
-        <div class="input-prepend
+        <div class="
           %if 'AllowAllBackend' in backend_names or backend_names == ['OAuthBackend']:
             hide
           %endif
         ">
-          <span class="add-on"><i class="fa fa-lock"></i></span>
           ${ form['password'] | n,unicode }
         </div>
+
         ${ form['password'].errors | n,unicode }
 
         %if active_directory:
-        <div class="input-prepend">
-          <span class="add-on"><i class="fa fa-globe"></i></span>
+        <div>
           ${ form['server'] | n,unicode }
         </div>
         %endif
@@ -246,21 +252,28 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
             %endif
           </div>
         %endif
-        <hr/>
+
         %if first_login_ever:
           <input type="submit" class="btn btn-large btn-primary" value="${_('Create account')}"/>
         %else:
           <input type="submit" class="btn btn-large btn-primary" value="${_('Sign in')}"/>
         %endif
         <input type="hidden" name="next" value="${next}"/>
+        </div>
+
       </form>
 
+      %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
+      <div class="alert alert-info" id="login-splash">
+        ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+      </div>
+      %endif
     </div>
-    %if conf.CUSTOM.LOGIN_SPLASH_HTML.get():
-    <div class="alert alert-info" id="login-splash">
-      ${ conf.CUSTOM.LOGIN_SPLASH_HTML.get() | n,unicode }
+  </div>
+  <div class="row">
+    <div class="center muted">
+      ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
     </div>
-    %endif
   </div>
 </div>
 
@@ -275,7 +288,7 @@ ${ commonheader("Welcome to Hue", "login", user, "50px") | n,unicode }
 
     $("form").on("submit", function () {
       window.setTimeout(function () {
-        $("#logo").addClass("waiting");
+        $(".logo").find("img").addClass("waiting");
       }, 1000);
     });
 
