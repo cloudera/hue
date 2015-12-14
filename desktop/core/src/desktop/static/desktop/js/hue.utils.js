@@ -168,6 +168,14 @@ Array.prototype.diff = function (a) {
     return parsedParams;
   }
 
+  hueUtils.isOverflowing = function (element) {
+    if (element instanceof jQuery) {
+      element = element[0];
+    }
+    return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+  }
+
+
 }(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {

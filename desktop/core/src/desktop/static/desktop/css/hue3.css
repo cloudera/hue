@@ -2219,6 +2219,26 @@ div.navigator .pull-right .nav {
   color: #d1d1d1;
 }
 
+.toggle-overflow {
+  display: inline-block;
+  overflow: hidden;
+}
+
+.toggle-overflow-gradient {
+  position: relative;
+  z-index: 2;
+  top: -10px;
+  height: 10px;
+  line-height: 10px;
+  background-color: #F6F6F6;
+  cursor: s-resize;
+  text-align: center;
+}
+
+.toggle-overflow-gradient:hover {
+  background-color: #EEE;
+}
+
 /*
 Transition to Hue 4
 */

@@ -325,16 +325,15 @@ ${ assist.assistPanel() }
             <div><a data-bind="attr: {'href': stats().hdfs_link, 'rel': stats().location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
           </div>
         </div>
+        <!-- ko if: stats().parameters -->
         <div class="row-fluid">
           <div class="span12">
-            <div title="${ _('Parameters') }"><i class="fa fa-fw fa-cog muted"></i>
+            <div title="${ _('Parameters') }">
               <!-- ko template: { if: stats().parameters, name: 'metastore-databases-parameters', data: hueUtils.parseHivePseudoJson(stats().parameters) }--><!-- /ko -->
-              <!-- ko ifnot: stats().parameters -->
-              <i>${_('No parameters.')}</i>
-              <!-- /ko -->
             </div>
           </div>
         </div>
+        <!-- /ko -->
       </div>
     </div>
     <!-- /ko -->
@@ -404,9 +403,12 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-databases-parameters">
-  <!-- ko foreach: Object.keys($data) -->
-    <div class="inline margin-right-20"><strong data-bind="text: $data"></strong>: <span data-bind="text: $parent[$data]"></span></div>
-  <!-- /ko -->
+  <div data-bind="toggleOverflow: {height: 24}">
+    <div class="inline margin-right-20"><i class="fa fa-fw fa-cog muted"></i></div>
+    <!-- ko foreach: Object.keys($data) -->
+      <div class="inline margin-right-20"><strong data-bind="text: $data"></strong>: <span data-bind="text: $parent[$data]"></span></div>
+    <!-- /ko -->
+  </div>
 </script>
 
 <script type="text/html" id="metastore-databases-actions">

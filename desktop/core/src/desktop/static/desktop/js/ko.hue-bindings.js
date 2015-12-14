@@ -22,6 +22,36 @@
   }
 }(function (ko) {
 
+  ko.bindingHandlers.toggleOverflow = {
+    render: function ($element) {
+      if (hueUtils.isOverflowing($element.find('.toggle-overflow'))) {
+        $('<div>').addClass('toggle-overflow-gradient').html('<i class="fa fa-caret-down muted"></i>').appendTo($element);
+        $element.on('click', function () {
+          $element.find('.toggle-overflow-gradient').hide();
+          $element.find('.toggle-overflow').css('height', '');
+          $element.css('cursor', 'default');
+        });
+      }
+    },
+    init: function (element, valueAccessor) {
+      var $element = $(element);
+      var options = $.extend(valueAccessor(), {});
+      $element.wrapInner('<div class="toggle-overflow"></div>');
+      if (options.height) {
+        $element.find('.toggle-overflow').height(options.height);
+      }
+      if (options.width) {
+        $element.find('.toggle-overflow').width(options.width);
+      }
+    },
+    update: function (element, valueAccessor) {
+      var $element = $(element);
+      window.setTimeout(function () {
+        ko.bindingHandlers.toggleOverflow.render($element);
+      }, 100);
+    }
+  };
+
   ko.bindingHandlers.draggableText = {
     init: function (element, valueAccessor) {
       var $element = $(element);
