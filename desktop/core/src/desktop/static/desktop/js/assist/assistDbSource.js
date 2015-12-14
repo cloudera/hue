@@ -16,11 +16,11 @@
 
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
-    define(['knockout', 'desktop/js/assist/assistEntry'], factory);
+    define(['knockout', 'desktop/js/assist/assistDbEntry'], factory);
   } else {
-    root.AssistSource = factory(ko, AssistEntry);
+    root.AssistDbSource = factory(ko, AssistDbEntry);
   }
-}(this, function (ko, AssistEntry) {
+}(this, function (ko, AssistDbEntry) {
 
   /**
    * @param {Object} options
@@ -31,7 +31,7 @@
    * @param {Object} options.navigationSettings
    * @constructor
    */
-  function AssistSource (options) {
+  function AssistDbSource (options) {
 
     var self = this;
     self.i18n = options.i18n;
@@ -95,11 +95,11 @@
       var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
       dbIndex = {};
       self.databases($.map(names, function(name) {
-        var database = new AssistEntry({
+        var database = new AssistDbEntry({
           name: name,
           displayName: name,
           title: name,
-          isDatabase: true,
+          isDatabase: true
         }, null, self, self.filter, self.i18n, self.navigationSettings);
         dbIndex[name] = database;
         if (name === lastSelectedDb) {
@@ -160,5 +160,5 @@
     huePubSub.subscribe('assist.refresh', self.reload);
   }
 
-  return AssistSource;
+  return AssistDbSource;
 }));

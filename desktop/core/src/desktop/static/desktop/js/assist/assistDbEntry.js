@@ -18,7 +18,7 @@
   if(typeof define === "function" && define.amd) {
     define(['knockout'], factory);
   } else {
-    root.AssistEntry = factory(ko);
+    root.AssistDbEntry = factory(ko);
   }
 }(this, function (ko) {
 
@@ -32,8 +32,8 @@
    * @param {boolean} [definition.isDatabase]
    * @param {boolean} [definition.isMapValue]
    * @param {boolean} [definition.isArray]
-   * @param {AssistEntry} parent
-   * @param {AssistSource} assistSource
+   * @param {AssistDbEntry} parent
+   * @param {AssistDbSource} assistDbSource
    * @param {Object} filter
    * @param {function} filter.query (observable)
    * @param {function} filter.showViews (observable)
@@ -43,12 +43,12 @@
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistEntry (definition, parent, assistSource, filter, i18n, navigationSettings) {
+  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
     var self = this;
     self.i18n = i18n;
     self.definition = definition;
 
-    self.assistSource = assistSource;
+    self.assistDbSource = assistDbSource;
     self.parent = parent;
     self.filter = filter;
     self.isSearchVisible = ko.observable(false);
@@ -117,7 +117,7 @@
           break;
         }
         if (entry.definition.isArray || entry.definition.isMapValue) {
-          if (self.assistSource.type === 'hive') {
+          if (self.assistDbSource.type === 'hive') {
             parts.push("[]");
           }
         } else {
@@ -132,13 +132,13 @@
     });
   }
 
-  AssistEntry.prototype.toggleSearch = function() {
+  AssistDbEntry.prototype.toggleSearch = function() {
     var self = this;
     self.isSearchVisible(!self.isSearchVisible());
     self.editingSearch(self.isSearchVisible());
-  }
+  };
 
-  AssistEntry.prototype.loadEntries = function() {
+  AssistDbEntry.prototype.loadEntries = function() {
     var self = this;
     if (!self.expandable || self.loading()) {
       return;
@@ -233,12 +233,12 @@
     };
 
     var errorCallback = function () {
-      self.assistSource.hasErrors(true);
+      self.assistDbSource.hasErrors(true);
       self.loading(false);
     };
 
-    self.assistSource.assistHelper.fetchPanelData({
-      sourceType: self.assistSource.type,
+    self.assistDbSource.assistHelper.fetchPanelData({
+      sourceType: self.assistDbSource.type,
       hierarchy: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -256,12 +256,12 @@
    * @param {boolean} [definition.isMapValue]
    * @param {boolean} [definition.isArray]
    */
-  AssistEntry.prototype.createEntry = function (definition) {
+  AssistDbEntry.prototype.createEntry = function (definition) {
     var self = this;
-    return new AssistEntry(definition, self, self.assistSource, null, self.i18n, self.navigationSettings)
+    return new AssistDbEntry(definition, self, self.assistDbSource, null, self.i18n, self.navigationSettings)
   };
 
-  AssistEntry.prototype.getHierarchy = function () {
+  AssistDbEntry.prototype.getHierarchy = function () {
     var self = this;
     var parts = [];
     var entry = self;
@@ -273,17 +273,17 @@
     return parts;
   };
 
-  AssistEntry.prototype.dblClick = function () {
+  AssistDbEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish('assist.dblClickItem', self);
   };
 
-  AssistEntry.prototype.toggleOpen = function () {
+  AssistDbEntry.prototype.toggleOpen = function () {
     var self = this;
     self.open(!self.open());
   };
 
-  AssistEntry.prototype.openItem = function () {
+  AssistDbEntry.prototype.openItem = function () {
     var self = this;
     if (self.definition.isTable || self.definition.isView) {
       huePubSub.publish("assist.table.selected", {
@@ -297,7 +297,7 @@
     }
   };
 
-  AssistEntry.prototype.showPreview = function () {
+  AssistDbEntry.prototype.showPreview = function () {
     var self = this;
     var $assistQuickLook = $("#assistQuickLook");
 
@@ -307,12 +307,12 @@
 
     $assistQuickLook.find(".tableName").text(self.definition.name);
     $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
-    self.assistSource.loadingSamples(true);
-    self.assistSource.samples({});
+    self.assistDbSource.loadingSamples(true);
+    self.assistDbSource.samples({});
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
-    self.assistSource.assistHelper.fetchTableSample({
-      sourceType: self.assistSource.type === "hive" ? "beeswax" : self.assistSource.type,
+    self.assistDbSource.assistHelper.fetchTableSample({
+      sourceType: self.assistDbSource.type === "hive" ? "beeswax" : self.assistDbSource.type,
       databaseName: databaseName,
       tableName: tableName,
       dataType: "html",
@@ -322,8 +322,8 @@
         } else if (! data.headers) {
           data.headers = [];
         }
-        self.assistSource.samples(data);
-        self.assistSource.loadingSamples(false);
+        self.assistDbSource.samples(data);
+        self.assistDbSource.loadingSamples(false);
       },
       errorCallback: function(e) {
         if (e.status == 500) {
@@ -336,5 +336,5 @@
     $assistQuickLook.modal("show");
   };
 
-  return AssistEntry;
+  return AssistDbEntry;
 }));
