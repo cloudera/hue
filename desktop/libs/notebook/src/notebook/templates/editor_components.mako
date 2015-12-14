@@ -1927,6 +1927,16 @@ ${ require.config() }
       ko.applyBindings(viewModel);
       viewModel.init();
 
+      // global catch for ajax calls after the user has logged out
+      var isLoginRequired = false;
+      $(document).ajaxSuccess(function (event, xhr, settings, data) {
+        if (data === '/* login required */' && !isLoginRequired) {
+          isLoginRequired = true;
+          window.location.href = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+        }
+      });
+
+
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
           $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");
@@ -1977,7 +1987,9 @@ ${ require.config() }
 
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function (e) {
-        viewModel.selectedNotebook().close();
+        if (!isLoginRequired){
+          viewModel.selectedNotebook().close();
+        }
       };
 
       $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
