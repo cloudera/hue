@@ -23,6 +23,27 @@ from desktop.views import _ko
 
 <%def name="assistPanel()">
   <style>
+
+    .assist {
+      position: relative;
+      height: 100%;
+    }
+
+    .assist-main {
+      overflow-y: auto;
+    }
+
+    .assist-resizer {
+      border-top: 1px solid #F1F1F1;
+      margin-left: 5px;
+      margin-right: 5px;
+      cursor: row-resize;
+      text-align: center;
+      font-size: 12px;
+      height: 8px;
+      margin-bottom: 5px;
+      color: #E1E1E1;
+    }
     .assist-entry,a {
       white-space: nowrap;
     }
@@ -182,7 +203,7 @@ from desktop.views import _ko
     <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
 
-  <script type="text/html" id="assist-breadcrumb">
+  <script type="text/html" id="assist-db-breadcrumb">
     <div class="assist-breadcrumb">
       <a data-bind="click: back">
         <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
@@ -192,17 +213,48 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/html" id="assist-panel-template">
-    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-breadcrumb' } --><!-- /ko -->
+  <script type="text/html" id="assist-db-panel">
+    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
     <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
       <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
       <!-- ko with: selectedSource -->
-        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-        <!-- ko with: selectedDatabase -->
-          <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
-        <!-- /ko -->
+      <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+      <!-- ko with: selectedDatabase -->
+      <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
+      <!-- /ko -->
       <!-- /ko -->
     </ul>
+  </script>
+
+  <script type="text/html" id="assist-hdfs-panel">
+    HDFS Goes here
+  </script>
+
+  <script type="text/html" id="assist-two-panel-layout">
+    <div style="position:relative; height: 100%;">
+      <div style="overflow: auto;">
+        <!-- ko template: 'assist-db-panel' --><!-- /ko -->
+      </div>
+      <div class="assist-resizer" data-bind="assistVerticalResizer">
+        <i class="fa fa-ellipsis-h"></i>
+      </div>
+      <div style="overflow: auto;">
+        <!-- ko template: 'assist-hdfs-panel' --><!-- /ko -->
+      </div>
+    </div>
+  </script>
+
+
+  <script type="text/html" id="assist-panel-template">
+    <div style="position:relative; height: 100%;">
+      <!-- ko template: { if: showingDb() && showingHdfs(), name: 'assist-two-panel-layout' } --><!-- /ko -->
+      <!-- ko template: { if: showingDb() && ! showingHdfs(), name: 'assist-db-panel' } --><!-- /ko -->
+      <!-- ko template: { if: ! showingDb() && showingHdfs(), name: 'assist-hdfs-panel' } --><!-- /ko -->
+    </div>
+    <div style="position: absolute; bottom: 2px; left: 2px">
+      <a href="javascript: void(0);" data-bind="click: function () { showingDb(!showingDb()) }, text: showingDb() ? 'Hide DB' : 'Show DB'"></a>
+      <a href="javascript: void(0);" data-bind="click: function () { showingHdfs(!showingHdfs()) }, text: showingHdfs() ? 'Hide HDFS' : 'Show HDFS'"></a>
+    </div>
   </script>
 
   <script type="text/html" id="assist-sources-template">
@@ -346,6 +398,9 @@ from desktop.views import _ko
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         };
+
+        self.showingDb = ko.observable(true);
+        self.showingHdfs = ko.observable(true);
 
         var assistHelper = new AssistHelper(i18n, params.user);
         self.sources = ko.observableArray();
