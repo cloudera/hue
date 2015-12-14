@@ -318,7 +318,9 @@ class HiveServer2Dbms(object):
         select_clause, from_clause = ImpalaDbms.get_nested_select(database, table.name, column, nested)
         hql = 'SELECT %s FROM %s LIMIT %s' % (select_clause, from_clause, limit)
     else:
-      if table.partition_keys:  # Filter on max # of partitions for partitioned tables
+      # Filter on max # of partitions for partitioned tables
+      # Impala's SHOW PARTITIONS is different from Hive, so we only support Hive for now
+      if self.server_name != 'impala' and table.partition_keys:
         hql = self._get_sample_partition_query(database, table, limit)
       else:
         hql = "SELECT * FROM `%s`.`%s` LIMIT %s" % (database, table.name, limit)
