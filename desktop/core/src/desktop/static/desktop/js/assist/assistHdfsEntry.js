@@ -37,6 +37,7 @@
     self.definition = options.definition;
     self.assistHelper = options.assistHelper;
     self.parent = options.parent;
+    self.path = self.parent !== null ? self.parent.path + self.definition.name + '/' : self.definition.name;
 
     self.entries = ko.observableArray([]);
 
@@ -62,8 +63,6 @@
     self.loading(true);
 
     var successCallback = function(data) {
-      console.log(data);
-
       self.entries($.map(data.files, function (file) {
         return new AssistHdfsEntry({
           definition: file,
@@ -87,7 +86,7 @@
     var parts = [];
     var entry = self;
     while (entry != null) {
-      parts.push(entry.name);
+      parts.push(entry.definition.name);
       entry = entry.parent;
     }
     parts.reverse();
@@ -96,7 +95,17 @@
 
   AssistHdfsEntry.prototype.toggleOpen = function () {
     var self = this;
+    if (self.definition.type === 'file') {
+      return;
+    }
     self.open(!self.open());
+    if (self.definition.name === '..') {
+      if (self.parent.parent) {
+        huePubSub.publish('assist.selectHdfsEntry', self.parent.parent);
+      }
+    } else {
+      huePubSub.publish('assist.selectHdfsEntry', self);
+    }
   };
 
   return AssistHdfsEntry;
