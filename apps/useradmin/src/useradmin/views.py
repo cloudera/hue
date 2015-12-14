@@ -24,6 +24,7 @@ import json
 
 import ldap
 import ldap_access
+from ldap_access import LdapSearchException
 
 from django.contrib.auth.models import User, Group
 
@@ -579,7 +580,12 @@ def _import_ldap_users(connection, username_pattern, sync_groups=False, import_b
   Import a user from LDAP. If import_by_dn is true, this will import the user by
   the distinguished name, rather than the configured username attribute.
   """
-  user_info = connection.find_users(username_pattern, find_by_dn=import_by_dn)
+  user_info = None
+  try:
+    user_info = connection.find_users(username_pattern, find_by_dn=import_by_dn)
+  except LdapSearchException, e:
+    LOG.warn("Failed to find LDAP user: %s" % e)
+
   if not user_info:
     LOG.warn("Could not get LDAP details for users with pattern %s" % username_pattern)
     return None
@@ -660,8 +666,8 @@ def _import_ldap_users_info(connection, user_info, sync_groups=False, import_by_
           user.groups.remove(group)
         user.groups.add(*new_groups)
         Group.objects.filter(group__in=remove_groups_filtered).delete()
-    except (AssertionError, RuntimeError) as e:
-      LOG.warn('%s: %s' % (ldap_info['username'], e.message))
+    except (AssertionError, LdapSearchException) as e:
+      LOG.warn('Could not import %s: %s' % (ldap_info['username'], e.message))
 
   return imported_users
 
@@ -671,8 +677,18 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1):
     return None
 
   # Find all users and groups of group.
-  users_info = connection.find_users_of_group(ldap_info['dn'])
-  groups_info = connection.find_groups_of_group(ldap_info['dn'])
+  users_info, groups_info = [], []
+
+  try:
+    users_info = connection.find_users_of_group(ldap_info['dn'])
+  except LdapSearchException, e:
+    LOG.warn("Failed to find LDAP users of group: %s" % e)
+
+  try:
+    groups_info = connection.find_groups_of_group(ldap_info['dn'])
+  except LdapSearchException, e:
+    LOG.warn("Failed to find LDAP groups of group: %s" % e)
+
   posix_members = ldap_info['posix_members']
 
   for user_info in users_info:
@@ -693,12 +709,17 @@ def _import_ldap_members(connection, group, ldap_info, count=0, max_count=1):
 
   for posix_member in posix_members:
     LOG.debug("Importing posix user %s into group %s" % (smart_str(posix_member), smart_str(group.name)))
-    user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-    users = _import_ldap_users_info(connection, user_info)
+    user_info = None
+    try:
+      user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+    except LdapSearchException, e:
+      LOG.warn("Failed to find LDAP users: %s" % e)
 
-    if users:
-      LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
-      group.user_set.add(*users)
+    if user_info:
+      users = _import_ldap_users_info(connection, user_info)
+      if users:
+        LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
+        group.user_set.add(*users)
 
 
 def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1):
@@ -706,8 +727,18 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1):
     return None
 
   # Find all users and groups of group.
-  users_info = connection.find_users_of_group(ldap_info['dn'])
-  groups_info = connection.find_groups_of_group(ldap_info['dn'])
+  users_info, groups_info = [], []
+
+  try:
+    users_info = connection.find_users_of_group(ldap_info['dn'])
+  except LdapSearchException, e:
+    LOG.warn("Failed to find LDAP users of group: %s" % e)
+
+  try:
+    groups_info = connection.find_groups_of_group(ldap_info['dn'])
+  except LdapSearchException, e:
+    LOG.warn("Failed to find LDAP groups of group: %s" % e)
+
   posix_members = ldap_info['posix_members']
 
   for user_info in users_info:
@@ -729,7 +760,12 @@ def _sync_ldap_members(connection, group, ldap_info, count=0, max_count=1):
 
   for posix_member in posix_members:
     LOG.debug("Synchronizing posix user %s with group %s" % (smart_str(posix_member), smart_str(group.name)))
-    users_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+    users_info = []
+    try:
+      users_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+    except LdapSearchException, e:
+      LOG.warn("Failed to find LDAP users: %s" % e)
+
     for user_info in users_info:
       try:
         user = ldap_access.get_ldap_user(username=user_info['username'])
@@ -751,7 +787,12 @@ def _import_ldap_nested_groups(connection, groupname_pattern, import_members=Fal
     scope = ldap.SCOPE_BASE
   else:
     scope = ldap.SCOPE_SUBTREE
-  group_info = connection.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
+
+  group_info = None
+  try:
+    group_info = connection.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
+  except LdapSearchException, e:
+    LOG.warn("Failed to find LDAP group: %s" % e)
 
   if not group_info:
     LOG.warn("Could not get LDAP details for group pattern %s" % groupname_pattern)
@@ -801,7 +842,12 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
     scope = ldap.SCOPE_BASE
   else:
     scope = ldap.SCOPE_SUBTREE
-  group_info = connection.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
+
+  group_info = None
+  try:
+    group_info = connection.find_groups(groupname_pattern, find_by_dn=import_by_dn, scope=scope)
+  except LdapSearchException, e:
+    LOG.warn("Could not find LDAP group: %s" % e)
 
   if not group_info:
     LOG.warn("Could not get LDAP details for group pattern %s" % groupname_pattern)
@@ -828,7 +874,13 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
     # @TODO: Deprecate recursive_import_members as it may not be useful.
     if import_members:
       if recursive_import_members:
-        for sub_ldap_info in connection.find_groups(ldap_info['dn'], find_by_dn=True):
+        group_info = []
+        try:
+          group_info = connection.find_groups(ldap_info['dn'], find_by_dn=True)
+        except LdapSearchException, e:
+          LOG.warn("Failed to find LDAP group: %s" % e)
+
+        for sub_ldap_info in group_info:
           members += sub_ldap_info['members']
           posix_members += sub_ldap_info['posix_members']
 
@@ -839,7 +891,12 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
     # Sync users
     if sync_users:
       for member in members:
-        user_info = connection.find_users(member, find_by_dn=True)
+        user_info = []
+        try:
+          user_info = connection.find_users(member, find_by_dn=True)
+        except LdapSearchException, e:
+          LOG.warn("Failed to find LDAP user: %s" % e)
+
         if len(user_info) > 1:
           LOG.warn('Found multiple users for member %s.' % member)
         else:
@@ -847,6 +904,8 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
             try:
               user = ldap_access.get_ldap_user(username=ldap_info['username'])
               group.user_set.add(user)
+            except AssertionError, e:
+              LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
             except User.DoesNotExist:
               pass
 
@@ -858,16 +917,26 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
           LOG.debug("Importing user %s" % str(posix_member))
           # posixGroup class defines 'memberUid' to be login names,
           # which are defined by 'uid'.
-          user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
-          users = _import_ldap_users_info(connection, user_info, import_by_dn=False)
+          user_info = None
+          try:
+            user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+          except LdapSearchException, e:
+            LOG.warn("Failed to find LDAP user: %s" % e)
 
-          if users:
-            LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
-            group.user_set.add(*users)
+          if user_info:
+            users = _import_ldap_users_info(connection, user_info, import_by_dn=False)
+            if users:
+              LOG.debug("Adding member %s represented as users (should be a single user) %s to group %s" % (str(posix_member), str(users), str(group.name)))
+              group.user_set.add(*users)
 
       if sync_users:
         for posix_member in posix_members:
-          user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+          user_info = []
+          try:
+            user_info = connection.find_users(posix_member, search_attr='uid', user_name_attr=desktop.conf.LDAP.USERS.USER_NAME_ATTR.get(), find_by_dn=False)
+          except LdapSearchException, e:
+            LOG.warn("Failed to find LDAP user: %s" % e)
+
           if len(user_info) > 1:
             LOG.warn('Found multiple users for member %s.' % posix_member)
           else:
@@ -875,6 +944,8 @@ def _import_ldap_suboordinate_groups(connection, groupname_pattern, import_membe
               try:
                 user = ldap_access.get_ldap_user(username=ldap_info['username'])
                 group.user_set.add(user)
+              except AssertionError, e:
+                LOG.warn('Could not sync %s: %s' % (ldap_info['username'], e.message))
               except User.DoesNotExist:
                 pass
 
