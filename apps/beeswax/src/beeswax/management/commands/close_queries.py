@@ -45,7 +45,6 @@ class Command(BaseCommand):
 
     self.stdout.write('Closing (all=%s) HiveServer2 queries older than %s days...\n' % (close_all, days))
 
-    n = 0
     queries = QueryHistory.objects.filter(last_state__in=[QueryHistory.STATE.expired.index, QueryHistory.STATE.failed.index, QueryHistory.STATE.available.index])
 
     if close_all:
@@ -67,6 +66,8 @@ class Command(BaseCommand):
     hive_site.reset()
     hive_site.get_conf()
 
+    closed_queries = 0
+    already_closed_queries = 0
 
     for query in queries:
       try:
@@ -74,14 +75,18 @@ class Command(BaseCommand):
         if query_history.server_id is not None:
           handle = query_history.get_handle()
           dbms.get(user=query_history.owner).close_operation(handle)
-          n += 1
+          closed_queries += 1
+        else:
+          already_closed_queries += 1
+
         query.last_state = QueryHistory.STATE.expired.index
         query.save()
       except Exception, e:
         if 'None' in str(e) or 'Invalid OperationHandle' in str(e):
+          already_closed_queries += 1
           query.last_state = QueryHistory.STATE.expired.index
           query.save()
         else:
           self.stdout.write('Info: %s\n' % e)
 
-    self.stdout.write('%s queries closed.\n' % n)
+    self.stdout.write('%s queries closed. %s queries already closed.\n' % (closed_queries, already_closed_queries))

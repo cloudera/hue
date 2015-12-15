@@ -45,7 +45,6 @@ class Command(BaseCommand):
 
     self.stdout.write('Closing (all=%s) HiveServer2 sessions older than %s days...\n' % (close_all, days))
 
-    n = 0
     sessions = Session.objects.all()
 
     if not close_all:
@@ -67,14 +66,21 @@ class Command(BaseCommand):
     hive_site.reset()
     hive_site.get_conf()
 
+    closed_sessions = 0
+    already_closed_sessions = 0
+
     for session in sessions:
       try:
         resp = dbms.get(user=session.owner).close_session(session)
         if not 'Session does not exist!' in str(resp):
           self.stdout.write('Info: %s\n' % resp)
-          n += 1
+          closed_sessions += 1
+        else:
+          already_closed_sessions += 1
       except Exception, e:
-        if not 'Session does not exist!' in str(e):
+        if 'Session does not exist!' in str(e):
+          already_closed_sessions += 1
+        else:
           self.stdout.write('Info: %s\n' % e)
 
-    self.stdout.write('%s sessions closed.\n' % n)
+    self.stdout.write('%s sessions closed. %s sessions already closed.\n' % (closed_sessions, already_closed_sessions))
