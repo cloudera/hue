@@ -16,14 +16,26 @@
 define([
   'knockout',
   'desktop/js/hdfsAutocompleter',
+  'desktop/js/Assist/assistHelper',
   'desktop/spec/autocompleterTestUtils'
-], function(ko, HdfsAutocompleter, testUtils) {
+], function(ko, HdfsAutocompleter, AssistHelper, testUtils) {
   describe("hdfsAutocompleter.js", function() {
     var subject;
 
     var ajaxHelper = {
       responseForUrls: {}
     };
+
+    var assistHelper = new AssistHelper({}, "testUser");
+
+    var snippet = {
+      type: ko.observable(),
+      database: ko.observable("database_one"),
+      isSqlDialect: function () { return true; },
+      getContext: function () { return ko.mapping.fromJS(null) },
+      getAssistHelper: function () { return assistHelper }
+    };
+
 
     beforeAll(function() {
       jasmine.addMatchers(testUtils.autocompleteMatcher);
@@ -57,7 +69,8 @@ define([
 
     beforeEach(function() {
       subject = new HdfsAutocompleter({
-        user: "user"
+        user: "testUser",
+        snippet: snippet
       });
       ajaxHelper.responseForUrls = {};
     });
