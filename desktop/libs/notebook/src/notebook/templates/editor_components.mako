@@ -265,6 +265,20 @@ ${ require.config() }
 
 <%def name="commonHTML()">
 
+<div id="loginRequiredModal" class="modal hide" data-backdrop="true">
+  <div class="modal-header">
+    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    <h3>${_('You have been logged off')}</h3>
+  </div>
+  <div class="modal-body">
+    ${ _('To continue without losing your work, please') } <a href="/accounts/login/" target="_blank">${ _('sign in on another tab') }</a> ${ _('and then return to this editor.')}
+  </div>
+  <div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+  </div>
+</div>
+
+
 <div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
@@ -1956,8 +1970,15 @@ ${ require.config() }
       $(document).ajaxSuccess(function (event, xhr, settings, data) {
         if (data === '/* login required */' && !isLoginRequired) {
           isLoginRequired = true;
-          window.location.href = '/accounts/login/?next=' + encodeURIComponent(window.location.pathname + window.location.search);
+          $('#loginRequiredModal').modal('show');
+          window.setTimeout(function(){
+            $('.jHueNotify').remove();
+          }, 200);
         }
+      });
+
+      $('#loginRequiredModal').on('hidden', function(){
+        isLoginRequired = false;
       });
 
 
