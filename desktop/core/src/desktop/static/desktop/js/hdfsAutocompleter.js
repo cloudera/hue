@@ -27,14 +27,16 @@
   var PARAMETERS = "?pagesize=100&format=json";
 
   /**
-   * @param options {object}
-   * @param options.user {string}
+   * @param {object} options
+   * @param {string} options.user
+   * @param {Snippet} options.snippet
    *
    * @constructor
    */
   function HdfsAutocompleter(options) {
     var self = this;
     self.user = options.user;
+    self.snippet = options.snippet;
   }
 
   HdfsAutocompleter.prototype.getTotalStorageUserPrefix = function () {
@@ -44,45 +46,6 @@
 
   HdfsAutocompleter.prototype.hasExpired = function (timestamp) {
     return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
-  };
-
-  HdfsAutocompleter.prototype.fetchAlternatives = function (pathParts, success, error, editor) {
-    var self = this;
-
-    var url = BASE_PATH + "/" + pathParts.join("/") + PARAMETERS;
-    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix()) || {};
-
-    if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
-      if (editor) {
-        editor.showSpinner();
-      }
-      $.ajax({
-        dataType: "json",
-        url: url,
-        success: function (data) {
-          if (editor) {
-            editor.hideSpinner();
-          }
-          if (!data.error) {
-            cachedData[url] = {
-              timestamp: (new Date()).getTime(),
-              data: data
-            };
-            $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(), cachedData);
-            success(self.extractFields(data));
-          } else {
-            error();
-          }
-        }
-      }).fail(function () {
-        if (editor) {
-          editor.hideSpinner();
-        }
-        error();
-      });
-    } else {
-      success(self.extractFields(cachedData[url].data));
-    }
   };
 
   HdfsAutocompleter.prototype.extractFields = function (data) {
@@ -124,7 +87,15 @@
       // Last one is either partial name or empty
       parts.pop();
 
-      self.fetchAlternatives(parts, callback, onFailure, editor);
+      var successCallback = function (data) {
+        if (!data.error) {
+          callback(self.extractFields(data));
+        } else {
+          onFailure();
+        }
+      };
+
+      self.snippet.getAssistHelper().fetchHdfsPath(parts, successCallback, onFailure, editor);
     } else {
       onFailure();
     }

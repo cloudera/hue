@@ -38,7 +38,8 @@
 
     var initializeAutocompleter = function () {
       var hdfsAutocompleter = new HdfsAutocompleter({
-        user: options.user
+        user: options.user,
+        snippet: options.snippet
       });
       if (self.snippet.isSqlDialect()) {
         self.autocompleter = new SqlAutocompleter({
