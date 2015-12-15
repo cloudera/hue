@@ -34,6 +34,7 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 from desktop import appmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.redaction import global_redaction_engine
 
 
 LOG = logging.getLogger(__name__)
@@ -845,6 +846,26 @@ class Document2(models.Model):
 
     Document2.objects.get(id=doc_id).dependencies.add(history_doc)
     return history_doc
+
+  def save(self, *args, **kwargs):
+    """
+    Override `save` to optionally mask out the query from being saved to the database. This is because if the database
+    contains sensitive information like personally identifiable information, that information could be leaked into the
+    Hue database and logfiles.
+    """
+    if global_redaction_engine.is_enabled() and self.type == 'notebook':
+      data_dict = self.data_dict
+      snippets = data_dict.get('snippets', [])
+      for snippet in snippets:
+        if snippet['type'] in ('hive', 'impala'):  # TODO: Pull SQL types from canonical lookup
+          redacted_statement_raw = global_redaction_engine.redact(snippet['statement_raw'])
+          if snippet['statement_raw'] != redacted_statement_raw:
+            snippet['statement_raw'] = redacted_statement_raw
+            snippet['statement'] = global_redaction_engine.redact(snippet['statement'])
+            snippet['is_redacted'] = True
+      self.data = json.dumps(data_dict)
+
+    super(Document2, self).save(*args, **kwargs)
 
 
 def get_data_link(meta):
