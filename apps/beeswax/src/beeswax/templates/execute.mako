@@ -44,11 +44,12 @@ ${ layout.menubar(section='query') }
     <div class="tab-content">
       <div class="tab-pane active" id="navigatorTab">
         <div class="card card-small card-tab">
-          <div class="card-body" style="margin-top: 0;">
+          <div class="card-body" style="margin-top: 0; height: 100%; ">
             <div class="assist" data-bind="component: {
               name: 'assist-panel',
               params: {
                 user: HIVE_AUTOCOMPLETE_USER,
+                onlySql: true,
                 sourceTypes: editorViewModel.sqlSourceTypes,
                 activeSourceType: snippetType,
                 navigationSettings: {
@@ -1314,8 +1315,8 @@ $(document).ready(function () {
 
   resizeNavigator = function () {
     $(".resizer").css("height", ($(window).height() - 150) + "px");
-    $("#navigator .card").css("min-height", ($(window).height() - 150) + "px");
-    $(".table-container").css("max-height", ($(window).height() - 280) + "px").css("overflow-y", "auto");
+    $("#navigator .card").css("height", ($(window).height() - 150) + "px");
+    $(".table-container").css("max-height", ($(window).height() - 180) + "px").css("overflow-y", "auto");
   };
 
   $("#expandResults").on("click", function(){
