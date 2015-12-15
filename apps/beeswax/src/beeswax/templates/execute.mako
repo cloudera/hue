@@ -800,6 +800,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/tableStats.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/assist/assistHdfsEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/autocompleter.js') }" type="text/javascript" charset="utf-8"></script>
@@ -2382,7 +2383,7 @@ $(document).ready(function () {
   // Type ahead for settings.
   $.getJSON("${ url(app_name + ':configuration') }", function (data) {
     $(".settingsField").typeahead({
-      source: $.map(data.config_values, function (value, key) {
+      source: $.map(data.configuration, function (value, key) {
         return value.key;
       })
     });
