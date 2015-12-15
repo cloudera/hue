@@ -131,12 +131,19 @@ ${ require.config() }
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right">
-        <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook">
-          <i class="fa fa-save"></i>
-        </a>
-        <a class="btn" title="${ _('Save As') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { $('#saveAsModal').modal('show'); }">
-          <i class="fa fa-save"></i>
-        </a>
+
+        <div class="btn-group">
+          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook"><i class="fa fa-save"></i></a>
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="pointer" data-bind="click: function() { $('#saveAsModal').modal('show'); }">
+                <i class="fa fa-save"></i> ${ _('Save as...') }
+              </a>
+            </li>
+          </ul>
+        </div>
+
 
         &nbsp;&nbsp;&nbsp;
 
@@ -144,6 +151,11 @@ ${ require.config() }
           <i class="fa fa-cogs"></i>
         </a>
 
+        <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+          <i class="fa fa-fw fa-expand"></i>
+        </a>
+
+        % if mode != 'editor':
         <div class="btn-group">
           <a class="btn dropdown-toggle" data-toggle="dropdown">
             <i class="fa fa-bars"></i>
@@ -154,7 +166,6 @@ ${ require.config() }
                 <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
               </a>
             </li>
-            % if mode != 'editor':
             <li>
               <a class="pointer" data-bind="click: function() { $root.selectedNotebook().executeAll() }">
                 <i class="fa fa-fw fa-play"></i> ${ _('Execute all snippets') }
@@ -180,9 +191,9 @@ ${ require.config() }
                 <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
               </a>
             </li>
-            % endif
           </ul>
         </div>
+        % endif
 
         &nbsp;&nbsp;&nbsp;
 
@@ -1062,15 +1073,28 @@ ${ require.config() }
 <div id="saveAsModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Save as')}</h3>
+    % if mode == 'editor':
+      <h3>${_('Save query as...')}</h3>
+    %else:
+      <h3>${_('Save notebook as...')}</h3>
+    %endif
   </div>
   <div class="modal-body">
     <!-- ko if: $root.selectedNotebook() -->
-      <a href="javascript:void(0)"><span data-bind="editable: $root.selectedNotebook().name, editableOptions: {enabled: true, placement: 'right'}"></span></a>
-      <br/>
-      <a href="javascript:void(0)">
-        <span data-bind="editable: $root.selectedNotebook().description, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
-      </a>
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label">${_('Name')}</label>
+        <div class="controls">
+          <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().name, valueUpdate:'afterkeydown'"/>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="control-label">${_('Description')}</label>
+        <div class="controls">
+          <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('No description') }"/>
+        </div>
+      </div>
+    </form>
     <!-- /ko -->
   </div>
   <div class="modal-footer">
