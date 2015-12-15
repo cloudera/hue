@@ -263,7 +263,7 @@ ${ assist.assistPanel() }
         <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
           ${ csrf_token(request) | n,unicode }
           <div class="modal-header">
-            <a href="#" class="close" data-dismiss="modal">×</a>
+            <a href="#" class="close" data-dismiss="modal">&times</a>
             <h3 id="dropDatabaseMessage">${ _('Do you really want to delete the database(s)?') }</h3>
           </div>
           <div class="modal-footer">
