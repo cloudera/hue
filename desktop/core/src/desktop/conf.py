@@ -58,7 +58,7 @@ def coerce_file(path):
   return path
 
 def coerce_password_from_script(script):
-  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
   stdout, stderr = p.communicate()
 
   if p.returncode != 0:
