@@ -57,6 +57,57 @@
   };
 
   /**
+   *
+   * @param {string} owner - 'assist', 'viewModelA' etc.
+   * @param {string} id
+   * @param {*} [value] - Optional, undefined and null will remove the value
+   */
+  AssistHelper.prototype.setInTotalStorage = function(owner, id, value) {
+    var self = this;
+    var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+    if (typeof value !== 'undefined' && value !== null) {
+      cachedData[id] = value;
+      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData);
+    } else if (cachedData[id]) {
+      delete cachedData[id];
+      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData);
+    }
+  };
+
+  /**
+   *
+   * @param {string} owner - 'assist', 'viewModelA' etc.
+   * @param {string} id
+   * @param {*} [defaultValue]
+   * @returns {*}
+   */
+  AssistHelper.prototype.getFromTotalStorage = function(owner, id, defaultValue) {
+    var self = this;
+    var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+    return typeof cachedData[id] !== 'undefined' ? cachedData[id] : defaultValue;
+  };
+
+  /**
+   * @param {string} owner - 'assist', 'viewModelA' etc.
+   * @param {string} id
+   * @param {Observable} observable
+   * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
+   */
+  AssistHelper.prototype.withTotalStorage = function(owner, id, observable, defaultValue) {
+    var self = this;
+
+    var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
+
+    if (cachedValue !== 'undefined') {
+      observable(cachedValue);
+    }
+
+    observable.subscribe(function (newValue) {
+      self.setInTotalStorage(owner, id, newValue);
+    })
+  };
+
+  /**
    * @param {string[]} pathParts
    * @param {function} successCallback
    * @param {function} errorCallback

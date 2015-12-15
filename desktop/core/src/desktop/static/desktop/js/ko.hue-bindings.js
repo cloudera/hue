@@ -872,13 +872,17 @@
 
   ko.bindingHandlers.assistVerticalResizer = {
     init: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+
+      var assistHelper = options.assistHelper;
+
       var $resizer = $(element);
       var $above = $resizer.prev();
       var $below = $resizer.next();
 
       $resizer.parent().height();
 
-      var aboveRatio = 0.5;
+      var aboveRatio = assistHelper.getFromTotalStorage('assist', 'twoPanelAboveRatio', 0.5);
 
       var aboveInitialHeight = ($resizer.parent().height() - $resizer.height()) * aboveRatio;
       var belowInitialHeight = aboveInitialHeight;
@@ -899,6 +903,7 @@
         stop: function (event, ui) {
           ui.offset.top = 0;
           ui.position.top = 0;
+          assistHelper.setInTotalStorage('assist', 'twoPanelAboveRatio', aboveRatio);
         }
       });
 
