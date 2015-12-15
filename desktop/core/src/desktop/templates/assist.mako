@@ -300,7 +300,7 @@ from desktop.views import _ko
       <!-- ko template: { if: showingDb() && ! showingHdfs(), name: 'assist-db-panel' } --><!-- /ko -->
       <!-- ko template: { if: ! showingDb() && showingHdfs(), name: 'assist-hdfs-panel' } --><!-- /ko -->
     </div>
-    <div style="position: absolute; bottom: 2px; left: 2px;width: 100%; border-top: 1px solid #F1F1F1;padding-top:3px">
+    <div data-bind="visible: ! onlySql" style="display: none; position: absolute; bottom: 2px; left: 2px;width: 100%; border-top: 1px solid #F1F1F1; padding-top:3px; background-color: #FFF;">
       <div class="inactive-action assist-type-switch" data-bind="click: function () { showingDb(!showingDb()) }, css: { 'blue': showingDb }, attr: { 'title': showingDb() ? '${ _('Hide Databases') }' : '${ _('Show Databases') }' }">
         <i class="fa fa-database"></i>
       </div>
@@ -435,6 +435,7 @@ from desktop.views import _ko
       /**
        * @param {Object} params
        * @param {Object[]} params.sourceTypes - All the available SQL source types
+       * @param {boolean} params.onlySql - For the old query editors
        * @param {string} params.sourceTypes[].name - Example: Hive SQL
        * @param {string} params.sourceTypes[].type - Example: hive
        * @param {string} [params.activeSourceType] - Example: hive
@@ -452,8 +453,9 @@ from desktop.views import _ko
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         };
 
+        self.onlySql = params.onlySql;
         self.showingDb = ko.observable(true);
-        self.showingHdfs = ko.observable(true);
+        self.showingHdfs = ko.observable(! self.onlySql);
 
         var assistHelper = new AssistHelper(i18n, params.user);
         self.sources = ko.observableArray();
