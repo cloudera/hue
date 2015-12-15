@@ -284,7 +284,7 @@ from desktop.views import _ko
       <div style="overflow: auto;">
         <!-- ko template: 'assist-db-panel' --><!-- /ko -->
       </div>
-      <div class="assist-resizer" data-bind="assistVerticalResizer">
+      <div class="assist-resizer" data-bind="assistVerticalResizer: { assistHelper: assistHelper } ">
         <i class="fa fa-ellipsis-h"></i>
       </div>
       <div style="overflow: auto;">
@@ -452,17 +452,24 @@ from desktop.views import _ko
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
           errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         };
+        self.assistHelper = new AssistHelper(i18n, params.user);
 
         self.onlySql = params.onlySql;
-        self.showingDb = ko.observable(true);
-        self.showingHdfs = ko.observable(! self.onlySql);
+        self.showingDb = ko.observable();
+        self.showingHdfs = ko.observable();
 
-        var assistHelper = new AssistHelper(i18n, params.user);
+        self.assistHelper.withTotalStorage('assist', 'showingDb', self.showingDb, true);
+        if (self.onlySql) {
+          self.showingHdfs(false);
+        } else {
+          self.assistHelper.withTotalStorage('assist', 'showingHdfs', self.showingHdfs, true);
+        }
+
         self.sources = ko.observableArray();
         var sourceIndex = {};
         $.each(params.sourceTypes, function (idx, sourceType) {
           sourceIndex[sourceType.type] = new AssistDbSource({
-            assistHelper: assistHelper,
+            assistHelper: self.assistHelper,
             i18n: i18n,
             type: sourceType.type,
             name: sourceType.name,
@@ -477,12 +484,16 @@ from desktop.views import _ko
             type: 'dir'
           },
           parent: null,
-          assistHelper: assistHelper
+          assistHelper: self.assistHelper
         }));
         self.selectedHdfsEntry().open(true);
 
+        // TODO: When we can tell the root entry to go to a path:
+        // self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
+          self.assistHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
         });
 
         self.selectedSource = ko.observable(null);
@@ -530,13 +541,13 @@ from desktop.views import _ko
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
             newSource.initDatabases();
-            $.totalStorage("hue.assist.lastSelectedSource." + self.user, newSource.type);
+            self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.type);
           } else {
-            $.totalStorage("hue.assist.lastSelectedSource." + self.user, null);
+            self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource');
           }
         });
 
-        var storageSourceType =  $.totalStorage("hue.assist.lastSelectedSource." + self.user);
+        var storageSourceType = self.assistHelper.getFromTotalStorage('assist', 'lastSelectedSource');
 
         if (! self.selectedSource()) {
           if (params.activeSourceType) {
