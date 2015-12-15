@@ -878,7 +878,9 @@
 
       $resizer.parent().height();
 
-      var aboveInitialHeight = ($resizer.parent().height() - $resizer.height()) / 2;
+      var aboveRatio = 0.5;
+
+      var aboveInitialHeight = ($resizer.parent().height() - $resizer.height()) * aboveRatio;
       var belowInitialHeight = aboveInitialHeight;
 
       $above.css("height", aboveInitialHeight + 'px');
@@ -888,8 +890,9 @@
         axis: "y",
         drag: function (event, ui) {
           var currentHeight = ui.offset.top - 81;
+          aboveRatio = currentHeight / ($resizer.parent().height() - $resizer.height());
           $above.css("height", currentHeight + 'px');
-          $below.css("height", ($resizer.parent().height() - currentHeight - $resizer.height()))
+          $below.css("height", ($resizer.parent().height() - currentHeight - $resizer.height() - 30));
           ui.offset.top = 0;
           ui.position.top = 0;
         },
@@ -897,6 +900,12 @@
           ui.offset.top = 0;
           ui.position.top = 0;
         }
+      });
+
+      $(window).resize(function () {
+        var aboveHeight = ($resizer.parent().height() - $resizer.height()) * aboveRatio;
+        $above.css("height", aboveHeight + 'px');
+        $below.css("height", ($resizer.parent().height() - aboveHeight - $resizer.height() - 30));
       });
     }
   };
