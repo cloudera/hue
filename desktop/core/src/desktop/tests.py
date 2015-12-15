@@ -23,17 +23,12 @@ import subprocess
 import sys
 import time
 
-import desktop
-import desktop.conf
-import desktop.urls
-import desktop.views as views
 import proxy.conf
 import tempfile
 
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises, nottest
-from django.conf import settings
 from django.conf.urls import patterns, url
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -44,6 +39,12 @@ from beeswax.conf import HIVE_SERVER_HOST
 from pig.models import PigScript
 from useradmin.models import GroupPermission
 
+import desktop
+import desktop.conf
+import desktop.urls
+import desktop.redaction as redaction
+import desktop.views as views
+
 from desktop.appmanager import DESKTOP_APPS
 from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
@@ -53,6 +54,8 @@ from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
 from desktop.models import Document, Document2, get_data_link
+from desktop.redaction import logfilter
+from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home
 
 
@@ -919,6 +922,84 @@ class TestDocument(object):
     assert_equal(history_doc, Document2.objects.get(id=doc_id).get_history()[0])
 
     assert_not_equal(doc_id, history_doc.id)
+
+  def test_redact_statements(self):
+    old_policies = redaction.global_redaction_engine.policies
+    redaction.global_redaction_engine.policies = [
+      RedactionPolicy([
+        RedactionRule('', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+      ])
+    ]
+
+    logfilter.add_log_redaction_filter_to_logger(redaction.global_redaction_engine, logging.root)
+
+    sensitive_query = 'SELECT "ssn=123-45-6789"'
+    redacted_query = 'SELECT "ssn=XXX-XX-XXXX"'
+    nonsensitive_query = 'SELECT "hello"'
+
+    snippets = [
+      {
+        'status': 'ready',
+        'viewSettings': {
+          'sqlDialect': True,
+          'snippetImage': '/static/beeswax/art/icon_beeswax_48.png',
+          'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
+          'aceMode': 'ace/mode/hive'
+         },
+        'id': '10a29cda-063f-1439-4836-d0c460154075',
+        'statement_raw': sensitive_query,
+        'statement': sensitive_query,
+        'type': 'hive'
+      },
+      {
+        'status': 'ready',
+        'viewSettings': {
+          'sqlDialect': True,
+          'snippetImage': '/static/impala/art/icon_impala_48.png',
+          'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
+          'aceMode': 'ace/mode/impala'
+         },
+        'id': 'e17d195a-beb5-76bf-7489-a9896eeda67a',
+        'statement_raw': sensitive_query,
+        'statement': sensitive_query,
+        'type': 'impala'
+      },
+      {
+        'status': 'ready',
+        'viewSettings': {
+          'sqlDialect': True,
+          'snippetImage': '/static/beeswax/art/icon_beeswax_48.png',
+          'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
+          'aceMode': 'ace/mode/hive'
+         },
+        'id': '10a29cda-063f-1439-4836-d0c460154075',
+        'statement_raw': nonsensitive_query,
+        'statement': nonsensitive_query,
+        'type': 'hive'
+      },
+    ]
+
+    try:
+      self.document2.type = 'notebook'
+      self.document2.update_data({'snippets': snippets})
+      self.document2.save()
+      saved_snippets = self.document2.data_dict['snippets']
+
+      # Make sure redacted queries are redacted.
+      assert_equal(redacted_query, saved_snippets[0]['statement'])
+      assert_equal(redacted_query, saved_snippets[0]['statement_raw'])
+      assert_equal(True, saved_snippets[0]['is_redacted'])
+
+      assert_equal(redacted_query, saved_snippets[1]['statement'])
+      assert_equal(redacted_query, saved_snippets[1]['statement_raw'])
+      assert_equal(True, saved_snippets[1]['is_redacted'])
+
+      # Make sure unredacted queries are not redacted.
+      assert_equal(nonsensitive_query, saved_snippets[2]['statement'])
+      assert_equal(nonsensitive_query, saved_snippets[2]['statement_raw'])
+      assert_false('is_redacted' in saved_snippets[2])
+    finally:
+      redaction.global_redaction_engine.policies = old_policies
 
 
 def test_session_secure_cookie():
