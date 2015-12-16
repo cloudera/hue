@@ -51,6 +51,7 @@ APPS := core \
 	libs/libsentry \
 	libs/libsolr \
 	libs/libzookeeper \
+	libs/metadata \
 	libs/notebook
 
 .PHONY: default
