@@ -21,168 +21,14 @@
   from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
 
-${ commonheader("Welcome to Hue", "login", user, "50px", True) | n,unicode }
+${ commonheader(_("Welcome to Hue"), "login", user, "50px", True) | n,unicode }
 
+<link rel="stylesheet" href="${ static('desktop/css/login.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <style type="text/css">
   body {
     background-color: #EEE;
     padding-top: 150px;
-  }
-
-  @-webkit-keyframes spinner {
-    from {
-      -webkit-transform: rotateY(0deg);
-    }
-    to {
-      -webkit-transform: rotateY(-360deg);
-    }
-  }
-
-  .logo {
-    background-color: #338BB8;
-    width: 60px;
-    height: 60px;
-    text-align: center;
-    -webkit-border-radius: 30px;
-    -moz-border-radius: 30px;
-    border-radius: 30px;
-    margin-left: 400px;
-    margin-top: -30px;
-  }
-
-  .logo img {
-    margin-top: 2px;
-  }
-
-  .logo img.waiting {
-    -webkit-animation-name: spinner;
-    -webkit-animation-timing-function: linear;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-duration: 2s;
-    -webkit-transform-style: preserve-3d;
-  }
-
-  .login-box {
-    width: 500px;
-    display: block;
-    margin: auto;
-    margin-bottom: 50px;
-    background: #fff;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  }
-
-  .login-box .input-prepend.error input, .login-box .input-prepend.error .add-on {
-    border-top-color: #dd4b39;
-    border-bottom-color: #dd4b39;
-  }
-
-  .login-box .input-prepend.error input {
-    border-right-color: #dd4b39;
-  }
-
-  .login-box .input-prepend.error .add-on {
-    border-left-color: #dd4b39;
-  }
-
-  .login-box input[type='submit'] {
-    height: 44px;
-    min-height: 44px;
-    font-weight: normal;
-    text-shadow: none;
-  }
-
-  .login-header {
-    background-color: #fafafa !important;
-    padding: 35px;
-  }
-
-  .login-header h1 {
-    margin: 0;
-    font-size: 18px;
-    line-height: 18px;
-  }
-
-  .login-header h2 {
-    margin: 5px 0 0 0;
-    color: #757575;
-    font-weight: normal;
-    font-size: 14px;
-    line-height: 14px;
-  }
-
-  .login-content {
-    padding: 35px;
-  }
-
-  ul.errorlist {
-    text-align: left;
-    margin-bottom: 4px;
-    margin-top: -4px;
-  }
-
-  .alert-error ul.errorlist {
-    text-align: center;
-    margin-top: 0;
-  }
-
-  ul.errorlist li {
-    font-size: 13px;
-    font-weight: normal;
-    font-style: normal;
-  }
-
-  .login-content input[type='text'], .login-content input[type='password'], .login-content input[type='text']:hover, .login-content input[type='password']:hover {
-    padding: 0 10px 2px 0;
-    height: auto;
-    border: none;
-    border-bottom: 2px solid #eeeeee;
-    border-radius: 0;
-    background: none;
-    box-shadow: none;
-    color: #9e9e9e;
-    font-weight: 400;
-    resize: none;
-    width: 100%;
-  }
-
-  input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0px 1000px white inset!important;
-  }
-
-  .login-content input.error {
-    border-color: #b94a48;
-    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
-  }
-
-  .btn-large.btn-primary {
-    width: 100%;
-    margin-top: 20px;
-  }
-
-  .chosen-single {
-    min-height: 38px;
-    text-align: left;
-    font-size: 18px;
-  }
-
-  .chosen-single span {
-    display: inline;
-    line-height: 38px;
-    vertical-align: middle;
-  }
-
-  .chosen-container-active.chosen-with-drop .chosen-single div b,
-  .chosen-container-single .chosen-single div b {
-    background-position-x: 1px;
-    background-position-y: 10px;
-  }
-
-  .chosen-container-active.chosen-with-drop .chosen-single div b {
-    background-position-x: -17px;
-    background-position-y: 10px;
   }
 </style>
 
@@ -303,10 +149,6 @@ ${ commonheader("Welcome to Hue", "login", user, "50px", True) | n,unicode }
         return false;
       });
     %endif
-
-    $("ul.errorlist").each(function () {
-      $(this).prev().addClass("error");
-    });
   });
 </script>
 
