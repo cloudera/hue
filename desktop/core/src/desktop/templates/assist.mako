@@ -337,7 +337,7 @@ from desktop.views import _ko
       <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
     </li>
     <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
-      <div><input id="searchInput" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </li>
     <li data-bind="visible: ! hasErrors()" >
       <ul class="assist-tables" data-bind="foreach: filteredEntries">
@@ -346,6 +346,11 @@ from desktop.views import _ko
           <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
         </li>
       </ul>
+      <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
+      <ul class="assist-tables">
+        <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
+      </ul>
+      <!-- /ko -->
     </li>
     <li class="center" data-bind="visible: loading" >
       <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
@@ -365,7 +370,7 @@ from desktop.views import _ko
 
       <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
         <div><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />Tables</label><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />Views</label></div>
-        <div><input id="searchInput" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+        <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
       </li>
 
       <div class="table-container">
