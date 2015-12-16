@@ -42,15 +42,15 @@
 
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
+    self.isSearchVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
 
     self.filter = {
-      query: ko.observable("").extend({ rateLimit: 150 }),
-      showTables: ko.observable(true),
-      showViews: ko.observable(true)
+      query: ko.observable("").extend({ rateLimit: 150 })
     };
 
     self.filterActive = ko.computed(function () {
-      return self.filter.query().length !== 0 || !self.filter.showViews() || !self.filter.showTables();
+      return self.filter.query().length !== 0;
     });
 
     var storageSearchVisible = $.totalStorage(self.type + ".assist.searchVisible");
@@ -61,6 +61,24 @@
     });
 
     self.databases = ko.observableArray();
+
+    self.hasEntries = ko.computed(function() {
+      return self.databases().length > 0;
+    });
+
+    self.filteredEntries = ko.computed(function () {
+      if (self.filter.query().length === 0) {
+        return self.databases();
+      }
+      var result = [];
+      $.each(self.databases(), function (index, database) {
+        if (database.definition.name.toLowerCase().indexOf(self.filter.query()) > -1) {
+          result.push(database);
+        }
+      });
+      return result;
+    });
+
     self.selectedDatabase = ko.observable();
 
     self.reloading = ko.observable(false);
@@ -91,6 +109,11 @@
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
     var dbIndex = {};
+    var nestedFilter = {
+      query: ko.observable("").extend({ rateLimit: 150 }),
+      showTables: ko.observable(true),
+      showViews: ko.observable(true)
+    };
     var updateDatabases = function (names) {
       var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
       dbIndex = {};
@@ -100,7 +123,7 @@
           displayName: name,
           title: name,
           isDatabase: true
-        }, null, self, self.filter, self.i18n, self.navigationSettings);
+        }, null, self, nestedFilter, self.i18n, self.navigationSettings);
         dbIndex[name] = database;
         if (name === lastSelectedDb) {
           self.selectedDatabase(database);
@@ -159,6 +182,12 @@
 
     huePubSub.subscribe('assist.refresh', self.reload);
   }
+
+  AssistDbSource.prototype.toggleSearch = function() {
+    var self = this;
+    self.isSearchVisible(!self.isSearchVisible());
+    self.editingSearch(self.isSearchVisible());
+  };
 
   return AssistDbSource;
 }));
