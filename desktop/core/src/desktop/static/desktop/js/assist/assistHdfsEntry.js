@@ -37,7 +37,14 @@
     self.definition = options.definition;
     self.assistHelper = options.assistHelper;
     self.parent = options.parent;
-    self.path = self.parent !== null ? self.parent.path + self.definition.name + '/' : self.definition.name;
+    self.path = '';
+    if (self.parent !== null) {
+      self.path = self.parent.path;
+      if (self.parent.path !== '/') {
+        self.path += '/'
+      }
+    }
+    self.path += self.definition.name;
 
     self.entries = ko.observableArray([]);
 
@@ -54,6 +61,11 @@
       return self.entries().length > 0;
     });
   }
+
+  AssistHdfsEntry.prototype.dblClick = function () {
+    var self = this;
+    huePubSub.publish('assist.dblClickHdfsItem', self);
+  };
 
   AssistHdfsEntry.prototype.loadEntries = function() {
     var self = this;
