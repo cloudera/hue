@@ -1015,6 +1015,19 @@ ${ login_modal(request).content | n,unicode }
             <!-- /ko -->
             <!-- ko foreach: sessions -->
               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
+              <!-- ko if: type()== 'impala' && typeof properties != 'undefined' -->
+
+              <ul class="nav nav-list" style="border: none; padding: 0;">
+                <li class="nav-header">${ _('address')}</li>
+              </ul>
+              <div style="margin: 2px" data-bind="with: ko.utils.arrayFirst(properties(), function(item) { return item.key() == 'http_addr' });">
+                <a data-bind="attr: {'href': window.location.protocol + '//' + $data.value().replace(/^(https?):\/\//, '')}" target="_blank">
+                  <span data-bind="text: $data.value().replace(/^(https?):\/\//, '')"></span>
+                  <i class="fa fa-external-link"></i>
+                </a>
+              </div>
+
+              <!-- /ko -->
               <!-- ko if: ['pyspark', 'spark'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <div style="display:block; width:100%;">
                 <!-- ko foreach: properties -->
