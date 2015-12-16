@@ -399,6 +399,9 @@ def commonshare():
 def commonimportexport(request):
   return django_mako.render_to_string("common_import_export.mako", {'request': request})
 
+def login_modal(request):
+  return desktop.auth.views.dt_login(request, True)
+
 def commonfooter(messages=None):
   """
   Returns the rendered common footer

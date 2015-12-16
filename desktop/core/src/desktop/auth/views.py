@@ -41,6 +41,7 @@ from useradmin.views import ensure_home_directory, require_change_password
 from desktop.auth import forms as auth_forms
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
+from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_warn, last_access_map
 from desktop.conf import AUTH, LDAP, OAUTH, DEMO_ENABLED
 
@@ -83,7 +84,7 @@ def get_backend_names():
 
 @login_notrequired
 @watch_login
-def dt_login(request):
+def dt_login(request, from_modal=False):
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
   backend_names = get_backend_names()
@@ -137,12 +138,17 @@ def dt_login(request):
         msg = 'Successful login for user: %s' % user.username
         request.audit['operationText'] = msg
         access_warn(request, msg)
-        return HttpResponseRedirect(redirect_to)
+        if from_modal or request.REQUEST.get('fromModal', 'false') == 'true':
+          return JsonResponse({'auth': True})
+        else:
+          return HttpResponseRedirect(redirect_to)
       else:
         request.audit['allowed'] = False
         msg = 'Failed login for user: %s' % request.POST.get('username')
         request.audit['operationText'] = msg
         access_warn(request, msg)
+        if from_modal or request.REQUEST.get('fromModal', 'false') == 'true':
+          return JsonResponse({'auth': False})
 
   else:
     first_user_form = None
@@ -155,7 +161,12 @@ def dt_login(request):
     return HttpResponseRedirect(redirect_to)
 
   request.session.set_test_cookie()
-  return render('login.mako', request, {
+
+  renderable_path = 'login.mako'
+  if from_modal:
+    renderable_path = 'login_modal.mako'
+
+  return render(renderable_path, request, {
     'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
