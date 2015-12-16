@@ -36,6 +36,10 @@ from django.http import HttpResponse
 LOG = logging.getLogger(__name__)
 
 
+def get_documents(request):
+  return JsonResponse({'documents': [doc.to_dict() for doc in Document2.objects.filter(owner=request.user)]})
+
+
 def get_document(request):
   if request.GET.get('id'):
     doc = Document2.objects.get(id=request.GET['id'])
