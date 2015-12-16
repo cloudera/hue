@@ -522,7 +522,7 @@ def test_404_handling():
   c = make_logged_in_client()
   response = c.get(view_name)
   assert_true(any(['404.mako' in _template.filename for _template in response.templates]), response.templates)
-  assert_true('Not Found' in response.content)
+  assert_true('not found' in response.content)
   assert_true(view_name in response.content)
 
 class RecordingHandler(logging.Handler):
