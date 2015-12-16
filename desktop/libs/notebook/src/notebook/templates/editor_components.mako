@@ -1014,8 +1014,8 @@ ${ login_modal(request).content | n,unicode }
             <p>${ _('There are currently no active sessions.') }</p>
             <!-- /ko -->
             <!-- ko foreach: sessions -->
-              <!-- ko if: ['pyspark', 'spark'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left;"></h4>
+              <!-- ko if: ['pyspark', 'spark'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <div style="display:block; width:100%;">
                 <!-- ko foreach: properties -->
                   <!-- ko template: {
@@ -1027,8 +1027,8 @@ ${ login_modal(request).content | n,unicode }
                       remove: function () { $parent.properties.remove($data) }
                     }
                   } --><!-- /ko -->
-                <!-- /ko -->
               </div>
+              <!-- /ko -->
               <div style="clear:both; padding-left: 120px;">
                 <!-- ko if: availableNewProperties().length -->
                 <select data-bind="options: availableNewProperties,
