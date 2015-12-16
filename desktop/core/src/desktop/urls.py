@@ -101,6 +101,7 @@ dynamic_patterns += patterns('desktop.api',
 )
 
 dynamic_patterns += patterns('desktop.api2',
+  (r'^desktop/api2/docs/?$', 'get_documents'),
   (r'^desktop/api2/doc/get$', 'get_document'),
   (r'^desktop/api2/doc/export$', 'export_documents'),
   (r'^desktop/api2/doc/import$', 'import_documents'),

@@ -206,11 +206,11 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script type="text/javascript" charset="utf-8">
   var viewModel, shareViewModel, JSON_USERS_GROUPS;
 
-  var JSON_DOCS = ${ json_documents | n,unicode };
-
   $(document).ready(function () {
-    viewModel = new HomeViewModel(JSON_DOCS);
-    ko.applyBindings(viewModel, $('#documentList')[0]);
+    $.get("/desktop/api2/docs/", function(data) {
+      viewModel = new HomeViewModel(data.documents);
+      ko.applyBindings(viewModel, $('#documentList')[0]);
+    });
   });
 </script>
 

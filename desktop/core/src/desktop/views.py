@@ -73,13 +73,10 @@ def home(request):
 
 
 def home2(request):
-  docs = Document2.objects.filter(owner=request.user)
-
   apps = appmanager.get_apps_dict(request.user)
 
   return render('home2.mako', request, {
     'apps': apps,
-    'json_documents': json.dumps([doc.to_dict() for doc in docs]),
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
