@@ -36,6 +36,14 @@ from notebook.conf import get_interpreters
 LOG = logging.getLogger(__name__)
 
 
+def notebooks(request):
+  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra__startswith='query')) if not d.content_object.is_history]
+
+  return render('notebooks.mako', request, {
+      'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
+  })
+
+
 @check_document_access_permission()
 def notebook(request):
   notebook_id = request.GET.get('notebook')
@@ -69,10 +77,11 @@ def editor(request):
 
   if editor_id:
     editor = Notebook(document=Document2.objects.get(id=editor_id))
+    editor_type = editor.get_data()['type'].rsplit('-', 1)[-1]
   else:
     editor = Notebook()
     data = editor.get_data()
-    data['name'] = 'Unsaved %s Query' % editor_type.title()
+    data['name'] = 'Untitled %s Query' % editor_type.title()
     data['type'] = 'query-%s' % editor_type
     editor.data = json.dumps(data)
 
@@ -139,14 +148,6 @@ def browse(request, database, table):
           'mode': 'editor',
       }),
       'editor_type': editor_type,
-  })
-
-
-def notebooks(request):
-  notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(request.user, Document2, qfilter=Q(extra='notebook') | Q(extra__startswith='query')) if not d.content_object.is_history]
-
-  return render('notebooks.mako', request, {
-      'notebooks_json': json.dumps(notebooks, cls=JSONEncoderForHTML)
   })
 
 
