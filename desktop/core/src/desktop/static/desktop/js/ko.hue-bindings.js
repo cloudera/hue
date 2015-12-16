@@ -55,9 +55,10 @@
   ko.bindingHandlers.draggableText = {
     init: function (element, valueAccessor) {
       var $element = $(element);
+      var options = valueAccessor();
       $element.addClass("draggableText");
 
-      var $helper = $("<div>").text(valueAccessor().text()).css("z-index", "99999");
+      var $helper = $("<div>").text(ko.isObservable(options.text) ? options.text() : options.text).css("z-index", "99999");
       $element.draggable({
         helper: function () { return $helper },
         appendTo: "body"
