@@ -576,6 +576,11 @@ class Document(models.Model):
         return staticfiles_storage.url('oozie/art/icon_oozie_bundle_48.png')
       elif self.extra == 'notebook':
         return staticfiles_storage.url('notebook/art/icon_notebook_48.png')
+      elif self.extra.startswith('query'):
+        if self.extra == 'query-impala':
+          return staticfiles_storage.url(apps['impala'].icon_path)
+        else:
+          return staticfiles_storage.url(apps['beeswax'].icon_path)
       elif self.extra.startswith('search'):
         return staticfiles_storage.url('search/art/icon_search_48.png')
       elif self.content_type.app_label == 'beeswax':
@@ -763,6 +768,7 @@ class Document2(models.Model):
 
   class Meta:
     unique_together = ('uuid', 'version', 'is_history')
+    ordering = ["-last_modified"]
 
   def natural_key(self):
     return (self.uuid, self.version, self.is_history)

@@ -37,7 +37,14 @@ LOG = logging.getLogger(__name__)
 
 
 def get_documents(request):
-  return JsonResponse({'documents': [doc.to_dict() for doc in Document2.objects.filter(owner=request.user)]})
+  filters = {
+      'owner': request.user
+  }
+
+  if request.GET.get('type'):
+    filters['type'] = json.loads(request.GET.get('type'))
+
+  return JsonResponse({'documents': [doc.to_dict() for doc in Document2.objects.filter(**filters)]})
 
 
 def get_document(request):

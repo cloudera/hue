@@ -207,7 +207,7 @@ ${ require.config() }
         </a>
         % endif
 
-        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Notebooks') }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:notebooks') }" title="${ _('Queries' if mode == 'editor' else 'Notebooks') }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
       </div>
@@ -416,7 +416,7 @@ ${ login_modal(request).content | n,unicode }
     </div>
 
     <div data-bind="visible: status() == 'expired', css: resultsKlass" style="display:none;">
-      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Result has expired.") }</pre>
+      <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Results have expired.") }</pre>
     </div>
 
     <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
