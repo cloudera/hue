@@ -57,18 +57,11 @@ def query_error_handler(func):
 
 class HS2Api(Api):
 
-  SUPPORTED_TYPES = ('hive', 'impala', 'spark-sql')
-
-
   @query_error_handler
   def create_session(self, lang='hive', properties=None):
-    if lang.lower() not in self.SUPPORTED_TYPES:
-      raise PopupException(_('Invalid HS2Api session lang.'))
+    application = 'beeswax' if lang == 'hive' else lang
 
-    if lang == 'hive':
-      lang = 'beeswax'
-
-    session = Session.objects.get_session(self.user, application=lang)
+    session = Session.objects.get_session(self.user, application=application)
 
     if session is None:
       session = dbms.get(self.user, query_server=get_query_server_config(name=lang)).open_session(self.user)
