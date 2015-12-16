@@ -705,7 +705,7 @@
     self.availableNewProperties = ko.computed(function() {
       var addedIndex = {};
       $.each(self.properties(), function(index, property) {
-        addedIndex[property.name()] = true;
+        addedIndex[property.key()] = true;
       });
       var result = $.grep(vm.availableSessionProperties(), function(property) {
         return ! addedIndex[property.name];
