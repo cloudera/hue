@@ -2262,6 +2262,12 @@
         }
       });
 
+      huePubSub.subscribe("assist.dblClickHdfsItem", function(assistHdfsEntry) {
+        if ($el.data("last-active-editor")) {
+          editor.session.insert(editor.getCursorPosition(), "'" + assistHdfsEntry.path + "'");
+        }
+      });
+
       $el.droppable({
         accept: ".draggableText",
         drop: function (e, ui) {

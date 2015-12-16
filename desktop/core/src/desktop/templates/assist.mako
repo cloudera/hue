@@ -263,7 +263,7 @@ from desktop.views import _ko
       <li>
         <ul class="assist-tables" data-bind="foreach: entries">
           <li class="assist-entry assist-table-link">
-            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: function () {} }, attr: {'title': definition.name }">
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.type === 'dir' -->
               <i class="fa fa-fw fa-folder muted"></i>
               <!-- /ko -->
