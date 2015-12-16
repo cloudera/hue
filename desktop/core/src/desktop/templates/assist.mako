@@ -222,7 +222,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-db-panel">
     <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-    <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
+    <ul class="nav nav-list" data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
       <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
       <!-- ko with: selectedSource -->
       <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
@@ -311,7 +311,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <li class="nav-header" data-bind="visibleOnHover: { selector: '.hover-actions' }">
+    <li class="nav-header">
       ${_('sources')}
     </li>
     <li>
@@ -323,15 +323,24 @@ from desktop.views import _ko
     </li>
   </script>
 
+  <script type="text/html" id="assist-db-header-actions">
+    <div class="pull-right hover-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
+      <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-databases-template">
-    <li class="nav-header" data-bind="visibleOnHover: { selector: '.hover-actions' }">
+    <li class="nav-header">
       ${_('databases')}
-      <div class="pull-right" data-bind="css: { 'hover-actions' : ! reloading() }">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin' : reloading }" title="${_('Manually refresh the databases list')}"></i></a>
-      </div>
+      <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
+    </li>
+    <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
+      <div><input id="searchInput" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </li>
     <li data-bind="visible: ! hasErrors()" >
-      <ul class="assist-tables" data-bind="foreach: databases">
+      <ul class="assist-tables" data-bind="foreach: filteredEntries">
         <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
           <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
           <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
@@ -351,11 +360,7 @@ from desktop.views import _ko
     <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
       <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('tables')}
-        <div class="pull-right hover-actions" data-bind="visible: hasEntries() && !$parent.loading() && !$parent.hasErrors()">
-          <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
-        </div>
+        <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </li>
 
       <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
@@ -457,6 +462,7 @@ from desktop.views import _ko
         self.onlySql = params.onlySql;
         self.showingDb = ko.observable();
         self.showingHdfs = ko.observable();
+        self.loading = ko.observable(false);
 
         self.assistHelper.withTotalStorage('assist', 'showingDb', self.showingDb, true);
         if (self.onlySql) {
