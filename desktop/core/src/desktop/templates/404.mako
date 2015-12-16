@@ -17,17 +17,25 @@
 from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
-${ commonheader(_('Not Found'), "", user) | n,unicode }
+${ commonheader(_('404 - Page not found'), "", user) | n,unicode }
 
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span12 well">
-        <div class="hero-unit">
-          <h1>${_('Page not found.')}</h1>
-          <p>${_("We're sorry, but the requested page could not be found:")} <code>${uri}</code></p>
-        </div>
-      </div>
+<link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12 center">
+      <div class="error-code">404</div>
     </div>
   </div>
+  <div class="row-fluid">
+    <div class="span6 offset3 center error-box">
+      <h1>${_('Page not found.')}</h1>
+
+      <p>${_("We're sorry, but the requested page could not be found:")} <code>${uri}</code></p>
+      <br/>
+      <a href="/home">${ _('Go to My documents') }</a>
+    </div>
+  </div>
+</div>
 
 ${ commonfooter(messages) | n,unicode }
