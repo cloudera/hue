@@ -1091,6 +1091,7 @@
       }
 
       _el.addClass("clearable");
+      _el[tog(valueAccessor()())]("x");
       _el
           .on("input", function () {
             _el[tog(this.value)]("x");
