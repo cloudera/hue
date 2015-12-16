@@ -270,7 +270,7 @@ from desktop.views import _ko
               <!-- ko if: definition.type === 'file' -->
               <i class="fa fa-fw fa-file-o muted"></i>
               <!-- /ko -->
-              <span data-bind="text: definition.name"></span>
+              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
             </a>
           </li>
         </ul>
