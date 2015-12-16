@@ -151,7 +151,7 @@ ${ require.config() }
           <i class="fa fa-cogs"></i>
         </a>
 
-        <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+        <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
           <i class="fa fa-fw fa-expand"></i>
         </a>
 
@@ -162,7 +162,7 @@ ${ require.config() }
           </a>
           <ul class="dropdown-menu pull-right">
             <li>
-              <a class="pointer" data-bind="visible: $root.selectedNotebook() && $root.selectedNotebook().snippets().length > 0, click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }" style="display:none">
+              <a class="pointer" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
                 <i class="fa fa-fw fa-expand"></i> ${ _('Player mode') }
               </a>
             </li>
