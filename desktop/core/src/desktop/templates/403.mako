@@ -18,20 +18,26 @@
 from django.utils.translation import ugettext as _
 from desktop.views import commonheader, commonfooter
 %>
-${ commonheader(_('Access Forbidden'), "", user) | n,unicode }
+${ commonheader(_('403 - Access forbidden'), "", user) | n,unicode }
 
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span12 well">
-        <div class="hero-unit">
-          <h1>${_('Access Forbidden (403)')}</h1>
-          <br>
-          <p>${_("Sorry, you don't have permissions to access the page, or your session has expired.")}</p>
-          <br>
-          <p><a class="btn" onclick="history.back()">${ _('Go Back') }</a></p>
-        </div>
-      </div>
+<link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12 center">
+      <div class="error-code">403</div>
     </div>
   </div>
+  <div class="row-fluid">
+    <div class="span6 offset3 center error-box">
+      <h1>${_('Access forbidden.')}</h1>
+
+      <p>${_("Sorry, you don't have permissions to access the page, or your session has expired.")}</p>
+      <br/>
+      <a href="/home">${ _('Go to My documents') }</a>
+    </div>
+  </div>
+</div>
+
 
 ${ commonfooter(messages) | n,unicode }

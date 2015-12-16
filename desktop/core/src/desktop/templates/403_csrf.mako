@@ -18,20 +18,26 @@
 from django.utils.translation import ugettext as _
 from desktop.views import commonheader, commonfooter
 %>
-${ commonheader(_('CSRF Error'), "", user) | n,unicode }
+${ commonheader(_('403 - CSRF error'), "", user) | n,unicode }
 
-  <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span12 well">
-        <div class="hero-unit">
-          <h1>${_('CSRF Error (403)')}</h1>
-          <br>
-          <p>${_("Sorry, your session is invalid or has expired. Please go back, refresh the page, and try your submission again.")}</p>
-          <br>
-          <p><a class="btn" onclick="history.back()">${ _('Go Back') }</a></p>
-        </div>
-      </div>
+<link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
+
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span12 center">
+      <div class="error-code">403</div>
     </div>
   </div>
+  <div class="row-fluid">
+    <div class="span6 offset3 center error-box">
+      <h1>${_('CSRF error.')}</h1>
+
+      <p>${_("Sorry, your session is invalid or has expired. Please go back, refresh the page, and try your submission again.")}</p>
+      <br/>
+      <a class="pointer" onclick="history.back()">${ _('Go back') }</a>
+    </div>
+  </div>
+</div>
+
 
 ${ commonfooter(messages) | n,unicode }
