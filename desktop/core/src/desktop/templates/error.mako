@@ -49,4 +49,4 @@ ${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
     </div>
   </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

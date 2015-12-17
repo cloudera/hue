@@ -43,4 +43,4 @@ ${ layout.menubar(section='users') }
 
 ${layout.commons()}
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

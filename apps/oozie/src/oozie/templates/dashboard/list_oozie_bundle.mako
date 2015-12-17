@@ -529,4 +529,4 @@ ${ layout.menubar(section='bundles', dashboard=True) }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

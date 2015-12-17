@@ -776,4 +776,4 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

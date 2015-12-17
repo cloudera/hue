@@ -101,4 +101,4 @@ ${layout.menubar(section='permissions')}
 
 ${layout.commons()}
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

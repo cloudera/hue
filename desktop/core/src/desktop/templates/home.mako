@@ -598,4 +598,4 @@ $(document).ready(function(){
      </div>
    </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

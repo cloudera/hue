@@ -609,4 +609,4 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 </script>
 ${ utils.bulk_dashboard_functions() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

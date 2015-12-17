@@ -18,7 +18,7 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
-from desktop.views import _ko, login_modal
+from desktop.views import _ko
 %>
 
 <%namespace name="require" file="/require.mako" />
@@ -264,10 +264,6 @@ ${ require.config() }
 
 
 <%def name="commonHTML()">
-
-
-${ login_modal(request).content | n,unicode }
-
 
 <div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
@@ -1967,22 +1963,6 @@ ${ login_modal(request).content | n,unicode }
       viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
       ko.applyBindings(viewModel);
       viewModel.init();
-
-      // global catch for ajax calls after the user has logged out
-      var isLoginRequired = false;
-      $(document).ajaxSuccess(function (event, xhr, settings, data) {
-        if (data === '/* login required */' && !isLoginRequired) {
-          isLoginRequired = true;
-          $('#login-modal').modal('show');
-          window.setTimeout(function () {
-            $('.jHueNotify').remove();
-          }, 200);
-        }
-      });
-
-      $('#login-modal').on('hidden', function () {
-        isLoginRequired = false;
-      });
 
       huePubSub.subscribe('hue.login.result', function (response) {
         if (response.auth) {

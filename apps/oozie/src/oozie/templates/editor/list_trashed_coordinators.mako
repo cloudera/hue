@@ -267,4 +267,4 @@ ${ layout.menubar(section='coordinators') }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

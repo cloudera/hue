@@ -499,4 +499,4 @@ canWrite = ${ str(can_write).lower() };
 <script src="${ static('hbase/js/nav.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('hbase/js/app.js') }" type="text/javascript" charset="utf-8"></script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

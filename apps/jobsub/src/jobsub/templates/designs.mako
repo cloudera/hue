@@ -957,4 +957,4 @@ $(document).ready(function(e) {
 });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

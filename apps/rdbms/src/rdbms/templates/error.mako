@@ -52,4 +52,4 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 }
 </style>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

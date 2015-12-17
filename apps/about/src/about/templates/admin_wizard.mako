@@ -410,4 +410,4 @@ $(document).ready(function(){
 </script>
 % endif
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

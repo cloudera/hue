@@ -227,4 +227,4 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }
