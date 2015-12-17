@@ -257,7 +257,8 @@ var Role = function (vm, role) {
   self.saveGroups = function () {
     $(".jHueNotify").hide();
     $.post("/security/api/sentry/update_role_groups", {
-      role: ko.mapping.toJSON(self)
+      role: ko.mapping.toJSON(self),
+      component: vm.component()
     }, function (data) {
       if (data.status == 0) {
         self.showEditGroups(false);
@@ -276,7 +277,8 @@ var Role = function (vm, role) {
   self.create = function () {
     $(".jHueNotify").hide();
     $.post("/security/api/sentry/create_role", {
-      role: ko.mapping.toJSON(self)
+      role: ko.mapping.toJSON(self),
+      component: vm.component()
     }, function (data) {
       if (data.status == 0) {
         $(document).trigger("info", data.message);
@@ -298,7 +300,8 @@ var Role = function (vm, role) {
   self.update = function () {
     $(".jHueNotify").hide();
     $.post("/security/api/sentry/save_privileges", {
-      role: ko.mapping.toJSON(self)
+      role: ko.mapping.toJSON(self),
+      component: vm.component()
     }, function (data) {
       if (data.status == 0) {
         $(document).trigger("info", data.message);
@@ -316,7 +319,8 @@ var Role = function (vm, role) {
   self.remove = function (role) {
     $(".jHueNotify").hide();
     $.post("/security/api/sentry/drop_sentry_role", {
-      roleName: role.name
+      roleName: role.name,
+      component: vm.component()
     }, function (data) {
       if (data.status == 0) {
         vm.removeRole(role.name());
@@ -333,7 +337,8 @@ var Role = function (vm, role) {
   self.savePrivileges = function (role) {
     $(".jHueNotify").hide();
     $.post("/security/api/sentry/save_privileges", {
-      role: ko.mapping.toJSON(role)
+      role: ko.mapping.toJSON(role),
+      component: vm.component()
     }, function (data) {
       if (data.status == 0) {
         vm.list_sentry_privileges_by_authorizable();
@@ -815,6 +820,7 @@ var HiveViewModel = function (initial) {
   self.privilegeFilter = ko.observable("");
 
   // Models
+  self.component = ko.observable(initial.component);
   self.roles = ko.observableArray();
   self.tempRoles = ko.observableArray();
   self.originalRoles = ko.observableArray();
@@ -966,7 +972,8 @@ var HiveViewModel = function (initial) {
       type: "POST",
       url: "/security/api/sentry/list_sentry_roles_by_group",
       data: {
-        'groupName': $('#selectedGroup').val()
+        'groupName': $('#selectedGroup').val(),
+        'component': self.component()
       },
       success: function (data) {
         if (typeof data.status !== "undefined" && data.status == -1) {
@@ -1014,7 +1021,8 @@ var HiveViewModel = function (initial) {
       type: "POST",
       url: "/security/api/sentry/list_sentry_privileges_by_role",
       data: {
-        'roleName': role.name
+        'roleName': role.name,
+        'component': self.component()
       },
       success: function (data) {
         if (typeof data.status !== "undefined" && data.status == -1) {
@@ -1083,7 +1091,8 @@ var HiveViewModel = function (initial) {
       url: "/security/api/sentry/grant_privilege",
       data: {
         'privilege': ko.mapping.toJSON(self.grantToPrivilege()),
-        'roleName': ko.mapping.toJSON(self.grantToPrivilegeRole())
+        'roleName': ko.mapping.toJSON(self.grantToPrivilegeRole()),
+        'component': self.component()
       },
       success: function (data) {
         if (data.status == 0) {
@@ -1132,7 +1141,8 @@ var HiveViewModel = function (initial) {
       data: {
         groupName: $('#selectedGroup').val(),
         roleSet: ko.mapping.toJSON({all: true, roles: []}),
-        authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path))
+        authorizableHierarchy: ko.mapping.toJSON(_create_authorizable_from_ko(_path)),
+        component: self.component()
       },
       success: function (data) {
     	if (data.status == 0) {
@@ -1198,7 +1208,8 @@ var HiveViewModel = function (initial) {
     $.post("/security/api/sentry/bulk_delete_privileges", {
       'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
       'checkedPaths': ko.mapping.toJSON(checkedPaths),
-      'recursive': false
+      'recursive': false,
+      'component': self.component()
     }, function (data) {
       if (data.status == 0) {
         if (norefresh == undefined) {
@@ -1220,7 +1231,8 @@ var HiveViewModel = function (initial) {
       'privileges': ko.mapping.toJSON(self.assist.privileges),
       'authorizableHierarchy': ko.mapping.toJSON(_create_authorizable_from_ko()),
       'checkedPaths': ko.mapping.toJSON(checkedPaths),
-      'recursive': false
+      'recursive': false,
+      'component': self.component()
     }, function (data) {
       if (data.status == 0) {
         self.list_sentry_privileges_by_authorizable(); // Refresh
