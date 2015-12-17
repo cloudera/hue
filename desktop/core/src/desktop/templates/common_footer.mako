@@ -14,12 +14,15 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
 from desktop.views import login_modal
 %>
 
-${ login_modal(request).content | n,unicode }
+%if request and isinstance(request, HttpRequest):
+  ${ login_modal(request).content | n,unicode }
+%endif
 
 <script type="text/javascript">
   $(document).ready(function () {
