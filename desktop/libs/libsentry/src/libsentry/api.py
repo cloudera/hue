@@ -24,7 +24,7 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from libsentry.client import SentryClient
+from libsentry.client2 import SentryClient
 from libsentry.conf import HOSTNAME, PORT
 from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
 from libzookeeper.models import ZookeeperClient
