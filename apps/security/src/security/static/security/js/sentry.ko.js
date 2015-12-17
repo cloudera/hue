@@ -1056,22 +1056,24 @@ var HiveViewModel = function (initial) {
   }
 
   function _create_authorizable_from_ko(optionalPath) {
-    if (optionalPath != null){
+	var authorizables = [];
+
+    if (optionalPath != null) {
       var paths = optionalPath.split(/[.]/);
-      return {
-        'server': self.assist.server(),
-        'db': paths[0] ? paths[0] : null,
-        'table': paths[1] ? paths[1] : null,
-        'column': paths[2] ? paths[2] : null
-      }
+      
+      if (paths[0]) { authorizables.push({'type': 'db', 'name': paths[0]}); }
+      if (paths[1]) { authorizables.push({'type': 'table', 'name': paths[1]}); }
+      if (paths[2]) { authorizables.push({'type': 'column', 'name': paths[2]}); }
     } else {
-      return {
-        'server': self.assist.server(),
-        'db': self.assist.db(),
-        'table': self.assist.table(),
-        'column': self.assist.column(),
-      }
+      authorizables.push({'type': 'column', 'name': self.assist.db()});
+      authorizables.push({'type': 'table', 'name': self.assist.table()});
+      authorizables.push({'type': 'column', 'name': self.assist.column()});
     }
+
+	return {
+	    'server': self.assist.server(),
+		'authorizables': authorizables
+    };
   }
 
   self.grant_privilege = function () {
