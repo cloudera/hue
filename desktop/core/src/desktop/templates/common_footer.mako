@@ -20,9 +20,7 @@ from django.template.defaultfilters import escape, escapejs
 from desktop.views import login_modal
 %>
 
-%if request and isinstance(request, HttpRequest):
-  ${ login_modal(request).content | n,unicode }
-%endif
+${ login_modal(request).content | n,unicode }
 
 <script type="text/javascript">
   $(document).ready(function () {
