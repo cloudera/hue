@@ -22,11 +22,11 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
-from libsentry.api import get_api
-from libsentry.sentry_site import get_sentry_server_admin_groups
+from beeswax.api import autocomplete
 from hadoop.cluster import get_defaultfs
 
-from beeswax.api import autocomplete
+from libsentry.api2 import get_api
+from libsentry.sentry_site import get_sentry_server_admin_groups
 
 
 LOG = logging.getLogger(__name__)
