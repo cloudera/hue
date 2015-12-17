@@ -57,14 +57,14 @@ def ha_error_handler(func):
           global _api_cache
           _api_cache = None
           time.sleep(1)
-          args[0].client = _get_client(args[0].client.username)
+          args[0].client = _get_client(args[0].client.username, args[0].client.component)
           LOG.info('Picked %s' % args[0].client)
 
   return decorator
 
 
-def get_api(user):
-  client = _get_client(user.username)
+def get_api(user, component):
+  client = _get_client(user.username, component)
 
   return SentryApi(client)
 
@@ -230,7 +230,7 @@ class SentryException(Exception):
     return self.message
 
 
-def _get_client(username):
+def _get_client(username, component):
   if get_sentry_server_ha_enabled():
     servers = _get_server_properties()
     if servers:
@@ -243,7 +243,7 @@ def _get_client(username):
         'port': PORT.get()
     }
 
-  return SentryClient(server['hostname'], server['port'], username)
+  return SentryClient(server['hostname'], server['port'], username, component)
 
 
 def _get_server_properties():

@@ -55,6 +55,7 @@ def fetch_hive_path(request):
 
 def list_sentry_roles_by_group(request):
   result = {'status': -1, 'message': 'Error'}
+  component = request.POST['component']
 
   try:
     if request.POST['groupName']:
@@ -62,7 +63,7 @@ def list_sentry_roles_by_group(request):
     else:
       # Admins can see everything, other only the groups they belong too
       groupName = None if request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists() else '*'
-    roles = get_api(request.user).list_sentry_roles_by_group(groupName)
+    roles = get_api(request.user, component).list_sentry_roles_by_group(groupName)
     result['roles'] = sorted(roles, key=lambda role: role['name'])
     result['message'] = ''
     result['status'] = 0
@@ -80,10 +81,11 @@ def list_sentry_roles_by_group(request):
 
 def list_sentry_privileges_by_role(request):
   result = {'status': -1, 'message': 'Error'}
+  component = request.POST['component']
 
   try:
     roleName = request.POST['roleName']
-    sentry_privileges = get_api(request.user).list_sentry_privileges_by_role(roleName)
+    sentry_privileges = get_api(request.user, component).list_sentry_privileges_by_role(roleName)
     result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']))
     result['message'] = ''
     result['status'] = 0
@@ -109,8 +111,8 @@ def _to_sentry_privilege(privilege):
   }
 
 
-def _hive_add_privileges(user, role, privileges):
-    api = get_api(user)
+def _hive_add_privileges(user, role, privileges, component):
+    api = get_api(user, component)
 
     _privileges = []
 
@@ -157,8 +159,8 @@ def _get_splitted_path(path):
   return db, table, column
 
 
-def _drop_sentry_privilege(user, role, authorizable):
-  return get_api(user).alter_sentry_role_revoke_privilege(role['name'], _to_sentry_privilege(authorizable))
+def _drop_sentry_privilege(user, role, authorizable, component):
+  return get_api(user, component).alter_sentry_role_revoke_privilege(role['name'], _to_sentry_privilege(authorizable))
 
 
 def create_role(request):
@@ -166,13 +168,14 @@ def create_role(request):
 
   try:
     role = json.loads(request.POST['role'])
+    component = json.loads(request.POST['component'])
 
-    api = get_api(request.user)
+    api = get_api(request.user, component)
 
     api.create_sentry_role(role['name'])
 
     privileges = [privilege for privilege in role['privileges'] if privilege['status'] not in ('deleted', 'alreadydeleted')]
-    result['privileges'] = _hive_add_privileges(request.user, role, privileges)
+    result['privileges'] = _hive_add_privileges(request.user, role, privileges, component)
     api.alter_sentry_role_add_groups(role['name'], role['groups'])
 
     result['role'] = {"name": role['name'], "groups": role['groups']}
@@ -192,11 +195,12 @@ def update_role_groups(request):
 
   try:
     role = json.loads(request.POST['role'])
+    component = request.POST['component']
 
     new_groups = set(role['groups']) - set(role['originalGroups'])
     deleted_groups = set(role['originalGroups']) - set(role['groups'])
 
-    api = get_api(request.user)
+    api = get_api(request.user, component)
 
     if new_groups:
       api.alter_sentry_role_add_groups(role['name'], new_groups)
@@ -218,9 +222,10 @@ def save_privileges(request):
 
   try:
     role = json.loads(request.POST['role'])
+    component = json.loads(request.POST['component'])
 
     new_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'new']
-    result['privileges'] = _hive_add_privileges(request.user, role, new_privileges)
+    result['privileges'] = _hive_add_privileges(request.user, role, new_privileges, component)
 
     deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
     for privilege in deleted_privileges:
@@ -228,7 +233,7 @@ def save_privileges(request):
 
     modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
     old_privileges_ids = [privilege['id'] for privilege in modified_privileges]
-    _hive_add_privileges(request.user, role, modified_privileges)
+    _hive_add_privileges(request.user, role, modified_privileges, component)
     for privilege in role['originalPrivileges']:
       if privilege['id'] in old_privileges_ids:
         _drop_sentry_privilege(request.user, role, privilege)
@@ -249,8 +254,9 @@ def grant_privilege(request):
   try:
     roleName = json.loads(request.POST['roleName'])
     privilege = json.loads(request.POST['privilege'])
+    component = json.loads(request.POST['component'])
 
-    result['privileges'] = _hive_add_privileges(request.user, {'name': roleName}, [privilege])
+    result['privileges'] = _hive_add_privileges(request.user, {'name': roleName}, [privilege], component)
 
     result['message'] = _('Privilege granted successfully to %s.') % roleName
     result['status'] = 0
@@ -267,8 +273,9 @@ def create_sentry_role(request):
 
   try:
     roleName = request.POST['roleName']
+    component = json.loads(request.POST['component'])
 
-    get_api(request.user).create_sentry_role(roleName)
+    get_api(request.user, component).create_sentry_role(roleName)
     result['message'] = _('Role and privileges created.')
     result['status'] = 0
   except Exception, e:
@@ -284,8 +291,9 @@ def drop_sentry_role(request):
 
   try:
     roleName = request.POST['roleName']
+    component = request.POST['component']
 
-    get_api(request.user).drop_sentry_role(roleName)
+    get_api(request.user, component).drop_sentry_role(roleName)
     result['message'] = _('Role and privileges deleted.')
     result['status'] = 0
   except Exception, e:
@@ -302,10 +310,11 @@ def list_sentry_privileges_by_authorizable(request):
   try:
     groups = [request.POST['groupName']] if request.POST['groupName'] else None
     authorizableSet = [json.loads(request.POST['authorizableHierarchy'])]
+    component = request.POST['component']
 
     _privileges = []
 
-    for authorizable, roles in get_api(request.user).list_sentry_privileges_by_authorizable(authorizableSet=authorizableSet, groups=groups):
+    for authorizable, roles in get_api(request.user, component).list_sentry_privileges_by_authorizable(authorizableSet=authorizableSet, groups=groups):
       for role, privileges in roles.iteritems():
         for privilege in privileges:
           privilege['roleName'] = role
@@ -329,6 +338,7 @@ def bulk_delete_privileges(request):
   try:
     checkedPaths = json.loads(request.POST['checkedPaths'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+    component = request.POST['component']
 
     for path in [path['path'] for path in checkedPaths]:
       db, table, column = _get_splitted_path(path)
@@ -337,7 +347,7 @@ def bulk_delete_privileges(request):
         'table': table,
         'column': column,
       })
-      get_api(request.user).drop_sentry_privileges(authorizableHierarchy)
+      get_api(request.user, component).drop_sentry_privileges(authorizableHierarchy)
     result['message'] = _('Privileges deleted.')
     result['status'] = 0
   except Exception, e:
@@ -355,6 +365,7 @@ def bulk_add_privileges(request):
     privileges = json.loads(request.POST['privileges'])
     checkedPaths = json.loads(request.POST['checkedPaths'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+    component = json.loads(request.POST['component'])
 
     privileges = [privilege for privilege in privileges if privilege['status'] == '']
 
@@ -373,7 +384,7 @@ def bulk_add_privileges(request):
         privilege['tableName'] = table
         privilege['columnName'] = column
         privilege['privilegeScope'] = privilegeScope
-        _hive_add_privileges(request.user, {'name': privilege['roleName']}, [privilege])
+        _hive_add_privileges(request.user, {'name': privilege['roleName']}, [privilege], component)
 
     result['message'] = _('Privileges added.')
     result['status'] = 0
@@ -391,8 +402,9 @@ def rename_sentry_privilege(request):
   try:
     oldAuthorizable = json.loads(request.POST['oldAuthorizable'])
     newAuthorizable = json.loads(request.POST['newAuthorizable'])
+    component = request.POST['component']
 
-    get_api(request.user).rename_sentry_privilege(oldAuthorizable, newAuthorizable)
+    get_api(request.user, component).rename_sentry_privilege(oldAuthorizable, newAuthorizable)
     result['message'] = _('Privilege deleted.')
     result['status'] = 0
   except Exception, e:
@@ -410,8 +422,9 @@ def list_sentry_privileges_for_provider(request):
     groups = json.loads(request.POST['groups'])
     roleSet = json.loads(request.POST['roleSet'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
+    component = request.POST['component']
 
-    sentry_privileges = get_api(request.user).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    sentry_privileges = get_api(request.user, component).list_sentry_privileges_for_provider(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
     result['sentry_privileges'] = sentry_privileges
     result['message'] = ''
     result['status'] = 0
