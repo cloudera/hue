@@ -22,7 +22,7 @@
 # Thrift Service that the MetaStore is built on
 #
 
-include "share/fb303/if/fb303.thrift"
+# include "share/fb303/if/fb303.thrift"
 include "sentry_common_service.thrift"
 include "sentry_policy_service.thrift"
 
