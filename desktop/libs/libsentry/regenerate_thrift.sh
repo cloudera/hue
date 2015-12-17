@@ -17,3 +17,5 @@
 cd $(dirname $0)
 
 thrift -I thrift/include --gen py:new_style thrift/sentry_policy_service.thrift
+thrift -I thrift/include --gen py:new_style thrift/sentry_generic_policy_service.thrift
+
