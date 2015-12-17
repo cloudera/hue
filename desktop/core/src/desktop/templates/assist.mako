@@ -33,24 +33,48 @@ from desktop.views import _ko
       overflow-y: auto;
     }
 
+    .assist-resizer {
+      cursor: row-resize;
+    }
+    .assist-header {
+      color: #338bb8;
+      background-color: #f9f9f9;
+      border-top: 1px solid #f1f1f1;
+      border-bottom: 1px solid #f1f1f1;
+      font-weight: bold;
+      letter-spacing: 0.035em;
+      font-size: 0.975em;
+      line-height: 25px;
+      padding-left: 10px;
+      height: 24px;
+      margin-bottom: 8px;
+    }
+
+    .assist-inner-panel {
+      padding: 0px 16px 0 10px;
+    }
+
+    .assist-inner-header {
+      color: #737373;
+      margin-left:3px;
+      margin-bottom:2px;
+      font-weight: bold;
+      margin-top: 0
+    }
+
+    .assist-panel-switches {
+      padding-left: 12px;
+      height: 29px;
+      border-bottom: 1px solid #f1f1f1;
+    }
+
     .assist-type-switch {
       display: inline-block;
       font-size: 16px;
-      margin: 2px 3px;
+      margin-right: 6px;
       cursor: pointer;
     }
 
-    .assist-resizer {
-      border-top: 1px solid #F1F1F1;
-      margin-left: 5px;
-      margin-right: 5px;
-      cursor: row-resize;
-      text-align: center;
-      font-size: 12px;
-      height: 8px;
-      margin-bottom: 5px;
-      color: #E1E1E1;
-    }
     .assist-entry,a {
       white-space: nowrap;
     }
@@ -252,9 +276,6 @@ from desktop.views import _ko
     </div>
     <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
 
-      <li class="nav-header" style="margin-top: 0">
-        ${_('HDFS')}
-      </li>
       <li class="center" data-bind="visible: loading">
         <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
@@ -280,7 +301,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <li class="nav-header">
+    <li class="assist-inner-header">
       ${_('sources')}
     </li>
     <li>
@@ -301,8 +322,8 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <li class="nav-header">
-      ${_('databases')}
+    <li class="assist-inner-header">
+      ${_('Databases')}
       <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
     </li>
     <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
@@ -332,8 +353,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-tables-template">
     <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
-      <li class="nav-header" style="margin-top: 0" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
-        ${_('tables')}
+      <li class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
+        ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </li>
 
@@ -402,25 +423,29 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/html" id="assist-panel-template">
-    <div style="position:relative; height: 100%; margin-right:15px;" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
-      <!-- ko foreach: visiblePanels -->
-      <!-- ko if: $index() > 0 -->
-      <div class="assist-resizer assist-fixed-height" style="display:none;">
-        <i class="fa fa-ellipsis-h"></i>
+  <script type="text/html" id="assist-panel-switches">
+    <div class="assist-panel-switches assist-fixed-height" style="display:none;">
+      <!-- ko foreach: availablePanels -->
+      <div class="inactive-action assist-type-switch" data-bind="click: function () { visible(!visible()) }, css: { 'blue': visible }, attr: { 'title': visible() ? '${ _('Hide') } ' + name : '${ _('Show') } ' + name }">
+        <i class="fa" data-bind="css: icon"></i>
       </div>
       <!-- /ko -->
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-panel-inner-header">
+    <div class="assist-header  assist-fixed-height" data-bind="css: { 'assist-resizer': $index() > 0 }" style="display:none;">
+      <span data-bind="text: name"></span>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-panel-template">
+    <div style="position:relative; height: 100%;" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
+      <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
+      <!-- ko foreach: visiblePanels -->
+      <!-- ko template: { if: $parent.availablePanels.length > 1, name: 'assist-panel-inner-header' }--><!-- /ko -->
       <div class="assist-inner-panel" style="overflow: auto; display:none;">
         <!-- ko template: { name: templateName, data: $parent } --><!-- /ko -->
-      </div>
-      <!-- /ko -->
-      <!-- ko if: availablePanels.length > 1 -->
-      <div class="assist-panel-switches assist-fixed-height" style="position:absolute; bottom: 0; width: 100%; margin: 5px 0; height: 24px; display:none;">
-        <!-- ko foreach: availablePanels -->
-        <div class="inactive-action assist-type-switch" data-bind="click: function () { visible(!visible()) }, css: { 'blue': visible }, attr: { 'title': visible() ? '${ _('Hide') } ' + name : '${ _('Show') } ' + name }">
-          <i class="fa" data-bind="css: icon"></i>
-        </div>
-        <!-- /ko -->
       </div>
       <!-- /ko -->
     </div>
@@ -481,7 +506,7 @@ from desktop.views import _ko
         self.loading = ko.observable(false);
 
         self.availablePanels = [
-          new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("Databases") }', type: 'db', icon: 'fa-database', minHeight: 40})
+          new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("SQL") }', type: 'db', icon: 'fa-database', minHeight: 40})
         ];
 
         if (!self.onlySql) {
