@@ -19,8 +19,8 @@ import logging
 
 from desktop.lib import thrift_util
 
-from sentry_policy_service import SentryPolicyService
-from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TSentryAuthorizable, TCreateSentryRoleRequest, \
+from sentry_generic_policy_service import SentryGenericPolicyService
+from sentry_generic_policy_service.ttypes import TListSentryRolesRequest, TListSentryPrivilegesRequest, TSentryAuthorizable, TCreateSentryRoleRequest, \
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
     TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest, \
@@ -34,39 +34,37 @@ LOG = logging.getLogger(__name__)
 
 
 """
-struct TSentryPrivilege {
-1: required string privilegeScope, # Valid values are SERVER, DATABASE, TABLE
-3: required string serverName,
-4: optional string dbName = "",
-5: optional string tableName = "",
-6: optional string URI = "",
-7: required string action = "",
-8: optional i64 createTime, # Set on server side
-9: optional TSentryGrantOption grantOption = TSentryGrantOption.FALSE
+struct TAuthorizable {
+1: required string type,
+2: required string name
 }
 
-struct TSentryAuthorizable {
-1: required string server,
-2: optional string uri,
-3: optional string db,
-4: optional string table,
+struct TSentryPrivilege {
+1: required string component,
+2: required string serviceName,
+3: required list<TAuthorizable> authorizables,
+4: required string action,
+5: optional i64 createTime, # Set on server side
+6: optional string grantorPrincipal, # Set on server side
+7: optional TSentryGrantOption grantOption = sentry_policy_service.TSentryGrantOption.FALSE
 }
 """
 
 class SentryClient(object):
   SENTRY_MECHANISMS = {'KERBEROS': 'GSSAPI', 'NOSASL': 'NOSASL', 'NONE': 'NONE'}
 
-  def __init__(self, host, port, username):
+  def __init__(self, host, port, username, component='hive'):
     self.username = username
     self.host = host
     self.port = port
     self.security = self._get_security()
+    self.component = component
 
     self.client = thrift_util.get_client(
-        SentryPolicyService.Client,
+        SentryGenericPolicyService.Client,
         host,
         port,
-        service_name="SentryPolicyService",
+        service_name="SentryGenericPolicyService",
         username=self.username,
         timeout_seconds=30,
         multiple=True,
@@ -76,7 +74,7 @@ class SentryClient(object):
     )
 
   def __str__(self):
-    return ', '.join(map(str, [self.host, self.port, self.username, self.security]))
+    return ', '.join(map(str, [self.host, self.port, self.component, self.username, self.security]))
 
 
   def _get_security(self):
@@ -96,12 +94,12 @@ class SentryClient(object):
 
 
   def create_sentry_role(self, roleName):
-    request = TCreateSentryRoleRequest(requestorUserName=self.username, roleName=roleName)
+    request = TCreateSentryRoleRequest(requestorUserName=self.username, component=self.component, roleName=roleName)
     return self.client.create_sentry_role(request)
 
 
   def drop_sentry_role(self, roleName):
-    request = TDropSentryRoleRequest(requestorUserName=self.username, roleName=roleName, )
+    request = TDropSentryRoleRequest(requestorUserName=self.username, component=self.component, roleName=roleName)
     return self.client.drop_sentry_role(request)
 
 
@@ -112,7 +110,7 @@ class SentryClient(object):
     if tSentryPrivileges is not None:
       tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
 
-    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
+    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, component=self.component, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
     return self.client.alter_sentry_role_grant_privilege(request)
 
 
@@ -123,44 +121,44 @@ class SentryClient(object):
     if tSentryPrivileges is not None:
       tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
 
-    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
+    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, component=self.component, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
     return self.client.alter_sentry_role_revoke_privilege(request)
 
 
   def alter_sentry_role_add_groups(self, roleName, groups):
     groups = [TSentryGroup(name) for name in groups]
-    request = TAlterSentryRoleAddGroupsRequest(requestorUserName=self.username, roleName=roleName, groups=groups)
+    request = TAlterSentryRoleAddGroupsRequest(requestorUserName=self.username, component=self.component, roleName=roleName, groups=groups)
     return self.client.alter_sentry_role_add_groups(request)
 
 
   def alter_sentry_role_delete_groups(self, roleName, groups):
     groups = [TSentryGroup(name) for name in groups]
-    request = TAlterSentryRoleDeleteGroupsRequest(requestorUserName=self.username, roleName=roleName, groups=groups)
+    request = TAlterSentryRoleDeleteGroupsRequest(requestorUserName=self.username, component=self.component, roleName=roleName, groups=groups)
     return self.client.alter_sentry_role_delete_groups(request)
 
 
   def list_sentry_roles_by_group(self, groupName=None):
-    request = TListSentryRolesRequest(requestorUserName=self.username, groupName=groupName)
+    request = TListSentryRolesRequest(requestorUserName=self.username, component=self.component, groupName=groupName)
     return self.client.list_sentry_roles_by_group(request)
 
 
   def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
     if authorizableHierarchy is not None:
       authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
-    request = TListSentryPrivilegesRequest(requestorUserName=self.username, roleName=roleName, authorizableHierarchy=authorizableHierarchy)
+    request = TListSentryPrivilegesRequest(requestorUserName=self.username, component=self.component, roleName=roleName, authorizableHierarchy=authorizableHierarchy)
     return self.client.list_sentry_privileges_by_role(request)
 
 
   def drop_sentry_privilege(self, authorizable):
     authorizable = TSentryAuthorizable(**authorizable)
-    request = TDropPrivilegesRequest(requestorUserName=self.username, authorizable=authorizable)
+    request = TDropPrivilegesRequest(requestorUserName=self.username, component=self.component, authorizable=authorizable)
     return self.client.drop_sentry_privilege(request)
 
 
   def rename_sentry_privilege(self, oldAuthorizable, newAuthorizable):
     oldAuthorizable = TSentryAuthorizable(**oldAuthorizable)
     newAuthorizable = TSentryAuthorizable(**newAuthorizable)
-    request = TRenamePrivilegesRequest(requestorUserName=self.username, oldAuthorizable=oldAuthorizable, newAuthorizable=newAuthorizable)
+    request = TRenamePrivilegesRequest(requestorUserName=self.username, component=self.component, oldAuthorizable=oldAuthorizable, newAuthorizable=newAuthorizable)
     return self.client.rename_sentry_privilege(request)
 
 
@@ -180,7 +178,7 @@ class SentryClient(object):
       roleSet = TSentryActiveRoleSet(**roleSet)
     if authorizableHierarchy is not None:
       authorizableHierarchy = TSentryAuthorizable(**authorizableHierarchy)
-    request = TListSentryPrivilegesForProviderRequest(groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
+    request = TListSentryPrivilegesForProviderRequest(component=self.component, groups=groups, roleSet=roleSet, authorizableHierarchy=authorizableHierarchy)
     return self.client.list_sentry_privileges_for_provider(request)
 
 
@@ -189,7 +187,7 @@ class SentryClient(object):
     if roleSet is not None:
       roleSet = TSentryActiveRoleSet(**roleSet)
 
-    request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
+    request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, component=self.component, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
     return self.client.list_sentry_privileges_by_authorizable(request)
 
 
