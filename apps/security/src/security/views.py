@@ -36,7 +36,7 @@ def hive(request):
 
 def hive2(request):
 
-  return render("hive2.mako", request, {
+  return render("sentry.mako", request, {
       'initial': json.dumps({
           'user': request.user.username,
           'sentry_provider': get_hive_sentry_provider(),
