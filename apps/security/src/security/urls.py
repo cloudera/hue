@@ -21,6 +21,8 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('security.views',
   url(r'^$', 'hive', name='index'),
   url(r'^hive$', 'hive', name='hive'),
+  url(r'^hive2$', 'hive2', name='hive2'),
+  url(r'^solr$', 'solr', name='solr'),
   url(r'^hdfs$', 'hdfs', name='hdfs'),
 )
 
@@ -35,7 +37,7 @@ urlpatterns += patterns('security.api.hdfs',
 )
 
 
-urlpatterns += patterns('security.api.hive',
+urlpatterns += patterns('security.api.hive2',
   url(r'^api/hive/fetch_hive_path', 'fetch_hive_path', name='fetch_hive_path'),
 
   url(r'^api/hive/list_sentry_roles_by_group', 'list_sentry_roles_by_group', name='list_sentry_roles_by_group'),
@@ -53,4 +55,25 @@ urlpatterns += patterns('security.api.hive',
 
   # Unused: API is for blind bulk operations
   url(r'^api/hive/rename_sentry_privilege', 'rename_sentry_privilege', name='rename_sentry_privilege'),
+)
+
+
+urlpatterns += patterns('security.api.hive2',
+  url(r'^api/hive2/fetch_hive_path', 'fetch_hive_path', name='fetch_hive_path'),
+
+  url(r'^api/hive2/list_sentry_roles_by_group', 'list_sentry_roles_by_group', name='list_sentry_roles_by_group'),
+  url(r'^api/hive2/list_sentry_privileges_by_role', 'list_sentry_privileges_by_role', name='list_sentry_privileges_by_role'),
+  url(r'^api/hive2/list_sentry_privileges_for_provider$', 'list_sentry_privileges_for_provider', name='list_sentry_privileges_for_provider'),
+  url(r'^api/hive2/list_sentry_privileges_by_authorizable', 'list_sentry_privileges_by_authorizable', name='list_sentry_privileges_by_authorizable'),
+  url(r'^api/hive2/create_sentry_role', 'create_sentry_role', name='create_sentry_role'),
+  url(r'^api/hive2/update_role_groups', 'update_role_groups', name='update_role_groups'),
+  url(r'^api/hive2/drop_sentry_role', 'drop_sentry_role', name='drop_sentry_role'),
+  url(r'^api/hive2/create_role$', 'create_role', name='create_role'),
+  url(r'^api/hive2/save_privileges$', 'save_privileges', name='save_privileges'),
+  url(r'^api/hive2/bulk_delete_privileges', 'bulk_delete_privileges', name='bulk_delete_privileges'),
+  url(r'^api/hive2/bulk_add_privileges', 'bulk_add_privileges', name='bulk_add_privileges'),
+  url(r'^api/hive2/grant_privilege', 'grant_privilege', name='grant_privilege'),
+
+  # Unused: API is for blind bulk operations
+  url(r'^api/hive2/rename_sentry_privilege', 'rename_sentry_privilege', name='rename_sentry_privilege'),
 )

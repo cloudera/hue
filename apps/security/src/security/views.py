@@ -26,7 +26,32 @@ def hive(request):
 
   return render("hive.mako", request, {
       'initial': json.dumps({
-          'user': request.user.username, 'sentry_provider': get_hive_sentry_provider(),
+          'user': request.user.username,
+          'sentry_provider': get_hive_sentry_provider(),
+          'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
+      }),
+      'has_impersonation_perm': _has_impersonation_perm(request.user),
+  })
+
+
+def hive2(request):
+
+  return render("hive2.mako", request, {
+      'initial': json.dumps({
+          'user': request.user.username,
+          'sentry_provider': get_hive_sentry_provider(),
+          'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
+      }),
+      'has_impersonation_perm': _has_impersonation_perm(request.user),
+  })
+
+
+def solr(request):
+
+  return render("hive.mako", request, {
+      'initial': json.dumps({
+          'user': request.user.username,
+          'sentry_provider': get_hive_sentry_provider(),
           'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
       }),
       'has_impersonation_perm': _has_impersonation_perm(request.user),
