@@ -1623,7 +1623,7 @@ class TSentryRole(object):
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.roleName)
-    value = (value * 31) ^ hash(self.groups)
+    value = (value * 31) ^ hash(frozenset(self.groups))
     return value
 
   def __repr__(self):
