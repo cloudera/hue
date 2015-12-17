@@ -16,8 +16,8 @@ from thrift.transport import TSSLSocket
 from thrift.transport import THttpClient
 from thrift.protocol import TBinaryProtocol
 
-from sentry_policy_service import SentryPolicyService
-from sentry_policy_service.ttypes import *
+from sentry_generic_policy_service import SentryGenericPolicyService
+from sentry_generic_policy_service.ttypes import *
 
 if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print('')
@@ -35,8 +35,6 @@ if len(sys.argv) <= 1 or sys.argv[1] == '--help':
   print('  TListSentryPrivilegesForProviderResponse list_sentry_privileges_for_provider(TListSentryPrivilegesForProviderRequest request)')
   print('  TDropPrivilegesResponse drop_sentry_privilege(TDropPrivilegesRequest request)')
   print('  TRenamePrivilegesResponse rename_sentry_privilege(TRenamePrivilegesRequest request)')
-  print('  TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(TListSentryPrivilegesByAuthRequest request)')
-  print('  TSentryConfigValueResponse get_sentry_config_value(TSentryConfigValueRequest request)')
   print('')
   sys.exit(0)
 
@@ -90,7 +88,7 @@ else:
   else:
     transport = TTransport.TBufferedTransport(socket)
 protocol = TBinaryProtocol.TBinaryProtocol(transport)
-client = SentryPolicyService.Client(protocol)
+client = SentryGenericPolicyService.Client(protocol)
 transport.open()
 
 if cmd == 'create_sentry_role':
@@ -158,18 +156,6 @@ elif cmd == 'rename_sentry_privilege':
     print('rename_sentry_privilege requires 1 args')
     sys.exit(1)
   pp.pprint(client.rename_sentry_privilege(eval(args[0]),))
-
-elif cmd == 'list_sentry_privileges_by_authorizable':
-  if len(args) != 1:
-    print('list_sentry_privileges_by_authorizable requires 1 args')
-    sys.exit(1)
-  pp.pprint(client.list_sentry_privileges_by_authorizable(eval(args[0]),))
-
-elif cmd == 'get_sentry_config_value':
-  if len(args) != 1:
-    print('get_sentry_config_value requires 1 args')
-    sys.exit(1)
-  pp.pprint(client.get_sentry_config_value(eval(args[0]),))
 
 else:
   print('Unrecognized method %s' % cmd)

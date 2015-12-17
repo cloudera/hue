@@ -8,6 +8,7 @@
 
 from thrift.Thrift import TType, TMessageType, TException, TApplicationException
 import sentry_common_service.ttypes
+import sentry_policy_service.ttypes
 
 
 from thrift.transport import TTransport
@@ -36,44 +37,22 @@ class TSentryGrantOption(object):
   }
 
 
-class TSentryPrivilege(object):
+class TAuthorizable(object):
   """
   Attributes:
-   - privilegeScope
-   - serverName
-   - dbName
-   - tableName
-   - URI
-   - action
-   - createTime
-   - grantOption
-   - columnName
+   - type
+   - name
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.STRING, 'privilegeScope', None, None, ), # 1
-    None, # 2
-    (3, TType.STRING, 'serverName', None, None, ), # 3
-    (4, TType.STRING, 'dbName', None, "", ), # 4
-    (5, TType.STRING, 'tableName', None, "", ), # 5
-    (6, TType.STRING, 'URI', None, "", ), # 6
-    (7, TType.STRING, 'action', None, "", ), # 7
-    (8, TType.I64, 'createTime', None, None, ), # 8
-    (9, TType.I32, 'grantOption', None,     0, ), # 9
-    (10, TType.STRING, 'columnName', None, "", ), # 10
+    (1, TType.STRING, 'type', None, None, ), # 1
+    (2, TType.STRING, 'name', None, None, ), # 2
   )
 
-  def __init__(self, privilegeScope=None, serverName=None, dbName=thrift_spec[4][4], tableName=thrift_spec[5][4], URI=thrift_spec[6][4], action=thrift_spec[7][4], createTime=None, grantOption=thrift_spec[9][4], columnName=thrift_spec[10][4],):
-    self.privilegeScope = privilegeScope
-    self.serverName = serverName
-    self.dbName = dbName
-    self.tableName = tableName
-    self.URI = URI
-    self.action = action
-    self.createTime = createTime
-    self.grantOption = grantOption
-    self.columnName = columnName
+  def __init__(self, type=None, name=None,):
+    self.type = type
+    self.name = name
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -86,47 +65,12 @@ class TSentryPrivilege(object):
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.privilegeScope = iprot.readString()
+          self.type = iprot.readString()
         else:
           iprot.skip(ftype)
-      elif fid == 3:
+      elif fid == 2:
         if ftype == TType.STRING:
-          self.serverName = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 4:
-        if ftype == TType.STRING:
-          self.dbName = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 5:
-        if ftype == TType.STRING:
-          self.tableName = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 6:
-        if ftype == TType.STRING:
-          self.URI = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 7:
-        if ftype == TType.STRING:
-          self.action = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 8:
-        if ftype == TType.I64:
-          self.createTime = iprot.readI64()
-        else:
-          iprot.skip(ftype)
-      elif fid == 9:
-        if ftype == TType.I32:
-          self.grantOption = iprot.readI32()
-        else:
-          iprot.skip(ftype)
-      elif fid == 10:
-        if ftype == TType.STRING:
-          self.columnName = iprot.readString()
+          self.name = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -138,67 +82,30 @@ class TSentryPrivilege(object):
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('TSentryPrivilege')
-    if self.privilegeScope is not None:
-      oprot.writeFieldBegin('privilegeScope', TType.STRING, 1)
-      oprot.writeString(self.privilegeScope)
+    oprot.writeStructBegin('TAuthorizable')
+    if self.type is not None:
+      oprot.writeFieldBegin('type', TType.STRING, 1)
+      oprot.writeString(self.type)
       oprot.writeFieldEnd()
-    if self.serverName is not None:
-      oprot.writeFieldBegin('serverName', TType.STRING, 3)
-      oprot.writeString(self.serverName)
-      oprot.writeFieldEnd()
-    if self.dbName is not None:
-      oprot.writeFieldBegin('dbName', TType.STRING, 4)
-      oprot.writeString(self.dbName)
-      oprot.writeFieldEnd()
-    if self.tableName is not None:
-      oprot.writeFieldBegin('tableName', TType.STRING, 5)
-      oprot.writeString(self.tableName)
-      oprot.writeFieldEnd()
-    if self.URI is not None:
-      oprot.writeFieldBegin('URI', TType.STRING, 6)
-      oprot.writeString(self.URI)
-      oprot.writeFieldEnd()
-    if self.action is not None:
-      oprot.writeFieldBegin('action', TType.STRING, 7)
-      oprot.writeString(self.action)
-      oprot.writeFieldEnd()
-    if self.createTime is not None:
-      oprot.writeFieldBegin('createTime', TType.I64, 8)
-      oprot.writeI64(self.createTime)
-      oprot.writeFieldEnd()
-    if self.grantOption is not None:
-      oprot.writeFieldBegin('grantOption', TType.I32, 9)
-      oprot.writeI32(self.grantOption)
-      oprot.writeFieldEnd()
-    if self.columnName is not None:
-      oprot.writeFieldBegin('columnName', TType.STRING, 10)
-      oprot.writeString(self.columnName)
+    if self.name is not None:
+      oprot.writeFieldBegin('name', TType.STRING, 2)
+      oprot.writeString(self.name)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
   def validate(self):
-    if self.privilegeScope is None:
-      raise TProtocol.TProtocolException(message='Required field privilegeScope is unset!')
-    if self.serverName is None:
-      raise TProtocol.TProtocolException(message='Required field serverName is unset!')
-    if self.action is None:
-      raise TProtocol.TProtocolException(message='Required field action is unset!')
+    if self.type is None:
+      raise TProtocol.TProtocolException(message='Required field type is unset!')
+    if self.name is None:
+      raise TProtocol.TProtocolException(message='Required field name is unset!')
     return
 
 
   def __hash__(self):
     value = 17
-    value = (value * 31) ^ hash(self.privilegeScope)
-    value = (value * 31) ^ hash(self.serverName)
-    value = (value * 31) ^ hash(self.dbName)
-    value = (value * 31) ^ hash(self.tableName)
-    value = (value * 31) ^ hash(self.URI)
-    value = (value * 31) ^ hash(self.action)
-    value = (value * 31) ^ hash(self.createTime)
-    value = (value * 31) ^ hash(self.grantOption)
-    value = (value * 31) ^ hash(self.columnName)
+    value = (value * 31) ^ hash(self.type)
+    value = (value * 31) ^ hash(self.name)
     return value
 
   def __repr__(self):
@@ -212,19 +119,37 @@ class TSentryPrivilege(object):
   def __ne__(self, other):
     return not (self == other)
 
-class TSentryGroup(object):
+class TSentryPrivilege(object):
   """
   Attributes:
-   - groupName
+   - component
+   - serviceName
+   - authorizables
+   - action
+   - createTime
+   - grantorPrincipal
+   - grantOption
   """
 
   thrift_spec = (
     None, # 0
-    (1, TType.STRING, 'groupName', None, None, ), # 1
+    (1, TType.STRING, 'component', None, None, ), # 1
+    (2, TType.STRING, 'serviceName', None, None, ), # 2
+    (3, TType.LIST, 'authorizables', (TType.STRUCT,(TAuthorizable, TAuthorizable.thrift_spec)), None, ), # 3
+    (4, TType.STRING, 'action', None, None, ), # 4
+    (5, TType.I64, 'createTime', None, None, ), # 5
+    (6, TType.STRING, 'grantorPrincipal', None, None, ), # 6
+    (7, TType.I32, 'grantOption', None,     0, ), # 7
   )
 
-  def __init__(self, groupName=None,):
-    self.groupName = groupName
+  def __init__(self, component=None, serviceName=None, authorizables=None, action=None, createTime=None, grantorPrincipal=None, grantOption=thrift_spec[7][4],):
+    self.component = component
+    self.serviceName = serviceName
+    self.authorizables = authorizables
+    self.action = action
+    self.createTime = createTime
+    self.grantorPrincipal = grantorPrincipal
+    self.grantOption = grantOption
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -237,7 +162,43 @@ class TSentryGroup(object):
         break
       if fid == 1:
         if ftype == TType.STRING:
-          self.groupName = iprot.readString()
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 2:
+        if ftype == TType.STRING:
+          self.serviceName = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 3:
+        if ftype == TType.LIST:
+          self.authorizables = []
+          (_etype3, _size0) = iprot.readListBegin()
+          for _i4 in xrange(_size0):
+            _elem5 = TAuthorizable()
+            _elem5.read(iprot)
+            self.authorizables.append(_elem5)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.action = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.I64:
+          self.createTime = iprot.readI64()
+        else:
+          iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.STRING:
+          self.grantorPrincipal = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 7:
+        if ftype == TType.I32:
+          self.grantOption = iprot.readI32()
         else:
           iprot.skip(ftype)
       else:
@@ -249,23 +210,62 @@ class TSentryGroup(object):
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('TSentryGroup')
-    if self.groupName is not None:
-      oprot.writeFieldBegin('groupName', TType.STRING, 1)
-      oprot.writeString(self.groupName)
+    oprot.writeStructBegin('TSentryPrivilege')
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 1)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
+    if self.serviceName is not None:
+      oprot.writeFieldBegin('serviceName', TType.STRING, 2)
+      oprot.writeString(self.serviceName)
+      oprot.writeFieldEnd()
+    if self.authorizables is not None:
+      oprot.writeFieldBegin('authorizables', TType.LIST, 3)
+      oprot.writeListBegin(TType.STRUCT, len(self.authorizables))
+      for iter6 in self.authorizables:
+        iter6.write(oprot)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.action is not None:
+      oprot.writeFieldBegin('action', TType.STRING, 4)
+      oprot.writeString(self.action)
+      oprot.writeFieldEnd()
+    if self.createTime is not None:
+      oprot.writeFieldBegin('createTime', TType.I64, 5)
+      oprot.writeI64(self.createTime)
+      oprot.writeFieldEnd()
+    if self.grantorPrincipal is not None:
+      oprot.writeFieldBegin('grantorPrincipal', TType.STRING, 6)
+      oprot.writeString(self.grantorPrincipal)
+      oprot.writeFieldEnd()
+    if self.grantOption is not None:
+      oprot.writeFieldBegin('grantOption', TType.I32, 7)
+      oprot.writeI32(self.grantOption)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
   def validate(self):
-    if self.groupName is None:
-      raise TProtocol.TProtocolException(message='Required field groupName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
+    if self.serviceName is None:
+      raise TProtocol.TProtocolException(message='Required field serviceName is unset!')
+    if self.authorizables is None:
+      raise TProtocol.TProtocolException(message='Required field authorizables is unset!')
+    if self.action is None:
+      raise TProtocol.TProtocolException(message='Required field action is unset!')
     return
 
 
   def __hash__(self):
     value = 17
-    value = (value * 31) ^ hash(self.groupName)
+    value = (value * 31) ^ hash(self.component)
+    value = (value * 31) ^ hash(self.serviceName)
+    value = (value * 31) ^ hash(self.authorizables)
+    value = (value * 31) ^ hash(self.action)
+    value = (value * 31) ^ hash(self.createTime)
+    value = (value * 31) ^ hash(self.grantorPrincipal)
+    value = (value * 31) ^ hash(self.grantOption)
     return value
 
   def __repr__(self):
@@ -285,6 +285,7 @@ class TCreateSentryRoleRequest(object):
    - protocol_version
    - requestorUserName
    - roleName
+   - component
   """
 
   thrift_spec = (
@@ -292,12 +293,14 @@ class TCreateSentryRoleRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
+    (4, TType.STRING, 'component', None, None, ), # 4
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
+    self.component = component
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -323,6 +326,11 @@ class TCreateSentryRoleRequest(object):
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -345,6 +353,10 @@ class TCreateSentryRoleRequest(object):
       oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -355,6 +367,8 @@ class TCreateSentryRoleRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
     return
 
 
@@ -363,6 +377,7 @@ class TCreateSentryRoleRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
+    value = (value * 31) ^ hash(self.component)
     return value
 
   def __repr__(self):
@@ -450,6 +465,7 @@ class TDropSentryRoleRequest(object):
    - protocol_version
    - requestorUserName
    - roleName
+   - component
   """
 
   thrift_spec = (
@@ -457,12 +473,14 @@ class TDropSentryRoleRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
+    (4, TType.STRING, 'component', None, None, ), # 4
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
+    self.component = component
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -488,6 +506,11 @@ class TDropSentryRoleRequest(object):
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -510,6 +533,10 @@ class TDropSentryRoleRequest(object):
       oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -520,6 +547,8 @@ class TDropSentryRoleRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
     return
 
 
@@ -528,6 +557,7 @@ class TDropSentryRoleRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
+    value = (value * 31) ^ hash(self.component)
     return value
 
   def __repr__(self):
@@ -615,6 +645,7 @@ class TAlterSentryRoleAddGroupsRequest(object):
    - protocol_version
    - requestorUserName
    - roleName
+   - component
    - groups
   """
 
@@ -623,14 +654,15 @@ class TAlterSentryRoleAddGroupsRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
-    None, # 4
-    (5, TType.SET, 'groups', (TType.STRUCT,(TSentryGroup, TSentryGroup.thrift_spec)), None, ), # 5
+    (4, TType.STRING, 'component', None, None, ), # 4
+    (5, TType.SET, 'groups', (TType.STRING,None), None, ), # 5
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, groups=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None, groups=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
+    self.component = component
     self.groups = groups
 
   def read(self, iprot):
@@ -657,14 +689,18 @@ class TAlterSentryRoleAddGroupsRequest(object):
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       elif fid == 5:
         if ftype == TType.SET:
           self.groups = set()
-          (_etype3, _size0) = iprot.readSetBegin()
-          for _i4 in xrange(_size0):
-            _elem5 = TSentryGroup()
-            _elem5.read(iprot)
-            self.groups.add(_elem5)
+          (_etype10, _size7) = iprot.readSetBegin()
+          for _i11 in xrange(_size7):
+            _elem12 = iprot.readString()
+            self.groups.add(_elem12)
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
@@ -690,11 +726,15 @@ class TAlterSentryRoleAddGroupsRequest(object):
       oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     if self.groups is not None:
       oprot.writeFieldBegin('groups', TType.SET, 5)
-      oprot.writeSetBegin(TType.STRUCT, len(self.groups))
-      for iter6 in self.groups:
-        iter6.write(oprot)
+      oprot.writeSetBegin(TType.STRING, len(self.groups))
+      for iter13 in self.groups:
+        oprot.writeString(iter13)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -707,6 +747,8 @@ class TAlterSentryRoleAddGroupsRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
     if self.groups is None:
       raise TProtocol.TProtocolException(message='Required field groups is unset!')
     return
@@ -717,6 +759,7 @@ class TAlterSentryRoleAddGroupsRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
+    value = (value * 31) ^ hash(self.component)
     value = (value * 31) ^ hash(self.groups)
     return value
 
@@ -805,6 +848,7 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
    - protocol_version
    - requestorUserName
    - roleName
+   - component
    - groups
   """
 
@@ -813,14 +857,15 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
-    None, # 4
-    (5, TType.SET, 'groups', (TType.STRUCT,(TSentryGroup, TSentryGroup.thrift_spec)), None, ), # 5
+    (4, TType.STRING, 'component', None, None, ), # 4
+    (5, TType.SET, 'groups', (TType.STRING,None), None, ), # 5
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, groups=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None, groups=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
+    self.component = component
     self.groups = groups
 
   def read(self, iprot):
@@ -847,14 +892,18 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       elif fid == 5:
         if ftype == TType.SET:
           self.groups = set()
-          (_etype10, _size7) = iprot.readSetBegin()
-          for _i11 in xrange(_size7):
-            _elem12 = TSentryGroup()
-            _elem12.read(iprot)
-            self.groups.add(_elem12)
+          (_etype17, _size14) = iprot.readSetBegin()
+          for _i18 in xrange(_size14):
+            _elem19 = iprot.readString()
+            self.groups.add(_elem19)
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
@@ -880,11 +929,15 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
       oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     if self.groups is not None:
       oprot.writeFieldBegin('groups', TType.SET, 5)
-      oprot.writeSetBegin(TType.STRUCT, len(self.groups))
-      for iter13 in self.groups:
-        iter13.write(oprot)
+      oprot.writeSetBegin(TType.STRING, len(self.groups))
+      for iter20 in self.groups:
+        oprot.writeString(iter20)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -897,6 +950,8 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
     if self.groups is None:
       raise TProtocol.TProtocolException(message='Required field groups is unset!')
     return
@@ -907,6 +962,7 @@ class TAlterSentryRoleDeleteGroupsRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
+    value = (value * 31) ^ hash(self.component)
     value = (value * 31) ^ hash(self.groups)
     return value
 
@@ -995,8 +1051,8 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
    - protocol_version
    - requestorUserName
    - roleName
+   - component
    - privilege
-   - privileges
   """
 
   thrift_spec = (
@@ -1004,17 +1060,16 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
-    None, # 4
+    (4, TType.STRING, 'component', None, None, ), # 4
     (5, TType.STRUCT, 'privilege', (TSentryPrivilege, TSentryPrivilege.thrift_spec), None, ), # 5
-    (6, TType.SET, 'privileges', (TType.STRUCT,(TSentryPrivilege, TSentryPrivilege.thrift_spec)), None, ), # 6
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, privilege=None, privileges=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None, privilege=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
+    self.component = component
     self.privilege = privilege
-    self.privileges = privileges
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1040,21 +1095,15 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       elif fid == 5:
         if ftype == TType.STRUCT:
           self.privilege = TSentryPrivilege()
           self.privilege.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 6:
-        if ftype == TType.SET:
-          self.privileges = set()
-          (_etype17, _size14) = iprot.readSetBegin()
-          for _i18 in xrange(_size14):
-            _elem19 = TSentryPrivilege()
-            _elem19.read(iprot)
-            self.privileges.add(_elem19)
-          iprot.readSetEnd()
         else:
           iprot.skip(ftype)
       else:
@@ -1079,16 +1128,13 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
       oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     if self.privilege is not None:
       oprot.writeFieldBegin('privilege', TType.STRUCT, 5)
       self.privilege.write(oprot)
-      oprot.writeFieldEnd()
-    if self.privileges is not None:
-      oprot.writeFieldBegin('privileges', TType.SET, 6)
-      oprot.writeSetBegin(TType.STRUCT, len(self.privileges))
-      for iter20 in self.privileges:
-        iter20.write(oprot)
-      oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1100,6 +1146,10 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
+    if self.privilege is None:
+      raise TProtocol.TProtocolException(message='Required field privilege is unset!')
     return
 
 
@@ -1108,8 +1158,8 @@ class TAlterSentryRoleGrantPrivilegeRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
+    value = (value * 31) ^ hash(self.component)
     value = (value * 31) ^ hash(self.privilege)
-    value = (value * 31) ^ hash(self.privileges)
     return value
 
   def __repr__(self):
@@ -1127,21 +1177,15 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
   """
   Attributes:
    - status
-   - privilege
-   - privileges
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
-    (2, TType.STRUCT, 'privilege', (TSentryPrivilege, TSentryPrivilege.thrift_spec), None, ), # 2
-    (3, TType.SET, 'privileges', (TType.STRUCT,(TSentryPrivilege, TSentryPrivilege.thrift_spec)), None, ), # 3
   )
 
-  def __init__(self, status=None, privilege=None, privileges=None,):
+  def __init__(self, status=None,):
     self.status = status
-    self.privilege = privilege
-    self.privileges = privileges
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1158,23 +1202,6 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
           self.status.read(iprot)
         else:
           iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRUCT:
-          self.privilege = TSentryPrivilege()
-          self.privilege.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 3:
-        if ftype == TType.SET:
-          self.privileges = set()
-          (_etype24, _size21) = iprot.readSetBegin()
-          for _i25 in xrange(_size21):
-            _elem26 = TSentryPrivilege()
-            _elem26.read(iprot)
-            self.privileges.add(_elem26)
-          iprot.readSetEnd()
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -1189,17 +1216,6 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
       oprot.writeFieldBegin('status', TType.STRUCT, 1)
       self.status.write(oprot)
       oprot.writeFieldEnd()
-    if self.privilege is not None:
-      oprot.writeFieldBegin('privilege', TType.STRUCT, 2)
-      self.privilege.write(oprot)
-      oprot.writeFieldEnd()
-    if self.privileges is not None:
-      oprot.writeFieldBegin('privileges', TType.SET, 3)
-      oprot.writeSetBegin(TType.STRUCT, len(self.privileges))
-      for iter27 in self.privileges:
-        iter27.write(oprot)
-      oprot.writeSetEnd()
-      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -1212,8 +1228,6 @@ class TAlterSentryRoleGrantPrivilegeResponse(object):
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.status)
-    value = (value * 31) ^ hash(self.privilege)
-    value = (value * 31) ^ hash(self.privileges)
     return value
 
   def __repr__(self):
@@ -1233,8 +1247,8 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
    - protocol_version
    - requestorUserName
    - roleName
+   - component
    - privilege
-   - privileges
   """
 
   thrift_spec = (
@@ -1242,17 +1256,16 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'roleName', None, None, ), # 3
-    None, # 4
+    (4, TType.STRING, 'component', None, None, ), # 4
     (5, TType.STRUCT, 'privilege', (TSentryPrivilege, TSentryPrivilege.thrift_spec), None, ), # 5
-    (6, TType.SET, 'privileges', (TType.STRUCT,(TSentryPrivilege, TSentryPrivilege.thrift_spec)), None, ), # 6
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, privilege=None, privileges=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None, privilege=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
+    self.component = component
     self.privilege = privilege
-    self.privileges = privileges
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1278,21 +1291,15 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       elif fid == 5:
         if ftype == TType.STRUCT:
           self.privilege = TSentryPrivilege()
           self.privilege.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 6:
-        if ftype == TType.SET:
-          self.privileges = set()
-          (_etype31, _size28) = iprot.readSetBegin()
-          for _i32 in xrange(_size28):
-            _elem33 = TSentryPrivilege()
-            _elem33.read(iprot)
-            self.privileges.add(_elem33)
-          iprot.readSetEnd()
         else:
           iprot.skip(ftype)
       else:
@@ -1317,16 +1324,13 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
       oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     if self.privilege is not None:
       oprot.writeFieldBegin('privilege', TType.STRUCT, 5)
       self.privilege.write(oprot)
-      oprot.writeFieldEnd()
-    if self.privileges is not None:
-      oprot.writeFieldBegin('privileges', TType.SET, 6)
-      oprot.writeSetBegin(TType.STRUCT, len(self.privileges))
-      for iter34 in self.privileges:
-        iter34.write(oprot)
-      oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1338,6 +1342,10 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
+    if self.privilege is None:
+      raise TProtocol.TProtocolException(message='Required field privilege is unset!')
     return
 
 
@@ -1346,8 +1354,8 @@ class TAlterSentryRoleRevokePrivilegeRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
+    value = (value * 31) ^ hash(self.component)
     value = (value * 31) ^ hash(self.privilege)
-    value = (value * 31) ^ hash(self.privileges)
     return value
 
   def __repr__(self):
@@ -1435,6 +1443,7 @@ class TListSentryRolesRequest(object):
    - protocol_version
    - requestorUserName
    - groupName
+   - component
   """
 
   thrift_spec = (
@@ -1442,12 +1451,14 @@ class TListSentryRolesRequest(object):
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
     (3, TType.STRING, 'groupName', None, None, ), # 3
+    (4, TType.STRING, 'component', None, None, ), # 4
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, groupName=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, groupName=None, component=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.groupName = groupName
+    self.component = component
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1473,6 +1484,11 @@ class TListSentryRolesRequest(object):
           self.groupName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -1495,6 +1511,10 @@ class TListSentryRolesRequest(object):
       oprot.writeFieldBegin('groupName', TType.STRING, 3)
       oprot.writeString(self.groupName)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -1503,6 +1523,8 @@ class TListSentryRolesRequest(object):
       raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
     if self.requestorUserName is None:
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
     return
 
 
@@ -1511,6 +1533,7 @@ class TListSentryRolesRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.groupName)
+    value = (value * 31) ^ hash(self.component)
     return value
 
   def __repr__(self):
@@ -1529,20 +1552,17 @@ class TSentryRole(object):
   Attributes:
    - roleName
    - groups
-   - grantorPrincipal
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.STRING, 'roleName', None, None, ), # 1
-    (2, TType.SET, 'groups', (TType.STRUCT,(TSentryGroup, TSentryGroup.thrift_spec)), None, ), # 2
-    (3, TType.STRING, 'grantorPrincipal', None, None, ), # 3
+    (2, TType.SET, 'groups', (TType.STRING,None), None, ), # 2
   )
 
-  def __init__(self, roleName=None, groups=None, grantorPrincipal=None,):
+  def __init__(self, roleName=None, groups=None,):
     self.roleName = roleName
     self.groups = groups
-    self.grantorPrincipal = grantorPrincipal
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1561,17 +1581,11 @@ class TSentryRole(object):
       elif fid == 2:
         if ftype == TType.SET:
           self.groups = set()
-          (_etype38, _size35) = iprot.readSetBegin()
-          for _i39 in xrange(_size35):
-            _elem40 = TSentryGroup()
-            _elem40.read(iprot)
-            self.groups.add(_elem40)
+          (_etype24, _size21) = iprot.readSetBegin()
+          for _i25 in xrange(_size21):
+            _elem26 = iprot.readString()
+            self.groups.add(_elem26)
           iprot.readSetEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 3:
-        if ftype == TType.STRING:
-          self.grantorPrincipal = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -1590,14 +1604,10 @@ class TSentryRole(object):
       oprot.writeFieldEnd()
     if self.groups is not None:
       oprot.writeFieldBegin('groups', TType.SET, 2)
-      oprot.writeSetBegin(TType.STRUCT, len(self.groups))
-      for iter41 in self.groups:
-        iter41.write(oprot)
+      oprot.writeSetBegin(TType.STRING, len(self.groups))
+      for iter27 in self.groups:
+        oprot.writeString(iter27)
       oprot.writeSetEnd()
-      oprot.writeFieldEnd()
-    if self.grantorPrincipal is not None:
-      oprot.writeFieldBegin('grantorPrincipal', TType.STRING, 3)
-      oprot.writeString(self.grantorPrincipal)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1607,8 +1617,6 @@ class TSentryRole(object):
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
     if self.groups is None:
       raise TProtocol.TProtocolException(message='Required field groups is unset!')
-    if self.grantorPrincipal is None:
-      raise TProtocol.TProtocolException(message='Required field grantorPrincipal is unset!')
     return
 
 
@@ -1616,7 +1624,6 @@ class TSentryRole(object):
     value = 17
     value = (value * 31) ^ hash(self.roleName)
     value = (value * 31) ^ hash(self.groups)
-    value = (value * 31) ^ hash(self.grantorPrincipal)
     return value
 
   def __repr__(self):
@@ -1665,11 +1672,11 @@ class TListSentryRolesResponse(object):
       elif fid == 2:
         if ftype == TType.SET:
           self.roles = set()
-          (_etype45, _size42) = iprot.readSetBegin()
-          for _i46 in xrange(_size42):
-            _elem47 = TSentryRole()
-            _elem47.read(iprot)
-            self.roles.add(_elem47)
+          (_etype31, _size28) = iprot.readSetBegin()
+          for _i32 in xrange(_size28):
+            _elem33 = TSentryRole()
+            _elem33.read(iprot)
+            self.roles.add(_elem33)
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
@@ -1690,8 +1697,8 @@ class TListSentryRolesResponse(object):
     if self.roles is not None:
       oprot.writeFieldBegin('roles', TType.SET, 2)
       oprot.writeSetBegin(TType.STRUCT, len(self.roles))
-      for iter48 in self.roles:
-        iter48.write(oprot)
+      for iter34 in self.roles:
+        iter34.write(oprot)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -1720,148 +1727,34 @@ class TListSentryRolesResponse(object):
   def __ne__(self, other):
     return not (self == other)
 
-class TSentryAuthorizable(object):
-  """
-  Attributes:
-   - server
-   - uri
-   - db
-   - table
-   - column
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.STRING, 'server', None, None, ), # 1
-    (2, TType.STRING, 'uri', None, None, ), # 2
-    (3, TType.STRING, 'db', None, None, ), # 3
-    (4, TType.STRING, 'table', None, None, ), # 4
-    (5, TType.STRING, 'column', None, None, ), # 5
-  )
-
-  def __init__(self, server=None, uri=None, db=None, table=None, column=None,):
-    self.server = server
-    self.uri = uri
-    self.db = db
-    self.table = table
-    self.column = column
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.STRING:
-          self.server = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.uri = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 3:
-        if ftype == TType.STRING:
-          self.db = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 4:
-        if ftype == TType.STRING:
-          self.table = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 5:
-        if ftype == TType.STRING:
-          self.column = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('TSentryAuthorizable')
-    if self.server is not None:
-      oprot.writeFieldBegin('server', TType.STRING, 1)
-      oprot.writeString(self.server)
-      oprot.writeFieldEnd()
-    if self.uri is not None:
-      oprot.writeFieldBegin('uri', TType.STRING, 2)
-      oprot.writeString(self.uri)
-      oprot.writeFieldEnd()
-    if self.db is not None:
-      oprot.writeFieldBegin('db', TType.STRING, 3)
-      oprot.writeString(self.db)
-      oprot.writeFieldEnd()
-    if self.table is not None:
-      oprot.writeFieldBegin('table', TType.STRING, 4)
-      oprot.writeString(self.table)
-      oprot.writeFieldEnd()
-    if self.column is not None:
-      oprot.writeFieldBegin('column', TType.STRING, 5)
-      oprot.writeString(self.column)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    if self.server is None:
-      raise TProtocol.TProtocolException(message='Required field server is unset!')
-    return
-
-
-  def __hash__(self):
-    value = 17
-    value = (value * 31) ^ hash(self.server)
-    value = (value * 31) ^ hash(self.uri)
-    value = (value * 31) ^ hash(self.db)
-    value = (value * 31) ^ hash(self.table)
-    value = (value * 31) ^ hash(self.column)
-    return value
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
 class TListSentryPrivilegesRequest(object):
   """
   Attributes:
    - protocol_version
    - requestorUserName
    - roleName
-   - authorizableHierarchy
+   - component
+   - serviceName
+   - authorizables
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
-    None, # 3
-    (4, TType.STRING, 'roleName', None, None, ), # 4
-    (5, TType.STRUCT, 'authorizableHierarchy', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 5
+    (3, TType.STRING, 'roleName', None, None, ), # 3
+    (4, TType.STRING, 'component', None, None, ), # 4
+    (5, TType.STRING, 'serviceName', None, None, ), # 5
+    (6, TType.LIST, 'authorizables', (TType.STRUCT,(TAuthorizable, TAuthorizable.thrift_spec)), None, ), # 6
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, authorizableHierarchy=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, roleName=None, component=None, serviceName=None, authorizables=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
     self.roleName = roleName
-    self.authorizableHierarchy = authorizableHierarchy
+    self.component = component
+    self.serviceName = serviceName
+    self.authorizables = authorizables
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -1882,15 +1775,30 @@ class TListSentryPrivilegesRequest(object):
           self.requestorUserName = iprot.readString()
         else:
           iprot.skip(ftype)
-      elif fid == 4:
+      elif fid == 3:
         if ftype == TType.STRING:
           self.roleName = iprot.readString()
         else:
           iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
+        else:
+          iprot.skip(ftype)
       elif fid == 5:
-        if ftype == TType.STRUCT:
-          self.authorizableHierarchy = TSentryAuthorizable()
-          self.authorizableHierarchy.read(iprot)
+        if ftype == TType.STRING:
+          self.serviceName = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.LIST:
+          self.authorizables = []
+          (_etype38, _size35) = iprot.readListBegin()
+          for _i39 in xrange(_size35):
+            _elem40 = TAuthorizable()
+            _elem40.read(iprot)
+            self.authorizables.append(_elem40)
+          iprot.readListEnd()
         else:
           iprot.skip(ftype)
       else:
@@ -1912,12 +1820,23 @@ class TListSentryPrivilegesRequest(object):
       oprot.writeString(self.requestorUserName)
       oprot.writeFieldEnd()
     if self.roleName is not None:
-      oprot.writeFieldBegin('roleName', TType.STRING, 4)
+      oprot.writeFieldBegin('roleName', TType.STRING, 3)
       oprot.writeString(self.roleName)
       oprot.writeFieldEnd()
-    if self.authorizableHierarchy is not None:
-      oprot.writeFieldBegin('authorizableHierarchy', TType.STRUCT, 5)
-      self.authorizableHierarchy.write(oprot)
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
+    if self.serviceName is not None:
+      oprot.writeFieldBegin('serviceName', TType.STRING, 5)
+      oprot.writeString(self.serviceName)
+      oprot.writeFieldEnd()
+    if self.authorizables is not None:
+      oprot.writeFieldBegin('authorizables', TType.LIST, 6)
+      oprot.writeListBegin(TType.STRUCT, len(self.authorizables))
+      for iter41 in self.authorizables:
+        iter41.write(oprot)
+      oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -1929,6 +1848,10 @@ class TListSentryPrivilegesRequest(object):
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
     if self.roleName is None:
       raise TProtocol.TProtocolException(message='Required field roleName is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
+    if self.serviceName is None:
+      raise TProtocol.TProtocolException(message='Required field serviceName is unset!')
     return
 
 
@@ -1937,7 +1860,9 @@ class TListSentryPrivilegesRequest(object):
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
     value = (value * 31) ^ hash(self.roleName)
-    value = (value * 31) ^ hash(self.authorizableHierarchy)
+    value = (value * 31) ^ hash(self.component)
+    value = (value * 31) ^ hash(self.serviceName)
+    value = (value * 31) ^ hash(self.authorizables)
     return value
 
   def __repr__(self):
@@ -1986,11 +1911,11 @@ class TListSentryPrivilegesResponse(object):
       elif fid == 2:
         if ftype == TType.SET:
           self.privileges = set()
-          (_etype52, _size49) = iprot.readSetBegin()
-          for _i53 in xrange(_size49):
-            _elem54 = TSentryPrivilege()
-            _elem54.read(iprot)
-            self.privileges.add(_elem54)
+          (_etype45, _size42) = iprot.readSetBegin()
+          for _i46 in xrange(_size42):
+            _elem47 = TSentryPrivilege()
+            _elem47.read(iprot)
+            self.privileges.add(_elem47)
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
@@ -2011,8 +1936,8 @@ class TListSentryPrivilegesResponse(object):
     if self.privileges is not None:
       oprot.writeFieldBegin('privileges', TType.SET, 2)
       oprot.writeSetBegin(TType.STRUCT, len(self.privileges))
-      for iter55 in self.privileges:
-        iter55.write(oprot)
+      for iter48 in self.privileges:
+        iter48.write(oprot)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -2046,20 +1971,23 @@ class TDropPrivilegesRequest(object):
   Attributes:
    - protocol_version
    - requestorUserName
-   - authorizable
+   - privilege
+   - component
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
-    (3, TType.STRUCT, 'authorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 3
+    (3, TType.STRUCT, 'privilege', (TSentryPrivilege, TSentryPrivilege.thrift_spec), None, ), # 3
+    (4, TType.STRING, 'component', None, None, ), # 4
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, authorizable=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, privilege=None, component=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
-    self.authorizable = authorizable
+    self.privilege = privilege
+    self.component = component
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -2082,8 +2010,13 @@ class TDropPrivilegesRequest(object):
           iprot.skip(ftype)
       elif fid == 3:
         if ftype == TType.STRUCT:
-          self.authorizable = TSentryAuthorizable()
-          self.authorizable.read(iprot)
+          self.privilege = TSentryPrivilege()
+          self.privilege.read(iprot)
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
         else:
           iprot.skip(ftype)
       else:
@@ -2104,9 +2037,13 @@ class TDropPrivilegesRequest(object):
       oprot.writeFieldBegin('requestorUserName', TType.STRING, 2)
       oprot.writeString(self.requestorUserName)
       oprot.writeFieldEnd()
-    if self.authorizable is not None:
-      oprot.writeFieldBegin('authorizable', TType.STRUCT, 3)
-      self.authorizable.write(oprot)
+    if self.privilege is not None:
+      oprot.writeFieldBegin('privilege', TType.STRUCT, 3)
+      self.privilege.write(oprot)
+      oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 4)
+      oprot.writeString(self.component)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2116,8 +2053,10 @@ class TDropPrivilegesRequest(object):
       raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
     if self.requestorUserName is None:
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
-    if self.authorizable is None:
-      raise TProtocol.TProtocolException(message='Required field authorizable is unset!')
+    if self.privilege is None:
+      raise TProtocol.TProtocolException(message='Required field privilege is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
     return
 
 
@@ -2125,7 +2064,8 @@ class TDropPrivilegesRequest(object):
     value = 17
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
-    value = (value * 31) ^ hash(self.authorizable)
+    value = (value * 31) ^ hash(self.privilege)
+    value = (value * 31) ^ hash(self.component)
     return value
 
   def __repr__(self):
@@ -2212,23 +2152,29 @@ class TRenamePrivilegesRequest(object):
   Attributes:
    - protocol_version
    - requestorUserName
-   - oldAuthorizable
-   - newAuthorizable
+   - component
+   - serviceName
+   - oldAuthorizables
+   - newAuthorizables
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
     (2, TType.STRING, 'requestorUserName', None, None, ), # 2
-    (3, TType.STRUCT, 'oldAuthorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 3
-    (4, TType.STRUCT, 'newAuthorizable', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 4
+    (3, TType.STRING, 'component', None, None, ), # 3
+    (4, TType.STRING, 'serviceName', None, None, ), # 4
+    (5, TType.LIST, 'oldAuthorizables', (TType.STRUCT,(TAuthorizable, TAuthorizable.thrift_spec)), None, ), # 5
+    (6, TType.LIST, 'newAuthorizables', (TType.STRUCT,(TAuthorizable, TAuthorizable.thrift_spec)), None, ), # 6
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, oldAuthorizable=None, newAuthorizable=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, component=None, serviceName=None, oldAuthorizables=None, newAuthorizables=None,):
     self.protocol_version = protocol_version
     self.requestorUserName = requestorUserName
-    self.oldAuthorizable = oldAuthorizable
-    self.newAuthorizable = newAuthorizable
+    self.component = component
+    self.serviceName = serviceName
+    self.oldAuthorizables = oldAuthorizables
+    self.newAuthorizables = newAuthorizables
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -2250,15 +2196,35 @@ class TRenamePrivilegesRequest(object):
         else:
           iprot.skip(ftype)
       elif fid == 3:
-        if ftype == TType.STRUCT:
-          self.oldAuthorizable = TSentryAuthorizable()
-          self.oldAuthorizable.read(iprot)
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
         else:
           iprot.skip(ftype)
       elif fid == 4:
-        if ftype == TType.STRUCT:
-          self.newAuthorizable = TSentryAuthorizable()
-          self.newAuthorizable.read(iprot)
+        if ftype == TType.STRING:
+          self.serviceName = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
+        if ftype == TType.LIST:
+          self.oldAuthorizables = []
+          (_etype52, _size49) = iprot.readListBegin()
+          for _i53 in xrange(_size49):
+            _elem54 = TAuthorizable()
+            _elem54.read(iprot)
+            self.oldAuthorizables.append(_elem54)
+          iprot.readListEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 6:
+        if ftype == TType.LIST:
+          self.newAuthorizables = []
+          (_etype58, _size55) = iprot.readListBegin()
+          for _i59 in xrange(_size55):
+            _elem60 = TAuthorizable()
+            _elem60.read(iprot)
+            self.newAuthorizables.append(_elem60)
+          iprot.readListEnd()
         else:
           iprot.skip(ftype)
       else:
@@ -2279,13 +2245,27 @@ class TRenamePrivilegesRequest(object):
       oprot.writeFieldBegin('requestorUserName', TType.STRING, 2)
       oprot.writeString(self.requestorUserName)
       oprot.writeFieldEnd()
-    if self.oldAuthorizable is not None:
-      oprot.writeFieldBegin('oldAuthorizable', TType.STRUCT, 3)
-      self.oldAuthorizable.write(oprot)
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 3)
+      oprot.writeString(self.component)
       oprot.writeFieldEnd()
-    if self.newAuthorizable is not None:
-      oprot.writeFieldBegin('newAuthorizable', TType.STRUCT, 4)
-      self.newAuthorizable.write(oprot)
+    if self.serviceName is not None:
+      oprot.writeFieldBegin('serviceName', TType.STRING, 4)
+      oprot.writeString(self.serviceName)
+      oprot.writeFieldEnd()
+    if self.oldAuthorizables is not None:
+      oprot.writeFieldBegin('oldAuthorizables', TType.LIST, 5)
+      oprot.writeListBegin(TType.STRUCT, len(self.oldAuthorizables))
+      for iter61 in self.oldAuthorizables:
+        iter61.write(oprot)
+      oprot.writeListEnd()
+      oprot.writeFieldEnd()
+    if self.newAuthorizables is not None:
+      oprot.writeFieldBegin('newAuthorizables', TType.LIST, 6)
+      oprot.writeListBegin(TType.STRUCT, len(self.newAuthorizables))
+      for iter62 in self.newAuthorizables:
+        iter62.write(oprot)
+      oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2295,10 +2275,14 @@ class TRenamePrivilegesRequest(object):
       raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
     if self.requestorUserName is None:
       raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
-    if self.oldAuthorizable is None:
-      raise TProtocol.TProtocolException(message='Required field oldAuthorizable is unset!')
-    if self.newAuthorizable is None:
-      raise TProtocol.TProtocolException(message='Required field newAuthorizable is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
+    if self.serviceName is None:
+      raise TProtocol.TProtocolException(message='Required field serviceName is unset!')
+    if self.oldAuthorizables is None:
+      raise TProtocol.TProtocolException(message='Required field oldAuthorizables is unset!')
+    if self.newAuthorizables is None:
+      raise TProtocol.TProtocolException(message='Required field newAuthorizables is unset!')
     return
 
 
@@ -2306,8 +2290,10 @@ class TRenamePrivilegesRequest(object):
     value = 17
     value = (value * 31) ^ hash(self.protocol_version)
     value = (value * 31) ^ hash(self.requestorUserName)
-    value = (value * 31) ^ hash(self.oldAuthorizable)
-    value = (value * 31) ^ hash(self.newAuthorizable)
+    value = (value * 31) ^ hash(self.component)
+    value = (value * 31) ^ hash(self.serviceName)
+    value = (value * 31) ^ hash(self.oldAuthorizables)
+    value = (value * 31) ^ hash(self.newAuthorizables)
     return value
 
   def __repr__(self):
@@ -2423,10 +2409,10 @@ class TSentryActiveRoleSet(object):
       elif fid == 2:
         if ftype == TType.SET:
           self.roles = set()
-          (_etype59, _size56) = iprot.readSetBegin()
-          for _i60 in xrange(_size56):
-            _elem61 = iprot.readString()
-            self.roles.add(_elem61)
+          (_etype66, _size63) = iprot.readSetBegin()
+          for _i67 in xrange(_size63):
+            _elem68 = iprot.readString()
+            self.roles.add(_elem68)
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
@@ -2447,8 +2433,8 @@ class TSentryActiveRoleSet(object):
     if self.roles is not None:
       oprot.writeFieldBegin('roles', TType.SET, 2)
       oprot.writeSetBegin(TType.STRING, len(self.roles))
-      for iter62 in self.roles:
-        oprot.writeString(iter62)
+      for iter69 in self.roles:
+        oprot.writeString(iter69)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -2483,24 +2469,30 @@ class TListSentryPrivilegesForProviderRequest(object):
   """
   Attributes:
    - protocol_version
+   - component
+   - serviceName
    - groups
    - roleSet
-   - authorizableHierarchy
+   - authorizables
   """
 
   thrift_spec = (
     None, # 0
     (1, TType.I32, 'protocol_version', None, 2, ), # 1
-    (2, TType.SET, 'groups', (TType.STRING,None), None, ), # 2
-    (3, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 3
-    (4, TType.STRUCT, 'authorizableHierarchy', (TSentryAuthorizable, TSentryAuthorizable.thrift_spec), None, ), # 4
+    (2, TType.STRING, 'component', None, None, ), # 2
+    (3, TType.STRING, 'serviceName', None, None, ), # 3
+    (4, TType.SET, 'groups', (TType.STRING,None), None, ), # 4
+    (5, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 5
+    (6, TType.LIST, 'authorizables', (TType.STRUCT,(TAuthorizable, TAuthorizable.thrift_spec)), None, ), # 6
   )
 
-  def __init__(self, protocol_version=thrift_spec[1][4], groups=None, roleSet=None, authorizableHierarchy=None,):
+  def __init__(self, protocol_version=thrift_spec[1][4], component=None, serviceName=None, groups=None, roleSet=None, authorizables=None,):
     self.protocol_version = protocol_version
+    self.component = component
+    self.serviceName = serviceName
     self.groups = groups
     self.roleSet = roleSet
-    self.authorizableHierarchy = authorizableHierarchy
+    self.authorizables = authorizables
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -2517,25 +2509,40 @@ class TListSentryPrivilegesForProviderRequest(object):
         else:
           iprot.skip(ftype)
       elif fid == 2:
-        if ftype == TType.SET:
-          self.groups = set()
-          (_etype66, _size63) = iprot.readSetBegin()
-          for _i67 in xrange(_size63):
-            _elem68 = iprot.readString()
-            self.groups.add(_elem68)
-          iprot.readSetEnd()
+        if ftype == TType.STRING:
+          self.component = iprot.readString()
         else:
           iprot.skip(ftype)
       elif fid == 3:
+        if ftype == TType.STRING:
+          self.serviceName = iprot.readString()
+        else:
+          iprot.skip(ftype)
+      elif fid == 4:
+        if ftype == TType.SET:
+          self.groups = set()
+          (_etype73, _size70) = iprot.readSetBegin()
+          for _i74 in xrange(_size70):
+            _elem75 = iprot.readString()
+            self.groups.add(_elem75)
+          iprot.readSetEnd()
+        else:
+          iprot.skip(ftype)
+      elif fid == 5:
         if ftype == TType.STRUCT:
           self.roleSet = TSentryActiveRoleSet()
           self.roleSet.read(iprot)
         else:
           iprot.skip(ftype)
-      elif fid == 4:
-        if ftype == TType.STRUCT:
-          self.authorizableHierarchy = TSentryAuthorizable()
-          self.authorizableHierarchy.read(iprot)
+      elif fid == 6:
+        if ftype == TType.LIST:
+          self.authorizables = []
+          (_etype79, _size76) = iprot.readListBegin()
+          for _i80 in xrange(_size76):
+            _elem81 = TAuthorizable()
+            _elem81.read(iprot)
+            self.authorizables.append(_elem81)
+          iprot.readListEnd()
         else:
           iprot.skip(ftype)
       else:
@@ -2552,20 +2559,31 @@ class TListSentryPrivilegesForProviderRequest(object):
       oprot.writeFieldBegin('protocol_version', TType.I32, 1)
       oprot.writeI32(self.protocol_version)
       oprot.writeFieldEnd()
+    if self.component is not None:
+      oprot.writeFieldBegin('component', TType.STRING, 2)
+      oprot.writeString(self.component)
+      oprot.writeFieldEnd()
+    if self.serviceName is not None:
+      oprot.writeFieldBegin('serviceName', TType.STRING, 3)
+      oprot.writeString(self.serviceName)
+      oprot.writeFieldEnd()
     if self.groups is not None:
-      oprot.writeFieldBegin('groups', TType.SET, 2)
+      oprot.writeFieldBegin('groups', TType.SET, 4)
       oprot.writeSetBegin(TType.STRING, len(self.groups))
-      for iter69 in self.groups:
-        oprot.writeString(iter69)
+      for iter82 in self.groups:
+        oprot.writeString(iter82)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     if self.roleSet is not None:
-      oprot.writeFieldBegin('roleSet', TType.STRUCT, 3)
+      oprot.writeFieldBegin('roleSet', TType.STRUCT, 5)
       self.roleSet.write(oprot)
       oprot.writeFieldEnd()
-    if self.authorizableHierarchy is not None:
-      oprot.writeFieldBegin('authorizableHierarchy', TType.STRUCT, 4)
-      self.authorizableHierarchy.write(oprot)
+    if self.authorizables is not None:
+      oprot.writeFieldBegin('authorizables', TType.LIST, 6)
+      oprot.writeListBegin(TType.STRUCT, len(self.authorizables))
+      for iter83 in self.authorizables:
+        iter83.write(oprot)
+      oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -2573,6 +2591,10 @@ class TListSentryPrivilegesForProviderRequest(object):
   def validate(self):
     if self.protocol_version is None:
       raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
+    if self.component is None:
+      raise TProtocol.TProtocolException(message='Required field component is unset!')
+    if self.serviceName is None:
+      raise TProtocol.TProtocolException(message='Required field serviceName is unset!')
     if self.groups is None:
       raise TProtocol.TProtocolException(message='Required field groups is unset!')
     if self.roleSet is None:
@@ -2583,9 +2605,11 @@ class TListSentryPrivilegesForProviderRequest(object):
   def __hash__(self):
     value = 17
     value = (value * 31) ^ hash(self.protocol_version)
+    value = (value * 31) ^ hash(self.component)
+    value = (value * 31) ^ hash(self.serviceName)
     value = (value * 31) ^ hash(self.groups)
     value = (value * 31) ^ hash(self.roleSet)
-    value = (value * 31) ^ hash(self.authorizableHierarchy)
+    value = (value * 31) ^ hash(self.authorizables)
     return value
 
   def __repr__(self):
@@ -2634,10 +2658,10 @@ class TListSentryPrivilegesForProviderResponse(object):
       elif fid == 2:
         if ftype == TType.SET:
           self.privileges = set()
-          (_etype73, _size70) = iprot.readSetBegin()
-          for _i74 in xrange(_size70):
-            _elem75 = iprot.readString()
-            self.privileges.add(_elem75)
+          (_etype87, _size84) = iprot.readSetBegin()
+          for _i88 in xrange(_size84):
+            _elem89 = iprot.readString()
+            self.privileges.add(_elem89)
           iprot.readSetEnd()
         else:
           iprot.skip(ftype)
@@ -2658,8 +2682,8 @@ class TListSentryPrivilegesForProviderResponse(object):
     if self.privileges is not None:
       oprot.writeFieldBegin('privileges', TType.SET, 2)
       oprot.writeSetBegin(TType.STRING, len(self.privileges))
-      for iter76 in self.privileges:
-        oprot.writeString(iter76)
+      for iter90 in self.privileges:
+        oprot.writeString(iter90)
       oprot.writeSetEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -2677,502 +2701,6 @@ class TListSentryPrivilegesForProviderResponse(object):
     value = 17
     value = (value * 31) ^ hash(self.status)
     value = (value * 31) ^ hash(self.privileges)
-    return value
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class TSentryPrivilegeMap(object):
-  """
-  Attributes:
-   - privilegeMap
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.MAP, 'privilegeMap', (TType.STRING,None,TType.SET,(TType.STRUCT,(TSentryPrivilege, TSentryPrivilege.thrift_spec))), None, ), # 1
-  )
-
-  def __init__(self, privilegeMap=None,):
-    self.privilegeMap = privilegeMap
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.MAP:
-          self.privilegeMap = {}
-          (_ktype78, _vtype79, _size77 ) = iprot.readMapBegin()
-          for _i81 in xrange(_size77):
-            _key82 = iprot.readString()
-            _val83 = set()
-            (_etype87, _size84) = iprot.readSetBegin()
-            for _i88 in xrange(_size84):
-              _elem89 = TSentryPrivilege()
-              _elem89.read(iprot)
-              _val83.add(_elem89)
-            iprot.readSetEnd()
-            self.privilegeMap[_key82] = _val83
-          iprot.readMapEnd()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('TSentryPrivilegeMap')
-    if self.privilegeMap is not None:
-      oprot.writeFieldBegin('privilegeMap', TType.MAP, 1)
-      oprot.writeMapBegin(TType.STRING, TType.SET, len(self.privilegeMap))
-      for kiter90,viter91 in self.privilegeMap.items():
-        oprot.writeString(kiter90)
-        oprot.writeSetBegin(TType.STRUCT, len(viter91))
-        for iter92 in viter91:
-          iter92.write(oprot)
-        oprot.writeSetEnd()
-      oprot.writeMapEnd()
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    if self.privilegeMap is None:
-      raise TProtocol.TProtocolException(message='Required field privilegeMap is unset!')
-    return
-
-
-  def __hash__(self):
-    value = 17
-    value = (value * 31) ^ hash(self.privilegeMap)
-    return value
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class TListSentryPrivilegesByAuthRequest(object):
-  """
-  Attributes:
-   - protocol_version
-   - requestorUserName
-   - authorizableSet
-   - groups
-   - roleSet
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.I32, 'protocol_version', None, 2, ), # 1
-    (2, TType.STRING, 'requestorUserName', None, None, ), # 2
-    (3, TType.SET, 'authorizableSet', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec)), None, ), # 3
-    (4, TType.SET, 'groups', (TType.STRING,None), None, ), # 4
-    (5, TType.STRUCT, 'roleSet', (TSentryActiveRoleSet, TSentryActiveRoleSet.thrift_spec), None, ), # 5
-  )
-
-  def __init__(self, protocol_version=thrift_spec[1][4], requestorUserName=None, authorizableSet=None, groups=None, roleSet=None,):
-    self.protocol_version = protocol_version
-    self.requestorUserName = requestorUserName
-    self.authorizableSet = authorizableSet
-    self.groups = groups
-    self.roleSet = roleSet
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.I32:
-          self.protocol_version = iprot.readI32()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.requestorUserName = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 3:
-        if ftype == TType.SET:
-          self.authorizableSet = set()
-          (_etype96, _size93) = iprot.readSetBegin()
-          for _i97 in xrange(_size93):
-            _elem98 = TSentryAuthorizable()
-            _elem98.read(iprot)
-            self.authorizableSet.add(_elem98)
-          iprot.readSetEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 4:
-        if ftype == TType.SET:
-          self.groups = set()
-          (_etype102, _size99) = iprot.readSetBegin()
-          for _i103 in xrange(_size99):
-            _elem104 = iprot.readString()
-            self.groups.add(_elem104)
-          iprot.readSetEnd()
-        else:
-          iprot.skip(ftype)
-      elif fid == 5:
-        if ftype == TType.STRUCT:
-          self.roleSet = TSentryActiveRoleSet()
-          self.roleSet.read(iprot)
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('TListSentryPrivilegesByAuthRequest')
-    if self.protocol_version is not None:
-      oprot.writeFieldBegin('protocol_version', TType.I32, 1)
-      oprot.writeI32(self.protocol_version)
-      oprot.writeFieldEnd()
-    if self.requestorUserName is not None:
-      oprot.writeFieldBegin('requestorUserName', TType.STRING, 2)
-      oprot.writeString(self.requestorUserName)
-      oprot.writeFieldEnd()
-    if self.authorizableSet is not None:
-      oprot.writeFieldBegin('authorizableSet', TType.SET, 3)
-      oprot.writeSetBegin(TType.STRUCT, len(self.authorizableSet))
-      for iter105 in self.authorizableSet:
-        iter105.write(oprot)
-      oprot.writeSetEnd()
-      oprot.writeFieldEnd()
-    if self.groups is not None:
-      oprot.writeFieldBegin('groups', TType.SET, 4)
-      oprot.writeSetBegin(TType.STRING, len(self.groups))
-      for iter106 in self.groups:
-        oprot.writeString(iter106)
-      oprot.writeSetEnd()
-      oprot.writeFieldEnd()
-    if self.roleSet is not None:
-      oprot.writeFieldBegin('roleSet', TType.STRUCT, 5)
-      self.roleSet.write(oprot)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    if self.protocol_version is None:
-      raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
-    if self.requestorUserName is None:
-      raise TProtocol.TProtocolException(message='Required field requestorUserName is unset!')
-    if self.authorizableSet is None:
-      raise TProtocol.TProtocolException(message='Required field authorizableSet is unset!')
-    return
-
-
-  def __hash__(self):
-    value = 17
-    value = (value * 31) ^ hash(self.protocol_version)
-    value = (value * 31) ^ hash(self.requestorUserName)
-    value = (value * 31) ^ hash(self.authorizableSet)
-    value = (value * 31) ^ hash(self.groups)
-    value = (value * 31) ^ hash(self.roleSet)
-    return value
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class TListSentryPrivilegesByAuthResponse(object):
-  """
-  Attributes:
-   - status
-   - privilegesMapByAuth
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
-    (2, TType.MAP, 'privilegesMapByAuth', (TType.STRUCT,(TSentryAuthorizable, TSentryAuthorizable.thrift_spec),TType.STRUCT,(TSentryPrivilegeMap, TSentryPrivilegeMap.thrift_spec)), None, ), # 2
-  )
-
-  def __init__(self, status=None, privilegesMapByAuth=None,):
-    self.status = status
-    self.privilegesMapByAuth = privilegesMapByAuth
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.STRUCT:
-          self.status = sentry_common_service.ttypes.TSentryResponseStatus()
-          self.status.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.MAP:
-          self.privilegesMapByAuth = {}
-          (_ktype108, _vtype109, _size107 ) = iprot.readMapBegin()
-          for _i111 in xrange(_size107):
-            _key112 = TSentryAuthorizable()
-            _key112.read(iprot)
-            _val113 = TSentryPrivilegeMap()
-            _val113.read(iprot)
-            self.privilegesMapByAuth[_key112] = _val113
-          iprot.readMapEnd()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('TListSentryPrivilegesByAuthResponse')
-    if self.status is not None:
-      oprot.writeFieldBegin('status', TType.STRUCT, 1)
-      self.status.write(oprot)
-      oprot.writeFieldEnd()
-    if self.privilegesMapByAuth is not None:
-      oprot.writeFieldBegin('privilegesMapByAuth', TType.MAP, 2)
-      oprot.writeMapBegin(TType.STRUCT, TType.STRUCT, len(self.privilegesMapByAuth))
-      for kiter114,viter115 in self.privilegesMapByAuth.items():
-        kiter114.write(oprot)
-        viter115.write(oprot)
-      oprot.writeMapEnd()
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    if self.status is None:
-      raise TProtocol.TProtocolException(message='Required field status is unset!')
-    return
-
-
-  def __hash__(self):
-    value = 17
-    value = (value * 31) ^ hash(self.status)
-    value = (value * 31) ^ hash(self.privilegesMapByAuth)
-    return value
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class TSentryConfigValueRequest(object):
-  """
-  Attributes:
-   - protocol_version
-   - propertyName
-   - defaultValue
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.I32, 'protocol_version', None, 2, ), # 1
-    (2, TType.STRING, 'propertyName', None, None, ), # 2
-    (3, TType.STRING, 'defaultValue', None, None, ), # 3
-  )
-
-  def __init__(self, protocol_version=thrift_spec[1][4], propertyName=None, defaultValue=None,):
-    self.protocol_version = protocol_version
-    self.propertyName = propertyName
-    self.defaultValue = defaultValue
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.I32:
-          self.protocol_version = iprot.readI32()
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.propertyName = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      elif fid == 3:
-        if ftype == TType.STRING:
-          self.defaultValue = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('TSentryConfigValueRequest')
-    if self.protocol_version is not None:
-      oprot.writeFieldBegin('protocol_version', TType.I32, 1)
-      oprot.writeI32(self.protocol_version)
-      oprot.writeFieldEnd()
-    if self.propertyName is not None:
-      oprot.writeFieldBegin('propertyName', TType.STRING, 2)
-      oprot.writeString(self.propertyName)
-      oprot.writeFieldEnd()
-    if self.defaultValue is not None:
-      oprot.writeFieldBegin('defaultValue', TType.STRING, 3)
-      oprot.writeString(self.defaultValue)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    if self.protocol_version is None:
-      raise TProtocol.TProtocolException(message='Required field protocol_version is unset!')
-    if self.propertyName is None:
-      raise TProtocol.TProtocolException(message='Required field propertyName is unset!')
-    return
-
-
-  def __hash__(self):
-    value = 17
-    value = (value * 31) ^ hash(self.protocol_version)
-    value = (value * 31) ^ hash(self.propertyName)
-    value = (value * 31) ^ hash(self.defaultValue)
-    return value
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class TSentryConfigValueResponse(object):
-  """
-  Attributes:
-   - status
-   - value
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.STRUCT, 'status', (sentry_common_service.ttypes.TSentryResponseStatus, sentry_common_service.ttypes.TSentryResponseStatus.thrift_spec), None, ), # 1
-    (2, TType.STRING, 'value', None, None, ), # 2
-  )
-
-  def __init__(self, status=None, value=None,):
-    self.status = status
-    self.value = value
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.STRUCT:
-          self.status = sentry_common_service.ttypes.TSentryResponseStatus()
-          self.status.read(iprot)
-        else:
-          iprot.skip(ftype)
-      elif fid == 2:
-        if ftype == TType.STRING:
-          self.value = iprot.readString()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('TSentryConfigValueResponse')
-    if self.status is not None:
-      oprot.writeFieldBegin('status', TType.STRUCT, 1)
-      self.status.write(oprot)
-      oprot.writeFieldEnd()
-    if self.value is not None:
-      oprot.writeFieldBegin('value', TType.STRING, 2)
-      oprot.writeString(self.value)
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def validate(self):
-    if self.status is None:
-      raise TProtocol.TProtocolException(message='Required field status is unset!')
-    return
-
-
-  def __hash__(self):
-    value = 17
-    value = (value * 31) ^ hash(self.status)
-    value = (value * 31) ^ hash(self.value)
     return value
 
   def __repr__(self):
