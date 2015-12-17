@@ -220,7 +220,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/html" id="assist-db-panel">
+  <script type="text/html" id="assist-db-inner-panel">
     <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
     <ul class="nav nav-list" data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
       <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
@@ -233,7 +233,7 @@ from desktop.views import _ko
     </ul>
   </script>
 
-  <script type="text/html" id="assist-hdfs-panel">
+  <script type="text/html" id="assist-hdfs-inner-panel">
     <!-- ko with: selectedHdfsEntry -->
     <div class="assist-breadcrumb">
       <!-- ko if: parent !== null -->
@@ -277,37 +277,6 @@ from desktop.views import _ko
       </li>
     </ul>
     <!-- /ko -->
-  </script>
-
-  <script type="text/html" id="assist-two-panel-layout">
-    <div style="position:relative; height: 100%;">
-      <div style="overflow: auto;">
-        <!-- ko template: 'assist-db-panel' --><!-- /ko -->
-      </div>
-      <div class="assist-resizer" data-bind="assistVerticalResizer: { assistHelper: assistHelper } ">
-        <i class="fa fa-ellipsis-h"></i>
-      </div>
-      <div style="overflow: auto;">
-        <!-- ko template: 'assist-hdfs-panel' --><!-- /ko -->
-      </div>
-    </div>
-  </script>
-
-
-  <script type="text/html" id="assist-panel-template">
-    <div style="position:relative; height: 100%;">
-      <!-- ko template: { if: showingDb() && showingHdfs(), name: 'assist-two-panel-layout' } --><!-- /ko -->
-      <!-- ko template: { if: showingDb() && ! showingHdfs(), name: 'assist-db-panel' } --><!-- /ko -->
-      <!-- ko template: { if: ! showingDb() && showingHdfs(), name: 'assist-hdfs-panel' } --><!-- /ko -->
-    </div>
-    <div data-bind="visible: ! onlySql" style="display: none; position: absolute; bottom: 2px; left: 2px;width: 100%; border-top: 1px solid #F1F1F1; padding-top:3px; background-color: #FFF;">
-      <div class="inactive-action assist-type-switch" data-bind="click: function () { showingDb(!showingDb()) }, css: { 'blue': showingDb }, attr: { 'title': showingDb() ? '${ _('Hide Databases') }' : '${ _('Show Databases') }' }">
-        <i class="fa fa-database"></i>
-      </div>
-      <div class="inactive-action assist-type-switch" data-bind="click: function () { showingHdfs(!showingHdfs()) }, css: { 'blue': showingHdfs }, attr: { 'title': showingHdfs() ? '${ _('Hide HDFS') }' : '${ _('Show HDFS') }' }">
-        <i class="fa fa-file-o"></i>
-      </div>
-    </div>
   </script>
 
   <script type="text/html" id="assist-sources-template">
@@ -433,6 +402,30 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-panel-template">
+    <div style="position:relative; height: 100%; margin-right:15px;" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
+      <!-- ko foreach: visiblePanels -->
+      <!-- ko if: $index() > 0 -->
+      <div class="assist-resizer assist-fixed-height" style="display:none;">
+        <i class="fa fa-ellipsis-h"></i>
+      </div>
+      <!-- /ko -->
+      <div class="assist-inner-panel" style="overflow: auto; display:none;">
+        <!-- ko template: { name: templateName, data: $parent } --><!-- /ko -->
+      </div>
+      <!-- /ko -->
+      <!-- ko if: availablePanels.length > 1 -->
+      <div class="assist-panel-switches assist-fixed-height" style="position:absolute; bottom: 0; width: 100%; margin: 5px 0; height: 24px; display:none;">
+        <!-- ko foreach: availablePanels -->
+        <div class="inactive-action assist-type-switch" data-bind="click: function () { visible(!visible()) }, css: { 'blue': visible }, attr: { 'title': visible() ? '${ _('Hide') } ' + name : '${ _('Show') } ' + name }">
+          <i class="fa" data-bind="css: icon"></i>
+        </div>
+        <!-- /ko -->
+      </div>
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
@@ -441,6 +434,26 @@ from desktop.views import _ko
         factory(ko, AssistDbSource, AssistHdfsEntry, AssistHelper);
       }
     }(function (ko, AssistDbSource, AssistHdfsEntry, AssistHelper) {
+
+      /**
+       * @param {Object} options
+       * @param {AssistHelper} options.assistHelper
+       * @param {string} options.type
+       * @param {number} options.minHeight
+       * @param {string} options.icon
+       * @constructor
+       */
+      function AssistInnerPanel(options) {
+        var self = this;
+        self.minHeight = options.minHeight;
+        self.icon = options.icon;
+        self.type = options.type;
+        self.name = options.name;
+
+        self.visible = ko.observable();
+        options.assistHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false);
+        self.templateName = 'assist-' + self.type + '-inner-panel'
+      }
 
       /**
        * @param {Object} params
@@ -465,16 +478,26 @@ from desktop.views import _ko
         self.assistHelper = new AssistHelper(i18n, params.user);
 
         self.onlySql = params.onlySql;
-        self.showingDb = ko.observable();
-        self.showingHdfs = ko.observable();
         self.loading = ko.observable(false);
 
-        self.assistHelper.withTotalStorage('assist', 'showingDb', self.showingDb, true);
-        if (self.onlySql) {
-          self.showingHdfs(false);
-        } else {
-          self.assistHelper.withTotalStorage('assist', 'showingHdfs', self.showingHdfs, true);
+        self.availablePanels = [
+          new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("Databases") }', type: 'db', icon: 'fa-database', minHeight: 40})
+        ];
+
+        if (!self.onlySql) {
+          self.availablePanels.push(new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("HDFS") }', type: 'hdfs', icon: 'fa-file-o', minHeight: 40}));
         }
+
+        if (self.availablePanels.length == 1) {
+          self.availablePanels[0].visible(true);
+        }
+
+        self.visiblePanels = ko.computed(function () {
+          var result = $.grep(self.availablePanels, function (panel) {
+            return panel.visible();
+          });
+          return result;
+        });
 
         self.sources = ko.observableArray();
         var sourceIndex = {};
