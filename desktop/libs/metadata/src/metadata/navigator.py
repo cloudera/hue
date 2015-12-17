@@ -77,14 +77,16 @@ class NavigatorApi(object):
 
       response = self._root.get('entities', headers=self.__headers, params=params)
 
-      if len(response) == 0:
+      if not response:
         raise NavigatorApiException('Could not find entity with query filters: %s' % str(query_filters))
       elif len(response) > 1:
         raise NavigatorApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
 
       return response[0]
     except RestException, e:
-      raise NavigatorApiException('Failed to find entity: %s' % str(e))
+      msg = 'Failed to find entity: %s' % str(e)
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
 
 
   def get_entity(self, entity_id):
@@ -95,7 +97,9 @@ class NavigatorApi(object):
     try:
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
     except RestException, e:
-      raise NavigatorApiException('Failed to get entity %s: %s' % (entity_id, str(e)))
+      msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
 
 
   def update_entity(self, entity_id, **metadata):
@@ -106,10 +110,11 @@ class NavigatorApi(object):
     try:
       # TODO: Check permissions of entity
       data = json.dumps(metadata)
-      response = self._root.put('entities/%s' % entity_id, params=self.__params, data=data)
-      return response
+      return self._root.put('entities/%s' % entity_id, params=self.__params, data=data)
     except RestException, e:
-      raise NavigatorApiException('Failed to update entity %s: %s' % (entity_id, str(e)))
+      msg = 'Failed to update entity %s: %s' % (entity_id, str(e))
+      LOG.exception(msg)
+      raise NavigatorApiException(msg)
 
 
   def get_database(self, name):
