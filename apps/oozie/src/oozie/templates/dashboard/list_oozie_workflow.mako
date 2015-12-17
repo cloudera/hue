@@ -762,4 +762,4 @@ ${ utils.slaGlobal() }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

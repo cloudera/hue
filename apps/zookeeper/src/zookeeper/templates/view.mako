@@ -159,4 +159,4 @@ ${ shared.header(_breadcrumbs, clusters, False) }
 
 ${ shared.footer() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

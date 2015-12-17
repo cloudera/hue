@@ -441,4 +441,4 @@ ${ commonheader(_("Solr Indexes"), "search", user, "60px") | n,unicode }
 </script>
 
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

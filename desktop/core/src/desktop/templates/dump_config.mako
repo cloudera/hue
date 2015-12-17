@@ -159,4 +159,4 @@ ${ layout.menubar(section='dump_config') }
 
     </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

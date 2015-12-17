@@ -402,7 +402,7 @@ def commonimportexport(request):
 def login_modal(request):
   return desktop.auth.views.dt_login(request, True)
 
-def commonfooter(messages=None):
+def commonfooter(request, messages=None):
   """
   Returns the rendered common footer
   """
@@ -412,6 +412,7 @@ def commonfooter(messages=None):
   hue_settings = Settings.get_settings()
 
   return django_mako.render_to_string("common_footer.mako", {
+    'request': request,
     'messages': messages,
     'version': settings.HUE_DESKTOP_VERSION,
     'collect_usage': collect_usage(),

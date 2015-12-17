@@ -38,4 +38,4 @@ ${ commonheader(_('404 - Page not found'), "", user) | n,unicode }
   </div>
 </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

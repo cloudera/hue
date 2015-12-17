@@ -540,4 +540,4 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
 ${ utils.bulk_dashboard_functions() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

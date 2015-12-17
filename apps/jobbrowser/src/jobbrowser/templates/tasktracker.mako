@@ -74,4 +74,4 @@ ${ comps.menubar()}
     </div>
 </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

@@ -16,8 +16,10 @@
 <%!
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
+from desktop.views import login_modal
 %>
 
+${ login_modal(request).content | n,unicode }
 
 <script type="text/javascript">
   $(document).ready(function () {
@@ -42,6 +44,22 @@ from django.template.defaultfilters import escape, escapejs
         %endif
       %endfor
     %endif
+
+    // global catch for ajax calls after the user has logged out
+    var isLoginRequired = false;
+    $(document).ajaxSuccess(function (event, xhr, settings, data) {
+      if (data === '/* login required */' && !isLoginRequired) {
+        isLoginRequired = true;
+        $('#login-modal').modal('show');
+        window.setTimeout(function () {
+          $('.jHueNotify').remove();
+        }, 200);
+      }
+    });
+
+    $('#login-modal').on('hidden', function () {
+      isLoginRequired = false;
+    });
 
 
     $("div.navigator ul.dropdown-menu").css("maxHeight", $(window).height() - 50);

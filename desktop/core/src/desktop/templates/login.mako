@@ -152,4 +152,4 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True) | n,unicode }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

@@ -1073,4 +1073,4 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 ${ utils.decorate_datetime_fields() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

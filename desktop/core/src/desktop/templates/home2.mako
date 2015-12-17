@@ -226,4 +226,4 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 ## Add a Tour?
 ##
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

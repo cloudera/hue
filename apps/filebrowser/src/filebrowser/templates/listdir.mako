@@ -167,4 +167,4 @@ ${ fb_components.menubar() }
 </div>
 
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

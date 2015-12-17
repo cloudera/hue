@@ -1146,4 +1146,4 @@ ${ utils.path_chooser_libs(True) }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }
