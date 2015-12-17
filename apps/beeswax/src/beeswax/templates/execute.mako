@@ -41,10 +41,10 @@ ${ layout.menubar(section='query') }
       <li><a href="#sessionTab" data-toggle="tab" class="sidetab">${_('Session')}</a></li>
       % endif
     </ul>
-    <div class="tab-content">
+    <div class="tab-content" style=" overflow: hidden;">
       <div class="tab-pane active" id="navigatorTab">
-        <div class="card card-small card-tab">
-          <div class="card-body" style="margin-top: 0; height: 100%; ">
+        <div class="card card-small card-tab" style="margin-bottom: 0;">
+          <div class="card-body" style="margin-top: 0; height: 100%;">
             <div class="assist" data-bind="component: {
               name: 'assist-panel',
               params: {
@@ -1314,8 +1314,8 @@ $(document).ready(function () {
   });
 
   resizeNavigator = function () {
-    $(".resizer").css("height", ($(window).height() - 150) + "px");
-    $("#navigator .card").css("height", ($(window).height() - 150) + "px");
+    $(".resizer").css("height", $(window).height() + "px");
+    $("#navigator .card").css("height", $(window).height() + "px");
     $(".table-container").css("max-height", ($(window).height() - 180) + "px").css("overflow-y", "auto");
   };
 
