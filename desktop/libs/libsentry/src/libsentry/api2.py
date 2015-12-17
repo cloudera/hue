@@ -144,8 +144,8 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
-    response = self.client.list_sentry_privileges_by_role(roleName, authorizableHierarchy)
+  def list_sentry_privileges_by_role(self, serviceName, roleName, authorizables=None):
+    response = self.client.list_sentry_privileges_by_role(serviceName, roleName, authorizables)
 
     if response.status.value == 0:
       return [self._massage_priviledge(privilege) for privilege in response.privileges]

@@ -821,6 +821,7 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.component = ko.observable(initial.component);
+  self.server = ko.observable(initial.sentry_provider);
   self.roles = ko.observableArray();
   self.tempRoles = ko.observableArray();
   self.originalRoles = ko.observableArray();
@@ -928,7 +929,7 @@ var HiveViewModel = function (initial) {
 
   self.expandSelectedRoles = function () {
     ko.utils.arrayForEach(self.selectedRoles(), function (role) {
-      if (!role.showPrivileges()) {
+      if (! role.showPrivileges()) {
         self.list_sentry_privileges_by_role(role);
       }
     });
@@ -1020,9 +1021,10 @@ var HiveViewModel = function (initial) {
     $.ajax({
       type: "POST",
       url: "/security/api/sentry/list_sentry_privileges_by_role",
-      data: {
-        'roleName': role.name,
-        'component': self.component()
+      data: {        
+        'server': self.server(),
+        'component': self.component(),
+        'roleName': role.name
       },
       success: function (data) {
         if (typeof data.status !== "undefined" && data.status == -1) {

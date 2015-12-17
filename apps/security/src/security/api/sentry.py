@@ -81,11 +81,14 @@ def list_sentry_roles_by_group(request):
 
 def list_sentry_privileges_by_role(request):
   result = {'status': -1, 'message': 'Error'}
-  component = request.POST['component']
 
-  try:
+  try:    
+    serviceName = request.POST['server']
+    component = request.POST['component']
     roleName = request.POST['roleName']
-    sentry_privileges = get_api(request.user, component).list_sentry_privileges_by_role(roleName)
+
+    sentry_privileges = get_api(request.user, component).list_sentry_privileges_by_role(serviceName, roleName)
+
     result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']))
     result['message'] = ''
     result['status'] = 0
