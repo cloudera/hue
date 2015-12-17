@@ -14,3 +14,14 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+from django.utils.translation import ugettext_lazy as _
+
+from desktop.lib.conf import Config, coerce_bool
+
+
+LATEST = Config(
+  key="latest",
+  help=_("Use Sentry generic API V2 for Hive and Solr."),
+  default=False,
+  type=coerce_bool)

@@ -16,7 +16,7 @@
 
 <%!
 from django.utils.translation import ugettext as _
-
+from security.conf import LATEST
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -64,8 +64,10 @@ def is_selected(section, matcher):
                 </a>
               </li>
               <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive') }">${_('Sentry Tables')}</a></li>
+              % if LATEST.get():
               <li class="${is_selected(section, 'hive2')}"><a href="${ url('security:hive2') }">${_('Sentry Tables v2')}</a></li>
               <li class="${is_selected(section, 'solr')}"><a href="${ url('security:hive') }">${_('Solr Collections')}</a></li>
+              % endif
               <li class="${is_selected(section, 'hdfs')}"><a href="${ url('security:hdfs') }">${_('File ACLs')}</a></li>
             </ul>
           </div>
