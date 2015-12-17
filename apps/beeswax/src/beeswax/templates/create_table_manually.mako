@@ -54,7 +54,7 @@ ${ assist.assistPanel() }
 </a>
 
 <div class="main-content">
-  <div class="vertical-full container-fluid">
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
 

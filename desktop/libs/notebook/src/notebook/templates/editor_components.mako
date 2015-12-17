@@ -301,7 +301,7 @@ ${ require.config() }
 
 
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode}">
-  <div class="vertical-full container-fluid">
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }" >
     <div class="vertical-full" data-bind="foreach: notebooks">
       <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: $parent.selectedNotebook() === $data }, template: { name: 'notebook'}">
       </div>
