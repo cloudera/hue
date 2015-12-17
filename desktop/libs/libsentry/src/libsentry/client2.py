@@ -142,7 +142,7 @@ class SentryClient(object):
   def list_sentry_privileges_by_role(self, roleName, authorizableHierarchy=None):
     if authorizableHierarchy is not None:
       authorizableHierarchy = TAuthorizable(**authorizableHierarchy)
-    request = TListSentryPrivilegesRequest(requestorUserName=self.username, component=self.component, roleName=roleName, authorizableHierarchy=authorizableHierarchy)
+    request = TListSentryPrivilegesRequest(requestorUserName=self.username, component=self.component, roleName=roleName, serviceName=authorizableHierarchy['server'], authorizables=authorizableHierarchy['authorizables'])
     return self.client.list_sentry_privileges_by_role(request)
 
 
