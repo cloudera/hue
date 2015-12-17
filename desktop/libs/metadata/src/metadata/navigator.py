@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 
 from desktop.lib.rest.http_client import HttpClient, RestException
@@ -49,26 +50,100 @@ class NavigatorApi(object):
     self.__params = ()
 
 
-  def find_entity(self, type, name):
+  def find_entity(self, source_type, type, name, **filters):
     """
-    GET /api/v2/interactive/entities?query=((originalName:<name>)AND(type:<type>))
-    http://cloudera.github.io/navigator/apidocs/v2/path__v2_interactive_entities.html
+    GET /api/v2/entities?query=((sourceType:<source_type>)AND(type:<type>)AND(originalName:<name>))
+    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities.html
     """
     try:
       params = self.__params
-      filter_query = '((originalName:%(name)s)AND(type:%(type)s))' % {'name': name, 'type': type}
+
+      query_filters = {
+        'sourceType': source_type,
+        'type': type,
+        'originalName': name,
+        'deleted': 'false'
+      }
+      for key, value in filters.items():
+        query_filters[key] = value
+
+      filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
+
       params += (
         ('query', filter_query),
         ('offset', 0),
+        ('limit', 2),  # We are looking for single entity, so limit to 2 to check for multiple results
       )
 
-      response = self._root.get('interactive/entities', headers=self.__headers, params=params)
-      if response['totalMatched'] == 0:
-        raise NavigatorApiException('Could not find entity with type %s and name %s') % (type, name)
-      elif response['totalMatched'] > 1:
-        raise NavigatorApiException('Found more than 1 entity with type %s and name %s') % (type, name)
-      else:
-        return response['results'][0]
+      response = self._root.get('entities', headers=self.__headers, params=params)
 
+      if len(response) == 0:
+        raise NavigatorApiException('Could not find entity with query filters: %s' % str(query_filters))
+      elif len(response) > 1:
+        raise NavigatorApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
+
+      return response[0]
     except RestException, e:
-      raise NavigatorApiException('Failed to find entity with type %s and name %s: %s' % (type, name, str(e)))
+      raise NavigatorApiException('Failed to find entity: %s' % str(e))
+
+
+  def get_entity(self, entity_id):
+    """
+    GET /api/v2/entities/:id
+    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities_-id-.html
+    """
+    try:
+      return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
+    except RestException, e:
+      raise NavigatorApiException('Failed to get entity %s: %s' % (entity_id, str(e)))
+
+
+  def update_entity(self, entity_id, **metadata):
+    """
+    PUT /api/v2/entities/:id
+    http://cloudera.github.io/navigator/apidocs/v2/path__v2_entities_-id-.html
+    """
+    try:
+      # TODO: Check permissions of entity
+      data = json.dumps(metadata)
+      response = self._root.put('entities/%s' % entity_id, params=self.__params, data=data)
+      return response
+    except RestException, e:
+      raise NavigatorApiException('Failed to update entity %s: %s' % (entity_id, str(e)))
+
+
+  def get_database(self, name):
+    return self.find_entity(source_type='HIVE', type='DATABASE', name=name)
+
+
+  def get_table(self, database_name, table_name):
+    parent_path = '\/%s' % database_name
+    return self.find_entity(source_type='HIVE', type='TABLE', name=table_name, parentPath=parent_path)
+
+
+  def get_directory(self, path):
+    dir_name, dir_path = self._clean_path(path)
+    return self.find_entity(source_type='HDFS', type='DIRECTORY', name=dir_name, fileSystemPath=dir_path)
+
+
+  def get_file(self, path):
+    file_name, file_path = self._clean_path(path)
+    return self.find_entity(source_type='HDFS', type='FILE', name=file_name, fileSystemPath=file_path)
+
+
+  def add_tags(self, entity_id, tags):
+    entity = self.get_entity(entity_id)
+    new_tags = entity['tags'] or []
+    new_tags.extend(tags)
+    return self.update_entity(entity_id, tags=new_tags)
+
+
+  # TODO: remove_tags?
+
+
+  def _clean_path(self, path):
+    return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
+
+
+  def _escape_slashes(self, s):
+    return s.replace('/', '\/')
