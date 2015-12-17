@@ -292,4 +292,4 @@ ${ commonimportexport(request) | n,unicode }
   });
 </script>
 
-${commonfooter(messages) | n,unicode}
+${commonfooter(request, messages) | n,unicode}
