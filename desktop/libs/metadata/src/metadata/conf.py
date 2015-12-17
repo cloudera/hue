@@ -18,8 +18,8 @@
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-  AUTH_PASSWORD_SCRIPT, coerce_password_from_script
-from desktop.lib.conf import Config, ConfigSection, coerce_string
+                         AUTH_PASSWORD_SCRIPT, coerce_password_from_script
+from desktop.lib.conf import Config, ConfigSection
 
 
 def get_auth_username():
@@ -41,9 +41,8 @@ NAVIGATOR = ConfigSection(
   members=dict(
     API_URL=Config(
       key='api_url',
-      help=_t('Base URL to Navigator API'),
-      default='http://localhost:7187/api/v2',
-      type=coerce_string),
+      help=_t('Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)'),
+      default=None),
     AUTH_USERNAME=Config(
       key="auth_username",
       help=_t("Auth username of the hue user used for authentications."),
