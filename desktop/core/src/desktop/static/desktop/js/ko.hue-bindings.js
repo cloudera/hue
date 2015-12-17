@@ -909,7 +909,6 @@
         allExtrasHeight += $(extra).outerHeight(true);
       });
 
-      var panelRatios = {};
       if (panelDefinitions().length === 0) {
         $allExtras.show();
       }
@@ -920,11 +919,25 @@
         return;
       }
 
+      var panelRatios = assistHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
 
-      $allPanels.each(function (idx, panel) {
-        panelRatios[idx] = 1 / ($allPanels.length);
-        $(panel).data('minHeight', panels()[idx].minHeight);
+      var totalRatios = 0;
+      $.each($allPanels, function(idx, panel) {
+        var panelDef = panelDefinitions()[idx];
+        if (!panelRatios[panelDef.type]) {
+          panelRatios[panelDef.type] = 1 / panelDefinitions().length;
+        }
+        totalRatios += panelRatios[panelDef.type];
+        $(panel).data('minHeight', panelDef.minHeight);
       });
+
+      // Normalize the ratios in case new panels were added or removed.
+      if (totalRatios !== 1) {
+        var diff = 1 / totalRatios;
+        $.each(panelDefinitions(), function (idx, panel) {
+          totalRatios[panel.type] = totalRatios[panel.type] * diff;
+        });
+      }
 
       var totalHeight = -1;
       var containerTop = $container.offset().top;
@@ -941,7 +954,7 @@
         var leftoverSpace = 0;
         $allPanels.each(function (idx, panel) {
           var $panel = $(panel);
-          var desiredHeight = availableForPanels * panelRatios[idx];
+          var desiredHeight = availableForPanels * panelRatios[panelDefinitions()[idx].type];
           var newHeight = Math.max($panel.data('minHeight'), desiredHeight);
           $panel.height(newHeight);
           leftoverSpace += newHeight - desiredHeight;
@@ -970,17 +983,17 @@
       $allPanels.show();
 
       var fitPanelHeights = function ($panelsToResize, desiredTotalHeight) {
-        var currentHeightForPanels = 0;
+        var currentHeightOfPanels = 0;
 
         var noMoreSpace = true;
         $panelsToResize.each(function (idx, panel) {
           var $panel = $(panel);
           var panelHeight = $panel.outerHeight(true);
           noMoreSpace = noMoreSpace && panelHeight <= $panel.data('minHeight');
-          currentHeightForPanels += panelHeight;
+          currentHeightOfPanels += panelHeight;
         });
 
-        var distanceToGo = desiredTotalHeight - currentHeightForPanels;
+        var distanceToGo = desiredTotalHeight - currentHeightOfPanels;
         if (noMoreSpace && distanceToGo < 0) {
           return;
         }
@@ -1045,10 +1058,10 @@
             $allPanels.each(function (idx, panel) {
               totalHeightForPanels += $(panel).outerHeight(true);
             });
-            panelRatios = {};
             $allPanels.each(function (idx, panel) {
-              panelRatios[idx] = $(panel).outerHeight(true) / totalHeightForPanels;
+              panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
+            assistHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios)
           }
         });
       });
