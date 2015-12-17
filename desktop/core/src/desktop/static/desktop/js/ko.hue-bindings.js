@@ -873,45 +873,184 @@
 
   ko.bindingHandlers.assistVerticalResizer = {
     init: function (element, valueAccessor) {
+      var $container = $(element);
       var options = ko.unwrap(valueAccessor());
+      var panelDefinitions = options.panels;
 
-      var assistHelper = options.assistHelper;
-
-      var $resizer = $(element);
-      var $above = $resizer.prev();
-      var $below = $resizer.next();
-
-      $resizer.parent().height();
-
-      var aboveRatio = assistHelper.getFromTotalStorage('assist', 'twoPanelAboveRatio', 0.5);
-
-      var aboveInitialHeight = ($resizer.parent().height() - $resizer.height()) * aboveRatio;
-      var belowInitialHeight = aboveInitialHeight;
-
-      $above.css("height", aboveInitialHeight + 'px');
-      $below.css("height", belowInitialHeight + 'px');
-
-      $resizer.draggable({
-        axis: "y",
-        drag: function (event, ui) {
-          var currentHeight = ui.offset.top - 81;
-          aboveRatio = currentHeight / ($resizer.parent().height() - $resizer.height());
-          $above.css("height", currentHeight + 'px');
-          $below.css("height", ($resizer.parent().height() - currentHeight - $resizer.height() - 30));
-          ui.offset.top = 0;
-          ui.position.top = 0;
-        },
-        stop: function (event, ui) {
-          ui.offset.top = 0;
-          ui.position.top = 0;
-          assistHelper.setInTotalStorage('assist', 'twoPanelAboveRatio', aboveRatio);
+      var timeout = -1;
+      var checkForElements = function () {
+        var $allPanels = $container.children('.assist-inner-panel');
+        if (panelDefinitions().length == $allPanels.length) {
+          ko.bindingHandlers.assistVerticalResizer.updateWhenRendered(element, valueAccessor);
+        } else {
+          timeout = window.setTimeout(checkForElements, 10);
         }
+      };
+
+      checkForElements();
+      panelDefinitions.subscribe(function () {
+        timeout = window.setTimeout(checkForElements, 10);
+      })
+    },
+
+    updateWhenRendered: function (element, valueAccessor) {
+      var self = this;
+      var options = ko.unwrap(valueAccessor());
+      var assistHelper = options.assistHelper;
+      var panelDefinitions = options.panels;
+
+      var $container = $(element);
+      var $allPanels = $container.children('.assist-inner-panel');
+      var $allResizers = $container.children(".assist-resizer");
+      var $allExtras = $container.children('.assist-fixed-height');
+
+      var allExtrasHeight = 0;
+      $allExtras.each(function (idx, extra) {
+        allExtrasHeight += $(extra).outerHeight(true);
       });
 
-      $(window).resize(function () {
-        var aboveHeight = ($resizer.parent().height() - $resizer.height()) * aboveRatio;
-        $above.css("height", aboveHeight + 'px');
-        $below.css("height", ($resizer.parent().height() - aboveHeight - $resizer.height() - 30));
+      var panelRatios = {};
+      if (panelDefinitions().length === 0) {
+        $allExtras.show();
+      }
+      if (panelDefinitions().length === 1) {
+        $allPanels.height($container.innerHeight() - allExtrasHeight);
+        $allExtras.show();
+        $allPanels.show();
+        return;
+      }
+
+
+      $allPanels.each(function (idx, panel) {
+        panelRatios[idx] = 1 / ($allPanels.length);
+        $(panel).data('minHeight', panels()[idx].minHeight);
+      });
+
+      var totalHeight = -1;
+      var containerTop = $container.offset().top;
+
+      // Resizes all containers according to the set ratios
+      var resizeByRatio = function () {
+        if (totalHeight == $container.innerHeight()) {
+          return;
+        }
+        totalHeight = $container.innerHeight();
+        containerTop = $container.offset().top;
+
+        var availableForPanels = totalHeight - allExtrasHeight;
+        var leftoverSpace = 0;
+        $allPanels.each(function (idx, panel) {
+          var $panel = $(panel);
+          var desiredHeight = availableForPanels * panelRatios[idx];
+          var newHeight = Math.max($panel.data('minHeight'), desiredHeight);
+          $panel.height(newHeight);
+          leftoverSpace += newHeight - desiredHeight;
+        });
+        // The minheight is greater than the ratio so we shrink where possible
+        if (leftoverSpace > 0) {
+          $allPanels.each(function (idx, panel) {
+            if (leftoverSpace === 0) {
+              return false;
+            }
+            var $panel = $(panel);
+            var currentHeight = $panel.height();
+            var possibleContribution = Math.min(currentHeight - $panel.data('minHeight'), leftoverSpace);
+            if (possibleContribution > 0) {
+              $panel.height(currentHeight - possibleContribution);
+              leftoverSpace -= possibleContribution;
+            }
+          });
+        }
+      };
+
+      resizeByRatio();
+      $(window).resize(resizeByRatio);
+
+      $allExtras.show();
+      $allPanels.show();
+
+      var fitPanelHeights = function ($panelsToResize, desiredTotalHeight) {
+        var currentHeightForPanels = 0;
+
+        var noMoreSpace = true;
+        $panelsToResize.each(function (idx, panel) {
+          var $panel = $(panel);
+          var panelHeight = $panel.outerHeight(true);
+          noMoreSpace = noMoreSpace && panelHeight <= $panel.data('minHeight');
+          currentHeightForPanels += panelHeight;
+        });
+
+        var distanceToGo = desiredTotalHeight - currentHeightForPanels;
+        if (noMoreSpace && distanceToGo < 0) {
+          return;
+        }
+
+        // Add all to the first panel if expanding (distanceToGo is positive
+        if (distanceToGo >= 0) {
+          $panelsToResize.first().height($panelsToResize.first().height() + distanceToGo + 'px');
+          return;
+        }
+
+        // Remove as much as possible on each panel if shrinking (distanceToGo is negative)
+        $panelsToResize.each(function (idx, panel) {
+          var $panel = $(panel);
+          var initialHeight = $panel.height();
+          var newHeight = Math.max($panel.data('minHeight'), initialHeight + distanceToGo);
+          if (initialHeight == newHeight) {
+            return true;
+          }
+          $panel.height(newHeight);
+          distanceToGo += initialHeight - newHeight;
+          if (distanceToGo >= 0) {
+            return false;
+          }
+        });
+      };
+
+      $allResizers.each(function (idx, resizer) {
+        var $resizer = $(resizer);
+        var extrasBeforeHeight = 0;
+        $resizer.prevAll('.assist-fixed-height').each(function (idx, extra) {
+          extrasBeforeHeight += $(extra).outerHeight(true);
+        });
+        var $panelsBefore = $resizer.prevAll('.assist-inner-panel');
+        var limitBefore = extrasBeforeHeight;
+        $panelsBefore.each(function (idx, panel) {
+          limitBefore += $(panel).data('minHeight');
+        });
+
+        var extrasAfterHeight = allExtrasHeight - extrasBeforeHeight;
+        var $panelsAfter = $resizer.nextAll('.assist-inner-panel');
+        var limitAfter = totalHeight - extrasAfterHeight;
+        $panelsAfter.each(function (idx, panel) {
+          limitAfter -= $(panel).data('minHeight');
+        });
+
+        $resizer.draggable({
+          axis: "y",
+          drag: function (event, ui) {
+            var position = ui.offset.top - containerTop;
+            if (position > limitBefore && position < limitAfter) {
+              fitPanelHeights($panelsBefore, position - extrasBeforeHeight);
+              fitPanelHeights($panelsAfter, totalHeight - extrasAfterHeight - position);
+            }
+
+            ui.offset.top = 0;
+            ui.position.top = 0;
+          },
+          stop: function (event, ui) {
+            ui.offset.top = 0;
+            ui.position.top = 0;
+            var totalHeightForPanels = 0;
+            $allPanels.each(function (idx, panel) {
+              totalHeightForPanels += $(panel).outerHeight(true);
+            });
+            panelRatios = {};
+            $allPanels.each(function (idx, panel) {
+              panelRatios[idx] = $(panel).outerHeight(true) / totalHeightForPanels;
+            });
+          }
+        });
       });
     }
   };
