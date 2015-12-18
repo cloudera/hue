@@ -455,6 +455,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-panel-template">
     <div style="position:relative; height: 100%;" data-bind="assistVerticalResizer: { panels: visiblePanels, assistHelper: assistHelper }">
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
+      <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
       <!-- ko foreach: visiblePanels -->
       <!-- ko template: { if: $parent.availablePanels.length > 1, name: 'assist-panel-inner-header' }--><!-- /ko -->
       <div class="assist-inner-panel" style="overflow: auto; display:none;">
