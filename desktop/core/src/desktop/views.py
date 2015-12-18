@@ -47,7 +47,7 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
-from desktop.models import UserPreferences, Settings, Document2
+from desktop.models import UserPreferences, Settings
 from desktop import appmanager
 
 

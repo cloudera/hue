@@ -20,7 +20,9 @@ from django.template.defaultfilters import escape, escapejs
 from desktop.views import login_modal
 %>
 
+% if request is not None:
 ${ login_modal(request).content | n,unicode }
+% endif
 
 <script type="text/javascript">
   $(document).ready(function () {
