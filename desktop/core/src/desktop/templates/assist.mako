@@ -62,6 +62,16 @@ from desktop.views import _ko
       margin-top: 0
     }
 
+    .assist-header-actions {
+      float: right;
+      margin-right: 3px;
+      opacity: 0;
+    }
+
+    .assist-header-actions > div {
+      cursor: pointer;
+    }
+
     .assist-panel-switches {
       padding-left: 12px;
       height: 29px;
@@ -434,8 +444,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-panel-inner-header">
-    <div class="assist-header  assist-fixed-height" data-bind="css: { 'assist-resizer': $index() > 0 }" style="display:none;">
+    <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
       <span data-bind="text: name"></span>
+      <div class="assist-header-actions">
+        <div class="inactive-action" data-bind="click: function () { visible(false) }"><i class="fa fa-times"></i></div>
+      </div>
     </div>
   </script>
 
