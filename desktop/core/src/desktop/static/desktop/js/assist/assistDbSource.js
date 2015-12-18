@@ -165,10 +165,8 @@
     self.modalItem = ko.observable();
 
     self.repositionActions = function(data, event) {
-      if (data.definition.isDatabase) {
-        var $container = $(event.target);
-        $container.find(".assist-actions").css('right', -$container.scrollLeft() + 'px');
-      }
+      var $container = $(event.target);
+      $container.find(".assist-actions, .assist-db-header-actions").css('right', -$container.scrollLeft() + 'px');
     };
 
     self.reload = function() {
