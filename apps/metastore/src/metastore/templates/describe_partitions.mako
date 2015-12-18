@@ -180,11 +180,11 @@ ${ assist.assistPanel() }
     "tableStats",
     "knockout-mapping",
     "knockout-sortable",
-    "knockout-deferred-updates",
     "ko.editable",
     "ko.hue-bindings"
   ], function (ko, charts, AssistHelper) {
 
+    ko.options.deferUpdates = true;
 
     function PartitionViewModel(options, partition_keys_json, partition_values_json) {
       var self = this;
