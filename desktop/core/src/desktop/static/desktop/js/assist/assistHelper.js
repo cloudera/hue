@@ -26,6 +26,7 @@
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
+  var DOCUMENTS_API = "/desktop/api2/docs/";
 
 
   /**
@@ -138,6 +139,21 @@
     };
 
     self.fetchCached('hdfs', url, fetchFunction, successCallback, editor);
+  };
+
+  /**
+   * @param {function} successCallback
+   * @param {function} errorCallback
+   */
+  AssistHelper.prototype.fetchDocuments = function (successCallback, errorCallback) {
+    $.ajax({
+      url: DOCUMENTS_API,
+      success: function (data) {
+        successCallback(data);
+      }
+    }).fail(function () {
+      errorCallback();
+    });
   };
 
   /**
