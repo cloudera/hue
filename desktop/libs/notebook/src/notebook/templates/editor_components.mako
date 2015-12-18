@@ -1036,6 +1036,7 @@ ${ require.config() }
                       remove: function () { $parent.properties.remove($data) }
                     }
                   } --><!-- /ko -->
+                <!-- /ko -->
               </div>
               <!-- /ko -->
               <div style="clear:both; padding-left: 120px;">
