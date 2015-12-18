@@ -43,7 +43,7 @@ from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_warn, last_access_map
-from desktop.conf import AUTH, LDAP, OAUTH, DEMO_ENABLED
+from desktop.conf import LDAP, OAUTH, DEMO_ENABLED
 
 
 LOG = logging.getLogger(__name__)
