@@ -2027,9 +2027,7 @@ ${ require.config() }
 
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function (e) {
-        if (!isLoginRequired){
-          viewModel.selectedNotebook().close();
-        }
+        viewModel.selectedNotebook().close();
       };
 
       $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
