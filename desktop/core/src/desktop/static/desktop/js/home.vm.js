@@ -142,8 +142,10 @@ function HomeViewModel(json_tags, json_docs) {
             }
           });
           if (_removeDocFromTag) {
-            tag.docs().splice(tag.docs().indexOf(doc.id), 1);
-            tag.docs.valueHasMutated();
+            if(tag.docs().indexOf(doc.id)!=-1) {
+              tag.docs().splice(tag.docs().indexOf(doc.id), 1);
+              tag.docs.valueHasMutated();
+            }
           }
         });
       }
