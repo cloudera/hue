@@ -493,7 +493,7 @@ from desktop.views import _ko
           'knockout',
           'desktop/js/assist/assistDbSource',
           'desktop/js/assist/assistHdfsEntry',
-          'desktop/js/assist/AssistDocuments',
+          'desktop/js/assist/assistDocuments',
           'desktop/js/assist/assistHelper',
           'tableStats'
         ], factory);
