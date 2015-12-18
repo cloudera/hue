@@ -33,7 +33,9 @@
   <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   %if with_deferred:
-  <script src="${ static('desktop/ext/js/knockout-deferred-updates.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    ko.options.deferUpdates = true;
+  </script>
   %endif
 </%def>
 

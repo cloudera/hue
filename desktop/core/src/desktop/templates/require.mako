@@ -36,7 +36,6 @@ DEBUG = DJANGO_DEBUG_MODE.get()
         "ko.charts" : "desktop/js/ko.charts",
         "knockout-mapping" : "desktop/ext/js/knockout-mapping.min",
         "knockout-sortable" : "desktop/ext/js/knockout-sortable.min",
-        "knockout-deferred-updates" : "desktop/ext/js/knockout-deferred-updates.min",
         "ko.editable" : "desktop/js/ko.editable",
         "ko.hue-bindings" : "desktop/js/ko.hue-bindings"
       },
@@ -44,7 +43,6 @@ DEBUG = DJANGO_DEBUG_MODE.get()
         "knockout": { exports: "ko" },
         "knockout-mapping": { deps: ["knockout"] },
         "knockout-sortable": { deps: ["knockout", "jquery", "jquery.ui.sortable"] },
-        "knockout-deferred-updates": { deps: ["knockout"] },
         "ko.editable": { deps: ["knockout"] },
         "ace.extended": { deps: ["ace"] },
         "ace.ext-language-tools": { deps: ["ace"] }

@@ -1645,10 +1645,11 @@ ${ require.config() }
     "assistPanel",
     "knockout-mapping",
     "knockout-sortable",
-    "knockout-deferred-updates",
     "ko.editable",
     "ko.hue-bindings"
   ], function (ko, charts, EditorViewModel) {
+
+    ko.options.deferUpdates = true;
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
       user: '${ user.username }',

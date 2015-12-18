@@ -194,11 +194,11 @@ ${ assist.assistPanel() }
     "tableStats",
     "knockout-mapping",
     "knockout-sortable",
-    "knockout-deferred-updates",
     "ko.editable",
     "ko.hue-bindings"
   ], function (ko, charts, AssistHelper) {
 
+    ko.options.deferUpdates = true;
 
     function MetastoreViewModel(options) {
       var self = this;
