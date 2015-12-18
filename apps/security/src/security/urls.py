@@ -37,7 +37,7 @@ urlpatterns += patterns('security.api.hdfs',
 )
 
 
-urlpatterns += patterns('security.api.hive2',
+urlpatterns += patterns('security.api.hive',
   url(r'^api/hive/fetch_hive_path', 'fetch_hive_path', name='fetch_hive_path'),
 
   url(r'^api/hive/list_sentry_roles_by_group', 'list_sentry_roles_by_group', name='list_sentry_roles_by_group'),
