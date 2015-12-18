@@ -36,6 +36,7 @@ from desktop.views import _ko
     .assist-resizer {
       cursor: row-resize;
     }
+
     .assist-header {
       color: #338bb8;
       background-color: #f9f9f9;
@@ -90,8 +91,6 @@ from desktop.views import _ko
     }
 
     .assist-tables {
-      overflow-y: hidden;
-      overflow-x: auto;
       margin-left: 3px;
     }
 
@@ -162,8 +161,10 @@ from desktop.views import _ko
       color: #737373;
     }
 
+    .assist-db-header-actions,
     .assist-actions  {
       position:absolute;
+      top: 0;
       right: 0;
       padding-right:4px;
       padding-left:4px;
@@ -221,7 +222,7 @@ from desktop.views import _ko
       <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }, event: { 'scroll': assistDbSource.repositionActions }">
+    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }">
       <li data-bind="visibleOnHover: { override: statsVisible, selector: (definition.isTable || definition.isView) ? '.table-actions' : '.column-actions' }, css: { 'assist-table': (definition.isTable || definition.isView), 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isTable || definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-entry" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! (definition.isTable || definition.isView), 'assist-table-link': (definition.isTable || definition.isView) }" href="javascript:void(0)">
@@ -255,59 +256,63 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-inner-panel">
-    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-    <ul class="nav nav-list" data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
-      <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-      <!-- ko with: selectedSource -->
-      <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-      <!-- ko with: selectedDatabase -->
-      <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
-      <!-- /ko -->
-      <!-- /ko -->
-    </ul>
+    <div class="assist-inner-panel" style="overflow: auto; display:none;" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
+      <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+      <ul class="nav nav-list" data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
+        <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
+        <!-- ko with: selectedSource -->
+        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+        <!-- ko with: selectedDatabase -->
+        <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
+        <!-- /ko -->
+        <!-- /ko -->
+      </ul>
+    </div>
   </script>
 
   <script type="text/html" id="assist-hdfs-inner-panel">
-    <!-- ko with: selectedHdfsEntry -->
-    <div class="assist-breadcrumb">
-      <!-- ko if: parent !== null -->
-      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-folder" style="font-size: 14px; line-height: 16px; vertical-align: top;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-      </a>
-      <!-- /ko -->
-      <!-- ko if: parent === null -->
-      <div>
-        <i class="fa fa-folder" style="font-size: 14px; line-height: 16px;vertical-align: top;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+    <div class="assist-inner-panel" style="overflow: auto; display:none;">
+      <!-- ko with: selectedHdfsEntry -->
+      <div class="assist-breadcrumb">
+        <!-- ko if: parent !== null -->
+        <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
+          <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+          <i class="fa fa-folder" style="font-size: 14px; line-height: 16px; vertical-align: top;"></i>
+          <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+        </a>
+        <!-- /ko -->
+        <!-- ko if: parent === null -->
+        <div>
+          <i class="fa fa-folder" style="font-size: 14px; line-height: 16px;vertical-align: top;"></i>
+          <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+        </div>
+        <!-- /ko -->
       </div>
+      <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
+
+        <li class="center" data-bind="visible: loading">
+          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+        </li>
+
+        <li>
+          <ul class="assist-tables" data-bind="foreach: entries">
+            <li class="assist-entry assist-table-link">
+              <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+                <!-- ko if: definition.type === 'dir' -->
+                <i class="fa fa-fw fa-folder muted"></i>
+                <!-- /ko -->
+                <!-- ko if: definition.type === 'file' -->
+                <i class="fa fa-fw fa-file-o muted"></i>
+                <!-- /ko -->
+                <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
       <!-- /ko -->
     </div>
-    <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
-
-      <li class="center" data-bind="visible: loading">
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-      </li>
-
-      <li>
-        <ul class="assist-tables" data-bind="foreach: entries">
-          <li class="assist-entry assist-table-link">
-            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
-              <!-- ko if: definition.type === 'dir' -->
-              <i class="fa fa-fw fa-folder muted"></i>
-              <!-- /ko -->
-              <!-- ko if: definition.type === 'file' -->
-              <i class="fa fa-fw fa-file-o muted"></i>
-              <!-- /ko -->
-              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
-            </a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-sources-template">
@@ -324,7 +329,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-header-actions">
-    <div class="pull-right hover-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
+    <div class="hover-actions assist-db-header-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
@@ -458,9 +463,7 @@ from desktop.views import _ko
       <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
       <!-- ko foreach: visiblePanels -->
       <!-- ko template: { if: $parent.availablePanels.length > 1, name: 'assist-panel-inner-header' }--><!-- /ko -->
-      <div class="assist-inner-panel" style="overflow: auto; display:none;">
-        <!-- ko template: { name: templateName, data: $parent } --><!-- /ko -->
-      </div>
+      <!-- ko template: { name: templateName, data: $parent } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
