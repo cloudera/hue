@@ -82,7 +82,7 @@ from desktop.views import _ko
     .assist-type-switch {
       display: inline-block;
       font-size: 16px;
-      margin-right: 6px;
+      margin-right: 2px;
       cursor: pointer;
     }
 
@@ -315,6 +315,24 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-documents-inner-panel">
+    <div class="assist-inner-panel" style="overflow: auto; display:none;">
+      <!-- ko with: documents -->
+      <ul class="assist-tables" data-bind="foreach: availableTypes">
+        <li class="assist-table">
+          <a class="assist-entry assist-table-link" href="javascript: void(0);" data-bind="click: function () { open(! open()) }">
+            <i class="fa fa-fw fa-question muted"></i>
+            <span data-bind="text: name"></span>
+          </a>
+          <ul data-bind="slideVisible: open, foreach: documents">
+            <li><a data-bind="attr: {'href': definition.absoluteUrl }, text: definition.name"></a></li>
+          </ul>
+        </li>
+      </ul>
+      <!-- /ko -->
+    </div>
+  </script>
+
   <script type="text/html" id="assist-sources-template">
     <li class="assist-inner-header">
       ${_('sources')}
@@ -442,7 +460,7 @@ from desktop.views import _ko
     <div class="assist-panel-switches assist-fixed-height" style="display:none;">
       <!-- ko foreach: availablePanels -->
       <div class="inactive-action assist-type-switch" data-bind="click: function () { visible(!visible()) }, css: { 'blue': visible }, attr: { 'title': visible() ? '${ _('Hide') } ' + name : '${ _('Show') } ' + name }">
-        <i class="fa" data-bind="css: icon"></i>
+        <i class="fa fa-fw" data-bind="css: icon"></i>
       </div>
       <!-- /ko -->
     </div>
@@ -471,11 +489,18 @@ from desktop.views import _ko
   <script type="text/javascript" charset="utf-8">
     (function (factory) {
       if(typeof require === "function") {
-        define('assistPanel', ['knockout', 'desktop/js/assist/assistDbSource', 'desktop/js/assist/assistHdfsEntry', 'desktop/js/assist/assistHelper', 'tableStats'], factory);
+        define('assistPanel', [
+          'knockout',
+          'desktop/js/assist/assistDbSource',
+          'desktop/js/assist/assistHdfsEntry',
+          'desktop/js/assist/AssistDocuments',
+          'desktop/js/assist/assistHelper',
+          'tableStats'
+        ], factory);
       } else {
-        factory(ko, AssistDbSource, AssistHdfsEntry, AssistHelper);
+        factory(ko, AssistDbSource, AssistHdfsEntry, AssistDocuments, AssistHelper);
       }
-    }(function (ko, AssistDbSource, AssistHdfsEntry, AssistHelper) {
+    }(function (ko, AssistDbSource, AssistHdfsEntry, AssistDocuments, AssistHelper) {
 
       /**
        * @param {Object} options
@@ -515,7 +540,12 @@ from desktop.views import _ko
         var self = this;
         var i18n = {
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
+          documentTypes: {
+            'query-hive' : "${ _('Hive Query') }",
+            'query' : "${ _('Query') }",
+            'notebook' : "${ _('Notebook') }"
+          }
         };
         self.assistHelper = new AssistHelper(i18n, params.user);
 
@@ -527,7 +557,8 @@ from desktop.views import _ko
         ];
 
         if (!self.onlySql) {
-          self.availablePanels.push(new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("HDFS") }', type: 'hdfs', icon: 'fa-file-o', minHeight: 40}));
+          self.availablePanels.push(new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("HDFS") }', type: 'hdfs', icon: 'fa-folder-o', minHeight: 40}));
+          self.availablePanels.push(new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("Documents") }', type: 'documents', icon: 'fa-files-o', minHeight: 40}));
         }
 
         if (self.availablePanels.length == 1) {
@@ -553,6 +584,9 @@ from desktop.views import _ko
           });
           self.sources.push(sourceIndex[sourceType.type]);
         });
+
+        self.documents = new AssistDocuments(self.assistHelper, i18n);
+        self.documents.load();
 
         self.selectedHdfsEntry = ko.observable(new AssistHdfsEntry({
           definition: {
