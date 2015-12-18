@@ -1034,14 +1034,16 @@
 
         var extrasAfterHeight = allExtrasHeight - extrasBeforeHeight;
         var $panelsAfter = $resizer.nextAll('.assist-inner-panel');
-        var limitAfter = totalHeight - extrasAfterHeight;
+        var requiredSpaceAfter = extrasAfterHeight;
         $panelsAfter.each(function (idx, panel) {
-          limitAfter -= $(panel).data('minHeight');
+          requiredSpaceAfter += $(panel).data('minHeight');
         });
 
         $resizer.draggable({
           axis: "y",
           drag: function (event, ui) {
+            var limitAfter = totalHeight - requiredSpaceAfter;
+
             var position = ui.offset.top - containerTop;
             if (position > limitBefore && position < limitAfter) {
               fitPanelHeights($panelsBefore, position - extrasBeforeHeight);
