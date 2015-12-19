@@ -29,7 +29,7 @@ from django.utils import html
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str
-from desktop.models import Document2, Document
+from desktop.models import Document2, Document, Directory
 from django.http import HttpResponse
 
 
@@ -45,6 +45,31 @@ def get_documents(request):
     filters['type'] = json.loads(request.GET.get('type'))
 
   return JsonResponse({'documents': [doc.to_dict() for doc in Document2.objects.filter(**filters)]})
+
+
+def get_documents2(request):
+  path = request.GET.get('path', '/') # Expects path to be a Directory for now
+
+  filters = {
+      'owner': request.user,
+      'name': path,
+      'type': 'directory'
+  }
+
+  try:
+    file_doc = Directory.objects.get(**filters)
+  except Directory.DoesNotExist, e:
+    if path == '/':
+      file_doc = Directory.objects.create(name='/', type='directory', owner=request.user)
+      file_doc.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=file_doc.id))
+    else:
+      raise e
+
+  return JsonResponse({
+      'file': file_doc.to_dict(),
+      'documents': [doc.to_dict() for doc in file_doc.documents()],
+      'path': path
+  })
 
 
 def get_document(request):
