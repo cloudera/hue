@@ -26,7 +26,7 @@ include $(ROOT)/Makefile.sdk
 SPARK_ROOT := $(realpath .)
 JAVA_LIB = $(SPARK_ROOT)/java-lib
 
-LIVY_VERSION = 0.2.0-SNAPSHOT
+LIVY_VERSION = 3.9.0-cdh5.7.0-SNAPSHOT
 LIVY_DIR = $(SPARK_ROOT)/java
 LIVY_TARGET_DIR = $(LIVY_DIR)/livy-assembly/target/scala-2.10
 LIVY_ASSEMBLY_JAR = livy-assembly-$(LIVY_VERSION).jar
