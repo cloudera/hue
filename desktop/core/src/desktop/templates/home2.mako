@@ -139,6 +139,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       <div class="card card-home" style="margin-top: 0">
         <input id="searchInput" type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
         <h2 class="card-heading simple">${_('My Documents')}</h2>
+        <span data-bind="text: path"></span>
 
         <div class="card-body">
           <p>
@@ -206,10 +207,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 <script type="text/javascript" charset="utf-8">
   var viewModel, shareViewModel, JSON_USERS_GROUPS;
 
-  $(document).ready(function () {
-    $.get("/desktop/api2/docs/", function(data) {
-      viewModel = new HomeViewModel(data.documents);
-      ko.applyBindings(viewModel, $('#documentList')[0]);
+  $(document).ready(function() {
+    $.get("/desktop/api2/docs2/", {
+      'path': location.getParameter('path') ? location.getParameter('path') : '/'
+      }, function(data) {
+        viewModel = new HomeViewModel(data);
+        ko.applyBindings(viewModel, $('#documentList')[0]);
     });
   });
 </script>

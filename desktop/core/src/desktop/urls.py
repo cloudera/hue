@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 
 import logging
-import os
 import re
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
@@ -39,7 +38,6 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from desktop import appmanager
-from desktop import metrics
 from desktop.conf import METRICS
 
 # Django expects handler404 and handler500 to be defined.
@@ -102,6 +100,7 @@ dynamic_patterns += patterns('desktop.api',
 
 dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api2/docs/?$', 'get_documents'),
+  (r'^desktop/api2/docs2/?$', 'get_documents2'),
   (r'^desktop/api2/doc/get$', 'get_document'),
   (r'^desktop/api2/doc/export$', 'export_documents'),
   (r'^desktop/api2/doc/import$', 'import_documents'),

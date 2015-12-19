@@ -813,6 +813,8 @@ class Document2(models.Model):
       return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
     elif self.type.startswith('query'):
       return reverse('notebook:editor') + '?editor=' + str(self.id)
+    elif self.type == 'directory':
+      return '/home2' + '?path=' + self.name
     elif self.type == 'notebook':
       return reverse('notebook:notebook') + '?notebook=' + str(self.id)
     elif self.type == 'search-dashboard':
@@ -872,6 +874,19 @@ class Document2(models.Model):
       self.data = json.dumps(data_dict)
 
     super(Document2, self).save(*args, **kwargs)
+
+
+class Directory(Document2):
+  # e.g. name = '/' or '/dir1/dir2/f3'
+
+  class Meta:
+    proxy = True
+
+  def parent(self):
+    return Document2.objects.get(type='directory', dependencies=[self.pk])
+
+  def documents(self):
+    return self.dependencies.all()
 
 
 def get_data_link(meta):

@@ -15,11 +15,13 @@
 // limitations under the License.
 
 
-function HomeViewModel(json_docs) {
+function HomeViewModel(data) {
   var self = this;
 
-  var ALL_DOCUMENTS = json_docs;
+  var ALL_DOCUMENTS = data.documents;
   self.documents = ko.mapping.fromJS(ALL_DOCUMENTS);
+  self.path = ko.mapping.fromJS(data.path);
+
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
 
