@@ -137,9 +137,12 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
     <div class="span10">
       <div class="card card-home" style="margin-top: 0">
-        <input id="searchInput" type="text" placeholder="Search for name, description, etc..." class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
+        <input id="searchInput" type="text" placeholder="${ _('Search for name, description, etc...') }" class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
         <h2 class="card-heading simple">${_('My Documents')}</h2>
         <span data-bind="text: path"></span>
+        <br/>
+        <input data-bind="value: mkdirFormPath"></input>
+        <a href="javascript(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
 
         <div class="card-body">
           <p>
@@ -208,12 +211,10 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
   var viewModel, shareViewModel, JSON_USERS_GROUPS;
 
   $(document).ready(function() {
-    $.get("/desktop/api2/docs2/", {
-      'path': location.getParameter('path') ? location.getParameter('path') : '/'
-      }, function(data) {
-        viewModel = new HomeViewModel(data);
-        ko.applyBindings(viewModel, $('#documentList')[0]);
-    });
+    viewModel = new HomeViewModel();
+    ko.applyBindings(viewModel, $('#documentList')[0]);
+
+    viewModel.loadDocuments(location.getParameter('path') ? location.getParameter('path') : '/');
   });
 </script>
 

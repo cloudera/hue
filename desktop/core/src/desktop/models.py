@@ -742,7 +742,7 @@ class Document2Manager(models.Manager):
 
   # TODO permissions
   def documents(self, user):
-    return Document2.objects.filter(owner=user)
+    return Document2.objects.filter(owner=user).order_by('-last_modified')
 
   def directory(self, user, path):
     return self.documents(user).get(type='directory', name=path)
@@ -751,7 +751,7 @@ class Document2Manager(models.Manager):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
   def get_history(self, user, doc_type):
-    return self.filter(owner=user, type=doc_type, is_history=True).order_by('-last_modified') # To do perm sharing
+    return self.filter(owner=user, type=doc_type, is_history=True).order_by('-last_modified')
 
 
 def uuid_default():
@@ -896,20 +896,22 @@ class Document2(models.Model):
     destination_directory = self.documents(self.user).get(type='directory', uuid=self.uuid)
     destination_directory.dependencies.remove(self)
 
-    # ok return true
-
 
 class Directory(Document2):
   # e.g. name = '/' or '/dir1/dir2/f3'
 
   class Meta:
     proxy = True
+    
+  def save(self, *args, **kwargs):
+    super(Directory, self).save(*args, **kwargs)
+    # TODO unique_together = ('owner', 'name')
 
   def parent(self):
     return Document2.objects.get(type='directory', dependencies=[self.pk])
 
-  def documents(self):
-    return self.dependencies.all()
+  def documents(self): 
+    return self.dependencies.all() # TODO perms
 
 
 def get_data_link(meta):

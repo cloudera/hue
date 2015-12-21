@@ -33,6 +33,7 @@ from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory
 from desktop.lib.exceptions_renderable import PopupException
+from hadoop.fs.hadoopfs import Hdfs
 
 
 LOG = logging.getLogger(__name__)
@@ -72,8 +73,8 @@ def get_documents2(request):
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
   try:
-    file_doc = Document2.objects.directory(user=request.user, name=path)
-  except Document2.DoesNotExist, e:
+    file_doc = Directory.objects.get(owner=request.user, name=path) # TODO perms
+  except Directory.DoesNotExist, e:
     if path == '/':
       file_doc = Directory.objects.create(name='/', type='directory', owner=request.user)
       file_doc.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=file_doc.id))
@@ -105,9 +106,14 @@ def move_document(request):
 @api_error_handler
 @require_POST
 def create_directory(request):
-  path = request.POST.get('path')
+  parent_path = json.loads(request.POST.get('parent_path'))
+  name = json.loads(request.POST.get('name'))
 
+  parent_dir = Directory.objects.get(owner=request.user, name=parent_path)
+  
+  path = Hdfs.normpath(parent_path + '/' + name)
   file_doc = Directory.objects.create(name=path, type='directory', owner=request.user)
+  parent_dir.dependencies.add(file_doc)
 
   return JsonResponse({
       'status': 0,
