@@ -71,27 +71,30 @@ function HomeViewModel(data) {
 
 
   self.loadDocuments = function(path) {
-	$.get("/desktop/api2/docs2/", {
-	   path: path
-	}, function(data) {
-	  self.documents(data.documents);    	
-	});
+    $.get("/desktop/api2/docs2/", {
+     path: path
+    }, function(data) {
+      self.path(path);
+      self.documents(data.documents);
+    }).fail(function (xhr) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
 
   self.mkdir = function() {
     $.post("/desktop/api2/doc/mkdir", {
-	    parent_path: ko.mapping.toJSON(self.path),
-	    name: ko.mapping.toJSON(self.mkdirFormPath)
+      parent_path: ko.mapping.toJSON(self.path),
+      name: ko.mapping.toJSON(self.mkdirFormPath)
       }, function (data) {
         if (data.status == 0) {
           self.loadDocuments(self.path()); // TODO proper refresh
           self.mkdirFormPath('');
         }
         else {
-          fail(data.message);
+          $(document).trigger("error", data.message);
         }
      }).fail(function (xhr) {
-        fail(xhr.responseText);
+       $(document).trigger("error", xhr.responseText);
      });
   };
 }

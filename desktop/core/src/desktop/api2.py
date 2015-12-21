@@ -110,7 +110,7 @@ def create_directory(request):
   name = json.loads(request.POST.get('name'))
 
   parent_dir = Directory.objects.get(owner=request.user, name=parent_path)
-  
+
   path = Hdfs.normpath(parent_path + '/' + name)
   file_doc = Directory.objects.create(name=path, type='directory', owner=request.user)
   parent_dir.dependencies.add(file_doc)
