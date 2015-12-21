@@ -23,20 +23,40 @@ import StringIO
 import zipfile
 
 from django.core import management
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import html
+from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import make_response
-from desktop.lib.i18n import smart_str
+from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory
-from django.http import HttpResponse
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
 
 
-def get_documents(request):
+def api_error_handler(func):
+  def decorator(*args, **kwargs):
+    response = {}
+
+    try:
+      return func(*args, **kwargs)
+    except Exception, e:
+      LOG.exception('Error running %s' % func)
+      response['status'] = -1
+      response['message'] = force_unicode(str(e))
+    finally:
+      if response:
+        return JsonResponse(response)
+
+  return decorator
+
+
+@api_error_handler
+def get_documents(request): # TODO only here for assist
   filters = {
       'owner': request.user
   }
@@ -47,18 +67,13 @@ def get_documents(request):
   return JsonResponse({'documents': [doc.to_dict() for doc in Document2.objects.filter(**filters)]})
 
 
+@api_error_handler
 def get_documents2(request):
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
-  filters = {
-      'owner': request.user,
-      'name': path,
-      'type': 'directory'
-  }
-
   try:
-    file_doc = Directory.objects.get(**filters)
-  except Directory.DoesNotExist, e:
+    file_doc = Document2.objects.directory(user=request.user, name=path)
+  except Document2.DoesNotExist, e:
     if path == '/':
       file_doc = Directory.objects.create(name='/', type='directory', owner=request.user)
       file_doc.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=file_doc.id))
@@ -72,6 +87,57 @@ def get_documents2(request):
   })
 
 
+@api_error_handler
+@require_POST
+def move_document(request):
+  source_id = request.POST.get('source_id', 'source_id')
+  destination_id = request.POST.get('destination_id', 'destination_id')
+
+  # destination exists + is dir?
+  source = Document2.objects.document(request.user, uuid=source_id)
+  destination = Directory.objects.document(request.user, uuid=destination_id)
+
+  source.move(destination)
+
+  return JsonResponse({'status': 0})
+
+
+@api_error_handler
+@require_POST
+def create_directory(request):
+  path = request.POST.get('path')
+
+  file_doc = Directory.objects.create(name=path, type='directory', owner=request.user)
+
+  return JsonResponse({
+      'status': 0,
+      'file': file_doc.to_dict()
+  })
+
+
+@api_error_handler
+@require_POST
+def delete_document(request):
+  document_id = request.POST.get('document_id')
+
+  document = Document2.objects.document(request.user, id=document_id)
+  if document.type == 'directory' and document.dependencies():
+    raise PopupException(_('Directory is not empty'))
+
+  document.delete()
+
+  return JsonResponse({
+      'status': 0,
+  })
+
+
+@api_error_handler
+@require_POST
+def update_permissions(requests):
+  pass
+
+
+# TODO security + permissions
 def get_document(request):
   if request.GET.get('id'):
     doc = Document2.objects.get(id=request.GET['id'])
