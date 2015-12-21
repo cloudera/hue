@@ -735,6 +735,18 @@ class DocumentPermission(models.Model):
 
 
 class Document2Manager(models.Manager):
+
+  # TODO prevent get
+  def document(self, user, doc_id):
+    return self.get_documents(user).get(id=doc_id)
+
+  # TODO permissions
+  def documents(self, user):
+    return Document2.objects.filter(owner=user)
+
+  def directory(self, user, path):
+    return self.documents(user).get(type='directory', name=path)
+
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
@@ -874,6 +886,17 @@ class Document2(models.Model):
       self.data = json.dumps(data_dict)
 
     super(Document2, self).save(*args, **kwargs)
+
+  def move(self, directory):
+    # get dir and remove
+    old_directory = self.documents(self.user).get(type='directory', uuid=self.uuid)
+    old_directory.dependencies.remove(self)
+
+    # add to new dir
+    destination_directory = self.documents(self.user).get(type='directory', uuid=self.uuid)
+    destination_directory.dependencies.remove(self)
+
+    # ok return true
 
 
 class Directory(Document2):
