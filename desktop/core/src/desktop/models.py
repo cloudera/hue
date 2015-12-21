@@ -29,6 +29,7 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
 from django.db import connection, models, transaction
 from django.db.models import Q
+from django.forms import ValidationError
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop import appmanager
@@ -902,15 +903,17 @@ class Directory(Document2):
 
   class Meta:
     proxy = True
-    
+
   def save(self, *args, **kwargs):
     super(Directory, self).save(*args, **kwargs)
-    # TODO unique_together = ('owner', 'name')
+
+    if Document2.objects.filter(type='directory', owner=self.owner, name=self.name).count() > 1:
+      raise ValidationError(_('Same directory %s for %s already exist') % (self.owner, self.name))
 
   def parent(self):
     return Document2.objects.get(type='directory', dependencies=[self.pk])
 
-  def documents(self): 
+  def documents(self):
     return self.dependencies.all() # TODO perms
 
 
