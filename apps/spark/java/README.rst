@@ -199,7 +199,7 @@ Once the session has completed starting up, it transitions to the idle state:
 
 .. code:: python
 
-    >>> session_url = host + r.headers['location']
+    >>> session_url = host + '/sessions' + r.headers['location']
     >>> r = requests.get(session_url, headers=headers)
     >>> r.json()
     {u'state': u'idle', u'id': 0, u’kind’: u’spark’}
