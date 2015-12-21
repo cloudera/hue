@@ -922,7 +922,7 @@
       var panelRatios = assistHelper.getFromTotalStorage('assist', 'innerPanelRatios', {});
 
       var totalRatios = 0;
-      $.each($allPanels, function(idx, panel) {
+      $.each($allPanels, function (idx, panel) {
         var panelDef = panelDefinitions()[idx];
         if (!panelRatios[panelDef.type]) {
           panelRatios[panelDef.type] = 1 / panelDefinitions().length;
@@ -944,11 +944,21 @@
 
       // Resizes all containers according to the set ratios
       var resizeByRatio = function () {
+        $allPanels = $container.children('.assist-inner-panel');
         if (totalHeight == $container.innerHeight()) {
           return;
         }
         totalHeight = $container.innerHeight();
         containerTop = $container.offset().top;
+
+        $.each($allPanels, function (idx, panel) {
+          var panelDef = panelDefinitions()[idx];
+          if (!panelRatios[panelDef.type] || $allPanels.length == 1) {
+            panelRatios[panelDef.type] = 1 / panelDefinitions().length;
+          }
+          totalRatios += panelRatios[panelDef.type];
+          $(panel).data('minHeight', panelDef.minHeight);
+        });
 
         var availableForPanels = totalHeight - allExtrasHeight;
         var leftoverSpace = 0;
