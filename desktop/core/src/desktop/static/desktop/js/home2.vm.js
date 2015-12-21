@@ -18,9 +18,9 @@
 function HomeViewModel(data) {
   var self = this;
 
-  var ALL_DOCUMENTS = data.documents;
-  self.documents = ko.mapping.fromJS(ALL_DOCUMENTS);
-  self.path = ko.mapping.fromJS(data.path);
+  self.documents = ko.observableArray();
+  self.path = ko.mapping.fromJS('/');
+  self.mkdirFormPath = ko.observable('');
 
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
@@ -69,13 +69,29 @@ function HomeViewModel(data) {
     self.page(1);
   });
 
-  self.getDocById = function (docId) {
-    var _doc = null;
-    $.each(ALL_DOCUMENTS, function (id, doc) {
-      if (doc.id == docId) {
-        _doc = doc;
-      }
-    });
-    return _doc;
-  }
+
+  self.loadDocuments = function(path) {
+	$.get("/desktop/api2/docs2/", {
+	   path: path
+	}, function(data) {
+	  self.documents(data.documents);    	
+	});
+  };
+
+  self.mkdir = function() {
+    $.post("/desktop/api2/doc/mkdir", {
+	    parent_path: ko.mapping.toJSON(self.path),
+	    name: ko.mapping.toJSON(self.mkdirFormPath)
+      }, function (data) {
+        if (data.status == 0) {
+          self.loadDocuments(self.path()); // TODO proper refresh
+          self.mkdirFormPath('');
+        }
+        else {
+          fail(data.message);
+        }
+     }).fail(function (xhr) {
+        fail(xhr.responseText);
+     });
+  };
 }
