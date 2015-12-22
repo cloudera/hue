@@ -1,0 +1,328 @@
+# German translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  0PROJEKTVERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
+"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:40
+msgid "Configuration options for Navigator API"
+msgstr ""
+
+#: src/metadata/conf.py:44
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+msgstr ""
+
+#: src/metadata/conf.py:48
+msgid "Auth username of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:53
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:58
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+
+#~ msgid "Notebook saved !"
+#~ msgstr "Notizbuch gesperrt!"
+
+#~ msgid "Notebook closed !"
+#~ msgstr "Notizbuch geschlossen!"
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr "URL des Spark-Job-Servers."
+
+#~ msgid "List of available types of snippets."
+#~ msgstr "Liste der verfügbaren Arten von Snippets"
+
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "Die Anwendung funktioniert nicht, wenn kein Job-Server aktiv ist"
+
+#~ msgid "Example: 1 + 1, or press CTRL + space"
+#~ msgstr "Beispiel: 1 + 1 oder drücken Sie STRG + Leerzeichen"
+
+#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+#~ msgstr ""
+#~ "Beispiel: \"SELECT * FROM Tabellenname\", "
+#~ "oder STRG + Leerzeichen drücken"
+
+#~ msgid "<h2>This is a text snippet</h2>Type your text here"
+#~ msgstr "<h2>Dies ist ein Text-Snippet</h2>Geben Sie Ihren Text hier ein"
+
+#~ msgid "Query"
+#~ msgstr "Abfrage"
+
+#~ msgid "Execute all snippets"
+#~ msgstr "Alle Snippets ausführen"
+
+#~ msgid "Clear all results"
+#~ msgstr "Alle Ergebnisse entfernen"
+
+#~ msgid "Edit"
+#~ msgstr "Bearbeiten"
+
+#~ msgid "Save"
+#~ msgstr "Speichern"
+
+#~ msgid "Saving..."
+#~ msgstr "Es wird gespeichert..."
+
+#~ msgid "Brand New"
+#~ msgstr "Völlig neu"
+
+#~ msgid "Notebooks"
+#~ msgstr "Notizbücher"
+
+#~ msgid "Add a new notebook"
+#~ msgstr "Neues Notizbuch hinzufügen"
+
+#~ msgid "Toggle Assist"
+#~ msgstr "Hilfe umschalten"
+
+#~ msgid "Data sample for"
+#~ msgstr "Datenmuster für"
+
+#~ msgid "Ok"
+#~ msgstr "OK"
+
+#~ msgid "Manually refresh the table list"
+#~ msgstr "Tabellenliste manuell aktualisieren"
+
+#~ msgid "database"
+#~ msgstr "Datenbank"
+
+#~ msgid "Choose a database..."
+#~ msgstr "Datenbank auswählen..."
+
+#~ msgid "Table name..."
+#~ msgstr "Tabellenname..."
+
+#~ msgid "The selected database has no tables."
+#~ msgstr "Die ausgewählte Datenbank enthält keine Tabellen."
+
+#~ msgid "The database list cannot be loaded."
+#~ msgstr "Die Datenbankliste kann nicht geladen werden."
+
+#~ msgid "Add a snippet to start your new notebook"
+#~ msgstr "Snippet hinzufügen, um das neue Notizbuch zu starten"
+
+#~ msgid "Add a new snippet"
+#~ msgstr "Neues Snippet hinzufügen"
+
+#~ msgid "Text"
+#~ msgstr "Text"
+
+#~ msgid "Creating session"
+#~ msgstr "Sitzung wird erstellt"
+
+#~ msgid "CTRL + ENTER"
+#~ msgstr "STRG + EINGABETASTE"
+
+#~ msgid "Cancel"
+#~ msgstr "Abbrechen"
+
+#~ msgid "Grid"
+#~ msgstr "Raster"
+
+#~ msgid "Bars"
+#~ msgstr "Leisten"
+
+#~ msgid "Lines"
+#~ msgstr "Zeilen"
+
+#~ msgid "Pie"
+#~ msgstr "Kreis"
+
+#~ msgid "Scatter"
+#~ msgstr "Punkt"
+
+#~ msgid "Marker Map"
+#~ msgstr "Markierungskarte"
+
+#~ msgid "Gradient Map"
+#~ msgstr "Verlaufskarte"
+
+#~ msgid "Show Logs"
+#~ msgstr "Protokolle anzeigen"
+
+#~ msgid "Download first rows as CSV"
+#~ msgstr "Erste Zeilen als CSV herunterladen"
+
+#~ msgid "CSV"
+#~ msgstr "CSV"
+
+#~ msgid "Download first rows as XLS"
+#~ msgstr "Erste Zeilen als XLS herunterladen"
+
+#~ msgid "Excel"
+#~ msgstr "Excel"
+
+#~ msgid "Loading..."
+#~ msgstr "Wird geladen..."
+
+#~ msgid "Success."
+#~ msgstr "Erfolg."
+
+#~ msgid "Success but empty results."
+#~ msgstr "Erfolg, aber leere Ergebnisse."
+
+#~ msgid "Hide columns"
+#~ msgstr "Spalten ausblenden"
+
+#~ msgid "columns"
+#~ msgstr "Spalten"
+
+#~ msgid "Show columns"
+#~ msgstr "Spalten anzeigen"
+
+#~ msgid "Hide"
+#~ msgstr "Ausblenden"
+
+#~ msgid "Hide settings"
+#~ msgstr "Einstellungen ausblenden"
+
+#~ msgid "x-axis"
+#~ msgstr "X-Achse"
+
+#~ msgid "region"
+#~ msgstr "Region"
+
+#~ msgid "latitude"
+#~ msgstr "Breite"
+
+#~ msgid "legend"
+#~ msgstr "Legende"
+
+#~ msgid "Choose a column..."
+#~ msgstr "Spalte auswählen..."
+
+#~ msgid "y-axis"
+#~ msgstr "Y-Achse"
+
+#~ msgid "value"
+#~ msgstr "Wert"
+
+#~ msgid "longitude"
+#~ msgstr "Länge"
+
+#~ msgid "label"
+#~ msgstr "Kennzeichnung"
+
+#~ msgid "scatter group"
+#~ msgstr "Punktgruppe"
+
+#~ msgid "scatter size"
+#~ msgstr "Punktgröße"
+
+#~ msgid "sorting"
+#~ msgstr "Sortieren"
+
+#~ msgid "No sorting"
+#~ msgstr "Keine Sortierung"
+
+#~ msgid "Sort ascending"
+#~ msgstr "Aufsteigend sortieren"
+
+#~ msgid "Sort descending"
+#~ msgstr "Absteigend sortieren"
+
+#~ msgid "Show settings"
+#~ msgstr "Einstellungen anzeigen"
+
+#~ msgid "Paste or type a link"
+#~ msgstr "Link einfügen oder eingeben"
+
+#~ msgid "Open in new window"
+#~ msgstr "In neuem Fenster öffnen"
+
+#~ msgid "No data available"
+#~ msgstr "Keine Daten verfügbar"
+
+#~ msgid "No matching records"
+#~ msgstr "Keine übereinstimmenden Datensätze"
+
+#~ msgid "Distribution"
+#~ msgstr "Verteilung"
+
+#~ msgid "There was a problem loading the table preview."
+#~ msgstr "Beim Laden der Tabellenvorschau ist ein Problem aufgetreten."
+
+#~ msgid "Spark Editor"
+#~ msgstr "Spark-Editor"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr "Nach Namen, Beschreibung, usw. suchen"
+
+#~ msgid "Submit"
+#~ msgstr "Übermitteln"
+
+#~ msgid "Share"
+#~ msgstr "Freigeben"
+
+#~ msgid "Copy"
+#~ msgstr "Kopieren"
+
+#~ msgid "Delete"
+#~ msgstr "Löschen"
+
+#~ msgid "Create"
+#~ msgstr "Erstellen"
+
+#~ msgid "Name"
+#~ msgstr "Name"
+
+#~ msgid "Description"
+#~ msgstr "Beschreibung"
+
+#~ msgid "Owner"
+#~ msgstr "Eigentümer"
+
+#~ msgid "Last Modified"
+#~ msgstr "Zuletzt geändert"
+
+#~ msgid "Delete the selected notebook(s)?"
+#~ msgstr "Ausgewählte Notizbücher löschen?"
+
+#~ msgid "No"
+#~ msgstr "Nein"
+
+#~ msgid "Yes"
+#~ msgstr "Ja"
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr "_START_ bis _END_ von _TOTAL_ Einträge werden angezeigt"
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr "0 bis 0 von 0 Einträgen werden angezeigt"
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr "(gefiltert von _MAX_ gesamten Einträgen)"
+
+#~ msgid "First"
+#~ msgstr "Erster"
+
+#~ msgid "Last"
+#~ msgstr "Letzter"
+
+#~ msgid "Next"
+#~ msgstr "Weiter"
+
+#~ msgid "Previous"
+#~ msgstr "Zurück"
+

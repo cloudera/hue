@@ -1,0 +1,326 @@
+# Korean translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 프로젝트 버전\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
+"Language-Team: ko <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:40
+msgid "Configuration options for Navigator API"
+msgstr ""
+
+#: src/metadata/conf.py:44
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+msgstr ""
+
+#: src/metadata/conf.py:48
+msgid "Auth username of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:53
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:58
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+
+#~ msgid "Notebook saved !"
+#~ msgstr "노트북이 저장되었습니다!"
+
+#~ msgid "Notebook closed !"
+#~ msgstr "노트북이 닫혔습니다!"
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr "Spark Job Server의 URL입니다."
+
+#~ msgid "List of available types of snippets."
+#~ msgstr "사용 가능한 스니펫 유형 목록입니다."
+
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "Job Server를 실행하지 않으면 이 앱을 사용할 수 없습니다."
+
+#~ msgid "Example: 1 + 1, or press CTRL + space"
+#~ msgstr "예: 1 + 1, 또는 CTRL + space를 누름"
+
+#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+#~ msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
+
+#~ msgid "<h2>This is a text snippet</h2>Type your text here"
+#~ msgstr "<h2>텍스트 스니펫</h2>여기에 텍스트 입력"
+
+#~ msgid "Query"
+#~ msgstr "쿼리"
+
+#~ msgid "Execute all snippets"
+#~ msgstr "모든 스니펫 실행"
+
+#~ msgid "Clear all results"
+#~ msgstr "모든 결과 지우기"
+
+#~ msgid "Edit"
+#~ msgstr "편집"
+
+#~ msgid "Save"
+#~ msgstr "저장"
+
+#~ msgid "Saving..."
+#~ msgstr "저장하는 중..."
+
+#~ msgid "Brand New"
+#~ msgstr "새로 만들기"
+
+#~ msgid "Notebooks"
+#~ msgstr "노트북"
+
+#~ msgid "Add a new notebook"
+#~ msgstr "새 노트북 추가"
+
+#~ msgid "Toggle Assist"
+#~ msgstr "지원 전환"
+
+#~ msgid "Data sample for"
+#~ msgstr "데이터 샘플"
+
+#~ msgid "Ok"
+#~ msgstr "확인"
+
+#~ msgid "Manually refresh the table list"
+#~ msgstr "테이블 목록을 수동으로 새로 고침"
+
+#~ msgid "database"
+#~ msgstr "데이터베이스"
+
+#~ msgid "Choose a database..."
+#~ msgstr "데이터베이스 선택..."
+
+#~ msgid "Table name..."
+#~ msgstr "테이블 이름..."
+
+#~ msgid "The selected database has no tables."
+#~ msgstr "선택한 데이터베이스에 테이블이 없습니다."
+
+#~ msgid "The database list cannot be loaded."
+#~ msgstr "데이터베이스 목록을 로드할 수 없습니다."
+
+#~ msgid "Add a snippet to start your new notebook"
+#~ msgstr "스니펫을 추가하여 새 노트북 시작"
+
+#~ msgid "Add a new snippet"
+#~ msgstr "새 스니펫 추가"
+
+#~ msgid "Text"
+#~ msgstr "텍스트"
+
+#~ msgid "Creating session"
+#~ msgstr "세션 생성 중"
+
+#~ msgid "CTRL + ENTER"
+#~ msgstr "CTRL + ENTER"
+
+#~ msgid "Cancel"
+#~ msgstr "취소"
+
+#~ msgid "Grid"
+#~ msgstr "눈금선"
+
+#~ msgid "Bars"
+#~ msgstr "막대"
+
+#~ msgid "Lines"
+#~ msgstr "줄"
+
+#~ msgid "Pie"
+#~ msgstr "파이"
+
+#~ msgid "Scatter"
+#~ msgstr "분산"
+
+#~ msgid "Marker Map"
+#~ msgstr "Marker Map"
+
+#~ msgid "Gradient Map"
+#~ msgstr "경사도 Map"
+
+#~ msgid "Show Logs"
+#~ msgstr "로그 표시"
+
+#~ msgid "Download first rows as CSV"
+#~ msgstr "첫 번째 행을 CSV로 다운로드"
+
+#~ msgid "CSV"
+#~ msgstr "CSV"
+
+#~ msgid "Download first rows as XLS"
+#~ msgstr "첫 번째 행을 XLS로 다운로드"
+
+#~ msgid "Excel"
+#~ msgstr "Excel"
+
+#~ msgid "Loading..."
+#~ msgstr "로드 중..."
+
+#~ msgid "Success."
+#~ msgstr "성공."
+
+#~ msgid "Success but empty results."
+#~ msgstr "성공했지만 결과가 없습니다."
+
+#~ msgid "Hide columns"
+#~ msgstr "열 숨기기"
+
+#~ msgid "columns"
+#~ msgstr "열"
+
+#~ msgid "Show columns"
+#~ msgstr "열 표시"
+
+#~ msgid "Hide"
+#~ msgstr "숨기기"
+
+#~ msgid "Hide settings"
+#~ msgstr "설정 숨기기"
+
+#~ msgid "x-axis"
+#~ msgstr "X축"
+
+#~ msgid "region"
+#~ msgstr "영역"
+
+#~ msgid "latitude"
+#~ msgstr "위도"
+
+#~ msgid "legend"
+#~ msgstr "범례"
+
+#~ msgid "Choose a column..."
+#~ msgstr "열 선택..."
+
+#~ msgid "y-axis"
+#~ msgstr "Y축"
+
+#~ msgid "value"
+#~ msgstr "값"
+
+#~ msgid "longitude"
+#~ msgstr "경도"
+
+#~ msgid "label"
+#~ msgstr "레이블"
+
+#~ msgid "scatter group"
+#~ msgstr "그룹 분산"
+
+#~ msgid "scatter size"
+#~ msgstr "크기 분산"
+
+#~ msgid "sorting"
+#~ msgstr "정렬"
+
+#~ msgid "No sorting"
+#~ msgstr "정렬되지 않음"
+
+#~ msgid "Sort ascending"
+#~ msgstr "오름차순으로 정렬"
+
+#~ msgid "Sort descending"
+#~ msgstr "내림차순으로 정렬"
+
+#~ msgid "Show settings"
+#~ msgstr "설정 표시"
+
+#~ msgid "Paste or type a link"
+#~ msgstr "링크 붙여넣기 또는 입력"
+
+#~ msgid "Open in new window"
+#~ msgstr "새 창에서 열기"
+
+#~ msgid "No data available"
+#~ msgstr "데이터를 이용할 수 없음"
+
+#~ msgid "No matching records"
+#~ msgstr "일치하는 레코드가 없음"
+
+#~ msgid "Distribution"
+#~ msgstr "배포"
+
+#~ msgid "There was a problem loading the table preview."
+#~ msgstr "테이블 미리 보기를 로드하는 중에 문제가 발생했습니다."
+
+#~ msgid "Spark Editor"
+#~ msgstr "Spark 편집기"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr "이름, 설명 등을 검색합니다."
+
+#~ msgid "Submit"
+#~ msgstr "제출"
+
+#~ msgid "Share"
+#~ msgstr "공유"
+
+#~ msgid "Copy"
+#~ msgstr "복사"
+
+#~ msgid "Delete"
+#~ msgstr "삭제"
+
+#~ msgid "Create"
+#~ msgstr "생성"
+
+#~ msgid "Name"
+#~ msgstr "이름"
+
+#~ msgid "Description"
+#~ msgstr "설명"
+
+#~ msgid "Owner"
+#~ msgstr "소유자"
+
+#~ msgid "Last Modified"
+#~ msgstr "최종 수정 날짜"
+
+#~ msgid "Delete the selected notebook(s)?"
+#~ msgstr "선택한 노트북을 삭제하시겠습니까?"
+
+#~ msgid "No"
+#~ msgstr "아니요"
+
+#~ msgid "Yes"
+#~ msgstr "예"
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr "0~0개(전체 0개 중) 항목 표시"
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr "(총 _MAX_ 항목에서 필터링됨)"
+
+#~ msgid "First"
+#~ msgstr "처음"
+
+#~ msgid "Last"
+#~ msgstr "마지막"
+
+#~ msgid "Next"
+#~ msgstr "다음"
+
+#~ msgid "Previous"
+#~ msgstr "이전"
+
