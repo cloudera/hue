@@ -35,9 +35,10 @@
    * @param {AssistDocument[]} documents
    * @constructor
    */
-  function AssistDocumentType(type, documents) {
+  function AssistDocumentType(name, type, documents) {
     var self = this;
-    self.name = type;
+    self.name = name || type;
+    self.type = type;
     self.documents = documents;
     self.open = ko.observable(false);
   }
@@ -73,7 +74,7 @@
 
       var types = [];
       $.each(documentsByType, function (key, value) {
-        types.push(new AssistDocumentType(self.i18n.documentTypes[key], value))
+        types.push(new AssistDocumentType(self.i18n.documentTypes[key], key, value))
       });
 
       self.availableTypes(types);

@@ -421,7 +421,7 @@ from django.utils.translation import ugettext as _
            % endif
            % if 'impala' in apps:
              <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
-             % if USE_NEW_EDITOR.get(): # impala requies beeswax anyway
+             % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
              <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('New Impala')}</a></li>
              % endif
            % endif
