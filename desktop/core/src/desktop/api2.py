@@ -124,10 +124,11 @@ def create_directory(request):
 @api_error_handler
 @require_POST
 def delete_document(request):
-  document_id = request.POST.get('document_id')
+  document_id = json.loads(request.POST.get('doc_id'))
+  skip_trash = json.loads(request.POST.get('skip_trash', 'false')) # TODO always false currently
 
-  document = Document2.objects.document(request.user, id=document_id)
-  if document.type == 'directory' and document.dependencies():
+  document = Document2.objects.document(request.user, doc_id=document_id)
+  if document.type == 'directory' and document.dependencies().count() > 1:
     raise PopupException(_('Directory is not empty'))
 
   document.delete()
