@@ -21,6 +21,7 @@ function HomeViewModel(data) {
   self.documents = ko.observableArray();
   self.path = ko.mapping.fromJS('/');
   self.mkdirFormPath = ko.observable('');
+  self.deleteFormPath = ko.observable('');
 
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
@@ -85,16 +86,34 @@ function HomeViewModel(data) {
     $.post("/desktop/api2/doc/mkdir", {
       parent_path: ko.mapping.toJSON(self.path),
       name: ko.mapping.toJSON(self.mkdirFormPath)
-      }, function (data) {
-        if (data.status == 0) {
-          self.loadDocuments(self.path()); // TODO proper refresh
-          self.mkdirFormPath('');
-        }
-        else {
+    }, function (data) {
+      if (data.status == 0) {
+        self.loadDocuments(self.path()); // TODO proper refresh
+        self.mkdirFormPath('');
+      }
+      else {
           $(document).trigger("error", data.message);
-        }
-     }).fail(function (xhr) {
-       $(document).trigger("error", xhr.responseText);
-     });
+      }
+    }).fail(function (xhr) {
+      $(document).trigger("error", xhr.responseText);
+    });
   };
+
+  self.deleteDocument = function() {
+    $.post("/desktop/api2/doc/delete", {
+      doc_id: ko.mapping.toJSON(self.deleteFormPath),
+      skip_trash: ko.mapping.toJSON(false)
+    }, function (data) {
+      if (data.status == 0) {
+        self.loadDocuments(self.path()); // TODO proper refresh
+        self.mkdirFormPath('');
+      }
+      else {
+        $(document).trigger("error", data.message);
+      }
+    }).fail(function (xhr) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
 }

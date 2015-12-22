@@ -739,7 +739,7 @@ class Document2Manager(models.Manager):
 
   # TODO prevent get
   def document(self, user, doc_id):
-    return self.get_documents(user).get(id=doc_id)
+    return self.documents(user).get(id=doc_id)
 
   # TODO permissions
   def documents(self, user):
@@ -772,6 +772,7 @@ class Document2(models.Model):
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
+  # is_trashed
 
   tags = models.ManyToManyField('self', db_index=True)
   dependencies = models.ManyToManyField('self', db_index=True)
@@ -911,7 +912,7 @@ class Directory(Document2):
       raise ValidationError(_('Same directory %s for %s already exist') % (self.owner, self.name))
 
   def parent(self):
-    return Document2.objects.get(type='directory', dependencies=[self.pk])
+    return Document2.objects.get(type='directory', dependencies=[self.pk]) # or name__startswith=self.name
 
   def documents(self):
     return self.dependencies.all() # TODO perms
