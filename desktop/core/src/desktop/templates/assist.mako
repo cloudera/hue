@@ -24,6 +24,14 @@ from desktop.views import _ko
 <%def name="assistPanel()">
   <style>
 
+    .assist-icon {
+      width: 16px;
+      height: 16px;
+      -webkit-filter: grayscale(1);
+      filter: grayscale(1);
+      opacity: .8;
+    }
+
     .assist {
       position: relative;
       height: 100%;
@@ -321,7 +329,28 @@ from desktop.views import _ko
       <ul class="assist-tables" data-bind="foreach: availableTypes">
         <li class="assist-table">
           <a class="assist-entry assist-table-link" href="javascript: void(0);" data-bind="click: function () { open(! open()) }">
-            <i class="fa fa-fw fa-question muted"></i>
+            <!-- ko if: type == 'query-hive' || type == 'query' -->
+            <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="assist-icon"/>
+            <!-- /ko -->
+            <!-- ko if: type == 'query-impala' -->
+            <img src="${ static('impala/art/icon_impala_48.png') }" class="assist-icon"/>
+            <!-- /ko -->
+            <!-- ko if: type == 'notebook' -->
+            <i class="fa fa-fw fa-tags muted"></i>
+            <!-- /ko -->
+            <!-- ko if: type == 'oozie-workflow2' -->
+            <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="assist-icon"/>
+            <!-- /ko -->
+            <!-- ko if: type == 'oozie-coordinator2' -->
+            <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="assist-icon"/>
+            <!-- /ko -->
+            <!-- ko if: type == 'oozie-bundle2' -->
+            <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="assist-icon"/>
+            <!-- /ko -->
+            <!-- ko if: type == 'search-dashboard' -->
+            <i class="fa fa-fw fa-search muted"></i>
+            <!-- /ko -->
+
             <span data-bind="text: name"></span>
           </a>
           <ul data-bind="slideVisible: open, foreach: documents">
