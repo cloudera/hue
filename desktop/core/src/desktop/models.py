@@ -741,9 +741,13 @@ class Document2Manager(models.Manager):
   def document(self, user, doc_id):
     return self.documents(user).get(id=doc_id)
 
-  # TODO permissions
   def documents(self, user):
-    return Document2.objects.filter(owner=user).order_by('-last_modified')
+    return Document2.objects.filter(
+        Q(owner=user) |
+        Q(documentpermission2__users=user) |
+        Q(documentpermission2__groups__in=user.groups.all()) |
+        Q(documentpermission2__all=True)
+    ).distinct().order_by('-last_modified')
 
   def directory(self, user, path):
     return self.documents(user).get(type='directory', name=path)
@@ -752,7 +756,7 @@ class Document2Manager(models.Manager):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
   def get_history(self, user, doc_type):
-    return self.filter(owner=user, type=doc_type, is_history=True).order_by('-last_modified')
+    return self.documents(user).filter(type=doc_type, is_history=True)
 
 
 def uuid_default():
@@ -921,7 +925,9 @@ class Directory(Document2):
 
 class Document2Permission(models.Model):
   """
-  Combine either regular perms or link.
+  Combine either:
+   - regular perms (listed)
+   - link
   """
   READ_PERM = 'read'
   WRITE_PERM = 'write'
