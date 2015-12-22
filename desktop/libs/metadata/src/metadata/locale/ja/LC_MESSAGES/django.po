@@ -1,0 +1,326 @@
+# Japanese translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:40
+msgid "Configuration options for Navigator API"
+msgstr ""
+
+#: src/metadata/conf.py:44
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+msgstr ""
+
+#: src/metadata/conf.py:48
+msgid "Auth username of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:53
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:58
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+
+#~ msgid "Notebook saved !"
+#~ msgstr "ノートブックが保存されました"
+
+#~ msgid "Notebook closed !"
+#~ msgstr "ノートブックが閉じられました"
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr "Spark Job Server の URL です。"
+
+#~ msgid "List of available types of snippets."
+#~ msgstr "使用可能なスニペットのタイプのリストです。"
+
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "実行中の Job Server が存在しない場合、アプリが機能しません"
+
+#~ msgid "Example: 1 + 1, or press CTRL + space"
+#~ msgstr "例：1 + 1、または CTRL キーを押したまま Space キーを押します"
+
+#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+#~ msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押す"
+
+#~ msgid "<h2>This is a text snippet</h2>Type your text here"
+#~ msgstr "<h2>これはテキストスニペットです</h2>ここにテキストを入力してください"
+
+#~ msgid "Query"
+#~ msgstr "クエリ"
+
+#~ msgid "Execute all snippets"
+#~ msgstr "すべてのスニペットを実行"
+
+#~ msgid "Clear all results"
+#~ msgstr "すべての結果をクリア"
+
+#~ msgid "Edit"
+#~ msgstr "編集"
+
+#~ msgid "Save"
+#~ msgstr "保存"
+
+#~ msgid "Saving..."
+#~ msgstr "保存中..."
+
+#~ msgid "Brand New"
+#~ msgstr "新規"
+
+#~ msgid "Notebooks"
+#~ msgstr "ノートブック"
+
+#~ msgid "Add a new notebook"
+#~ msgstr "新しいノートブックを追加"
+
+#~ msgid "Toggle Assist"
+#~ msgstr "アシストを切り替え"
+
+#~ msgid "Data sample for"
+#~ msgstr "データサンプルの対象"
+
+#~ msgid "Ok"
+#~ msgstr "OK"
+
+#~ msgid "Manually refresh the table list"
+#~ msgstr "テーブルリストを手動で更新"
+
+#~ msgid "database"
+#~ msgstr "データベース"
+
+#~ msgid "Choose a database..."
+#~ msgstr "データベースを選択..."
+
+#~ msgid "Table name..."
+#~ msgstr "テーブル名..."
+
+#~ msgid "The selected database has no tables."
+#~ msgstr "選択したデータベースにテーブルがありません。"
+
+#~ msgid "The database list cannot be loaded."
+#~ msgstr "データベースリストをロードできません。"
+
+#~ msgid "Add a snippet to start your new notebook"
+#~ msgstr "スニペットを追加して、新しいノートブックを開始します"
+
+#~ msgid "Add a new snippet"
+#~ msgstr "新しいスニペットを追加"
+
+#~ msgid "Text"
+#~ msgstr "テキスト"
+
+#~ msgid "Creating session"
+#~ msgstr "セッションの作成"
+
+#~ msgid "CTRL + ENTER"
+#~ msgstr "CTRL + ENTER"
+
+#~ msgid "Cancel"
+#~ msgstr "キャンセル"
+
+#~ msgid "Grid"
+#~ msgstr "グリッド"
+
+#~ msgid "Bars"
+#~ msgstr "棒"
+
+#~ msgid "Lines"
+#~ msgstr "折れ線"
+
+#~ msgid "Pie"
+#~ msgstr "円グラフ"
+
+#~ msgid "Scatter"
+#~ msgstr "散布図"
+
+#~ msgid "Marker Map"
+#~ msgstr "Marker Map"
+
+#~ msgid "Gradient Map"
+#~ msgstr "Gradient Map"
+
+#~ msgid "Show Logs"
+#~ msgstr "ログを表示"
+
+#~ msgid "Download first rows as CSV"
+#~ msgstr "最初の行を CSV としてダウンロード"
+
+#~ msgid "CSV"
+#~ msgstr "CSV"
+
+#~ msgid "Download first rows as XLS"
+#~ msgstr "最初の行を XLS としてダウンロード"
+
+#~ msgid "Excel"
+#~ msgstr "Excel"
+
+#~ msgid "Loading..."
+#~ msgstr "読み込み中..."
+
+#~ msgid "Success."
+#~ msgstr "成功しました。"
+
+#~ msgid "Success but empty results."
+#~ msgstr "成功しましたが結果が空です。"
+
+#~ msgid "Hide columns"
+#~ msgstr "列を非表示"
+
+#~ msgid "columns"
+#~ msgstr "列"
+
+#~ msgid "Show columns"
+#~ msgstr "列を表示"
+
+#~ msgid "Hide"
+#~ msgstr "非表示"
+
+#~ msgid "Hide settings"
+#~ msgstr "設定を非表示"
+
+#~ msgid "x-axis"
+#~ msgstr "X 軸"
+
+#~ msgid "region"
+#~ msgstr "地域"
+
+#~ msgid "latitude"
+#~ msgstr "緯度"
+
+#~ msgid "legend"
+#~ msgstr "凡例"
+
+#~ msgid "Choose a column..."
+#~ msgstr "列を選択..."
+
+#~ msgid "y-axis"
+#~ msgstr "Y 軸"
+
+#~ msgid "value"
+#~ msgstr "値"
+
+#~ msgid "longitude"
+#~ msgstr "経度"
+
+#~ msgid "label"
+#~ msgstr "ラベル"
+
+#~ msgid "scatter group"
+#~ msgstr "散布図グループ"
+
+#~ msgid "scatter size"
+#~ msgstr "散布図サイズ"
+
+#~ msgid "sorting"
+#~ msgstr "ソート"
+
+#~ msgid "No sorting"
+#~ msgstr "ソートなし"
+
+#~ msgid "Sort ascending"
+#~ msgstr "昇順でソート"
+
+#~ msgid "Sort descending"
+#~ msgstr "降順でソート"
+
+#~ msgid "Show settings"
+#~ msgstr "設定を表示"
+
+#~ msgid "Paste or type a link"
+#~ msgstr "リンクを貼り付けるか入力してください"
+
+#~ msgid "Open in new window"
+#~ msgstr "新しいウィンドウで開く"
+
+#~ msgid "No data available"
+#~ msgstr "利用可能なデータがありません"
+
+#~ msgid "No matching records"
+#~ msgstr "一致するレコードがありません"
+
+#~ msgid "Distribution"
+#~ msgstr "配布"
+
+#~ msgid "There was a problem loading the table preview."
+#~ msgstr "テーブルプレビューをロード中に問題が発生しました。"
+
+#~ msgid "Spark Editor"
+#~ msgstr "Spark エディタ"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr "名前、説明などを検索..."
+
+#~ msgid "Submit"
+#~ msgstr "サブミット"
+
+#~ msgid "Share"
+#~ msgstr "共有"
+
+#~ msgid "Copy"
+#~ msgstr "コピー"
+
+#~ msgid "Delete"
+#~ msgstr "削除"
+
+#~ msgid "Create"
+#~ msgstr "作成"
+
+#~ msgid "Name"
+#~ msgstr "名前"
+
+#~ msgid "Description"
+#~ msgstr "説明"
+
+#~ msgid "Owner"
+#~ msgstr "所有者"
+
+#~ msgid "Last Modified"
+#~ msgstr "前回の変更"
+
+#~ msgid "Delete the selected notebook(s)?"
+#~ msgstr "選択したノートブックを削除しますか？"
+
+#~ msgid "No"
+#~ msgstr "いいえ"
+
+#~ msgid "Yes"
+#~ msgstr "はい"
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr "_TOTAL_ 件のエントリの _START_ から _END_ までを表示"
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr "0 件のエントリの 0 から 0 までを表示"
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr "（合計 _MAX_ 件のエントリからフィルタ処理）"
+
+#~ msgid "First"
+#~ msgstr "先頭"
+
+#~ msgid "Last"
+#~ msgstr "末尾"
+
+#~ msgid "Next"
+#~ msgstr "次"
+
+#~ msgid "Previous"
+#~ msgstr "前"
+
