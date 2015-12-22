@@ -768,6 +768,7 @@ class Document2(models.Model):
 
   data = models.TextField(default='{}')
   extra = models.TextField(default='')
+  # settings = models.TextField(default='{}') # Owner settings like, can other reshare, can change access
 
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
@@ -916,6 +917,32 @@ class Directory(Document2):
 
   def documents(self):
     return self.dependencies.all() # TODO perms
+
+
+class Document2Permission(models.Model):
+  """
+  Combine either regular perms or link.
+  """
+  READ_PERM = 'read'
+  WRITE_PERM = 'write'
+  COMMENT_PERM = 'comment'
+
+  doc = models.ForeignKey(Document2)
+
+  users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission2_users')
+  groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission2_groups')
+  all = models.BooleanField(db_index=True, default=True, help_text=_t('Specify users/groups or ALL'))
+
+  perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
+    (READ_PERM, 'read'),
+    (WRITE_PERM, 'write'),
+    (COMMENT_PERM, 'comment'), # PLAYER PERM?    
+  ))
+
+  link = models.CharField(default='', max_length=255, unique=True) # Short link like dropbox
+
+  class Meta:
+    unique_together = ('doc', 'perms')
 
 
 def get_data_link(meta):
