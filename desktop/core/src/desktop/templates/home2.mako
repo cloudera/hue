@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, _ko
+  from desktop.views import commonheader, commonfooter, commonshare2, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -142,9 +142,16 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
         <span data-bind="text: path"></span>
         <br/>
         <input data-bind="value: mkdirFormPath" placeholder="dir name, e.g. projects"></input>
-        <a href="javascript(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
+        <a href="javascript:void(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
+
         <input data-bind="value: deleteFormPath" placeholder="doc id, e.g. 50491"></input>
-        <a href="javascript(0);" class="btn" data-bind="click: deleteDocument"><i class="fa fa-times"></i> ${ _('Delete') }</a>
+        <a href="javascript:void(0);" class="btn" data-bind="click: deleteDocument"><i class="fa fa-times"></i> ${ _('Delete') }</a>
+
+        <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491"></input>
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ prepareShareModal(e) },
+          attr: {'data-original-title': '${ _ko("Share") } ' + name}">
+          <i class="fa fa-users"></i> ${ _('Share') }
+        </a>
 
         <div class="card-body">
           <p>
@@ -186,7 +193,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     </div>
 
   </div>
-
+</div>
 
 
 <script type="text/html" id="document-template">
@@ -203,10 +210,14 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 </script>
 
 
+${ commonshare2() | n,unicode }
+
+
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/home2.vm.js') }"></script>
+<script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 
 <script type="text/javascript" charset="utf-8">
@@ -216,7 +227,15 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     viewModel = new HomeViewModel();
     ko.applyBindings(viewModel, $('#documentList')[0]);
 
+    shareViewModel = initSharing("#documentShareModal");
+    shareViewModel.setDocId(-1);
+
     viewModel.loadDocuments(location.getParameter('path') ? location.getParameter('path') : '/');
+    
+    prepareShareModal = function(job) {
+      shareViewModel.setDocId(viewModel.shareFormDocId());
+      openShareModal();
+    };
   });
 </script>
 
