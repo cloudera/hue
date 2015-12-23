@@ -45,14 +45,15 @@ import desktop.views
 import desktop.conf
 from desktop.context_processors import get_app_name
 from desktop.lib import apputil, i18n, fsmanager
-from desktop.lib.django_util import render, render_json, get_username_re_rule, get_groupname_re_rule
+from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
-from desktop.log import get_audit_logger
+
 
 
 LOG = logging.getLogger(__name__)
@@ -304,7 +305,7 @@ class LoginAndPermissionMiddleware(object):
         app_accessed = ui_app_accessed
 
       if app_accessed and \
-          app_accessed not in ("desktop", "home", "about") and \
+          app_accessed not in ("desktop", "home", "home2", "about") and \
           not (request.user.has_hue_permission(action="access", app=app_accessed) or
                request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
