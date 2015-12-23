@@ -223,7 +223,7 @@ ${ commonshare2() | n,unicode }
     shareViewModel.setDocId(-1);
 
     viewModel.loadDocuments(location.getParameter('path') ? location.getParameter('path') : '/');
-    
+
     prepareShareModal = function(job) {
       shareViewModel.setDocId(viewModel.shareFormDocId());
       openShareModal();
