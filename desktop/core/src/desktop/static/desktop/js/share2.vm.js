@@ -33,7 +33,7 @@ function ShareViewModel(updateDocF) {
   self.setDocId = function(docId) {
     if (docId == -1) { return false; }
     $.get('/desktop/api2/doc/get', { id : docId }, function (data) {
-      shareViewModel.selectedDoc(data)
+      shareViewModel.selectedDoc(data);
     }).fail(function (response) {
       $(document).trigger("error", "There was an error processing your action: " + response.responseText);
     });

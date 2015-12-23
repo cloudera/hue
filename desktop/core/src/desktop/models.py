@@ -921,6 +921,10 @@ class Document2(models.Model):
     if not users and not groups:
       perm.delete()
 
+  def list_permissions(self, perm='read'):
+    perm, created = Document2Permission.objects.get_or_create(doc=self, perms=perm)
+    return perm
+
 
 class Directory(Document2):
   # e.g. name = '/' or '/dir1/dir2/f3'
