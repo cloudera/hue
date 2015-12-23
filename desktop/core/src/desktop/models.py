@@ -967,7 +967,7 @@ class Document2Permission(models.Model):
     (COMMENT_PERM, 'comment'), # PLAYER PERM?    
   ))
 
-  link = models.CharField(default='', max_length=255, unique=True) # Short link like dropbox
+  link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
 
   class Meta:
     unique_together = ('doc', 'perms')
