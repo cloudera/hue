@@ -593,3 +593,58 @@ em {
   white-space: nowrap;
   padding-right: 20px;
 }
+
+.grid-row {
+  position: relative;
+  display: block;
+  height: auto;
+  width: 100%;
+}
+
+.grid-left-bar {
+  position:absolute;
+  display:inline-block;
+  height:auto;
+  left:0;
+  top:0;
+  bottom:0;
+  width: 35px;
+}
+
+.grid-results {
+  margin-left: 35px;
+  margin-right: 20px;
+}
+
+.grid-side-btn {
+  color: #DBE8F1;
+  display: inline-block;
+  line-height: 27px;
+  height: 27px;
+  min-height: 27px;
+  padding: 0 7px;
+  margin: 0;
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
+}
+
+.grid-side-btn.disabled {
+  cursor: default !important;
+  color: #DBE8F1 !important;
+}
+
+.grid-side-btn:focus {
+  color: #DBE8F1;
+}
+
+.grid-side-btn.active {
+  color: #338bb8;
+}
+
+.grid-side-btn:hover {
+  color: #338bb8;
+}

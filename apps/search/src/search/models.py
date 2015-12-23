@@ -355,6 +355,7 @@ class Collection(models.Model):
 
   @classmethod
   def _make_gridlayout_header_field(cls, field, isDynamic=False):
+    print field
     return {'name': field['name'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
 
   def get_absolute_url(self):
@@ -558,7 +559,7 @@ class Collection2(object):
 
   @classmethod
   def _make_gridlayout_header_field(cls, field, isDynamic=False):
-    return {'name': field['name'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
+    return {'name': field['name'], 'type': field['type'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
 
   def get_absolute_url(self):
     return reverse('search:index') + '?collection=%s' % self.id
