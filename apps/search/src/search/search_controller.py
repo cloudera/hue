@@ -105,20 +105,19 @@ class SearchController(object):
     return result
 
   def is_collection(self, collection_name):
-    solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
-    return collection_name in solr_collections
+    return collection_name in self.get_solr_collections()
 
   def is_core(self, core_name):
     solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
     return core_name in solr_cores
 
-  def get_solr_collection(self):
+  def get_solr_collections(self):
     return SolrApi(SOLR_URL.get(), self.user).collections()
 
   def get_all_indexes(self, show_all=False):
     indexes = []
     try:
-      indexes = self.get_solr_collection().keys()
+      indexes = self.get_solr_collections().keys()
     except:
       LOG.exception('failed to get indexes')
 
