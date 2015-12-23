@@ -484,6 +484,9 @@ class Collection2(object):
       }
     if 'suggest' not in props['collection']:
       props['collection']['suggest'] = {'enabled': False, 'dictionary': ''}
+    for field in props['collection']['template']['fieldsAttributes']:
+      if 'type' not in field:
+        field['type'] = 'string'
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
