@@ -934,13 +934,13 @@ var Collection = function (vm, collection) {
         $.grep(currentObservable(), function(field) {
           return field.isDynamic() == isDynamic;
         }), function(field) {
-      return field.name();
+      return field.name() + '|' + field.type();
     });
     var _newFieldsNames = $.map(
       $.grep(newJson, function(field) {
           return field.isDynamic == isDynamic;
         }), function(field) {
-      return field.name;
+      return field.name + '|' + field.type;
     });
 
     var _toDelete = diff(_currentFieldsNames, _newFieldsNames);
@@ -949,13 +949,13 @@ var Collection = function (vm, collection) {
     // Deleted fields
     self.template.fieldsSelected.removeAll(_toDelete);
     var bulk = $.grep(currentObservable(), function(field) {
-      return (_toDelete.indexOf(field.name()) != -1)
+      return (_toDelete.indexOf(field.name() + '|' + field.type()) != -1)
     });
     currentObservable.removeAll(bulk);
 
     // New fields
     $.each(newJson, function(index, field) {
-      if (_toAdd.indexOf(field.name) != -1) {
+      if (_toAdd.indexOf(field.name + '|' + field.type) != -1) {
         currentObservable.push(ko.mapping.fromJS(field));
       }
     });
