@@ -161,9 +161,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                 <th style="width: 26px">&nbsp;</th>
                 <th style="width: 200px">${_('Name')}</th>
                 <th>${_('Description')}</th>
-                <th style="width: 150px">${_('Last Modified')}</th>
-                <th style="width: 80px; text-align: center">${_('Project')}</th>
-                <th style="width: 40px">${_('Sharing')}</th>
               </tr>
             </thead>
             <tbody data-bind="template: { name: 'document-template', foreach: renderableDocuments}">
@@ -201,11 +198,6 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <td style="width: 26px"></td>
     <td><a data-bind="attr: { href: absoluteUrl }, html: name"></a></td>
     <td data-bind="text: ko.mapping.toJSON($data)"></td>
-    <td></td>
-    <td style="text-align: center; white-space: nowrap">
-    </td>
-    <td style="width: 40px; text-align: center">    
-    </td>
   </tr>
 </script>
 

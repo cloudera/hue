@@ -96,17 +96,13 @@ def get_document(request):
   else:
     doc = Document2.objects.get(uuid=request.GET['uuid'])
 
-
-
   permissions = _massage_permissions(doc)
-
 
   doc_info = doc.to_dict()
   doc_info.update(permissions)
 
-#   response = _massage_doc_for_json(doc, request.user, with_data=request.GET.get('with_data'))
-#   return JsonResponse(response)
   return JsonResponse(doc_info)
+
 
 def _massage_permissions(document):
   """
@@ -189,7 +185,7 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
-  perms_dict = json.loads(request.POST['perms_dict'])
+  perms_dict = json.loads(request.POST['data'])
   doc_id = json.loads(request.POST['doc_id'])
 
   doc = Document2.objects.document(request.user, doc_id)
@@ -207,6 +203,10 @@ def share_document(request):
       groups = []
 
     doc.share(request.user, name=name, users=users, groups=groups)
+
+  return JsonResponse({
+      'status': 0,
+  })
 
 
 def _massage_doc_for_json(document, user, with_data=False):
