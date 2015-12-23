@@ -22,6 +22,7 @@ import time
 import StringIO
 import zipfile
 
+from django.contrib.auth.models import Group, User
 from django.core import management
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -89,6 +90,18 @@ def get_documents2(request):
 
 
 @api_error_handler
+def get_document(request):
+  if request.GET.get('id'):
+    doc = Document2.objects.get(id=request.GET['id'])
+  else:
+    doc = Document2.objects.get(uuid=request.GET['uuid'])
+
+#   response = _massage_doc_for_json(doc, request.user, with_data=request.GET.get('with_data'))
+
+  return JsonResponse(doc.to_dict())
+
+
+@api_error_handler
 @require_POST
 def move_document(request):
   source_id = request.POST.get('source_id', 'source_id')
@@ -140,20 +153,30 @@ def delete_document(request):
 
 @api_error_handler
 @require_POST
-def update_permissions(requests):
-  pass
+def share_document(request):
+  """
+  Set who else or which other group can interact with the document.
 
+  Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
+  """
+  perms_dict = json.loads(request.POST['perms_dict'])
+  doc_id = json.loads(request.POST['doc_id'])
 
-# TODO security + permissions
-def get_document(request):
-  if request.GET.get('id'):
-    doc = Document2.objects.get(id=request.GET['id'])
-  else:
-    doc = Document2.objects.get(uuid=request.GET['uuid'])
+  doc = Document2.objects.document(request.user, doc_id)
 
-  response = _massage_doc_for_json(doc, request.user, with_data=request.GET.get('with_data'))
+  for name, perm in perms_dict.iteritems():
+    users = groups = None
+    if perm.get('user_ids'):
+      users = User.objects.in_bulk(perm.get('user_ids'))
+    else:
+      users = []
 
-  return JsonResponse(response)
+    if perm.get('group_ids'):
+      groups = Group.objects.in_bulk(perm.get('group_ids'))
+    else:
+      groups = []
+
+    doc.share(request.user, name=name, users=users, groups=groups)
 
 
 def _massage_doc_for_json(document, user, with_data=False):

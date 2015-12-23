@@ -903,6 +903,24 @@ class Document2(models.Model):
     destination_directory = self.documents(self.user).get(type='directory', uuid=self.uuid)
     destination_directory.dependencies.remove(self)
 
+  def share(self, user, name='read', users=None, groups=None):
+    # TODO check in settings if user can sync, re-share, which perms...
+
+    perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
+
+    if users is not None:
+      perm.users = []
+      perm.users = users
+      perm.save()
+
+    if groups is not None:
+      perm.groups = []
+      perm.groups = groups
+      perm.save()
+
+    if not users and not groups:
+      perm.delete()
+
 
 class Directory(Document2):
   # e.g. name = '/' or '/dir1/dir2/f3'

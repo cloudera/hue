@@ -396,6 +396,9 @@ def commonheader(title, section, user, padding="90px", skip_topbar=False):
 def commonshare():
   return django_mako.render_to_string("common_share.mako", {})
 
+def commonshare2():
+  return django_mako.render_to_string("common_share2.mako", {})
+
 def commonimportexport(request):
   return django_mako.render_to_string("common_import_export.mako", {'request': request})
 

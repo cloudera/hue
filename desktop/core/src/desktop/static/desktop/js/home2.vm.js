@@ -22,6 +22,7 @@ function HomeViewModel(data) {
   self.path = ko.mapping.fromJS('/');
   self.mkdirFormPath = ko.observable('');
   self.deleteFormPath = ko.observable('');
+  self.shareFormDocId = ko.observable('');
 
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
@@ -92,7 +93,7 @@ function HomeViewModel(data) {
         self.mkdirFormPath('');
       }
       else {
-          $(document).trigger("error", data.message);
+        $(document).trigger("error", data.message);
       }
     }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);
