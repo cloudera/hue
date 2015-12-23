@@ -221,7 +221,7 @@ ${ commonshare2() | n,unicode }
 
 
 <script type="text/javascript" charset="utf-8">
-  var viewModel, shareViewModel, JSON_USERS_GROUPS;
+  var viewModel, shareViewModel;
 
   $(document).ready(function() {
     viewModel = new HomeViewModel();

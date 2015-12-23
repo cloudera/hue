@@ -96,10 +96,40 @@ def get_document(request):
   else:
     doc = Document2.objects.get(uuid=request.GET['uuid'])
 
+
+
+  permissions = _massage_permissions(doc)
+
+
+  doc_info = doc.to_dict()
+  doc_info.update(permissions)
+
 #   response = _massage_doc_for_json(doc, request.user, with_data=request.GET.get('with_data'))
+#   return JsonResponse(response)
+  return JsonResponse(doc_info)
 
-  return JsonResponse(doc.to_dict())
-
+def _massage_permissions(document):
+  """
+  Returns the permissions for a given document as a dictionary
+  """
+  read_perms = document.list_permissions(perm='read')
+  write_perms = document.list_permissions(perm='write')
+  return {
+    'perms': {
+        'read': {
+          'users': [{'id': perm_user.id, 'username': perm_user.username} \
+                     for perm_user in read_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+                     for perm_group in read_perms.groups.all()]
+        },
+        'write': {
+          'users': [{'id': perm_user.id, 'username': perm_user.username} \
+                     for perm_user in write_perms.users.all()],
+          'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+                     for perm_group in write_perms.groups.all()]
+        }
+      }
+    }
 
 @api_error_handler
 @require_POST
