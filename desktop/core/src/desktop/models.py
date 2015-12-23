@@ -744,9 +744,9 @@ class Document2Manager(models.Manager):
   def documents(self, user):
     return Document2.objects.filter(
         Q(owner=user) |
-        Q(documentpermission2__users=user) |
-        Q(documentpermission2__groups__in=user.groups.all()) |
-        Q(documentpermission2__all=True)
+        Q(document2permission__users=user) |
+        Q(document2permission__groups__in=user.groups.all()) |
+        Q(document2permission__all=True)
     ).distinct().order_by('-last_modified')
 
   def directory(self, user, path):
