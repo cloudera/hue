@@ -670,6 +670,19 @@ class Collection2(object):
   def _make_gridlayout_header_field(cls, field, isDynamic=False):
     return {'name': field['name'], 'type': field['type'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
 
+
+  @classmethod
+  def _make_luke_from_schema_fields(cls, schema_fields):
+    return dict([
+          (f['name'], {
+              'copySources': [],
+              'type': f['type'],
+              'required': True,
+              'uniqueKey': f.get('uniqueKey'),
+              'flags': u'%s-%s-----OF-----l' % ('I' if f['indexed'] else '-', 'S' if f['stored'] else '-'), u'copyDests': []
+          })
+        for f in schema_fields['fields']])
+
   def get_absolute_url(self):
     return reverse('search:index') + '?collection=%s' % self.id
 
@@ -677,8 +690,14 @@ class Collection2(object):
     return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
 
   def fields_data(self, user, name):
-    schema_fields = SolrApi(SOLR_URL.get(), user).fields(name)
-    schema_fields = schema_fields['schema']['fields']
+    api = SolrApi(SOLR_URL.get(), user)
+    try:
+      schema_fields = api.fields(name)
+      schema_fields = schema_fields['schema']['fields']
+    except Exception, e:
+      LOG.warn('/luke call did not succeed: %s' % e)
+      fields = api.schema_fields(name)
+      schema_fields = Collection2._make_luke_from_schema_fields(fields)
 
     return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.iteritems()])
 

@@ -128,6 +128,47 @@ class TestWithMockedSolr(TestSearchBase):
     response = '{"uid":"1111111","method":"check_user"}\x00'
     response = json.loads(response.replace('\x00', '')) # Does not call real API
 
+  def test_convert_schema_fields_to_luke(self):
+    schema_fields = {u'fields': [
+        {u'indexed': True, u'stored': True, u'type': u'long', u'name': u'_version_'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tdate', u'name': u'created_at'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'string', u'name': u'expanded_url'},
+        {u'uniqueKey': True, u'name': u'id', u'required': True, u'stored': True, u'indexed': True, u'type': u'tlong'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tlong', u'name': u'in_reply_to_status_id'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tint', u'name': u'in_reply_to_user_id'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'string', u'name': u'media_url_https'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tint', u'name': u'retweet_count'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'text_general', u'name': u'source'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'text_general', u'name': u'text'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tint', u'name': u'user_followers_count'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tint', u'name': u'user_friends_count'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'string', u'name': u'user_location'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'text_general', u'name': u'user_name'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'string', u'name': u'user_screen_name'},
+        {u'indexed': True, u'stored': True, u'required': True, u'type': u'tint', u'name': u'user_statuses_count'}
+        ], u'responseHeader': {u'status': 0, u'QTime': 1}
+    }
+    assert_equal([
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'long', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'string', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'string', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'string', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'string', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tdate', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'text_general', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'text_general', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'text_general', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tint', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tint', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tint', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tint', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tint', u'copyDests': []},
+        {'uniqueKey': None, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tlong', u'copyDests': []},
+        {'uniqueKey': True, 'copySources': [], 'flags': u'I-S-----OF-----l', 'required': True, 'type': u'tlong', u'copyDests': []}
+        ],
+        sorted(Collection2._make_luke_from_schema_fields(schema_fields).values())
+    )
+
   def test_response_escaping_multi_value(self):
     MockResource.set_solr_response("""{
       "responseHeader": {
