@@ -964,7 +964,7 @@ class Document2Permission(models.Model):
   perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
     (READ_PERM, 'read'),
     (WRITE_PERM, 'write'),
-    (COMMENT_PERM, 'comment'), # PLAYER PERM?    
+    (COMMENT_PERM, 'comment'), # PLAYER PERM?
   ))
 
   link = models.CharField(default=uuid_default, max_length=255, unique=True) # Short link like dropbox
