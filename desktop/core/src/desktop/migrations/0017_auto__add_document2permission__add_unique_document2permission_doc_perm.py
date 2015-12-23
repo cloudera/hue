@@ -14,7 +14,6 @@ class Migration(SchemaMigration):
             ('doc', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['desktop.Document2'])),
             ('all', self.gf('django.db.models.fields.BooleanField')(default=True, db_index=True)),
             ('perms', self.gf('django.db.models.fields.CharField')(default='read', max_length=10, db_index=True)),
-            ('link', self.gf('django.db.models.fields.CharField')(default='a08735f3-7fed-47b6-a914-0e3083c92790', unique=True, max_length=255)),
         ))
         db.send_create_signal(u'desktop', ['Document2Permission'])
 
@@ -117,7 +116,7 @@ class Migration(SchemaMigration):
             'owner': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'doc2_owner'", 'to': u"orm['auth.User']"}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'tags_rel_+'", 'db_index': 'True', 'to': u"orm['desktop.Document2']"}),
             'type': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '32', 'db_index': 'True'}),
-            'uuid': ('django.db.models.fields.CharField', [], {'default': "'c6fc0d9d-3f2f-4220-9081-c63f53e21a48'", 'max_length': '36', 'db_index': 'True'}),
+            'uuid': ('django.db.models.fields.CharField', [], {'default': "'1f47e38e-ed53-4237-9d7b-a6f8c4a08459'", 'max_length': '36', 'db_index': 'True'}),
             'version': ('django.db.models.fields.SmallIntegerField', [], {'default': '1', 'db_index': 'True'})
         },
         u'desktop.document2permission': {
@@ -126,7 +125,6 @@ class Migration(SchemaMigration):
             'doc': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['desktop.Document2']"}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'db_index': 'True', 'to': u"orm['auth.Group']", 'db_table': "'documentpermission2_groups'", 'symmetrical': 'False'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'link': ('django.db.models.fields.CharField', [], {'default': "'7c3f5ce0-f8e7-43c7-8b94-20c8f0196222'", 'unique': 'True', 'max_length': '255'}),
             'perms': ('django.db.models.fields.CharField', [], {'default': "'read'", 'max_length': '10', 'db_index': 'True'}),
             'users': ('django.db.models.fields.related.ManyToManyField', [], {'db_index': 'True', 'to': u"orm['auth.User']", 'db_table': "'documentpermission2_users'", 'symmetrical': 'False'})
         },
