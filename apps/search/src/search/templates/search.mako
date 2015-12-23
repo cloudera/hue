@@ -542,6 +542,91 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="resultset-widget">
   <!-- ko if: $root.collection.template.isGridLayout() -->
+
+  <div class="grid-row">
+
+    <div class="grid-left-bar">
+      <div style="opacity:1">
+        <div style="margin-top:25px;">
+          <a class="grid-side-btn active" href="javascript: void(0)"
+             data-bind="click: function() {  }, css: {'active': true}" title="${_('Grid')}">
+            <i class="fa fa-th"></i>
+          </a>
+        </div>
+
+        <div class="dropdown">
+          <a class="grid-side-btn" style="padding-right:0" href="javascript: void(0)"
+             data-bind="css: {'active': true }, click: function() {  }">
+            <i class="hcha hcha-bar-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-line-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
+               style="display: none;"></i>
+            <i class="hcha hcha-pie-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
+               style="display: none;"></i>
+            <i class="fa fa-fw fa-dot-circle-o"
+               data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" style="display: none;"></i>
+            <i class="fa fa-fw fa-map-marker" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.MAP"
+               style="display: none;"></i>
+            <i class="hcha hcha-map-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"
+               style="display: none;"></i>
+          </a>
+          <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown"
+             href="javascript: void(0)" data-bind="css: {'active': true}">
+            <i class="fa fa-caret-down"></i>
+          </a>
+
+          <ul class="dropdown-menu">
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"
+                 class="active">
+                <i class="hcha hcha-bar-chart"></i> Bars
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+                <i class="hcha hcha-line-chart"></i> Lines
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                <i class="hcha hcha-pie-chart"></i> Pie
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+                <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> Scatter
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+                <i class="fa fa-fw fa-map-marker chart-icon"></i> Marker Map
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                <i class="hcha hcha-map-chart"></i> Gradient Map
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ }, css: { 'blue' : true }"><i
+              class="fa fa-cog"></i></a>
+        </div>
+
+
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-results">
+
     <div style="float:left; margin-right: 10px">
       <div data-bind="visible: ! $root.collection.template.showFieldList()" style="padding-top: 5px; display: inline-block">
         <a href="javascript: void(0)"  data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
@@ -628,6 +713,8 @@ ${ dashboard.layout_skeleton() }
           </table>
         </div>
       </div>
+      </div>
+    </div>
     </div>
   <!-- /ko -->
 </script>
