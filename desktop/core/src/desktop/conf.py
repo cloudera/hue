@@ -279,7 +279,7 @@ LEAFLET_TILE_LAYER_ATTRIBUTION = Config(
   key="leaflet_tile_layer_attribution",
   help=_("The copyright message for the specified Leaflet maps Tile Layer"),
   type=coerce_str_lowercase,
-  default="&copy; <a href='http://osm.org/copyright'>OpenStreetMap</a> contributors")
+  default='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors')
 
 POLL_ENABLED = Config(
   key="poll_enabled",
