@@ -283,6 +283,10 @@ class Collection(models.Model):
       props['collection']['enabled'] = True
     if 'leafletmap' not in props['collection']['template']:
       props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
+    if 'showGrid' not in props['collection']['template']:
+      props['collection']['template']['showGrid'] = True
+    if 'showChart' not in props['collection']['template']:
+      props['collection']['template']['showChart'] = False
     for facet in props['collection']['facets']:
       properties = facet['properties']
       if 'gap' in properties and not 'initial_gap' in properties:
@@ -330,6 +334,8 @@ class Collection(models.Model):
       </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
       "isGridLayout": True,
       "showFieldList": True,
+      "showGrid": True,
+      "showChart": False,
       "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
       "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},
@@ -382,6 +388,10 @@ class Collection(models.Model):
     if 'collection' in properties_python:
       if 'showFieldList' not in properties_python['collection']['template']:
         properties_python['collection']['template']['showFieldList'] = True
+      if 'showGrid' not in properties_python['collection']['template']:
+        properties_python['collection']['template']['showGrid'] = True
+      if 'showChart' not in properties_python['collection']['template']:
+        properties_python['collection']['template']['showChart'] = False
 
     return properties_python
 
@@ -469,6 +479,10 @@ class Collection2(object):
     # For backward compatibility
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 10
+    if 'showGrid' not in props['collection']['template']:
+      props['collection']['template']['showGrid'] = True
+    if 'showChart' not in props['collection']['template']:
+      props['collection']['template']['showChart'] = False
     if 'enabled' not in props['collection']:
       props['collection']['enabled'] = True
     if 'leafletmap' not in props['collection']['template']:
@@ -532,6 +546,8 @@ class Collection2(object):
       </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
       "isGridLayout": True,
       "showFieldList": True,
+      "showGrid": True,
+      "showChart": False,
       "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
       "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},
