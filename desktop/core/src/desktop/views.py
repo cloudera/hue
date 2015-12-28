@@ -389,6 +389,10 @@ def commonheader(title, section, user, padding="90px", skip_topbar=False):
     'padding': padding,
     'user': user,
     'skip_topbar': skip_topbar,
+    'leaflet': {
+      'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
+      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
+    },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
   })

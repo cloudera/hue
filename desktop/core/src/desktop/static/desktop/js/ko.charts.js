@@ -373,8 +373,15 @@
           try {
             if (_map == null) {
               _map = L.map(element);
-              L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
-                attribution: $(element).width() > 300 ? '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors' : ''
+              var tileLayerOptions = {
+                layer: 'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+              }
+              if (LeafletGlobals) {
+                tileLayerOptions = LeafletGlobals
+              }
+              L.tileLayer(tileLayerOptions.layer, {
+                attribution: $(element).width() > 300 ? tileLayerOptions.attribution : ''
               }).addTo(_map);
 
               if (L.control.zoomBox) {

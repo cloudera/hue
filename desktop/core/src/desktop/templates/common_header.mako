@@ -141,6 +141,11 @@ from django.utils.translation import ugettext as _
       }
     };
 
+    LeafletGlobals = {
+      layer: '${ leaflet['layer'] |n,unicode }',
+      attribution: '${ leaflet['attribution'] |n,unicode }'
+    };
+
   </script>
 
   <!--[if lt IE 9]>
