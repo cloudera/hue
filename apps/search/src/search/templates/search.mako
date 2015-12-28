@@ -547,16 +547,16 @@ ${ dashboard.layout_skeleton() }
 
     <div class="grid-left-bar">
       <div style="opacity:1">
-        <div style="margin-top:25px;">
+        <div style="margin-top:3px">
           <a class="grid-side-btn active" href="javascript: void(0)"
-             data-bind="click: function() {  }, css: {'active': true}" title="${_('Grid')}">
-            <i class="fa fa-th"></i>
+             data-bind="click: function() { $root.collection.template.showChart(false); $root.collection.template.showGrid(true); }, css: {'active': $root.collection.template.showGrid() }" title="${_('Grid')}">
+            <i class="fa fa-fw fa-th"></i>
           </a>
         </div>
 
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript: void(0)"
-             data-bind="css: {'active': true }, click: function() {  }">
+             data-bind="css: {'active': $root.collection.template.showChart() }, click: function() { $root.collection.template.showChart(true); $root.collection.template.showGrid(false); }">
             <i class="hcha hcha-bar-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
             <i class="hcha hcha-line-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
                style="display: none;"></i>
@@ -569,8 +569,8 @@ ${ dashboard.layout_skeleton() }
             <i class="hcha hcha-map-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"
                style="display: none;"></i>
           </a>
-          <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown"
-             href="javascript: void(0)" data-bind="css: {'active': true}">
+          <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
+             href="javascript: void(0)" data-bind="css: {'active': $root.collection.template.showChart()}">
             <i class="fa fa-caret-down"></i>
           </a>
 
@@ -616,30 +616,49 @@ ${ dashboard.layout_skeleton() }
         </div>
 
         <div>
-          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ }, css: { 'blue' : true }"><i
-              class="fa fa-cog"></i></a>
+          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ $root.collection.template.showFieldList(!$root.collection.template.showFieldList()) }, css: { 'blue' : $root.collection.template.showFieldList() }"><i
+              class="fa fa-fw fa-cog"></i></a>
         </div>
-
+        <!-- ko if: $root.response && $root.response().response && $root.response().response.numFound > 0 -->
+        <form method="POST" action="${ url('search:download') }" style="display:inline">
+          ${ csrf_token(request) | n,unicode }
+          <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
+          <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
+          <input type="hidden" name="download">
+          <input type="hidden" name="type" value="">
+          <div class="dropdown">
+            <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
+              <i class="fa fa-fw fa-download"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('csv'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="hfo hfo-file-csv"></i> CSV
+                </a>
+              </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('xls'); $f.submit()}" title="${ _('Download first rows as XLS') }">
+                  <i class="hfo hfo-file-xls"></i> Excel
+                </a>
+              </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="hfo hfo-file-json"></i> JSON
+                </a>
+              </li>
+            </ul>
+          </div>
+        </form>
+        <!-- /ko -->
 
       </div>
     </div>
   </div>
 
   <div class="grid-results">
-
-    <div style="float:left; margin-right: 10px">
-      <div data-bind="visible: ! $root.collection.template.showFieldList()" style="padding-top: 5px; display: inline-block">
-        <a href="javascript: void(0)"  data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
-          <i class="fa fa-chevron-right"></i>
-        </a>
-      </div>
-    </div>
     <div data-bind="visible: $root.collection.template.showFieldList()" style="float:left; margin-right: 10px; background-color: #F6F6F6; padding: 5px">
       <span data-bind="visible: $root.collection.template.showFieldList()">
         <div>
-          <a href="javascript: void(0)" class="pull-right" data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
-            <i class="fa fa-chevron-left"></i>
-          </a>
           <input type="text" data-bind="clearable: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
         </div>
         <div style="margin-bottom: 8px">
@@ -926,20 +945,6 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="resultset-pagination">
-<!-- ko if: $data.response.numFound > 0 -->
-<div class="pull-right" style="display:inline">
-  <form method="POST" action="${ url('search:download') }" style="display:inline">
-    ${ csrf_token(request) | n,unicode }
-    <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
-    <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
-    <input type="hidden" name="download">
-    <button class="btn" type="submit" name="json" title="${ _('Download first rows as JSON') }"><i class="hfo hfo-file-json"></i></button>
-    <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="hfo hfo-file-csv"></i></button>
-    <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="hfo hfo-file-xls"></i></button>
-  </form>
-</div>
-<!-- /ko -->
-
 <div style="text-align: center; margin-top: 4px">
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
