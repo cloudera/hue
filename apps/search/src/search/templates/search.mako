@@ -546,27 +546,28 @@ ${ dashboard.layout_skeleton() }
   <div class="grid-row">
 
     <div class="grid-left-bar">
-      <div style="opacity:1">
+      <div>
+        <!-- ko if: $root.response && $root.response().response && $root.response().response.numFound > 0 -->
         <div style="margin-top:3px">
           <a class="grid-side-btn active" href="javascript: void(0)"
              data-bind="click: function() { $root.collection.template.showChart(false); $root.collection.template.showGrid(true); }, css: {'active': $root.collection.template.showGrid() }" title="${_('Grid')}">
-            <i class="fa fa-fw fa-th"></i>
+            <i class="fa fa-th"></i>
           </a>
         </div>
 
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript: void(0)"
              data-bind="css: {'active': $root.collection.template.showChart() }, click: function() { $root.collection.template.showChart(true); $root.collection.template.showGrid(false); }">
-            <i class="hcha hcha-bar-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
-            <i class="hcha hcha-line-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
+            <i class="hcha hcha-bar-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-line-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
                style="display: none;"></i>
-            <i class="hcha hcha-pie-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
+            <i class="hcha hcha-pie-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
                style="display: none;"></i>
             <i class="fa fa-fw fa-dot-circle-o"
-               data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" style="display: none;"></i>
-            <i class="fa fa-fw fa-map-marker" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.MAP"
+               data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" style="display: none;"></i>
+            <i class="fa fa-fw fa-map-marker" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP"
                style="display: none;"></i>
-            <i class="hcha hcha-map-chart" data-bind="visible: $root.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"
+            <i class="hcha hcha-map-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP"
                style="display: none;"></i>
           </a>
           <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
@@ -577,38 +578,38 @@ ${ dashboard.layout_skeleton() }
           <ul class="dropdown-menu">
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"
                  class="active">
                 <i class="hcha hcha-bar-chart"></i> Bars
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
                 <i class="hcha hcha-line-chart"></i> Lines
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
                 <i class="hcha hcha-pie-chart"></i> Pie
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
                 <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> Scatter
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); }">
                 <i class="fa fa-fw fa-map-marker chart-icon"></i> Marker Map
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $root.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
                 <i class="hcha hcha-map-chart"></i> Gradient Map
               </a>
             </li>
@@ -617,9 +618,8 @@ ${ dashboard.layout_skeleton() }
 
         <div>
           <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ $root.collection.template.showFieldList(!$root.collection.template.showFieldList()) }, css: { 'blue' : $root.collection.template.showFieldList() }"><i
-              class="fa fa-fw fa-cog"></i></a>
+              class="fa fa-cog"></i></a>
         </div>
-        <!-- ko if: $root.response && $root.response().response && $root.response().response.numFound > 0 -->
         <form method="POST" action="${ url('search:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
           <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
@@ -628,7 +628,7 @@ ${ dashboard.layout_skeleton() }
           <input type="hidden" name="type" value="">
           <div class="dropdown">
             <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
-              <i class="fa fa-fw fa-download"></i>
+              <i class="fa fa-download"></i>
             </a>
             <ul class="dropdown-menu">
               <li>
@@ -686,17 +686,17 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <div>
-      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
+      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults() || !$root.response().response">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
       </div>
 
-      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0 && $root.response().response">
         <br/>
         ${ _('Your search did not match any documents.') }
       </div>
 
-      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showGrid()">
         <!-- ko if: $root.response().response -->
           <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding: 8px; color: #666"></div>
         <!-- /ko -->
@@ -732,10 +732,97 @@ ${ dashboard.layout_skeleton() }
           </table>
         </div>
       </div>
+
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showChart()">
+        <span data-bind="template: {name: 'grid-chart-settings', data: $root.collection.template.chartSettings}"></span>
+      </div>
+
       </div>
     </div>
     </div>
   <!-- /ko -->
+</script>
+
+<script type="text/html" id="grid-chart-settings">
+  <div>
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+      <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
+    </ul>
+    <div data-bind="visible: chartType() != ''">
+      <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP) ? $root.collection.template.cleanedMeta : $root.collection.template.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX}" class="input-medium"></select>
+    </div>
+
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+      <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('value')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
+    </ul>
+
+    <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
+      <ul class="unstyled" data-bind="foreach: $root.collection.template.cleanedNumericMeta">
+        <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
+      </ul>
+    </div>
+    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? $root.collection.template.cleanedMeta : $root.collection.template.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
+    </div>
+
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
+      <li class="nav-header">${_('label')}</li>
+    </ul>
+    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
+      <select data-bind="options: $root.collection.template.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
+    </div>
+
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <li class="nav-header">${_('scatter group')}</li>
+    </ul>
+    <div data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <select data-bind="options: $root.collection.template.cleanedMeta, value: chartScatterGroup, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartScatterGroup}" class="input-medium"></select>
+    </div>
+
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <li class="nav-header">${_('scatter size')}</li>
+    </ul>
+    <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <select data-bind="options: $root.collection.template.cleanedMeta, value: chartScatterSize, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartScatterSize}" class="input-medium"></select>
+    </div>
+
+    <!-- ko if: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP -->
+    <ul class="nav nav-list" style="border: none; background-color: #FFF">
+      <li class="nav-header">${_('scope')}</li>
+    </ul>
+    <div data-bind="visible: chartType() != ''">
+      <select data-bind="selectedOptions: chartScope, optionsCaption: '${_ko('Choose a scope...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a scope...") }', update: chartScope}">
+        <option value="world">${ _("World") }</option>
+        <option value="europe">${ _("Europe") }</option>
+        <option value="aus">${ _("Australia") }</option>
+        <option value="bra">${ _("Brazil") }</option>
+        <option value="can">${ _("Canada") }</option>
+        <option value="chn">${ _("China") }</option>
+        <option value="fra">${ _("France") }</option>
+        <option value="deu">${ _("Germany") }</option>
+        <option value="ita">${ _("Italy") }</option>
+        <option value="jpn">${ _("Japan") }</option>
+        <option value="gbr">${ _("UK") }</option>
+        <option value="usa">${ _("USA") }</option>
+      </select>
+    </div>
+    <!-- /ko -->
+
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <li class="nav-header">${_('sorting')}</li>
+    </ul>
+    <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP && chartType() != ko.HUE_CHARTS.TYPES.GRADIENTMAP && chartType() != ko.HUE_CHARTS.TYPES.SCATTERCHART">
+      <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
+      <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
+      <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+    </div>
+  </div>
 </script>
 
 <script type="text/html" id="html-resultset-widget">
@@ -2001,6 +2088,7 @@ ${ dashboard.layout_skeleton() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -2015,6 +2103,7 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
+<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('search/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
