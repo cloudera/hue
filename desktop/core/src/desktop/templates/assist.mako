@@ -94,6 +94,10 @@ from desktop.views import _ko
       cursor: pointer;
     }
 
+    .assist-column {
+      position: relative;
+    }
+
     .assist-entry,a {
       white-space: nowrap;
     }
