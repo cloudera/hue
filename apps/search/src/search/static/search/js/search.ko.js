@@ -833,6 +833,48 @@ var Collection = function (vm, collection) {
     });
   });
 
+  self.template.getMeta = function (extraCheck) {
+    return $.map(self.template.fieldsAttributes(), function (field) {
+      if (field.name() != '' && extraCheck(field.type())) {
+        return field;
+      }
+    }).sort(function (a, b) {
+      return a.name().toLowerCase().localeCompare(b.name().toLowerCase());
+    });
+  }
+
+  function alwaysTrue() {
+    return true;
+  }
+
+  function isNumericColumn(type) {
+    return $.inArray(type, ['tfloat', 'tint', 'tlong', 'tdouble', 'plong', 'pint', 'pfloat', 'pdouble', 'currency', 'long', 'int', 'float', 'double']) > -1;
+  }
+
+  function isDateTimeColumn(type) {
+    return $.inArray(type, ['tdate', 'pdate', 'date']) > -1;
+  }
+
+  function isStringColumn(type) {
+    return !isNumericColumn(type) && !isDateTimeColumn(type);
+  }
+
+  self.template.cleanedMeta = ko.computed(function () {
+    return self.template.getMeta(alwaysTrue);
+  });
+
+  self.template.cleanedNumericMeta = ko.computed(function () {
+    return self.template.getMeta(isNumericColumn);
+  });
+
+  self.template.cleanedStringMeta = ko.computed(function () {
+    return self.template.getMeta(isStringColumn);
+  });
+
+  self.template.cleanedDateTimeMeta = ko.computed(function () {
+    return self.template.getMeta(isDateTimeColumn);
+  });
+
   self.getTemplateField = function (name) {
     var _field = null;
     $.each(self.template.fields(), function (index, field) {
@@ -1245,26 +1287,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.isSyncingCollections = ko.observable(false);
 
   self.isPlayerMode = ko.observable(false);
-
-  var snippet = {};
-
-  self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
-  self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
-  self.chartScatterGroup = ko.observable(typeof snippet.chartScatterGroup != "undefined" && snippet.chartScatterGroup != null ? snippet.chartScatterGroup : null);
-  self.chartScatterSize = ko.observable(typeof snippet.chartScatterSize != "undefined" && snippet.chartScatterSize != null ? snippet.chartScatterSize : null);
-  self.chartScope = ko.observable(typeof snippet.chartScope != "undefined" && snippet.chartScope != null ? snippet.chartScope : "world");
-  self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
-  self.chartYSingle = ko.observable(typeof snippet.chartYSingle != "undefined" && snippet.chartYSingle != null ? snippet.chartYSingle : null);
-  self.chartYMulti = ko.observableArray(typeof snippet.chartYMulti != "undefined" && snippet.chartYMulti != null ? snippet.chartYMulti : []);
-  self.chartData = ko.observableArray(typeof snippet.chartData != "undefined" && snippet.chartData != null ? snippet.chartData : []);
-  self.chartMapLabel = ko.observable(typeof snippet.chartMapLabel != "undefined" && snippet.chartMapLabel != null ? snippet.chartMapLabel : null);
-
-  self.hasDataForChart = ko.computed(function () {
-    if (self.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.chartType() == ko.HUE_CHARTS.TYPES.LINECHART) {
-      return typeof self.chartX() != "undefined" && self.chartX() != null && self.chartYMulti().length > 0;
-    }
-    return typeof self.chartX() != "undefined" && self.chartX() != null && typeof self.chartYSingle() != "undefined" && self.chartYSingle() != null ;
-  });
 
   function bareWidgetBuilder(name, type){
     return new Widget({
