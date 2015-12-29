@@ -27,14 +27,13 @@ import sys
 
 from guppy import hpy
 
+from django.utils.translation import ugettext_lazy as _
 
 import desktop.conf
 import desktop.log
 import desktop.redaction
-
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
-from django.utils.translation import ugettext_lazy as _
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -317,6 +316,12 @@ else:
     # Wrap each request in a transaction.
     "ATOMIC_REQUESTS" : True,
   }
+
+# If database engine is MySQL, set to InnoDB
+if default_db['ENGINE'] == 'django.db.backends.mysql':
+  if not 'OPTIONS' in default_db or default_db['OPTIONS'] is None:
+    default_db['OPTIONS'] = dict()
+  default_db['OPTIONS'].update({'init_command': 'SET storage_engine=INNODB'})
 
 DATABASES = {
   'default': default_db
