@@ -193,6 +193,26 @@ from desktop.views import _ko
       margin-right: 0 !important;
       padding-right: 4px !important;
     }
+
+    .assist-details-wrap {
+      display: table;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    .assist-details-wrap > div {
+      display: table-row;
+    }
+
+    .assist-details-header {
+      display: table-cell;
+      width: 95px;
+      font-weight: bold;
+    }
+
+    .assist-details-value {
+      display: table-cell;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -327,6 +347,20 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="document-details-content">
+    <!-- ko with: definition -->
+    <div class="assist-details-wrap">
+      <div><div class="assist-details-header">${ _('Description') }</div><div class="assist-details-value" data-bind="text: description"></div></div>
+      <div><div class="assist-details-header">${ _('Modified') }</div><div class="assist-details-value" data-bind="text: last_modified"></div></div>
+      <div><div class="assist-details-header">${ _('Owner') }</div><div class="assist-details-value" data-bind="text: owner"></div></div>
+    </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="document-details-title">
+    <span data-bind="text: definition.name"></span>
+  </script>
+
   <script type="text/html" id="assist-documents-inner-panel">
     <div class="assist-inner-panel" style="overflow: auto; display:none;">
       <!-- ko with: documents -->
@@ -358,7 +392,14 @@ from desktop.views import _ko
             <span data-bind="text: name"></span>
           </a>
           <ul data-bind="slideVisible: open, foreach: documents">
-            <li><a data-bind="attr: {'href': definition.absoluteUrl }, text: definition.name"></a></li>
+            <li style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+              <div class="assist-actions table-actions" style="opacity: 0;" >
+                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'document-details-content', titleTemplate: 'document-details-title' }">
+                  <i class='fa fa-info' title="${ _('Details') }"></i>
+                </a>
+              </div>
+              <a data-bind="attr: {'href': definition.absoluteUrl }, text: definition.name"></a>
+            </li>
           </ul>
         </li>
       </ul>
