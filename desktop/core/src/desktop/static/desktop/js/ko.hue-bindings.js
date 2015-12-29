@@ -301,6 +301,63 @@
     }
   };
 
+  ko.bindingHandlers.templatePopover = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+      var options = ko.unwrap(valueAccessor());
+
+      var clickTrigger = options.trigger === 'click';
+      $.extend(options, { html: true, trigger: 'manual' });
+
+      var $element = $(element);
+
+      var $contents;
+
+      var visible = false;
+
+      var hidePopover = function () {
+        $element.popover('hide');
+        visible = false;
+      };
+
+      var showPopover = function () {
+        $contents = $('<div>').hide().appendTo('body');
+        $title = $('<div>').hide().appendTo('body');
+
+        ko.renderTemplate(options.contentTemplate, viewModel, {
+          afterRender: function () {
+            ko.renderTemplate(options.titleTemplate, viewModel, {
+              afterRender: function () {
+                options.content = $contents.html();
+                options.title = $title.html();
+                $element.popover(options);
+                $element.popover('show');
+                var $tip = $element.data('popover').$tip;
+                ko.cleanNode($tip.get(0));
+                ko.applyBindings(viewModel, $tip.get(0));
+                $tip.find(".close-popover").click(hidePopover);
+                $contents.remove();
+                visible = true;
+              }
+            }, $title.get(0), 'replaceChildren');
+          }
+        }, $contents.get(0), 'replaceChildren');
+      };
+
+      if (clickTrigger) {
+        $element.click(function () {
+          if (visible) {
+            hidePopover();
+          } else {
+            showPopover();
+          }
+        });
+      } else {
+        $element.mouseenter(showPopover);
+        $element.mouseleave(hidePopover);
+      }
+    }
+  };
+
   ko.bindingHandlers.freshereditor = {
     init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var _el = $(element);
