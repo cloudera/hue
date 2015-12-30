@@ -306,11 +306,19 @@
       var options = ko.unwrap(valueAccessor());
 
       var clickTrigger = options.trigger === 'click';
-      $.extend(options, { html: true, trigger: 'manual' });
+      var $container = $('#popover-container');
+      if (! $container.length) {
+        $container = $('<div>').attr('id', 'popover-container').appendTo('body');
+        $('<div>').addClass('temp-content').hide().appendTo($container);
+        $('<div>').addClass('temp-title').hide().appendTo($container);
+      }
+
+      var $content = $container.find('.temp-content');
+      var $title = $container.find('.temp-title');
+
+      $.extend(options, { html: true, trigger: 'manual', container: '#popover-container' });
 
       var $element = $(element);
-
-      var $contents;
 
       var visible = false;
 
@@ -320,14 +328,11 @@
       };
 
       var showPopover = function () {
-        $contents = $('<div>').hide().appendTo('body');
-        $title = $('<div>').hide().appendTo('body');
-
         ko.renderTemplate(options.contentTemplate, viewModel, {
           afterRender: function () {
             ko.renderTemplate(options.titleTemplate, viewModel, {
               afterRender: function () {
-                options.content = $contents.html();
+                options.content = $content.html();
                 options.title = $title.html();
                 $element.popover(options);
                 $element.popover('show');
@@ -335,12 +340,16 @@
                 ko.cleanNode($tip.get(0));
                 ko.applyBindings(viewModel, $tip.get(0));
                 $tip.find(".close-popover").click(hidePopover);
-                $contents.remove();
+                if (options.minWidth) {
+                  $(".popover:visible").css('min-width', options.minWidth)
+                }
+                $content.empty();
+                $title.empty();
                 visible = true;
               }
             }, $title.get(0), 'replaceChildren');
           }
-        }, $contents.get(0), 'replaceChildren');
+        }, $content.get(0), 'replaceChildren');
       };
 
       if (clickTrigger) {
