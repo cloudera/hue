@@ -341,6 +341,11 @@ from desktop.views import _ko
               </a>
             </li>
           </ul>
+          <!-- ko if: !loading() && entries().length === 0 -->
+          <ul class="assist-tables">
+            <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+          </ul>
+          <!-- /ko -->
         </li>
       </ul>
       <!-- /ko -->
@@ -662,18 +667,24 @@ from desktop.views import _ko
         self.documents = new AssistDocuments(self.assistHelper, i18n);
         self.documents.load();
 
-        self.selectedHdfsEntry = ko.observable(new AssistHdfsEntry({
-          definition: {
-            name: '/',
-            type: 'dir'
-          },
-          parent: null,
-          assistHelper: self.assistHelper
-        }));
-        self.selectedHdfsEntry().open(true);
+        var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+        var parts = lastKnownPath.split('/');
+        parts[0] = '/';
 
-        // TODO: When we can tell the root entry to go to a path:
-        // self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+        var currentEntry = null;
+        $.each(parts, function (idx, part) {
+          currentEntry = new AssistHdfsEntry({
+            definition: {
+              name: part,
+              type: 'dir'
+            },
+            parent: currentEntry,
+            assistHelper: self.assistHelper
+          });
+          currentEntry.loadEntries();
+        });
+        currentEntry.open(true);
+        self.selectedHdfsEntry = ko.observable(currentEntry);
 
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
