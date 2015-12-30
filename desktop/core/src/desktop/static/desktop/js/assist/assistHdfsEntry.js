@@ -75,7 +75,10 @@
     self.loading(true);
 
     var successCallback = function(data) {
-      self.entries($.map(data.files, function (file) {
+      var filteredFiles = $.grep(data.files, function (file) {
+        return file.name !== '.' && file.name !== '..';
+      });
+      self.entries($.map(filteredFiles, function (file) {
         return new AssistHdfsEntry({
           definition: file,
           parent: self,
@@ -86,7 +89,6 @@
     };
 
     var errorCallback = function () {
-      console.log(data);
       self.loading(false);
     };
 
