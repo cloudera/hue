@@ -580,39 +580,39 @@ ${ dashboard.layout_skeleton() }
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"
                  class="active">
-                <i class="hcha hcha-bar-chart"></i> Bars
+                <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
-                <i class="hcha hcha-line-chart"></i> Lines
+                <i class="hcha hcha-line-chart"></i> ${_('Lines')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
-                <i class="hcha hcha-pie-chart"></i> Pie
+                <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
               </a>
             </li>
-            <li>
-              <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
-                <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> Scatter
-              </a>
-            </li>
+##             <li>
+##               <a href="javascript:void(0)"
+##                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.SCATTERCHART); }">
+##                 <i class="fa fa-fw fa-dot-circle-o chart-icon"></i> ${_('Scatter')}
+##               </a>
+##             </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); }">
-                <i class="fa fa-fw fa-map-marker chart-icon"></i> Marker Map
+                <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
               </a>
             </li>
-            <li>
-              <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
-                <i class="hcha hcha-map-chart"></i> Gradient Map
-              </a>
-            </li>
+##             <li>
+##               <a href="javascript:void(0)"
+##                  data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); }">
+##                 <i class="hcha hcha-map-chart"></i> ${_('Gradient Map')}
+##               </a>
+##             </li>
           </ul>
         </div>
 
@@ -735,7 +735,7 @@ ${ dashboard.layout_skeleton() }
       </div>
 
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showChart()">
-        <div data-bind="visible: !$root.collection.template.hasDataForChart()">${ _('Select the chart parameters on the left') }</div>
+        <div data-bind="visible: !$root.collection.template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
         <div data-bind="visible: $root.collection.template.hasDataForChart" style="overflow-x: auto">
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                 transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
@@ -749,11 +749,6 @@ ${ dashboard.layout_skeleton() }
           <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
 
-          <div data-bind="attr:{'id': 'gradientMapChart_'+id()}, mapChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data, scope: $root.collection.template.chartSettings.chartScope()},
-                transformer: mapChartDataTransformerGrid, isScale: true, showControls: false, height: 380, maxWidth: 750, parentSelector: '.chart-container', visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}" class="chart"></div>
-
-          <div data-bind="attr:{'id': 'scatterChart_'+id()}, scatterChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
-                transformer: scatterChartDataTransformerGrid, maxWidth: 350 }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART" class="chart"></div>
         </div>
       </div>
     </div>
@@ -2307,13 +2302,17 @@ function rangeUpPieChartDataTransformer(data) {
 
 function pieChartDataTransformerGrid(data) {
   var _data = [];
+  var chartX = viewModel.collection.template.chartSettings.chartX();
+  var chartY = viewModel.collection.template.chartSettings.chartYSingle();
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
-    _data.push({
-      label: item.item[viewModel.collection.template.chartSettings.chartX()](),
-      value: item.item[viewModel.collection.template.chartSettings.chartYSingle()](),
-      obj: item
-    });
+    if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
+      _data.push({
+        label: item.item[chartX](),
+        value: item.item[chartY](),
+        obj: item
+      });
+    }
   });
   return _data;
 }
@@ -2551,11 +2550,6 @@ function mapChartDataTransformer(data) {
   return _data;
 }
 
-function mapChartDataTransformerGrid(data) {
-  var _data = [];
-  return _data;
-}
-
 function leafletMapChartDataTransformer(data) {
   var _data = [];
   if (!$.isEmptyObject(data.counts) && data.counts.response.docs && viewModel.collection.template.leafletmap.latitudeField() != "" && viewModel.collection.template.leafletmap.longitudeField() != "") {
@@ -2576,14 +2570,19 @@ function leafletMapChartDataTransformer(data) {
 function leafletMapChartDataTransformerGrid(data) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {
-    var _obj = {
-      lat: item.item[viewModel.collection.template.chartSettings.chartX()](),
-      lng: item.item[viewModel.collection.template.chartSettings.chartYSingle()]()
+    var chartX = viewModel.collection.template.chartSettings.chartX();
+    var chartY = viewModel.collection.template.chartSettings.chartYSingle();
+    var chartMapLabel = viewModel.collection.template.chartSettings.chartMapLabel();
+    if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
+      var _obj = {
+        lat: item.item[chartX](),
+        lng: item.item[chartY]()
+      }
+      if (chartMapLabel != "" && item.item[chartMapLabel]) {
+        _obj.label = item.item[chartMapLabel]();
+      }
+      _data.push(_obj);
     }
-    if (viewModel.collection.template.chartSettings.chartMapLabel() != "") {
-      _obj.label = item.item[viewModel.collection.template.chartSettings.chartMapLabel()]();
-    }
-    _data.push(_obj);
   });
   return _data;
 }
@@ -2641,17 +2640,22 @@ function multiSerieDataTransformer(rawDatum) {
 function multiSerieDataTransformerGrid(rawDatum) {
   var _datum = [];
 
-  if (viewModel.collection.template.chartSettings.chartX() != null && viewModel.collection.template.chartSettings.chartYMulti().length > 0 && rawDatum.counts.length > 0) {
+  var chartX = viewModel.collection.template.chartSettings.chartX();
+  var chartY = viewModel.collection.template.chartSettings.chartYMulti();
+
+  if (chartX != null && chartY.length > 0 && rawDatum.counts.length > 0) {
     var _plottedSerie = 0;
-    viewModel.collection.template.chartSettings.chartYMulti().forEach(function (col) {
+    chartY.forEach(function (col) {
       var _data = [];
       $(rawDatum.counts).each(function (cnt, item) {
-      _data.push({
-          series: _plottedSerie,
-          x: item.item[viewModel.collection.template.chartSettings.chartX()](),
-          y: item.item[col](),
-          obj: item.item
-        });
+        if (item.item[chartX] && item.item[col]) {
+          _data.push({
+            series: _plottedSerie,
+            x: item.item[chartX](),
+            y: item.item[col](),
+            obj: item.item
+          });
+        }
       });
       if (rawDatum.sorting == "asc") {
         _data.sort(function (a, b) {

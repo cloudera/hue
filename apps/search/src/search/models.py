@@ -290,7 +290,7 @@ class Collection(models.Model):
     if 'chartSettings' not in props['collection']['template']:
       props['collection']['template']['chartSettings'] = {}
     if 'chartType' not in props['collection']['template']['chartSettings']:
-      props['collection']['template']['chartSettings']['chartType'] = 'barchart'
+      props['collection']['template']['chartSettings']['chartType'] = 'bars'
     if 'chartSorting' not in props['collection']['template']['chartSettings']:
       props['collection']['template']['chartSettings']['chartSorting'] = 'none'
     if 'chartScatterGroup' not in props['collection']['template']['chartSettings']:
@@ -359,7 +359,7 @@ class Collection(models.Model):
       "showGrid": True,
       "showChart": False,
       "chartSettings": {
-        'chartType': 'barchart',
+        'chartType': 'bars',
         'chartSorting': 'none',
         'chartScatterGroup': None,
         'chartScatterSize': None,
@@ -429,7 +429,7 @@ class Collection(models.Model):
       if 'chartSettings' not in properties_python['collection']['template']:
         properties_python['collection']['template']['chartSettings'] = {}
       if 'chartType' not in properties_python['collection']['template']['chartSettings']:
-        properties_python['collection']['template']['chartSettings']['chartType'] = 'barchart'
+        properties_python['collection']['template']['chartSettings']['chartType'] = 'bars'
       if 'chartSorting' not in properties_python['collection']['template']['chartSettings']:
         properties_python['collection']['template']['chartSettings']['chartSorting'] = 'none'
       if 'chartScatterGroup' not in properties_python['collection']['template']['chartSettings']:
@@ -542,7 +542,7 @@ class Collection2(object):
     if 'chartSettings' not in props['collection']['template']:
       props['collection']['template']['chartSettings'] = {}
     if 'chartType' not in props['collection']['template']['chartSettings']:
-      props['collection']['template']['chartSettings']['chartType'] = 'barchart'
+      props['collection']['template']['chartSettings']['chartType'] = 'bars'
     if 'chartSorting' not in props['collection']['template']['chartSettings']:
       props['collection']['template']['chartSettings']['chartSorting'] = 'none'
     if 'chartScatterGroup' not in props['collection']['template']['chartSettings']:
@@ -627,7 +627,7 @@ class Collection2(object):
       "showGrid": True,
       "showChart": False,
       "chartSettings" : {
-        'chartType': 'barchart',
+        'chartType': 'bars',
         'chartSorting': 'none',
         'chartScatterGroup': None,
         'chartScatterSize': None,
