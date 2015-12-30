@@ -875,6 +875,20 @@ var Collection = function (vm, collection) {
     return self.template.getMeta(isDateTimeColumn);
   });
 
+  self.template.hasDataForChart = ko.computed(function () {
+    var hasData = false;
+    if (self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART || self.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART) {
+      hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && self.template.chartSettings.chartYMulti().length > 0;
+    }
+    else {
+     hasData = typeof self.template.chartSettings.chartX() != "undefined" && self.template.chartSettings.chartX() != null && typeof self.template.chartSettings.chartYSingle() != "undefined" && self.template.chartSettings.chartYSingle() != null ;
+    }
+    if (!hasData && self.template.showChart()){
+      self.template.showFieldList(true);
+    }
+    return hasData;
+  });
+
   self.getTemplateField = function (name) {
     var _field = null;
     $.each(self.template.fields(), function (index, field) {
