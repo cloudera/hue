@@ -302,6 +302,24 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="hdfs-details-content">
+    <!-- ko with: definition -->
+    <div class="assist-details-wrap">
+      <div><div class="assist-details-header">${ _('Size') }</div><div class="assist-details-value" data-bind="text: humansize"></div></div>
+      <!-- ko with: stats -->
+      <div><div class="assist-details-header">${ _('User') }</div><div class="assist-details-value" data-bind="text: user"></div></div>
+      <div><div class="assist-details-header">${ _('Group') }</div><div class="assist-details-value" data-bind="text: group"></div></div>
+      <!-- /ko -->
+      <div><div class="assist-details-header">${ _('Permissions') }</div><div class="assist-details-value" data-bind="text: rwx"></div></div>
+      <div><div class="assist-details-header">${ _('Date') }</div><div class="assist-details-value" data-bind="text: mtime"></div></div>
+    </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/html" id="hdfs-details-title">
+    <span data-bind="text: definition.name"></span>
+  </script>
+
   <script type="text/html" id="assist-hdfs-inner-panel">
     <div class="assist-inner-panel" style="overflow: auto; display:none;">
       <!-- ko with: selectedHdfsEntry -->
@@ -329,7 +347,13 @@ from desktop.views import _ko
 
         <li>
           <ul class="assist-tables" data-bind="foreach: entries">
-            <li class="assist-entry assist-table-link">
+            <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+              <div class="assist-actions table-actions" style="opacity: 0;" >
+                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
+                  <i class='fa fa-info' title="${ _('Details') }"></i>
+                </a>
+              </div>
+
               <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
                 <!-- ko if: definition.type === 'dir' -->
                 <i class="fa fa-fw fa-folder muted"></i>
@@ -399,7 +423,7 @@ from desktop.views import _ko
           <ul data-bind="slideVisible: open, foreach: documents">
             <li style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
               <div class="assist-actions table-actions" style="opacity: 0;" >
-                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'document-details-content', titleTemplate: 'document-details-title' }">
+                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'document-details-content', titleTemplate: 'document-details-title', minWidth: '350px' }">
                   <i class='fa fa-info' title="${ _('Details') }"></i>
                 </a>
               </div>
