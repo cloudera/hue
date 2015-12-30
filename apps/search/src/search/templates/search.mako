@@ -2575,6 +2575,16 @@ function leafletMapChartDataTransformer(data) {
 
 function leafletMapChartDataTransformerGrid(data) {
   var _data = [];
+  $(data.counts).each(function (cnt, item) {
+    var _obj = {
+      lat: item.item[viewModel.collection.template.chartSettings.chartX()](),
+      lng: item.item[viewModel.collection.template.chartSettings.chartYSingle()]()
+    }
+    if (viewModel.collection.template.chartSettings.chartMapLabel() != "") {
+      _obj.label = item.item[viewModel.collection.template.chartSettings.chartMapLabel()]();
+    }
+    _data.push(_obj);
+  });
   return _data;
 }
 
