@@ -48,6 +48,7 @@
 
     self.entries = ko.observableArray([]);
 
+    self.loaded = false;
     self.loading = ko.observable(false);
     self.open = ko.observable(false);
 
@@ -67,7 +68,7 @@
     huePubSub.publish('assist.dblClickHdfsItem', self);
   };
 
-  AssistHdfsEntry.prototype.loadEntries = function() {
+  AssistHdfsEntry.prototype.loadEntries = function(callback) {
     var self = this;
     if (self.loading()) {
       return;
@@ -85,14 +86,48 @@
           assistHelper: self.assistHelper
         })
       }));
+      self.loaded = true;
       self.loading(false);
+      if (callback) {
+        callback();
+      }
     };
 
     var errorCallback = function () {
       self.loading(false);
+      if (callback) {
+        callback();
+      }
     };
 
     self.assistHelper.fetchHdfsPath(self.getHierarchy(), successCallback, errorCallback)
+  };
+
+  AssistHdfsEntry.prototype.loadDeep = function(folders, callback) {
+    var self = this;
+
+    if (folders.length === 0) {
+      callback(self);
+      return;
+    }
+
+    var findNextAndLoadDeep = function () {
+      var nextName = folders.shift();
+      var foundEntry = $.grep(self.entries(), function (entry) {
+        return entry.definition.name === nextName && entry.definition.type === 'dir';
+      });
+      if (foundEntry.length === 1) {
+        foundEntry[0].loadDeep(folders, callback);
+      } else {
+        callback(self);
+      }
+    };
+
+    if (! self.loaded) {
+      self.loadEntries(findNextAndLoadDeep);
+    } else {
+      findNextAndLoadDeep();
+    }
   };
 
   AssistHdfsEntry.prototype.getHierarchy = function () {

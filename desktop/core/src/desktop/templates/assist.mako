@@ -669,20 +669,21 @@ from desktop.views import _ko
 
         var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
         var parts = lastKnownPath.split('/');
-        parts[0] = '/';
+        parts.shift();
 
-        var currentEntry = null;
-        $.each(parts, function (idx, part) {
-          currentEntry = new AssistHdfsEntry({
-            definition: {
-              name: part,
-              type: 'dir'
-            },
-            parent: currentEntry,
-            assistHelper: self.assistHelper
-          });
-          currentEntry.loadEntries();
+        var currentEntry = new AssistHdfsEntry({
+          definition: {
+            name: '/',
+            type: 'dir'
+          },
+          parent: null,
+          assistHelper: self.assistHelper
         });
+
+        currentEntry.loadDeep(parts, function (entry) {
+          currentEntry = entry;
+        });
+
         currentEntry.open(true);
         self.selectedHdfsEntry = ko.observable(currentEntry);
 
