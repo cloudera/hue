@@ -222,28 +222,25 @@ ${ assist.assistPanel() }
   <div class="row-fluid">
     <div class="span6">
       <div title="${ _('Owner') }">
-        <a data-bind="{attr: { 'href': '/useradmin/users/view/' + details.properties.owner } }">
-          <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
-        </a>
+        <i class="fa fa-fw fa-user muted"></i> <a data-bind="text: details.properties.owner, attr: { 'href': '/useradmin/users/view/' + details.properties.owner }"></a>
       </div>
       <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: details.properties.create_time"></span></div>
       <div title="${ _('Format') }"><i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span></div>
       <div title="${ _('Compressed?') }"><i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span><span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span></div>
     </div>
-
     <div class="span6">
-      <div><a data-bind="attr: {'href': hdfs_link, 'rel': path_location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
-      <!-- ko if: $parent.tableStats  -->
-        <!-- ko with: $parent.tableStats -->
-          <!-- ko if: typeof numFiles !== 'undefined'  -->
-            <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
-          <!-- /ko -->
-          <!-- ko if: typeof numRows !== 'undefined'  -->
-            <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
-          <!-- /ko -->
-          <!-- ko if: typeof totalSize !== 'undefined'  -->
-            <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
-          <!-- /ko -->
+      <div>
+        <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': path_location }">${_('Location')}</a>
+      </div>
+      <!-- ko with: $parent.tableStats -->
+        <!-- ko if: typeof numFiles !== 'undefined'  -->
+          <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
+        <!-- /ko -->
+        <!-- ko if: typeof numRows !== 'undefined'  -->
+          <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
+        <!-- /ko -->
+        <!-- ko if: typeof totalSize !== 'undefined'  -->
+          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
         <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -300,37 +297,39 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables">
-    <!-- ko if: stats  -->
+    <!-- ko with: stats  -->
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Stats') }</h4>
         <div class="row-fluid">
           <div class="span6">
             <div title="${ _('Comment') }"><i class="fa fa-fw fa-comment muted"></i>
-              <!-- ko if: stats().comment -->
-              <span data-bind="text: stats().comment"></span>
+              <!-- ko if: comment -->
+              <span data-bind="text: comment"></span>
               <!-- /ko -->
-              <!-- ko ifnot: stats().comment -->
+              <!-- ko ifnot: comment -->
               <i>${_('No comment.')}</i>
               <!-- /ko -->
             </div>
           </div>
           <div class="span3">
             <div title="${ _('Owner') }">
-              <a data-bind="{attr: { 'href': '/useradmin/users/view/' + stats().owner_name } }">
-                <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: stats().owner_name"></span> (<span data-bind="text: stats().owner_type"></span>)
+              <i class="fa fa-fw fa-user muted"></i> <a data-bind="attr: { 'href': '/useradmin/users/view/' + owner_name }">
+                <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
               </a>
             </div>
           </div>
           <div class="span3">
-            <div><a data-bind="attr: {'href': stats().hdfs_link, 'rel': stats().location }"><i class="fa fa-fw fa-hdd-o"></i> ${_('Location')}</a></div>
+            <div>
+              <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
+            </div>
           </div>
         </div>
-        <!-- ko if: stats().parameters -->
+        <!-- ko with: parameters -->
         <div class="row-fluid">
           <div class="span12">
             <div title="${ _('Parameters') }">
-              <!-- ko template: { if: stats().parameters, name: 'metastore-databases-parameters', data: hueUtils.parseHivePseudoJson(stats().parameters) }--><!-- /ko -->
+              <!-- ko template: { name: 'metastore-databases-parameters', data: hueUtils.parseHivePseudoJson($data) }--><!-- /ko -->
             </div>
           </div>
         </div>
