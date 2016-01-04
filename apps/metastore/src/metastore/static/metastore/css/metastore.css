@@ -93,6 +93,7 @@ h2.card-heading {
   margin-bottom: 10px;
 }
 
+.empty-header-col,
 .metastore-main h4 {
   font-weight: bold;
   color: #999;
@@ -105,4 +106,16 @@ h2.card-heading {
 
 .tile {
   margin-bottom: 20px;
+}
+
+.properties-table {
+  width: 100%;
+}
+
+.properties-table td {
+  padding-top: 5px;
+}
+
+.property-name {
+  padding-left: 10px;
 }

@@ -568,24 +568,24 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-properties-tab">
-  <table class="table table-striped table-condensed">
-    <thead>
-    <tr>
-      <th>${ _('Name') }</th>
-      <th>${ _('Value') }</th>
-      <th>${ _('Comment') }</th>
-    </tr>
-    </thead>
-    <tbody>
-      ##           % for prop in table.properties:
-##             <tr>
-##               <td>${ smart_unicode(prop['col_name']) }</td>
-##               <td>${ smart_unicode(prop['data_type']) if prop['data_type'] else '' }</td>
-##               <td>${ smart_unicode(prop['comment']) if prop['comment'] else '' }&nbsp;</td>
-##             </tr>
-##           % endfor
-        </tbody>
+  <!-- ko with: tableDetails -->
+  <table class="properties-table">
+    <tbody data-bind="foreach: properties">
+      <!-- ko if: col_name.indexOf('#') === 0 -->
+      <tr>
+        <td colspan="3"><h4 data-bind="text: col_name.substring(1)"></h4></td>
+      </tr>
+      <!-- /ko -->
+      <!-- ko ifnot: col_name.indexOf('#') === 0 -->
+      <tr>
+        <td class="property-name" data-bind="text: col_name || '&nbsp;'"></td>
+        <td data-bind="text: data_type || '&nbsp;'"></td>
+        <td data-bind="text: comment || '&nbsp;'"></td>
+      </tr>
+      <!-- /ko -->
+    </tbody>
   </table>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="metastore-describe-table">
