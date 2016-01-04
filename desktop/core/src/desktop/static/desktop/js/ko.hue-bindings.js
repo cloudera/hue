@@ -73,7 +73,7 @@
 
       var selector = options.selector;
       var hideTimeout = -1;
-      var override = options.override && ! ko.isObservable(options.override);
+      ko.utils.domData.set(element, 'visibleOnHover.override', ko.utils.unwrapObservable(options.override) || false)
       var inside = false;
 
       var show = function () {
@@ -82,24 +82,17 @@
       };
 
       var hide = function () {
-        hideTimeout = window.setTimeout(function () {
-          $element.find(selector).fadeTo("normal", 0);
-        }, 50);
+        if (! inside) {
+          hideTimeout = window.setTimeout(function () {
+            $element.find(selector).fadeTo("normal", 0);
+          }, 50);
+        }
       };
 
-      if (ko.isObservable(options.override)) {
-        override = options.override();
-        options.override.subscribe(function (newValue) {
-          override = newValue;
-          if (newValue) {
-            show();
-          } else if (! inside) {
-            hide();
-          }
-        })
-      }
+      ko.utils.domData.set(element, 'visibleOnHover.show', show)
+      ko.utils.domData.set(element, 'visibleOnHover.hide', hide)
 
-      if (override) {
+      if (ko.utils.domData.get(element, 'visibleOnHover.override')) {
         window.setTimeout(show, 1);
       }
 
@@ -110,10 +103,19 @@
 
       $element.mouseleave(function () {
         inside = false;
-        if (! override) {
+        if (! ko.utils.domData.get(element, 'visibleOnHover.override')) {
           hide();
         }
       });
+    },
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      if (ko.utils.unwrapObservable(valueAccessor().override)) {
+        ko.utils.domData.set(element, 'visibleOnHover.override', true)
+        ko.utils.domData.get(element, 'visibleOnHover.show')()
+      } else {
+        ko.utils.domData.set(element, 'visibleOnHover.override', false)
+        ko.utils.domData.get(element, 'visibleOnHover.hide')();
+      }
     }
   };
 

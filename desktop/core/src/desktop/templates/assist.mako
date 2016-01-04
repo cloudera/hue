@@ -290,7 +290,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-db-inner-panel">
     <div class="assist-inner-panel" style="overflow: auto; display:none;" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
       <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-      <ul class="nav nav-list" data-bind="visibleOnHover: { selector: '.hover-actions' }" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
+      <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
         <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
         <!-- ko with: selectedSource -->
         <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
@@ -453,42 +453,44 @@ from desktop.views import _ko
     <div class="hover-actions assist-db-header-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $parent.reloading }" title="${_('Manually refresh the table list')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
     </div>
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <li class="assist-inner-header">
-      ${_('Databases')}
-      <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
-    </li>
-    <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
-      <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
-    </li>
-    <li data-bind="visible: ! hasErrors()" >
-      <ul class="assist-tables" data-bind="foreach: filteredEntries">
-        <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
-          <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
-        </li>
-      </ul>
-      <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
-      <ul class="assist-tables">
-        <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
-      </ul>
-      <!-- /ko -->
-    </li>
-    <li class="center" data-bind="visible: loading" >
-      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-    </li>
-    <li data-bind="visible: hasErrors">
-      <span>${ _('The database list cannot be loaded.') }</span>
-    </li>
+    <div data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" style="position: relative; width:100%">
+      <li class="assist-inner-header">
+        ${_('Databases')}
+        <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
+      </li>
+      <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
+        <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      </li>
+      <li data-bind="visible: ! hasErrors()" >
+        <ul class="assist-tables" data-bind="foreach: filteredEntries">
+          <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
+            <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
+            <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+          </li>
+        </ul>
+        <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
+        </ul>
+        <!-- /ko -->
+      </li>
+      <li class="center" data-bind="visible: loading" >
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      </li>
+      <li data-bind="visible: hasErrors">
+        <span>${ _('The database list cannot be loaded.') }</span>
+      </li>
+    </div>
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading }" style="position: relative; width:100%">
+    <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }" style="position: relative; width:100%">
       <li class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
