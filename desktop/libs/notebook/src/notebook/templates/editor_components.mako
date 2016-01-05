@@ -152,7 +152,7 @@ ${ require.config() }
         </a>
 
         <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-          <i class="fa fa-fw fa-expand"></i>
+          <i class="fa fa-expand"></i>
         </a>
 
         % if mode != 'editor':
