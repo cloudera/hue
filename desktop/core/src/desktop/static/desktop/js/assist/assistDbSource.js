@@ -49,7 +49,7 @@
       query: ko.observable("").extend({ rateLimit: 150 })
     };
 
-    self.filterActive = ko.computed(function () {
+    self.filterActive = ko.pureComputed(function () {
       return self.filter.query().length !== 0;
     });
 
@@ -62,11 +62,11 @@
 
     self.databases = ko.observableArray();
 
-    self.hasEntries = ko.computed(function() {
+    self.hasEntries = ko.pureComputed(function() {
       return self.databases().length > 0;
     });
 
-    self.filteredEntries = ko.computed(function () {
+    self.filteredEntries = ko.pureComputed(function () {
       if (self.filter.query().length === 0) {
         return self.databases();
       }
@@ -83,7 +83,7 @@
 
     self.reloading = ko.observable(false);
 
-    self.loadingTables = ko.computed(function() {
+    self.loadingTables = ko.pureComputed(function() {
       return typeof self.selectedDatabase() != "undefined" && self.selectedDatabase() !== null && self.selectedDatabase().loading();
     });
 
@@ -110,7 +110,7 @@
     self.loading = ko.observable(false);
     var dbIndex = {};
     var nestedFilter = {
-      query: ko.observable("").extend({ rateLimit: 150 }),
+      query: ko.observable("").extend({ rateLimit: { timeout: 250, method: 'notifyWhenChangesStop' } }),
       showTables: ko.observable(true),
       showViews: ko.observable(true)
     };

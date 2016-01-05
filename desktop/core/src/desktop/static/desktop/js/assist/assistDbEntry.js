@@ -70,7 +70,7 @@
       }
     });
 
-    self.hasEntries = ko.computed(function() {
+    self.hasEntries = ko.pureComputed(function() {
       return self.entries().length > 0;
     });
 
@@ -103,7 +103,7 @@
       self.columnName = self.definition.name;
     }
 
-    self.editorText = ko.computed(function () {
+    self.editorText = ko.pureComputed(function () {
       if (self.definition.isTable || self.definition.isView) {
         return self.definition.name;
       }
