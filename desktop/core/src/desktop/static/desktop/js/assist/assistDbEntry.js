@@ -147,8 +147,9 @@
 
     var successCallback = function(data) {
       self.entries([]);
+      var newEntries = [];
       if (typeof data.tables_meta !== "undefined") {
-        self.entries($.map(data.tables_meta, function(table) {
+        newEntries = $.map(data.tables_meta, function(table) {
           return self.createEntry({
             name: table.name,
             displayName: table.name,
@@ -157,9 +158,9 @@
             isTable: /table/i.test(table.type),
             isView: /view/i.test(table.type)
           });
-        }));
+        });
       } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
-        self.entries($.map(data.extended_columns, function (columnDef) {
+        newEntries = $.map(data.extended_columns, function (columnDef) {
           var displayName = columnDef.name;
           if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
             displayName += ' (' + columnDef.type + ')'
@@ -179,19 +180,19 @@
             isColumn: true,
             type: shortType
           });
-        }));
+        });
       } else if (typeof data.columns !== "undefined" && data.columns !== null) {
-        self.entries($.map(data.columns, function(columnName) {
+        newEntries = $.map(data.columns, function(columnName) {
           return self.createEntry({
             name: columnName,
             displayName: columnName,
             title: columnName,
             isColumn: true
           });
-        }));
+        });
       } else if (typeof data.type !== "undefined" && data.type !== null) {
         if (data.type === "map") {
-          self.entries([
+          newEntries = [
             self.createEntry({
               name: "key",
               displayName: "key (" + data.key.type + ")",
@@ -205,19 +206,18 @@
               isMapValue: true,
               type: data.value.type
             })
-          ]);
-          self.entries()[1].open(true);
+          ];
         } else if (data.type == "struct") {
-          self.entries($.map(data.fields, function(field) {
+          newEntries = $.map(data.fields, function(field) {
             return self.createEntry({
               name: field.name,
               displayName: field.name + " (" + field.type + ")",
               title: field.name + " (" + field.type + ")",
               type: field.type
             });
-          }));
+          });
         } else if (data.type == "array") {
-          self.entries([
+          newEntries = [
             self.createEntry({
               name: "item",
               displayName: "item (" + data.item.type + ")",
@@ -225,11 +225,22 @@
               isArray: true,
               type: data.item.type
             })
-          ]);
-          self.entries()[0].open(true);
+          ];
         }
       }
+
       self.loading(false);
+      if (data.type === 'array' || data.type === 'map') {
+        self.entries(newEntries);
+        self.entries()[0].open(true);
+        return;
+      }
+
+      newEntries.sort(function (a, b) {
+        return a.definition.name.localeCompare(b.definition.name);
+      });
+
+      self.entries(newEntries);
     };
 
     var errorCallback = function () {
