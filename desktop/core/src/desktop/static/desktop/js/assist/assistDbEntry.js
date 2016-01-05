@@ -74,7 +74,26 @@
       return self.entries().length > 0;
     });
 
-    self.filteredEntries = ko.computed(function () {
+    self.entryLimit = ko.observable(500);
+    self.increasingLimit = ko.observable(false);
+
+    self.increaseLimit = function () {
+      self.increasingLimit(true);
+      window.setTimeout(function () {
+        self.entryLimit(self.entryLimit() + 500);
+        self.increasingLimit(false);
+      }, 100);
+    };
+
+    self.hasMoreEntries = ko.pureComputed(function () {
+      return self.limitedFilteredEntries().length < self.filteredEntries().length;
+    });
+
+    self.limitedFilteredEntries = ko.pureComputed(function () {
+      return self.filteredEntries().slice(0, self.entryLimit());
+    });
+
+    self.filteredEntries = ko.pureComputed(function () {
       if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
         return self.entries();
       }

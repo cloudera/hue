@@ -219,6 +219,12 @@ from desktop.views import _ko
       display: table-cell;
     }
 
+    .assist-show-more {
+      padding-left: 2px;
+      padding-bottom: 5px;
+      font-style: italic;
+    }
+
     .no-entries {
       font-style: italic;
     }
@@ -276,7 +282,7 @@ from desktop.views import _ko
       <li class="assist-entry no-entries">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }">
+    <ul data-bind="foreach: limitedFilteredEntries, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko ifnot: definition.isTable -->
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
@@ -292,6 +298,17 @@ from desktop.views import _ko
       </li>
       <!-- /ko -->
     </ul>
+    <!-- ko if: hasMoreEntries -->
+    <ul class="assist-tables">
+      <li>
+        <div class="assist-show-more" data-bind="visible: ! increasingLimit()" style="display: none;">
+          ${_('Showing')} <span data-bind="text: limitedFilteredEntries().length"></span> ${_('of')} <span data-bind="text: filteredEntries().length"></span> -
+          <a href="javascript:void(0);" data-bind="click: increaseLimit">${_('Show more')}...</a>
+        </div>
+        <div class="center" data-bind="visible: increasingLimit" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      </li>
+    </ul>
+    <!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
