@@ -45,6 +45,11 @@ from desktop.views import _ko
       cursor: row-resize;
     }
 
+    .assist-spinner {
+      font-size: 20px;
+      color: #BBB;
+    }
+
     .assist-header {
       color: #338bb8;
       background-color: #f9f9f9;
@@ -213,6 +218,10 @@ from desktop.views import _ko
     .assist-details-value {
       display: table-cell;
     }
+
+    .no-entries {
+      font-style: italic;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -256,15 +265,15 @@ from desktop.views import _ko
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted"></i><span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
-      <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i></div>
-      <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
+      <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+      <!-- ko template: { if: open, name: 'assist-entries'  } --><!-- /ko -->
     </li>
   </script>
 
   <script type="text/html" id="assist-entries">
     <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
     <ul class="assist-tables">
-      <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
+      <li class="assist-entry no-entries">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }">
@@ -278,10 +287,8 @@ from desktop.views import _ko
           <!-- /ko -->
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
-        <div class="center"  data-bind="visible: loading" style="display:none;">
-          <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i>
-        </div>
-        <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
+        <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
+        <!-- ko template: { if: open, name: 'assist-entries'  } --><!-- /ko -->
       </li>
       <!-- /ko -->
     </ul>
@@ -682,7 +689,7 @@ from desktop.views import _ko
           self.availablePanels[0].visible(true);
         }
 
-        self.visiblePanels = ko.computed(function () {
+        self.visiblePanels = ko.pureComputed(function () {
           var result = $.grep(self.availablePanels, function (panel) {
             return panel.visible();
           });
