@@ -248,6 +248,19 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="assist-table-entry">
+    <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
+      <div class="assist-actions table-actions" style="opacity: 0">
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+        <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: assistDbSource.type, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
+        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
+      </div>
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted"></i><span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
+      <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i></div>
+      <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
+    </li>
+  </script>
+
   <script type="text/html" id="assist-entries">
     <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
     <ul class="assist-tables">
@@ -255,23 +268,22 @@ from desktop.views import _ko
     </ul>
     <!-- /ko -->
     <ul data-bind="foreach: filteredEntries, css: { 'assist-tables': definition.isDatabase }">
-      <li data-bind="visibleOnHover: { override: statsVisible, selector: (definition.isTable || definition.isView) ? '.table-actions' : '.column-actions' }, css: { 'assist-table': (definition.isTable || definition.isView), 'assist-column': definition.isColumn }">
-        <!-- ko template: { if: definition.isTable || definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
-        <a class="assist-entry" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': ! (definition.isTable || definition.isView), 'assist-table-link': (definition.isTable || definition.isView) }" href="javascript:void(0)">
-          <!-- ko if: definition.isTable -->
-            <i class="fa fa-fw fa-table muted"></i>
-          <!-- /ko -->
+      <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
+      <!-- ko ifnot: definition.isTable -->
+      <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
+        <!-- ko template: { if: definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
+        <a class="assist-entry" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': !definition.isView, 'assist-table-link': definition.isView }">
           <!-- ko if: definition.isView -->
             <i class="fa fa-fw fa-eye muted"></i>
           <!-- /ko -->
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
         <div class="center"  data-bind="visible: loading" style="display:none;">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+          <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i>
         </div>
         <!-- ko template: { if: open(), name: 'assist-entries'  } --><!-- /ko -->
       </li>
+      <!-- /ko -->
     </ul>
     <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
