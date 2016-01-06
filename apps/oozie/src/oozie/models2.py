@@ -192,7 +192,7 @@ class Workflow(Job):
     sub_wfs_ids = [node.data['properties']['workflow'] for node in nodes if node.data['type'] == 'subworkflow']
     workflow_mapping = dict([(workflow.uuid, Workflow(document=workflow)) for workflow in Document2.objects.filter(uuid__in=sub_wfs_ids)])
 
-    xml = re.sub(re.compile('\s*\n+', re.MULTILINE), '\n', django_mako.render_to_string(tmpl, {
+    xml = re.sub(re.compile('>\s*\n+', re.MULTILINE), '>\n', django_mako.render_to_string(tmpl, {
               'wf': self,
               'workflow': data['workflow'],
               'nodes': nodes,
@@ -200,7 +200,7 @@ class Workflow(Job):
               'node_mapping': node_mapping,
               'workflow_mapping': workflow_mapping
           }))
-    return force_unicode(xml)
+    return force_unicode(xml.strip())
 
   @property
   def name(self):
