@@ -463,17 +463,9 @@ ${ assist.assistPanel() }
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
 
-    <div class="span2 tile">
-      <h4>${ _('Sharing') }</h4>
+    <div class="span6 tile">
+      <h4>${ _('Tagging') }</h4>
       <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
-      <div title="${ _('Users') }"><i class="fa fa-fw fa-users muted"></i> ${ _('No users') }</div>
-    </div>
-
-    <div class="span4 tile">
-      <h4>${ _('Comments') }</h4>
-      <div>
-        <i class="fa fa-fw fa-comments-o muted"></i> ${ _('No comments available yet.') }
-      </div>
     </div>
   </div>
 
