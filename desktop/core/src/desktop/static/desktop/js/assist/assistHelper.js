@@ -462,5 +462,24 @@
     }
   };
 
-  return AssistHelper;
+  var instance = null;
+
+  return {
+
+    /**
+     * @param {Object} options
+     * @param {Object} options.i18n
+     * @param {string} options.i18n.errorLoadingDatabases
+     * @param {string} options.i18n.errorLoadingTablePreview
+     * @param {string} options.user
+     *
+     * @returns {AssistHelper}
+     */
+    getInstance: function (options) {
+      if (instance === null) {
+        instance = new AssistHelper(options.i18n, options.user);
+      }
+      return instance;
+    }
+  };
 }));

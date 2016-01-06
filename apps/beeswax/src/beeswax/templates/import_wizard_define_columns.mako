@@ -239,7 +239,7 @@ ${ assist.assistPanel() }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-      self.assistHelper = new AssistHelper(options);
+      self.assistHelper = AssistHelper.getInstance(options);
 
       huePubSub.subscribe("assist.table.selected", function (tableDef) {
         location.href = '/metastore/table/' + tableDef.database + '/' + tableDef.name;

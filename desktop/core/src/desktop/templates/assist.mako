@@ -688,7 +688,10 @@ from desktop.views import _ko
             'notebook' : "${ _('Notebook') }"
           }
         };
-        self.assistHelper = new AssistHelper(i18n, params.user);
+        self.assistHelper = AssistHelper.getInstance({
+          i18n: i18n,
+          user: params.user
+        });
 
         self.onlySql = params.onlySql;
         self.loading = ko.observable(false);
