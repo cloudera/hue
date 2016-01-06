@@ -1001,16 +1001,15 @@
       $.post("/notebook/api/close_session", {
         session: ko.mapping.toJSON(session)
       }, function (data) {
-        if (!silent && data.status != 0 && data.status != -2) {
+        if (! silent && data.status != 0 && data.status != -2) {
           $(document).trigger("error", data.message);
-          return;
         }
 
         if (callback) {
           callback();
         }
       }).fail(function (xhr) {
-        if (!silent) {
+        if (! silent) {
           $(document).trigger("error", xhr.responseText);
         }
       });
