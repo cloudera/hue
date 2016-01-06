@@ -19,6 +19,7 @@ import logging
 import re
 
 from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
