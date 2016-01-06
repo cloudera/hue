@@ -212,7 +212,7 @@ ${ assist.assistPanel() }
     <div title="${ _('Type') }">
       <!-- ko if: is_view -->
         <i class="fa fa-fw fa-eye muted"></i> ${ _('View') }
-      <!-- /ko -->        
+      <!-- /ko -->
       <!-- ko ifnot: is_view -->
         <i class="fa fa-fw fa-table muted"></i> ${ _('Table') }
       <!-- /ko -->
@@ -581,7 +581,7 @@ ${ assist.assistPanel() }
   </table>
 </script>
 
-<script type="text/html" id="metastore-properties-tab">
+<script type="text/html" id="metastore-details-tab">
   <!-- ko with: tableDetails -->
   <table class="properties-table">
     <tbody data-bind="foreach: properties">
@@ -620,7 +620,7 @@ ${ assist.assistPanel() }
     <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
     <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
     <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
-    <li><a href="#properties" data-toggle="tab">${ _('Properties') }</a></li>
+    <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none">
@@ -656,8 +656,8 @@ ${ assist.assistPanel() }
       ${ _('Not available') }
     </div>
 
-    <div class="tab-pane" id="properties">
-      <!-- ko template: 'metastore-properties-tab' --><!-- /ko -->
+    <div class="tab-pane" id="details">
+      <!-- ko template: 'metastore-details-tab' --><!-- /ko -->
     </div>
   </div>
 </script>
