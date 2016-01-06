@@ -44,8 +44,7 @@ ${ header.menubar() }
          <div class="row-fluid">
           <div id="properties" class="section">
             <ul class="nav nav-tabs" style="margin-bottom: 0">
-              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i
-                  class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
+              <li class="active"><a href="#step1" class="step">${ _('Step 1:') } <i class="fa fa-cogs"></i> ${ _('Check Configuration') }</a></li>
               <li><a href="#step2" class="step">${ _('Step 2:') } <i class="fa fa-book"></i> ${ _('Examples') }</a></li>
               <li><a href="#step3" class="step">${ _('Step 3:') } <i class="fa fa-group"></i> ${ _('Users') }</a></li>
               <li><a id="lastStep" href="#step4" class="step">${ _('Step 4:') } <i class="fa fa-flag"></i> ${_('Go!') }</a></li>
@@ -70,156 +69,143 @@ ${ header.menubar() }
           </div>
 
           <div id="step2" class="stepDetails hide">
-
-          <div class="card card-home card-tab card-listcontent">
-            <h2 class="card-heading simple">${ _('Install individual application examples') }</h2>
-          <div class="card-body">
-            <p>
-          <ul>
-          % if 'beeswax' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('beeswax:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['beeswax'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'impala' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('impala:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['impala'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'search' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('search:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['search'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'spark' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('notebook:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['spark'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'oozie' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('oozie:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['oozie'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'hbase' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('hbase:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['hbase'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'pig' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('pig:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['pig'].nice_name }
-                </a>
-              </li>
-          % endif
-          % if 'jobsub' in app_names:
-              <li>
-                <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
-                   data-sample-url="${ url('oozie:install_examples') }">
-                  <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
-                </a>
-              </li>
-          % endif
-          </ul>
-            </p>
-          </div>
-          </div>
-          </div>
-
-            <div id="step3" class="stepDetails hide">
-              <div class="card card-tab card-listcontent">
-                <h2 class="card-heading simple">${ _('Create or import users') }</h2>
-
-                <div class="card-body">
-                  <p>
-                    <a href="${ url('useradmin.views.list_users') }" target="_blank" style="padding-left: 2px"><img
-                        src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon"
-                        style="margin-right: 4px;"> ${ _('User Admin') }</a>
-                  </p>
-                </div>
+            <div class="card card-tab card-listcontent">
+              <h2 class="card-heading simple">${ _('Install individual application examples') }</h2>
+              <div class="card-body">
+                <ul>
+                % if 'beeswax' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('beeswax:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['beeswax'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'impala' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('impala:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['impala'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'search' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('search:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['search'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'spark' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('notebook:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['spark'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'oozie' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('oozie:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['oozie'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'hbase' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('hbase:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['hbase'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'pig' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('pig:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['pig'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                % if 'jobsub' in app_names:
+                    <li>
+                      <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                         data-sample-url="${ url('oozie:install_examples') }">
+                        <i class="fa fa-download"></i> ${ apps['jobsub'].nice_name }
+                      </a>
+                    </li>
+                % endif
+                </ul>
               </div>
-
-              <div class="card card-home card-tab card-tab-bordertop card-listcontent">
-                <h2 class="card-heading simple">${ _('Tours and tutorials') }</h2>
-
-                <div class="card-body">
-                  <p>
-                    <label class="checkbox">
-                      <input class="updatePreferences" type="checkbox" name="tours_and_tutorials"
-                             style="margin-right: 10px"
-                             title="${ _('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and 'checked' or '' }/>
-                      ${ _('Display the "Available Tours" question mark when tours are available for a specific page.') }
-                    </label>
-                  </p>
-                </div>
-              </div>
-
-          <div class="card card-home card-tab card-tab-bordertop card-listcontent">
-            <h2 class="card-heading simple">${ _('Anonymous usage analytics') }</h2>
-
-            <div class="card-body">
-              <label class="checkbox">
-                <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ _('Check to enable usage analytics') }" ${ collect_usage and 'checked' or '' }/>
-                ${ _('Help improve Hue with anonymous usage analytics.') }
-                <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
-                   title="${ _('How does it work?') }"
-                   data-content="${ _('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
-                   <i class="fa fa-question-circle"></i>
-                </a>
-              </label>
             </div>
           </div>
 
+          <div id="step3" class="stepDetails hide">
+            <div class="card card-tab card-listcontent">
+              <h2 class="card-heading simple">${ _('Create or import users') }</h2>
+
+              <div class="card-body" style="margin-top: 10px">
+                <a href="${ url('useradmin.views.list_users') }" target="_blank" style="padding-left: 2px"><img
+                    src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon"
+                    style="margin-right: 4px;"> ${ _('User Admin') }</a>
+              </div>
             </div>
 
-            <div id="step4" class="stepDetails hide">
-              <div class="card card-tab card-listcontent">
-                <h2 class="card-heading simple">${ _('Use the applications') }</h2>
+            <div class="card card-home card-tab card-tab-bordertop card-listcontent margin-top-30">
+              <h2 class="card-heading simple">${ _('Tours and tutorials') }</h2>
 
-                <div class="card-body">
-                  <p>
-                    <a href="${ url('desktop.views.home') }" class="step"><i class="fa fa-home"></i> ${ _('Hue Home') }
-                    </a>
-                  </p>
-                </div>
+              <div class="card-body" style="margin-top: 10px">
+                <label class="checkbox">
+                  <input class="updatePreferences" type="checkbox" name="tours_and_tutorials"
+                         style="margin-right: 10px"
+                         title="${ _('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and 'checked' or '' }/>
+                  ${ _('Display the "Available Tours" question mark when tours are available for a specific page.') }
+                </label>
               </div>
-
-              <div class="card card-home card-tab card-tab-bordertop card-listcontent">
-                <h2 class="card-heading simple">${ _('Skip wizard next time') }</h2>
-
-                <div class="card-body">
-                  <p>
-                    <label class="checkbox">
-                      <input id="updateSkipWizard" type="checkbox"
-                             style="margin-right: 10px"
-                             title="${ _('Check to skip this wizard next time.') }"/>
-                      ${ _('Skip the Quick Start Wizard at next login and land directly on the home page.') }
-                    </label>
-                  </p>
-                </div>
-              </div>
-
             </div>
+
+            <div class="card card-home card-tab card-tab-bordertop card-listcontent margin-top-30">
+              <h2 class="card-heading simple">${ _('Anonymous usage analytics') }</h2>
+
+              <div class="card-body" style="margin-top: 10px">
+                <label class="checkbox">
+                  <input class="updatePreferences" type="checkbox" name="collect_usage" style="margin-right: 10px" title="${ _('Check to enable usage analytics') }" ${ collect_usage and 'checked' or '' }/>
+                  ${ _('Help improve Hue with anonymous usage analytics.') }
+                  <a href="javascript:void(0)" style="display: inline" data-trigger="hover" data-toggle="popover" data-placement="right" rel="popover"
+                     title="${ _('How does it work?') }"
+                     data-content="${ _('We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more.') }">
+                     <i class="fa fa-question-circle"></i>
+                  </a>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div id="step4" class="stepDetails hide">
+            <div class="card card-tab card-listcontent">
+              <h2 class="card-heading simple">${ _('Use the applications') }</h2>
+
+              <div class="card-body">
+                <a href="${ url('desktop.views.home') }" style="padding-left: 2px; line-height: 24px; margin-right: 4px"><i class="fa fa-home" style="font-size: 24px; color: #338bb8; vertical-align: middle;"></i> ${ _('Hue Home') }</a>
+              </div>
+            </div>
+
+            <div class="card card-home card-tab card-tab-bordertop card-listcontent">
+              <h2 class="card-heading simple">${ _('Skip wizard next time') }</h2>
+
+              <div class="card-body">
+                <label class="checkbox">
+                  <input id="updateSkipWizard" type="checkbox"
+                         style="margin-right: 10px"
+                         title="${ _('Check to skip this wizard next time.') }"/>
+                  ${ _('Skip the Quick Start Wizard at next login and land directly on the home page.') }
+                </label>
+              </div>
+            </div>
+
+          </div>
           </div>
 
           </div>
@@ -272,6 +258,10 @@ ${ header.menubar() }
 
   .footer {
     text-align: center;
+  }
+
+  .stepDetails .card .card-heading.simple {
+    border-bottom: none;
   }
 
 </style>
