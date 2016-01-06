@@ -393,7 +393,14 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
-              <td data-bind="text: type"></td>
+              <td>
+                <!-- ko if: type == 'Table' -->
+                  <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
+                <!-- /ko -->
+                <!-- ko if: type == 'View' -->
+                  <i class="fa fa-fw fa-eye muted" title="${ _('View') }"></i>
+                <!-- /ko -->
+              </td>
             </tr>
           </tbody>
         </table>
