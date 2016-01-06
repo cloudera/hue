@@ -231,32 +231,34 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-table-stats">
-  <!-- ko with: tableDetails -->
-  <h4>${ _('Stats') }
-    <!-- ko if: $parent.refreshingTableStats -->
-    <i class="fa fa-refresh fa-spin"></i>
-    <!-- /ko -->
-    <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
-    <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
-    <!-- /ko -->
-    <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
-  </h4>
-  <div class="row-fluid">
-    <div>
-      <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': path_location }">${_('Location')}</a>
+  <!-- ko if: tableDetails() && ! tableDetails().is_view -->
+    <!-- ko with: tableDetails -->
+    <h4>${ _('Stats') }
+      <!-- ko if: $parent.refreshingTableStats -->
+      <i class="fa fa-refresh fa-spin"></i>
+      <!-- /ko -->
+      <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
+      <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
+      <!-- /ko -->
+      <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
+    </h4>
+    <div class="row-fluid">
+      <div>
+        <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}">${_('Location')}</a>
+      </div>
+      <!-- ko with: $parent.tableStats -->
+        <!-- ko if: typeof numFiles !== 'undefined'  -->
+          <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
+        <!-- /ko -->
+        <!-- ko if: typeof numRows !== 'undefined'  -->
+          <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
+        <!-- /ko -->
+        <!-- ko if: typeof totalSize !== 'undefined'  -->
+          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
+        <!-- /ko -->
+      <!-- /ko -->
     </div>
-    <!-- ko with: $parent.tableStats -->
-      <!-- ko if: typeof numFiles !== 'undefined'  -->
-        <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
-      <!-- /ko -->
-      <!-- ko if: typeof numRows !== 'undefined'  -->
-        <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
-      <!-- /ko -->
-      <!-- ko if: typeof totalSize !== 'undefined'  -->
-        <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
-      <!-- /ko -->
     <!-- /ko -->
-  </div>
   <!-- /ko -->
 </script>
 
@@ -462,9 +464,11 @@ ${ assist.assistPanel() }
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
     % endif
-    <a class="inactive-action margin-left-10" href="${ 'table.hdfs_link' }" rel="${ 'table.path_location' }" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
-    <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap"></i></a>
+    <!-- ko if: tableDetails() -->
+      <a class="inactive-action margin-left-10" data-bind="visible: tableDetails().hdfs_link, attr: {'href': tableDetails().hdfs_link, 'rel': tableDetails().path_location}" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
+      <!-- ko if: tableDetails().partition_keys.length -->
+      <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap"></i></a>
+      <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
