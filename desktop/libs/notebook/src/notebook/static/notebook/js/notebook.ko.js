@@ -170,7 +170,7 @@
     };
 
     self.getAssistHelper = function() {
-      return notebook.getAssistHelper(self.type());
+      return AssistHelper.getInstance(vm);
     };
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
@@ -731,7 +731,6 @@
       }
     });
 
-    self.assistHelpers = {};
     self.history = ko.observableArray([]);
     self.showHistory = ko.observable(typeof notebook.showHistory != "undefined" && notebook.showHistory != null ? notebook.showHistory : false);
     self.showHistory.subscribe(function (val) {
@@ -739,16 +738,6 @@
         self.fetchHistory();
       }
     });
-
-    self.getAssistHelper = function (snippetType) {
-      if (! self.assistHelpers[snippetType]) {
-        self.assistHelpers[snippetType] = new AssistHelper({
-          user: vm.user,
-          i18n: vm.i18n
-        }, vm.i18n);
-      }
-      return self.assistHelpers[snippetType]
-    };
 
     self.getSession = function (session_type) {
       var _s = null;

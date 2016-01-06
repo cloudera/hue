@@ -430,7 +430,7 @@
     self.assistAvailable = ko.observable(true);
     self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
 
-    self.assistHelper = new AssistHelper(options);
+    self.assistHelper = AssistHelper.getInstance(options);
 
     self.reloading = ko.observable(false);
     self.loading = ko.observable(false);

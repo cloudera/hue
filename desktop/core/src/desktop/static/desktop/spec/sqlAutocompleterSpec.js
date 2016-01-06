@@ -26,7 +26,10 @@ define([
       responseForUrls: {}
     };
 
-    var assistHelper = new AssistHelper({}, "testUser");
+    var assistHelper = AssistHelper.getInstance({
+      i18n: {},
+      user: 'testUser'
+    });
 
     var snippet = {
       type: ko.observable(),
