@@ -56,9 +56,6 @@ ${ assist.assistPanel() }
 <script type="text/html" id="metastore-breadcrumbs">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
     <li>
-      <i class="fa fa-th muted"></i>
-    </li>
-    <li>
       <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}</a>
       <!-- ko if: database -->
       <span class="divider">&gt;</span>
@@ -137,7 +134,7 @@ ${ assist.assistPanel() }
       <tbody>
       <!-- ko foreach: detailedKeys -->
       <tr>
-        <td data-bind="text: $index()+1"></td>
+        <td data-bind="text: $index() + 1"></td>
         <td data-bind="text: $data.name"></td>
         <td data-bind="text: $data.type"></td>
       </tr>
@@ -208,6 +205,31 @@ ${ assist.assistPanel() }
   </div>
 </script>
 
+<script type="text/html" id="metastore-table-properties">
+  <!-- ko with: tableDetails -->
+  <h4>${ _('Properties') }</h4>
+  <div class="row-fluid">
+    <div title="${ _('Type') }">
+      <!-- ko if: is_view -->
+        <i class="fa fa-fw fa-eye muted"></i> ${ _('View') }
+      <!-- /ko -->        
+      <!-- ko ifnot: is_view -->
+        <i class="fa fa-fw fa-table muted"></i> ${ _('Table') }
+      <!-- /ko -->
+    </div>
+    <div title="${ _('Owner') }">
+      <i class="fa fa-fw fa-user muted"></i> <a data-bind="text: details.properties.owner, attr: { 'href': '/useradmin/users/view/' + details.properties.owner }"></a>
+    </div>
+    <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: details.properties.create_time"></span></div>
+    <div title="${ _('Format') }">
+      <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
+      <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span>
+      <span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span>
+    </div>
+  </div>
+  <!-- /ko -->
+</script>
+
 <script type="text/html" id="metastore-table-stats">
   <!-- ko with: tableDetails -->
   <h4>${ _('Stats') }
@@ -217,33 +239,23 @@ ${ assist.assistPanel() }
     <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
     <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
     <!-- /ko -->
-    <span data-bind="visible: !details.stats.COLUMN_STATS_ACCURATE && !is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
+    <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
   </h4>
   <div class="row-fluid">
-    <div class="span6">
-      <div title="${ _('Owner') }">
-        <i class="fa fa-fw fa-user muted"></i> <a data-bind="text: details.properties.owner, attr: { 'href': '/useradmin/users/view/' + details.properties.owner }"></a>
-      </div>
-      <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: details.properties.create_time"></span></div>
-      <div title="${ _('Format') }"><i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span></div>
-      <div title="${ _('Compressed?') }"><i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span><span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span></div>
+    <div>
+      <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': path_location }">${_('Location')}</a>
     </div>
-    <div class="span6">
-      <div>
-        <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': path_location }">${_('Location')}</a>
-      </div>
-      <!-- ko with: $parent.tableStats -->
-        <!-- ko if: typeof numFiles !== 'undefined'  -->
-          <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
-        <!-- /ko -->
-        <!-- ko if: typeof numRows !== 'undefined'  -->
-          <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
-        <!-- /ko -->
-        <!-- ko if: typeof totalSize !== 'undefined'  -->
-          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
-        <!-- /ko -->
+    <!-- ko with: $parent.tableStats -->
+      <!-- ko if: typeof numFiles !== 'undefined'  -->
+        <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
       <!-- /ko -->
-    </div>
+      <!-- ko if: typeof numRows !== 'undefined'  -->
+        <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
+      <!-- /ko -->
+      <!-- ko if: typeof totalSize !== 'undefined'  -->
+        <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
+      <!-- /ko -->
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 </script>
@@ -461,10 +473,12 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-overview-tab">
   <div class="row-fluid margin-top-10">
-    <div class="span6 tile">
+    <div class="span3 tile">
+      <!-- ko template: 'metastore-table-properties' --><!-- /ko -->
+    </div>
+    <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-
     <div class="span6 tile">
       <h4>${ _('Tagging') }</h4>
       <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
