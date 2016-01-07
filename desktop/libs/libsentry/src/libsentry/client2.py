@@ -102,14 +102,11 @@ class SentryClient(object):
     return self.client.drop_sentry_role(request)
 
 
-  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
-    if tSentryPrivilege is not None:
-      tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
+    tSentryPrivilege['authorizables'] = [TAuthorizable(type=_auth['type'], name=_auth['name']) for _auth in tSentryPrivilege['authorizables']]
+    tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
 
-    if tSentryPrivileges is not None:
-      tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
-
-    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, component=self.component, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
+    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, component=self.component, roleName=roleName, privilege=tSentryPrivilege)
     return self.client.alter_sentry_role_grant_privilege(request)
 
 
@@ -183,10 +180,10 @@ class SentryClient(object):
 #     authorizableSet = [TAuthorizable(**authorizable) for authorizable in authorizableSet]
 #     if roleSet is not None:
 #       roleSet = TSentryActiveRoleSet(**roleSet)
-#  
+#
 #     request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, component=self.component, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
 #     return self.client.list_sentry_privileges_by_authorizable(request)
     return type('Response', (object,), {
         'status': type('Status', (object,), {'value': 0}),
-        'privilegesMapByAuth': {}          
+        'privilegesMapByAuth': {}
     })

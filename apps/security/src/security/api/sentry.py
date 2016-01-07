@@ -82,7 +82,7 @@ def list_sentry_roles_by_group(request):
 def list_sentry_privileges_by_role(request):
   result = {'status': -1, 'message': 'Error'}
 
-  try:    
+  try:
     serviceName = request.POST['server']
     component = request.POST['component']
     roleName = request.POST['roleName']
@@ -102,14 +102,12 @@ def list_sentry_privileges_by_role(request):
 
 def _to_sentry_privilege(privilege):
   return {
-      'privilegeScope': privilege['privilegeScope'],
-      'serverName': privilege['serverName'],
-      'dbName': privilege['dbName'],
-      'tableName': privilege['tableName'],
-      'columnName': privilege['columnName'],
-      'URI': _massage_uri(privilege['URI']),
+      'component': privilege['component'],
+      'serviceName': privilege['serverName'],
+      'authorizables': [{'type': auth['type'], 'name': auth['name_']} for auth in privilege['authorizables']], # TODO URI {'type': 'URI', 'name': _massage_uri('/path')}
       'action': privilege['action'],
       'createTime': privilege['timestamp'],
+      'grantorPrincipal': privilege['grantorPrincipal'],
       'grantOption': 1 if privilege['grantOption'] else 0,
   }
 
