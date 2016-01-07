@@ -65,6 +65,17 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       isLoginRequired = false;
     });
 
+    huePubSub.subscribe('hue.login.result', function (response) {
+      if (response.auth) {
+        $('#login-modal').modal('hide');
+        $.jHueNotify.info('${ _('You have signed in successfully!') }');
+        $('#login-modal .login-error').addClass('hide');
+      }
+      else {
+        $('#login-modal .login-error').removeClass('hide');
+      }
+    });
+
 
     $("div.navigator ul.dropdown-menu").css("maxHeight", $(window).height() - 50);
     var scrollableDropdownTimeout = -1;

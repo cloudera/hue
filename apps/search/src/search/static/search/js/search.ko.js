@@ -1387,7 +1387,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     if (self.selectedQDefinition() != null) {
       var _prop = ko.mapping.fromJSON(self.selectedQDefinition().data());
       if (ko.toJSON(_prop.qs()) != ko.mapping.toJSON(self.query.qs())
-          || ko.toJSON(_prop.selectedMultiq()) != ko.mapping.toJSON(self.query.selectedMultiq())) {
+        || ko.toJSON(_prop.selectedMultiq()) != ko.mapping.toJSON(self.query.selectedMultiq())) {
         self.selectedQDefinition().hasChanged(true);
       }
     }
@@ -1408,17 +1408,21 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         queries = self.query.qs();
       } else {
         facet = self.query.getFacetFilter(self.query.selectedMultiq());
-        queries = $.map(facet.filter(), function(f) { return f.value(); });
+        queries = $.map(facet.filter(), function (f) {
+          return f.value();
+        });
       }
 
-      multiQs = $.map(queries, function(qdata) {
+      multiQs = $.map(queries, function (qdata) {
         return $.post("/search/get_timeline", {
-            collection: ko.mapping.toJSON(self.collection),
-            query: ko.mapping.toJSON(self.query),
-            facet: ko.mapping.toJSON(facet),
-            qdata: ko.mapping.toJSON(qdata),
-            multiQ: multiQ
-          }, function (data) {return data});
+          collection: ko.mapping.toJSON(self.collection),
+          query: ko.mapping.toJSON(self.query),
+          facet: ko.mapping.toJSON(facet),
+          qdata: ko.mapping.toJSON(qdata),
+          multiQ: multiQ
+        }, function (data) {
+          return data
+        });
       });
     }
 
@@ -1432,124 +1436,130 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 
     $.when.apply($, [
-      $.post("/search/search", {
-        collection: ko.mapping.toJSON(self.collection),
-        query: ko.mapping.toJSON(self.query),
-        layout: ko.mapping.toJSON(self.columns)
-      }, function (data) {
-        data = JSON.bigdataParse(data);
+        $.post("/search/search", {
+            collection: ko.mapping.toJSON(self.collection),
+            query: ko.mapping.toJSON(self.query),
+            layout: ko.mapping.toJSON(self.columns)
+          }, function (data) {
+            try {
+              data = JSON.bigdataParse(data);
 
-        if (typeof callback != undefined && callback != null){
-          callback(data);
-        }
+              if (typeof callback != undefined && callback != null) {
+                callback(data);
+              }
 
-        $.each(data.normalized_facets, function (index, new_facet) {
-          var facet = self.getFacetFromQuery(new_facet.id);
-          var _hash = ko.mapping.toJSON(new_facet);
+              $.each(data.normalized_facets, function (index, new_facet) {
+                var facet = self.getFacetFromQuery(new_facet.id);
+                var _hash = ko.mapping.toJSON(new_facet);
 
-          if (! facet.has_data() || facet.hash() != _hash) {
-            facet.counts(new_facet.counts);
-            facet.label(new_facet.label);
-            facet.field(new_facet.field);
-            facet.dimension(new_facet.dimension);
-            facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
-            facet.hash(_hash);
-            facet.has_data(true);
-          }
-        });
-
-        // Delete norm_facets that were deleted
-
-        self.response(data);
-
-        if (data.error) {
-          $(document).trigger("error", data.error);
-        }
-        else {
-          var _resultsHash = ko.mapping.toJSON(data.response.docs);
-
-          if (self.resultsHash != _resultsHash) {
-
-              var _docs = [];
-              var leafletmap = {};
-              var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
-              $.each(data.response.docs, function (index, item) {
-                var row = [];
-                var _externalLink = item.externalLink;
-                var _details = item.details;
-                var _id = item.hueId;
-                delete item["externalLink"];
-                delete item["details"];
-                delete item["hueId"];
-                var fields = self.collection.template.fieldsSelected();
-                // Display selected fields or whole json document
-                if (fields.length != 0) {
-                  $.each(self.collection.template.fieldsSelected(), function (index, field) {
-                    row.push(item[field]);
-                  });
-                } else {
-                  row.push(ko.mapping.toJSON(item));
+                if (!facet.has_data() || facet.hash() != _hash) {
+                  facet.counts(new_facet.counts);
+                  facet.label(new_facet.label);
+                  facet.field(new_facet.field);
+                  facet.dimension(new_facet.dimension);
+                  facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
+                  facet.hash(_hash);
+                  facet.has_data(true);
                 }
-                if (self.collection.template.leafletmapOn()) {
-                  leafletmap = {
-                    'latitude': item[self.collection.template.leafletmap.latitudeField()],
-                    'longitude': item[self.collection.template.leafletmap.longitudeField()],
-                    'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
-                  }
-                }
-                var doc = {
-                  'id': _id,
-                  'row': row,
-                  'item': ko.mapping.fromJS(item),
-                  'showEdit': ko.observable(false),
-                  'hasChanged': ko.observable(false),
-                  'externalLink': ko.observable(_externalLink),
-                  'details': ko.observableArray(_details),
-                  'originalDetails': ko.observable(''),
-                  'showDetails': ko.observable(false),
-                  'leafletmap': leafletmap
-                };
-                if (! self.collection.template.isGridLayout()) {
-                  // fix the fields that contain dots in the name
-                  addTemplateFunctions(item);
-                  if (self.additionalMustache != null && typeof self.additionalMustache == "function"){
-                    self.additionalMustache(item);
-                  }
-                  doc.content =  Mustache.render(_mustacheTmpl, item);
-                }
-                _docs.push(doc);
               });
-              self.results(_docs);
-          }
-          self.resultsHash = _resultsHash;
-        }
-      },
-      "text")
+
+              // Delete norm_facets that were deleted
+
+              self.response(data);
+
+              if (data.error) {
+                $(document).trigger("error", data.error);
+              }
+              else {
+                var _resultsHash = ko.mapping.toJSON(data.response.docs);
+
+                if (self.resultsHash != _resultsHash) {
+
+                  var _docs = [];
+                  var leafletmap = {};
+                  var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
+                  $.each(data.response.docs, function (index, item) {
+                    var row = [];
+                    var _externalLink = item.externalLink;
+                    var _details = item.details;
+                    var _id = item.hueId;
+                    delete item["externalLink"];
+                    delete item["details"];
+                    delete item["hueId"];
+                    var fields = self.collection.template.fieldsSelected();
+                    // Display selected fields or whole json document
+                    if (fields.length != 0) {
+                      $.each(self.collection.template.fieldsSelected(), function (index, field) {
+                        row.push(item[field]);
+                      });
+                    } else {
+                      row.push(ko.mapping.toJSON(item));
+                    }
+                    if (self.collection.template.leafletmapOn()) {
+                      leafletmap = {
+                        'latitude': item[self.collection.template.leafletmap.latitudeField()],
+                        'longitude': item[self.collection.template.leafletmap.longitudeField()],
+                        'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
+                      }
+                    }
+                    var doc = {
+                      'id': _id,
+                      'row': row,
+                      'item': ko.mapping.fromJS(item),
+                      'showEdit': ko.observable(false),
+                      'hasChanged': ko.observable(false),
+                      'externalLink': ko.observable(_externalLink),
+                      'details': ko.observableArray(_details),
+                      'originalDetails': ko.observable(''),
+                      'showDetails': ko.observable(false),
+                      'leafletmap': leafletmap
+                    };
+                    if (!self.collection.template.isGridLayout()) {
+                      // fix the fields that contain dots in the name
+                      addTemplateFunctions(item);
+                      if (self.additionalMustache != null && typeof self.additionalMustache == "function") {
+                        self.additionalMustache(item);
+                      }
+                      doc.content = Mustache.render(_mustacheTmpl, item);
+                    }
+                    _docs.push(doc);
+                  });
+                  self.results(_docs);
+                }
+                self.resultsHash = _resultsHash;
+              }
+            }
+            catch (e) {
+
+            }
+          },
+          "text")
       ].concat(multiQs)
     )
-    .done(function() {
-      if (arguments[0] instanceof Array) { // If multi queries
-        var histograms = self.collection.getHistogramFacets();
-        for(var h = 0; h < histograms.length; h++){ // Do not use $.each here
-          var histoFacetId = histograms[h].id();
-          var histoFacet = self.getFacetFromQuery(histoFacetId);
-          var _series = [];
-          for (var i = 1; i < arguments.length; i++) {
-            _series.push(arguments[i][0]['series']);
+      .done(function () {
+        if (arguments[0] instanceof Array) { // If multi queries
+          var histograms = self.collection.getHistogramFacets();
+          for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
+            var histoFacetId = histograms[h].id();
+            var histoFacet = self.getFacetFromQuery(histoFacetId);
+            var _series = [];
+            for (var i = 1; i < arguments.length; i++) {
+              _series.push(arguments[i][0]['series']);
+            }
+            histoFacet.extraSeries(_series);
           }
-          histoFacet.extraSeries(_series);
-        };
-        self.response.valueHasMutated();
-      }
-    })
-    .fail(function (xhr, textStatus, errorThrown) {
-      $(document).trigger("error", xhr.responseText);
-    })
-    .always(function () {
-      self.isRetrievingResults(false);
-      self.hasRetrievedResults(true);
-      $('.btn-loading').button('reset');
-    });
+          ;
+          self.response.valueHasMutated();
+        }
+      })
+      .fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      })
+      .always(function () {
+        self.isRetrievingResults(false);
+        self.hasRetrievedResults(true);
+        $('.btn-loading').button('reset');
+      });
   };
 
   self.suggest = function (query, callback) {

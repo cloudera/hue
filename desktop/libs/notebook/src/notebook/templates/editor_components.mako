@@ -1966,18 +1966,6 @@ ${ require.config() }
       ko.applyBindings(viewModel);
       viewModel.init();
 
-      huePubSub.subscribe('hue.login.result', function (response) {
-        if (response.auth) {
-          $('#login-modal').modal('hide');
-          $.jHueNotify.info('${ _('You have signed in successfully!') }');
-          $('#login-modal .login-error').addClass('hide');
-        }
-        else {
-          $('#login-modal .login-error').removeClass('hide');
-        }
-      });
-
-
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
           $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");
