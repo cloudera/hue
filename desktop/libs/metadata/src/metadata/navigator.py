@@ -143,7 +143,13 @@ class NavigatorApi(object):
     return self.update_entity(entity_id, tags=new_tags)
 
 
-  # TODO: remove_tags?
+  def delete_tags(self, entity_id, tags):
+    entity = self.get_entity(entity_id)
+    new_tags = entity['tags'] or []
+    for tag in tags:
+      if tag in new_tags:
+        new_tags.remove(tag)
+    return self.update_entity(entity_id, tags=new_tags)
 
 
   def _clean_path(self, path):
