@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare2, _ko
+  from desktop.views import commonheader, commonfooter, commonshare2, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -153,6 +153,15 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
 
+        <input data-bind="value: exportFormDocIds" placeholder="doc id, e.g. 50491,50492"></input>
+        <a class="share-link btn" data-bind="click: exportDocuments">
+          <i class="fa fa-download"></i> ${ _('Export') }
+        </a>
+
+        <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
+          <i class="fa fa-upload"></i> ${ _('Import') }
+        </a>
+
         <div class="card-body">
           <p>
           <table id="documents" class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
@@ -203,7 +212,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
 
 
 ${ commonshare2() | n,unicode }
-
+${ commonimportexport(request) | n,unicode }
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
