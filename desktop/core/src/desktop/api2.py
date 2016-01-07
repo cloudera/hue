@@ -27,6 +27,7 @@ from django.core import management
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import html
+from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
@@ -167,7 +168,7 @@ def delete_document(request):
   skip_trash = json.loads(request.POST.get('skip_trash', 'false')) # TODO always false currently
 
   document = Document2.objects.document(request.user, doc_id=document_id)
-  if document.type == 'directory' and document.dependencies().count() > 1:
+  if document.type == 'directory' and document.dependencies.count() > 1:
     raise PopupException(_('Directory is not empty'))
 
   document.delete()
