@@ -23,6 +23,7 @@ function HomeViewModel(data) {
   self.mkdirFormPath = ko.observable('');
   self.deleteFormPath = ko.observable('');
   self.shareFormDocId = ko.observable('');
+  self.exportFormDocIds = ko.observable('');
 
   self.page = ko.observable(1);
   self.documentsPerPage = ko.observable(50);
@@ -115,6 +116,11 @@ function HomeViewModel(data) {
     }).fail(function (xhr) {
       $(document).trigger("error", xhr.responseText);
     });
+  };
+
+  self.exportDocuments = function() {
+    $('#export-documents').find('input[name=\'documents\']').val(ko.mapping.toJSON(self.exportFormDocIds().split(",")));
+    $('#export-documents').find('form').submit();
   };
 
 }
