@@ -65,7 +65,9 @@ ${ layout.menubar(section='hive2') }
         <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri' , 'fa-check-circle-o': privilegeType() == 'uri'}"></i>
       </a>
     </div>
-    <input type="text" data-bind="filechooser: $data.URI, enable: privilegeType() == 'uri'" placeholder="URI">
+    <!-- ko if: editing() -->
+    <input type="text" data-bind="filechooser: 'URI TODO', enable: privilegeType() == 'uri'" placeholder="URI">
+    <!-- /ko -->
 
     <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
 

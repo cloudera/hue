@@ -93,8 +93,8 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege=None, tSentryPrivileges=None):
-    response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege, tSentryPrivileges)
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege=None):
+    response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege)
 
     if response.status.value == 0:
       return response

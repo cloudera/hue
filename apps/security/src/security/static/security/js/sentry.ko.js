@@ -25,6 +25,24 @@ function UUID() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 
+var Authorizable = function (vm, privilege, authorizable) {
+  var self = this;
+
+  self.type = ko.observable(typeof authorizable.type != "undefined" && authorizable.type != null ? authorizable.type : "");
+  self.type.subscribe(function () {
+    if (privilege.status() == '') {
+      privilege.status('modified');
+    }
+    privilege.privilegeScope(getPrivilegeScope());
+  });
+  self.name_ = ko.observable(typeof authorizable.name != "undefined" && authorizable.name != null ? authorizable.name : "");
+  self.name_.subscribe(function () {
+    if (privilege.status() == '') {
+      privilege.status('modified');
+    }
+    privilege.privilegeScope(getPrivilegeScope());
+  });
+}
 
 var Privilege = function (vm, privilege) {
   var self = this;
@@ -39,6 +57,22 @@ var Privilege = function (vm, privilege) {
       self.status('modified');
     }
   });
+  self.component = ko.observable(typeof privilege.component != "undefined" && privilege.component != null ? privilege.component : vm.component());
+  self.authorizables = ko.observableArray();
+  if (typeof privilege.authorizables != "undefined" && privilege.authorizables != null) {
+    self.authorizables(
+      $.map(privilege.authorizables, function(authorizable) {
+        return new Authorizable(vm, privilege, authorizable);
+      })
+    )
+  };
+  self.authorizables.subscribe(function () {
+    if (self.status() == '') {
+      self.status('modified');
+    }
+    self.privilegeScope(getPrivilegeScope());
+  });
+  /**
   self.dbName = ko.observable(typeof privilege.dbName != "undefined" && privilege.dbName != null ? privilege.dbName : "");
   self.dbName.subscribe(function () {
     if (self.status() == '') {
@@ -62,7 +96,7 @@ var Privilege = function (vm, privilege) {
     if (self.status() == '') {
       self.status('modified');
     }
-  });
+  });*/
   self.action = ko.observable(typeof privilege.action != "undefined" && privilege.action != null ? privilege.action : 'SELECT');
   self.action.subscribe(function () {
     if (self.status() == '') {
@@ -70,6 +104,7 @@ var Privilege = function (vm, privilege) {
     }
   });
   self.timestamp = ko.observable(typeof privilege.timestamp != "undefined" && privilege.timestamp != null ? privilege.timestamp : 0);
+  self.grantorPrincipal = ko.observable(typeof privilege.grantorPrincipal != "undefined" && privilege.grantorPrincipal != null ? privilege.grantorPrincipal : vm.user());
   self.grantOption = ko.observable(typeof privilege.grantOption != "undefined" && privilege.grantOption != null ? privilege.grantOption : false);
   self.grantOption.subscribe(function () {
     if (self.status() == '') {
@@ -82,43 +117,50 @@ var Privilege = function (vm, privilege) {
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
-      if (self.columnName().length > 0) {
-        return self.dbName() + "." + self.tableName() + "." + self.columnName();
-      } else if (self.tableName().length > 0) {
-        return self.dbName() + "." + self.tableName();
-      } else {
-        return self.dbName();
-      }
+      return $.map(self.authorizables(), function(authorizable) {
+        return authorizable.name_();
+      }).join(".");
     },
     write: function (value) {
       var _parts = value.split(".");
-      this.dbName(_parts[0]);
-      this.tableName(_parts.length > 1 ? _parts[1] : "");
-      this.columnName(_parts.length > 2 ? _parts[2] : "");
+
+      self.authorizables.removeAll();
+      self.authorizables.push(new Authorizable(vm, self, {type: 'DATABASE', name: _parts[0]}))
+      if (_parts.length > 1) {
+        self.authorizables.push(new Authorizable(vm, self, {type: 'TABLE', name: _parts[1]}))
+      }
+      if (_parts.length > 2) {
+        self.authorizables.push(new Authorizable(vm, self, {type: 'COLUMN', name: _parts[2]}))
+      }
     },
     owner: self
   });
 
-  self.metastorePath = ko.computed(function(){
-    if (self.columnName().length > 0) {
-      return '/metastore/table/' + self.dbName() + "/" + self.tableName() + "#col=" + self.columnName();
-    } else if (self.tableName().length > 0) {
-      return '/metastore/table/' + self.dbName() + "/" + self.tableName();
-    } else if (self.dbName().length > 0) {
-      return '/metastore/tables/' + self.dbName();
-    } else {
-      return '';
+  self.metastorePath = ko.computed(function() {
+    var path = '';
+
+    if (self.authorizables()[0] && self.authorizables()[0]['type'] == 'DATABASE') {
+      path = '/metastore/tables/' + self.authorizables()[0];
     }
+    if (self.authorizables()[1] && self.authorizables()[1]['type'] == 'TABLE') {
+      path +=  "/" + self.authorizables()[1];
+    }
+    if (self.authorizables()[2] && self.authorizables()[2]['type'] == 'COLUMN') {
+      path +=  "#col=" + self.authorizables()[2];
+    }
+
+    return path;
   });
 
+  // TODO remove
   function getPrivilegeScope() {
     if (self.privilegeType() == 'uri') {
       return 'URI';
-    } else if (self.columnName().length > 0) {
+    } else if (self.authorizables()[2] == 'COLUMN') {
       return 'COLUMN';
-    } else if (self.tableName().length > 0) {
+    } else if (self.authorizables()[1] == 'TABLE') {
       return 'TABLE';
-    } else if (self.dbName().length > 0) {
+    } else if (self.authorizables()[0] == 'DATABASE') {
       return 'DATABASE';
     } else {
       return 'SERVER';
@@ -126,7 +168,7 @@ var Privilege = function (vm, privilege) {
   }
 
   self.privilegeScope = ko.observable(typeof privilege.privilegeScope != "undefined" ? privilege.privilegeScope : getPrivilegeScope());
-
+/**
   self.privilegeType.subscribe(function(newVal){
     self.privilegeScope(getPrivilegeScope());
   });
@@ -142,7 +184,7 @@ var Privilege = function (vm, privilege) {
   self.dbName.subscribe(function(newVal){
     self.privilegeScope(getPrivilegeScope());
   });
-
+*/
   self.remove = function (privilege) {
     if (privilege.status() == 'new') {
       privilege.status('alreadydeleted');
@@ -240,8 +282,18 @@ var Role = function (vm, role) {
   }
 
   self.addPrivilege = function () {
-    if (vm.getSectionHash() == 'edit') {
-      self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true, 'dbName': vm.assist.db(), 'tableName': vm.assist.table(), 'columnName': vm.assist.column()}));
+    if (vm.getSectionHash() == 'edit') { // used?
+      self.privileges.push(new Privilege(vm, {
+          'serverName': vm.assist.server(),
+          'status': 'new',
+          'component': vm.component(),
+          'editing': true,
+          'authorizables': [
+              {'type': 'DATABASE', 'name': vm.assist.db()},
+              {'type': 'TABLE', 'name': vm.assist.table()},
+              {'type': 'COLUMN', 'name': vm.assist.column()}
+           ]
+      }));
     } else {
       self.privileges.push(new Privilege(vm, {'serverName': vm.assist.server(), 'status': 'new', 'editing': true}));
     }
@@ -821,6 +873,7 @@ var HiveViewModel = function (initial) {
 
   // Models
   self.component = ko.observable(initial.component);
+  self.user = ko.observable(initial.user);
   self.server = ko.observable(initial.sentry_provider);
   self.roles = ko.observableArray();
   self.tempRoles = ko.observableArray();
@@ -1021,7 +1074,7 @@ var HiveViewModel = function (initial) {
     $.ajax({
       type: "POST",
       url: "/security/api/sentry/list_sentry_privileges_by_role",
-      data: {        
+      data: {
         'server': self.server(),
         'component': self.component(),
         'roleName': role.name
@@ -1070,7 +1123,7 @@ var HiveViewModel = function (initial) {
 
     if (optionalPath != null) {
       var paths = optionalPath.split(/[.]/);
-      
+
       if (paths[0]) { authorizables.push({'type': 'db', 'name': paths[0]}); }
       if (paths[1]) { authorizables.push({'type': 'table', 'name': paths[1]}); }
       if (paths[2]) { authorizables.push({'type': 'column', 'name': paths[2]}); }
