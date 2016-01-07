@@ -65,10 +65,15 @@ from desktop.views import _ko
     }
 
     .assist-inner-panel {
-      padding: 0px 16px 0 10px;
+      display: none;
+      position: relative;
+      padding: 0 0 0 10px;
+      overflow: hidden;
     }
 
     .assist-inner-header {
+      position:relative;
+      width: 100%;
       color: #737373;
       margin-left:3px;
       margin-bottom:2px;
@@ -76,12 +81,13 @@ from desktop.views import _ko
       margin-top: 0
     }
 
-    .assist-database-list {
+    .assist-stretchable-list {
       position:relative;
-      width:100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
       border: none;
       padding: 0;
-      background-color: #FFF;
       margin-bottom: 1px;
       margin-top:3px;
     }
@@ -193,9 +199,13 @@ from desktop.views import _ko
       position:absolute;
       top: 0;
       right: 0;
-      padding-right:4px;
+      padding-right: 17px;
       padding-left:4px;
       background-color: #FFF;
+    }
+
+    .table-actions {
+      padding-top:2px;
     }
 
     .assist-tables > li.selected .assist-actions {
@@ -334,7 +344,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-inner-panel">
-    <div class="assist-inner-panel" style="overflow: auto; display:none;" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
+    <div class="assist-inner-panel" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
       <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
         <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
         <!-- ko with: selectedSource -->
@@ -365,7 +375,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-hdfs-inner-panel">
-    <div class="assist-inner-panel" style="overflow: auto; display:none;">
+    <div class="assist-inner-panel">
       <!-- ko with: selectedHdfsEntry -->
       <div class="assist-breadcrumb">
         <!-- ko if: parent !== null -->
@@ -382,8 +392,7 @@ from desktop.views import _ko
         </div>
         <!-- /ko -->
       </div>
-      <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
-
+      <ul class="nav assist-stretchable-list" data-bind="stretchDown">
         <li class="center" data-bind="visible: loading">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
@@ -435,9 +444,9 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-documents-inner-panel">
-    <div class="assist-inner-panel" style="overflow: auto; display:none;">
+    <div class="assist-inner-panel">
       <!-- ko with: documents -->
-      <ul class="assist-tables" data-bind="foreach: availableTypes">
+      <ul class="nav assist-tables assist-stretchable-list" data-bind="stretchDown, foreach: availableTypes">
         <li class="assist-table">
           <a class="assist-entry assist-table-link" href="javascript: void(0);" data-bind="click: function () { open(! open()) }">
             <!-- ko if: type == 'query-hive' || type == 'query' -->
@@ -481,10 +490,12 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <ul class="nav nav-list assist-database-list">
+    <ul class="nav">
       <li class="assist-inner-header">
-        ${_('sources')}
+        ${_('Sources')}
       </li>
+    </ul>
+    <ul class="nav assist-stretchable-list" data-bind="stretchDown">
       <li>
         <ul class="assist-tables" data-bind="foreach: sources">
           <li class="assist-table pointer">
@@ -504,7 +515,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <ul class="nav nav-list assist-database-list" data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" >
+    <ul class="nav" data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" >
       <li class="assist-inner-header">
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
@@ -512,6 +523,8 @@ from desktop.views import _ko
       <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
         <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
       </li>
+    </ul>
+    <ul class="nav assist-stretchable-list" data-bind="stretchDown">
       <li data-bind="visible: ! hasErrors()" >
         <ul class="assist-tables" data-bind="foreach: filteredEntries">
           <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
@@ -536,17 +549,17 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <ul class="nav nav-list assist-database-list" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
+    <ul class="nav" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
       <li class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </li>
-
       <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
         <div><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />Tables</label><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />Views</label></div>
         <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
       </li>
-
+    </ul>
+    <ul class="nav assist-stretchable-list" data-bind="stretchDown">
       <li class="table-container">
         <div class="center" data-bind="visible: loading() || $parent.loading()">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
@@ -706,7 +719,7 @@ from desktop.views import _ko
         self.loading = ko.observable(false);
 
         self.availablePanels = [
-          new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("SQL") }', type: 'db', icon: 'fa-database', minHeight: 40})
+          new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("SQL") }', type: 'db', icon: 'fa-database', minHeight: 55})
         ];
 
         if (!self.onlySql) {
