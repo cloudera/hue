@@ -426,7 +426,7 @@ ${ require.config() }
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <!-- ko if: $parent.history().length > 0 -->
-      <table class="table table-compressed">
+      <table class="table table-condensed table-striped">
         <thead>
           <tr>
             <th colspan="2" class="muted">
@@ -742,7 +742,7 @@ ${ require.config() }
           </div>
           <div data-bind="css: {'span10': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
             <div data-bind="visible: showGrid; delayedOverflow, css: resultsKlass" style="display: none;">
-              <table class="table table-condensed resultTable">
+              <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
                   <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
