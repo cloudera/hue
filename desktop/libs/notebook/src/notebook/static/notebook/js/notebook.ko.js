@@ -1073,7 +1073,7 @@
       download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
     }
 
-    huePubSub.subscribe("assist.ready", function () {
+    huePubSub.subscribe("assist.db.panel.ready", function () {
       if (self.type() == 'query' && self.snippets().length == 1) {
         huePubSub.publish('assist.set.database', {
           source: self.snippets()[0].type(),

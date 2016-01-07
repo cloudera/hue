@@ -37,10 +37,6 @@ from desktop.views import _ko
       height: 100%;
     }
 
-    .assist-main {
-      overflow-y: auto;
-    }
-
     .assist-resizer {
       cursor: row-resize;
     }
@@ -210,13 +206,6 @@ from desktop.views import _ko
 
     .assist-tables > li.selected .assist-actions {
       background-color: #EEE;
-    }
-
-    .assist .nav-header {
-      padding-top: 0 !important;
-      margin-top: 0 !important;
-      margin-right: 0 !important;
-      padding-right: 4px !important;
     }
 
     .assist-details-wrap {
@@ -643,8 +632,8 @@ from desktop.views import _ko
       <!-- ko template: { if: availablePanels.length > 1, name: 'assist-panel-switches' }--><!-- /ko -->
       <div data-bind="visible: visiblePanels().length === 0" style="margin:10px; font-style: italic; display:none;">${_('Select your assist contents above.')}</div>
       <!-- ko foreach: visiblePanels -->
-      <!-- ko template: { if: $parent.availablePanels.length > 1, name: 'assist-panel-inner-header' }--><!-- /ko -->
-      <!-- ko template: { name: templateName, data: $parent } --><!-- /ko -->
+      <!-- ko template: { if: $parent.availablePanels.length > 1, name: 'assist-panel-inner-header', data: panelData }--><!-- /ko -->
+      <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -671,14 +660,16 @@ from desktop.views import _ko
        * @param {string} options.type
        * @param {number} options.minHeight
        * @param {string} options.icon
+       * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel)} panelData
        * @constructor
        */
-      function AssistInnerPanel(options) {
+      function AssistInnerPanel (options) {
         var self = this;
         self.minHeight = options.minHeight;
         self.icon = options.icon;
         self.type = options.type;
         self.name = options.name;
+        self.panelData = options.panelData;
 
         self.visible = ko.observable();
         options.assistHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false);
@@ -686,97 +677,36 @@ from desktop.views import _ko
       }
 
       /**
-       * @param {Object} params
-       * @param {Object[]} params.sourceTypes - All the available SQL source types
-       * @param {boolean} params.onlySql - For the old query editors
-       * @param {string} params.sourceTypes[].name - Example: Hive SQL
-       * @param {string} params.sourceTypes[].type - Example: hive
-       * @param {string} [params.activeSourceType] - Example: hive
-       * @param {string} params.user
-       * @param {Object} params.navigationSettings - enable/disable the links
-       * @param {boolean} params.navigationSettings.openItem - Example: true
-       * @param {boolean} params.navigationSettings.showPreview - Example: true
-       * @param {boolean} params.navigationSettings.showStats - Example: true
+       * @param {Object} options
+       * @param {AssistHelper} options.assistHelper
+       * @param {Object} options.i18n
+       * @param {Object[]} options.sourceTypes - All the available SQL source types
+       * @param {string} options.sourceTypes[].name - Example: Hive SQL
+       * @param {string} options.sourceTypes[].type - Example: hive
+       * @param {string} [options.activeSourceType] - Example: hive
+       * @param {Object} options.navigationSettings - enable/disable the links
+       * @param {boolean} options.navigationSettings.openItem
+       * @param {boolean} options.navigationSettings.showPreview
+       * @param {boolean} options.navigationSettings.showStats
+
        * @constructor
-       */
-      function AssistPanel (params) {
+       **/
+      function AssistDbPanel (options) {
         var self = this;
-        var i18n = {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
-          documentTypes: {
-            'query-hive' : "${ _('Hive Query') }",
-            'query' : "${ _('Query') }",
-            'notebook' : "${ _('Notebook') }"
-          }
-        };
-        self.assistHelper = AssistHelper.getInstance({
-          i18n: i18n,
-          user: params.user
-        });
-
-        self.onlySql = params.onlySql;
-        self.loading = ko.observable(false);
-
-        self.availablePanels = [
-          new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("SQL") }', type: 'db', icon: 'fa-database', minHeight: 55})
-        ];
-
-        if (!self.onlySql) {
-          self.availablePanels.push(new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("HDFS") }', type: 'hdfs', icon: 'fa-folder-o', minHeight: 40}));
-          self.availablePanels.push(new AssistInnerPanel({assistHelper: self.assistHelper, name: '${ _("Documents") }', type: 'documents', icon: 'fa-files-o', minHeight: 40}));
-        }
-
-        if (self.availablePanels.length == 1) {
-          self.availablePanels[0].visible(true);
-        }
-
-        self.visiblePanels = ko.pureComputed(function () {
-          var result = $.grep(self.availablePanels, function (panel) {
-            return panel.visible();
-          });
-          return result;
-        });
+        self.assistHelper = options.assistHelper;
+        self.i18n = options.i18n;
 
         self.sources = ko.observableArray();
         var sourceIndex = {};
-        $.each(params.sourceTypes, function (idx, sourceType) {
+        $.each(options.sourceTypes, function (idx, sourceType) {
           sourceIndex[sourceType.type] = new AssistDbSource({
             assistHelper: self.assistHelper,
-            i18n: i18n,
+            i18n: self.i18n,
             type: sourceType.type,
             name: sourceType.name,
-            navigationSettings: params.navigationSettings
+            navigationSettings: options.navigationSettings
           });
           self.sources.push(sourceIndex[sourceType.type]);
-        });
-
-        self.documents = new AssistDocuments(self.assistHelper, i18n);
-        self.documents.load();
-
-        var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
-        var parts = lastKnownPath.split('/');
-        parts.shift();
-
-        var currentEntry = new AssistHdfsEntry({
-          definition: {
-            name: '/',
-            type: 'dir'
-          },
-          parent: null,
-          assistHelper: self.assistHelper
-        });
-
-        currentEntry.loadDeep(parts, function (entry) {
-          currentEntry = entry;
-        });
-
-        currentEntry.open(true);
-        self.selectedHdfsEntry = ko.observable(currentEntry);
-
-        huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
-          self.selectedHdfsEntry(entry);
-          self.assistHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
         });
 
         self.selectedSource = ko.observable(null);
@@ -819,7 +749,7 @@ from desktop.views import _ko
           }
         });
 
-        huePubSub.publish("assist.ready");
+        huePubSub.publish("assist.db.panel.ready");
 
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
@@ -833,8 +763,8 @@ from desktop.views import _ko
         var storageSourceType = self.assistHelper.getFromTotalStorage('assist', 'lastSelectedSource');
 
         if (! self.selectedSource()) {
-          if (params.activeSourceType) {
-            self.selectedSource(sourceIndex[params.activeSourceType]);
+          if (options.activeSourceType) {
+            self.selectedSource(sourceIndex[options.activeSourceType]);
             setDatabaseWhenLoaded();
           } else if (storageSourceType && sourceIndex[storageSourceType]) {
             self.selectedSource(sourceIndex[storageSourceType]);
@@ -853,7 +783,7 @@ from desktop.views import _ko
         });
       }
 
-      AssistPanel.prototype.back = function () {
+      AssistDbPanel.prototype.back = function () {
         var self = this;
         if (self.selectedSource() && self.selectedSource().selectedDatabase()) {
           self.selectedSource().selectedDatabase(null)
@@ -861,6 +791,138 @@ from desktop.views import _ko
           self.selectedSource(null);
         }
       };
+
+      /**
+       * @param {Object} options
+       * @param {AssistHelper} options.assistHelper
+       * @param {Object} options.i18n
+       * @constructor
+       **/
+      function AssistDocumentsPanel (options) {
+        var self = this;
+        self.documents = new AssistDocuments(options.assistHelper, options.i18n);
+        self.documents.load();
+      }
+
+      /**
+       * @param {Object} options
+       * @param {AssistHelper} options.assistHelper
+       * @constructor
+       **/
+      function AssistHdfsPanel (options) {
+        var self = this;
+        self.assistHelper = options.assistHelper;
+
+        var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+        var parts = lastKnownPath.split('/');
+        parts.shift();
+
+        var currentEntry = new AssistHdfsEntry({
+          definition: {
+            name: '/',
+            type: 'dir'
+          },
+          parent: null,
+          assistHelper: self.assistHelper
+        });
+
+        currentEntry.loadDeep(parts, function (entry) {
+          currentEntry = entry;
+        });
+
+        currentEntry.open(true);
+        self.selectedHdfsEntry = ko.observable(currentEntry);
+
+        huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
+          self.selectedHdfsEntry(entry);
+          self.assistHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
+        });
+      }
+
+      /**
+       * @param {Object} params
+       * @param {Object[]} params.sourceTypes - All the available SQL source types
+       * @param {boolean} params.onlySql - For the old query editors
+       * @param {string} params.sourceTypes[].name - Example: Hive SQL
+       * @param {string} params.sourceTypes[].type - Example: hive
+       * @param {string} [params.activeSourceType] - Example: hive
+       * @param {string} params.user
+       * @param {Object} params.navigationSettings - enable/disable the links
+       * @param {boolean} params.navigationSettings.openItem - Example: true
+       * @param {boolean} params.navigationSettings.showPreview - Example: true
+       * @param {boolean} params.navigationSettings.showStats - Example: true
+       * @constructor
+       */
+      function AssistPanel (params) {
+        var self = this;
+        var i18n = {
+          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
+          documentTypes: {
+            'query-hive' : "${ _('Hive Query') }",
+            'query' : "${ _('Query') }",
+            'notebook' : "${ _('Notebook') }"
+          }
+        };
+        self.assistHelper = AssistHelper.getInstance({
+          i18n: i18n,
+          user: params.user
+        });
+
+        self.onlySql = params.onlySql;
+        self.loading = ko.observable(false);
+
+        self.availablePanels = [
+          new AssistInnerPanel({
+            panelData: new AssistDbPanel({
+              assistHelper: self.assistHelper,
+              i18n: i18n,
+              navigationSettings: params.navigationSettings,
+              sourceTypes: params.sourceTypes
+            }),
+            assistHelper: self.assistHelper,
+            name: '${ _("SQL") }',
+            type: 'db',
+            icon: 'fa-database',
+            minHeight: 55
+          })
+        ];
+
+        if (! self.onlySql) {
+          self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistHdfsPanel({
+              assistHelper: self.assistHelper
+            }),
+            assistHelper: self.assistHelper,
+            name: '${ _("HDFS") }',
+            type: 'hdfs',
+            icon: 'fa-folder-o',
+            minHeight: 40
+          }));
+          self.availablePanels.push(new AssistInnerPanel({
+            panelData: new AssistDocumentsPanel({
+              assistHelper: self.assistHelper,
+              i18n: i18n
+            }),
+            assistHelper: self.assistHelper,
+            name: '${ _("Documents") }',
+            type: 'documents',
+            icon: 'fa-files-o',
+            minHeight: 40
+          }));
+        }
+
+        if (self.availablePanels.length == 1) {
+          self.availablePanels[0].visible(true);
+        }
+
+        self.visiblePanels = ko.pureComputed(function () {
+          var result = $.grep(self.availablePanels, function (panel) {
+            return panel.visible();
+          });
+          return result;
+        });
+      }
 
       ko.components.register('assist-panel', {
         viewModel: AssistPanel,

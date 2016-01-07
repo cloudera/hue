@@ -75,7 +75,7 @@ function BeeswaxViewModel(server, assistHelper) {
   self.database = ko.observable(null);
 
   var type = server === "beeswax" ? "hive" : "impala";
-  huePubSub.subscribe("assist.ready", function () {
+  huePubSub.subscribe("assist.db.panel.ready", function () {
     huePubSub.publish('assist.set.database', {
       source: type,
       name: self.database()
