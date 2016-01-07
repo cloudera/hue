@@ -981,7 +981,11 @@
         $allExtras.show();
       }
       if (panelDefinitions().length === 1) {
-        $allPanels.height($container.innerHeight() - allExtrasHeight);
+        var adjustHeightSingle = function () {
+          $allPanels.height($container.innerHeight() - allExtrasHeight);
+        }
+        adjustHeightSingle();
+        $(window).resize(adjustHeightSingle);
         $allExtras.show();
         $allPanels.show();
         return;
