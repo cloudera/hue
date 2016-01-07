@@ -152,6 +152,22 @@ class NavigatorApi(object):
     return self.update_entity(entity_id, tags=new_tags)
 
 
+  def update_properties(self, entity_id, properties):
+    entity = self.get_entity(entity_id)
+    new_props = entity['properties'] or {}
+    new_props.update(properties)
+    return self.update_entity(entity_id, properties=new_props)
+
+
+  def delete_properties(self, entity_id, property_keys):
+    entity = self.get_entity(entity_id)
+    new_props = entity['properties'] or {}
+    for key in property_keys:
+      if key in new_props:
+        del new_props[key]
+    return self.update_entity(entity_id, properties=new_props)
+
+
   def _clean_path(self, path):
     return path.rstrip('/').split('/')[-1], self._escape_slashes(path.rstrip('/'))
 
