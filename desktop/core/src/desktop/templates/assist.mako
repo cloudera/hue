@@ -76,6 +76,16 @@ from desktop.views import _ko
       margin-top: 0
     }
 
+    .assist-database-list {
+      position:relative;
+      width:100%;
+      border: none;
+      padding: 0;
+      background-color: #FFF;
+      margin-bottom: 1px;
+      margin-top:3px;
+    }
+
     .assist-header-actions {
       float: right;
       margin-right: 3px;
@@ -326,7 +336,6 @@ from desktop.views import _ko
   <script type="text/html" id="assist-db-inner-panel">
     <div class="assist-inner-panel" style="overflow: auto; display:none;" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
       <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-      <ul class="nav nav-list" style="position:relative; border: none; padding: 0; background-color: #FFF; margin-bottom: 1px; margin-top:3px;width:100%;">
         <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
         <!-- ko with: selectedSource -->
         <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
@@ -334,7 +343,6 @@ from desktop.views import _ko
         <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
-      </ul>
     </div>
   </script>
 
@@ -473,16 +481,18 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <li class="assist-inner-header">
-      ${_('sources')}
-    </li>
-    <li>
-      <ul class="assist-tables" data-bind="foreach: sources">
-        <li class="assist-table pointer">
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
-        </li>
-      </ul>
-    </li>
+    <ul class="nav nav-list assist-database-list">
+      <li class="assist-inner-header">
+        ${_('sources')}
+      </li>
+      <li>
+        <ul class="assist-tables" data-bind="foreach: sources">
+          <li class="assist-table pointer">
+            <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+          </li>
+        </ul>
+      </li>
+    </ul>
   </script>
 
   <script type="text/html" id="assist-db-header-actions">
@@ -494,7 +504,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <div data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" style="position: relative; width:100%">
+    <ul class="nav nav-list assist-database-list" data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" >
       <li class="assist-inner-header">
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
@@ -522,11 +532,11 @@ from desktop.views import _ko
       <li data-bind="visible: hasErrors">
         <span>${ _('The database list cannot be loaded.') }</span>
       </li>
-    </div>
+    </ul>
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <div data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }" style="position: relative; width:100%">
+    <ul class="nav nav-list assist-database-list" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
       <li class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
@@ -537,15 +547,14 @@ from desktop.views import _ko
         <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
       </li>
 
-      <div class="table-container">
+      <li class="table-container">
         <div class="center" data-bind="visible: loading() || $parent.loading()">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
         <!-- ko template: { ifnot: loading() || $parent.loading(), name: 'assist-entries' } --><!-- /ko -->
-      </div>
-    </div>
-
+      </li>
+    </ul>
     <div id="assistQuickLook" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -576,14 +585,14 @@ from desktop.views import _ko
               <!-- /ko -->
             </tr>
             <tbody>
-              <!-- ko foreach: rows -->
-                <tr>
-                  <td data-bind="text: $index()+1"></td>
-                  <!-- ko foreach: $data -->
-                    <td style="white-space: pre;" data-bind="text: $data"></td>
-                  <!-- /ko -->
-                </tr>
+            <!-- ko foreach: rows -->
+            <tr>
+              <td data-bind="text: $index()+1"></td>
+              <!-- ko foreach: $data -->
+              <td style="white-space: pre;" data-bind="text: $data"></td>
               <!-- /ko -->
+            </tr>
+            <!-- /ko -->
             </tbody>
           </table>
           <!-- /ko -->
