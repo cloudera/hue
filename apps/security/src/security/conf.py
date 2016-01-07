@@ -20,8 +20,20 @@ from django.utils.translation import ugettext_lazy as _
 from desktop.lib.conf import Config, coerce_bool
 
 
-LATEST = Config(
-  key="latest",
-  help=_("Use Sentry generic API V2 for Hive and Solr."),
+HIVE_V1 = Config(
+  key="hive_v1",
+  help=_("Use Sentry API V1 for Hive."),
+  default=True,
+  type=coerce_bool)
+
+HIVE_V2 = Config(
+  key="hive_v2",
+  help=_("Use Sentry generic API V2 for Hive."),
+  default=False,
+  type=coerce_bool)
+
+SOLR_V2 = Config(
+  key="solr_v2",
+  help=_("Use Sentry generic API V2 for Solr."),
   default=False,
   type=coerce_bool)

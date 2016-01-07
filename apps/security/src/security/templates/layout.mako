@@ -16,7 +16,7 @@
 
 <%!
 from django.utils.translation import ugettext as _
-from security.conf import LATEST
+from security.conf import HIVE_V1, HIVE_V2, SOLR_V2
 
 def is_selected(section, matcher):
   if section == matcher:
@@ -63,9 +63,13 @@ def is_selected(section, matcher):
                   ${ _('Hadoop Security') }
                 </a>
               </li>
+              % if HIVE_V1.get():
               <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive') }">${_('Sentry Tables')}</a></li>
-              % if LATEST.get():
+              % endif
+              % if HIVE_V2.get():
               <li class="${is_selected(section, 'hive2')}"><a href="${ url('security:hive2') }">${_('Sentry Tables v2')}</a></li>
+              % endif
+              % if SOLR_V2.get():
               <li class="${is_selected(section, 'solr')}"><a href="${ url('security:hive') }">${_('Solr Collections')}</a></li>
               % endif
               <li class="${is_selected(section, 'hdfs')}"><a href="${ url('security:hdfs') }">${_('File ACLs')}</a></li>
