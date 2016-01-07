@@ -343,18 +343,24 @@
         databaseName: self.database.name,
         tableName: self.name,
         successCallback: function (data) {
-          self.tableDetails(data);
-          self.tableStats(data.details.stats);
-          self.refreshingTableStats(false);
-          self.samples.load();
-          self.loaded(true);
-          self.loading(false);
-          if (data.partition_keys.length) {
-            self.partitions.detailedKeys(data.partition_keys);
-            self.partitions.load();
-          } else {
-            self.partitions.loading(false);
-            self.partitions.loaded(true);
+          if ((typeof data === 'object') && (data !== null)) {
+            self.tableDetails(data);
+            self.tableStats(data.details.stats);
+            self.refreshingTableStats(false);
+            self.samples.load();
+            self.loaded(true);
+            self.loading(false);
+            if (data.partition_keys.length) {
+              self.partitions.detailedKeys(data.partition_keys);
+              self.partitions.load();
+            } else {
+              self.partitions.loading(false);
+              self.partitions.loaded(true);
+            }
+          }
+          else {
+            self.refreshingTableStats(false);
+            self.loading(false);
           }
         },
         errorCallback: function (data) {
