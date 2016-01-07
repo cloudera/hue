@@ -171,7 +171,7 @@ def create_role(request):
 
   try:
     role = json.loads(request.POST['role'])
-    component = json.loads(request.POST['component'])
+    component = request.POST['component']
 
     api = get_api(request.user, component)
 
@@ -225,7 +225,7 @@ def save_privileges(request):
 
   try:
     role = json.loads(request.POST['role'])
-    component = json.loads(request.POST['component'])
+    component = request.POST['component']
 
     new_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'new']
     result['privileges'] = _hive_add_privileges(request.user, role, new_privileges, component)
@@ -257,7 +257,7 @@ def grant_privilege(request):
   try:
     roleName = json.loads(request.POST['roleName'])
     privilege = json.loads(request.POST['privilege'])
-    component = json.loads(request.POST['component'])
+    component = request.POST['component']
 
     result['privileges'] = _hive_add_privileges(request.user, {'name': roleName}, [privilege], component)
 
@@ -276,7 +276,7 @@ def create_sentry_role(request):
 
   try:
     roleName = request.POST['roleName']
-    component = json.loads(request.POST['component'])
+    component = request.POST['component']
 
     get_api(request.user, component).create_sentry_role(roleName)
     result['message'] = _('Role and privileges created.')
@@ -368,7 +368,7 @@ def bulk_add_privileges(request):
     privileges = json.loads(request.POST['privileges'])
     checkedPaths = json.loads(request.POST['checkedPaths'])
     authorizableHierarchy = json.loads(request.POST['authorizableHierarchy'])
-    component = json.loads(request.POST['component'])
+    component = request.POST['component']
 
     privileges = [privilege for privilege in privileges if privilege['status'] == '']
 
