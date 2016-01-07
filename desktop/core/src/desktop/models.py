@@ -416,7 +416,7 @@ class Document(models.Model):
     if self.can_write(user):
       return True
     else:
-      raise exception_class(_('Only superusers and %s are allowed to write this document.') % user)
+      raise exception_class(_("Document does not exist or you don't have the permission to access it."))
 
   def copy(self, name=None, owner=None):
     copy_doc = self
