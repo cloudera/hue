@@ -939,6 +939,23 @@
     }
   };
 
+  ko.bindingHandlers.stretchDown = {
+    init: function (element) {
+      var $element = $(element);
+      var $parent = $element.parent();
+
+      var lastParentHeight = -1;
+      var lastTop = -1;
+      window.setInterval(function () {
+        if (lastParentHeight !== $parent.innerHeight() || lastTop !== $element.position().top) {
+          lastParentHeight = $parent.innerHeight();
+          lastTop = $element.position().top;
+          $element.height(lastParentHeight - lastTop - ($element.outerHeight(true) - $element.innerHeight()));
+        }
+      }, 200);
+    }
+  };
+
   ko.bindingHandlers.assistVerticalResizer = {
     init: function (element, valueAccessor) {
       var $container = $(element);
