@@ -167,11 +167,12 @@ def oozie_to_hue_frequency(frequency_string):
   else:
     raise InvalidFrequency(_('invalid frequency: %s') % frequency_string)
 
-def convert_to_server_timezone(date, local_tz='UTC', server_tz='UTC', user=DEFAULT_USER):
+def convert_to_server_timezone(date, local_tz='UTC', server_tz=None, user=DEFAULT_USER):
   api = get_oozie(user)
-  oozie_conf = api.get_configuration()
+
   if server_tz is None:
-    server_tz = oozie_conf['oozie.processing.timezone']
+    oozie_conf = api.get_configuration()
+    server_tz = oozie_conf.get('oozie.processing.timezone') or 'UTC'
 
   if date and date.startswith('$'):
     return date
