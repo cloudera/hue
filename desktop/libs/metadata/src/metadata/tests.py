@@ -86,3 +86,17 @@ class TestNavigatorApi(object):
     entity = self.api.delete_tags(entity['identity'], ['hue_test'])
     new_tags = entity['tags'] or []
     assert_equal(tags, new_tags)
+
+
+  def test_update_properties(self):
+    entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
+    props = entity['properties'] or {}
+
+    entity = self.api.update_properties(entity['identity'], {'hue': 'test'})
+    props.update({'hue': 'test'})
+    assert_equal(props, entity['properties'])
+
+    entity = self.api.delete_properties(entity['identity'], ['hue'])
+    del props['hue']
+    new_props = entity['properties'] or {}
+    assert_equal(props, new_props)
