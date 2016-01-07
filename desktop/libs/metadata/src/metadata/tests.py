@@ -74,3 +74,15 @@ class TestNavigatorApi(object):
   def test_find_entity(self):
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
     assert_true('identity' in entity, entity)
+
+
+  def test_update_tags(self):
+    entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
+    tags = entity['tags'] or []
+
+    entity = self.api.add_tags(entity['identity'], ['hue_test'])
+    assert_equal(tags + ['hue_test'], entity['tags'])
+
+    entity = self.api.delete_tags(entity['identity'], ['hue_test'])
+    new_tags = entity['tags'] or []
+    assert_equal(tags, new_tags)
