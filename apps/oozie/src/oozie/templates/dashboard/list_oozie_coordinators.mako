@@ -588,6 +588,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               % endif
             });
             if (foundRow != null) {
+              runningTable.fnUpdate('<span data-sort-value="' + coord.nextMaterializedTimeInMillis + '" data-type="date">' + emptyStringIfNull(coord.nextMaterializedTime) + '</span>', foundRow, 1, false);
               runningTable.fnUpdate('<span class="' + coord.statusClass + '" data-type="status">' + coord.status + '</span>', foundRow, 2, false);
               if (coord.progress == 0){
                 runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
