@@ -40,4 +40,4 @@ ${ commonheader(_('403 - CSRF error'), "", user) | n,unicode }
 </div>
 
 
-${ commonfooter(request, messages) | n,unicode }
+${ commonfooter(None, messages) | n,unicode }
