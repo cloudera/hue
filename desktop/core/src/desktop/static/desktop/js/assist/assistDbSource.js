@@ -158,7 +158,10 @@
       self.loading(true);
       self.assistHelper.loadDatabases({
         sourceType: self.type,
-        callback: updateDatabases
+        successCallback: updateDatabases,
+        errorCallback: function() {
+          updateDatabases([]);
+        }
       });
     };
 

@@ -449,7 +449,7 @@
       self.loading(true);
       self.assistHelper.loadDatabases({
         sourceType: 'hive',
-        callback: function (databaseNames) {
+        successCallback: function (databaseNames) {
           self.databases($.map(databaseNames, function (name) {
             return new MetastoreDatabase({
               name: name,
@@ -461,6 +461,9 @@
           if (successCallback) {
             successCallback();
           }
+        },
+        errorCallback: function () {
+          self.databases([]);
         }
       });
     };

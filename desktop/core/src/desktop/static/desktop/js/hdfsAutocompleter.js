@@ -95,7 +95,12 @@
         }
       };
 
-      self.snippet.getAssistHelper().fetchHdfsPath(parts, successCallback, onFailure, editor);
+      self.snippet.getAssistHelper().fetchHdfsPath({
+        pathParts: parts,
+        successCallback: successCallback,
+        errorCallback: onFailure,
+        editor: editor
+      });
     } else {
       onFailure();
     }

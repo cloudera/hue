@@ -85,7 +85,10 @@
       self.loading(false);
     };
 
-    self.assistHelper.fetchDocuments(successCallback, errorCallback);
+    self.assistHelper.fetchDocuments({
+      successCallback: successCallback,
+      errorCallback: errorCallback
+    });
   };
 
   return AssistDocuments;
