@@ -39,6 +39,7 @@
     var initDatabases = function () {
       self.snippet.getAssistHelper().loadDatabases({
         sourceType: self.snippet.type(),
+        silenceErrors: true,
         successCallback: $.noop
       });
     };
@@ -255,6 +256,7 @@
                 callback(tableAndComplexRefs);
               }
             },
+            silenceErrors: true,
             errorCallback: function () {
               callback(tableAndComplexRefs);
             }
@@ -451,6 +453,7 @@
           }
           callback(self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null));
         },
+        silenceErrors: true,
         errorCallback: onFailure,
         editor: editor
       });
@@ -561,6 +564,7 @@
                 callback(self.extractFields(data, "", !fieldTermBefore));
               }
             },
+            silenceErrors: true,
             errorCallback: onFailure
           });
           return; // break recursion
@@ -608,6 +612,7 @@
                     onFailure();
                   }
                 },
+                silenceErrors: true,
                 errorCallback: onFailure
               });
               return; // break recursion, it'll be async above
@@ -658,6 +663,7 @@
               fields: fields,
               editor: editor,
               successCallback: successCallback,
+              silenceErrors: true,
               errorCallback: onFailure
             });
             return; // break recursion, it'll be async above

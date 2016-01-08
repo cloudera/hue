@@ -120,6 +120,7 @@
   /**
    * @param {Object} options
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    * @returns {Function}
    */
   AssistHelper.prototype.assistErrorCallback = function (options) {
@@ -133,11 +134,13 @@
         errorMessage = errorResponse;
       }
 
-      if (typeof window.console !== 'undefined') {
-        console.error(errorResponse);
-        console.error(new Error().stack);
+      if (! options.silenceErrors) {
+        if (typeof window.console !== 'undefined') {
+          console.error(errorResponse);
+          console.error(new Error().stack);
+        }
+        $(document).trigger("error", errorMessage);
       }
-      $(document).trigger("error", errorMessage);
 
       if (options.errorCallback) {
         options.errorCallback(errorMessage);
@@ -149,6 +152,7 @@
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string[]} options.pathParts
@@ -188,6 +192,7 @@
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    */
   AssistHelper.prototype.fetchDocuments = function (options) {
     var self = this;
@@ -238,6 +243,7 @@
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    **/
   AssistHelper.prototype.loadDatabases = function (options) {
     var self = this;
@@ -269,6 +275,7 @@
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
@@ -300,6 +307,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
@@ -331,6 +339,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
@@ -360,6 +369,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
@@ -397,6 +407,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
@@ -427,6 +438,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {Object} [options.prefixFilter]
    * @param {string} options.databaseName
@@ -458,6 +470,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string} options.databaseName
@@ -475,6 +488,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    * @param {Object} [options.editor] - Ace editor
    *
    * @param {string} options.databaseName
@@ -495,6 +509,7 @@
    * @param {string} options.sourceType
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
    *
    * @param {string[]} options.hierarchy
    */
@@ -511,7 +526,7 @@
    * @param {string} options.sourceType
    * @param {string} options.url
    * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
+   * @param {Function} options.errorCallback
    * @param {Object} [options.editor] - Ace editor
    */
   var fetchAssistData = function (options) {
