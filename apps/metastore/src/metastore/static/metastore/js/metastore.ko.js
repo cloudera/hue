@@ -94,8 +94,6 @@
         }
       },
       errorCallback: function (response) {
-        console.error('MetastoreDatabase.load error');
-        console.error(response);
         self.loading(false);
         if (callback) {
           callback();
@@ -176,8 +174,6 @@
         self.loaded(true);
       },
       errorCallback: function (data) {
-        console.error('assistHelper.fetchPartitions error');
-        console.error(data);
         self.loading(false);
         self.loaded(true);
       }
@@ -227,9 +223,6 @@
         self.loaded(true);
       },
       errorCallback: function (data) {
-        $.jHueNotify.error(self.i18n.errorFetchingTableSample);
-        console.error('assistHelper.fetchTableSample error');
-        console.error(data);
         self.loading(false);
         self.loaded(true);
       }
@@ -327,11 +320,6 @@
             })
           }));
           self.favouriteColumns(self.columns().slice(0, 3));
-        },
-        errorCallback: function (data) {
-          $.jHueNotify.error(self.i18n.errorFetchingTableFields);
-          console.error('assistHelper.fetchFields error');
-          console.error(data);
         }
       })
     };
@@ -365,9 +353,6 @@
         },
         errorCallback: function (data) {
           self.refreshingTableStats(false);
-          $.jHueNotify.error(self.i18n.errorFetchingTableDetails);
-          console.error('assistHelper.fetchTableDetails error');
-          console.error(data);
           self.loading(false);
         }
       })

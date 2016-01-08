@@ -109,9 +109,46 @@
   };
 
   /**
+   * @param {Object} [response]
+   * @param {number} [response.status]
+   * @returns {boolean} - True if actually an error
+   */
+  AssistHelper.prototype.successResponseIsError = function (response) {
+    return typeof response !== 'undefined' && (response.status === -1 || response.status === 500);
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} [options.errorCallback]
+   * @returns {Function}
+   */
+  AssistHelper.prototype.assistErrorCallback = function (options) {
+    return function (errorResponse) {
+      var errorMessage = 'Unknown error occurred';
+      if (typeof errorResponse !== 'undefined' && typeof errorResponse.message !== 'undefined') {
+        errorMessage = errorResponse.message;
+      } else if (typeof errorResponse !== 'undefined' && typeof errorResponse.statusText !== 'undefined') {
+        errorMessage = errorResponse.statusText;
+      } else if (typeof errorResponse !== 'undefined' && toString.call(errorResponse) == '[object String]') {
+        errorMessage = errorResponse;
+      }
+
+      if (typeof window.console !== 'undefined') {
+        console.error(errorResponse);
+        console.error(new Error().stack);
+      }
+      $(document).trigger("error", errorMessage);
+
+      if (options.errorCallback) {
+        options.errorCallback(errorMessage);
+      }
+    };
+  };
+
+  /**
    * @param {string[]} pathParts
-   * @param {function} successCallback
-   * @param {function} errorCallback
+   * @param {Function} successCallback
+   * @param {Function} [errorCallback]
    * @param {Object} [editor] - Ace editor
    */
   AssistHelper.prototype.fetchHdfsPath = function (pathParts, successCallback, errorCallback, editor) {
@@ -123,37 +160,55 @@
         dataType: "json",
         url: url,
         success: function (data) {
-          if (!data.error) {
+          if (!data.error && !self.successResponseIsError(data)) {
             successCallback(data);
           } else {
-            errorCallback();
+            self.assistErrorCallback({
+              errorCallback: errorCallback
+            })(data);
           }
         }
-      }).fail(function () {
-        errorCallback();
-      }).always(function () {
-        if (editor) {
-          editor.hideSpinner();
-        }
-      });
+      })
+        .fail(self.assistErrorCallback({
+          errorCallback: errorCallback
+        }))
+        .always(function () {
+          if (editor) {
+            editor.hideSpinner();
+          }
+        });
     };
 
-    self.fetchCached('hdfs', url, fetchFunction, successCallback, editor);
+    fetchCached.bind(self)({
+      sourceType: 'hdfs',
+      url: url,
+      fetchFunction: fetchFunction,
+      successCallback: successCallback,
+      editor: editor
+    });
   };
 
   /**
-   * @param {function} successCallback
-   * @param {function} errorCallback
+   * @param {Function} successCallback
+   * @param {Function} [errorCallback]
    */
   AssistHelper.prototype.fetchDocuments = function (successCallback, errorCallback) {
+    var self = this;
     $.ajax({
       url: DOCUMENTS_API,
       success: function (data) {
-        successCallback(data);
+        if (! self.successResponseIsError(data)) {
+          successCallback(data);
+        } else {
+          self.assistErrorCallback({
+            errorCallback: errorCallback
+          })(data);
+        }
       }
-    }).fail(function () {
-      errorCallback();
-    });
+    })
+      .fail(self.assistErrorCallback({
+        errorCallback: errorCallback
+      }));
   };
 
   /**
@@ -189,46 +244,44 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {function} options.callback
+   * @param {Function} options.callback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.loadDatabases = function (options) {
     var self = this;
 
-    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX, function(data) {
-      var databases = data.databases || [];
-      // Blacklist of system databases
-      self.lastKnownDatabases = $.grep(databases, function(database) {
-        return database !== "_impala_builtins";
-      });
-      options.callback(self.lastKnownDatabases);
-    }, function (message) {
-      if (message.status == 401) {
-        $(document).trigger("showAuthModal", {'type': options.sourceType, 'callback': function() {
-          self.loadDatabases(options);
-        }});
-      } else if (message.statusText) {
-        $(document).trigger("error", self.i18n.errorLoadingDatabases + ":" + message.statusText);
-      } else if (message.message) {
-        $(document).trigger("error", self.i18n.errorLoadingDatabases + ":" + message.message);
-      } else if (message) {
-        $(document).trigger("error", message);
-      } else {
-        $(document).trigger("error", self.i18n.errorLoadingDatabases + ".");
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX,
+      successCallback: function (data) {
+        var databases = data.databases || [];
+        // Blacklist of system databases
+        self.lastKnownDatabases = $.grep(databases, function(database) {
+          return database !== "_impala_builtins";
+        });
+        options.callback(self.lastKnownDatabases);
+      },
+      errorCallback: function (response) {
+        if (response.status == 401) {
+          $(document).trigger("showAuthModal", {'type': options.sourceType, 'callback': function() {
+            self.loadDatabases(options);
+          }});
+          return;
+        }
+        self.lastKnownDatabases = [];
+        self.assistErrorCallback(options)(response);
       }
-      self.lastKnownDatabases = [];
-      options.callback([]);
-    });
+    }));
   };
 
   /**
    * @param {Object} options
    * @param {string} options.databaseName
    * @param {string} options.tableName
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchPartitions = function (options) {
-    // http://127.0.0.1:8000/metastore/table/default/blog/partitions?format=json
+    var self = this;
     $.ajax({
       url: "/metastore/table/" + options.databaseName + "/" + options.tableName + "/partitions",
       data: {
@@ -237,8 +290,15 @@
       beforeSend: function (xhr) {
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },
-      success: options.successCallback,
-      error: options.errorCallback
+      success: function (response) {
+        if (! self.successResponseIsError(response)) {
+          options.successCallback(response);
+        } else {
+          self.assistErrorCallback(options)(response);
+        }
+
+      },
+      error: self.assistErrorCallback(options)
     });
   };
 
@@ -247,10 +307,11 @@
    * @param {string} options.sourceType
    * @param {string} options.databaseName
    * @param {string} options.tableName
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchTableDetails = function (options) {
+    var self = this;
     $.ajax({
       url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName,
       data: {
@@ -259,8 +320,14 @@
       beforeSend: function (xhr) {
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },
-      success: options.successCallback,
-      error: options.errorCallback
+      success: function (response) {
+        if (! self.successResponseIsError(response)) {
+          options.successCallback(response);
+        } else {
+          self.assistErrorCallback(options)(response);
+        }
+      },
+      error: self.assistErrorCallback(options)
     });
   };
 
@@ -271,18 +338,25 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.dataType - html or json
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
+    var self = this;
     $.ajax({
       url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName + "/sample",
       data: {},
       beforeSend: function (xhr) {
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },
-      success: options.successCallback,
-      error: options.errorCallback
+      success: function (response) {
+        if (! self.successResponseIsError(response)) {
+          options.successCallback(response);
+        } else {
+          self.assistErrorCallback(options)(response);
+        }
+      },
+      error: self.assistErrorCallback(options)
     });
   };
 
@@ -292,31 +366,34 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.columnName
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.refreshTableStats = function (options) {
+    var self = this;
     var pollRefresh = function (url) {
       $.post(url, function (data) {
         if (data.isSuccess) {
           options.successCallback(data);
         } else if (data.isFailure) {
-          options.errorCallback(data.message);
+          self.assistErrorCallback(options)(data.message);
         } else {
           window.setTimeout(function () {
             pollRefresh(url);
           }, 1000);
         }
-      }).fail(options.errorCallback);
+      })
+        .fail(self.assistErrorCallback(options));
     };
 
     $.post("/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/analyze/" + options.databaseName + "/" + options.tableName + "/"  + (options.columnName || ""), function (data) {
       if (data.status == 0 && data.watch_url) {
         pollRefresh(data.watch_url);
       } else {
-        options.errorCallback(data.message);
+        self.assistErrorCallback(options)(data);
       }
-    }).fail(options.errorCallback);
+    })
+      .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -325,10 +402,11 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.columnName
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchStats = function (options) {
+    var self = this;
     $.ajax({
       url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName + "/stats/" + ( options.columnName || ""),
       data: {},
@@ -336,8 +414,14 @@
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },
       dataType: "json",
-      success: options.successCallback,
-      error: options.errorCallback
+      success: function (response) {
+        if (! self.successResponseIsError(response)) {
+          options.successCallback(response)
+        } else {
+          self.assistErrorCallback(options)(response);
+        }
+      },
+      error: self.assistErrorCallback(options)
     });
   };
 
@@ -348,10 +432,11 @@
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.columnName
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchTerms = function (options) {
+    var self = this;
     $.ajax({
       url: "/" + options.sourceType + "/api/table/" + options.databaseName + "/" + options.tableName + "/terms/" + options.columnName + "/" + (options.prefixFilter || ""),
       data: {},
@@ -359,8 +444,14 @@
         xhr.setRequestHeader("X-Requested-With", "Hue");
       },
       dataType: "json",
-      success: options.successCallback,
-      error: options.errorCallback
+      success: function (response) {
+        if (! self.successResponseIsError(response)) {
+          options.successCallback(response);
+        } else {
+          self.assistErrorCallback(options)(response);
+        }
+      },
+      error: self.assistErrorCallback(options)
     });
   };
 
@@ -368,13 +459,16 @@
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.databaseName
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    * @param {Object} [options.editor] - Ace editor
    */
   AssistHelper.prototype.fetchTables = function (options) {
     var self = this;
-    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX + options.databaseName, options.successCallback, options.errorCallback, options.editor);
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
+      errorCallback: self.assistErrorCallback(options)
+    }));
   };
 
   /**
@@ -384,81 +478,96 @@
    * @param {string} options.tableName
    * @param {string[]} options.fields
    * @param {Object} [options.editor] - Ace editor
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchFields = function (options) {
     var self = this;
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
-    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart, options.successCallback, options.errorCallback, options.editor);
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
+      errorCallback: self.assistErrorCallback(options)
+    }));
   };
 
   /**
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string[]} options.hierarchy
-   * @param {function} options.successCallback
-   * @param {function} options.errorCallback
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchPanelData = function (options) {
     var self = this;
-    self.fetchAssistData(options.sourceType, AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"), options.successCallback, options.errorCallback);
+    fetchAssistData.bind(self)($.extend({}, options, {
+      url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
+      errorCallback: self.assistErrorCallback(options)
+    }));
   };
 
   /**
-   * @param {string} sourceType
-   * @param {string} url
-   * @param {function} successCallback
-   * @param {function} errorCallback
-   * @param {Object} [editor] - Ace editor
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {string} options.url
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {Object} [options.editor] - Ace editor
    */
-  AssistHelper.prototype.fetchAssistData = function (sourceType, url, successCallback, errorCallback, editor) {
+  var fetchAssistData = function (options) {
     var self = this;
-    if (!sourceType) {
+    if (!options.sourceType) {
       return
     }
 
-    var fetchFunction = function (successCallback) {
-      $.post(url, {
-        notebook: {},
-        snippet: ko.mapping.toJSON({
-          type: sourceType
-        })
-      }, function (data) {
-        if (data.status == 0) {
-          successCallback(data);
-        } else {
-          errorCallback(data);
-        }
-      }).fail(errorCallback).always(function () {
-        if (editor) {
-          editor.hideSpinner();
-        }
-      });
-    };
-
-    self.fetchCached(sourceType, url, fetchFunction, successCallback, editor);
+    fetchCached.bind(self)($.extend(options, {
+      fetchFunction: function (successCallback) {
+        $.post(options.url, {
+          notebook: {},
+          snippet: ko.mapping.toJSON({
+            type: options.sourceType
+          })
+        }, function (data) {
+          if (data.status === 0) {
+            successCallback(data);
+          } else {
+            options.errorCallback(data);
+          }
+        }).fail(options.errorCallback).always(function () {
+          if (options.editor) {
+            options.editor.hideSpinner();
+          }
+        });
+      }
+    }));
   };
 
-  AssistHelper.prototype.fetchCached = function (sourceType, url, fetchFunction, successCallback, editor) {
+  /**
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {string} options.url
+   * @param {Function} options.fetchFunction
+   * @param {Function} options.successCallback
+   * @param {Object} [options.editor] - Ace editor
+   */
+  var fetchCached = function (options) {
     var self = this;
-    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType)) || {};
+    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
 
-    if (typeof cachedData[url] == "undefined" || self.hasExpired(cachedData[url].timestamp)) {
-      if (editor) {
-        editor.showSpinner();
+    if (typeof cachedData[options.url] == "undefined" || self.hasExpired(cachedData[options.url].timestamp)) {
+      if (options.editor) {
+        options.editor.showSpinner();
       }
-
-      fetchFunction(function (data) {
-        cachedData[url] = {
+      options.fetchFunction(function (data) {
+        cachedData[options.url] = {
           timestamp: (new Date()).getTime(),
           data: data
         };
-        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(sourceType), cachedData);
-        successCallback(data);
+        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
+        options.successCallback(data);
       });
     } else {
-      successCallback(cachedData[url].data);
+      options.successCallback(cachedData[options.url].data);
     }
   };
 

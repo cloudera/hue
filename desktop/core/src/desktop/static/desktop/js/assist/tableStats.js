@@ -99,9 +99,6 @@
     };
 
     var errorCallback = function (e) {
-      if (e.status == 500) {
-        $(document).trigger("error", self.i18n.errorLoadingStats);
-      }
       self.hasError(true);
       self.loading(false);
     };
@@ -173,9 +170,6 @@
         self.loadingTerms(false);
       },
       errorCallback: function (e) {
-        if (e.status == 500) {
-          $(document).trigger("error", self.i18n.errorLoadingTerms);
-        }
         self.loadingTerms(false);
       }
     });
