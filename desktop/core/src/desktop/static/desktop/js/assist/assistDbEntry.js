@@ -337,10 +337,7 @@
         self.assistDbSource.loadingSamples(false);
       },
       errorCallback: function(e) {
-        if (e.status == 500) {
-          $(document).trigger("error", self.i18n.errorLoadingTablePreview);
-          $("#assistQuickLook").modal("hide");
-        }
+        $("#assistQuickLook").modal("hide");
       }
     });
 
