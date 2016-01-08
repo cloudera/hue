@@ -234,13 +234,15 @@ ${ assist.assistPanel() }
   <!-- ko if: tableDetails() && ! tableDetails().is_view -->
     <!-- ko with: tableDetails -->
     <h4>${ _('Stats') }
-      <!-- ko if: $parent.refreshingTableStats -->
-      <i class="fa fa-refresh fa-spin"></i>
+      <!-- ko ifnot: partition_keys.length -->
+        <!-- ko if: $parent.refreshingTableStats -->
+        <i class="fa fa-refresh fa-spin"></i>
+        <!-- /ko -->
+        <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
+        <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
+        <!-- /ko -->
+        <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
       <!-- /ko -->
-      <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
-      <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
-      <!-- /ko -->
-      <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
     </h4>
     <div class="row-fluid">
       <div>
@@ -248,13 +250,13 @@ ${ assist.assistPanel() }
       </div>
       <!-- ko with: $parent.tableStats -->
         <!-- ko if: typeof numFiles !== 'undefined'  -->
-          <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span></div>
+          <div title="${ _('Number of files') }"><i class="fa fa-fw fa-files-o muted"></i> <span data-bind="text: numFiles"></span> ${ _('files') }</div>
         <!-- /ko -->
         <!-- ko if: typeof numRows !== 'undefined'  -->
-          <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span></div>
+          <div title="${ _('Number of rows') }"><i class="fa fa-fw fa-list muted"></i> <span data-bind="text: numRows"></span> ${ _('rows') }</div>
         <!-- /ko -->
         <!-- ko if: typeof totalSize !== 'undefined'  -->
-          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span></div>
+          <div title="${ _('Total size') }"><i class="fa fa-fw fa-tasks muted"></i> <span data-bind="text: totalSize"></span> ${ _('bytes') }</div>
         <!-- /ko -->
       <!-- /ko -->
     </div>
