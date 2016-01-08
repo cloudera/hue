@@ -39,7 +39,7 @@
     var initDatabases = function () {
       self.snippet.getAssistHelper().loadDatabases({
         sourceType: self.snippet.type(),
-        callback: $.noop
+        successCallback: $.noop
       });
     };
     self.snippet.type.subscribe(function() {

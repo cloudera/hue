@@ -146,14 +146,16 @@
   };
 
   /**
-   * @param {string[]} pathParts
-   * @param {Function} successCallback
-   * @param {Function} [errorCallback]
-   * @param {Object} [editor] - Ace editor
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string[]} options.pathParts
    */
-  AssistHelper.prototype.fetchHdfsPath = function (pathParts, successCallback, errorCallback, editor) {
+  AssistHelper.prototype.fetchHdfsPath = function (options) {
     var self = this;
-    var url = HDFS_API_PREFIX + "/" + pathParts.join("/") + HDFS_PARAMETERS;
+    var url = HDFS_API_PREFIX + "/" + options.pathParts.join("/") + HDFS_PARAMETERS;
 
     var fetchFunction = function (successCallback) {
       $.ajax({
@@ -163,52 +165,43 @@
           if (!data.error && !self.successResponseIsError(data)) {
             successCallback(data);
           } else {
-            self.assistErrorCallback({
-              errorCallback: errorCallback
-            })(data);
+            self.assistErrorCallback(options)(data);
           }
         }
       })
-        .fail(self.assistErrorCallback({
-          errorCallback: errorCallback
-        }))
+        .fail(self.assistErrorCallback(options))
         .always(function () {
-          if (editor) {
-            editor.hideSpinner();
+          if (options.editor) {
+            options.editor.hideSpinner();
           }
         });
     };
 
-    fetchCached.bind(self)({
+    fetchCached.bind(self)($.extend({}, options, {
       sourceType: 'hdfs',
       url: url,
-      fetchFunction: fetchFunction,
-      successCallback: successCallback,
-      editor: editor
-    });
+      fetchFunction: fetchFunction
+    }));
   };
 
   /**
-   * @param {Function} successCallback
-   * @param {Function} [errorCallback]
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    */
-  AssistHelper.prototype.fetchDocuments = function (successCallback, errorCallback) {
+  AssistHelper.prototype.fetchDocuments = function (options) {
     var self = this;
     $.ajax({
       url: DOCUMENTS_API,
       success: function (data) {
         if (! self.successResponseIsError(data)) {
-          successCallback(data);
+          options.successCallback(data);
         } else {
-          self.assistErrorCallback({
-            errorCallback: errorCallback
-          })(data);
+          self.assistErrorCallback(options)(data);
         }
       }
     })
-      .fail(self.assistErrorCallback({
-        errorCallback: errorCallback
-      }));
+      .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -243,10 +236,9 @@
 
   /**
    * @param {Object} options
-   * @param {string} options.sourceType
-   * @param {Function} options.callback
+   * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
-   */
+   **/
   AssistHelper.prototype.loadDatabases = function (options) {
     var self = this;
 
@@ -258,7 +250,7 @@
         self.lastKnownDatabases = $.grep(databases, function(database) {
           return database !== "_impala_builtins";
         });
-        options.callback(self.lastKnownDatabases);
+        options.successCallback(self.lastKnownDatabases);
       },
       errorCallback: function (response) {
         if (response.status == 401) {
@@ -275,10 +267,11 @@
 
   /**
    * @param {Object} options
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   *
+   * @param {string} options.databaseName
+   * @param {string} options.tableName
    */
   AssistHelper.prototype.fetchPartitions = function (options) {
     var self = this;
@@ -305,10 +298,11 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {string} options.databaseName
-   * @param {string} options.tableName
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   *
+   * @param {string} options.databaseName
+   * @param {string} options.tableName
    */
   AssistHelper.prototype.fetchTableDetails = function (options) {
     var self = this;
@@ -335,11 +329,12 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   *
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.dataType - html or json
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     var self = this;
@@ -363,11 +358,12 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   *
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.columnName
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.refreshTableStats = function (options) {
     var self = this;
@@ -399,11 +395,12 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   *
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.columnName
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchStats = function (options) {
     var self = this;
@@ -427,13 +424,14 @@
 
   /**
    * @param {Object} options
-   * @param {Object} [options.prefixFilter]
    * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   *
+   * @param {Object} [options.prefixFilter]
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string} options.columnName
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchTerms = function (options) {
     var self = this;
@@ -458,10 +456,11 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {string} options.databaseName
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {Object} [options.editor] - Ace editor
+   *
+   * @param {string} options.databaseName
    */
   AssistHelper.prototype.fetchTables = function (options) {
     var self = this;
@@ -474,12 +473,13 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {Object} [options.editor] - Ace editor
+   *
    * @param {string} options.databaseName
    * @param {string} options.tableName
    * @param {string[]} options.fields
-   * @param {Object} [options.editor] - Ace editor
-   * @param {Function} options.successCallback
-   * @param {Function} [options.errorCallback]
    */
   AssistHelper.prototype.fetchFields = function (options) {
     var self = this;
@@ -493,9 +493,10 @@
   /**
    * @param {Object} options
    * @param {string} options.sourceType
-   * @param {string[]} options.hierarchy
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   *
+   * @param {string[]} options.hierarchy
    */
   AssistHelper.prototype.fetchPanelData = function (options) {
     var self = this;

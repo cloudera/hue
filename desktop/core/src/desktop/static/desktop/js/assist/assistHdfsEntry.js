@@ -100,7 +100,11 @@
       }
     };
 
-    self.assistHelper.fetchHdfsPath(self.getHierarchy(), successCallback, errorCallback)
+    self.assistHelper.fetchHdfsPath({
+      pathParts: self.getHierarchy(),
+      successCallback: successCallback,
+      errorCallback: errorCallback
+    })
   };
 
   AssistHdfsEntry.prototype.loadDeep = function(folders, callback) {
