@@ -201,7 +201,7 @@ def save(request):
 @allow_viewer_only
 def download(request):
   try:
-    file_format = 'csv' if 'csv' in request.POST.get('type') else 'xls' if 'xls' in request.POST.get('type') else 'json'
+    file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
     response = search(request)
 
     if file_format == 'json':

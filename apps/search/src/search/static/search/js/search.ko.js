@@ -848,11 +848,11 @@ var Collection = function (vm, collection) {
   }
 
   function isNumericColumn(type) {
-    return $.inArray(type, ['tfloat', 'tint', 'tlong', 'tdouble', 'plong', 'pint', 'pfloat', 'pdouble', 'currency', 'long', 'int', 'float', 'double']) > -1;
+    return $.inArray(type, NUMBER_TYPES.concat(FLOAT_TYPES)) > -1;
   }
 
   function isDateTimeColumn(type) {
-    return $.inArray(type, ['tdate', 'pdate', 'date']) > -1;
+    return $.inArray(type, DATE_TYPES) > -1;
   }
 
   function isStringColumn(type) {
@@ -1221,7 +1221,7 @@ var NewTemplate = function (vm, initial) {
 
 
 var DATE_TYPES = ['date', 'tdate'];
-var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat', 'double', 'tdouble'];
+var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat', 'double', 'tdouble', 'currency'];
 var FLOAT_TYPES = ['float', 'tfloat', 'double', 'tdouble'];
 var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];
 
