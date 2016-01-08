@@ -2256,7 +2256,8 @@
               $.each(data.tables_meta, function(index, tableMeta) {
                 currentAssistTables[tableMeta.name] = true;
               });
-            }
+            },
+            silenceErrors: true
           });
         }
       };
