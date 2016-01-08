@@ -127,10 +127,13 @@
       properties['py_file'] = '';
       properties['arguments'] = [];
     }
-    else if (snippetType == 'hive' || snippetType == 'impala') {
+    else if (snippetType == 'hive') {
       properties['settings'] = [];
       properties['files'] = [];
       properties['functions'] = [];
+    }
+    else if (snippetType == 'impala') {
+      properties['settings'] = [];
     }
     else if (snippetType == 'pig') {
       properties['parameters'] = [];

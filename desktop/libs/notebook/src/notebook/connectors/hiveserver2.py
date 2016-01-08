@@ -123,6 +123,13 @@ class HS2Api(Api):
     file_resources = snippet['properties'].get('files', None)
     functions = snippet['properties'].get('functions', None)
 
+    if settings:
+      settings = [{'key': s.rsplit('=', 1)[0], 'value': s.rsplit('=', 1)[1]} for s in settings] # TODO integrate with new binding
+    if file_resources:
+      file_resources = [{'type': 'JAR', 'path': f} for f in file_resources] # TODO support FILE ARCHIVE
+    if functions:
+      functions = [{'name': f.rsplit(' ', 1)[0], 'class_name': f.rsplit(' ', 1)[1]} for f in functions] # TODO protect for index out of bounds
+
     query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings, file_resources=file_resources, functions=functions)
 
     try:
