@@ -2239,6 +2239,15 @@ div.navigator .pull-right .nav {
   background-color: #EEE;
 }
 
+.hueach {
+  position: relative;
+  width: 100%;
+}
+
+.valign-middle {
+  vertical-align: middle;
+}
+
 /*
 Transition to Hue 4
 */

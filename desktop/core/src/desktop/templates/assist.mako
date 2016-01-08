@@ -279,7 +279,7 @@ from desktop.views import _ko
         <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: assistDbSource.type, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
-      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted"></i><span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
+      <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted valign-middle"></i><span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
       <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-entries'  } --><!-- /ko -->
     </li>
@@ -291,14 +291,14 @@ from desktop.views import _ko
       <li class="assist-entry no-entries">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="foreach: limitedFilteredEntries, css: { 'assist-tables': definition.isDatabase }">
+    <ul data-bind="hueach: {data: filteredEntries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko ifnot: definition.isTable -->
       <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-entry" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': !definition.isView, 'assist-table-link': definition.isView }">
           <!-- ko if: definition.isView -->
-            <i class="fa fa-fw fa-eye muted"></i>
+            <i class="fa fa-fw fa-eye muted valign-middle"></i>
           <!-- /ko -->
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
@@ -307,17 +307,6 @@ from desktop.views import _ko
       </li>
       <!-- /ko -->
     </ul>
-    <!-- ko if: hasMoreEntries -->
-    <ul class="assist-tables">
-      <li>
-        <div class="assist-show-more" data-bind="visible: ! increasingLimit()" style="display: none;">
-          ${_('Showing')} <span data-bind="text: limitedFilteredEntries().length"></span> ${_('of')} <span data-bind="text: filteredEntries().length"></span> -
-          <a href="javascript:void(0);" data-bind="click: increaseLimit">${_('Show more')}...</a>
-        </div>
-        <div class="center" data-bind="visible: increasingLimit" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
-      </li>
-    </ul>
-    <!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
@@ -388,7 +377,7 @@ from desktop.views import _ko
         </li>
 
         <li>
-          <ul class="assist-tables" data-bind="foreach: entries">
+          <ul class="assist-tables" data-bind="hueach: {data: entries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}">
             <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
               <div class="assist-actions table-actions" style="opacity: 0;" >
                 <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
@@ -398,10 +387,10 @@ from desktop.views import _ko
 
               <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
                 <!-- ko if: definition.type === 'dir' -->
-                <i class="fa fa-fw fa-folder muted"></i>
+                <i class="fa fa-fw fa-folder muted valign-middle"></i>
                 <!-- /ko -->
                 <!-- ko if: definition.type === 'file' -->
-                <i class="fa fa-fw fa-file-o muted"></i>
+                <i class="fa fa-fw fa-file-o muted valign-middle"></i>
                 <!-- /ko -->
                 <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
               </a>
@@ -445,7 +434,7 @@ from desktop.views import _ko
             <img src="${ static('impala/art/icon_impala_48.png') }" class="assist-icon"/>
             <!-- /ko -->
             <!-- ko if: type == 'notebook' -->
-            <i class="fa fa-fw fa-tags muted"></i>
+            <i class="fa fa-fw fa-tags muted valign-middle"></i>
             <!-- /ko -->
             <!-- ko if: type == 'oozie-workflow2' -->
             <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="assist-icon"/>
@@ -457,7 +446,7 @@ from desktop.views import _ko
             <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="assist-icon"/>
             <!-- /ko -->
             <!-- ko if: type == 'search-dashboard' -->
-            <i class="fa fa-fw fa-search muted"></i>
+            <i class="fa fa-fw fa-search muted valign-middle"></i>
             <!-- /ko -->
 
             <span data-bind="text: name"></span>
@@ -515,7 +504,7 @@ from desktop.views import _ko
     </ul>
     <ul class="nav assist-stretchable-list" data-bind="stretchDown">
       <li data-bind="visible: ! hasErrors()" >
-        <ul class="assist-tables" data-bind="foreach: filteredEntries">
+        <ul class="assist-tables" data-bind="hueach: {data: filteredEntries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}">
           <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
             <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
             <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
@@ -612,7 +601,7 @@ from desktop.views import _ko
     <div class="assist-panel-switches assist-fixed-height" style="display:none;">
       <!-- ko foreach: availablePanels -->
       <div class="inactive-action assist-type-switch" data-bind="click: function () { visible(!visible()) }, css: { 'blue': visible }, attr: { 'title': visible() ? '${ _('Hide') } ' + name : '${ _('Show') } ' + name }">
-        <i class="fa fa-fw" data-bind="css: icon"></i>
+        <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
       </div>
       <!-- /ko -->
     </div>
