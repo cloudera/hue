@@ -951,6 +951,7 @@
           lastParentHeight = $parent.innerHeight();
           lastTop = $element.position().top;
           $element.height(lastParentHeight - lastTop - ($element.outerHeight(true) - $element.innerHeight()));
+          huePubSub.publish('assist.stretchDown', $element);
         }
       }, 200);
     }
@@ -2703,6 +2704,75 @@
         ko.utils.toggleDomNodeCssClass(element, 'fa-minus hue-uncheck', newValue.length > 0 && newValue.length !== allValues().length);
       })
       ko.utils.toggleDomNodeCssClass(element, 'fa-minus hue-uncheck', selectedValues().length > 0 && selectedValues().length !== allValues().length);
+    }
+  };
+
+  ko.bindingHandlers.hueach = {
+    init: function (element, valueAccessor, allBindings) {
+      var valueAccessorBuilder = function () {
+        return {
+          data: ko.observableArray([])
+        }
+      }
+      ko.bindingHandlers.foreach.init(element, valueAccessorBuilder, allBindings);
+    },
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var $parent = $(element).parent(),
+        considerStretching = valueAccessor().considerStretching || false,
+        itemHeight = valueAccessor().itemHeight || 30,
+        scrollable = valueAccessor().scrollable || 'body',
+        renderTimeout = -1,
+        dataHasChanged = true;
+
+      if (!$parent.hasClass('hueach')) {
+        $(element).wrap('<div class="hueach"></div>');
+        $parent = $(element).parent();
+        $(element).css({
+          position: 'absolute',
+          width: '100%'
+        });
+      }
+
+      $parent.height(valueAccessor().data().length * itemHeight);
+      if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(valueAccessor().data())) {
+        dataHasChanged = false;
+      }
+      if (dataHasChanged) {
+        ko.utils.domData.set(element, 'originalData', valueAccessor().data());
+      }
+
+      var startItem = 0, endItem = 0;
+      var valueAccessorBuilder = function () {
+        return {
+          data: ko.utils.domData.get(element, 'originalData') ? ko.observableArray(ko.utils.domData.get(element, 'originalData').slice(startItem, endItem)) : []
+        }
+      }
+
+      var render = function () {
+        startItem = Math.floor($parent.parents(scrollable).scrollTop() / itemHeight);
+        endItem = startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight);
+        $(element).css('top', (startItem * itemHeight) + 'px');
+        ko.bindingHandlers.foreach.update(element, valueAccessorBuilder, allBindings, viewModel, bindingContext);
+      }
+
+      $parent.parents(scrollable).on('scroll', function () {
+        window.clearTimeout(renderTimeout);
+        renderTimeout = window.setTimeout(render, 30);
+      });
+
+      if (considerStretching) {
+        huePubSub.subscribe('assist.stretchDown', function () {
+          window.clearTimeout(renderTimeout);
+          renderTimeout = window.setTimeout(function () {
+              ko.utils.domData.set(element, 'hasStretched', true);
+            render();
+          }, 300);
+        });
+      }
+
+      if (considerStretching && ko.utils.domData.get(element, 'hasStretched')) {
+        render();
+      }
     }
   };
 
