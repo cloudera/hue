@@ -566,7 +566,9 @@ ${ require.config() }
         <!-- ko template: { if: typeof properties().numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executors') }', value: properties().numExecutors, title: '${ _ko('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _ko('Queue') }', value: properties().queue, title: '${ _ko('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Archives') }', value: properties().archives, title: '${ _ko('Archives to be extracted into the working directory of each executor (YARN only)') }', placeholder: '${ _ko('e.g. file.zip') }'}} --><!-- /ko -->
+
         <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Files') }', value: properties().files, title: '${ _ko('Files to be placed in the working directory of each executor.') }', placeholder: '${ _ko('e.g. file.data') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().functions != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Functions') }', value: properties().functions, title: '${ _ko('UDFs name and class') }', placeholder: '${ _ko('e.g. myUpper org.hue.udf.MyUpper') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Settings') }', value: properties().settings, title: '${ _ko('Spark properties') }', placeholder: '${ _ko('e.g. foo=value') }'}} --><!-- /ko -->
 
         <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
@@ -1023,7 +1025,6 @@ ${ require.config() }
                   <i class="fa fa-external-link"></i>
                 </a>
               </div>
-
               <!-- /ko -->
               <!-- ko if: ['pyspark', 'spark'].indexOf(type()) != -1 && typeof properties != 'undefined' -->
               <div style="display:block; width:100%;">

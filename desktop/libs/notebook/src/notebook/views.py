@@ -107,38 +107,40 @@ def browse(request, database, table):
 
   editor = Notebook()
   editor.data = json.dumps({
-    'description':'',
-    'sessions':[
+    'description': '',
+    'sessions': [
       {
-         'type':'hive',
-         'properties':[
+         'type': 'hive',
+         'properties': [
 
          ],
-         'id':None
+         'id': None
       }
     ],
-    'selectedSnippet':'hive',
+    'selectedSnippet': 'hive',
     'type': 'query-%s' % editor_type,
 
-    'snippets':[
+    'snippets': [
       {
-         'status':'ready-execute',
-         'id':'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
+         'status': 'ready-execute',
+         'id': 'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
          'statement_raw': sql_select,
          'statement': sql_select,
          'type': editor_type,
-         'properties':{
-            'files':[
+         'properties': {
+            'files': [
             ],
-            'settings':[
+            'functions': [
+            ],
+            'settings': [
             ]
          },
          'name': 'Browse',
-         'database':'default',
-         'result':{  }
+         'database': 'default',
+         'result': {}
       }
     ],
-    'name':'Browse'
+    'name': 'Browse'
   })
 
   return render('editor.mako', request, {

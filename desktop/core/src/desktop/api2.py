@@ -59,7 +59,7 @@ def api_error_handler(func):
 
 
 @api_error_handler
-def get_documents(request): # TODO only here for assist
+def get_documents(request): # TODO only here for not breaking assist for now
   filters = {
       'owner': request.user
   }
