@@ -50,11 +50,12 @@ def escape_rows(rows, nulls_only=False):
   return data
 
 
-def make_notebook(name='Browse', editor_type='hive', statement='', status='ready', files=None, functions=None, settings=None):
+def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready', files=None, functions=None, settings=None):
   editor = Notebook()
 
   editor.data = json.dumps({
-    'description': '',
+    'name': name,
+    'description': description,
     'sessions': [
       {
          'type': editor_type,
@@ -83,8 +84,7 @@ def make_notebook(name='Browse', editor_type='hive', statement='', status='ready
          'database': 'default',
          'result': {}
       }
-    ],
-    'name': name
+    ]
   })
   
   return editor
