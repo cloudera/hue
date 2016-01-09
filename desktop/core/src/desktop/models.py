@@ -36,6 +36,7 @@ from desktop import appmanager
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.redaction import global_redaction_engine
+from notebook.models import make_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -993,3 +994,33 @@ def get_data_link(meta):
     link = '/metastore/table/%(database)s/%(table)s' % meta # Could also add col=val
 
   return link
+
+
+def import_beeswax_query(bquery):
+  design = bquery.get_design()
+
+  return make_notebook(
+      name=bquery.name,
+      description=bquery.desc,
+      editor_type=_convert_type(bquery.type),
+      statement=design.hql_query,
+      status='ready',
+      files=design.file_resources,
+      functions=design.functions,
+      settings=design.settings
+  )
+
+def _convert_type(btype):
+  from beeswax.models import HQL, IMPALA, RDBMS, SPARK
+
+  if btype == HQL:
+    return 'hive'
+  elif btype == IMPALA:
+    return 'impala'
+  elif btype == RDBMS: # We should instead get the 'type' (https://github.com/cloudera/hue/blob/master/desktop/libs/librdbms/src/librdbms/design.py#L47
+    return 'mysql' # postgres, sqlite, oracle
+  elif btype == SPARK: # We should not import
+    return 'spark'
+  else:
+    return 'hive'
+
