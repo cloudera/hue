@@ -28,7 +28,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
-from metadata.navigator import NavigatorApi
+from metadata.navigator import NavigatorApi, is_navigator_enabled
 
 
 LOG = logging.getLogger(__name__)
@@ -36,24 +36,10 @@ LOG = logging.getLogger(__name__)
 
 class TestNavigatorApi(object):
 
-  @staticmethod
-  def is_navigator_enabled():
-    is_enabled = True
-    try:
-      from metadata.conf import NAVIGATOR
-      if not NAVIGATOR.API_URL.get():
-        is_enabled = False
-    except:
-      LOG.info('Testing navigator requires a configured navigator api_url')
-      is_enabled = False
-
-    return is_enabled
-
-
   @classmethod
   def setup_class(cls):
 
-    if not is_live_cluster() or not cls.is_navigator_enabled():
+    if not is_live_cluster() or not is_navigator_enabled():
       raise SkipTest
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
@@ -76,27 +62,54 @@ class TestNavigatorApi(object):
     assert_true('identity' in entity, entity)
 
 
-  def test_update_tags(self):
+  def test_api_find_entity(self):
+    resp = self.client.post(reverse('metadata:find_entity'), self._format_json_body({'type': 'database', 'name': 'default'}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'])
+    assert_true('entity' in json_resp, json_resp)
+    assert_true('identity' in json_resp['entity'], json_resp)
+
+
+  def test_api_tags(self):
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
+    entity_id = entity['identity']
     tags = entity['tags'] or []
 
-    entity = self.api.add_tags(entity['identity'], ['hue_test'])
-    assert_equal(tags + ['hue_test'], entity['tags'])
+    resp = self.client.post(reverse('metadata:add_tags'), self._format_json_body({'id': entity_id}))
+    json_resp = json.loads(resp.content)
+    # add_tags requires a list of tags
+    assert_equal(-1, json_resp['status'])
 
-    entity = self.api.delete_tags(entity['identity'], ['hue_test'])
-    new_tags = entity['tags'] or []
-    assert_equal(tags, new_tags)
+    resp = self.client.post(reverse('metadata:add_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal(tags + ['hue_test'], json_resp['entity']['tags'])
+
+    resp = self.client.post(reverse('metadata:delete_tags'), self._format_json_body({'id': entity_id, 'tags': ['hue_test']}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal(entity['tags'] , json_resp['entity']['tags'])
 
 
-  def test_update_properties(self):
+  def test_api_properties(self):
     entity = self.api.find_entity(source_type='HIVE', type='DATABASE', name='default')
+    entity_id = entity['identity']
     props = entity['properties'] or {}
 
-    entity = self.api.update_properties(entity['identity'], {'hue': 'test'})
+    resp = self.client.post(reverse('metadata:update_properties'), self._format_json_body({'id': entity_id, 'properties': {'hue': 'test'}}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
     props.update({'hue': 'test'})
-    assert_equal(props, entity['properties'])
+    assert_equal(props, json_resp['entity']['properties'])
 
-    entity = self.api.delete_properties(entity['identity'], ['hue'])
-    del props['hue']
-    new_props = entity['properties'] or {}
-    assert_equal(props, new_props)
+    resp = self.client.post(reverse('metadata:delete_properties'), self._format_json_body({'id': entity_id, 'keys': ['hue']}))
+    json_resp = json.loads(resp.content)
+    assert_equal(0, json_resp['status'], json_resp)
+    assert_equal(entity['properties'], json_resp['entity']['properties'])
+
+
+  def _format_json_body(self, post_dict):
+    json_dict = {}
+    for key, value in post_dict.items():
+      json_dict[key] = json.dumps(value)
+    return json_dict
