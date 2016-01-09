@@ -31,6 +31,7 @@ from notebook.connectors.base import Notebook, get_api
 from notebook.management.commands.notebook_setup import Command
 from notebook.connectors.spark_shell import SparkApi
 from notebook.conf import get_interpreters
+from notebook.models import make_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -105,43 +106,7 @@ def browse(request, database, table):
   snippet = {'type': editor_type}
   sql_select = get_api(request.user, snippet, request.fs, request.jt).get_select_star_query(snippet, database, table)
 
-  editor = Notebook()
-  editor.data = json.dumps({
-    'description': '',
-    'sessions': [
-      {
-         'type': 'hive',
-         'properties': [
-
-         ],
-         'id': None
-      }
-    ],
-    'selectedSnippet': 'hive',
-    'type': 'query-%s' % editor_type,
-
-    'snippets': [
-      {
-         'status': 'ready-execute',
-         'id': 'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
-         'statement_raw': sql_select,
-         'statement': sql_select,
-         'type': editor_type,
-         'properties': {
-            'files': [
-            ],
-            'functions': [
-            ],
-            'settings': [
-            ]
-         },
-         'name': 'Browse',
-         'database': 'default',
-         'result': {}
-      }
-    ],
-    'name': 'Browse'
-  })
+  editor = make_notebook(name='Browse', editor_type=editor_type, statement=sql_select, status='ready-execute')
 
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
