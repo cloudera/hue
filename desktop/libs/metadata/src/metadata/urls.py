@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,18 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup, find_packages
-from hueversion import VERSION
+from django.conf.urls import patterns, url
 
-setup(
-      name = "metadata",
-      version = VERSION,
-      url = 'http://github.com/cloudera/hue',
-      description = "Metadata Libraries",
-      packages = find_packages('src'),
-      package_dir = {'': 'src' },
-      install_requires = ['setuptools', 'desktop'],
-      # Even libraries need to be registered as desktop_apps,
-      # if they have configuration, like this one.
-      entry_points = { 'desktop.sdk.application': 'metadata=metadata' },
+# Navigator API
+urlpatterns = patterns('metadata.navigator_api',
+  url(r'^api/navigator/find_entity/?$', 'find_entity', name='find_entity'),
+  url(r'^api/navigator/get_entity/?$', 'get_entity', name='get_entity'),
+  url(r'^api/navigator/add_tags/?$', 'add_tags', name='add_tags'),
+  url(r'^api/navigator/delete_tags/?$', 'delete_tags', name='delete_tags'),
+  url(r'^api/navigator/update_properties/?$', 'update_properties', name='update_properties'),
+  url(r'^api/navigator/delete_properties/?$', 'delete_properties', name='delete_properties'),
 )

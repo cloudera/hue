@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -14,18 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from setuptools import setup, find_packages
-from hueversion import VERSION
+DJANGO_APPS = [ "metadata" ]
+NICE_NAME = "Metadata"
+REQUIRES_HADOOP = False
 
-setup(
-      name = "metadata",
-      version = VERSION,
-      url = 'http://github.com/cloudera/hue',
-      description = "Metadata Libraries",
-      packages = find_packages('src'),
-      package_dir = {'': 'src' },
-      install_requires = ['setuptools', 'desktop'],
-      # Even libraries need to be registered as desktop_apps,
-      # if they have configuration, like this one.
-      entry_points = { 'desktop.sdk.application': 'metadata=metadata' },
-)
+IS_URL_NAMESPACED = True

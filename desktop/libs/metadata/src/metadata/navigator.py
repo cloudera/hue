@@ -28,6 +28,10 @@ from metadata.conf import NAVIGATOR
 LOG = logging.getLogger(__name__)
 
 
+def is_navigator_enabled():
+  return NAVIGATOR.API_URL.get()
+
+
 class NavigatorApiException(Exception):
   pass
 
