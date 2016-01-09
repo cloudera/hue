@@ -23,6 +23,8 @@ from django.utils.html import escape
 
 from desktop.lib.i18n import smart_unicode
 
+from notebook.connectors.base import Notebook
+
 
 # Materialize and HTML escape results
 def escape_rows(rows, nulls_only=False):
@@ -46,3 +48,44 @@ def escape_rows(rows, nulls_only=False):
     data.append(escaped_row)
 
   return data
+
+
+def make_notebook(name='Browse', editor_type='hive', statement='', status='ready', files=None, functions=None, settings=None):
+  editor = Notebook()
+
+  editor.data = json.dumps({
+    'description': '',
+    'sessions': [
+      {
+         'type': editor_type,
+         'properties': [
+
+         ],
+         'id': None
+      }
+    ],
+    'selectedSnippet': editor_type,
+    'type': 'query-%s' % editor_type,
+
+    'snippets': [
+      {
+         'status': status,
+         'id': 'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
+         'statement_raw': statement,
+         'statement': statement,
+         'type': editor_type,
+         'properties': {
+            'files': [] if files is None else files,
+            'functions': [] if functions is None else functions,
+            'settings': [] if settings is None else settings
+         },
+         'name': name,
+         'database': 'default',
+         'result': {}
+      }
+    ],
+    'name': name
+  })
+  
+  return editor
+
