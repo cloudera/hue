@@ -31,6 +31,7 @@ from desktop.models import SAMPLE_USER_ID
 from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
+from liboozie.conf import SECURITY_ENABLED
 from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
@@ -88,6 +89,43 @@ class TestMock(TestPigBase):
 
     wf = api._create_workflow(pig_script, '[]')
     assert_true({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog'} in wf.find_all_parameters(), wf.find_all_parameters())
+
+    start_link = wf.start.get_link()
+    pig_action = start_link.child
+    assert_equal([], pig_action.credentials)
+
+  def test_check_automated_hcatalogs_credentials(self):
+    reset = SECURITY_ENABLED.set_for_testing(True)
+
+    try:
+      api = get(None, None, self.user)
+      pig_script = self.create_script()
+      pig_script.update_from_dict({
+          'script':"""
+            a = LOAD 'sample_07' USING org.apache.hcatalog.pig.HCatLoader();
+            dump a;
+
+            STORE raw_data INTO 'students' USING
+            org.apache.pig.backend.hadoop.hbase.HBaseStorage
+            org.apache.pig.backend.hadoop.hbase.HBaseStorage (
+            'info:first_name info:last_name info:age info:gpa info:part');
+            raw_data = LOAD 'students' USING PigStorage( ' ' ) AS (
+            id: chararray,
+            first_name: chararray,
+            last_name: chararray,
+            age: int,
+            gpa: float,
+            part: int );
+      """})
+      pig_script.save()
+
+      wf = api._create_workflow(pig_script, '[]')
+      start_link = wf.start.get_link()
+      pig_action = start_link.child
+      assert_equal([{u'name': u'hcat', u'value': True}, {u'name': u'hbase', u'value': True}], pig_action.credentials)
+    finally:
+      reset()
+
 
   def test_editor_view(self):
     response = self.c.get(reverse('pig:app'))
