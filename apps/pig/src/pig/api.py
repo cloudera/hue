@@ -109,11 +109,13 @@ class OozieApi(object):
         job_properties=json.dumps(job_properties)
     )
 
+    credentials = []
     if pig_script.use_hcatalog and self.oozie_api.security_enabled:
-      action.credentials.append([{'name': 'hcat', 'value': True}])
-      action.save()
+      credentials.append({'name': 'hcat', 'value': True})
     if pig_script.use_hbase and self.oozie_api.security_enabled:
-      action.credentials.append([{'name': 'hbase', 'value': True}])
+      credentials.append({'name': 'hbase', 'value': True})
+    if credentials:
+      action.credentials = credentials # Note, action.credentials is a @setter here
       action.save()
 
     action.add_node(workflow.end)
