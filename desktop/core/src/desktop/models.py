@@ -91,6 +91,9 @@ class DocumentTagManager(models.Manager):
   def get_example_tag(self, user):
     return self._get_tag(user, DocumentTag.EXAMPLE)
 
+  def get_imported2_tag(self, user):
+    return self._get_tag(user, DocumentTag.IMPORTED2)
+
   def tag(self, owner, doc_id, tag_name='', tag_id=None):
     try:
       tag = DocumentTag.objects.get(id=tag_id, owner=owner)
@@ -151,8 +154,9 @@ class DocumentTag(models.Model):
   TRASH = 'trash' # There when the document is trashed
   HISTORY = 'history' # There when the document is a submission history
   EXAMPLE = 'example' # Hue examples
+  IMPORTED2 = 'imported2' # Was imported to document2
 
-  RESERVED = (DEFAULT, TRASH, HISTORY, EXAMPLE)
+  RESERVED = (DEFAULT, TRASH, HISTORY, EXAMPLE, IMPORTED2)
 
   objects = DocumentTagManager()
 
@@ -996,7 +1000,7 @@ def get_data_link(meta):
   return link
 
 
-def import_beeswax_query(bquery):
+def import_saved_beeswax_query(bquery):
   design = bquery.get_design()
 
   return make_notebook(

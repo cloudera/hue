@@ -30,10 +30,11 @@ from django.utils import html
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
+from beeswax.models import SavedQuery
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
-from desktop.models import Document2, Document, Directory
+from desktop.models import Document2, Document, Directory, DocumentTag, import_saved_beeswax_query
 from desktop.lib.exceptions_renderable import PopupException
 from hadoop.fs.hadoopfs import Hdfs
 
@@ -74,6 +75,8 @@ def get_documents(request): # TODO only here for not breaking assist for now
 def get_documents2(request):
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
+  _import_documents1(request.user)
+
   try:
     file_doc = Directory.objects.get(owner=request.user, name=path) # TODO perms
   except Directory.DoesNotExist, e:
@@ -88,6 +91,39 @@ def get_documents2(request):
       'documents': [doc.to_dict() for doc in file_doc.documents()],
       'path': path
   })
+
+
+def _import_documents1(user):
+  from beeswax.models import HQL, IMPALA, RDBMS
+  docs = Document.objects.get_docs(user, SavedQuery).filter(owner=user).filter(extra__in=[HQL, IMPALA]) # TODO RDBMS
+
+  imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
+
+  docs = docs.exclude(tags__in=[
+      DocumentTag.objects.get_trash_tag(user=user), # No trashed docs
+      DocumentTag.objects.get_history_tag(user=user), # No history yet
+      DocumentTag.objects.get_example_tag(user=user), # No examples
+      imported_tag # No already imported docs
+  ])
+
+  root_doc, created = Directory.objects.get_or_create(name='/', type='directory', owner=user)
+  imported_docs = []
+
+  for doc in docs:
+    if doc.content_object:
+      try:
+        notebook = import_saved_beeswax_query(doc.content_object)
+        data = notebook.get_data()
+        notebook_doc = Document2.objects.create(name=data['name'], type='query-%s' % data['type'], owner=user, data=notebook.get_json())
+
+        doc.add_tag(imported_tag)
+        doc.save()
+        imported_docs.append(notebook_doc)
+      except Exception, e:
+        raise e
+
+  if imported_docs:
+    root_doc.dependencies.add(*imported_docs)
 
 
 @api_error_handler

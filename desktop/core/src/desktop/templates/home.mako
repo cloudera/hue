@@ -93,6 +93,16 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            </li>
         </ul>
       </div>
+      <div class="nav-collapse pull-right">
+        <ul class="nav">
+          <li class="currentApp">
+            <a href="${ url('desktop.views.home2') }">
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              ${ _('New Home') }
+            </a>
+           </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>

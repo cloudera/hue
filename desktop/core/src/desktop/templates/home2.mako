@@ -136,9 +136,19 @@ ${ assist.assistPanel() }
       <div class="nav-collapse">
         <ul class="nav">
           <li class="currentApp">
-            <a href="${ url('desktop.views.home') }">
+            <a href="${ url('desktop.views.home2') }">
               <img src="${ static('desktop/art/home.png') }" class="app-icon" />
               ${ _('My documents') }
+            </a>
+           </li>
+        </ul>
+        </div>
+      <div class="nav-collapse pull-right">
+        <ul class="nav">
+          <li class="currentApp">
+            <a href="${ url('desktop.views.home') }">
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              ${ _('Old home') }
             </a>
            </li>
         </ul>
