@@ -2755,10 +2755,7 @@
         ko.bindingHandlers.foreach.update(element, valueAccessorBuilder, allBindings, viewModel, bindingContext);
       }
 
-      $parent.parents(scrollable).on('scroll', function () {
-        window.clearTimeout(renderTimeout);
-        renderTimeout = window.setTimeout(render, 30);
-      });
+      $parent.parents(scrollable).on('scroll', render);
 
       if (considerStretching) {
         huePubSub.subscribe('assist.stretchDown', function () {
