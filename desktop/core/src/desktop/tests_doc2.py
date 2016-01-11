@@ -24,7 +24,7 @@ from desktop.lib.test_utils import grant_access
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
-from desktop.models import import_beeswax_query
+from desktop.models import import_saved_beeswax_query
 
 
 class TestDocument2(object):
@@ -51,7 +51,7 @@ class TestDocument2(object):
         desc='Example of old format'
     )
 
-    new_query = import_beeswax_query(old_query)
+    new_query = import_saved_beeswax_query(old_query)
     new_query_data = new_query.get_data()
 
     assert_equal('query-hive', new_query_data['type'])
