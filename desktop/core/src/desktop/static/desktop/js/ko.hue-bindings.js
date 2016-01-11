@@ -2439,7 +2439,7 @@
           window.open("/filebrowser/#" + token.value.replace(/\"/gi, ""));
         }
         else {
-          window.open("/metastore/table/" + assistHelper.activeDatabase() + "/" + token.value);
+          window.open("/metastore/table/" + snippet.database() + "/" + token.value);
         }
       });
 
