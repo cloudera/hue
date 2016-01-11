@@ -94,12 +94,12 @@
    * @param {Observable} observable
    * @param {*} [defaultValue] - Optional default value to use if not in total storage initially
    */
-  AssistHelper.prototype.withTotalStorage = function(owner, id, observable, defaultValue) {
+  AssistHelper.prototype.withTotalStorage = function(owner, id, observable, defaultValue, noInit) {
     var self = this;
 
     var cachedValue = self.getFromTotalStorage(owner, id, defaultValue);
 
-    if (cachedValue !== 'undefined') {
+    if (! noInit && cachedValue !== 'undefined') {
       observable(cachedValue);
     }
 

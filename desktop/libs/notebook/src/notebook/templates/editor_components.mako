@@ -324,7 +324,8 @@ ${ require.config() }
             openItem: false,
             showPreview: true,
             showStats: true
-          }
+          },
+          visibleAssistPanels: $root.editorMode ? ['sql'] : []
         }
       }"></div>
   </div>

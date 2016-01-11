@@ -669,6 +669,7 @@ from desktop.views import _ko
        * @param {string} options.type
        * @param {number} options.minHeight
        * @param {string} options.icon
+       * @param {boolean} options.visible
        * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel)} panelData
        * @constructor
        */
@@ -680,8 +681,8 @@ from desktop.views import _ko
         self.name = options.name;
         self.panelData = options.panelData;
 
-        self.visible = ko.observable();
-        options.assistHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false);
+        self.visible = ko.observable(options.visible);
+        options.assistHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
         self.templateName = 'assist-' + self.type + '-inner-panel'
       }
 
@@ -852,6 +853,7 @@ from desktop.views import _ko
        * @param {Object} params
        * @param {Object[]} params.sourceTypes - All the available SQL source types
        * @param {boolean} params.onlySql - For the old query editors
+       * @param {string[]} params.visibleAssistPanels - Panels that will initially be shown regardless of total storage
        * @param {string} params.sourceTypes[].name - Example: Hive SQL
        * @param {string} params.sourceTypes[].type - Example: hive
        * @param {string} [params.activeSourceType] - Example: hive
@@ -893,7 +895,8 @@ from desktop.views import _ko
             name: '${ _("SQL") }',
             type: 'db',
             icon: 'fa-database',
-            minHeight: 55
+            minHeight: 55,
+            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('sql') !== -1
           })
         ];
 
@@ -906,7 +909,8 @@ from desktop.views import _ko
             name: '${ _("HDFS") }',
             type: 'hdfs',
             icon: 'fa-folder-o',
-            minHeight: 40
+            minHeight: 40,
+            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('hdfs') !== -1
           }));
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistDocumentsPanel({
@@ -917,7 +921,8 @@ from desktop.views import _ko
             name: '${ _("Documents") }',
             type: 'documents',
             icon: 'fa-files-o',
-            minHeight: 40
+            minHeight: 40,
+            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
           }));
         }
 

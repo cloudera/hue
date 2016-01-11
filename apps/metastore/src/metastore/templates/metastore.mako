@@ -688,7 +688,8 @@ ${ assist.assistPanel() }
                   openItem: true,
                   showPreview: true,
                   showStats: false
-                }
+                },
+                visibleAssistPanels: ['sql']
               }
             }"></div>
         </div>
