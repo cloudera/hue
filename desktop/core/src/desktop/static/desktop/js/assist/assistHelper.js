@@ -126,12 +126,16 @@
   AssistHelper.prototype.assistErrorCallback = function (options) {
     return function (errorResponse) {
       var errorMessage = 'Unknown error occurred';
-      if (typeof errorResponse !== 'undefined' && typeof errorResponse.message !== 'undefined') {
-        errorMessage = errorResponse.message;
-      } else if (typeof errorResponse !== 'undefined' && typeof errorResponse.statusText !== 'undefined') {
-        errorMessage = errorResponse.statusText;
-      } else if (typeof errorResponse !== 'undefined' && toString.call(errorResponse) == '[object String]') {
-        errorMessage = errorResponse;
+      if (errorResponse !== 'undefined') {
+        if (typeof errorResponse.message !== 'undefined') {
+          errorMessage = errorResponse.message;
+        } else if (typeof errorResponse.statusText !== 'undefined') {
+          errorMessage = errorResponse.statusText;
+        } else if (errorResponse.error !== 'undefined' && toString.call(errorResponse.error) === '[object String]' ) {
+          errorMessage = errorResponse.error;
+        } else if (toString.call(errorResponse) === '[object String]') {
+          errorMessage = errorResponse;
+        }
       }
 
       if (! options.silenceErrors) {
