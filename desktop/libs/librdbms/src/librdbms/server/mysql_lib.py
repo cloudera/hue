@@ -61,7 +61,7 @@ class MySQLClient(BaseRDMSClient):
   def _conn_params(self):
     params = {
       'user': self.query_server['username'],
-      'passwd': self.query_server['password'],
+      'passwd': self.query_server['password'] or '',  # MySQL can accept an empty password
       'host': self.query_server['server_host'],
       'port': self.query_server['server_port']
     }
