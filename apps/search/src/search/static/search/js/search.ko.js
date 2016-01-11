@@ -483,6 +483,20 @@ var Collection = function (vm, collection) {
       vm.search();
     }
   });
+
+  collection.template.chartSettings = $.extend({
+    chartType: 'bars',
+    chartSorting: 'none',
+    chartScatterGroup: null,
+    chartScatterSize: null,
+    chartScope: 'world',
+    chartX: null,
+    chartYSingle: null,
+    chartYMulti: [],
+    chartData: [],
+    chartMapLabel: null
+  }, collection.template.chartSettings);
+
   self.template = ko.mapping.fromJS(collection.template);
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
