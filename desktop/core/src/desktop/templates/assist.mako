@@ -631,7 +631,7 @@ from desktop.views import _ko
     <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
       <span data-bind="text: $parent.name"></span>
       <div class="assist-header-actions">
-        <div class="inactive-action" data-bind="click: function () { visible(false) }"><i class="fa fa-times"></i></div>
+        <div class="inactive-action" data-bind="click: function () { $parent.visible(false) }"><i class="fa fa-times"></i></div>
       </div>
     </div>
   </script>
