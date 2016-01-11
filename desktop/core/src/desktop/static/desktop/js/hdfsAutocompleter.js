@@ -98,6 +98,7 @@
       self.snippet.getAssistHelper().fetchHdfsPath({
         pathParts: parts,
         successCallback: successCallback,
+        silenceErrors: true,
         errorCallback: onFailure,
         editor: editor
       });
