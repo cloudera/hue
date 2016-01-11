@@ -53,6 +53,7 @@
     self.assistHelper = assistHelper;
     self.i18n = i18n;
     self.loading = ko.observable(false);
+    self.hasErrors = ko.observable(false);
     self.availableTypes = ko.observableArray();
   }
 
@@ -64,6 +65,7 @@
     self.loading(true);
 
     var successCallback = function(data) {
+      self.hasErrors(false);
       var documentsByType = {};
       $.each(data.documents, function (idx, document) {
         if (!documentsByType[document.type]) {
@@ -82,6 +84,7 @@
     };
 
     var errorCallback = function () {
+      self.hasErrors(true);
       self.loading(false);
     };
 

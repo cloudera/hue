@@ -135,6 +135,11 @@ from desktop.views import _ko
       color: #338bb8;
     }
 
+    .assist-errors {
+      padding: 4px 5px;
+      font-style: italic;
+    }
+
     .assist-tables > li {
       position: relative;
       padding-top: 2px;
@@ -294,7 +299,7 @@ from desktop.views import _ko
     <ul data-bind="hueach: {data: filteredEntries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko ifnot: definition.isTable -->
-      <li data-bind="visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
+      <li data-bind="visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-entry" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': !definition.isView, 'assist-table-link': definition.isView }">
           <!-- ko if: definition.isView -->
@@ -305,6 +310,10 @@ from desktop.views import _ko
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
         <!-- ko template: { if: open, name: 'assist-entries'  } --><!-- /ko -->
       </li>
+      <li class="assist-errors" data-bind="visible: hasErrors() && definition.isTable">
+        <span >${ _('Error loading columns.') }</span>
+      </li>
+
       <!-- /ko -->
     </ul>
     <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
@@ -376,7 +385,7 @@ from desktop.views import _ko
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </li>
 
-        <li>
+        <li data-bind="visible: ! hasErrors()">
           <ul class="assist-tables" data-bind="hueach: {data: entries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}">
             <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
               <div class="assist-actions table-actions" style="opacity: 0;" >
@@ -402,6 +411,9 @@ from desktop.views import _ko
           </ul>
           <!-- /ko -->
         </li>
+        <li class="assist-errors" data-bind="visible: hasErrors">
+          <span>${ _('Error loading contents.') }</span>
+        </li>
       </ul>
       <!-- /ko -->
     </div>
@@ -424,7 +436,7 @@ from desktop.views import _ko
   <script type="text/html" id="assist-documents-inner-panel">
     <div class="assist-inner-panel">
       <!-- ko with: documents -->
-      <ul class="nav assist-tables assist-stretchable-list" data-bind="stretchDown, foreach: availableTypes">
+      <ul class="nav assist-tables assist-stretchable-list" data-bind="visible: ! hasErrors(), stretchDown, foreach: availableTypes">
         <li class="assist-table">
           <a class="assist-entry assist-table-link" href="javascript: void(0);" data-bind="click: function () { open(! open()) }">
             <!-- ko if: type == 'query-hive' || type == 'query' -->
@@ -461,6 +473,11 @@ from desktop.views import _ko
               <a data-bind="attr: {'href': definition.absoluteUrl }, text: definition.name"></a>
             </li>
           </ul>
+        </li>
+      </ul>
+      <ul class="nav assist-tables" data-bind="visible: hasErrors">
+        <li class="assist-errors">
+          <span>${ _('Error loading documents.') }</span>
         </li>
       </ul>
       <!-- /ko -->
@@ -520,8 +537,8 @@ from desktop.views import _ko
         <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
       </li>
-      <li data-bind="visible: hasErrors">
-        <span>${ _('The database list cannot be loaded.') }</span>
+      <li class="assist-errors" data-bind="visible: hasErrors">
+        <span>${ _('Error loading databases.') }</span>
       </li>
     </ul>
   </script>
@@ -538,12 +555,15 @@ from desktop.views import _ko
       </li>
     </ul>
     <ul class="nav assist-stretchable-list" data-bind="stretchDown">
-      <li class="table-container">
+      <li class="table-container" data-bind="visible: ! hasErrors()">
         <div class="center" data-bind="visible: loading() || $parent.loading()">
           <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </div>
         <!-- ko template: { ifnot: loading() || $parent.loading(), name: 'assist-entries' } --><!-- /ko -->
+      </li>
+      <li class="assist-errors" data-bind="visible: hasErrors">
+        <span>${ _('Error loading tables.') }</span>
       </li>
     </ul>
     <div id="assistQuickLook" class="modal hide fade">

@@ -62,6 +62,8 @@
     self.entries = ko.observableArray([]);
     self.statsVisible = ko.observable(false);
 
+    self.hasErrors = ko.observable(false);
+
     self.navigationSettings = navigationSettings;
 
     self.open.subscribe(function(newValue) {
@@ -147,6 +149,7 @@
 
     var successCallback = function(data) {
       self.entries([]);
+      self.hasErrors(false);
       var newEntries = [];
       if (typeof data.tables_meta !== "undefined") {
         newEntries = $.map(data.tables_meta, function(table) {
@@ -244,7 +247,7 @@
     };
 
     var errorCallback = function () {
-      self.assistDbSource.hasErrors(true);
+      self.hasErrors(true);
       self.loading(false);
     };
 
