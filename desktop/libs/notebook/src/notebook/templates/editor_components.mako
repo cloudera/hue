@@ -557,21 +557,21 @@ ${ require.config() }
 <script type="text/html" id="snippet-settings">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
-      <h4><i class="fa fa-cog"></i> '${ _('Settings') }'</h4>
+      <h4><i class="fa fa-cog"></i> ${ _('Settings') }</h4>
     </div>
     <div class="snippet-settings-body">
       <form class="form-horizontal">
-        <!-- ko template: { if: typeof properties().driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Driver Cores') }', value: properties().driverCores, title: '${ _('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executor Cores') }', value: properties().executorCores, title: '${ _('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _('Executors') }', value: properties().numExecutors, title: '${ _('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _('Queue') }', value: properties().queue, title: '${ _('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Archives') }', value: properties().archives, title: '${ _('Archives to be extracted into the working directory of each executor (YARN only)') }', placeholder: '${ _('e.g. file.zip') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Files') }', value: properties().files, title: '${ _('Files to be placed in the working directory of each executor.') }', placeholder: '${ _('e.g. file.data') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Settings') }', value: properties().settings, title: '${ _('Spark properties') }', placeholder: '${ _('e.g. foo=value') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().driverCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Driver Cores') }', value: properties().driverCores, title: '${ _ko('Number of cores used by the driver, only in cluster mode (Default: 1)') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().executorCores != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executor Cores') }', value: properties().executorCores, title: '${ _ko('Number of cores per executor (Default: 1)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().numExecutors != 'undefined', name: 'property', data: { type: 'number', label: '${ _ko('Executors') }', value: properties().numExecutors, title: '${ _ko('Number of executors to launch (Default: 2)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _ko('Queue') }', value: properties().queue, title: '${ _ko('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Archives') }', value: properties().archives, title: '${ _ko('Archives to be extracted into the working directory of each executor (YARN only)') }', placeholder: '${ _ko('e.g. file.zip') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Files') }', value: properties().files, title: '${ _ko('Files to be placed in the working directory of each executor.') }', placeholder: '${ _ko('e.g. file.data') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Settings') }', value: properties().settings, title: '${ _ko('Spark properties') }', placeholder: '${ _ko('e.g. foo=value') }'}} --><!-- /ko -->
 
-        <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Parameters') }', value: properties().parameters, title: '${ _('Names and values of Pig parameters and options') }', placeholder: '${ _('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _('Name and values of Hadoop properties') }', placeholder: '${ _('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().resources != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _('Resources') }', value: properties().resources, title: '${ _('HDFS Files or compressed files') }', placeholder: '${ _('e.g. /tmp/file, /tmp.file.zip') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().resources != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Resources') }', value: properties().resources, title: '${ _ko('HDFS Files or compressed files') }', placeholder: '${ _ko('e.g. /tmp/file, /tmp.file.zip') }'}} --><!-- /ko -->
       </form>
     </div>
     <a class="pointer demi-modal-chevron" data-bind="click: function() { settingsVisible(! settingsVisible()) }"><i class="fa fa-chevron-up"></i></a>
@@ -833,7 +833,7 @@ ${ require.config() }
         </div>
       </div>
       <!-- /ko -->
-      <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _('Arguments') }', value: properties().arguments, title: '${ _('The YARN queue to submit to (Default: default)') }', placeholder: '${ _('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
+      <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Arguments') }', value: properties().arguments, title: '${ _ko('The YARN queue to submit to (Default: default)') }', placeholder: '${ _ko('e.g. -foo=bar') }', inline: false }} --><!-- /ko -->
     </form>
   </div>
 </script>
