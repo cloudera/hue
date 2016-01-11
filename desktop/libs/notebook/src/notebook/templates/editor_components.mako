@@ -427,7 +427,7 @@ ${ require.config() }
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <!-- ko if: $parent.history().length > 0 -->
-      <table class="table table-condensed table-striped">
+      <table class="table table-condensed">
         <thead>
           <tr>
             <th colspan="2" class="muted">
