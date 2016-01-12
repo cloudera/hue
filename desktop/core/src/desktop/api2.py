@@ -60,18 +60,6 @@ def api_error_handler(func):
 
 
 @api_error_handler
-def get_documents(request): # TODO only here for not breaking assist for now
-  filters = {
-      'owner': request.user
-  }
-
-  if request.GET.get('type'):
-    filters['type'] = json.loads(request.GET.get('type'))
-
-  return JsonResponse({'documents': [doc.to_dict() for doc in Document2.objects.filter(**filters)]})
-
-
-@api_error_handler
 def get_documents2(request):
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
