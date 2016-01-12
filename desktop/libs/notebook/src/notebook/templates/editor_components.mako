@@ -43,6 +43,7 @@ from desktop.views import _ko
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
@@ -888,10 +889,13 @@ ${ require.config() }
       <i class="fa fa-fw fa-stop"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result && result.handle().has_more, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Restart from the first statement') }">
-      <i class="fa fa-fw fa-sign-out"></i>
+      <i class="fa fa-fw fa-repeat"></i>
     </a>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Execute or CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
+    </a>
+    <a class="snippet-side-btn" data-bind="click: format, visible: status() != 'running' && status() != 'loading', css: {'disabled': statement() === '' }" title="${ _('Format the current SQL query') }">
+      <i class="fa fa-fw fa-indent"></i>
     </a>
     <!-- ko if: $root.editorMode -->
       <a class="snippet-side-btn" data-bind="click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': true}" title="${ _('Show query history') }">

@@ -483,6 +483,18 @@
       self.execute();
     };
 
+    self.format = function () {
+      if (self.isSqlDialect() && vkbeautify) {
+        if (self.ace().getSelectedText() != '') {
+          self.ace().session.replace(self.ace().session.selection.getRange(), vkbeautify.sql(self.ace().getSelectedText(), 2));
+        }
+        else {
+          self.statement_raw(vkbeautify.sql(self.statement_raw(), 2));
+          self.ace().setValue(self.statement_raw(), 1);
+        }
+      }
+    };
+
     self.fetchResult = function (rows, startOver) {
       if (typeof startOver == "undefined") {
         startOver = true;

@@ -314,6 +314,7 @@ ${ layout.menubar(section='query') }
               % endif
               <button data-bind="click: saveAsModal" type="button" class="btn">${_('Save as...')}</button>
               <button data-bind="click: tryExplainQuery, visible: $root.canExecute" type="button" id="explainQuery" class="btn">${_('Explain')}</button>
+              <button data-bind="click: formatQuery" type="button" class="btn">${_('Format')}</button>
               &nbsp; ${_('or create a')} &nbsp;
               <button data-bind="click: createNewQuery" type="button" class="btn">${_('New query')}</button>
               <br/><br/>
@@ -809,6 +810,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('notebook/js/notebook.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/beeswax.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
+<script src="${ static('desktop/ext/js/vkbeautify.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
 <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
@@ -1631,6 +1633,9 @@ $(document).ready(function () {
       }
     },
     onKeyEvent: function (e, s) {
+      if (s.type == "keydown" && s.keyCode == 73 && (s.altKey || s.ctrlKey || s.metaKey)) {
+        formatQuery();
+      }
       if (s.type == "keyup") {
         if (s.keyCode == 190) {
           var _statement = getStatementAtCursor().statement;
@@ -2280,6 +2285,18 @@ function tryExplainQuery() {
   viewModel.explainQuery();
 
   logGA('query/explain');
+}
+
+function formatQuery() {
+  if (vkbeautify) {
+    if (codeMirror.getSelection() != '') {
+      codeMirror.replaceSelection(vkbeautify.sql(codeMirror.getSelection(), 2));
+    }
+    else {
+      codeMirror.setValue(vkbeautify.sql(codeMirror.getValue(), 2));
+    }
+    viewModel.design.query.value(codeMirror.getValue());
+  }
 }
 
 function tryExplainParameterizedQuery() {
