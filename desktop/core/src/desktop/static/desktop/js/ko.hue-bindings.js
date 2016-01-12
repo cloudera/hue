@@ -2503,6 +2503,24 @@
         }
       });
 
+      editor.commands.addCommand({
+        name: "format",
+        bindKey: {win: "Ctrl-i", mac: "Command-i|Ctrl-i"},
+        exec: function () {
+          if (['ace/mode/hive', 'ace/mode/impala', 'ace/mode/sql', 'ace/mode/mysql', 'ace/mode/pgsql', 'ace/mode/sqlite', 'ace/mode/oracle'].indexOf(snippet.getAceMode()) > -1) {
+            if (vkbeautify) {
+              if (editor.getSelectedText() != '') {
+                editor.session.replace(editor.session.selection.getRange(), vkbeautify.sql(editor.getSelectedText(), 2));
+              }
+              else {
+                editor.setValue(vkbeautify.sql(editor.getValue(), 2), 1);
+                snippet.statement_raw(editor.getValue());
+              }
+            }
+          }
+        }
+      });
+
       huePubSub.subscribe("assist.dblClickDbItem", function(assistDbEntry) {
         if ($el.data("last-active-editor")) {
           var text = assistDbEntry.editorText();
