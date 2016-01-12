@@ -670,48 +670,46 @@ ${ assist.assistPanel() }
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
-    <div class="vertical-full">
-      <div class="vertical-full row-fluid panel-container">
-        <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
-          <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
-            <i class="fa fa-chevron-left"></i>
-          </a>
-          <div class="assist" data-bind="component: {
-              name: 'assist-panel',
-              params: {
-                sourceTypes: [{
-                  name: 'hive',
-                  type: 'hive'
-                }],
-                user: '${user.username}',
-                navigationSettings: {
-                  openItem: true,
-                  showPreview: true,
-                  showStats: false
-                },
-                visibleAssistPanels: ['sql']
-              }
-            }"></div>
-        </div>
-        <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-        <div class="right-panel">
-          <div class="metastore-main">
-            <h3>
-              <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
-              <!-- ko template: { if: database() !== null && database().table() === null, name: 'metastore-tables-actions' }--><!-- /ko -->
-              <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
-              <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
-            </h3>
-            <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
-            <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
-            <!-- ko with: database -->
-            <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
-            <!-- ko template: { if: !loading() && table() === null, name: 'metastore-tables' } --><!-- /ko -->
-            <!-- ko with: table -->
-              <!-- ko template: 'metastore-describe-table' --><!-- /ko -->
-            <!-- /ko -->
-            <!-- /ko -->
-          </div>
+    <div class="vertical-full row-fluid panel-container">
+      <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
+        <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
+          <i class="fa fa-chevron-left"></i>
+        </a>
+        <div class="assist" data-bind="component: {
+            name: 'assist-panel',
+            params: {
+              sourceTypes: [{
+                name: 'hive',
+                type: 'hive'
+              }],
+              user: '${user.username}',
+              navigationSettings: {
+                openItem: true,
+                showPreview: true,
+                showStats: false
+              },
+              visibleAssistPanels: ['sql']
+            }
+          }"></div>
+      </div>
+      <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+      <div class="right-panel">
+        <div class="metastore-main">
+          <h3>
+            <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
+            <!-- ko template: { if: database() !== null && database().table() === null, name: 'metastore-tables-actions' }--><!-- /ko -->
+            <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
+            <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
+          </h3>
+          <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
+          <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
+          <!-- ko with: database -->
+          <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
+          <!-- ko template: { if: !loading() && table() === null, name: 'metastore-tables' } --><!-- /ko -->
+          <!-- ko with: table -->
+            <!-- ko template: 'metastore-describe-table' --><!-- /ko -->
+          <!-- /ko -->
+          <!-- /ko -->
         </div>
       </div>
     </div>
