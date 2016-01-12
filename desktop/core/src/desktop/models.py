@@ -938,6 +938,10 @@ class Directory(Document2):
     proxy = True
 
   def save(self, *args, **kwargs):
+    if self.type != 'directory':
+      self.type = 'directory'
+    if Directory.objects.filter(name=self.name, owner=self.owner).exists():
+      raise Exception('Directory %s %s already exists' % (self.name, self.owner))
     super(Directory, self).save(*args, **kwargs)
 
     if Document2.objects.filter(type='directory', owner=self.owner, name=self.name).count() > 1:

@@ -81,7 +81,7 @@ def get_documents2(request):
     file_doc = Directory.objects.get(owner=request.user, name=path) # TODO perms
   except Directory.DoesNotExist, e:
     if path == '/':
-      file_doc = Directory.objects.create(name='/', type='directory', owner=request.user)
+      file_doc, created = Directory.objects.get_or_create(name='/', owner=request.user)
       file_doc.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=file_doc.id))
     else:
       raise e
@@ -106,7 +106,7 @@ def _import_documents1(user):
       imported_tag # No already imported docs
   ])
 
-  root_doc, created = Directory.objects.get_or_create(name='/', type='directory', owner=user)
+  root_doc, created = Directory.objects.get_or_create(name='/', owner=user)
   imported_docs = []
 
   for doc in docs:
@@ -188,7 +188,7 @@ def create_directory(request):
   parent_dir = Directory.objects.get(owner=request.user, name=parent_path)
 
   path = Hdfs.normpath(parent_path + '/' + name)
-  file_doc = Directory.objects.create(name=path, type='directory', owner=request.user)
+  file_doc = Directory.objects.create(name=path, owner=request.user)
   parent_dir.dependencies.add(file_doc)
 
   return JsonResponse({
