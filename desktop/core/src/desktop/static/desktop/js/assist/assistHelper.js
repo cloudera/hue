@@ -26,7 +26,7 @@
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
-  var DOCUMENTS_API = "/desktop/api2/docs/";
+  var DOCUMENTS_API = "/desktop/api2/docs2/";
 
 
   /**
