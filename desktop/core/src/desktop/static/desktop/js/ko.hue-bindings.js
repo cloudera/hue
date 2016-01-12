@@ -2717,9 +2717,10 @@
       ko.bindingHandlers.foreach.init(element, valueAccessorBuilder, allBindings);
     },
     update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-      var $parent = $(element).parent(),
+      var $element = $(element),
+        $parent = $element.parent(),
         considerStretching = valueAccessor().considerStretching || false,
-        itemHeight = valueAccessor().itemHeight || 30,
+        itemHeight = valueAccessor().itemHeight || 22,
         scrollable = valueAccessor().scrollable || 'body',
         renderTimeout = -1,
         dataHasChanged = true;
@@ -2749,13 +2750,33 @@
       }
 
       var render = function () {
-        startItem = Math.floor($parent.parents(scrollable).scrollTop() / itemHeight);
-        endItem = startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight);
-        $(element).css('top', (startItem * itemHeight) + 'px');
+        if ($parent.parents('.hueach').length === 0){
+          var heightCorrection = 0, fluidCorrection = 0;
+          $element.children(':visible').each(function(cnt, child){
+            if ($(child).height() >= itemHeight){
+              heightCorrection += $(child).height();
+            }
+          });
+          if (heightCorrection > 0){
+            ko.utils.domData.set(element, 'heightCorrection', heightCorrection);
+          }
+          if (heightCorrection == 0 && ko.utils.domData.get(element, 'heightCorrection')){
+            fluidCorrection = ko.utils.domData.get(element, 'heightCorrection') - 20;
+          }
+          startItem = Math.max(0, Math.floor(Math.max(1, ($parent.parents(scrollable).scrollTop() - heightCorrection - fluidCorrection)) / itemHeight) - 5);
+          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 5, valueAccessor().data().length);
+          $element.css('top', ((startItem * itemHeight) + fluidCorrection) + 'px');
+        }
+        else {
+          startItem = 0, endItem = valueAccessor().data().length;
+        }
         ko.bindingHandlers.foreach.update(element, valueAccessorBuilder, allBindings, viewModel, bindingContext);
       }
 
       $parent.parents(scrollable).on('scroll', render);
+      if ($parent.parents('.hueach').length > 0){
+        window.setTimeout(render, 100);
+      }
 
       if (considerStretching) {
         huePubSub.subscribe('assist.stretchDown', function () {
