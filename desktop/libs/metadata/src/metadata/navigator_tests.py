@@ -28,7 +28,7 @@ from hadoop.pseudo_hdfs4 import is_live_cluster
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 
-from metadata.navigator import NavigatorApi, is_navigator_enabled
+from metadata.navigator_client import NavigatorApi, is_navigator_enabled
 
 
 LOG = logging.getLogger(__name__)

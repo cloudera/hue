@@ -1356,12 +1356,34 @@
 [metadata]
   # For metadata tagging and enrichment features
 
-  [[navigator]]
-  # Navigator API URL with version
-  ## api_url=http://localhost:7187/api/v2
+  [[optimizer]]
+    # For SQL query and table analysis
+    # Base URL to Optimizer API.
+    ## api_url=https://alpha.optimizer.cloudera.com
+    # The name of the product or group which will have API access to the emails associated with it.
+    ## product_name=hue
+    # A secret passphrase associated with the productName
+    ## product_secret=hue
+    # Execute this script to produce the product secret. This will be used when `product_secret` is not set.
+    ## product_secret_script=
 
-  # Navigator API HTTP authentication username and password
-  # Override the desktop default username and password of the hue user used for authentications with other services.
-  # e.g. Used for LDAP/PAM pass-through authentication.
-  ## auth_username=hue
-  ## auth_password=
+    # The email of the Optimizer account you want to associate with the Product.
+    ## email=hue@gethue.com
+    # The password associated with the Optimizer account you to associate with the Product.
+    ## email_password=hue
+    # Execute this script to produce the email password. This will be used when `email_password` is not set.
+    ## password_script=
+
+    # In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority.
+    ## ssl_cert_ca_verify=True
+
+  [[navigator]]
+    # For tagging tables, files and getting lineage of data.
+    # Navigator API URL with version
+    ## api_url=http://localhost:7187/api/v2
+
+    # Navigator API HTTP authentication username and password
+    # Override the desktop default username and password of the hue user used for authentications with other services.
+    # e.g. Used for LDAP/PAM pass-through authentication.
+    ## auth_username=hue
+    ## auth_password=

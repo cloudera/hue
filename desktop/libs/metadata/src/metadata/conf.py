@@ -18,8 +18,8 @@
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-                         AUTH_PASSWORD_SCRIPT, coerce_password_from_script
-from desktop.lib.conf import Config, ConfigSection
+                         AUTH_PASSWORD_SCRIPT, coerce_password_from_script, default_ssl_validate
+from desktop.lib.conf import Config, ConfigSection, coerce_bool
 
 
 def get_auth_username():
@@ -33,6 +33,59 @@ def get_auth_password():
   if password:
     return password
   return DEFAULT_AUTH_PASSWORD.get()
+
+
+OPTIMIZER = ConfigSection(
+  key='optimizer',
+  help=_t("""Configuration options for Optimizer API"""),
+  members=dict(
+    API_URL=Config(
+      key='api_url',
+      help=_t('Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)'),
+      default=None),
+
+    PRODUCT_NAME=Config(
+      key="product_name",
+      help=_t("The name of the product or group which will have API access to the emails associated with it."),
+      private=True,
+      dynamic_default=get_auth_username),
+    PRODUCT_SECRET=Config(
+      key="product_secret",
+      help=_t("A secret passphrase associated with the productName."),
+      private=True,
+      dynamic_default=get_auth_password),
+    PRODUCT_SECRET_SCRIPT=Config(
+      key="product_secret_script",
+      help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    EMAIL=Config(
+      key="email",
+      help=_t("The email of the Optimizer account you want to associate with the Product."),
+      private=True,
+      dynamic_default=get_auth_username),
+    EMAIL_PASSWORD=Config(
+      key="email_password",
+      help=_t("The password associated with the Optimizer account you to associate with the Product."),
+      private=True,
+      dynamic_default=get_auth_password),
+    EMAIL_PASSWORD_SCRIPT=Config(
+      key="password_script",
+      help=_t("Execute this script to produce the email password. This will be used when `email_password` is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    SSL_CERT_CA_VERIFY = Config(
+      key="ssl_cert_ca_verify",
+      help=_t("In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"),
+      dynamic_default=default_ssl_validate,
+      type=coerce_bool
+    )
+  )
+)
 
 
 NAVIGATOR = ConfigSection(
