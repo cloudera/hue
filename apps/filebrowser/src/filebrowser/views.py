@@ -539,8 +539,7 @@ def display(request, path):
       mimetype = mimetypes.guess_type(path)[0]
 
       if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype):
-        path_enc = urlencode(path)
-        return redirect(reverse('filebrowser.views.download', args=[path_enc]) + '?disposition=inline')
+        return redirect(reverse('filebrowser.views.download', args=[path]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()
