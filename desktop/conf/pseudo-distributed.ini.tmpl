@@ -581,6 +581,10 @@
       name=Impala
       interface=hiveserver2
 
+    # [[[sparksql]]]
+    #   name=SparkSql
+    #   interface=hiveserver2
+
     [[[spark]]]
       name=Scala
       interface=livy
@@ -613,9 +617,21 @@
       name=Markdown
       interface=text
 
-    # [[[sparksql]]]
-    #   name=SparkSql
-    #   interface=hiveserver2
+    [[[mysql]]]
+      name = MySQL
+      interface=rdbms
+
+    [[[sqlite]]]
+      name = SQLite
+      interface=rdbms
+
+    [[[postgresql]]]
+      name = PostgreSQL
+      interface=rdbms
+
+    [[[oracle]]]
+      name = Oracle
+      interface=rdbms
 
     # [[[mysql]]]
     #   name=MySql JDBC

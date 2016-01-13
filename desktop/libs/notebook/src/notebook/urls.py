@@ -79,4 +79,7 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/?$', 'autocomplete', name='api_autocomplete_columns'),
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'autocomplete', name='api_autocomplete_column'),
   url(r'^api/autocomplete/(?P<database>\w+)/(?P<table>\w+)/(?P<column>\w+)/(?P<nested>.+)/?$', 'autocomplete', name='api_autocomplete_nested'),
+  # SQLite
+  url(r'^api/autocomplete/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/?$', 'autocomplete', name='api_autocomplete_tables'),
+  url(r'^api/autocomplete/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', 'autocomplete', name='api_autocomplete_columns'),
 )

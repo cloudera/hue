@@ -349,7 +349,7 @@ def close_statement(request):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
-def autocomplete(request, database=None, table=None, column=None, nested=None):
+def autocomplete(request, server=None, database=None, table=None, column=None, nested=None):
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs

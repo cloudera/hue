@@ -111,13 +111,21 @@ class MySQLClient(BaseRDMSClient):
 
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
-    cursor.execute("SHOW TABLES")
+    query = 'SHOW TABLES'
+    if table_names:
+      clause = ' OR '.join(["`Tables_in_%(database)s` LIKE '%%%(table)s%%'" % {'database': database, 'table': table} for table in table_names])
+      query += ' FROM `%(database)s` WHERE (%(clause)s)' % {'database': database, 'clause': clause}
+    cursor.execute(query)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
-  def get_columns(self, database, table):
+  def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
     cursor.execute("SHOW COLUMNS FROM %s.%s" % (database, table))
     self.connection.commit()
-    return [row[0] for row in cursor.fetchall()]
+    if names_only:
+      columns = [row[0] for row in cursor.fetchall()]
+    else:
+      columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
+    return columns
