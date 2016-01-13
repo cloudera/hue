@@ -130,6 +130,14 @@ ${ fileBrowser.fileBrowser() }
     margin-right: 2px;
     color: #338bb8;
   }
+
+  .home-container {
+    height: 100%;
+  }
+  .file-browser {
+    position: ;
+  }
+
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
@@ -171,75 +179,76 @@ ${ fileBrowser.fileBrowser() }
           <i class="fa fa-chevron-left"></i>
         </a>
         <div class="assist" data-bind="component: {
-        name: 'assist-panel',
-        params: {
-          sourceTypes: [{
-            name: 'hive',
-            type: 'hive'
-          }],
-          user: '${user.username}',
-          navigationSettings: {
-            openItem: true,
-            showPreview: true,
-            showStats: false
-          },
-          visibleAssistPanels: ['sql']
-        }
-      }"></div>
+          name: 'assist-panel',
+          params: {
+            sourceTypes: [{
+              name: 'hive',
+              type: 'hive'
+            }],
+            user: '${user.username}',
+            navigationSettings: {
+              openItem: true,
+              showPreview: true,
+              showStats: false
+            },
+            visibleAssistPanels: ['sql']
+          }
+        }"></div>
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible, splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }" style="display:none;"><div class="resize-bar">&nbsp;</div></div>
-      <div class="right-panel" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '20px' : '0' }">
-        <input id="searchInput" type="text" placeholder="${ _('Search for name, description, etc...') }" class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
-        <div class="dropdown" style="float: right;">
-          <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
-          <ul class="dropdown-menu" role="menu">
-            % if 'beeswax' in apps:
-              <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
-            % endif
-            % if 'impala' in apps:
-              <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
-            % endif
-            % if 'pig' in apps:
-              <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
-            % endif
-            % if 'spark' in apps:
-              <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
-            % endif
-            % if 'oozie' in apps:
-              <li class="dropdown-submenu">
-                <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon"/> ${_('Oozie Scheduler')}</a>
-                <ul class="dropdown-menu">
-                  <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
-                  <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Coordinator')}</a></li>
-                  <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Bundle')}</a></li>
-                </ul>
-              </li>
-            % endif
-          </ul>
-        </div>
-        <h2 class="card-heading simple">${_('My Documents')}</h2>
-        <br/>
-        <input data-bind="value: mkdirFormPath" placeholder="dir name, e.g. projects" />
-        <a href="javascript:void(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
-
-        <input data-bind="value: deleteFormPath" placeholder="doc id, e.g. 50491" />
-        <a href="javascript:void(0);" class="btn" data-bind="click: deleteDocument"><i class="fa fa-times"></i> ${ _('Delete') }</a>
-
-        <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491" />
-        <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ prepareShareModal(e) },
-          attr: {'data-original-title': '${ _ko("Share") } ' + name}">
-          <i class="fa fa-users"></i> ${ _('Share') }
-        </a>
-
-        <input data-bind="value: exportFormDocIds" placeholder="doc id, e.g. 50491,50492" />
-        <a class="share-link btn" data-bind="click: exportDocuments">
-          <i class="fa fa-download"></i> ${ _('Export') }
-        </a>
-
-        <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
-          <i class="fa fa-upload"></i> ${ _('Import') }
-        </a>
-
+      <div class="right-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">
+##         <div class="home-header">
+##           <input id="searchInput" type="text" placeholder="${ _('Search for name, description, etc...') }" class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
+##           <div class="dropdown" style="float: right;">
+##             <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
+##             <ul class="dropdown-menu" role="menu">
+##               % if 'beeswax' in apps:
+##                 <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+##               % endif
+##               % if 'impala' in apps:
+##                 <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+##               % endif
+##               % if 'pig' in apps:
+##                 <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
+##               % endif
+##               % if 'spark' in apps:
+##                 <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+##               % endif
+##               % if 'oozie' in apps:
+##                 <li class="dropdown-submenu">
+##                   <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon"/> ${_('Oozie Scheduler')}</a>
+##                   <ul class="dropdown-menu">
+##                     <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
+##                     <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Coordinator')}</a></li>
+##                     <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Bundle')}</a></li>
+##                   </ul>
+##                 </li>
+##               % endif
+##             </ul>
+##           </div>
+##           <h2 class="card-heading simple">${_('My Documents')}</h2>
+##           <br/>
+##           <input data-bind="value: mkdirFormPath" placeholder="dir name, e.g. projects" />
+##           <a href="javascript:void(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
+##
+##           <input data-bind="value: deleteFormPath" placeholder="doc id, e.g. 50491" />
+##           <a href="javascript:void(0);" class="btn" data-bind="click: deleteDocument"><i class="fa fa-times"></i> ${ _('Delete') }</a>
+##
+##           <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491" />
+##           <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ prepareShareModal(e) },
+##             attr: {'data-original-title': '${ _ko("Share") } ' + name}">
+##             <i class="fa fa-users"></i> ${ _('Share') }
+##           </a>
+##
+##           <input data-bind="value: exportFormDocIds" placeholder="doc id, e.g. 50491,50492" />
+##           <a class="share-link btn" data-bind="click: exportDocuments">
+##             <i class="fa fa-download"></i> ${ _('Export') }
+##           </a>
+##
+##           <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
+##             <i class="fa fa-upload"></i> ${ _('Import') }
+##           </a>
+##         </div>
         <div class="file-browser" data-bind="component: {
           name: 'file-browser',
           params: {
