@@ -46,24 +46,8 @@
 
     self.currentDirectory().open();
 
-    self.deleteFormPath = ko.observable('');
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');
-
-    self.deleteDocument = function() {
-      $.post("/desktop/api2/doc/delete", {
-        doc_id: ko.mapping.toJSON(self.deleteFormPath),
-        skip_trash: ko.mapping.toJSON(false)
-      }, function (data) {
-        if (data.status == 0) {
-          self.currentDirectory().load();
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    };
 
     self.exportDocuments = function() {
       $('#export-documents').find('input[name=\'documents\']').val(ko.mapping.toJSON(self.exportFormDocIds().split(",")));
