@@ -46,7 +46,7 @@ Install the mini cluster (only once):
 ```
 $ ./tools/jenkins/jenkins.sh slow
 ```
-   
+
 Run all the tests:
 ```
 $ build/env/bin/hue test all
@@ -67,6 +67,7 @@ your system:
 
 __Ubuntu:__
 
+* Oracle's JDK [(read more here)](https://help.ubuntu.com/community/Java)
 * ant
 * gcc
 * g++
@@ -88,6 +89,7 @@ __Ubuntu:__
 
 __CentOS/RHEL:__
 
+* Oracle's JDK [(read more here)](https://www.digitalocean.com/community/tutorials/how-to-install-java-on-centos-and-fedora)
 * ant
 * asciidoc
 * cyrus-sasl-devel
@@ -99,7 +101,7 @@ __CentOS/RHEL:__
 * libxml2-devel
 * libxslt-devel
 * make
-* mvn (from ``maven`` package or maven3 tarball)
+* mvn (from [``apache-maven``](https://gist.github.com/sebsto/19b99f1fa1f32cae5d00) package or maven3 tarball)
 * mysql
 * mysql-devel
 * openldap-devel
@@ -176,4 +178,3 @@ License
 -----------
 Apache License, Version 2.0
 http://www.apache.org/licenses/LICENSE-2.0
-
