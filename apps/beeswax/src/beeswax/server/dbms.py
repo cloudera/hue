@@ -157,7 +157,7 @@ class HiveServer2Dbms(object):
       result = self.fetch(handle, rows=5000)
       self.close(handle)
       
-      databases = [row[0] for row in list(result.rows())]
+      databases = [row[0] for row in result.rows()]
 
       if len(databases) <= APPLY_NATURAL_SORT_MAX.get():
         databases = apply_natural_sort(databases)
