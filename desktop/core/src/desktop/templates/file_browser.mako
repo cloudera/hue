@@ -120,6 +120,15 @@ from desktop.views import _ko
       vertical-align: middle;
     }
 
+    .active-breadcrumb {
+      padding: 0 12px;
+      color: #444;
+    }
+
+    .fb-type {
+      width: 140px;
+    }
+
     .fb-owner {
       width: 170px;
     }
@@ -155,15 +164,22 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
     </div>
-
     <div class="fb-container">
       <div class="fb-action-bar">
         <h4>
-          <div class="fb-breadcrumb">
-              <ul class="nav nav-pills hueBreadcrumbBar">
-                <li><a href="javascript:void(0);">Documents</a><span class="divider">&gt;</span></li>
-                <li><a href="javascript:void(0);">Test folder</a></li>
-              </ul>
+          <div class="fb-breadcrumb" data-bind="with: currentDirectory">
+            <ul class="nav nav-pills hueBreadcrumbBar">
+              <!-- ko if: isRoot -->
+              <li class="active-breadcrumb">${ _('My documents') }</li>
+              <!-- /ko -->
+
+              <!-- ko foreach: breadcrumbs -->
+              <li><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: function () { $parents[1].currentDirectory($data); } "></a> <span class="divider">&gt;</span></li>
+              <!-- /ko -->
+              <!-- ko ifNot: isRoot -->
+              <li class="active-breadcrumb" data-bind="text: name"></li>
+              <!-- /ko -->
+            </ul>
           </div>
           <div class="fb-folder-actions">
             <a class="inactive-action" href="javascript:void(0);"><span class="fa-stack fa-fw fb-action"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
@@ -178,6 +194,9 @@ from desktop.views import _ko
       <div class="fb-header">
         <div class="fb-primary-col">Name</div>
         <div class="fb-attr-group">
+          <div class="fb-attr-col fb-type">
+            Type
+          </div>
           <div class="fb-attr-col fb-owner">
             Owner
           </div>
@@ -186,13 +205,24 @@ from desktop.views import _ko
           </div>
         </div>
       </div>
-      <div class="fb-list">
-        <ul>
+      <div class="fb-list" data-bind="with: currentDirectory">
+        <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
           <li>
-            <div class="fb-primary-col"><i class="fa fa-file-o fa-fw"></i> Filename</div>
+            <div class="fb-primary-col">
+              <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : definition.type === 'directory', 'fa-file-o': definition.type !== 'directory' }"></i>
+              <!-- ko if: definition.type === 'directory' -->
+              <a href="javascript: void(0);" data-bind="text: name, click: function () { $data.open(true); $parents[1].currentDirectory($data); }"></a>
+              <!-- /ko -->
+              <!-- ko ifnot: definition.type === 'directory' -->
+              <a data-bind="text: name, attr: { href: absoluteUrl }"></a>
+              <!-- /ko -->
+            </div>
             <div class="fb-attr-group">
-              <div class="fb-attr-col fb-owner">me</div>
-              <div class="fb-attr-col fb-modified">2015-10-11</div>
+              <!-- ko with: definition -->
+              <div class="fb-attr-col fb-type" data-bind="text: type"></div>
+              <div class="fb-attr-col fb-owner" data-bind="text: owner">me</div>
+              <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
+              <!-- /ko -->
             </div>
           </li>
         </ul>

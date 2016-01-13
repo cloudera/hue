@@ -197,11 +197,16 @@
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} [options.path]
    */
   AssistHelper.prototype.fetchDocuments = function (options) {
     var self = this;
     $.ajax({
       url: DOCUMENTS_API,
+      data: {
+        path: options.path
+      },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
           options.successCallback(data);
