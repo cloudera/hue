@@ -222,7 +222,7 @@ from desktop.views import _ko
               <a href="javascript: void(0);" data-bind="text: name, click: function () { $data.open(true); $parents[1].currentDirectory($data); }"></a>
               <!-- /ko -->
               <!-- ko ifnot: definition.type === 'directory' -->
-              <a data-bind="text: name, attr: { href: absoluteUrl }"></a>
+              <a data-bind="text: definition.name, attr: { href: definition.absoluteUrl }"></a>
               <!-- /ko -->
             </div>
             <div class="fb-attr-group">
