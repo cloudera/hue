@@ -139,6 +139,23 @@ from desktop.views import _ko
   </style>
 
   <script type="text/html" id="fb-template">
+    <div id="createDirectoryModal" class="modal hide fade">
+      <!-- ko with: currentDirectory -->
+      <div class="modal-body form-horizontal">
+        <div class="control-group">
+          <label class="control-label" for="newDirectoryName">Name</label>
+          <div class="controls">
+            <input id="newDirectoryName" type="text" /></label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" value="Cancel">
+        <input type="button" class="btn" value="Create" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
+      </div>
+      <!-- /ko -->
+    </div>
+
     <div class="fb-container">
       <div class="fb-action-bar">
         <h4>
@@ -150,7 +167,7 @@ from desktop.views import _ko
           </div>
           <div class="fb-folder-actions">
             <a class="inactive-action" href="javascript:void(0);"><span class="fa-stack fa-fw fb-action"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
-            <a class="inactive-action" href="javascript:void(0);"><span class="fa-stack fa-fw fb-action"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+            <a class="inactive-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw fb-action"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
             <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-times fb-action"></i></a>
             <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-users fb-action"></i></a>
             <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-download fb-action"></i></a>
