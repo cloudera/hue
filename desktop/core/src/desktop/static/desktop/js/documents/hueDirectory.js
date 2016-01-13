@@ -39,7 +39,9 @@
     self.parent = options.parent;
     self.definition = options.definition;
     self.assistHelper = options.assistHelper;
-    self.path = self.parent ? self.parent.path + self.definition.name : self.definition.name;
+    self.name = self.definition.name.substring(self.definition.name.lastIndexOf('/') + 1);
+    self.isRoot = self.name === '';
+    self.path = self.definition.name;
     self.app = options.app;
 
     self.loaded = ko.observable(false);
@@ -47,6 +49,13 @@
     self.hasErrors = ko.observable(false);
     self.open = ko.observable(false);
     self.entries = ko.observableArray([]);
+
+    self.breadcrumbs = [];
+    var lastParent = self.parent;
+    while (lastParent) {
+      self.breadcrumbs.unshift(lastParent);
+      lastParent = lastParent.parent;
+    }
 
     self.open.subscribe(function () {
       if (! self.loaded()) {
@@ -64,13 +73,18 @@
 
     if (self.app === 'documents') {
       self.assistHelper.fetchDocuments({
+        path: self.path,
         successCallback: function(data) {
           self.hasErrors(false);
-          self.entries($.map(data.documents, function (definition) {
+          var cleanEntries = $.grep(data.documents, function (definition) {
+            return definition.name !== '/';
+          });
+          self.entries($.map(cleanEntries, function (definition) {
             if (definition.type === "directory") {
               return new HueDirectory({
                 assistHelper: self.assistHelper,
                 definition: definition,
+                app: self.app,
                 parent: self
               })
             } else {
@@ -80,9 +94,6 @@
               }
             }
           }));
-          $.each(data.documents, function (idx, document) {
-            console.log(document);
-          });
           self.loading(false);
           self.loaded(true);
         },
