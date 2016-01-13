@@ -19,12 +19,13 @@
     define([
       'knockout',
       'desktop/js/assist/assistHelper',
+      'desktop/js/documents/hueDirectory',
       'knockout-mapping'
     ], factory);
   } else {
-    root.HomeViewModel = factory(ko, assistHelper);
+    root.HomeViewModel = factory(ko, assistHelper, HueDirectory);
   }
-}(this, function (ko, AssistHelper) {
+}(this, function (ko, AssistHelper, HueDirectory) {
 
   function HomeViewModel(options) {
     var self = this;
@@ -34,81 +35,29 @@
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.documents = ko.observableArray([]);
-    self.path = ko.mapping.fromJS('/');
+
+    self.currentDirectory = ko.observable(new HueDirectory({
+      assistHelper: self.assistHelper,
+      definition: {
+        name: '/'
+      }
+    }));
+
+    self.currentDirectory().open();
+
     self.mkdirFormPath = ko.observable('');
     self.deleteFormPath = ko.observable('');
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');
 
-    self.page = ko.observable(1);
-    self.documentsPerPage = ko.observable(50);
-
-    self.renderableDocuments = ko.computed(function () {
-      return self.documents().slice((self.page() * 1 - 1) * self.documentsPerPage(), (self.page() * self.documentsPerPage()) - 1);
-    });
-
-    self.totalPages = ko.computed(function () {
-      return Math.ceil(self.documents().length / self.documentsPerPage());
-    });
-
-    self.hasPrevious = ko.computed(function () {
-      return self.page() > 1;
-    });
-
-    self.hasNext = ko.computed(function () {
-      return self.page() < self.totalPages();
-    });
-
-    self.page.subscribe(function (value) {
-      if (isNaN(value * 1)) {
-        self.page(1);
-      }
-      if (value > self.totalPages()) {
-        self.page(self.totalPages());
-      }
-      if (value < 1) {
-        self.page(1);
-      }
-    });
-
-    self.nextPage = function () {
-      if (self.hasNext()) {
-        self.page(self.page() + 1);
-      }
-    };
-
-    self.previousPage = function () {
-      if (self.hasPrevious()) {
-        self.page(self.page() - 1);
-      }
-    };
-
-    self.documents.subscribe(function () {
-      self.page(1);
-    });
-
-
-    self.loadDocuments = function(path) {
-      $.get("/desktop/api2/docs2/", {
-       path: path
-      }, function(data) {
-        self.path(path);
-        self.documents(data.documents);
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    };
-
     self.mkdir = function() {
       $.post("/desktop/api2/doc/mkdir", {
-        parent_path: ko.mapping.toJSON(self.path),
+        parent_path: ko.mapping.toJSON(self.currentDirectory().path),
         name: ko.mapping.toJSON(self.mkdirFormPath)
       }, function (data) {
         if (data.status == 0) {
-          self.loadDocuments(self.path()); // TODO proper refresh
-          self.mkdirFormPath('');
-        }
-        else {
+          self.currentFolder.load();
+        } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr) {
@@ -122,10 +71,8 @@
         skip_trash: ko.mapping.toJSON(false)
       }, function (data) {
         if (data.status == 0) {
-          self.loadDocuments(self.path()); // TODO proper refresh
-          self.mkdirFormPath('');
-        }
-        else {
+          self.currentDirectory().load();
+        } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr) {
@@ -138,6 +85,10 @@
       $('#export-documents').find('form').submit();
     };
   }
+
+  HomeViewModel.prototype.openPath = function (path) {
+    console.log(path);
+  };
 
   return HomeViewModel;
 }));

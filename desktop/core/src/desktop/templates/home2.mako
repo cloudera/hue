@@ -216,21 +216,20 @@ ${ assist.assistPanel() }
           </ul>
         </div>
         <h2 class="card-heading simple">${_('My Documents')}</h2>
-        <span data-bind="text: path"></span>
         <br/>
-        <input data-bind="value: mkdirFormPath" placeholder="dir name, e.g. projects"></input>
+        <input data-bind="value: mkdirFormPath" placeholder="dir name, e.g. projects" />
         <a href="javascript:void(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
 
-        <input data-bind="value: deleteFormPath" placeholder="doc id, e.g. 50491"></input>
+        <input data-bind="value: deleteFormPath" placeholder="doc id, e.g. 50491" />
         <a href="javascript:void(0);" class="btn" data-bind="click: deleteDocument"><i class="fa fa-times"></i> ${ _('Delete') }</a>
 
-        <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491"></input>
+        <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491" />
         <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ prepareShareModal(e) },
           attr: {'data-original-title': '${ _ko("Share") } ' + name}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
 
-        <input data-bind="value: exportFormDocIds" placeholder="doc id, e.g. 50491,50492"></input>
+        <input data-bind="value: exportFormDocIds" placeholder="doc id, e.g. 50491,50492" />
         <a class="share-link btn" data-bind="click: exportDocuments">
           <i class="fa fa-download"></i> ${ _('Export') }
         </a>
@@ -239,39 +238,9 @@ ${ assist.assistPanel() }
           <i class="fa fa-upload"></i> ${ _('Import') }
         </a>
 
-        <div class="card-body">
-          <p>
-          <table id="documents" class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
-            <thead>
-              <tr>
-                <th style="width: 26px">&nbsp;</th>
-                <th style="width: 200px">${_('Name')}</th>
-                <th>${_('Description')}</th>
-              </tr>
-            </thead>
-            <tbody data-bind="template: { name: 'document-template', foreach: renderableDocuments}">
-            </tbody>
-            <tfoot data-bind="visible: documents().length > 0">
-              <tr>
-                <td colspan="7">
-                  <div class="pull-right" style="margin-top: 10px" data-bind="visible: hasPrevious() || hasNext()">
-                    <span>${_('Page')} <input type="number" class="input-mini" style="text-align: center" data-bind="value: page"> ${_('of')} <span data-bind="text: totalPages"></span></span>
-                  </div>
-                  <div class="pagination">
-                    <ul>
-                      <li><a data-bind="click: previousPage, visible: hasPrevious">${_('Previous')}</a></li>
-                      <li><a data-bind="click: nextPage, visible: hasNext">${_('Next')}</a></li>
-                    </ul>
-                  </div>
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-          <div data-bind="visible: documents().length == 0">
-            <h4 style="color: #777; margin-bottom: 30px">${_('There are currently no documents in this project or tag.')}</h4>
-          </div>
-          </p>
-        </div>
+        <!-- ko with: currentDirectory -->
+        <div></div>
+        <!-- /ko -->
       </div>
     </div>
   </div>
@@ -316,7 +285,10 @@ ${ commonimportexport(request) | n,unicode }
       };
 
       var viewModel = new HomeViewModel(options);
-      viewModel.loadDocuments(location.getParameter('path') ? location.getParameter('path') : '/');
+      if (location.getParameter('path')) {
+        viewModel.openPath(location.getParameter('path'));
+      }
+      viewModel.currentDirectory().open(true);
       ko.applyBindings(viewModel, $('#documentList')[0]);
 
 ##       ShareViewModel.initSharing("#documentShareModal");
