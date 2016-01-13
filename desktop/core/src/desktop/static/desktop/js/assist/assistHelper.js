@@ -214,6 +214,30 @@
   };
 
   /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.path
+   * @param {string} options.name
+   */
+  AssistHelper.prototype.createDocumentsFolder = function (options) {
+    var self = this;
+    $.post("/desktop/api2/doc/mkdir", {
+      parent_path: ko.mapping.toJSON(options.path),
+      name: ko.mapping.toJSON(options.name)
+    }, function (data) {
+      if (! self.successResponseIsError(data)) {
+        options.successCallback(data);
+      } else {
+        self.assistErrorCallback(options)(data);
+      }
+    })
+      .fail(self.assistErrorCallback(options));
+  };
+
+  /**
    *
    * @param {Object} options
    * @param {string} options.sourceType

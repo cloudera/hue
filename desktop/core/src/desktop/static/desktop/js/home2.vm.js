@@ -38,6 +38,7 @@
 
     self.currentDirectory = ko.observable(new HueDirectory({
       assistHelper: self.assistHelper,
+      app: 'documents',
       definition: {
         name: '/'
       }
@@ -45,25 +46,9 @@
 
     self.currentDirectory().open();
 
-    self.mkdirFormPath = ko.observable('');
     self.deleteFormPath = ko.observable('');
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');
-
-    self.mkdir = function() {
-      $.post("/desktop/api2/doc/mkdir", {
-        parent_path: ko.mapping.toJSON(self.currentDirectory().path),
-        name: ko.mapping.toJSON(self.mkdirFormPath)
-      }, function (data) {
-        if (data.status == 0) {
-          self.currentFolder.load();
-        } else {
-          $(document).trigger("error", data.message);
-        }
-      }).fail(function (xhr) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    };
 
     self.deleteDocument = function() {
       $.post("/desktop/api2/doc/delete", {

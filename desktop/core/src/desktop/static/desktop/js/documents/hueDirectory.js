@@ -30,6 +30,7 @@
    * @param {AssistHelper} options.assistHelper
    * @param {Object} options.definition
    * @param {HueFolder} options.parent
+   * @param {string} options.app - Currently only 'documents' is supported
    *
    * @constructor
    */
@@ -39,6 +40,7 @@
     self.definition = options.definition;
     self.assistHelper = options.assistHelper;
     self.path = self.parent ? self.parent.path + self.definition.name : self.definition.name;
+    self.app = options.app;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -60,35 +62,48 @@
     }
     self.loading(true);
 
-    self.assistHelper.fetchDocuments({
-      successCallback: function(data) {
-        self.hasErrors(false);
-        self.entries($.map(data.documents, function (definition) {
-          if (definition.type === "directory") {
-            return new HueDirectory({
-              assistHelper: self.assistHelper,
-              definition: definition,
-              parent: self
-            })
-          } else {
-            return {
-              definition: definition,
-              path: self.path + definition.name
+    if (self.app === 'documents') {
+      self.assistHelper.fetchDocuments({
+        successCallback: function(data) {
+          self.hasErrors(false);
+          self.entries($.map(data.documents, function (definition) {
+            if (definition.type === "directory") {
+              return new HueDirectory({
+                assistHelper: self.assistHelper,
+                definition: definition,
+                parent: self
+              })
+            } else {
+              return {
+                definition: definition,
+                path: self.path + definition.name
+              }
             }
-          }
-        }));
-        $.each(data.documents, function (idx, document) {
-          console.log(document);
-        });
-        self.loading(false);
-        self.loaded(true);
-      },
-      errorCallback: function () {
-        self.hasErrors(true);
-        self.loading(false);
-        self.loaded(true);
-      }
-    });
+          }));
+          $.each(data.documents, function (idx, document) {
+            console.log(document);
+          });
+          self.loading(false);
+          self.loaded(true);
+        },
+        errorCallback: function () {
+          self.hasErrors(true);
+          self.loading(false);
+          self.loaded(true);
+        }
+      });
+    }
+  };
+
+  HueDirectory.prototype.createDirectory = function (name) {
+    var self = this;
+    if (self.app === 'documents') {
+      self.assistHelper.createDocumentsFolder({
+        successCallback: self.load.bind(self),
+        path: self.path,
+        name: name
+      });
+    }
   };
 
   return HueDirectory;
