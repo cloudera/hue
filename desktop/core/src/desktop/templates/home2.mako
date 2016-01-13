@@ -19,6 +19,7 @@
 %>
 
 <%namespace name="assist" file="/assist.mako" />
+<%namespace name="fileBrowser" file="/file_browser.mako" />
 <%namespace name="tableStats" file="/table_stats.mako" />
 <%namespace name="require" file="/require.mako" />
 
@@ -28,6 +29,7 @@ ${ require.config() }
 
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
+${ fileBrowser.fileBrowser() }
 
 <style type="text/css">
 
@@ -238,9 +240,12 @@ ${ assist.assistPanel() }
           <i class="fa fa-upload"></i> ${ _('Import') }
         </a>
 
-        <!-- ko with: currentDirectory -->
-        <div></div>
-        <!-- /ko -->
+        <div class="file-browser" data-bind="component: {
+          name: 'file-browser',
+          params: {
+            currentDirectory: currentDirectory
+          }
+        }"></div>
       </div>
     </div>
   </div>
@@ -264,6 +269,7 @@ ${ commonimportexport(request) | n,unicode }
     'desktop/js/share2.vm',
     'assistPanel',
     'tableStats',
+    'fileBrowser',
     'knockout-mapping',
     'knockout-sortable',
     'ko.hue-bindings'
