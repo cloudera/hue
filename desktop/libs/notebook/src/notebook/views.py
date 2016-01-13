@@ -19,18 +19,17 @@ import json
 import logging
 
 from django.db.models import Q
-from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 
-from notebook.decorators import check_document_access_permission, check_document_modify_permission
-from notebook.connectors.base import Notebook, get_api
-from notebook.management.commands.notebook_setup import Command
-from notebook.connectors.spark_shell import SparkApi
 from notebook.conf import get_interpreters
+from notebook.connectors.base import Notebook, get_api
+from notebook.connectors.spark_shell import SparkApi
+from notebook.decorators import check_document_access_permission, check_document_modify_permission
+from notebook.management.commands.notebook_setup import Command
 from notebook.models import make_notebook
 
 
@@ -83,7 +82,7 @@ def editor(request):
     editor = Notebook()
     data = editor.get_data()
     data['name'] = 'Untitled %s Query' % editor_type.title()
-    data['type'] = 'query-%s' % editor_type
+    data['type'] = 'query-%s' % editor_type  # TODO: Add handling for non-SQL types
     editor.data = json.dumps(data)
 
   return render('editor.mako', request, {

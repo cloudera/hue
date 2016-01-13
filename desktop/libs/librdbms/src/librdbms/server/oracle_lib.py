@@ -89,13 +89,21 @@ class OracleClient(BaseRDMSClient):
 
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
-    cursor.execute("SELECT table_name FROM all_tables")
+    query = "SELECT table_name FROM user_tables"
+    if table_names:
+      clause = ' OR '.join(["table_name LIKE '%%%(table)s%%'" % {'table': table} for table in table_names])
+      query += ' WHERE (%s)' % clause
+    cursor.execute(query)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
-  def get_columns(self, database, table):
+  def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
-    cursor.execute("SELECT column_name FROM user_tab_cols WHERE table_name = '%s'" % table)
+    cursor.execute("SELECT column_name, data_type FROM user_tab_cols WHERE table_name = '%s'" % table)
     self.connection.commit()
-    return [row[0] for row in cursor.fetchall()]
+    if names_only:
+      columns = [row[0] for row in cursor.fetchall()]
+    else:
+      columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
+    return columns

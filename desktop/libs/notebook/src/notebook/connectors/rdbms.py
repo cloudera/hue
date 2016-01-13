@@ -21,7 +21,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 
 from librdbms.server import dbms
-from librdbms.server.mysql_lib import MySQLClient
 
 from notebook.connectors.base import Api, QueryError, QueryExpired
 
@@ -42,13 +41,14 @@ def query_error_handler(func):
   return decorator
 
 
-class MySqlApi(Api):
+class RdbmsApi(Api):
 
+  @query_error_handler
   def execute(self, notebook, snippet):
-    query_server = dbms.get_query_server_config(server='mysql')
-    db = MySQLClient(query_server, self.user)
+    query_server = dbms.get_query_server_config(server=self.interpreter)
+    db = dbms.get(self.user, query_server)
 
-    table = db.execute_statement(snippet['statement'])
+    table = db.execute_statement(snippet['statement'])  # TODO: execute statement stub in Rdbms
 
     data = table.rows()
     has_result_set = data is not None
@@ -56,6 +56,7 @@ class MySqlApi(Api):
     return {
       'sync': True,
       'has_result_set': has_result_set,
+      'modified_row_count': 0,
       'result': {
         'has_more': False,
         'data': data if has_result_set else [],
@@ -68,60 +69,72 @@ class MySqlApi(Api):
       }
     }
 
+
   @query_error_handler
   def check_status(self, notebook, snippet):
     return {'status': 'available'}
 
-  def _fetch_result(self, cursor):
-    return {}
+
+  @query_error_handler
+  def fetch_result(self, notebook, snippet, rows, start_over):
+    return {
+      'has_more': False,
+      'data': [],
+      'meta': [],
+      'type': 'table'
+    }
+
 
   @query_error_handler
   def fetch_result_metadata(self):
     pass
 
+
   @query_error_handler
   def cancel(self, notebook, snippet):
     return {'status': 0}
+
 
   @query_error_handler
   def get_log(self, notebook, snippet, startFrom=None, size=None):
     return 'No logs'
 
+
   def download(self, notebook, snippet, format):
     raise PopupException('Downloading is not supported yet')
+
 
   @query_error_handler
   def close_statement(self, snippet):
     return {'status': -1}
 
+
   @query_error_handler
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
-    query_server = dbms.get_query_server_config(server='mysql')
-    db = MySQLClient(query_server, self.user)
+    query_server = dbms.get_query_server_config(server=self.interpreter)
+    db = dbms.get(self.user, query_server)
 
     assist = Assist(db)
-    response = {'error': 0}
+    response = {'status': -1}
 
-    try:
-      if database is None:
-        response['databases'] = assist.get_databases()
-      elif table is None:
-        response['tables'] = assist.get_tables(database)
-      else:
-        columns = assist.get_columns(database, table)
-        response['columns'] = [col for col in columns]
-        response['extended_columns'] = [{
-            'name': col,
-            'type': '',
-            'comment': ''
-          } for col in columns
-        ]
-    except Exception, e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
-      response['code'] = -1
-      response['error'] = str(e)
+    if database is None:
+      response['databases'] = assist.get_databases()
+    elif table is None:
+      tables_meta = []
+      for t in assist.get_tables(database):
+        tables_meta.append({'name': t, 'type': 'Table', 'comment': ''})
+      response['tables_meta'] = tables_meta
+    else:
+      columns = assist.get_columns(database, table)
+      response['columns'] = [col['name'] for col in columns]
+      response['extended_columns'] = columns
 
+    response['status'] = 0
     return response
+
+  @query_error_handler
+  def get_select_star_query(self, snippet, database, table):
+    return "SELECT * FROM `%s`.`%s`" % (database, table)
 
 
 class Assist():
@@ -136,4 +149,4 @@ class Assist():
     return self.db.get_tables(database, table_names)
 
   def get_columns(self, database, table):
-    return self.db.get_columns(database, table)
+    return self.db.get_columns(database, table, names_only=False)

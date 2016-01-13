@@ -1698,12 +1698,18 @@ ${ require.config() }
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
+        oracle: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/oracle',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
+        },
         pig: {
           placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
           aceMode: 'ace/mode/pig',
           snippetImage: '${ static("pig/art/icon_pig_48.png") }'
         },
-        pgsql: {
+        postgresql: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
           aceMode: 'ace/mode/pgsql',
           snippetIcon: 'fa-database',
@@ -1726,6 +1732,12 @@ ${ require.config() }
           placeHolder: '${ _("Example: 1 + 1, or press CTRL + space") }',
           aceMode: 'ace/mode/scala',
           snippetImage: '${ static("spark/art/icon_spark_48.png") }'
+        },
+        sqlite: {
+          placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+          aceMode: 'ace/mode/sqlite',
+          snippetIcon: 'fa-database',
+          sqlDialect: true
         },
         text: {
           placeHolder: '${ _('Type your text here') }',

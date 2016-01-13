@@ -81,12 +81,11 @@ class Notebook(object):
 def get_api(user, snippet, fs, jt):
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
-  from notebook.connectors.mysql import MySqlApi
+  from notebook.connectors.rdbms import RdbmsApi
   from notebook.connectors.pig_batch import PigApi
   from notebook.connectors.spark_shell import SparkApi
   from notebook.connectors.spark_batch import SparkBatchApi
   from notebook.connectors.text import TextApi
-
 
   interpreter = [interpreter for interpreter in get_interpreters(user) if interpreter['type'] == snippet['type']]
   if not interpreter:
@@ -102,8 +101,8 @@ def get_api(user, snippet, fs, jt):
     return SparkBatchApi(user)
   elif interface == 'text' or interface == 'markdown':
     return TextApi(user)
-  elif interface == 'mysql':
-    return MySqlApi(user)
+  elif interface == 'rdbms':
+    return RdbmsApi(user, interpreter=snippet['type'])
   elif interface == 'jdbc':
     return JdbcApi(user, interpreter=interpreter)
   elif interface == 'pig':
