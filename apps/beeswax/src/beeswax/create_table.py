@@ -235,7 +235,8 @@ def import_wizard(request, database='default'):
                 'name': table_name,
                 'comment': s1_file_form.cleaned_data['comment'],
                 'row_format': 'Delimited',
-                'field_terminator': delim
+                'field_terminator': delim,
+                'file_format': 'TextFile'
              },
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
             'partition_columns': [],
