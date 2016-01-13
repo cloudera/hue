@@ -106,6 +106,16 @@
     }
   };
 
+  HueDirectory.prototype.delete = function () {
+    var self = this;
+    if (self.app === 'documents') {
+      self.assistHelper.deleteDocument({
+        successCallback: self.parent.load.bind(self.parent),
+        id: self.definition.id
+      });
+    }
+  };
+
   HueDirectory.prototype.createDirectory = function (name) {
     var self = this;
     if (self.app === 'documents') {

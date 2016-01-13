@@ -228,12 +228,6 @@ ${ fileBrowser.fileBrowser() }
 ##           </div>
 ##           <h2 class="card-heading simple">${_('My Documents')}</h2>
 ##           <br/>
-##           <input data-bind="value: mkdirFormPath" placeholder="dir name, e.g. projects" />
-##           <a href="javascript:void(0);" class="btn" data-bind="click: mkdir"><i class="fa fa-plus-circle"></i> ${ _('Create Directory') }</a>
-##
-##           <input data-bind="value: deleteFormPath" placeholder="doc id, e.g. 50491" />
-##           <a href="javascript:void(0);" class="btn" data-bind="click: deleteDocument"><i class="fa fa-times"></i> ${ _('Delete') }</a>
-##
 ##           <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491" />
 ##           <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ prepareShareModal(e) },
 ##             attr: {'data-original-title': '${ _ko("Share") } ' + name}">

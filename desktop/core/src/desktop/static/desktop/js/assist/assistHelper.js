@@ -243,6 +243,30 @@
   };
 
   /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.id
+   * @param {string} [options.skipTrash] - Default false
+   */
+  AssistHelper.prototype.deleteDocument = function (options) {
+    var self = this;
+    $.post("/desktop/api2/doc/delete", {
+      doc_id: ko.mapping.toJSON(options.id),
+      skip_trash: ko.mapping.toJSON(options.skipTrash || false)
+    }, function (data) {
+      if (! self.successResponseIsError(data)) {
+        options.successCallback(data);
+      } else {
+        self.assistErrorCallback(options)(data);
+      }
+    })
+      .fail(self.assistErrorCallback(options));
+  };
+
+  /**
    *
    * @param {Object} options
    * @param {string} options.sourceType

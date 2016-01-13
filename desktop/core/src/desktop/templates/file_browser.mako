@@ -152,15 +152,27 @@ from desktop.views import _ko
       <!-- ko with: currentDirectory -->
       <div class="modal-body form-horizontal">
         <div class="control-group">
-          <label class="control-label" for="newDirectoryName">Name</label>
+          <label class="control-label" for="newDirectoryName">${ _('Name') }</label>
           <div class="controls">
             <input id="newDirectoryName" type="text" /></label>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <input type="button" class="btn" data-dismiss="modal" value="Cancel">
-        <input type="button" class="btn" value="Create" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
+        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+        <input type="button" class="btn" value="${ _('Create') }" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
+      </div>
+      <!-- /ko -->
+    </div>
+    <div id="deleteDirectoryModal" class="modal hide fade">
+      <!-- ko with: currentDirectory -->
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times</a>
+        <h3>${ _('Do you really want to delete:') } <span data-bind="text: name"></span></h3>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+        <input type="submit" data-bind="click: function () { $parents[1].currentDirectory($data.parent); $data.delete(); $('#deleteDirectoryModal').modal('hide'); }" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <!-- /ko -->
     </div>
@@ -181,10 +193,12 @@ from desktop.views import _ko
               <!-- /ko -->
             </ul>
           </div>
-          <div class="fb-folder-actions">
+          <div class="fb-folder-actions" data-bind="with: currentDirectory">
             <a class="inactive-action" href="javascript:void(0);"><span class="fa-stack fa-fw fb-action"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
             <a class="inactive-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw fb-action"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-            <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-times fb-action"></i></a>
+            <!-- ko ifnot: isRoot -->
+            <a class="inactive-action" href="javascript:void(0);" data-bind="click: function () { $('#deleteDirectoryModal').modal('show'); }"><i class="fa fa-fw fa-times fb-action"></i></a>
+            <!-- /ko -->
             <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-users fb-action"></i></a>
             <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-download fb-action"></i></a>
             <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-upload fb-action"></i></a>
@@ -192,17 +206,11 @@ from desktop.views import _ko
         </h4>
       </div>
       <div class="fb-header">
-        <div class="fb-primary-col">Name</div>
+        <div class="fb-primary-col">${ _('Name') }</div>
         <div class="fb-attr-group">
-          <div class="fb-attr-col fb-type">
-            Type
-          </div>
-          <div class="fb-attr-col fb-owner">
-            Owner
-          </div>
-          <div class="fb-attr-col fb-modified">
-            Last Modified
-          </div>
+          <div class="fb-attr-col fb-type">${ _('Type') }</div>
+          <div class="fb-attr-col fb-owner">${ _('Owner') }</div>
+          <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
         </div>
       </div>
       <div class="fb-list" data-bind="with: currentDirectory">
@@ -220,7 +228,7 @@ from desktop.views import _ko
             <div class="fb-attr-group">
               <!-- ko with: definition -->
               <div class="fb-attr-col fb-type" data-bind="text: type"></div>
-              <div class="fb-attr-col fb-owner" data-bind="text: owner">me</div>
+              <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
               <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
               <!-- /ko -->
             </div>
