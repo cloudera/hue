@@ -319,12 +319,14 @@ ${ require.config() }
         name: 'assist-panel',
         params: {
           user: $root.user,
-          sourceTypes: $root.sqlSourceTypes,
-          activeSourceType: $root.activeSqlSourceType,
-          navigationSettings: {
-            openItem: false,
-            showPreview: true,
-            showStats: true
+          sql: {
+            sourceTypes: $root.sqlSourceTypes,
+            activeSourceType: $root.activeSqlSourceType,
+            navigationSettings: {
+              openItem: false,
+              showPreview: true,
+              showStats: true
+            },
           },
           visibleAssistPanels: $root.editorMode ? ['sql'] : []
         }
