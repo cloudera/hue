@@ -66,17 +66,22 @@ def get_documents2(request):
   _import_documents1(request.user)
 
   try:
-    file_doc = Directory.objects.get(owner=request.user, name=path) # TODO perms
+    directory = Directory.objects.get(owner=request.user, name=path) # TODO perms
   except Directory.DoesNotExist, e:
     if path == '/':
-      file_doc, created = Directory.objects.get_or_create(name='/', owner=request.user)
-      file_doc.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=file_doc.id))
+      directory, created = Directory.objects.get_or_create(name='/', owner=request.user)
+      directory.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=directory.id))
     else:
       raise e
 
+
+  parent_path = path.rsplit('/', 1)[0] or '/'
+  parent = directory.dependencies.get(name=parent_path) if path != '/' else None
+
   return JsonResponse({
-      'file': file_doc.to_dict(),
-      'documents': [doc.to_dict() for doc in file_doc.documents()],
+      'directory': directory.to_dict(),
+      'parent': parent.to_dict() if parent else None,
+      'documents': [doc.to_dict() for doc in directory.documents() if doc != parent],
       'path': path
   })
 
