@@ -946,14 +946,20 @@
 
       var lastParentHeight = -1;
       var lastTop = -1;
-      window.setInterval(function () {
-        if (lastParentHeight !== $parent.innerHeight() || lastTop !== $element.position().top) {
+
+      function stretch(force) {
+        if (lastParentHeight !== $parent.innerHeight() || lastTop !== $element.position().top || force) {
           lastParentHeight = $parent.innerHeight();
           lastTop = $element.position().top;
           $element.height(lastParentHeight - lastTop - ($element.outerHeight(true) - $element.innerHeight()));
           huePubSub.publish('assist.stretchDown', $element);
         }
-      }, 200);
+      }
+
+      window.setInterval(stretch, 200);
+      huePubSub.subscribe('assist.forceStretchDown', function(){
+        stretch(true);
+      });
     }
   };
 
@@ -1002,7 +1008,7 @@
         var adjustHeightSingle = function () {
           $allPanels.height($container.innerHeight() - allExtrasHeight);
         }
-        adjustHeightSingle();
+        window.setTimeout(adjustHeightSingle, 200);
         $(window).resize(adjustHeightSingle);
         $allExtras.show();
         $allPanels.show();
@@ -2792,6 +2798,7 @@
       }
 
       $parent.parents(scrollable).on('scroll', render);
+
       if ($parent.parents('.hueach').length > 0){
         window.setTimeout(render, 100);
       }

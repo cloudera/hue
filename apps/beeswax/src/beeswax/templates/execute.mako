@@ -832,7 +832,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-${ assist.assistPanel() }
+${ assist.assistPanel('.table-container') }
 ${ tableStats.tableStats() }
 
 <style type="text/css">

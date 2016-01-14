@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
-<%def name="assistPanel()">
+<%def name="assistPanel(scrollable='.assist-stretchable-list')">
   <style>
 
     .assist-icon {
@@ -75,6 +75,10 @@ from desktop.views import _ko
       margin-bottom:2px;
       font-weight: bold;
       margin-top: 0
+    }
+    
+    .nav.nav-no-margin {
+      margin-bottom: 0;
     }
 
     .assist-stretchable-list {
@@ -296,7 +300,7 @@ from desktop.views import _ko
       <li class="assist-entry no-entries">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="hueach: {data: filteredEntries, itemHeight: 22, scrollable: '.assist-stretchable-list', considerStretching: true}, css: { 'assist-tables': definition.isDatabase }">
+    <ul data-bind="hueach: {data: filteredEntries, itemHeight: 25, scrollable: '${scrollable}', considerStretching: true}, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko ifnot: definition.isTable -->
       <li data-bind="visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
@@ -485,7 +489,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <ul class="nav">
+    <ul class="nav nav-no-margin">
       <li class="assist-inner-header">
         ${_('Sources')}
       </li>
@@ -510,7 +514,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <ul class="nav" data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" >
+    <ul class="nav nav-no-margin" data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" >
       <li class="assist-inner-header">
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
@@ -544,7 +548,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <ul class="nav" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
+    <ul class="nav nav-no-margin" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
       <li class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
