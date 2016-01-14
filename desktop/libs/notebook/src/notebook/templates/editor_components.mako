@@ -1301,6 +1301,7 @@ ${ require.config() }
 
         $(el).jHueTableExtender({
           fixedHeader: true,
+          fixedFirstColumn: true,
           includeNavigator: false,
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "absolute"
@@ -1357,6 +1358,7 @@ ${ require.config() }
 
     $(el).jHueTableExtender({
       fixedHeader: true,
+      fixedFirstColumn: true,
       includeNavigator: false,
       parentId: 'snippet_' + snippet.id(),
       clonedContainerPosition: "absolute"
@@ -1779,6 +1781,7 @@ ${ require.config() }
           var _el = $("#snippet_" + snippet.id()).find(".resultTable");
           _el.jHueTableExtender({
             fixedHeader: true,
+            fixedFirstColumn: true,
             includeNavigator: false,
             parentId: 'snippet_' + snippet.id(),
             clonedContainerPosition: "absolute"
@@ -2066,9 +2069,13 @@ ${ require.config() }
           drag: function (e, ui) {
             draggableHelper($(this), e, ui);
             $(".jHueTableExtenderClonedContainer").hide();
+            $(".jHueTableExtenderClonedContainerColumn").hide();
+            $(".jHueTableExtenderClonedContainerCell").hide();
           },
           stop: function (e, ui) {
             $(".jHueTableExtenderClonedContainer").show();
+            $(".jHueTableExtenderClonedContainerColum").show();
+            $(".jHueTableExtenderClonedContainerCell").show();
             draggableHelper($(this), e, ui, true);
             redrawFixedHeaders();
             ui.helper.first().removeAttr("style");
@@ -2110,6 +2117,8 @@ ${ require.config() }
         if (_el.hasClass("dt")) {
           _el.removeClass("dt");
           $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
+          $("#eT" + snippet.id() + "jHueTableExtenderClonedContainerColumn").remove();
+          $("#eT" + snippet.id() + "jHueTableExtenderClonedContainerCell").remove();
           _el.dataTable().fnClearTable();
           _el.dataTable().fnDestroy();
           _el.find("thead tr").empty();

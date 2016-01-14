@@ -971,6 +971,7 @@ ${ tableStats.tableStats() }
 
   #resultTable td, #resultTable th {
     white-space: nowrap;
+    border-right: 1px solid #e5e5e5;
   }
 
   .tab-content {
@@ -1188,6 +1189,7 @@ function placeResizePanelHandle() {
 function reinitializeTableExtenders() {
   $("#resultTable").jHueTableExtender({
      fixedHeader: true,
+     fixedFirstColumn: true,
      includeNavigator: false
   });
   $("#recentQueries").jHueTableExtender({
@@ -1206,9 +1208,13 @@ $(document).ready(function () {
     drag: function (e, ui) {
       draggableHelper($(this), e, ui);
       $(".jHueTableExtenderClonedContainer").hide();
+      $(".jHueTableExtenderClonedContainerColumn").hide();
+      $(".jHueTableExtenderClonedContainerCell").hide();
     },
     stop: function (e, ui) {
       $(".jHueTableExtenderClonedContainer").show();
+      $(".jHueTableExtenderClonedContainerColumn").show();
+      $(".jHueTableExtenderClonedContainerCell").show();
       draggableHelper($(this), e, ui);
       reinitializeTableExtenders();
     }
@@ -1327,6 +1333,8 @@ $(document).ready(function () {
 
   $("#expandResults").on("click", function(){
     $("#resultTablejHueTableExtenderClonedContainer").remove();
+    $("#resultTablejHueTableExtenderClonedContainerColumn").remove();
+    $("#resultTablejHueTableExtenderClonedContainerCell").remove();
     if ($(this).find("i").hasClass("fa-expand")){
       $(this).find("i").removeClass("fa-expand").addClass("fa-compress");
       $(this).parent().parent().addClass("fullscreen");
@@ -2130,6 +2138,8 @@ var errorWidgets = [];
 
 function clearErrorWidgets() {
   $(".jHueTableExtenderClonedContainer").hide();
+  $(".jHueTableExtenderClonedContainerColumn").hide();
+  $(".jHueTableExtenderClonedContainerCell").hide();
   $.each(errorWidgets, function(index, errorWidget) {
     errorWidget.clear();
   });
@@ -2233,6 +2243,8 @@ function tryExecuteQuery() {
   viewModel.scrollNotWorking(true);
   $("#results .dataTables_wrapper").off("scroll", datatableScroll);
   $(".jHueTableExtenderClonedContainer").hide();
+  $(".jHueTableExtenderClonedContainerColumn").hide();
+  $(".jHueTableExtenderClonedContainerCell").hide();
   $(".tooltip").remove();
   var query = getHighlightedQuery() || codeMirror.getValue();
   viewModel.design.query.value(query);
