@@ -1140,6 +1140,10 @@ a#advanced-btn:hover {
   background-color: #DDDDDD !important;
 }
 
+.jHueTableExtenderClonedContainerColumn {
+  border-right: 1px solid #CCC;
+}
+
 #jHueTableExtenderNavigator {
   position: absolute;
   left: 0;
@@ -2246,6 +2250,10 @@ div.navigator .pull-right .nav {
 
 .valign-middle {
   vertical-align: middle;
+}
+
+table.resultTable td {
+  border-right: 1px solid #e5e5e5;
 }
 
 /*
