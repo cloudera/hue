@@ -903,7 +903,7 @@ for x in sys.stdin:
     # Delete a design
     resp = cli.get('/beeswax/delete_designs')
     assert_true('Delete design(s)' in resp.content, resp.content)
-    resp = cli.post('/beeswax/delete_designs', {u'designs_selection': [u'1']})
+    resp = cli.post('/beeswax/delete_designs', {u'designs_selection': [design.id]})
     assert_equal(resp.status_code, 302)
 
     # Delete designs

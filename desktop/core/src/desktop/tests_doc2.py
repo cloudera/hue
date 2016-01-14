@@ -51,17 +51,20 @@ class TestDocument2(object):
         desc='Example of old format'
     )
 
-    new_query = import_saved_beeswax_query(old_query)
-    new_query_data = new_query.get_data()
+    try:
+      new_query = import_saved_beeswax_query(old_query)
+      new_query_data = new_query.get_data()
 
-    assert_equal('query-hive', new_query_data['type'])
-    assert_equal('See examples', new_query_data['name'])
-    assert_equal('Example of old format', new_query_data['description'])
+      assert_equal('query-hive', new_query_data['type'])
+      assert_equal('See examples', new_query_data['name'])
+      assert_equal('Example of old format', new_query_data['description'])
 
-    assert_equal('ready', new_query_data['snippets'][0]['status'])
-    assert_equal('See examples', new_query_data['snippets'][0]['name'])
-    assert_equal('SELECT * FROM sample_07', new_query_data['snippets'][0]['statement_raw'])
+      assert_equal('ready', new_query_data['snippets'][0]['status'])
+      assert_equal('See examples', new_query_data['snippets'][0]['name'])
+      assert_equal('SELECT * FROM sample_07', new_query_data['snippets'][0]['statement_raw'])
 
-    assert_equal([], new_query_data['snippets'][0]['properties']['settings'])
-    assert_equal([], new_query_data['snippets'][0]['properties']['files'])
-    assert_equal([], new_query_data['snippets'][0]['properties']['functions'])
+      assert_equal([], new_query_data['snippets'][0]['properties']['settings'])
+      assert_equal([], new_query_data['snippets'][0]['properties']['files'])
+      assert_equal([], new_query_data['snippets'][0]['properties']['functions'])
+    finally:
+      old_query.delete()
