@@ -687,6 +687,36 @@ def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
   return import_workflow_root(workflow, workflow_definition_root, metadata, fs)
 
 
+def generate_v2_graph_nodes(workflow_definition):
+  # Parse Workflow Definition
+  workflow_definition_root = etree.fromstring(workflow_definition)
+  if workflow_definition_root is None:
+    raise MalformedWfDefException()
+
+  xslt_definition_fh = open("%(xslt_dir)s/workflow.xslt" % {
+      'xslt_dir': os.path.join(DEFINITION_XSLT2_DIR.get(), 'workflows')
+    })
+
+  tag = etree.QName(workflow_definition_root.tag)
+  schema_version = tag.namespace
+
+  # Ensure namespace exists
+  if schema_version not in OOZIE_NAMESPACES:
+    raise InvalidTagWithNamespaceException(workflow_definition_root.tag)
+
+  # Get XSLT
+  xslt = etree.parse(xslt_definition_fh)
+  xslt_definition_fh.close()
+  transform = etree.XSLT(xslt)
+
+  # Transform XML using XSLT
+  transformed_root = transform(workflow_definition_root)
+  node_list = str(transformed_root).replace('\n', '').replace(' ', '')
+  node_list = json.loads(node_list)
+
+  return node_list
+
+
 class MalformedWfDefException(Exception):
   pass
 

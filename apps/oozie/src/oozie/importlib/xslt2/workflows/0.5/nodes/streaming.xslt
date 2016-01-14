@@ -9,7 +9,8 @@
 
   ,"streaming": {
         <xsl:call-template name="mapper"/>,
-        <xsl:call-template name="reducer"/> }
+        <xsl:call-template name="reducer"/>
+    }
 
 </xsl:template>
 

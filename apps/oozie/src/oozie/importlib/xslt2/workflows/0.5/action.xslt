@@ -10,12 +10,12 @@
 <xsl:import href="extensions/sqoop.0.1.xslt"/>
 <xsl:import href="extensions/sqoop.0.2.xslt"/>
 <xsl:import href="extensions/ssh.0.1.xslt"/>
+<xsl:import href="extensions/spark.0.1.xslt"/>
 <xsl:import href="nodes/fs.xslt"/>
 <xsl:import href="nodes/java.xslt"/>
 <xsl:import href="nodes/mapreduce.xslt"/>
 <xsl:import href="nodes/pig.xslt"/>
 <xsl:import href="nodes/streaming.xslt"/>
-<xsl:import href="nodes/generic.xslt"/>
 <xsl:import href="nodes/subworkflow.xslt"/>
 
 <xsl:template match="workflow:action" xmlns:workflow="uri:oozie:workflow:0.5">

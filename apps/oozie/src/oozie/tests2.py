@@ -24,7 +24,8 @@ from django.core.urlresolvers import reverse
 from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from oozie.conf import ENABLE_V2
-from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node
+from oozie.importlib.workflows import generate_v2_graph_nodes
+from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node, _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, _create_workflow_layout, _add_uuids_to_adj_list
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
 
 
@@ -292,3 +293,170 @@ LIMIT $limit"""))
     finally:
       reset()
       wf_doc.delete()
+
+
+class TestExternalWorkflowGraph():
+
+  def setUp(self):
+    self.wf = Workflow()
+
+  def test_graph_generation_from_xml(self):
+    f = open('apps/oozie/src/oozie/test_data/xslt2/test-workflow.xml')
+    self.wf.definition = f.read()
+    self.node_list = [{u'node_type': u'start', u'ok_to': u'fork-68d4', u'name': u''}, {u'node_type': u'kill', u'ok_to': u'', u'name': u'Kill'}, {u'path2': u'shell-0f44', u'node_type': u'fork', u'ok_to': u'', u'name': u'fork-68d4', u'path1': u'subworkflow-a13f'}, {u'node_type': u'join', u'ok_to': u'End', u'name': u'join-775e'}, {u'node_type': u'end', u'ok_to': u'', u'name': u'End'}, {u'node_type': u'sub-workflow', u'ok_to': u'join-775e', u'sub-workflow': {u'app-path': u'${nameNode}/user/hue/oozie/deployments/_admin_-oozie-50001-1427488969.48'}, u'name': u'subworkflow-a13f', u'error_to': u'Kill'}, {u'shell': {u'command': u'ls'}, u'node_type': u'shell', u'ok_to': u'join-775e', u'name': u'shell-0f44', u'error_to': u'Kill'}, {}]
+    assert_equal(self.node_list, generate_v2_graph_nodes(self.wf.definition))
+
+  def test_get_graph_adjacency_list(self):
+    self.node_list = [{u'node_type': u'start', u'ok_to': u'fork-68d4', u'name': u''}, {u'node_type': u'kill', u'ok_to': u'', u'name': u'Kill'}, {u'path2': u'shell-0f44', u'node_type': u'fork', u'ok_to': u'', u'name': u'fork-68d4', u'path1': u'subworkflow-a13f'}, {u'node_type': u'join', u'ok_to': u'End', u'name': u'join-775e'}, {u'node_type': u'end', u'ok_to': u'', u'name': u'End'}, {u'node_type': u'sub-workflow', u'ok_to': u'join-775e', u'sub-workflow': {u'app-path': u'${nameNode}/user/hue/oozie/deployments/_admin_-oozie-50001-1427488969.48'}, u'name': u'subworkflow-a13f', u'error_to': u'Kill'}, {u'shell': {u'command': u'ls'}, u'node_type': u'shell', u'ok_to': u'join-775e', u'name': u'shell-0f44', u'error_to': u'Kill'}, {}]
+    adj_list = _create_graph_adjaceny_list(self.node_list)
+
+    assert_true(len(adj_list) == 7)
+    assert_true('subworkflow-a13f' in adj_list.keys())
+    assert_true(adj_list['shell-0f44']['shell']['command'] == 'ls')
+    assert_equal(adj_list['fork-68d4'], {u'path2': u'shell-0f44', u'node_type': u'fork', u'ok_to': u'', u'name': u'fork-68d4', u'path1': u'subworkflow-a13f'})
+
+  def test_get_hierarchy_from_adj_list(self):
+    self.wf.definition = """<workflow-app name="ls-4thread" xmlns="uri:oozie:workflow:0.5">
+        <start to="fork-fe93"/>
+        <kill name="Kill">
+            <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <action name="shell-5429">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-7f80"/>
+            <error to="Kill"/>
+        </action>
+        <action name="shell-bd90">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-7f80"/>
+            <error to="Kill"/>
+        </action>
+        <fork name="fork-fe93">
+            <path start="shell-5429" />
+            <path start="shell-bd90" />
+            <path start="shell-d64c" />
+            <path start="shell-d8cc" />
+        </fork>
+        <join name="join-7f80" to="End"/>
+        <action name="shell-d64c">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-7f80"/>
+            <error to="Kill"/>
+        </action>
+        <action name="shell-d8cc">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-7f80"/>
+            <error to="Kill"/>
+        </action>
+        <end name="End"/>
+    </workflow-app>"""
+
+    node_list = generate_v2_graph_nodes(self.wf.definition)
+    adj_list = _create_graph_adjaceny_list(node_list)
+
+    node_hierarchy = ['start']
+    _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
+
+    assert_equal(node_hierarchy, ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']])
+
+  def test_gen_workflow_data_from_xml(self):
+    self.wf.definition = """<workflow-app name="fork-fork-test" xmlns="uri:oozie:workflow:0.5">
+        <start to="fork-949d"/>
+        <kill name="Kill">
+            <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <action name="shell-eadd">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-1a0f"/>
+            <error to="Kill"/>
+        </action>
+        <action name="shell-f4c1">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-3bba"/>
+            <error to="Kill"/>
+        </action>
+        <fork name="fork-949d">
+            <path start="fork-e5fa" />
+            <path start="shell-3dd5" />
+        </fork>
+        <join name="join-ca1a" to="End"/>
+        <action name="shell-ef70">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-1a0f"/>
+            <error to="Kill"/>
+        </action>
+        <fork name="fork-37d7">
+            <path start="shell-eadd" />
+            <path start="shell-ef70" />
+        </fork>
+        <join name="join-1a0f" to="join-ca1a"/>
+        <action name="shell-3dd5">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="fork-37d7"/>
+            <error to="Kill"/>
+        </action>
+        <action name="shell-2ba8">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-3bba"/>
+            <error to="Kill"/>
+        </action>
+        <fork name="fork-e5fa">
+            <path start="shell-f4c1" />
+            <path start="shell-2ba8" />
+        </fork>
+        <join name="join-3bba" to="join-ca1a"/>
+        <end name="End"/>
+    </workflow-app>"""
+
+    workflow_data = Workflow.gen_workflow_data_from_xml('test', self.wf)
+
+    assert_true(len(workflow_data['layout'][0]['rows']) == 6)
+    assert_true(len(workflow_data['workflow']['nodes']) == 14)
+    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'fork-widget')
+    assert_equal(workflow_data['workflow']['nodes'][0]['name'], 'start-3f10')
+
