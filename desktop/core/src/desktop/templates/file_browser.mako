@@ -83,6 +83,11 @@ from desktop.views import _ko
       margin: 0;
       color: #444;
       font-size: 13px;
+      cursor: pointer;
+    }
+
+    .fb-selected {
+      background-color: #DBE8F1;
     }
 
     .fb-list i {
@@ -101,10 +106,13 @@ from desktop.views import _ko
       float: left;
       display: inline-block;
       height: 30px;
-      line-height: 30px;
       vertical-align: middle;
       padding-left: 8px;
       text-overflow: ellipsis;
+    }
+
+    .fb-primary-col .fa {
+      vertical-align: middle;
     }
 
     .fb-attr-group {
@@ -273,15 +281,10 @@ from desktop.views import _ko
       </div>
       <div class="fb-list" data-bind="with: currentDirectory">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
-          <li>
+          <li data-bind="multiClick: { click: toggleSelected, dblClick: open }, css: { 'fb-selected': selected }">
             <div class="fb-primary-col">
               <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : definition.type === 'directory', 'fa-file-o': definition.type !== 'directory' }"></i>
-              <!-- ko if: definition.type === 'directory' -->
-              <a href="javascript: void(0);" data-bind="text: name, click: function () { $data.load(); $parents[1].currentDirectory($data); }"></a>
-              <!-- /ko -->
-              <!-- ko ifnot: definition.type === 'directory' -->
-              <a data-bind="text: definition.name, attr: { href: definition.absoluteUrl }"></a>
-              <!-- /ko -->
+              <a href="javascript: void(0);" data-bind="text: name, click: open"></a>
             </div>
             <div class="fb-attr-group">
               <!-- ko with: definition -->

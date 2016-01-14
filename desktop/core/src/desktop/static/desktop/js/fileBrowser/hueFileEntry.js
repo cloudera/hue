@@ -29,6 +29,7 @@
    * @param {Object} options
    * @param {AssistHelper} options.assistHelper
    * @param {Object} options.definition
+   * @param {Function} options.currentDirectory - The observable keeping track of the current open directory
    * @param {HueFolder} options.parent
    * @param {string} options.app - Currently only 'documents' is supported
    *
@@ -36,6 +37,7 @@
    */
   function HueFileEntry (options) {
     var self = this;
+    self.currentDirectory = options.currentDirectory;
     self.parent = options.parent;
     self.definition = options.definition;
     self.assistHelper = options.assistHelper;
@@ -44,6 +46,8 @@
     self.isDirectory = self.definition.type === 'directory';
     self.path = self.definition.name;
     self.app = options.app;
+
+    self.selected = ko.observable(false);
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -63,6 +67,20 @@
     }
   }
 
+  HueFileEntry.prototype.toggleSelected = function () {
+    var self = this;
+    self.selected(! self.selected());
+  };
+
+  HueFileEntry.prototype.open = function () {
+    var self = this;
+    if (self.definition.type === 'directory') {
+      self.currentDirectory(self);
+    } else {
+      window.location.href = self.definition.absoluteUrl;
+    }
+  };
+
   HueFileEntry.prototype.load = function () {
     var self = this;
     if (self.loading()) {
@@ -80,6 +98,7 @@
           });
           self.entries($.map(cleanEntries, function (definition) {
             return new HueFileEntry({
+              currentDirectory: self.currentDirectory,
               assistHelper: self.assistHelper,
               definition: definition,
               app: self.app,

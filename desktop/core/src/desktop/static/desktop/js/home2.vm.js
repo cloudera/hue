@@ -34,9 +34,9 @@
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
-    self.documents = ko.observableArray([]);
-
-    self.currentDirectory = ko.observable(new HueFileEntry({
+    self.currentDirectory = ko.observable();
+    self.currentDirectory(new HueFileEntry({
+      currentDirectory: self.currentDirectory,
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
