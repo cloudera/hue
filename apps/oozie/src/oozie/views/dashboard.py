@@ -325,7 +325,6 @@ def list_oozie_workflow(request, job_id):
       if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
 
       if hue_workflow:
-        workflow_graph = ''
         full_node_list = hue_workflow.nodes
         workflow_id = hue_workflow.id
         wid = {
@@ -334,11 +333,13 @@ def list_oozie_workflow(request, job_id):
         doc = Document2.objects.get(type='oozie-workflow2', **wid)
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
-        credentials = Credentials()
       else:
-        # For workflows submitted from CLI or deleted in the editor
-        # Until better parsing in https://issues.cloudera.org/browse/HUE-2659
-        workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+        try:
+          workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
+        except Exception, e:
+          LOG.exception('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e))
+      workflow_graph = ''
+      credentials = Credentials()
     except:
       LOG.exception("Error generating full page for running workflow %s" % job_id)
   else:
