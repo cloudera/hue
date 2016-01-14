@@ -148,6 +148,39 @@ from desktop.views import _ko
   </style>
 
   <script type="text/html" id="fb-template">
+    <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
+      <!-- ko with: currentDirectory -->
+      <div class="modal-header">
+        <a href="#" class="close" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">&times;</a>
+        <h3>${_('Import Hue documents')}</h3>
+      </div>
+        <div class="modal-body form-horizontal">
+          <form id="importDocumentsForm" style="display: inline" enctype="multipart/form-data">
+            <div class="control-group" data-bind="visible: !uploading() && !uploadComplete()">
+              <label class="control-label" for="importDocumentInput">${ _('Select json file') }</label>
+              <div class="controls">
+                <input id="importDocumentInput" style="line-height: 10px; margin-top: 5px;" type="file" name="documents" accept=".json" />
+              </div>
+            </div>
+            <span data-bind="visible: !uploadFailed() && uploadComplete()">${ _('Import complete!') }</span>
+            <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
+            <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
+            ${ csrf_token(request) | n,unicode }
+            <input type="hidden" name="path" data-bind="value: path" />
+          </form>
+        </div>
+        <div class="modal-footer">
+          <!-- ko ifnot: uploading() || uploadComplete() -->
+          <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Cancel') }</a>
+          <a herf="#" class="btn btn-danger" data-bind="click: upload">${ _('Import') }</a>
+          <!-- /ko -->
+          <!-- ko if: uploading() || uploadComplete() -->
+          <a href="#" class="btn" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">${ _('Close') }</a>
+          <!-- /ko -->
+        </div>
+
+      <!-- /ko -->
+    </div>
     <div id="createDirectoryModal" class="modal hide fade">
       <!-- ko with: currentDirectory -->
       <div class="modal-body form-horizontal">
@@ -225,7 +258,9 @@ from desktop.views import _ko
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-users"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-download"></i></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-upload"></i></a>
+          <!-- ko if: app === 'documents' -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#importDocumentsModal').modal('show'); }"><i class="fa fa-fw fa-upload"></i></a>
+          <!-- /ko -->
         </div>
       </div>
       <div class="fb-header">
