@@ -62,9 +62,11 @@ from desktop.views import _ko
 
     .fb-folder-actions {
       display: inline-block;
-      float: right;
-      font-size: 25px;
-      margin-right: 10px;
+      position: absolute;
+      right: 10px;
+      top: 0;
+      height: 50px;
+      line-height: 50px;
     }
 
     .fb-list ul {
@@ -91,10 +93,8 @@ from desktop.views import _ko
     }
 
     .fb-action {
-      width: 25px;
-      height: 40px;
-      line-height: 40px;
-      margin-left:5px;
+      font-size: 25px;
+      margin-left: 5px;
     }
 
     .fb-primary-col {
@@ -193,17 +193,40 @@ from desktop.views import _ko
               <!-- /ko -->
             </ul>
           </div>
-          <div class="fb-folder-actions" data-bind="with: currentDirectory">
-            <a class="inactive-action" href="javascript:void(0);"><span class="fa-stack fa-fw fb-action"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
-            <a class="inactive-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw fb-action"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-            <!-- ko ifnot: isRoot -->
-            <a class="inactive-action" href="javascript:void(0);" data-bind="click: function () { $('#deleteDirectoryModal').modal('show'); }"><i class="fa fa-fw fa-times fb-action"></i></a>
-            <!-- /ko -->
-            <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-users fb-action"></i></a>
-            <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-download fb-action"></i></a>
-            <a class="inactive-action" href="javascript:void(0);"><i class="fa fa-fw fa-upload fb-action"></i></a>
-          </div>
         </h4>
+        <div class="fb-folder-actions" data-bind="with: currentDirectory">
+          <!-- ko if: app === 'documents' -->
+          <span class="dropdown">
+            <a class="inactive-action fb-action" data-toggle="dropdown" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
+            <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
+              % if 'beeswax' in apps:
+                <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+              % endif
+              % if 'impala' in apps:
+                <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+              % endif
+              % if 'pig' in apps:
+                <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
+              % endif
+              % if 'spark' in apps:
+                <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+              % endif
+              % if 'oozie' in apps:
+                <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Oozie Workflow')}</a></li>
+                <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Oozie Coordinator')}</a></li>
+                <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Oozie Bundle')}</a></li>
+              % endif
+            </ul>
+          </span>
+          <!-- /ko -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+          <!-- ko ifnot: isRoot -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#deleteDirectoryModal').modal('show'); }"><i class="fa fa-fw fa-times"></i></a>
+          <!-- /ko -->
+          <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-users"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-download"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-upload"></i></a>
+        </div>
       </div>
       <div class="fb-header">
         <div class="fb-primary-col">${ _('Name') }</div>
