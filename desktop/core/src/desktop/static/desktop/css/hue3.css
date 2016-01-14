@@ -1466,13 +1466,13 @@ a#advanced-btn:hover {
   }
 }
 
-@media (max-width: 1290px) {
+@media (max-width: 1380px) {
   .navigator .hideable {
     display: none;
   }
 }
 
-@media (max-width: 830px) {
+@media (max-width: 950px) {
   .brand {
     display: none;
   }
