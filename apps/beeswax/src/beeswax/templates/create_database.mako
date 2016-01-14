@@ -65,16 +65,19 @@ ${ assist.assistPanel() }
           <div class="assist" data-bind="component: {
               name: 'assist-panel',
               params: {
-                sourceTypes: [{
-                  name: 'hive',
-                  type: 'hive'
-                }],
                 user: '${user.username}',
-                navigationSettings: {
-                  openItem: true,
-                  showPreview: true,
-                  showStats: false
-                }
+                sql : {
+                  sourceTypes: [{
+                    name: 'hive',
+                    type: 'hive'
+                  }],
+                  navigationSettings: {
+                    openItem: false,
+                    showPreview: true,
+                    showStats: true
+                  }
+                },
+                visibleAssistPanels: ['sql']
               }
             }"></div>
         </div>

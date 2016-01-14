@@ -855,17 +855,18 @@ from desktop.views import _ko
 
       /**
        * @param {Object} params
-       * @param {Object[]} params.sourceTypes - All the available SQL source types
+       * @param {string} params.user
        * @param {boolean} params.onlySql - For the old query editors
        * @param {string[]} params.visibleAssistPanels - Panels that will initially be shown regardless of total storage
-       * @param {string} params.sourceTypes[].name - Example: Hive SQL
-       * @param {string} params.sourceTypes[].type - Example: hive
-       * @param {string} [params.activeSourceType] - Example: hive
-       * @param {string} params.user
-       * @param {Object} params.navigationSettings - enable/disable the links
-       * @param {boolean} params.navigationSettings.openItem - Example: true
-       * @param {boolean} params.navigationSettings.showPreview - Example: true
-       * @param {boolean} params.navigationSettings.showStats - Example: true
+       * @param {Object} params.sql
+       * @param {Object[]} params.sql.sourceTypes - All the available SQL source types
+       * @param {string} params.sql.sourceTypes[].name - Example: Hive SQL
+       * @param {string} params.sql.sourceTypes[].type - Example: hive
+       * @param {string} [params.sql.activeSourceType] - Example: hive
+       * @param {Object} params.sql.navigationSettings - enable/disable the links
+       * @param {boolean} params.sql.navigationSettings.openItem - Example: true
+       * @param {boolean} params.sql.navigationSettings.showPreview - Example: true
+       * @param {boolean} params.sql.navigationSettings.showStats - Example: true
        * @constructor
        */
       function AssistPanel (params) {
@@ -889,12 +890,10 @@ from desktop.views import _ko
 
         self.availablePanels = [
           new AssistInnerPanel({
-            panelData: new AssistDbPanel({
+            panelData: new AssistDbPanel($.extend({
               assistHelper: self.assistHelper,
-              i18n: i18n,
-              navigationSettings: params.navigationSettings,
-              sourceTypes: params.sourceTypes
-            }),
+              i18n: i18n
+            }, params.sql)),
             assistHelper: self.assistHelper,
             name: '${ _("SQL") }',
             type: 'db',
