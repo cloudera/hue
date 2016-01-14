@@ -265,10 +265,8 @@ from desktop.views import _ko
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#deleteDirectoryModal').modal('show'); }"><i class="fa fa-fw fa-times"></i></a>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-users"></i></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-download"></i></a>
-          <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#importDocumentsModal').modal('show'); }"><i class="fa fa-fw fa-upload"></i></a>
-          <!-- /ko -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
         </div>
       </div>
       <div class="fb-header">
