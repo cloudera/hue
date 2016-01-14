@@ -266,7 +266,6 @@ ${ fileBrowser.fileBrowser() }
       if (location.getParameter('path')) {
         viewModel.openPath(location.getParameter('path'));
       }
-      viewModel.currentDirectory().open(true);
       ko.applyBindings(viewModel, $('#documentList')[0]);
 
 ##       ShareViewModel.initSharing("#documentShareModal");

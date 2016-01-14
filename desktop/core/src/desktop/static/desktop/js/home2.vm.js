@@ -19,13 +19,13 @@
     define([
       'knockout',
       'desktop/js/assist/assistHelper',
-      'desktop/js/documents/hueDirectory',
+      'desktop/js/fileBrowser/hueFileEntry',
       'knockout-mapping'
     ], factory);
   } else {
-    root.HomeViewModel = factory(ko, assistHelper, HueDirectory);
+    root.HomeViewModel = factory(ko, assistHelper, HueFileEntry);
   }
-}(this, function (ko, AssistHelper, HueDirectory) {
+}(this, function (ko, AssistHelper, HueFileEntry) {
 
   function HomeViewModel(options) {
     var self = this;
@@ -36,7 +36,7 @@
 
     self.documents = ko.observableArray([]);
 
-    self.currentDirectory = ko.observable(new HueDirectory({
+    self.currentDirectory = ko.observable(new HueFileEntry({
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
@@ -44,7 +44,7 @@
       }
     }));
 
-    self.currentDirectory().open();
+    self.currentDirectory().load();
 
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');

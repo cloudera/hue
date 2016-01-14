@@ -20,7 +20,7 @@
       'knockout'
     ], factory);
   } else {
-    root.HueDirectory = factory(ko);
+    root.HueFileEntry = factory(ko);
   }
 }(this, function (ko) {
 
@@ -34,13 +34,14 @@
    *
    * @constructor
    */
-  function HueDirectory (options) {
+  function HueFileEntry (options) {
     var self = this;
     self.parent = options.parent;
     self.definition = options.definition;
     self.assistHelper = options.assistHelper;
     self.name = self.definition.name.substring(self.definition.name.lastIndexOf('/') + 1);
     self.isRoot = self.name === '';
+    self.isDirectory = self.definition.type === 'directory';
     self.path = self.definition.name;
     self.app = options.app;
 
@@ -50,9 +51,8 @@
 
     self.uploading = ko.observable(false);
     self.uploadComplete = ko.observable(false);
-    self.uploadFailed = ko.observable(false)
+    self.uploadFailed = ko.observable(false);
 
-    self.open = ko.observable(false);
     self.entries = ko.observableArray([]);
 
     self.breadcrumbs = [];
@@ -61,15 +61,9 @@
       self.breadcrumbs.unshift(lastParent);
       lastParent = lastParent.parent;
     }
-
-    self.open.subscribe(function () {
-      if (! self.loaded()) {
-        self.load();
-      }
-    })
   }
 
-  HueDirectory.prototype.load = function () {
+  HueFileEntry.prototype.load = function () {
     var self = this;
     if (self.loading()) {
       return;
@@ -85,19 +79,12 @@
             return definition.name !== '/';
           });
           self.entries($.map(cleanEntries, function (definition) {
-            if (definition.type === "directory") {
-              return new HueDirectory({
-                assistHelper: self.assistHelper,
-                definition: definition,
-                app: self.app,
-                parent: self
-              })
-            } else {
-              return {
-                definition: definition,
-                path: self.path + definition.name
-              }
-            }
+            return new HueFileEntry({
+              assistHelper: self.assistHelper,
+              definition: definition,
+              app: self.app,
+              parent: self
+            })
           }));
           self.loading(false);
           self.loaded(true);
@@ -111,7 +98,7 @@
     }
   };
 
-  HueDirectory.prototype.delete = function () {
+  HueFileEntry.prototype.delete = function () {
     var self = this;
     if (self.app === 'documents') {
       self.assistHelper.deleteDocument({
@@ -121,7 +108,7 @@
     }
   };
 
-  HueDirectory.prototype.closeUploadModal = function () {
+  HueFileEntry.prototype.closeUploadModal = function () {
     var self = this;
     if (self.app === 'documents') {
       $('#importDocumentsModal').modal('hide');
@@ -135,7 +122,7 @@
     }, 400);
   };
 
-  HueDirectory.prototype.upload = function () {
+  HueFileEntry.prototype.upload = function () {
     var self = this;
     if (self.app === 'documents') {
       self.uploading(true);
@@ -160,7 +147,7 @@
     }
   };
 
-  HueDirectory.prototype.createDirectory = function (name) {
+  HueFileEntry.prototype.createDirectory = function (name) {
     var self = this;
     if (self.app === 'documents') {
       self.assistHelper.createDocumentsFolder({
@@ -171,5 +158,5 @@
     }
   };
 
-  return HueDirectory;
+  return HueFileEntry;
 }));
