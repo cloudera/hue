@@ -277,7 +277,7 @@ from desktop.views import _ko
             <div class="fb-primary-col">
               <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : definition.type === 'directory', 'fa-file-o': definition.type !== 'directory' }"></i>
               <!-- ko if: definition.type === 'directory' -->
-              <a href="javascript: void(0);" data-bind="text: name, click: function () { $data.open(true); $parents[1].currentDirectory($data); }"></a>
+              <a href="javascript: void(0);" data-bind="text: name, click: function () { $data.load(); $parents[1].currentDirectory($data); }"></a>
               <!-- /ko -->
               <!-- ko ifnot: definition.type === 'directory' -->
               <a data-bind="text: definition.name, attr: { href: definition.absoluteUrl }"></a>
@@ -309,7 +309,7 @@ from desktop.views import _ko
 
       /**
        * @param {Object} params
-       * @param {HueDirectory} params.currentDirectory - Observable holding the current directory
+       * @param {HueFileEntry} params.currentDirectory - Observable holding the current directory
        * @constructor
        */
       function FileBrowser (params) {
