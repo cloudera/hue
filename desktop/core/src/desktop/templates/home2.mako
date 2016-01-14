@@ -211,10 +211,6 @@ ${ fileBrowser.fileBrowser() }
 ##           <a class="share-link btn" data-bind="click: exportDocuments">
 ##             <i class="fa fa-download"></i> ${ _('Export') }
 ##           </a>
-##
-##           <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
-##             <i class="fa fa-upload"></i> ${ _('Import') }
-##           </a>
 ##         </div>
         <div class="file-browser" data-bind="component: {
           name: 'file-browser',
@@ -236,7 +232,7 @@ ${ fileBrowser.fileBrowser() }
 </script>
 
 ## ${ commonshare2() | n,unicode }
-${ commonimportexport(request) | n,unicode }
+## ${ commonimportexport(request) | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
   require([

@@ -246,6 +246,43 @@
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
+   * @param {Function} [options.progressHandler]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {FormData} options.formData
+   */
+  AssistHelper.prototype.uploadDocument = function (options) {
+    var self = this;
+    $.ajax({
+      url: '/desktop/api2/doc/import',
+      type: 'POST',
+      success: function (data) {
+        if (! self.successResponseIsError(data)) {
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      },
+      xhr: function() {
+        var myXhr = $.ajaxSettings.xhr();
+        if(myXhr.upload && options.progressHandler) {
+          myXhr.upload.addEventListener('progress', options.progressHandler, false);
+        }
+        return myXhr;
+      },
+      dataType: 'json',
+      data: options.formData,
+      cache: false,
+      contentType: false,
+      processData: false
+    })
+      .fail(self.assistErrorCallback(options));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} options.id

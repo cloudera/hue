@@ -47,6 +47,11 @@
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
     self.hasErrors = ko.observable(false);
+
+    self.uploading = ko.observable(false);
+    self.uploadComplete = ko.observable(false);
+    self.uploadFailed = ko.observable(false)
+
     self.open = ko.observable(false);
     self.entries = ko.observableArray([]);
 
@@ -112,6 +117,45 @@
       self.assistHelper.deleteDocument({
         successCallback: self.parent.load.bind(self.parent),
         id: self.definition.id
+      });
+    }
+  };
+
+  HueDirectory.prototype.closeUploadModal = function () {
+    var self = this;
+    if (self.app === 'documents') {
+      $('#importDocumentsModal').modal('hide');
+      $('#importDocumentInput').val('');
+    }
+    // Allow the modal to hide
+    window.setTimeout(function () {
+      self.uploading(false);
+      self.uploadComplete(false);
+      self.uploadFailed(false);
+    }, 400);
+  };
+
+  HueDirectory.prototype.upload = function () {
+    var self = this;
+    if (self.app === 'documents') {
+      self.uploading(true);
+      self.uploadComplete(false);
+      self.uploadFailed(false);
+      self.assistHelper.uploadDocument({
+        formData: new FormData($('#importDocumentsForm')[0]),
+        successCallback: function () {
+          self.uploading(false);
+          self.uploadComplete(true);
+          self.load();
+        },
+        progressHandler: function (event) {
+          $("#importDocumentsProgress").val(Math.round((event.loaded / event.total) * 100));
+        },
+        errorCallback: function () {
+          self.uploading(false);
+          self.uploadComplete(true);
+          self.uploadFailed(true);
+        }
       });
     }
   };
