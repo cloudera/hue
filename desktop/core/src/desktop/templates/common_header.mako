@@ -376,7 +376,7 @@ from django.utils.translation import ugettext as _
     % endif
     <li class="dropdown">
       <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-cogs"></i>&nbsp;<span class="hideable">${user.username}&nbsp;</span><b class="caret"></b></a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu pull-right">
         <li>
           <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
             % if is_ldap_setup:
