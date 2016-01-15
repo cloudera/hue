@@ -557,7 +557,7 @@ ${ dashboard.layout_skeleton() }
 
         <div class="dropdown">
           <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
-             data-bind="css: {'active': $root.collection.template.showChart() }, click: function(){ $root.collection.template.showChart(true); $root.collection.template.showGrid(false); }">
+             data-bind="css: {'active': $root.collection.template.showChart() }, click: function(){ $root.collection.template.showChart(true); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
             <i class="hcha hcha-bar-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
             <i class="hcha hcha-line-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
                style="display: none;"></i>
@@ -736,7 +736,7 @@ ${ dashboard.layout_skeleton() }
 
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showChart()">
         <div data-bind="visible: !$root.collection.template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
-        <div data-bind="visible: $root.collection.template.hasDataForChart" style="overflow-x: auto">
+        <div class="grid-chart-container" data-bind="visible: $root.collection.template.hasDataForChart" style="overflow-x: auto">
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                 transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
 
@@ -2835,6 +2835,12 @@ $(document).ready(function () {
 
   $(document).on("setLayout", function(){
     resizeFieldsList();
+  });
+
+  huePubSub.subscribe('gridChartForceUpdate', function () {
+    window.setTimeout(function () {
+      $('.grid-chart-container').children().trigger('forceUpdate')
+    }, 200);
   });
 
   var _query = ${ query | n,unicode };

@@ -498,6 +498,13 @@ var Collection = function (vm, collection) {
   }, collection.template.chartSettings);
 
   self.template = ko.mapping.fromJS(collection.template);
+
+  for (var setting in self.template.chartSettings) {
+    self.template.chartSettings[setting].subscribe(function () {
+      huePubSub.publish('gridChartForceUpdate');
+    });
+  }
+
   self.template.fieldsSelected.subscribe(function () {
     vm.search();
   });
@@ -848,7 +855,11 @@ var Collection = function (vm, collection) {
   });
 
   self.template.getMeta = function (extraCheck) {
-    return $.map(self.template.fieldsAttributes(), function (field) {
+    var iterable = self.template.fieldsAttributes();
+    if (self.template.fields().length > 0) {
+      iterable = self.template.fields();
+    }
+    return $.map(iterable, function (field) {
       if (field.name() != '' && extraCheck(field.type())) {
         return field;
       }
