@@ -2746,22 +2746,35 @@
         considerStretching = valueAccessor().considerStretching || false,
         itemHeight = valueAccessor().itemHeight || 22,
         scrollable = valueAccessor().scrollable || 'body',
+        scrollableOffset = valueAccessor().scrollableOffset || 0,
+        forceRenderSub = valueAccessor().forceRenderSub || null,
         renderTimeout = -1,
         dataHasChanged = true;
 
-      if (!$parent.hasClass('hueach')) {
-        $(element).wrap('<div class="hueach"></div>');
-        $parent = $(element).parent();
-        $(element).css({
+
+      var wrappable = $(element);
+      if ($parent.is('table')) {
+        wrappable = $parent;
+        $parent = wrappable.parent();
+      }
+
+      if (!wrappable.parent().hasClass('hueach')) {
+        wrappable.wrap('<div class="hueach"></div>');
+        $parent = wrappable.parent();
+        wrappable.css({
           position: 'absolute',
           width: '100%'
         });
       }
 
       $parent.height(valueAccessor().data().length * itemHeight);
-      if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(valueAccessor().data())) {
-        dataHasChanged = false;
+      try {
+        if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(valueAccessor().data())) {
+          dataHasChanged = false;
+        }
       }
+      catch (e) {}
+
       if (dataHasChanged) {
         ko.utils.domData.set(element, 'originalData', valueAccessor().data());
       }
@@ -2774,22 +2787,35 @@
       }
 
       var render = function () {
-        if ($parent.parents('.hueach').length === 0){
+        if ($parent.parents('.hueach').length === 0) {
           var heightCorrection = 0, fluidCorrection = 0;
-          $element.children(':visible').each(function(cnt, child){
-            if ($(child).height() >= itemHeight){
-              heightCorrection += $(child).height();
+          if (wrappable.is('table')) {
+            if ($parent.parents(scrollable).scrollTop() < scrollableOffset + itemHeight) {
+              wrappable.find('thead').css('opacity', '1');
             }
-          });
-          if (heightCorrection > 0){
-            ko.utils.domData.set(element, 'heightCorrection', heightCorrection);
+            else {
+              wrappable.find('thead').css('opacity', '0');
+            }
           }
-          if (heightCorrection == 0 && ko.utils.domData.get(element, 'heightCorrection')){
-            fluidCorrection = ko.utils.domData.get(element, 'heightCorrection') - 20;
+          else {
+            wrappable.children(':visible').each(function (cnt, child) {
+              if ($(child).height() >= itemHeight) {
+                heightCorrection += $(child).height();
+              }
+            });
+            if (heightCorrection > 0) {
+              ko.utils.domData.set(element, 'heightCorrection', heightCorrection);
+            }
+            if (heightCorrection == 0 && ko.utils.domData.get(element, 'heightCorrection')) {
+              fluidCorrection = ko.utils.domData.get(element, 'heightCorrection') - 20;
+            }
           }
-          startItem = Math.max(0, Math.floor(Math.max(1, ($parent.parents(scrollable).scrollTop() - heightCorrection - fluidCorrection)) / itemHeight) - 5);
-          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 5, valueAccessor().data().length);
-          $element.css('top', ((startItem * itemHeight) + fluidCorrection) + 'px');
+          startItem = Math.max(0, Math.floor(Math.max(1, ($parent.parents(scrollable).scrollTop() - heightCorrection - fluidCorrection - scrollableOffset)) / itemHeight) - 10);
+          if (wrappable.is('table') && startItem % 2 == 1) {
+            startItem--;
+          }
+          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 10, valueAccessor().data().length);
+          wrappable.css('top', ((startItem * itemHeight) + fluidCorrection) + 'px');
         }
         else {
           startItem = 0, endItem = valueAccessor().data().length;
@@ -2797,9 +2823,10 @@
         ko.bindingHandlers.foreach.update(element, valueAccessorBuilder, allBindings, viewModel, bindingContext);
       }
 
+      $parent.parents(scrollable).off('scroll');
       $parent.parents(scrollable).on('scroll', render);
 
-      if ($parent.parents('.hueach').length > 0){
+      if ($parent.parents('.hueach').length > 0) {
         window.setTimeout(render, 100);
       }
 
@@ -2807,15 +2834,24 @@
         huePubSub.subscribe('assist.stretchDown', function () {
           window.clearTimeout(renderTimeout);
           renderTimeout = window.setTimeout(function () {
-              ko.utils.domData.set(element, 'hasStretched', true);
+            ko.utils.domData.set(element, 'hasStretched', true);
             render();
           }, 300);
         });
       }
 
-      if (considerStretching && ko.utils.domData.get(element, 'hasStretched')) {
-        render();
+      if (forceRenderSub) {
+        huePubSub.subscribe(forceRenderSub, function () {
+          window.setTimeout(render, 300);
+        });
       }
+
+      window.clearTimeout(renderTimeout);
+      renderTimeout = window.setTimeout(function () {
+        ko.utils.domData.set(element, 'hasStretched', true);
+        render();
+      }, 300);
+
     }
   };
 

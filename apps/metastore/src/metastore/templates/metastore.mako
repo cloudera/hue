@@ -298,7 +298,7 @@ ${ assist.assistPanel() }
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: filteredDatabases">
+    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 145}">
     <tr>
       <td width="1%" style="text-align: center">
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
@@ -383,7 +383,7 @@ ${ assist.assistPanel() }
           % endif
         </div>
 
-        <table id="tablesTable" class="table table-striped table-condensed sampleTable" style="margin-bottom: 10px" data-bind="visible: tables().length > 0">
+        <table id="tablesTable" class="table table-striped table-condensed sampleTable" style="margin-bottom: 10px; width: 100%" data-bind="visible: tables().length > 0">
           <thead>
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
@@ -393,7 +393,7 @@ ${ assist.assistPanel() }
             <th>${ _('Type') }</th>
           </tr>
           </thead>
-          <tbody data-bind="foreach: filteredTables">
+          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 277}">
             <tr>
               <td width="1%" style="text-align: center">
                 <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
