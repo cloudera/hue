@@ -1389,7 +1389,7 @@ ${ require.config() }
       window.clearTimeout(_scrollTimeout);
       dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
       _scrollTimeout = window.setTimeout(function () {
-        if (_lastScrollPosition != dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt) {
+        if (_lastScrollPosition != dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt && snippet.result.hasMore()) {
           dataTableEl.animate({opacity: '0.55'}, 200);
           snippet.fetchResult(100, false);
         }
@@ -2166,7 +2166,6 @@ ${ require.config() }
         else {
           var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
           _dtElement.animate({opacity: '1'}, 50);
-          _dtElement.off("scroll");
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
       });
@@ -2174,7 +2173,6 @@ ${ require.config() }
       $(document).on("renderDataError", function (e, options) {
         var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
         _dtElement.animate({opacity: '1'}, 50);
-        _dtElement.off("scroll");
       });
 
       $(document).on("progress", function (e, options) {
