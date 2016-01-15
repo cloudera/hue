@@ -52,12 +52,15 @@
     self.tableQuery = ko.observable('').extend({rateLimit: 150});
 
     self.filteredTables = ko.computed(function () {
-      if (self.tableQuery() === '') {
-        return self.tables();
-      }
-      return $.grep(self.tables(), function (table) {
-        return table.name.toLowerCase().indexOf(self.tableQuery()) > -1
+      var returned = self.tables();
+      if (self.tableQuery() !== '') {
+        returned = $.grep(self.tables(), function (table) {
+          return table.name.toLowerCase().indexOf(self.tableQuery()) > -1
             || (table.comment() && table.comment().toLowerCase().indexOf(self.tableQuery()) > -1);
+        });
+      }
+      return returned.sort(function (a, b) {
+        return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
       });
     });
 
