@@ -35,6 +35,7 @@
       .extend("throttle", 100);
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
+    self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
     self.cleanedMeta = ko.computed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item) {
         return item.name != ''
@@ -97,6 +98,7 @@
 
     self.clear = function () {
       self.fetchedOnce(false);
+      self.hasMore(false);
       self.meta.removeAll();
       self.data.removeAll();
       self.images.removeAll();
@@ -542,6 +544,8 @@
         self.result.type(data.result.type);
         self.result.fetchedOnce(true);
       }
+
+      self.result.hasMore(data.result.has_more);
 
       if (data.result.has_more && rows > 0) {
         setTimeout(function () {
