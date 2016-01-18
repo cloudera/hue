@@ -280,16 +280,21 @@ from desktop.views import _ko
       <div class="fb-list" data-bind="with: currentDirectory">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
           <li data-bind="multiClick: { click: toggleSelected, dblClick: open }, css: { 'fb-selected': selected }">
-            <div class="fb-primary-col">
-              <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : definition.type === 'directory', 'fa-file-o': definition.type !== 'directory' }"></i>
-              <a href="javascript: void(0);" data-bind="text: name, click: open"></a>
-            </div>
-            <div class="fb-attr-group">
-              <!-- ko with: definition -->
-              <div class="fb-attr-col fb-type" data-bind="text: type"></div>
-              <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
-              <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
-              <!-- /ko -->
+            <div style="width: 100%; height: 100%" data-bind="contextMenu: '.hue-context-menu'">
+              <ul class="hue-context-menu">
+                <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') }</a></li>
+              </ul>
+              <div class="fb-primary-col">
+                <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : definition.type === 'directory', 'fa-file-o': definition.type !== 'directory' }"></i>
+                <a href="javascript: void(0);" data-bind="text: name, click: open"></a>
+              </div>
+              <div class="fb-attr-group">
+                <!-- ko with: definition -->
+                <div class="fb-attr-col fb-type" data-bind="text: type"></div>
+                <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
+                <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
+                <!-- /ko -->
+              </div>
             </div>
           </li>
         </ul>
