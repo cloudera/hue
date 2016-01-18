@@ -2819,6 +2819,7 @@
     update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var $element = $(element),
         $parent = $element.parent(),
+        data = typeof valueAccessor().data === 'function' ? valueAccessor().data() : valueAccessor().data,
         considerStretching = valueAccessor().considerStretching || false,
         itemHeight = valueAccessor().itemHeight || 22,
         scrollable = valueAccessor().scrollable || 'body',
@@ -2826,7 +2827,6 @@
         forceRenderSub = valueAccessor().forceRenderSub || null,
         renderTimeout = -1,
         dataHasChanged = true;
-
 
       var wrappable = $(element);
       if ($parent.is('table')) {
@@ -2843,16 +2843,19 @@
         });
       }
 
-      $parent.height(valueAccessor().data().length * itemHeight);
+      $parent.height(data.length * itemHeight);
+      if (wrappable.is('table')) {
+        $parent.height($parent.height() + itemHeight);
+      }
       try {
-        if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(valueAccessor().data())) {
+        if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(data)) {
           dataHasChanged = false;
         }
       }
       catch (e) {}
 
       if (dataHasChanged) {
-        ko.utils.domData.set(element, 'originalData', valueAccessor().data());
+        ko.utils.domData.set(element, 'originalData', data);
       }
 
       var startItem = 0, endItem = 0;
@@ -2890,11 +2893,14 @@
           if (wrappable.is('table') && startItem % 2 == 1) {
             startItem--;
           }
-          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 10, valueAccessor().data().length);
+          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 10, data.length);
           wrappable.css('top', ((startItem * itemHeight) + fluidCorrection) + 'px');
         }
         else {
-          startItem = 0, endItem = valueAccessor().data().length;
+          startItem = 0, endItem = data.length;
+        }
+        bindingContext.$indexOffset = function () {
+          return startItem
         }
         ko.bindingHandlers.foreach.update(element, valueAccessorBuilder, allBindings, viewModel, bindingContext);
       }

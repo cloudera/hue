@@ -90,10 +90,10 @@ ${ assist.assistPanel() }
       <th>${_('Comment')}</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: $data">
+    <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
       <tr>
-        ## start at 0
-        <td data-bind="text: $index()+1"></td>
+        ## start at 1
+        <td data-bind="text: $index()+$indexOffset()+1"></td>
         ## no stats for partition key type
         <td>
          <span class="blue" data-bind="component: { name: 'table-stats', params: {
