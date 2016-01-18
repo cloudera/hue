@@ -279,7 +279,7 @@ from desktop.views import _ko
       </div>
       <div class="fb-list" data-bind="with: currentDirectory">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
-          <li data-bind="multiClick: { click: toggleSelected, dblClick: open }, css: { 'fb-selected': selected }">
+          <li data-bind="fileSelect: $parent.entries, css: { 'fb-selected': selected }">
             <div style="width: 100%; height: 100%" data-bind="contextMenu: '.hue-context-menu'">
               <ul class="hue-context-menu">
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') }</a></li>
@@ -312,6 +312,51 @@ from desktop.views import _ko
         factory(ko);
       }
     }(function (ko) {
+
+      ko.bindingHandlers.fileSelect = {
+        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
+          $(element).attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
+
+          var allEntries = valueAccessor();
+
+          var clickHandler = function (clickedEntry, event) {
+            var clickedIndex = $.inArray(clickedEntry, allEntries());
+
+            if (event.metaKey) {
+              clickedEntry.selected(!clickedEntry.selected());
+            } else if (event.shiftKey) {
+              var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-file-index');
+              var lower = Math.min(lastClickedIndex, clickedIndex);
+              var upper = Math.max(lastClickedIndex, clickedIndex);
+              for (var i = lower; i <= upper; i++) {
+                allEntries()[i].selected(true);
+              }
+            } else {
+              var otherSelected = false;
+              $.each(allEntries(), function (idx, entry) {
+                if (entry !== clickedEntry) {
+                  otherSelected = otherSelected || entry.selected();
+                  entry.selected(false);
+                }
+              });
+              if (otherSelected) {
+                clickedEntry.selected(true);
+              } else {
+                clickedEntry.selected(! clickedEntry.selected());
+              }
+            }
+
+            ko.utils.domData.set(document, 'last-clicked-file-index', clickedIndex);
+          };
+
+          ko.bindingHandlers.multiClick.init(element, function () {
+            return {
+              click: clickHandler,
+              dblClick: viewModel.open
+            }
+          }, allBindings, viewModel, bindingContext);
+        }
+      };
 
       /**
        * @param {Object} params
