@@ -183,15 +183,27 @@
     }
   };
 
+  HueFileEntry.prototype.contextMenuDownload = function () {
+    var self = this;
+    if (self.selected()) {
+      self.parent.download();
+    } else {
+      self.downloadThis();
+    }
+  };
+
+  HueFileEntry.prototype.downloadThis = function () {
+    var self = this;
+    window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON([ self.definition.id ]);
+  };
+
   HueFileEntry.prototype.download = function () {
     var self = this;
     if (self.app = 'documents') {
-      console.log(self.selectedEntryIds());
       if (self.selectedEntryIds().length > 0) {
-        console.log('here');
         window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON(self.selectedEntryIds());
       } else {
-        window.location.href = '/desktop/api2/doc/export?documents=' + ko.mapping.toJSON([ self.definition.id ]);
+        self.downloadThis();
       }
     };
   };
