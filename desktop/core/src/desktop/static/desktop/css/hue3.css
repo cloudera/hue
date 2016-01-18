@@ -2273,3 +2273,93 @@ body {
   box-shadow: none;
   border-bottom: 1px solid #DDD;
 }
+
+.hue-context-menu {
+  display: none;
+  position: fixed;
+  margin: 2px 4px 6px 4px;
+  z-index: 10000;
+  padding: 6px 1px;
+  list-style: none;
+  font-size: 13px;
+  opacity: 0;
+
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  transition: opacity .3s;
+}
+
+.hue-contex-menu > li {
+  min-width: 170px;
+  color: #e5e5e5;
+}
+
+.hue-context-menu > li > a {
+  display: block;
+  position: relative;
+  clear: both;
+  height: 22px;
+  line-height: 22px;
+  vertical-align: middle;
+  padding: 6px 16px 6px 38px;
+
+  color: #333;
+  text-decoration: none;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: background-color .3s;
+}
+
+.hue-context-menu > li > .disabled {
+  display: block;
+  position: relative;
+  clear: both;
+  height: 22px;
+  line-height: 22px;
+  vertical-align: middle;
+  padding: 6px 16px 6px 38px;
+
+  color: #CCC;
+  text-decoration: none;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.hue-context-menu > li > a:hover {
+  background-color: #DBE8F1;
+}
+
+.hue-context-menu > li > .disabled > i {
+  position: absolute;
+  height: 22px;
+  left: 13px;
+  right: auto;
+  top: 6px;
+
+  color: #CCC;
+  font-size: 17px;
+  line-height: 22px;
+  vertical-align: middle;
+}
+
+.hue-context-menu > li > a > i {
+  position: absolute;
+  top: 6px;
+  left: 13px;
+  right: auto;
+  line-height: 22px;
+  height: 24px;
+
+  color: #555;
+  font-size: 17px;
+  vertical-align: middle;
+}
+
+.hue-context-menu > .divider {
+  height: 1px;
+  margin: 9px 0;
+  overflow: hidden;
+  background-color: #e5e5e5;
+}

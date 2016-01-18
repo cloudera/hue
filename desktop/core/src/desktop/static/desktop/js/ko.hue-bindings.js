@@ -152,6 +152,79 @@
     }
   };
 
+  /**
+   * This binding can be used to show a custom context menu on right-click,
+   * It assumes that the context menu is nested within the bound element and
+   * the selector for the menu has to be supplied as a parameter.
+   *
+   * Example:
+   *
+   * <div data-bind="contextMenu: '.hue-context-menu'>
+   *   <ul class="hue-context-menu">...</ul>
+   * </div>
+   * 
+   */
+  ko.bindingHandlers.contextMenu = {
+    init: function (element, valueAccessor) {
+      var $element = $(element);
+      var $menu = $element.find(valueAccessor());
+      var active = false;
+
+      element.addEventListener("contextmenu", function(e) {
+        if(document.selection && document.selection.empty) {
+          document.selection.empty();
+        } else if(window.getSelection) {
+          var sel = window.getSelection();
+          sel.removeAllRanges();
+        }
+        $menu.css('top', 0);
+        $menu.css('left', 0);
+        $menu.css('opacity', 0);
+        $menu.show();
+        var menuWidth = $menu.outerWidth(true)
+        if (event.clientX + menuWidth > $(window).width()) {
+          $menu.css('left', event.clientX - menuWidth);
+        } else {
+          $menu.css('left', event.clientX);
+        }
+
+        var menuHeight = $menu.outerHeight(true);
+        if (event.clientY + menuHeight > $(window).height()) {
+          $menu.css('top', $(window).height() - menuHeight);
+        } else {
+          $menu.css('top', event.clientY);
+        }
+        $menu.css('opacity', 1);
+        active = true;
+        huePubSub.publish('contextmenu-active', element);
+        e.preventDefault();
+        e.stopPropagation();
+      });
+
+      var hideMenu = function () {
+        if (active) {
+          $menu.css('opacity', 0);
+          window.setTimeout(function () {
+            $menu.hide();
+          }, 300);
+          active = false;
+        }
+      }
+
+      huePubSub.subscribe('contextmenu-active', function (origin) {
+        if (origin !== element) {
+          hideMenu();
+        }
+      })
+      document.addEventListener("contextmenu", function (event) {
+        hideMenu();
+      })
+      $menu.click(hideMenu)
+      $element.click(hideMenu);
+      $(document).click(hideMenu);
+    }
+  };
+
   ko.bindingHandlers.multiClick = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var clickHandlerFunction = valueAccessor().click;
