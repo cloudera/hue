@@ -209,17 +209,20 @@
           }, 300);
           active = false;
         }
-      }
+      };
 
       huePubSub.subscribe('contextmenu-active', function (origin) {
         if (origin !== element) {
           hideMenu();
         }
-      })
+      });
       document.addEventListener("contextmenu", function (event) {
         hideMenu();
-      })
-      $menu.click(hideMenu)
+      });
+      $menu.click(function (e) {
+        hideMenu();
+        e.stopPropagation();
+      });
       $element.click(hideMenu);
       $(document).click(hideMenu);
     }

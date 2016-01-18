@@ -215,7 +215,7 @@ ${ fileBrowser.fileBrowser() }
         <div class="file-browser" data-bind="component: {
           name: 'file-browser',
           params: {
-            currentDirectory: currentDirectory
+            activeEntry: activeEntry
           }
         }"></div>
       </div>

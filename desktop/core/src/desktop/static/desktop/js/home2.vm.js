@@ -34,9 +34,9 @@
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
-    self.currentDirectory = ko.observable();
-    self.currentDirectory(new HueFileEntry({
-      currentDirectory: self.currentDirectory,
+    self.activeEntry = ko.observable();
+    self.activeEntry(new HueFileEntry({
+      activeEntry: self.activeEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
@@ -44,7 +44,7 @@
       }
     }));
 
-    self.currentDirectory().load();
+    self.activeEntry().load();
 
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');
