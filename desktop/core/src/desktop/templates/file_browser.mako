@@ -157,7 +157,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="fb-template">
     <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
-      <!-- ko with: currentDirectory -->
+      <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">&times;</a>
         <h3>${_('Import Hue documents')}</h3>
@@ -190,7 +190,7 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
     <div id="createDirectoryModal" class="modal hide fade">
-      <!-- ko with: currentDirectory -->
+      <!-- ko with: activeEntry -->
       <div class="modal-body form-horizontal">
         <div class="control-group">
           <label class="control-label" for="newDirectoryName">${ _('Name') }</label>
@@ -205,29 +205,32 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
     </div>
-    <div id="deleteDirectoryModal" class="modal hide fade">
-      <!-- ko with: currentDirectory -->
+    <div id="deleteEntriesModal" class="modal hide fade">
+      <!-- ko with: activeEntry -->
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times</a>
-        <h3>${ _('Do you really want to delete:') } <span data-bind="text: name"></span></h3>
+        <h3>${ _('Do you really want to delete') }
+          <!-- ko if: entriesToDelete().length == 1 --> <span data-bind="text: entriesToDelete()[0].name"></span><!-- /ko -->
+          <!-- ko if: entriesToDelete().length > 1 --> <span data-bind="text: entriesToDelete().length"></span> ${ _('entries') }<!-- /ko -->
+        </h3>
       </div>
       <div class="modal-footer">
         <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="submit" data-bind="click: function () { $parents[1].currentDirectory($data.parent); $data.delete(); $('#deleteDirectoryModal').modal('hide'); }" class="btn btn-danger" value="${_('Yes')}"/>
+        <input type="submit" data-bind="click: performDelete" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <!-- /ko -->
     </div>
     <div class="fb-container">
       <div class="fb-action-bar">
         <h4>
-          <div class="fb-breadcrumb" data-bind="with: currentDirectory">
+          <div class="fb-breadcrumb" data-bind="with: activeEntry">
             <ul class="nav nav-pills hueBreadcrumbBar">
               <!-- ko if: isRoot -->
               <li class="active-breadcrumb">${ _('My documents') }</li>
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: function () { $parents[1].currentDirectory($data); } "></a> <span class="divider">&gt;</span></li>
+              <li><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: makeActive"></a> <span class="divider">&gt;</span></li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
               <li class="active-breadcrumb" data-bind="text: name"></li>
@@ -235,7 +238,7 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <div class="fb-folder-actions" data-bind="with: currentDirectory">
+        <div class="fb-folder-actions" data-bind="with: activeEntry">
           <!-- ko if: app === 'documents' -->
           <span class="dropdown">
             <a class="inactive-action fb-action" data-toggle="dropdown" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
@@ -261,8 +264,11 @@ from desktop.views import _ko
           </span>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-          <!-- ko ifnot: isRoot -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#deleteDirectoryModal').modal('show'); }"><i class="fa fa-fw fa-times"></i></a>
+          <!-- ko if: !isRoot || selectedEntries().length > 0 -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: topMenuDelete"><i class="fa fa-fw fa-times"></i></a>
+          <!-- /ko -->
+          <!-- ko if: isRoot && selectedEntries().length == 0 -->
+          <span class="inactive-action fb-action"><i class="fa fa-fw fa-times"></i></span>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-users"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
@@ -277,15 +283,16 @@ from desktop.views import _ko
           <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
         </div>
       </div>
-      <div class="fb-list" data-bind="with: currentDirectory">
+      <div class="fb-list" data-bind="with: activeEntry">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, css: { 'fb-selected': selected }">
             <div style="width: 100%; height: 100%" data-bind="contextMenu: '.hue-context-menu'">
               <ul class="hue-context-menu">
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') }</a></li>
+                <li><a href="javascript:void(0);" data-bind="click: contextMenuDelete"><i class="fa fa-fw fa-times"></i> ${ _('Delete') }</a></li>
               </ul>
               <div class="fb-primary-col">
-                <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : definition.type === 'directory', 'fa-file-o': definition.type !== 'directory' }"></i>
+                <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : isDirectory, 'fa-file-o': ! isDirectory }"></i>
                 <a href="javascript: void(0);" data-bind="text: name, click: open"></a>
               </div>
               <div class="fb-attr-group">
@@ -360,12 +367,12 @@ from desktop.views import _ko
 
       /**
        * @param {Object} params
-       * @param {HueFileEntry} params.currentDirectory - Observable holding the current directory
+       * @param {HueFileEntry} params.activeEntry - Observable holding the current directory
        * @constructor
        */
       function FileBrowser (params) {
         var self = this;
-        self.currentDirectory = params.currentDirectory;
+        self.activeEntry = params.activeEntry;
       }
 
       ko.components.register('file-browser', {
