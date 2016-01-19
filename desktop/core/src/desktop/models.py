@@ -864,6 +864,16 @@ class Document2(models.Model):
   def can_read_or_exception(self, user):
     self.doc.get().can_read_or_exception(user)
 
+  def can_write(self, user):
+    perm = self.list_permissions('write')
+    return user.is_superuser or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+
+  def can_write_or_exception(self, user):
+    if self.can_write(user):
+      return True
+    else:
+      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
+
   def get_history(self):
     return self.dependencies.filter(is_history=True).order_by('-last_modified')
 
@@ -899,14 +909,15 @@ class Document2(models.Model):
 
     super(Document2, self).save(*args, **kwargs)
 
-  def move(self, directory):
+  def move(self, directory, user):
     # get dir and remove
-    old_directory = self.documents(self.user).get(type='directory', uuid=self.uuid)
-    old_directory.dependencies.remove(self)
+    old_directory = Document2.objects.get(type='directory', dependencies=self.pk)
+    if old_directory.can_write_or_exception(user=user):
+      old_directory.dependencies.remove(self)
 
     # add to new dir
-    destination_directory = self.documents(self.user).get(type='directory', uuid=self.uuid)
-    destination_directory.dependencies.remove(self)
+    if directory.can_write_or_exception(user=user):
+      directory.dependencies.add(self)
 
   def share(self, user, name='read', users=None, groups=None):
     # TODO check in settings if user can sync, re-share, which perms...
