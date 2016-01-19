@@ -84,6 +84,9 @@
     var self = this;
     if (self.definition.type === 'directory') {
       self.makeActive();
+      if (! self.loaded()) {
+        self.load();
+      }
     } else {
       window.location.href = self.definition.absoluteUrl;
     }
