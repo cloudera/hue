@@ -160,14 +160,17 @@ def _massage_permissions(document):
 @api_error_handler
 @require_POST
 def move_document(request):
-  source_id = request.POST.get('source_id', 'source_id')
-  destination_id = request.POST.get('destination_id', 'destination_id')
+  source_doc_id = json.loads(request.POST.get('source_doc_id'))
+  destination_doc_id = json.loads(request.POST.get('destination_doc_id'))
 
   # destination exists + is dir?
-  source = Document2.objects.document(request.user, uuid=source_id)
-  destination = Directory.objects.document(request.user, uuid=destination_id)
+  source = Document2.objects.document(request.user, doc_id=source_doc_id)
+  destination = Document2.objects.document(request.user, doc_id=destination_doc_id)
 
-  source.move(destination)
+  if destination.type != 'directory':
+    raise PopupException(_('Destination is not a directory'))
+
+  source.move(destination, request.user)
 
   return JsonResponse({'status': 0})
 
