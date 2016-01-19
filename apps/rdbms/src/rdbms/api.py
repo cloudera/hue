@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import datetime
+import decimal
 import json
 import logging
 
@@ -46,6 +47,8 @@ class ResultEncoder(json.JSONEncoder):
       return obj.strftime('%Y-%m-%d %H:%M:%S %Z')
     elif isinstance(obj, datetime.date):
       return obj.strftime('%Y-%m-%d %Z')
+    elif isinstance(obj, decimal.Decimal):
+      return float(obj)
     return super(ResultEncoder, self).default(obj)
 
 
