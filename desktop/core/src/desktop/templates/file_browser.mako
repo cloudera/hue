@@ -376,6 +376,17 @@ from desktop.views import _ko
 
           var allEntries = valueAccessor();
 
+          if (boundEntry.isDirectory) {
+            $element.droppable({
+              drop: function (ev, ui) {
+                boundEntry.moveHere($.grep(allEntries(), function (entry) {
+                  return entry.selected();
+                }));
+              },
+              hoverClass: 'fb-drop-hover'
+            })
+          }
+
           $element.draggable({
             helper: function () {
               var selectedEntries = $.grep(allEntries(), function (entry) {
@@ -400,7 +411,6 @@ from desktop.views import _ko
                 $helper.find('.drag-text').text(boundEntry.name);
                 $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
               }
-              console.log($helper);
               return $helper;
             },
             appendTo: "body",

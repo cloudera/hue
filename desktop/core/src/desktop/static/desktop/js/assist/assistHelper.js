@@ -280,6 +280,30 @@
   };
 
   /**
+   *
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {number} options.sourceId - The ID of the source document
+   * @param {number} options.destinationId - The ID of the target document
+   */
+  AssistHelper.prototype.moveDocument = function (options) {
+    var self = this;
+    $.post("/desktop/api2/doc/move", {
+      source_doc_id: ko.mapping.toJSON(options.sourceId),
+      destination_doc_id: ko.mapping.toJSON(options.destinationId)
+    }, function (data) {
+      if (! self.successResponseIsError(data)) {
+        options.successCallback(data);
+      } else {
+        self.assistErrorCallback(options)(data);
+      }
+    })
+      .fail(self.assistErrorCallback(options));
+  };
+
+  /**
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]

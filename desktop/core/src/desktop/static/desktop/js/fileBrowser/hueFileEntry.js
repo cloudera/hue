@@ -75,6 +75,34 @@
     }
   }
 
+
+  /**
+   * @param {HueFileEntry[]} entries
+   */
+  HueFileEntry.prototype.moveHere = function (entries) {
+    var self = this;
+    if (self.app === "documents") {
+      var moveNext = function () {
+        if (entries.length > 0) {
+          var nextId = entries.shift().definition.id;
+          self.assistHelper.moveDocument({
+            successCallback: function () {
+              moveNext();
+            },
+            errorCallback: function () {
+              self.activeEntry().load();
+            },
+            sourceId: nextId,
+            destinationId: self.definition.id
+          });
+        } else {
+          self.activeEntry().load();
+        }
+      };
+    };
+    moveNext();
+  };
+
   HueFileEntry.prototype.toggleSelected = function () {
     var self = this;
     self.selected(! self.selected());
