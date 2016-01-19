@@ -78,7 +78,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-columns-table">
-  <table class="table table-striped table-condensed sampleTable">
+  <table class="table table-striped table-condensed table-nowrap">
     <thead>
     <tr>
       <th width="1%">&nbsp;</th>
@@ -123,7 +123,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-partition-columns-table">
   <div style="overflow: auto">
-    <table id="sampleTable" class="table table-striped table-condensed sampleTable">
+    <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 10px"></th>
@@ -146,7 +146,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-partition-values-table">
   <div style="overflow: auto">
-    <table id="sampleTable" class="table table-striped table-condensed sampleTable">
+    <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 10px"></th>
@@ -174,7 +174,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-samples-table">
   <div style="overflow: auto">
-    <table id="sampleTable" class="table table-striped table-condensed sampleTable">
+    <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 10px"></th>
@@ -383,7 +383,7 @@ ${ assist.assistPanel() }
           % endif
         </div>
 
-        <table id="tablesTable" class="table table-striped table-condensed sampleTable" style="margin-bottom: 10px; width: 100%" data-bind="visible: tables().length > 0">
+        <table id="tablesTable" class="table table-striped table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: tables().length > 0">
           <thead>
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
@@ -789,79 +789,6 @@ ${ assist.assistPanel() }
       });
 
     });
-  });
-
-  $(document).ready(function () {
-    function selectColumn(col) {
-      var _t = $("#sampleTable");
-      var _col = _t.find("th").filter(function () {
-        return $.trim($(this).text()).indexOf(col) > -1;
-      });
-      _t.find(".columnSelected").removeClass("columnSelected");
-      _t.find("tr td:nth-child(" + (_col.index() + 1) + ")").addClass("columnSelected");
-      $("a[href='#sample']").click();
-
-    }
-
-    $(".column-selector").on("click", function () {
-      selectColumn($.trim($(this).text().split("(")[0]));
-    });
-
-    if (window.location.hash != "") {
-      if (window.location.hash.indexOf("col=") > -1) {
-        window.setTimeout(function () {
-          selectColumn(window.location.hash.split("=")[1]);
-        }, 200)
-      }
-    }
-
-    $('a[data-toggle="tab"]').on('shown', function (e) {
-      var sortables = [];
-      $(".sampleTable").not('.initialized').each(function () {
-        var _id = $(this).attr("id");
-        if (sortables[_id] === undefined) {
-          sortables[_id] = [];
-        }
-        $('#' + _id + ' thead th').each(function () {
-          if ($(this).hasClass('no-sort')) {
-            sortables[_id].push({
-              "bSortable": false
-            });
-          } else {
-            sortables[_id].push(null);
-          }
-        });
-      });
-
-      for (var id in sortables) {
-        $("#" + id).addClass("initialized");
-        ##         % if len(table.cols) < 1000:
-        ##         $("#" + id).dataTable({
-        ##           "aoColumns": sortables[id],
-        ##           "bPaginate": false,
-        ##           "bLengthChange": false,
-        ##           "bInfo": false,
-        ##           "bFilter": false,
-        ##           "bAutoWidth": false,
-        ##           "fnInitComplete": function () {
-        ##             $(this).parent().jHueTableScroller();
-        ##             if (! $(this).hasClass("skip-extender")) {
-        ##               $(this).jHueTableExtender({
-        ##                 hintElement: "#jumpToColumnAlert",
-        ##                 fixedHeader: true
-        ##               });
-        ##             }
-        ##           },
-        ##           "oLanguage": {
-        ##             "sEmptyTable": "${_('No data available')}",
-        ##             "sZeroRecords": "${_('No matching records')}"
-        ##           }
-        ##         });
-        ##         % endif
-              }
-    });
-
-    $('a[data-toggle="tab"]:eq(0)').click();
   });
 </script>
 

@@ -43,7 +43,7 @@
   border-bottom: none !important;
 }
 
-.sampleTable td, .sampleTable th {
+.sampleTable td, .sampleTable th, .table-nowrap td, .table-nowrap th {
   white-space: nowrap;
 }
 
