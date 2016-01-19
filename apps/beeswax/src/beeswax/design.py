@@ -106,15 +106,15 @@ class HQLdesign(object):
 
   @property
   def settings(self):
-    return list(self._data_dict['settings'])
+    return list(self._data_dict.get('settings', []))
 
   @property
   def file_resources(self):
-    return list(self._data_dict['file_resources'])
+    return list(self._data_dict.get('file_resources', []))
 
   @property
   def functions(self):
-    return list(self._data_dict['functions'])
+    return list(self._data_dict.get('functions', []))
 
   @property
   def statement_count(self):

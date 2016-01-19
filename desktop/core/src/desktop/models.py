@@ -1021,7 +1021,7 @@ def import_saved_beeswax_query(bquery):
   return make_notebook(
       name=bquery.name,
       description=bquery.desc,
-      editor_type=_convert_type(bquery.type),
+      editor_type=_convert_type(bquery.type, bquery.data),
       statement=design.hql_query,
       status='ready',
       files=design.file_resources,
@@ -1029,15 +1029,16 @@ def import_saved_beeswax_query(bquery):
       settings=design.settings
   )
 
-def _convert_type(btype):
+def _convert_type(btype, bdata):
   from beeswax.models import HQL, IMPALA, RDBMS, SPARK
 
   if btype == HQL:
     return 'hive'
   elif btype == IMPALA:
     return 'impala'
-  elif btype == RDBMS: # We should instead get the 'type' (https://github.com/cloudera/hue/blob/master/desktop/libs/librdbms/src/librdbms/design.py#L47
-    return 'mysql' # postgres, sqlite, oracle
+  elif btype == RDBMS:
+    data = json.loads(bdata)
+    return data['query']['server']
   elif btype == SPARK: # We should not import
     return 'spark'
   else:
