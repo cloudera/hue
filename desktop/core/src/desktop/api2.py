@@ -24,6 +24,7 @@ import zipfile
 
 from django.contrib.auth.models import Group, User
 from django.core import management
+from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils import html
@@ -63,8 +64,6 @@ def api_error_handler(func):
 def get_documents2(request):
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
-  _import_documents1(request.user)
-
   try:
     directory = Directory.objects.get(owner=request.user, name=path) # TODO perms
   except Directory.DoesNotExist, e:
@@ -73,7 +72,6 @@ def get_documents2(request):
       directory.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=directory.id))
     else:
       raise e
-
 
   parent_path = path.rsplit('/', 1)[0] or '/'
   parent = directory.dependencies.get(name=parent_path) if path != '/' else None
@@ -88,35 +86,37 @@ def get_documents2(request):
 
 def _import_documents1(user):
   from beeswax.models import HQL, IMPALA, RDBMS
-  docs = Document.objects.get_docs(user, SavedQuery).filter(owner=user).filter(extra__in=[HQL, IMPALA]) # TODO RDBMS
 
-  imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
+  with transaction.atomic():
+    docs = Document.objects.get_docs(user, SavedQuery).filter(owner=user).filter(extra__in=[HQL, IMPALA, RDBMS])
 
-  docs = docs.exclude(tags__in=[
-      DocumentTag.objects.get_trash_tag(user=user), # No trashed docs
-      DocumentTag.objects.get_history_tag(user=user), # No history yet
-      DocumentTag.objects.get_example_tag(user=user), # No examples
-      imported_tag # No already imported docs
-  ])
+    imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
 
-  root_doc, created = Directory.objects.get_or_create(name='/', owner=user)
-  imported_docs = []
+    docs = docs.exclude(tags__in=[
+        DocumentTag.objects.get_trash_tag(user=user), # No trashed docs
+        DocumentTag.objects.get_history_tag(user=user), # No history yet
+        DocumentTag.objects.get_example_tag(user=user), # No examples
+        imported_tag # No already imported docs
+    ])
 
-  for doc in docs:
-    if doc.content_object:
-      try:
-        notebook = import_saved_beeswax_query(doc.content_object)
-        data = notebook.get_data()
-        notebook_doc = Document2.objects.create(name=data['name'], type='query-%s' % data['type'], owner=user, data=notebook.get_json())
+    root_doc, created = Directory.objects.get_or_create(name='/', owner=user)
+    imported_docs = []
 
-        doc.add_tag(imported_tag)
-        doc.save()
-        imported_docs.append(notebook_doc)
-      except Exception, e:
-        raise e
+    for doc in docs:
+      if doc.content_object:
+        try:
+          notebook = import_saved_beeswax_query(doc.content_object)
+          data = notebook.get_data()
+          notebook_doc = Document2.objects.create(name=data['name'], type=data['type'], owner=user, data=notebook.get_json())
 
-  if imported_docs:
-    root_doc.dependencies.add(*imported_docs)
+          doc.add_tag(imported_tag)
+          doc.save()
+          imported_docs.append(notebook_doc)
+        except Exception, e:
+          raise e
+
+    if imported_docs:
+      root_doc.dependencies.add(*imported_docs)
 
 
 @api_error_handler
