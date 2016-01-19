@@ -37,7 +37,6 @@ from desktop.views import _ko
     .fb-action-bar,
     .fb-header {
       flex: 0 0 auto;
-
       overflow: hidden;
       padding: 2px;
       clear: both;
@@ -48,6 +47,16 @@ from desktop.views import _ko
       letter-spacing: 0.035em;
       font-size: 15px;
       color: #737373;
+    }
+
+    .fb-empty {
+      letter-spacing: 0.035em;
+      font-size: 15px;
+      color: #737373;
+      padding: 40px 0;
+      text-align: center;
+      -webkit-animation-name: fadeIn;
+      animation-name: fadeIn;
     }
 
     .fb-list {
@@ -275,6 +284,9 @@ from desktop.views import _ko
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
         </div>
       </div>
+
+
+      <!-- ko if: activeEntry().entries().length > 0 -->
       <div class="fb-header">
         <div class="fb-primary-col">${ _('Name') }</div>
         <div class="fb-attr-group">
@@ -283,6 +295,15 @@ from desktop.views import _ko
           <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
         </div>
       </div>
+      <!-- /ko -->
+
+      <!-- ko if: activeEntry().entries().length == 0 -->
+      <div class="fb-empty animated">
+        ${ _('The current folder is empty. You can add a new file or folder form the top right menu.')}
+      </div>
+      <!-- /ko -->
+
+
       <div class="fb-list" data-bind="with: activeEntry">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, css: { 'fb-selected': selected }">
