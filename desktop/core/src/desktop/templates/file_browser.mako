@@ -88,8 +88,8 @@ from desktop.views import _ko
       clear: both;
       height: 35px;
       line-height: 35px;
-      padding: 2px;
-      margin: 0;
+      border: 1px solid #fff;
+      margin: 1px;
       color: #444;
       font-size: 13px;
       cursor: pointer;
@@ -154,6 +154,31 @@ from desktop.views import _ko
       width: 150px;
     }
 
+    .fb-drag-helper {
+      display: none;
+      position: fixed;
+      height: 30px;
+      line-height: 30px;
+      vertical-align: middle;
+      padding: 1px 12px 1px 7px;
+      cursor: pointer;
+      background-color: #338BB8;
+      color: #DBE8F1;
+      border-radius: 2px;
+      z-index: 1000;
+    }
+
+    .fb-drag-helper i {
+      line-height: 30px;
+      vertical-align: middle;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+
+    .fb-drop-hover {
+      border: 1px solid #338BB8 !important;
+    }
+
     .hueBreadcrumbBar a {
       color: #338BB8 !important;
       display: inline !important;
@@ -165,6 +190,9 @@ from desktop.views import _ko
   </style>
 
   <script type="text/html" id="fb-template">
+    <div class="fb-drag-helper">
+      <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
+    </div>
     <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
@@ -342,10 +370,45 @@ from desktop.views import _ko
     }(function (ko) {
 
       ko.bindingHandlers.fileSelect = {
-        init: function(element, valueAccessor, allBindings, viewModel, bindingContext) {
-          $(element).attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
+        init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
+          var $element = $(element);
+          $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
 
           var allEntries = valueAccessor();
+
+          $element.draggable({
+            helper: function () {
+              var selectedEntries = $.grep(allEntries(), function (entry) {
+                return entry.selected();
+              })
+
+              if (selectedEntries.length === 0) {
+                boundEntry.selected(true);
+              } else if (selectedEntries.length > 0 && !boundEntry.selected()){
+                $.each(selectedEntries, function (idx, selectedEntry) {
+                  selectedEntry.selected(false);
+                });
+                selectedEntries = [];
+                boundEntry.selected(true);
+              }
+
+              var $helper = $('.fb-drag-helper').clone().show();
+              if (selectedEntries.length > 1) {
+                $helper.find('.drag-text').text(selectedEntries.length + ' ${ _('selected') }');
+                $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
+              } else {
+                $helper.find('.drag-text').text(boundEntry.name);
+                $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
+              }
+              console.log($helper);
+              return $helper;
+            },
+            appendTo: "body",
+            cursorAt: {
+              top: 0,
+              left: 0
+            }
+          });
 
           var clickHandler = function (clickedEntry, event) {
             var clickedIndex = $.inArray(clickedEntry, allEntries());
@@ -380,9 +443,9 @@ from desktop.views import _ko
           ko.bindingHandlers.multiClick.init(element, function () {
             return {
               click: clickHandler,
-              dblClick: viewModel.open
+              dblClick: boundEntry.open
             }
-          }, allBindings, viewModel, bindingContext);
+          }, allBindings, boundEntry, bindingContext);
         }
       };
 
