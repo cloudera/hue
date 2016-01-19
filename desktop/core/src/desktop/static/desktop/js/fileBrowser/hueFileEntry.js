@@ -103,12 +103,9 @@
       self.assistHelper.fetchDocuments({
         path: self.path,
         successCallback: function(data) {
-          self.definition = data.file;
+          self.definition = data.directory;
           self.hasErrors(false);
-          var cleanEntries = $.grep(data.documents, function (definition) {
-            return definition.name !== '/';
-          });
-          self.entries($.map(cleanEntries, function (definition) {
+          self.entries($.map(data.documents, function (definition) {
             return new HueFileEntry({
               activeEntry: self.activeEntry,
               assistHelper: self.assistHelper,
@@ -117,6 +114,15 @@
               parent: self
             })
           }));
+          if (! self.parent && data.parent) {
+            self.parent = new HueFileEntry({
+              activeEntry: self.activeEntry,
+              assistHelper: self.assistHelper,
+              definition: data.parent,
+              app: self.app,
+              parent: null
+            });
+          }
           self.loading(false);
           self.loaded(true);
         },

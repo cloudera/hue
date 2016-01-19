@@ -230,7 +230,7 @@ from desktop.views import _ko
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: makeActive"></a> <span class="divider">&gt;</span></li>
+              <li><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: open"></a> <span class="divider">&gt;</span></li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
               <li class="active-breadcrumb" data-bind="text: name"></li>
