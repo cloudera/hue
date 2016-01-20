@@ -263,9 +263,18 @@ ${ fileBrowser.fileBrowser() }
       };
 
       var viewModel = new HomeViewModel(options);
-      if (location.getParameter('path')) {
-        viewModel.openPath(location.getParameter('path'));
-      }
+
+      viewModel.activeEntry.subscribe(function (newEntry) {
+        hueUtils.changeURL('/home2?path=' + newEntry.path);
+      });
+      var loadUrlParam = function () {
+        if (location.getParameter('path')) {
+          viewModel.openPath(location.getParameter('path'));
+        }
+      };
+      window.onpopstate = loadUrlParam;
+      loadUrlParam();
+
       ko.applyBindings(viewModel, $('#documentList')[0]);
 
 ##       ShareViewModel.initSharing("#documentShareModal");
