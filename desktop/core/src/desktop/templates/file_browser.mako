@@ -275,7 +275,8 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <div class="fb-folder-actions" data-bind="with: activeEntry">
+        <!-- ko with: activeEntry -->
+        <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
           <!-- ko if: app === 'documents' -->
           <span class="dropdown">
             <a class="inactive-action fb-action" data-toggle="dropdown" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
@@ -311,10 +312,11 @@ from desktop.views import _ko
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
         </div>
+        <!-- /ko -->
       </div>
 
-
-      <!-- ko if: activeEntry().entries().length > 0 -->
+      <!-- ko with: activeEntry -->
+      <!-- ko if: entries().length > 0 -->
       <div class="fb-header">
         <div class="fb-primary-col">${ _('Name') }</div>
         <div class="fb-attr-group">
@@ -325,10 +327,16 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
 
-      <!-- ko if: activeEntry().entries().length == 0 -->
+      <!-- ko if: entries().length == 0 && ! hasErrors()-->
       <div class="fb-empty animated">
         ${ _('The current folder is empty. You can add a new file or folder form the top right menu.')}
       </div>
+      <!-- /ko -->
+      <!-- ko if: hasErrors() && app === 'documents' -->
+      <div class="fb-empty animated">
+        ${ _('There was an error loading the documents.')}
+      </div>
+      <!-- /ko -->
       <!-- /ko -->
 
 
