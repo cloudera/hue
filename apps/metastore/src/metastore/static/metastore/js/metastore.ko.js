@@ -434,6 +434,8 @@
 
     self.databaseQuery = ko.observable('').extend({rateLimit: 150});
 
+    self.currentTab = ko.observable('');
+
     self.filteredDatabases = ko.computed(function () {
       if (self.databaseQuery() === '') {
         return self.databases();

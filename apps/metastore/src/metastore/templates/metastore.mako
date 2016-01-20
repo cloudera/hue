@@ -85,9 +85,9 @@ ${ assist.assistPanel() }
       ## no stats for partition key type
       <th width="1%" class="no-sort">&nbsp;</th>
       <th width="1%">&nbsp;</th>
-      <th>${_('Name')}</th>
-      <th>${_('Type')}</th>
-      <th>${_('Comment')}</th>
+      <th width="17%">${_('Name')}</th>
+      <th width="30%">${_('Type')}</th>
+      <th width="50%">${_('Comment')}</th>
     </tr>
     </thead>
     <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
@@ -512,8 +512,8 @@ ${ assist.assistPanel() }
           ${_('View more...')}
         </a>
         <!-- /ko -->
-        <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-        <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+        <div data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data.') }</div>
+        <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data.') }</div>
       <!-- /ko -->
     <!-- /ko -->
   </div>
@@ -559,10 +559,15 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-sample-tab">
   <!-- ko with: samples -->
+  <!-- ko if: loading -->
+  <div class="empty-message">
+    <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i>
+  </div>
+  <!-- /ko -->
   <!-- ko if: loaded -->
   <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
-  <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-  <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+  <div data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The view does not contain any data.') }</div>
+  <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The table does not contain any data.') }</div>
   <!-- /ko -->
   <!-- /ko -->
 </script>
@@ -619,34 +624,43 @@ ${ assist.assistPanel() }
   </span>
 
   <ul class="nav nav-pills margin-top-30">
-    <li><a href="#overview" data-toggle="tab">${_('Overview')}</a></li>
-    <li><a href="#columns" data-toggle="tab">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
+    <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>
+    <li><a href="#columns" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-columns'); }">${_('Columns')} (<span data-bind="text: columns().length"></span>)</a></li>
     <!-- ko if: tableDetails() && tableDetails().partition_keys.length -->
-      <li><a href="#partitions" data-toggle="tab">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
+      <li><a href="#partitions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-partitions'); }">${_('Partitions')} <span data-bind="text: '(' + partitions.values().length + ')'"></span></a></li>
     <!-- /ko -->
-    <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
-    <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
-    <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
-    <li><a href="#analysis" data-toggle="tab">${_('Analyze')}</a></li>
-    <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
-    <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
+    <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
+    <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
+    <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')}</a></li>
+    <li><a href="#analysis" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-analysis'); }">${_('Analyze')}</a></li>
+    <li><a href="#lineage" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-lineage'); }">${_('Lineage')}</a></li>
+    <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
   </ul>
 
   <div class="tab-content margin-top-10" style="border: none">
     <div class="tab-pane" id="overview">
+      <!-- ko if: $root.currentTab() == 'table-overview' -->
       <!-- ko template: 'metastore-overview-tab' --><!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="columns">
+      <!-- ko if: $root.currentTab() == 'table-columns' -->
       <!-- ko template: 'metastore-columns-tab' --><!-- /ko -->
+      <!-- /ko -->
+
     </div>
 
     <div class="tab-pane" id="partitions">
+      <!-- ko if: $root.currentTab() == 'table-partitions' -->
       <!-- ko template: 'metastore-partitions-tab' --><!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="sample">
+      <!-- ko if: $root.currentTab() == 'table-sample' -->
       <!-- ko template: 'metastore-sample-tab' --><!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="permissions">
@@ -654,7 +668,9 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="queries">
+      <!-- ko if: $root.currentTab() == 'table-queries' -->
       <!-- ko template: 'metastore-queries-tab' --><!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div class="tab-pane" id="analysis">
@@ -666,7 +682,9 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="details">
+      <!-- ko if: $root.currentTab() == 'table-details' -->
       <!-- ko template: 'metastore-details-tab' --><!-- /ko -->
+      <!-- /ko -->
     </div>
   </div>
 </script>
