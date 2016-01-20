@@ -171,6 +171,7 @@ def move_document(request):
     raise PopupException(_('Destination is not a directory'))
 
   source.move(destination, request.user)
+  source.save()
 
   return JsonResponse({'status': 0})
 
