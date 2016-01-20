@@ -16,6 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+
 from nose.tools import assert_equal
 from django.contrib.auth.models import User
 
@@ -33,6 +35,12 @@ class TestDocument2(object):
     self.client = make_logged_in_client(username="doc2", groupname="doc2", recreate=True, is_superuser=False)
     self.user = User.objects.get(username="doc2")
     grant_access("doc2", "doc2", "beeswax")
+
+    # Setup Home dir this way currently
+    response = self.client.get('/desktop/api2/docs/')
+    data = json.loads(response.content)
+
+    assert_equal('/', data['path'], data)
 
 
   def test_document_create(self):
@@ -68,3 +76,10 @@ class TestDocument2(object):
       assert_equal([], new_query_data['snippets'][0]['properties']['functions'])
     finally:
       old_query.delete()
+
+
+  def test_directory_create(self):
+    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_path': json.dumps('/'), 'name': json.dumps('test_mkdir')})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)

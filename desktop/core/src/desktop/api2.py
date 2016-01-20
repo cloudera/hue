@@ -61,7 +61,7 @@ def api_error_handler(func):
 
 
 @api_error_handler
-def get_documents2(request):
+def get_documents(request):
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
   try:
