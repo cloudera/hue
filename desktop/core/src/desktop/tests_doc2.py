@@ -18,7 +18,7 @@
 
 import json
 
-from nose.tools import assert_equal
+from nose.tools import assert_equal, assert_true
 from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
@@ -26,7 +26,7 @@ from desktop.lib.test_utils import grant_access
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
-from desktop.models import import_saved_beeswax_query
+from desktop.models import import_saved_beeswax_query, Directory
 
 
 class TestDocument2(object):
@@ -83,3 +83,23 @@ class TestDocument2(object):
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
+
+
+  def test_directory_move(self):
+    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_path': json.dumps('/'), 'name': json.dumps('test_mv')})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+
+    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_path': json.dumps('/'), 'name': json.dumps('test_mv_dst')})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+
+    response = self.client.post('/desktop/api2/doc/move', {
+        'source_doc_id': json.dumps(Directory.objects.get(owner=self.user, name='/test_mv').id),
+        'destination_doc_id': json.dumps(Directory.objects.get(owner=self.user, name='/test_mv_dst').id)
+    })
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+
+    assert_true(Directory.objects.filter(owner=self.user, name='/test_mv_dst/test_mv').exists())
