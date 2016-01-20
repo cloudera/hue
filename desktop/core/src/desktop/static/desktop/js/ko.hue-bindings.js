@@ -2845,7 +2845,7 @@
 
       $parent.height(data.length * itemHeight);
       if (wrappable.is('table')) {
-        $parent.height($parent.height() + itemHeight);
+        $parent.height($parent.height() + (data.length > 0 ? itemHeight : 0));
       }
       try {
         if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(data)) {

@@ -502,19 +502,19 @@ ${ assist.assistPanel() }
     </a>
   </div>
 
-  <div class="tile" data-bind="visible: true" style="display: none;">
+  <div class="tile">
+    <h4>${ _('Sample') } <i data-bind="visible: samples.loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
     <!-- ko with: samples -->
-    <h4>${ _('Sample') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
-    <!-- ko if: loaded -->
-    <!-- ko with: preview -->
-    <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
-    <a class="pointer" data-bind="visible: rows().length >= 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
-      ${_('View more...')}
-    </a>
-    <!-- /ko -->
-    <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
-    <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
-    <!-- /ko -->
+      <!-- ko if: loaded -->
+        <!-- ko with: preview -->
+        <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
+        <a class="pointer" data-bind="visible: rows().length >= 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
+          ${_('View more...')}
+        </a>
+        <!-- /ko -->
+        <span data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data') }</span>
+        <span data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data') }</span>
+      <!-- /ko -->
     <!-- /ko -->
   </div>
 
@@ -569,7 +569,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="metastore-queries-tab">
   <i class="fa fa-spinner fa-spin" data-bind="visible: $root.loadingQueries"></i>
-  <table data-bind="visible: !$root.loadingQueries()" class="table table-condensed">
+  <table data-bind="visible: !$root.loadingQueries() && $root.queries().length > 0" class="table table-condensed">
     <thead>
     <tr>
       <th width="20%">${ _('Name') }</th>
@@ -577,7 +577,7 @@ ${ assist.assistPanel() }
       <th width="20%">${ _('Owner') }</th>
     </tr>
     </thead>
-    <tbody data-bind="foreach: $root.queries">
+    <tbody data-bind="hueach: {data: $root.queries, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
     <tr class="pointer" data-bind="click: function(){ location.href=doc.absoluteUrl; }">
       <td data-bind="text: doc.name"></td>
       <td><code data-bind="text: data.snippets[0].statement_raw"></code></td>
@@ -585,6 +585,9 @@ ${ assist.assistPanel() }
     </tr>
     </tbody>
   </table>
+  <div data-bind="visible: !$root.loadingQueries() && $root.queries().length == 0" class="empty-message">
+    ${ _('No queries found for the current table.') }
+  </div>
 </script>
 
 <script type="text/html" id="metastore-details-tab">
@@ -624,7 +627,7 @@ ${ assist.assistPanel() }
     <li><a href="#sample" data-toggle="tab">${_('Sample')}</a></li>
     <li><a href="#permissions" data-toggle="tab">${_('Permissions')}</a></li>
     <li><a href="#queries" data-toggle="tab">${_('Queries')}</a></li>
-    <li><a href="#analysis" data-toggle="tab">${_('Analyse')}</a></li>
+    <li><a href="#analysis" data-toggle="tab">${_('Analyze')}</a></li>
     <li><a href="#lineage" data-toggle="tab">${_('Lineage')}</a></li>
     <li><a href="#details" data-toggle="tab">${ _('Details') }</a></li>
   </ul>
@@ -647,7 +650,7 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="permissions">
-      ${ _('Not available') }
+      <div class="empty-message">${ _('Currently not available.') }</div>
     </div>
 
     <div class="tab-pane" id="queries">
@@ -655,11 +658,11 @@ ${ assist.assistPanel() }
     </div>
 
     <div class="tab-pane" id="analysis">
-      ${ _('Not available') }
+      <div class="empty-message">${ _('Currently not available.') }</div>
     </div>
 
     <div class="tab-pane" id="lineage">
-      ${ _('Not available') }
+      <div class="empty-message">${ _('Currently not available.') }</div>
     </div>
 
     <div class="tab-pane" id="details">

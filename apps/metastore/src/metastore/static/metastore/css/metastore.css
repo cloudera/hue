@@ -106,6 +106,7 @@ h2.card-heading {
 
 .tile {
   margin-bottom: 20px;
+  min-height: 124px;
 }
 
 .properties-table {
@@ -118,4 +119,8 @@ h2.card-heading {
 
 .property-name {
   padding-left: 10px;
+}
+
+.empty-message {
+  padding: 10px;
 }
