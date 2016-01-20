@@ -649,9 +649,14 @@ class HiveServerClient:
     return self._client.CloseSession(req)
 
 
-  def get_databases(self):
+  def get_databases(self, schemaName=None):
     # GetCatalogs() is not implemented in HS2
     req = TGetSchemasReq()
+    if schemaName is not None:
+      req.schemaName = schemaName
+    if self.query_server['server_name'] == 'impala':
+      req.schemaName = None
+
     res = self.call(self._client.GetSchemas, req)
 
     results, schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT, max_rows=5000)
@@ -1065,9 +1070,9 @@ class HiveServerClientCompatible(object):
       return self._client.fetch_log(operationHandle, orientation=orientation, max_rows=-1)
 
 
-  def get_databases(self):
+  def get_databases(self, schemaName=None):
     col = 'TABLE_SCHEM'
-    return [table[col] for table in self._client.get_databases()]
+    return [table[col] for table in self._client.get_databases(schemaName)]
 
 
   def get_database(self, database):
