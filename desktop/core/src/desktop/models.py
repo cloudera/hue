@@ -919,6 +919,8 @@ class Document2(models.Model):
     if directory.can_write_or_exception(user=user):
       directory.dependencies.add(self)
 
+    self.name = directory.name + '/' + self.name.rsplit('/', 1)[1]
+ 
   def share(self, user, name='read', users=None, groups=None):
     # TODO check in settings if user can sync, re-share, which perms...
 
