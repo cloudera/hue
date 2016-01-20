@@ -18,9 +18,13 @@
 import logging
 from datetime import datetime
 
+from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db import DatabaseError
+from django.utils.translation import ugettext as _
 
-from desktop.conf import LDAP
+from desktop.auth.views import dt_logout
+from desktop.conf import AUTH, LDAP
 
 from models import UserProfile, get_profile
 from views import import_ldap_users
@@ -60,9 +64,9 @@ class LdapSynchronizationMiddleware(object):
       request.session.modified = True
 
 
-class UpdateLastActivityMiddleware(object):
+class LastActivityMiddleware(object):
   """
-  Middleware to track the last activity of a user.
+  Middleware to track the last activity of a user and automatically log out the user after a specified period of inactivity
   """
 
   def process_request(self, request):
@@ -72,9 +76,21 @@ class UpdateLastActivityMiddleware(object):
       return
 
     profile = get_profile(user)
-    profile.last_activity = datetime.now()
+    expires_after = AUTH.IDLE_SESSION_TIMEOUT.get()
+    now = datetime.now()
+    logout = False
 
-    try:
-      profile.save()
-    except DatabaseError:
-      log.exception('Error saving profile information')
+    if profile.last_activity and expires_after > 0 and (now - profile.last_activity).total_seconds() > expires_after:
+      messages.info(request, _('Your session has been timed out due to inactivity.'))
+      logout = True
+
+    # Save last activity for user except when polling jobbrowser
+    if not (request.path.strip('/') == 'jobbrowser' and request.GET.get('format') == 'json'):
+      try:
+        profile.last_activity = datetime.now()
+        profile.save()
+      except DatabaseError:
+        LOG.exception('Error saving profile information')
+
+    if logout:
+      dt_logout(request, next_page='/')

@@ -422,9 +422,9 @@ USE_X_FORWARDED_HOST = desktop.conf.USE_X_FORWARDED_HOST.get()
 if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
   SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
 
-# Add last activity tracking.
+# Add last activity tracking and idle session timeout
 if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
-  MIDDLEWARE_CLASSES.append('useradmin.middleware.UpdateLastActivityMiddleware')
+  MIDDLEWARE_CLASSES.append('useradmin.middleware.LastActivityMiddleware')
 
 ############################################################
 

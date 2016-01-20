@@ -689,6 +689,11 @@ AUTH = ConfigSection(
                                 help=_("Apply 'expires_after' to superusers."),
                                 type=coerce_bool,
                                 default=True),
+    IDLE_SESSION_TIMEOUT = Config("idle_session_timeout",
+                            help=_("Users will automatically be logged out after 'n' seconds of inactivity."
+                                   "A negative number means that idle sessions will not be timed out."),
+                            type=int,
+                            default=-1),
     CHANGE_DEFAULT_PASSWORD = Config(
                             key="change_default_password",
                             help=_("When set to true this will allow you to specify a password for "
