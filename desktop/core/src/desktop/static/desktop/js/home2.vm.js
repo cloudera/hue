@@ -56,7 +56,36 @@
   }
 
   HomeViewModel.prototype.openPath = function (path) {
-    console.log(path);
+    var self = this;
+    var parts = path.split('/');
+    parts.shift(); // Remove root
+    self.activeEntry(null);
+    var lastChild = new HueFileEntry({
+      activeEntry: self.activeEntry,
+      assistHelper: self.assistHelper,
+      app: 'documents',
+      definition: {
+        name: '/',
+        type: 'directory'
+      }
+    });
+    $.each(parts, function (idx, part) {
+      if (part === '') {
+        return false;
+      }
+      lastChild = new HueFileEntry({
+        activeEntry: self.activeEntry,
+        assistHelper: self.assistHelper,
+        parent: lastChild,
+        app: 'documents',
+        definition: {
+          name: lastChild.isRoot ? '/' + part : lastChild.definition.name + '/' + part,
+          type: 'directory'
+        }
+      })
+    });
+    self.activeEntry(lastChild);
+    self.activeEntry().load();
   };
 
   return HomeViewModel;
