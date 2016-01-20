@@ -162,6 +162,7 @@ def group_permissions(group):
 def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
+  p.last_activity = datetime.now()
   p.home_directory = "/user/%s" % p.user.username
   try:
     p.save()

@@ -24,9 +24,10 @@ except:
 import cgi
 import logging
 import urllib
+from datetime import datetime
 
-import django.contrib.auth.views
 from axes.decorators import watch_login
+import django.contrib.auth.views
 from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
 from django.contrib.auth import login, get_backends, authenticate
@@ -34,9 +35,6 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
-from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import get_profile
-from useradmin.views import ensure_home_directory, require_change_password
 
 from desktop.auth import forms as auth_forms
 from desktop.lib.django_util import render
@@ -44,6 +42,10 @@ from desktop.lib.django_util import login_notrequired
 from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_warn, last_access_map
 from desktop.conf import LDAP, OAUTH, DEMO_ENABLED
+
+from hadoop.fs.exceptions import WebHdfsException
+from useradmin.models import get_profile
+from useradmin.views import ensure_home_directory, require_change_password
 
 
 LOG = logging.getLogger(__name__)
@@ -133,6 +135,7 @@ def dt_login(request, from_modal=False):
           return HttpResponseRedirect(urlresolvers.reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
 
         userprofile.first_login = False
+        userprofile.last_activity = datetime.now()
         userprofile.save()
 
         msg = 'Successful login for user: %s' % user.username
