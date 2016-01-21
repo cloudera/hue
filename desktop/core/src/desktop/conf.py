@@ -20,14 +20,14 @@ import logging
 import os
 import socket
 import stat
-import subprocess
 
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
-                             validate_path, list_of_compiled_res, coerce_str_lowercase
+                             validate_path, list_of_compiled_res, coerce_str_lowercase, \
+                             coerce_password_from_script
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -52,24 +52,11 @@ def coerce_port(port):
   else:
     return port
 
+
 def coerce_file(path):
   if path and not os.path.isfile(path):
     raise Exception('File %s does not exist.' % path)
   return path
-
-def coerce_password_from_script(script):
-  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
-  stdout, stderr = p.communicate()
-
-  if p.returncode != 0:
-    if os.environ.get('HUE_IGNORE_PASSWORD_SCRIPT_ERRORS') is None:
-      raise subprocess.CalledProcessError(p.returncode, script)
-    else:
-      return None
-
-  # whitespace may be significant in the password, but most files have a
-  # trailing newline.
-  return stdout.strip('\n')
 
 
 def coerce_timedelta(value):
@@ -146,7 +133,7 @@ SSL_CIPHER_LIST = Config(
 
 SSL_PASSWORD = Config(
   key="ssl_password",
-  help=_("SSL password of the the certificate"),
+  help=_("SSL password of the certificate"),
   default=None)
 
 SSL_PASSWORD_SCRIPT = Config(

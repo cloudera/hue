@@ -21,8 +21,8 @@ import socket
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME,\
-  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, coerce_password_from_script
-from desktop.lib.conf import ConfigSection, Config, coerce_bool
+  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
+from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 
 from impala.settings import NICE_NAME
