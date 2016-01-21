@@ -261,7 +261,7 @@ class TSentryPrivilege(object):
     value = 17
     value = (value * 31) ^ hash(self.component)
     value = (value * 31) ^ hash(self.serviceName)
-    value = (value * 31) ^ hash(self.authorizables)
+    value = (value * 31) ^ hash(frozenset(self.authorizables))
     value = (value * 31) ^ hash(self.action)
     value = (value * 31) ^ hash(self.createTime)
     value = (value * 31) ^ hash(self.grantorPrincipal)
