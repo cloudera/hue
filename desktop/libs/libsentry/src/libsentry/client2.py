@@ -110,14 +110,12 @@ class SentryClient(object):
     return self.client.alter_sentry_role_grant_privilege(request)
 
 
-  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
     if tSentryPrivilege is not None:
+      tSentryPrivilege['authorizables'] = [TAuthorizable(type=_auth['type'], name=_auth['name']) for _auth in tSentryPrivilege['authorizables']]
       tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
 
-    if tSentryPrivileges is not None:
-      tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
-
-    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, component=self.component, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
+    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, component=self.component, roleName=roleName, privilege=tSentryPrivilege)
     return self.client.alter_sentry_role_revoke_privilege(request)
 
 

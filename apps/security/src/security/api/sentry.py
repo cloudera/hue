@@ -267,14 +267,14 @@ def save_privileges(request):
 
     deleted_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'deleted']
     for privilege in deleted_privileges:
-      _drop_sentry_privilege(request.user, role, privilege)
+      _drop_sentry_privilege(request.user, role, privilege, component)
 
     modified_privileges = [privilege for privilege in role['privilegesChanged'] if privilege['status'] == 'modified']
     old_privileges_ids = [privilege['id'] for privilege in modified_privileges]
     _hive_add_privileges(request.user, role, modified_privileges, component)
     for privilege in role['originalPrivileges']:
       if privilege['id'] in old_privileges_ids:
-        _drop_sentry_privilege(request.user, role, privilege)
+        _drop_sentry_privilege(request.user, role, privilege, component)
 
     result['message'] = _('Privileges updated')
     result['status'] = 0
