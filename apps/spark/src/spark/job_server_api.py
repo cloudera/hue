@@ -98,7 +98,7 @@ class JobServerApi(object):
 
   def create_session(self, **properties):
     properties['proxyUser'] = self.user
-    return self._root.post('sessions', data=json.dumps(properties), contenttype='application/json')
+    return self._root.post('sessions', data=json.dumps(properties), contenttype=_JSON_CONTENT_TYPE)
 
   def get_session(self, uuid):
     return self._root.get('sessions/%s' % uuid)

@@ -57,7 +57,14 @@ class TestOptimizerApi(object):
     cls.user.save()
 
 
+  def test_api_create_product(self):
+    resp = self.api.create_product()
+
+    assert_equal('success', resp['status'], resp)
+
+
   def test_api_authenticate(self):
     resp = self.api.authenticate()
 
     assert_equal('success', resp['status'], resp)
+
