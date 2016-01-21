@@ -105,7 +105,7 @@ from desktop.views import _ko
       display: inline-block;
       position: absolute;
       right: 10px;
-      top: 0;
+      top: 13px;
       height: 50px;
       line-height: 50px;
     }
