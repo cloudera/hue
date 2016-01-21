@@ -16,6 +16,13 @@
 <%!
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from django.utils.translation import ugettext as _
+
+  use_new_home = False
+  try:
+    from beeswax.conf import USE_NEW_EDITOR
+    use_new_home = USE_NEW_EDITOR.get()
+  except:
+    pass
 %>
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
@@ -93,6 +100,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            </li>
         </ul>
       </div>
+      % if use_new_home:
       <div class="nav-collapse pull-right">
         <ul class="nav">
           <li class="currentApp">
@@ -103,6 +111,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            </li>
         </ul>
       </div>
+      % endif
     </div>
   </div>
 </div>
