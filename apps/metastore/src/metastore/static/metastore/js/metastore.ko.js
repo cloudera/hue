@@ -422,9 +422,10 @@
   function MetastoreViewModel(options) {
     var self = this;
     self.assistAvailable = ko.observable(true);
-    self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
-
     self.assistHelper = AssistHelper.getInstance(options);
+    self.isLeftPanelVisible = ko.observable();
+    self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
 
     self.reloading = ko.observable(false);
     self.loading = ko.observable(false);
@@ -563,10 +564,6 @@
       setDatabaseByName(databaseDef.name, function () {
         huePubSub.publish('metastore.url.change')
       });
-    });
-
-    self.isLeftPanelVisible.subscribe(function (newValue) {
-      $.totalStorage('spark_left_panel_visible', newValue);
     });
 
     huePubSub.subscribe('metastore.url.change', function () {

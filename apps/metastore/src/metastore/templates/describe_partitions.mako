@@ -191,10 +191,11 @@ ${ assist.assistPanel() }
 
     function PartitionViewModel(options, partition_keys_json, partition_values_json) {
       var self = this;
-      self.assistAvailable = ko.observable(true);
-      self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
-
       self.assistHelper = AssistHelper.getInstance(options);
+      self.assistAvailable = ko.observable(true);
+      self.isLeftPanelVisible = ko.observable();
+      self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+
 
       self.isLoading = ko.observable(false);
 
@@ -263,10 +264,6 @@ ${ assist.assistPanel() }
 
       huePubSub.subscribe("assist.database.selected", function (databaseDef) {
         location.href = '/metastore/tables/' + databaseDef.name;
-      });
-
-      self.isLeftPanelVisible.subscribe(function (newValue) {
-        $.totalStorage('spark_left_panel_visible', newValue);
       });
     }
 

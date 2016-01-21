@@ -1182,11 +1182,8 @@
 
     self.assistAvailable = ko.observable(options.assistAvailable);
 
-    self.isLeftPanelVisible = ko.observable(self.assistAvailable() && $.totalStorage('spark_left_panel_visible') != null && $.totalStorage('spark_left_panel_visible'));
-
-    self.isLeftPanelVisible.subscribe(function(newValue) {
-      $.totalStorage('spark_left_panel_visible', newValue);
-    });
+    self.isLeftPanelVisible = ko.observable();
+    AssistHelper.getInstance(self).withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
