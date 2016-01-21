@@ -419,19 +419,25 @@ from django.utils.translation import ugettext as _
              <%
                from beeswax.conf import USE_NEW_EDITOR
              %>
-             <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
              % if USE_NEW_EDITOR.get():
-             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('New Hive')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+             % else:
+             <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
              % endif
            % endif
            % if 'impala' in apps:
-             <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
              % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
-             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('New Impala')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+             % else:
+             <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
              % endif
            % endif
            % if 'rdbms' in apps:
-            <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             % if USE_NEW_EDITOR.get():
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             % else:
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             % endif
            % endif
            % if 'pig' in apps:
              <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
@@ -444,7 +450,11 @@ from django.utils.translation import ugettext as _
        % elif query_apps[1] == 1:
           <li><a href="/${apps[query_apps[0]].display_name}">${apps[query_apps[0]].nice_name}</a></li>
        % endif
-       % if 'spark' in apps:
+       % if 'beeswax' in apps:
+        <%
+          from beeswax.conf import USE_NEW_EDITOR
+        %>
+        % if USE_NEW_EDITOR.get():
          <% from desktop.models import Document2, Document %>
          <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
@@ -469,8 +479,9 @@ from django.utils.translation import ugettext as _
                % endfor
              </ul>
            </li>
-         % endif
-       % endif
+          % endif
+        % endif
+      % endif
        <%
          data_apps = count_apps(apps, ['metastore', 'hbase', 'sqoop', 'zookeeper']);
        %>

@@ -59,10 +59,27 @@ dynamic_patterns = patterns('desktop.auth.views',
   (r'^login/oauth_authenticated/?$', 'oauth_authenticated'),
 )
 
+
+use_new_home = False
+try:
+  from beeswax.conf import USE_NEW_EDITOR
+  use_new_home = USE_NEW_EDITOR.get()
+except:
+  logging.debug('Beeswax is disabled, using old home')
+
+if use_new_home:
+  dynamic_patterns += patterns('desktop.views',
+    (r'^home$','home2'),
+    (r'^home2$','home')
+  )
+else:
+  dynamic_patterns += patterns('desktop.views',
+    (r'^home$','home'),
+    (r'^home2$','home2')
+  )
+
 dynamic_patterns += patterns('desktop.views',
   (r'^logs$','log_view'),
-  (r'^home$','home'),
-  (r'^home2$','home2'),
   (r'^desktop/dump_config$','dump_config'),
   (r'^desktop/download_logs$','download_log_view'),
   (r'^bootstrap.js$', 'bootstrap'), # unused
