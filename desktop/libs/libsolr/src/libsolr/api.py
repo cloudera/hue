@@ -471,6 +471,18 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+
+  def configs(self):
+    try:
+      params = self._get_params() + (
+          ('action', 'LIST'),
+          ('wt', 'json'),
+      )
+      return self._root.get('admin/configs', params=params)['configSets']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
   def aliases(self):
     try:
       params = self._get_params() + ( # Waiting for SOLR-4968

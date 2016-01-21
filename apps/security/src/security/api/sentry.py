@@ -85,7 +85,7 @@ def _fetch_collections(request):
   elif item == 'collections':
     return {"tables_meta": [{"comment": None, "type": "Table", "name": col} for col in api.collections2()]}
   elif item == 'configs':
-    return {"tables_meta": [{"comment": None, "type": "Table", "name": "log_analytics_demo"}, {"comment": None, "type": "Table", "name": "schemalessTemplateSecure"}]}
+    return {"tables_meta": [{"comment": None, "type": "Table", "name": conf} for conf in api.configs()]}
   else:
     raise PopupException(_('Authorizable %s could not be retrieved') % path)
 
