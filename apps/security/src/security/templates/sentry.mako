@@ -53,23 +53,29 @@ ${ layout.menubar(section=component) }
       <a class="pointer" style="margin-right: 4px" data-bind="click: remove"><i class="fa fa-times"></i></a>
     </div>
 
-    <div class="inline-block" style="vertical-align: middle">
-      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); action($root.availableActions()[0]) }">
-        <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db' , 'fa-check-circle-o': privilegeType() == 'db'}"></i>
-      </a>
-    </div>
-    <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
+    <!-- ko if: $root.component() == 'hive' -->
+      <div class="inline-block" style="vertical-align: middle">
+        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('db'); action($root.availableActions()[0]) }">
+          <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'db', 'fa-check-circle-o': privilegeType() == 'db'}"></i>
+        </a>
+      </div>
+      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
 
-    <div class="inline-block" style="vertical-align: middle">
-      <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); action('ALL'); }">
-        <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri' , 'fa-check-circle-o': privilegeType() == 'uri'}"></i>
-      </a>
-    </div>
-    <!-- ko if: editing() -->
-    <input type="text" data-bind="filechooser: 'URI TODO', enable: privilegeType() == 'uri'" placeholder="URI">
+      <div class="inline-block" style="vertical-align: middle">
+        <a class="pointer" style="padding-top: 4px" data-bind="click: function(){ privilegeType('uri'); action('ALL'); }">
+          <i class="fa fa-fw fa-1halfx muted" data-bind="css: {'fa-circle-o': privilegeType() != 'uri', 'fa-check-circle-o': privilegeType() == 'uri'}"></i>
+        </a>
+      </div>
+
+      <input type="text" data-bind="filechooser: 'URI TODO', enable: privilegeType() == 'uri'" placeholder="URI">
+
+      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
-
-    <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
+    <!-- ko if: $root.component() == 'solr' -->
+      <span data-bind="text: ko.mapping.toJSON($data)"></span>
+      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
+      <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
+    <!-- /ko -->
 
     <div class="new-line-if-small">
       <label class="checkbox"><input type="checkbox" data-bind="checked: grantOption"> ${ _('With grant') }</label>
@@ -93,34 +99,45 @@ ${ layout.menubar(section=component) }
     <!-- /ko -->
 
     <span class="muted" data-bind="text: privilegeScope, attr: {title: moment(timestamp()).fromNow()}"></span>
+
     <!-- ko if: grantOption -->
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
-    <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
-      <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
-    </span>
-    <br/>
 
-    server=<span data-bind="text: serverName"></span>
+    <!-- ko if: $root.component() == 'hive' -->
+      <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
+        <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
+      </span>
+      <br/>
 
-    <!-- ko if: privilegeType() == 'db' -->
-      <span data-bind="visible: dbName">
-        <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }" title="${ _('Browse db privileges') }"><span data-bind="text: dbName"></span></a>
-      </span>
-      <span data-bind="visible: tableName">
-        <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName()) }" title="${ _('Browse table privileges') }"><span data-bind="text: tableName"></span></a>
-      </span>
-      <span data-bind="visible: columnName">
-        <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }" title="${ _('Browse column privileges') }"><span data-bind="text: columnName"></span></a>
-      </span>
+      server=<span data-bind="text: serverName"></span>
+
+      <!-- ko if: privilegeType() == 'db' -->
+        <span data-bind="visible: dbName">
+          <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }" title="${ _('Browse db privileges') }"><span data-bind="text: dbName"></span></a>
+        </span>
+        <span data-bind="visible: tableName">
+          <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName()) }" title="${ _('Browse table privileges') }"><span data-bind="text: tableName"></span></a>
+        </span>
+        <span data-bind="visible: columnName">
+          <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }" title="${ _('Browse column privileges') }"><span data-bind="text: columnName"></span></a>
+        </span>
+      <!-- /ko -->
+
+      <!-- ko if: privilegeType() == 'uri' -->
+        <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+      <!-- /ko -->
+
+      <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
-
-    <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+    <!-- ko if: $root.component() == 'solr' -->
+      <span data-bind="text: ko.mapping.toJSON($data)"></span>
+      <br/>
+      <!-- ko foreach: authorizables -->
+        <span data-bind="text: type"></span>=<span data-bind="text: name_"></span><i class="fa fa-long-arrow-right"></i>
+      </span>
+      <!-- /ko -->
     <!-- /ko -->
-
-    <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
-
   <!-- /ko -->
 </div>
 </script>
