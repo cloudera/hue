@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="tree" file="common_tree.mako" />
 
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
-${ layout.menubar(section='hive2') }
+${ layout.menubar(section=component) }
 
 
 <script type="text/html" id="role">
