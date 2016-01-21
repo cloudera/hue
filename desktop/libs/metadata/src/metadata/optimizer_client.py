@@ -31,8 +31,11 @@ from metadata.conf import OPTIMIZER
 LOG = logging.getLogger(__name__)
 
 
+_JSON_CONTENT_TYPE = 'application/json'
+
+
 def is_optimizer_enabled():
-  return OPTIMIZER.API_URL.get()
+  return OPTIMIZER.API_URL.get() and OPTIMIZER.PRODUCT_NAME.get()
 
 
 class OptimizerApiException(Exception):
@@ -41,24 +44,25 @@ class OptimizerApiException(Exception):
 
 class OptimizerApi(object):
 
-  def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get()):
+  def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
     self._api_url = (api_url or OPTIMIZER.API_URL.get()).strip('/')
     self._product_name = product_name if product_name else OPTIMIZER.PRODUCT_NAME.get()
     self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
+    self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
 
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_verify(ssl_cert_ca_verify)
 
     self._root = resource.Resource(self._client)
 
-  def create_product(self, product_name, product_secret):
+  def create_product(self, product_name=None, product_secret=None, authCode=None):
     try:
       data = {
-          'productName': product_name,
-          'productSecret': product_secret,
-          'authCode': ''
+          'productName': product_name if product_name is not None else self._product_name,
+          'productSecret': product_secret if product_secret is not None else self._product_secret,
+          'authCode': authCode if authCode is not None else self._product_auth_secret
       }
-      return self._root.post('/api/createProduct', data)
+      return self._root.post('/api/createProduct', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
