@@ -631,20 +631,20 @@ var Assist = function (vm, initial) {
   self.refreshTree = function (force) {
     self.growingTree(jQuery.extend(true, {}, self.initialGrowingTree));
     // load root first
-    self.fetchHivePath("", function () {
+    self.fetchAuthorizablesPath("", function () {
       Object.keys(self.treeAdditionalData).forEach(function (path) {
         if (path.indexOf(".") == -1 && path != "") {
           if (typeof force == "boolean" && force) {
-            self.fetchHivePath(path);
+            self.fetchAuthorizablesPath(path);
           }
           else {
             if (self.treeAdditionalData[path].loaded) {
-              self.fetchHivePath(path, function () {
+              self.fetchAuthorizablesPath(path, function () {
                 self.updatePathProperty(self.growingTree(), path, "isExpanded", self.treeAdditionalData[path].expanded);
                 var _withTable = false;
                 Object.keys(self.treeAdditionalData).forEach(function (ipath) {
                   if (ipath.split(".").length == 2 && ipath.split(".")[0] == path) {
-                    self.fetchHivePath(ipath, function () {
+                    self.fetchAuthorizablesPath(ipath, function () {
                       _withTable = true;
                       self.updatePathProperty(self.growingTree(), ipath, "isExpanded", self.treeAdditionalData[ipath].expanded);
                       self.loadData(self.growingTree());
@@ -691,7 +691,7 @@ var Assist = function (vm, initial) {
       }
     }
     else {
-      self.fetchHivePath();
+      self.fetchAuthorizablesPath();
     }
   }
 
@@ -703,7 +703,7 @@ var Assist = function (vm, initial) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-    self.fetchHivePath(obj.path(), function(data){
+    self.fetchAuthorizablesPath(obj.path(), function(data){
       location.href = "/security/hdfs#" + data.hdfs_link.substring("/filebrowser/view=".length);
     });
   }
@@ -767,13 +767,13 @@ var Assist = function (vm, initial) {
   }
 
   self.loadParents = function (callback) {
-    self.fetchHivePath("", function () {
+    self.fetchAuthorizablesPath("", function () {
       self.updatePathProperty(self.growingTree(), "", "isExpanded", true);
       var _crumbs = self.path().split(".");
-      self.fetchHivePath(_crumbs[0], function () {
+      self.fetchAuthorizablesPath(_crumbs[0], function () {
         self.updatePathProperty(self.growingTree(), _crumbs[0], "isExpanded", true);
         if (_crumbs.length > 1) {
-          self.fetchHivePath(_crumbs[0] + "." + _crumbs[1], function () {
+          self.fetchAuthorizablesPath(_crumbs[0] + "." + _crumbs[1], function () {
             self.updatePathProperty(self.growingTree(), _crumbs[0] + "." + _crumbs[1], "isExpanded", true);
             self.loadData(self.growingTree());
             if (typeof callback != "undefined") {
@@ -799,7 +799,7 @@ var Assist = function (vm, initial) {
     });
   }
 
-  self.fetchHivePath = function (optionalPath, loadCallback) {
+  self.fetchAuthorizablesPath = function (optionalPath, loadCallback) {
     var _originalPath = typeof optionalPath != "undefined" ? optionalPath : self.path();
 
     if (_originalPath.split(".").length < 4) {
@@ -807,9 +807,10 @@ var Assist = function (vm, initial) {
 
       var _path = _originalPath.replace('.', '/');
       var request = {
-        url: '/security/api/sentry/fetch_hive_path',
+        url: '/security/api/sentry/fetch_authorizables',
         data: {
           'path': _path,
+          'component': vm.component(),
           'doas': vm.doAs(),
           'isDiffMode': self.isDiffMode()
         },
@@ -1000,7 +1001,7 @@ var HiveViewModel = function (initial) {
       if (path != "") {
         self.assist.loadParents();
       } else {
-        self.assist.fetchHivePath();
+        self.assist.fetchAuthorizablesPath();
       }
     }, 100);
   };
