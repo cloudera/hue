@@ -1086,6 +1086,9 @@
         }
         window.setTimeout(adjustHeightSingle, 200);
         $(window).resize(adjustHeightSingle);
+        huePubSub.subscribe('assist.forceRender', function () {
+          window.setTimeout(adjustHeightSingle, 200);
+        });
         $allExtras.show();
         $allPanels.show();
         return;
@@ -1160,8 +1163,9 @@
 
       resizeByRatio();
       $(window).resize(resizeByRatio);
-
-      huePubSub.subscribe('assist.forceResize', resizeByRatio);
+      huePubSub.subscribe('assist.forceRender', function () {
+        window.setTimeout(resizeByRatio, 200);
+      });
 
       $allExtras.show();
       $allPanels.show();
@@ -2895,7 +2899,7 @@
           if (wrappable.is('table') && startItem % 2 == 1) {
             startItem--;
           }
-          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 10, data.length);
+          endItem = Math.min(startItem + Math.ceil($parent.parents(scrollable).height() / itemHeight) + 20, data.length);
           wrappable.css('top', ((startItem * itemHeight) + fluidCorrection) + 'px');
         }
         else {
