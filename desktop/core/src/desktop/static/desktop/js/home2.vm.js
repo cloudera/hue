@@ -85,7 +85,19 @@
       })
     });
     self.activeEntry(lastChild);
-    self.activeEntry().load();
+
+    self.activeEntry().load(function () {
+      var currentParent = lastChild.parent;
+      var loadParent = function () {
+        if (currentParent) {
+          currentParent.load(function () {
+            currentParent = currentParent.parent;
+            loadParent();
+          });
+        }
+      };
+      loadParent();
+    });
   };
 
   return HomeViewModel;

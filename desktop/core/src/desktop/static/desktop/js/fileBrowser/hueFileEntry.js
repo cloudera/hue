@@ -96,6 +96,9 @@
             destinationId: self.definition.id
           });
         } else {
+          if (self !== self.activeEntry()) {
+            self.load();
+          }
           self.activeEntry().load();
         }
       };
@@ -120,7 +123,7 @@
     }
   };
 
-  HueFileEntry.prototype.load = function () {
+  HueFileEntry.prototype.load = function (callback) {
     var self = this;
     if (self.loading()) {
       return;
@@ -153,6 +156,9 @@
           }
           self.loading(false);
           self.loaded(true);
+          if (callback) {
+            callback();
+          }
         },
         errorCallback: function () {
           self.hasErrors(true);
