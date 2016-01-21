@@ -199,26 +199,18 @@ class SentryApi(object):
 
   def _massage_priviledge(self, privilege):
     return {
-        'scope': privilege.privilegeScope,
-        'server': privilege.serverName,
-        'database': privilege.dbName,
-        'table': privilege.tableName,
-        'URI': privilege.URI,
+        'component': privilege.component,
+        'serviceName': privilege.serviceName,
+        'authorizables': self._massage_authorizable(privilege.authorizables),
         'action': 'ALL' if privilege.action == '*' else privilege.action.upper(),
         'timestamp': privilege.createTime,
+        'grantorPrincipal': privilege.grantorPrincipal,
         'grantOption': privilege.grantOption == 1,
-        'column': privilege.columnName,
     }
 
 
-  def _massage_authorizable(self, authorizable):
-    return {
-        'server': authorizable.server,
-        'database': authorizable.db,
-        'table': authorizable.table,
-        'URI': authorizable.uri,
-        'column': authorizable.column,
-    }
+  def _massage_authorizable(self, authorizables):
+    return [{'type': auth.type, 'name': auth.name} for auth in authorizables]
 
 
 class SentryException(Exception):

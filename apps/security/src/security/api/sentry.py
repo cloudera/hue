@@ -36,11 +36,11 @@ LOG = logging.getLogger(__name__)
 
 def fetch_authorizables(request):
   if request.GET['component'] == 'solr':
-    resp = _fetch_collections(request)
+    resp = JsonResponse(_fetch_collections(request))
   elif request.GET['component'] == 'hive':
     resp = _fetch_hive_path(request)
 
-  return JsonResponse(resp)
+  return resp
 
 
 def _fetch_hive_path(request):
@@ -126,7 +126,7 @@ def list_sentry_privileges_by_role(request):
 
     sentry_privileges = get_api(request.user, component).list_sentry_privileges_by_role(serviceName, roleName)
 
-    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '%s.%s.%s.%s' % (privilege['server'], privilege['database'], privilege['table'], privilege['URI']))
+    result['sentry_privileges'] = sorted(sentry_privileges, key=lambda privilege: '.'.join([auth['name'] for auth in privilege['authorizables']]))
     result['message'] = ''
     result['status'] = 0
   except Exception, e:

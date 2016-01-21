@@ -868,7 +868,12 @@ var HiveViewModel = function (initial) {
   self.isApplyingBulk = ko.observable(false);
 
   self.availablePrivileges = ko.observableArray(['SERVER', 'DATABASE', 'TABLE', 'COLUMN']);
-  self.availableActions = ko.observableArray(['SELECT', 'INSERT', 'ALL']);
+  self.availableActions = ko.observableArray();
+  if (initial.component == 'solr') {
+    self.availableActions(['QUERY', 'UPDATE', 'ALL']);
+  } else {
+    self.availableActions(['SELECT', 'INSERT', 'ALL']);
+  }
 
   self.privilegeFilter = ko.observable("");
 
@@ -1104,15 +1109,12 @@ var HiveViewModel = function (initial) {
 
   function _create_ko_privilege(privilege) {
     var _privilege = new Privilege(self, {
-      'privilegeScope': privilege.scope,
-      'serverName': privilege.server,
-      'dbName': privilege.database,
-      'tableName': privilege.table,
-      'columnName': privilege.column,
-      'URI': privilege.URI,
+      'component': privilege.component,
+      'serverName': privilege.serviceName,
+      'authorizables': privilege.authorizables,
       'action': privilege.action,
       'timestamp': privilege.timestamp,
-      'roleName': privilege.roleName,
+      'grantorPrincipal': privilege.grantorPrincipal,
       'grantOption': privilege.grantOption,
       'id': UUID()
     });
