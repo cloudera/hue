@@ -1161,6 +1161,8 @@
       resizeByRatio();
       $(window).resize(resizeByRatio);
 
+      huePubSub.subscribe('assist.forceResize', resizeByRatio);
+
       $allExtras.show();
       $allPanels.show();
 
