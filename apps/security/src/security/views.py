@@ -50,7 +50,7 @@ def _sentry(request, component):
           'sentry_provider': get_hive_sentry_provider(),
           'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
       }),
-      'has_impersonation_perm': _has_impersonation_perm(request.user),
+      'has_impersonation_perm': _has_impersonation_perm(request.user) and component == 'hive',
       'component': component
   })
 
