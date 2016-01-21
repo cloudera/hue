@@ -44,13 +44,7 @@
     self.name = self.definition.name.substring(self.definition.name.lastIndexOf('/') + 1);
     self.isRoot = self.name === '';
     self.isDirectory = self.definition.type === 'directory';
-    if (self.isRoot) {
-      self.path = '/';
-    } else if (self.parent.isRoot) {
-      self.path = self.definition.name;
-    } else {
-      self.path = self.parent.path + self.definition.name;
-    }
+    self.path = self.definition.name;
     self.app = options.app;
 
     self.entriesToDelete = ko.observableArray();
