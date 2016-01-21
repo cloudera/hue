@@ -147,7 +147,12 @@ ${ layout.menubar(section=component) }
 
       <div id="edit" class="mainSection card card-small">
         <h1 class="card-heading simple">
+          <!-- ko if: component() == 'hive' -->
           ${ _('Database and Table privileges') }
+          <!-- /ko -->
+          <!-- ko if: component() == 'solr' -->
+          ${ _('Collections privileges') }
+          <!-- /ko -->
           <div id="help-content" class="hide">
             ${ _('Check the') } <a href="http://gethue.com/apache-sentry-made-easy-with-the-new-hue-security-app/#howto" target="_blank">${ _('documentation!') }</a>
           </div>
@@ -598,7 +603,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }
         viewModel.assist.path(path);
         viewModel.assist.updatePathProperty(viewModel.assist.growingTree(), path, "isExpanded", true);
-        viewModel.assist.fetchHivePath();
+        viewModel.assist.fetchAuthorizablesPath();
       }
 
       $("#path").jHueHiveAutocomplete({

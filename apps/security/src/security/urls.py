@@ -60,7 +60,7 @@ urlpatterns += patterns('security.api.hive',
 
 # Generic API V2
 urlpatterns += patterns('security.api.sentry',
-  url(r'^api/sentry/fetch_hive_path', 'fetch_hive_path', name='fetch_hive_path'),
+  url(r'^api/sentry/fetch_authorizables', 'fetch_authorizables', name='fetch_authorizables'),
 
   url(r'^api/sentry/list_sentry_roles_by_group', 'list_sentry_roles_by_group', name='list_sentry_roles_by_group'),
   url(r'^api/sentry/list_sentry_privileges_by_role', 'list_sentry_privileges_by_role', name='list_sentry_privileges_by_role'),

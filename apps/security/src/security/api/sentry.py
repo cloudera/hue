@@ -22,8 +22,10 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from beeswax.api import autocomplete
 from hadoop.cluster import get_defaultfs
+from libsolr.api import SolrApi
 
 from libsentry.api2 import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
@@ -32,7 +34,16 @@ from libsentry.sentry_site import get_sentry_server_admin_groups
 LOG = logging.getLogger(__name__)
 
 
-def fetch_hive_path(request):
+def fetch_authorizables(request):
+  if request.GET['component'] == 'solr':
+    resp = _fetch_collections(request)
+  elif request.GET['component'] == 'hive':
+    resp = _fetch_hive_path(request)
+
+  return JsonResponse(resp)
+
+
+def _fetch_hive_path(request):
   path = request.GET['path']
 
   database = None
@@ -51,6 +62,32 @@ def fetch_hive_path(request):
     resp = autocomplete(request, database, table)
 
   return resp
+
+
+def _fetch_collections(request):
+  from search.conf import SOLR_URL
+
+  path = request.GET['path']
+  item = None
+  name = None
+
+  if path:
+    item = path
+  if '/' in path:
+    item, name = path.split('/')
+
+  api = SolrApi(SOLR_URL.get(), request.user)
+
+  if not item:
+    return {"databases": ["collections", "configs"]}
+  elif item and name:
+    return {"hdfs_link": "/indexer/#edit/%s" % name, "extended_columns": [], "columns": [], "partition_keys": []}
+  elif item == 'collections':
+    return {"tables_meta": [{"comment": None, "type": "Table", "name": col} for col in api.collections2()]}
+  elif item == 'configs':
+    return {"tables_meta": [{"comment": None, "type": "Table", "name": "log_analytics_demo"}, {"comment": None, "type": "Table", "name": "schemalessTemplateSecure"}]}
+  else:
+    raise PopupException(_('Authorizable %s could not be retrieved') % path)
 
 
 def list_sentry_roles_by_group(request):
