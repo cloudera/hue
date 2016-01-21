@@ -445,3 +445,62 @@ def _convert_documents(user):
 
     if imported_docs:
       root_doc.children.add(*imported_docs)
+
+
+def _convert_documents(user):
+  """
+  Given a user, converts any existing Document objects to Document2 objects
+  """
+  from beeswax.models import HQL, IMPALA, RDBMS
+  from pig.models import PigScript
+
+  # If user does not have a home directory, we need to create one and import any orphan documents to it
+  home_dir = Document2.objects.create_user_directories(user)
+  imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
+  imported_docs = []
+
+  def get_unconverted_docs(content_type):
+    docs = Document.objects.get_docs(user, content_type).filter(owner=user)
+    docs = docs.exclude(tags__in=[
+      DocumentTag.objects.get_trash_tag(user=user), # No trashed docs
+      DocumentTag.objects.get_history_tag(user=user), # No history yet
+      DocumentTag.objects.get_example_tag(user=user), # No examples
+      imported_tag # No already imported docs
+    ])
+    return docs
+
+  def create_doc2(doc, name, doctype, description=None, data=None):
+    with transaction.atomic():
+      doc2 = Document2.objects.create(
+        owner=user,
+        name=name,
+        type=doctype,
+        description=description,
+        data=data,
+        parent_directory=home_dir
+      )
+      doc.add_tag(imported_tag)
+      doc.save()
+      return doc2
+
+  # Convert SavedQuery documents
+  docs = get_unconverted_docs(SavedQuery).filter(extra__in=[HQL, IMPALA, RDBMS])
+  for doc in docs:
+    if doc.content_object:
+      notebook = import_saved_beeswax_query(doc.content_object)
+      data = notebook.get_data()
+      doc2 = create_doc2(doc, name=data['name'], doctype=data['type'], description=data['description'], data=notebook.get_json())
+      imported_docs.append(doc2)
+
+  # Convert PigScript documents
+  docs = get_unconverted_docs(PigScript)
+  for doc in docs:
+    if doc.content_object:
+      data = doc.content_object.dict
+      data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+      doc2 = create_doc2(doc, name=doc.name, doctype='link-pigscript', description=doc.description, data=json.dumps(data))
+      imported_docs.append(doc2)
+
+  # Add converted docs to root directory
+  if imported_docs:
+    LOG.info('Successfully imported %d documents' % len(imported_docs))
