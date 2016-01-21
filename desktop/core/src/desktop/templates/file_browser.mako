@@ -327,16 +327,15 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
 
-      <!-- ko if: entries().length == 0 && ! hasErrors()-->
-      <div class="fb-empty animated">
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading()">
         ${ _('The current folder is empty. You can add a new file or folder form the top right menu.')}
       </div>
-      <!-- /ko -->
-      <!-- ko if: hasErrors() && app === 'documents' -->
-      <div class="fb-empty animated">
+      <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
         ${ _('There was an error loading the documents.')}
       </div>
-      <!-- /ko -->
+      <div class="fb-empty animated" style="display: none;" data-bind="visible: loading">
+        <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
+      </div>
       <!-- /ko -->
 
 
