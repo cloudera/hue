@@ -65,8 +65,40 @@ from desktop.views import _ko
       overflow-x: hidden;
     }
 
-    .fb-breadcrumb {
+    .fb-breadcrumbs {
+      padding: 9px 9px;
+      margin: 10px;
+      list-style: none outside none;
+    }
+
+    .fb-breadcrumbs li {
+      line-height: 36px;
+      padding: 0;
+      vertical-align: middle;
       display: inline-block;
+      height: 36px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .fb-breadcrumbs .fb-drop-target {
+      padding: 0 6px;
+    }
+
+    .active {
+      padding: 0 12px;
+      color: #444;
+    }
+
+    .fb-breadcrumbs li:not(.divider):not(.active):hover {
+      border-bottom: 2px solid #338BB8;
+    }
+
+    .fb-breadcrumbs a {
+      color: #338BB8 !important;
+    }
+
+    .fb-breadcrumbs a:hover {
+      text-decoration: none;
     }
 
     .fb-folder-actions {
@@ -88,7 +120,7 @@ from desktop.views import _ko
       clear: both;
       height: 35px;
       line-height: 35px;
-      border: 1px solid #fff;
+      border: 1px solid transparent;
       margin: 1px;
       color: #444;
       font-size: 13px;
@@ -137,11 +169,6 @@ from desktop.views import _ko
       vertical-align: middle;
     }
 
-    .active-breadcrumb {
-      padding: 0 12px;
-      color: #444;
-    }
-
     .fb-type {
       width: 140px;
     }
@@ -154,9 +181,18 @@ from desktop.views import _ko
       width: 150px;
     }
 
+    .fb-drag-container {
+      position: fixed;
+    }
+
     .fb-drag-helper {
       display: none;
-      position: fixed;
+      position: absolute;
+      width: auto;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      top: -15px;
+      left: 10px;
       height: 30px;
       line-height: 30px;
       vertical-align: middle;
@@ -173,6 +209,10 @@ from desktop.views import _ko
       vertical-align: middle;
       margin-right: 8px;
       font-size: 16px;
+    }
+
+    .fb-drop-target {
+      border: 1px solid transparent;
     }
 
     .fb-drop-hover {
@@ -260,17 +300,18 @@ from desktop.views import _ko
     <div class="fb-container">
       <div class="fb-action-bar">
         <h4>
-          <div class="fb-breadcrumb" data-bind="with: activeEntry">
-            <ul class="nav nav-pills hueBreadcrumbBar">
+          <div data-bind="with: activeEntry">
+            <ul class="fb-breadcrumbs">
               <!-- ko if: isRoot -->
-              <li class="active-breadcrumb">${ _('My documents') }</li>
+              <li class="active"><div class="fb-drop-target">${ _('My documents') }</div></li>
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: open"></a> <span class="divider">&gt;</span></li>
+              <li><div class="fb-drop-target" data-bind="folderDroppable: $parent.entries"><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: open"></a></div></li>
+              <li class="divider">&gt;</li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
-              <li class="active-breadcrumb" data-bind="text: name"></li>
+              <li class="active"><div class="fb-drop-target" data-bind="text: name"></div></li>
               <!-- /ko -->
             </ul>
           </div>
@@ -341,7 +382,7 @@ from desktop.views import _ko
 
       <div class="fb-list" data-bind="with: activeEntry">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
-          <li data-bind="fileSelect: $parent.entries, css: { 'fb-selected': selected }">
+          <li data-bind="fileSelect: $parent.entries, folderDroppable: $parent.entries, css: { 'fb-selected': selected }">
             <div style="width: 100%; height: 100%" data-bind="contextMenu: '.hue-context-menu'">
               <ul class="hue-context-menu">
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') }</a></li>
@@ -376,15 +417,11 @@ from desktop.views import _ko
       }
     }(function (ko) {
 
-      ko.bindingHandlers.fileSelect = {
+      ko.bindingHandlers.folderDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
-          var $element = $(element);
-          $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
-
           var allEntries = valueAccessor();
-
           if (boundEntry.isDirectory) {
-            $element.droppable({
+            $(element).droppable({
               drop: function (ev, ui) {
                 boundEntry.moveHere($.grep(allEntries(), function (entry) {
                   return entry.selected();
@@ -393,12 +430,22 @@ from desktop.views import _ko
               hoverClass: 'fb-drop-hover'
             })
           }
+        }
+      };
+
+      ko.bindingHandlers.fileSelect = {
+        init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
+          var $element = $(element);
+          $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
+          var allEntries = valueAccessor();
 
           $element.draggable({
-            helper: function () {
+            start: function (event, ui) {
+              var $container = $('.fb-drag-container');
+
               var selectedEntries = $.grep(allEntries(), function (entry) {
                 return entry.selected();
-              })
+              });
 
               if (selectedEntries.length === 0) {
                 boundEntry.selected(true);
@@ -418,7 +465,11 @@ from desktop.views import _ko
                 $helper.find('.drag-text').text(boundEntry.name);
                 $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
               }
-              return $helper;
+
+              $helper.appendTo($container);
+            },
+            helper: function () {
+              return $('<div>').addClass('fb-drag-container');
             },
             appendTo: "body",
             cursorAt: {
