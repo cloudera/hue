@@ -975,6 +975,8 @@ class Document2(models.Model):
       return reverse('notebook:notebook') + '?notebook=' + str(self.id)
     elif self.type == 'search-dashboard':
       return reverse('search:index') + '?collection=' + str(self.id)
+    elif self.type == 'link-pigscript':
+      return reverse('pig:index') + '#edit/%s' % self.data_dict.get('object_id', '')
     else:
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
 
