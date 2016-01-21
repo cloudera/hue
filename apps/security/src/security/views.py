@@ -51,6 +51,7 @@ def _sentry(request, component):
           'is_sentry_admin': request.user.groups.filter(name__in=get_sentry_server_admin_groups()).exists()
       }),
       'has_impersonation_perm': _has_impersonation_perm(request.user),
+      'component': component
   })
 
 
