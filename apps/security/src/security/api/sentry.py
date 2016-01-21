@@ -48,18 +48,22 @@ def _fetch_hive_path(request):
 
   database = None
   table = None
+  column = None
+
   if path:
     database = path
   if '/' in path:
-    database, table = path.split('/')
+    database, table = path.split('/', 1)
+    if '.' in table:
+      table, column  = table.split('.', 1)
 
-  resp = autocomplete(request, database, table)
+  resp = autocomplete(request, database, table, column)
 
   if database and request.GET['doas'] != request.user.username:
     request.GET = request.GET.copy()
     request.GET['doas'] = request.GET['doas']
 
-    resp = autocomplete(request, database, table)
+    resp = autocomplete(request, database, table, column)
 
   return resp
 
