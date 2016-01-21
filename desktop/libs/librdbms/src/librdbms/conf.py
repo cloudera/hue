@@ -17,8 +17,9 @@
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 from desktop.lib.conf import Config, UnspecifiedConfigSection,\
-                             ConfigSection, coerce_json_dict
-from desktop.conf import coerce_database, coerce_password_from_script
+                             ConfigSection, coerce_json_dict,\
+                             coerce_password_from_script
+from desktop.conf import coerce_database
 
 
 DATABASES = UnspecifiedConfigSection(

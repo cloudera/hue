@@ -75,6 +75,7 @@ import logging
 import os
 import textwrap
 import re
+import subprocess
 import sys
 
 try:
@@ -701,3 +702,17 @@ def validate_thrift_transport(confvar):
     return error_res
 
   return []
+
+def coerce_password_from_script(script):
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
+  stdout, stderr = p.communicate()
+
+  if p.returncode != 0:
+    if os.environ.get('HUE_IGNORE_PASSWORD_SCRIPT_ERRORS') is None:
+      raise subprocess.CalledProcessError(p.returncode, script)
+    else:
+      return None
+
+  # whitespace may be significant in the password, but most files have a
+  # trailing newline.
+  return stdout.strip('\n')

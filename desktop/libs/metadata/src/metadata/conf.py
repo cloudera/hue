@@ -18,8 +18,8 @@
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-                         AUTH_PASSWORD_SCRIPT, coerce_password_from_script, default_ssl_validate
-from desktop.lib.conf import Config, ConfigSection, coerce_bool
+                         AUTH_PASSWORD_SCRIPT, default_ssl_validate
+from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 
 
 def get_auth_username():
