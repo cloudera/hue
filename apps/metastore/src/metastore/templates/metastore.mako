@@ -291,7 +291,7 @@ ${ assist.assistPanel() }
       </div>
     % endif
   </div>
-  <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px">
+  <table id="databasesTable" class="table table-condensed datatables" style="margin-bottom: 10px" data-bind="visible: filteredDatabases().length > 0">
     <thead>
     <tr>
       <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredDatabases, selectedValues: selectedDatabases }"></div></th>
@@ -383,7 +383,7 @@ ${ assist.assistPanel() }
           % endif
         </div>
 
-        <table id="tablesTable" class="table table-striped table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: tables().length > 0">
+        <table id="tablesTable" class="table table-striped table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
           <thead>
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
