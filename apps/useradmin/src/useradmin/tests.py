@@ -847,7 +847,7 @@ def test_get_connection_bind_password_script():
       f()
 
 
-class BaseUserAdminTests(object):
+class LastActivityMiddlewareTests(object):
 
   def test_last_activity(self):
     c = make_logged_in_client(username="test", is_superuser=True)
