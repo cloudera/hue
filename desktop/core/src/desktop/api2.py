@@ -62,6 +62,18 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_documents(request):
+  """
+  Returns all documents and directories found in the given path (required) and current user.
+  Optional params:
+    page=<n>    - Controls pagination. Defaults to 1.
+    limit=<n>   - Controls limit per page. Defaults to all.
+    type=<type> - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc). Default to all.
+    sort=<key>  - Sort by the attribute <key>, which is one of:
+                    "name", "type", "owner", "last_modified"
+                  Accepts the form "-last_modified", which sorts in descending order.
+                  Default to "-last_modified".
+    text=<frag> - Search for fragment "frag" in names and descriptions.
+  """
   path = request.GET.get('path', '/') # Expects path to be a Directory for now
 
   try:
@@ -73,18 +85,36 @@ def get_documents(request):
     else:
       raise e
 
-  parent_path = path.rsplit('/', 1)[0] or '/'
+  parent_path = path.rstrip('/').rsplit('/', 1)[0] or '/'
   parent = directory.dependencies.get(name=parent_path) if path != '/' else None
 
+  # Get querystring filters if any
+  page = int(request.GET.get('page', 1))
+  limit = int(request.GET.get('limit', 0))
+  type_filters = request.GET.getlist('type', None)
+  sort = request.GET.get('sort', '-last_modified')
+  search_text = request.GET.get('text', None)
+
+  documents, count = directory.documents(types=type_filters, search_text=search_text, page=page, limit=limit, order_by=sort)
+
   return JsonResponse({
+      'path': path,
       'directory': directory.to_dict(),
       'parent': parent.to_dict() if parent else None,
-      'documents': [doc.to_dict() for doc in directory.documents() if doc != parent],
-      'path': path
+      'documents': [doc.to_dict() for doc in documents if doc != parent],
+      'page': page,
+      'limit': limit,
+      'count': count,
+      'types': type_filters,
+      'sort': sort,
+      'text': search_text
   })
 
 
-def _import_documents1(user):
+def _convert_documents(user):
+  """
+  Given a user, converts any existing Document objects to Document2 objects
+  """
   from beeswax.models import HQL, IMPALA, RDBMS
 
   with transaction.atomic():
@@ -93,10 +123,10 @@ def _import_documents1(user):
     imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
 
     docs = docs.exclude(tags__in=[
-        DocumentTag.objects.get_trash_tag(user=user), # No trashed docs
-        DocumentTag.objects.get_history_tag(user=user), # No history yet
-        DocumentTag.objects.get_example_tag(user=user), # No examples
-        imported_tag # No already imported docs
+        DocumentTag.objects.get_trash_tag(user=user),  # No trashed docs
+        DocumentTag.objects.get_history_tag(user=user),  # No history yet
+        DocumentTag.objects.get_example_tag(user=user),  # No examples
+        imported_tag  # No already imported docs
     ])
 
     root_doc, created = Directory.objects.get_or_create(name='/', owner=user)
@@ -156,6 +186,7 @@ def _massage_permissions(document):
         }
       }
     }
+
 
 @api_error_handler
 @require_POST
@@ -310,7 +341,6 @@ def export_documents(request):
     return response
   else:
     return make_response(f.getvalue(), 'json', 'hue-documents')
-
 
 
 def import_documents(request):

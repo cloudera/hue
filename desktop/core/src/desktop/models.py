@@ -951,6 +951,7 @@ class Directory(Document2):
   class Meta:
     proxy = True
 
+
   def save(self, *args, **kwargs):
     if self.type != 'directory':
       self.type = 'directory'
@@ -961,11 +962,32 @@ class Directory(Document2):
     if Document2.objects.filter(type='directory', owner=self.owner, name=self.name).count() > 1:
       raise ValidationError(_('Same directory %s for %s already exist') % (self.owner, self.name))
 
+
   def parent(self):
     return Document2.objects.get(type='directory', dependencies=[self.pk]) # or name__startswith=self.name
 
-  def documents(self):
-    return self.dependencies.all() # TODO perms
+
+  def documents(self, types=None, search_text=None, page=1, limit=0, order_by=None):
+    documents = self.dependencies.all()  # TODO: perms
+
+    if types and isinstance(types, list):
+      documents = documents.filter(type__in=types)
+
+    if search_text:
+      documents = documents.filter(Q(name__icontains=search_text) |
+                                   Q(description__icontains=search_text))
+
+    if order_by:  # TODO: Validate that order_by is a valid sort parameter
+      documents = documents.order_by(order_by)
+
+    count = documents.count()
+
+    if limit > 0:
+      offset = (page - 1) * limit
+      last = offset + limit
+      documents = documents.all()[offset:last]
+
+    return documents, count
 
 
 class Document2Permission(models.Model):
