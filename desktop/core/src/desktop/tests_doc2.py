@@ -23,10 +23,11 @@ from django.contrib.auth.models import User
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from desktop.models import import_saved_beeswax_query, Directory, Document2
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
-from desktop.models import import_saved_beeswax_query, Directory
+
 
 
 class TestDocument2(object):
@@ -103,3 +104,34 @@ class TestDocument2(object):
     assert_equal(0, data['status'], data)
 
     assert_true(Directory.objects.filter(owner=self.user, name='/test_mv_dst/test_mv').exists())
+
+
+  def test_directory_documents(self):
+    home_dir = Directory.objects.get(owner=self.user, name='/')
+
+    dir1 = Directory.objects.create(name='/test_dir1', owner=self.user)
+    dir2 = Directory.objects.create(name='/test_dir2', owner=self.user)
+    query1 = Document2.objects.create(name='query1', type='query-hive', owner=self.user, data={})
+    query2 = Document2.objects.create(name='query2', type='query-hive', owner=self.user, data={})
+    children = [dir1, dir2, query1, query2]
+
+    home_dir.dependencies.add(*children)
+
+    # Test that all children directories and documents are returned
+    documents, count = home_dir.documents()
+    assert_equal(4, count, documents)
+
+    # Test filter type
+    documents, count = home_dir.documents(types=['directory'])
+    assert_equal(2, count, documents)
+    assert_true(all(doc.type == 'directory' for doc in documents))
+
+    # Test search text
+    documents, count = home_dir.documents(search_text='query')
+    assert_equal(2, count, documents)
+    assert_true(all(doc.name.startswith('query') for doc in documents))
+
+    # Test pagination with limit
+    documents, count = home_dir.documents(page=2, limit=2)
+    assert_equal(4, count, documents)
+    assert_equal(2, len(documents))

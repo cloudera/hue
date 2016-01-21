@@ -40,7 +40,7 @@ import desktop.conf
 import desktop.log.log_buffer
 
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
-from desktop.api2 import _import_documents1
+from desktop.api2 import _convert_documents
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
 from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
@@ -74,7 +74,7 @@ def home(request):
 
 
 def home2(request):
-  _import_documents1(request.user)
+  _convert_documents(request.user)
 
   apps = appmanager.get_apps_dict(request.user)
 
