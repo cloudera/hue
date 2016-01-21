@@ -104,8 +104,11 @@
     }
 
     observable.subscribe(function (newValue) {
+      if (owner === 'assist' && id === 'assist_panel_visible') {
+        huePubSub.publish('assist.forceRender');
+      }
       self.setInTotalStorage(owner, id, newValue);
-    })
+    });
   };
 
   /**
