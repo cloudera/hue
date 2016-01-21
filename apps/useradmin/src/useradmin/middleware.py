@@ -80,7 +80,7 @@ class LastActivityMiddleware(object):
     now = datetime.now()
     logout = False
 
-    if profile.last_activity and expires_after > 0 and (now - profile.last_activity).total_seconds() > expires_after:
+    if profile.last_activity and expires_after > 0 and self._total_seconds(now - profile.last_activity) > expires_after:
       messages.info(request, _('Your session has been timed out due to inactivity.'))
       logout = True
 
@@ -94,3 +94,11 @@ class LastActivityMiddleware(object):
 
     if logout:
       dt_logout(request, next_page='/')
+
+
+  def _total_seconds(self, dt):
+    # Keep backward compatibility with Python 2.6 which doesn't support total_seconds()
+    if hasattr(dt, 'total_seconds'):
+      return dt.total_seconds()
+    else:
+      return (dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6
