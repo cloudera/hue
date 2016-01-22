@@ -74,7 +74,9 @@ def check_job_permission(view_func):
     except JobExpired, e:
       raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
     except Exception, e:
-      raise PopupException(_('Could not find job %s.') % jobid, detail=e)
+      msg = 'Could not find job %s.'
+      LOGGER.exception(msg % jobid)
+      raise PopupException(_(msg) % jobid, detail=e)
 
     if not SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
@@ -308,7 +310,6 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
   return JsonResponse(response)
 
 
-
 @check_job_permission
 def job_single_logs(request, job):
   """
@@ -338,6 +339,7 @@ def job_single_logs(request, job):
     raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
 
   return single_task_attempt_logs(request, **{'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
+
 
 @check_job_permission
 def tasks(request, job):

@@ -18,8 +18,9 @@
 import logging
 import json
 
-from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
+from django.http import QueryDict
+from django.utils.translation import ugettext as _
 
 from notebook.connectors.base import Api, QueryError
 
@@ -36,6 +37,12 @@ except Exception, e:
 
 
 class PigApi(Api):
+
+  def __init__(self, *args, **kwargs):
+    Api.__init__(self, *args, **kwargs)
+
+    self.fs = self.request.fs
+    self.jt = self.request.jt
 
   def execute(self, notebook, snippet):
 
@@ -54,20 +61,23 @@ class PigApi(Api):
 
     return {
       'id': oozie_id,
-      'watchUrl': reverse('pig:watch', kwargs={'job_id': oozie_id}) + '?format=python'
+      'watchUrl': reverse('pig:watch', kwargs={'job_id': oozie_id}) + '?format=python',
+      'has_result_set': True,
     }
 
   def check_status(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
-    request = MockRequest(self.user, self.fs, self.jt)
 
-    oozie_workflow = check_job_access_permission(request, job_id)
-    logs, workflow_actions, is_really_done = api.get(self.jt, self.jt, self.user).get_log(request, oozie_workflow)
+    oozie_workflow = check_job_access_permission(self.request, job_id)
+    logs, workflow_actions, is_really_done = self._get_output(oozie_workflow)
 
     if is_really_done and not oozie_workflow.is_running():
       if oozie_workflow.status in ('KILLED', 'FAILED'):
         raise QueryError(_('The script failed to run and was stopped'))
-      status = 'available'
+      if logs:
+        status = 'available'
+      else:
+        status = 'running' # Tricky case when the logs are being moved by YARN at job completion
     elif oozie_workflow.is_running():
       status = 'running'
     else:
@@ -77,16 +87,28 @@ class PigApi(Api):
         'status': status
     }
 
+  def _get_output(self, oozie_workflow):
+    q = QueryDict(self.request.GET, mutable=True)
+    q['format'] = 'python' # Hack for triggering the good section in single_task_attempt_logs
+    self.request.GET = q
+
+    logs, workflow_actions, is_really_done = api.get(self.fs, self.jt, self.user).get_log(self.request, oozie_workflow)
+
+    return logs, workflow_actions, is_really_done
+
   def fetch_result(self, notebook, snippet, rows, start_over):
     job_id = snippet['result']['handle']['id']
 
-    oozie_workflow = check_job_access_permission(MockRequest(self.user, self.fs, self.jt), job_id)
-    output = get_workflow_output(oozie_workflow, self.fs)
+    oozie_workflow = check_job_access_permission(self.request, job_id)
+    logs, workflow_actions, is_really_done = self._get_output(oozie_workflow)
+
+    output = logs.get('pig', _('No result'))
 
     return {
-        'data':  [hdfs_link(output)],
+        'data':  [[line] for line in output.split('\n')], # hdfs_link()
         'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
-        'type': 'text'
+        'type': 'table',
+        'has_more': False,
     }
 
   def cancel(self, notebook, snippet):
@@ -101,17 +123,16 @@ class PigApi(Api):
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
     job_id = snippet['result']['handle']['id']
-    request = MockRequest(self.user, self.fs, self.jt)
 
-    oozie_workflow = check_job_access_permission(MockRequest(self.user, self.fs, self.jt), job_id)
-    logs, workflow_actions, is_really_done = api.get(self.jt, self.jt, self.user).get_log(request, oozie_workflow)
+    oozie_workflow = check_job_access_permission(self.request, job_id)
+    logs, workflow_actions, is_really_done = self._get_output(oozie_workflow)
 
-    return logs
+    return logs.get('pig', _('No result'))
 
   def progress(self, snippet, logs):
     job_id = snippet['result']['handle']['id']
 
-    oozie_workflow = check_job_access_permission(MockRequest(self.user, self.fs, self.jt), job_id)
+    oozie_workflow = check_job_access_permission(self.request, job_id)
     return oozie_workflow.get_progress(),
 
   def close_statement(self, snippet):
@@ -119,11 +140,3 @@ class PigApi(Api):
 
   def close_session(self, session):
     pass
-
-
-class MockRequest():
-
-  def __init__(self, user, fs, jt):
-    self.user = user
-    self.fs = fs
-    self.js = jt
