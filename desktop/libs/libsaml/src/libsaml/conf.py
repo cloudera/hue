@@ -21,7 +21,7 @@ import subprocess
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config, coerce_bool, coerce_csv
+from desktop.lib.conf import Config, coerce_bool, coerce_csv, coerce_password_from_script
 
 
 BASEDIR = os.path.dirname(os.path.abspath(__file__))
@@ -113,6 +113,17 @@ KEY_FILE = Config(
   type=str,
   help=_t("key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."))
 
+KEY_FILE_PASSWORD = Config(
+  key="key_file_password",
+  help=_t("key_file_password password of the private key"),
+  default=None)
+
+KEY_FILE_PASSWORD_SCRIPT = Config(
+  key="key_file_password_script",
+  help=_t("Execute this script to produce the private key password. This will be used when `key_file_password` is not set."),
+  type=coerce_password_from_script,
+  default=None)
+
 CERT_FILE = Config(
   key="cert_file",
   default="",
@@ -155,6 +166,16 @@ NAME_ID_FORMAT = Config(
   type=str,
   help=_t("Request this NameID format from the server"))
 
+def get_key_file_password():
+  password = os.environ.get('HUE_SAML_KEY_FILE_PASSWORD')
+  if password is not None:
+    return password
+
+  password = KEY_FILE_PASSWORD.get()
+  if not password:
+    password = KEY_FILE_PASSWORD_SCRIPT.get()
+
+  return password
 
 def config_validator(user):
   res = []

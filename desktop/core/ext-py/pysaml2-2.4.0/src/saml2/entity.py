@@ -136,7 +136,8 @@ class Entity(HTTPBase):
 
         try:
             self.signkey = RSA.importKey(
-                open(self.config.getattr("key_file", ""), 'r').read())
+                open(self.config.getattr("key_file", ""), 'r').read(),
+                passphrase=self.config.key_file_passphrase)
         except (KeyError, TypeError):
             self.signkey = None
 
