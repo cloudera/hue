@@ -17,12 +17,13 @@
 (function (root, factory) {
   if(typeof define === "function" && define.amd) {
     define([
-      'knockout'
+      'knockout',
+      'desktop/js/fileBrowser/hueDocument'
     ], factory);
   } else {
     root.HueFileEntry = factory(ko);
   }
-}(this, function (ko) {
+}(this, function (ko, HueDocument) {
 
   /**
    *
@@ -47,6 +48,8 @@
     self.path = self.definition.name;
     self.app = options.app;
 
+    self.activeDocument = ko.observable();
+
     self.entriesToDelete = ko.observableArray();
 
     self.selected = ko.observable(false);
@@ -67,6 +70,13 @@
       });
     });
 
+    self.selectedEntry = ko.pureComputed(function () {
+      if (self.selectedEntries().length === 1) {
+        return self.selectedEntries()[0];
+      }
+      return null;
+    });
+
     self.breadcrumbs = [];
     var lastParent = self.parent;
     while (lastParent) {
@@ -75,6 +85,19 @@
     }
   }
 
+  HueFileEntry.prototype.showSharingModal = function () {
+    var self = this;
+    if (self.selectedEntry()) {
+      if (! self.activeDocument()) {
+        self.activeDocument(new HueDocument({
+          assistHelper: self.assistHelper,
+          fileEntry: self
+        }));
+        self.activeDocument().load();
+      }
+      $('#shareDocumentModal').modal('show');
+    }
+  };
 
   /**
    * @param {HueFileEntry[]} entries
