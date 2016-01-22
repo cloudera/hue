@@ -27,6 +27,7 @@
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var DOCUMENTS_API = "/desktop/api2/docs/";
+  var DOCUMENT_API = "/desktop/api2/doc/get";
 
 
   /**
@@ -219,6 +220,32 @@
       }
     })
       .fail(self.assistErrorCallback(options));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {number} options.docId
+   */
+  AssistHelper.prototype.fetchDocument = function (options) {
+    var self = this;
+    $.ajax({
+      url: DOCUMENT_API,
+      data: {
+        id: options.docId
+      },
+      success: function (data) {
+        if (! self.successResponseIsError(data)) {
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      }
+    })
+    .fail(self.assistErrorCallback(options));
   };
 
   /**

@@ -23,7 +23,6 @@ from desktop.views import _ko
 
 <%def name="fileBrowser()">
   <style>
-
     .fb-container {
       position: absolute;
       top: 0;
@@ -239,6 +238,79 @@ from desktop.views import _ko
     <div class="fb-drag-helper">
       <i class="fa fa-fw"></i><span class="drag-text">4 entries</span>
     </div>
+
+    <div id="shareDocumentModal" class="modal hide fade">
+      <!-- ko with: activeEntry -->
+      <!-- ko with: activeDocument -->
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3>${_('Sharing Settings')}</h3>
+      </div>
+      <div class="modal-body" style="overflow-y: visible">
+        <!-- ko with: definition -->
+        <div class="row-fluid" data-bind="visible: !$parent.hasErrors()">
+          <div class="span6">
+            <h4 class="muted" style="margin-top:0px">${_('Read')}</h4>
+            <div data-bind="visible: (perms.read.users.length == 0 && perms.read.groups.length == 0)">${_('The document is not shared for read.')}</div>
+            <ul class="unstyled airy" data-bind="foreach: perms.read.users">
+              <li>
+                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{ 'notpretty': prettyName === '' }, attr:{ 'data-id': id }"></span></span>
+                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserReadShare($data) }"> <i class="fa fa-times"></i></span>
+              </li>
+            </ul>
+            <ul class="unstyled airy" data-bind="foreach: perms.read.groups">
+              <li>
+                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span>
+                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupReadShare($data) }"> <i class="fa fa-times"></i></span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="span6">
+            <h4 class="muted" style="margin-top:0px">${_('Modify')}</h4>
+            <div data-bind="visible: (perms.write.users.length == 0 && perms.write.groups.length == 0)">${_('The document is not shared for modify.')}</div>
+            <ul class="unstyled airy" data-bind="foreach: perms.write.users">
+              <li>
+                <span class="badge badge-info badge-left"><i class="fa fa-user"></i> <span data-bind="text: prettyName, css:{'notpretty': prettyName == ''}, attr:{'data-id': id}"></span></span>
+                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeUserWriteShare($data) }"> <i class="fa fa-times"></i></span>
+              </li>
+            </ul>
+            <ul class="unstyled airy" data-bind="foreach: perms.write.groups">
+              <li>
+                <span class="badge badge-info badge-left"><i class="fa fa-users"></i> ${ _('Group') } &quot;<span data-bind="text: name"></span>&quot;</span>
+                <span class="badge badge-right trash-share" data-bind="click: function() { $parents[1].removeGroupWriteShare($data) }"> <i class="fa fa-times"></i></span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- /ko -->
+        <div class="fb-empty animated" style="display: none;" data-bind="visible: loading">
+          <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
+        </div>
+        <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && ! loading()">
+          ${ _('There was an error loading the document.')}
+        </div>
+        <div style="margin-top: 20px" data-bind="visible: ! hasErrors() && ! loading()">
+          <div class="input-append">
+            <input id="documentShareTypeahead" type="text" style="width: 420px" placeholder="${_('Type a username or a group name')}">
+            <div class="btn-group" style="overflow:visible">
+              <a class="btn" data-bind="click: handleTypeAheadSelection"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
+              <a class="btn dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a data-bind="click: function () { selectedPerm('read') }" href="javascript:void(0)">${ _('Read') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('write') }" href="javascript:void(0)">${ _('Modify') }</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Close')}</a>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+
     <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
@@ -272,6 +344,7 @@ from desktop.views import _ko
 
       <!-- /ko -->
     </div>
+
     <div id="createDirectoryModal" class="modal hide fade">
       <!-- ko with: activeEntry -->
       <div class="modal-body form-horizontal">
@@ -288,6 +361,7 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
     </div>
+
     <div id="deleteEntriesModal" class="modal hide fade">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
@@ -303,6 +377,7 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
     </div>
+
     <div class="fb-container">
       <div class="fb-action-bar">
         <h4>
@@ -355,7 +430,9 @@ from desktop.views import _ko
           <!-- ko if: isRoot && selectedEntries().length == 0 -->
           <span class="inactive-action fb-action"><i class="fa fa-fw fa-times"></i></span>
           <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);"><i class="fa fa-fw fa-users"></i></a>
+          <!-- ko if: app === 'documents' -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal"><i class="fa fa-fw fa-users"></i></a>
+          <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
         </div>
