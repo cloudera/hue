@@ -234,7 +234,6 @@ ${ fileBrowser.fileBrowser() }
   require([
     'knockout',
     'desktop/js/home2.vm',
-    'desktop/js/share2.vm',
     'assistPanel',
     'tableStats',
     'fileBrowser',
