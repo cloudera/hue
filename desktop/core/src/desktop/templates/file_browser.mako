@@ -528,7 +528,7 @@ from desktop.views import _ko
                 }
               },
               out: function (event, ui) {
-                if (!(alreadySelected && event.metaKey) && dragToSelect && ! disableSelect) {
+                if (!(alreadySelected && (event.metaKey || event.ctrlKey)) && dragToSelect && ! disableSelect) {
                   var originTop = ui.draggable[0].getBoundingClientRect().top;
                   var elementMiddle = element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2)
                   if ((originTop > elementMiddle && ui.position.top > elementMiddle) ||
@@ -568,7 +568,7 @@ from desktop.views import _ko
 
               huePubSub.publish('fb.drag.to.select', dragToSelect);
 
-              if (selectedEntries.length > 0 && ! event.metaKey){
+              if (selectedEntries.length > 0 && ! (event.metaKey || event.ctrlKey)){
                 $.each(selectedEntries, function (idx, selectedEntry) {
                   if (selectedEntry !== boundEntry) {
                    selectedEntry.selected(false);
@@ -625,7 +625,7 @@ from desktop.views import _ko
           var clickHandler = function (clickedEntry, event) {
             var clickedIndex = $.inArray(clickedEntry, allEntries());
 
-            if (event.metaKey) {
+            if (event.metaKey || event.ctrlKey) {
               clickedEntry.selected(!clickedEntry.selected());
             } else if (event.shiftKey) {
               var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-file-index');
