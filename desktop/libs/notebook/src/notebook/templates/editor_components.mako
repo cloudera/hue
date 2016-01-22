@@ -1070,7 +1070,7 @@ ${ require.config() }
               </div>
               <!-- /ko -->
             <!-- /ko -->
-            </br>
+            <br/>
           </fieldset>
         </form>
         <!-- /ko -->
