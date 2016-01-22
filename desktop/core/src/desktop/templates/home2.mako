@@ -265,7 +265,7 @@ ${ fileBrowser.fileBrowser() }
       var viewModel = new HomeViewModel(options);
 
       viewModel.activeEntry.subscribe(function (newEntry) {
-        hueUtils.changeURL('/home2?path=' + newEntry.path);
+        hueUtils.changeURL('/home?path=' + newEntry.path);
       });
       var loadUrlParam = function () {
         if (location.getParameter('path')) {
