@@ -185,6 +185,12 @@ from desktop.views import _ko
       position: fixed;
     }
 
+    .fb-drag-select {
+      position: fixed;
+      border: 1px solid #338BB8;
+      cursor: pointer;
+    }
+
     .fb-drag-helper {
       display: none;
       position: absolute;
@@ -307,7 +313,7 @@ from desktop.views import _ko
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><div class="fb-drop-target" data-bind="folderDroppable: $parent.entries"><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: open"></a></div></li>
+              <li><div class="fb-drop-target" data-bind="folderDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: open"></a></div></li>
               <li class="divider">&gt;</li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
@@ -382,7 +388,7 @@ from desktop.views import _ko
 
       <div class="fb-list" data-bind="with: activeEntry">
         <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
-          <li data-bind="fileSelect: $parent.entries, folderDroppable: $parent.entries, css: { 'fb-selected': selected }">
+          <li data-bind="fileSelect: $parent.entries, folderDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div style="width: 100%; height: 100%" data-bind="contextMenu: '.hue-context-menu'">
               <ul class="hue-context-menu">
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') }</a></li>
@@ -419,15 +425,44 @@ from desktop.views import _ko
 
       ko.bindingHandlers.folderDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
-          var allEntries = valueAccessor();
+          var options = valueAccessor();
+          var allEntries = options.entries;
+          var disableSelect = options.disableSelect || false;
+          var $element = $(element);
+          var dragToSelect = false;
+          var alreadySelected = false;
+          huePubSub.subscribe('fb.drag.to.select', function (value) {
+            alreadySelected = boundEntry.selected();
+            dragToSelect = value;
+          });
           if (boundEntry.isDirectory) {
-            $(element).droppable({
+            $element.droppable({
               drop: function (ev, ui) {
-                boundEntry.moveHere($.grep(allEntries(), function (entry) {
-                  return entry.selected();
-                }));
+                if (! dragToSelect) {
+                  boundEntry.moveHere($.grep(allEntries(), function (entry) {
+                    return entry.selected();
+                  }));
+                }
               },
-              hoverClass: 'fb-drop-hover'
+              over: function () {
+                if (dragToSelect && ! disableSelect) {
+                  boundEntry.selected(true);
+                } else if (! dragToSelect) {
+                  $element.addClass('fb-drop-hover');
+                }
+              },
+              out: function (event, ui) {
+                if (!(alreadySelected && event.metaKey) && dragToSelect && ! disableSelect) {
+                  var originTop = ui.draggable[0].getBoundingClientRect().top;
+                  var elementMiddle = element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2)
+                  if ((originTop > elementMiddle && ui.position.top > elementMiddle) ||
+                      (originTop < elementMiddle && ui.position.top < elementMiddle)) {
+                    boundEntry.selected(false);
+                  }
+                } else if (! dragToSelect) {
+                  $element.removeClass('fb-drop-hover');
+                }
+              }
             })
           }
         }
@@ -439,6 +474,9 @@ from desktop.views import _ko
           $element.attr('unselectable', 'on').css('user-select', 'none').on('selectstart', false);
           var allEntries = valueAccessor();
 
+          var dragStartY = -1;
+          var dragStartX = -1;
+          var dragToSelect = false;
           $element.draggable({
             start: function (event, ui) {
               var $container = $('.fb-drag-container');
@@ -447,29 +485,59 @@ from desktop.views import _ko
                 return entry.selected();
               });
 
-              if (selectedEntries.length === 0) {
-                boundEntry.selected(true);
-              } else if (selectedEntries.length > 0 && !boundEntry.selected()){
+              dragToSelect = ! boundEntry.selected();
+
+              dragStartX = event.clientX;
+              dragStartY = event.clientY;
+
+              huePubSub.publish('fb.drag.to.select', dragToSelect);
+
+              if (selectedEntries.length > 0 && ! event.metaKey){
                 $.each(selectedEntries, function (idx, selectedEntry) {
-                  selectedEntry.selected(false);
+                  if (selectedEntry !== boundEntry) {
+                   selectedEntry.selected(false);
+                  }
                 });
                 selectedEntries = [];
-                boundEntry.selected(true);
               }
 
-              var $helper = $('.fb-drag-helper').clone().show();
-              if (selectedEntries.length > 1) {
-                $helper.find('.drag-text').text(selectedEntries.length + ' ${ _('selected') }');
-                $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
+              boundEntry.selected(true);
+
+              if (! dragToSelect) {
+                var $helper = $('.fb-drag-helper').clone().show();
+                if (selectedEntries.length > 1) {
+                  $helper.find('.drag-text').text(selectedEntries.length + ' ${ _('selected') }');
+                  $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
+                } else {
+                  $helper.find('.drag-text').text(boundEntry.name);
+                  $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
+                }
+
+                $helper.appendTo($container);
               } else {
-                $helper.find('.drag-text').text(boundEntry.name);
-                $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
+                $('<div>').addClass('fb-drag-select').appendTo('body');
               }
-
-              $helper.appendTo($container);
             },
-            helper: function () {
-              return $('<div>').addClass('fb-drag-container');
+            drag: function (event) {
+              var startX = Math.min(event.clientX, dragStartX);
+              var startY = Math.min(event.clientY, dragStartY);
+              if (dragToSelect) {
+                $('.fb-drag-select').css({
+                  top: startY + 'px',
+                  left: startX + 'px',
+                  height: Math.max(event.clientY, dragStartY) - startY + 'px',
+                  width: Math.max(event.clientX, dragStartX) - startX + 'px'
+                })
+              }
+            },
+            stop: function () {
+              $('.fb-drag-select').remove();
+            },
+            helper: function (event) {
+              if (boundEntry.selected()) {
+                return $('<div>').addClass('fb-drag-container');
+              }
+              return $('<div>');
             },
             appendTo: "body",
             cursorAt: {
