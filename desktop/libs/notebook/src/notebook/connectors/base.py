@@ -78,7 +78,7 @@ class Notebook(object):
     return '\n\n'.join([snippet['statement_raw'] for snippet in self.get_data()['snippets']])
 
 
-def get_api(user, snippet, fs, jt):
+def get_api(request, snippet):
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
@@ -87,26 +87,26 @@ def get_api(user, snippet, fs, jt):
   from notebook.connectors.spark_batch import SparkBatchApi
   from notebook.connectors.text import TextApi
 
-  interpreter = [interpreter for interpreter in get_interpreters(user) if interpreter['type'] == snippet['type']]
+  interpreter = [interpreter for interpreter in get_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
   interface = interpreter['interface']
 
   if interface == 'hiveserver2':
-    return HS2Api(user)
+    return HS2Api(user=request.user)
   elif interface == 'livy':
-    return SparkApi(user)
+    return SparkApi(request.user)
   elif interface == 'livy-batch':
-    return SparkBatchApi(user)
+    return SparkBatchApi(request.user)
   elif interface == 'text' or interface == 'markdown':
-    return TextApi(user)
+    return TextApi(request.user)
   elif interface == 'rdbms':
-    return RdbmsApi(user, interpreter=snippet['type'])
+    return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'jdbc':
-    return JdbcApi(user, interpreter=interpreter)
+    return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'pig':
-    return PigApi(user, fs=fs, jt=jt)
+    return PigApi(user=request.user, request=request)
   else:
     raise PopupException(_('Notebook connector interface not recognized: %s') % interface)
 
@@ -123,11 +123,10 @@ def _get_snippet_session(notebook, snippet):
 
 class Api(object):
 
-  def __init__(self, user, fs=None, jt=None, interpreter=None):
+  def __init__(self, user, interpreter=None, request=None):
     self.user = user
-    self.fs = fs
-    self.jt = jt
     self.interpreter = interpreter
+    self.request = request
 
   def create_session(self, lang, properties=None):
     return {
