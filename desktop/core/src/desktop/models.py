@@ -977,6 +977,8 @@ class Document2(models.Model):
       return reverse('search:index') + '?collection=' + str(self.id)
     elif self.type == 'link-pigscript':
       return reverse('pig:index') + '#edit/%s' % self.data_dict.get('object_id', '')
+    elif self.type == 'link-workflow':
+      return '/jobsub/#edit-design/%s' % self.data_dict.get('object_id', '')
     else:
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
 

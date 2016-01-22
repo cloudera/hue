@@ -452,6 +452,7 @@ def _convert_documents(user):
   Given a user, converts any existing Document objects to Document2 objects
   """
   from beeswax.models import HQL, IMPALA, RDBMS
+  from oozie.models import Workflow
   from pig.models import PigScript
 
   # If user does not have a home directory, we need to create one and import any orphan documents to it
@@ -490,6 +491,15 @@ def _convert_documents(user):
       notebook = import_saved_beeswax_query(doc.content_object)
       data = notebook.get_data()
       doc2 = create_doc2(doc, name=data['name'], doctype=data['type'], description=data['description'], data=notebook.get_json())
+      imported_docs.append(doc2)
+
+  # Convert Workflow documents
+  docs = get_unconverted_docs(Workflow)
+  for doc in docs:
+    if doc.content_object:
+      data = doc.content_object.data_dict
+      data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+      doc2 = create_doc2(doc, name=doc.name, doctype='link-workflow', description=doc.description, data=json.dumps(data))
       imported_docs.append(doc2)
 
   # Convert PigScript documents
