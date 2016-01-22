@@ -63,6 +63,12 @@ class TestOptimizerApi(object):
     assert_equal('success', resp['status'], resp)
 
 
+  def test_api_add_email_to_product(self):
+    resp = self.api.add_email_to_product()
+
+    assert_equal('success', resp['status'], resp)
+
+
   def test_api_authenticate(self):
     resp = self.api.authenticate()
 

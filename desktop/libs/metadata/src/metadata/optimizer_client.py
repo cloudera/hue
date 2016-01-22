@@ -49,6 +49,8 @@ class OptimizerApi(object):
     self._product_name = product_name if product_name else OPTIMIZER.PRODUCT_NAME.get()
     self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
     self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
+    self._email = OPTIMIZER.EMAIL.get()
+    self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
 
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_verify(ssl_cert_ca_verify)
@@ -67,15 +69,15 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def add_email_to_product(self, email):
+  def add_email_to_product(self, email=None, email_password=None):
     try:
       data = {
           'productName': self._product_name,
           'productSecret': self._product_secret,
-          'email': '',
-          'password': ''
+          'email': email if email is not None else self._email,
+          'password': email_password if email_password is not None else self._email_password
       }
-      return self._root.post('/api/addEmailToProduct', data)
+      return self._root.post('/api/addEmailToProduct', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
@@ -86,7 +88,7 @@ class OptimizerApi(object):
           'productName': self._product_name,
           'productSecret': self._product_secret,
       }
-      return self._root.post('/api/createProduct', data)
+      return self._root.post('/api/createProduct', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
