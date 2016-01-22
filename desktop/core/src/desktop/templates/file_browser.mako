@@ -232,6 +232,10 @@ from desktop.views import _ko
     .divider {
       color: #CCC;
     }
+
+    .large-as-modal {
+      width: 542px;
+    }
   </style>
 
   <script type="text/html" id="fb-template">
@@ -348,16 +352,11 @@ from desktop.views import _ko
     <div id="createDirectoryModal" class="modal hide fade">
       <!-- ko with: activeEntry -->
       <div class="modal-body form-horizontal">
-        <div class="control-group">
-          <label class="control-label" for="newDirectoryName">${ _('Name') }</label>
-          <div class="controls">
-            <input id="newDirectoryName" type="text" /></label>
-          </div>
-        </div>
+        <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" data-bind="floatlabel" />
       </div>
       <div class="modal-footer">
         <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="button" class="btn" value="${ _('Create') }" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
+        <input type="button" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); }"/>
       </div>
       <!-- /ko -->
     </div>
@@ -369,7 +368,7 @@ from desktop.views import _ko
         <h3>${ _('Do you really want to delete') }
           <!-- ko if: entriesToDelete().length == 1 --> <span data-bind="text: entriesToDelete()[0].name"></span><!-- /ko -->
           <!-- ko if: entriesToDelete().length > 1 --> <span data-bind="text: entriesToDelete().length"></span> ${ _('entries') }<!-- /ko -->
-        </h3>
+        ?</h3>
       </div>
       <div class="modal-footer">
         <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">

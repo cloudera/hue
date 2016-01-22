@@ -179,7 +179,7 @@
           }
           self.loading(false);
           self.loaded(true);
-          if (callback) {
+          if (callback && typeof callback === 'function') {
             callback();
           }
         },

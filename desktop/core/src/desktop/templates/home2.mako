@@ -134,10 +134,6 @@ ${ fileBrowser.fileBrowser() }
   .home-container {
     height: 100%;
   }
-  .file-browser {
-    position: ;
-  }
-
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">

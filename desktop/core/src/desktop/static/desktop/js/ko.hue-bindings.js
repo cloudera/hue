@@ -2943,4 +2943,10 @@
     }
   };
 
+  ko.bindingHandlers.floatlabel = {
+    init: function (element, valueAccessor, allBindings) {
+      $(element).floatlabel();
+    }
+  };
+
 }));
