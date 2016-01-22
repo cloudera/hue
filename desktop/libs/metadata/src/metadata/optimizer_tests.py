@@ -72,5 +72,6 @@ class TestOptimizerApi(object):
   def test_api_authenticate(self):
     resp = self.api.authenticate()
 
+    assert_true(resp['token'], resp)
     assert_equal('success', resp['status'], resp)
 
