@@ -6,7 +6,9 @@
 
 <xsl:template match="workflow:java" xmlns:workflow="uri:oozie:workflow:0.5">
 
-  ,"java": {<xsl:call-template name="jar_path"/>}
+  ,"java": {
+        "main-class": "<xsl:value-of select="*[local-name()='main-class']"/>"
+    }
 
 
 </xsl:template>

@@ -28,7 +28,15 @@
     "ok_to": "<xsl:value-of select="*[name()=$ok]/@to"/>",
     "error_to": "<xsl:value-of select="*[name()=$error]/@to"/>"
 
-    <xsl:apply-templates select="*"/>
+    <xsl:variable name="name" select="@name"/>
+    <xsl:choose>
+      <xsl:when test="contains($name, 'streaming')">
+        <xsl:call-template name="streaming"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="*"/>
+      </xsl:otherwise>
+    </xsl:choose>
   },
 </xsl:template>
 

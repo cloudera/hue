@@ -6,7 +6,7 @@
 
 <xsl:template match="sqoop:sqoop">
 
-  ,"sqoop": {<xsl:call-template name="script_path"/>}
+  ,"sqoop": { "command": "<xsl:value-of select="*[local-name()='command']"/>"}
 
 </xsl:template>
 

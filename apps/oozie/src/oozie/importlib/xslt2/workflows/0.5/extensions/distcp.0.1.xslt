@@ -4,14 +4,18 @@
 
 <xsl:template match="distcp:distcp">
 
-  ,"distcp": {
-        <xsl:for-each select="arg">
-          "path<xsl:value-of select='position()'/>": "<xsl:value-of select="arg"/>"
-          <xsl:if  test="position() &lt; last()">
-            ,
-          </xsl:if>
+  ,"params": [
+        <xsl:for-each select="*[local-name()='arg']">
+          <xsl:choose>
+            <xsl:when test="position() &lt; last()">
+              {"type":"arg","value":"<xsl:value-of select="."/>"},
+            </xsl:when>
+            <xsl:otherwise>
+              {"type":"arg","value":"<xsl:value-of select="."/>"}
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:for-each>
-    }
+    ]
 
 </xsl:template>
 

@@ -366,7 +366,7 @@ class Workflow(Job):
     node_hierarchy = ['start']
     _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
 
-    _add_uuids_to_adj_list(adj_list)
+    _update_adj_list(adj_list)
 
     wf_rows = _create_workflow_layout(node_hierarchy, adj_list)
     data = {'layout': [{}], 'workflow': {}}
@@ -434,11 +434,20 @@ class Workflow(Job):
 
     return data
 
-def _add_uuids_to_adj_list(adj_list):
+def _update_adj_list(adj_list):
   uuids = {}
   id = 1
   for node in adj_list.keys():
     adj_list[node]['id'] = id
+
+    # Oozie uses same action for streaming and mapreduce but Hue manages them differently
+    if adj_list[node]['node_type'] == 'map-reduce':
+      if 'streaming' in adj_list[node]['name']:
+        adj_list[node]['node_type'] = 'streaming'
+      else:
+        adj_list[node]['node_type'] = 'mapreduce'
+    elif adj_list[node]['node_type'] == 'sub-workflow':
+      adj_list[node]['node_type'] = 'subworkflow'
 
     if adj_list[node]['node_type'] == 'kill':
       adj_list[node]['uuid'] = '17c9c895-5a16-7443-bb81-f34b30b21548'
@@ -462,19 +471,18 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
         properties = dict(NODES['%s-widget' % node['node_type']].get_fields())
 
       if node['node_type'] == 'pig':
-        properties['script_path'] = node.get('script_path')
+        properties['script_path'] = node.get('pig').get('script_path')
       elif node['node_type'] == 'spark':
         properties['class'] = node.get('spark').get('class')
-        #TBD: jar_path
-        properties['jar_path'] = node.get('spark').get('jar')
+        properties['jars'] = node.get('spark').get('jar')
       elif node['node_type'] == 'hive' or node['node_type'] == 'hive2':
         properties['script_path'] = node.get('hive2').get('script')
       elif node['node_type'] == 'java':
-        properties['jar_path'] = node.get('jar_path')
+        properties['main_class'] = node.get('java').get('main-class')
       elif node['node_type'] == 'sqoop':
-        properties['command'] = node.get('script_path')
+        properties['command'] = node.get('sqoop').get('command')
       elif node['node_type'] == 'mapreduce':
-        properties['jar_path'] = node.get('jar_path')
+        properties['job_properties'] = node.get('job_properties')
       elif node['node_type'] == 'shell':
         properties['shell_command'] = node.get('shell').get('command')
       elif node['node_type'] == 'ssh':
@@ -495,11 +503,9 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
         properties['mapper'] = node.get('streaming').get('mapper')
         properties['reducer'] = node.get('streaming').get('reducer')
       elif node['node_type'] == 'distcp':
-        #TBD: both
-        properties['source'] = node.get('distcp').get('source')
-        properties['destination'] = node.get('distcp').get('source')
-      elif node['node_type'] == 'sub-workflow':
-        properties['app-path'] = node.get('sub-workflow').get('app-path')
+        properties['distcp_parameters'] = node.get('params')
+      elif node['node_type'] == 'subworkflow':
+        properties['app-path'] = node.get('subworkflow').get('app-path')
         properties['workflow'] = node.get('uuid')
         properties['job_properties'] = []
         properties['sla'] = ''
@@ -531,7 +537,7 @@ def _create_workflow_layout(nodes, adj_list, size=12):
     if type(node) == list and len(node) == 1:
       node = node[0]
     if type(node) != list:
-      wf_rows.append({"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": "%s-widget" % adj_list[node]['node_type'] if adj_list[node]['node_type'] != 'sub-workflow' else 'subworkflow-widget', "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+      wf_rows.append({"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": "%s-widget" % adj_list[node]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
     else:
       if adj_list[node[0]]['node_type'] == 'fork':
         wf_rows.append({"widgets":[{"size":size, "name": 'Fork', "id":  adj_list[node[0]]['uuid'], "widgetType": "%s-widget" % adj_list[node[0]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})

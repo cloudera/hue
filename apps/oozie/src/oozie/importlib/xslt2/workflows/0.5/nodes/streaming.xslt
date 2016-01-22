@@ -5,11 +5,11 @@
 <xsl:import href="fields/mapper.xslt"/>
 <xsl:import href="fields/reducer.xslt"/>
 
-<xsl:template match="workflow:streaming" xmlns:workflow="uri:oozie:workflow:0.5">
+<xsl:template name="streaming">
 
   ,"streaming": {
-        <xsl:call-template name="mapper"/>,
-        <xsl:call-template name="reducer"/>
+        "mapper": "<xsl:value-of select="*[local-name()='map-reduce']/*[local-name()='streaming']/*[local-name()='mapper']"/>",
+        "reducer": "<xsl:value-of select="*[local-name()='map-reduce']/*[local-name()='streaming']/*[local-name()='reducer']"/>"
     }
 
 </xsl:template>
