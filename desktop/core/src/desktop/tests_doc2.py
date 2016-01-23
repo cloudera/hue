@@ -118,20 +118,27 @@ class TestDocument2(object):
     home_dir.dependencies.add(*children)
 
     # Test that all children directories and documents are returned
-    documents, count = home_dir.documents()
-    assert_equal(4, count, documents)
+    response = self.client.get('/desktop/api2/docs', {'path': '/'})
+    data = json.loads(response.content)
+    assert_true('documents' in data)
+    assert_equal(4, data['count'])
 
     # Test filter type
-    documents, count = home_dir.documents(types=['directory'])
-    assert_equal(2, count, documents)
-    assert_true(all(doc.type == 'directory' for doc in documents))
+    response = self.client.get('/desktop/api2/docs', {'path': '/', 'type': ['directory']})
+    data = json.loads(response.content)
+    assert_equal(['directory'], data['types'])
+    assert_equal(2, data['count'])
+    assert_true(all(doc['type'] == 'directory' for doc in data['documents']))
 
     # Test search text
-    documents, count = home_dir.documents(search_text='query')
-    assert_equal(2, count, documents)
-    assert_true(all(doc.name.startswith('query') for doc in documents))
+    response = self.client.get('/desktop/api2/docs', {'path': '/', 'text': 'query'})
+    data = json.loads(response.content)
+    assert_equal('query', data['text'])
+    assert_equal(2, data['count'])
+    assert_true(all(doc['name'].startswith('query') for doc in data['documents']))
 
     # Test pagination with limit
-    documents, count = home_dir.documents(page=2, limit=2)
-    assert_equal(4, count, documents)
-    assert_equal(2, len(documents))
+    response = self.client.get('/desktop/api2/docs', {'path': '/', 'page': 2, 'limit': 2})
+    data = json.loads(response.content)
+    assert_equal(4, data['count'])
+    assert_equal(2, len(data['documents']))

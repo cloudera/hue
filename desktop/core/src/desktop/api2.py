@@ -95,7 +95,14 @@ def get_documents(request):
   sort = request.GET.get('sort', '-last_modified')
   search_text = request.GET.get('text', None)
 
-  documents, count = directory.documents(types=type_filters, search_text=search_text, page=page, limit=limit, order_by=sort)
+  documents = directory.documents(types=type_filters, search_text=search_text, order_by=sort)
+  count = documents.count()
+
+  # Paginate
+  if limit > 0:
+    offset = (page - 1) * limit
+    last = offset + limit
+    documents = documents.all()[offset:last]
 
   return JsonResponse({
       'path': path,
