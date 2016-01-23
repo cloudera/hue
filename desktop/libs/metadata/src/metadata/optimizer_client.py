@@ -18,9 +18,11 @@
 
 import json
 import logging
+import uuid
 
 from django.utils.translation import ugettext as _
 
+from desktop.lib import export_csvxls
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
@@ -115,14 +117,25 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def upload(self):
+  def upload(self, token, queries, email=None, sourcePlatform='generic'):
     try:
+      content_generator = OptimizerDataAdapter(queries)
+      queries_csv = export_csvxls.create_generator(content_generator, 'csv')
+
       data = {
-          'email': email,
+          'email': email if email is not None else self._email,
           'token': token,
-          'sourcePlatform': 'generic',
-          'file': 'file'
+          'sourcePlatform': sourcePlatform,
       }
-      return self._root.post('/api/upload', data)
+      return self._root.post('/api/upload', data=data, files = {'file': ('hue-report.csv', list(queries_csv)[0])})
+      
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
+def OptimizerDataAdapter(queries):
+  headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
+  rows = ([str(uuid.uuid4()), 1000, q] for q in queries)
+
+  yield headers, rows
+    

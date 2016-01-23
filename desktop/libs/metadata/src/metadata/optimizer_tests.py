@@ -75,3 +75,19 @@ class TestOptimizerApi(object):
     assert_true(resp['token'], resp)
     assert_equal('success', resp['status'], resp)
 
+  def test_api_upload(self):
+    resp = self.api.authenticate()
+    token = resp['token']
+
+    queries = [
+        "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;",
+        "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;",
+        "select Part.partkey, Part.name, Part.type from Part where Part.yyprice > 2095",
+        "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';",
+        "select count(*) as loans from account a where a.account_state_id in (5,9);",
+        "select orders.key, orders.id from orders where orders.price < 9999",
+        "select mgr.name from mgr where mgr.reports > 10 group by mgr.state;"
+    ]
+
+    resp = self.api.upload(token=token, queries=queries)
+    assert_equal('success', resp['status'], resp)
