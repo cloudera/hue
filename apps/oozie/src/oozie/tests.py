@@ -285,6 +285,7 @@ class OozieMockBase(object):
     grant_access("test", "test", "oozie")
     add_to_group("test")
     self.user = User.objects.get(username='test')
+
     self.wf = create_workflow(self.c, self.user)
     self.original_fs = originalCluster.FS_CACHE["default"]
     originalCluster.FS_CACHE["default"] = MockFs()
@@ -391,6 +392,7 @@ class OozieBase(OozieServerProvider):
     grant_access("test", "test", "oozie")
     add_to_group("test")
     self.cluster = OozieServerProvider.cluster
+
     self.install_examples()
 
   def install_examples(self):

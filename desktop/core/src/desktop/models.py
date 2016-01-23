@@ -18,6 +18,7 @@
 import calendar
 import logging
 import json
+import os
 import uuid
 
 from itertools import chain
@@ -29,7 +30,9 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
 from django.db import connection, models, transaction
 from django.db.models import Q
-from django.forms import ValidationError
+from django.db.models.signals import pre_save, pre_delete, post_save
+from django.dispatch import receiver
+from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop import appmanager
@@ -44,6 +47,12 @@ LOG = logging.getLogger(__name__)
 SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'
 SAMPLE_USER_OWNERS = ['hue', 'sample']
+
+UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
+
+
+def uuid_default():
+  return str(uuid.uuid4())
 
 
 class UserPreferences(models.Model):
@@ -460,9 +469,6 @@ class DocumentManager(models.Manager):
           docs.delete()
 
 
-UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
-
-
 class Document(models.Model):
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('User who can own the job.'), related_name='doc_owner')
   name = models.CharField(default='', max_length=255)
@@ -734,11 +740,14 @@ class DocumentPermission(models.Model):
     (WRITE_PERM, 'write'),
   ))
 
-
   objects = DocumentPermissionManager()
 
   class Meta:
     unique_together = ('doc', 'perms')
+
+
+class FilesystemException(Exception):
+  pass
 
 
 class Document2Manager(models.Manager):
@@ -748,6 +757,10 @@ class Document2Manager(models.Manager):
     return self.documents(user).get(id=doc_id)
 
   def documents(self, user):
+    """
+    Returns all documents that are either owned or shared with the user
+    WARNING: Do NOT use this if you ONLY need documents that are owned by the user!
+    """
     return Document2.objects.filter(
         Q(owner=user) |
         Q(document2permission__users=user) |
@@ -755,21 +768,68 @@ class Document2Manager(models.Manager):
         Q(document2permission__all=True)
     ).distinct().order_by('-last_modified')
 
-  def directory(self, user, path):
-    return self.documents(user).get(type='directory', name=path)
-
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
   def get_history(self, user, doc_type):
     return self.documents(user).filter(type=doc_type, is_history=True)
 
+  def get_home_directory(self, user):
+    try:
+      return self.get(owner=user, parent_directory=None, name='', type='directory')
+    except Document2.DoesNotExist:
+      return self.create_user_directories(user)
 
-def uuid_default():
-  return str(uuid.uuid4())
+  def get_by_path(self, user, path):
+    """
+    This can be an expensive operation b/c we have to traverse the path tree, so if possible, request a document by UUID
+    """
+    cleaned_path = path.rstrip('/')
+    doc = Document2.objects.get_home_directory(user)
+    if cleaned_path:
+      path_tokens = cleaned_path.split('/')[1:]
+      for token in path_tokens:
+        try:
+          doc = doc.children.get(name=token)
+        except Document2.DoesNotExist:
+          raise FilesystemException(_('Requested invalid path for user %s: %s') % (user.username, path))
+
+    return doc
+
+  def create_user_directories(self, user):
+    """
+    Creates user home and Trash directories if they do not exist and move any orphan documents to home directory
+    :param user: User object
+    """
+    # Edge-case if the user has a legacy home directory with path-name
+    Directory.objects.filter(name='/', owner=user).update(name='')
+
+    # Get or create home and Trash directories for all users
+    home_dir, created = Directory.objects.get_or_create(name='', owner=user)
+
+    if created:
+      LOG.info('Successfully created home directory for user: %s' % user.username)
+
+    trash_dir, created = Directory.objects.get_or_create(name=Document2.TRASH_DIR, owner=user, parent_directory=home_dir)
+
+    if created:
+      LOG.info('Successfully created trash directory for user: %s' % user.username)
+
+    # For any directories or documents that do not have a parent directory, assign it to home directory
+    count = 0
+    for doc in Document2.objects.filter(owner=user).filter(parent_directory=None).exclude(id__in=[home_dir.id, trash_dir.id]):
+      doc.parent_directory = home_dir
+      doc.save()
+      count += 1
+
+    LOG.info("Moved %d documents to home directory for user: %s" % (count, user.username))
+    return home_dir
 
 
 class Document2(models.Model):
+
+  TRASH_DIR = '.Trash'
+
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
   description = models.TextField(default='')
@@ -783,10 +843,12 @@ class Document2(models.Model):
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
-  # is_trashed
 
   tags = models.ManyToManyField('self', db_index=True)
   dependencies = models.ManyToManyField('self', db_index=True)
+
+  parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
+
   doc = generic.GenericRelation(Document, related_name='doc_doc') # Compatibility with Hue 3
 
   objects = Document2Manager()
@@ -795,16 +857,42 @@ class Document2(models.Model):
     unique_together = ('uuid', 'version', 'is_history')
     ordering = ["-last_modified"]
 
-  def natural_key(self):
-    return (self.uuid, self.version, self.is_history)
+  def __str__(self):
+    res = '%s - %s - %s' % (force_unicode(self.name), self.owner, self.uuid)
+    return force_unicode(res)
 
   @property
   def data_dict(self):
     if not self.data:
       self.data = json.dumps({})
     data_python = json.loads(self.data)
-
     return data_python
+
+  @property
+  def path(self):
+    if self.parent_directory:
+      return '%s/%s' % (self.parent_directory.path, self.name)
+    else:
+      return self.name
+
+  @property
+  def dirname(self):
+    return os.path.dirname(self.path) or '/'
+
+  @property
+  def is_directory(self):
+    return self.type == 'directory'
+
+  @property
+  def is_home_directory(self):
+    return self.is_directory and self.parent_directory == None and self.name == ''
+
+  @property
+  def is_trash_directory(self):
+    return self.is_directory and self.name == self.TRASH_DIR
+
+  def natural_key(self):
+    return (self.uuid, self.version, self.is_history)
 
   def copy(self, name, owner, description=None):
     copy_doc = self
@@ -817,19 +905,12 @@ class Document2(models.Model):
     if description:
       copy_doc.description = description
     copy_doc.save()
-
     return copy_doc
 
   def update_data(self, post_data):
     data_dict = self.data_dict
-
     data_dict.update(post_data)
-
     self.data = json.dumps(data_dict)
-
-  def __str__(self):
-    res = '%s - %s - %s' % (force_unicode(self.name), self.owner, self.uuid)
-    return force_unicode(res)
 
   def get_absolute_url(self):
     if self.type == 'oozie-coordinator2':
@@ -839,7 +920,7 @@ class Document2(models.Model):
     elif self.type.startswith('query'):
       return reverse('notebook:editor') + '?editor=' + str(self.id)
     elif self.type == 'directory':
-      return '/home2' + '?path=' + self.name
+      return '/home2' + '?uuid=' + self.uuid
     elif self.type == 'notebook':
       return reverse('notebook:notebook') + '?notebook=' + str(self.id)
     elif self.type == 'search-dashboard':
@@ -851,6 +932,7 @@ class Document2(models.Model):
     doc_dict = {
       'owner': self.owner.username,
       'name': self.name,
+      'path': urlencode(self.path or '/'),
       'description': self.description,
       'uuid': self.uuid,
       'id': self.id,
@@ -910,19 +992,30 @@ class Document2(models.Model):
             snippet['is_redacted'] = True
       self.data = json.dumps(data_dict)
 
+    # TODO: Validate name, shouldn't contain slashes
+    # TODO: Prevent documents with same name and location from being saved
+    # TODO: Prevent Home and Trash directories from being deleted
+    # TODO: Prevent creating home or trash directories in any location
+
+    # Save document to home directory if parent directory isn't specified
+    if not self.parent_directory and not self.is_home_directory and not self.is_trash_directory:
+      home_dir = Document2.objects.get_home_directory(self.owner)
+      self.parent_directory = home_dir
+
     super(Document2, self).save(*args, **kwargs)
 
   def move(self, directory, user):
-    # get dir and remove
-    old_directory = Document2.objects.get(type='directory', dependencies=self.pk)
-    if old_directory.can_write_or_exception(user=user):
-      old_directory.dependencies.remove(self)
-
-    # add to new dir
     if directory.can_write_or_exception(user=user):
-      directory.dependencies.add(self)
+      self.parent_directory = directory
+      self.save()
 
-    self.name = directory.name + '/' + self.name.split('/')[-1]
+  def trash(self):
+    trash_dir = Directory.objects.get(name=self.TRASH_DIR, owner=self.owner)
+    self.move(trash_dir, self.owner)
+
+  # TODO: erase/purge
+
+  # TODO: restore
 
   def share(self, user, name='read', users=None, groups=None):
     # TODO check in settings if user can sync, re-share, which perms...
@@ -943,6 +1036,7 @@ class Document2(models.Model):
       perm.delete()
 
   def list_permissions(self, perm='read'):
+    # FIXME This is causing an integrity error b/c it is called by doc2 api potentially concurrently for new docs
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=perm)
     return perm
 
@@ -967,15 +1061,22 @@ class Document2(models.Model):
       }
     }
 
+class DirectoryManager(models.Manager):
+
+  def get_queryset(self):
+    return super(DirectoryManager, self).get_queryset().filter(type='directory')
+
+
 class Directory(Document2):
   # e.g. name = '/' or '/dir1/dir2/f3'
+
+  objects = DirectoryManager()
 
   class Meta:
     proxy = True
 
-
   def documents(self, types=None, search_text=None, order_by=None):
-    documents = self.dependencies.all()  # TODO: perms
+    documents = self.children.all()  # TODO: perms
 
     if types and isinstance(types, list):
       documents = documents.filter(type__in=types)
@@ -988,22 +1089,19 @@ class Directory(Document2):
 
     return documents
 
-
-  def parent(self):
-    return Document2.objects.get(type='directory', dependencies=[self.pk]) # or name__startswith=self.name
-
-
   def save(self, *args, **kwargs):
     self.type = 'directory'
 
     try:
       directory = Directory.objects.get(name=self.name, owner=self.owner, type='directory')
       if directory.pk != self.pk:
-        raise ValidationError('Directory for owner %s named %s already exists' % (self.name, self.owner))
+        raise FilesystemException(_('Directory for owner %s at path already exists') % (self.owner, self.path))
     except Directory.DoesNotExist:
       pass  # no conflicts
     except Directory.MultipleObjectsReturned:
-      raise Exception('Found multiple directories for owner %s named %s' % (self.owner, self.name))
+      directory_ids = [dir.id for dir in Directory.objects.filter(name=self.name, owner=self.owner, type='directory')]
+      raise FilesystemException(_('Found multiple directories for owner %s at path %s with IDs: [%s]') %
+                                (self.owner, self.path, ', '.join(directory_ids)))
 
     super(Directory, self).save(*args, **kwargs)
 
@@ -1086,4 +1184,3 @@ def _convert_type(btype, bdata):
     return 'spark'
   else:
     return 'hive'
-
