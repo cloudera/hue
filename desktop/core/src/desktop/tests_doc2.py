@@ -41,7 +41,7 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/docs/')
     data = json.loads(response.content)
 
-    assert_equal('/', data['path'], data)
+    assert_equal('/', data['document']['path'], data)
 
 
   def test_document_create(self):
@@ -80,65 +80,69 @@ class TestDocument2(object):
 
 
   def test_directory_create(self):
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_path': json.dumps('/'), 'name': json.dumps('test_mkdir')})
+    home_dir = Document2.objects.get_home_directory(self.user)
+    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(home_dir.uuid), 'name': json.dumps('test_mkdir')})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
+    assert_true('directory' in data)
+    assert_equal(data['directory']['name'], 'test_mkdir', data)
+    assert_equal(data['directory']['type'], 'directory', data)
 
 
   def test_directory_move(self):
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_path': json.dumps('/'), 'name': json.dumps('test_mv')})
+    home_dir = Document2.objects.get_home_directory(self.user)
+    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(home_dir.uuid), 'name': json.dumps('test_mv')})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
 
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_path': json.dumps('/'), 'name': json.dumps('test_mv_dst')})
+    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(home_dir.uuid), 'name': json.dumps('test_mv_dst')})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
 
     response = self.client.post('/desktop/api2/doc/move', {
-        'source_doc_id': json.dumps(Directory.objects.get(owner=self.user, name='/test_mv').id),
-        'destination_doc_id': json.dumps(Directory.objects.get(owner=self.user, name='/test_mv_dst').id)
+        'source_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv').uuid),
+        'destination_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv_dst').uuid)
     })
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
-
-    assert_true(Directory.objects.filter(owner=self.user, name='/test_mv_dst/test_mv').exists())
+    assert_equal(Directory.objects.get(name='test_mv', owner=self.user).path, '/test_mv_dst/test_mv')
 
 
   def test_directory_documents(self):
-    home_dir = Directory.objects.get(owner=self.user, name='/')
+    home_dir = Directory.objects.get(owner=self.user, name='')
 
-    dir1 = Directory.objects.create(name='/test_dir1', owner=self.user)
-    dir2 = Directory.objects.create(name='/test_dir2', owner=self.user)
-    query1 = Document2.objects.create(name='query1', type='query-hive', owner=self.user, data={})
-    query2 = Document2.objects.create(name='query2', type='query-hive', owner=self.user, data={})
+    dir1 = Directory.objects.create(name='test_dir1', owner=self.user)
+    dir2 = Directory.objects.create(name='test_dir2', owner=self.user)
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={})
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={})
     children = [dir1, dir2, query1, query2]
 
-    home_dir.dependencies.add(*children)
+    home_dir.children.add(*children)
 
     # Test that all children directories and documents are returned
     response = self.client.get('/desktop/api2/docs', {'path': '/'})
     data = json.loads(response.content)
-    assert_true('documents' in data)
-    assert_equal(4, data['count'])
+    assert_true('children' in data)
+    assert_equal(5, data['count'])  # This includes the 4 docs and .Trash
 
     # Test filter type
     response = self.client.get('/desktop/api2/docs', {'path': '/', 'type': ['directory']})
     data = json.loads(response.content)
     assert_equal(['directory'], data['types'])
-    assert_equal(2, data['count'])
-    assert_true(all(doc['type'] == 'directory' for doc in data['documents']))
+    assert_equal(3, data['count'])
+    assert_true(all(doc['type'] == 'directory' for doc in data['children']))
 
     # Test search text
     response = self.client.get('/desktop/api2/docs', {'path': '/', 'text': 'query'})
     data = json.loads(response.content)
     assert_equal('query', data['text'])
     assert_equal(2, data['count'])
-    assert_true(all(doc['name'].startswith('query') for doc in data['documents']))
+    assert_true(all('query' in doc['name'] for doc in data['children']))
 
     # Test pagination with limit
     response = self.client.get('/desktop/api2/docs', {'path': '/', 'page': 2, 'limit': 2})
     data = json.loads(response.content)
-    assert_equal(4, data['count'])
-    assert_equal(2, len(data['documents']))
+    assert_equal(5, data['count'])
+    assert_equal(2, len(data['children']))

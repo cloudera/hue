@@ -53,7 +53,7 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document, Document2, get_data_link
+from desktop.models import Directory, Document, Document2, get_data_link
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home
@@ -849,19 +849,17 @@ class TestDocument(object):
     make_logged_in_client(username="copy_owner", groupname="test_doc", recreate=True, is_superuser=False)
     self.copy_user = User.objects.get(username="copy_owner")
 
-    # Get count of existing Document objects
-    self.doc2_count = Document2.objects.count()
-    self.doc1_count = Document.objects.count()
-
     self.document2 = Document2.objects.create(name='Test Document2',
                                               type='search-dashboard',
                                               owner=self.user,
                                               description='Test Document2')
+
     self.document = Document.objects.link(content_object=self.document2,
                                           owner=self.user,
                                           name='Test Document',
                                           description='Test Document',
                                           extra='test')
+
     self.document.save()
     self.document2.doc.add(self.document)
 
@@ -871,17 +869,22 @@ class TestDocument(object):
     test_docs.delete()
 
   def test_document_create(self):
-    assert_equal(Document2.objects.count(), self.doc2_count + 1)
-    assert_equal(Document.objects.count(), self.doc1_count + 1)
+    assert_true(Document2.objects.filter(name='Test Document2').exists())
+    assert_true(Document.objects.filter(name='Test Document').exists())
     assert_equal(Document2.objects.get(name='Test Document2').id, self.document2.id)
     assert_equal(Document.objects.get(name='Test Document').id, self.document.id)
 
   def test_document_copy(self):
     name = 'Test Document2 Copy'
-    doc2 = self.document2.copy(name=name, owner=self.copy_user, description=self.document2.description)
 
-    # Test that copying a Document2 object creates another object
-    assert_equal(Document2.objects.count(), self.doc2_count + 2)
+    self.doc2_count = Document2.objects.count()
+    self.doc1_count = Document.objects.count()
+
+    doc2 = self.document2.copy(name=name, owner=self.copy_user, description=self.document2.description)
+    doc = self.document.copy(doc2, name=name, owner=self.copy_user, description=self.document2.description)
+
+    # Test that copying creates another object
+    assert_equal(Document2.objects.count(), self.doc2_count + 1)
     assert_equal(Document.objects.count(), self.doc1_count + 1)
 
     # Test that the content object is not pointing to the same object
@@ -894,12 +897,6 @@ class TestDocument(object):
     assert_equal(Document2.objects.filter(name=name).count(), 1)
     assert_equal(doc2.description, self.document2.description)
 
-    doc = self.document.copy(doc2, name=name, owner=self.copy_user, description=self.document2.description)
-
-    # Test that copying a Document object creates another Document2 and Document object
-    assert_equal(Document2.objects.count(), self.doc2_count + 2)
-    assert_equal(Document.objects.count(), self.doc1_count + 2)
-
     # Test that the content object is not pointing to the same object
     assert_not_equal(self.document.content_object, doc.content_object)
 
@@ -910,18 +907,6 @@ class TestDocument(object):
     assert_equal(Document.objects.filter(name=name).count(), 1)
     assert_equal(doc.description, self.document.description)
 
-  def test_add_to_history(self):
-    assert_equal(len(self.document2.get_history()), 0)
-
-    doc_id = self.document2.id
-    history_doc = self.document2.add_to_history(self.user, {'key1': 'val1'})
-
-    assert_equal(len(Document2.objects.get(id=doc_id).dependencies.all()), 1) # Need to get original document dynamically
-    assert_equal(len(Document2.objects.get(id=doc_id).get_history()), 1)
-
-    assert_equal(history_doc, Document2.objects.get(id=doc_id).get_history()[0])
-
-    assert_not_equal(doc_id, history_doc.id)
 
   def test_redact_statements(self):
     old_policies = redaction.global_redaction_engine.policies

@@ -18,7 +18,6 @@
 import logging
 import json
 import tempfile
-import time
 import StringIO
 import zipfile
 
@@ -27,17 +26,15 @@ from django.core import management
 from django.db import transaction
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils import html
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from beeswax.models import SavedQuery
 from desktop.lib.django_util import JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
-from desktop.models import Document2, Document, Directory, DocumentTag, import_saved_beeswax_query
-from desktop.lib.exceptions_renderable import PopupException
-from hadoop.fs.hadoopfs import Hdfs
+from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException, import_saved_beeswax_query
 
 
 LOG = logging.getLogger(__name__)
@@ -63,7 +60,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_documents(request):
   """
-  Returns all documents and directories found in the given path (required) and current user.
+  Returns all documents and directories found for the given uuid or path and current user.
   Optional params:
     page=<n>    - Controls pagination. Defaults to 1.
     limit=<n>   - Controls limit per page. Defaults to all.
@@ -74,19 +71,15 @@ def get_documents(request):
                   Default to "-last_modified".
     text=<frag> - Search for fragment "frag" in names and descriptions.
   """
-  path = request.GET.get('path', '/') # Expects path to be a Directory for now
+  path = request.GET.get('path', '/')
+  uuid = request.GET.get('uuid')
 
-  try:
-    directory = Directory.objects.get(owner=request.user, name=path) # TODO perms
-  except Directory.DoesNotExist, e:
-    if path == '/':
-      directory, created = Directory.objects.get_or_create(name='/', owner=request.user)
-      directory.dependencies.add(*Document2.objects.filter(owner=request.user).exclude(id=directory.id))
-    else:
-      raise e
+  if uuid:
+    document = Document2.objects.get(uuid=uuid)
+  else:  # Find by path
+    document = Document2.objects.get_by_path(user=request.user, path=path)
 
-  parent_path = path.rstrip('/').rsplit('/', 1)[0] or '/'
-  parent = directory.dependencies.get(name=parent_path) if path != '/' else None
+  # TODO perms
 
   # Get querystring filters if any
   page = int(request.GET.get('page', 1))
@@ -95,20 +88,24 @@ def get_documents(request):
   sort = request.GET.get('sort', '-last_modified')
   search_text = request.GET.get('text', None)
 
-  documents = directory.documents(types=type_filters, search_text=search_text, order_by=sort)
-  count = documents.count()
+  # Get children documents if this is a directory
+  children = None
+  count = 0
+  if document.is_directory:
+    directory = Directory.objects.get(id=document.id)
+    children = directory.documents(types=type_filters, search_text=search_text, order_by=sort)
+    count = children.count()
 
   # Paginate
-  if limit > 0:
+  if children and limit > 0:
     offset = (page - 1) * limit
     last = offset + limit
-    documents = documents.all()[offset:last]
+    children = children.all()[offset:last]
 
   return JsonResponse({
-      'path': path,
-      'directory': directory.to_dict(),
-      'parent': parent.to_dict() if parent else None,
-      'documents': [doc.to_dict() for doc in documents if doc != parent],
+      'document': document.to_dict(),
+      'parent': document.parent_directory.to_dict() if document.parent_directory else None,
+      'children': [doc.to_dict() for doc in children] if children else [],
       'page': page,
       'limit': limit,
       'count': count,
@@ -125,6 +122,9 @@ def _convert_documents(user):
   from beeswax.models import HQL, IMPALA, RDBMS
 
   with transaction.atomic():
+    # If user does not have a home directory, we need to create one and import any orphan documents to it
+    Document2.objects.create_user_directories(user)
+
     docs = Document.objects.get_docs(user, SavedQuery).filter(owner=user).filter(extra__in=[HQL, IMPALA, RDBMS])
 
     imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
@@ -136,7 +136,7 @@ def _convert_documents(user):
         imported_tag  # No already imported docs
     ])
 
-    root_doc, created = Directory.objects.get_or_create(name='/', owner=user)
+    root_doc, created = Directory.objects.get_or_create(name='', owner=user)
     imported_docs = []
 
     for doc in docs:
@@ -153,7 +153,7 @@ def _convert_documents(user):
           raise e
 
     if imported_docs:
-      root_doc.dependencies.add(*imported_docs)
+      root_doc.children.add(*imported_docs)
 
 
 @api_error_handler
@@ -170,18 +170,15 @@ def get_document(request):
 @api_error_handler
 @require_POST
 def move_document(request):
-  source_doc_id = json.loads(request.POST.get('source_doc_id'))
-  destination_doc_id = json.loads(request.POST.get('destination_doc_id'))
+  source_doc_uuid = json.loads(request.POST.get('source_doc_uuid'))
+  destination_doc_uuid = json.loads(request.POST.get('destination_doc_uuid'))
 
-  # destination exists + is dir?
-  source = Document2.objects.document(request.user, doc_id=source_doc_id)
-  destination = Document2.objects.document(request.user, doc_id=destination_doc_id)
+  if not source_doc_uuid or not destination_doc_uuid:
+    raise PopupException(_('move_document requires source_doc_uuid and destination_doc_uuid'))
 
-  if destination.type != 'directory':
-    raise PopupException(_('Destination is not a directory'))
-
+  source = Directory.objects.get(uuid=source_doc_uuid)
+  destination = Directory.objects.get(uuid=destination_doc_uuid)
   source.move(destination, request.user)
-  source.save()
 
   return JsonResponse({'status': 0})
 
@@ -189,32 +186,49 @@ def move_document(request):
 @api_error_handler
 @require_POST
 def create_directory(request):
-  parent_path = json.loads(request.POST.get('parent_path'))
+  parent_uuid = json.loads(request.POST.get('parent_uuid'))
   name = json.loads(request.POST.get('name'))
 
-  parent_dir = Directory.objects.get(owner=request.user, name=parent_path)
+  if not parent_uuid or not name:
+    raise PopupException(_('create_directory requires parent_uuid and name'))
 
-  path = Hdfs.normpath(parent_path + '/' + name)
-  file_doc = Directory.objects.create(name=path, owner=request.user)
-  parent_dir.dependencies.add(file_doc)
+  parent_dir = Directory.objects.get(uuid=parent_uuid)
+  # TODO: Check permissions and move to manager
+  directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
 
   return JsonResponse({
       'status': 0,
-      'file': file_doc.to_dict()
+      'directory': directory.to_dict()
   })
 
 
 @api_error_handler
 @require_POST
 def delete_document(request):
-  document_id = json.loads(request.POST.get('doc_id'))
-  skip_trash = json.loads(request.POST.get('skip_trash', 'false')) # TODO always false currently
+  """
+  Accepts a uuid and optional skip_trash parameter
 
-  document = Document2.objects.document(request.user, doc_id=document_id)
-  if document.type == 'directory' and document.dependencies.count() > 1:
-    raise PopupException(_('Directory is not empty'))
+  (Default) skip_trash=false, flags a document as trashed
+  skip_trash=true, deletes it permanently along with any history dependencies
 
-  document.delete()
+  If directory and skip_trash=false, all dependencies will also be flagged as trash
+  If directory and skip_trash=true, directory must be empty (no dependencies)
+  """
+  uuid = json.loads(request.POST.get('uuid'))
+  skip_trash = json.loads(request.POST.get('skip_trash', 'false'))
+
+  if not uuid:
+    raise PopupException(_('delete_document requires uuid'))
+
+  document = Document2.objects.get(uuid=uuid)
+
+  if skip_trash:
+    # TODO: check if document is in the .Trash folder, if not raise exception
+    if document.is_directory and document.has_children:
+      raise PopupException(_('Directory is not empty'))
+    document.delete()
+  else:
+    document.trash()  # TODO: get number of docs trashed
 
   return JsonResponse({
       'status': 0,
@@ -229,10 +243,13 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
-  perms_dict = json.loads(request.POST['data'])
-  doc_id = json.loads(request.POST['doc_id'])
+  perms_dict = json.loads(request.POST.get('data'))
+  uuid = json.loads(request.POST.get('uuid'))
 
-  doc = Document2.objects.document(request.user, doc_id)
+  if not uuid:
+    raise PopupException(_('share_document requires uuid'))
+
+  doc = Document2.objects.get(uuid=uuid)
 
   for name, perm in perms_dict.iteritems():
     users = groups = None
@@ -251,33 +268,6 @@ def share_document(request):
   return JsonResponse({
       'status': 0,
   })
-
-
-def _massage_doc_for_json(document, user, with_data=False):
-
-  massaged_doc = {
-    'id': document.id,
-    'uuid': document.uuid,
-
-    'owner': document.owner.username,
-    'type': html.conditional_escape(document.type),
-    'name': html.conditional_escape(document.name),
-    'description': html.conditional_escape(document.description),
-
-    'isMine': document.owner == user,
-    'lastModified': document.last_modified.strftime("%x %X"),
-    'lastModifiedInMillis': time.mktime(document.last_modified.timetuple()),
-    'version': document.version,
-    'is_history': document.is_history,
-
-    # tags
-    # dependencies
-  }
-
-  if with_data:
-    massaged_doc['data'] = document.data_dict
-
-  return massaged_doc
 
 
 def export_documents(request):

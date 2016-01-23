@@ -63,7 +63,7 @@ def check_document_modify_permission():
           doc2 = Document2.objects.get(id=notebook['id'])
           doc2.doc.get().can_write_or_exception(request.user)
       except Document.DoesNotExist:
-        raise PopupException(_('Job %(id)s does not exist') % {'id': notebook.get('id')})
+        raise PopupException(_('Document %(id)s does not exist') % {'id': notebook.get('id')})
 
       return view_func(request, *args, **kwargs)
     return wraps(view_func)(decorate)
