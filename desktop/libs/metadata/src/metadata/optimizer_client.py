@@ -88,7 +88,7 @@ class OptimizerApi(object):
           'productName': self._product_name,
           'productSecret': self._product_secret,
       }
-      return self._root.post('/api/createProduct', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+      return self._root.post('/api/authenticate', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
