@@ -967,27 +967,19 @@ class Directory(Document2):
     return Document2.objects.get(type='directory', dependencies=[self.pk]) # or name__startswith=self.name
 
 
-  def documents(self, types=None, search_text=None, page=1, limit=0, order_by=None):
+  def documents(self, types=None, search_text=None, order_by=None):
     documents = self.dependencies.all()  # TODO: perms
 
     if types and isinstance(types, list):
       documents = documents.filter(type__in=types)
 
     if search_text:
-      documents = documents.filter(Q(name__icontains=search_text) |
-                                   Q(description__icontains=search_text))
+      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text))
 
     if order_by:  # TODO: Validate that order_by is a valid sort parameter
       documents = documents.order_by(order_by)
 
-    count = documents.count()
-
-    if limit > 0:
-      offset = (page - 1) * limit
-      last = offset + limit
-      documents = documents.all()[offset:last]
-
-    return documents, count
+    return documents
 
 
 class Document2Permission(models.Model):
