@@ -63,7 +63,7 @@ class Resource(object):
     else:
       return resp.content
 
-  def invoke(self, method, relpath=None, params=None, data=None, headers=None, allow_redirects=False):
+  def invoke(self, method, relpath=None, params=None, data=None, headers=None, files=None, allow_redirects=False):
     """
     Invoke an API method.
     @return: Raw body or JSON dictionary (if response content type is JSON).
@@ -74,6 +74,7 @@ class Resource(object):
                                 params=params,
                                 data=data,
                                 headers=headers,
+                                files=files,
                                 allow_redirects=allow_redirects,
                                 urlencode=self._urlencode)
 
@@ -109,7 +110,7 @@ class Resource(object):
     return self.invoke("DELETE", relpath, params, headers=headers)
 
 
-  def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None):
+  def post(self, relpath=None, params=None, data=None, contenttype=None, headers=None, files=None):
     """
     Invoke the POST method on a resource.
     @param relpath: Optional. A relative path to this resource's path.
@@ -120,7 +121,7 @@ class Resource(object):
 
     @return: A dictionary of the JSON result.
     """
-    return self.invoke("POST", relpath, params, data, self._make_headers(contenttype, headers))
+    return self.invoke("POST", relpath, params, data, self._make_headers(contenttype, headers), files)
 
 
   def put(self, relpath=None, params=None, data=None, contenttype=None):
