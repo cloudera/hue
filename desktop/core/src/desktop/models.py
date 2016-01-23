@@ -952,21 +952,6 @@ class Directory(Document2):
     proxy = True
 
 
-  def save(self, *args, **kwargs):
-    if self.type != 'directory':
-      self.type = 'directory'
-    if Directory.objects.filter(name=self.name, owner=self.owner).exists():
-      raise Exception('Directory %s %s already exists' % (self.name, self.owner))
-    super(Directory, self).save(*args, **kwargs)
-
-    if Document2.objects.filter(type='directory', owner=self.owner, name=self.name).count() > 1:
-      raise ValidationError(_('Same directory %s for %s already exist') % (self.owner, self.name))
-
-
-  def parent(self):
-    return Document2.objects.get(type='directory', dependencies=[self.pk]) # or name__startswith=self.name
-
-
   def documents(self, types=None, search_text=None, order_by=None):
     documents = self.dependencies.all()  # TODO: perms
 
@@ -980,6 +965,25 @@ class Directory(Document2):
       documents = documents.order_by(order_by)
 
     return documents
+
+
+  def parent(self):
+    return Document2.objects.get(type='directory', dependencies=[self.pk]) # or name__startswith=self.name
+
+
+  def save(self, *args, **kwargs):
+    self.type = 'directory'
+
+    try:
+      directory = Directory.objects.get(name=self.name, owner=self.owner, type='directory')
+      if directory.pk != self.pk:
+        raise ValidationError('Directory for owner %s named %s already exists' % (self.name, self.owner))
+    except Directory.DoesNotExist:
+      pass  # no conflicts
+    except Directory.MultipleObjectsReturned:
+      raise Exception('Found multiple directories for owner %s named %s' % (self.owner, self.name))
+
+    super(Directory, self).save(*args, **kwargs)
 
 
 class Document2Permission(models.Model):
