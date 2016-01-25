@@ -250,6 +250,8 @@
       clonedTableContainer.css("marginTop", (-$(plugin.element).parent().scrollTop()) + "px");
     });
 
+    clonedTableContainer.css("marginTop", (-$(plugin.element).parent().scrollTop()) + "px");
+
     $(window).scroll(function () {
       clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
       clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
