@@ -423,14 +423,9 @@ from desktop.views import _ko
           </span>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-          <!-- ko if: !isRoot || selectedEntries().length > 0 -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: topMenuDelete"><i class="fa fa-fw fa-times"></i></a>
-          <!-- /ko -->
-          <!-- ko if: isRoot && selectedEntries().length == 0 -->
-          <span class="inactive-action fb-action"><i class="fa fa-fw fa-times"></i></span>
-          <!-- /ko -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: topMenuDelete, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal"><i class="fa fa-fw fa-users"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal, css: { 'disabled': selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i></a>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
