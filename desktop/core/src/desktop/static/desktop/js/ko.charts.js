@@ -156,7 +156,7 @@
 
   ko.bindingHandlers.barChart = {
     init: function (element, valueAccessor) {
-      window.setTimeout(function(){
+      window.setTimeout(function () {
         barChartBuilder(element, valueAccessor(), false);
       }, 0);
     },
@@ -170,48 +170,50 @@
           _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
         }
 
-        var _d3 = d3.select($(element).find("svg")[0]);
-        _d3.datum(_datum)
-          .transition().duration(150)
-          .each("end", function () {
-            if (_options.onComplete != null) {
-              _options.onComplete();
-            }
-          }).call(_chart);
+        window.setTimeout(function () {
+          var _d3 = d3.select($(element).find("svg")[0]);
+          _d3.datum(_datum)
+            .transition().duration(150)
+            .each("end", function () {
+              if (_options.onComplete != null) {
+                _options.onComplete();
+              }
+            }).call(_chart);
 
-        if (_chart.selectBars) {
-          var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
-          $.each(_options.fqs(), function (cnt, item) {
-            if (item.id() == _options.datum.widget_id) {
-              if (item.field() == _field) {
-                if (item.properties){
-                  _chart.selectBars({
-                    singleValues: $.map(item.filter(), function (it) {
+          if (_chart.selectBars) {
+            var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
+            $.each(_options.fqs(), function (cnt, item) {
+              if (item.id() == _options.datum.widget_id) {
+                if (item.field() == _field) {
+                  if (item.properties) {
+                    _chart.selectBars({
+                      singleValues: $.map(item.filter(), function (it) {
+                        return it.value();
+                      }),
+                      rangeValues: $.map(item.properties(), function (it) {
+                        return {from: it.from(), to: it.to()};
+                      })
+                    });
+                  }
+                  else {
+                    _chart.selectBars($.map(item.filter(), function (it) {
                       return it.value();
-                    }),
-                    rangeValues: $.map(item.properties(), function (it) {
-                      return {from: it.from(), to: it.to() };
+                    }));
+                  }
+                }
+                if (Array.isArray(item.field())) {
+                  _chart.selectBars({
+                    field: item.field(),
+                    selected: $.map(item.filter(), function (it) {
+                      return {values: it.value()};
                     })
                   });
                 }
-                else {
-                  _chart.selectBars($.map(item.filter(), function (it) {
-                      return it.value();
-                  }));
-                }
               }
-              if (Array.isArray(item.field())) {
-                _chart.selectBars({
-                  field: item.field(),
-                  selected: $.map(item.filter(), function (it) {
-                    return { values: it.value() };
-                  })
-                });
-              }
-            }
-          });
-        }
-        chartsNormalState();
+            });
+          }
+          chartsNormalState();
+        }, 0);
       }
       else if (_datum.length > 0) {
         ko.bindingHandlers.barChart.init(element, valueAccessor);
@@ -255,39 +257,41 @@
       var _datum = _options.transformer(_options.datum);
       var _chart = $(element).data("chart");
       if (_chart) {
-        var _d3 = d3.select($(element).find("svg")[0]);
-        _d3.datum(_datum)
+        window.setTimeout(function () {
+          var _d3 = d3.select($(element).find("svg")[0]);
+          _d3.datum(_datum)
             .transition().duration(150)
             .each("end", function () {
               if (_options.onComplete != null) {
                 _options.onComplete();
               }
             }).call(_chart);
-        _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
-          insertLinebreaks(d, this);
-        });
-        _d3.selectAll(".nv-brush").call(_chart.brush().clear());
-        if (_chart.selectBars) {
-          var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
-          $.each(_options.fqs(), function (cnt, item) {
-            if (item.id() == _options.datum.widget_id) {
-              if (item.field() == _field) {
-                _chart.selectBars($.map(item.filter(), function (it) {
-                  return it.value();
-                }));
-              }
-              if (Array.isArray(item.field())) {
-                _chart.selectBars({
-                  field: item.field(),
-                  selected: $.map(item.filter(), function (it) {
-                    return { values: it.value() };
-                  })
-                });
-              }
-            }
+          _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
+            insertLinebreaks(d, this);
           });
-        }
-        chartsNormalState();
+          _d3.selectAll(".nv-brush").call(_chart.brush().clear());
+          if (_chart.selectBars) {
+            var _field = (typeof _options.field == "function") ? _options.field() : _options.field;
+            $.each(_options.fqs(), function (cnt, item) {
+              if (item.id() == _options.datum.widget_id) {
+                if (item.field() == _field) {
+                  _chart.selectBars($.map(item.filter(), function (it) {
+                    return it.value();
+                  }));
+                }
+                if (Array.isArray(item.field())) {
+                  _chart.selectBars({
+                    field: item.field(),
+                    selected: $.map(item.filter(), function (it) {
+                      return {values: it.value()};
+                    })
+                  });
+                }
+              }
+            });
+          }
+          chartsNormalState();
+        }, 0);
       }
     }
   };
@@ -303,15 +307,17 @@
       var _datum = _options.transformer(_options.datum);
       var _chart = $(element).data("chart");
       if (_chart) {
-        var _d3 = d3.select($(element).find("svg")[0]);
-        _d3.datum(_datum)
-          .transition().duration(150)
-          .each("end", function () {
-            if (_options.onComplete != null) {
-              _options.onComplete();
-            }
-          }).call(_chart);
-        chartsNormalState();
+        window.setTimeout(function () {
+          var _d3 = d3.select($(element).find("svg")[0]);
+          _d3.datum(_datum)
+            .transition().duration(150)
+            .each("end", function () {
+              if (_options.onComplete != null) {
+                _options.onComplete();
+              }
+            }).call(_chart);
+          chartsNormalState();
+        }, 0);
       }
       else if (_datum.length > 0) {
         ko.bindingHandlers.lineChart.init(element, valueAccessor);
@@ -763,7 +769,7 @@
 
   ko.bindingHandlers.scatterChart = {
     update: function (element, valueAccessor) {
-      window.setTimeout(function(){
+      window.setTimeout(function () {
         var options = valueAccessor();
         var _datum = options.transformer(options.datum);
         $(element).height(300);
