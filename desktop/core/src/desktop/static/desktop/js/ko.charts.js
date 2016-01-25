@@ -36,93 +36,95 @@
 
   ko.bindingHandlers.pieChart = {
     init: function (element, valueAccessor) {
-      var _options = valueAccessor();
-      var _data = _options.transformer(_options.data);
-      $(element).css("marginLeft", "auto");
-      $(element).css("marginRight", "auto");
-      if (typeof _options.maxWidth != "undefined") {
-        var _max = _options.maxWidth * 1;
-        $(element).width(Math.min($(element).parent().width(), _max));
-      }
+      window.setTimeout(function(){
+        var _options = valueAccessor();
+        var _data = _options.transformer(_options.data);
+        $(element).css("marginLeft", "auto");
+        $(element).css("marginRight", "auto");
+        if (typeof _options.maxWidth != "undefined") {
+          var _max = _options.maxWidth * 1;
+          $(element).width(Math.min($(element).parent().width(), _max));
+        }
 
-      if ($(element).find("svg").length > 0 && _data.length == 0) {
-        $(element).find("svg").empty();
-      }
+        if ($(element).find("svg").length > 0 && _data.length == 0) {
+          $(element).find("svg").empty();
+        }
 
-      if (_data.length > 0 && isNaN(_data[0].value)) {
-        _data = [];
-        $(element).find("svg").empty();
-      }
+        if (_data.length > 0 && isNaN(_data[0].value)) {
+          _data = [];
+          $(element).find("svg").empty();
+        }
 
-      if ($(element).is(":visible")) {
-        nv.addGraph(function () {
-          var _chart = nv.models.growingPieChart()
-              .x(function (d) {
-                return d.label
-              })
-              .y(function (d) {
-                return d.value
-              })
-              .height($(element).width())
-              .showLabels(true).showLegend(false)
-              .tooltipContent(function (key, y, e, graph) {
-                return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>'
-              });
+        if ($(element).is(":visible")) {
+          nv.addGraph(function () {
+            var _chart = nv.models.growingPieChart()
+                .x(function (d) {
+                  return d.label
+                })
+                .y(function (d) {
+                  return d.value
+                })
+                .height($(element).width())
+                .showLabels(true).showLegend(false)
+                .tooltipContent(function (key, y, e, graph) {
+                  return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>'
+                });
 
-          var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+            var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
 
-          _d3.datum(_data)
-              .transition().duration(150)
-              .each("end", _options.onComplete != null ? _options.onComplete : void(0))
-              .call(_chart);
+            _d3.datum(_data)
+                .transition().duration(150)
+                .each("end", _options.onComplete != null ? _options.onComplete : void(0))
+                .call(_chart);
 
-          if (_options.fqs) {
-            $.each(_options.fqs(), function (cnt, item) {
-              if (item.id() == _options.data.widget_id && item.field() == _options.field()) {
-                _chart.selectSlices($.map(item.filter(), function (it) {
-                  return it.value();
-                }));
-              }
-            });
-          }
-
-          $(element).data("chart", _chart);
-
-          var _resizeTimeout = -1;
-          nv.utils.windowResize(function () {
-            window.clearTimeout(_resizeTimeout);
-            _resizeTimeout = window.setTimeout(function () {
-              _chart.update();
-            }, 200);
-          });
-
-          $(element).on("forceUpdate", function () {
-            _chart.update();
-          });
-
-          $(element).height($(element).width());
-          var _parentSelector = typeof _options.parentSelector != "undefined" ? _options.parentSelector : ".card-widget";
-          $(element).parents(_parentSelector).on("resize", function () {
-            if (typeof _options.maxWidth != "undefined") {
-              var _max = _options.maxWidth * 1;
-              $(element).width(Math.min($(element).parent().width(), _max));
-            }
-            $(element).height($(element).width());
-            _chart.update();
-          });
-
-          return _chart;
-        }, function () {
-          var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
-          _d3.selectAll(".nv-slice").on("click",
-              function (d, i) {
-                if (typeof _options.onClick != "undefined") {
-                  chartsUpdatingState();
-                  _options.onClick(d);
+            if (_options.fqs) {
+              $.each(_options.fqs(), function (cnt, item) {
+                if (item.id() == _options.data.widget_id && item.field() == _options.field()) {
+                  _chart.selectSlices($.map(item.filter(), function (it) {
+                    return it.value();
+                  }));
                 }
               });
-        });
-      }
+            }
+
+            $(element).data("chart", _chart);
+
+            var _resizeTimeout = -1;
+            nv.utils.windowResize(function () {
+              window.clearTimeout(_resizeTimeout);
+              _resizeTimeout = window.setTimeout(function () {
+                _chart.update();
+              }, 200);
+            });
+
+            $(element).on("forceUpdate", function () {
+              _chart.update();
+            });
+
+            $(element).height($(element).width());
+            var _parentSelector = typeof _options.parentSelector != "undefined" ? _options.parentSelector : ".card-widget";
+            $(element).parents(_parentSelector).on("resize", function () {
+              if (typeof _options.maxWidth != "undefined") {
+                var _max = _options.maxWidth * 1;
+                $(element).width(Math.min($(element).parent().width(), _max));
+              }
+              $(element).height($(element).width());
+              _chart.update();
+            });
+
+            return _chart;
+          }, function () {
+            var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+            _d3.selectAll(".nv-slice").on("click",
+                function (d, i) {
+                  if (typeof _options.onClick != "undefined") {
+                    chartsUpdatingState();
+                    _options.onClick(d);
+                  }
+                });
+          });
+        }
+      }, 0);
     },
     update: function (element, valueAccessor) {
       var _options = valueAccessor();
@@ -154,7 +156,9 @@
 
   ko.bindingHandlers.barChart = {
     init: function (element, valueAccessor) {
-      barChartBuilder(element, valueAccessor(), false);
+      window.setTimeout(function(){
+        barChartBuilder(element, valueAccessor(), false);
+      }, 0);
     },
     update: function (element, valueAccessor) {
       var _options = valueAccessor();
@@ -162,7 +166,6 @@
       var _chart = $(element).data("chart");
 
       if (_chart) {
-
         if (_chart.multibar){
           _chart.multibar.stacked(typeof _options.stacked != "undefined" ? _options.stacked : false);
         }
@@ -219,11 +222,15 @@
   ko.bindingHandlers.timelineChart = {
     init: function (element, valueAccessor) {
       if (valueAccessor().type && valueAccessor().type() == "line"){
-        lineChartBuilder(element, valueAccessor(), true);
+        window.setTimeout(function(){
+          lineChartBuilder(element, valueAccessor(), true);
+        }, 0);
         $(element).data("type", "line");
       }
       else {
-        barChartBuilder(element, valueAccessor(), true);
+        window.setTimeout(function(){
+          barChartBuilder(element, valueAccessor(), true);
+        }, 0);
         $(element).data("type", "bar");
       }
     },
@@ -234,10 +241,14 @@
           $(element).find("svg").remove();
         }
         if (valueAccessor().type() == "line"){
-          lineChartBuilder(element, valueAccessor(), true);
+          window.setTimeout(function(){
+            lineChartBuilder(element, valueAccessor(), true);
+          }, 0);
         }
         else {
-          barChartBuilder(element, valueAccessor(), true);
+          window.setTimeout(function(){
+            barChartBuilder(element, valueAccessor(), true);
+          }, 0);
         }
         $(element).data("type", valueAccessor().type());
       }
@@ -283,7 +294,9 @@
 
   ko.bindingHandlers.lineChart = {
     init: function (element, valueAccessor) {
-      lineChartBuilder(element, valueAccessor(), false);
+      window.setTimeout(function(){
+        lineChartBuilder(element, valueAccessor(), false);
+      }, 0);
     },
     update: function (element, valueAccessor) {
       var _options = valueAccessor();
@@ -750,52 +763,54 @@
 
   ko.bindingHandlers.scatterChart = {
     update: function (element, valueAccessor) {
-      var options = valueAccessor();
-      var _datum = options.transformer(options.datum);
-      $(element).height(300);
-      if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
-        $(element).find("svg").empty();
-      }
-      if (_datum.length > 0 && _datum[0].values.length > 0 && (isNaN(_datum[0].values[0].x) || isNaN(_datum[0].values[0].y))) {
-        _datum = [];
-        $(element).find("svg").empty();
-      }
+      window.setTimeout(function(){
+        var options = valueAccessor();
+        var _datum = options.transformer(options.datum);
+        $(element).height(300);
+        if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
+          $(element).find("svg").empty();
+        }
+        if (_datum.length > 0 && _datum[0].values.length > 0 && (isNaN(_datum[0].values[0].x) || isNaN(_datum[0].values[0].y))) {
+          _datum = [];
+          $(element).find("svg").empty();
+        }
 
-      if ($(element).is(":visible")) {
-        nv.addGraph(function () {
-          var _chart = nv.models.scatterChart()
-              .transitionDuration(350)
-              .color(d3.scale.category10().range());
+        if ($(element).is(":visible")) {
+          nv.addGraph(function () {
+            var _chart = nv.models.scatterChart()
+                .transitionDuration(350)
+                .color(d3.scale.category10().range());
 
-          _chart.tooltipContent(function (key, x, y, obj) {
-            return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
-          });
+            _chart.tooltipContent(function (key, x, y, obj) {
+              return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
+            });
 
-          _chart.xAxis.tickFormat(d3.format('.02f'));
-          _chart.yAxis.tickFormat(d3.format('.02f'));
-          _chart.scatter.onlyCircles(true);
+            _chart.xAxis.tickFormat(d3.format('.02f'));
+            _chart.yAxis.tickFormat(d3.format('.02f'));
+            _chart.scatter.onlyCircles(true);
 
-          var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
-          _d3.datum(_datum)
-              .transition().duration(150)
-              .each("end", options.onComplete != null ? options.onComplete : void(0))
-              .call(_chart);
+            var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+            _d3.datum(_datum)
+                .transition().duration(150)
+                .each("end", options.onComplete != null ? options.onComplete : void(0))
+                .call(_chart);
 
-          var _resizeTimeout = -1;
-          nv.utils.windowResize(function () {
-            window.clearTimeout(_resizeTimeout);
-            _resizeTimeout = window.setTimeout(function () {
+            var _resizeTimeout = -1;
+            nv.utils.windowResize(function () {
+              window.clearTimeout(_resizeTimeout);
+              _resizeTimeout = window.setTimeout(function () {
+                _chart.update();
+              }, 200);
+            });
+
+            $(element).on("forceUpdate", function () {
               _chart.update();
-            }, 200);
-          });
+            });
 
-          $(element).on("forceUpdate", function () {
-            _chart.update();
+            return _chart;
           });
-
-          return _chart;
-        });
-      }
+        }
+      }, 0);
     }
   };
 
