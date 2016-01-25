@@ -133,6 +133,17 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
+  def top_tables(self, token, email=None):
+    try:
+      data = {
+          'email': email if email is not None else self._email,
+          'token': token,
+      }
+      return self._root.post('/api/topTables', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
 def OptimizerDataAdapter(queries):
   headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
   rows = ([str(uuid.uuid4()), 1000, q] for q in queries)
