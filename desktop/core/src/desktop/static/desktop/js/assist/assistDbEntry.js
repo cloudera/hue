@@ -306,6 +306,7 @@
       })
     } else if (self.definition.isDatabase) {
       huePubSub.publish("assist.database.selected", {
+        source: self.assistDbSource.type,
         name: self.definition.name
       })
     }

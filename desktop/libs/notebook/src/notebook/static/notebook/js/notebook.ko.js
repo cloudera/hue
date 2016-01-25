@@ -197,11 +197,14 @@
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
 
-    huePubSub.subscribe("assist.database.set", function (databaseDef) {
+    var handleAssistSelection = function (databaseDef) {
       if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
         self.database(databaseDef.name);
       }
-    });
+    };
+
+    huePubSub.subscribe("assist.database.set", handleAssistSelection);
+    huePubSub.subscribe("assist.database.selected", handleAssistSelection);
 
     if (! self.database()) {
       huePubSub.publish("assist.get.database", self.type());
