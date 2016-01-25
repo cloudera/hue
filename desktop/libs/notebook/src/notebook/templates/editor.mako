@@ -27,6 +27,13 @@
 ${ commonheader(_('Editor'), editor_type, user, "68px") | n,unicode }
 
 ${ editorComponents.includes() }
+
+<style type="text/css">
+  .snippet {
+    margin-right: 10px;
+  }
+</style>
+
 ${ editorComponents.topBar('editor', editor_type) }
 ${ editorComponents.commonHTML() }
 
