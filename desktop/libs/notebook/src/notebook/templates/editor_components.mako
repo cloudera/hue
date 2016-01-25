@@ -323,6 +323,7 @@ ${ require.config() }
             sourceTypes: $root.sqlSourceTypes,
             activeSourceType: $root.activeSqlSourceType,
             navigationSettings: {
+              openDatabase: true,
               openItem: false,
               showPreview: true,
               showStats: true
