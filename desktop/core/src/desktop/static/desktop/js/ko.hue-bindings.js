@@ -159,15 +159,19 @@
    *
    * Example:
    *
-   * <div data-bind="contextMenu: '.hue-context-menu'>
+   * <div data-bind="contextMenu: {
+   *   menuSelector: '.hue-context-menu',
+   *   beforeOpen: function () { ... }
+   * }">
    *   <ul class="hue-context-menu">...</ul>
    * </div>
-   * 
+   *
    */
   ko.bindingHandlers.contextMenu = {
-    init: function (element, valueAccessor) {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var $element = $(element);
-      var $menu = $element.find(valueAccessor());
+      var options = valueAccessor();
+      var $menu = $element.find(options.menuSelector);
       var active = false;
 
       element.addEventListener("contextmenu", function(e) {
@@ -176,6 +180,9 @@
         } else if(window.getSelection) {
           var sel = window.getSelection();
           sel.removeAllRanges();
+        }
+        if (typeof options.beforeOpen === 'function') {
+          options.beforeOpen.bind(viewModel)();
         }
         $menu.css('top', 0);
         $menu.css('left', 0);
