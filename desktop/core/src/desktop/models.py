@@ -848,7 +848,7 @@ class Document2(models.Model):
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
 
   def to_dict(self):
-    return {
+    doc_dict = {
       'owner': self.owner.username,
       'name': self.name,
       'description': self.description,
@@ -856,11 +856,13 @@ class Document2(models.Model):
       'id': self.id,
       'doc1_id': self.doc.get().id if self.doc.exists() else -1,
       'type': self.type,
+      'perms': self._massage_permissions(),
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),
       'last_modified_ts': calendar.timegm(self.last_modified.utctimetuple()),
       'isSelected': False,
       'absoluteUrl': self.get_absolute_url()
     }
+    return doc_dict
 
   def can_read_or_exception(self, user):
     self.doc.get().can_read_or_exception(user)
@@ -944,6 +946,26 @@ class Document2(models.Model):
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=perm)
     return perm
 
+  def _massage_permissions(self):
+    """
+    Returns the permissions for a given document as a dictionary
+    """
+    read_perms = self.list_permissions(perm='read')
+    write_perms = self.list_permissions(perm='write')
+    return {
+      'read': {
+        'users': [{'id': perm_user.id, 'username': perm_user.username} \
+                  for perm_user in read_perms.users.all()],
+        'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+                   for perm_group in read_perms.groups.all()]
+      },
+      'write': {
+        'users': [{'id': perm_user.id, 'username': perm_user.username} \
+                  for perm_user in write_perms.users.all()],
+        'groups': [{'id': perm_group.id, 'name': perm_group.name} \
+                   for perm_group in write_perms.groups.all()]
+      }
+    }
 
 class Directory(Document2):
   # e.g. name = '/' or '/dir1/dir2/f3'
