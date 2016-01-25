@@ -2325,6 +2325,7 @@ body {
   line-height: 22px;
   vertical-align: middle;
   padding: 6px 16px 6px 38px;
+  cursor: default;
 
   color: #CCC;
   text-decoration: none;
@@ -2332,7 +2333,7 @@ body {
   white-space: nowrap;
 }
 
-.hue-context-menu > li > a:hover {
+.hue-context-menu > li > a:not(.disabled):hover {
   background-color: #DBE8F1;
 }
 

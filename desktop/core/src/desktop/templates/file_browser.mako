@@ -244,11 +244,11 @@ from desktop.views import _ko
     </div>
 
     <div id="shareDocumentModal" class="modal hide fade">
-      <!-- ko with: activeEntry -->
-      <!-- ko with: activeDocument -->
+      <!-- ko with: activeEntry().selectedEntry() -->
+      <!-- ko with: document -->
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Sharing Settings')}</h3>
+        <h3>${_('Sharing')} - <span data-bind="text: $parent.name"></span></h3>
       </div>
       <div class="modal-body" style="overflow-y: visible">
         <!-- ko with: definition -->
@@ -464,6 +464,7 @@ from desktop.views import _ko
               <ul class="hue-context-menu">
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') }</a></li>
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
               </ul>
               <div class="fb-primary-col">
                 <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : isDirectory, 'fa-file-o': ! isDirectory }"></i>
