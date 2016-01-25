@@ -85,6 +85,16 @@
     }
   }
 
+  HueFileEntry.prototype.beforeContextOpen = function () {
+    var self = this;
+    if (! self.selected()) {
+      $.each(self.parent.selectedEntries(), function (idx, entry) {
+        entry.selected(false);
+      });
+      self.selected(true);
+    }
+  };
+
   HueFileEntry.prototype.showSharingModal = function () {
     var self = this;
     if (self.selectedEntry()) {
