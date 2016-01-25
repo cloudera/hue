@@ -26,3 +26,9 @@ urlpatterns = patterns('metadata.navigator_api',
   url(r'^api/navigator/update_properties/?$', 'update_properties', name='update_properties'),
   url(r'^api/navigator/delete_properties/?$', 'delete_properties', name='delete_properties'),
 )
+
+
+# Optimizer API
+urlpatterns = patterns('metadata.optimizer_api',
+  url(r'^api/optimizer_api/top_tables/?$', 'top_tables', name='top_tables'),
+)

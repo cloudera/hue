@@ -58,6 +58,15 @@ class OptimizerApi(object):
     self._client.set_verify(ssl_cert_ca_verify)
 
     self._root = resource.Resource(self._client)
+    self._token = None
+
+
+  def _authenticate(self, force=False):
+    if self._token is None or force:
+      self._token = self.authenticate()['token']
+
+    return self._token
+
 
   def create_product(self, product_name=None, product_secret=None, authCode=None):
     try:
@@ -133,7 +142,10 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def top_tables(self, token, email=None):
+  def top_tables(self, token=None, email=None):
+    if token is None:
+      token = self._authenticate()
+
     try:
       data = {
           'email': email if email is not None else self._email,
