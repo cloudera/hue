@@ -113,3 +113,12 @@ class TestOptimizerApi(object):
 
     resp = self.api.upload(token=token, queries=queries)
     assert_equal('success', resp['status'], resp)
+
+
+  def test_api_top_tables(self):
+    resp = self.api.authenticate()
+    token = resp['token']
+
+    resp = self.api.top_tables(token=token)
+
+    assert_true(isinstance(resp, list), resp) # No status code currently
