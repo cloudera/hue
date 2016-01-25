@@ -2211,16 +2211,21 @@ div.navigator .pull-right .nav {
   -moz-transition: color 0.2s ease;
   -ms-transition: color 0.2s ease;
   transition: color 0.2s ease;
-  color: #d1d1d1;
+  color: #aaa;
 }
 
-.inactive-action:hover,
-.inactive-action:hover > a {
+.inactive-action.disabled {
+  color: #eee !important;
+  cursor: default !important;
+}
+
+.inactive-action:not(.disabled):hover,
+.inactive-action:not(.disabled):hover > a {
   color: #338bb8 !important;
 }
 
 .inactive-action:focus {
-  color: #d1d1d1;
+  color: #aaa;
 }
 
 .toggle-overflow {
