@@ -79,13 +79,22 @@ class TestOptimizerApi(object):
   def test_api_get_status(self):
     resp = self.api.authenticate()
     token = resp['token']
-   
+
     resp = self.api.get_status(token=token)
 
     assert_equal('success', resp['status'], resp)
     assert_true('filesFinished' in resp['details'], resp)
     assert_true('filesProcessing' in resp['details'], resp)
     assert_true('finished' in resp['details'], resp)
+
+
+  def test_api_delete_workload(self):
+    resp = self.api.authenticate()
+    token = resp['token']
+
+    resp = self.api.delete_workload(token=token)
+
+    assert_equal('success', resp['status'], resp)
 
 
   def test_api_upload(self):
