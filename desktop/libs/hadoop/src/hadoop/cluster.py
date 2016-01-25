@@ -216,7 +216,8 @@ def get_next_ha_yarncluster():
   for name in conf.YARN_CLUSTERS.keys():
     config = conf.YARN_CLUSTERS[name]
     if config.SUBMIT_TO.get():
-      rm = ResourceManagerApi(DEFAULT_USER, config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get(), config.SSL_CERT_CA_VERIFY.get())
+      rm = ResourceManagerApi(config.RESOURCE_MANAGER_API_URL.get(), config.SECURITY_ENABLED.get(), config.SSL_CERT_CA_VERIFY.get())
+      rm.setuser(DEFAULT_USER)
       if has_ha:
         try:
           cluster_info = rm.cluster()
