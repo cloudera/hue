@@ -166,9 +166,9 @@
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };
 
-    self.isSqlDialect = function () {
+    self.isSqlDialect = ko.pureComputed(function () {
       return vm.getSnippetViewSettings(self.type()).sqlDialect;
-    };
+    });
 
     self.getPlaceHolder = function() {
       return vm.getSnippetViewSettings(self.type()).placeHolder;
@@ -179,6 +179,23 @@
     };
 
     self.database = ko.observable(typeof snippet.database != "undefined" && snippet.database != null ? snippet.database : null);
+
+    self.availableDatabases = ko.observableArray();
+
+    var updateDatabases = function () {
+      if (self.isSqlDialect()) {
+        self.getAssistHelper().loadDatabases({
+          sourceType: self.type(),
+          silenceErrors: true,
+          successCallback: self.availableDatabases
+        });
+      } else {
+        self.availableDatabases([]);
+      }
+    };
+
+    self.isSqlDialect.subscribe(updateDatabases);
+    updateDatabases();
 
     huePubSub.subscribe("assist.database.set", function (databaseDef) {
       if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
