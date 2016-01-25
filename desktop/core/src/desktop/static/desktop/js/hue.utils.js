@@ -116,6 +116,10 @@ Array.prototype.diff = function (a) {
     return $('<div/>').text(value).html();
   };
 
+  hueUtils.html2text = function (value){
+    return $('<div/>').html(value).text();
+  };
+
   hueUtils.goFullScreen = function () {
     if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
       if (document.documentElement.requestFullscreen) {
