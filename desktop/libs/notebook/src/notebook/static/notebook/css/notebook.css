@@ -789,7 +789,11 @@ table.airy tr td {
 
 .execution-timer {
   color: #d1d1d1;
-  padding-right: 10px;
+  font-size: 12px;
+  font-weight: lighter;
+}
+
+.active-database span {
   font-size: 12px;
   font-weight: lighter;
 }

@@ -42,7 +42,7 @@
     var self = this;
     self.i18n = i18n;
     self.user = user;
-    self.lastKnownDatabases = [];
+    self.lastKnownDatabases = {};
   }
 
   AssistHelper.prototype.hasExpired = function (timestamp) {
@@ -392,6 +392,8 @@
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.sourceType
    **/
   AssistHelper.prototype.loadDatabases = function (options) {
     var self = this;
@@ -401,10 +403,10 @@
       successCallback: function (data) {
         var databases = data.databases || [];
         // Blacklist of system databases
-        self.lastKnownDatabases = $.grep(databases, function(database) {
+        self.lastKnownDatabases[options.sourceType] = $.grep(databases, function(database) {
           return database !== "_impala_builtins";
         });
-        options.successCallback(self.lastKnownDatabases);
+        options.successCallback(self.lastKnownDatabases[options.sourceType]);
       },
       errorCallback: function (response) {
         if (response.status == 401) {
@@ -413,7 +415,7 @@
           }});
           return;
         }
-        self.lastKnownDatabases = [];
+        self.lastKnownDatabases[options.sourceType] = [];
         self.assistErrorCallback(options)(response);
       }
     }));

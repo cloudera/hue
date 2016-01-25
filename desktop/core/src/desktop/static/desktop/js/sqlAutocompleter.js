@@ -68,7 +68,7 @@
         if (ref.indexOf('.') > 0) {
           var refParts = ref.split('.');
 
-          if(self.snippet.getAssistHelper().lastKnownDatabases.indexOf(refParts[0]) > -1) {
+          if(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()].indexOf(refParts[0]) > -1) {
             return {
               database: refParts.shift(),
               table: refParts.join('.')
@@ -300,7 +300,7 @@
       if (! excludeDatabases) {
         // No FROM prefix
         prependedFields = prependedFields.concat(fields);
-        fields = $.map(self.snippet.getAssistHelper().lastKnownDatabases, function(database) {
+        fields = $.map(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function(database) {
           return {
             name: database + ".",
             type: "database"
@@ -370,7 +370,7 @@
     var impalaFieldRef = impalaSyntax && beforeCursor.slice(-1) === '.';
 
     if (keywordBeforeCursor === "USE") {
-      var databases = self.snippet.getAssistHelper().lastKnownDatabases;
+      var databases = self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()];
       databases.sort();
       callback($.map(databases, function(db, idx) {
         return {
