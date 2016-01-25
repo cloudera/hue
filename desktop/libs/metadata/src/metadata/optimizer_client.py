@@ -106,13 +106,13 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def get_status(self):
+  def get_status(self, token, email=None):
     try:
       data = {
-          'email': email,
+          'email': email if email is not None else self._email,
           'token': token,
       }
-      return self._root.post('/api/getStatus', data)
+      return self._root.post('/api/getStatus', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
