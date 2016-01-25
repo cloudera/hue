@@ -113,7 +113,7 @@
 
   HueDocument.prototype.handleTypeAheadSelection = function () {
     var self = this;
-    if (self.selectedUserOrGroup() !== null) {
+    if (self.selectedUserOrGroup()) {
       if (typeof self.selectedUserOrGroup().username !== 'undefined') {
         self.definition().perms[self.selectedPerm()].users.push(self.selectedUserOrGroup());
       } else {
@@ -181,13 +181,7 @@
       })
     };
 
-    if (!self.loaded()) {
-      window.setTimeout(function () {
-        self.initUserTypeahead(fetchFunction);
-      }, 2000);
-    } else {
-      fetchFunction();
-    }
+    self.initUserTypeahead(fetchFunction);
   };
 
   HueDocument.prototype.prettifyUserNames = function (users) {

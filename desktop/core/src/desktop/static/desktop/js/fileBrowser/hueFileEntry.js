@@ -48,7 +48,7 @@
     self.path = self.definition.name;
     self.app = options.app;
 
-    self.activeDocument = ko.observable();
+    self.document = ko.observable();
 
     self.entriesToDelete = ko.observableArray();
 
@@ -88,15 +88,20 @@
   HueFileEntry.prototype.showSharingModal = function () {
     var self = this;
     if (self.selectedEntry()) {
-      if (! self.activeDocument()) {
-        self.activeDocument(new HueDocument({
-          assistHelper: self.assistHelper,
-          fileEntry: self
-        }));
-        self.activeDocument().load();
+      if (! self.selectedEntry().document()) {
+        self.selectedEntry().loadDocument();
       }
       $('#shareDocumentModal').modal('show');
     }
+  };
+
+  HueFileEntry.prototype.loadDocument = function () {
+    var self = this;
+    self.document(new HueDocument({
+      assistHelper: self.assistHelper,
+      fileEntry: self
+    }));
+    self.document().load();
   };
 
   /**
