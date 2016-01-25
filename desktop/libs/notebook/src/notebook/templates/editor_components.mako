@@ -1456,7 +1456,7 @@ ${ require.config() }
       });
       $(rawDatum.counts()).each(function (cnt, item) {
         _data.push({
-          label: item[_idxLabel],
+          label: hueUtils.html2text(item[_idxLabel]),
           value: item[_idxValue],
           obj: item
         });
@@ -1525,7 +1525,7 @@ ${ require.config() }
           _data.push({
             lat: item[_idxLat],
             lng: item[_idxLng],
-            label: item[_idxLabel],
+            label: hueUtils.html2text(item[_idxLabel]),
             obj: item
           });
         });
@@ -1565,7 +1565,7 @@ ${ require.config() }
           $(rawDatum.counts()).each(function (cnt, item) {
             _data.push({
               series: _plottedSerie,
-              x: item[_idxLabel],
+              x: hueUtils.html2text(item[_idxLabel]),
               y: item[_idxValue],
               obj: item
             });
