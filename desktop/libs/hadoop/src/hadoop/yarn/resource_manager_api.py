@@ -49,9 +49,12 @@ def get_resource_manager(username):
         yarn_cluster = cluster.get_cluster_conf_for_job_submission()
         if yarn_cluster is None:
           raise PopupException(_('No Resource Manager are available.'))
-        API_CACHE = ResourceManagerApi(username, yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+        API_CACHE = ResourceManagerApi(yarn_cluster.RESOURCE_MANAGER_API_URL.get(), yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
     finally:
       API_CACHE_LOCK.release()
+
+  API_CACHE.setuser(username) # Set the correct user
+
   return API_CACHE
 
 
@@ -61,12 +64,12 @@ class YarnFailoverOccurred(Exception):
 
 class ResourceManagerApi(object):
 
-  def __init__(self, username, rm_url, security_enabled=False, ssl_cert_ca_verify=False):
-    self._username = username
+  def __init__(self, rm_url, security_enabled=False, ssl_cert_ca_verify=False):
     self._url = posixpath.join(rm_url, 'ws', _API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)
     self._root = Resource(self._client)
     self._security_enabled = security_enabled
+    self._thread_local = threading.local() # To store user info
 
     if self._security_enabled:
       self._client.set_kerberos_auth()
@@ -76,8 +79,8 @@ class ResourceManagerApi(object):
   def _get_params(self):
     params = {}
 
-    if self._username != DEFAULT_USER.get(): # We impersonate if needed
-      params['doAs'] = self._username
+    if self.username != DEFAULT_USER.get(): # We impersonate if needed
+      params['doAs'] = self.username
       if not self.security_enabled:
         params['user.name'] = DEFAULT_USER.get()
 
@@ -85,6 +88,22 @@ class ResourceManagerApi(object):
 
   def __str__(self):
     return "ResourceManagerApi at %s" % (self._url,)
+
+  def setuser(self, user):
+    curr = self.user
+    self._thread_local.user = user
+    return curr
+
+  @property
+  def user(self):
+    return self.username # Backward compatibility
+
+  @property
+  def username(self):
+    try:
+      return self._thread_local.user
+    except AttributeError:
+      return DEFAULT_USER.get()
 
   @property
   def url(self):
@@ -128,13 +147,13 @@ class ResourceManagerApi(object):
 
   def delegation_token(self):
     params = self._get_params()
-    data = {'renewer': self._username}
+    data = {'renewer': self.username}
     return self._execute(self._root.post, 'cluster/delegation-token', params=params, data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
 
   def cancel_token(self, token):
     params = self._get_params()
     headers = {'Hadoop-YARN-RM-Delegation-Token': token}
-    LOG.debug('Canceling delegation token of ' % self._username)
+    LOG.debug('Canceling delegation token of ' % self.username)
     return self._execute(self._root.delete, 'cluster/delegation-token', params=params, headers=headers)
 
   def _execute(self, function, *args, **kwargs):
