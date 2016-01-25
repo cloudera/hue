@@ -2034,6 +2034,10 @@ ${ require.config() }
         }
       });
 
+      viewModel.isLeftPanelVisible.subscribe(function (value) {
+        window.setTimeout(redrawFixedHeaders, 200);
+      });
+
       $(document).on("showAuthModal", function (e, data) {
         viewModel.authSessionUsername('${ user.username }');
         viewModel.authSessionPassword('');
