@@ -95,13 +95,13 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def delete_workload(self):
+  def delete_workload(self, token, email=None):
     try:
       data = {
-          'email': email,
+          'email': email if email is not None else self._email,
           'token': token,
       }
-      return self._root.post('/api/deleteWorkload', data)
+      return self._root.post('/api/deleteWorkload', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
@@ -128,7 +128,7 @@ class OptimizerApi(object):
           'sourcePlatform': sourcePlatform,
       }
       return self._root.post('/api/upload', data=data, files = {'file': ('hue-report.csv', list(queries_csv)[0])})
-      
+
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
@@ -138,4 +138,3 @@ def OptimizerDataAdapter(queries):
   rows = ([str(uuid.uuid4()), 1000, q] for q in queries)
 
   yield headers, rows
-    
