@@ -204,7 +204,7 @@
       $(this).attr("class", originalTh.attr("class"));
     });
 
-    var clonedCellContainer = $("<div>").css("background-color", "#FFCC00").width(originalTh.outerWidth()).height(originalTh.outerHeight());
+    var clonedCellContainer = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height(originalTh.outerHeight());
     clonedCell.appendTo(clonedCellContainer);
 
     var clonedCellVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerCell").addClass("jHueTableExtenderClonedContainerCell").width(originalTh.outerWidth()).css("overflow", "hidden").css("top", topPosition + "px");
