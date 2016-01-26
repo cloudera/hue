@@ -655,7 +655,7 @@ from desktop.views import _ko
             if (event.metaKey || event.ctrlKey) {
               clickedEntry.selected(!clickedEntry.selected());
             } else if (event.shiftKey) {
-              var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-file-index');
+              var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-file-index') || 0;
               var lower = Math.min(lastClickedIndex, clickedIndex);
               var upper = Math.max(lastClickedIndex, clickedIndex);
               for (var i = lower; i <= upper; i++) {
@@ -675,8 +675,10 @@ from desktop.views import _ko
                 clickedEntry.selected(! clickedEntry.selected());
               }
             }
-
-            ko.utils.domData.set(document, 'last-clicked-file-index', clickedIndex);
+            var selectedEntries = $.grep(allEntries(), function (entry) {
+              return entry.selected();
+            });
+            ko.utils.domData.set(document, 'last-clicked-file-index', selectedEntries.length > 0 ? clickedIndex : 0);
           };
 
           ko.bindingHandlers.multiClick.init(element, function () {
