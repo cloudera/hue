@@ -199,7 +199,7 @@ ${ require.config() }
         &nbsp;&nbsp;&nbsp;
 
         % if mode == 'editor':
-        <a class="btn" href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('New %s Query') % editor_type.title() }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="${ url('notebook:editor') }?type=${ editor_type }&new=true" title="${ _('New %s Query') % editor_type.title() }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         % else:
@@ -599,6 +599,7 @@ ${ require.config() }
           snippet: $data,
           openIt: '${ _ko("Alt or Ctrl + Click to open it") }',
           expandStar: '${ _ko("Alt or Ctrl + Click to replace with all columns") }',
+          onBlur: saveTemporarySnippet,
           aceOptions: {
             showLineNumbers: $root.editorMode,
             showGutter: $root.editorMode,
@@ -1657,6 +1658,12 @@ ${ require.config() }
     return _datum;
   }
 
+  function saveTemporarySnippet($element, value) {
+    if ($element.data('last-active-editor')) {
+      $.totalStorage('hue.notebook.lastWrittenSnippet', value);
+    }
+  }
+
   require([
     "knockout",
     "ko.charts",
@@ -1997,6 +2004,11 @@ ${ require.config() }
       viewModel = new EditorViewModel(${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS, i18n);
       ko.applyBindings(viewModel);
       viewModel.init();
+
+      if (viewModel.editorMode && window.location.getParameter('editor') == '' && window.location.getParameter('new') == '') {
+        viewModel.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet'));
+        $.totalStorage('hue.notebook.lastWrittenSnippet', '');
+      }
 
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
