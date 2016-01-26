@@ -36,10 +36,11 @@ from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
-from metastore.forms import LoadDataForm, DbForm
-from metastore.settings import DJANGO_APPS
+from metadata.optimizer_client import is_optimizer_enabled
 from notebook.connectors.base import Notebook
 
+from metastore.forms import LoadDataForm, DbForm
+from metastore.settings import DJANGO_APPS
 
 LOG = logging.getLogger(__name__)
 
@@ -179,6 +180,7 @@ def show_tables(request, database=None):
     'database': None,
     'partitions': [],
     'has_write_access': has_write_access(request.user),
+    'is_optimizer_enabled': is_optimizer_enabled() and request.user.is_superuser
     })
 
   return resp

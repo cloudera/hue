@@ -380,6 +380,11 @@ ${ assist.assistPanel() }
                 <!-- /ko -->
               </form>
             </div>
+            % if is_optimizer_enabled:
+              <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table in Optimizer')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1">
+                <i class="fa fa-eye"></i> ${_('View in Optimizer')}
+              </button>
+            % endif
           % endif
         </div>
 
@@ -390,6 +395,11 @@ ${ assist.assistPanel() }
             <th>&nbsp;</th>
             <th>${ _('Table Name') }</th>
             <th>${ _('Comment') }</th>
+            % if is_optimizer_enabled:
+            <th>${ _('Popularity') }</th>
+            <th>${ _('Column count') }</th>
+            <th>${ _('Fact / Dimension') }</th>
+            % endif
             <th>${ _('Type') }</th>
           </tr>
           </thead>
@@ -411,6 +421,11 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
+              % if is_optimizer_enabled:
+              <td>28% workload (8)</td>
+              <td>15 columns</td>
+              <td>Dimension</td>
+              % endif
               <td>
                 <!-- ko if: type == 'Table' -->
                   <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
