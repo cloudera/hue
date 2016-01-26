@@ -126,15 +126,18 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def upload(self, token, queries, email=None, sourcePlatform='generic'):
-    try:
+  def upload(self, queries, token=None, email=None, source_platform='generic'):
+    if token is None:
+      token = self._authenticate()
+
+    try:      
       content_generator = OptimizerDataAdapter(queries)
       queries_csv = export_csvxls.create_generator(content_generator, 'csv')
 
       data = {
           'email': email if email is not None else self._email,
           'token': token,
-          'sourcePlatform': sourcePlatform,
+          'sourcePlatform': source_platform,
       }
       return self._root.post('/api/upload', data=data, files = {'file': ('hue-report.csv', list(queries_csv)[0])})
 
@@ -173,6 +176,9 @@ class OptimizerApi(object):
 
 def OptimizerDataAdapter(queries):
   headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
-  rows = ([str(uuid.uuid4()), 1000, q] for q in queries)
+  if queries and len(queries[0]) == 3:
+    rows = queries
+  else:  
+    rows = ([str(uuid.uuid4()), 1000, q] for q in queries)
 
   yield headers, rows

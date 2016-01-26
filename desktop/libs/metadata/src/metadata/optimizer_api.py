@@ -24,6 +24,8 @@ from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
+from desktop.models import Document2
+from notebook.models import Notebook
 
 from metadata.optimizer_client import OptimizerApi
 
@@ -69,6 +71,26 @@ def table_details(request):
   api = OptimizerApi()
 
   response['table_details'] = api.table_details(table_name=table_name)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def upload_history(request):
+  response = {'status': -1}
+
+  query_type = 'hive'
+
+  queries = [
+      (doc.uuid, 1000, Notebook(document=doc).get_data()['snippets'][0]['statement'])
+      for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)[:25]
+  ]
+
+  api = OptimizerApi()
+
+  response['upload_history'] = api.upload(queries=queries, source_platform=query_type)
   response['status'] = 0
 
   return JsonResponse(response)
