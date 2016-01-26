@@ -893,7 +893,7 @@ ${ require.config() }
 </script>
 
 <script type ="text/html" id="snippet-execution-controls">
-  <div class="snippet-actions" style="position: absolute; bottom: 0">
+  <div class="snippet-actions" style="position: absolute; bottom: 0" data-bind="css: {'snippet-actions-compact': !$root.editorMode}">
     <a class="snippet-side-btn" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
@@ -1010,8 +1010,8 @@ ${ require.config() }
     <p>${_('Are you sure you want to remove this snippet?')}</p>
   </div>
   <div class="modal-footer" data-bind="with: $root.removeSnippetConfirmation">
-    <a class="btn" data-dismiss="modal" data-bind="click: function() { $root.removeSnippetConfirmation(null); }">${_('No')}</a>
-    <input type="submit" data-dismiss="modal" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); window.setTimeout(redrawFixedHeaders, 100); $root.removeSnippetConfirmation(null); }" />
+    <a class="btn" data-bind="click: function() { $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }">${_('No')}</a>
+    <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); window.setTimeout(redrawFixedHeaders, 100); $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }" />
   </div>
 </div>
 
