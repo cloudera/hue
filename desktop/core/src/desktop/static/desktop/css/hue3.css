@@ -2082,7 +2082,6 @@ pre, .like-pre {
   border: 1px solid #999;
   padding: 3px 18px 3px 4px;
   border-radius: 3px;
-  transition: background 0.4s !important;
 }
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
