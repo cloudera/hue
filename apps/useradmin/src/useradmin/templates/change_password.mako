@@ -46,6 +46,9 @@ ${ layout.menubar(section='users') }
       <div id="step1" class="stepDetails">
         ${layout.render_field(form["username"], extra_attrs={'validate':'true'})}
         % if "password1" in form.fields:
+          % if username and "password_old" in form.fields:
+            ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
+          % endif
           ${layout.render_field(form["password1"], extra_attrs=username is None and {'validate':'true'} or {})}
           % if is_password_policy_enabled():
             <div class="password_rule" style="margin-left:180px; width:500px;">
@@ -53,9 +56,6 @@ ${ layout.menubar(section='users') }
             </div>
           % endif
           ${layout.render_field(form["password2"], extra_attrs=username is None and {'validate':'true'} or {})}
-          % if username and "password_old" in form.fields:
-            ${layout.render_field(form["password_old"], extra_attrs=username is None and {'validate':'true'} or {})}
-          % endif
         % endif
       </div>
       <div class="form-actions">
