@@ -225,6 +225,9 @@ ${ require.config() }
               % elif editor_type == 'rdbms':
                 <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
                 DB Query
+              % elif editor_type == 'pig':
+                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
+                Pig
               % else:
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive

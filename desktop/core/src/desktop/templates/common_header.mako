@@ -441,7 +441,11 @@ from django.utils.translation import ugettext as _
              % endif
            % endif
            % if 'pig' in apps:
+             % if USE_NEW_EDITOR.get():
+             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+             % else:
              <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+             % endif
            % endif
            % if 'jobsub' in apps:
              <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
