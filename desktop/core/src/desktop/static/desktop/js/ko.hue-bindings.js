@@ -2357,6 +2357,9 @@
       editor.on("blur", function () {
         snippet.inFocus(false);
         snippet.statement_raw(editor.getValue());
+        if (options.onBlur) {
+          options.onBlur($el, editor.getValue());
+        }
       });
 
       var currentAssistTables = {};
