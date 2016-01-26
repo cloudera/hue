@@ -257,15 +257,14 @@ class Job(models.Model):
 
 class WorkflowManager(models.Manager):
   SCHEMA_VERSION = {
-    '0.4': 'uri:oozie:workflow:0.4',
     '0.5': 'uri:oozie:workflow:0.5'
   }
 
   def new_workflow(self, owner):
-    workflow = Workflow(owner=owner, schema_version=WorkflowManager.SCHEMA_VERSION['0.4'])
+    workflow = Workflow(owner=owner, schema_version=WorkflowManager.SCHEMA_VERSION['0.5'])
 
-    kill = Kill(name='kill', workflow=workflow, node_type=Kill.node_type)
-    end = End(name='end', workflow=workflow, node_type=End.node_type)
+    kill = Kill(name='Kill', workflow=workflow, node_type=Kill.node_type)
+    end = End(name='End', workflow=workflow, node_type=End.node_type)
     start = Start(name='start', workflow=workflow, node_type=Start.node_type)
 
     to = Link(parent=start, child=end, name='to')
@@ -277,8 +276,8 @@ class WorkflowManager(models.Manager):
     return workflow
 
   def initialize(self, workflow, fs=None):
-    Kill.objects.create(name='kill', workflow=workflow, node_type=Kill.node_type)
-    end = End.objects.create(name='end', workflow=workflow, node_type=End.node_type)
+    Kill.objects.create(name='Kill', workflow=workflow, node_type=Kill.node_type)
+    end = End.objects.create(name='End', workflow=workflow, node_type=End.node_type)
     start = Start.objects.create(name='start', workflow=workflow, node_type=Start.node_type)
 
     link = Link(parent=start, child=end, name='to')
