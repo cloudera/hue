@@ -2295,7 +2295,7 @@ body {
   transition: opacity .3s;
 }
 
-.hue-contex-menu > li {
+.hue-context-menu > li {
   min-width: 170px;
   color: #e5e5e5;
 }
@@ -2392,4 +2392,12 @@ body {
   animation-duration: 1s;
   -webkit-animation-fill-mode: both;
   animation-fill-mode: both;
+}
+
+.dropdown-menu {
+  border-radius: 2px;
+  background-color: #FFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  transition: opacity .3s;
 }
