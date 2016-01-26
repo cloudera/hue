@@ -27,7 +27,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
-from metadata.conf import OPTIMIZER
+from metadata.conf import OPTIMIZER, get_optimizer_url
 
 
 LOG = logging.getLogger(__name__)
@@ -37,7 +37,7 @@ _JSON_CONTENT_TYPE = 'application/json'
 
 
 def is_optimizer_enabled():
-  return OPTIMIZER.API_URL.get() and OPTIMIZER.PRODUCT_NAME.get()
+  return get_optimizer_url() and OPTIMIZER.PRODUCT_NAME.get()
 
 
 class OptimizerApiException(Exception):
@@ -47,7 +47,7 @@ class OptimizerApiException(Exception):
 class OptimizerApi(object):
 
   def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
-    self._api_url = (api_url or OPTIMIZER.API_URL.get()).strip('/')
+    self._api_url = (api_url or get_optimizer_url()).strip('/')
     self._product_name = product_name if product_name else OPTIMIZER.PRODUCT_NAME.get()
     self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
     self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
@@ -152,6 +152,21 @@ class OptimizerApi(object):
           'token': token,
       }
       return self._root.post('/api/topTables', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
+  def table_details(self, table_name, token=None, email=None):
+    if token is None:
+      token = self._authenticate()
+
+    try:
+      data = {
+          'email': email if email is not None else self._email,
+          'token': token,
+          'tableName': table_name
+      }
+      return self._root.post('/api/tableDetails', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 

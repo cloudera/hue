@@ -57,26 +57,26 @@ class TestOptimizerApi(object):
     cls.user.save()
 
 
-  def test_api_create_product(self):
+  def test_create_product(self):
     resp = self.api.create_product()
 
     assert_equal('success', resp['status'], resp)
 
 
-  def test_api_add_email_to_product(self):
+  def test_add_email_to_product(self):
     resp = self.api.add_email_to_product()
 
     assert_equal('success', resp['status'], resp)
 
 
-  def test_api_authenticate(self):
+  def test_authenticate(self):
     resp = self.api.authenticate()
 
     assert_true(resp['token'], resp)
     assert_equal('success', resp['status'], resp)
 
 
-  def test_api_get_status(self):
+  def test_get_status(self):
     resp = self.api.authenticate()
     token = resp['token']
 
@@ -88,7 +88,7 @@ class TestOptimizerApi(object):
     assert_true('finished' in resp['details'], resp)
 
 
-  def test_api_delete_workload(self):
+  def test_delete_workload(self):
     resp = self.api.authenticate()
     token = resp['token']
 
@@ -97,7 +97,7 @@ class TestOptimizerApi(object):
     assert_equal('success', resp['status'], resp)
 
 
-  def test_api_upload(self):
+  def test_upload(self):
     resp = self.api.authenticate()
     token = resp['token']
 
@@ -115,10 +115,19 @@ class TestOptimizerApi(object):
     assert_equal('success', resp['status'], resp)
 
 
-  def test_api_top_tables(self):
+  def test_top_tables(self):
     resp = self.api.authenticate()
     token = resp['token']
 
     resp = self.api.top_tables(token=token)
 
     assert_true(isinstance(resp, list), resp) # No status code currently
+
+
+  def test_table_details(self):  # Requires test_upload to run before
+    resp = self.api.authenticate()
+    token = resp['token']
+
+    resp = self.api.table_details(table_name='orders', token=token)
+
+    assert_equal('success', resp['status'], resp)
