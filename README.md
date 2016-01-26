@@ -86,6 +86,7 @@ __Ubuntu:__
 * python-dev
 * python-setuptools
 * libgmp3-dev
+* libz-dev
 
 __CentOS/RHEL:__
 
