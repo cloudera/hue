@@ -228,6 +228,34 @@
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
+   * @param {string} [options.path]
+   * @param {string} options.query
+   */
+  AssistHelper.prototype.searchDocuments = function (options) {
+    var self = this;
+    $.ajax({
+          url: DOCUMENTS_API,
+          data: {
+            path: options.path,
+            text: options.query
+          },
+          success: function (data) {
+            if (! self.successResponseIsError(data)) {
+              options.successCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          }
+        })
+        .fail(self.assistErrorCallback(options));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
    * @param {number} options.docId
    */
   AssistHelper.prototype.fetchDocument = function (options) {

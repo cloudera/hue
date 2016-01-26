@@ -66,7 +66,7 @@ from desktop.views import _ko
 
     .fb-breadcrumbs {
       padding: 9px 9px;
-      margin: 10px;
+      margin: 0 10px 10px 10px;
       list-style: none outside none;
     }
 
@@ -100,11 +100,15 @@ from desktop.views import _ko
       text-decoration: none;
     }
 
+    .fb-main-header {
+      position: relative;
+    }
+
     .fb-folder-actions {
       display: inline-block;
       position: absolute;
       right: 10px;
-      top: 13px;
+      top: 5px;
       height: 50px;
       line-height: 50px;
     }
@@ -235,6 +239,26 @@ from desktop.views import _ko
 
     .large-as-modal {
       width: 542px;
+    }
+
+    .fb-search-container {
+      position: absolute;
+      top: 17px;
+      right: 300px;
+      opacity: 0;
+
+      -webkit-transition: opacity 0.3s ease;
+      -moz-transition: opacity 0.3s ease;
+      -ms-transition: opacity 0.3s ease;
+      transition: opacity 0.3s ease;
+    }
+
+    .fb-search-visible {
+      opacity: 1;
+    }
+
+    .fb-search-container input {
+      width: 300px;
     }
   </style>
 
@@ -379,7 +403,7 @@ from desktop.views import _ko
 
     <div class="fb-container">
       <div class="fb-action-bar">
-        <h4>
+        <h4 class="fb-main-header">
           <div data-bind="with: activeEntry">
             <ul class="fb-breadcrumbs">
               <!-- ko if: isRoot -->
@@ -395,42 +419,46 @@ from desktop.views import _ko
               <!-- /ko -->
             </ul>
           </div>
+          <div class="fb-search-container" data-bind="css: { 'fb-search-visible' : searchVisible() }">
+            <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="textInput: searchQuery, clearable: searchQuery">
+          </div>
+          <!-- ko with: activeEntry -->
+          <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
+            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
+            <!-- ko if: app === 'documents' -->
+            <span class="dropdown">
+              <a class="inactive-action fb-action" data-toggle="dropdown" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
+              <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
+                % if 'beeswax' in apps:
+                  <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                % endif
+                % if 'impala' in apps:
+                  <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+                % endif
+                % if 'pig' in apps:
+                  <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
+                % endif
+                % if 'spark' in apps:
+                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+                % endif
+                % if 'oozie' in apps:
+                  <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Oozie Workflow')}</a></li>
+                  <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Oozie Coordinator')}</a></li>
+                  <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Oozie Bundle')}</a></li>
+                % endif
+              </ul>
+            </span>
+            <!-- /ko -->
+            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showDeleteConfirmation, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
+            <!-- ko if: app === 'documents' -->
+            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal, css: { 'disabled': selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i></a>
+            <!-- /ko -->
+            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
+            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
+          </div>
+          <!-- /ko -->
         </h4>
-        <!-- ko with: activeEntry -->
-        <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-          <!-- ko if: app === 'documents' -->
-          <span class="dropdown">
-            <a class="inactive-action fb-action" data-toggle="dropdown" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
-            <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
-              % if 'beeswax' in apps:
-                <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
-              % endif
-              % if 'impala' in apps:
-                <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
-              % endif
-              % if 'pig' in apps:
-                <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
-              % endif
-              % if 'spark' in apps:
-                <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
-              % endif
-              % if 'oozie' in apps:
-                <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Oozie Workflow')}</a></li>
-                <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Oozie Coordinator')}</a></li>
-                <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Oozie Bundle')}</a></li>
-              % endif
-            </ul>
-          </span>
-          <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showDeleteConfirmation, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
-          <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal, css: { 'disabled': selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i></a>
-          <!-- /ko -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
-        </div>
-        <!-- /ko -->
       </div>
 
       <!-- ko with: activeEntry -->
@@ -445,8 +473,11 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
 
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading()">
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition.isSearchResult">
         ${ _('The current folder is empty. You can add a new file or folder form the top right menu.')}
+      </div>
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && definition.isSearchResult">
+        ${ _('No documents found matching your query.')}
       </div>
       <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
         ${ _('There was an error loading the documents.')}
@@ -665,6 +696,19 @@ from desktop.views import _ko
       function FileBrowser (params) {
         var self = this;
         self.activeEntry = params.activeEntry;
+
+        self.searchQuery = ko.observable().extend({ throttle: 500 });;
+        self.searchQuery.subscribe(function (query) {
+          self.activeEntry().search(query);
+        });
+
+        self.searchVisible = ko.observable(true);
+
+        huePubSub.subscribe('file.browser.directory.opened', function () {
+          self.searchQuery('');
+          self.searchVisible(false);
+        });
+
       }
 
       ko.components.register('file-browser', {
