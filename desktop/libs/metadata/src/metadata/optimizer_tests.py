@@ -131,3 +131,17 @@ class TestOptimizerApi(object):
     resp = self.api.table_details(table_name='orders', token=token)
 
     assert_equal('success', resp['status'], resp)
+
+
+  def test_query_compatibility(self):
+    source_platform = 'MySQL'
+    target_platform = 'Hive'
+    query = 'Select * from (Select item.id from item)'
+
+    resp = self.api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
+
+    assert_equal('success', resp['status'], resp)
+
+    details = json.loads(resp['details']) # Auto fix suggestion is empty in most of the cases currently
+
+    assert_equal('FAIL', details['platformCompilationStatus']['Hive']['queryStatus'], resp)

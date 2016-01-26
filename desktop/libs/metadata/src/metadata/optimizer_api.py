@@ -78,6 +78,23 @@ def table_details(request):
 
 @require_POST
 @error_handler
+def query_compatibility(request):
+  response = {'status': -1}
+
+  source_platform = request.POST.get('sourcePlatform')
+  target_platform = request.POST.get('target_platform')
+  query = request.POST.get('query')
+
+  api = OptimizerApi()
+
+  response['table_details'] = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
 def upload_history(request):
   response = {'status': -1}
 
