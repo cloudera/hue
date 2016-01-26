@@ -35,7 +35,7 @@ def get_auth_password():
   return DEFAULT_AUTH_PASSWORD.get()
 
 def get_optimizer_url():
-  return OPTIMIZER.API_URL.get().strip('/')
+  return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
 
 
 OPTIMIZER = ConfigSection(
