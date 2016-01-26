@@ -422,7 +422,7 @@ ${ assist.assistPanel() }
               </td>
               <td data-bind="text: comment"></td>
               % if is_optimizer_enabled:
-              <td>28% workload (8)</td>
+              <td>28% access (8)</td>
               <td>15 columns</td>
               <td>Dimension</td>
               % endif

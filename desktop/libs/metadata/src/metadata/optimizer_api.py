@@ -57,3 +57,18 @@ def top_tables(request):
   response['status'] = 0
 
   return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def table_details(request):
+  response = {'status': -1}
+
+  table_name = request.POST.get('tableName')
+
+  api = OptimizerApi()
+
+  response['table_details'] = api.table_details(table_name=table_name)
+  response['status'] = 0
+
+  return JsonResponse(response)
