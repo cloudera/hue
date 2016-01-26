@@ -662,18 +662,12 @@ from desktop.views import _ko
                 allEntries()[i].selected(true);
               }
             } else {
-              var otherSelected = false;
               $.each(allEntries(), function (idx, entry) {
                 if (entry !== clickedEntry) {
-                  otherSelected = otherSelected || entry.selected();
                   entry.selected(false);
                 }
               });
-              if (otherSelected) {
-                clickedEntry.selected(true);
-              } else {
-                clickedEntry.selected(! clickedEntry.selected());
-              }
+              clickedEntry.selected(true);
             }
             var selectedEntries = $.grep(allEntries(), function (entry) {
               return entry.selected();
