@@ -421,7 +421,8 @@ class Session(models.Model):
     return json.loads(self.properties)
 
   def get_formatted_properties(self):
-    return [dict({'key': key, 'value': value}) for key, value in self.get_properties().items()]
+    blacklisted_properties = ('system:java.class.path', 'env:CLASSPATH', 'env:HADOOP_CLASSPATH')
+    return [dict({'key': key, 'value': value}) for key, value in self.get_properties().items() if key not in blacklisted_properties]
 
   def __str__(self):
     return '%s %s' % (self.owner, self.last_used)
