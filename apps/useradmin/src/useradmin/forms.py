@@ -88,7 +88,6 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
       error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
 
-  password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
   password1 = forms.CharField(label=_t("New Password"),
                               widget=forms.
                               PasswordInput,
@@ -98,6 +97,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                               widget=forms.PasswordInput,
                               required=False,
                               validators=get_password_validators())
+  password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
   ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
                                             help_text=_t("Create home directory if one doesn't already exist."),
                                             initial=True,
