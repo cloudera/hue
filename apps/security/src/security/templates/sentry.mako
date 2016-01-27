@@ -72,9 +72,7 @@ ${ layout.menubar(section=component) }
       <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
     <!-- ko if: $root.component() == 'solr' -->
-      <span data-bind="text: ko.mapping.toJSON($data)"></span>
-      <br/>
-      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="dbName.tableName <CTRL+SPACE>">
+      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="collections.collectionName <CTRL+SPACE>">
       <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
