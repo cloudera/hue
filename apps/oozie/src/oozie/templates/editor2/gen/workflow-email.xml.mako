@@ -18,13 +18,22 @@
 <%namespace name="common" file="workflow-common.xml.mako" />
 
     <action name="${ node['name'] }"${ common.credentials(node['properties']['credentials']) }${ common.retry_max(node['properties']['retry_max']) }${ common.retry_interval(node['properties']['retry_interval']) }>
-        <email xmlns="uri:oozie:email-action:0.1">
+        <email xmlns="uri:oozie:email-action:0.2">
             <to>${ node['properties']['to'] }</to>
             % if node['properties']['cc']:
             <cc>${ node['properties']['cc'] }</cc>
             % endif
+            % if node['properties']['bcc']:
+            <bcc>${ node['properties']['bcc'] }</bcc>
+            % endif
             <subject>${ node['properties']['subject'] }</subject>
             <body>${ node['properties']['body'] }</body>
+            % if node['properties']['content_type']:
+            <content_type>${ node['properties']['content_type'] }</content_type>
+            % endif
+            % if node['properties']['attachment']:
+            <attachment>${ node['properties']['attachment'] }</attachment>
+            % endif
         </email>
         <ok to="${ node_mapping[node['children'][0]['to']].name }"/>
         <error to="${ node_mapping[node['children'][1]['error']].name }"/>

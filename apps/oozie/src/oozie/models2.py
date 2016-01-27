@@ -717,6 +717,11 @@ def _upgrade_older_node(node):
     node['properties']['subject'] = ''
     node['properties']['body'] = ''
 
+  if node['type'] == 'email-widget' and 'bcc' not in node['properties']:
+    node['properties']['bcc'] = ''
+    node['properties']['content_type'] = 'text/plain'
+    node['properties']['attachment'] = ''
+
 
 class Action(object):
 
@@ -1504,7 +1509,14 @@ class EmailAction(Action):
      },
      'cc': {
           'name': 'cc',
-          'label': _('Cc addresses (optional)'),
+          'label': _('cc'),
+          'value': '',
+          'help_text': _('Comma-separated values'),
+          'type': 'text'
+     },
+     'bcc': {
+          'name': 'bcc',
+          'label': _('bcc'),
           'value': '',
           'help_text': _('Comma-separated values'),
           'type': 'text'
@@ -1522,6 +1534,20 @@ class EmailAction(Action):
           'value': '',
           'help_text': _('Plain-text'),
           'type': 'textarea'
+     },
+     'attachment': {
+          'name': 'attachment',
+          'label': _('Attachment'),
+          'value': '',
+          'help_text': _('Comma separated list of HDFS files.'),
+          'type': ''
+     },
+     'content_type': {
+          'name': 'content_type',
+          'label': _('Content-type'),
+          'value': 'text/plain',
+          'help_text': _('Default is text/plain'),
+          'type': 'text'
      },
      # Common
      'retry_max': {
