@@ -130,11 +130,13 @@ ${ layout.menubar(section=component) }
       <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
     <!-- ko if: $root.component() == 'solr' -->
-      <span data-bind="text: ko.mapping.toJSON($data)"></span>
-      <br/>
       <!-- ko foreach: authorizables -->
-        <span data-bind="text: type"></span>=<span data-bind="text: name_"></span><i class="fa fa-long-arrow-right"></i>
-      </span>
+        <!-- ko if: name_() != '' -->
+          <!-- ko if: $index() > 0 -->
+            <i class="fa fa-long-arrow-right"></i>
+          <!-- /ko -->
+          <span data-bind="text: type"></span>=<span data-bind="text: name_"></span></span>
+        <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
   <!-- /ko -->
