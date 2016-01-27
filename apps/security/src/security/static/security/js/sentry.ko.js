@@ -117,9 +117,12 @@ var Privilege = function (vm, privilege) {
   self.showAdvanced = ko.observable(false);
   self.path = ko.computed({
     read: function () {
-      return $.map(self.authorizables(), function(authorizable) {
-        return authorizable.name_();
+      var path = $.map(self.authorizables(), function(authorizable) {
+        if (authorizable.name_() !== ''){
+          return authorizable.name_();
+        }
       }).join(".");
+      return path;
     },
     write: function (value) {
       var _parts = value.split(".");
