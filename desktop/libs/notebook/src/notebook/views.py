@@ -103,7 +103,7 @@ def browse(request, database, table):
   editor_type = request.GET.get('type', 'hive')
 
   snippet = {'type': editor_type}
-  sql_select = get_api(request.user, snippet, request.fs, request.jt).get_select_star_query(snippet, database, table)
+  sql_select = get_api(request, snippet).get_select_star_query(snippet, database, table)
 
   editor = make_notebook(name='Browse', editor_type=editor_type, statement=sql_select, status='ready-execute')
 
@@ -154,7 +154,7 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  return get_api(request.user, snippet, request.fs, request.jt).download(notebook, snippet, file_format)
+  return get_api(request, snippet).download(notebook, snippet, file_format)
 
 
 def install_examples(request):
