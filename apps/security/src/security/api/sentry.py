@@ -85,7 +85,7 @@ def _fetch_collections(request):
   if not item:
     return {"databases": ["collections", "configs"]}
   elif item and name:
-    return {"hdfs_link": "/indexer/#edit/%s" % name, "extended_columns": [], "columns": [], "partition_keys": []}
+    return {"authorizable_link": "/indexer/#edit/%s" % name, "extended_columns": [], "columns": [], "partition_keys": []}
   elif item == 'collections':
     return {"tables_meta": [{"comment": None, "type": "Table", "name": col} for col in api.collections2()]}
   elif item == 'configs':

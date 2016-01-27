@@ -565,7 +565,7 @@ ${ layout.menubar(section=component) }
 <%def name="withPrivilegesPullRight()">
   <div class="pull-right">
     <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #338bb8" title="${ _('Has some privileges') }"></i>&nbsp;
-    <i class="fa fa-file-o muted" data-bind="click: $root.assist.showHdfs ,visible: isTable()"></i>
+    <i class="fa fa-file-o muted" data-bind="click: $root.assist.showAuthorizable ,visible: isTable()"></i>
   </div>
 </%def>
 
@@ -599,7 +599,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       }
     }
 
-    var viewModel = new HiveViewModel(${ initial | n,unicode });
+    var viewModel = new SentryViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel);
 
     $(document).ready(function () {

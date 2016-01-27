@@ -699,12 +699,17 @@ var Assist = function (vm, initial) {
     self.setPath(obj, true);
   }
 
-  self.showHdfs = function (obj, e) {
+  self.showAuthorizable = function (obj, e) {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-    self.fetchAuthorizablesPath(obj.path(), function(data){
-      location.href = "/security/hdfs#" + data.hdfs_link.substring("/filebrowser/view=".length);
+    self.fetchAuthorizablesPath(obj.path(), function (data) {
+      if (vm.component() === 'solr') {
+        location.href = data.authorizable_link;
+      }
+      else {
+        location.href = "/security/hdfs#" + data.authorizable_link.substring("/filebrowser/view=".length);
+      }
     });
   }
 
@@ -860,7 +865,7 @@ var Assist = function (vm, initial) {
 }
 
 
-var HiveViewModel = function (initial) {
+var SentryViewModel = function (initial) {
   var self = this;
 
   self.isLoadingRoles = ko.observable(false);
