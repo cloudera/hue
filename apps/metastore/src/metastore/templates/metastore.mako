@@ -40,10 +40,15 @@ ${ assist.assistPanel() }
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
+<script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingPie.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/nv.d3.growingPieChart.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -323,9 +328,16 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-tables">
-    <!-- ko with: stats  -->
     <div class="row-fluid">
-      <div class="span12 tile">
+      <!-- ko with: stats  -->
+      <div class="
+      %if is_optimizer_enabled:
+        span8
+      %else:
+        span12
+      %endif
+       tile">
+
         <h4>${ _('Stats') }</h4>
         <div class="row-fluid">
           <div class="span6">
@@ -360,8 +372,23 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
       </div>
+      <!-- /ko -->
+
+      %if is_optimizer_enabled:
+      <!-- ko with: optimizerStats  -->
+      <div class="span4 tile chart-container">
+        <h4>${ _('Navigator optimizer') }</h4>
+
+        <div data-bind="attr:{'id': 'optimizerPieChart'}, pieChart: {data: {counts: details}, fqs: ko.observableArray([]),
+                      transformer: pieChartDataTransformer, maxWidth: 350, parentSelector: '.chart-container' }" class="chart"></div>
+
+      </div>
+      <!-- /ko -->
+      %endif
+
     </div>
-    <!-- /ko -->
+
+
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Tables') }</h4>
@@ -775,6 +802,22 @@ ${ assist.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
 
+  function pieChartDataTransformer(rawDatum) {
+    var _data = [];
+    $(rawDatum.counts()).each(function (cnt, item) {
+      _data.push({
+        label: item.name(),
+        value: item.total(),
+        obj: item
+      });
+    });
+    _data.sort(function (a, b) {
+      return a.value - b.value
+    });
+
+    return _data;
+  }
+
   require([
     'knockout',
     'metastore/js/metastore.ko',
@@ -799,7 +842,8 @@ ${ assist.assistPanel() }
           errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
           errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
           errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
-        }
+        },
+        optimizerEnabled: '${is_optimizer_enabled}' === 'True'
       };
 
       var viewModel = new MetastoreViewModel(options);
