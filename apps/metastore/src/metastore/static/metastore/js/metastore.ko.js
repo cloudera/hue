@@ -48,6 +48,7 @@
     self.loading = ko.observable(false);
     self.tables = ko.observableArray();
     self.stats = ko.observable();
+    self.optimizerStats = ko.observable();
 
     self.tableQuery = ko.observable('').extend({rateLimit: 150});
 
@@ -69,7 +70,7 @@
     self.table = ko.observable(null);
   }
 
-  MetastoreDatabase.prototype.load = function (callback) {
+  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled) {
     var self = this;
     if (self.loading()) {
       return;
@@ -109,6 +110,14 @@
         self.stats(data.data);
       }
     });
+
+    if (optimizerEnabled) {
+      $.post('/metadata/api/optimizer_api/top_tables', function(data){
+        if (data && data.status == 0) {
+          self.optimizerStats(ko.mapping.fromJS(data.top_tables));
+        }
+      });
+    }
 
     $.totalStorage('hue.metastore.lastdb', self.name);
   };
@@ -443,6 +452,7 @@
     self.assistHelper = AssistHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+    self.optimizerEnabled = options.optimizerEnabled || false;
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
@@ -660,7 +670,7 @@
     self.database(metastoreDatabase);
 
     if (!metastoreDatabase.loaded()) {
-      metastoreDatabase.load(callback);
+      metastoreDatabase.load(callback, self.optimizerEnabled);
     } else if (callback) {
       callback();
     }
