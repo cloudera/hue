@@ -136,6 +136,15 @@ var Privilege = function (vm, privilege) {
     owner: self
   });
 
+  self.indexerPath = ko.computed(function () {
+    if (self.authorizables()[1] && self.authorizables()[1]['type'] == 'TABLE') {
+      return '/indexer/#edit/' + self.authorizables()[1];
+    }
+    else {
+      return '/indexer/#manage';
+    }
+  });
+
   self.metastorePath = ko.computed(function() {
     var path = '';
 
@@ -433,6 +442,14 @@ var Assist = function (vm, initial) {
     var column = self.path().split(/[.]/)[2];
     return column ? column : null;
   });
+  self.indexerPath = ko.computed(function () {
+    if (self.table()) {
+      return '/indexer/#edit/' + self.table();
+    }
+    else {
+      return '/indexer/#manage';
+    }
+  });
   self.metastorePath = ko.computed(function(){
     if (self.column()) {
       return '/metastore/table/' + self.db() + "/" + self.table() + "#col=" + self.column();
@@ -708,7 +725,7 @@ var Assist = function (vm, initial) {
         location.href = data.authorizable_link;
       }
       else {
-        location.href = "/security/hdfs#" + data.authorizable_link.substring("/filebrowser/view=".length);
+        location.href = "/security/hdfs#" + data.hdfs_link.substring("/filebrowser/view=".length);
       }
     });
   }
