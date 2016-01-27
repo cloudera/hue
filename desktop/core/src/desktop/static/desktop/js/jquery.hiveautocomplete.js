@@ -19,7 +19,7 @@
  */
 
 (function ($, window, document, undefined) {
-  var pluginName = "jHueHiveAutocomplete",
+  var pluginName = "jHueGenericAutocomplete",
       defaults = {
         serverType: "HIVE",
         home: "/",
@@ -48,8 +48,8 @@
     var _el = $(_this.element);
 
     // creates autocomplete popover
-    if ($("#jHueHiveAutocomplete").length == 0) {
-      $("<div>").attr("id", "jHueHiveAutocomplete").addClass("jHueAutocomplete popover")
+    if ($("#jHueGenericAutocomplete").length == 0) {
+      $("<div>").attr("id", "jHueGenericAutocomplete").addClass("jHueAutocomplete popover")
           .attr("style", "position:absolute;display:none;max-width:1000px;z-index:33000")
           .html('<div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><ul class="unstyled"></ul></div></div>')
           .appendTo($("body"));
@@ -95,12 +95,12 @@
     });
 
     function smartTooltipMaker() {
-      if (_this.options.smartTooltip != "" && typeof $.totalStorage != "undefined" && $.totalStorage("jHueHiveAutocompleteTooltip") != -1) {
+      if (_this.options.smartTooltip != "" && typeof $.totalStorage != "undefined" && $.totalStorage("jHueGenericAutocompleteTooltip") != -1) {
         var cnt = 0;
-        if ($.totalStorage("jHueHiveAutocompleteTooltip") != null) {
-          cnt = $.totalStorage("jHueHiveAutocompleteTooltip") + 1;
+        if ($.totalStorage("jHueGenericAutocompleteTooltip") != null) {
+          cnt = $.totalStorage("jHueGenericAutocompleteTooltip") + 1;
         }
-        $.totalStorage("jHueHiveAutocompleteTooltip", cnt);
+        $.totalStorage("jHueGenericAutocompleteTooltip", cnt);
         if (cnt >= _this.options.smartTooltipThreshold) {
           _el.tooltip({
             animation: true,
@@ -111,13 +111,13 @@
           window.setTimeout(function () {
             _el.tooltip("hide");
           }, 10000);
-          $.totalStorage("jHueHiveAutocompleteTooltip", -1);
+          $.totalStorage("jHueGenericAutocompleteTooltip", -1);
         }
       }
     }
 
     $(window).on("scroll", function(){
-      $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
+      $("#jHueGenericAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
     });
 
     var _hiveAutocompleteSelectedIndex = -1;
@@ -131,9 +131,9 @@
           if (path.indexOf(".") > -1) {
             path = path.substr(path.lastIndexOf(".") + 1);
           }
-          $("#jHueHiveAutocomplete ul li").show();
+          $("#jHueGenericAutocomplete ul li").show();
           if (path != ""){
-            $("#jHueHiveAutocomplete ul li").each(function () {
+            $("#jHueGenericAutocomplete ul li").each(function () {
               if ($(this).text().trim().indexOf(path) != 0) {
                 $(this).hide();
               }
@@ -143,14 +143,14 @@
       }
       if (e.keyCode == 38) {
         if (_hiveAutocompleteSelectedIndex <= 0) {
-          _hiveAutocompleteSelectedIndex = $("#jHueHiveAutocomplete ul li:visible").length - 1;
+          _hiveAutocompleteSelectedIndex = $("#jHueGenericAutocomplete ul li:visible").length - 1;
         }
         else {
           _hiveAutocompleteSelectedIndex--;
         }
       }
       if (e.keyCode == 40) {
-        if (_hiveAutocompleteSelectedIndex == $("#jHueHiveAutocomplete ul li:visible").length - 1) {
+        if (_hiveAutocompleteSelectedIndex == $("#jHueGenericAutocomplete ul li:visible").length - 1) {
           _hiveAutocompleteSelectedIndex = 0;
         }
         else {
@@ -159,9 +159,9 @@
       }
       if (e.keyCode == 38 || e.keyCode == 40) {
         smartTooltipMaker();
-        $("#jHueHiveAutocomplete ul li").removeClass("active");
-        $("#jHueHiveAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).addClass("active");
-        $("#jHueHiveAutocomplete .popover-content").scrollTop($("#jHueHiveAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).prevAll().length * $("#jHueHiveAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).outerHeight());
+        $("#jHueGenericAutocomplete ul li").removeClass("active");
+        $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).addClass("active");
+        $("#jHueGenericAutocomplete .popover-content").scrollTop($("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).prevAll().length * $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).outerHeight());
       }
       if ((e.keyCode == 32 && e.ctrlKey) || e.keyCode == 191) {
         smartTooltipMaker();
@@ -170,12 +170,12 @@
       if (e.keyCode == 13) {
         _pauseBlur = true;
         if (_hiveAutocompleteSelectedIndex > -1) {
-          $("#jHueHiveAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).click();
+          $("#jHueGenericAutocomplete ul li:visible").eq(_hiveAutocompleteSelectedIndex).click();
         }
         else {
           _this.options.onEnter($(this));
         }
-        $("#jHueHiveAutocomplete").hide();
+        $("#jHueGenericAutocomplete").hide();
         _hiveAutocompleteSelectedIndex = -1;
       }
     });
@@ -191,7 +191,7 @@
     _el.blur(function () {
       if (!_pauseBlur) {
         $(document.body).off("contextmenu");
-        $("#jHueHiveAutocomplete").hide();
+        $("#jHueGenericAutocomplete").hide();
         _this.options.onBlur();
       }
     });
@@ -199,6 +199,9 @@
     var BASE_PATH = "/beeswax/api/autocomplete/";
     if (_this.options.serverType == "IMPALA"){
       BASE_PATH = "/impala/api/autocomplete/";
+    }
+    if (_this.options.serverType == "SOLR"){
+      BASE_PATH = "/indexer/api/collections/";
     }
     var _currentFiles = [];
 
@@ -214,7 +217,9 @@
         path = path.substring(0, _el.val().lastIndexOf("."));
       }
 
-      autocompleteUrl += path.replace(/\./g, "/");
+      if (_this.options.serverType != "SOLR") {
+        autocompleteUrl += path.replace(/\./g, "/");
+      }
 
       $.getJSON(autocompleteUrl, function (data) {
         if (data.error == null) {
@@ -224,38 +229,59 @@
           var _iterable = [];
           var _isSkipColumns = false;
 
-          if (data.databases != null){ // it's a db
-            _iterable = data.databases;
-            _ico = "fa-database";
-          }
-          else if (data.tables_meta != null) { // it's a table
-            _iterable = $.map(data.tables_meta, function (tablesMeta) {
-              return tablesMeta.name;
-            });
-            _ico = "fa-table";
+          if (_this.options.serverType == "SOLR") {
+            _iterable = data.collections;
+            _ico = "fa-search";
           }
           else {
-            if (! _this.options.skipColumns) {
-              _iterable = data.columns;
-              _ico = "fa-columns";
+            if (data.databases != null) { // it's a db
+              _iterable = data.databases;
+              _ico = "fa-database";
+            }
+            else if (data.tables_meta != null) { // it's a table
+              _iterable = $.map(data.tables_meta, function (tablesMeta) {
+                return tablesMeta.name;
+              });
+              _ico = "fa-table";
             }
             else {
-              _isSkipColumns = true;
+              if (!_this.options.skipColumns) {
+                _iterable = data.columns;
+                _ico = "fa-columns";
+              }
+              else {
+                _isSkipColumns = true;
+              }
             }
           }
 
           if (! _isSkipColumns){
             $(_iterable).each(function (cnt, item) {
-              _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
+              if (_this.options.serverType == "SOLR") {
+                if (!item.isCoreOnly){
+                  _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item.name + '" title="' + item.name + '"><i class="fa '+ _ico +'"></i> ' + item.name + '</li>');
+                }
+              }
+              else {
+                _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa '+ _ico +'"></i> ' + item + '</li>');
+              }
             });
 
-            $("#jHueHiveAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
-            $("#jHueHiveAutocomplete").find("ul").empty().html(_currentFiles.join(""));
-            $("#jHueHiveAutocomplete").find("li").on("click", function (e) {
+            $("#jHueGenericAutocomplete").css("top", _el.offset().top + _el.outerHeight() - 1).css("left", _el.offset().left).width(_el.outerWidth() - 4);
+            $("#jHueGenericAutocomplete").find("ul").empty().html(_currentFiles.join(""));
+            $("#jHueGenericAutocomplete").find("li").on("click", function (e) {
               smartTooltipMaker();
               e.preventDefault();
               var item = $(this).text().trim();
               var path = autocompleteUrl.substring(BASE_PATH.length);
+
+              if ($(this).html().indexOf("search") > -1) {
+                _el.val("collections." + item);
+                _this.options.onPathChange(_el.val());
+                $("#jHueGenericAutocomplete").hide();
+                _hiveAutocompleteSelectedIndex = -1;
+                _this.options.onEnter(_el);
+              }
 
               if ($(this).html().indexOf("database") > -1){
                 _el.val(item + ".");
@@ -284,7 +310,7 @@
                 }
                 else {
                   _this.options.onEnter(_el);
-                  $("#jHueHiveAutocomplete").hide();
+                  $("#jHueGenericAutocomplete").hide();
                   _hiveAutocompleteSelectedIndex = -1;
                 }
               }
@@ -296,13 +322,13 @@
                 else {
                   _el.val(_el.val() + "." + item);
                 }
-                $("#jHueHiveAutocomplete").hide();
+                $("#jHueGenericAutocomplete").hide();
                 _hiveAutocompleteSelectedIndex = -1;
                 _this.options.onEnter(_el);
               }
 
             });
-            $("#jHueHiveAutocomplete").show();
+            $("#jHueGenericAutocomplete").show();
             window.setTimeout(function(){
               setHueBreadcrumbCaretAtEnd(_this.element);
             }, 100)
@@ -367,9 +393,9 @@
 
   $[pluginName] = function (options) {
     if (typeof console != "undefined") {
-      console.warn("$(elem).jHueHiveAutocomplete() is a preferred call method.");
+      console.warn("$(elem).jHueGenericAutocomplete() is a preferred call method.");
     }
-    $(options.element).jHueHiveAutocomplete(options);
+    $(options.element).jHueGenericAutocomplete(options);
   };
 
 })(jQuery, window, document);

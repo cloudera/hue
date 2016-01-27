@@ -599,7 +599,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.assist.fetchHivePath();
       }
 
-      $("#path").jHueHiveAutocomplete({
+      $("#path").jHueGenericAutocomplete({
         skipColumns: true,
         home: viewModel.assist.path(),
         onPathChange: function (path) {
@@ -705,7 +705,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $("#createRoleModal").on("hidden", function () {
-        $('#jHueHiveAutocomplete').hide();
+        $('#jHueGenericAutocomplete').hide();
         viewModel.resetCreateRole();
       });
 

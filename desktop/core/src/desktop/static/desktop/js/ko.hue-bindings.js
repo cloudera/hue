@@ -1975,9 +1975,44 @@
         valueAccessor()(self.val());
       });
 
-      self.jHueHiveAutocomplete({
+      self.jHueGenericAutocomplete({
         showOnFocus: true,
         home: "/",
+        onPathChange: function (path) {
+          setPathFromAutocomplete(path);
+        },
+        onEnter: function (el) {
+          setPathFromAutocomplete(el.val());
+        },
+        onBlur: function () {
+          if (self.val().lastIndexOf(".") == self.val().length - 1) {
+            self.val(self.val().substr(0, self.val().length - 1));
+          }
+          valueAccessor()(self.val());
+        }
+      });
+    }
+  }
+
+  ko.bindingHandlers.solrchooser = {
+    init: function (element, valueAccessor, allBindingsAccessor, vm) {
+      var self = $(element);
+      self.val(valueAccessor()());
+
+      function setPathFromAutocomplete(path) {
+        self.val(path);
+        valueAccessor()(path);
+        self.blur();
+      }
+
+      self.on("blur", function () {
+        valueAccessor()(self.val());
+      });
+
+      self.jHueGenericAutocomplete({
+        showOnFocus: true,
+        home: "/",
+        serverType: "SOLR",
         onPathChange: function (path) {
           setPathFromAutocomplete(path);
         },
