@@ -17,7 +17,7 @@
 
 %if node['properties']['enableMail']:
     <action name="${ node['name'] }">
-        <email xmlns="uri:oozie:email-action:0.1">
+        <email xmlns="uri:oozie:email-action:0.2">
             <to>${ node['properties']['to'] }</to>
             % if node['properties']['cc']:
             <cc>${ node['properties']['cc'] }</cc>

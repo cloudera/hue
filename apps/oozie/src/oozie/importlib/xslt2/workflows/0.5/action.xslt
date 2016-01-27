@@ -4,6 +4,7 @@
 
 <xsl:import href="extensions/distcp.0.1.xslt"/>
 <xsl:import href="extensions/email.0.1.xslt"/>
+<xsl:import href="extensions/email.0.2.xslt"/>
 <xsl:import href="extensions/hive.0.1.xslt"/>
 <xsl:import href="extensions/hive.0.2.xslt"/>
 <xsl:import href="extensions/shell.0.1.xslt"/>
