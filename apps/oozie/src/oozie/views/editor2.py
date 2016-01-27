@@ -599,7 +599,7 @@ def submit_coordinator(request, doc_id):
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_doc = Document2.objects.get(uuid=coordinator.data['properties']['workflow'])
+    wf_doc = Document2.objects.get_by_uuid(uuid=coordinator.data['properties']['workflow'])
     wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}

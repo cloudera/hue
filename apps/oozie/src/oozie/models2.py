@@ -2342,7 +2342,7 @@ class Coordinator(Job):
 
   @property
   def workflow(self):
-    wf_doc = Document2.objects.get(uuid=self.data['properties']['workflow'])
+    wf_doc = Document2.objects.get_by_uuid(uuid=self.data['properties']['workflow'])
     return Workflow(document=wf_doc)
 
   def get_absolute_url(self):

@@ -746,6 +746,9 @@ class DocumentPermission(models.Model):
     unique_together = ('doc', 'perms')
 
 
+###################################################################################################
+# Document2
+###################################################################################################
 class FilesystemException(Exception):
   pass
 
@@ -770,6 +773,16 @@ class Document2Manager(models.Manager):
 
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
+
+  def get_by_uuid(self, uuid):
+    """
+    Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
+    This should always be used in place of Document2.objects.get(uuid=) when a single document is expected
+    """
+    docs = self.filter(uuid=uuid).order_by('-last_modified')
+    if not docs.exists():
+      raise FilesystemException(_('Document with UUID %s not found.') % uuid)
+    return docs[0]
 
   def get_history(self, user, doc_type):
     return self.documents(user).filter(type=doc_type, is_history=True)
@@ -1005,6 +1018,9 @@ class Document2(models.Model):
     super(Document2, self).save(*args, **kwargs)
 
   def move(self, directory, user):
+    if not directory.is_directory:
+      raise FilesystemException(_('Target with UUID %s is not a directory') % directory.uuid)
+
     if directory.can_write_or_exception(user=user):
       self.parent_directory = directory
       self.save()
@@ -1061,7 +1077,8 @@ class Document2(models.Model):
       }
     }
 
-class DirectoryManager(models.Manager):
+
+class DirectoryManager(Document2Manager):
 
   def get_queryset(self):
     return super(DirectoryManager, self).get_queryset().filter(type='directory')
