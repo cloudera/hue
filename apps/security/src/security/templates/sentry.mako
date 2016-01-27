@@ -72,7 +72,7 @@ ${ layout.menubar(section=component) }
       <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
     <!-- ko if: $root.component() == 'solr' -->
-      <input type="text" data-bind="hivechooser: $data.path, enable: privilegeType() == 'db'" placeholder="collections.collectionName <CTRL+SPACE>">
+      <input type="text" class="input-xxlarge" data-bind="solrchooser: $data.path, enable: privilegeType() == 'db'" placeholder="collection name <CTRL+SPACE>">
       <select data-bind="options: $root.availableActions, value: $data.action, enable: (privilegeType() == 'db')" style="width: 100px; margin-bottom: 0"></select>
     <!-- /ko -->
 
@@ -629,8 +629,9 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.assist.fetchAuthorizablesPath();
       }
 
-      $("#path").jHueHiveAutocomplete({
+      $("#path").jHueGenericAutocomplete({
         skipColumns: true,
+        serverType: viewModel.component().toUpperCase(),
         home: viewModel.assist.path(),
         onPathChange: function (path) {
           setPathFromAutocomplete(path);
@@ -735,7 +736,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $("#createRoleModal").on("hidden", function () {
-        $('#jHueHiveAutocomplete').hide();
+        $('#jHueGenericAutocomplete').hide();
         viewModel.resetCreateRole();
       });
 
