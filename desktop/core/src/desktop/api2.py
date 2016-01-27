@@ -75,7 +75,7 @@ def get_documents(request):
   uuid = request.GET.get('uuid')
 
   if uuid:
-    document = Document2.objects.get(uuid=uuid)
+    document = Document2.objects.get_by_uuid(uuid)
   else:  # Find by path
     document = Document2.objects.get_by_path(user=request.user, path=path)
 
@@ -115,53 +115,12 @@ def get_documents(request):
   })
 
 
-def _convert_documents(user):
-  """
-  Given a user, converts any existing Document objects to Document2 objects
-  """
-  from beeswax.models import HQL, IMPALA, RDBMS
-
-  with transaction.atomic():
-    # If user does not have a home directory, we need to create one and import any orphan documents to it
-    Document2.objects.create_user_directories(user)
-
-    docs = Document.objects.get_docs(user, SavedQuery).filter(owner=user).filter(extra__in=[HQL, IMPALA, RDBMS])
-
-    imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
-
-    docs = docs.exclude(tags__in=[
-        DocumentTag.objects.get_trash_tag(user=user),  # No trashed docs
-        DocumentTag.objects.get_history_tag(user=user),  # No history yet
-        DocumentTag.objects.get_example_tag(user=user),  # No examples
-        imported_tag  # No already imported docs
-    ])
-
-    root_doc, created = Directory.objects.get_or_create(name='', owner=user)
-    imported_docs = []
-
-    for doc in docs:
-      if doc.content_object:
-        try:
-          notebook = import_saved_beeswax_query(doc.content_object)
-          data = notebook.get_data()
-          notebook_doc = Document2.objects.create(name=data['name'], type=data['type'], owner=user, data=notebook.get_json())
-
-          doc.add_tag(imported_tag)
-          doc.save()
-          imported_docs.append(notebook_doc)
-        except Exception, e:
-          raise e
-
-    if imported_docs:
-      root_doc.children.add(*imported_docs)
-
-
 @api_error_handler
 def get_document(request):
   if request.GET.get('id'):
     doc = Document2.objects.get(id=request.GET['id'])
   else:
-    doc = Document2.objects.get(uuid=request.GET['uuid'])
+    doc = Document2.objects.get_by_uuid(uuid=request.GET['uuid'])
 
   doc_info = doc.to_dict()
   return JsonResponse(doc_info)
@@ -176,8 +135,8 @@ def move_document(request):
   if not source_doc_uuid or not destination_doc_uuid:
     raise PopupException(_('move_document requires source_doc_uuid and destination_doc_uuid'))
 
-  source = Directory.objects.get(uuid=source_doc_uuid)
-  destination = Directory.objects.get(uuid=destination_doc_uuid)
+  source = Directory.objects.get_by_uuid(uuid=source_doc_uuid)
+  destination = Directory.objects.get_by_uuid(uuid=destination_doc_uuid)
   source.move(destination, request.user)
 
   return JsonResponse({'status': 0})
@@ -192,7 +151,7 @@ def create_directory(request):
   if not parent_uuid or not name:
     raise PopupException(_('create_directory requires parent_uuid and name'))
 
-  parent_dir = Directory.objects.get(uuid=parent_uuid)
+  parent_dir = Directory.objects.get_by_uuid(uuid=parent_uuid)
   # TODO: Check permissions and move to manager
   directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
 
@@ -220,7 +179,7 @@ def delete_document(request):
   if not uuid:
     raise PopupException(_('delete_document requires uuid'))
 
-  document = Document2.objects.get(uuid=uuid)
+  document = Document2.objects.get_by_uuid(uuid=uuid)
 
   if skip_trash:
     # TODO: check if document is in the .Trash folder, if not raise exception
@@ -249,7 +208,7 @@ def share_document(request):
   if not uuid:
     raise PopupException(_('share_document requires uuid'))
 
-  doc = Document2.objects.get(uuid=uuid)
+  doc = Document2.objects.get_by_uuid(uuid=uuid)
 
   for name, perm in perms_dict.iteritems():
     users = groups = None
@@ -328,6 +287,7 @@ def import_documents(request):
 
     doc['fields']['tags'] = []
 
+    # TODO: Check if this should be replaced by get_by_uuid
     if Document2.objects.filter(uuid=doc['fields']['uuid'], owner__username=owner).exists():
       doc['pk'] = Document2.objects.get(uuid=doc['fields']['uuid'], owner__username=owner).pk
     else:
@@ -351,3 +311,44 @@ def import_documents(request):
     return redirect(request.POST.get('redirect'))
   else:
     return JsonResponse({'message': stdout.getvalue()})
+
+
+def _convert_documents(user):
+  """
+  Given a user, converts any existing Document objects to Document2 objects
+  """
+  from beeswax.models import HQL, IMPALA, RDBMS
+
+  with transaction.atomic():
+    # If user does not have a home directory, we need to create one and import any orphan documents to it
+    Document2.objects.create_user_directories(user)
+
+    docs = Document.objects.get_docs(user, SavedQuery).filter(owner=user).filter(extra__in=[HQL, IMPALA, RDBMS])
+
+    imported_tag = DocumentTag.objects.get_imported2_tag(user=user)
+
+    docs = docs.exclude(tags__in=[
+        DocumentTag.objects.get_trash_tag(user=user),  # No trashed docs
+        DocumentTag.objects.get_history_tag(user=user),  # No history yet
+        DocumentTag.objects.get_example_tag(user=user),  # No examples
+        imported_tag  # No already imported docs
+    ])
+
+    root_doc, created = Directory.objects.get_or_create(name='', owner=user)
+    imported_docs = []
+
+    for doc in docs:
+      if doc.content_object:
+        try:
+          notebook = import_saved_beeswax_query(doc.content_object)
+          data = notebook.get_data()
+          notebook_doc = Document2.objects.create(name=data['name'], type=data['type'], owner=user, data=notebook.get_json())
+
+          doc.add_tag(imported_tag)
+          doc.save()
+          imported_docs.append(notebook_doc)
+        except Exception, e:
+          raise e
+
+    if imported_docs:
+      root_doc.children.add(*imported_docs)

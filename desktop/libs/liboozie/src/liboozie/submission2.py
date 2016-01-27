@@ -178,7 +178,7 @@ class Submission(object):
         # Don't support more than one level sub-workflow
         if action.data['type'] == 'subworkflow':
           from oozie.models2 import Workflow
-          workflow = Workflow(document=Document2.objects.get(uuid=action.data['properties']['workflow']))
+          workflow = Workflow(document=Document2.objects.get_by_uuid(uuid=action.data['properties']['workflow']))
           sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
           workspace = sub_deploy.deploy()
 

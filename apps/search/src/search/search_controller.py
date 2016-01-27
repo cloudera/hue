@@ -84,7 +84,7 @@ class SearchController(object):
     try:
       for doc2 in self.get_shared_search_collections():
         if doc2.id in collection_ids:
-          doc2 = Document2.objects.get(uuid=doc2.uuid)
+          doc2 = Document2.objects.get_by_uuid(uuid=doc2.uuid)
           doc = doc2.doc.get()
 
           name = doc2.name + '-copy'
