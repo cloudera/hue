@@ -587,17 +587,22 @@ routie({
     }, 300);
   },
   "edit/:name": function(name) {
-    ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
-      collection.selected(ko.unwrap(collection).name() == name);
-    });
-    if (vm.manage.selectedCollections().length == 0) {
-      routie('manage');
-    } else {
-      vm.breadcrumb(window.location.hash.substring(1));
-      vm.edit.collection(vm.manage.selectedCollections()[0]());
-      vm.edit.fetchFields();
-      vm.page('edit-page');
-    }
+    var _interval = window.setInterval(function () {
+      if (vm.manage.hasLoadedOnce()) {
+        window.clearInterval(_interval);
+        ko.utils.arrayForEach(vm.manage.collections(), function (collection) {
+          collection.selected(ko.unwrap(collection).name() == name);
+        });
+        if (vm.manage.selectedCollections().length == 0) {
+          routie('manage');
+        } else {
+          vm.breadcrumb(window.location.hash.substring(1));
+          vm.edit.collection(vm.manage.selectedCollections()[0]());
+          vm.edit.fetchFields();
+          vm.page('edit-page');
+        }
+      }
+    }, 300);
   },
   "edit/:name/upload": function(name) {
     ko.utils.arrayForEach(vm.manage.collections(), function(collection) {
