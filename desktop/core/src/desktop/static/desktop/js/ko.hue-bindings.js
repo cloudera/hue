@@ -2951,8 +2951,8 @@
       var elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
       var updateVisibleEntryCount = function () {
         visibleEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
-        elementIncrement = visibleEntryCount * 3;
-        incrementLimit = visibleEntryCount / 3;
+        elementIncrement = options.elementIncrement || (visibleEntryCount * 3);
+        incrementLimit = options.incrementLimit || visibleEntryCount;
       };
       var updateCountInterval = setInterval(updateVisibleEntryCount, 100);
       updateVisibleEntryCount();
