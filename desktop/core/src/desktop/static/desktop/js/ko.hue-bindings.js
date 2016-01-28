@@ -2910,6 +2910,8 @@
       var $element = $(element);
       var $container = $(options.container);
 
+      var id = Math.random();
+
       // This is possibly a parent element that has the foreachVisible binding
       var $parentFVElement = bindingContext.$parentForeachVisible || null;
       // This is the element from the parent foreachVisible rendered element that contains
@@ -2955,9 +2957,15 @@
       var incrementLimit = 0; // The diff required to re-render, set to visibleCount below
       var elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
       var updateVisibleEntryCount = function () {
-        visibleEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
-        elementIncrement = options.elementIncrement || visibleEntryCount * 3;
-        incrementLimit = options.incrementLimit || visibleEntryCount;
+        var newEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
+        if (newEntryCount !== visibleEntryCount) {
+          var diff = newEntryCount - visibleEntryCount;
+          elementIncrement = options.elementIncrement || (newEntryCount * 3);
+          incrementLimit = options.incrementLimit || newEntryCount;
+          visibleEntryCount = newEntryCount;
+          endIndex += diff;
+          huePubSub.publish('foreach.visible.update', id);
+        }
       };
       var updateCountInterval = setInterval(updateVisibleEntryCount, 100);
       updateVisibleEntryCount();
@@ -3047,6 +3055,10 @@
       };
 
       var render = function () {
+        if (endIndex < 0) {
+          $container.data('busyRendering', false);
+          return;
+        }
         $container.data('busyRendering', true);
         // Save the start and end index for when the list is removed and is shown again.
         $parentFVOwnerElement.data('startIndex', startIndex);
@@ -3130,6 +3142,14 @@
           renderThrottle = setTimeout(render, 1);
         }
       };
+
+      huePubSub.subscribe('foreach.visible.update', function (callerId) {
+        if (callerId === id && endIndex > 0) {
+          setStartAndEndFromScrollTop();
+          clearTimeout(renderThrottle);
+          renderThrottle = setTimeout(render, 1);
+        }
+      });
 
       $container.bind('scroll', onScroll);
 
