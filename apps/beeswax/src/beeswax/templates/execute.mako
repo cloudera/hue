@@ -2804,7 +2804,7 @@ viewModel.design.fileResources.values.subscribe(function() {
     }
     else if (viewModel.design.results.errors().length == 0) {
       window.setTimeout(function(){
-        window.location.href = "${request.GET['on_success_url']}";
+        window.location.href = successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
       }, 200);
     }
   });

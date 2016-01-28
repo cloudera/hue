@@ -798,6 +798,10 @@ ${ assist.assistPanel() }
 
       ko.applyBindings(viewModel);
 
+      if (location.getParameter('refresh') === 'true') {
+        huePubSub.publish('assist.refresh');
+      }
+
       // TODO: Use ko for this and the put the queries in the MetastoreTable
       $('a[data-toggle="tab"]').on('shown', function (e) {
         if ($(e.target).attr("href") == "#queries") {
