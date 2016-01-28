@@ -2878,6 +2878,267 @@
     }
   };
 
+  /**
+   * This binding limits the rendered items based on what is visible within a scrollable container. It supports
+   * multiple any amount of nested children with foreachVisible bindings
+   *
+   * The minHeight parameter is the initial expected rendered height of each entry, once rendered the real
+   * height is used. It keeps a number of elements above and below the visible elements to make slow scrolling
+   * smooth.
+   *
+   * Example:
+   *
+   * <div class=".container" style="overflow-y: scroll; height: 100px">
+   *  <ul data-bind="foreachVisible: { data: items, minHeight: 20, container: '.container' }">
+   *    ...
+   *  </ul>
+   * </div>
+   *
+   */
+  ko.bindingHandlers.foreachVisible = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      return ko.bindingHandlers.template.init(element, function () {
+        return {
+          'foreach': [],
+          'templateEngine': ko.nativeTemplateEngine.instance
+        };
+      }, allBindings, viewModel, bindingContext);
+    },
+
+    update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var options = valueAccessor();
+      var $element = $(element);
+      var $container = $(options.container);
+
+      // This is possibly a parent element that has the foreachVisible binding
+      var $parentFVElement = bindingContext.$parentForeachVisible || null;
+      // This is the element from the parent foreachVisible rendered element that contains
+      // this one or container for root
+      var $parentFVOwnerElement = $container;
+      $element.data('parentForeachVisible', $parentFVElement);
+      var depth = bindingContext.$depth || 0;
+
+      $container.data('busyRendering', true);
+
+      // Locate the owning element if within another foreach visible binding
+      if ($parentFVElement) {
+        var myOffset = $element.offset().top;
+        $parentFVElement.children().each(function (idx, child) {
+          var $child = $(child);
+          if (myOffset > $child.offset().top) {
+            $parentFVOwnerElement = $child;
+          } else {
+            return false;
+          }
+        });
+      }
+
+      var childBindingContext = bindingContext.createChildContext(
+          bindingContext.$rawData,
+          null,
+          function(context) {
+            ko.utils.extend(context, {
+              $parentForeachVisible: $element,
+              $depth: depth + 1
+            });
+          });
+
+      var entryMinHeight = options.minHeight;
+      var allEntries = options.data();
+
+      var visibleEntryCount = 0;
+      var incrementLimit = 0; // The diff required to re-render, set to visibleCount below
+      var elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
+      var updateVisibleEntryCount = function () {
+        visibleEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
+        elementIncrement = visibleEntryCount * 3;
+        incrementLimit = visibleEntryCount / 3;
+      };
+      var updateCountInterval = setInterval(updateVisibleEntryCount, 100);
+      updateVisibleEntryCount();
+
+      // In case this element was rendered before use the last known indices
+      var startIndex = $parentFVOwnerElement.data('startIndex') || 0;
+      var endIndex = $parentFVOwnerElement.data('endIndex') || (visibleEntryCount + elementIncrement);
+      if (startIndex > (allEntries.length-1)) {
+        startIndex = 0
+      }
+      if (endIndex > (allEntries.length - 1)) {
+        endIndex = allEntries.length - 1;
+      }
+
+      var $wrapper = $('<div>').css({
+        'position': 'relative',
+        'width': '100%'
+      }).insertBefore($element);
+
+      $element.css({
+        'position': 'absolute',
+        'top': 0,
+        'width': '100%'
+      }).appendTo($wrapper);
+
+      // This is kept up to date with the currently rendered elements, it's used to keep track of any
+      // height changes of the elements.
+      var renderedElements = [];
+
+      if (! $parentFVOwnerElement.data('lastKnownHeights')) {
+        var lastKnownHeights = [];
+        $.each(allEntries, function () {
+          lastKnownHeights.push(entryMinHeight);
+        });
+        $parentFVOwnerElement.data('lastKnownHeights', lastKnownHeights);
+      }
+
+      var resizeWrapper = function () {
+        var totalHeight = 0;
+        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        $.each(lastKnownHeights, function(idx, height) {
+          totalHeight += height;
+        });
+        $wrapper.height(totalHeight + 'px');
+      };
+      resizeWrapper();
+
+      var updateLastKnownHeights = function () {
+        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        if (!lastKnownHeights) {
+          return;
+        }
+        var diff = false;
+        $.each(renderedElements, function (idx, renderedElement) {
+          // TODO: Figure out why it goes over index at the end scroll position
+          if (startIndex + idx < lastKnownHeights.length) {
+            var $renderedElement = $(renderedElement);
+            if (lastKnownHeights[startIndex + idx] !== ($renderedElement.height())) {
+              lastKnownHeights[startIndex + idx] = $renderedElement.height();
+              diff = true;
+            }
+          }
+        });
+        // Only resize if a difference in height was noticed.
+        if (diff) {
+          $parentFVOwnerElement.data('lastKnownHeights', lastKnownHeights);
+          resizeWrapper();
+        }
+      };
+
+      var updateHeightsInterval = -1;
+      updateLastKnownHeights();
+
+      var positionList = function () {
+        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        if (! lastKnownHeights) {
+          return;
+        }
+        var top = 0;
+        for (var i = 0; i < startIndex; i++) {
+          top += lastKnownHeights[i];
+        }
+        $element.css('top', top + 'px');
+      };
+
+      var render = function () {
+        $container.data('busyRendering', true);
+        clearInterval(updateHeightsInterval);
+        // Save the start and end index for when the list is removed and is shown again.
+        $parentFVOwnerElement.data('startIndex', startIndex);
+        $parentFVOwnerElement.data('endIndex', endIndex);
+        positionList();
+
+        var afterRender = function () {
+          renderedElements = $element.children();
+          updateHeightsInterval = window.setInterval(updateLastKnownHeights, 500);
+          $container.data('busyRendering', false);
+        };
+
+        // This is to ensure that our afterRender is called (the afterRender of KO below isn't called
+        // when only elements are removed)
+        var throttle = setTimeout(afterRender, 0);
+
+        ko.bindingHandlers.template.update(element, function () {
+          return {
+            'foreach': allEntries.slice(startIndex, endIndex + 1),
+            'templateEngine': ko.nativeTemplateEngine.instance,
+            'afterRender': function () {
+              // This is called once for each added element (not when elements are removed)
+              clearTimeout(throttle);
+              throttle = setTimeout(afterRender, 0);
+            }
+          };
+        }, allBindings, viewModel, childBindingContext);
+      };
+
+      var setStartAndEndFromScrollTop = function () {
+        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+
+        var parentSpace = 0;
+
+        var $lastParent = $parentFVElement;
+        var $lastRef = $element;
+        var $parentOwner;
+
+        while ($lastParent) {
+          var lastRefOffset = $lastRef.offset().top;
+          var lastAddedSpace = 0;
+          $lastParent.children().each(function (idx, child) {
+            var $child = $(child);
+            if (lastRefOffset > $child.offset().top) {
+              lastAddedSpace = $child.outerHeight(true);
+              parentSpace += lastAddedSpace;
+              if ($lastParent === $parentFVElement) {
+                $parentOwner = $child;
+              }
+            } else {
+              // Remove the height of the child witch is the parent of this
+              parentSpace -= lastAddedSpace;
+              return false;
+            }
+          });
+          parentSpace += $lastParent.position().top;
+          $lastRef = $lastParent;
+          $lastParent = $lastParent.data('parentForeachVisible');
+        }
+        var position = Math.min($container.scrollTop() - parentSpace, $wrapper.height());
+
+        for (var i = 0; i < lastKnownHeights.length; i++) {
+          position -= lastKnownHeights[i];
+          if (position <= 0) {
+            startIndex = Math.min(allEntries.length - elementIncrement, Math.max(i - elementIncrement, 0));
+            endIndex = Math.min(allEntries.length - 1, i + elementIncrement + visibleEntryCount);
+            break;
+          }
+        }
+      };
+
+      var renderThrottle = -1;
+
+      var onScroll = function () {
+        if ($container.data('busyRendering')) {
+          return;
+        }
+        setStartAndEndFromScrollTop();
+        clearTimeout(renderThrottle);
+        if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
+            Math.abs($parentFVOwnerElement.data('endIndex') - endIndex) > incrementLimit) {
+          renderThrottle = setTimeout(render, 1);
+        }
+      };
+
+      $container.bind('scroll', onScroll);
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+        clearInterval(updateCountInterval);
+        clearInterval(updateHeightsInterval);
+        $container.unbind('scroll', onScroll);
+      });
+
+      render();
+    }
+  };
+  ko.expressionRewriting.bindingRewriteValidators['foreachVisible'] = false;
+  ko.virtualElements.allowedBindings['foreachVisible'] = true;
+
   ko.bindingHandlers.hueach = {
     init: function (element, valueAccessor, allBindings) {
       var valueAccessorBuilder = function () {
