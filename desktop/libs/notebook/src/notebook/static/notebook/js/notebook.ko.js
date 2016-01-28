@@ -397,7 +397,8 @@
         status: self.status,
         statement: self.statement,
         properties: self.properties,
-        result: self.result.getContext()
+        result: self.result.getContext(),
+        database: self.database
       };
     };
 
@@ -876,7 +877,7 @@
 
       $.post("/notebook/api/create_session", {
         notebook: ko.mapping.toJSON(self.getContext()),
-        session: ko.mapping.toJSON(session) // e.g. {'type': 'hive', 'properties': [{'name': driverCores', 'value', '2'}]}
+        session: ko.mapping.toJSON(session) // e.g. {'type': 'pyspark', 'properties': [{'name': driverCores', 'value', '2'}]}
         }, function (data) {
           if (data.status == 0) {
             ko.mapping.fromJS(data.session, {}, session);

@@ -122,6 +122,7 @@ class HS2Api(Api):
     settings = snippet['properties'].get('settings', None)
     file_resources = snippet['properties'].get('files', None)
     functions = snippet['properties'].get('functions', None)
+    database = snippet.get('database') or 'default'
 
     if settings:
       settings = [{'key': s.rsplit('=', 1)[0], 'value': s.rsplit('=', 1)[1]} for s in settings] # TODO integrate with new binding
@@ -130,9 +131,10 @@ class HS2Api(Api):
     if functions:
       functions = [{'name': f.rsplit(' ', 1)[0], 'class_name': f.rsplit(' ', 1)[1]} for f in functions] # TODO protect for index out of bounds
 
-    query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings, file_resources=file_resources, functions=functions)
+    query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings, file_resources=file_resources, functions=functions, database=database)
 
     try:
+      db.use(database)
       handle = db.client.query(query)
     except QueryServerException, ex:
       raise QueryError(ex.message)
