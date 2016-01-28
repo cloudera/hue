@@ -940,7 +940,7 @@ class Document2(models.Model):
       return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
 
   def to_dict(self):
-    doc_dict = {
+    return {
       'owner': self.owner.username,
       'name': self.name,
       'path': urlencode(self.path or '/'),
@@ -955,14 +955,28 @@ class Document2(models.Model):
       'isSelected': False,
       'absoluteUrl': self.get_absolute_url()
     }
-    return doc_dict
+
+  def can_read(self, user):
+    has_read_permissions = False
+    perm = self.list_permissions('read')
+    if perm:
+      has_read_permissions = perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+    return user.is_superuser or self.owner == user or self.can_write(user) or has_read_permissions
 
   def can_read_or_exception(self, user):
-    self.doc.get().can_read_or_exception(user)
+    if self.doc.get():
+      self.doc.get().can_read_or_exception(user)
+    elif self.can_read(user):
+      return True
+    else:
+      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
 
   def can_write(self, user):
+    has_write_permissions = False
     perm = self.list_permissions('write')
-    return user.is_superuser or self.owner == user or perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+    if perm:
+      has_write_permissions = perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
+    return user.is_superuser or self.owner == user or has_write_permissions
 
   def can_write_or_exception(self, user):
     if self.can_write(user):
@@ -1022,7 +1036,6 @@ class Document2(models.Model):
        Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
       raise FilesystemException(_('Cannot create or modify the home or .Trash directory.'))
 
-
   def move(self, directory, user):
     if not directory.is_directory:
       raise FilesystemException(_('Target with UUID %s is not a directory') % directory.uuid)
@@ -1030,6 +1043,8 @@ class Document2(models.Model):
     if directory.can_write_or_exception(user=user):
       self.parent_directory = directory
       self.save()
+
+    return self
 
   def trash(self):
     trash_dir = Directory.objects.get(name=self.TRASH_DIR, owner=self.owner)
@@ -1039,49 +1054,55 @@ class Document2(models.Model):
 
   # TODO: restore
 
-  def share(self, user, name='read', users=None, groups=None):
+  def share(self, user, name='read', users=None, groups=None, all=False):
+    with transaction.atomic():
+      self.update_permission(user, name, users, groups, all)
+      # For directories, update all children recursively with same permissions
+      for child in self.children.all():
+        child.share(user, name, users, groups, all)
+    return self
+
+  def update_permission(self, user, name='read', users=None, groups=None, all=False):
     # TODO check in settings if user can sync, re-share, which perms...
 
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
 
+    perm.users = []
     if users is not None:
-      perm.users = []
       perm.users = users
-      perm.save()
 
+    perm.groups = []
     if groups is not None:
-      perm.groups = []
       perm.groups = groups
-      perm.save()
 
-    if not users and not groups:
-      perm.delete()
+    perm.all = all
+
+    perm.save()
 
   def list_permissions(self, perm='read'):
-    # FIXME This is causing an integrity error b/c it is called by doc2 api potentially concurrently for new docs
-    perm, created = Document2Permission.objects.get_or_create(doc=self, perms=perm)
-    return perm
+    try:
+      return Document2Permission.objects.get(doc=self, perms=perm)
+    except Document2Permission.DoesNotExist:
+      return None
 
   def _massage_permissions(self):
     """
     Returns the permissions for a given document as a dictionary
     """
+    permissions = {
+      'read': {'users': [], 'groups': [], 'all': False},
+      'write': {'users': [], 'groups': [], 'all': False}
+    }
+
     read_perms = self.list_permissions(perm='read')
     write_perms = self.list_permissions(perm='write')
-    return {
-      'read': {
-        'users': [{'id': perm_user.id, 'username': perm_user.username} \
-                  for perm_user in read_perms.users.all()],
-        'groups': [{'id': perm_group.id, 'name': perm_group.name} \
-                   for perm_group in read_perms.groups.all()]
-      },
-      'write': {
-        'users': [{'id': perm_user.id, 'username': perm_user.username} \
-                  for perm_user in write_perms.users.all()],
-        'groups': [{'id': perm_group.id, 'name': perm_group.name} \
-                   for perm_group in write_perms.groups.all()]
-      }
-    }
+
+    if read_perms:
+      permissions.update(read_perms.to_dict())
+    if write_perms:
+      permissions.update(write_perms.to_dict())
+
+    return permissions
 
   def _redact_query(self):
     """
@@ -1156,7 +1177,7 @@ class Document2Permission(models.Model):
 
   users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission2_groups')
-  all = models.BooleanField(db_index=True, default=True, help_text=_t('Specify users/groups or ALL'))
+  all = models.BooleanField(db_index=True, default=False, help_text=_t('Specify users/groups or ALL'))
 
   perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
     (READ_PERM, 'read'),
@@ -1169,6 +1190,15 @@ class Document2Permission(models.Model):
 
   class Meta:
     unique_together = ('doc', 'perms')
+
+  def to_dict(self):
+    return {
+      self.perms: {
+        'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in self.users.all()],
+        'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in self.groups.all()],
+        'all': self.all
+      }
+    }
 
 
 def get_data_link(meta):
