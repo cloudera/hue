@@ -856,7 +856,6 @@ class Document2(models.Model):
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
 
-  tags = models.ManyToManyField('self', db_index=True)
   dependencies = models.ManyToManyField('self', db_index=True)
 
   parent_directory = models.ForeignKey('self', blank=True, null=True, related_name='children', on_delete=models.CASCADE)
@@ -1124,7 +1123,7 @@ class Directory(Document2):
     :param search_text: search for given text in name and description fields
     :param order_by: order by field (e.g. -last_modified, type)
     """
-    documents = self.children.filter(is_history=True)  # TODO: perms
+    documents = self.children.filter(is_history=False)  # TODO: perms
 
     if types and isinstance(types, list):
       documents = documents.filter(type__in=types)
