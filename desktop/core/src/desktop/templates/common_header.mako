@@ -441,7 +441,7 @@ from django.utils.translation import ugettext as _
              % endif
            % endif
            % if 'pig' in apps:
-             % if USE_NEW_EDITOR.get():
+             % if USE_NEW_EDITOR.get() and False:
              <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
              % else:
              <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>

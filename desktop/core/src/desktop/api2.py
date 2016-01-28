@@ -103,7 +103,7 @@ def get_documents(request):
     offset = (page - 1) * limit
     last = offset + limit
     documents = documents.all()[offset:last]
-
+  documents = documents.filter(is_history=True)
   return JsonResponse({
       'path': path,
       'directory': directory.to_dict(),
