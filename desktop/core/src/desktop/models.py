@@ -1118,7 +1118,13 @@ class Directory(Document2):
     proxy = True
 
   def documents(self, types=None, search_text=None, order_by=None):
-    documents = self.children.all()  # TODO: perms
+    """
+    Returns the children documents for a given directory, excluding history documents
+    :param types: document types to filter on (e.g. - query-hive, link-pig, etc)
+    :param search_text: search for given text in name and description fields
+    :param order_by: order by field (e.g. -last_modified, type)
+    """
+    documents = self.children.filter(is_history=True)  # TODO: perms
 
     if types and isinstance(types, list):
       documents = documents.filter(type__in=types)
