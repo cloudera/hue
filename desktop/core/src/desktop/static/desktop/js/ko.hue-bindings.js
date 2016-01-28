@@ -2920,8 +2920,6 @@
       $element.data('parentForeachVisible', $parentFVElement);
       var depth = bindingContext.$depth || 0;
 
-      $container.data('busyRendering', true);
-
       // Locate the owning element if within another foreach visible binding
       if ($parentFVElement) {
         var myOffset = $element.offset().top;
@@ -2956,18 +2954,19 @@
       var visibleEntryCount = 0;
       var incrementLimit = 0; // The diff required to re-render, set to visibleCount below
       var elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
+
       var updateVisibleEntryCount = function () {
         var newEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
         if (newEntryCount !== visibleEntryCount) {
           var diff = newEntryCount - visibleEntryCount;
-          elementIncrement = options.elementIncrement || (newEntryCount * 3);
-          incrementLimit = options.incrementLimit || newEntryCount;
+          elementIncrement = options.elementIncrement || (newEntryCount * 4);
+          incrementLimit = options.incrementLimit || (newEntryCount * 2);
           visibleEntryCount = newEntryCount;
           endIndex += diff;
           huePubSub.publish('foreach.visible.update', id);
         }
       };
-      var updateCountInterval = setInterval(updateVisibleEntryCount, 100);
+      var updateCountInterval = setInterval(updateVisibleEntryCount, 300);
       updateVisibleEntryCount();
 
       // In case this element was rendered before use the last known indices
@@ -3039,7 +3038,7 @@
         }
       };
 
-      var updateHeightsInterval = window.setInterval(updateLastKnownHeights, 500);
+      var updateHeightsInterval = window.setInterval(updateLastKnownHeights, 600);
       updateLastKnownHeights();
 
       var positionList = function () {
@@ -3056,7 +3055,6 @@
 
       var render = function () {
         if (endIndex < 0) {
-          $container.data('busyRendering', false);
           return;
         }
         $container.data('busyRendering', true);
@@ -3131,15 +3129,16 @@
 
       var renderThrottle = -1;
 
+      var lastScrollTop = -1;
       var onScroll = function () {
-        if ($container.data('busyRendering')) {
+        if (Math.abs(lastScrollTop - $container.scrollTop()) < incrementLimit * options.minHeight) {
           return;
         }
         setStartAndEndFromScrollTop();
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
             Math.abs($parentFVOwnerElement.data('endIndex') - endIndex) > incrementLimit) {
-          renderThrottle = setTimeout(render, 1);
+          renderThrottle = setTimeout(render, 0);
         }
       };
 
@@ -3147,7 +3146,7 @@
         if (callerId === id && endIndex > 0) {
           setStartAndEndFromScrollTop();
           clearTimeout(renderThrottle);
-          renderThrottle = setTimeout(render, 1);
+          renderThrottle = setTimeout(render, 0);
         }
       });
 
