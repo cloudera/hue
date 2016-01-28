@@ -47,6 +47,7 @@ from desktop.views import _ko
     }
 
     .assist-header {
+      flex: 1;
       color: #338bb8;
       background-color: #f9f9f9;
       border-top: 1px solid #f1f1f1;
@@ -68,7 +69,6 @@ from desktop.views import _ko
     }
 
     .assist-inner-header {
-      position:relative;
       width: 100%;
       color: #737373;
       margin-left:3px;
@@ -156,11 +156,6 @@ from desktop.views import _ko
     }
 
     .assist-breadcrumb {
-      position:relative;
-      left: 0;
-      top: 0;
-      right: 0;
-      height:25px;
       padding-top: 0px;
       padding-left: 0px;
     }
@@ -246,6 +241,29 @@ from desktop.views import _ko
     .no-entries {
       font-style: italic;
     }
+
+    .assist-flex-panel {
+      position: relative;
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: stretch;
+      height:100%;
+    }
+
+    .assist-flex-header {
+      overflow: hidden;
+      position: relative;
+      flex: 0 0 25px;
+      white-space: nowrap;
+    }
+
+    .assist-flex-fill {
+      position: relative;
+      flex: 1 1 100%;
+      white-space: nowrap;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -290,17 +308,17 @@ from desktop.views import _ko
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted valign-middle"></i><span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
       <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
-      <!-- ko template: { if: open, name: 'assist-entries'  } --><!-- /ko -->
+      <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
     </li>
   </script>
 
-  <script type="text/html" id="assist-entries">
+  <script type="text/html" id="assist-db-entries">
     <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
     <ul class="assist-tables">
       <li class="assist-entry no-entries">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="hueach: {data: filteredEntries, itemHeight: (definition.isTable || definition.isView ? 20 : 25), scrollable: '${scrollable}', considerStretching: true}, css: { 'assist-tables': definition.isDatabase }">
+    <ul data-bind="foreachVisible: { data: filteredEntries, minHeight: (definition.isTable || definition.isView ? 20 : 25), container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko ifnot: definition.isTable -->
       <li data-bind="visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
@@ -312,7 +330,7 @@ from desktop.views import _ko
           <span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span>
         </a>
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
-        <!-- ko template: { if: open, name: 'assist-entries'  } --><!-- /ko -->
+        <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
       </li>
       <li class="assist-errors" data-bind="visible: hasErrors() && definition.isTable">
         <span >${ _('Error loading columns.') }</span>
@@ -325,7 +343,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-breadcrumb">
-    <div class="assist-breadcrumb">
+    <div class="assist-flex-header assist-breadcrumb">
       <a data-bind="click: back">
         <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
         <i data-bind="visible: selectedSource() && ! selectedSource().selectedDatabase()" style="display:none;font-size: 14px;line-height: 16px;vertical-align: top;" class="fa fa-server"></i>
@@ -335,15 +353,18 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-inner-panel">
-    <div class="assist-inner-panel" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
+    ##<div class="assist-inner-panel" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
       <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-        <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-        <!-- ko with: selectedSource -->
-        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-        <!-- ko with: selectedDatabase -->
-        <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
-        <!-- /ko -->
-        <!-- /ko -->
+       <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
+       <!-- ko with: selectedSource -->
+       <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+       <!-- ko with: selectedDatabase -->
+       <!-- ko template: { name: "assist-tables-template" } --><!-- /ko -->
+       <!-- /ko -->
+       <!-- /ko -->
+      </div>
     </div>
   </script>
 
@@ -489,20 +510,18 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-sources-template">
-    <ul class="nav nav-no-margin">
-      <li class="assist-inner-header">
+    <div class="assist-flex-header">
+      <div class="assist-inner-header">
         ${_('Sources')}
-      </li>
-    </ul>
-    <ul class="nav assist-stretchable-list" data-bind="stretchDown">
-      <li>
-        <ul class="assist-tables" data-bind="foreach: sources">
-          <li class="assist-table pointer">
-            <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
-          </li>
-        </ul>
-      </li>
-    </ul>
+      </div>
+    </div>
+    <div class="assist-flex-fill">
+      <ul class="assist-tables" data-bind="foreach: sources">
+        <li class="assist-table pointer">
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: name, click: function () { $parent.selectedSource($data); }"></a>
+        </li>
+      </ul>
+    </div>
   </script>
 
   <script type="text/html" id="assist-db-header-actions">
@@ -514,62 +533,54 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-databases-template">
-    <ul class="nav nav-no-margin" data-bind="visibleOnHover: { selector: '.hover-actions', override: isSearchVisible() || loading() }" >
-      <li class="assist-inner-header">
+    <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading() || isSearchVisible() }" style="display: none;">
+      <div class="assist-inner-header" data-bind="visible: ! hasErrors()">
         ${_('Databases')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
-      </li>
-      <li data-bind="slideVisible: hasEntries() && isSearchVisible()">
-        <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
-      </li>
-    </ul>
-    <ul class="nav assist-stretchable-list" data-bind="stretchDown">
-      <li data-bind="visible: ! hasErrors()" >
-        <ul class="assist-tables" data-bind="hueach: {data: filteredEntries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}">
-          <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
-            <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
-            <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
-          </li>
-        </ul>
-        <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
-        <ul class="assist-tables">
-          <li class="assist-entry" style="font-style: italic;">${_('No results found')}</li>
-        </ul>
-        <!-- /ko -->
-      </li>
-      <li class="center" data-bind="visible: loading" >
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-      </li>
-      <li class="assist-errors" data-bind="visible: hasErrors">
-        <span>${ _('Error loading databases.') }</span>
-      </li>
-    </ul>
+      </div>
+    </div>
+    <div class="assist-flex-header" data-bind="slideVisible: hasEntries() && isSearchVisible() && ! hasErrors()" style="display: none;">
+      <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+    </div>
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()" style="display: none;">
+      <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
+        <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
+          <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
+          <a class="assist-table-link" href="javascript: void(0);" data-bind="text: definition.name, click: function () { $parent.selectedDatabase($data) }"></a>
+        </li>
+      </ul>
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: loading" style="display: none;">
+      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()" style="display: none;">
+      <span class="assist-errors">${ _('Error loading databases.') }</span>
+    </div>
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <ul class="nav nav-no-margin" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
-      <li class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
+    <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
+      <div class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
-      </li>
-      <li data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
-        <div><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />Tables</label><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />Views</label></div>
-        <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
-      </li>
-    </ul>
-    <ul class="nav assist-stretchable-list" data-bind="stretchDown">
-      <li class="table-container" data-bind="visible: ! hasErrors()">
-        <div class="center" data-bind="visible: loading() || $parent.loading()">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </div>
-        <!-- ko template: { ifnot: loading() || $parent.loading(), name: 'assist-entries' } --><!-- /ko -->
-      </li>
-      <li class="assist-errors" data-bind="visible: hasErrors">
-        <span>${ _('Error loading tables.') }</span>
-      </li>
-    </ul>
+      </div>
+    </div>
+    <div class="assist-flex-header" data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
+      <div><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />Tables</label><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />Views</label></div>
+      <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+    </div>
+    <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
+      <!-- ko template: 'assist-db-entries' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: loading() || $parent.loading()" style="display: none;">
+      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
+      <span class="assist-errors">${ _('Error loading tables.') }</span>
+    </div>
+
     <div id="assistQuickLook" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
