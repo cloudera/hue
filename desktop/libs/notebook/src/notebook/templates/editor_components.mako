@@ -2008,7 +2008,7 @@ ${ require.config() }
       ko.applyBindings(viewModel);
       viewModel.init();
 
-      if (viewModel.editorMode && window.location.getParameter('editor') == '' && window.location.getParameter('new') == '') {
+      if (viewModel.editorMode && window.location.getParameter('type') != '' && window.location.getParameter('new') == '') {
         viewModel.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet'));
         $.totalStorage('hue.notebook.lastWrittenSnippet', '');
       }
