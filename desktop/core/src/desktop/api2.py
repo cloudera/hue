@@ -122,8 +122,7 @@ def get_document(request):
   else:
     doc = Document2.objects.get_by_uuid(uuid=request.GET['uuid'])
 
-  doc_info = doc.to_dict()
-  return JsonResponse(doc_info)
+  return JsonResponse(doc.to_dict())
 
 
 @api_error_handler
@@ -137,9 +136,12 @@ def move_document(request):
 
   source = Directory.objects.get_by_uuid(uuid=source_doc_uuid)
   destination = Directory.objects.get_by_uuid(uuid=destination_doc_uuid)
-  source.move(destination, request.user)
+  doc = source.move(destination, request.user)
 
-  return JsonResponse({'status': 0})
+  return JsonResponse({
+    'status': 0,
+    'document': doc.to_dict()
+  })
 
 
 @api_error_handler
@@ -200,13 +202,13 @@ def share_document(request):
   """
   Set who else or which other group can interact with the document.
 
-  Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
+  Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3], 'all': false}}
   """
   perms_dict = json.loads(request.POST.get('data'))
   uuid = json.loads(request.POST.get('uuid'))
 
-  if not uuid:
-    raise PopupException(_('share_document requires uuid'))
+  if not uuid or not perms_dict:
+    raise PopupException(_('share_document requires uuid and perms_dict'))
 
   doc = Document2.objects.get_by_uuid(uuid=uuid)
 
@@ -222,10 +224,13 @@ def share_document(request):
     else:
       groups = []
 
-    doc.share(request.user, name=name, users=users, groups=groups)
+    all = perm.get('all', False)
+
+    doc = doc.share(request.user, name=name, users=users, groups=groups, all=all)
 
   return JsonResponse({
-      'status': 0,
+    'status': 0,
+    'document': doc.to_dict()
   })
 
 
