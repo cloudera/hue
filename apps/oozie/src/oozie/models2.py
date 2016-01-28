@@ -361,6 +361,7 @@ class Workflow(Job):
       'namespaces': e.namespaces
     })
 
+    _to_lowercase(node_list)
     adj_list = _create_graph_adjaceny_list(node_list)
 
     node_hierarchy = ['start']
@@ -433,6 +434,17 @@ class Workflow(Job):
     }""")
 
     return data
+
+
+# Updates node_list to lowercase names
+# To avoid case-sensitive failures
+def _to_lowercase(node_list):
+  for node in node_list:
+    node['node_type'] = node['node_type'].lower()
+    node['name'] = node['name'].lower()
+    node['ok_to'] = node['ok_to'].lower()
+    if 'error_to' in node.keys():
+      node['error_to'] = node['error_to'].lower()
 
 def _update_adj_list(adj_list):
   uuids = {}
@@ -575,8 +587,8 @@ def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
     return curr_node
 
   elif adj_list[curr_node]['node_type'] == 'end':
-    node_hierarchy.append(['Kill'])
-    node_hierarchy.append(['End'])
+    node_hierarchy.append(['kill'])
+    node_hierarchy.append(['end'])
     return node_hierarchy
 
   elif adj_list[curr_node]['node_type'] == 'fork':

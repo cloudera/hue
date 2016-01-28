@@ -714,7 +714,8 @@ def generate_v2_graph_nodes(workflow_definition):
   node_list = str(transformed_root).replace('\n', '').replace(' ', '')
   node_list = json.loads(node_list)
 
-  return node_list
+  return [node for node in node_list if node]
+
 
 
 class MalformedWfDefException(Exception):
