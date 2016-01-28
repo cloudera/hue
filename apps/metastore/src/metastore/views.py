@@ -321,15 +321,17 @@ def alter_column(request, database, table):
 @check_has_write_access_permission
 def drop_table(request, database):
   db = dbms.get(request.user)
+  print "drop table"
 
   if request.method == 'POST':
     tables = request.POST.getlist('table_selection')
+    print tables
     tables_objects = [db.get_table(database, table) for table in tables]
     try:
       # Can't be simpler without an important refactoring
       design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
       query_history = db.drop_tables(database, tables_objects, design)
-      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables')
+      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables', kwargs={'database': database})
       return redirect(url)
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
