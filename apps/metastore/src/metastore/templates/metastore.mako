@@ -739,7 +739,7 @@ ${ assist.assistPanel() }
   </div>
 
   <div id="dropSingleTable" class="modal hide fade">
-    <form method="POST" data-bind="attr: { 'action': '/metastore/tables/drop/' + (database() ? database().name : '') }">
+    <form method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -749,15 +749,9 @@ ${ assist.assistPanel() }
         <div>${_('Do you really want to drop the table')} <span style="font-weight: bold;" data-bind="text: database() && database().table() ? database().table().name : ''"></span>?</div>
       </div>
       <div class="modal-footer">
+        <input type="hidden" name="table_selection" data-bind="value: database() && database().table() ? database().table().name : ''" />
         <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}"/>
-        <input type="submit" data-bind="click: function () { huePubSub.publish('assist.refresh'); return true; }" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
-      </div>
-      <div class="hide">
-        <!-- ko with: database -->
-        <!-- ko with: table -->
-        <input type="hidden" name="table_selection" data-bind="value: name" />
-        <!-- /ko -->
-        <!-- /ko -->
+        <input type="submit" data-bind="click: function (vm, e) { var $form = $(e.target).parents('form'); $form.attr('action', '/metastore/tables/drop/' + vm.database().name); return true; }" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
       </div>
     </form>
   </div>
@@ -800,6 +794,7 @@ ${ assist.assistPanel() }
 
       if (location.getParameter('refresh') === 'true') {
         huePubSub.publish('assist.refresh');
+        hueUtils.replaceURL('?');
       }
 
       // TODO: Use ko for this and the put the queries in the MetastoreTable

@@ -153,6 +153,10 @@ Array.prototype.diff = function (a) {
     window.history.pushState(null, null, newURL);
   }
 
+  hueUtils.replaceURL = function (newURL) {
+    window.history.replaceState(null, null, newURL);
+  }
+
   /**
    * @param {string} pseudoJson
    * @constructor
