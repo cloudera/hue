@@ -321,11 +321,9 @@ def alter_column(request, database, table):
 @check_has_write_access_permission
 def drop_table(request, database):
   db = dbms.get(request.user)
-  print "drop table"
 
   if request.method == 'POST':
     tables = request.POST.getlist('table_selection')
-    print tables
     tables_objects = [db.get_table(database, table) for table in tables]
     try:
       # Can't be simpler without an important refactoring
