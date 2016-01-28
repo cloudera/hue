@@ -19,6 +19,7 @@ import calendar
 import logging
 import json
 import os
+import re
 import uuid
 
 from itertools import chain
@@ -30,8 +31,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.core.urlresolvers import reverse
 from django.db import connection, models, transaction
 from django.db.models import Q
-from django.db.models.signals import pre_save, pre_delete, post_save
-from django.dispatch import receiver
 from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
@@ -988,34 +987,42 @@ class Document2(models.Model):
     return history_doc
 
   def save(self, *args, **kwargs):
-    """
-    Override `save` to optionally mask out the query from being saved to the database. This is because if the database
-    contains sensitive information like personally identifiable information, that information could be leaked into the
-    Hue database and logfiles.
-    """
-    if global_redaction_engine.is_enabled() and self.type == 'notebook':
-      data_dict = self.data_dict
-      snippets = data_dict.get('snippets', [])
-      for snippet in snippets:
-        if snippet['type'] in ('hive', 'impala'):  # TODO: Pull SQL types from canonical lookup
-          redacted_statement_raw = global_redaction_engine.redact(snippet['statement_raw'])
-          if snippet['statement_raw'] != redacted_statement_raw:
-            snippet['statement_raw'] = redacted_statement_raw
-            snippet['statement'] = global_redaction_engine.redact(snippet['statement'])
-            snippet['is_redacted'] = True
-      self.data = json.dumps(data_dict)
-
-    # TODO: Validate name, shouldn't contain slashes
-    # TODO: Prevent documents with same name and location from being saved
-    # TODO: Prevent Home and Trash directories from being deleted
-    # TODO: Prevent creating home or trash directories in any location
-
-    # Save document to home directory if parent directory isn't specified
+    # Set document parent to home directory if parent directory isn't specified
     if not self.parent_directory and not self.is_home_directory and not self.is_trash_directory:
       home_dir = Document2.objects.get_home_directory(self.owner)
       self.parent_directory = home_dir
 
+    # Run validations
+    self.validate()
+
+    # Redact query if needed
+    self._redact_query()
+
     super(Document2, self).save(*args, **kwargs)
+
+  def validate(self):
+    # Validate document name
+    invalid_chars = re.compile(r"[<>/{}[\]~`]");
+    if invalid_chars.search(self.name):
+      raise FilesystemException(_('Document name contains an invalid character.'))
+
+    # Prevent documents with same name and parent from being created more than once
+    try:
+      document = Document2.objects.get(name=self.name, owner=self.owner, parent_directory=self.parent_directory)
+      if document.pk != self.pk:
+        raise FilesystemException(_('Document for owner %s at path %s already exists') % (self.owner, self.path))
+    except Document2.DoesNotExist:
+      pass  # no conflicts
+    except Document2.MultipleObjectsReturned:
+      document_ids = [doc.id for doc in Document2.objects.filter(name=self.name, owner=self.owner, parent_directory=self.parent_directory)]
+      raise FilesystemException(_('Found multiple documents for owner %s at path %s with IDs: [%s]') %
+                                (self.owner, self.path, ', '.join(document_ids)))
+
+    # Validate home and Trash directories are only created once per user and cannot be created or modified after
+    if self.name in ['', Document2.TRASH_DIR] and \
+       Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
+      raise FilesystemException(_('Cannot create or modify the home or .Trash directory.'))
+
 
   def move(self, directory, user):
     if not directory.is_directory:
@@ -1077,6 +1084,24 @@ class Document2(models.Model):
       }
     }
 
+  def _redact_query(self):
+    """
+    Optionally mask out the query from being saved to the database. This is because if the database contains sensitive
+    information like personally identifiable information, that information could be leaked into the Hue database and
+    logfiles.
+    """
+    if global_redaction_engine.is_enabled() and self.type == 'notebook':
+      data_dict = self.data_dict
+      snippets = data_dict.get('snippets', [])
+      for snippet in snippets:
+        if snippet['type'] in ('hive', 'impala'):  # TODO: Pull SQL types from canonical lookup
+          redacted_statement_raw = global_redaction_engine.redact(snippet['statement_raw'])
+          if snippet['statement_raw'] != redacted_statement_raw:
+            snippet['statement_raw'] = redacted_statement_raw
+            snippet['statement'] = global_redaction_engine.redact(snippet['statement'])
+            snippet['is_redacted'] = True
+      self.data = json.dumps(data_dict)
+
 
 class DirectoryManager(Document2Manager):
 
@@ -1108,17 +1133,6 @@ class Directory(Document2):
 
   def save(self, *args, **kwargs):
     self.type = 'directory'
-
-    try:
-      directory = Directory.objects.get(name=self.name, owner=self.owner, type='directory')
-      if directory.pk != self.pk:
-        raise FilesystemException(_('Directory for owner %s at path already exists') % (self.owner, self.path))
-    except Directory.DoesNotExist:
-      pass  # no conflicts
-    except Directory.MultipleObjectsReturned:
-      directory_ids = [dir.id for dir in Directory.objects.filter(name=self.name, owner=self.owner, type='directory')]
-      raise FilesystemException(_('Found multiple directories for owner %s at path %s with IDs: [%s]') %
-                                (self.owner, self.path, ', '.join(directory_ids)))
 
     super(Directory, self).save(*args, **kwargs)
 
