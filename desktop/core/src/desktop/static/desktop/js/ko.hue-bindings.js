@@ -2933,6 +2933,11 @@
         });
       }
 
+      if ($parentFVOwnerElement.data('disposalFunction')) {
+        $parentFVOwnerElement.data('disposalFunction')();
+        $parentFVOwnerElement.data('lastKnownHeights', null);
+      }
+
       var childBindingContext = bindingContext.createChildContext(
           bindingContext.$rawData,
           null,
@@ -2951,7 +2956,7 @@
       var elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
       var updateVisibleEntryCount = function () {
         visibleEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
-        elementIncrement = options.elementIncrement || (visibleEntryCount * 3);
+        elementIncrement = options.elementIncrement || visibleEntryCount * 3;
         incrementLimit = options.incrementLimit || visibleEntryCount;
       };
       var updateCountInterval = setInterval(updateVisibleEntryCount, 100);
@@ -2967,16 +2972,19 @@
         endIndex = allEntries.length - 1;
       }
 
-      var $wrapper = $('<div>').css({
-        'position': 'relative',
-        'width': '100%'
-      }).insertBefore($element);
+      var $wrapper = $element.parent();
 
-      $element.css({
-        'position': 'absolute',
-        'top': 0,
-        'width': '100%'
-      }).appendTo($wrapper);
+      if (!$wrapper.hasClass('foreach-wrapper')) {
+        $wrapper = $('<div>').css({
+          'position': 'relative',
+          'width': '100%'
+        }).addClass('foreach-wrapper').insertBefore($element);
+        $element.css({
+          'position': 'absolute',
+          'top': 0,
+          'width': '100%'
+        }).appendTo($wrapper);
+      }
 
       // This is kept up to date with the currently rendered elements, it's used to keep track of any
       // height changes of the elements.
@@ -3001,10 +3009,10 @@
       resizeWrapper();
 
       var updateLastKnownHeights = function () {
-        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
-        if (!lastKnownHeights) {
+        if ($container.data('busyRendering')) {
           return;
         }
+        var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
         var diff = false;
         $.each(renderedElements, function (idx, renderedElement) {
           // TODO: Figure out why it goes over index at the end scroll position
@@ -3023,7 +3031,7 @@
         }
       };
 
-      var updateHeightsInterval = -1;
+      var updateHeightsInterval = window.setInterval(updateLastKnownHeights, 500);
       updateLastKnownHeights();
 
       var positionList = function () {
@@ -3040,7 +3048,6 @@
 
       var render = function () {
         $container.data('busyRendering', true);
-        clearInterval(updateHeightsInterval);
         // Save the start and end index for when the list is removed and is shown again.
         $parentFVOwnerElement.data('startIndex', startIndex);
         $parentFVOwnerElement.data('endIndex', endIndex);
@@ -3048,7 +3055,6 @@
 
         var afterRender = function () {
           renderedElements = $element.children();
-          updateHeightsInterval = window.setInterval(updateLastKnownHeights, 500);
           $container.data('busyRendering', false);
         };
 
@@ -3127,11 +3133,14 @@
 
       $container.bind('scroll', onScroll);
 
-      ko.utils.domNodeDisposal.addDisposeCallback(element, function() {
+      $parentFVOwnerElement.data('disposalFunction', function () {
+        $container.unbind('scroll', onScroll);
         clearInterval(updateCountInterval);
         clearInterval(updateHeightsInterval);
-        $container.unbind('scroll', onScroll);
+        $parentFVOwnerElement.data('disposalFunction', null);
       });
+
+      ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], $parentFVOwnerElement.data('disposalFunction'));
 
       render();
     }
