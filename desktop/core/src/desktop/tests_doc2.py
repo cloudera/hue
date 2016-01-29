@@ -453,10 +453,10 @@ class TestDocument2Permissions(object):
   def test_share_directory(self):
     # Test that updating the permissions for a directory updates all nested documents accordingly, with file structure:
     # /
-    # /test_dir
-    # /test_dir/query1.sql
-    # /test_dir/nested_dir
-    # /test_dir/nested_dir/query2.sql
+    #   test_dir/
+    #     query1.sql
+    #     nested_dir/
+    #       query2.sql
 
     # All initially owned by self.user
     parent_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
@@ -493,3 +493,75 @@ class TestDocument2Permissions(object):
       assert_true(doc.can_write(self.user))
       assert_true(doc.can_read(self.user_not_me))
       assert_true(doc.can_write(self.user_not_me))
+
+
+  def test_get_shared_documents(self):
+    not_shared = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    shared_1 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+    shared_2 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+
+    shared_1.share(user=self.user, name='read', users=[self.user_not_me], groups=[])
+    shared_2.share(user=self.user, name='read', users=[self.user_not_me], groups=[])
+
+    # 2 shared docs should appear in the other user's shared documents response
+    response = self.client_not_me.get('/desktop/api2/docs/shared')
+    data = json.loads(response.content)
+    assert_true('documents' in data)
+    assert_equal(2, data['count'])
+    doc_names = [doc['name'] for doc in data['documents']]
+    assert_true('query2.sql' in doc_names)
+    assert_true('query3.sql' in doc_names)
+    assert_false('query1.sql' in doc_names)
+
+    # they should not appear in the other user's regular get_documents response
+    response = self.client_not_me.get('/desktop/api2/docs/')
+    data = json.loads(response.content)
+    doc_names = [doc['name'] for doc in data['children']]
+    assert_false('query2.sql' in doc_names)
+    assert_false('query3.sql' in doc_names)
+
+
+  def test_get_shared_directories(self):
+    # Tests that when fetching the shared documents for a user, they are grouped by top-level directory when possible
+    # /
+    #   dir1/
+    #     query1.sql
+    #   dir2/
+    #     dir3/
+    #       query2.sql
+    #   query3.sql
+
+    dir1 = Directory.objects.create(name='dir1', owner=self.user, parent_directory=self.home_dir)
+    doc1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir1)
+    dir2 = Directory.objects.create(name='dir2', owner=self.user, parent_directory=self.home_dir)
+    dir3 = Directory.objects.create(name='dir3', owner=self.user, parent_directory=dir2)
+    doc2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir3)
+    doc3 = Document2.objects.create(name='query3.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+
+    dir1.share(user=self.user, name='read', users=[], groups=[self.default_group])
+    dir3.share(user=self.user, name='read', users=[], groups=[self.default_group])
+    doc3.share(user=self.user, name='read', users=[], groups=[self.default_group])
+
+    # 3 shared docs should appear, due to directory rollup
+    response = self.client_not_me.get('/desktop/api2/docs/shared')
+    data = json.loads(response.content)
+    assert_true('documents' in data)
+    assert_equal(3, data['count'], data)
+    doc_names = [doc['name'] for doc in data['documents']]
+    assert_true('dir1' in doc_names)
+    assert_true('dir3' in doc_names)
+    assert_true('query3.sql' in doc_names)
+    assert_false('dir2' in doc_names)
+
+    # nested documents should not appear
+    assert_false('query1.sql' in doc_names)
+    assert_false('query2.sql' in doc_names)
+
+    # but nested documents should still be shared/viewable by group
+    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc1.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc1.uuid, data['uuid'], data)
+
+    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc2.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc2.uuid, data['uuid'], data)

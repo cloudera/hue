@@ -766,9 +766,43 @@ class Document2Manager(models.Manager):
     return Document2.objects.filter(
         Q(owner=user) |
         Q(document2permission__users=user) |
-        Q(document2permission__groups__in=user.groups.all()) |
-        Q(document2permission__all=True)
+        Q(document2permission__groups__in=user.groups.all())
     ).distinct().order_by('-last_modified')
+
+  def get_shared_documents(self, user, flatten=False):
+    """
+    Returns all documents that are shared with the user
+    :param flatten: True to return all directories and documents in a flat list,
+                    False to filter the documents to top-level directories
+    """
+    documents = Document2.objects.filter(
+        Q(document2permission__users=user) |
+        Q(document2permission__groups__in=user.groups.all())
+    ).distinct()
+
+    if not flatten:
+      documents = documents.exclude(parent_directory__in=documents)
+
+    return documents
+
+  def refine_documents(self, documents, types=None, search_text=None, order_by=None):
+    """
+    Refines a queryset of document objects by type filters, search_text or order_by
+    :param documents: queryset of Document2 objects
+    :param types: list of Document2 types (e.g. - query-hive, directory, etc)
+    :param search_text: text to search on in the name and description fields
+    :param order_by: order by field (e.g. -last_modified, type)
+    """
+    if types and isinstance(types, list):
+      documents = documents.filter(type__in=types)
+
+    if search_text:
+      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text))
+
+    if order_by:  # TODO: Validate that order_by is a valid sort parameter
+      documents = documents.order_by(order_by)
+
+    return documents
 
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
@@ -1134,29 +1168,15 @@ class Directory(Document2):
   class Meta:
     proxy = True
 
-  def documents(self, types=None, search_text=None, order_by=None):
+  def get_children_documents(self):
     """
     Returns the children documents for a given directory, excluding history documents
-    :param types: document types to filter on (e.g. - query-hive, link-pig, etc)
-    :param search_text: search for given text in name and description fields
-    :param order_by: order by field (e.g. -last_modified, type)
     """
     documents = self.children.filter(is_history=False)  # TODO: perms
-
-    if types and isinstance(types, list):
-      documents = documents.filter(type__in=types)
-
-    if search_text:
-      documents = documents.filter(Q(name__icontains=search_text) | Q(description__icontains=search_text))
-
-    if order_by:  # TODO: Validate that order_by is a valid sort parameter
-      documents = documents.order_by(order_by)
-
     return documents
 
   def save(self, *args, **kwargs):
     self.type = 'directory'
-
     super(Directory, self).save(*args, **kwargs)
 
 
