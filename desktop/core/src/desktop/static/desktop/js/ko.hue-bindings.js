@@ -3139,7 +3139,7 @@
         for (var i = 0; i < lastKnownHeights.length; i++) {
           position -= lastKnownHeights[i];
           if (position <= 0) {
-            startIndex = Math.min(allEntries.length - elementIncrement, Math.max(i - elementIncrement, 0));
+            startIndex = Math.max(i - elementIncrement, 0);
             endIndex = Math.min(allEntries.length - 1, i + elementIncrement + visibleEntryCount);
             break;
           }
