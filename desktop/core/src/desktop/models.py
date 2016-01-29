@@ -807,6 +807,8 @@ class Document2Manager(models.Manager):
           doc = doc.children.get(name=token)
         except Document2.DoesNotExist:
           raise FilesystemException(_('Requested invalid path for user %s: %s') % (user.username, path))
+        except Document2.MultipleObjectsReturned:
+          raise FilesystemException(_('Duplicate documents found for user %s at path: %s') % (user.username, path))
 
     return doc
 
@@ -993,17 +995,18 @@ class Document2(models.Model):
     if invalid_chars.search(self.name):
       raise FilesystemException(_('Document name contains an invalid character.'))
 
-    # Prevent documents with same name and parent from being created more than once
-    try:
-      document = Document2.objects.get(name=self.name, owner=self.owner, parent_directory=self.parent_directory)
-      if document.pk != self.pk:
-        raise FilesystemException(_('Document for owner %s at path %s already exists') % (self.owner, self.path))
-    except Document2.DoesNotExist:
-      pass  # no conflicts
-    except Document2.MultipleObjectsReturned:
-      document_ids = [doc.id for doc in Document2.objects.filter(name=self.name, owner=self.owner, parent_directory=self.parent_directory)]
-      raise FilesystemException(_('Found multiple documents for owner %s at path %s with IDs: [%s]') %
-                                (self.owner, self.path, ', '.join(document_ids)))
+    # Validate that directories cannot have same name and parent
+    if self.is_directory:
+      try:
+        dir = Directory.objects.get(name=self.name, owner=self.owner, parent_directory=self.parent_directory)
+        if dir.pk != self.pk:
+          raise FilesystemException(_('Directory for owner %s at path %s already exists') % (self.owner, self.path))
+      except Directory.DoesNotExist:
+        pass  # no conflicts
+      except Directory.MultipleObjectsReturned:
+        dir_ids = [doc.id for doc in Directory.objects.filter(name=self.name, owner=self.owner, parent_directory=self.parent_directory)]
+        raise FilesystemException(_('Found multiple documents for owner %s at path %s with IDs: [%s]') %
+                                    (self.owner, self.path, ', '.join(dir_ids)))
 
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
     if self.name in ['', Document2.TRASH_DIR] and \
