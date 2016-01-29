@@ -777,6 +777,7 @@ class Document2Manager(models.Manager):
     """
     Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
     This should always be used in place of Document2.objects.get(uuid=) when a single document is expected
+    WARNING: This does not check for read/write pernissions!
     """
     docs = self.filter(uuid=uuid).order_by('-last_modified')
     if not docs.exists():
@@ -795,6 +796,7 @@ class Document2Manager(models.Manager):
   def get_by_path(self, user, path):
     """
     This can be an expensive operation b/c we have to traverse the path tree, so if possible, request a document by UUID
+    NOTE: get_by_path only works for the owner's documents since it is based off the user's home directory
     """
     cleaned_path = path.rstrip('/')
     doc = Document2.objects.get_home_directory(user)
@@ -956,34 +958,6 @@ class Document2(models.Model):
       'absoluteUrl': self.get_absolute_url()
     }
 
-  def can_read(self, user):
-    has_read_permissions = False
-    perm = self.list_permissions('read')
-    if perm:
-      has_read_permissions = perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
-    return user.is_superuser or self.owner == user or self.can_write(user) or has_read_permissions
-
-  def can_read_or_exception(self, user):
-    if self.doc.get():
-      self.doc.get().can_read_or_exception(user)
-    elif self.can_read(user):
-      return True
-    else:
-      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
-
-  def can_write(self, user):
-    has_write_permissions = False
-    perm = self.list_permissions('write')
-    if perm:
-      has_write_permissions = perm.groups.filter(id__in=user.groups.all()).exists() or user in perm.users.all()
-    return user.is_superuser or self.owner == user or has_write_permissions
-
-  def can_write_or_exception(self, user):
-    if self.can_write(user):
-      return True
-    else:
-      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
-
   def get_history(self):
     return self.dependencies.filter(is_history=True).order_by('-last_modified')
 
@@ -1054,6 +1028,34 @@ class Document2(models.Model):
 
   # TODO: restore
 
+  def can_read(self, user):
+    perm = self.get_permission('read')
+    has_read_permissions = perm.user_has_access(user) if perm else False
+    return user.is_superuser or self.owner == user or self.can_write(user) or has_read_permissions
+
+  def can_read_or_exception(self, user):
+    if self.can_read(user):
+      return True
+    else:
+      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
+
+  def can_write(self, user):
+    perm = self.get_permission('write')
+    has_write_permissions = perm.user_has_access(user) if perm else False
+    return user.is_superuser or self.owner == user or has_write_permissions
+
+  def can_write_or_exception(self, user):
+    if self.can_write(user):
+      return True
+    else:
+      raise PopupException(_("Document does not exist or you don't have the permission to access it."))
+
+  def get_permission(self, perm='read'):
+    try:
+      return Document2Permission.objects.get(doc=self, perms=perm)
+    except Document2Permission.DoesNotExist:
+      return None
+
   def share(self, user, name='read', users=None, groups=None, all=False):
     with transaction.atomic():
       self.update_permission(user, name, users, groups, all)
@@ -1079,12 +1081,6 @@ class Document2(models.Model):
 
     perm.save()
 
-  def list_permissions(self, perm='read'):
-    try:
-      return Document2Permission.objects.get(doc=self, perms=perm)
-    except Document2Permission.DoesNotExist:
-      return None
-
   def _massage_permissions(self):
     """
     Returns the permissions for a given document as a dictionary
@@ -1094,8 +1090,8 @@ class Document2(models.Model):
       'write': {'users': [], 'groups': [], 'all': False}
     }
 
-    read_perms = self.list_permissions(perm='read')
-    write_perms = self.list_permissions(perm='write')
+    read_perms = self.get_permission(perm='read')
+    write_perms = self.get_permission(perm='write')
 
     if read_perms:
       permissions.update(read_perms.to_dict())
@@ -1199,6 +1195,12 @@ class Document2Permission(models.Model):
         'all': self.all
       }
     }
+
+  def user_has_access(self, user):
+    """
+    Returns true if the given user has permissions based on users, groups, or all flag
+    """
+    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all() or self.all
 
 
 def get_data_link(meta):

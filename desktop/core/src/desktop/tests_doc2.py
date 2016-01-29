@@ -92,6 +92,12 @@ class TestDocument2(object):
     assert_true('uuid' in data)
     assert_equal(doc.uuid, data['uuid'])
 
+    # Invalid uuid returns error
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': '1234-5678-9'})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
+    assert_true('not found' in data['message'])
+
 
   def test_directory_create(self):
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mkdir')})
@@ -283,6 +289,16 @@ class TestDocument2Permissions(object):
   def test_share_document_read_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
+    # owner can view document
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['uuid'], data)
+
+    # other user cannot view document
+    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
+
     # Share read perm by users
     response = self.client.post("/desktop/api2/doc/share", {
       'uuid': json.dumps(doc.uuid),
@@ -309,9 +325,24 @@ class TestDocument2Permissions(object):
     assert_true(doc.can_read(self.user_not_me))
     assert_false(doc.can_write(self.user_not_me))
 
+    # other user can view document
+    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['uuid'], data)
+
 
   def test_share_document_read_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+
+    # owner can view document
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['uuid'], data)
+
+    # other user cannot view document
+    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
 
     response = self.client.post("/desktop/api2/doc/share", {
       'uuid': json.dumps(doc.uuid),
@@ -337,9 +368,19 @@ class TestDocument2Permissions(object):
     assert_true(doc.can_read(self.user_not_me))
     assert_false(doc.can_write(self.user_not_me))
 
+    # other user can view document
+    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['uuid'], data)
+
 
   def test_share_document_write_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+
+    # other user cannot modify document
+    response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
 
     # Share write perm by user
     response = self.client.post("/desktop/api2/doc/share", {
@@ -366,9 +407,19 @@ class TestDocument2Permissions(object):
     assert_true(doc.can_read(self.user_not_me))
     assert_true(doc.can_write(self.user_not_me))
 
+    # other user can modify document
+    response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
 
   def test_share_document_write_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
+
+    # other user cannot modify document
+    response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
 
     # Share write perm by group
     response = self.client.post("/desktop/api2/doc/share", {
@@ -394,6 +445,11 @@ class TestDocument2Permissions(object):
     assert_true(doc.can_write(self.user))
     assert_true(doc.can_read(self.user_not_me))
     assert_true(doc.can_write(self.user_not_me))
+
+    # other user can modify document
+    response = self.client_not_me.post('/desktop/api2/doc/delete', {'uuid': json.dumps(doc.uuid)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
 
 
   def test_share_directory(self):

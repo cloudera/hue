@@ -79,7 +79,8 @@ def get_documents(request):
   else:  # Find by path
     document = Document2.objects.get_by_path(user=request.user, path=path)
 
-  # TODO perms
+  # Check if user has read permissions
+  document.can_read_or_exception(request.user)
 
   # Get querystring filters if any
   page = int(request.GET.get('page', 1))
@@ -122,6 +123,9 @@ def get_document(request):
   else:
     doc = Document2.objects.get_by_uuid(uuid=request.GET['uuid'])
 
+  # Check if user has read permissions
+  doc.can_read_or_exception(request.user)
+
   return JsonResponse(doc.to_dict())
 
 
@@ -136,6 +140,11 @@ def move_document(request):
 
   source = Directory.objects.get_by_uuid(uuid=source_doc_uuid)
   destination = Directory.objects.get_by_uuid(uuid=destination_doc_uuid)
+
+  # Check if user has write permissions for both source and destination
+  source.can_write_or_exception(request.user)
+  destination.can_write_or_exception(request.user)
+
   doc = source.move(destination, request.user)
 
   return JsonResponse({
@@ -154,7 +163,10 @@ def create_directory(request):
     raise PopupException(_('create_directory requires parent_uuid and name'))
 
   parent_dir = Directory.objects.get_by_uuid(uuid=parent_uuid)
-  # TODO: Check permissions and move to manager
+
+  # Check if user has write permissions for parent directory
+  parent_dir.can_write_or_exception(request.user)
+
   directory = Directory.objects.create(name=name, owner=request.user, parent_directory=parent_dir)
 
   return JsonResponse({
@@ -182,6 +194,9 @@ def delete_document(request):
     raise PopupException(_('delete_document requires uuid'))
 
   document = Document2.objects.get_by_uuid(uuid=uuid)
+
+  # Check if user has write permissions for given document
+  document.can_write_or_exception(request.user)
 
   if skip_trash:
     # TODO: check if document is in the .Trash folder, if not raise exception
