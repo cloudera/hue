@@ -97,6 +97,12 @@ class ZipArchive(Archive):
         dirs.append(name)
       else:
         files.append(name)
+        # self.zfh.namelist() sometimes doesn't return all the directories
+        # Go up the path one directory at the time
+        parent = os.path.dirname(name)
+        while parent != '' and parent not in dirs:
+          dirs.append(parent)
+          parent = os.path.dirname(parent)
     return (dirs, files)
 
   def _create_files(self, basepath, files=[]):
