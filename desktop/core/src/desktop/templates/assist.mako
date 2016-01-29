@@ -76,10 +76,6 @@ from desktop.views import _ko
       font-weight: bold;
       margin-top: 0
     }
-    
-    .nav.nav-no-margin {
-      margin-bottom: 0;
-    }
 
     .assist-stretchable-list {
       position:relative;
@@ -232,12 +228,6 @@ from desktop.views import _ko
       display: table-cell;
     }
 
-    .assist-show-more {
-      padding-left: 2px;
-      padding-bottom: 5px;
-      font-style: italic;
-    }
-
     .no-entries {
       font-style: italic;
     }
@@ -263,6 +253,14 @@ from desktop.views import _ko
       white-space: nowrap;
       overflow-x: hidden;
       overflow-y: auto;
+    }
+
+    .database-tree ul {
+      margin: 0 !important;
+    }
+
+    .database-tree ul li {
+      padding-left: 15px;
     }
   </style>
 
@@ -318,7 +316,7 @@ from desktop.views import _ko
       <li class="assist-entry no-entries">${_('No results found')}</li>
     </ul>
     <!-- /ko -->
-    <ul data-bind="foreachVisible: { data: filteredEntries, minHeight: (definition.isTable || definition.isView ? 20 : 25), container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
+    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: (definition.isTable || definition.isView ? 20 : 25), container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko ifnot: definition.isTable -->
       <li data-bind="visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
