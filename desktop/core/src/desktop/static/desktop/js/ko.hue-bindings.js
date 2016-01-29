@@ -2914,10 +2914,12 @@
 
       // This is possibly a parent element that has the foreachVisible binding
       var $parentFVElement = bindingContext.$parentForeachVisible || null;
+      var parentId = bindingContext.$parentForeachVisibleId || -1;
       // This is the element from the parent foreachVisible rendered element that contains
       // this one or container for root
       var $parentFVOwnerElement = $container;
       $element.data('parentForeachVisible', $parentFVElement);
+
       var depth = bindingContext.$depth || 0;
 
       // Locate the owning element if within another foreach visible binding
@@ -2944,6 +2946,7 @@
           function(context) {
             ko.utils.extend(context, {
               $parentForeachVisible: $element,
+              $parentForeachVisibleId: id,
               $depth: depth + 1
             });
           });
@@ -3020,13 +3023,18 @@
           return;
         }
         var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        // Happens when closing first level and the third level is open, disposal tells the parents
+        // to update their heights...
+        if (!lastKnownHeights) {
+          return;
+        }
         var diff = false;
         $.each(renderedElements, function (idx, renderedElement) {
           // TODO: Figure out why it goes over index at the end scroll position
           if (startIndex + idx < lastKnownHeights.length) {
-            var $renderedElement = $(renderedElement);
-            if (lastKnownHeights[startIndex + idx] !== ($renderedElement.height())) {
-              lastKnownHeights[startIndex + idx] = $renderedElement.height();
+            var renderedHeight = $(renderedElement).height();
+            if (lastKnownHeights[startIndex + idx] !== renderedHeight) {
+              lastKnownHeights[startIndex + idx] = renderedHeight;
               diff = true;
             }
           }
@@ -3039,6 +3047,16 @@
       };
 
       var updateHeightsInterval = window.setInterval(updateLastKnownHeights, 600);
+
+      huePubSub.subscribe('foreach.visible.update.heights', function (targetId) {
+        if (targetId === id) {
+          clearInterval(updateHeightsInterval);
+          updateLastKnownHeights();
+          huePubSub.publish('foreach.visible.update.heights', parentId);
+          updateHeightsInterval = window.setInterval(updateLastKnownHeights, 600);
+        }
+      });
+
       updateLastKnownHeights();
 
       var positionList = function () {
@@ -3066,6 +3084,7 @@
         var afterRender = function () {
           renderedElements = $element.children();
           $container.data('busyRendering', false);
+          huePubSub.publish('foreach.visible.update.heights', id);
         };
 
         // This is to ensure that our afterRender is called (the afterRender of KO below isn't called
@@ -3154,6 +3173,9 @@
       $container.bind('scroll', onScroll);
 
       $parentFVOwnerElement.data('disposalFunction', function () {
+        setTimeout(function () {
+          huePubSub.publish('foreach.visible.update.heights', parentId);
+        }, 0);
         $container.unbind('scroll', onScroll);
         clearInterval(updateCountInterval);
         clearInterval(updateHeightsInterval);
