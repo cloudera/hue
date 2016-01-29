@@ -275,14 +275,14 @@ class TestDocument2Permissions(object):
 
 
   def test_default_permissions(self):
-    # Tests that for a new doc by default, read/write perms are set to no users, groups, or all
+    # Tests that for a new doc by default, read/write perms are set to no users and no groups
     new_doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
     response = self.client.get('/desktop/api2/doc/get', {'uuid': new_doc.uuid})
     data = json.loads(response.content)
     assert_equal(new_doc.uuid, data['uuid'], data)
     assert_true('perms' in data)
-    assert_equal({'read': {'users': [], 'groups': [], 'all': False}, 'write': {'users': [], 'groups': [], 'all': False}},
+    assert_equal({'read': {'users': [], 'groups': []}, 'write': {'users': [], 'groups': []}},
                  data['perms'])
 
 
@@ -309,12 +309,10 @@ class TestDocument2Permissions(object):
             self.user_not_me.id
           ],
           'group_ids': [],
-          'all': False
         },
         'write': {
           'user_ids': [],
           'group_ids': [],
-          'all': False
         }
       })
     })

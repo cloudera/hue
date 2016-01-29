@@ -217,7 +217,7 @@ def share_document(request):
   """
   Set who else or which other group can interact with the document.
 
-  Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3], 'all': false}}
+  Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
   perms_dict = json.loads(request.POST.get('data'))
   uuid = json.loads(request.POST.get('uuid'))
@@ -239,9 +239,7 @@ def share_document(request):
     else:
       groups = []
 
-    all = perm.get('all', False)
-
-    doc = doc.share(request.user, name=name, users=users, groups=groups, all=all)
+    doc = doc.share(request.user, name=name, users=users, groups=groups)
 
   return JsonResponse({
     'status': 0,
