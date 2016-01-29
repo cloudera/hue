@@ -127,9 +127,10 @@ ${ layout.menubar(section=component) }
         <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
       <!-- /ko -->
 
-      <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
     <!-- /ko -->
     <!-- ko if: $root.component() == 'solr' -->
+      <br/>
+
       <!-- ko foreach: authorizables -->
         <!-- ko if: name_() != '' -->
           <!-- ko if: $index() > 0 -->
@@ -139,6 +140,8 @@ ${ layout.menubar(section=component) }
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
+
+    <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
   <!-- /ko -->
 </div>
 </script>
