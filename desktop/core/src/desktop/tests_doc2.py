@@ -212,8 +212,8 @@ class TestDocument2(object):
     assert_true('invalid character' in data['message'])
 
 
-  def test_validate_same_name_and_parent(self):
-    # Test error on creating documents with same name and location
+  def test_validate_same_directory(self):
+    # Test error on creating directories with same name and location
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_dir')})
     data = json.loads(response.content)
