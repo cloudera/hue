@@ -405,10 +405,7 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
       <ul class="nav assist-stretchable-list" data-bind="stretchDown">
-        <li class="center" data-bind="visible: loading">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </li>
+        <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
 
         <li data-bind="visible: ! hasErrors()">
           <ul class="assist-tables" data-bind="hueach: {data: entries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}">
@@ -539,7 +536,7 @@ from desktop.views import _ko
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-header" data-bind="slideVisible: hasEntries() && isSearchVisible() && ! hasErrors()" style="display: none;">
+    <div class="assist-flex-header" data-bind="slideVisible: hasEntries() && isSearchVisible() && ! hasErrors()">
       <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()" style="display: none;">
@@ -551,8 +548,7 @@ from desktop.views import _ko
       </ul>
     </div>
     <div class="assist-flex-fill" data-bind="visible: loading" style="display: none;">
-      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     </div>
     <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()" style="display: none;">
       <span class="assist-errors">${ _('Error loading databases.') }</span>
@@ -574,8 +570,7 @@ from desktop.views import _ko
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
     </div>
     <div class="assist-flex-fill" data-bind="visible: loading() || $parent.loading()" style="display: none;">
-      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
     </div>
     <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
       <span class="assist-errors">${ _('Error loading tables.') }</span>
@@ -590,12 +585,7 @@ from desktop.views import _ko
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
       <div class="modal-body" style="min-height: 100px">
-        <!-- ko if: assistDbSource.loadingSamples -->
-        <div class="loader">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-        </div>
-        <!-- /ko -->
+        <!-- ko hueSpinner: { spin: assistDbSource.loadingSamples, center: true, size: 'large' } --><!-- /ko -->
         <!-- ko ifnot: assistDbSource.loadingSamples -->
         <div style="overflow: auto">
           <!-- ko with: assistDbSource.samples -->
