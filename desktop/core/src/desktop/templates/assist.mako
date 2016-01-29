@@ -318,7 +318,7 @@ from desktop.views import _ko
     <!-- /ko -->
     <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: (definition.isTable || definition.isView ? 20 : 25), container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable, name: 'assist-table-entry' } --><!-- /ko -->
-      <!-- ko ifnot: definition.isTable -->
+      <!-- ko ifnot: definition.isTable && ! hasErrors() -->
       <li data-bind="visible: ! hasErrors(), visibleOnHover: { override: statsVisible, selector: definition.isView ? '.table-actions' : '.column-actions' }, css: { 'assist-table': definition.isView, 'assist-column': definition.isColumn }">
         <!-- ko template: { if: definition.isView || definition.isColumn, name: 'assist-entry-actions' } --><!-- /ko -->
         <a class="assist-entry" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }, css: { 'assist-field-link': !definition.isView, 'assist-table-link': definition.isView }">
@@ -330,12 +330,14 @@ from desktop.views import _ko
         <div class="center" data-bind="visible: loading" style="display:none;"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
         <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
       </li>
-      <li class="assist-errors" data-bind="visible: hasErrors() && definition.isTable">
+      <!-- ko if: definition.isTable && hasErrors() -->
+      <li class="assist-errors">
         <span >${ _('Error loading columns.') }</span>
       </li>
-
+      <!-- /ko -->
       <!-- /ko -->
     </ul>
+    <ul></ul>
     <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
