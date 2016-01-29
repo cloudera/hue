@@ -82,38 +82,61 @@ def get_documents(request):
   # Check if user has read permissions
   document.can_read_or_exception(request.user)
 
-  # Get querystring filters if any
-  page = int(request.GET.get('page', 1))
-  limit = int(request.GET.get('limit', 0))
-  type_filters = request.GET.getlist('type', None)
-  sort = request.GET.get('sort', '-last_modified')
-  search_text = request.GET.get('text', None)
+  response = {
+    'document': document.to_dict(),
+    'parent': document.parent_directory.to_dict() if document.parent_directory else None,
+    'children': [],
+  }
 
   # Get children documents if this is a directory
-  children = None
-  count = 0
   if document.is_directory:
     directory = Directory.objects.get(id=document.id)
-    children = directory.documents(types=type_filters, search_text=search_text, order_by=sort)
-    count = children.count()
+    children = directory.get_children_documents()
+    # Refine results
+    response.update(_refine_documents(request, queryset=children, key="children"))
 
   # Paginate
-  if children and limit > 0:
-    offset = (page - 1) * limit
-    last = offset + limit
-    children = children.all()[offset:last]
+  response.update(_paginate(request, queryset=response['children'], key="children"))
 
-  return JsonResponse({
-      'document': document.to_dict(),
-      'parent': document.parent_directory.to_dict() if document.parent_directory else None,
-      'children': [doc.to_dict() for doc in children] if children else [],
-      'page': page,
-      'limit': limit,
-      'count': count,
-      'types': type_filters,
-      'sort': sort,
-      'text': search_text
-  })
+  # Serialize Results
+  if response['children']:
+    response['children'] = [doc.to_dict() for doc in response['children']]
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def get_shared_documents(request):
+  """
+  Returns the directories and documents that are shared with the current user, grouped by top-level directory.
+  Optional params:
+    page=<n>    - Controls pagination. Defaults to 1.
+    limit=<n>   - Controls limit per page. Defaults to all.
+    type=<type> - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc). Default to all.
+    sort=<key>  - Sort by the attribute <key>, which is one of:
+                    "name", "type", "owner", "last_modified"
+                  Accepts the form "-last_modified", which sorts in descending order.
+                  Default to "-last_modified".
+    text=<frag> - Search for fragment "frag" in names and descriptions.
+  """
+
+  response = {
+    'documents': [],
+  }
+
+  documents = Document2.objects.get_shared_documents(request.user, flatten=False)
+
+  # Refine results
+  response.update(_refine_documents(request, queryset=documents))
+
+  # Paginate
+  response.update(_paginate(request, queryset=response['documents']))
+
+  # Serialize results
+  if response['documents']:
+    response['documents'] = [doc.to_dict() for doc in response['documents']]
+
+  return JsonResponse(response)
 
 
 @api_error_handler
@@ -329,6 +352,57 @@ def import_documents(request):
     return redirect(request.POST.get('redirect'))
   else:
     return JsonResponse({'message': stdout.getvalue()})
+
+
+def _refine_documents(request, queryset, key="documents"):
+  """
+  Given optional querystring params extracted from the request, filter the given queryset of documents and return a
+    dictionary with the refined queryset and filter params
+  :param request: request object with params
+  :param queryset: Document2 queryset
+  :param key: name for key of refined document set
+  """
+  documents = []
+  count = 0
+  type_filters = request.GET.getlist('type', None)
+  sort = request.GET.get('sort', '-last_modified')
+  search_text = request.GET.get('text', None)
+
+  if queryset:
+    documents = Document2.objects.refine_documents(documents=queryset, types=type_filters, search_text=search_text,
+                                                   order_by=sort)
+    count = documents.count()
+
+  return {
+    key: documents,
+    'count': count,
+    'types': type_filters,
+    'text': search_text,
+    'sort': sort
+  }
+
+
+def _paginate(request, queryset, key="documents"):
+  """
+  Given optional querystring params extracted from the request, slice the given queryset of documents for the given page
+    and limit, and return the updated queryset along with pagination params used.
+  :param request: request object with params
+  :param queryset: queryset
+  :param key: name for key of refined document set
+  """
+  page = int(request.GET.get('page', 1))
+  limit = int(request.GET.get('limit', 0))
+
+  if queryset and limit > 0:
+    offset = (page - 1) * limit
+    last = offset + limit
+    queryset = queryset.all()[offset:last]
+
+  return {
+    key: queryset,
+    'page': page,
+    'limit': limit
+  }
 
 
 def _convert_documents(user):
