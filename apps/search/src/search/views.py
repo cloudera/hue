@@ -295,10 +295,14 @@ def index_fields_dynamic(request):
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(name)
 
     result['message'] = ''
-    result['fields'] = [Collection2._make_field(name, properties)
-                        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
-    result['gridlayout_header_fields'] = [Collection2._make_gridlayout_header_field({'name': name}, True)
-                                          for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
+    result['fields'] = [
+        Collection2._make_field(name, properties)
+        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+    ]
+    result['gridlayout_header_fields'] = [
+        Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
+        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+    ]
     result['status'] = 0
   except Exception, e:
     result['message'] = force_unicode(e)
