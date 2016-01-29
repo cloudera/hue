@@ -3131,9 +3131,10 @@
 
       var lastScrollTop = -1;
       var onScroll = function () {
-        if (Math.abs(lastScrollTop - $container.scrollTop()) < incrementLimit * options.minHeight) {
+        if (startIndex > incrementLimit && Math.abs(lastScrollTop - $container.scrollTop()) < (incrementLimit * options.minHeight)) {
           return;
         }
+        lastScrollTop = $container.scrollTop();
         setStartAndEndFromScrollTop();
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
