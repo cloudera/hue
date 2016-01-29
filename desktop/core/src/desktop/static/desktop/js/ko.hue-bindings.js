@@ -66,6 +66,56 @@
     }
   };
 
+  /**
+   * Binding for adding a spinner to the page
+   *
+   * Example:
+   *
+   * <!-- ko hueSpinner: loading --><!-- /ko -->
+   *
+   * Or with options:
+   *
+   * <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+   *
+   */
+  ko.bindingHandlers.hueSpinner = {
+    update: function (element, valueAccessor) {
+      var value = ko.unwrap(valueAccessor);
+
+      var options = {
+        size: 'default',
+        center: false
+      };
+
+      var spin = false;
+      if (ko.isObservable(valueAccessor())) {
+        spin = value();
+      } else {
+        var value = valueAccessor();
+        $.extend(options, value);
+        spin = ko.isObservable(value.spin) ? value.spin() : value.spin;
+      }
+
+      ko.virtualElements.emptyNode(element);
+
+      if (spin) {
+        var container = document.createElement('DIV');
+        container.className = 'hue-spinner';
+        var spinner = document.createElement('I');
+        spinner.className = 'fa fa-spinner fa-spin';
+        if (options.size === 'large') {
+          spinner.className += ' hue-spinner-large';
+        }
+        if (options.center) {
+          spinner.className += ' hue-spinner-center';
+        }
+        container.appendChild(spinner);
+        ko.virtualElements.prepend(element, container);
+      }
+    }
+  };
+  ko.virtualElements.allowedBindings.hueSpinner = true;
+
   ko.bindingHandlers.visibleOnHover = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
