@@ -1059,15 +1059,15 @@ class Document2(models.Model):
     except Document2Permission.DoesNotExist:
       return None
 
-  def share(self, user, name='read', users=None, groups=None, all=False):
+  def share(self, user, name='read', users=None, groups=None):
     with transaction.atomic():
-      self.update_permission(user, name, users, groups, all)
+      self.update_permission(user, name, users, groups)
       # For directories, update all children recursively with same permissions
       for child in self.children.all():
-        child.share(user, name, users, groups, all)
+        child.share(user, name, users, groups)
     return self
 
-  def update_permission(self, user, name='read', users=None, groups=None, all=False):
+  def update_permission(self, user, name='read', users=None, groups=None):
     # TODO check in settings if user can sync, re-share, which perms...
 
     perm, created = Document2Permission.objects.get_or_create(doc=self, perms=name)
@@ -1080,8 +1080,6 @@ class Document2(models.Model):
     if groups is not None:
       perm.groups = groups
 
-    perm.all = all
-
     perm.save()
 
   def _massage_permissions(self):
@@ -1089,8 +1087,8 @@ class Document2(models.Model):
     Returns the permissions for a given document as a dictionary
     """
     permissions = {
-      'read': {'users': [], 'groups': [], 'all': False},
-      'write': {'users': [], 'groups': [], 'all': False}
+      'read': {'users': [], 'groups': []},
+      'write': {'users': [], 'groups': []}
     }
 
     read_perms = self.get_permission(perm='read')
@@ -1176,7 +1174,6 @@ class Document2Permission(models.Model):
 
   users = models.ManyToManyField(auth_models.User, db_index=True, db_table='documentpermission2_users')
   groups = models.ManyToManyField(auth_models.Group, db_index=True, db_table='documentpermission2_groups')
-  all = models.BooleanField(db_index=True, default=False, help_text=_t('Specify users/groups or ALL'))
 
   perms = models.CharField(default=READ_PERM, max_length=10, db_index=True, choices=( # one perm
     (READ_PERM, 'read'),
@@ -1194,8 +1191,7 @@ class Document2Permission(models.Model):
     return {
       self.perms: {
         'users': [{'id': perm_user.id, 'username': perm_user.username} for perm_user in self.users.all()],
-        'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in self.groups.all()],
-        'all': self.all
+        'groups': [{'id': perm_group.id, 'name': perm_group.name} for perm_group in self.groups.all()]
       }
     }
 
@@ -1203,7 +1199,7 @@ class Document2Permission(models.Model):
     """
     Returns true if the given user has permissions based on users, groups, or all flag
     """
-    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all() or self.all
+    return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
 
 
 def get_data_link(meta):
