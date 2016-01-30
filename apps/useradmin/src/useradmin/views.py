@@ -364,8 +364,8 @@ def edit_group(request, name=None):
           'operation': 'CREATE_GROUP',
           'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
         }
-      return list_groups(request)
 
+      return redirect(reverse(list_groups))
   else:
     form = GroupEditForm(instance=instance)
 
@@ -404,8 +404,8 @@ def edit_permission(request, app=None, priv=None):
         'operation': 'EDIT_PERMISSION',
         'operationText': 'Successfully edited permissions: %(app)s/%(priv)s' % {'app': app, 'priv': priv}
       }
-      return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
 
+      return redirect(reverse(list_permissions))
   else:
     form = PermissionsEditForm(instance=instance)
 
