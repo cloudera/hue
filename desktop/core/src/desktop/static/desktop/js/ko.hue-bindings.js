@@ -3131,8 +3131,25 @@
         $element.css('top', top + 'px');
       };
 
+      var afterRender = function () {
+        renderedElements = $element.children();
+        $container.data('busyRendering', false);
+        huePubSub.publish('foreach.visible.update.heights', id);
+      };
+
       var render = function () {
         if (endIndex < 0) {
+          ko.bindingHandlers.template.update(element, function () {
+            return {
+              'foreach': [],
+              'templateEngine': ko.nativeTemplateEngine.instance,
+              'afterRender': function () {
+                // This is called once for each added element (not when elements are removed)
+                clearTimeout(throttle);
+                throttle = setTimeout(afterRender, 0);
+              }
+            };
+          }, allBindings, viewModel, childBindingContext);
           return;
         }
         $container.data('busyRendering', true);
@@ -3141,11 +3158,6 @@
         $parentFVOwnerElement.data('endIndex', endIndex);
         positionList();
 
-        var afterRender = function () {
-          renderedElements = $element.children();
-          $container.data('busyRendering', false);
-          huePubSub.publish('foreach.visible.update.heights', id);
-        };
 
         // This is to ensure that our afterRender is called (the afterRender of KO below isn't called
         // when only elements are removed)
@@ -3244,6 +3256,7 @@
 
       ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], $parentFVOwnerElement.data('disposalFunction'));
 
+      setStartAndEndFromScrollTop();
       render();
     }
   };

@@ -247,6 +247,20 @@ from desktop.views import _ko
       white-space: nowrap;
     }
 
+    .assist-flex-table-search {
+      overflow: hidden;
+      position: relative;
+      flex: 0 0 65px;
+      white-space: nowrap;
+    }
+
+    .assist-flex-search {
+      overflow: hidden;
+      position: relative;
+      flex: 0 0 43px;
+      white-space: nowrap;
+    }
+
     .assist-flex-fill {
       position: relative;
       flex: 1 1 100%;
@@ -536,10 +550,15 @@ from desktop.views import _ko
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-header" data-bind="slideVisible: hasEntries() && isSearchVisible() && ! hasErrors()">
+    <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && ! hasErrors()">
       <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()" style="display: none;">
+      <!-- ko if: hasEntries() && ! loading() && filteredEntries().length == 0 -->
+      <ul class="assist-tables">
+        <li class="assist-entry no-entries">${_('No results found')}</li>
+      </ul>
+      <!-- /ko -->
       <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
         <li class="assist-table pointer" data-bind="visibleOnHover: { selector: '.database-actions' }">
           <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
@@ -562,7 +581,7 @@ from desktop.views import _ko
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
       </div>
     </div>
-    <div class="assist-flex-header" data-bind="slideVisible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
+    <div class="assist-flex-table-search" data-bind="visible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
       <div><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />Tables</label><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />Views</label></div>
       <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
