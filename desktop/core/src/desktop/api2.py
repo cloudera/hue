@@ -85,21 +85,21 @@ def get_documents(request):
   response = {
     'document': document.to_dict(),
     'parent': document.parent_directory.to_dict() if document.parent_directory else None,
-    'children': [],
+    'children': []
   }
 
   # Get children documents if this is a directory
   if document.is_directory:
     directory = Directory.objects.get(id=document.id)
     children = directory.get_children_documents()
-    # Refine results
-    response.update(_refine_documents(request, queryset=children, key="children"))
+    # Filter and order results
+    response.update(_filter_documents(request, queryset=children))
 
-  # Paginate
-  response.update(_paginate(request, queryset=response['children'], key="children"))
-
-  # Serialize Results
-  if response['children']:
+  # Paginate and serialize Results
+  if 'documents' in response:
+    response.update(_paginate(request, queryset=response['documents']))
+    # Rename documents to children
+    response['children'] = response.pop('documents')
     response['children'] = [doc.to_dict() for doc in response['children']]
 
   return JsonResponse(response)
@@ -127,7 +127,7 @@ def get_shared_documents(request):
   documents = Document2.objects.get_shared_documents(request.user, flatten=False)
 
   # Refine results
-  response.update(_refine_documents(request, queryset=documents))
+  response.update(_filter_documents(request, queryset=documents))
 
   # Paginate
   response.update(_paginate(request, queryset=response['documents']))
@@ -354,7 +354,7 @@ def import_documents(request):
     return JsonResponse({'message': stdout.getvalue()})
 
 
-def _refine_documents(request, queryset, key="documents"):
+def _filter_documents(request, queryset):
   """
   Given optional querystring params extracted from the request, filter the given queryset of documents and return a
     dictionary with the refined queryset and filter params
@@ -362,19 +362,20 @@ def _refine_documents(request, queryset, key="documents"):
   :param queryset: Document2 queryset
   :param key: name for key of refined document set
   """
-  documents = []
-  count = 0
   type_filters = request.GET.getlist('type', None)
   sort = request.GET.get('sort', '-last_modified')
   search_text = request.GET.get('text', None)
 
-  if queryset:
-    documents = Document2.objects.refine_documents(documents=queryset, types=type_filters, search_text=search_text,
-                                                   order_by=sort)
-    count = documents.count()
+  documents = Document2.objects.refine_documents(
+    documents=queryset,
+    types=type_filters,
+    search_text=search_text,
+    order_by=sort)
+
+  count = documents.count()
 
   return {
-    key: documents,
+    'documents': documents,
     'count': count,
     'types': type_filters,
     'text': search_text,
@@ -382,7 +383,7 @@ def _refine_documents(request, queryset, key="documents"):
   }
 
 
-def _paginate(request, queryset, key="documents"):
+def _paginate(request, queryset):
   """
   Given optional querystring params extracted from the request, slice the given queryset of documents for the given page
     and limit, and return the updated queryset along with pagination params used.
@@ -393,13 +394,13 @@ def _paginate(request, queryset, key="documents"):
   page = int(request.GET.get('page', 1))
   limit = int(request.GET.get('limit', 0))
 
-  if queryset and limit > 0:
+  if limit > 0:
     offset = (page - 1) * limit
     last = offset + limit
     queryset = queryset.all()[offset:last]
 
   return {
-    key: queryset,
+    'documents': queryset,
     'page': page,
     'limit': limit
   }

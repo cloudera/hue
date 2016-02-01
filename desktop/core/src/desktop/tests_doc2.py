@@ -110,22 +110,34 @@ class TestDocument2(object):
 
 
   def test_directory_move(self):
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mv')})
-    data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
+    source_dir = Directory.objects.create(name='test_mv', owner=self.user, parent_directory=self.home_dir)
+    target_dir = Directory.objects.create(name='test_mv_dst', owner=self.user, parent_directory=self.home_dir)
+    doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=source_dir)
 
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_mv_dst')})
+    # Verify original paths before move operation
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
+    assert_equal('/test_mv', data['path'])
+
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal('/test_mv/query1.sql', data['path'])
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv').uuid),
         'destination_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv_dst').uuid)
     })
     data = json.loads(response.content)
-
     assert_equal(0, data['status'], data)
-    assert_equal(Directory.objects.get(name='test_mv', owner=self.user).path, '/test_mv_dst/test_mv')
+
+    # Verify that the paths are updated
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': source_dir.uuid})
+    data = json.loads(response.content)
+    assert_equal('/test_mv_dst/test_mv', data['path'])
+
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal('/test_mv_dst/test_mv/query1.sql', data['path'])
 
 
   def test_directory_children(self):
