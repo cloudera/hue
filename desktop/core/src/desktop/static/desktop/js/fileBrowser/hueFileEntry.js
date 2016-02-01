@@ -201,6 +201,13 @@
     self.selected(! self.selected());
   };
 
+  HueFileEntry.prototype.openSelected = function () {
+    var self = this;
+    if (self.selectedEntries().length === 1) {
+      self.selectedEntry().open();
+    }
+  };
+
   HueFileEntry.prototype.open = function () {
     var self = this;
     if (self.definition.type === 'directory') {
