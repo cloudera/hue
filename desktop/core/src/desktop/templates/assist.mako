@@ -367,7 +367,6 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-inner-panel">
-    ##<div class="assist-inner-panel" data-bind="event: { 'scroll': function (data, event) { if (selectedSource()) { selectedSource().repositionActions(data, event); } } }">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
       <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
@@ -402,56 +401,57 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-hdfs-inner-panel">
     <div class="assist-inner-panel">
-      <!-- ko with: selectedHdfsEntry -->
-      <div class="assist-breadcrumb">
-        <!-- ko if: parent !== null -->
-        <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
-          <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-          <i class="fa fa-folder" style="font-size: 14px; line-height: 16px; vertical-align: top;"></i>
-          <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-        </a>
-        <!-- /ko -->
-        <!-- ko if: parent === null -->
-        <div>
-          <i class="fa fa-folder" style="font-size: 14px; line-height: 16px;vertical-align: top;"></i>
-          <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      <div class="assist-flex-panel">
+        <!-- ko with: selectedHdfsEntry -->
+        <div class="assist-flex-header assist-breadcrumb">
+          <!-- ko if: parent !== null -->
+          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
+            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+            <i class="fa fa-folder" style="font-size: 14px; line-height: 16px; vertical-align: top;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </a>
+          <!-- /ko -->
+          <!-- ko if: parent === null -->
+          <div>
+            <i class="fa fa-folder" style="font-size: 14px; line-height: 16px;vertical-align: top;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </div>
+          <!-- /ko -->
+        </div>
+        <div class="assist-flex-fill assist-hdfs-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors()">
+            <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-hdfs-scrollable' }">
+              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+                <div class="assist-actions table-actions" style="opacity: 0;" >
+                  <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
+                    <i class='fa fa-info' title="${ _('Details') }"></i>
+                  </a>
+                </div>
+
+                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+                  <!-- ko if: definition.type === 'dir' -->
+                  <i class="fa fa-fw fa-folder muted valign-middle"></i>
+                  <!-- /ko -->
+                  <!-- ko if: definition.type === 'file' -->
+                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- ko if: !loading() && entries().length === 0 -->
+            <ul class="assist-tables">
+              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+            </ul>
+            <!-- /ko -->
+          </div>
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
         </div>
         <!-- /ko -->
       </div>
-      <ul class="nav assist-stretchable-list" data-bind="stretchDown">
-        <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-
-        <li data-bind="visible: ! hasErrors()">
-          <ul class="assist-tables" data-bind="hueach: {data: entries, itemHeight: 20, scrollable: '.assist-stretchable-list', considerStretching: true}">
-            <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-              <div class="assist-actions table-actions" style="opacity: 0;" >
-                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
-                  <i class='fa fa-info' title="${ _('Details') }"></i>
-                </a>
-              </div>
-
-              <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
-                <!-- ko if: definition.type === 'dir' -->
-                <i class="fa fa-fw fa-folder muted valign-middle"></i>
-                <!-- /ko -->
-                <!-- ko if: definition.type === 'file' -->
-                <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-                <!-- /ko -->
-                <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'' }"></span>
-              </a>
-            </li>
-          </ul>
-          <!-- ko if: !loading() && entries().length === 0 -->
-          <ul class="assist-tables">
-            <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
-          </ul>
-          <!-- /ko -->
-        </li>
-        <li class="assist-errors" data-bind="visible: hasErrors">
-          <span>${ _('Error loading contents.') }</span>
-        </li>
-      </ul>
-      <!-- /ko -->
     </div>
   </script>
 
