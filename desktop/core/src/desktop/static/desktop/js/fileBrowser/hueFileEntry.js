@@ -50,6 +50,11 @@
 
     self.document = ko.observable();
 
+    self.isShared = ko.pureComputed(function () {
+      var perms = self.definition().perms;
+      return perms && (perms.read.users.length || perms.read.groups.length || perms.write.users.length || perms.write.groups.length);
+    });
+
     self.entriesToDelete = ko.observableArray();
 
     self.selected = ko.observable(false);
@@ -95,8 +100,16 @@
     }
   };
 
-  HueFileEntry.prototype.showSharingModal = function () {
+  HueFileEntry.prototype.showSharingModal = function (entry) {
     var self = this;
+    if (entry) {
+      $.each(self.selectedEntries(), function (idx, otherEntry) {
+        if (otherEntry !== entry) {
+          otherEntry.selected(false);
+        }
+      });
+      entry.selected(true);
+    }
     if (self.selectedEntry()) {
       if (! self.selectedEntry().document()) {
         self.selectedEntry().loadDocument();
