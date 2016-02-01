@@ -489,7 +489,7 @@ from desktop.views import _ko
 
 
       <div class="fb-list" data-bind="with: activeEntry">
-        <ul data-bind="foreach: { data: entries, itemHeight: 39, scrollableElement: '.fb-list' }">
+        <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, folderDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div style="width: 100%; height: 100%" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
