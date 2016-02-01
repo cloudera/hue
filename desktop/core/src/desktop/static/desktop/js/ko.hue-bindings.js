@@ -2968,7 +2968,7 @@
     update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
       var $element = $(element);
-      var $container = $(options.container);
+      var $container = $element.closest(options.container);
 
       var id = Math.random();
 
