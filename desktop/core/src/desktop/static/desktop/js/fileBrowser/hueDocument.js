@@ -139,7 +139,7 @@
     };
 
     $.post("/desktop/api2/doc/share", {
-      doc_id: self.fileEntry.definition.id,
+      doc_id: self.fileEntry.definition().id,
       data: JSON.stringify(postPerms)
     }, function (response) {
       if (response != null) {
@@ -165,7 +165,7 @@
 
     var fetchFunction = function () {
       self.assistHelper.fetchDocument({
-        docId: self.fileEntry.definition.id,
+        docId: self.fileEntry.definition().id,
         successCallback: function (data) {
           self.prettifyUserNames(data.perms.write.users);
           self.prettifyUserNames(data.perms.read.users);

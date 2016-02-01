@@ -473,10 +473,10 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
 
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition.isSearchResult">
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult">
         ${ _('The current folder is empty. You can add a new file or folder form the top right menu.')}
       </div>
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && definition.isSearchResult">
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && definition().isSearchResult">
         ${ _('No documents found matching your query.')}
       </div>
       <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
