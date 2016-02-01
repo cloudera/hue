@@ -389,8 +389,8 @@ ${ assist.assistPanel() }
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>
             <th>&nbsp;</th>
             <th>${ _('Table Name') }</th>
-            <th>${ _('Comment') }</th>
-            <th>${ _('Type') }</th>
+            <th width="50%">${ _('Comment') }</th>
+            <th width="1%">${ _('Type') }</th>
           </tr>
           </thead>
           <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 277}">
@@ -411,7 +411,7 @@ ${ assist.assistPanel() }
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
               <td data-bind="text: comment"></td>
-              <td>
+              <td class="center">
                 <!-- ko if: type == 'Table' -->
                   <i class="fa fa-fw fa-table muted" title="${ _('Table') }"></i>
                 <!-- /ko -->

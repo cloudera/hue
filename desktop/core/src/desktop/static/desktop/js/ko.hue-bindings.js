@@ -3219,13 +3219,13 @@
       };
 
       var renderThrottle = -1;
-
       var lastScrollTop = -1;
       var onScroll = function () {
-        if (startIndex > incrementLimit && Math.abs(lastScrollTop - $container.scrollTop()) < (incrementLimit * options.minHeight)) {
+        var scrollTop = $container.data('scrollTop') || $container.scrollTop();
+        if (startIndex > incrementLimit && Math.abs(lastScrollTop - scrollTop) < (incrementLimit * options.minHeight)) {
           return;
         }
-        lastScrollTop = $container.scrollTop();
+        lastScrollTop = scrollTop;
         setStartAndEndFromScrollTop();
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
@@ -3324,8 +3324,9 @@
       var render = function () {
         if ($parent.parents('.hueach').length === 0) {
           var heightCorrection = 0, fluidCorrection = 0;
+          var scrollTop = wrappable.data('scrollTop') || $parent.parents(scrollable).scrollTop();
           if (wrappable.is('table')) {
-            if ($parent.parents(scrollable).scrollTop() < scrollableOffset + itemHeight) {
+            if (scrollTop < scrollableOffset + itemHeight) {
               wrappable.find('thead').css('opacity', '1');
             }
             else {
@@ -3345,7 +3346,7 @@
               fluidCorrection = ko.utils.domData.get(element, 'heightCorrection') - 20;
             }
           }
-          startItem = Math.max(0, Math.floor(Math.max(1, ($parent.parents(scrollable).scrollTop() - heightCorrection - fluidCorrection - scrollableOffset)) / itemHeight) - 10);
+          startItem = Math.max(0, Math.floor(Math.max(1, (scrollTop - heightCorrection - fluidCorrection - scrollableOffset)) / itemHeight) - 10);
           if (wrappable.is('table') && startItem % 2 == 1) {
             startItem--;
           }
@@ -3360,6 +3361,7 @@
         }
         ko.bindingHandlers.foreach.update(element, valueAccessorBuilder, allBindings, viewModel, bindingContext);
       }
+
 
       $parent.parents(scrollable).off('scroll');
       $parent.parents(scrollable).on('scroll', render);
@@ -3396,6 +3398,32 @@
   ko.bindingHandlers.floatlabel = {
     init: function (element, valueAccessor, allBindings) {
       $(element).floatlabel();
+    }
+  };
+
+  ko.bindingHandlers.customScrollbar = {
+    init: function (element, valueAccessor, allBindings) {
+      $(element).mCustomScrollbar({
+        autoHideScrollbar: true,
+        theme: 'minimal-dark',
+        autoExpandScrollbar: true,
+        callbacks: {
+          onInit: function () {
+            huePubSub.publish('customScrollbar.init', {
+              element: element,
+              mcs: this.mcs
+            });
+            $(element).trigger('scroll');
+          },
+          whileScrolling: function () {
+            huePubSub.publish('customScrollbar.scroll', {
+              element: element,
+              mcs: this.mcs
+            });
+            $(element).trigger('scroll');
+          }
+        }
+      });
     }
   };
 
