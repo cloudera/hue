@@ -21,7 +21,8 @@ import logging
 from django.db import transaction
 
 from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
-from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException, import_saved_beeswax_query
+from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission, \
+    FilesystemException, import_saved_beeswax_query
 from oozie.models import Workflow
 from pig.models import PigScript
 
@@ -51,15 +52,15 @@ class DocumentConverter(object):
         data = notebook.get_data()
         doc2 = self._create_doc2(
             document=doc,
-            parent=self._get_parent_directory(doc),
-            name=data['name'],
             doctype=data['type'],
+            name=data['name'],
             description=data['description'],
             data=notebook.get_json()
         )
         self.imported_docs.append(doc2)
 
     # Convert Workflow documents
+    # TODO: Change this logic to actually embed the workflow data in Doc2 instead of linking to old workflow
     docs = self._get_unconverted_docs(Workflow)
     for doc in docs:
       if doc.content_object:
@@ -67,8 +68,6 @@ class DocumentConverter(object):
         data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
         doc2 = self._create_doc2(
             document=doc,
-            parent=self._get_parent_directory(doc),
-            name=doc.name,
             doctype='link-workflow',
             description=doc.description,
             data=json.dumps(data)
@@ -76,6 +75,7 @@ class DocumentConverter(object):
         self.imported_docs.append(doc2)
 
     # Convert PigScript documents
+    # TODO: Change this logic to actually embed the pig data in Doc2 instead of linking to old pig script
     docs = self._get_unconverted_docs(PigScript)
     for doc in docs:
       if doc.content_object:
@@ -83,8 +83,6 @@ class DocumentConverter(object):
         data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
         doc2 = self._create_doc2(
             document=doc,
-            parent=self._get_parent_directory(doc),
-            name=doc.name,
             doctype='link-pigscript',
             description=doc.description,
             data=json.dumps(data)
@@ -108,24 +106,47 @@ class DocumentConverter(object):
 
 
   def _get_parent_directory(self, document):
+    """
+    Returns the parent directory object that should be used for a given document. If the document is tagged with a
+        project name (non-RESERVED DocumentTag), a Directory object with the first project tag found is returned.
+        Otherwise, the owner's home directory is returned.
+    """
     parent_dir = self.home_dir
     project_tags = document.tags.exclude(tag__in=DocumentTag.RESERVED)
     if project_tags.exists():
       first_tag = project_tags[0]
-      parent_dir = Directory.objects.get_or_create(owner=self.user, name=first_tag.tag, parent_directory=self.home_dir)
+      parent_dir, created = Directory.objects.get_or_create(
+          owner=self.user,
+          name=first_tag.tag,
+          parent_directory=self.home_dir
+      )
     return parent_dir
 
 
-  def _create_doc2(self, document, parent, name, doctype, description=None, data=None):
+  def _sync_permissions(self, document, document2):
+    """
+    Syncs (creates) Document2Permissions based on the DocumentPermissions found for a given document.
+    """
+    doc_permissions = DocumentPermission.objects.filter(doc=document)
+    for perm in doc_permissions:
+      doc2_permission, created = Document2Permission.objects.get_or_create(doc=document2, perms=perm.perms)
+      if perm.users:
+        doc2_permission.users.add(*perm.users.all())
+      if perm.groups:
+        doc2_permission.groups.add(*perm.groups.all())
+
+
+  def _create_doc2(self, document, doctype, name=None, description=None, data=None):
     with transaction.atomic():
-      doc2 = Document2.objects.create(
+      document2 = Document2.objects.create(
         owner=self.user,
-        parent_directory=parent,
-        name=name,
+        parent_directory=self._get_parent_directory(document),
+        name=name if name else document.name,
         type=doctype,
         description=description,
         data=data
       )
+      self._sync_permissions(document, document2)
       document.add_tag(self.imported_tag)
       document.save()
-      return doc2
+      return document2
