@@ -247,7 +247,8 @@
         successCallback: function(data) {
           self.definition(data.directory);
           self.hasErrors(false);
-          self.entries($.map(data.documents, function (definition) {
+
+          var newEntries = $.map(data.documents, function (definition) {
             return new HueFileEntry({
               activeEntry: self.activeEntry,
               assistHelper: self.assistHelper,
@@ -255,7 +256,18 @@
               app: self.app,
               parent: self
             })
-          }));
+          });
+
+          newEntries.sort(function (a, b) {
+            if (a.isDirectory && !b.isDirectory) {
+              return -1;
+            }
+            if (b.isDirectory && !a.isDirectory) {
+              return 1;
+            }
+            return a.name.localeCompare(b.name);
+          });
+          self.entries(newEntries);
           if (! self.parent && data.parent) {
             self.parent = new HueFileEntry({
               activeEntry: self.activeEntry,
