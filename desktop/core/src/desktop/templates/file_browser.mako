@@ -606,6 +606,12 @@ from desktop.views import _ko
 
               dragToSelect = ! boundEntry.selected();
 
+              huePubSub.publish('file.browser.dragging', {
+                selectedEntries: selectedEntries,
+                originEntry: boundEntry.parent,
+                dragToSelect: dragToSelect
+              });
+
               dragStartX = event.clientX;
               dragStartY = event.clientY;
 

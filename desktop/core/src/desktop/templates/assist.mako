@@ -119,6 +119,15 @@ from desktop.views import _ko
       white-space: nowrap;
     }
 
+    .assist-file-entry {
+      margin-right: 15px;
+      border: 1px solid transparent;
+    }
+
+    .assist-file-entry-drop {
+      border: 1px solid #338BB8 !important;
+    }
+
     .assist-tables {
       margin-left: 3px;
     }
@@ -200,6 +209,15 @@ from desktop.views import _ko
       top: 0;
       right: 0;
       padding-right: 17px;
+      padding-left:4px;
+      background-color: #FFF;
+    }
+
+    .assist-file-actions  {
+      position:absolute;
+      top: 0;
+      right: 0;
+      padding-right: 2px;
       padding-left:4px;
       background-color: #FFF;
     }
@@ -496,8 +514,8 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
          <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
-           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-             <div class="assist-actions table-actions" style="opacity: 0;" >
+           <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+             <div class="assist-file-actions table-actions" style="opacity: 0;" >
                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
                  <i class='fa fa-info' title="${ _('Details') }"></i>
                </a>
@@ -702,6 +720,34 @@ from desktop.views import _ko
         factory(ko, AssistDbSource, AssistHdfsEntry, AssistHelper, HueFileEntry);
       }
     }(function (ko, AssistDbSource, AssistHdfsEntry, AssistHelper, HueFileEntry) {
+
+      ko.bindingHandlers.assistFileDroppable = {
+        init: function(element, valueAccessor, allBindings, boundEntry) {
+          var dragData;
+          huePubSub.subscribe('file.browser.dragging', function (data) {
+            dragData = data;
+          });
+          var $element = $(element);
+          if (boundEntry.isDirectory) {
+            $element.droppable({
+              drop: function () {
+                if (!dragData.dragToSelect) {
+                  boundEntry.moveHere(dragData.selectedEntries);
+                  dragData.originEntry.load();
+                }
+              },
+              over: function () {
+                if (!dragData.dragToSelect) {
+                  $element.addClass('assist-file-entry-drop');
+                }
+              },
+              out: function () {
+                $element.removeClass('assist-file-entry-drop');
+              }
+            })
+          }
+        }
+      };
 
       /**
        * @param {Object} options
