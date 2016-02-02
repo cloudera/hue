@@ -156,7 +156,11 @@ from desktop.views import _ko
       padding-left: 0px;
     }
 
-    .assist-breadcrumb a  {
+    .assist-breadcrumb span {
+      color: #737373;
+    }
+
+    .assist-breadcrumb a {
       cursor: pointer;
       text-decoration: none;
       color: #737373;
@@ -407,13 +411,13 @@ from desktop.views import _ko
           <!-- ko if: parent !== null -->
           <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
             <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-            <i class="fa fa-folder" style="font-size: 14px; line-height: 16px; vertical-align: top;"></i>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
             <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
           </a>
           <!-- /ko -->
           <!-- ko if: parent === null -->
           <div>
-            <i class="fa fa-folder" style="font-size: 14px; line-height: 16px;vertical-align: top;"></i>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
             <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
           </div>
           <!-- /ko -->
@@ -430,7 +434,7 @@ from desktop.views import _ko
 
                 <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
                   <!-- ko if: definition.type === 'dir' -->
-                  <i class="fa fa-fw fa-folder muted valign-middle"></i>
+                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
                   <!-- /ko -->
                   <!-- ko if: definition.type === 'file' -->
                   <i class="fa fa-fw fa-file-o muted valign-middle"></i>
