@@ -1027,7 +1027,7 @@ class Document2(models.Model):
     # Validate document name
     invalid_chars = re.compile(r"[<>/{}[\]~`]");
     if invalid_chars.search(self.name):
-      raise FilesystemException(_('Document name contains an invalid character.'))
+      raise FilesystemException(_('Document %s contains an invalid character.') % self.name)
 
     # Validate that directories cannot have same name and parent
     if self.is_directory:
@@ -1044,8 +1044,8 @@ class Document2(models.Model):
 
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
     if self.name in ['', Document2.TRASH_DIR] and \
-       Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
-      raise FilesystemException(_('Cannot create or modify the home or .Trash directory.'))
+          Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
+      raise FilesystemException(_('Cannot create directory with name %s') % self.name)
 
   def move(self, directory, user):
     if not directory.is_directory:
