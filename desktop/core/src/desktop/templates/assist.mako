@@ -488,7 +488,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="file-details-title">
-    <span data-bind="text: name"></span>
+    <span data-bind="text: definition().name"></span>
   </script>
 
   <script type="text/html" id="assist-file-panel">
@@ -498,7 +498,7 @@ from desktop.views import _ko
       <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
         <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
         <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: name"></span>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition().name"></span>
       </a>
       <!-- /ko -->
 
@@ -520,19 +520,19 @@ from desktop.views import _ko
                  <i class='fa fa-info' title="${ _('Details') }"></i>
                </a>
              </div>
-             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: makeActive, dblClick: open }, attr: {'title': name }">
+             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
                <!-- ko if: isDirectory -->
                <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
                <!-- /ko -->
                <!-- ko ifnot: isDirectory -->
                <i class="fa fa-fw fa-file-o muted valign-middle"></i>
                <!-- /ko -->
-               <span data-bind="text: name"></span>
+               <span data-bind="text: definition().name"></span>
              </a>
            </li>
          </ul>
       </div>
-      <div data-bind="visible:  !loading() && ! hasErrors() && entries().length === 0">
+      <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
         <span style="font-style: italic;">${_('Empty directory')}</span>
       </div>
       <div class="center" data-bind="visible: loading() && ! hasErrors()">
