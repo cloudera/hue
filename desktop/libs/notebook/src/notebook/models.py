@@ -18,6 +18,7 @@
 import json
 import math
 import numbers
+import uuid
 
 from django.utils.html import escape
 
@@ -71,7 +72,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'snippets': [
       {
          'status': status,
-         'id': 'e8b323b3-88ef-3a84-6264-af11fa5fbefb',
+         'id': str(uuid.uuid4()),
          'statement_raw': statement,
          'statement': statement,
          'type': editor_type,
