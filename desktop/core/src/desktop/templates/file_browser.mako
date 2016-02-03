@@ -108,7 +108,7 @@ from desktop.views import _ko
       display: inline-block;
       position: absolute;
       right: 10px;
-      top: 5px;
+      top: 14px;
       height: 50px;
       line-height: 50px;
     }
@@ -256,7 +256,7 @@ from desktop.views import _ko
 
     .fb-search-container {
       position: absolute;
-      top: 17px;
+      top: 26px;
       right: 300px;
       opacity: 0;
 
@@ -432,13 +432,14 @@ from desktop.views import _ko
               <!-- /ko -->
             </ul>
           </div>
-          <div class="fb-search-container" data-bind="css: { 'fb-search-visible' : searchVisible() }">
-            <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="textInput: searchQuery, clearable: searchQuery">
-          </div>
-          <!-- ko with: activeEntry -->
-          <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
-            <!-- ko if: app === 'documents' -->
+        </h4>
+        <div class="fb-search-container" data-bind="css: { 'fb-search-visible' : searchVisible() }">
+          <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="textInput: searchQuery, clearable: searchQuery">
+        </div>
+        <!-- ko with: activeEntry -->
+        <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
+          <!-- ko if: app === 'documents' -->
             <span class="dropdown">
               <a class="inactive-action fb-action" data-toggle="dropdown" href="javascript:void(0);"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 6px; margin-top: 6px;"></i></span></a>
               <ul class="dropdown-menu" style="margin-top:10px; width: 175px;" role="menu">
@@ -461,17 +462,16 @@ from desktop.views import _ko
                 % endif
               </ul>
             </span>
-            <!-- /ko -->
-            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showDeleteConfirmation, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
-            <!-- ko if: app === 'documents' -->
-            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal, css: { 'disabled': selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i></a>
-            <!-- /ko -->
-            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
-            <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
-          </div>
           <!-- /ko -->
-        </h4>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showDeleteConfirmation, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
+          <!-- ko if: app === 'documents' -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showSharingModal, css: { 'disabled': selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i></a>
+          <!-- /ko -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
+        </div>
+        <!-- /ko -->
       </div>
 
       <!-- ko with: activeEntry -->
