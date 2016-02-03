@@ -113,9 +113,12 @@ from desktop.views import _ko
       line-height: 50px;
     }
 
+    .fb-list {
+      padding: 4px 0;
+    }
+
     .fb-list ul {
       list-style: none;
-      padding: 4px 0;
       margin: 0;
     }
 
