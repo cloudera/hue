@@ -284,7 +284,8 @@ from desktop.views import _ko
     </div>
 
     <div id="shareDocumentModal" class="modal hide fade">
-      <!-- ko with: activeEntry().selectedEntry() -->
+      <!-- ko with: activeEntry -->
+      <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -353,6 +354,7 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
       <!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div id="importDocumentsModal" class="modal hide fade fileupload-modal">
@@ -373,7 +375,7 @@ from desktop.views import _ko
             <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
             <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
             ${ csrf_token(request) | n,unicode }
-            <input type="hidden" name="path" data-bind="value: path" />
+            <input type="hidden" name="path" data-bind="value: definition().path" />
           </form>
         </div>
         <div class="modal-footer">
@@ -406,7 +408,7 @@ from desktop.views import _ko
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times</a>
         <h3>${ _('Do you really want to delete') }
-          <!-- ko if: entriesToDelete().length == 1 --> <span data-bind="text: entriesToDelete()[0].name"></span><!-- /ko -->
+          <!-- ko if: entriesToDelete().length == 1 --> <span data-bind="text: entriesToDelete()[0].definition().name"></span><!-- /ko -->
           <!-- ko if: entriesToDelete().length > 1 --> <span data-bind="text: entriesToDelete().length"></span> ${ _('entries') }<!-- /ko -->
         ?</h3>
       </div>
@@ -427,11 +429,11 @@ from desktop.views import _ko
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><div class="fb-drop-target" data-bind="folderDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot ? '${ _('My documents') }' : name, click: open"></a></div></li>
+              <li><div class="fb-drop-target" data-bind="folderDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : definition().name, click: open"></a></div></li>
               <li class="divider">&gt;</li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
-              <li class="active"><div class="fb-drop-target" data-bind="text: name"></div></li>
+              <li class="active"><div class="fb-drop-target" data-bind="text: definition().name"></div></li>
               <!-- /ko -->
             </ul>
           </div>
@@ -516,8 +518,8 @@ from desktop.views import _ko
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
               </ul>
               <div class="fb-primary-col">
-                <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : isDirectory, 'fa-file-o': ! isDirectory }"></i>
-                <a href="javascript: void(0);" data-bind="text: name, click: open"></a>
+                <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : isDirectory, 'fa-file-o': ! isDirectory() }"></i>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open"></a>
               </div>
               <div class="fb-attr-group">
                 <div class="fb-attr-col fb-share"><i class="fa fa-fw fa-users fb-shared-icon" data-bind="click: function (entry, event) { $parent.showSharingModal($data); event.stopPropagation(); }, css: { 'fb-shared-icon-active': isShared }"></i></div>
@@ -557,7 +559,7 @@ from desktop.views import _ko
             alreadySelected = boundEntry.selected();
             dragToSelect = value;
           });
-          if (boundEntry.isDirectory) {
+          if (boundEntry.isDirectory()) {
             $element.droppable({
               drop: function (ev, ui) {
                 if (! dragToSelect) {
@@ -637,7 +639,7 @@ from desktop.views import _ko
                   $helper.find('.drag-text').text(selectedEntries.length + ' ${ _('selected') }');
                   $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
                 } else {
-                  $helper.find('.drag-text').text(boundEntry.name);
+                  $helper.find('.drag-text').text(boundEntry.definition().name);
                   $helper.find('i').removeClass().addClass($element.find('.fb-primary-col i').attr('class'));
                 }
 
