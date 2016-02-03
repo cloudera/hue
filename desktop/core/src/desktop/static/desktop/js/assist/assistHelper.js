@@ -256,14 +256,14 @@
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
-   * @param {number} options.docId
+   * @param {number} options.uuid
    */
   AssistHelper.prototype.fetchDocument = function (options) {
     var self = this;
     $.ajax({
       url: DOCUMENT_API,
       data: {
-        uuid: options.docId
+        uuid: options.uuid
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
