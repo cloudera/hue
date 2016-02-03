@@ -1045,7 +1045,7 @@ class Document2(models.Model):
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
     if self.name in ['', Document2.TRASH_DIR] and \
           Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():
-      raise FilesystemException(_('Cannot create directory with name %s') % self.name)
+      raise FilesystemException(_('Cannot create or modify directory with name: %s') % self.name)
 
   def move(self, directory, user):
     if not directory.is_directory:

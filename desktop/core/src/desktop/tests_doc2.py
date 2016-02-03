@@ -244,7 +244,7 @@ class TestDocument2(object):
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps(Document2.TRASH_DIR)})
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
-    assert_equal('Cannot create or modify the home or .Trash directory.', data['message'])
+    assert_equal('Cannot create or modify directory with name: .Trash', data['message'])
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(self.home_dir.uuid),
@@ -252,7 +252,7 @@ class TestDocument2(object):
     })
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
-    assert_equal('Cannot create or modify the home or .Trash directory.', data['message'])
+    assert_equal('Cannot create or modify directory with name: ', data['message'])
 
     trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
     response = self.client.post('/desktop/api2/doc/move', {
@@ -261,7 +261,7 @@ class TestDocument2(object):
     })
     data = json.loads(response.content)
     assert_equal(-1, data['status'], data)
-    assert_equal('Cannot create or modify the home or .Trash directory.', data['message'])
+    assert_equal('Cannot create or modify directory with name: .Trash', data['message'])
 
 
 class TestDocument2Permissions(object):
