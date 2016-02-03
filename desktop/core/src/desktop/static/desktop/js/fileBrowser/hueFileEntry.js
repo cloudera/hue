@@ -42,13 +42,17 @@
     self.parent = options.parent;
     self.definition = ko.observable(options.definition);
     self.assistHelper = options.assistHelper;
-    self.name = self.definition().name.substring(self.definition().name.lastIndexOf('/') + 1);
-    self.isRoot = self.name === '';
-    self.isDirectory = self.definition().type === 'directory';
-    self.path = self.definition().name;
     self.app = options.app;
 
     self.document = ko.observable();
+
+    self.isRoot = ko.pureComputed(function () {
+      return self.definition().name === '';
+    });
+
+    self.isDirectory = ko.pureComputed(function () {
+      return self.definition().type === 'directory';
+    });
 
     self.isShared = ko.pureComputed(function () {
       var perms = self.definition().perms;
@@ -82,12 +86,15 @@
       return null;
     });
 
-    self.breadcrumbs = [];
-    var lastParent = self.parent;
-    while (lastParent) {
-      self.breadcrumbs.unshift(lastParent);
-      lastParent = lastParent.parent;
-    }
+    self.breadcrumbs = ko.pureComputed(function () {
+      var result = [];
+      var lastParent = self.parent;
+      while (lastParent) {
+        result.unshift(lastParent);
+        lastParent = lastParent.parent;
+      }
+      return result;
+    });
   }
 
   HueFileEntry.prototype.beforeContextOpen = function () {
@@ -259,13 +266,13 @@
           });
 
           newEntries.sort(function (a, b) {
-            if (a.isDirectory && ! b.isDirectory) {
+            if (a.isDirectory() && ! b.isDirectory()) {
               return -1;
             }
-            if (b.isDirectory && ! a.isDirectory) {
+            if (b.isDirectory() && ! a.isDirectory()) {
               return 1;
             }
-            return a.name.localeCompare(b.name);
+            return a.definition().name.localeCompare(b.definition().name);
           });
           self.entries(newEntries);
           if (! self.parent && data.parent) {

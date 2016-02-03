@@ -55,49 +55,67 @@
     };
   }
 
+  HomeViewModel.prototype.openUuid = function (uuid) {
+    var self = this;
+    self.activeEntry(undefined);
+    var entry = new HueFileEntry({
+      activeEntry: self.activeEntry,
+      assistHelper: self.assistHelper,
+      app: 'documents',
+      definition: {
+        uuid: location.getParameter('uuid'),
+        name: 'unknown',
+        type: 'directory',
+        path: '/unknown'
+      }
+    });
+
+    var lastParent = entry;
+
+    var loadParents = function () {
+      if (lastParent.parent) {
+        lastParent = lastParent.parent;
+        lastParent.load(loadParents);
+      } else {
+        self.activeEntry(entry);
+      }
+    };
+
+    entry.load(loadParents);
+  };
+
   HomeViewModel.prototype.openPath = function (path) {
     var self = this;
     var parts = path.split('/');
     parts.shift(); // Remove root
-    self.activeEntry(null);
+    self.activeEntry(undefined);
     var lastChild = new HueFileEntry({
       activeEntry: self.activeEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
-        name: '/',
-        type: 'directory'
+        name: '',
+        type: 'directory',
+        path: '/'
       }
     });
-    $.each(parts, function (idx, part) {
-      if (part === '') {
-        return false;
-      }
-      lastChild = new HueFileEntry({
-        activeEntry: self.activeEntry,
-        assistHelper: self.assistHelper,
-        parent: lastChild,
-        app: 'documents',
-        definition: {
-          name: lastChild.isRoot ? '/' + part : lastChild.definition.name + '/' + part,
-          type: 'directory'
-        }
-      })
-    });
-    self.activeEntry(lastChild);
 
-    self.activeEntry().load(function () {
-      var currentParent = lastChild.parent;
-      var loadParent = function () {
-        if (currentParent) {
-          currentParent.load(function () {
-            currentParent = currentParent.parent;
-            loadParent();
-          });
+    var loadDeep = function () {
+      if (parts.length > 0) {
+        var targetDir = parts.shift();
+        var foundDirs = $.grep(lastChild.entries(), function (entry) {
+          return entry.definition().name === targetDir;
+        });
+        if (foundDirs.length === 1) {
+          lastChild = foundDirs[0];
+          lastChild.load(loadDeep);
+          return;
         }
-      };
-      loadParent();
-    });
+      }
+      self.activeEntry(lastChild);
+    };
+
+    lastChild.load(loadDeep);
   };
 
   return HomeViewModel;

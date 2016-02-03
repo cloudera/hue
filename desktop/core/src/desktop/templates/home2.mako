@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare2, commonimportexport, _ko
+  from desktop.views import commonheader, commonfooter, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -194,19 +194,6 @@ ${ fileBrowser.fileBrowser() }
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible, splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }" style="display:none;"><div class="resize-bar">&nbsp;</div></div>
       <div class="right-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">
-##         <div class="home-header">
-##           <input id="searchInput" type="text" placeholder="${ _('Search for name, description, etc...') }" class="input-xlarge search-query" style="margin-left: 20px;margin-top: 5px">
-##           <input data-bind="value: shareFormDocId" placeholder="doc id, e.g. 50491" />
-##           <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ prepareShareModal(e) },
-##             attr: {'data-original-title': '${ _ko("Share") } ' + name}">
-##             <i class="fa fa-users"></i> ${ _('Share') }
-##           </a>
-##
-##           <input data-bind="value: exportFormDocIds" placeholder="doc id, e.g. 50491,50492" />
-##           <a class="share-link btn" data-bind="click: exportDocuments">
-##             <i class="fa fa-download"></i> ${ _('Export') }
-##           </a>
-##         </div>
         <div class="file-browser" data-bind="component: {
           name: 'file-browser',
           params: {
@@ -225,9 +212,6 @@ ${ fileBrowser.fileBrowser() }
     <td data-bind="text: ko.mapping.toJSON($data)"></td>
   </tr>
 </script>
-
-## ${ commonshare2() | n,unicode }
-## ${ commonimportexport(request) | n,unicode }
 
 <script type="text/javascript" charset="utf-8">
   require([
@@ -258,27 +242,24 @@ ${ fileBrowser.fileBrowser() }
 
       var viewModel = new HomeViewModel(options);
 
-      viewModel.activeEntry.subscribe(function (newEntry) {
-        hueUtils.changeURL('/home?path=' + newEntry.path);
-      });
       var loadUrlParam = function () {
-        if (location.getParameter('path')) {
+        if (location.getParameter('uuid')) {
+          viewModel.openUuid(location.getParameter('uuid'));
+        } else if (location.getParameter('path')) {
           viewModel.openPath(location.getParameter('path'));
         }
       };
       window.onpopstate = loadUrlParam;
       loadUrlParam();
 
+      viewModel.activeEntry.subscribe(function (newEntry) {
+        if (newEntry.definition().uuid) {
+          hueUtils.changeURL('/home?uuid=' + newEntry.definition().uuid);
+        }
+      });
+
       ko.applyBindings(viewModel, $('#documentList')[0]);
 
-##       ShareViewModel.initSharing("#documentShareModal");
-##       shareViewModel.setDocId(-1);
-##
-##
-##       prepareShareModal = function(job) {
-##         shareViewModel.setDocId(viewModel.shareFormDocId());
-##         openShareModal();
-##       };
     });
   });
 </script>
