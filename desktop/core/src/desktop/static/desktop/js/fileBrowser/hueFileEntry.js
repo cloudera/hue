@@ -38,7 +38,6 @@
    */
   function HueFileEntry (options) {
     var self = this;
-    self.uuid = options.uuid;
     self.activeEntry = options.activeEntry;
     self.parent = options.parent;
     self.definition = ko.observable(options.definition);
@@ -246,7 +245,7 @@
       self.assistHelper.fetchDocuments({
         uuid: self.uuid,
         successCallback: function(data) {
-          self.definition(data.directory);
+          self.definition(data.document);
           self.hasErrors(false);
 
           var newEntries = $.map(data.children, function (definition) {
@@ -310,7 +309,7 @@
 
       var deleteNext = function () {
         if (self.entriesToDelete().length > 0) {
-          var nextId = self.entriesToDelete().shift().definition().id;
+          var nextUuid = self.entriesToDelete().shift().definition().uuid;
           self.assistHelper.deleteDocument({
             successCallback: function () {
               deleteNext();
@@ -318,7 +317,7 @@
             errorCallback: function () {
               self.activeEntry().load();
             },
-            id: nextId
+            uuid: nextUuid
           });
         } else {
           self.activeEntry().load();
@@ -413,7 +412,7 @@
     if (self.app === 'documents') {
       self.assistHelper.createDocumentsFolder({
         successCallback: self.load.bind(self),
-        parent_uuid: self.uuid,
+        parentUuid: self.definition().uuid,
         name: name
       });
     }
