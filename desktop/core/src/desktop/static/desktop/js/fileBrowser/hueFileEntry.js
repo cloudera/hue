@@ -243,7 +243,7 @@
 
     if (self.app === 'documents') {
       self.assistHelper.fetchDocuments({
-        uuid: self.uuid,
+        uuid: self.definition().uuid,
         successCallback: function(data) {
           self.definition(data.document);
           self.hasErrors(false);
