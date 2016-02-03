@@ -74,8 +74,11 @@ def home(request):
 
 
 def home2(request):
-  converter = DocumentConverter(request.user)
-  converter.convert()
+  try:
+    converter = DocumentConverter(request.user)
+    converter.convert()
+  except Exception, e:
+    LOG.warning("Failed to convert and import documents: %s" % e)
 
   apps = appmanager.get_apps_dict(request.user)
 

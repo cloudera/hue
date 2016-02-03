@@ -59,8 +59,8 @@ class DocumentConverter(object):
         )
         self.imported_docs.append(doc2)
 
-    # Convert Workflow documents
-    # TODO: Change this logic to actually embed the workflow data in Doc2 instead of linking to old workflow
+    # Convert Job Designer documents
+    # TODO: Change this logic to actually embed the workflow data in Doc2 instead of linking to old job design
     docs = self._get_unconverted_docs(Workflow)
     for doc in docs:
       if doc.content_object:
@@ -96,13 +96,12 @@ class DocumentConverter(object):
 
   def _get_unconverted_docs(self, content_type):
     docs = Document.objects.get_docs(self.user, content_type).filter(owner=self.user)
-    docs = docs.exclude(tags__in=[
+    return docs.exclude(tags__in=[
       DocumentTag.objects.get_trash_tag(user=self.user), # No trashed docs
       DocumentTag.objects.get_history_tag(user=self.user), # No history yet
       DocumentTag.objects.get_example_tag(user=self.user), # No examples
       self.imported_tag # No already imported docs
     ])
-    return docs
 
 
   def _get_parent_directory(self, document):
