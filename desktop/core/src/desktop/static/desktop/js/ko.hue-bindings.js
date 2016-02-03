@@ -3043,7 +3043,6 @@
       }
 
       var $wrapper = $element.parent();
-
       if (!$wrapper.hasClass('foreach-wrapper')) {
         $wrapper = $('<div>').css({
           'position': 'relative',
@@ -3054,6 +3053,22 @@
           'top': 0,
           'width': '100%'
         }).appendTo($wrapper);
+
+        $container.perfectScrollbar({
+          minScrollbarLength: options.minScrollbarLength || 20,
+          suppressScrollX: options.suppressScrollX || true
+        });
+        $container.on('ps-scroll-x', function () {
+          $(element).trigger('scroll');
+        });
+        $container.on('ps-scroll-y', function () {
+          $(element).trigger('scroll');
+        });
+      }
+      else {
+        window.setTimeout(function(){
+          $container.perfectScrollbar('update');
+        }, 200);
       }
 
       // This is kept up to date with the currently rendered elements, it's used to keep track of any
@@ -3075,6 +3090,7 @@
           totalHeight += height;
         });
         $wrapper.height(totalHeight + 'px');
+        $container.perfectScrollbar('update');
       };
       resizeWrapper();
 
@@ -3221,11 +3237,10 @@
       var renderThrottle = -1;
       var lastScrollTop = -1;
       var onScroll = function () {
-        var scrollTop = $container.data('scrollTop') || $container.scrollTop();
-        if (startIndex > incrementLimit && Math.abs(lastScrollTop - scrollTop) < (incrementLimit * options.minHeight)) {
+        if (startIndex > incrementLimit && Math.abs(lastScrollTop - $container.scrollTop()) < (incrementLimit * options.minHeight)) {
           return;
         }
-        lastScrollTop = scrollTop;
+        lastScrollTop = $container.scrollTop();;
         setStartAndEndFromScrollTop();
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
@@ -3324,7 +3339,7 @@
       var render = function () {
         if ($parent.parents('.hueach').length === 0) {
           var heightCorrection = 0, fluidCorrection = 0;
-          var scrollTop = wrappable.data('scrollTop') || $parent.parents(scrollable).scrollTop();
+          var scrollTop = $parent.parents(scrollable).scrollTop();
           if (wrappable.is('table')) {
             if (scrollTop < scrollableOffset + itemHeight) {
               wrappable.find('thead').css('opacity', '1');
@@ -3401,28 +3416,18 @@
     }
   };
 
-  ko.bindingHandlers.customScrollbar = {
+  ko.bindingHandlers.perfectScrollbar = {
     init: function (element, valueAccessor, allBindings) {
-      $(element).mCustomScrollbar({
-        autoHideScrollbar: true,
-        theme: 'minimal-dark',
-        autoExpandScrollbar: true,
-        callbacks: {
-          onInit: function () {
-            huePubSub.publish('customScrollbar.init', {
-              element: element,
-              mcs: this.mcs
-            });
-            $(element).trigger('scroll');
-          },
-          whileScrolling: function () {
-            huePubSub.publish('customScrollbar.scroll', {
-              element: element,
-              mcs: this.mcs
-            });
-            $(element).trigger('scroll');
-          }
-        }
+      var options = valueAccessor() || {};
+      $(element).perfectScrollbar({
+        minScrollbarLength: options.minScrollbarLength || 20,
+        suppressScrollX: options.suppressScrollX || true
+      });
+      $(element).on('ps-scroll-x', function () {
+        $(element).trigger('scroll');
+      });
+      $(element).on('ps-scroll-y', function () {
+        $(element).trigger('scroll');
       });
     }
   };
