@@ -181,12 +181,12 @@
           }
         }
       })
-        .fail(self.assistErrorCallback(options))
-        .always(function () {
-          if (options.editor) {
-            options.editor.hideSpinner();
-          }
-        });
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
+        if (options.editor) {
+          options.editor.hideSpinner();
+        }
+      });
     };
 
     fetchCached.bind(self)($.extend({}, options, {
@@ -209,7 +209,7 @@
     $.ajax({
       url: DOCUMENTS_API,
       data: {
-        path: options.path
+        uuid: options.uuid
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
@@ -219,7 +219,7 @@
         }
       }
     })
-      .fail(self.assistErrorCallback(options));
+    .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -234,20 +234,20 @@
   AssistHelper.prototype.searchDocuments = function (options) {
     var self = this;
     $.ajax({
-          url: DOCUMENTS_API,
-          data: {
-            path: options.path,
-            text: options.query
-          },
-          success: function (data) {
-            if (! self.successResponseIsError(data)) {
-              options.successCallback(data);
-            } else {
-              self.assistErrorCallback(options)(data);
-            }
-          }
-        })
-        .fail(self.assistErrorCallback(options));
+      url: DOCUMENTS_API,
+      data: {
+        uuid: options.uuid,
+        text: options.query
+      },
+      success: function (data) {
+        if (! self.successResponseIsError(data)) {
+          options.successCallback(data);
+        } else {
+          self.assistErrorCallback(options)(data);
+        }
+      }
+    })
+    .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -263,7 +263,7 @@
     $.ajax({
       url: DOCUMENT_API,
       data: {
-        id: options.docId
+        uuid: options.docId
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
@@ -288,7 +288,7 @@
   AssistHelper.prototype.createDocumentsFolder = function (options) {
     var self = this;
     $.post("/desktop/api2/doc/mkdir", {
-      parent_path: ko.mapping.toJSON(options.path),
+      parent_uuid: ko.mapping.toJSON(options.uuid),
       name: ko.mapping.toJSON(options.name)
     }, function (data) {
       if (! self.successResponseIsError(data)) {
@@ -297,7 +297,7 @@
         self.assistErrorCallback(options)(data);
       }
     })
-      .fail(self.assistErrorCallback(options));
+    .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -334,7 +334,7 @@
       contentType: false,
       processData: false
     })
-      .fail(self.assistErrorCallback(options));
+    .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -349,8 +349,8 @@
   AssistHelper.prototype.moveDocument = function (options) {
     var self = this;
     $.post("/desktop/api2/doc/move", {
-      source_doc_id: ko.mapping.toJSON(options.sourceId),
-      destination_doc_id: ko.mapping.toJSON(options.destinationId)
+      source_doc_uuid: ko.mapping.toJSON(options.sourceId),
+      destination_doc_uuid: ko.mapping.toJSON(options.destinationId)
     }, function (data) {
       if (! self.successResponseIsError(data)) {
         options.successCallback(data);
@@ -358,7 +358,7 @@
         self.assistErrorCallback(options)(data);
       }
     })
-      .fail(self.assistErrorCallback(options));
+    .fail(self.assistErrorCallback(options));
   };
 
   /**
@@ -382,7 +382,7 @@
         self.assistErrorCallback(options)(data);
       }
     })
-      .fail(self.assistErrorCallback(options));
+    .fail(self.assistErrorCallback(options));
   };
 
   /**

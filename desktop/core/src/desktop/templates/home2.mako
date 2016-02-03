@@ -32,7 +32,6 @@ ${ assist.assistPanel() }
 ${ fileBrowser.fileBrowser() }
 
 <style type="text/css">
-
   html {
     height: 100%;
   }
