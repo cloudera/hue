@@ -282,13 +282,13 @@
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
-   * @param {string} options.path
+   * @param {string} options.parentUuid
    * @param {string} options.name
    */
   AssistHelper.prototype.createDocumentsFolder = function (options) {
     var self = this;
     $.post("/desktop/api2/doc/mkdir", {
-      parent_uuid: ko.mapping.toJSON(options.uuid),
+      parent_uuid: ko.mapping.toJSON(options.parentUuid),
       name: ko.mapping.toJSON(options.name)
     }, function (data) {
       if (! self.successResponseIsError(data)) {
@@ -367,13 +367,13 @@
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
-   * @param {string} options.id
+   * @param {string} options.uuid
    * @param {string} [options.skipTrash] - Default false
    */
   AssistHelper.prototype.deleteDocument = function (options) {
     var self = this;
     $.post("/desktop/api2/doc/delete", {
-      doc_id: ko.mapping.toJSON(options.id),
+      uuid: ko.mapping.toJSON(options.uuid),
       skip_trash: ko.mapping.toJSON(options.skipTrash || false)
     }, function (data) {
       if (! self.successResponseIsError(data)) {
