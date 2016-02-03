@@ -957,12 +957,16 @@ ${ tableStats.tableStats() }
   }
 
   .fullscreen {
-    position: absolute;
-    top: 70px;
+    position: fixed;
+    top: -16px;
     left: 0;
     width: 100%;
     background-color: #FFFFFF;
-    z-index: 100;
+    z-index: 2000;
+  }
+
+  body.fullscreen {
+    overflow: hidden;
   }
 
   .map {
@@ -1331,19 +1335,21 @@ $(document).ready(function () {
     $(".table-container").css("max-height", ($(window).height() - 180) + "px").css("overflow-y", "auto");
   };
 
-  $("#expandResults").on("click", function(){
+  $(document).on("click", "#expandResults", function(){
     $("#resultTablejHueTableExtenderClonedContainer").remove();
     $("#resultTablejHueTableExtenderClonedContainerColumn").remove();
     $("#resultTablejHueTableExtenderClonedContainerCell").remove();
     if ($(this).find("i").hasClass("fa-expand")){
       $(this).find("i").removeClass("fa-expand").addClass("fa-compress");
-      $(this).parent().parent().addClass("fullscreen");
+      $(this).parents('.resultsContainer').addClass("fullscreen");
+      $('body').addClass("fullscreen");
     }
     else {
       $(this).find("i").addClass("fa-expand").removeClass("fa-compress");
-      $(this).parent().parent().removeClass("fullscreen");
+      $(this).parents('.resultsContainer').removeClass("fullscreen");
+      $('body').removeClass("fullscreen");
     }
-    reinitializeTable();
+    window.setTimeout(reinitializeTable, 200);
   });
 
   resizeNavigator();
@@ -1374,9 +1380,9 @@ $(document).ready(function () {
   });
 
   $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
-    if ($(e.target).attr("href") == "#log") {
+    if ($(e.target).attr("href") == "#log" || $(e.target).attr("href") == "#query" ) {
       logsAtEnd = true;
-      window.setTimeout(resizeLogs, 150);
+      window.setTimeout(resizeLogs, 100);
     }
     if ($(e.target).attr("href") == "#results" && $(e.relatedTarget).attr("href") == "#columns") {
       if ($("#resultTable .columnSelected").length > 0) {
@@ -1390,14 +1396,11 @@ $(document).ready(function () {
     if ($(e.target).attr("href") == "#results" || $(e.target).attr("href") == "#recentTab") {
       reinitializeTableExtenders();
     }
-    if ($(e.target).attr("href") != "#results"){
+    if ($(e.target).attr("href") != "#results" && $(e.target).attr("href") != "#columns"){
       $($(e.target).attr("href")).css('height', 'auto');
       if ($(e.target).attr("href") == "#chart") {
         logGA('results/chart');
         predictGraph();
-      }
-      if ($(e.target).attr("href") == "#resultTab") {
-        reinitializeTable();
       }
     } else {
       reinitializeTable();
@@ -1425,21 +1428,22 @@ function getHighlightedQuery() {
 
 function reinitializeTable(max) {
   var _max = max || 10;
+  var _heightCorrection = $('body').hasClass('fullscreen') ? 85 : 150;
 
   function fn(){
     var container = $($("a[data-toggle='tab']:not(.sidetab)").parent(".active").find("a").attr("href"));
     if ($("#results .dataTables_wrapper").height() > 0) {
 
       $("#results .dataTables_wrapper").jHueTableScroller({
-        minHeight: $(window).height() - 150,
+        minHeight: $(window).height() - _heightCorrection,
         heightAfterCorrection: 0
       });
       $("#recentTab .dataTables_wrapper").jHueTableScroller({
-        minHeight: $(window).height() - 150,
+        minHeight: $(window).height() - _heightCorrection,
         heightAfterCorrection: 0
       });
       reinitializeTableExtenders();
-      container.height($(window).height() - 150);
+      container.height($(window).height() - _heightCorrection);
       $("#results .dataTables_wrapper").jHueScrollUp();
     } else if ($('#resultEmpty').height() > 0) {
       container.height($('#resultEmpty').height());
@@ -1918,6 +1922,9 @@ $(document).ready(function () {
   $("a[href='#log']").on("shown", function () {
     resizeLogs();
   });
+  $("a[href='#query']").on("shown", function () {
+    resizeLogs();
+  });
 
   % if app_name == 'impala':
   $("a[href='#sessionTab']").on("shown", function () {
@@ -2006,6 +2013,11 @@ function resizeLogs() {
     var _height = Math.max($(window).height() - $("#log pre:eq(1)").offset().top, 250);
     $("#log").height(_height - 10);
     $("#log pre:eq(1)").css("overflow", "auto").height(_height - 50);
+  }
+  if ($("#query pre:eq(1)").length > 0) {
+    var _height = Math.max($(window).height() - $("#log pre:eq(1)").offset().top, 250);
+    $("#query").height(_height - 10);
+    $("#query pre:eq(1)").css("overflow", "auto").height(_height - 50);
   }
 }
 
