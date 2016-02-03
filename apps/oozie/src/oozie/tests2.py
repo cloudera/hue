@@ -25,7 +25,7 @@ from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
 
 from oozie.conf import ENABLE_V2
 from oozie.importlib.workflows import generate_v2_graph_nodes
-from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node, _create_graph_adjaceny_list, _get_hierarchy_from_adj_list, _create_workflow_layout
+from oozie.models2 import Workflow, find_dollar_variables, find_dollar_braced_variables, Node, _create_graph_adjaceny_list, _get_hierarchy_from_adj_list
 from oozie.tests import OozieMockBase, save_temp_workflow, MockOozieApi
 
 
@@ -293,6 +293,10 @@ LIMIT $limit"""))
     finally:
       reset()
       wf_doc.delete()
+
+  def test_list_bundles_page(self):
+    response = self.c.get(reverse('oozie:list_editor_bundles'))
+    assert_true('bundles_json' in response.context, response.context)
 
 
 class TestExternalWorkflowGraph():
