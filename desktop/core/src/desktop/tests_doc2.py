@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import json
+import re
 
 from nose.tools import assert_equal, assert_false, assert_true
 from django.contrib.auth.models import User
@@ -224,18 +225,21 @@ class TestDocument2(object):
     assert_true('invalid character' in data['message'])
 
 
-  def test_validate_same_directory(self):
-    # Test error on creating directories with same name and location
+  def test_validate_same_name_and_path(self):
+    # Test that creating a document with the same name at the same path will auto-rename the document
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps('test_dir')})
     data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_true('/test_dir already exists' in data['message'])
+    assert_equal(0, data['status'], data)
+
+    pattern = re.compile("test_dir \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}")
+    assert_true(pattern.match(data['directory']['name']), data)
 
     # But can create same name in different location
     response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(test_dir.uuid), 'name': json.dumps('test_dir')})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
+    assert_equal('test_dir', data['directory']['name'])
 
 
   def test_validate_immutable_user_directories(self):
