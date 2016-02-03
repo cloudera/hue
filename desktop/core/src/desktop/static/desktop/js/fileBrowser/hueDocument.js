@@ -165,7 +165,7 @@
 
     var fetchFunction = function () {
       self.assistHelper.fetchDocument({
-        docId: self.fileEntry.definition().id,
+        uuid: self.fileEntry.definition().uuid,
         successCallback: function (data) {
           self.prettifyUserNames(data.perms.write.users);
           self.prettifyUserNames(data.perms.read.users);
