@@ -38,6 +38,7 @@
    */
   function HueFileEntry (options) {
     var self = this;
+    self.uuid = options.uuid;
     self.activeEntry = options.activeEntry;
     self.parent = options.parent;
     self.definition = ko.observable(options.definition);
@@ -135,7 +136,7 @@
     if (self.app === "documents") {
       var moveNext = function () {
         if (entries.length > 0) {
-          var nextId = entries.shift().definition().id;
+          var nextId = entries.shift().definition().uuid;
           self.assistHelper.moveDocument({
             successCallback: function () {
               moveNext();
@@ -144,7 +145,7 @@
               self.activeEntry().load();
             },
             sourceId: nextId,
-            destinationId: self.definition().id
+            destinationId: self.definition().uuid
           });
         } else {
           if (self !== self.activeEntry()) {
@@ -185,11 +186,11 @@
     resultEntry.loading(true);
 
     self.assistHelper.searchDocuments({
-      path: owner.path,
+      uuid: owner.uuid,
       query: query,
       successCallback: function (data) {
         resultEntry.hasErrors(false);
-        resultEntry.entries($.map(data.documents, function (definition) {
+        resultEntry.entries($.map(data.children, function (definition) {
           return new HueFileEntry({
             activeEntry: self.activeEntry,
             assistHelper: self.assistHelper,
@@ -243,12 +244,12 @@
 
     if (self.app === 'documents') {
       self.assistHelper.fetchDocuments({
-        path: self.path,
+        uuid: self.uuid,
         successCallback: function(data) {
           self.definition(data.directory);
           self.hasErrors(false);
 
-          var newEntries = $.map(data.documents, function (definition) {
+          var newEntries = $.map(data.children, function (definition) {
             return new HueFileEntry({
               activeEntry: self.activeEntry,
               assistHelper: self.assistHelper,
@@ -259,10 +260,10 @@
           });
 
           newEntries.sort(function (a, b) {
-            if (a.isDirectory && !b.isDirectory) {
+            if (a.isDirectory && ! b.isDirectory) {
               return -1;
             }
-            if (b.isDirectory && !a.isDirectory) {
+            if (b.isDirectory && ! a.isDirectory) {
               return 1;
             }
             return a.name.localeCompare(b.name);
@@ -294,7 +295,7 @@
 
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
-    if (self.selectedEntries().length > 0 ) {
+    if (self.selectedEntries().length > 0) {
       self.entriesToDelete(self.selectedEntries());
       $('#deleteEntriesModal').modal('show');
     }
@@ -412,7 +413,7 @@
     if (self.app === 'documents') {
       self.assistHelper.createDocumentsFolder({
         successCallback: self.load.bind(self),
-        path: self.path,
+        parent_uuid: self.uuid,
         name: name
       });
     }
