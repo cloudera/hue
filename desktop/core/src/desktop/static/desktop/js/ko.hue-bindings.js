@@ -3108,7 +3108,7 @@
         $.each(renderedElements, function (idx, renderedElement) {
           // TODO: Figure out why it goes over index at the end scroll position
           if (startIndex + idx < lastKnownHeights.length) {
-            var renderedHeight = $(renderedElement).height();
+            var renderedHeight = $(renderedElement).outerHeight(true);
             if (lastKnownHeights[startIndex + idx] !== renderedHeight) {
               lastKnownHeights[startIndex + idx] = renderedHeight;
               diff = true;
