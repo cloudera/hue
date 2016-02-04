@@ -938,6 +938,10 @@ class Document2(models.Model):
     return self.is_directory and self.parent_directory == None and self.name == ''
 
   @property
+  def has_children(self):
+    return self.children.filter(is_history=False).exists()
+
+  @property
   def is_trash_directory(self):
     return self.is_directory and self.name == self.TRASH_DIR
 
