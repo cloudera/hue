@@ -336,7 +336,7 @@ ${ require.config() }
       }"></div>
   </div>
   <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }">
+  <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, perfectScrollbar: { enable: $root.editorMode }">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
@@ -351,10 +351,10 @@ ${ require.config() }
             'greedy': true,
             'stop': function(event, ui) {
               var $element = $(event.target);
-              $element.find('.snippet-body').slideDown('fast', function () { $(window).scrollTop(lastWindowScrollPosition); });
+              $element.find('.snippet-body').slideDown('fast', function () { $('.right-panel').scrollTop(lastWindowScrollPosition); });
             },
             'helper': function(event) {
-              lastWindowScrollPosition = $(window).scrollTop();
+              lastWindowScrollPosition = $('.right-panel').scrollTop();
               var $element = $(event.target);
               $element.find('.snippet-body').slideUp('fast', function () {
                 $('.sortable-snippets').sortable('refreshPositions')
@@ -379,7 +379,7 @@ ${ require.config() }
             }
           },
           dragged: function (widget) {
-            $('.snippet-body').slideDown('fast', function () { $(window).scrollTop(lastWindowScrollPosition); });
+            $('.snippet-body').slideDown('fast', function () { $('.right-panel').scrollTop(lastWindowScrollPosition); });
           }
         }">
       </div>
@@ -1306,18 +1306,31 @@ ${ require.config() }
         if (vm.editorMode){
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
         }
-        $(el).parents(".dataTables_wrapper").jHueTableScroller({
-          maxHeight: DATATABLES_MAX_HEIGHT,
-          heightAfterCorrection: 0
-        });
-
-        $(el).jHueTableExtender({
-          fixedHeader: true,
-          fixedFirstColumn: true,
-          includeNavigator: false,
-          parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: "absolute"
-        });
+        if (vm.editorMode) {
+          $(el).parents(".dataTables_wrapper").css("overflow-x", "auto");
+          $(el).jHueTableExtender({
+            fixedHeader: true,
+            fixedFirstColumn: true,
+            includeNavigator: false,
+            parentId: 'snippet_' + snippet.id(),
+            mainScrollable: '.right-panel',
+            stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
+            clonedContainerPosition: "fixed"
+          });
+        }
+        else {
+          $(el).parents(".dataTables_wrapper").jHueTableScroller({
+            maxHeight: DATATABLES_MAX_HEIGHT,
+            heightAfterCorrection: 0
+          });
+          $(el).jHueTableExtender({
+            fixedHeader: true,
+            fixedFirstColumn: true,
+            includeNavigator: false,
+            parentId: 'snippet_' + snippet.id(),
+            clonedContainerPosition: "absolute"
+          });
+        }
       },
       "aoColumnDefs": [
         {
@@ -1335,45 +1348,69 @@ ${ require.config() }
       ]
     });
 
-    $(el).parents(".dataTables_wrapper").jHueTableScroller({
-      maxHeight: DATATABLES_MAX_HEIGHT,
-      heightAfterCorrection: 0
-    });
-
-    $(el).jHueTableExtender({
-      fixedHeader: true,
-      fixedFirstColumn: true,
-      includeNavigator: false,
-      parentId: 'snippet_' + snippet.id(),
-      clonedContainerPosition: "absolute"
-    });
+    if (vm.editorMode) {
+      $(el).parents(".dataTables_wrapper").css("overflow-x", "auto");
+      $(el).jHueTableExtender({
+        fixedHeader: true,
+        fixedFirstColumn: true,
+        includeNavigator: false,
+        parentId: 'snippet_' + snippet.id(),
+        mainScrollable: '.right-panel',
+        stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
+        clonedContainerPosition: "fixed"
+      });
+    }
+    else {
+      $(el).parents(".dataTables_wrapper").jHueTableScroller({
+        maxHeight: DATATABLES_MAX_HEIGHT,
+        heightAfterCorrection: 0
+      });
+      $(el).jHueTableExtender({
+        fixedHeader: true,
+        fixedFirstColumn: true,
+        includeNavigator: false,
+        parentId: 'snippet_' + snippet.id(),
+        clonedContainerPosition: "absolute"
+      });
+    }
     $(".dataTables_filter").hide();
     var dataTableEl = $(el).parents(".dataTables_wrapper");
 
-    dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
-      if ($(el).closest(".results").css("overflow") == "hidden") {
-        return;
-      }
-      var _e = e.originalEvent,
-          _deltaX = _e.wheelDeltaX || -_e.deltaX,
-          _deltaY = _e.wheelDeltaY || -_e.deltaY;
-      this.scrollTop += -_deltaY / 2;
-      this.scrollLeft += -_deltaX / 2;
+    if (!vm.editorMode) {
+      dataTableEl.bind('mousewheel DOMMouseScroll wheel', function (e) {
+        if ($(el).closest(".results").css("overflow") == "hidden") {
+          return;
+        }
+        var _e = e.originalEvent,
+            _deltaX = _e.wheelDeltaX || -_e.deltaX,
+            _deltaY = _e.wheelDeltaY || -_e.deltaY;
+        this.scrollTop += -_deltaY / 2;
+        this.scrollLeft += -_deltaX / 2;
 
-      if (this.scrollTop == 0) {
-        $("body")[0].scrollTop += -_deltaY / 3;
-        $("html")[0].scrollTop += -_deltaY / 3; // for firefox
-      }
-      e.preventDefault();
-    });
+        if (this.scrollTop == 0) {
+          $("body")[0].scrollTop += -_deltaY / 3;
+          $("html")[0].scrollTop += -_deltaY / 3; // for firefox
+        }
+        e.preventDefault();
+      });
+    }
 
     var _scrollTimeout = -1;
-    dataTableEl.on("scroll", function () {
-      var _lastScrollPosition = dataTableEl.data("scrollPosition") != null ? dataTableEl.data("scrollPosition") : 0;
+
+    var scrollElement = dataTableEl;
+    if (vm.editorMode) {
+      scrollElement = $('.right-panel');
+    }
+
+    scrollElement.on("scroll", function () {
+      var _lastScrollPosition = scrollElement.data("scrollPosition") != null ? scrollElement.data("scrollPosition") : 0;
       window.clearTimeout(_scrollTimeout);
-      dataTableEl.data("scrollPosition", dataTableEl.scrollTop());
+      scrollElement.data("scrollPosition", scrollElement.scrollTop());
       _scrollTimeout = window.setTimeout(function () {
-        if (_lastScrollPosition != dataTableEl.scrollTop() && dataTableEl.scrollTop() + dataTableEl.outerHeight() + 20 > dataTableEl[0].scrollHeight && _dt && snippet.result.hasMore()) {
+        if (vm.editorMode){
+          _lastScrollPosition--; //hack for forcing fetching
+        }
+        if (_lastScrollPosition != scrollElement.scrollTop() && scrollElement.scrollTop() + scrollElement.outerHeight() + 20 >= scrollElement[0].scrollHeight && _dt && snippet.result.hasMore()) {
           dataTableEl.animate({opacity: '0.55'}, 200);
           snippet.fetchResult(100, false);
         }
@@ -1769,13 +1806,26 @@ ${ require.config() }
       viewModel.notebooks().forEach(function (notebook) {
         notebook.snippets().forEach(function (snippet) {
           var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-          _el.jHueTableExtender({
-            fixedHeader: true,
-            fixedFirstColumn: true,
-            includeNavigator: false,
-            parentId: 'snippet_' + snippet.id(),
-            clonedContainerPosition: "absolute"
-          });
+          if (viewModel.editorMode){
+            _el.jHueTableExtender({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              includeNavigator: false,
+              mainScrollable: '.right-panel',
+              stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
+              parentId: 'snippet_' + snippet.id(),
+              clonedContainerPosition: "fixed"
+            });
+          }
+          else {
+            _el.jHueTableExtender({
+              fixedHeader: true,
+              fixedFirstColumn: true,
+              includeNavigator: false,
+              parentId: 'snippet_' + snippet.id(),
+              clonedContainerPosition: "absolute"
+            });
+          }
         });
       });
     };
