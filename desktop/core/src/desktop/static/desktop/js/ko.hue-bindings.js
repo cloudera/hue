@@ -244,6 +244,16 @@
       var $menu = $element.find(options.menuSelector);
       var active = false;
 
+      bindingContext.$altDown = ko.observable(false);
+
+      window.addEventListener("keydown", function (e) {
+        bindingContext.$altDown(e.altKey);
+      });
+
+      window.addEventListener("keyup", function (e) {
+        bindingContext.$altDown(false);
+      });
+
       element.addEventListener("contextmenu", function(e) {
         if(document.selection && document.selection.empty) {
           document.selection.empty();
