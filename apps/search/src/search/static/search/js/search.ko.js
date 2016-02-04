@@ -1711,7 +1711,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
 
       analyse.update();
-      $(document).trigger("shownAuthModal");
+      $(document).trigger("shownAnalysis");
     }
   }
 
