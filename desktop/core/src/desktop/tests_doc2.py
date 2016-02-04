@@ -211,6 +211,10 @@ class TestDocument2(object):
 
   def test_document_trash(self):
     # Create document under home and directory under home with child document
+    # /
+    #   test_dir/
+    #     query1.sql
+    #   query2.sql
     dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
     nested_query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
     query = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
@@ -220,7 +224,7 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert_equal(0, data['count'])
 
-    # Delete document
+    # Delete query2.sql
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(query.uuid)})
     data = json.loads(response.content)
     assert_equal(0, data['status'])
@@ -230,7 +234,7 @@ class TestDocument2(object):
     assert_equal(1, data['count'])
     assert_equal(data['children'][0]['uuid'], query.uuid)
 
-    # Delete directory
+    # Delete test_dir directory w/ contents
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(dir.uuid)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
@@ -238,6 +242,18 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/docs', {'path': '/.Trash'})
     data = json.loads(response.content)
     assert_equal(2, data['count'])
+
+    # Child document should be in trash too
+    response = self.client.get('/desktop/api2/docs', {'path': '/.Trash/test_dir'})
+    data = json.loads(response.content)
+    assert_equal(nested_query.uuid, data['children'][0]['uuid'])
+
+    # Skip Trash (erase) on a directory with contents should erase all children recursively
+    response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(dir.uuid), 'skip_trash': json.dumps(True)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+    assert_false(Document2.objects.filter(uuid=dir.uuid).exists())
+    assert_false(Document2.objects.filter(uuid=nested_query.uuid).exists())
 
     # Verify that only doc in home is .Trash
     response = self.client.get('/desktop/api2/docs', {'path': '/'})

@@ -221,12 +221,9 @@ def delete_document(request):
   document.can_write_or_exception(request.user)
 
   if skip_trash:
-    # TODO: check if document is in the .Trash folder, if not raise exception
-    if document.is_directory and document.has_children:
-      raise PopupException(_('Directory is not empty'))
     document.delete()
   else:
-    document.trash()  # TODO: get number of docs trashed
+    document.trash()
 
   return JsonResponse({
       'status': 0,

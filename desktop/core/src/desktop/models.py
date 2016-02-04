@@ -1067,8 +1067,6 @@ class Document2(models.Model):
     trash_dir = Directory.objects.get(name=self.TRASH_DIR, owner=self.owner)
     self.move(trash_dir, self.owner)
 
-  # TODO: erase/purge
-
   # TODO: restore
 
   def can_read(self, user):
