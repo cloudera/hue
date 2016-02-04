@@ -39,7 +39,6 @@ from desktop.views import _ko
 
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.kinetic.min.js') }"></script>
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1318,34 +1317,6 @@ ${ require.config() }
           includeNavigator: false,
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "absolute"
-        });
-
-        var originialAttachListeners = $.Kinetic.prototype._attachListeners;
-        $.Kinetic.prototype._attachListeners = function($el, listeners) {
-          var kinetic = this;
-          var altDown = false;
-          $(window).bind("keydown", "alt", function (e) {
-            kinetic.$el.css('cursor', 'move');
-            altDown = true;
-          });
-          $(window).bind("keyup", "alt", function (e) {
-            altDown = false;
-            kinetic.$el.css('cursor', '');
-          });
-          var altDownListener = function (listener) {
-            return function(e) {
-              if (altDown) {
-                listener.apply(this, arguments);
-              }
-            }
-          }
-          listeners.events.inputDown = altDownListener(listeners.events.inputDown);
-          listeners.events.selectStart = altDownListener(listeners.events.selectStart);
-          originialAttachListeners.apply(this, arguments)
-        }
-
-        $('.dataTables_wrapper').kinetic({
-          cursor: ''
         });
       },
       "aoColumnDefs": [
