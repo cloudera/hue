@@ -22,12 +22,11 @@ from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
-from desktop.decorators import check_document_access_permission
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired
-from notebook.decorators import api_error_handler, check_document_modify_permission
+from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.github import GithubClient
 from notebook.models import escape_rows
 
@@ -228,26 +227,30 @@ def save_notebook(request):
 
 
 @require_POST
-@check_document_modify_permission()
+@api_error_handler
+@check_document_access_permission()
 def historify(request):
   response = {'status': -1}
 
-  history = json.loads(request.POST.get('notebook', '{}'))
-  query_type = history['type']
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  query_type = notebook['type']
 
-  history_doc = Document2.objects.create(name=history['name'], type=query_type, owner=request.user, is_history=True)
-  Document.objects.link(history_doc, owner=history_doc.owner, name=history_doc.name, description=history_doc.description, extra=query_type)
+  history_doc = Document2.objects.create(
+    name=notebook['name'],
+    type=query_type,
+    owner=request.user,
+    is_history=True
+  )
+  Document.objects.link(
+    history_doc,
+    name=history_doc.name,
+    owner=history_doc.owner,
+    description=history_doc.description,
+    extra=query_type
+  )
 
-  history_doc1 = history_doc.doc.get()
-  history_doc.update_data(history)
-  history_doc.name = history_doc1.name = history['name']
-  history_doc.description = history_doc1.description = history.get('description', '')
-  history_doc.is_history = True
+  history_doc.update_data(notebook)
   history_doc.save()
-  history_doc1.save()
-
-  if history.get('id'): # If we come from a saved query
-    Document2.objects.get(id=history['id']).dependencies.add(history_doc)
 
   response['status'] = 0
   response['id'] = history_doc.id
@@ -257,6 +260,8 @@ def historify(request):
 
 
 @require_GET
+@api_error_handler
+@check_document_access_permission()
 def get_history(request):
   response = {'status': -1}
 
@@ -275,6 +280,7 @@ def get_history(request):
 
 
 @require_POST
+@api_error_handler
 @check_document_modify_permission()
 def clear_history(request):
   response = {'status': -1}

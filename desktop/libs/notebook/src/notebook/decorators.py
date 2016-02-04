@@ -44,7 +44,7 @@ def check_document_access_permission():
       try:
         if notebook_id:
           document = Document2.objects.get(id=notebook_id)
-          document.doc.get().can_read_or_exception(request.user)
+          document.can_read_or_exception(request.user)
       except Document2.DoesNotExist:
         raise PopupException(_('Document %(id)s does not exist') % {'id': notebook_id})
 
@@ -61,7 +61,7 @@ def check_document_modify_permission():
       try:
         if notebook.get('id'):
           doc2 = Document2.objects.get(id=notebook['id'])
-          doc2.doc.get().can_write_or_exception(request.user)
+          doc2.can_write_or_exception(request.user)
       except Document.DoesNotExist:
         raise PopupException(_('Document %(id)s does not exist') % {'id': notebook.get('id')})
 
