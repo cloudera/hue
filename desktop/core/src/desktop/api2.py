@@ -160,7 +160,7 @@ def move_document(request):
   if not source_doc_uuid or not destination_doc_uuid:
     raise PopupException(_('move_document requires source_doc_uuid and destination_doc_uuid'))
 
-  source = Directory.objects.get_by_uuid(uuid=source_doc_uuid)
+  source = Document2.objects.get_by_uuid(uuid=source_doc_uuid)
   destination = Directory.objects.get_by_uuid(uuid=destination_doc_uuid)
 
   # Check if user has write permissions for both source and destination

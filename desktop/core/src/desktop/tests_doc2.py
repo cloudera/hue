@@ -110,6 +110,37 @@ class TestDocument2(object):
     assert_equal(data['directory']['type'], 'directory', data)
 
 
+  def test_file_move(self):
+    source_dir = Directory.objects.create(name='test_mv_file_src', owner=self.user, parent_directory=self.home_dir)
+    target_dir = Directory.objects.create(name='test_mv_file_dst', owner=self.user, parent_directory=self.home_dir)
+    doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=source_dir)
+
+    # Verify original paths before move operation
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': source_dir.uuid})
+    data = json.loads(response.content)
+    assert_equal('/test_mv_file_src', data['path'])
+
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal('/test_mv_file_src/query1.sql', data['path'])
+
+    response = self.client.post('/desktop/api2/doc/move', {
+        'source_doc_uuid': json.dumps(doc.uuid),
+        'destination_doc_uuid': json.dumps(target_dir.uuid)
+    })
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+
+    # Verify that the paths are updated
+    response = self.client.get('/desktop/api2/docs', {'uuid': source_dir.uuid})
+    data = json.loads(response.content)
+    assert_false(any(doc['uuid'] == doc.uuid for doc in data['children']), data['children'])
+
+    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal('/test_mv_file_dst/query1.sql', data['path'])
+
+
   def test_directory_move(self):
     source_dir = Directory.objects.create(name='test_mv', owner=self.user, parent_directory=self.home_dir)
     target_dir = Directory.objects.create(name='test_mv_dst', owner=self.user, parent_directory=self.home_dir)
