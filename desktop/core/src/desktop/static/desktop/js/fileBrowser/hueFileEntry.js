@@ -124,6 +124,13 @@
     }
   };
 
+  HueFileEntry.prototype.showNewDirectoryModal = function () {
+    var self = this;
+    if (! self.isTrash() && ! self.isTrashed()) {
+      $('#createDirectoryModal').modal('show');
+    }
+  }
+
   HueFileEntry.prototype.showSharingModal = function (entry) {
     var self = this;
     if (entry) {
@@ -431,7 +438,8 @@
   };
 
   HueFileEntry.prototype.showUploadModal = function () {
-    if (self.app = 'documents') {
+    var self = this;
+    if (self.app == 'documents' && ! self.isTrash() && ! self.isTrashed()) {
       $('#importDocumentsModal').modal('show');
     }
   };
