@@ -2440,3 +2440,41 @@ body {
   font-size: 16px;
   color: #aaa;
 }
+
+.dataTables_wrapper:hover > .hue-scrollbar-x-rail {
+  opacity: 0.9
+}
+
+.hue-scrollbar-x-rail {
+  background-color: #eee;
+  opacity: 0;
+  position: fixed;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-transition: background-color .2s linear, opacity .2s linear;
+  -moz-transition: background-color .2s linear, opacity .2s linear;
+  -o-transition: background-color .2s linear, opacity .2s linear;
+  transition: background-color .2s linear, opacity .2s linear;
+  bottom: 3px;
+  height: 8px;
+}
+
+
+.hue-scrollbar-x-rail > .hue-scrollbar-x {
+  position: absolute;
+  background-color: #aaa;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  -webkit-transition: background-color .2s linear;
+  -moz-transition: background-color .2s linear;
+  -o-transition: background-color .2s linear;
+  transition: background-color .2s linear;
+  bottom: 0;
+  height: 8px;
+}
+
+.hue-scrollbar-x:hover {
+  background-color: #999;
+}
