@@ -295,6 +295,7 @@ if os.getenv('DESKTOP_DB_CONFIG'):
   default_db = dict(zip(
     ["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"],
     conn_string.split(':')))
+  default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
 else:
   test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
   logging.debug("DESKTOP_DB_TEST_NAME SET: %s" % test_name)
