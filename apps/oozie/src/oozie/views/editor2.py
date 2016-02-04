@@ -726,7 +726,7 @@ def _submit_bundle(request, bundle, properties):
 
     for i, bundled in enumerate(bundle.data['coordinators']):
       coord = coords[bundled['coordinator']]
-      workflow = Workflow(document=coord.dependencies.all()[0])
+      workflow = Workflow(document=coord.dependencies.filter(type='oozie-workflow2')[0])
       wf_dir = Submission(request.user, workflow, request.fs, request.jt, properties).deploy()
       deployment_mapping['wf_%s_dir' % i] = request.fs.get_hdfs_path(wf_dir)
 
