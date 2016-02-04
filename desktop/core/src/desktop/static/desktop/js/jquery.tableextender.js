@@ -27,6 +27,8 @@
       firstColumnTooltip: false,
       hintElement: null,
       includeNavigator: true,
+      mainScrollable: window,
+      stickToTopPosition: -1,
       labels: {
         GO_TO_COLUMN: "Go to column:",
         PLACEHOLDER: "column name..."
@@ -184,12 +186,13 @@
       $(plugin.element).attr("id", "eT" + plugin.options.parentId);
     }
 
+    var mainScrollable = plugin.options.mainScrollable;
     var originalTh = $(plugin.element).find("thead>tr th:eq(0)");
     var topPosition;
     if (plugin.options.clonedContainerPosition == 'absolute') {
-      topPosition = $(plugin.element).parent().position().top - $(window).scrollTop();
+      topPosition = $(plugin.element).parent().position().top - $(mainScrollable).scrollTop();
     } else {
-      topPosition = $(plugin.element).parent().offset().top - $(window).scrollTop();
+      topPosition = $(plugin.element).parent().offset().top - $(mainScrollable).scrollTop();
     }
 
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainerCell").remove();
@@ -252,10 +255,22 @@
 
     clonedTableContainer.css("marginTop", (-$(plugin.element).parent().scrollTop()) + "px");
 
-    $(window).scroll(function () {
-      clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
-      clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
+    $(mainScrollable).scroll(function () {
+      if (plugin.options.stickToTopPosition > -1){
+        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition){
+          clonedCellVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
+        }
+        else {
+          clonedCellVisibleContainer.css("top", $(plugin.element).offset().top + "px");
+        }
+        clonedTableVisibleContainer.css("top", $(plugin.element).offset().top + "px");
+      }
+      else {
+        clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+        clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+      }
     });
+
   }
 
 
@@ -263,6 +278,7 @@
     if (!$(plugin.element).attr("id") && plugin.options.parentId) {
       $(plugin.element).attr("id", "eT" + plugin.options.parentId);
     }
+    var mainScrollable = plugin.options.mainScrollable;
     $("#" + $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").remove();
     var clonedTable = $(plugin.element).clone();
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
@@ -281,9 +297,9 @@
 
     var topPosition;
     if (plugin.options.clonedContainerPosition == 'absolute') {
-      topPosition = $(plugin.element).parent().position().top - $(window).scrollTop();
+      topPosition = $(plugin.element).parent().position().top - $(mainScrollable).scrollTop();
     } else {
-      topPosition = $(plugin.element).parent().offset().top - $(window).scrollTop();
+      topPosition = $(plugin.element).parent().offset().top - $(mainScrollable).scrollTop();
     }
     var clonedTableVisibleContainer = $("<div>").attr("id", $(plugin.element).attr("id") + "jHueTableExtenderClonedContainer").addClass("jHueTableExtenderClonedContainer").width($(plugin.element).parent().width()).css("overflow-x", "hidden").css("top", topPosition + "px");
     clonedTableVisibleContainer.css("position", plugin.options.clonedContainerPosition || "fixed");
@@ -313,8 +329,18 @@
       clonedTableVisibleContainer.width($(this).width());
     });
 
-    $(window).scroll(function () {
-      clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(window).scrollTop()) + "px");
+    $(mainScrollable).scroll(function () {
+      if (plugin.options.stickToTopPosition > -1){
+        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition){
+          clonedTableVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
+        }
+        else {
+          clonedTableVisibleContainer.css("top", $(plugin.element).offset().top + "px");
+        }
+      }
+      else {
+        clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
+      }
     });
   }
 

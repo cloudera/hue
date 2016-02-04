@@ -3429,16 +3429,18 @@
   ko.bindingHandlers.perfectScrollbar = {
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
-      $(element).perfectScrollbar({
-        minScrollbarLength: options.minScrollbarLength || 20,
-        suppressScrollX: options.suppressScrollX || true
-      });
-      $(element).on('ps-scroll-x', function () {
-        $(element).trigger('scroll');
-      });
-      $(element).on('ps-scroll-y', function () {
-        $(element).trigger('scroll');
-      });
+      if (typeof options.enable === 'undefined' || options.enable) {
+        $(element).perfectScrollbar({
+          minScrollbarLength: options.minScrollbarLength || 20,
+          suppressScrollX: options.suppressScrollX || true
+        });
+        $(element).on('ps-scroll-x', function () {
+          $(element).trigger('scroll');
+        });
+        $(element).on('ps-scroll-y', function () {
+          $(element).trigger('scroll');
+        });
+      }
     }
   };
 
