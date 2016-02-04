@@ -50,7 +50,18 @@
 
     self.isTrash = ko.pureComputed(function () {
       return self.definition().name === '.Trash';
-    })
+    });
+
+    self.isTrashed = ko.pureComputed(function () {
+      var parent = self.parent;
+      while (parent) {
+        if (parent.isTrash()) {
+          return true;
+        }
+        parent = parent.parent;
+      }
+      return false;
+    });
 
     self.isRoot = ko.pureComputed(function () {
       return self.definition().name === '';
