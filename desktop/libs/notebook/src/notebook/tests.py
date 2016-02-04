@@ -37,6 +37,9 @@ class TestNotebookApi(object):
     self.user = User.objects.get(username="test")
     self.user_not_me = User.objects.get(username="not_perm_user")
 
+    grant_access("test", "default", "notebook")
+    grant_access("not_perm_user", "default", "notebook")
+
     self.notebook_json = """
       {
         "selectedSnippet": "hive",
