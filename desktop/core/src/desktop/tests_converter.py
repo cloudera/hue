@@ -257,6 +257,8 @@ class TestDocumentConverter(object):
 
 
   def test_import_permissions(self):
+    make_logged_in_client(username="other_user", groupname="default", recreate=True, is_superuser=False)
+
     other_user = User.objects.get(username="other_user")
     test_group = get_default_user_group()
 
@@ -284,9 +286,9 @@ class TestDocumentConverter(object):
 
       doc2 = Document2.objects.get(owner=self.user, name=query.name)
       # Test that doc2 has same read permissions
-      assert_true(other_user in doc2.get_permission('read').users)
-      assert_true(test_group in doc2.get_permission('read').groups)
+      assert_true(other_user in doc2.get_permission('read').users.all())
+      assert_true(test_group in doc2.get_permission('read').groups.all())
       # Test that doc2 has same write permissions
-      assert_true(other_user in doc2.get_permission('write').users)
+      assert_true(other_user in doc2.get_permission('write').users.all())
     finally:
       query.delete()
