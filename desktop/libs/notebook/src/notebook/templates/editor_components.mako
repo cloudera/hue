@@ -1856,6 +1856,7 @@ ${ require.config() }
               clonedContainerPosition: "fixed"
             });
             createXScrollbar(_el);
+            $('.right-panel').perfectScrollbar('update');
           }
           else {
             _el.jHueTableExtender({
