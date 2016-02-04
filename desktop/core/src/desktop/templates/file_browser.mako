@@ -414,7 +414,7 @@ from desktop.views import _ko
       </div>
       <div class="modal-footer">
         <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
-        <input type="submit" data-bind="click: performDelete" class="btn btn-danger" value="${_('Yes')}"/>
+        <input type="submit" data-bind="click: function() { removeDocuments(true); }" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <!-- /ko -->
     </div>
@@ -519,7 +519,8 @@ from desktop.views import _ko
               <ul class="hue-context-menu">
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-file-o"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: ! $altDown()"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Remove') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: $altDown()"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
               </ul>
               <div class="fb-primary-col">

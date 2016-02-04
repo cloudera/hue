@@ -329,6 +329,14 @@
     }
   };
 
+  HueFileEntry.prototype.moveToTrash = function () {
+    var self = this;
+    if (self.selectedEntries().length > 0) {
+      self.entriesToDelete(self.selectedEntries());
+      self.removeDocuments(false);
+    }
+  }
+
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
     if (self.selectedEntries().length > 0) {
@@ -337,7 +345,7 @@
     }
   };
 
-  HueFileEntry.prototype.performDelete = function () {
+  HueFileEntry.prototype.removeDocuments = function (deleteForever) {
     var self = this;
     if (self.app === 'documents') {
       if (self.entriesToDelete().indexOf(self) !== -1) {
@@ -348,13 +356,14 @@
         if (self.entriesToDelete().length > 0) {
           var nextUuid = self.entriesToDelete().shift().definition().uuid;
           self.assistHelper.deleteDocument({
+            uuid: nextUuid,
+            skipTrash: deleteForever,
             successCallback: function () {
               deleteNext();
             },
             errorCallback: function () {
               self.activeEntry().load();
-            },
-            uuid: nextUuid
+            }
           });
         } else {
           self.activeEntry().load();
