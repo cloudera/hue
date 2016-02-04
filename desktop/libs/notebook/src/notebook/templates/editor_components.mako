@@ -39,6 +39,7 @@ from desktop.views import _ko
 
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1291,6 +1292,7 @@ ${ require.config() }
 
   function createXScrollbar(el) {
     if ($(el).parents('.dataTables_wrapper').length > 0) {
+      var scrollingRatio = function() { return ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width() / 2) / $(el).parents('.dataTables_wrapper').width(); };
       if ($(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').length == 0 && $(el).parents('.dataTables_wrapper').width() < $(el).parents('.dataTables_wrapper')[0].scrollWidth) {
         var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
         var scrollbarRail = $('<div>');
@@ -1301,12 +1303,20 @@ ${ require.config() }
           axis: 'x',
           containment: 'parent',
           drag: function () {
-            $(el).parents('.dataTables_wrapper').scrollLeft($(this).position().left * (($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width() / 2) / $(el).parents('.dataTables_wrapper').width()))
+            $(el).parents('.dataTables_wrapper').scrollLeft($(this).position().left * scrollingRatio())
           }
         });
         scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
         scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
         scrollbarRail.css("marginLeft", (colWidth) + "px");
+        $(el).parents('.dataTables_wrapper').off('mousewheel');
+        $(el).parents('.dataTables_wrapper').on('mousewheel', function (e) {
+          if (e.deltaY > -2 && e.deltaY < 2) {
+            e.preventDefault();
+          }
+          $(el).parents('.dataTables_wrapper').scrollLeft($(el).parents('.dataTables_wrapper').scrollLeft() + e.deltaX * scrollingRatio());
+          $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x').css('left', $(el).parents('.dataTables_wrapper').scrollLeft() / scrollingRatio());
+        });
       }
       else {
         var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
