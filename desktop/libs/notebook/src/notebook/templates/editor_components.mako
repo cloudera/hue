@@ -1289,6 +1289,33 @@ ${ require.config() }
     return _width;
   };
 
+  function createXScrollbar(el) {
+    if ($(el).parents('.dataTables_wrapper').length > 0) {
+      if ($(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').length == 0 && $(el).parents('.dataTables_wrapper').width() < $(el).parents('.dataTables_wrapper')[0].scrollWidth) {
+        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
+        var scrollbarRail = $('<div>');
+        var scrollbar = $('<div>').addClass('hue-scrollbar-x');
+        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper')[0].scrollWidth / $(el).parents('.dataTables_wrapper').width()));
+        scrollbar.appendTo(scrollbarRail);
+        scrollbar.draggable({
+          axis: 'x',
+          containment: 'parent',
+          drag: function () {
+            $(el).parents('.dataTables_wrapper').scrollLeft($(this).position().left * (($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width() / 2) / $(el).parents('.dataTables_wrapper').width()))
+          }
+        });
+        scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
+        scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
+        scrollbarRail.css("marginLeft", (colWidth) + "px");
+      }
+      else {
+        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
+        $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').width($(el).parents(".dataTables_wrapper").width() - colWidth);
+        $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x').width(Math.max(20, $(el).parents('.dataTables_wrapper')[0].scrollWidth / $(el).parents('.dataTables_wrapper').width()));
+      }
+    }
+  }
+
   function createDatatable(el, snippet, vm) {
     $(el).addClass("dt");
     var DATATABLES_MAX_HEIGHT = 330;
@@ -1307,7 +1334,7 @@ ${ require.config() }
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
         }
         if (vm.editorMode) {
-          $(el).parents(".dataTables_wrapper").css("overflow-x", "auto");
+          $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
           $(el).jHueTableExtender({
             fixedHeader: true,
             fixedFirstColumn: true,
@@ -1317,6 +1344,7 @@ ${ require.config() }
             stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
             clonedContainerPosition: "fixed"
           });
+          createXScrollbar(el);
         }
         else {
           $(el).parents(".dataTables_wrapper").jHueTableScroller({
@@ -1349,7 +1377,7 @@ ${ require.config() }
     });
 
     if (vm.editorMode) {
-      $(el).parents(".dataTables_wrapper").css("overflow-x", "auto");
+      $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
       $(el).jHueTableExtender({
         fixedHeader: true,
         fixedFirstColumn: true,
@@ -1359,6 +1387,7 @@ ${ require.config() }
         stickToTopPosition: vm.isPlayerMode() ? 48 : 73,
         clonedContainerPosition: "fixed"
       });
+      createXScrollbar(el);
     }
     else {
       $(el).parents(".dataTables_wrapper").jHueTableScroller({
@@ -1816,6 +1845,7 @@ ${ require.config() }
               parentId: 'snippet_' + snippet.id(),
               clonedContainerPosition: "fixed"
             });
+            createXScrollbar(_el);
           }
           else {
             _el.jHueTableExtender({
