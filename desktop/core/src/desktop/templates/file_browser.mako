@@ -429,11 +429,11 @@ from desktop.views import _ko
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><div class="fb-drop-target" data-bind="folderDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : definition().name, click: open"></a></div></li>
+              <li><div class="fb-drop-target" data-bind="folderDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
               <li class="divider">&gt;</li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
-              <li class="active"><div class="fb-drop-target" data-bind="text: definition().name"></div></li>
+              <li class="active"><div class="fb-drop-target" data-bind="text: isTrash() ? '${ _('Trash') }' : definition().name"></div></li>
               <!-- /ko -->
             </ul>
           </div>
@@ -469,12 +469,14 @@ from desktop.views import _ko
             </span>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { $('#createDirectoryModal').modal('show'); }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showDeleteConfirmation, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
           <!-- ko if: app === 'documents' -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i></a>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal"><i class="fa fa-fw fa-upload"></i></a>
+          <!-- ko if: app === 'documents' -->
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showTrash"><i class="fa fa-fw fa-trash-o"></i></a>
+          <!-- /ko -->
         </div>
         <!-- /ko -->
       </div>
@@ -492,14 +494,17 @@ from desktop.views import _ko
       </div>
       <!-- /ko -->
 
-      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult">
-        ${ _('The current folder is empty. You can add a new file or folder form the top right menu.')}
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult && ! isTrash()">
+        ${ _('The current folder is empty, you can add a new file or folder form the top right menu')}
+      </div>
+      <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && ! definition().isSearchResult && isTrash()">
+        ${ _('The trash is empty')}
       </div>
       <div class="fb-empty animated" style="display:none;" data-bind="visible: entries().length == 0 && ! hasErrors() && ! loading() && definition().isSearchResult">
-        ${ _('No documents found matching your query.')}
+        ${ _('No documents found matching your query')}
       </div>
       <div class="fb-empty animated" style="display: none;" data-bind="visible: hasErrors() && app === 'documents' && ! loading()">
-        ${ _('There was an error loading the documents.')}
+        ${ _('There was an error loading the documents')}
       </div>
       <div class="fb-empty animated" style="display: none;" data-bind="visible: loading">
         <i class="fa fa-spinner fa-spin fa-2x" style="color: #999;"></i>
