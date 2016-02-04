@@ -900,6 +900,7 @@ from desktop.views import _ko
         self.activeEntry = ko.observable();
         self.activeEntry(new HueFileEntry({
           activeEntry: self.activeEntry,
+          trashEntry: ko.observable,
           assistHelper: options.assistHelper,
           app: 'documents',
           definition: {

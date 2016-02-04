@@ -31,6 +31,7 @@
    * @param {AssistHelper} options.assistHelper
    * @param {Object} options.definition
    * @param {Function} options.activeEntry - The observable keeping track of the current open directory
+   * @param {Function} options.trashEntry - The observable keeping track of the trash directory
    * @param {HueFolder} options.parent
    * @param {string} options.app - Currently only 'documents' is supported
    *
@@ -39,12 +40,17 @@
   function HueFileEntry (options) {
     var self = this;
     self.activeEntry = options.activeEntry;
+    self.trashEntry = options.trashEntry;
     self.parent = options.parent;
     self.definition = ko.observable(options.definition);
     self.assistHelper = options.assistHelper;
     self.app = options.app;
 
     self.document = ko.observable();
+
+    self.isTrash = ko.pureComputed(function () {
+      return self.definition().name === '.Trash';
+    })
 
     self.isRoot = ko.pureComputed(function () {
       return self.definition().name === '';
@@ -178,6 +184,7 @@
 
     var resultEntry = new HueFileEntry({
       activeEntry: self.activeEntry,
+      trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       definition: {
         isSearchResult: true,
@@ -196,15 +203,23 @@
       query: query,
       successCallback: function (data) {
         resultEntry.hasErrors(false);
-        resultEntry.entries($.map(data.children, function (definition) {
-          return new HueFileEntry({
+        var newEntries = [];
+
+        $.each(data.children, function (idx, definition) {
+          var entry = new HueFileEntry({
             activeEntry: self.activeEntry,
+            trashEntry: self.trashEntry,
             assistHelper: self.assistHelper,
             definition: definition,
             app: self.app,
             parent: self
-          })
-        }));
+          });
+          if (!entry.isTrash()) {
+            newEntries.push(entry);
+          }
+        });
+
+        resultEntry.entries(entries);
         resultEntry.loading(false);
         resultEntry.loaded(true);
       },
@@ -254,15 +269,22 @@
         successCallback: function(data) {
           self.definition(data.document);
           self.hasErrors(false);
+          var newEntries = [];
 
-          var newEntries = $.map(data.children, function (definition) {
-            return new HueFileEntry({
+          $.each(data.children, function (idx, definition) {
+            var entry = new HueFileEntry({
               activeEntry: self.activeEntry,
+              trashEntry: self.trashEntry,
               assistHelper: self.assistHelper,
               definition: definition,
               app: self.app,
               parent: self
-            })
+            });
+            if (entry.isTrash()) {
+              self.trashEntry(entry);
+            } else {
+              newEntries.push(entry);
+            }
           });
 
           newEntries.sort(function (a, b) {
@@ -278,6 +300,7 @@
           if (! self.parent && data.parent) {
             self.parent = new HueFileEntry({
               activeEntry: self.activeEntry,
+              trashEntry: self.trashEntry,
               assistHelper: self.assistHelper,
               definition: data.parent,
               app: self.app,
@@ -296,6 +319,13 @@
           self.loaded(true);
         }
       });
+    }
+  };
+
+  HueFileEntry.prototype.showTrash = function () {
+    var self = this;
+    if (self.trashEntry()) {
+      self.trashEntry().open();
     }
   };
 

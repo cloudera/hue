@@ -35,8 +35,10 @@
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.activeEntry = ko.observable();
+    self.trashEntry = ko.observable();
     self.activeEntry(new HueFileEntry({
       activeEntry: self.activeEntry,
+      trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
@@ -60,6 +62,7 @@
     self.activeEntry(undefined);
     var entry = new HueFileEntry({
       activeEntry: self.activeEntry,
+      trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
@@ -91,6 +94,7 @@
     self.activeEntry(undefined);
     var lastChild = new HueFileEntry({
       activeEntry: self.activeEntry,
+      trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
       definition: {
