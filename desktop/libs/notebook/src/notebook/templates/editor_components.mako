@@ -1885,6 +1885,7 @@ ${ require.config() }
       else {
         renderer();
       }
+      $('.right-panel').jHueScrollUp();
     };
 
     window.redrawFixedHeaders = redrawFixedHeaders;
