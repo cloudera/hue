@@ -482,7 +482,7 @@ from desktop.views import _ko
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showTrash"><i class="fa fa-fw fa-trash-o"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
           <!-- /ko -->
         </div>
         <!-- /ko -->
@@ -564,6 +564,32 @@ from desktop.views import _ko
         factory(ko);
       }
     }(function (ko) {
+
+      ko.bindingHandlers.trashDroppable = {
+        init: function(element, valueAccessor, allBindings, boundEntry) {
+          var dragData;
+          huePubSub.subscribe('file.browser.dragging', function (data) {
+            dragData = data;
+          });
+          var $element = $(element);
+          $element.droppable({
+            drop: function () {
+              if (!dragData.dragToSelect) {
+                boundEntry.moveToTrash();
+                $element.removeClass('blue');
+              }
+            },
+            over: function () {
+              if (!dragData.dragToSelect) {
+                $element.addClass('blue');
+              }
+            },
+            out: function () {
+              $element.removeClass('blue');
+            }
+          })
+        }
+      };
 
       ko.bindingHandlers.fileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
