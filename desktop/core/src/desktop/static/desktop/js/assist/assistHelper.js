@@ -43,6 +43,7 @@
     self.i18n = i18n;
     self.user = user;
     self.lastKnownDatabases = {};
+    self.fetchQueue = {};
   }
 
   AssistHelper.prototype.hasExpired = function (timestamp) {
@@ -196,30 +197,60 @@
     }));
   };
 
+  AssistHelper.prototype.getFetchQueue = function (fetchFunction, identifier) {
+    var self = this;
+    if (! self.fetchQueue[fetchFunction]) {
+      self.fetchQueue[fetchFunction] = {};
+    }
+    var queueForFunction = self.fetchQueue[fetchFunction];
+
+    var id = typeof identifier === 'undefined' || identifier === null ? 'DEFAULT_QUEUE' : identifier;
+
+    if (! queueForFunction[id]) {
+      queueForFunction[id] = [];
+    }
+    return queueForFunction[id];
+  };
+
   /**
    * @param {Object} options
    * @param {Function} options.successCallback
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
-   * @param {string} [options.path]
+   * @param {string} [options.uuid]
    */
   AssistHelper.prototype.fetchDocuments = function (options) {
     var self = this;
+
+    var queue = self.getFetchQueue('fetchDocuments', options.uuid);
+    queue.push(options);
+    if (queue.length > 1) {
+      return;
+    }
+
     $.ajax({
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid
       },
       success: function (data) {
-        if (! self.successResponseIsError(data)) {
-          options.successCallback(data);
-        } else {
-          self.assistErrorCallback(options)(data);
+        while (queue.length > 0) {
+          var next = queue.shift();
+          if (! self.successResponseIsError(data)) {
+            next.successCallback(data);
+          } else {
+            self.assistErrorCallback(next)(data);
+          }
         }
       }
     })
-    .fail(self.assistErrorCallback(options));
+    .fail(function () {
+      while (queue.length > 0) {
+        var next = queue.shift();
+        self.assistErrorCallback(next);
+      }
+    });
   };
 
   /**
