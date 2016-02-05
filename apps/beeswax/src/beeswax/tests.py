@@ -3172,7 +3172,7 @@ def hive_site_xml(is_local=False, use_sasl=False, thrift_uris='thrift://darkside
 
 def test_ssl_cacerts():
   for desktop_kwargs, conf_kwargs, expected in [
-      ({'present': False}, {'present': False}, '/etc/hue/cacerts.pem'),
+      ({'present': False}, {'present': False}, ''),
       ({'present': False}, {'data': 'local-cacerts.pem'}, 'local-cacerts.pem'),
 
       ({'data': 'global-cacerts.pem'}, {'present': False}, 'global-cacerts.pem'),
