@@ -2131,6 +2131,13 @@ ${ require.config() }
         redrawFixedHeaders(200);
       });
 
+      if (viewModel.editorMode) {
+        viewModel.selectedNotebook().snippets()[0].variables.subscribe(function (newValue) {
+          hideFixedHeaders();
+          redrawFixedHeaders(200);
+        });
+      }
+
       $(document).on("showAuthModal", function (e, data) {
         viewModel.authSessionUsername('${ user.username }');
         viewModel.authSessionPassword('');
