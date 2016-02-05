@@ -118,7 +118,7 @@ class QueryHistory(models.Model):
     query_server.update({
         'server_name': self.server_name,
         'server_host': self.server_host,
-        'server_port': self.server_port,
+        'server_port': int(self.server_port),
         'server_type': self.server_type,
     })
 
