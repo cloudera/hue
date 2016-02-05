@@ -684,6 +684,7 @@ ${ utils.slaGlobal() }
               }
               _w.actionURL(action.url);
               _w.logsURL(action.log);
+              _w.externalIdUrl(action.externalIdUrl);
             }
           });
           %endif
