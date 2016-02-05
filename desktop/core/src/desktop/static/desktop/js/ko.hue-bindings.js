@@ -194,9 +194,10 @@
       var value = valueAccessor();
       $(element).toggle(ko.unwrap(value));
     },
-    update: function (element, valueAccessor) {
+    update: function (element, valueAccessor, allBindings) {
       var value = valueAccessor();
-      ko.unwrap(value) ? $(element).slideDown(100) : $(element).slideUp(100);
+      var onComplete = ko.unwrap(allBindings()).onComplete;
+      ko.unwrap(value) ? $(element).slideDown(100, onComplete ? onComplete() : function(){}) : $(element).slideUp(100, onComplete ? onComplete() : function(){});
     }
   };
 
