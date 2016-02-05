@@ -476,13 +476,14 @@ from desktop.views import _ko
             </span>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed()) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
           <!-- ko if: app === 'documents' -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: download"><i class="fa fa-fw fa-download"></i></a>
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a>
           <!-- ko if: app === 'documents' -->
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
+          <a class="inactive-action fb-action" style="margin-left: 20px;" href="javascript:void(0);" data-bind="click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }"><i class="fa fa-fw fa-trash-o"></i></a>
           <!-- /ko -->
         </div>
         <!-- /ko -->
