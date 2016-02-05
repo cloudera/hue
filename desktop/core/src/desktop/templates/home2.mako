@@ -83,7 +83,7 @@ ${ fileBrowser.fileBrowser() }
   .right-panel {
     position: absolute;
     height: 100%;
-    overflow: auto;
+    overflow: hidden;
   }
 
   .show-assist {
