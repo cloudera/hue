@@ -880,6 +880,7 @@ class Document2Manager(models.Manager):
 class Document2(models.Model):
 
   TRASH_DIR = '.Trash'
+  EXAMPLES_DIR = 'examples'
 
   owner = models.ForeignKey(auth_models.User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Creator.'), related_name='doc2_owner')
   name = models.CharField(default='', max_length=255)
