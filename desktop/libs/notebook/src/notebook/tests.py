@@ -82,8 +82,6 @@ class TestNotebookApi(object):
     assert_equal(1, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
     assert_equal(2, Document.objects.filter(name__contains=self.notebook['name']).count())
 
-    # TODO: test that shared query history saves with owner=current user
-
 
   def test_get_history(self):
     assert_equal(0, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
@@ -91,6 +89,16 @@ class TestNotebookApi(object):
     self.client.post(reverse('notebook:historify'), {'notebook': self.notebook_json})
     self.client.post(reverse('notebook:historify'), {'notebook': self.notebook_json})
     assert_equal(3, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
+
+    # History should not return history objects that don't have the given doc type
+    Document2.objects.create(name='Impala History', type='query-impala', owner=self.user, is_history=True)
+
+    # Verify that get_history API returns history objects for given type and current user
+    response = self.client.get(reverse('notebook:get_history'), {'doc_type': 'hive'})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal(3, len(data['history']), data)
+    assert_true(all(doc['data']['type'] == 'query-hive' for doc in data['history']), data)
 
     # TODO: test that query history for shared query only returns docs accessible by current user
 
@@ -102,11 +110,16 @@ class TestNotebookApi(object):
     self.client.post(reverse('notebook:historify'), {'notebook': self.notebook_json})
     assert_equal(3, Document2.objects.filter(name__contains=self.notebook['name'], is_history=True).count())
 
+    # Clear history should not clear history objects that don't have the given doc type
+    Document2.objects.create(name='Impala History', type='query-impala', owner=self.user, is_history=True)
+
     # clear history should retain original document but wipe history
-    response = self.client.post(reverse('notebook:clear_history'), {'notebook': self.notebook_json})
+    response = self.client.post(reverse('notebook:clear_history'), {'notebook': self.notebook_json, 'doc_type': 'hive'})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
-    assert_true(Document2.objects.filter(name__contains=self.notebook['name'], is_history=False).exists())
+    assert_false(Document2.objects.filter(type='query-hive', is_history=True).exists())
+    assert_true(Document2.objects.filter(type='query-hive', is_history=False).exists())
+    assert_true(Document2.objects.filter(type='query-impala', is_history=True).exists())
 
 
 class TestSparkShellConnector(object):
