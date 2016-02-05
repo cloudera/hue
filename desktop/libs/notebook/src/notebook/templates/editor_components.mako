@@ -431,7 +431,7 @@ ${ require.config() }
 
 <script type="text/html" id="query-history">
   <!-- ko if: $root.editorMode -->
-  <div class="query-history-container" data-bind="slideVisible: $parent.showHistory" style="display: none;">
+  <div class="query-history-container" data-bind="slideVisible: $parent.showHistory, onComplete: function(){ redrawFixedHeaders(200); }" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <!-- ko if: $parent.history().length > 0 -->
       <table class="table table-condensed">
@@ -466,7 +466,7 @@ ${ require.config() }
 <script type="text/html" id="notebook-snippet-header">
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); redrawFixedHeaders(100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
     <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
@@ -485,7 +485,7 @@ ${ require.config() }
       </li>
     </ul>
     <!-- /ko -->
-    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
+    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { $data.showLogs(! $data.showLogs()); redrawFixedHeaders(100); }, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>
   </div>
 </script>
@@ -913,7 +913,7 @@ ${ require.config() }
       <i class="fa fa-fw fa-indent"></i>
     </a>
     <!-- ko if: $root.editorMode -->
-      <a class="snippet-side-btn" data-bind="click: function() { $parent.showHistory(! $parent.showHistory()); window.setTimeout(redrawFixedHeaders, 100); }, css: {'blue': true}" title="${ _('Show query history') }">
+      <a class="snippet-side-btn" data-bind="click: function() { hideFixedHeaders(); $parent.showHistory(! $parent.showHistory()); }, css: {'blue': true}" title="${ _('Show query history') }">
         <i class="fa fa-fw fa-history"></i>
       </a>
     <!-- /ko -->
@@ -1014,7 +1014,7 @@ ${ require.config() }
   </div>
   <div class="modal-footer" data-bind="with: $root.removeSnippetConfirmation">
     <a class="btn" data-bind="click: function() { $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }">${_('No')}</a>
-    <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); window.setTimeout(redrawFixedHeaders, 100); $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }" />
+    <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); redrawFixedHeaders(100); $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }" />
   </div>
 </div>
 
@@ -1841,34 +1841,50 @@ ${ require.config() }
 
     window.importExternalNotebook = importExternalNotebook;
 
-    var redrawFixedHeaders = function () {
-      viewModel.notebooks().forEach(function (notebook) {
-        notebook.snippets().forEach(function (snippet) {
-          var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-          if (viewModel.editorMode){
-            _el.jHueTableExtender({
-              fixedHeader: true,
-              fixedFirstColumn: true,
-              includeNavigator: false,
-              mainScrollable: '.right-panel',
-              stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
-              parentId: 'snippet_' + snippet.id(),
-              clonedContainerPosition: "fixed"
-            });
-            createXScrollbar(_el);
-            $('.right-panel').perfectScrollbar('update');
-          }
-          else {
-            _el.jHueTableExtender({
-              fixedHeader: true,
-              fixedFirstColumn: true,
-              includeNavigator: false,
-              parentId: 'snippet_' + snippet.id(),
-              clonedContainerPosition: "absolute"
-            });
-          }
+    var hideFixedHeaders = function() {
+      $(".jHueTableExtenderClonedContainer").hide();
+      $(".jHueTableExtenderClonedContainerColumn").hide();
+      $(".jHueTableExtenderClonedContainerCell").hide();
+    };
+
+    window.hideFixedHeaders = hideFixedHeaders;
+
+    var redrawFixedHeaders = function (timeout) {
+      var renderer = function() {
+        viewModel.notebooks().forEach(function (notebook) {
+          notebook.snippets().forEach(function (snippet) {
+            var _el = $("#snippet_" + snippet.id()).find(".resultTable");
+            if (viewModel.editorMode) {
+              _el.jHueTableExtender({
+                fixedHeader: true,
+                fixedFirstColumn: true,
+                includeNavigator: false,
+                mainScrollable: '.right-panel',
+                stickToTopPosition: viewModel.isPlayerMode() ? 48 : 73,
+                parentId: 'snippet_' + snippet.id(),
+                clonedContainerPosition: "fixed"
+              });
+              createXScrollbar(_el);
+              $('.right-panel').perfectScrollbar('update');
+            }
+            else {
+              _el.jHueTableExtender({
+                fixedHeader: true,
+                fixedFirstColumn: true,
+                includeNavigator: false,
+                parentId: 'snippet_' + snippet.id(),
+                clonedContainerPosition: "absolute"
+              });
+            }
+          });
         });
-      });
+      }
+      if (timeout){
+        window.setTimeout(renderer, timeout);
+      }
+      else {
+        renderer();
+      }
     };
 
     window.redrawFixedHeaders = redrawFixedHeaders;
@@ -2112,7 +2128,7 @@ ${ require.config() }
       });
 
       viewModel.isLeftPanelVisible.subscribe(function (value) {
-        window.setTimeout(redrawFixedHeaders, 200);
+        redrawFixedHeaders(200);
       });
 
       $(document).on("showAuthModal", function (e, data) {
