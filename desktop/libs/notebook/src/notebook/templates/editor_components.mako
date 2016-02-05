@@ -1905,10 +1905,18 @@ ${ require.config() }
       }, 100);
     }
 
-    function replaceAce (content) {
-      var snip = viewModel.notebooks()[0].snippets()[0];
-      snip.statement_raw(content);
-      snip.ace().setValue(content);
+    function replaceAce(content) {
+      var snip = viewModel.notebooks()[0].snippets()[0],
+          contentLines = content.split('\n');
+      if (contentLines.length > 5000) {
+        $.jHueNotify.warn("${ _('The content you are trying to import is too big and it has been truncated for performance reasons.') }");
+        snip.statement_raw(contentLines.slice(0, 5000).join('\n'));
+        snip.ace().setValue(contentLines.slice(0, 5000).join('\n'));
+      }
+      else {
+        snip.statement_raw(content);
+        snip.ace().setValue(content);
+      }
       hideHoverMsg(viewModel);
     }
 
