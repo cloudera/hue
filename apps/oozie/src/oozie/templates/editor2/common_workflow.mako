@@ -611,8 +611,11 @@
 
 
 <script type="text/html" id="logs-icon">
-  <!-- ko if: $parent.logsURL() != '' && $parent.logsURL() != null -->
+  <!-- ko if: $parent.widgetType() != 'subworkflow-widget' && $parent.logsURL() != '' && $parent.logsURL() != null -->
     <a class="pull-right pointer logs-icon" data-bind="click: function(){ location.href = $parent.logsURL(); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+  <!-- /ko -->
+  <!-- ko if: $parent.widgetType() == 'subworkflow-widget' -->
+    <a class="pull-right pointer logs-icon" data-bind="attr: { href: $parent.externalIdUrl() }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon"/></a>
   <!-- /ko -->
 </script>
 
