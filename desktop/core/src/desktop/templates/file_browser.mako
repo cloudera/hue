@@ -257,20 +257,25 @@ from desktop.views import _ko
       width: 542px;
     }
 
+    @-webkit-keyframes fb-search-visible {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fb-search-visible {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
     .fb-search-container {
       position: absolute;
       top: 26px;
       right: 300px;
-      opacity: 0;
 
-      -webkit-transition: opacity 0.3s ease;
-      -moz-transition: opacity 0.3s ease;
-      -ms-transition: opacity 0.3s ease;
-      transition: opacity 0.3s ease;
-    }
-
-    .fb-search-visible {
-      opacity: 1;
+      -webkit-animation-name: fb-search-visible;
+      animation-name: fb-search-visible;
+      -webkit-animation-duration: 0.4s;
+      animation-duration: 0.4s;
     }
 
     .fb-search-container input {
@@ -438,9 +443,11 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <div class="fb-search-container" data-bind="css: { 'fb-search-visible' : searchVisible() }">
+        <!-- ko if: searchVisible -->
+        <div class="fb-search-container">
           <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="textInput: searchQuery, clearable: searchQuery">
         </div>
+        <!-- /ko -->
         <!-- ko with: activeEntry -->
         <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a>
