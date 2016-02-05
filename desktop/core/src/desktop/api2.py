@@ -120,7 +120,7 @@ def get_shared_documents(request):
   """
 
   response = {
-    'documents': [],
+    'documents': []
   }
 
   documents = Document2.objects.get_shared_documents(request.user, flatten=False)
@@ -132,8 +132,10 @@ def get_shared_documents(request):
   response.update(_paginate(request, queryset=response['documents']))
 
   # Serialize results
-  if response['documents']:
+  if response['documents'] and response['documents'].count() > 0:
     response['documents'] = [doc.to_dict() for doc in response['documents']]
+  else:
+    response['documents'] = []
 
   return JsonResponse(response)
 
@@ -363,10 +365,10 @@ def _filter_documents(request, queryset):
   search_text = request.GET.get('text', None)
 
   documents = Document2.objects.refine_documents(
-    documents=queryset,
-    types=type_filters,
-    search_text=search_text,
-    order_by=sort)
+      documents=queryset,
+      types=type_filters,
+      search_text=search_text,
+      order_by=sort)
 
   count = documents.count()
 

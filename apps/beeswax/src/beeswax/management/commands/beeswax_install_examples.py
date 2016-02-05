@@ -24,14 +24,12 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-from hadoop import cluster
-
 from desktop.lib.exceptions_renderable import PopupException
-from useradmin.models import install_sample_user
-from desktop.models import Document
+from desktop.models import Directory, Document, Document2, Document2Permission, import_saved_beeswax_query
+from hadoop import cluster
+from useradmin.models import get_default_user_group, install_sample_user
 
 import beeswax.conf
-
 from beeswax.models import SavedQuery, HQL, IMPALA
 from beeswax.design import hql_query
 from beeswax.server import dbms
@@ -107,7 +105,7 @@ class Command(BaseCommand):
     design_list = filter(lambda d: int(d['type']) == app_type, design_list)
 
     for design_dict in design_list:
-      design = SampleDesign(design_dict)
+      design = SampleQuery(design_dict)
       try:
         design.install(django_user)
       except Exception, ex:
@@ -280,13 +278,15 @@ class SampleTable(object):
       raise InstallException(msg)
 
 
-class SampleDesign(object):
+class SampleQuery(object):
+
   """Represents a query loaded from the designs.json file"""
   def __init__(self, data_dict):
     self.name = data_dict['name']
     self.desc = data_dict['desc']
     self.type = int(data_dict['type'])
     self.data = data_dict['data']
+
 
   def install(self, django_user):
     """
@@ -295,13 +295,45 @@ class SampleDesign(object):
     LOG.info('Installing sample query: %s' % (self.name,))
     try:
       # Don't overwrite
-      model = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
-    except SavedQuery.DoesNotExist:
-      model = SavedQuery(owner=django_user, name=self.name)
-      model.type = self.type
+      doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
+    except Document2.DoesNotExist:
+      query = SavedQuery(owner=django_user, name=self.name, type=self.type, desc=self.desc)
       # The data field needs to be a string. The sample file writes it
       # as json (without encoding into a string) for readability.
-      model.data = json.dumps(self.data)
-      model.desc = self.desc
-      model.save()
-      LOG.info('Successfully installed sample design: %s' % (self.name,))
+      query.data = json.dumps(self.data)
+
+      # Create document from saved query
+      notebook = import_saved_beeswax_query(query)
+      data = notebook.get_json()
+
+      # Get or create sample user directories
+      home_dir = Directory.objects.get_home_directory(django_user)
+      examples_dir, created = Directory.objects.get_or_create(
+        parent_directory=home_dir,
+        owner=django_user,
+        name=Document2.EXAMPLES_DIR
+      )
+
+      doc2 = Document2.objects.create(
+        owner=django_user,
+        parent_directory=examples_dir,
+        name=self.name,
+        type=self._document_type(self.type),
+        description=self.desc,
+        data=data
+      )
+
+      # Share with default group
+      examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
+      doc2.save()
+
+      LOG.info('Successfully installed sample query: %s' % (self.name,))
+
+
+  def _document_type(self, type):
+    if type == HQL:
+      return 'query-hive'
+    elif type == IMPALA:
+      return 'query-impala'
+    else:
+      return None
