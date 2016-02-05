@@ -434,7 +434,7 @@ from desktop.views import _ko
               <!-- /ko -->
 
               <!-- ko foreach: breadcrumbs -->
-              <li><div class="fb-drop-target" data-bind="folderDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
+              <li><div class="fb-drop-target" data-bind="fileDroppable: { entries: $parent.entries, disableSelect: true }"><a href="javascript:void(0);" data-bind="text: isRoot() ? '${ _('My documents') }' : (isTrash() ? '${ _('Trash') }' : definition().name), click: open"></a></div></li>
               <li class="divider">&gt;</li>
               <!-- /ko -->
               <!-- ko ifNot: isRoot -->
@@ -521,7 +521,7 @@ from desktop.views import _ko
 
       <div class="fb-list" data-bind="with: activeEntry">
         <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
-          <li data-bind="fileSelect: $parent.entries, folderDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
+          <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div style="width: 100%; height: 100%" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
@@ -565,7 +565,7 @@ from desktop.views import _ko
       }
     }(function (ko) {
 
-      ko.bindingHandlers.folderDroppable = {
+      ko.bindingHandlers.fileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry, bindingContext) {
           var options = valueAccessor();
           var allEntries = options.entries;
@@ -577,36 +577,35 @@ from desktop.views import _ko
             alreadySelected = boundEntry.selected();
             dragToSelect = value;
           });
-          if (boundEntry.isDirectory()) {
-            $element.droppable({
-              drop: function (ev, ui) {
-                if (! dragToSelect) {
-                  boundEntry.moveHere($.grep(allEntries(), function (entry) {
-                    return entry.selected();
-                  }));
-                }
-              },
-              over: function () {
-                if (dragToSelect && ! disableSelect) {
-                  boundEntry.selected(true);
-                } else if (! dragToSelect) {
-                  $element.addClass('fb-drop-hover');
-                }
-              },
-              out: function (event, ui) {
-                if (!(alreadySelected && (event.metaKey || event.ctrlKey)) && dragToSelect && ! disableSelect) {
-                  var originTop = ui.draggable[0].getBoundingClientRect().top;
-                  var elementMiddle = element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2)
-                  if ((originTop > elementMiddle && ui.position.top > elementMiddle) ||
-                      (originTop < elementMiddle && ui.position.top < elementMiddle)) {
-                    boundEntry.selected(false);
-                  }
-                } else if (! dragToSelect) {
-                  $element.removeClass('fb-drop-hover');
-                }
+          $element.droppable({
+            drop: function (ev, ui) {
+              if (! dragToSelect && boundEntry.isDirectory()) {
+                boundEntry.moveHere($.grep(allEntries(), function (entry) {
+                  return entry.selected();
+                }));
               }
-            })
-          }
+              $element.removeClass('fb-drop-hover');
+            },
+            over: function () {
+              if (dragToSelect && ! disableSelect) {
+                boundEntry.selected(true);
+              } else if (! dragToSelect && boundEntry.isDirectory()) {
+                $element.addClass('fb-drop-hover');
+              }
+            },
+            out: function (event, ui) {
+              if (!(alreadySelected && (event.metaKey || event.ctrlKey)) && dragToSelect && ! disableSelect) {
+                var originTop = ui.draggable[0].getBoundingClientRect().top;
+                var elementMiddle = element.getBoundingClientRect().top + (element.getBoundingClientRect().height / 2)
+                if ((originTop > elementMiddle && ui.position.top > elementMiddle) ||
+                    (originTop < elementMiddle && ui.position.top < elementMiddle)) {
+                  boundEntry.selected(false);
+                }
+              } else if (! dragToSelect && boundEntry.isDirectory()) {
+                $element.removeClass('fb-drop-hover');
+              }
+            }
+          })
         }
       };
 
@@ -640,7 +639,7 @@ from desktop.views import _ko
 
               huePubSub.publish('fb.drag.to.select', dragToSelect);
 
-              if (selectedEntries.length > 0 && ! (event.metaKey || event.ctrlKey)){
+              if (dragToSelect && selectedEntries.length > 0 && ! (event.metaKey || event.ctrlKey)){
                 $.each(selectedEntries, function (idx, selectedEntry) {
                   if (selectedEntry !== boundEntry) {
                    selectedEntry.selected(false);
