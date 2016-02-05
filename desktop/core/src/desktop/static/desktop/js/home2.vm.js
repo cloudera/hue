@@ -46,8 +46,6 @@
       }
     }));
 
-    self.activeEntry().load();
-
     self.shareFormDocId = ko.observable('');
     self.exportFormDocIds = ko.observable('');
 

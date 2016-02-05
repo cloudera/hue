@@ -247,13 +247,15 @@ ${ fileBrowser.fileBrowser() }
           viewModel.openUuid(location.getParameter('uuid'));
         } else if (location.getParameter('path')) {
           viewModel.openPath(location.getParameter('path'));
+        } else {
+          viewModel.activeEntry().load();
         }
       };
       window.onpopstate = loadUrlParam;
       loadUrlParam();
 
       viewModel.activeEntry.subscribe(function (newEntry) {
-        if (newEntry.definition().uuid) {
+        if (newEntry.definition().uuid && ! newEntry.isRoot()) {
           hueUtils.changeURL('/home?uuid=' + newEntry.definition().uuid);
         }
       });
