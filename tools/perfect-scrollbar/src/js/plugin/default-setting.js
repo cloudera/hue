@@ -14,5 +14,6 @@ module.exports = {
   useSelectionScroll: false,
   wheelPropagation: false,
   wheelSpeed: 1,
-  theme: 'default'
+  theme: 'default',
+  scrollYFixedTop: null
 };

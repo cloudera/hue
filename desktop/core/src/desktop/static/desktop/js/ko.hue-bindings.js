@@ -3073,7 +3073,8 @@
 
         $container.perfectScrollbar({
           minScrollbarLength: options.minScrollbarLength || 20,
-          suppressScrollX: options.suppressScrollX || true
+          suppressScrollX: options.suppressScrollX || true,
+          scrollYFixedTop: options.scrollYFixedTop ? $container.position().top : null
         });
         $container.on('ps-scroll-x', function () {
           $(element).trigger('scroll');
@@ -3084,7 +3085,7 @@
       }
       else {
         window.setTimeout(function(){
-          $container.perfectScrollbar('update');
+          $container.perfectScrollbar('update', {scrollYFixedTop: $container.position().top});
         }, 200);
       }
 
