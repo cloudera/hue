@@ -81,12 +81,12 @@ ${ assist.assistPanel() }
   <table class="table table-striped table-condensed table-nowrap">
     <thead>
     <tr>
-      <th width="1%">&nbsp;</th>
+      <th width="2%">&nbsp;</th>
       ## no stats for partition key type
-      <th width="1%" class="no-sort">&nbsp;</th>
-      <th width="1%">&nbsp;</th>
+      <th width="2%" class="no-sort">&nbsp;</th>
+##       <th width="1%">&nbsp;</th>
       <th width="17%">${_('Name')}</th>
-      <th width="30%">${_('Type')}</th>
+      <th width="29%">${_('Type')}</th>
       <th width="50%">${_('Comment')}</th>
     </tr>
     </thead>
@@ -107,7 +107,7 @@ ${ assist.assistPanel() }
             assistHelper: table.assistHelper
           } }"></span>
         </td>
-        <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
+##         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
         <td title="${ _("Scroll to the column") }">
           <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
         </td>
@@ -460,7 +460,7 @@ ${ assist.assistPanel() }
     <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     <!-- ko with: database -->
     <!-- ko with: table -->
-    <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
+##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % if has_write_access:
