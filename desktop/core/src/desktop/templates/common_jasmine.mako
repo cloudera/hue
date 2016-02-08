@@ -27,6 +27,7 @@
 
     <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
     <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
+    <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 
     ${ require.config() }
 
