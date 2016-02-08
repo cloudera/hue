@@ -2,5 +2,5 @@
 # See LICENSE for details.
 
 """
-Package containing unit tests for L{OpenSSL}.
+Package containing unit tests for :py:mod:`OpenSSL`.
 """

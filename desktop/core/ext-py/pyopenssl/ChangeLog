@@ -1,3 +1,185 @@
+2011-09-02  Hynek Schlawack  <hs@ox.cx>
+
+	* Release 0.15.1
+
+2015-04-14  Glyph Lefkowitz  <glyph@twistedmatrix.com>
+
+	* OpenSSL/SSL.py, OpenSSL/test/test_ssl.py: Fix a regression
+	  present in 0.15, where when an error occurs and no errno() is set,
+	  a KeyError is raised.  This happens, for example, if
+	  Connection.shutdown() is called when the underlying transport has
+	  gone away.
+
+2011-09-02  Hynek Schlawack  <hs@ox.cx>
+
+	* Release 0.15
+
+2015-04-12  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/rand.py, OpenSSL/SSL.py: APIs which previously accepted
+	  filenames only as bytes now accept them as either bytes or
+	  unicode (and respect sys.getfilesystemencoding()).
+
+2015-03-23  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/SSL.py: Add Cory Benfield's next-protocol-negotiation
+	  (NPN) bindings.
+
+2015-03-15  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/SSL.py: Add ``Connection.recv_into``, mirroring the
+	  builtin ``socket.recv_into``.  Based on work from Cory Benfield.
+	* OpenSSL/test/test_ssl.py: Add tests for ``recv_into``.
+
+2015-01-30  Stephen Holsapple <sholsapp@gmail.com>
+
+	* OpenSSL/crypto.py: Expose ``X509StoreContext`` for verifying certificates.
+	* OpenSSL/test/test_crypto.py: Add intermediate certificates for
+
+2015-01-08  Paul Aurich <paul@darkrain42.org>
+
+	* OpenSSL/SSL.py: ``Connection.shutdown`` now propagates errors from the
+	  underlying socket.
+
+2014-12-11  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/SSL.py: Fixed a regression ``Context.check_privatekey``
+	  causing it to always succeed - even if it should fail.
+
+2014-08-21  Alex Gaynor  <alex.gaynor@gmail.com>
+
+	* OpenSSL/crypto.py: Fixed a regression where calling ``load_pkcs7_data``
+	  with ``FILETYPE_ASN1`` would fail with a ``NameError``.
+
+2014-05-05  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/SSL.py: Fix a regression in which the first argument of
+	  the "verify" callback was incorrectly passed a ``Context`` instance
+	  instead of the ``Connection`` instance.
+	* OpenSSL/test/test_ssl.py: Add a test for the value passed as the
+	  first argument of the "verify" callback.
+
+2014-04-19  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/crypto.py: Based on work from Alex Gaynor, Andrew
+	  Lutomirski, Tobias Oberstein, Laurens Van Houtven, and Hynek
+	  Schlawack, add ``get_elliptic_curve`` and ``get_elliptic_curves``
+	  to support TLS ECDHE modes.
+	* OpenSSL/SSL.py: Add ``Context.set_tmp_ecdh`` to configure a TLS
+	  context with a particular elliptic curve for ECDHE modes.
+
+2014-04-19  Markus Unterwaditzer <markus@unterwaditzer.net>
+
+	* OpenSSL/SSL.py: ``Connection.send`` and ``Connection.sendall``
+	  now also accept the ``buffer`` type as data.
+
+2014-04-05  Stephen Holsapple <sholsapp@gmail.com>
+
+	* OpenSSL/crypto.py: Make ``load_pkcs12`` backwards compatible with
+	  pyOpenSSL 0.13 by making passphrase optional.
+
+2014-03-30  Fedor Brunner  <fedor.brunner@azet.sk>
+
+	* OpenSSL/SSL.py: Add ``get_finished``, ``get_peer_finished``
+	  methods to ``Connection``. If you use these methods to
+	  implement TLS channel binding (RFC 5929) disable session
+	  resumption because triple handshake attacks against TLS.
+	  <https://www.ietf.org/mail-archive/web/tls/current/msg11337.html>
+	  <https://secure-resumption.com/tlsauth.pdf>
+
+2014-03-29  Fedor Brunner  <fedor.brunner@azet.sk>
+
+	* OpenSSL/SSL.py: Add ``get_cipher_name``, ``get_cipher_bits``,
+	  and ``get_cipher_version`` to ``Connection``.
+
+2014-03-28  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/tsafe.py: Replace the use of ``apply`` (which has been
+	  removed in Python 3) with the equivalent syntax.
+
+2014-03-28  Jonathan Giannuzzi  <jonathan@giannuzzi.be>
+
+	* OpenSSL/crypto.py: Fix memory leak in _X509_REVOKED_dup.
+	* leakcheck/crypto.py: Add checks for _X509_REVOKED_dup, CRL.add_revoked
+	  and CRL.get_revoked.
+	* setup.py: Require cryptography 0.3 to have the ASN1_TIME_free binding.
+
+2014-03-02  Stephen Holsapple  <sholsapp@gmail.com>
+
+	* OpenSSL/crypto.py: Add ``get_extensions`` method to ``X509Req``.
+
+2014-02-23  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* Release 0.14
+
+2014-01-09  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL: Port to the cffi-based OpenSSL bindings provided by
+	  <https://github.com/pyca/cryptography>
+
+2013-10-06  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/ssl/context.c: Add support for negotiating TLS v1.1 or
+	  v1.2.
+
+2013-10-03  Christian Heimes  <christian@python.org>
+
+	* OpenSSL/crypto/x509.c: Fix an inconsistency in memory management
+	  in X509.get_serial_number which leads to crashes on some runtimes
+	  (certain Windows/Python 3.3 environments, at least).
+
+2013-08-11  Christian Heimes  <christian@python.org>
+
+	* OpenSSL/crypto/x509ext.c: Fix handling of NULL bytes inside
+	  subjectAltName general names when formatting an X509 extension
+	  as a string.
+	* OpenSSL/crypto/x509.c: Fix memory leak in get_extension().
+
+2012-04-03  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/crypto/pkey.c: Release the GIL around RSA and DSA key
+	  generation, based on code from INADA Naoki.
+
+2012-02-13  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/ssl/ssl.c: Add session cache related constants for use
+	  with the new Context.set_session_cache_mode method.
+
+	* OpenSSL/ssl/context.c: Add new Context methods
+	  set_session_cache_mode and get_session_cache_mode.
+
+2011-11-01  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/crypto/pkey.c: Raise TypeError when trying to check a
+	  PKey instance which has no private component, instead of crashing.
+	  Based on fix by <lp:~dataway>.
+
+2011-09-14  Žiga Seilnacht <lp:ziga-seilnacht>
+
+	* OpenSSL/crypto/crypto.c: Allow exceptions from passphrase
+	  callbacks to propagate up out of load_privatekey
+	* OpenSSL/crypto/crypto.c: Raise an exception when a too-long
+	  passphrase is returned from a passphrase callback, instead of
+	  silently truncating it.
+	* OpenSSL/crypto/crypto.c: Fix a memory leak when a passphrase
+	  callback returns the wrong type.
+
+2011-09-13  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
+
+	* OpenSSL/crypto/crl.c: Add error handling for the use of
+	  X509_CRL_sign.
+
+2011-09-11  Jonathan Ballet  <lp:multani>
+
+	* doc/: Convert the LaTeX documentation to Sphinx-using ReST.
+	* OpenSSL/: Convert the epytext API documentation to Sphinx-using ReST.
+
+2011-09-08  Guillermo Gonzalez  <guillermo.gonzalez@canonical.com>
+
+	* OpenSSL/ssl/context.c: Add Context.set_mode method.
+	* OpenSSL/ssl/ssl.c: Add MODE_RELEASE_BUFFERS and OP_NO_COMPRESSION
+	  constants.
+
 2011-09-02  Jean-Paul Calderone  <exarkun@twistedmatrix.com>
 
 	* Release 0.13
