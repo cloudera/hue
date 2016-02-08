@@ -731,13 +731,13 @@ from desktop.views import _ko
           if (boundEntry.isDirectory) {
             $element.droppable({
               drop: function () {
-                if (!dragData.dragToSelect) {
+                if (dragData && !dragData.dragToSelect) {
                   boundEntry.moveHere(dragData.selectedEntries);
                   dragData.originEntry.load();
                 }
               },
               over: function () {
-                if (!dragData.dragToSelect) {
+                if (dragData && !dragData.dragToSelect) {
                   $element.addClass('assist-file-entry-drop');
                 }
               },
