@@ -575,13 +575,13 @@ from desktop.views import _ko
           var $element = $(element);
           $element.droppable({
             drop: function () {
-              if (!dragData.dragToSelect) {
+              if (dragData && !dragData.dragToSelect) {
                 boundEntry.moveToTrash();
                 $element.removeClass('blue');
               }
             },
             over: function () {
-              if (!dragData.dragToSelect) {
+              if (dragData && !dragData.dragToSelect) {
                 $element.addClass('blue');
               }
             },
