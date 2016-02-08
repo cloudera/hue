@@ -1339,7 +1339,8 @@
             $allPanels.each(function (idx, panel) {
               panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
-            assistHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios)
+            assistHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
+            $('.ps-container').perfectScrollbar('update');
           }
         });
       });
@@ -3074,7 +3075,7 @@
         $container.perfectScrollbar({
           minScrollbarLength: options.minScrollbarLength || 20,
           suppressScrollX: options.suppressScrollX || true,
-          scrollYFixedTop: options.scrollYFixedTop ? $container.position().top : null
+          scrollYFixedTop: options.scrollYFixedTop ? (typeof options.scrollYFixedTop == 'boolean' ? $container.position().top : options.scrollYFixedTop) : null
         });
         $container.on('ps-scroll-x', function () {
           $(element).trigger('scroll');
@@ -3085,7 +3086,18 @@
       }
       else {
         window.setTimeout(function(){
-          $container.perfectScrollbar('update', {scrollYFixedTop: $container.position().top});
+          $container.perfectScrollbar('destroy');
+          $container.perfectScrollbar({
+            minScrollbarLength: options.minScrollbarLength || 20,
+            suppressScrollX: options.suppressScrollX || true,
+            scrollYFixedTop: options.scrollYFixedTop ? (typeof options.scrollYFixedTop == 'boolean' ? $container.position().top : options.scrollYFixedTop) : null
+          });
+          $container.on('ps-scroll-x', function () {
+            $(element).trigger('scroll');
+          });
+          $container.on('ps-scroll-y', function () {
+            $(element).trigger('scroll');
+          });
         }, 200);
       }
 
@@ -3287,6 +3299,9 @@
         $parentFVOwnerElement.data('disposalFunction', null);
       });
 
+      ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], function () {
+        $container.perfectScrollbar('destroy')
+      });
       ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], $parentFVOwnerElement.data('disposalFunction'));
 
       setStartAndEndFromScrollTop();
