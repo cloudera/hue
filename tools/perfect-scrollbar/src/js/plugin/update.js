@@ -6,11 +6,17 @@ var d = require('../lib/dom')
   , updateGeometry = require('./update-geometry')
   , updateScroll = require('./update-scroll');
 
-module.exports = function (element) {
+module.exports = function (element, settings) {
   var i = instances.get(element);
 
   if (!i) {
     return;
+  }
+
+  if (settings) {
+    Object.keys(settings).forEach(function (key) {
+      i.settings[key] = settings[key];
+    });
   }
 
   // Recalcuate negative scrollLeft adjustment
