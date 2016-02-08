@@ -187,7 +187,7 @@
       })
       .fail(self.assistErrorCallback(options))
       .always(function () {
-        if (options.editor) {
+        if (typeof options.editor !== 'undefined' && options.editor !== null) {
           options.editor.hideSpinner();
         }
       });
@@ -248,10 +248,10 @@
         }
       }
     })
-    .fail(function () {
+    .fail(function (response) {
       while (queue.length > 0) {
         var next = queue.shift();
-        self.assistErrorCallback(next);
+        self.assistErrorCallback(next)(response);
       }
     });
   };
@@ -768,29 +768,55 @@
       return
     }
 
-    fetchCached.bind(self)($.extend(options, {
-      fetchFunction: function (storeInCache) {
-        $.post(options.url, {
-          notebook: {},
-          snippet: ko.mapping.toJSON({
-            type: options.sourceType
-          })
-        }, function (data) {
-          if (data.status === 0) {
-            if (options.cacheCondition(data)) {
-              storeInCache(data);
-            }
-            options.successCallback(data);
-          } else {
-            options.errorCallback(data);
-          }
-        }).fail(options.errorCallback).always(function () {
-          if (options.editor) {
-            options.editor.hideSpinner();
-          }
-        });
+    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+    if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp)) {
+      options.successCallback(cachedData[options.url].data);
+      return;
+    }
+    if (typeof options.editor !== 'undefined' && options.editor !== null) {
+      options.editor.showSpinner();
+    }
+
+    var queue = self.getFetchQueue('fetchAssistData', options.sourceType + '_' + options.url);
+    queue.push(options);
+    if (queue.length > 1) {
+      return;
+    }
+    
+    $.post(options.url, {
+      notebook: {},
+      snippet: ko.mapping.toJSON({
+        type: options.sourceType
+      })
+    }, function (data) {
+      // Safe to assume all requests in the queue have the same cacheCondition
+      if (data.status === 0 && options.cacheCondition(data)) {
+        cachedData[options.url] = {
+          timestamp: (new Date()).getTime(),
+          data: data
+        };
+        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
       }
-    }));
+      while (queue.length > 0) {
+        var next = queue.shift();
+        if (data.status === 0) {
+          next.successCallback(data);
+        } else {
+          next.errorCallback(data);
+        }
+        if (typeof next.editor !== 'undefined' && next.editor !== null) {
+          next.editor.hideSpinner();
+        }
+      }
+    }).fail(function (data) {
+      while (queue.length > 0) {
+        var next = queue.shift();
+        next.errorCallback(data);
+        if (typeof next.editor !== 'undefined' && next.editor !== null) {
+          next.editor.hideSpinner();
+        }
+      }
+    });
   };
 
   /**
@@ -807,7 +833,7 @@
     var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
 
     if (typeof cachedData[options.url] == "undefined" || self.hasExpired(cachedData[options.url].timestamp)) {
-      if (options.editor) {
+      if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }
       options.fetchFunction(function (data) {
