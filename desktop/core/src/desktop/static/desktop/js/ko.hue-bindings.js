@@ -2947,6 +2947,8 @@
    * height is used. It keeps a number of elements above and below the visible elements to make slow scrolling
    * smooth.
    *
+   * The height of the container element has to be less than or equal to the inner height of the window.
+   *
    * Example:
    *
    * <div class=".container" style="overflow-y: scroll; height: 100px">
@@ -3030,7 +3032,11 @@
       var elementIncrement = 0; // Elements to add on either side of the visible elements, set to 3x visibleCount
 
       var updateVisibleEntryCount = function () {
-        var newEntryCount = Math.ceil($container.innerHeight() / entryMinHeight);
+        // TODO: Drop the window innerHeight limitation.
+        // Sometimes after resizeWrapper() is called the reported innerHeight of the $container is the same as
+        // the wrapper causing the binding to render all the items. This limits the visibleEntryCount to the
+        // window height.
+        var newEntryCount = Math.ceil(Math.min($(window).innerHeight(), $container.innerHeight()) / entryMinHeight);
         if (newEntryCount !== visibleEntryCount) {
           var diff = newEntryCount - visibleEntryCount;
           elementIncrement = options.elementIncrement || (newEntryCount * 4);
@@ -3165,7 +3171,7 @@
       };
 
       var render = function () {
-        if (endIndex < 0) {
+        if (endIndex === 0 && allEntries.length > 1 || endIndex < 0) {
           ko.bindingHandlers.template.update(element, function () {
             return {
               'foreach': [],
@@ -3224,7 +3230,7 @@
                 $parentOwner = $child;
               }
             } else {
-              // Remove the height of the child witch is the parent of this
+              // Remove the height of the child which is the parent of this
               parentSpace -= lastAddedSpace;
               return false;
             }
