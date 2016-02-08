@@ -53,12 +53,8 @@
     });
 
     self.isTrashed = ko.pureComputed(function () {
-      var parent = self.parent;
-      while (parent) {
-        if (parent.isTrash()) {
-          return true;
-        }
-        parent = parent.parent;
+      if (typeof self.parent !== 'undefined' && self.parent !== null) {
+        return self.parent.isTrash() || self.parent.isTrashed();
       }
       return false;
     });
