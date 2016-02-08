@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>perfect-scrollbar example</title>
+    <link href="../dist/css/perfect-scrollbar.css" rel="stylesheet">
+    <script src="../dist/js/perfect-scrollbar.js"></script>
+    <style>
+      .contentHolder { position:relative; margin:0px auto; padding:0px; width: 600px; height: 400px; overflow: auto; }
+      .contentHolder .content { background-image: url('./azusa.jpg'); width: 1280px; height: 720px; }
+      .spacer { text-align:center }
+      h2 { text-align: center; }
+    </style>
+  </head>
+  <body>
+    <h2>Default</h2>
+    <div id="Default" class="contentHolder">
+      <div class="content">
+      </div>
+    </div>
+    <h2>suppressScrollX: true</h2>
+    <div id="SuppressScrollX" class="contentHolder">
+      <div class="content">
+      </div>
+    </div>
+    <h2>suppressScrollY: true</h2>
+    <div id="SuppressScrollY" class="contentHolder">
+      <div class="content">
+      </div>
+    </div>
+    <script>
+      var $ = document.querySelector.bind(document);
+      window.onload = function () {
+        Ps.initialize($('#Default'));
+        Ps.initialize($('#SuppressScrollX'), {suppressScrollX: true});
+        Ps.initialize($('#SuppressScrollY'), {suppressScrollY: true});
+      };
+    </script>
+  </body>
+</html>
