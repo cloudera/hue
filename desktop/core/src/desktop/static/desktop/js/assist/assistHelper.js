@@ -170,13 +170,16 @@
     var self = this;
     var url = HDFS_API_PREFIX + "/" + options.pathParts.join("/") + HDFS_PARAMETERS;
 
-    var fetchFunction = function (successCallback) {
+    var fetchFunction = function (storeInCache) {
       $.ajax({
         dataType: "json",
         url: url,
         success: function (data) {
-          if (!data.error && !self.successResponseIsError(data)) {
-            successCallback(data);
+          if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+            if (data.files.length > 2) {
+              storeInCache(data);
+            }
+            options.successCallback(data);
           } else {
             self.assistErrorCallback(options)(data);
           }
@@ -476,6 +479,9 @@
         }
         self.lastKnownDatabases[options.sourceType] = [];
         self.assistErrorCallback(options)(response);
+      },
+      cacheCondition: function (data) {
+        return typeof data !== 'undefined' && data !== null && typeof data.databases !== 'undefined' && data.databases !== null && data.databases.length > 0;
       }
     }));
   };
@@ -688,8 +694,23 @@
     var self = this;
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
-      errorCallback: self.assistErrorCallback(options)
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: function (data) {
+        return typeof data !== 'undefined' && data !== null && typeof data.tables_meta !== 'undefined' && data.tables_meta !== null && data.tables_meta.length > 0;
+      }
     }));
+  };
+
+  var fieldCacheCondition = function (data) {
+    if (typeof data !== 'undefined' && data !== null) {
+      return (typeof data.item !== 'undefined' && data.item !== null) ||
+          (typeof data.key !== 'undefined' && data.key !== null) ||
+          (typeof data.tables_meta !== 'undefined' && data.tables_meta !== null && data.tables_meta.length > 0) ||
+          (typeof data.extended_columns !== 'undefined' && data.extended_columns !== null && data.extended_columns.length > 0) ||
+          (typeof data.columns !== 'undefined' && data.columns !== null && data.columns.length > 0) ||
+          (typeof data.fields !== 'undefined' && data.fields !== null && data.fields.length > 0)
+    }
+    return false;
   };
 
   /**
@@ -709,7 +730,8 @@
     var fieldPart = options.fields.length > 0 ? "/" + options.fields.join("/") : "";
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
-      errorCallback: self.assistErrorCallback(options)
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: fieldCacheCondition
     }));
   };
 
@@ -726,7 +748,8 @@
     var self = this;
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
-      errorCallback: self.assistErrorCallback(options)
+      errorCallback: self.assistErrorCallback(options),
+      cacheCondition: fieldCacheCondition
     }));
   };
 
@@ -734,6 +757,7 @@
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} options.url
+   * @param {Function} options.cacheCondition - Determines whether it should be cached or not
    * @param {Function} options.successCallback
    * @param {Function} options.errorCallback
    * @param {Object} [options.editor] - Ace editor
@@ -745,7 +769,7 @@
     }
 
     fetchCached.bind(self)($.extend(options, {
-      fetchFunction: function (successCallback) {
+      fetchFunction: function (storeInCache) {
         $.post(options.url, {
           notebook: {},
           snippet: ko.mapping.toJSON({
@@ -753,7 +777,10 @@
           })
         }, function (data) {
           if (data.status === 0) {
-            successCallback(data);
+            if (options.cacheCondition(data)) {
+              storeInCache(data);
+            }
+            options.successCallback(data);
           } else {
             options.errorCallback(data);
           }
@@ -789,7 +816,6 @@
           data: data
         };
         $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
-        options.successCallback(data);
       });
     } else {
       options.successCallback(cachedData[options.url].data);
