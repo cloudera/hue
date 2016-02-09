@@ -478,7 +478,7 @@ ${ require.config() }
   <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;">
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
     <!-- ko if: availableDatabases().length > 0 -->
-    <a class="inactive-action active-database margin-left-10" data-toggle="dropdown" href="javascript:void(0)"><span data-bind="visible: isSqlDialect, text: database"></span> <i class="fa fa-caret-down"></i></a>
+    <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-toggle="dropdown" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }"><span data-bind="visible: isSqlDialect, text: database"></span> <i class="fa fa-caret-down"></i></a>
     <ul class="dropdown-menu" data-bind="foreach: availableDatabases">
       <li>
         <a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.database($data); }"></a>
@@ -491,7 +491,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet">
-  <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible(), selector: '.hover-actions' }">
+  <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible(), selector: '.hover-actions' }">
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode || inFocus, selector: '.snippet-actions' }">
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode, 'editor-mode': $root.editorMode, 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
