@@ -293,15 +293,22 @@ class SampleQuery(object):
     Install queries. Raise InstallException on failure.
     """
     LOG.info('Installing sample query: %s' % (self.name,))
+
     try:
       # Don't overwrite
-      doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
-    except Document2.DoesNotExist:
+      query = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
+    except SavedQuery.DoesNotExist:
       query = SavedQuery(owner=django_user, name=self.name, type=self.type, desc=self.desc)
       # The data field needs to be a string. The sample file writes it
       # as json (without encoding into a string) for readability.
       query.data = json.dumps(self.data)
+      query.save()
+      LOG.info('Successfully installed sample design: %s' % (self.name,))
 
+    try:
+      # Don't overwrite
+      doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
+    except Document2.DoesNotExist:
       # Create document from saved query
       notebook = import_saved_beeswax_query(query)
       data = notebook.get_json()
