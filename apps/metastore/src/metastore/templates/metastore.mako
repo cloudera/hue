@@ -485,10 +485,10 @@ ${ assist.assistPanel() }
     <div class="span3 tile">
       <!-- ko template: 'metastore-table-stats' --><!-- /ko -->
     </div>
-    <div class="span6 tile">
-      <h4>${ _('Tagging') }</h4>
-      <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
-    </div>
+    ## <div class="span6 tile">
+    ##  <h4>${ _('Tagging') }</h4>
+    ##  <div title="${ _('Tags') }"><i class="fa fa-fw fa-tags muted"></i> ${ _('No tags') }</div>
+    ## </div>
   </div>
 
   <div class="tile">
