@@ -782,7 +782,7 @@
     if (queue.length > 1) {
       return;
     }
-    
+
     $.post(options.url, {
       notebook: {},
       snippet: ko.mapping.toJSON({

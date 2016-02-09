@@ -769,7 +769,19 @@ from desktop.views import _ko
 
         self.visible = ko.observable(options.visible);
         options.assistHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
-        self.templateName = 'assist-' + self.type + '-inner-panel'
+        self.templateName = 'assist-' + self.type + '-inner-panel';
+
+        var loadWhenVisible = function () {
+          if (! self.visible()) {
+            return;
+          }
+          if (self.type === 'documents' && !self.panelData.activeEntry().loaded()) {
+            self.panelData.activeEntry().load();
+          }
+        };
+
+        self.visible.subscribe(loadWhenVisible);
+        loadWhenVisible();
       }
 
       /**
@@ -908,8 +920,6 @@ from desktop.views import _ko
             type: 'directory'
           }
         }));
-
-        self.activeEntry().load();
       }
 
       /**
