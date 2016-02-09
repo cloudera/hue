@@ -421,11 +421,17 @@ from desktop.views import _ko
     <span data-bind="text: definition.name"></span>
   </script>
 
+  <script type="text/html" id="assist-hdfs-header-actions">
+    <div class="hover-actions assist-db-header-actions">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-hdfs-inner-panel">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
         <!-- ko with: selectedHdfsEntry -->
-        <div class="assist-flex-header assist-breadcrumb">
+        <div class="assist-flex-header assist-breadcrumb" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading }">
           <!-- ko if: parent !== null -->
           <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
             <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
@@ -439,6 +445,7 @@ from desktop.views import _ko
             <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
           </div>
           <!-- /ko -->
+          <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
         </div>
         <div class="assist-flex-fill assist-hdfs-scrollable">
           <div data-bind="visible: ! loading() && ! hasErrors()">
@@ -931,29 +938,37 @@ from desktop.views import _ko
         var self = this;
         self.assistHelper = options.assistHelper;
 
-        var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
-        var parts = lastKnownPath.split('/');
-        parts.shift();
+        self.selectedHdfsEntry = ko.observable();
+        var reload = function () {
+          var lastKnownPath = self.assistHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+          var parts = lastKnownPath.split('/');
+          parts.shift();
 
-        var currentEntry = new AssistHdfsEntry({
-          definition: {
-            name: '/',
-            type: 'dir'
-          },
-          parent: null,
-          assistHelper: self.assistHelper
-        });
+          var currentEntry = new AssistHdfsEntry({
+            definition: {
+              name: '/',
+              type: 'dir'
+            },
+            parent: null,
+            assistHelper: self.assistHelper
+          });
 
-        currentEntry.loadDeep(parts, function (entry) {
-          currentEntry = entry;
-        });
+          currentEntry.loadDeep(parts, function (entry) {
+            self.selectedHdfsEntry(entry);
+            entry.open(true);
+          });
+        };
 
-        currentEntry.open(true);
-        self.selectedHdfsEntry = ko.observable(currentEntry);
+        reload();
 
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
           self.assistHelper.setInTotalStorage('assist', 'currentHdfsPath', entry.path);
+        });
+
+        huePubSub.subscribe('assist.hdfs.refresh', function () {
+          huePubSub.publish('assist.clear.hdfs.cache');
+          reload();
         });
       }
 
