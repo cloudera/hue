@@ -46,8 +46,12 @@
     self.fetchQueue = {};
 
     huePubSub.subscribe('assist.clear.db.cache', function (options) {
-      self.clearCache(options);
-    })
+      self.clearDbCache(options);
+    });
+
+    huePubSub.subscribe('assist.clear.hdfs.cache', function () {
+      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hdfs'), {});
+    });
   }
 
   AssistHelper.prototype.hasExpired = function (timestamp) {
@@ -432,7 +436,7 @@
    * @param {string[]} [options.fields]
    * @param {boolean} [options.clearAll]
    */
-  AssistHelper.prototype.clearCache = function (options) {
+  AssistHelper.prototype.clearDbCache = function (options) {
     var self = this;
     if (options.clearAll) {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
