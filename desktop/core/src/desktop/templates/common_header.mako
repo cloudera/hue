@@ -208,6 +208,9 @@ from django.utils.translation import ugettext as _
 
     $.fn.dataTableExt.sErrMode = "throw";
 
+    // sets global assistHelper TTL
+    $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
+
     $(document).ready(function () {
       // forces IE's ajax calls not to cache
       if ($.browser.msie) {
