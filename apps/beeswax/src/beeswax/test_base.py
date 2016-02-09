@@ -35,7 +35,7 @@ from desktop.lib.python_util import find_unused_port
 from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.security_util import get_localhost_name
 from desktop.lib.test_utils import add_to_group, grant_access
-from hadoop import pseudo_hdfs4
+from hadoop import cluster, pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 
 import beeswax.conf
@@ -53,6 +53,10 @@ _SHARED_HIVE_SERVER_CLOSER = None
 
 
 LOG = logging.getLogger(__name__)
+
+
+def is_hive_on_spark():
+  return os.environ.get('ENABLE_HIVE_ON_SPARK', 'false').lower() == 'true'
 
 
 def _start_server(cluster):
@@ -124,8 +128,6 @@ def get_shared_beeswax_server(db_name='default'):
             raise
         except Exception, e:
           LOG.exception('Failed to open Hive Server session')
-          import pdb
-          pdb.set_trace()
         else:
           started = True
           break
@@ -351,6 +353,7 @@ class BeeswaxSampleProvider(object):
   def setup_class(cls):
     cls.db_name = get_db_prefix(name='hive')
     cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
+    cls.set_execution_engine()
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     add_to_group('test', 'test')
     grant_access('test', 'test', 'beeswax')
@@ -363,10 +366,16 @@ class BeeswaxSampleProvider(object):
   def teardown_class(cls):
     if is_live_cluster():
       # Delete test DB and tables
+      query_server = get_query_server_config()
       client = make_logged_in_client()
       user = User.objects.get(username='test')
-      query_server = get_query_server_config()
+
       db = dbms.get(user, query_server)
+
+      # Kill Spark context if running
+      if is_hive_on_spark() and cluster.is_yarn():
+        # TODO: We should clean up the running Hive on Spark job here
+        pass
 
       for db_name in [cls.db_name, '%s_other' % cls.db_name]:
         databases = db.get_databases()
@@ -384,6 +393,17 @@ class BeeswaxSampleProvider(object):
 
       global _INITIALIZED
       _INITIALIZED = False
+
+  @classmethod
+  def set_execution_engine(cls):
+    query_server = get_query_server_config()
+
+    if query_server['server_name'] == 'beeswax' and is_hive_on_spark():
+      user = User.objects.get(username='test')
+      db = dbms.get(user, query_server)
+
+      LOG.info("Setting Hive execution engine to Spark")
+      db.execute_statement('SET hive.execution.engine=spark')
 
   @classmethod
   def init_beeswax_db(cls):
