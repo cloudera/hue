@@ -479,11 +479,11 @@ ${ require.config() }
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()"></span>
     <!-- ko if: availableDatabases().length > 0 -->
     <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-toggle="dropdown" data-bind="toggle: dbSelectionVisible, css: { 'blue': dbSelectionVisible }"><span data-bind="visible: isSqlDialect, text: database"></span> <i class="fa fa-caret-down"></i></a>
-    <ul class="dropdown-menu" data-bind="foreach: availableDatabases">
-      <li>
-        <a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.database($data); }"></a>
-      </li>
-    </ul>
+    <div class="dropdown-menu" style="overflow-y: scroll; height: 200px;">
+      <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: availableDatabases, minHeight: 34, container: '.dropdown-menu' }">
+        <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.database($data); }"></a></li>
+      </ul>
+    </div>
     <!-- /ko -->
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="click: function(){ settingsVisible(! settingsVisible()) }, visible: hasProperties, css: { 'blue' : settingsVisible }"><i class="fa fa-cog"></i></a>

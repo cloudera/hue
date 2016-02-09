@@ -2295,9 +2295,33 @@ body {
   transition: opacity .3s;
 }
 
+.hue-inner-drop-down {
+  margin: 0 !important;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.hue-inner-drop-down > li,
 .hue-context-menu > li {
   min-width: 170px;
   color: #e5e5e5;
+}
+
+.hue-inner-drop-down > li > a {
+  display: block;
+  position: relative;
+  clear: both;
+  height: 22px;
+  line-height: 22px;
+  vertical-align: middle;
+  padding: 6px 16px 6px 16px;
+
+  color: #333;
+  text-decoration: none;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: background-color .3s;
 }
 
 .hue-context-menu > li > a {
@@ -2332,6 +2356,7 @@ body {
   white-space: nowrap;
 }
 
+.hue-inner-drop-down > li > a:hover,
 .hue-context-menu > li > a:not(.disabled):hover {
   background-color: #DBE8F1;
 }
