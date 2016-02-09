@@ -1,4 +1,6 @@
 /**
+ * Modified version from https://github.com/enricoberti/vkBeautify
+ *
  * vkBeautify - javascript plugin to pretty-print or minify text in XML, JSON, CSS and SQL formats.
  *
  * Version - 0.99.00.beta
@@ -282,7 +284,8 @@
 
   vkbeautify.prototype.sql = function (text, step) {
 
-    var ar_by_quote = text.replace(/\s{1,}/g, " ")
+    var ar_by_quote = text.replace(/\/\*.*?\*\/|--.*?\n/g, '$&~::~')
+        .replace(/\s{1,}/g, " ")
         .replace(/\'/ig, "~::~\'")
         .split('~::~'),
       len = ar_by_quote.length,
