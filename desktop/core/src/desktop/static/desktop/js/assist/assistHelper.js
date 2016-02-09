@@ -127,7 +127,7 @@
    * @returns {boolean} - True if actually an error
    */
   AssistHelper.prototype.successResponseIsError = function (response) {
-    return typeof response !== 'undefined' && (response.status === -1 || response.status === 500);
+    return typeof response !== 'undefined' && (response.status === -1 || response.status === 500 || response.code === 503 || response.code === 500);
   };
 
   /**
@@ -798,7 +798,7 @@
       })
     }, function (data) {
       // Safe to assume all requests in the queue have the same cacheCondition
-      if (data.status === 0 && options.cacheCondition(data)) {
+      if (data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
         cachedData[options.url] = {
           timestamp: (new Date()).getTime(),
           data: data
@@ -807,7 +807,7 @@
       }
       while (queue.length > 0) {
         var next = queue.shift();
-        if (data.status === 0) {
+        if (data.status === 0 && !self.successResponseIsError(data)) {
           next.successCallback(data);
         } else {
           next.errorCallback(data);
