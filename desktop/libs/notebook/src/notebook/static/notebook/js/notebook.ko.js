@@ -166,6 +166,8 @@
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };
 
+    self.dbSelectionVisible = ko.observable(false);
+
     self.isSqlDialect = ko.pureComputed(function () {
       return vm.getSnippetViewSettings(self.type()).sqlDialect;
     });
