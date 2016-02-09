@@ -612,7 +612,7 @@
             self.fetchResult(100);
             self.progress(100);
             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
-              huePubSub.publish('assist.refresh');
+              huePubSub.publish('assist.db.refresh', self.type());
               if (self.result.handle().has_more_statements) {
                 setTimeout(function () {
                   self.execute(); // Execute next, need to wait as we disabled fast click

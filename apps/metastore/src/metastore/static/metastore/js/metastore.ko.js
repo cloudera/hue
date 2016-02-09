@@ -521,9 +521,12 @@
       }
     };
 
-    huePubSub.subscribe('assist.refresh', function () {
+    huePubSub.subscribe('assist.db.refresh', function (type) {
+      if (type !== 'hive') {
+        return;
+      }
       self.reloading(true);
-      self.assistHelper.clearCache({
+      huePubSub.publish('assist.clear.db.cache', {
         sourceType: 'hive',
         clearAll: true
       });
