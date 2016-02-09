@@ -22,7 +22,7 @@
   }
 }(this, function (ko) {
 
-  var TIME_TO_LIVE_IN_MILLIS = $.totalStorage('hue.cacheable.ttl') || 86400000; // 1 day by default, configurable with $.totalStorage('hue.cacheable.ttl', 1234567890)
+  var TIME_TO_LIVE_IN_MILLIS = $.totalStorage('hue.cacheable.ttl.override') || $.totalStorage('hue.cacheable.ttl'); // 1 day by default, configurable with desktop.custom.cacheable_ttl in the .ini or $.totalStorage('hue.cacheable.ttl.override', 1234567890)
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
