@@ -1359,9 +1359,11 @@
       var autoExpandTimeout = window.setInterval(function () {
         var chunks = Math.floor((Math.max(ace().session.getLength(), 4) - lastEditorHeight) / 4);
         if (chunks !== 0) {
-          $target.height($target.height() + 64 * chunks);
-          ace().resize();
-          lastEditorHeight += 4 * chunks;
+          if ($target.height() + 64 * chunks < $(window).height() - $target.position().top - 90) {
+            $target.height($target.height() + 64 * chunks);
+            ace().resize();
+            lastEditorHeight += 4 * chunks;
+          }
         }
       }, 300);
 
