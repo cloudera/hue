@@ -44,6 +44,10 @@
     self.user = user;
     self.lastKnownDatabases = {};
     self.fetchQueue = {};
+
+    huePubSub.subscribe('assist.clear.db.cache', function (options) {
+      self.clearCache(options);
+    })
   }
 
   AssistHelper.prototype.hasExpired = function (timestamp) {
