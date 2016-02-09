@@ -43,7 +43,7 @@ class Command(BaseCommand):
     if not Document2.objects.filter(type='notebook', owner__username__in=SAMPLE_USER_OWNERS).exists():
       install_sample_user()
 
-      management.call_command('loaddata', 'desktop/libs/notebook/src/notebook/fixtures/initial_notebook_examples.json', verbosity=2)
+      management.call_command('loaddata', 'initial_notebook_examples.json', verbosity=2)
       Document.objects.sync()
 
     from beeswax.management.commands.beeswax_install_examples import Command
