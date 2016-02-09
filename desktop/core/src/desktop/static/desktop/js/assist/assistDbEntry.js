@@ -140,6 +140,11 @@
     self.editingSearch(self.isSearchVisible());
   };
 
+  AssistDbEntry.prototype.triggerRefresh = function () {
+    var self = this;
+    huePubSub.publish('assist.db.refresh', self.assistDbSource.type);
+  };
+
   AssistDbEntry.prototype.loadEntries = function() {
     var self = this;
     if (!self.expandable || self.loading()) {

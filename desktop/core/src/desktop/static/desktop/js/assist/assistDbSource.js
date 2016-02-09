@@ -198,5 +198,10 @@
     self.editingSearch(self.isSearchVisible());
   };
 
+  AssistDbSource.prototype.triggerRefresh = function () {
+    var self = this;
+    huePubSub.publish('assist.db.refresh', self.type);
+  };
+
   return AssistDbSource;
 }));
