@@ -78,7 +78,7 @@ from beeswax.server.dbms import QueryServerException
 from beeswax.server.hive_server2_lib import HiveServerClient,\
   PartitionKeyCompatible, PartitionValueCompatible, HiveServerTable,\
   HiveServerTColumnValue2
-from beeswax.test_base import BeeswaxSampleProvider
+from beeswax.test_base import BeeswaxSampleProvider, is_hive_on_spark
 from beeswax.hive_site import get_metastore
 
 
@@ -218,8 +218,10 @@ for x in sys.stdin:
     response = _make_query(self.client, QUERY, local=False, database=self.db_name)
     content = json.loads(response.content)
     assert_true('watch_url' in content)
+
     # Check that we report this query as "running" (this query should take a little while).
-    self._verify_query_state(beeswax.models.QueryHistory.STATE.running)
+    if not is_hive_on_spark():
+      self._verify_query_state(beeswax.models.QueryHistory.STATE.running)
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     content = fetch_query_result_data(self.client, response)
@@ -365,10 +367,12 @@ for x in sys.stdin:
 
     assert_equal([2.0, 4.0], content["results"][0])
     log = content['log']
-    assert_true(search_log_line('map = 100%', log), log)
-    assert_true(search_log_line('reduce = 100%', log), log)
-    # Test job extraction while we're at it
-    assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
+
+    if not is_hive_on_spark():
+      assert_true(search_log_line('map = 100%', log), log)
+      assert_true(search_log_line('reduce = 100%', log), log)
+      # Test job extraction while we're at it
+      assert_equal(1, len(content["hadoop_jobs"]), "Should have started 1 job and extracted it.")
 
 
   def test_query_with_remote_udf(self):
@@ -1993,6 +1997,9 @@ for x in sys.stdin:
     """
     Test that the HS2 logs send back the ql.Driver log output with JobID
     """
+    if is_hive_on_spark():
+      raise SkipTest
+
     hql = "SELECT foo FROM `%(db)s`.`test` GROUP BY foo" % {'db': self.db_name}  # GROUP BY forces the MR job
     response = _make_query(self.client, hql, wait=True, local=False, max=180.0, database=self.db_name)
     content = fetch_query_result_data(self.client, response)
