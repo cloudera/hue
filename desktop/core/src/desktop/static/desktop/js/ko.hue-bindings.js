@@ -1198,7 +1198,7 @@
       if (totalRatios !== 1) {
         var diff = 1 / totalRatios;
         $.each(panelDefinitions(), function (idx, panel) {
-          totalRatios[panel.type] = totalRatios[panel.type] * diff;
+          panelRatios[panel.type] = panelRatios[panel.type] * diff;
         });
       }
 
