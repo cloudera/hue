@@ -407,7 +407,10 @@ ${ require.config() }
         <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
       </ul>
       <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-      <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger"></pre>
+      <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs" class="logs logs-bigger logs-populated"></pre>
+    </div>
+    <div class="snippet-log-resizer" data-bind="visible: result.logs().length > 0, logResizer: {parent: '.snippet-log-container', target: '.logs-populated', onStart: hideFixedHeaders, onResize: function(){ hideFixedHeaders(); redrawFixedHeaders(500); }}">
+      <i class="fa fa-ellipsis-h"></i>
     </div>
   </div>
   <div class="snippet-log-container">
