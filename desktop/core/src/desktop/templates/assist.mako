@@ -1017,7 +1017,7 @@ from desktop.views import _ko
             name: '${ _("SQL") }',
             type: 'db',
             icon: 'fa-database',
-            minHeight: 55,
+            minHeight: 75,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('sql') !== -1
           })
         ];
@@ -1031,7 +1031,7 @@ from desktop.views import _ko
             name: '${ _("HDFS") }',
             type: 'hdfs',
             icon: 'fa-folder-o',
-            minHeight: 40,
+            minHeight: 50,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('hdfs') !== -1
           }));
           self.availablePanels.push(new AssistInnerPanel({
@@ -1043,7 +1043,7 @@ from desktop.views import _ko
             name: '${ _("Documents") }',
             type: 'documents',
             icon: 'fa-files-o',
-            minHeight: 40,
+            minHeight: 50,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
           }));
         }
