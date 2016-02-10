@@ -488,7 +488,7 @@ ${ require.config() }
             </tr>
             </tbody>
           </table>
-          <div class="pagination">
+          <div class="pagination" data-bind="visible: queriesTotalPages() > 1">
             <ul>
               <li data-bind="css: { 'disabled' : queriesCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: prevQueriesPage">${ _("Prev") }</a></li>
               <li class="active"><span data-bind="text: queriesCurrentPage() + '/' + queriesTotalPages()"></span></li>
