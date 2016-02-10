@@ -273,6 +273,8 @@
    * @param {string} [options.path]
    * @param {string} [options.query]
    * @param {string} [options.type]
+   * @param {int} [options.page]
+   * @param {int} [options.limit]
    */
   AssistHelper.prototype.searchDocuments = function (options) {
     var self = this;
@@ -281,7 +283,9 @@
       data: {
         uuid: options.uuid,
         text: options.query,
-        type: options.type
+        type: options.type,
+        page: options.page,
+        limit: options.limit
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
