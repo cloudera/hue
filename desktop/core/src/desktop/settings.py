@@ -318,12 +318,6 @@ else:
     "ATOMIC_REQUESTS" : True,
   }
 
-# If database engine is MySQL, set to InnoDB
-if default_db['ENGINE'] == 'django.db.backends.mysql':
-  if not 'OPTIONS' in default_db or default_db['OPTIONS'] is None:
-    default_db['OPTIONS'] = dict()
-  default_db['OPTIONS'].update({'init_command': 'SET storage_engine=INNODB'})
-
 DATABASES = {
   'default': default_db
 }
