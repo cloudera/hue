@@ -919,7 +919,7 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-code-resizer">
-  <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable' }">
+  <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable', onStart: hideFixedHeaders }">
     <i class="fa fa-ellipsis-h"></i>
   </div>
 </script>
