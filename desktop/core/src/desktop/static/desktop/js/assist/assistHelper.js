@@ -271,7 +271,8 @@
    * @param {boolean} [options.silenceErrors]
    *
    * @param {string} [options.path]
-   * @param {string} options.query
+   * @param {string} [options.query]
+   * @param {string} [options.type]
    */
   AssistHelper.prototype.searchDocuments = function (options) {
     var self = this;
@@ -279,7 +280,8 @@
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid,
-        text: options.query
+        text: options.query,
+        type: options.type
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
