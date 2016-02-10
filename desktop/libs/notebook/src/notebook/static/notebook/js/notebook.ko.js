@@ -196,6 +196,19 @@
       }
     };
 
+    self.currentQueryTab = ko.observable('queryHistory');
+
+    self.errorLoadingQueries = ko.observable(false);
+    self.loadingQueries = ko.observable(false);
+    self.queries = ko.observableArray();
+
+    self.currentQueryTab.subscribe(function (newValue) {
+      if (newValue === 'myQueries') {
+        // Load the queries
+      }
+    });
+
+
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
 
@@ -774,6 +787,7 @@
     });
 
     self.history = ko.observableArray([]);
+    // TODO: Move showHistory, fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet
     self.showHistory = ko.observable(typeof notebook.showHistory != "undefined" && notebook.showHistory != null ? notebook.showHistory : false);
 
     self.getSession = function (session_type) {

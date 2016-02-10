@@ -433,31 +433,38 @@ ${ require.config() }
   <!-- ko if: $root.editorMode -->
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory, onComplete: function(){ redrawFixedHeaders(200); }" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
-      <!-- ko if: $parent.history().length > 0 -->
-      <table class="table table-condensed">
-        <thead>
-          <tr>
-            <th colspan="2" class="muted">
-              ${ _('Query history') } &nbsp;
-              <span class="inactive-action">
-                <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="snippet-icon" data-toggle="modal">
-                  <i class="fa fa-calendar-times-o"></i>
-                </a>
-              </span>
-            </th>
-          </tr>
-        </thead>
-        <tbody data-bind="foreach: $parent.history">
-          <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { location.href=url; } }">
-            <td style="width: 100px" class="muted"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
-            <td style="width: 25px" class="muted">
-              <i class="fa fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
-            </td>
-            <td><code data-bind="text: query" style="white-space: normal"></code></td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- /ko -->
+      <div style="display: inline-block;">
+        <a class="inactive-action" href="#queryHistory" data-toggle="tab" data-bind="css: { 'blue' : currentQueryTab() === 'queryHistory' }, click: function(){ currentQueryTab('queryHistory'); }">${_('Query History')}</a>
+        <a class="inactive-action" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip"><i class="snippet-icon fa fa-calendar-times-o"></i></a>
+      </div>
+      <div class="margin-left-10" style="display: inline-block;">
+          <a class="inactive-action" href="#myQueries" data-toggle="tab" data-bind="css: { 'blue' : currentQueryTab() === 'myQueries' }, click: function(){ currentQueryTab('myQueries'); }">${_('My Queries')}</a>
+      </div>
+      <div class="tab-content" style="border: none">
+        <div class="tab-pane active" id="queryHistory">
+          <!-- ko if: $parent.history().length === 0 -->
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Query history is empty") }</div>
+          <!-- /ko -->
+          <!-- ko if: $parent.history().length > 0 -->
+          <table class="table table-condensed">
+            <tbody data-bind="foreach: $parent.history">
+              <tr class="pointer" data-bind="click: function() { if (getSelection().toString().length == 0) { location.href=url; } }">
+                <td style="width: 100px" class="muted"><span data-bind="text: moment(lastExecuted).fromNow(), attr: {title: moment(lastExecuted).format('LLL')}"></span></td>
+                <td style="width: 25px" class="muted">
+                  <i class="fa fa-bolt inactive-action" data-bind="css: {'fa-fighter-jet': status == 'running', 'fa-cloud-download': status == 'available'}, attr: {'title': status}"></i>
+                </td>
+                <td><code data-bind="text: query" style="white-space: normal"></code></td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- /ko -->
+        </div>
+
+        <div class="tab-pane" id="myQueries">
+          Hola?
+        </div>
+      </div>
+
     </div>
   </div>
   <!-- /ko -->
@@ -913,7 +920,7 @@ ${ require.config() }
       <i class="fa fa-fw fa-indent"></i>
     </a>
     <!-- ko if: $root.editorMode -->
-      <a class="snippet-side-btn" data-bind="click: function() { hideFixedHeaders(); $parent.showHistory(!$parent.showHistory()); }, css: {'blue': true}" title="${ _('Show query history') }">
+      <a class="snippet-side-btn" data-bind="click: function() { hideFixedHeaders(); $parent.showHistory(!$parent.showHistory()); }, css: {'blue': $parent.showHistory() }" title="${ _('Show query history') }">
         <i class="fa fa-fw fa-history"></i>
       </a>
     <!-- /ko -->
