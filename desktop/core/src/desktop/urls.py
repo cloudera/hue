@@ -118,6 +118,7 @@ dynamic_patterns += patterns('desktop.api',
 dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api2/docs/?$', 'get_documents'),
   (r'^desktop/api2/docs/shared?$', 'get_shared_documents'),
+  (r'^desktop/api2/docs/search?$', 'search_documents'),
 
   (r'^desktop/api2/doc/get$', 'get_document'),
   (r'^desktop/api2/doc/move$', 'move_document'),

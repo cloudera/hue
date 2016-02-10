@@ -628,3 +628,27 @@ class TestDocument2Permissions(object):
     response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc2.uuid})
     data = json.loads(response.content)
     assert_equal(doc2.uuid, data['uuid'], data)
+
+
+  def test_search_documents(self):
+    owned_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    owned_query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir)
+    owned_workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=owned_dir)
+
+    other_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
+    not_shared = Document2.objects.create(name='other_query1.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir)
+    shared_1 = Document2.objects.create(name='other_query2.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir)
+    shared_2 = Document2.objects.create(name='other_query3.sql', type='query-hive', owner=self.user_not_me, data={}, parent_directory=other_home_dir)
+
+    shared_1.share(user=self.user_not_me, name='read', users=[self.user], groups=[])
+    shared_2.share(user=self.user_not_me, name='read', users=[], groups=[self.default_group])
+
+    # 3 total docs (1 owned, 2 shared)
+    response = self.client.get('/desktop/api2/docs/search', {'type': 'query-hive'})
+    data = json.loads(response.content)
+    assert_true('documents' in data)
+    assert_equal(3, data['count'])
+    doc_names = [doc['name'] for doc in data['documents']]
+    assert_true('query1.sql' in doc_names)
+    assert_true('other_query2.sql' in doc_names)
+    assert_true('other_query3.sql' in doc_names)

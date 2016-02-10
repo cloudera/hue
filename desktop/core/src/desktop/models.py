@@ -759,30 +759,35 @@ class Document2Manager(models.Manager):
   def document(self, user, doc_id):
     return self.documents(user).get(id=doc_id)
 
-  def documents(self, user):
+  def documents(self, user, get_shared=True, get_history=False):
     """
     Returns all documents that are either owned or shared with the user
     WARNING: Do NOT use this if you ONLY need documents that are owned by the user!
     """
-    return Document2.objects.filter(
+    if get_shared:
+      docs = Document2.objects.filter(
         Q(owner=user) |
         Q(document2permission__users=user) |
         Q(document2permission__groups__in=user.groups.all())
-    ).distinct().order_by('-last_modified')
+      )
+    else:
+      docs = Document2.objects.filter(owner=user)
 
-  def get_shared_documents(self, user, flatten=False):
+    if not get_history:
+      docs = docs.exclude(is_history=True)
+
+    docs = docs.distinct()
+
+    return docs.order_by('-last_modified')
+
+  def get_shared_documents(self, user):
     """
     Returns all documents that are shared with the user
-    :param flatten: True to return all directories and documents in a flat list,
-                    False to filter the documents to top-level directories
     """
     documents = Document2.objects.filter(
         Q(document2permission__users=user) |
         Q(document2permission__groups__in=user.groups.all())
     ).distinct()
-
-    if not flatten:
-      documents = documents.exclude(parent_directory__in=documents)
 
     return documents
 
