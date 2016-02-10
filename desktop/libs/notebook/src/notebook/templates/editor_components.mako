@@ -1755,7 +1755,9 @@ ${ require.config() }
   function saveTemporarySnippet($element, value) {
     if ($element.data('last-active-editor')) {
       try {
-        $.totalStorage('hue.notebook.lastWrittenSnippet', value);
+        %if editor_type:
+        $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.${editor_type}', value);
+        %endif
       }
       catch (e){} // storage quota exceeded with enormous editor content
     }
@@ -2137,8 +2139,8 @@ ${ require.config() }
       viewModel.init();
 
       if (viewModel.editorMode && window.location.getParameter('type') != '' && window.location.getParameter('new') == '') {
-        viewModel.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet'));
-        $.totalStorage('hue.notebook.lastWrittenSnippet', '');
+        viewModel.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + window.location.getParameter('type')));
+        $.totalStorage('hue.notebook.lastWrittenSnippet.${user}.' + window.location.getParameter('type'), '');
       }
 
       if (location.getParameter("github_status") != "") {
