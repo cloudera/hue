@@ -775,11 +775,6 @@
 
     self.history = ko.observableArray([]);
     self.showHistory = ko.observable(typeof notebook.showHistory != "undefined" && notebook.showHistory != null ? notebook.showHistory : false);
-    self.showHistory.subscribe(function (val) {
-      if (val) {
-        self.fetchHistory();
-      }
-    });
 
     self.getSession = function (session_type) {
       var _s = null;
@@ -1064,6 +1059,16 @@
         self.history(parsedHistory);
       });
     };
+
+    self.showHistory.subscribe(function (val) {
+      if (val) {
+        self.fetchHistory();
+      }
+    });
+
+    if (self.showHistory()) {
+      self.fetchHistory();
+    }
 
     self.clearHistory = function (type) {
       $.post("/notebook/api/clear_history", {
