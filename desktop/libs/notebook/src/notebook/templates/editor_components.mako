@@ -470,9 +470,20 @@ ${ require.config() }
           <!-- /ko -->
           <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length > 0 -->
           <table class="table table-condensed">
+            <thead>
+              <tr>
+                <th style="width: 16%">${ _("Name") }</th>
+                <th style="width: 50%">${ _("Description") }</th>
+                <th style="width: 18%">${ _("Owner") }</th>
+                <th style="width: 16%">${ _("Last Modified") }</th>
+              </tr>
+            </thead>
             <tbody data-bind="foreach: queries">
             <tr>
-              <td><a data-bind="click: function () { console.log($data) }">Click me</a></td>
+              <td style="width: 16%"><a data-bind="text: name, click: function() { location.href = absoluteUrl; }"></a></td>
+              <td style="width: 50%"><span data-bind="text: description"></span></td>
+              <td style="width: 18%"><span data-bind="text: owner"></span></td>
+              <td style="width: 16%"><span data-bind="text: last_modified"></span></td>
             </tr>
             </tbody>
           </table>
