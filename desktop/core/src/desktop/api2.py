@@ -109,6 +109,8 @@ def get_shared_documents(request):
   """
   Returns the directories and documents that are shared with the current user, grouped by top-level directory.
   Optional params:
+    flatten=<bool>    - Controls whether to return documents in a flat list, or roll up documents to a common directory
+                        if possible. Defaults to false.
     page=<n>    - Controls pagination. Defaults to 1.
     limit=<n>   - Controls limit per page. Defaults to all.
     type=<type> - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc). Default to all.
@@ -123,10 +125,12 @@ def get_shared_documents(request):
     'documents': []
   }
 
-  documents = Document2.objects.get_shared_documents(request.user, flatten=False)
+  flatten = json.loads(request.GET.get('flatten', 'false'))
+
+  documents = Document2.objects.get_shared_documents(request.user)
 
   # Refine results
-  response.update(_filter_documents(request, queryset=documents))
+  response.update(_filter_documents(request, queryset=documents, flatten=flatten))
 
   # Paginate
   response.update(_paginate(request, queryset=response['documents']))
@@ -138,6 +142,51 @@ def get_shared_documents(request):
     response['documents'] = []
 
   return JsonResponse(response)
+
+
+@api_error_handler
+def search_documents(request):
+  """
+  Returns the directories and documents based on given params that are accessible by the current user
+  Optional params:
+    get_shared=<bool> - Controls whether to retrieve shared docs. Defaults to true.
+    get_history=<bool> - Controls whether to retrieve history docs. Defaults to false.
+    flatten=<bool>    - Controls whether to return documents in a flat list, or roll up documents to a common directory
+                        if possible. Defaults to true.
+    page=<n>          - Controls pagination. Defaults to 1.
+    limit=<n>         - Controls limit per page. Defaults to all.
+    type=<type>       - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc).
+                        Defaults to all.
+    sort=<key>        - Sort by the attribute <key>, which is one of: "name", "type", "owner", "last_modified"
+                        Accepts the form "-last_modified", which sorts in descending order.
+                        Defaults to "-last_modified".
+    text=<frag>       - Search for fragment "frag" in names and descriptions.
+  """
+
+  response = {
+    'documents': []
+  }
+
+  get_shared = json.loads(request.GET.get('get_shared', 'true'))
+  get_history = json.loads(request.GET.get('get_history', 'false'))
+  flatten = json.loads(request.GET.get('flatten', 'true'))
+
+  documents = Document2.objects.documents(user=request.user, get_shared=get_shared, get_history=get_history)
+
+  # Refine results
+  response.update(_filter_documents(request, queryset=documents, flatten=flatten))
+
+  # Paginate
+  response.update(_paginate(request, queryset=response['documents']))
+
+  # Serialize results
+  if response['documents'] and response['documents'].count() > 0:
+    response['documents'] = [doc.to_dict() for doc in response['documents']]
+  else:
+    response['documents'] = []
+
+  return JsonResponse(response)
+
 
 
 @api_error_handler
@@ -352,13 +401,13 @@ def import_documents(request):
     return JsonResponse({'message': stdout.getvalue()})
 
 
-def _filter_documents(request, queryset):
+def _filter_documents(request, queryset, flatten=True):
   """
   Given optional querystring params extracted from the request, filter the given queryset of documents and return a
     dictionary with the refined queryset and filter params
   :param request: request object with params
   :param queryset: Document2 queryset
-  :param key: name for key of refined document set
+  :param flatten: Return all results in a flat list if true, otherwise roll up to common directory
   """
   type_filters = request.GET.getlist('type', None)
   sort = request.GET.get('sort', '-last_modified')
@@ -369,6 +418,10 @@ def _filter_documents(request, queryset):
       types=type_filters,
       search_text=search_text,
       order_by=sort)
+
+  # Roll up documents to common directory
+  if not flatten:
+    documents = documents.exclude(parent_directory__in=documents)
 
   count = documents.count()
 
@@ -387,7 +440,6 @@ def _paginate(request, queryset):
     and limit, and return the updated queryset along with pagination params used.
   :param request: request object with params
   :param queryset: queryset
-  :param key: name for key of refined document set
   """
   page = int(request.GET.get('page', 1))
   limit = int(request.GET.get('limit', 0))
