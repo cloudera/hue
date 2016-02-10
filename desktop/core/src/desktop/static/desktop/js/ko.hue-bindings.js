@@ -1396,6 +1396,47 @@
     }
   };
 
+  ko.bindingHandlers.logResizer = {
+    init: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor()),
+        $resizer = $(element),
+        $parent = $resizer.parents(options.parent),
+        $target = $parent.find(options.target),
+        onStart = options.onStart,
+        onResize = options.onResize;
+
+      var initialHeight = $.totalStorage('hue.editor.logs.size') || 80;
+      $target.css("height", initialHeight + "px");
+
+      var initialOffset = null;
+      $resizer.draggable({
+        axis: "y",
+        start: function (event, ui) {
+          if (onStart) {
+            onStart();
+          }
+          if (!initialOffset) {
+            initialOffset = $resizer.offset().top;
+          }
+        },
+        drag: function (event, ui) {
+          var currentHeight = (ui.offset.top - initialOffset) + initialHeight;
+          $.totalStorage('hue.editor.logs.size', currentHeight);
+          $target.css("height", currentHeight + "px");
+          ui.offset.top = 0;
+          ui.position.top = 0;
+        },
+        stop: function (event, ui) {
+          ui.offset.top = 0;
+          ui.position.top = 0;
+          if (onResize) {
+            onResize();
+          }
+        }
+      });
+    }
+  };
+
   ko.bindingHandlers.splitDraggable = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
