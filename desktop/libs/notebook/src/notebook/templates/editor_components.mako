@@ -461,7 +461,29 @@ ${ require.config() }
         </div>
 
         <div class="tab-pane" id="myQueries">
-          Hola?
+          <!-- ko spinner: loadingQueries --><!-- /ko -->
+          <!-- ko if: queriesHasErrors() -->
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading queries") }</div>
+          <!-- /ko -->
+          <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length === 0 -->
+          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Query history is empty") }</div>
+          <!-- /ko -->
+          <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length > 0 -->
+          <table class="table table-condensed">
+            <tbody data-bind="foreach: queries">
+            <tr>
+              <td><a data-bind="click: function () { console.log($data) }">Click me</a></td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="pagination">
+            <ul>
+              <li data-bind="css: { 'disabled' : queriesCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: prevQueriesPage">${ _("Prev") }</a></li>
+              <li class="active"><span data-bind="text: queriesCurrentPage() + '/' + queriesTotalPages()"></span></li>
+              <li data-bind="css: { 'disabled' : queriesCurrentPage() === queriesTotalPages() }"><a href="javascript: void(0);" data-bind="click: nextQueriesPage">${ _("Next") }</a></li>
+            </ul>
+          </div>
+          <!-- /ko -->
         </div>
       </div>
 

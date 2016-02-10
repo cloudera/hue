@@ -200,13 +200,57 @@
 
     self.errorLoadingQueries = ko.observable(false);
     self.loadingQueries = ko.observable(false);
+
+    self.queriesHasErrors = ko.observable(false);
+    self.loadingQueries = ko.observable(false);
+    self.queriesCurrentPage = ko.observable(1);
+    self.queriesTotalPages = ko.observable(1);
     self.queries = ko.observableArray();
 
+    var fetchQueries = function () {
+      if (self.loadingQueries()) {
+        return;
+      }
+      lastQueriesPage = self.queriesCurrentPage();
+      self.loadingQueries(true);
+      self.queriesHasErrors(false);
+      self.getAssistHelper().searchDocuments({
+        successCallback: function (result) {
+          self.queriesTotalPages(Math.ceil(result.count / 25));
+          self.queries(result.children);
+          self.loadingQueries(false);
+          self.queriesHasErrors(false);
+        },
+        errorCallback: function () {
+          self.loadingQueries(false);
+          self.queriesHasErrors(true);
+        },
+        page: self.queriesCurrentPage(),
+        limit: 25,
+        type: 'query-' + self.type()
+      });
+    }
+
+    var lastQueriesPage = 1;
     self.currentQueryTab.subscribe(function (newValue) {
-      if (newValue === 'myQueries') {
-        // Load the queries
+      if (newValue === 'myQueries' && (self.queries().length === 0 || lastQueriesPage !== self.queriesCurrentPage())) {
+        fetchQueries();
       }
     });
+
+    self.prevQueriesPage = function () {
+      if (self.queriesCurrentPage() !== 1) {
+        self.queriesCurrentPage(self.queriesCurrentPage() - 1);
+        fetchQueries();
+      }
+    };
+
+    self.nextQueriesPage = function () {
+      if (self.queriesCurrentPage() !== self.queriesTotalPages()) {
+        self.queriesCurrentPage(self.queriesCurrentPage() + 1);
+        fetchQueries();
+      }
+    };
 
 
     self.isSqlDialect.subscribe(updateDatabases);
