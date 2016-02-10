@@ -433,17 +433,18 @@ ${ require.config() }
   <!-- ko if: $root.editorMode -->
   <div class="query-history-container" data-bind="slideVisible: $parent.showHistory, onComplete: function(){ redrawFixedHeaders(200); }" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
-      <div style="display: inline-block;">
-        <a class="inactive-action" href="#queryHistory" data-toggle="tab" data-bind="css: { 'blue' : currentQueryTab() === 'queryHistory' }, click: function(){ currentQueryTab('queryHistory'); }">${_('Query History')}</a>
-        <a class="inactive-action" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip"><i class="snippet-icon fa fa-calendar-times-o"></i></a>
-      </div>
-      <div class="margin-left-10" style="display: inline-block;">
-          <a class="inactive-action" href="#myQueries" data-toggle="tab" data-bind="css: { 'blue' : currentQueryTab() === 'myQueries' }, click: function(){ currentQueryTab('myQueries'); }">${_('My Queries')}</a>
-      </div>
+      <ul class="nav nav-tabs">
+        <li class="active" data-bind="click: function(){ currentQueryTab('queryHistory'); }">
+          <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
+            <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+          </a>
+        </li>
+        <li data-bind="click: function(){ currentQueryTab('myQueries'); }"><a class="inactive-action" href="#myQueries" data-toggle="tab">${_('My Queries')}</a></li>
+      </ul>
       <div class="tab-content" style="border: none">
         <div class="tab-pane active" id="queryHistory">
           <!-- ko if: $parent.history().length === 0 -->
-          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Query history is empty") }</div>
+          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("No queries to be shown.") }</div>
           <!-- /ko -->
           <!-- ko if: $parent.history().length > 0 -->
           <table class="table table-condensed">
@@ -463,10 +464,10 @@ ${ require.config() }
         <div class="tab-pane" id="myQueries">
           <!-- ko spinner: loadingQueries --><!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
-          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Error loading queries") }</div>
+          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
           <!-- /ko -->
           <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length === 0 -->
-          <div class="margin-top-10 margin-left-10" style="font-style: italic">${ _("Query history is empty") }</div>
+          <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("You don't have any saved query.") }</div>
           <!-- /ko -->
           <!-- ko if: ! queriesHasErrors() && ! loadingQueries() && queries().length > 0 -->
           <table class="table table-condensed">
@@ -480,7 +481,7 @@ ${ require.config() }
             </thead>
             <tbody data-bind="foreach: queries">
             <tr>
-              <td style="width: 16%"><a data-bind="text: name, click: function() { location.href = absoluteUrl; }"></a></td>
+              <td style="width: 16%"><a data-bind="text: name, attr: { 'href': absoluteUrl }"></a></td>
               <td style="width: 50%"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
               <td style="width: 16%"><span data-bind="text: last_modified"></span></td>
