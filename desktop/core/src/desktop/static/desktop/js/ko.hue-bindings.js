@@ -1379,6 +1379,7 @@
 
       $resizer.draggable({
         axis: "y",
+        start: options.onStart ? options.onStart : function(){},
         drag: function (event, ui) {
           clearInterval(autoExpandTimeout);
           var currentHeight = ui.offset.top - 120;
