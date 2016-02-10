@@ -302,7 +302,6 @@ ${ workflow.render() }
   <div class="modal-body">
       <h4>${ _('Variables') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
-        <!-- ko if: name() != 'oozie.use.system.libpath' -->
         <li>
           <input type="text" data-bind="value: name" placeholder="${ _('Name, e.g. market') }"/>
           <input type="text" data-bind="value: value" placeholder="${ _('Value, e.g. US') }"/>
@@ -310,7 +309,6 @@ ${ workflow.render() }
             <i class="fa fa-minus"></i>
           </a>
         </li>
-        <!-- /ko -->
       </ul>
       <a class="pointer" data-bind="click: function(){ $root.workflow.properties.parameters.push(ko.mapping.fromJS({'name': '', 'value': ''})); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
