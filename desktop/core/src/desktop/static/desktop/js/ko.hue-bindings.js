@@ -1207,10 +1207,10 @@
 
       // Resizes all containers according to the set ratios
       var resizeByRatio = function () {
-        $allPanels = $container.children('.assist-inner-panel');
         if (totalHeight == $container.innerHeight()) {
           return;
         }
+        $allPanels = $container.children('.assist-inner-panel');
         totalHeight = $container.innerHeight();
         containerTop = $container.offset().top;
 
@@ -1251,6 +1251,8 @@
 
       resizeByRatio();
       $(window).resize(resizeByRatio);
+
+      window.setTimeout(resizeByRatio, 1000);
       huePubSub.subscribe('assist.forceRender', function () {
         window.setTimeout(resizeByRatio, 200);
       });
@@ -1314,16 +1316,21 @@
         $panelsAfter.each(function (idx, panel) {
           requiredSpaceAfter += $(panel).data('minHeight');
         });
+        var limitAfter = totalHeight - requiredSpaceAfter;
 
         $resizer.draggable({
           axis: "y",
           drag: function (event, ui) {
-            var limitAfter = totalHeight - requiredSpaceAfter;
-
             var position = ui.offset.top - containerTop;
             if (position > limitBefore && position < limitAfter) {
               fitPanelHeights($panelsBefore, position - extrasBeforeHeight);
               fitPanelHeights($panelsAfter, totalHeight - extrasAfterHeight - position);
+            } else if (position > limitAfter) {
+              fitPanelHeights($panelsBefore, limitAfter - extrasBeforeHeight);
+              fitPanelHeights($panelsAfter, totalHeight - extrasAfterHeight - limitAfter);
+            } else if (position < limitBefore) {
+              fitPanelHeights($panelsBefore, limitBefore - extrasBeforeHeight);
+              fitPanelHeights($panelsAfter, totalHeight - extrasAfterHeight - limitBefore);
             }
 
             ui.offset.top = 0;
