@@ -510,7 +510,7 @@
       $(document).trigger("executeStarted", self);
       self.lastExecuted = now;
       $(".jHueNotify").hide();
-      logGA('/execute/' + self.type());
+      logGA('execute/' + self.type());
 
       self.status('running');
       self.errors([]);
@@ -575,6 +575,7 @@
           self.ace().setValue(self.statement_raw(), 1);
         }
       }
+      logGA('format');
     };
 
     self.fetchResult = function (rows, startOver) {
@@ -586,6 +587,7 @@
     };
 
     self.fetchResultData = function (rows, startOver) {
+      logGA('fetchResult/' + rows + '/' + startOver);
       $.post("/notebook/api/fetch_result_data", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
@@ -696,6 +698,7 @@
         clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
       }
+      logGA('cancel');
 
       $.post("/notebook/api/cancel_statement", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -986,7 +989,7 @@
         }
       }, 100);
 
-      logGA('/add_snippet/' + type);
+      logGA('add_snippet/' + (type ? type : self.selectedSnippet()));
       return snippet;
     };
 
