@@ -139,7 +139,7 @@
     };
 
     $.post("/desktop/api2/doc/share", {
-      doc_id: self.fileEntry.definition().id,
+      uuid: JSON.stringify(self.fileEntry.definition().uuid),
       data: JSON.stringify(postPerms)
     }, function (response) {
       if (response != null) {
