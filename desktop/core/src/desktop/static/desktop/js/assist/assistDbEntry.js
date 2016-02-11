@@ -51,7 +51,7 @@
     self.assistDbSource = assistDbSource;
     self.parent = parent;
     self.filter = filter;
-    self.isSearchVisible = ko.observable(false);
+    self.isSearchVisible = assistDbSource.isSearchVisible;
     self.editingSearch = ko.observable(false);
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
