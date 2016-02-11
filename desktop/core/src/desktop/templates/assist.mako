@@ -1034,6 +1034,10 @@ from desktop.views import _ko
             minHeight: 50,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('hdfs') !== -1
           }));
+          <%
+            from beeswax.conf import USE_NEW_EDITOR
+          %>
+          % if USE_NEW_EDITOR.get():
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistDocumentsPanel({
               assistHelper: self.assistHelper,
@@ -1046,6 +1050,7 @@ from desktop.views import _ko
             minHeight: 50,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
           }));
+          % endif
         }
 
         if (self.availablePanels.length == 1) {
