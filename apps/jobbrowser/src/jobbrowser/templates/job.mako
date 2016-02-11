@@ -655,7 +655,7 @@ $(document).ready(function () {
     if (_title != ""){
       $.jHueTitleUpdater.set(_title);
     }
-    $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
+    $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired || ! job.durationFormatted ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
 
     if (Utils.RUNNING_ARRAY.indexOf(job.status.toUpperCase()) == -1) {
       window.clearInterval(_runningInterval);

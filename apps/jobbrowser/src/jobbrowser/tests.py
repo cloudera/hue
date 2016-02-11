@@ -423,6 +423,16 @@ class TestMapReduce2NoHadoop:
     response_content = json.loads(response.content)
     assert_equal(len(response_content['jobs']), 1)
 
+  def test_applications_no_start_time(self):
+    response = self.c.get('/jobbrowser/?format=json')
+    data = json.loads(response.content)
+    job = [j for j in data['jobs'] if j['id'] == 'application_1428442704693_0007']
+    assert_true(job, job)
+    job = job[0]
+
+    assert_equal('', job['startTimeFormatted'], data)
+    assert_equal('', job['durationFormatted'], data)
+
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
     assert_true('job_1356251510842_0054' in response.content, response.content)
@@ -431,6 +441,13 @@ class TestMapReduce2NoHadoop:
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
     assert_true('job_1356251510842_0054' in response.content)
     assert_true('RUNNING' in response.content)
+
+  def test_application_no_start_time(self):
+    response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007?format=json')
+    data = json.loads(response.content)
+
+    assert_equal('', data['job']['startTimeFormatted'], data)
+    assert_equal('', data['job']['durationFormatted'], data)
 
   def test_finished_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
@@ -568,7 +585,7 @@ class MockResourceManagerApi:
         u'progress': 100.0,
         u'queue': u'root.erickt',
         u'runningContainers': -1,
-        u'startedTime': 1428454941315,
+        u'startedTime': 0,
         u'state': u'FINISHED',
         u'trackingUI': u'History',
         u'trackingUrl': u'http://N/A',
