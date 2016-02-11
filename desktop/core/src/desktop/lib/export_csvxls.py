@@ -93,9 +93,11 @@ def create_generator(content_generator, format, encoding=None):
     for _headers, _data in content_generator:
       # Forced limit on size from tablib
       if len(data) > MAX_XLS_ROWS:
+        LOG.warn('The query results exceeded the maximum row limit of %d. Data has been truncated.' % MAX_XLS_ROWS)
         break
 
       if _headers and len(_headers) > MAX_XLS_COLS:
+        LOG.warn('The query results exceeded the maximum column limit of %d. Data has been truncated.' % MAX_XLS_COLS)
         _headers = _headers[:MAX_XLS_COLS]
 
       headers = _headers
@@ -107,6 +109,7 @@ def create_generator(content_generator, format, encoding=None):
         data.append(row)
 
     if len(data) > MAX_XLS_ROWS:
+      LOG.warn('The query results exceeded the maximum row limit of %d. Data has been truncated.' % MAX_XLS_ROWS)
       data = data[:MAX_XLS_ROWS]
 
     yield xls_dataset(headers, data, encoding).xls
