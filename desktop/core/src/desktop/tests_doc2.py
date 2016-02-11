@@ -633,6 +633,7 @@ class TestDocument2Permissions(object):
   def test_search_documents(self):
     owned_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
     owned_query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=owned_dir)
+    owned_history = Document2.objects.create(name='history.sql', type='query-hive', owner=self.user, data={}, is_history=True, parent_directory=owned_dir)
     owned_workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={}, parent_directory=owned_dir)
 
     other_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
@@ -652,3 +653,11 @@ class TestDocument2Permissions(object):
     assert_true('query1.sql' in doc_names)
     assert_true('other_query2.sql' in doc_names)
     assert_true('other_query3.sql' in doc_names)
+
+    # Return history docs
+    response = self.client.get('/desktop/api2/docs/', {'type': 'query-hive', 'include_history': 'true'})
+    data = json.loads(response.content)
+    assert_true('documents' in data)
+    assert_equal(4, data['count'])
+    doc_names = [doc['name'] for doc in data['documents']]
+    assert_true('history.sql' in doc_names)

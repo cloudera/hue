@@ -759,11 +759,11 @@ class Document2Manager(models.Manager):
   def document(self, user, doc_id):
     return self.documents(user).get(id=doc_id)
 
-  def documents(self, user, perms='both', get_history=False):
+  def documents(self, user, perms='both', include_history=False):
     """
     Returns all documents that are owned or shared with the user.
     :param perms: both, shared, owned. Defaults to both.
-    :param get_history: boolean flag to return history documents. Defaults to False.
+    :param include_history: boolean flag to return history documents. Defaults to False.
     """
     if perms == 'both':
       docs = Document2.objects.filter(
@@ -779,12 +779,10 @@ class Document2Manager(models.Manager):
     else:  # only return documents owned by the user
       docs = Document2.objects.filter(owner=user)
 
-    if not get_history:
+    if not include_history:
       docs = docs.exclude(is_history=True)
 
-    docs = docs.distinct()
-
-    return docs.order_by('-last_modified')
+    return docs.distinct().order_by('-last_modified')
 
   def refine_documents(self, documents, types=None, search_text=None, order_by=None):
     """
