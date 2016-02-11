@@ -169,7 +169,7 @@ from desktop.views import _ko
       color: #737373;
     }
 
-    .assist-breadcrumb a {
+    .assist-breadcrumb a:not(.inactive-action) {
       cursor: pointer;
       text-decoration: none;
       color: #737373;
@@ -422,7 +422,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-hdfs-header-actions">
-    <div class="hover-actions assist-db-header-actions">
+    <div class="assist-db-header-actions"style="margin-top: -1px;">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -431,7 +431,7 @@ from desktop.views import _ko
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
         <!-- ko with: selectedHdfsEntry -->
-        <div class="assist-flex-header assist-breadcrumb" data-bind="visibleOnHover: { selector: '.hover-actions', override: loading }">
+        <div class="assist-flex-header assist-breadcrumb" >
           <!-- ko if: parent !== null -->
           <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
             <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
@@ -577,9 +577,14 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-db-header-actions">
-    <div class="hover-actions assist-db-header-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
+    <div class="assist-db-header-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
+      <!-- ko ifnot: loading -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+      <!-- /ko -->
+      <!-- ko if: loading -->
+      <span style="color: #aaa;"><i class="fa fa-search" title="${_('Search')}"></i></span>
+      <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
     </div>
   </script>
@@ -616,7 +621,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="assist-tables-template">
-    <div class="assist-flex-header" data-bind="visibleOnHover: { selector: '.hover-actions', override: $parent.reloading() || isSearchVisible() }">
+    <div class="assist-flex-header">
       <div class="assist-inner-header" data-bind="visible: !$parent.loading() && !$parent.hasErrors()">
         ${_('Tables')}
         <!-- ko template: 'assist-db-header-actions' --><!-- /ko -->
