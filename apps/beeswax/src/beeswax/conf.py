@@ -126,7 +126,7 @@ THRIFT_VERSION = Config(
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4
   key='use_new_editor',
-  default=True,
+  default=False,
   type=coerce_bool,
   help=_t('Choose whether to show the new SQL editor.')
 )
