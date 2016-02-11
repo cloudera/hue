@@ -62,7 +62,7 @@ def search_documents(request):
   Returns the directories and documents based on given params that are accessible by the current user
   Optional params:
     perms=<mode>       - Controls whether to retrieve owned, shared, or both. Defaults to both.
-    get_history=<bool> - Controls whether to retrieve history docs. Defaults to false.
+    include_history=<bool> - Controls whether to retrieve history docs. Defaults to false.
     flatten=<bool>     - Controls whether to return documents in a flat list, or roll up documents to a common directory
                          if possible. Defaults to true.
     page=<n>           - Controls pagination. Defaults to 1.
@@ -80,13 +80,13 @@ def search_documents(request):
   }
 
   perms = request.GET.get('perms', 'both').lower()
-  get_history = json.loads(request.GET.get('get_history', 'false'))
+  include_history = json.loads(request.GET.get('include_history', 'false'))
   flatten = json.loads(request.GET.get('flatten', 'true'))
 
   if perms not in ['owned', 'shared', 'both']:
     raise Exception(_('Invalid value for perms, acceptable values are: owned, shared, both.'))
 
-  documents = Document2.objects.documents(user=request.user, perms=perms, get_history=get_history)
+  documents = Document2.objects.documents(user=request.user, perms=perms, include_history=include_history)
 
   # Refine results
   response.update(_filter_documents(request, queryset=documents, flatten=flatten))
