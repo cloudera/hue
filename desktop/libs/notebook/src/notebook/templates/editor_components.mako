@@ -442,7 +442,7 @@ ${ require.config() }
             <div class="inline-block inactive-action margin-left-10 hand" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
-        <li data-bind="click: function(){ currentQueryTab('myQueries'); }"><a class="inactive-action" href="#myQueries" data-toggle="tab">${_('My Queries')}</a></li>
+        <li data-bind="click: function(){ currentQueryTab('savedQueries'); }"><a class="inactive-action" href="#savedQueries" data-toggle="tab">${_('Saved Queries')}</a></li>
       </ul>
       <div class="tab-content" style="border: none">
         <div class="tab-pane active" id="queryHistory">
@@ -464,7 +464,7 @@ ${ require.config() }
           <!-- /ko -->
         </div>
 
-        <div class="tab-pane" id="myQueries">
+        <div class="tab-pane" id="savedQueries">
           <!-- ko spinner: loadingQueries --><!-- /ko -->
           <!-- ko if: queriesHasErrors() -->
           <div class="margin-top-20 margin-left-10" style="font-style: italic">${ _("Error loading my queries") }</div>
