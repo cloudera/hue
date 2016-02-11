@@ -116,18 +116,16 @@ dynamic_patterns += patterns('desktop.api',
 )
 
 dynamic_patterns += patterns('desktop.api2',
-  (r'^desktop/api2/docs/?$', 'get_documents'),
-  (r'^desktop/api2/docs/shared?$', 'get_shared_documents'),
-  (r'^desktop/api2/docs/search?$', 'search_documents'),
+  (r'^desktop/api2/docs/?$', 'search_documents'),
 
-  (r'^desktop/api2/doc/get$', 'get_document'),
-  (r'^desktop/api2/doc/move$', 'move_document'),
-  (r'^desktop/api2/doc/mkdir$', 'create_directory'),
-  (r'^desktop/api2/doc/delete$', 'delete_document'),
-  (r'^desktop/api2/doc/share$', 'share_document'),
+  (r'^desktop/api2/doc/?$', 'get_document'),
+  (r'^desktop/api2/doc/move/?$', 'move_document'),
+  (r'^desktop/api2/doc/mkdir/?$', 'create_directory'),
+  (r'^desktop/api2/doc/delete/?$', 'delete_document'),
+  (r'^desktop/api2/doc/share/?$', 'share_document'),
 
-  (r'^desktop/api2/doc/export$', 'export_documents'),
-  (r'^desktop/api2/doc/import$', 'import_documents'),
+  (r'^desktop/api2/doc/export/?$', 'export_documents'),
+  (r'^desktop/api2/doc/import/?$', 'import_documents'),
 )
 
 dynamic_patterns += patterns('useradmin.views',

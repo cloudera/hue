@@ -759,18 +759,24 @@ class Document2Manager(models.Manager):
   def document(self, user, doc_id):
     return self.documents(user).get(id=doc_id)
 
-  def documents(self, user, get_shared=True, get_history=False):
+  def documents(self, user, perms='both', get_history=False):
     """
-    Returns all documents that are either owned or shared with the user
-    WARNING: Do NOT use this if you ONLY need documents that are owned by the user!
+    Returns all documents that are owned or shared with the user.
+    :param perms: both, shared, owned. Defaults to both.
+    :param get_history: boolean flag to return history documents. Defaults to False.
     """
-    if get_shared:
+    if perms == 'both':
       docs = Document2.objects.filter(
         Q(owner=user) |
         Q(document2permission__users=user) |
         Q(document2permission__groups__in=user.groups.all())
       )
-    else:
+    elif perms == 'shared':
+      docs = Document2.objects.filter(
+        Q(document2permission__users=user) |
+        Q(document2permission__groups__in=user.groups.all())
+      )
+    else:  # only return documents owned by the user
       docs = Document2.objects.filter(owner=user)
 
     if not get_history:
@@ -779,17 +785,6 @@ class Document2Manager(models.Manager):
     docs = docs.distinct()
 
     return docs.order_by('-last_modified')
-
-  def get_shared_documents(self, user):
-    """
-    Returns all documents that are shared with the user
-    """
-    documents = Document2.objects.filter(
-        Q(document2permission__users=user) |
-        Q(document2permission__groups__in=user.groups.all())
-    ).distinct()
-
-    return documents
 
   def refine_documents(self, documents, types=None, search_text=None, order_by=None):
     """

@@ -39,7 +39,7 @@ class TestDocument2(object):
     grant_access("doc2", "doc2", "beeswax")
 
     # This creates the user directories for the new user
-    response = self.client.get('/desktop/api2/docs/')
+    response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     assert_equal('/', data['document']['path'], data)
 
@@ -88,13 +88,13 @@ class TestDocument2(object):
   def test_get_document(self):
     doc = Document2.objects.create(name='test_doc', type='query-hive', owner=self.user, data={})
     self.home_dir.children.add(doc)
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_true('uuid' in data)
-    assert_equal(doc.uuid, data['uuid'])
+    assert_true('document' in data)
+    assert_equal(doc.uuid, data['document']['uuid'])
 
     # Invalid uuid returns error
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': '1234-5678-9'})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': '1234-5678-9'})
     data = json.loads(response.content)
     assert_equal(-1, data['status'])
     assert_true('not found' in data['message'])
@@ -116,13 +116,13 @@ class TestDocument2(object):
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=source_dir)
 
     # Verify original paths before move operation
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': source_dir.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_file_src', data['path'])
+    assert_equal('/test_mv_file_src', data['document']['path'])
 
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_file_src/query1.sql', data['path'])
+    assert_equal('/test_mv_file_src/query1.sql', data['document']['path'])
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(doc.uuid),
@@ -132,13 +132,13 @@ class TestDocument2(object):
     assert_equal(0, data['status'], data)
 
     # Verify that the paths are updated
-    response = self.client.get('/desktop/api2/docs', {'uuid': source_dir.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
     assert_false(any(doc['uuid'] == doc.uuid for doc in data['children']), data['children'])
 
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_file_dst/query1.sql', data['path'])
+    assert_equal('/test_mv_file_dst/query1.sql', data['document']['path'])
 
 
   def test_directory_move(self):
@@ -147,13 +147,13 @@ class TestDocument2(object):
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=source_dir)
 
     # Verify original paths before move operation
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': source_dir.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv', data['path'])
+    assert_equal('/test_mv', data['document']['path'])
 
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv/query1.sql', data['path'])
+    assert_equal('/test_mv/query1.sql', data['document']['path'])
 
     response = self.client.post('/desktop/api2/doc/move', {
         'source_doc_uuid': json.dumps(Directory.objects.get(owner=self.user, name='test_mv').uuid),
@@ -163,13 +163,13 @@ class TestDocument2(object):
     assert_equal(0, data['status'], data)
 
     # Verify that the paths are updated
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': source_dir.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_dst/test_mv', data['path'])
+    assert_equal('/test_mv_dst/test_mv', data['document']['path'])
 
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal('/test_mv_dst/test_mv/query1.sql', data['path'])
+    assert_equal('/test_mv_dst/test_mv/query1.sql', data['document']['path'])
 
 
   def test_directory_children(self):
@@ -183,27 +183,27 @@ class TestDocument2(object):
     self.home_dir.children.add(*children)
 
     # Test that all children directories and documents are returned
-    response = self.client.get('/desktop/api2/docs', {'path': '/'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
     assert_true('children' in data)
     assert_equal(5, data['count'])  # This includes the 4 docs and .Trash
 
     # Test filter type
-    response = self.client.get('/desktop/api2/docs', {'path': '/', 'type': ['directory']})
+    response = self.client.get('/desktop/api2/doc', {'path': '/', 'type': ['directory']})
     data = json.loads(response.content)
     assert_equal(['directory'], data['types'])
     assert_equal(3, data['count'])
     assert_true(all(doc['type'] == 'directory' for doc in data['children']))
 
     # Test search text
-    response = self.client.get('/desktop/api2/docs', {'path': '/', 'text': 'query'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/', 'text': 'query'})
     data = json.loads(response.content)
     assert_equal('query', data['text'])
     assert_equal(2, data['count'])
     assert_true(all('query' in doc['name'] for doc in data['children']))
 
     # Test pagination with limit
-    response = self.client.get('/desktop/api2/docs', {'path': '/', 'page': 2, 'limit': 2})
+    response = self.client.get('/desktop/api2/doc', {'path': '/', 'page': 2, 'limit': 2})
     data = json.loads(response.content)
     assert_equal(5, data['count'])
     assert_equal(2, len(data['children']))
@@ -220,7 +220,7 @@ class TestDocument2(object):
     query = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
     # Test that .Trash is currently empty
-    response = self.client.get('/desktop/api2/docs', {'path': '/.Trash'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
     assert_equal(0, data['count'])
 
@@ -229,7 +229,7 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'])
 
-    response = self.client.get('/desktop/api2/docs', {'path': '/.Trash'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
     assert_equal(1, data['count'])
     assert_equal(data['children'][0]['uuid'], query.uuid)
@@ -239,12 +239,12 @@ class TestDocument2(object):
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
 
-    response = self.client.get('/desktop/api2/docs', {'path': '/.Trash'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
     assert_equal(2, data['count'])
 
     # Child document should be in trash too
-    response = self.client.get('/desktop/api2/docs', {'path': '/.Trash/test_dir'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/.Trash/test_dir'})
     data = json.loads(response.content)
     assert_equal(nested_query.uuid, data['children'][0]['uuid'])
 
@@ -256,7 +256,7 @@ class TestDocument2(object):
     assert_false(Document2.objects.filter(uuid=nested_query.uuid).exists())
 
     # Verify that only doc in home is .Trash
-    response = self.client.get('/desktop/api2/docs', {'path': '/'})
+    response = self.client.get('/desktop/api2/doc', {'path': '/'})
     data = json.loads(response.content)
     assert_true('children' in data)
     assert_equal(1, data['count'])
@@ -330,7 +330,7 @@ class TestDocument2Permissions(object):
     self.default_group = get_default_user_group()
 
     # This creates the user directories for the new user
-    response = self.client.get('/desktop/api2/docs/')
+    response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     assert_equal('/', data['document']['path'], data)
 
@@ -341,24 +341,24 @@ class TestDocument2Permissions(object):
     # Tests that for a new doc by default, read/write perms are set to no users and no groups
     new_doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': new_doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': new_doc.uuid})
     data = json.loads(response.content)
-    assert_equal(new_doc.uuid, data['uuid'], data)
-    assert_true('perms' in data)
+    assert_equal(new_doc.uuid, data['document']['uuid'], data)
+    assert_true('perms' in data['document'])
     assert_equal({'read': {'users': [], 'groups': []}, 'write': {'users': [], 'groups': []}},
-                 data['perms'])
+                 data['document']['perms'])
 
 
   def test_share_document_read_by_user(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
     # owner can view document
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['uuid'], data)
+    assert_equal(doc.uuid, data['document']['uuid'], data)
 
     # other user cannot view document
-    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     assert_equal(-1, data['status'])
 
@@ -387,21 +387,21 @@ class TestDocument2Permissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     # other user can view document
-    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['uuid'], data)
+    assert_equal(doc.uuid, data['document']['uuid'], data)
 
 
   def test_share_document_read_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
 
     # owner can view document
-    response = self.client.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['uuid'], data)
+    assert_equal(doc.uuid, data['document']['uuid'], data)
 
     # other user cannot view document
-    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     assert_equal(-1, data['status'])
 
@@ -430,9 +430,9 @@ class TestDocument2Permissions(object):
     assert_false(doc.can_write(self.user_not_me))
 
     # other user can view document
-    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc.uuid})
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
-    assert_equal(doc.uuid, data['uuid'], data)
+    assert_equal(doc.uuid, data['document']['uuid'], data)
 
 
   def test_share_document_write_by_user(self):
@@ -567,7 +567,7 @@ class TestDocument2Permissions(object):
     shared_2.share(user=self.user, name='read', users=[self.user_not_me], groups=[])
 
     # 2 shared docs should appear in the other user's shared documents response
-    response = self.client_not_me.get('/desktop/api2/docs/shared')
+    response = self.client_not_me.get('/desktop/api2/docs/', {'perms': 'shared'})
     data = json.loads(response.content)
     assert_true('documents' in data)
     assert_equal(2, data['count'])
@@ -577,7 +577,7 @@ class TestDocument2Permissions(object):
     assert_false('query1.sql' in doc_names)
 
     # they should not appear in the other user's regular get_documents response
-    response = self.client_not_me.get('/desktop/api2/docs/')
+    response = self.client_not_me.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     doc_names = [doc['name'] for doc in data['children']]
     assert_false('query2.sql' in doc_names)
@@ -606,7 +606,7 @@ class TestDocument2Permissions(object):
     doc3.share(user=self.user, name='read', users=[], groups=[self.default_group])
 
     # 3 shared docs should appear, due to directory rollup
-    response = self.client_not_me.get('/desktop/api2/docs/shared')
+    response = self.client_not_me.get('/desktop/api2/docs/', {'perms': 'shared', 'flatten': 'false'})
     data = json.loads(response.content)
     assert_true('documents' in data)
     assert_equal(3, data['count'], data)
@@ -621,13 +621,13 @@ class TestDocument2Permissions(object):
     assert_false('query2.sql' in doc_names)
 
     # but nested documents should still be shared/viewable by group
-    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc1.uuid})
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
     data = json.loads(response.content)
-    assert_equal(doc1.uuid, data['uuid'], data)
+    assert_equal(doc1.uuid, data['document']['uuid'], data)
 
-    response = self.client_not_me.get('/desktop/api2/doc/get', {'uuid': doc2.uuid})
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc2.uuid})
     data = json.loads(response.content)
-    assert_equal(doc2.uuid, data['uuid'], data)
+    assert_equal(doc2.uuid, data['document']['uuid'], data)
 
 
   def test_search_documents(self):
@@ -644,7 +644,7 @@ class TestDocument2Permissions(object):
     shared_2.share(user=self.user_not_me, name='read', users=[], groups=[self.default_group])
 
     # 3 total docs (1 owned, 2 shared)
-    response = self.client.get('/desktop/api2/docs/search', {'type': 'query-hive'})
+    response = self.client.get('/desktop/api2/docs/', {'type': 'query-hive'})
     data = json.loads(response.content)
     assert_true('documents' in data)
     assert_equal(3, data['count'])
