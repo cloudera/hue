@@ -57,9 +57,54 @@ def api_error_handler(func):
 
 
 @api_error_handler
-def get_documents(request):
+def search_documents(request):
   """
-  Returns all documents and directories found for the given uuid or path and current user.
+  Returns the directories and documents based on given params that are accessible by the current user
+  Optional params:
+    perms=<mode>       - Controls whether to retrieve owned, shared, or both. Defaults to both.
+    get_history=<bool> - Controls whether to retrieve history docs. Defaults to false.
+    flatten=<bool>     - Controls whether to return documents in a flat list, or roll up documents to a common directory
+                         if possible. Defaults to true.
+    page=<n>           - Controls pagination. Defaults to 1.
+    limit=<n>          - Controls limit per page. Defaults to all.
+    type=<type>        - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc).
+                         Defaults to all.
+    sort=<key>         - Sort by the attribute <key>, which is one of: "name", "type", "owner", "last_modified"
+                         Accepts the form "-last_modified", which sorts in descending order.
+                         Defaults to "-last_modified".
+    text=<frag>       -  Search for fragment "frag" in names and descriptions.
+  """
+
+  response = {
+    'documents': []
+  }
+
+  perms = request.GET.get('perms', 'both').lower()
+  get_history = json.loads(request.GET.get('get_history', 'false'))
+  flatten = json.loads(request.GET.get('flatten', 'true'))
+
+  if perms not in ['owned', 'shared', 'both']:
+    raise Exception(_('Invalid value for perms, acceptable values are: owned, shared, both.'))
+
+  documents = Document2.objects.documents(user=request.user, perms=perms, get_history=get_history)
+
+  # Refine results
+  response.update(_filter_documents(request, queryset=documents, flatten=flatten))
+
+  # Paginate
+  response.update(_paginate(request, queryset=response['documents']))
+
+  # Serialize results
+  response['documents'] = [doc.to_dict() for doc in response.get('documents', [])]
+
+  return JsonResponse(response)
+
+
+@api_error_handler
+def get_document(request):
+  """
+  Returns the document or directory found for the given uuid or path and current user.
+  If a directory is found, return any children documents too.
   Optional params:
     page=<n>    - Controls pagination. Defaults to 1.
     limit=<n>   - Controls limit per page. Defaults to all.
@@ -102,104 +147,6 @@ def get_documents(request):
     response['children'] = [doc.to_dict() for doc in response['children']]
 
   return JsonResponse(response)
-
-
-@api_error_handler
-def get_shared_documents(request):
-  """
-  Returns the directories and documents that are shared with the current user, grouped by top-level directory.
-  Optional params:
-    flatten=<bool>    - Controls whether to return documents in a flat list, or roll up documents to a common directory
-                        if possible. Defaults to false.
-    page=<n>    - Controls pagination. Defaults to 1.
-    limit=<n>   - Controls limit per page. Defaults to all.
-    type=<type> - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc). Default to all.
-    sort=<key>  - Sort by the attribute <key>, which is one of:
-                    "name", "type", "owner", "last_modified"
-                  Accepts the form "-last_modified", which sorts in descending order.
-                  Default to "-last_modified".
-    text=<frag> - Search for fragment "frag" in names and descriptions.
-  """
-
-  response = {
-    'documents': []
-  }
-
-  flatten = json.loads(request.GET.get('flatten', 'false'))
-
-  documents = Document2.objects.get_shared_documents(request.user)
-
-  # Refine results
-  response.update(_filter_documents(request, queryset=documents, flatten=flatten))
-
-  # Paginate
-  response.update(_paginate(request, queryset=response['documents']))
-
-  # Serialize results
-  if response['documents'] and response['documents'].count() > 0:
-    response['documents'] = [doc.to_dict() for doc in response['documents']]
-  else:
-    response['documents'] = []
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def search_documents(request):
-  """
-  Returns the directories and documents based on given params that are accessible by the current user
-  Optional params:
-    get_shared=<bool> - Controls whether to retrieve shared docs. Defaults to true.
-    get_history=<bool> - Controls whether to retrieve history docs. Defaults to false.
-    flatten=<bool>    - Controls whether to return documents in a flat list, or roll up documents to a common directory
-                        if possible. Defaults to true.
-    page=<n>          - Controls pagination. Defaults to 1.
-    limit=<n>         - Controls limit per page. Defaults to all.
-    type=<type>       - Show documents of given type(s) (directory, query-hive, query-impala, query-mysql, etc).
-                        Defaults to all.
-    sort=<key>        - Sort by the attribute <key>, which is one of: "name", "type", "owner", "last_modified"
-                        Accepts the form "-last_modified", which sorts in descending order.
-                        Defaults to "-last_modified".
-    text=<frag>       - Search for fragment "frag" in names and descriptions.
-  """
-
-  response = {
-    'documents': []
-  }
-
-  get_shared = json.loads(request.GET.get('get_shared', 'true'))
-  get_history = json.loads(request.GET.get('get_history', 'false'))
-  flatten = json.loads(request.GET.get('flatten', 'true'))
-
-  documents = Document2.objects.documents(user=request.user, get_shared=get_shared, get_history=get_history)
-
-  # Refine results
-  response.update(_filter_documents(request, queryset=documents, flatten=flatten))
-
-  # Paginate
-  response.update(_paginate(request, queryset=response['documents']))
-
-  # Serialize results
-  if response['documents'] and response['documents'].count() > 0:
-    response['documents'] = [doc.to_dict() for doc in response['documents']]
-  else:
-    response['documents'] = []
-
-  return JsonResponse(response)
-
-
-
-@api_error_handler
-def get_document(request):
-  if request.GET.get('id'):
-    doc = Document2.objects.get(id=request.GET['id'])
-  else:
-    doc = Document2.objects.get_by_uuid(uuid=request.GET['uuid'])
-
-  # Check if user has read permissions
-  doc.can_read_or_exception(request.user)
-
-  return JsonResponse(doc.to_dict())
 
 
 @api_error_handler
@@ -347,7 +294,6 @@ def export_documents(request):
           from spark.models import Notebook
           zfile.writestr("notebook-%s-%s.txt" % (doc.name, doc.id), smart_str(Notebook(document=doc).get_str()))
         except Exception, e:
-          print e
           LOG.exception(e)
     zfile.close()
     response = HttpResponse(content_type="application/zip")
