@@ -28,7 +28,7 @@ from django.views.decorators.http import require_GET, require_POST
 import desktop.conf
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-from desktop.models import Document, DocumentTag
+from desktop.models import Document, DocumentTag, Directory
 
 
 LOG = logging.getLogger(__name__)
@@ -37,8 +37,11 @@ LOG = logging.getLogger(__name__)
 def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
 
+  dir_ids = [directory.doc.get().id for directory in Directory.objects.filter(doc__isnull=False).distinct()]
+
   query = Document.objects.get_docs(user) \
-      .exclude(tags__in=[history_tag])
+      .exclude(tags__in=[history_tag]) \
+      .exclude(id__in=dir_ids)
 
   # Work around Oracle not supporting SELECT DISTINCT with the CLOB type.
   if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
