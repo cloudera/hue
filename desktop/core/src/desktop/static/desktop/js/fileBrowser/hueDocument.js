@@ -167,9 +167,9 @@
       self.assistHelper.fetchDocument({
         uuid: self.fileEntry.definition().uuid,
         successCallback: function (data) {
-          self.prettifyUserNames(data.perms.write.users);
-          self.prettifyUserNames(data.perms.read.users);
-          self.definition(data);
+          self.prettifyUserNames(data.document.perms.write.users);
+          self.prettifyUserNames(data.document.perms.read.users);
+          self.definition(data.document);
           self.loading(false);
           self.loaded(true);
         },

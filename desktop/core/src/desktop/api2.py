@@ -84,7 +84,7 @@ def search_documents(request):
   flatten = json.loads(request.GET.get('flatten', 'true'))
 
   if perms not in ['owned', 'shared', 'both']:
-    raise Exception(_('Invalid value for perms, acceptable values are: owned, shared, both.'))
+    raise PopupException(_('Invalid value for perms, acceptable values are: owned, shared, both.'))
 
   documents = Document2.objects.documents(user=request.user, perms=perms, include_history=include_history)
 

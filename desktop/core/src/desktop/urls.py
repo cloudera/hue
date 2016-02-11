@@ -116,9 +116,9 @@ dynamic_patterns += patterns('desktop.api',
 )
 
 dynamic_patterns += patterns('desktop.api2',
-  (r'^desktop/api2/docs/?$', 'search_documents'),
+  (r'^desktop/api2/docs/?$', 'search_documents'),  # search documents for current user
+  (r'^desktop/api2/doc/?$', 'get_document'),  # get doc/dir by path or UUID
 
-  (r'^desktop/api2/doc/?$', 'get_document'),
   (r'^desktop/api2/doc/move/?$', 'move_document'),
   (r'^desktop/api2/doc/mkdir/?$', 'create_directory'),
   (r'^desktop/api2/doc/delete/?$', 'delete_document'),

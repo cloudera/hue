@@ -26,8 +26,7 @@
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
-  var DOCUMENTS_API = "/desktop/api2/docs/";
-  var DOCUMENT_API = "/desktop/api2/doc/get";
+  var DOCUMENTS_API = "/desktop/api2/doc/";
 
 
   /**
@@ -309,7 +308,7 @@
   AssistHelper.prototype.fetchDocument = function (options) {
     var self = this;
     $.ajax({
-      url: DOCUMENT_API,
+      url: DOCUMENTS_API,
       data: {
         uuid: options.uuid
       },
