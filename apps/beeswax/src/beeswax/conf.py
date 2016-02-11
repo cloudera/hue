@@ -100,7 +100,7 @@ DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
   default=1000000,
   type=int,
-  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 65,000 is applied to XLS downloads.'))
+  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 30,000 is applied to XLS downloads.'))
 
 APPLY_NATURAL_SORT_MAX = Config(
   key="apply_natural_sort_max",
