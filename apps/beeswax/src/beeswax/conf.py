@@ -24,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
 from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
   AUTH_USERNAME as DEFAULT_AUTH_USERNAME
-from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_password_from_script
+from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
 
 from beeswax.settings import NICE_NAME
@@ -129,6 +129,13 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   default=True,
   type=coerce_bool,
   help=_t('Choose whether to show the new SQL editor.')
+)
+
+CONFIG_WHITELIST = Config(
+  key='config_whitelist',
+  default='hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename',
+  type=coerce_csv,
+  help=_t('A comma-separated list of white-listed Hive configuration properties that users are authorized to set.')
 )
 
 SSL = ConfigSection(

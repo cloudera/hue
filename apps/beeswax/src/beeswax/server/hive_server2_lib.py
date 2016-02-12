@@ -39,7 +39,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
 from beeswax import conf as beeswax_conf
 from beeswax import hive_site
 from beeswax.hive_site import hiveserver2_use_ssl
-from beeswax.conf import LIST_PARTITIONS_LIMIT
+from beeswax.conf import CONFIG_WHITELIST, LIST_PARTITIONS_LIMIT
 from beeswax.models import Session, HiveServerQueryHandle, HiveServerQueryHistory
 from beeswax.server.dbms import Table, NoSuchObjectException, DataTable,\
                                 QueryServerException
@@ -887,8 +887,9 @@ class HiveServerClient:
 
     results = self.execute_query_statement(query)
     if results:
-      rows = [row[0] for row in results.rows()]
-      configuration = dict((row.split('=')[0], row.split('=')[1]) for row in rows if '=' in row)
+      config_whitelist = [config.lower() for config in CONFIG_WHITELIST.get()]
+      properties = [(row[0].split('=')[0], row[0].split('=')[1]) for row in results.rows() if '=' in row[0]]
+      configuration = dict((prop, value) for prop, value in properties if prop.lower() in config_whitelist)
     return configuration
 
 
