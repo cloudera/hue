@@ -74,7 +74,7 @@ from desktop.views import _ko
 
 <%def name="csvListInput()">
   <script type="text/html" id="csv-list-input-template">
-    <ul data-bind="sortable: values, visible: values().length" class="unstyled">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
       <li style="margin-bottom: 4px">
         <div class="input-append">
           <!-- ko ifnot: $parent.inputTemplate -->
@@ -82,10 +82,8 @@ from desktop.views import _ko
           <!-- /ko -->
           <!-- ko template: { if: $parent.inputTemplate, name: $parent.inputTemplate } --><!-- /ko -->
           <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
-        <a href="#" data-bind="click: function(){ $parent.removeValue(this); }">
-          <i class="fa fa-minus"></i>
-        </a>
       </li>
     </ul>
     <div style="min-width: 280px; margin-top: 5px;">
