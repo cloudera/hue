@@ -27,7 +27,7 @@
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var DOCUMENTS_API = "/desktop/api2/doc/";
-
+  var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
 
   /**
    * @param {Object} i18n
@@ -278,7 +278,7 @@
   AssistHelper.prototype.searchDocuments = function (options) {
     var self = this;
     $.ajax({
-      url: DOCUMENTS_API,
+      url: DOCUMENTS_SEARCH_API,
       data: {
         uuid: options.uuid,
         text: options.query,

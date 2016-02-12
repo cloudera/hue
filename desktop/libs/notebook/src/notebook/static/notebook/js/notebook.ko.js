@@ -204,7 +204,6 @@
     self.loadingQueries = ko.observable(false);
 
     self.queriesHasErrors = ko.observable(false);
-    self.loadingQueries = ko.observable(false);
     self.queriesCurrentPage = ko.observable(1);
     self.queriesTotalPages = ko.observable(1);
     self.queries = ko.observableArray();
@@ -219,7 +218,7 @@
       self.getAssistHelper().searchDocuments({
         successCallback: function (result) {
           self.queriesTotalPages(Math.ceil(result.count / 25));
-          self.queries(result.children);
+          self.queries(result.documents);
           self.loadingQueries(false);
           self.queriesHasErrors(false);
         },
@@ -235,7 +234,7 @@
 
     var lastQueriesPage = 1;
     self.currentQueryTab.subscribe(function (newValue) {
-      if (newValue === 'myQueries' && (self.queries().length === 0 || lastQueriesPage !== self.queriesCurrentPage())) {
+      if (newValue === 'savedQueries' && (self.queries().length === 0 || lastQueriesPage !== self.queriesCurrentPage())) {
         fetchQueries();
       }
     });
