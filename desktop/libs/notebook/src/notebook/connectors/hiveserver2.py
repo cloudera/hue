@@ -106,6 +106,7 @@ class HS2Api(Api):
 
     # Multiquery, if not first statement or arrived to the last query
     statement_id = snippet['result']['handle'].get('statement_id', 0)
+    statements_count = snippet['result']['handle'].get('statements_count', 1)
     if snippet['result']['handle'].get('has_more_statements'):
       try:
         handle = self._get_handle(snippet)
@@ -117,6 +118,8 @@ class HS2Api(Api):
       statement_id = 0
 
     statements = self._get_statements(snippet['statement'])
+    if statements_count != len(statements):
+      statement_id = 0
     statement = statements[statement_id]
 
     settings = snippet['properties'].get('settings', None)
