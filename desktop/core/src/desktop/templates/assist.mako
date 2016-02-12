@@ -373,7 +373,6 @@ from desktop.views import _ko
       <!-- /ko -->
       <!-- /ko -->
     </ul>
-    <ul></ul>
     <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
     <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
   </script>
@@ -617,6 +616,9 @@ from desktop.views import _ko
     </div>
     <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading()" style="display: none;">
       <span class="assist-errors">${ _('Error loading databases.') }</span>
+    </div>
+    <div class="assist-flex-fill" data-bind="visible: ! hasErrors() && ! loading() && ! hasEntries()" style="display: none;">
+      <span class="assist-errors">${ _('No databases found.') }</span>
     </div>
   </script>
 
