@@ -1220,13 +1220,13 @@ for x in sys.stdin:
     resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'customers'}))
 
     # New queries exist
-    resp = self.client.get('/desktop/api2/docs/shared')
+    resp = self.client.get('/desktop/api2/docs/')
     data = json.loads(resp.content)
     doc_names = [doc['name'] for doc in data['documents']]
     assert_true('examples' in doc_names, data)
     uuid = next((doc['uuid'] for doc in data['documents'] if doc['name'] == 'examples'), None)
 
-    resp = self.client.get('/desktop/api2/docs/', {'uuid': uuid})
+    resp = self.client.get('/desktop/api2/doc/', {'uuid': uuid})
     data = json.loads(resp.content)
     doc_names = [doc['name'] for doc in data['children']]
     assert_true('Sample: Job loss' in doc_names, data)
