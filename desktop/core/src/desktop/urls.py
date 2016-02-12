@@ -121,6 +121,7 @@ dynamic_patterns += patterns('desktop.api2',
 
   (r'^desktop/api2/doc/move/?$', 'move_document'),
   (r'^desktop/api2/doc/mkdir/?$', 'create_directory'),
+  (r'^desktop/api2/doc/update/?$', 'update_document'),
   (r'^desktop/api2/doc/delete/?$', 'delete_document'),
   (r'^desktop/api2/doc/share/?$', 'share_document'),
 
