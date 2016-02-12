@@ -1281,6 +1281,12 @@
   # Signed certificate to send along with encrypted metadata.
   ## cert_file=
 
+  # Path to a file containing the password private key.
+  ## key_file_password=/path/key
+
+  # Execute this script to produce the private key password. This will be used when `key_file_password` is not set.
+  ## key_file_password_script=/path/pwd.sh
+
   # A mapping from attributes in the response from the IdP to django user attributes.
   ## user_attribute_mapping={'uid': ('username', )}
 
