@@ -42,7 +42,7 @@ class TestDocumentConverter(object):
     grant_access("doc2", "doc2", "pig")
 
     # This creates the user directories for the new user
-    response = self.client.get('/desktop/api2/docs/')
+    response = self.client.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     assert_equal('/', data['document']['path'], data)
 
