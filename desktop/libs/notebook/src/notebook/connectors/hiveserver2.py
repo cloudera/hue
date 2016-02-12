@@ -149,7 +149,8 @@ class HS2Api(Api):
         'modified_row_count': handle.modified_row_count,
         'log_context': handle.log_context,
         'statement_id': statement_id,
-        'has_more_statements': statement_id < len(statements) - 1
+        'has_more_statements': statement_id < len(statements) - 1,
+        'statements_count': len(statements),
     }
 
   def _get_statements(self, hql_query):
@@ -293,6 +294,7 @@ class HS2Api(Api):
     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     snippet['result']['handle'].pop('statement_id')
     snippet['result']['handle'].pop('has_more_statements')
+    snippet['result']['handle'].pop('statements_count')
     return HiveServerQueryHandle(**snippet['result']['handle'])
 
 

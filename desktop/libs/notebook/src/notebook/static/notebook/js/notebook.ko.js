@@ -36,6 +36,8 @@
     self.handle = ko.observable(typeof result.handle != "undefined" && result.handle != null ? result.handle : {});
     self.meta = ko.observableArray(typeof result.meta != "undefined" && result.meta != null ? result.meta : []);
     self.hasMore = ko.observable(typeof result.hasMore != "undefined" && result.hasMore != null ? result.hasMore : false);
+    self.statement_id = ko.observable(typeof result.statement_id != "undefined" && result.statement_id != null ? result.statement_id : 0);
+    self.statements_count = ko.observable(typeof result.statements_count != "undefined" && result.statements_count != null ? result.statements_count : 1);
     self.cleanedMeta = ko.computed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item) {
         return item.name != ''
@@ -155,7 +157,7 @@
     self.name = ko.observable(typeof snippet.name != "undefined" && snippet.name != null ? snippet.name : '');
     self.type = ko.observable(typeof snippet.type != "undefined" && snippet.type != null ? snippet.type : 'hive');
 
-    //Ace stuff
+    // Ace stuff
     self.ace = ko.observable(null);
     self.errors = ko.observableArray([]);
 
@@ -531,6 +533,12 @@
           self.result.clear();
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
+          if (data.handle.statements_count != null) {
+            self.result.statements_count(data.handle.statements_count);
+          }
+          if (data.handle.statement_id != null) {
+            self.result.statement_id(data.handle.statement_id);
+          }
           if (data.handle.sync) {
             self.loadData(data.handle, 100);
             self.status('success');
