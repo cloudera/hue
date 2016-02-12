@@ -71,6 +71,70 @@ from desktop.views import _ko
   </script>
 </%def>
 
+<%def name="keyValueListInput()">
+  <script type="text/html" id="key-value-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li>
+        <div class="input-append" style="margin-bottom: 4px">
+          <input type="text" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
+          <input type="text" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function KeyValueListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.key() && value.value();
+              }))
+            }
+          });
+        }
+
+        KeyValueListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            key: ko.observable(''),
+            value: ko.observable('')
+          };
+          self.values.push(newValue);
+        };
+
+        KeyValueListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('key-value-list-input', {
+          viewModel: KeyValueListInputViewModel,
+          template: {element: 'key-value-list-input-template'}
+        });
+      }());
+    }));
+  </script>
+</%def>
+
 
 <%def name="csvListInput()">
   <script type="text/html" id="csv-list-input-template">
