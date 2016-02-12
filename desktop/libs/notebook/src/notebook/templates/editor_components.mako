@@ -950,6 +950,9 @@ ${ require.config() }
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode && result && result.handle().has_more, css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Restart from the first statement') }">
       <i class="fa fa-fw fa-repeat"></i>
     </a>
+    <span data-bind="visible: $root.editorMode && result.statements_count() > 1">
+      <span data-bind="text: result.statement_id() + 1"></span> / <span data-bind="text: result.statements_count()"></span>
+    </span>
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Execute or CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
     </a>
