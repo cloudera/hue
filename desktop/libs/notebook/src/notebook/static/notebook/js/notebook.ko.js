@@ -1017,16 +1017,6 @@
       };
     };
 
-    // Init
-    if (notebook.snippets) {
-      $.each(notebook.snippets, function (index, snippet) {
-        self.addSnippet(snippet);
-      });
-      if (vm.editorMode && notebook.snippets.length == 0) {
-        self.showHistory(true); // Show history when new query
-      }
-    }
-
     self.save = function () {
       $.post("/notebook/api/notebook/save", {
         "notebook": ko.mapping.toJSON(self, SPARK_MAPPING),
@@ -1134,10 +1124,6 @@
       }
     });
 
-    if (self.showHistory()) {
-      self.fetchHistory();
-    }
-
     self.clearHistory = function (type) {
       $.post("/notebook/api/clear_history", {
         notebook: ko.mapping.toJSON(self.getContext()),
@@ -1196,6 +1182,20 @@
         });
       }
     });
+
+    // Init
+    if (notebook.snippets) {
+      $.each(notebook.snippets, function (index, snippet) {
+        self.addSnippet(snippet);
+      });
+      if (vm.editorMode) {
+        if (notebook.snippets.length == 0) {
+          self.showHistory(true); // Show history when new query
+        } else if (self.showHistory()) {
+          self.fetchHistory(); // Show on saved query with history selected
+        }
+      }
+    }
   };
 
 
