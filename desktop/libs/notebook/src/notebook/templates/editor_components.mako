@@ -605,6 +605,10 @@ ${ require.config() }
   <div data-bind="component: { name: 'csv-list-input', params: { value: value, placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
 </script>
 
+<script type="text/html" id="property-settings">
+  <div data-bind="component: { name: 'key-value-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
+</script>
+
 <script type="text/html" id="property-csv-hdfs-files">
   <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-csv-hdfs-file-input', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
 </script>
@@ -628,7 +632,7 @@ ${ require.config() }
 
         <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Files') }', value: properties().files, title: '${ _ko('Files to be placed in the working directory of each executor.') }', placeholder: '${ _ko('e.g. file.data') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().functions != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Functions') }', value: properties().functions, title: '${ _ko('UDFs name and class') }', placeholder: '${ _ko('e.g. myUpper org.hue.udf.MyUpper') }'}} --><!-- /ko -->
-        <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Settings') }', value: properties().settings, title: '${ _ko('Spark properties') }', placeholder: '${ _ko('e.g. foo=value') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'settings', label: '${ _ko('Settings') }', value: properties().settings, visibleObservable: settingsVisible, title: '${ _ko('Properties') }'}} --><!-- /ko -->
 
         <!-- ko template: { if: typeof properties().parameters != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Parameters') }', value: properties().parameters, title: '${ _ko('Names and values of Pig parameters and options') }', placeholder: '${ _ko('e.g. input /user/data, -param input=/user/data, -optimizer_off SplitFilter, -verbose') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Hadoop properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->

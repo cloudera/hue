@@ -50,6 +50,7 @@ ${ editorComponents.topBar('notebook') }
 ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ koComponents.csvListInput() }
+${ koComponents.keyValueListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.addSnippetMenu() }
 ${ koComponents.downloadSnippetResults() }
