@@ -209,6 +209,36 @@ class TestDocument2(object):
     assert_equal(2, len(data['children']))
 
 
+  def test_update_document(self):
+    doc = Document2.objects.create(
+      name='initial',
+      description='initial desc',
+      type='query-hive',
+      owner=self.user,
+      data={},
+      parent_directory=self.home_dir
+    )
+
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal('initial', data['document']['name'])
+    assert_equal('initial desc', data['document']['description'])
+    assert_equal('query-hive', data['document']['type'])
+
+    # Update document's name and description
+    response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(doc.uuid),
+                                                             'name': 'updated',
+                                                             'description': 'updated desc',
+                                                             'type': 'bogus-type'})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+    assert_true('document' in data, data)
+    assert_equal('updated', data['document']['name'], data)
+    assert_equal('updated desc', data['document']['description'], data)
+    # Non-whitelisted attributes should remain unchanged
+    assert_equal('query-hive', data['document']['type'], data)
+
+
   def test_document_trash(self):
     # Create document under home and directory under home with child document
     # /
