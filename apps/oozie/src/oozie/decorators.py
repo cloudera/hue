@@ -33,7 +33,7 @@ LOG = logging.getLogger(__name__)
 def check_document_access_permission():
   def inner(view_func):
     def decorate(request, *args, **kwargs):
-      doc_id = uuid = None
+      doc_id = uuid = doc2 = None
 
       try:
         if request.REQUEST.get('workflow'):
@@ -55,10 +55,9 @@ def check_document_access_permission():
           doc2 = Document2.objects.get(id=doc_id)
         elif uuid is not None:
           doc2 = Document2.objects.get_by_uuid(uuid)
-        else:
-          raise PopupException(_('Failed to retrieve Document2 object, id or uuid is required.'))
 
-        doc2.doc.get().can_read_or_exception(request.user)
+        if doc2:
+          doc2.doc.get().can_read_or_exception(request.user)
       except Document2.DoesNotExist:
         raise PopupException(_('Job with %(key)s=%(value)s does not exist') %
                              {'key': 'id' if doc_id else 'uuid', 'value': doc_id or uuid})
