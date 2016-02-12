@@ -197,6 +197,32 @@ def create_directory(request):
 
 @api_error_handler
 @require_POST
+def update_document(request):
+  uuid = json.loads(request.POST.get('uuid'))
+
+  if not uuid:
+    raise PopupException(_('update_document requires uuid'))
+
+  document = Document2.objects.get_by_uuid(uuid=uuid)
+  document.can_write_or_exception(request.user)
+
+  whitelisted_attrs = ['name', 'description']
+
+  for attr in whitelisted_attrs:
+    if request.POST.get(attr):
+      setattr(document, attr, request.POST.get(attr))
+
+  document.save(update_fields=whitelisted_attrs)
+
+  return JsonResponse({
+    'status': 0,
+    'document': document.to_dict()
+  })
+
+
+
+@api_error_handler
+@require_POST
 def delete_document(request):
   """
   Accepts a uuid and optional skip_trash parameter
