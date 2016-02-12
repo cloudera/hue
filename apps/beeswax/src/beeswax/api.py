@@ -609,40 +609,7 @@ def save_results_hive_table(request, query_history_id):
   return JsonResponse(response)
 
 
-def design_to_dict(design):
-  hql_design = HQLdesign.loads(design.data)
-  return {
-    'id': design.id,
-    'query': hql_design.hql_query,
-    'name': design.name,
-    'desc': design.desc,
-    'database': hql_design.query.get('database', None),
-    'settings': hql_design.settings,
-    'file_resources': hql_design.file_resources,
-    'functions': hql_design.functions,
-    'is_parameterized': hql_design.query.get('is_parameterized', True),
-    'email_notify': hql_design.query.get('email_notify', True),
-    'is_redacted': design.is_redacted
-  }
-
-
-def query_history_to_dict(request, query_history):
-  query_history_dict = {
-    'id': query_history.id,
-    'state': query_history.last_state,
-    'query': query_history.query,
-    'has_results': query_history.has_results,
-    'statement_number': query_history.statement_number,
-    'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id}),
-    'results_url': reverse(get_app_name(request) + ':view_results', kwargs={'id': query_history.id, 'first_row': 0})
-  }
-
-  if query_history.design:
-    query_history_dict['design'] = design_to_dict(query_history.design)
-
-  return query_history_dict
-
-
+@error_handler
 def clear_history(request):
   response = {'status': -1, 'message': ''}
 
@@ -655,21 +622,11 @@ def clear_history(request):
   return JsonResponse(response)
 
 
-# Proxy API for Metastore App
-def describe_table(request, database, table):
-  try:
-    from metastore.views import describe_table
-    return describe_table(request, database, table)
-  except Exception, e:
-    LOG.exception('Describe table failed')
-    raise PopupException(_('Problem accessing table metadata'), detail=e)
-
-
 @error_handler
 def get_sample_data(request, database, table):
   query_server = dbms.get_query_server_config(get_app_name(request))
   db = dbms.get(request.user, query_server)
-  response = {'status': -1, 'error_message': ''}
+  response = {'status': -1}
 
   table_obj = db.get_table(database, table)
   sample_data = db.get_sample(database, table_obj)
@@ -678,7 +635,7 @@ def get_sample_data(request, database, table):
     response['headers'] = sample_data.cols()
     response['rows'] = escape_rows(sample_data.rows(), nulls_only=True)
   else:
-    response['error_message'] = _('Sample data took too long to be generated')
+    response['message'] = _('Failed to get sample data.')
 
   return JsonResponse(response)
 
@@ -687,7 +644,7 @@ def get_sample_data(request, database, table):
 def get_indexes(request, database, table):
   query_server = dbms.get_query_server_config(get_app_name(request))
   db = dbms.get(request.user, query_server)
-  response = {'status': -1, 'error_message': ''}
+  response = {'status': -1}
 
   indexes = db.get_indexes(database, table)
   if indexes:
@@ -695,7 +652,23 @@ def get_indexes(request, database, table):
     response['headers'] = indexes.cols()
     response['rows'] = escape_rows(indexes.rows(), nulls_only=True)
   else:
-    response['error_message'] = _('Index data took too long to be generated')
+    response['message'] = _('Failed to get indexes.')
+
+  return JsonResponse(response)
+
+
+@error_handler
+def get_settings(request):
+  query_server = dbms.get_query_server_config(get_app_name(request))
+  db = dbms.get(request.user, query_server)
+  response = {'status': -1}
+
+  settings = db.get_configuration()
+  if settings:
+    response['status'] = 0
+    response['settings'] = settings
+  else:
+    response['message'] = _('Failed to get settings.')
 
   return JsonResponse(response)
 
@@ -704,7 +677,7 @@ def get_indexes(request, database, table):
 def get_functions(request):
   query_server = dbms.get_query_server_config(get_app_name(request))
   db = dbms.get(request.user, query_server)
-  response = {'status': -1, 'error_message': ''}
+  response = {'status': -1}
 
   prefix = request.GET.get('prefix', None)
   functions = db.get_functions(prefix)
@@ -713,35 +686,9 @@ def get_functions(request):
     rows = escape_rows(functions.rows(), nulls_only=True)
     response['functions'] = [row[0] for row in rows]
   else:
-    response['error_message'] = _('Fetching functions timed out.')
+    response['message'] = _('Failed to get functions.')
 
   return JsonResponse(response)
-
-
-def get_query_form(request):
-  try:
-    try:
-      # Get database choices
-      query_server = dbms.get_query_server_config(get_app_name(request))
-      db = dbms.get(request.user, query_server)
-      databases = [(database, database) for database in db.get_databases()]
-    except StructuredThriftTransportException, e:
-      # If Thrift exception was due to failed authentication, raise corresponding message
-      if 'TSocket read 0 bytes' in str(e) or 'Error validating the login' in str(e):
-        raise PopupException(_('Failed to authenticate to query server, check authentication configurations.'), detail=e)
-      else:
-        raise e
-  except Exception, e:
-    raise PopupException(_('Unable to access databases, Query Server or Metastore may be down.'), detail=e)
-
-  if not databases:
-    raise RuntimeError(_("No databases are available. Permissions could be missing."))
-
-  query_form = QueryForm()
-  query_form.bind(request.POST)
-  query_form.query.fields['database'].choices = databases # Could not do it in the form
-
-  return query_form
 
 
 @error_handler
@@ -853,6 +800,76 @@ def close_session(request, session_id):
     response['session'] = {'id': session_id, 'application': session.application, 'status': session.status_code}
 
   return JsonResponse(response)
+
+
+# Proxy API for Metastore App
+def describe_table(request, database, table):
+  try:
+    from metastore.views import describe_table
+    return describe_table(request, database, table)
+  except Exception, e:
+    LOG.exception('Describe table failed')
+    raise PopupException(_('Problem accessing table metadata'), detail=e)
+
+
+def design_to_dict(design):
+  hql_design = HQLdesign.loads(design.data)
+  return {
+    'id': design.id,
+    'query': hql_design.hql_query,
+    'name': design.name,
+    'desc': design.desc,
+    'database': hql_design.query.get('database', None),
+    'settings': hql_design.settings,
+    'file_resources': hql_design.file_resources,
+    'functions': hql_design.functions,
+    'is_parameterized': hql_design.query.get('is_parameterized', True),
+    'email_notify': hql_design.query.get('email_notify', True),
+    'is_redacted': design.is_redacted
+  }
+
+
+def query_history_to_dict(request, query_history):
+  query_history_dict = {
+    'id': query_history.id,
+    'state': query_history.last_state,
+    'query': query_history.query,
+    'has_results': query_history.has_results,
+    'statement_number': query_history.statement_number,
+    'watch_url': reverse(get_app_name(request) + ':api_watch_query_refresh_json', kwargs={'id': query_history.id}),
+    'results_url': reverse(get_app_name(request) + ':view_results', kwargs={'id': query_history.id, 'first_row': 0})
+  }
+
+  if query_history.design:
+    query_history_dict['design'] = design_to_dict(query_history.design)
+
+  return query_history_dict
+
+
+def get_query_form(request):
+  try:
+    try:
+      # Get database choices
+      query_server = dbms.get_query_server_config(get_app_name(request))
+      db = dbms.get(request.user, query_server)
+      databases = [(database, database) for database in db.get_databases()]
+    except StructuredThriftTransportException, e:
+      # If Thrift exception was due to failed authentication, raise corresponding message
+      if 'TSocket read 0 bytes' in str(e) or 'Error validating the login' in str(e):
+        raise PopupException(_('Failed to authenticate to query server, check authentication configurations.'), detail=e)
+      else:
+        raise e
+  except Exception, e:
+    raise PopupException(_('Unable to access databases, Query Server or Metastore may be down.'), detail=e)
+
+  if not databases:
+    raise RuntimeError(_("No databases are available. Permissions could be missing."))
+
+  query_form = QueryForm()
+  query_form.bind(request.POST)
+  query_form.query.fields['database'].choices = databases # Could not do it in the form
+
+  return query_form
 
 
 """
