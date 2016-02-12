@@ -604,8 +604,8 @@ class HiveServerClient:
                                      properties=properties)
 
     # HS2 does not return properties in TOpenSessionResp
-    if self.query_server['server_name'] == "beeswax" and not session.get_properties():
-      session.properties = json.dumps(self.get_configuration(include_hadoop=False))
+    if not session.get_properties():
+      session.properties = json.dumps(self.get_configuration())
       session.save()
 
     return session
@@ -879,17 +879,20 @@ class HiveServerClient:
     return partitions[:max_parts]
 
 
-  def get_configuration(self, include_hadoop=False):
+  def get_configuration(self):
     configuration = {}
-    query = 'SET'
-    if include_hadoop:
-      query += ' -v'
 
-    results = self.execute_query_statement(query)
-    if results:
+    if self.query_server['server_name'] == 'impala':  # Return all configuration settings
+      query = 'SET'
+      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_NEXT)
+      configuration = dict((row[0], row[1]) for row in results.rows())
+    else:  # For Hive, only return white-listed configurations
+      query = 'SET -v'
+      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_FIRST)
       config_whitelist = [config.lower() for config in CONFIG_WHITELIST.get()]
       properties = [(row[0].split('=')[0], row[0].split('=')[1]) for row in results.rows() if '=' in row[0]]
       configuration = dict((prop, value) for prop, value in properties if prop.lower() in config_whitelist)
+
     return configuration
 
 
@@ -1108,7 +1111,7 @@ class HiveServerClientCompatible(object):
 
 
   def get_default_configuration(self, *args, **kwargs):
-    return {}
+    return []
 
 
   def get_results_metadata(self, handle):
@@ -1137,3 +1140,6 @@ class HiveServerClientCompatible(object):
 
 
   def alter_partition(self, db_name, tbl_name, new_part): raise NotImplementedError()
+
+  def get_configuration(self):
+    return self._client.get_configuration()

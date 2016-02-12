@@ -787,6 +787,10 @@ class HiveServer2Dbms(object):
     return result
 
 
+  def get_configuration(self):
+    return self.client.get_configuration()
+
+
   def get_functions(self, prefix=None):
     filter = '"%s.*"' % prefix if prefix else '".*"'
     hql = 'SHOW FUNCTIONS %s' % filter

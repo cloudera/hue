@@ -60,6 +60,7 @@ urlpatterns += patterns(
   url(r'^api/session/?$', 'get_session', name='api_get_session'),
   url(r'^api/session/(?P<session_id>\d+)/?$', 'get_session', name='api_get_session'),
   url(r'^api/session/(?P<session_id>\d+)/close/?$', 'close_session', name='api_close_session'),
+  url(r'^api/settings/?$', 'get_settings', name='get_settings'),
   url(r'^api/functions/?$', 'get_functions', name='get_functions'),
 
   # Deprecated by Notebook API
