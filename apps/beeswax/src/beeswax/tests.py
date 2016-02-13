@@ -1979,11 +1979,6 @@ for x in sys.stdin:
       assert_equal(2, len(json_resp['settings'].items()), json_resp)
       assert_true('hive.execution.engine' in json_resp['settings'])
       assert_true('mapreduce.job.queuename' in json_resp['settings'])
-
-      resp = self.client.get(reverse("impala:get_settings"))
-      json_resp = json.loads(resp.content)
-      assert_equal(0, json_resp['status'])
-      assert_true('QUERY_TIMEOUT_S' in json_resp['settings'])
     finally:
       for reset in resets:
         reset()
