@@ -45,20 +45,10 @@ function resizeLogs(element) {
 }
 
 var _resizeTimeout = -1;
-var _winWidth = $(window).width();
-var _winHeight = $(window).height();
 
 function enableResizeLogs() {
   $(window).on("resize", function () {
-    window.clearTimeout(_resizeTimeout);
-    _resizeTimeout = window.setTimeout(function () {
-      // prevents endless loop in IE8
-      if (_winWidth != $(window).width() || _winHeight != $(window).height()) {
-        $(document).trigger("resized");
-        _winWidth = $(window).width();
-        _winHeight = $(window).height();
-      }
-    }, 200);
+    $(document).trigger("resized");
   });
 }
 
