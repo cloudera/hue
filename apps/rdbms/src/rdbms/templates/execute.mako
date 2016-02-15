@@ -407,8 +407,6 @@ ${ commonshare() | n,unicode }
     $("#navigatorTables").css("max-height", ($(window).height() - 340) + "px").css("overflow-y", "auto");
 
     var resizeTimeout = -1;
-    var winWidth = $(window).width();
-    var winHeight = $(window).height();
 
     var resizeNavigator = function() {
       $("#navigatorTables").css("max-height", ($(window).height() - 380) + "px").css("overflow-y", "auto");
@@ -416,16 +414,8 @@ ${ commonshare() | n,unicode }
     }
 
     $(window).on("resize", function () {
-      window.clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(function () {
-        // prevents endless loop in IE8
-        if (winWidth != $(window).width() || winHeight != $(window).height()) {
-          codeMirror.setSize("95%", 100);
-          winWidth = $(window).width();
-          winHeight = $(window).height();
-          resizeNavigator();
-        }
-      }, 200);
+      codeMirror.setSize("95%", 100);
+      resizeNavigator();
     });
     resizeNavigator();
 
