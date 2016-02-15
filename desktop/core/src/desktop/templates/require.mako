@@ -15,6 +15,7 @@
 ## limitations under the License.
 <%!
 from desktop.conf import DJANGO_DEBUG_MODE
+from django.conf import settings
 DEBUG = DJANGO_DEBUG_MODE.get()
 %>
 
@@ -28,6 +29,8 @@ DEBUG = DJANGO_DEBUG_MODE.get()
     require.config({
       %if DEBUG:
       urlArgs: "bust=" + (new Date()).getTime(),
+      %else:
+      urlArgs: "version=${settings.HUE_DESKTOP_VERSION}",
       %endif
       baseUrl: "${ static('') }",
       paths: {
