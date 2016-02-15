@@ -1152,7 +1152,8 @@ var snippet = notebook.newSnippet(snippetType);
 var assistHelper = snippet.getAssistHelper();
 var autocompleter = new Autocompleter({
   snippet: snippet,
-  user: HIVE_AUTOCOMPLETE_USER
+  user: HIVE_AUTOCOMPLETE_USER,
+  oldEditor: true
 });
 
 var escapeOutput = function (str) {
