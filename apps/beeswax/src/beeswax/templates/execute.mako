@@ -1476,21 +1476,9 @@ $(document).ready(function () {
 
   initQueryField();
 
-  var resizeTimeout = -1;
-  var winWidth = $(window).width();
-  var winHeight = $(window).height();
+  $(window).on("resize", resizeNavigator);
 
-  $(window).on("resize", function () {
-    window.clearTimeout(resizeTimeout);
-    resizeTimeout = window.setTimeout(function () {
-      // prevents endless loop in IE8
-      if (winWidth != $(window).width() || winHeight != $(window).height()) {
-        resizeNavigator();
-        winWidth = $(window).width();
-        winHeight = $(window).height();
-      }
-    }, 200);
-  });
+  window.setInterval(resizeNavigator, 1000);
 
   function initQueryField() {
     if ($("#queryField").val() == "") {
