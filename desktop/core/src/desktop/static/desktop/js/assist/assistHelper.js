@@ -23,11 +23,13 @@
 }(this, function (ko) {
 
   var TIME_TO_LIVE_IN_MILLIS = $.totalStorage('hue.cacheable.ttl.override') || $.totalStorage('hue.cacheable.ttl'); // 1 day by default, configurable with desktop.custom.cacheable_ttl in the .ini or $.totalStorage('hue.cacheable.ttl.override', 1234567890)
+
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
-  var HDFS_API_PREFIX = "/filebrowser/view=";
-  var HDFS_PARAMETERS = "?pagesize=100&format=json";
   var DOCUMENTS_API = "/desktop/api2/doc/";
   var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
+  var HDFS_API_PREFIX = "/filebrowser/view=";
+  var HDFS_PARAMETERS = "?pagesize=100&format=json";
+  var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
 
   /**
    * @param {Object} i18n
@@ -43,6 +45,7 @@
     self.user = user;
     self.lastKnownDatabases = {};
     self.fetchQueue = {};
+    self.invalidateImpala = false;
 
     huePubSub.subscribe('assist.clear.db.cache', function (options) {
       self.clearDbCache(options);
@@ -443,6 +446,7 @@
    */
   AssistHelper.prototype.clearDbCache = function (options) {
     var self = this;
+    self.invalidateImpala = options.sourceType === 'impala' && options.clearAll;
     if (options.clearAll) {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
     } else {
@@ -473,30 +477,41 @@
   AssistHelper.prototype.loadDatabases = function (options) {
     var self = this;
 
-    fetchAssistData.bind(self)($.extend({}, options, {
-      url: AUTOCOMPLETE_API_PREFIX,
-      successCallback: function (data) {
-        var databases = data.databases || [];
-        // Blacklist of system databases
-        self.lastKnownDatabases[options.sourceType] = $.grep(databases, function(database) {
-          return database !== "_impala_builtins";
-        });
-        options.successCallback(self.lastKnownDatabases[options.sourceType]);
-      },
-      errorCallback: function (response) {
-        if (response.status == 401) {
-          $(document).trigger("showAuthModal", {'type': options.sourceType, 'callback': function() {
-            self.loadDatabases(options);
-          }});
-          return;
+    var loadFunction = function () {
+      self.invalidateImpala = false;
+      fetchAssistData.bind(self)($.extend({}, options, {
+        url: AUTOCOMPLETE_API_PREFIX,
+        successCallback: function (data) {
+          var databases = data.databases || [];
+          // Blacklist of system databases
+          self.lastKnownDatabases[options.sourceType] = $.grep(databases, function (database) {
+            return database !== "_impala_builtins";
+          });
+          options.successCallback(self.lastKnownDatabases[options.sourceType]);
+        },
+        errorCallback: function (response) {
+          if (response.status == 401) {
+            $(document).trigger("showAuthModal", {
+              'type': options.sourceType, 'callback': function () {
+                self.loadDatabases(options);
+              }
+            });
+            return;
+          }
+          self.lastKnownDatabases[options.sourceType] = [];
+          self.assistErrorCallback(options)(response);
+        },
+        cacheCondition: function (data) {
+          return typeof data !== 'undefined' && data !== null && typeof data.databases !== 'undefined' && data.databases !== null && data.databases.length > 0;
         }
-        self.lastKnownDatabases[options.sourceType] = [];
-        self.assistErrorCallback(options)(response);
-      },
-      cacheCondition: function (data) {
-        return typeof data !== 'undefined' && data !== null && typeof data.databases !== 'undefined' && data.databases !== null && data.databases.length > 0;
-      }
-    }));
+      }));
+    };
+
+    if (options.sourceType === 'impala' && self.invalidateImpala) {
+      $.post(IMPALA_INVALIDATE_API, loadFunction);
+    } else {
+      loadFunction();
+    }
   };
 
   /**
