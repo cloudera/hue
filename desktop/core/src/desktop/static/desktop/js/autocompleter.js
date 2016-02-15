@@ -44,7 +44,8 @@
       if (self.snippet.isSqlDialect()) {
         self.autocompleter = new SqlAutocompleter({
           hdfsAutocompleter: hdfsAutocompleter,
-          snippet: options.snippet
+          snippet: options.snippet,
+          oldEditor: options.oldEditor
         })
       } else {
         self.autocompleter = hdfsAutocompleter;
