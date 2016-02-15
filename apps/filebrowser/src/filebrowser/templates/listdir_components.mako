@@ -322,9 +322,9 @@ from django.utils.translation import ugettext as _
   </div>
 
   <!-- upload file modal -->
-  <div id="uploadFileModal" class="modal hide fade">
+  <div id="uploadFileModal" class="modal hide fade" data-backdrop="static">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0">&times;</a>
       <h3>${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
     </div>
     <div class="modal-body form-inline">
@@ -827,6 +827,7 @@ from django.utils.translation import ugettext as _
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
       self.isCurrentDirSentryManaged = ko.observable(false);
+      self.pendingUploads = ko.observable(0);
 
       self.fileNameSorting = function (l, r) {
         if (l.name == "..") {
@@ -1343,100 +1344,106 @@ from django.utils.translation import ugettext as _
       };
 
       self.uploadFile = (function () {
-        var num_of_pending_uploads = 0;
         var action = "/filebrowser/upload/file";
         var uploader = new qq.FileUploader({
-          element:document.getElementById("fileUploader"),
-          action:action,
-          template:'<div class="qq-uploader" style="margin-left: 10px">' +
-                  '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
-                  '<div class="qq-upload-button">${_('Select files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
-                  '<ul class="qq-upload-list"></ul>' +
-                  '</div>',
-          fileTemplate:'<li>' +
-                  '<span class="qq-upload-file"></span>' +
-                  '<span class="qq-upload-spinner"></span>' +
-                  '<span class="qq-upload-size"></span>' +
-                  '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
-                  '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-                  '</li>',
-          params:{
-            dest:self.currentPath(),
-            fileFieldLabel:"hdfs_file"
+          element: document.getElementById("fileUploader"),
+          action: action,
+          template: '<div class="qq-uploader" style="margin-left: 10px">' +
+          '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
+          '<div class="qq-upload-button">${_('Select files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
+          '<ul class="qq-upload-list"></ul>' +
+          '</div>',
+          fileTemplate: '<li>' +
+          '<span class="qq-upload-file"></span>' +
+          '<span class="qq-upload-spinner"></span>' +
+          '<span class="qq-upload-size"></span>' +
+          '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+          '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+          '</li>',
+          params: {
+            dest: self.currentPath(),
+            fileFieldLabel: "hdfs_file"
           },
-          onComplete:function (id, fileName, response) {
-            num_of_pending_uploads--;
+          onComplete: function (id, fileName, response) {
+            self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
               $(document).trigger("error", "${ _('Error: ') }" + response['data']);
-            } else if (num_of_pending_uploads == 0) {
+            } else if (self.pendingUploads() == 0) {
               location = "/filebrowser/view=" + self.currentPath();
             }
           },
-          onSubmit:function (id, fileName, responseJSON) {
-            num_of_pending_uploads++;
+          onSubmit: function (id, fileName, responseJSON) {
+            self.pendingUploads(self.pendingUploads() + 1);
           },
-          debug:false
+          onCancel: function (id, fileName) {
+            self.pendingUploads(0);
+          },
+          debug: false
         });
 
         $("#fileUploader").on('fb:updatePath', function (e, options) {
           uploader.setParams({
-            dest:options.dest,
-            fileFieldLabel:"hdfs_file"
+            dest: options.dest,
+            fileFieldLabel: "hdfs_file"
           });
         });
 
         return function () {
           $("#uploadFileModal").modal({
-            keyboard:true,
-            show:true
+            keyboard: false,
+            backdrop: 'static',
+            show: true
           });
         };
       })();
 
       self.uploadArchive = (function () {
-        var num_of_pending_uploads = 0;
         var uploader = new qq.FileUploader({
-          element:document.getElementById("archiveUploader"),
-          action:"/filebrowser/upload/archive",
-          template:'<div class="qq-uploader" style="margin-left: 10px">' +
-                  '<div class="qq-upload-drop-area"><span>${_('Drop the archives here to upload and extract them')}</span></div>' +
-                  '<div class="qq-upload-button">${_('Select ZIP, TGZ or BZ2 files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
-                  '<ul class="qq-upload-list"></ul>' +
-                  '</div>',
-          fileTemplate:'<li>' +
-                  '<span class="qq-upload-file"></span>' +
-                  '<span class="qq-upload-spinner"></span>' +
-                  '<span class="qq-upload-size"></span>' +
-                  '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
-                  '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-                  '</li>',
-          params:{
-            dest:self.currentPath(),
-            fileFieldLabel:"archive"
+          element: document.getElementById("archiveUploader"),
+          action: "/filebrowser/upload/archive",
+          template: '<div class="qq-uploader" style="margin-left: 10px">' +
+          '<div class="qq-upload-drop-area"><span>${_('Drop the archives here to upload and extract them')}</span></div>' +
+          '<div class="qq-upload-button">${_('Select ZIP, TGZ or BZ2 files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
+          '<ul class="qq-upload-list"></ul>' +
+          '</div>',
+          fileTemplate: '<li>' +
+          '<span class="qq-upload-file"></span>' +
+          '<span class="qq-upload-spinner"></span>' +
+          '<span class="qq-upload-size"></span>' +
+          '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+          '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
+          '</li>',
+          params: {
+            dest: self.currentPath(),
+            fileFieldLabel: "archive"
           },
-          onComplete:function (id, fileName, responseJSON) {
-            num_of_pending_uploads--;
-            if (num_of_pending_uploads == 0) {
+          onComplete: function (id, fileName, responseJSON) {
+            self.pendingUploads(self.pendingUploads() - 1);
+            if (self.pendingUploads() == 0) {
               location = "/filebrowser/view=" + self.currentPath();
             }
           },
-          onSubmit:function (id, fileName, responseJSON) {
-            num_of_pending_uploads++;
+          onSubmit: function (id, fileName, responseJSON) {
+            self.pendingUploads(self.pendingUploads() + 1);
           },
-          debug:false
+          onCancel: function (id, fileName) {
+            self.pendingUploads(0);
+          },
+          debug: false
         });
 
         $("#archiveUploader").on('fb:updatePath', function (e, options) {
           uploader.setParams({
-            dest:options.dest,
-            fileFieldLabel:"archive"
+            dest: options.dest,
+            fileFieldLabel: "archive"
           });
         });
 
         return function () {
           $("#uploadArchiveModal").modal({
-            keyboard:true,
-            show:true
+            keyboard: false,
+            backdrop: 'static',
+            show: true
           });
         };
       })();
