@@ -34,6 +34,7 @@
     var self = this;
     self.snippet = options.snippet;
     self.hdfsAutocompleter = options.hdfsAutocompleter;
+    self.oldEditor = options.oldEditor || false;
 
     // Speed up by caching the databases
     var initDatabases = function () {
@@ -297,7 +298,7 @@
           type: "table"
         }
       });
-      if (! excludeDatabases) {
+      if (! excludeDatabases && ! self.oldEditor) {
         // No FROM prefix
         prependedFields = prependedFields.concat(fields);
         fields = $.map(self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()], function(database) {
