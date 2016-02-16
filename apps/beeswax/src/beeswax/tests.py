@@ -2803,21 +2803,25 @@ class TestWithMockedServer(object):
     )
     query_history.save()
 
-    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s' % design_id)
-    page_ids = [hist.id for hist in resp.context['page'].object_list]
-    assert_true(design_id in page_ids, page_ids)
-    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s&recent=true' % design_id)
-    page_ids = [hist.id for hist in resp.context['page'].object_list]
-    assert_true(design_id in page_ids, page_ids)
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?q-design_id=%s&format=json' % design_id)
+    json_resp = json.loads(resp.content)
+    design_ids = [history['design_id'] for history in json_resp['queries']]
+    assert_true(design_id in design_ids, json_resp)
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?q-design_id=%s&recent=true&format=json' % design_id)
+    json_resp = json.loads(resp.content)
+    design_ids = [history['design_id'] for history in json_resp['queries']]
+    assert_true(design_id in design_ids, json_resp)
 
     self.client.post(reverse('beeswax:clear_history'))
 
-    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s' % design_id)
-    page_ids = [hist.id for hist in resp.context['page'].object_list]
-    assert_true(design_id in page_ids, page_ids)
-    resp = self.client.get(reverse('beeswax:list_query_history') + '?design_id=%s&recent=true' % design_id)
-    page_ids = [hist.id for hist in resp.context['page'].object_list]
-    assert_false(design_id in page_ids, page_ids)
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?q-design_id=%s&format=json' % design_id)
+    json_resp = json.loads(resp.content)
+    design_ids = [history['design_id'] for history in json_resp['queries']]
+    assert_true(design_id in design_ids, json_resp)
+    resp = self.client.get(reverse('beeswax:list_query_history') + '?q-design_id=%s&recent=true&format=json' % design_id)
+    json_resp = json.loads(resp.content)
+    design_ids = [history['design_id'] for history in json_resp['queries']]
+    assert_false(design_id in design_ids, json_resp)
 
 
 class TestDesign():
