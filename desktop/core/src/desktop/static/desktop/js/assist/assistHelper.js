@@ -440,13 +440,14 @@
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} [options.databaseName]
+   * @param {boolean} [options.invalidateImpala]
    * @param {string} [options.tableName]
    * @param {string[]} [options.fields]
    * @param {boolean} [options.clearAll]
    */
   AssistHelper.prototype.clearDbCache = function (options) {
     var self = this;
-    self.invalidateImpala = options.sourceType === 'impala' && options.clearAll;
+    self.invalidateImpala = options.invalidateImpala || false;
     if (options.clearAll) {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
     } else {

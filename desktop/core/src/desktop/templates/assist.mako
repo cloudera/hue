@@ -321,7 +321,7 @@ from desktop.views import _ko
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: (definition.isTable || definition.isView) && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
       <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
-          sourceType: assistDbSource.type,
+          sourceType: sourceType,
           snippet: assistDbSource.snippet,
           databaseName: databaseName,
           tableName: tableName,
@@ -337,7 +337,7 @@ from desktop.views import _ko
     <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
-        <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: assistDbSource.type, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
+        <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.title }"><i class="fa fa-fw fa-table muted valign-middle"></i><span draggable="true" data-bind="text: definition.displayName, draggableText: { text: editorText }"></span></a>
@@ -575,16 +575,38 @@ from desktop.views import _ko
     </div>
   </script>
 
+  <script type="text/html" id="ask-for-invalidate-title">
+    <a class="pull-right pointer close-popover inactive-action"><i class="fa fa-times"></i></a>
+  </script>
+
+  <script type="text/html" id="ask-for-invalidate-content">
+    <label class="checkbox" style="margin-bottom: 2px;"><input type="checkbox" data-bind="checked: invalidateOnRefresh" /> ${ _('Invalidate metadata') }</label>
+    <div style="display: inline-block; margin-left: 20px; font-style: italic">${ _('This could take a noticeable amount of time') }</div>
+    <label class="checkbox" style="margin-top: 4px;"><input type="checkbox" data-bind="checked: dontAskForInvalidateTemp" /> ${ _('Remember my decision') }</label>
+    <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="click: function () { huePubSub.publish('close.popover'); triggerRefresh(); }, clickBubble: false">${ _('Refresh') }</button></div>
+  </script>
+
   <script type="text/html" id="assist-db-header-actions">
     <div class="assist-db-header-actions" data-bind="visible: hasEntries() && (!$parent.loading() && !$parent.hasErrors()">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
+      <!-- ko if: sourceType === 'impala' -->
+      <!-- ko if: dontAskForInvalidate -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
+      <!-- /ko -->
+      <!-- ko ifnot: dontAskForInvalidate -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
+      <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: sourceType !== 'impala' -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
+      <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
       <span style="color: #aaa;"><i class="fa fa-search" title="${_('Search')}"></i></span>
+      <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
     </div>
   </script>
 
@@ -876,7 +898,7 @@ from desktop.views import _ko
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
             newSource.initDatabases();
-            self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.type);
+            self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource', newSource.sourceType);
           } else {
             self.assistHelper.setInTotalStorage('assist', 'lastSelectedSource');
           }
