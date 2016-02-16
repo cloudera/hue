@@ -114,8 +114,7 @@
       showTables: ko.observable(true),
       showViews: ko.observable(true)
     };
-    var updateDatabases = function (names) {
-      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
+    var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
       self.databases($.map(names, function(name) {
         var database = new AssistDbEntry({
@@ -156,11 +155,13 @@
         return;
       }
       self.loading(true);
+      var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
+      self.selectedDatabase(null);
       self.assistHelper.loadDatabases({
         sourceType: self.type,
         successCallback: function(data) {
           self.hasErrors(false);
-          updateDatabases(data)
+          updateDatabases(data, lastSelectedDb)
         },
         errorCallback: function() {
           self.hasErrors(true);
