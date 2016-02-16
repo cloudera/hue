@@ -131,7 +131,7 @@ class LdapConnection(object):
 
     self.ldap_handle = ldap.initialize(uri=ldap_url, trace_level=ldap_config.TRACE_LEVEL.get())
 
-    if bind_user is not None:
+    if bind_user:
       try:
         self.ldap_handle.simple_bind_s(bind_user, bind_password)
       except:
