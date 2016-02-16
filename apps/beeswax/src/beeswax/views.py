@@ -352,6 +352,8 @@ def list_query_history(request):
 
 def massage_query_history_for_json(app_name, query_history):
   return {
+    'id': query_history.id,
+    'design_id': query_history.design.id,
     'query': escape(query_history.query),
     'timeInMs': time.mktime(query_history.submission_date.timetuple()),
     'timeFormatted': query_history.submission_date.strftime("%x %X"),
