@@ -141,34 +141,32 @@ def show_tables(request, database=None):
   if database is None:
     database = 'default' # Assume always 'default'
 
-  db = dbms.get(request.user)
-
-  try:
-    databases = db.get_databases()
-
-    if database not in databases:
-      database = 'default'
-
-    if request.method == 'POST':
-      db_form = DbForm(request.POST, databases=databases)
-      if db_form.is_valid():
-        database = db_form.cleaned_data['database']
-    else:
-      db_form = DbForm(initial={'database': database}, databases=databases)
-
-    search_filter = request.GET.get('filter', '')
-
-    tables = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
-    table_names = [table['name'] for table in tables]
-  except Exception, e:
-    raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
-
-  database_meta = db.get_database(database)
-
   if request.REQUEST.get("format", "html") == "json":
+    db = dbms.get(request.user)
+
+    try:
+      databases = db.get_databases()
+
+      if database not in databases:
+        database = 'default'
+
+      if request.method == 'POST':
+        db_form = DbForm(request.POST, databases=databases)
+        if db_form.is_valid():
+          database = db_form.cleaned_data['database']
+      else:
+        db_form = DbForm(initial={'database': database}, databases=databases)
+
+      search_filter = request.GET.get('filter', '')
+
+      tables = db.get_tables_meta(database=database, table_names=search_filter) # SparkSql returns []
+      table_names = [table['name'] for table in tables]
+    except Exception, e:
+      raise PopupException(_('Failed to retrieve tables for database: %s' % database), detail=e)
+
     resp = JsonResponse({
         'status': 0,
-        'database_meta': database_meta,
+        'database_meta': db.get_database(database),
         'tables': tables,
         'table_names': table_names,
         'search_filter': search_filter
