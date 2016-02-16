@@ -1424,7 +1424,7 @@ class Coordinator(Job):
     '0,15,30,45 * * * *': _('Every 15 minutes'),
     '0,30 * * * *': _('Every 30 minutes'),
     '0 * * * *': _('Every hour'),
-    '0 0 * * *': _('Every day at midnight'),
+    '0 0 * * *': _('Every day'),
     '0 0 * * 0': _('Every week'),
     '0 0 1 * *': _('Every month'),
     '0 0 1 1 *': _('Every year'),
