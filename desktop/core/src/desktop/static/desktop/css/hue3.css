@@ -624,12 +624,23 @@ table.display td.center {
   vertical-align: middle!important;
 }
 
+.table-huedatatable th.sorting {
+  cursor: default;
+  background: none;
+  border-top: none;
+  padding-right: 0!important;
+}
+
 .sorting_disabled {
   vertical-align: middle!important;
 }
 
 .sorting:hover, .sorting_asc:hover, .sorting_desc:hover {
   border-top: 3px solid #EEEEEE !important;
+}
+
+.table-huedatatable th.sorting:hover {
+  border-top: none;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

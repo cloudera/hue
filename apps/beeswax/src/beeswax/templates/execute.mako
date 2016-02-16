@@ -796,6 +796,7 @@ ${ layout.menubar(section='query') }
 ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.huedatatable.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1192,11 +1193,13 @@ function placeResizePanelHandle() {
 }
 
 function reinitializeTableExtenders() {
-  $("#resultTable").jHueTableExtender({
-     fixedHeader: true,
-     fixedFirstColumn: true,
-     includeNavigator: false
-  });
+  if (viewModel.design.results.columns().length > 0 && viewModel.design.results.columns().length < 500) {
+    $("#resultTable").jHueTableExtender({
+       fixedHeader: true,
+       fixedFirstColumn: true,
+       includeNavigator: false
+    });
+  }
   $("#recentQueries").jHueTableExtender({
      fixedHeader: true,
      includeNavigator: false
@@ -2074,39 +2077,56 @@ function resultsTable(e, data) {
   $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
   if (viewModel.design.results.columns().length > 0) {
     if (!dataTable) {
-      dataTable = $("#resultTable").dataTable({
-        "bPaginate": false,
-        "bLengthChange": false,
-        "bInfo": false,
-        "bDestroy": true,
-        "bAutoWidth": false,
-        "oLanguage": {
-          "sEmptyTable": "${_('No data available')}",
-          "sZeroRecords": "${_('No matching records')}"
-        },
-        "fnDrawCallback": function (oSettings) {
-          reinitializeTableExtenders();
-          if (firstFnDrawcallback) {
-            firstFnDrawcallback = false;
-            window.setTimeout(reinitializeTable, 100);
-          }
-        },
-        "aoColumnDefs": [
-          {
-            "sType": "numeric",
-            "aTargets": [ "sort-numeric" ]
+      if (viewModel.design.results.columns().length < 500) {
+        dataTable = $("#resultTable").dataTable({
+          "bPaginate": false,
+          "bLengthChange": false,
+          "bInfo": false,
+          "bDestroy": true,
+          "bAutoWidth": false,
+          "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}"
           },
-          {
-            "sType": "string",
-            "aTargets": [ "sort-string" ]
+          "fnDrawCallback": function (oSettings) {
+            reinitializeTableExtenders();
+            if (firstFnDrawcallback) {
+              firstFnDrawcallback = false;
+              window.setTimeout(reinitializeTable, 100);
+            }
           },
-          {
-            "sType": "date",
-            "aTargets": [ "sort-date" ]
+          "aoColumnDefs": [
+            {
+              "sType": "numeric",
+              "aTargets": [ "sort-numeric" ]
+            },
+            {
+              "sType": "string",
+              "aTargets": [ "sort-string" ]
+            },
+            {
+              "sType": "date",
+              "aTargets": [ "sort-date" ]
+            }
+          ]
+        });
+        $(".dataTables_filter").hide();
+      }
+      else {
+        dataTable = $("#resultTable").hueDataTable({
+          "oLanguage": {
+            "sEmptyTable": "${_('No data available')}",
+            "sZeroRecords": "${_('No matching records')}"
+          },
+          "fnDrawCallback": function (oSettings) {
+            reinitializeTableExtenders();
+            if (firstFnDrawcallback) {
+              firstFnDrawcallback = false;
+              window.setTimeout(reinitializeTable, 100);
+            }
           }
-        ]
-      });
-      $(".dataTables_filter").hide();
+        });
+      }
       reinitializeTable();
       var _options = '<option value="-1">${ _("Please select a column")}</option>';
       $(viewModel.design.results.columns()).each(function(cnt, item){
