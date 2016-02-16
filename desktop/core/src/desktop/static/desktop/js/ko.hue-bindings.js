@@ -493,6 +493,8 @@
         visible = false;
       };
 
+      huePubSub.subscribe('close.popover', hidePopover);
+
       var showPopover = function () {
         ko.renderTemplate(options.contentTemplate, viewModel, {
           afterRender: function () {

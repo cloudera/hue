@@ -53,6 +53,10 @@
     self.filter = filter;
     self.isSearchVisible = assistDbSource.isSearchVisible;
     self.editingSearch = ko.observable(false);
+    self.sourceType = self.assistDbSource.sourceType;
+    self.dontAskForInvalidate = self.assistDbSource.dontAskForInvalidate;
+    self.dontAskForInvalidateTemp = self.assistDbSource.dontAskForInvalidateTemp;
+    self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -119,7 +123,7 @@
           break;
         }
         if (entry.definition.isArray || entry.definition.isMapValue) {
-          if (self.assistDbSource.type === 'hive') {
+          if (self.assistDbSource.sourceType === 'hive') {
             parts.push("[]");
           }
         } else {
@@ -142,7 +146,7 @@
 
   AssistDbEntry.prototype.triggerRefresh = function () {
     var self = this;
-    huePubSub.publish('assist.db.refresh', self.assistDbSource.type);
+    self.assistDbSource.triggerRefresh();
   };
 
   AssistDbEntry.prototype.loadEntries = function() {
@@ -257,7 +261,7 @@
     };
 
     self.assistDbSource.assistHelper.fetchPanelData({
-      sourceType: self.assistDbSource.type,
+      sourceType: self.assistDbSource.sourceType,
       hierarchy: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -311,7 +315,7 @@
       })
     } else if (self.definition.isDatabase) {
       huePubSub.publish("assist.database.selected", {
-        source: self.assistDbSource.type,
+        source: self.assistDbSource.sourceType,
         name: self.definition.name
       })
     }
@@ -332,7 +336,7 @@
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
     self.assistDbSource.assistHelper.fetchTableSample({
-      sourceType: self.assistDbSource.type === "hive" ? "beeswax" : self.assistDbSource.type,
+      sourceType: self.assistDbSource.sourceType === "hive" ? "beeswax" : self.assistDbSource.sourceType,
       databaseName: databaseName,
       tableName: tableName,
       dataType: "html",
