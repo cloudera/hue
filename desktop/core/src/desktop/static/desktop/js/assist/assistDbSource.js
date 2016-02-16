@@ -37,13 +37,19 @@
     self.i18n = options.i18n;
     self.navigationSettings = options.navigationSettings;
     self.assistHelper = options.assistHelper;
-    self.type = options.type;
+    self.sourceType = options.type;
     self.name = options.name;
 
     self.hasErrors = ko.observable(false);
     self.simpleStyles = ko.observable(false);
     self.isSearchVisible = ko.observable(false);
     self.editingSearch = ko.observable(false);
+
+    self.dontAskForInvalidate = ko.observable();
+    self.dontAskForInvalidateTemp = ko.observable();
+    self.assistHelper.withTotalStorage('assist', 'dontAskForInvalidate', self.dontAskForInvalidate, false);
+    self.invalidateOnRefresh = ko.observable();
+    self.assistHelper.withTotalStorage('assist', 'invalidateOnRefresh', self.invalidateOnRefresh, true);
 
     self.filter = {
       query: ko.observable("").extend({ rateLimit: 150 })
@@ -53,11 +59,11 @@
       return self.filter.query().length !== 0;
     });
 
-    var storageSearchVisible = $.totalStorage(self.type + ".assist.searchVisible");
+    var storageSearchVisible = $.totalStorage(self.sourceType + ".assist.searchVisible");
     self.searchVisible = ko.observable(storageSearchVisible || false);
 
     self.searchVisible.subscribe(function (newValue) {
-      $.totalStorage(self.type + ".assist.searchVisible", newValue);
+      $.totalStorage(self.sourceType + ".assist.searchVisible", newValue);
     });
 
     self.databases = ko.observableArray();
@@ -100,7 +106,7 @@
         }
         $.totalStorage("hue.assist.lastSelectedDb." + self.assistHelper.getTotalStorageUserPrefix(), newValue.definition.name);
         huePubSub.publish("assist.database.set", {
-          source: self.type,
+          source: self.sourceType,
           name: newValue.definition.name
         })
       }
@@ -157,8 +163,9 @@
       self.loading(true);
       var lastSelectedDb = self.selectedDatabase() ? self.selectedDatabase().definition.name : null;
       self.selectedDatabase(null);
+      self.databases([]);
       self.assistHelper.loadDatabases({
-        sourceType: self.type,
+        sourceType: self.sourceType,
         successCallback: function(data) {
           self.hasErrors(false);
           updateDatabases(data, lastSelectedDb)
@@ -180,14 +187,15 @@
     self.reload = function() {
       self.reloading(true);
       huePubSub.publish('assist.clear.db.cache', {
-        sourceType: self.type,
-        clearAll: true
+        sourceType: self.sourceType,
+        clearAll: true,
+        invalidateImpala: self.invalidateOnRefresh()
       });
       self.initDatabases();
     };
 
     huePubSub.subscribe('assist.db.refresh', function (type) {
-      if (self.type === type) {
+      if (self.sourceType === type) {
         self.reload();
       }
     });
@@ -201,7 +209,8 @@
 
   AssistDbSource.prototype.triggerRefresh = function () {
     var self = this;
-    huePubSub.publish('assist.db.refresh', self.type);
+    self.dontAskForInvalidate(self.dontAskForInvalidateTemp());
+    huePubSub.publish('assist.db.refresh', self.sourceType);
   };
 
   return AssistDbSource;
