@@ -93,4 +93,4 @@ ${ commonheader(title, "", user, "40px") | n,unicode }
     }
   </script>
 
-${ commonfooter(request, messages) | n,unicode }
+${ commonfooter(None, messages) | n,unicode }
