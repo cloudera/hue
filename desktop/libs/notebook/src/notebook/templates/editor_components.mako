@@ -609,6 +609,10 @@ ${ require.config() }
   <div data-bind="component: { name: 'key-value-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
 </script>
 
+<script type="text/html" id="property-hdfs-files">
+  <div data-bind="component: { name: 'hdfs-file-list-input', params: { values: value, visibleObservable: visibleObservable } }"></div>
+</script>
+
 <script type="text/html" id="property-csv-hdfs-files">
   <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-csv-hdfs-file-input', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
 </script>
@@ -630,7 +634,7 @@ ${ require.config() }
         <!-- ko template: { if: typeof properties().queue != 'undefined', name: 'property', data: { type: 'string', label: '${ _ko('Queue') }', value: properties().queue, title: '${ _ko('The YARN queue to submit to (Default: default)') }' }} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().archives != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Archives') }', value: properties().archives, title: '${ _ko('Archives to be extracted into the working directory of each executor (YARN only)') }', placeholder: '${ _ko('e.g. file.zip') }'}} --><!-- /ko -->
 
-        <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Files') }', value: properties().files, title: '${ _ko('Files to be placed in the working directory of each executor.') }', placeholder: '${ _ko('e.g. file.data') }'}} --><!-- /ko -->
+        <!-- ko template: { if: typeof properties().files != 'undefined', name: 'property', data: { type: 'hdfs-files', label: '${ _ko('Files') }', value: properties().files, visibleObservable: settingsVisible, title: '${ _ko('Files to be placed in the working directory of each executor.') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().functions != 'undefined', name: 'property', data: { type: 'csv', label: '${ _ko('Functions') }', value: properties().functions, title: '${ _ko('UDFs name and class') }', placeholder: '${ _ko('e.g. myUpper org.hue.udf.MyUpper') }'}} --><!-- /ko -->
         <!-- ko template: { if: typeof properties().settings != 'undefined', name: 'property', data: { type: 'settings', label: '${ _ko('Settings') }', value: properties().settings, visibleObservable: settingsVisible, title: '${ _ko('Properties') }'}} --><!-- /ko -->
 
