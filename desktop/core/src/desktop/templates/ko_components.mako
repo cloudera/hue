@@ -64,7 +64,7 @@ from desktop.views import _ko
 
         ko.components.register('jvm-memory-input', {
           viewModel: JvmMemoryInputViewModel,
-          template: {element: 'jvm-memory-input-template'}
+          template: { element: 'jvm-memory-input-template' }
         });
       }());
     }));
@@ -76,8 +76,8 @@ from desktop.views import _ko
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
       <li>
         <div class="input-append" style="margin-bottom: 4px">
-          <input type="text" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
-          <input type="text" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <input type="text" style="width: 130px" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
+          <input type="text" style="width: 130px" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
           <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
           <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
@@ -128,13 +128,97 @@ from desktop.views import _ko
 
         ko.components.register('key-value-list-input', {
           viewModel: KeyValueListInputViewModel,
-          template: {element: 'key-value-list-input-template'}
+          template: { element: 'key-value-list-input-template' }
         });
       }());
     }));
   </script>
 </%def>
 
+<%def name="hdfsFileListInput()">
+  <script type="text/html" id="hdfs-file-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li>
+        <div class="input-append" style="margin-bottom: 4px">
+          <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        var identifyType = function (path) {
+          switch (path.substr(path.lastIndexOf('.') + 1).toLowerCase()) {
+            case 'jar':
+              return 'jar'
+            case 'zip':
+            case 'tar':
+            case 'rar':
+            case 'bz2':
+            case 'gz':
+              return 'archive';
+          }
+          return 'file';
+        }
+
+        function HdfsFileListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          $.each(self.values(), function (idx, value) {
+            value.path.subscribe(function (newPath) {
+              value.type(identifyType(newPath));
+            });
+          })
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.path();
+              }))
+            }
+          });
+        }
+
+        HdfsFileListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            path: ko.observable(''),
+            type: ko.observable('')
+          };
+          newValue.path.subscribe(function (newPath) {
+            newValue.type(identifyType(newPath));
+          })
+          self.values.push(newValue);
+        };
+
+        HdfsFileListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('hdfs-file-list-input', {
+          viewModel: HdfsFileListInputViewModel,
+          template: { element: 'hdfs-file-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
 
 <%def name="csvListInput()">
   <script type="text/html" id="csv-list-input-template">
@@ -208,7 +292,7 @@ from desktop.views import _ko
 
         ko.components.register('csv-list-input', {
           viewModel: CsvListInputViewModel,
-          template: {element: 'csv-list-input-template'}
+          template: { element: 'csv-list-input-template' }
         });
       }());
     }));
@@ -342,7 +426,7 @@ from desktop.views import _ko
 
         ko.components.register('add-snippet-menu', {
           viewModel: AddSnippetMenuViewModel,
-          template: {element: 'add-snippet-menu-template'}
+          template: { element: 'add-snippet-menu-template' }
         });
       }());
     }));
