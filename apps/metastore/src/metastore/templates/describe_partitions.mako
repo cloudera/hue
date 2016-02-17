@@ -244,7 +244,7 @@ ${ assist.assistPanel() }
         _filters.forEach(function (filter) {
           _postData[filter.column] = filter.value;
         });
-        _postData["sort"] = viewModel.sortDesc() ? "desc" : "asc";
+        _postData["sort"] = self.sortDesc() ? "desc" : "asc";
 
         $.ajax({
           type: "POST",
