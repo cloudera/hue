@@ -41,6 +41,7 @@ ${ tableStats.tableStats() }
 ${ assist.assistPanel() }
 ${ koComponents.csvListInput() }
 ${ koComponents.keyValueListInput() }
+${ koComponents.hdfsFileListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.downloadSnippetResults() }
 
