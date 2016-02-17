@@ -42,6 +42,7 @@ ${ assist.assistPanel() }
 ${ koComponents.csvListInput() }
 ${ koComponents.keyValueListInput() }
 ${ koComponents.hdfsFileListInput() }
+${ koComponents.functionListInput() }
 ${ koComponents.jvmMemoryInput() }
 ${ koComponents.downloadSnippetResults() }
 

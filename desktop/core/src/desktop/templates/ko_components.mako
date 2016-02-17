@@ -135,6 +135,70 @@ from desktop.views import _ko
   </script>
 </%def>
 
+<%def name="functionListInput()">
+  <script type="text/html" id="function-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li>
+        <div class="input-append" style="margin-bottom: 4px">
+          <input type="text" style="width: 110px" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function FunctionListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.name() && value.class_name();
+              }))
+            }
+          });
+        }
+
+        FunctionListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            name: ko.observable(''),
+            class_name: ko.observable('')
+          };
+          self.values.push(newValue);
+        };
+
+        FunctionListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('function-list-input', {
+          viewModel: FunctionListInputViewModel,
+          template: { element: 'function-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
 <%def name="hdfsFileListInput()">
   <script type="text/html" id="hdfs-file-list-input-template">
     <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
