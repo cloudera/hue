@@ -104,50 +104,28 @@ class HS2Api(Api):
   def execute(self, notebook, snippet):
     db = self._get_db(snippet)
 
-    # Multiquery, if not first statement or arrived to the last query
-    statement_id = snippet['result']['handle'].get('statement_id', 0)
-    statements_count = snippet['result']['handle'].get('statements_count', 1)
-    if snippet['result']['handle'].get('has_more_statements'):
-      try:
-        handle = self._get_handle(snippet)
-        db.close_operation(handle) # Close all the time past multi queries
-      except:
-        LOG.warn('Could not close previous multiquery query')
-      statement_id += 1
-    else:
-      statement_id = 0
+    response = self._get_current_statement(db, snippet)
 
-    statements = self._get_statements(snippet['statement'])
-    if statements_count != len(statements):
-      statement_id = 0
-    statement = statements[statement_id]
-
-    settings = snippet['properties'].get('settings', None)
-    file_resources = snippet['properties'].get('files', None)
-    functions = snippet['properties'].get('functions', None)
-    database = snippet.get('database') or 'default'
-
-    query = hql_query(statement, query_type=QUERY_TYPES[0], settings=settings, file_resources=file_resources, functions=functions, database=database)
+    query = self._prepare_hql_query(snippet, response.pop('statement'))
 
     try:
-      db.use(database)
+      db.use(query.database)
       handle = db.client.query(query)
     except QueryServerException, ex:
       raise QueryError(ex.message)
 
     # All good
-    server_id, server_guid  = handle.get()
-    return {
-        'secret': server_id,
-        'guid': server_guid,
-        'operation_type': handle.operation_type,
-        'has_result_set': handle.has_result_set,
-        'modified_row_count': handle.modified_row_count,
-        'log_context': handle.log_context,
-        'statement_id': statement_id,
-        'has_more_statements': statement_id < len(statements) - 1,
-        'statements_count': len(statements),
-    }
+    server_id, server_guid = handle.get()
+    response.update({
+      'secret': server_id,
+      'guid': server_guid,
+      'operation_type': handle.operation_type,
+      'has_result_set': handle.has_result_set,
+      'modified_row_count': handle.modified_row_count,
+      'log_context': handle.log_context,
+    })
+
+    return response
 
   def _get_statements(self, hql_query):
     hql_query = strip_trailing_semicolon(hql_query)
@@ -278,6 +256,50 @@ class HS2Api(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
     return _autocomplete(db, database, table, column, nested)
+
+
+  def _get_current_statement(self, db, snippet):
+    # Multiquery, if not first statement or arrived to the last query
+    statement_id = snippet['result']['handle'].get('statement_id', 0)
+    statements_count = snippet['result']['handle'].get('statements_count', 1)
+
+    if snippet['result']['handle'].get('has_more_statements'):
+      try:
+        handle = self._get_handle(snippet)
+        db.close_operation(handle)  # Close all the time past multi queries
+      except:
+        LOG.warn('Could not close previous multiquery query')
+      statement_id += 1
+    else:
+      statement_id = 0
+
+    statements = self._get_statements(snippet['statement'])
+    if statements_count != len(statements):
+      statement_id = 0
+    statement = statements[statement_id]
+
+    return {
+      'statement_id': statement_id,
+      'statement': statement,
+      'has_more_statements': statement_id < len(statements) - 1,
+      'statements_count': len(statements)
+    }
+
+
+  def _prepare_hql_query(self, snippet, statement):
+    settings = snippet['properties'].get('settings', None)
+    file_resources = snippet['properties'].get('files', None)
+    functions = snippet['properties'].get('functions', None)
+    database = snippet.get('database') or 'default'
+
+    return hql_query(
+      statement,
+      query_type=QUERY_TYPES[0],
+      settings=settings,
+      file_resources=file_resources,
+      functions=functions,
+      database=database
+    )
 
 
   def get_select_star_query(self, snippet, database, table):
