@@ -277,6 +277,8 @@ if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True a
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
 
+X_FRAME_OPTIONS = desktop.conf.X_FRAME_OPTIONS.get()
+
 # Configure hue admins
 ADMINS = []
 for admin in desktop.conf.DJANGO_ADMINS.get():
