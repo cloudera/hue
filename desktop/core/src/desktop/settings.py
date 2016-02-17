@@ -273,6 +273,8 @@ TEMPLATE_DEBUG = DEBUG
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
 
+X_FRAME_OPTIONS = desktop.conf.X_FRAME_OPTIONS.get()
+
 # Configure hue admins
 ADMINS = []
 for admin in desktop.conf.DJANGO_ADMINS.get():
