@@ -480,12 +480,16 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   @metrics.spnego_authentication_time
   def authenticate(self, username=None):
     username = self.clean_username(username)
+    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
     is_super = False
     if User.objects.count() == 0:
       is_super = True
 
     try:
-      user = User.objects.get(username=username)
+      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+        user = User.objects.get(username__iexact=username)
+      else:
+        user = User.objects.get(username=username)
     except User.DoesNotExist:
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
