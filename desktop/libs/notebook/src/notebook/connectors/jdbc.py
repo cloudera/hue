@@ -50,9 +50,9 @@ def query_error_handler(func):
 
 class JdbcApi(Api):
 
-  def __init__(self, user, fs=None, jt=None, interpreter=None):
+  def __init__(self, user, interpreter=None):
     global API_CACHE
-    Api.__init__(self, user, fs=fs, jt=jt, interpreter=interpreter)
+    Api.__init__(self, user, interpreter=interpreter)
 
     self.db = None
     self.options = interpreter['options']
