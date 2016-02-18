@@ -43,7 +43,7 @@ LOG = logging.getLogger(__name__)
 def app(request):
   autocomplete_base_url = ''
   try:
-    autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={})
+    autocomplete_base_url = reverse('beeswax:api_autocomplete_databases', kwargs={}) + '/'
   except:
     LOG.exception('failed to find autocomplete base url')
 
