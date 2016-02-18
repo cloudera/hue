@@ -20,42 +20,43 @@
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-    <title>Jasmine Spec Runner</title>
+  <title>Jasmine Spec Runner</title>
 
-    <link rel="shortcut icon" type="image/png" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine_favicon.png') }">
-    <link rel="stylesheet" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine.css') }">
+  <link rel="shortcut icon" type="image/png" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine_favicon.png') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/js/jasmine-2.3.4/jasmine.css') }">
 
-    <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
-    <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
-    <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/js/jquery.migration.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/js/hue.utils.js') }"></script>
+  <script type="text/javascript" src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 
-    ${ require.config() }
+  ${ require.config() }
 
-    <script type="text/javascript" charset="utf-8">
-      // Adds the jasmine dependencies to the existing require config.
-      require.config({
-        urlArgs: "random=" + Math.random(),
-        baseUrl: "${ static('') }",
-        paths: {
-          'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
-          'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
-          'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot'
+  <script type="text/javascript" charset="utf-8">
+    // Adds the jasmine dependencies to the existing require config.
+    require.config({
+      urlArgs: "random=" + Math.random(),
+      baseUrl: "${ static('') }",
+      paths: {
+        'jasmine': 'desktop/ext/js/jasmine-2.3.4/jasmine',
+        'jasmine-html': 'desktop/ext/js/jasmine-2.3.4/jasmine-html',
+        'jasmine-boot': 'desktop/ext/js/jasmine-2.3.4/boot'
+      },
+      shim: {
+        'jasmine-html': {
+          deps : ['jasmine']
         },
-        shim: {
-          'jasmine-html': {
-            deps : ['jasmine']
-          },
-          'jasmine-boot': {
-            deps : ['jasmine', 'jasmine-html']
-          }
+        'jasmine-boot': {
+          deps : ['jasmine', 'jasmine-html']
         }
-      })
-    </script>
+      }
+    })
+  </script>
 
-    <%block name="specs"/>
+  <%block name="specs"/>
 </head>
 
 <body>
-    <%block name="fixtures"/>
+  <%block name="fixtures"/>
 </body>
 </html>
