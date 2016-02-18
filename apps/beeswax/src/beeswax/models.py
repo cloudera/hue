@@ -117,8 +117,8 @@ class QueryHistory(models.Model):
     query_server = get_query_server_config(QueryHistory.get_type_name(self.query_type))
     query_server.update({
         'server_name': self.server_name,
-        'server_host': self.server_host,
-        'server_port': int(self.server_port),
+#         'server_host': self.server_host, # Always use the live server configuration as the session is currently tied to the connection
+#         'server_port': int(self.server_port),
         'server_type': self.server_type,
     })
 
