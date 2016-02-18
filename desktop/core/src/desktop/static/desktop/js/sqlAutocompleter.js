@@ -429,8 +429,13 @@
 
     if (tableNameAutoComplete || (selectBefore && !fromAfter)) {
       var dbRefMatch = beforeCursor.match(/.*from\s+([^\.\s]+).$/i);
-      if (dbRefMatch) {
+      var partialMatch = beforeCursor.match(/.*from\s+([\S]+)$/i);
+      var partialTableOrDb = null;
+      if (dbRefMatch && self.snippet.getAssistHelper().lastKnownDatabases[self.snippet.type()].indexOf(dbRefMatch[1]) > -1) {
         database = dbRefMatch[1];
+      } else if (dbRefMatch && partialMatch) {
+        partialTableOrDb = partialMatch[1].toLowerCase();
+        database = self.snippet.database();
       }
 
       self.snippet.getAssistHelper().fetchTables({
@@ -452,7 +457,14 @@
             }
             fromKeyword += " ";
           }
-          callback(self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null));
+          var result = self.extractFields(data, fromKeyword, false, [], dbRefMatch !== null && partialTableOrDb === null);
+          if (partialTableOrDb !== null) {
+            callback($.grep(result, function (suggestion) {
+              return suggestion.value.indexOf(partialTableOrDb) === 0;
+            }))
+          } else {
+            callback(result);
+          }
         },
         silenceErrors: true,
         errorCallback: onFailure,
