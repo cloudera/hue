@@ -203,6 +203,7 @@ var Role = function (vm, role) {
 
   self.showEditGroups = ko.observable(false);
   self.isEditing = ko.observable(false);
+  self.isLoading = ko.observable(false);
 
   self.privilegesChanged = ko.computed(function () {
     return $.grep(self.privileges(), function (privilege) {
@@ -275,6 +276,7 @@ var Role = function (vm, role) {
 
   self.create = function () {
     $(".jHueNotify").hide();
+    self.isLoading(true);
     $.post("/security/api/hive/create_role", {
       role: ko.mapping.toJSON(self)
     }, function (data) {
@@ -292,11 +294,14 @@ var Role = function (vm, role) {
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+    }).always(function() {
+      self.isLoading(false);
     });
   }
 
   self.update = function () {
     $(".jHueNotify").hide();
+    self.isLoading(true);
     $.post("/security/api/hive/save_privileges", {
       role: ko.mapping.toJSON(self)
     }, function (data) {
@@ -310,11 +315,14 @@ var Role = function (vm, role) {
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+    }).always(function() {
+      self.isLoading(false);
     });
   }
 
   self.remove = function (role) {
     $(".jHueNotify").hide();
+    self.isLoading(true);
     $.post("/security/api/hive/drop_sentry_role", {
       roleName: role.name
     }, function (data) {
@@ -327,6 +335,8 @@ var Role = function (vm, role) {
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
+    }).always(function() {
+      self.isLoading(false);
     });
   }
 
