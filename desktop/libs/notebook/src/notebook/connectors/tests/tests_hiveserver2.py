@@ -93,6 +93,6 @@ class TestNotebookApi(object):
 
     config_statements = ', '.join(hql_query.get_configuration_statements())
 
-    pattern = re.compile("ADD JAR hdfs://[A-Za-z0-9.:-]+/user/test/myudfs.jar")
+    pattern = re.compile("ADD JAR hdfs://[A-Za-z0-9.:_-]+/user/test/myudfs.jar")
     assert_true(pattern.search(config_statements), config_statements)
     assert_true("CREATE TEMPORARY FUNCTION myUpper AS 'org.hue.udf.MyUpper'" in config_statements, config_statements)
