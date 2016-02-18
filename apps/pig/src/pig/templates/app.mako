@@ -1028,7 +1028,9 @@ ${ commonshare() | n,unicode }
     var availableTables = '';
 
     % if autocomplete_base_url != '':
-      var assistHelper = AssistHelper.getInstance({type: 'hive'});
+      var assistHelper = AssistHelper.getInstance({
+        user: '${ user }'
+      });
       assistHelper.fetchTables({
         successCallback: function (data) {
           if (data && data.status == 0 && data.tables_meta) {
