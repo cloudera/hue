@@ -1102,7 +1102,6 @@ ${ tableStats.tableStats() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-fieldselection.js') }" type="text/javascript"></script>
-<script src="${ static('beeswax/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1156,6 +1155,8 @@ var autocompleter = new Autocompleter({
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true
 });
+
+var totalStorageUserPrefix = assistHelper.getTotalStorageUserPrefix(snippetType);
 
 var escapeOutput = function (str) {
   return $('<span>').text(str).html().trim();
@@ -1702,9 +1703,9 @@ $(document).ready(function () {
   });
 
   % if not (design and design.id) and not ( query_history and query_history.id ):
-    if ($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query") != null && $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query") != "") {
+    if ($.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query") != null && $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query") != "") {
       viewModel.queryEditorBlank(true);
-      codeMirror.setValue($.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query"));
+      codeMirror.setValue($.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query"));
     }
   % endif
 
@@ -2074,7 +2075,7 @@ function addResults(viewModel, dataTable, startRow, nextRow) {
 
 function resultsTable(e, data) {
   $("#results .dataTables_wrapper").animate({opacity: '1'}, 50);
-  $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
+  $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query", null);
   if (viewModel.design.results.columns().length > 0) {
     if (!dataTable) {
       if (viewModel.design.results.columns().length < 500) {
@@ -2347,7 +2348,7 @@ function tryCancelQuery() {
 }
 
 function createNewQuery() {
-  $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", null);
+  $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query", null);
   location.href="${ url(app_name + ':execute_query') }";
 }
 
@@ -2746,7 +2747,7 @@ function cacheQueryTextEvents() {
     if (typeof codeMirror != "undefined") {
       codeMirror.on("change", function () {
         $(".query").val(codeMirror.getValue());
-        $.totalStorage(hac_getTotalStorageUserPrefix() + "${app_name}_temp_query", codeMirror.getValue());
+        $.totalStorage(totalStorageUserPrefix + "${app_name}_temp_query", codeMirror.getValue());
       });
       window.clearInterval(_waitForCodemirrorInit);
     }
