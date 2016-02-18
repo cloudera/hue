@@ -735,19 +735,13 @@ ${ commonshare() | n,unicode }
 <script src="${ static('pig/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('pig/js/pig.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/assist/assistHelper.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
 <script src="${ static('desktop/js/codemirror-pig.js') }"></script>
 <script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
 <script src="${ static('desktop/js/codemirror-pig-hint.js') }"></script>
-% if autocomplete_base_url != '':
-<script src="${ static('beeswax/js/autocomplete.utils.js') }" type="text/javascript" charset="utf-8"></script>
-% else:
-<script type="text/javascript" charset="utf-8">
-  var hac_getTables = function() {};
-</script>
-% endif
 
 <link rel="stylesheet" href="${ static('pig/css/pig.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
@@ -782,8 +776,6 @@ ${ commonshare() | n,unicode }
   }
 
   var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
-  var HIVE_AUTOCOMPLETE_FAILS_SILENTLY_ON = [503]; // error codes from beeswax/views.py - autocomplete
-  var HIVE_AUTOCOMPLETE_USER = "${ user }";
 
   var codeMirror;
 
@@ -1033,16 +1025,29 @@ ${ commonshare() | n,unicode }
       });
     }
 
-    hac_getTables("default", function(){}); //preload tables for the default db
+    var availableTables = '';
+
+    % if autocomplete_base_url != '':
+      var assistHelper = AssistHelper.getInstance({type: 'hive'});
+      assistHelper.fetchTables({
+        successCallback: function (data) {
+          if (data && data.status == 0 && data.tables_meta) {
+            availableTables = data.tables_meta.map(function (t) {
+              return t.name;
+            }).join(' ');
+          }
+        },
+        sourceType: 'hive',
+        databaseName: 'default'
+      });
+    % endif
 
     function showHiveAutocomplete(databaseName) {
       CodeMirror.isPath = false;
       CodeMirror.isTable = true;
       CodeMirror.isHCatHint = false;
-      hac_getTables(databaseName, function (tables) {
-        CodeMirror.catalogTables = tables;
-        CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
-      });
+      CodeMirror.catalogTables = availableTables;
+      CodeMirror.showHint(codeMirror, CodeMirror.pigHint);
     }
 
     codeMirror.on("focus", function () {
