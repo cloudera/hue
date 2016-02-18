@@ -236,6 +236,7 @@ from desktop.views import _ko
             case 'rar':
             case 'bz2':
             case 'gz':
+            case 'tgz':
               return 'archive';
           }
           return 'file';
