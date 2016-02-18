@@ -103,7 +103,7 @@ def log_view(request):
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
       return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", "")))
 
-  return render('logs.mako', request, dict(log=[_("No logs found!")]))
+  return render('logs.mako', request, dict(log=[_("No logs found!")], query=''))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):

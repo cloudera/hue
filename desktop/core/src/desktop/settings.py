@@ -264,6 +264,10 @@ conf.initialize(_app_conf_modules, _config_dir)
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
 TEMPLATE_DEBUG = DEBUG
+if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
+  os.environ[ENV_DESKTOP_DEBUG] = 'True'
+  desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
+  desktop.log.fancy_logging()
 
 ############################################################
 # Part 4a: Django configuration that requires bound Desktop
