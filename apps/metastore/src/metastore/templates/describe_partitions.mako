@@ -248,7 +248,7 @@ ${ assist.assistPanel() }
 
         $.ajax({
           type: "POST",
-          url: "/metastore/table/default/blog/partitions",
+          url: '/metastore/table/' + '${ database }' + '/' + '${ table.name }' + '/partitions',
           data: _postData,
           success: function (data) {
             self.values(data.partition_values_json);
