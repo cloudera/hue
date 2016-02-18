@@ -326,7 +326,7 @@ ${ layout.menubar(section='hive1') }
                     <a class="pointer" data-bind="visible: groupsChanged() && ! $root.isLoadingRoles(), click: resetGroups">
                       <i class="fa fa-undo"></i>
                     </a>
-                    <a class="pointer" data-bind="visible: groupsChanged && ! $root.isLoadingRoles(), click: saveGroups">
+                    <a class="pointer" data-bind="visible: groupsChanged() && ! $root.isLoadingRoles(), click: saveGroups">
                       <i class="fa fa-save"></i>
                     </a>
                   </div>
@@ -389,8 +389,8 @@ ${ layout.menubar(section='hive1') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role().create, visible: ! $root.role().isEditing()">${ _('Save') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role().update, visible: $root.role().isEditing()">${ _('Update') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading()}">${ _('Save') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading()}"">${ _('Update') }</button>
   </div>
 </div>
 
@@ -561,6 +561,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 
 <script type="text/javascript" charset="utf-8">
+
+    ko.options.deferUpdates = true;
 
     function deletePrivilegeModal(role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
