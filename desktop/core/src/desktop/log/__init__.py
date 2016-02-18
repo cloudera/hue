@@ -175,6 +175,10 @@ def basic_logging(proc_name, log_dir=None):
       handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
       root_logger.addHandler(handler)
     handler.setLevel(lvl)
+    for h in root_logger.__dict__['handlers']:
+      if h.__class__.__name__ == 'FileHandler' or h.__class__.__name__ == 'RotatingFileHandler':
+        if h.baseFilename.split('/')[-1] != 'error.log':
+          h.setLevel(lvl)
 
 
 def fancy_logging():
