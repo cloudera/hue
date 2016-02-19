@@ -893,8 +893,7 @@ ${ tableStats.tableStats() }
 
   .right-panel {
     position: absolute;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     position: absolute;
     top: 0;
     bottom: 0;
