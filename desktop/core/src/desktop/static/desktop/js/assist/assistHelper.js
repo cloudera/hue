@@ -509,7 +509,7 @@
     };
 
     if (options.sourceType === 'impala' && self.invalidateImpala) {
-      $.post(IMPALA_INVALIDATE_API, loadFunction);
+      $.post(IMPALA_INVALIDATE_API, { flush_all: true }, loadFunction);
     } else {
       loadFunction();
     }
