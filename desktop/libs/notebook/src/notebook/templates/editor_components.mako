@@ -1340,15 +1340,6 @@ ${ require.config() }
 
   ace.config.set("basePath", "/static/desktop/js/ace");
 
-  $.scrollbarWidth = function() {
-    var _parent, _child, _width;
-    _parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
-    _child = _parent.children();
-    _width = _child.innerWidth() - _child.height(99).innerWidth();
-    _parent.remove();
-    return _width;
-  };
-
   function createXScrollbar(el) {
     if ($(el).parents('.dataTables_wrapper').length > 0) {
       var scrollingRatio = function() { return ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width() / 2) / $(el).parents('.dataTables_wrapper').width(); };
@@ -2222,7 +2213,7 @@ ${ require.config() }
         viewModel.selectedNotebook().close();
       };
 
-      $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
+      $(".preview-sample").css("right", (10 + hueUtils.scrollbarWidth()) + "px");
 
       $(window).bind("keydown", "ctrl+s alt+s meta+s", function (e) {
         e.preventDefault();

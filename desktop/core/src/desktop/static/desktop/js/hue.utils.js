@@ -183,6 +183,15 @@ Array.prototype.diff = function (a) {
     return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
   }
 
+  hueUtils.scrollbarWidth = function() {
+    var _parent, _child, _width;
+    _parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+    _child = _parent.children();
+    _width = _child.innerWidth() - _child.height(99).innerWidth();
+    _parent.remove();
+    return _width;
+  };
+
 
 }(hueUtils = window.hueUtils || {}));
 
