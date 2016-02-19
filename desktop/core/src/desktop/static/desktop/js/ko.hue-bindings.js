@@ -3070,19 +3070,8 @@
         $parentFVOwnerElement.data('lastKnownHeights', null);
       }
 
-      var childBindingContext = bindingContext.createChildContext(
-          bindingContext.$rawData,
-          null,
-          function(context) {
-            ko.utils.extend(context, {
-              $parentForeachVisible: $element,
-              $parentForeachVisibleId: id,
-              $depth: depth + 1
-            });
-          });
-
       var entryMinHeight = options.minHeight;
-      var allEntries = options.data();
+      var allEntries = ko.utils.unwrapObservable(options.data);
 
       var visibleEntryCount = 0;
       var incrementLimit = 0; // The diff required to re-render, set to visibleCount below
@@ -3115,6 +3104,20 @@
       if (endIndex > (allEntries.length - 1)) {
         endIndex = allEntries.length - 1;
       }
+
+      var childBindingContext = bindingContext.createChildContext(
+          bindingContext.$rawData,
+          null,
+          function(context) {
+            ko.utils.extend(context, {
+              $parentForeachVisible: $element,
+              $parentForeachVisibleId: id,
+              $depth: depth + 1,
+              $indexOffset: function() {
+                return startIndex;
+              }
+            });
+          });
 
       var $wrapper = $element.parent();
       if (!$wrapper.hasClass('foreach-wrapper')) {
