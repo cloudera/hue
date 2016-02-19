@@ -150,9 +150,9 @@ MIDDLEWARE_CLASSES = [
     'axes.middleware.FailedLoginMiddleware',
 ]
 
-if os.environ.get(ENV_DESKTOP_DEBUG):
-  MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
-  logging.debug("Will try to validate generated HTML.")
+# if os.environ.get(ENV_DESKTOP_DEBUG):
+#   MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
+#   logging.debug("Will try to validate generated HTML.")
 
 ROOT_URLCONF = 'desktop.urls'
 
