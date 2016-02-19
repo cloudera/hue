@@ -371,7 +371,7 @@ ${ layout.menubar(section='query') }
               <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
               <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
-            <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
+            <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0">
               <thead>
                 <tr>
                   <th>${_('Time')}</th>
@@ -433,7 +433,7 @@ ${ layout.menubar(section='query') }
             </div>
 
             <div data-bind="css: {'hide': !$root.hasResults()}">
-              <table id="resultTable" class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
+              <table id="resultTable" class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
                 <thead>
                 <tr data-bind="foreach: $root.design.results.columns">
                   <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type), 'datatables-counter-col': $index() == 0}"></th>
@@ -1459,14 +1459,14 @@ function redrawFixedPanels() {
     if ($("#results .dataTables_wrapper").height() > 0) {
       $("#results .dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - _heightCorrection,
-        heightAfterCorrection: 0
+        heightAfterCorrection: 30
       });
       reinitializeTableExtenders();
     }
     if ($("#recentTab .dataTables_wrapper").height() > 0) {
       $("#recentTab .dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - _heightCorrection,
-        heightAfterCorrection: 0
+        heightAfterCorrection: 30
       });
       $("#recentTab .dataTables_wrapper").jHueScrollUp();
     }
