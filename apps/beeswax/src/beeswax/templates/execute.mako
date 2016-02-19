@@ -454,7 +454,7 @@ ${ layout.menubar(section='query') }
             </div>
           </div>
 
-          <div class="tab-pane" id="chart">
+          <div class="tab-pane" id="chart" style="overflow-x: hidden">
             <pre data-bind="visible: $root.design.results.empty() || $root.design.results.expired()">${_('There is currently no data to build a chart on.')}</pre>
             <div class="alert hide">
               <strong>${_('Warning:')}</strong> ${_('the results on the chart have been limited to 1000 rows.')}
@@ -894,6 +894,7 @@ ${ tableStats.tableStats() }
   .right-panel {
     position: absolute;
     overflow-y: auto;
+    overflow-x: hidden;
     position: absolute;
     top: 0;
     bottom: 0;
@@ -1341,7 +1342,7 @@ $(document).ready(function () {
       $("a[data-row-selector='true']").jHueRowSelector();
       $("#recentLoader").hide();
       $("#recentQueries").show().css("width", "100%");
-      redrawFixedPanels();
+      window.setTimeout(redrawFixedPanels, 100);
       reinitializeTableExtenders();
     });
   };
@@ -1383,6 +1384,7 @@ $(document).ready(function () {
     window.setTimeout(function(){
       redrawFixedPanels();
       reinitializeTableExtenders();
+      redrawChart();
     }, 200);
   });
 
@@ -1453,7 +1455,7 @@ function getHighlightedQuery() {
 }
 
 function redrawFixedPanels() {
-  var _heightCorrection = $('body').hasClass('fullscreen') ? 100 : 410;
+  var _heightCorrection = ($('body').hasClass('fullscreen') ? 100 : (410 + ($('.right-panel .alert-error:visible').length > 0 ? 100 : 0) + ($('.right-panel .card-heading:visible').length > 0 ? $('.right-panel .card-heading:visible').outerHeight() : 0)));
   function fn(){
     $('.right-panel .tab-pane').height($(window).height() - _heightCorrection);
     if ($("#results .dataTables_wrapper").height() > 0) {
@@ -1782,7 +1784,6 @@ function getMapBounds(lats, lngs) {
 }
 
 function generateGraph(graphType) {
-  $("#chart").height(Math.max($(window).height() - $("#blueprint").offset().top + 30, 500));
   $("#chart .alert").addClass("hide");
   if (graphType != "") {
     $("#blueprint").attr("class", "").attr("style", "").empty();
@@ -1901,6 +1902,10 @@ function predictGraph() {
   generateGraph(getGraphType());
 }
 
+function redrawChart() {
+  generateGraph(viewModel.chartType());
+}
+
 // Logs
 var logsAtEnd = true;
 $(document).ready(function () {
@@ -1961,10 +1966,6 @@ $(document).ready(function () {
     viewModel.chartSorting("desc");
     redrawChart();
   });
-
-  function redrawChart() {
-    generateGraph(viewModel.chartType());
-  }
 
   $("#log pre:eq(1)").scroll(function () {
     if ($(this).scrollTop() + $(this).height() + 20 >= $(this)[0].scrollHeight) {
