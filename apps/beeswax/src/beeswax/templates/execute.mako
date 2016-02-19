@@ -281,7 +281,6 @@ ${ layout.menubar(section='query') }
       <div class="card-body">
         <div class="tab-content">
           <div id="queryPane">
-
             <div data-bind="css: {'hide': design.errors().length == 0 || design.inlineErrors().length > 0}" class="alert alert-error">
               <!-- ko if: $root.getQueryErrors().length > 0 -->
               <p><strong>${_('Please provide a query')}</strong></p>
@@ -332,10 +331,9 @@ ${ layout.menubar(section='query') }
 
     <div class="card card-small scrollable resultsContainer">
       <div class="query-right-actions" data-bind="visible: !design.explain()">
+        <a id="expandResults" href="javascript:void(0)" title="${_('Expand/collapse this panel')}" rel="tooltip"
+          class="pull-right"><h4><i class="fa fa-expand"></i></h4></a>
         <!-- ko if: $root.hasResults() -->
-        <a id="expandResults" href="javascript:void(0)" title="${_('See results in full screen')}" rel="tooltip"
-          class="view-query-results hide pull-right"><h4><i class="fa fa-expand"></i></h4></a>
-
         <a id="save-results" data-bind="click: saveResultsModal" href="javascript:void(0)" title="${_('Save the results to HDFS or a new Hive table')}" rel="tooltip"
           class="view-query-results hide pull-right"><h4><i class="fa fa-save"></i></h4>
         </a>
@@ -1343,6 +1341,7 @@ $(document).ready(function () {
       $("a[data-row-selector='true']").jHueRowSelector();
       $("#recentLoader").hide();
       $("#recentQueries").show().css("width", "100%");
+      redrawFixedPanels();
       reinitializeTableExtenders();
     });
   };
@@ -1381,7 +1380,10 @@ $(document).ready(function () {
       $(this).parents('.resultsContainer').removeClass("fullscreen");
       $('body').removeClass("fullscreen");
     }
-    window.setTimeout(reinitializeTable, 200);
+    window.setTimeout(function(){
+      redrawFixedPanels();
+      reinitializeTableExtenders();
+    }, 200);
   });
 
   $(document).on("click", ".column-selector", function () {
@@ -1411,7 +1413,6 @@ $(document).ready(function () {
   $(document).on("shown", "a[data-toggle='tab']:not(.sidetab)", function (e) {
     if ($(e.target).attr("href") == "#log" || $(e.target).attr("href") == "#query" ) {
       logsAtEnd = true;
-      window.setTimeout(resizeLogs, 100);
     }
     if ($(e.target).attr("href") == "#results" && $(e.relatedTarget).attr("href") == "#columns") {
       if ($("#resultTable .columnSelected").length > 0) {
@@ -1425,14 +1426,9 @@ $(document).ready(function () {
     if ($(e.target).attr("href") == "#results" || $(e.target).attr("href") == "#recentTab") {
       reinitializeTableExtenders();
     }
-    if ($(e.target).attr("href") != "#results" && $(e.target).attr("href") != "#columns"){
-      $($(e.target).attr("href")).css('height', 'auto');
-      if ($(e.target).attr("href") == "#chart") {
-        logGA('results/chart');
-        predictGraph();
-      }
-    } else {
-      reinitializeTable();
+    if ($(e.target).attr("href") == "#chart") {
+      logGA('results/chart');
+      predictGraph();
     }
     if ($(e.target).attr("href") == "#columnAnalysisTerms") {
       $("#columnAnalysis .filter").removeClass("hide");
@@ -1440,6 +1436,7 @@ $(document).ready(function () {
     if ($(e.target).attr("href") == "#columnAnalysisStats") {
       $("#columnAnalysis .filter").addClass("hide");
     }
+    redrawFixedPanels();
     return e;
   });
 
@@ -1455,39 +1452,23 @@ function getHighlightedQuery() {
   return null;
 }
 
-function reinitializeTable(max) {
-  var _max = max || 10;
-  var _heightCorrection = $('body').hasClass('fullscreen') ? 85 : 150;
-
+function redrawFixedPanels() {
+  var _heightCorrection = $('body').hasClass('fullscreen') ? 100 : 410;
   function fn(){
-    var container = $($("a[data-toggle='tab']:not(.sidetab)").parent(".active").find("a").attr("href"));
+    $('.right-panel .tab-pane').height($(window).height() - _heightCorrection);
     if ($("#results .dataTables_wrapper").height() > 0) {
-
       $("#results .dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - _heightCorrection,
         heightAfterCorrection: 0
       });
+      reinitializeTableExtenders();
+    }
+    if ($("#recentTab .dataTables_wrapper").height() > 0) {
       $("#recentTab .dataTables_wrapper").jHueTableScroller({
         minHeight: $(window).height() - _heightCorrection,
         heightAfterCorrection: 0
       });
-      reinitializeTableExtenders();
-      container.height($(window).height() - _heightCorrection);
-      $("#results .dataTables_wrapper").jHueScrollUp();
-    } else if ($('#resultEmpty').height() > 0) {
-      container.height($('#resultEmpty').height());
-    } else if ($('#resultExpired').height() > 0) {
-      container.height($('#resultExpired').height());
-    }
-
-    if ($("#results .dataTables_wrapper").data('original-height') == 0 && --_max != 0) {
-      $("#results .dataTables_wrapper").data('original-height', $("#results .dataTables_wrapper").height());
-      window.setTimeout(fn, 100);
-    }
-
-    if ($("#recentTab .dataTables_wrapper").data('original-height') == 0 && --_max != 0) {
-      $("#recentTab .dataTables_wrapper").data('original-height', $("#recentTab .dataTables_wrapper").height());
-      window.setTimeout(fn, 100);
+      $("#recentTab .dataTables_wrapper").jHueScrollUp();
     }
   }
   window.setTimeout(fn, 100);
@@ -1928,16 +1909,7 @@ $(document).ready(function () {
     MRJOBS: "${_('MR Jobs')}"
   };
 
-  $(window).resize(function () {
-    resizeLogs();
-  });
-
-  $("a[href='#log']").on("shown", function () {
-    resizeLogs();
-  });
-  $("a[href='#query']").on("shown", function () {
-    resizeLogs();
-  });
+  $(window).resize(redrawFixedPanels);
 
   % if app_name == 'impala':
   $("a[href='#sessionTab']").on("shown", function () {
@@ -2009,7 +1981,7 @@ $(document).ready(function () {
     if (logsAtEnd && _logsEl[0]) {
       _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
     }
-    window.setTimeout(resizeLogs, 10);
+    window.setTimeout(redrawFixedPanels, 10);
   });
 
   viewModel.design.results.columns.subscribe(function(val){
@@ -2020,19 +1992,6 @@ $(document).ready(function () {
   });
 });
 
-function resizeLogs() {
-  // Use fixed subtraction since logs aren't always visible.
-  if ($("#log pre:eq(1)").length > 0) {
-    var _height = Math.max($(window).height() - $("#log pre:eq(1)").offset().top, 250);
-    $("#log").height(_height - 10);
-    $("#log pre:eq(1)").css("overflow", "auto").height(_height - 50);
-  }
-  if ($("#query pre:eq(1)").length > 0) {
-    var _height = Math.max($(window).height() - $("#log pre:eq(1)").offset().top, 250);
-    $("#query").height(_height - 10);
-    $("#query pre:eq(1)").css("overflow", "auto").height(_height - 50);
-  }
-}
 
 // Result Datatable
 function cleanResultsTable() {
@@ -2113,7 +2072,7 @@ function resultsTable(e, data) {
             reinitializeTableExtenders();
             if (firstFnDrawcallback) {
               firstFnDrawcallback = false;
-              window.setTimeout(reinitializeTable, 100);
+              window.setTimeout(redrawFixedPanels, 100);
             }
           },
           "aoColumnDefs": [
@@ -2143,12 +2102,12 @@ function resultsTable(e, data) {
             reinitializeTableExtenders();
             if (firstFnDrawcallback) {
               firstFnDrawcallback = false;
-              window.setTimeout(reinitializeTable, 100);
+              window.setTimeout(redrawFixedPanels, 100);
             }
           }
         });
       }
-      reinitializeTable();
+      redrawFixedPanels();
       var _options = '<option value="-1">${ _("Please select a column")}</option>';
       $(viewModel.design.results.columns()).each(function(cnt, item){
         if (cnt > 0){
