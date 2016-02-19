@@ -218,7 +218,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
     <div title="${ _('Owner') }">
-      <i class="fa fa-fw fa-user muted"></i> <a data-bind="text: details.properties.owner, attr: { 'href': '/useradmin/users/view/' + details.properties.owner }"></a>
+      <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
     </div>
     <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: details.properties.create_time"></span></div>
     <div title="${ _('Format') }">
@@ -330,9 +330,8 @@ ${ assist.assistPanel() }
           </div>
           <div class="span3">
             <div title="${ _('Owner') }">
-              <i class="fa fa-fw fa-user muted"></i> <a data-bind="attr: { 'href': '/useradmin/users/view/' + owner_name }">
-                <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
-              </a>
+              <i class="fa fa-fw fa-user muted"></i>
+              <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
             </div>
           </div>
           <div class="span3">
