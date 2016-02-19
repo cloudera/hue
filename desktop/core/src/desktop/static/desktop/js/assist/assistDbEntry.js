@@ -54,8 +54,6 @@
     self.isSearchVisible = assistDbSource.isSearchVisible;
     self.editingSearch = ko.observable(false);
     self.sourceType = self.assistDbSource.sourceType;
-    self.dontAskForInvalidate = self.assistDbSource.dontAskForInvalidate;
-    self.dontAskForInvalidateTemp = self.assistDbSource.dontAskForInvalidateTemp;
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);

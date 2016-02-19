@@ -45,11 +45,7 @@
     self.isSearchVisible = ko.observable(false);
     self.editingSearch = ko.observable(false);
 
-    self.dontAskForInvalidate = ko.observable();
-    self.dontAskForInvalidateTemp = ko.observable();
-    self.assistHelper.withTotalStorage('assist', 'dontAskForInvalidate', self.dontAskForInvalidate, false);
-    self.invalidateOnRefresh = ko.observable();
-    self.assistHelper.withTotalStorage('assist', 'invalidateOnRefresh', self.invalidateOnRefresh, true);
+    self.invalidateOnRefresh = ko.observable(false);
 
     self.filter = {
       query: ko.observable("").extend({ rateLimit: 150 })
@@ -193,6 +189,7 @@
         clearAll: true,
         invalidateImpala: self.invalidateOnRefresh()
       });
+      self.invalidateOnRefresh(false);
       self.initDatabases();
     };
 
@@ -211,7 +208,6 @@
 
   AssistDbSource.prototype.triggerRefresh = function () {
     var self = this;
-    self.dontAskForInvalidate(self.dontAskForInvalidateTemp());
     huePubSub.publish('assist.db.refresh', self.sourceType);
   };
 
