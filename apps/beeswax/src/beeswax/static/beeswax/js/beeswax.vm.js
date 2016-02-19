@@ -428,7 +428,9 @@ function BeeswaxViewModel(server, assistHelper) {
       type: 'GET',
       success: function(data) {
         self.updateHistory(data.query_history);
-        self.database(data.query_history.database);
+        if (data.query_history.database) {
+          self.database(data.query_history.database);
+        }
         $(document).trigger('fetched.query', [data]);
       },
       error: error_fn,
