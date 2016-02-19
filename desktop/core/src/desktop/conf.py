@@ -92,7 +92,7 @@ HTTP_ALLOWED_METHODS = Config(
   default=['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT'])
 
 X_FRAME_OPTIONS = Config(
-  key="django_x_frame_options",
+  key="http_x_frame_options",
   help=_("X-Frame-Options HTTP header value."),
   type=str,
   default="SAMEORIGIN")
