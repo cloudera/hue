@@ -581,9 +581,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="ask-for-invalidate-content">
     <label class="checkbox" style="margin-bottom: 2px;"><input type="checkbox" data-bind="checked: invalidateOnRefresh" /> ${ _('Invalidate metadata') }</label>
-    <div style="display: inline-block; margin-left: 20px; font-style: italic">${ _('This could take a noticeable amount of time') }</div>
-    <label class="checkbox" style="margin-top: 4px;"><input type="checkbox" data-bind="checked: dontAskForInvalidateTemp" /> ${ _('Remember my decision') }</label>
-    <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="click: function () { huePubSub.publish('close.popover'); triggerRefresh(); }, clickBubble: false">${ _('Refresh') }</button></div>
+    <div style="display: inline-block; margin-left: 20px; font-style: italic">${ _('This is a resource- and time-intensive operation that will rebuild the entire metadata store index.') }</div>
+    <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': !invalidateOnRefresh(), 'btn-danger': invalidateOnRefresh }, click: function () { huePubSub.publish('close.popover'); triggerRefresh(); }, clickBubble: false">${ _('Refresh') }</button></div>
   </script>
 
   <script type="text/html" id="assist-db-header-actions">
@@ -592,12 +591,7 @@ from desktop.views import _ko
       <!-- ko ifnot: loading -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-search" title="${_('Search')}"></i></a>
       <!-- ko if: sourceType === 'impala' -->
-      <!-- ko if: dontAskForInvalidate -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
-      <!-- /ko -->
-      <!-- ko ifnot: dontAskForInvalidate -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
-      <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: sourceType !== 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
