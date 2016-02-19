@@ -1336,16 +1336,17 @@ $(document).ready(function () {
 
   var lastWindowHeight = -1
   var resizeNavigator = function () {
-    var newHeight = $(window).height();
+    var newHeight = $(window).height() + $(window).scrollTop();
     if (lastWindowHeight !== newHeight) {
       $(".resizer").css("height", (newHeight - 90) + "px");
       $("#navigator .card").css("height", (newHeight - 130) + "px").css("overflow-y", "hidden");
-      $(".right-panel").css("height", (newHeight - 90) + "px").css("overflow-y", "auto").css("position", "absolute");
       lastWindowHeight = newHeight;
+      huePubSub.publish('assist.forceRender');
     }
   };
 
   resizeNavigator();
+  $(window).on("scroll", resizeNavigator);
   $(window).on("resize", resizeNavigator);
   window.setInterval(resizeNavigator, 500);
 
