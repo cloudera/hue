@@ -3085,8 +3085,8 @@
         var newEntryCount = Math.ceil(Math.min($(window).innerHeight(), $container.innerHeight()) / entryMinHeight);
         if (newEntryCount !== visibleEntryCount) {
           var diff = newEntryCount - visibleEntryCount;
-          elementIncrement = options.elementIncrement || (newEntryCount * 4);
-          incrementLimit = options.incrementLimit || (newEntryCount * 2);
+          elementIncrement = options.elementIncrement || 25;
+          incrementLimit = options.incrementLimit || 5;
           visibleEntryCount = newEntryCount;
           endIndex += diff;
           huePubSub.publish('foreach.visible.update', id);
