@@ -345,8 +345,6 @@ def import_documents(request):
       doc['fields']['owner'] = [request.user.username]
     owner = doc['fields']['owner'][0]
 
-    doc['fields']['tags'] = []
-
     # TODO: Check if this should be replaced by get_by_uuid
     if Document2.objects.filter(uuid=doc['fields']['uuid'], owner__username=owner).exists():
       doc['pk'] = Document2.objects.get(uuid=doc['fields']['uuid'], owner__username=owner).pk
