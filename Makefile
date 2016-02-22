@@ -244,6 +244,16 @@ ace:
 
 
 ###################################
+# JISON Parser Generator
+###################################
+
+# <<<< DEV ONLY
+.PHONY: jison
+jison:
+	@cd tools/jison && ./hue-jison.sh
+# END DEV ONLY >>>>
+
+###################################
 # Cleanup
 ###################################
 
