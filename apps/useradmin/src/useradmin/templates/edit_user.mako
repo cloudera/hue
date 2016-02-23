@@ -195,4 +195,4 @@ $(document).ready(function(){
 
 ${layout.commons()}
 
-${ commonfooter(request, messages) | n,unicode }
+${ commonfooter(None, messages) | n,unicode }
