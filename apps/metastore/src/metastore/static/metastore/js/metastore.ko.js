@@ -364,9 +364,9 @@
 
   MetastoreTable.prototype.showImportData = function () {
     var self = this;
-    $.get('/metastore/table/' + self.database.name + '/' + self.name + '/load', function (response) {
+    $.get('/metastore/table/' + self.database.name + '/' + self.name + '/load', function (data) {
       if (data.status == 0) {
-        $("#import-data-modal").html(response['data']);
+        $("#import-data-modal").html(data['data']);
         $("#import-data-modal").modal("show");
       } else {
         $(document).trigger("error", data.message);
@@ -403,12 +403,18 @@
       $.post('/metastore/table/' + self.table.database.name + '/' + self.table.name + '/alter_column', {
         column: self.name(),
         comment: newValue
-      }, function () {
-        huePubSub.publish('assist.clear.db.cache', {
-          sourceType: 'hive',
-          databaseName: self.table.database.name,
-          tableName: self.table.name
-        });
+      }, function (data) {
+        if (data.status == 0) {
+          huePubSub.publish('assist.clear.db.cache', {
+            sourceType: 'hive',
+            databaseName: self.table.database.name,
+            tableName: self.table.name
+          });
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
       });
     })
   }
