@@ -285,7 +285,7 @@ def alter_table(request, database, table):
 @require_http_methods(["POST"])
 def alter_column(request, database, table):
   db = dbms.get(request.user)
-  response = {'status': -1, 'data': ''}
+  response = {'status': -1, 'message': ''}
   try:
     column = request.POST.get('column', None)
 
@@ -311,7 +311,7 @@ def alter_column(request, database, table):
       raise PopupException(_('Column `%s`.`%s` `%s` not found') % (database, table, column))
   except Exception, ex:
     response['status'] = 1
-    response['data'] = _("Failed to alter column `%s`.`%s` `%s`: %s") % (database, table, column, str(ex))
+    response['message'] = _("Failed to alter column `%s`.`%s` `%s`: %s") % (database, table, column, str(ex))
 
   return JsonResponse(response)
 
