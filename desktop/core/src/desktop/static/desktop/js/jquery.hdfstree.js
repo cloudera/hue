@@ -142,10 +142,11 @@
           currentPath = "";
 
       if (options.paths != null && options.paths.length > 0) {
-        currentPath = options.paths.shift();
+        var shiftedPath = options.paths.shift();
+        currentPath = (shiftedPath != "" ? shiftedPath : "/");
       }
       else {
-        currentPath = (options.leaf != null ? options.leaf : "");
+        currentPath = (options.leaf != null ? options.leaf : "/");
       }
       autocompleteUrl += currentPath;
       $.getJSON(autocompleteUrl + "?pagesize=1000&format=json", function (data) {
@@ -243,6 +244,9 @@
               scroll: options.scroll
             });
           }
+        }
+        else {
+          $.jHueNotify.error(data.error);
         }
       });
     }
