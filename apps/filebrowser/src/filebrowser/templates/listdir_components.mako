@@ -651,7 +651,7 @@ from django.utils.translation import ugettext as _
       if (path != '/filebrowser/') {
         var _basePath = '${url('filebrowser.views.view', path='')}';
         if (path.indexOf(_basePath) > -1) {
-          path = path.substr(_basePath.length - 1);
+          path = path.substr(_basePath.length);
         }
 
         // ensure no duplicates are pushed to $.totalStorage()
