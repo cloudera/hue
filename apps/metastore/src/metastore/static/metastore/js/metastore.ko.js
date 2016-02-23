@@ -363,10 +363,16 @@
   }
 
   MetastoreTable.prototype.showImportData = function () {
-    var self = this;
+    var self = this; console.log('aaa');
     $.get('/metastore/table/' + self.database.name + '/' + self.name + '/load', function (response) {
-      $("#import-data-modal").html(response['data']);
-      $("#import-data-modal").modal("show");
+      if (data.status == 0) {
+        $("#import-data-modal").html(response['data']);
+        $("#import-data-modal").modal("show");
+      } else {
+        $(document).trigger("error", data.message);  
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
     });
   };
 
