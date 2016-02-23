@@ -37,6 +37,7 @@ from desktop.views import home
 from hadoop import pseudo_hdfs4
 
 import useradmin.conf
+from useradmin.forms import UserChangeForm
 import useradmin.ldap_access
 from useradmin.models import HuePermission, GroupPermission, UserProfile
 from useradmin.models import get_profile, get_default_user_group
@@ -581,7 +582,7 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_equal(["Passwords do not match."], response.context["form"]["password2"].errors, "Should have complained about mismatched password")
       # Old password not confirmed
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", is_active=True, is_superuser=True))
-      assert_equal(["The old password does not match the current password."], response.context["form"]["password_old"].errors, "Should have complained about old password")
+      assert_equal([UserChangeForm.GENERIC_VALIDATION_ERROR], response.context["form"]["password_old"].errors, "Should have complained about old password")
       # Good now
       response = c.post('/useradmin/users/edit/test', dict(username="test", first_name="Tom", last_name="Tester", password1="foo", password2="foo", password_old="test", is_active=True, is_superuser=True))
       assert_true(User.objects.get(username="test").is_superuser)
@@ -599,7 +600,7 @@ class TestUserAdmin(BaseUserAdminTests):
 
       # Create a new regular user (duplicate name)
       response = c.post('/useradmin/users/new', dict(username="test", password1="test", password2="test"))
-      assert_equal({ 'username': ["User with this Username already exists."]}, response.context["form"].errors)
+      assert_equal({ 'username': [UserChangeForm.GENERIC_VALIDATION_ERROR]}, response.context["form"].errors)
 
       # Create a new regular user (for real)
       response = c.post('/useradmin/users/new', dict(username=FUNNY_NAME,
