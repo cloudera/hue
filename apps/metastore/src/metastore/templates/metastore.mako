@@ -15,10 +15,13 @@
 ## limitations under the License.
 <%!
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
-from django.utils.translation import ugettext as _
+
+from beeswax.conf import USE_NEW_EDITOR
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -465,7 +468,11 @@ ${ assist.assistPanel() }
     % if has_write_access:
     <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     % endif
+    % if USE_NEW_EDITOR.get():
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    % else:
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    % endif
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
     % endif
