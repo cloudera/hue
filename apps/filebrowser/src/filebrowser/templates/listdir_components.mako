@@ -340,7 +340,7 @@ from django.utils.translation import ugettext as _
   <!-- upload archive modal -->
   <div id="uploadArchiveModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0">&times;</a>
       <h3>${_('Upload and extract in')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
     </div>
     <div class="modal-body form-inline">
@@ -1344,6 +1344,7 @@ from django.utils.translation import ugettext as _
       };
 
       self.uploadFile = (function () {
+        self.pendingUploads(0);
         var action = "/filebrowser/upload/file";
         var uploader = new qq.FileUploader({
           element: document.getElementById("fileUploader"),
@@ -1351,18 +1352,30 @@ from django.utils.translation import ugettext as _
           template: '<div class="qq-uploader" style="margin-left: 10px">' +
           '<div class="qq-upload-drop-area"><span>${_('Drop the files here to upload')}</span></div>' +
           '<div class="qq-upload-button">${_('Select files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
-          '<ul class="qq-upload-list"></ul>' +
+          '<ul class="qq-upload-list qq-upload-files unstyled" style="margin-right: 0;"></ul>' +
           '</div>',
-          fileTemplate: '<li>' +
-          '<span class="qq-upload-file"></span>' +
-          '<span class="qq-upload-spinner"></span>' +
-          '<span class="qq-upload-size"></span>' +
-          '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+          fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
+          '<div class="progress-row dz-processing">' +
+          '<span class="break-word qq-upload-file"></span>' +
+          '<div class="pull-right">' +
+          '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
+          '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
+          '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
           '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-          '</li>',
+          '</div>' +
+          '<div class="progress-row-bar" style="width: 0%;"></div>' +
+          '</div></li>',
           params: {
             dest: self.currentPath(),
             fileFieldLabel: "hdfs_file"
+          },
+          onProgress: function (id, fileName, loaded, total) {
+            $('.qq-upload-files').find('li').each(function(){
+              var listItem = $(this);
+              if (listItem.find('.qq-upload-file-extended').text() == fileName){
+                listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+              }
+            });
           },
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
@@ -1376,7 +1389,7 @@ from django.utils.translation import ugettext as _
             self.pendingUploads(self.pendingUploads() + 1);
           },
           onCancel: function (id, fileName) {
-            self.pendingUploads(0);
+            self.pendingUploads(self.pendingUploads() - 1);
           },
           debug: false
         });
@@ -1398,24 +1411,37 @@ from django.utils.translation import ugettext as _
       })();
 
       self.uploadArchive = (function () {
+        self.pendingUploads(0);
         var uploader = new qq.FileUploader({
           element: document.getElementById("archiveUploader"),
           action: "/filebrowser/upload/archive",
           template: '<div class="qq-uploader" style="margin-left: 10px">' +
           '<div class="qq-upload-drop-area"><span>${_('Drop the archives here to upload and extract them')}</span></div>' +
           '<div class="qq-upload-button">${_('Select ZIP, TGZ or BZ2 files')}</div> &nbsp; <span class="muted">or drag and drop them here</span>' +
-          '<ul class="qq-upload-list"></ul>' +
+          '<ul class="qq-upload-list qq-upload-archives unstyled" style="margin-right: 0;"></ul>' +
           '</div>',
-          fileTemplate: '<li>' +
-          '<span class="qq-upload-file"></span>' +
-          '<span class="qq-upload-spinner"></span>' +
-          '<span class="qq-upload-size"></span>' +
-          '<a class="qq-upload-cancel" href="#">${_('Cancel')}</a>' +
+          fileTemplate: '<li><span class="qq-upload-file-extended" style="display:none"></span><span class="qq-upload-spinner hide" style="display:none"></span>' +
+          '<div class="progress-row dz-processing">' +
+          '<span class="break-word qq-upload-file"></span>' +
+          '<div class="pull-right">' +
+          '<span class="muted qq-upload-size"></span>&nbsp;&nbsp;' +
+          '<a href="#" title="${_('Cancel')}" class="complex-layout"><i class="fa fa-fw fa-times qq-upload-cancel"></i></a>' +
+          '<span class="qq-upload-done" style="display:none"><i class="fa fa-fw fa-check muted"></i></span>' +
           '<span class="qq-upload-failed-text">${_('Failed')}</span>' +
-          '</li>',
+          '</div>' +
+          '<div class="progress-row-bar" style="width: 0%;"></div>' +
+          '</div></li>',
           params: {
             dest: self.currentPath(),
             fileFieldLabel: "archive"
+          },
+          onProgress: function (id, fileName, loaded, total) {
+            $('.qq-upload-archives').find('li').each(function(){
+              var listItem = $(this);
+              if (listItem.find('.qq-upload-file-extended').text() == fileName){
+                listItem.find('.progress-row-bar').css('width', (loaded/total)*100 + '%');
+              }
+            });
           },
           onComplete: function (id, fileName, responseJSON) {
             self.pendingUploads(self.pendingUploads() - 1);
@@ -1427,7 +1453,7 @@ from django.utils.translation import ugettext as _
             self.pendingUploads(self.pendingUploads() + 1);
           },
           onCancel: function (id, fileName) {
-            self.pendingUploads(0);
+            self.pendingUploads(self.pendingUploads() - 1);
           },
           debug: false
         });

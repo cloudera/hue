@@ -530,6 +530,7 @@ qq.FileUploader = function(o){
             list: 'qq-upload-list',
 
             file: 'qq-upload-file',
+            extendedFileName: 'qq-upload-file-extended',
             spinner: 'qq-upload-spinner',
             size: 'qq-upload-size',
             cancel: 'qq-upload-cancel',
@@ -566,9 +567,9 @@ qq.extend(qq.FileUploader.prototype, {
     /**
      * Gets one of the elements listed in this._options.classes
      **/
-    _find: function(parent, type){
+    _find: function(parent, type, skipIfNotFound){
         var element = qq.getByClass(parent, this._options.classes[type])[0];
-        if (!element){
+        if (!element && typeof skipIfNotFound === 'undefined'){
             throw new Error('element not found ' + type);
         }
 
@@ -653,6 +654,12 @@ qq.extend(qq.FileUploader.prototype, {
 
         var fileElement = this._find(item, 'file');
         qq.setText(fileElement, this._formatFileName(fileName));
+
+        var extendedFileElement = this._find(item, 'extendedFileName', true);
+        if (extendedFileElement){
+            qq.setText(extendedFileElement, fileName);
+        }
+
         this._find(item, 'size').style.display = 'none';
 
         this._listElement.appendChild(item);
@@ -682,6 +689,9 @@ qq.extend(qq.FileUploader.prototype, {
                 qq.preventDefault(e);
 
                 var item = target.parentNode;
+                if (qq.hasClass(item, 'complex-layout')){
+                    item = item.parentNode.parentNode.parentNode;
+                }
                 self._handler.cancel(item.qqFileId);
                 qq.remove(item);
             }
