@@ -21,7 +21,7 @@ from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
-<%def name="assistPanel(scrollable='.assist-stretchable-list')">
+<%def name="assistPanel()">
   <style>
 
     .assist-icon {
