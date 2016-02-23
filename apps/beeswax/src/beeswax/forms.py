@@ -130,24 +130,32 @@ class SaveResultsTableForm(forms.Form):
 
   def clean(self):
     cleaned_data = super(SaveResultsTableForm, self).clean()
-
     target_table = cleaned_data.get('target_table')
-    if target_table:
-      try:
-        if self.db is not None:
-          name_parts = target_table.split(".")
-          if len(name_parts) == 1:
-            pass
-          elif len(name_parts) == 2:
-            self.target_database, target_table = name_parts
-          else:
-            self._errors['target_table'] = self.error_class([_('Invalid table prefix name')])
-          cleaned_data['target_table'] = target_table # Update table name without the DB prefix
-          self.db.get_table(self.target_database, target_table)
-        self._errors['target_table'] = self.error_class([_('Table already exists')])
-        del cleaned_data['target_table']
-      except Exception:
-        pass
+
+    if not target_table:
+      raise forms.ValidationError(_("Table name is required."))
+    else:
+      if self.db is None:
+        raise forms.ValidationError(_("Cannot validate form, db object is required."))
+      else:
+        # Table field may be set to <database>.<table> so we need to parse it before validation
+        name_parts = target_table.split(".")
+        if len(name_parts) == 1:
+          pass
+        elif len(name_parts) == 2:   # Update table name without the DB prefix
+          self.target_database, target_table = name_parts
+        else:
+          raise forms.ValidationError(_("Invalid table prefix name."))
+
+        # Check if table already exists
+        table = None
+        try:
+          table = self.db.get_table(self.target_database, target_table)
+        except Exception:
+          cleaned_data['target_table'] = target_table
+
+        if table is not None:
+          raise forms.ValidationError(_("Table %s.%s already exists") % (self.target_database, target_table))
 
     return cleaned_data
 
