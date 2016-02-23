@@ -340,11 +340,12 @@ ${ layout.menubar(section='query') }
           class="view-query-results hide pull-right"><h4><i class="fa fa-save"></i></h4>
         </a>
 
-        <a id="download-csv" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/csv'}" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
+        ## Tricks for not triggering the closing of the query on download
+        <a id="download-csv" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/csv'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }"" href="javascript:void(0)" title="${_('Download the results in CSV format')}" rel="tooltip"
           class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-csv"></i></h4>
         </a>
 
-        <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}" href="javascript:void(0)" title="${_('Download the results in XLS format')}" rel="tooltip"
+        <a id="download-excel" data-bind="attr: {'href': '/${ app_name }/download/' + $root.design.history.id() + '/xls'}, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" href="javascript:void(0)" title="${_('Download the results in XLS format')}" rel="tooltip"
           class="view-query-results download hide pull-right"><h4><i class="hfo hfo-file-xls"></i></h4></a>
         <!-- /ko -->
         <a href="#clearHistoryModal" title="${_('Clear the query history')}" rel="tooltip" class="clear-queries pull-right" data-toggle="modal"><h4><i class="fa fa-calendar-times-o"></i></h4></a>
@@ -2483,23 +2484,15 @@ $(document).ready(function () {
   $(document).on('execute.query', function() {
     viewModel.closeQuery();
   });
-
-  // Tricks for not triggering the closing of the query on download
-  $("a.download").hover(function(){
-      window.onbeforeunload = null;
-    },function() {
-      window.onbeforeunload = $(window).data('beforeunload');
-    }
-  );
 });
 
 // Close the query when leaving the page, backup for later when disabling the close before downloading results.
 window.onbeforeunload = function(e) {
   viewModel.closeQuery();
 };
-$(window).data('beforeunload', window.onbeforeunload);
-
 % endif
+
+$(window).data('beforeunload', window.onbeforeunload);
 
 $(".folderChooser:not(:has(~ button))").after(getFolderBrowseButton($(".folderChooser:not(:has(~ button))"), true));
 $(".pathChooser:not(:has(~ button))").after(getPathBrowseButton($(".pathChooser:not(:has(~ button))"), true));
