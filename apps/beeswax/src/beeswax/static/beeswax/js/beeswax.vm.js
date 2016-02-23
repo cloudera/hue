@@ -98,13 +98,13 @@ function BeeswaxViewModel(server, assistHelper) {
 
   self.design.inlineErrors = ko.computed(function() {
     return ko.utils.arrayFilter(self.design.errors(), function(err) {
-        return err.toLowerCase().indexOf("line") > -1;
+        return err && err.toLowerCase().indexOf("line") > -1;
     });
   });
 
   self.design.watch.inlineErrors = ko.computed(function() {
     return ko.utils.arrayFilter(self.design.watch.errors(), function(err) {
-        return err.toLowerCase().indexOf("line") > -1;
+        return err && err.toLowerCase().indexOf("line") > -1;
     });
   });
 
