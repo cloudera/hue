@@ -3387,35 +3387,40 @@
         itemHeight = valueAccessor().itemHeight || 22,
         scrollable = valueAccessor().scrollable || 'body',
         scrollableOffset = valueAccessor().scrollableOffset || 0,
+        disableHueEachRowCount = valueAccessor().disableHueEachRowCount || 0,
         forceRenderSub = valueAccessor().forceRenderSub || null,
         renderTimeout = -1,
         dataHasChanged = true;
 
       var wrappable = $(element);
-      if ($parent.is('table')) {
-        wrappable = $parent;
-        $parent = wrappable.parent();
+      if (data.length > disableHueEachRowCount) {
+        if ($parent.is('table')) {
+          wrappable = $parent;
+          $parent = wrappable.parent();
+        }
+
+        if (!wrappable.parent().hasClass('hueach')) {
+          wrappable.wrap('<div class="hueach"></div>');
+          $parent = wrappable.parent();
+          wrappable.css({
+            position: 'absolute',
+            width: '100%'
+          });
+        }
+
+        $parent.height(data.length * itemHeight);
+        if (wrappable.is('table')) {
+          $parent.height($parent.height() + (data.length > 0 ? itemHeight : 0));
+        }
       }
 
-      if (!wrappable.parent().hasClass('hueach')) {
-        wrappable.wrap('<div class="hueach"></div>');
-        $parent = wrappable.parent();
-        wrappable.css({
-          position: 'absolute',
-          width: '100%'
-        });
-      }
-
-      $parent.height(data.length * itemHeight);
-      if (wrappable.is('table')) {
-        $parent.height($parent.height() + (data.length > 0 ? itemHeight : 0));
-      }
       try {
         if (ko.utils.domData.get(element, 'originalData') && JSON.stringify(ko.utils.domData.get(element, 'originalData')) === JSON.stringify(data)) {
           dataHasChanged = false;
         }
       }
-      catch (e) {}
+      catch (e) {
+      }
 
       if (dataHasChanged) {
         ko.utils.domData.set(element, 'originalData', data);

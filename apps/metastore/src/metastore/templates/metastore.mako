@@ -78,7 +78,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-columns-table">
-  <div style="overflow: auto">
+  <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
       <tr>
@@ -91,7 +91,7 @@ ${ assist.assistPanel() }
         <th width="50%">${_('Comment')}</th>
       </tr>
       </thead>
-      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200, disableHueEachRowCount: 5}">
         <tr>
           ## start at 1
           <td data-bind="text: $index()+$indexOffset()+1"></td>
@@ -124,7 +124,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-partition-columns-table">
-  <div style="overflow: auto">
+  <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
@@ -147,7 +147,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-partition-values-table">
-  <div style="overflow: auto">
+  <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
@@ -175,7 +175,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <div style="overflow: auto">
+  <div style="overflow-x: auto; overflow-y: hidden">
     <table class="table table-striped table-condensed table-nowrap">
       <thead>
         <tr>
@@ -638,7 +638,7 @@ ${ assist.assistPanel() }
     <li><a href="#details" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-details'); }">${ _('Details') }</a></li>
   </ul>
 
-  <div class="tab-content margin-top-10" style="border: none">
+  <div class="tab-content margin-top-10" style="border: none; overflow: hidden">
     <div class="tab-pane" id="overview">
       <!-- ko if: $root.currentTab() == 'table-overview' -->
       <!-- ko template: 'metastore-overview-tab' --><!-- /ko -->
@@ -717,7 +717,7 @@ ${ assist.assistPanel() }
           }"></div>
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-      <div class="right-panel">
+      <div class="right-panel" data-bind="perfectScrollbar">
         <div class="metastore-main">
           <h3>
             <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
