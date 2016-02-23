@@ -1318,11 +1318,11 @@
         $panelsAfter.each(function (idx, panel) {
           requiredSpaceAfter += $(panel).data('minHeight');
         });
-        var limitAfter = totalHeight - requiredSpaceAfter;
 
         $resizer.draggable({
           axis: "y",
           drag: function (event, ui) {
+            var limitAfter = totalHeight - requiredSpaceAfter;
             var position = ui.offset.top - containerTop;
             if (position > limitBefore && position < limitAfter) {
               fitPanelHeights($panelsBefore, position - extrasBeforeHeight);
