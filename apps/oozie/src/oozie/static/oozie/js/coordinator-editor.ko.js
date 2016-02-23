@@ -82,12 +82,22 @@ var Coordinator = function (vm, coordinator) {
         "uuid": self.properties.workflow(),
       }, function (data) {
         self.workflowParameters(data.parameters);
-        // Pre-add the variables
-        $.each(data.parameters, function (index, param) {
-          if (self.variables().length < data.parameters.length) {
-            self.addVariable();
+
+        // Remove Uncommon params
+        prev_variables = self.variables.slice();
+        $.each(prev_variables, function (index, variable) {
+          if (data.parameters.filter(function(param) { return param['name'] == variable.workflow_variable() }).length == 0) {
+            self.variables.remove(variable);
           }
-          self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+        });
+
+        // Append the new variables
+        prev_variables = self.variables.slice();
+        $.each(data.parameters, function (index, param) {
+          if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable() }).length == 0) {
+            self.addVariable();
+            self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+          }
         });
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
