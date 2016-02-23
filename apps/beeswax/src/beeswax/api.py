@@ -604,7 +604,7 @@ def save_results_hive_table(request, query_history_id):
 
     else:
       response['status'] = 1
-      response['errors'] = form.errors
+      response['message'] = '\n'.join(form.errors.values()[0])
 
   return JsonResponse(response)
 
