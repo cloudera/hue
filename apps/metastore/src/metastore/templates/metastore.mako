@@ -466,7 +466,7 @@ ${ assist.assistPanel() }
     <!-- ko with: table -->
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
-    <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
+    <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     % endif
     % if USE_NEW_EDITOR.get():
     <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
