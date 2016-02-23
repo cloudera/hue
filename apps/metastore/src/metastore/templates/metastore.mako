@@ -78,47 +78,49 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-columns-table">
-  <table class="table table-striped table-condensed table-nowrap">
-    <thead>
-    <tr>
-      <th width="2%">&nbsp;</th>
-      ## no stats for partition key type
-      <th width="2%" class="no-sort">&nbsp;</th>
-##       <th width="1%">&nbsp;</th>
-      <th width="17%">${_('Name')}</th>
-      <th width="29%">${_('Type')}</th>
-      <th width="50%">${_('Comment')}</th>
-    </tr>
-    </thead>
-    <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+  <div style="overflow: auto">
+    <table class="table table-striped table-condensed table-nowrap">
+      <thead>
       <tr>
-        ## start at 1
-        <td data-bind="text: $index()+$indexOffset()+1"></td>
+        <th width="2%">&nbsp;</th>
         ## no stats for partition key type
-        <td>
-         <span class="blue" data-bind="component: { name: 'table-stats', params: {
-            alwaysActive: true,
-            statsVisible: true,
-            sourceType: 'hive',
-            databaseName: table.database.name,
-            tableName: table.name,
-            columnName: name,
-            fieldType: type,
-            assistHelper: table.assistHelper
-          } }"></span>
-        </td>
-##         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
-        <td title="${ _("Scroll to the column") }">
-          <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
-        </td>
-        <td data-bind="text: type"></td>
-        <td>
-          <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }' }" class="editable editable-click editable-empty">
-            ${ _('Add a comment...') }</span>
-        </td>
+        <th width="2%" class="no-sort">&nbsp;</th>
+  ##       <th width="1%">&nbsp;</th>
+        <th width="17%">${_('Name')}</th>
+        <th width="29%">${_('Type')}</th>
+        <th width="50%">${_('Comment')}</th>
       </tr>
-    </tbody>
-  </table>
+      </thead>
+      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.right-panel', scrollableOffset: 200}">
+        <tr>
+          ## start at 1
+          <td data-bind="text: $index()+$indexOffset()+1"></td>
+          ## no stats for partition key type
+          <td>
+           <span class="blue" data-bind="component: { name: 'table-stats', params: {
+              alwaysActive: true,
+              statsVisible: true,
+              sourceType: 'hive',
+              databaseName: table.database.name,
+              tableName: table.name,
+              columnName: name,
+              fieldType: type,
+              assistHelper: table.assistHelper
+            } }"></span>
+          </td>
+  ##         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
+          <td title="${ _("Scroll to the column") }">
+            <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
+          </td>
+          <td data-bind="text: type"></td>
+          <td>
+            <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }' }" class="editable editable-click editable-empty">
+              ${ _('Add a comment...') }</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </script>
 
 <script type="text/html" id="metastore-partition-columns-table">
