@@ -736,48 +736,6 @@ ${ layout.menubar(section='query') }
 </div>
 
 
-<div id="tableAnalysis" class="popover mega-popover right">
-  <div class="arrow"></div>
-  <h3 class="popover-title" style="text-align: left">
-    <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
-    <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
-    <span class="pull-right stats-warning muted" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
-    <strong class="table-name"></strong> ${ _(' table analysis') }
-  </h3>
-  <div class="popover-content">
-    <div id="tableAnalysisStats">
-      <div class="content"></div>
-    </div>
-  </div>
-</div>
-
-<div id="columnAnalysis" class="popover mega-popover right">
-  <div class="arrow"></div>
-  <h3 class="popover-title" style="text-align: left">
-    <a class="pull-right pointer close-popover" style="margin-left: 8px"><i class="fa fa-times"></i></a>
-    <a class="pull-right pointer stats-refresh" style="margin-left: 8px"><i class="fa fa-refresh"></i></a>
-    <strong class="column-name"></strong> ${ _(' column analysis') }
-  </h3>
-  <div class="popover-content">
-    <div class="pull-right hide filter">
-      <input id="columnAnalysisTermsFilter" type="text" placeholder="${ _('Prefix filter...') }"/>
-    </div>
-    <ul class="nav nav-tabs" role="tablist">
-      <li class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
-      <li><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
-    </ul>
-    <div class="tab-content">
-      <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
-        <div class="content"></div>
-      </div>
-      <div class="tab-pane" id="columnAnalysisTerms" style="text-align: left">
-        <div class="alert">${ _('There are no terms to be shown') }</div>
-        <div class="content"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div id="clearHistoryModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -1377,14 +1335,6 @@ $(document).ready(function () {
     $("a[href='#results']").click();
   });
 
-  $(document).on("click", "#tableAnalysis .close-popover", function () {
-    $("#tableAnalysis").hide();
-  });
-
-  $(document).on("click", "#columnAnalysis .close-popover", function () {
-    $("#columnAnalysis").hide();
-  });
-
   $(document).on("clear.history", function() {
     renderRecent();
     $("#clearHistoryModal").modal("hide");
@@ -1415,12 +1365,6 @@ $(document).ready(function () {
       }
     } else {
       reinitializeTable();
-    }
-    if ($(e.target).attr("href") == "#columnAnalysisTerms") {
-      $("#columnAnalysis .filter").removeClass("hide");
-    }
-    if ($(e.target).attr("href") == "#columnAnalysisStats") {
-      $("#columnAnalysis .filter").addClass("hide");
     }
     return e;
   });
