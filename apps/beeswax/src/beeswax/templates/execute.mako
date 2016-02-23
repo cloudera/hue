@@ -836,7 +836,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-${ assist.assistPanel('.table-container') }
+${ assist.assistPanel() }
 ${ tableStats.tableStats() }
 
 <style type="text/css">
@@ -1116,7 +1116,7 @@ var leftPanelWidth = $.totalStorage("${app_name}_left_panel_width") != null ? $.
 $(".left-panel").css("width", leftPanelWidth + "px");
 $(".right-panel").css("left", leftPanelWidth + 20 + "px");
 
-var codeMirror, resizeNavigator, dataTable, renderRecent, syncWithHive;
+var codeMirror, dataTable, renderRecent, syncWithHive;
 
 var HIVE_AUTOCOMPLETE_BASE_URL = "${ autocomplete_base_url | n,unicode }";
 var HIVE_AUTOCOMPLETE_FAILS_QUIETLY_ON = [500]; // error codes from beeswax/views.py - autocomplete
@@ -1334,11 +1334,20 @@ $(document).ready(function () {
     });
   });
 
-  resizeNavigator = function () {
-    $(".resizer").css("height", $(window).height() + "px");
-    $("#navigator .card").css("height", $(window).height() + "px");
-    $(".table-container").css("max-height", ($(window).height() - 180) + "px").css("overflow-y", "auto");
+  var lastWindowHeight = -1
+  var resizeNavigator = function () {
+    var newHeight = $(window).height();
+    if (lastWindowHeight !== newHeight) {
+      $(".resizer").css("height", (newHeight - 90) + "px");
+      $("#navigator .card").css("height", (newHeight - 130) + "px").css("overflow-y", "hidden");
+      lastWindowHeight = newHeight;
+    }
   };
+
+  resizeNavigator();
+  $(window).on("scroll", resizeNavigator);
+  $(window).on("resize", resizeNavigator);
+  window.setInterval(resizeNavigator, 500);
 
   $(document).on("click", "#expandResults", function(){
     $("#resultTablejHueTableExtenderClonedContainer").remove();
@@ -1356,9 +1365,6 @@ $(document).ready(function () {
     }
     window.setTimeout(reinitializeTable, 200);
   });
-
-  resizeNavigator();
-  window.setTimeout(resizeNavigator, 200);
 
   $(document).on("click", ".column-selector", function () {
     var _t = $("#resultTable");
@@ -1479,10 +1485,6 @@ $(document).ready(function () {
   });
 
   initQueryField();
-
-  $(window).on("resize", resizeNavigator);
-
-  window.setInterval(resizeNavigator, 1000);
 
   function initQueryField() {
     if ($("#queryField").val() == "") {
