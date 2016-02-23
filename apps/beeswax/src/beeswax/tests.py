@@ -1219,25 +1219,33 @@ for x in sys.stdin:
     assert_true(data['rows'], data)
     resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'customers'}))
 
-    # New queries exist
-    resp = self.client.get('/desktop/api2/docs/')
-    data = json.loads(resp.content)
-    doc_names = [doc['name'] for doc in data['documents']]
-    assert_true('examples' in doc_names, data)
-    uuid = next((doc['uuid'] for doc in data['documents'] if doc['name'] == 'examples'), None)
+    if conf.USE_NEW_EDITOR.get():
+      # New queries exist
+      resp = self.client.get('/desktop/api2/docs/')
+      data = json.loads(resp.content)
+      doc_names = [doc['name'] for doc in data['documents']]
+      assert_true('examples' in doc_names, data)
+      uuid = next((doc['uuid'] for doc in data['documents'] if doc['name'] == 'examples'), None)
 
-    resp = self.client.get('/desktop/api2/doc/', {'uuid': uuid})
-    data = json.loads(resp.content)
-    doc_names = [doc['name'] for doc in data['children']]
-    assert_true('Sample: Job loss' in doc_names, data)
-    assert_true('Sample: Salary growth' in doc_names, data)
-    assert_true('Sample: Top salary' in doc_names, data)
-    assert_true('Sample: Customers' in doc_names, data)
+      resp = self.client.get('/desktop/api2/doc/', {'uuid': uuid})
+      data = json.loads(resp.content)
+      doc_names = [doc['name'] for doc in data['children']]
+      assert_true('Sample: Job loss' in doc_names, data)
+      assert_true('Sample: Salary growth' in doc_names, data)
+      assert_true('Sample: Top salary' in doc_names, data)
+      assert_true('Sample: Customers' in doc_names, data)
+    else:
+      # New designs exists
+      resp = self.client.get('/beeswax/list_designs')
+      assert_true('Sample: Job loss' in resp.content, resp.content)
+      assert_true('Sample: Salary growth' in resp.content)
+      assert_true('Sample: Top salary' in resp.content)
+      assert_true('Sample: Customers' in resp.content)
 
-    # Now install it a second time, and no error
-    resp = self.client.post('/beeswax/install_examples')
-    assert_equal(0, json.loads(resp.content)['status'])
-    assert_equal('', json.loads(resp.content)['message'])
+      # Now install it a second time, and no error
+      resp = self.client.post('/beeswax/install_examples')
+      assert_equal(0, json.loads(resp.content)['status'])
+      assert_equal('', json.loads(resp.content)['message'])
 
 
   def test_create_table_generation(self):
