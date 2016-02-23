@@ -866,9 +866,3 @@ h4.header {
   border-bottom: 1px solid #DDD;
   padding-bottom: 3px;
 }
-
-@media screen and ( max-height: 710px ){
-  .table-condensed th, .table-condensed td {
-    padding: 1px 2px;
-  }
-}
