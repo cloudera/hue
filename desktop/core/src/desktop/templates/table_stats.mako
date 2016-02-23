@@ -38,10 +38,6 @@ from desktop.views import _ko
     <div class="pull-right filter" data-bind="visible: termsTabActive" style="display:none;">
       <input type="text" data-bind="textInput: prefixFilter" placeholder="${ _('Prefix filter...') }"/>
     </div>
-    <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 0">
-      <li data-bind="click: function() { termsTabActive(false) }" class="active"><a href="#columnAnalysisStats" role="tab" data-toggle="tab">${ _('Stats') }</a></li>
-      <li data-bind="click: function() { termsTabActive(true) }"><a href="#columnAnalysisTerms" role="tab" data-toggle="tab">${ _('Terms') }</a></li>
-    </ul>
     <div class="tab-content" style="border: none; margin-top: 10px">
       <div class="tab-pane active" id="columnAnalysisStats" style="text-align: left">
         <div class="alert" data-bind="visible: isComplexType" style="margin: 5px">${ _('Column stats are currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
