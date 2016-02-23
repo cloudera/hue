@@ -1954,7 +1954,7 @@ function resizeLogs() {
     $("#log pre:eq(1)").css("overflow", "auto").height(_height - 50);
   }
   if ($("#query pre:eq(1)").length > 0) {
-    var _height = Math.max($(window).height() - $("#log pre:eq(1)").offset().top, 250);
+    var _height = Math.max($(window).height() - $("#query pre:eq(1)").offset().top, 250);
     $("#query").height(_height - 10);
     $("#query pre:eq(1)").css("overflow", "auto").height(_height - 50);
   }
