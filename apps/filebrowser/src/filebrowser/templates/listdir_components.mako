@@ -1643,9 +1643,11 @@ from django.utils.translation import ugettext as _
               $.jHueNotify.info("${_('Upload has been canceled')}");
             },
             complete: function (data) {
-              var response = JSON.parse(data.xhr.response);
-              if (response && response.status && response.status == -1){
-                $.jHueNotify.error(response.data);
+              if (data.xhr.response != '') {
+                var response = JSON.parse(data.xhr.response);
+                if (response && response.status && response.status == -1) {
+                  $.jHueNotify.error(response.data);
+                }
               }
             }
           };
