@@ -153,6 +153,8 @@
         self.selectedDatabase(dbIndex[lastSelectedDb]);
       } else if (dbIndex["default"]) {
         self.selectedDatabase(dbIndex["default"]);
+      } else if (self.databases().length > 0) {
+        self.selectedDatabase(self.databases()[0]);
       }
     };
 
