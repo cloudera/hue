@@ -1380,9 +1380,14 @@ from django.utils.translation import ugettext as _
           onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
             if (response.status != 0) {
-              $(document).trigger("error", "${ _('Error: ') }" + response['data']);
-            } else if (self.pendingUploads() == 0) {
-              location = "/filebrowser/view=" + self.currentPath();
+              $(document).trigger('error', "${ _('Error: ') }" + response.data);
+            }
+            else {
+              $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+            }
+            if (self.pendingUploads() == 0) {
+              $('#uploadFileModal').modal('hide');
+              self.retrieveData();
             }
           },
           onSubmit: function (id, fileName, responseJSON) {
@@ -1443,10 +1448,17 @@ from django.utils.translation import ugettext as _
               }
             });
           },
-          onComplete: function (id, fileName, responseJSON) {
+          onComplete: function (id, fileName, response) {
             self.pendingUploads(self.pendingUploads() - 1);
+            if (response.status != 0) {
+              $(document).trigger('error', "${ _('Error: ') }" + response.data);
+            }
+            else {
+              $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+            }
             if (self.pendingUploads() == 0) {
-              location = "/filebrowser/view=" + self.currentPath();
+              $('#uploadArchiveModal').modal('hide');
+              self.retrieveData();
             }
           },
           onSubmit: function (id, fileName, responseJSON) {
@@ -1645,8 +1657,13 @@ from django.utils.translation import ugettext as _
             complete: function (data) {
               if (data.xhr.response != '') {
                 var response = JSON.parse(data.xhr.response);
-                if (response && response.status && response.status == -1) {
-                  $.jHueNotify.error(response.data);
+                if (response && response.status != null) {
+                  if (response.status != 0) {
+                    $(document).trigger('error', response.data);
+                  }
+                  else {
+                    $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                  }
                 }
               }
             }
