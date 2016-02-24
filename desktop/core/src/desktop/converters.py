@@ -20,11 +20,8 @@ import logging
 
 from django.db import transaction
 
-from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission, \
     FilesystemException, import_saved_beeswax_query
-from oozie.models import Workflow
-from pig.models import PigScript
 
 
 LOG = logging.getLogger(__name__)
@@ -45,49 +42,64 @@ class DocumentConverter(object):
 
   def convert(self):
     # Convert SavedQuery documents
-    docs = self._get_unconverted_docs(SavedQuery).filter(extra__in=[HQL, IMPALA, RDBMS])
-    for doc in docs:
-      if doc.content_object:
-        notebook = import_saved_beeswax_query(doc.content_object)
-        data = notebook.get_data()
-        doc2 = self._create_doc2(
-            document=doc,
-            doctype=data['type'],
-            name=data['name'],
-            description=data['description'],
-            data=notebook.get_json()
-        )
-        self.imported_docs.append(doc2)
+    try:
+      from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
+
+      docs = self._get_unconverted_docs(SavedQuery).filter(extra__in=[HQL, IMPALA, RDBMS])
+      for doc in docs:
+        if doc.content_object:
+          notebook = import_saved_beeswax_query(doc.content_object)
+          data = notebook.get_data()
+          doc2 = self._create_doc2(
+              document=doc,
+              doctype=data['type'],
+              name=data['name'],
+              description=data['description'],
+              data=notebook.get_json()
+          )
+          self.imported_docs.append(doc2)
+    except ImportError, e:
+      LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
 
     # Convert Job Designer documents
-    # TODO: Change this logic to actually embed the workflow data in Doc2 instead of linking to old job design
-    docs = self._get_unconverted_docs(Workflow)
-    for doc in docs:
-      if doc.content_object:
-        data = doc.content_object.data_dict
-        data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
-        doc2 = self._create_doc2(
-            document=doc,
-            doctype='link-workflow',
-            description=doc.description,
-            data=json.dumps(data)
-        )
-        self.imported_docs.append(doc2)
+    try:
+      from oozie.models import Workflow
+
+      # TODO: Change this logic to actually embed the workflow data in Doc2 instead of linking to old job design
+      docs = self._get_unconverted_docs(Workflow)
+      for doc in docs:
+        if doc.content_object:
+          data = doc.content_object.data_dict
+          data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+          doc2 = self._create_doc2(
+              document=doc,
+              doctype='link-workflow',
+              description=doc.description,
+              data=json.dumps(data)
+          )
+          self.imported_docs.append(doc2)
+    except ImportError, e:
+      LOG.warn('Cannot convert Job Designer documents: oozie app is not installed')
 
     # Convert PigScript documents
-    # TODO: Change this logic to actually embed the pig data in Doc2 instead of linking to old pig script
-    docs = self._get_unconverted_docs(PigScript)
-    for doc in docs:
-      if doc.content_object:
-        data = doc.content_object.dict
-        data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
-        doc2 = self._create_doc2(
-            document=doc,
-            doctype='link-pigscript',
-            description=doc.description,
-            data=json.dumps(data)
-        )
-        self.imported_docs.append(doc2)
+    try:
+      from pig.models import PigScript
+
+      # TODO: Change this logic to actually embed the pig data in Doc2 instead of linking to old pig script
+      docs = self._get_unconverted_docs(PigScript)
+      for doc in docs:
+        if doc.content_object:
+          data = doc.content_object.dict
+          data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+          doc2 = self._create_doc2(
+              document=doc,
+              doctype='link-pigscript',
+              description=doc.description,
+              data=json.dumps(data)
+          )
+          self.imported_docs.append(doc2)
+    except ImportError, e:
+      LOG.warn('Cannot convert Pig documents: pig app is not installed')
 
     # Add converted docs to root directory
     if self.imported_docs:
