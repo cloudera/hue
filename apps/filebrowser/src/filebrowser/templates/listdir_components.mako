@@ -35,7 +35,12 @@ from django.utils.translation import ugettext as _
 <%def name="_table(files, path, current_request_path, view, show_download_button)">
 
   <link href="${ static('filebrowser/css/listdir_components.css') }" rel="stylesheet" type="text/css">
-  <table class="table table-condensed datatables tablescroller-disable">
+
+  <div data-bind="visible: isLoading">
+    <i class="fa fa-spinner fa-spin hue-spinner-large hue-spinner-center muted"></i>
+  </div>
+
+  <table class="table table-condensed datatables tablescroller-disable" data-bind="style: {'opacity': isLoading() ? '.5': '1'}">
     <thead>
       <tr>
         <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}" class="select-all"></div></th>
@@ -50,11 +55,6 @@ from django.utils.translation import ugettext as _
     </thead>
     <tbody id="files" data-bind="template: {name: 'fileTemplate', foreach: files}"></tbody>
     <tfoot>
-      <tr data-bind="visible: isLoading()">
-        <td colspan="8" class="left">
-          <img src="${ static('desktop/art/spinner.gif') }" />
-        </td>
-      </tr>
       <tr data-bind="visible: files().length === 0 && !isLoading()">
         <td colspan="8">
           <div class="alert">
