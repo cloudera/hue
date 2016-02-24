@@ -113,7 +113,12 @@ ${ assist.assistPanel() }
           </td>
   ##         <td class="pointer" data-bind="click: function() { favourite(!favourite()) }"><i style="color: #338bb8" class="fa" data-bind="css: {'fa-star': favourite, 'fa-star-o': !favourite() }"></i></td>
           <td title="${ _("Scroll to the column") }">
-            <a href="javascript:void(0)" class="column-selector" data-bind="text: name"></a>
+            <!-- ko if: $root.database().table().samples.loading() -->
+            <span data-bind="text: name"></span>
+            <!-- /ko -->
+            <!-- ko ifnot: $root.database().table().samples.loading() -->
+            <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: scrollToColumn"></a>
+            <!-- /ko -->
           </td>
           <td data-bind="text: type"></td>
           <td>
@@ -821,7 +826,27 @@ ${ assist.assistPanel() }
             viewModel.loadingQueries(false);
           });
         }
+        $('.right-panel').perfectScrollbar('update');
       });
+
+      window.scrollToColumn = function (col) {
+        if (!col.table.samples.loading()) {
+          $('a[href="#sample"]').click();
+          window.setTimeout(function () {
+            var sampleTable = $('#sample').find('table');
+            var sampleCol = sampleTable.find('th').filter(function () {
+              return $.trim($(this).text()).indexOf(col.name()) > -1;
+            });
+            sampleTable.find('.columnSelected').removeClass('columnSelected');
+            sampleTable.find('tr td:nth-child(' + (sampleCol.index() + 1) + ')').addClass('columnSelected');
+            var scrollLeft = 0;
+            sampleTable.find('th:lt(' + sampleCol.index() + ')').each(function () {
+              scrollLeft += $(this).outerWidth();
+            });
+            sampleTable.parent().scrollLeft(scrollLeft);
+          }, 200);
+        }
+      }
 
     });
   });
