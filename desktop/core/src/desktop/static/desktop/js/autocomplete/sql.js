@@ -38,19 +38,34 @@ case 7:
 break;
 case 10:
 
-     return parser.yy.callbacks.tableLister({
+     var tables = parser.yy.callbacks.tableHandler({
        prependQuestionMark: true,
        prependFrom: true,
        lowerCase: isLowerCase($$[$0-1])
      });
+
+     var databases = parser.yy.callbacks.databaseHandler({
+       prependQuestionMark: true,
+       prependFrom: true,
+       lowerCase: isLowerCase($$[$0-1])
+     });
+
+     return tables.concat(databases);
    
 break;
 case 12:
 
-     return parser.yy.callbacks.tableLister({
-       prependFrom: true,
-       lowerCase: isLowerCase($$[$0-1])
-     });
+      var tables = parser.yy.callbacks.tableHandler({
+        prependFrom: true,
+        lowerCase: isLowerCase($$[$0-1])
+      });
+
+      var databases = parser.yy.callbacks.databaseHandler({
+        prependFrom: true,
+        lowerCase: isLowerCase($$[$0-1])
+      });
+
+      return tables.concat(databases);
    
 break;
 }
