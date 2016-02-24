@@ -800,6 +800,11 @@ ${ assist.assistPanel() }
 
       var viewModel = new MetastoreViewModel(options);
 
+      huePubSub.subscribe('metastore.scroll.to.top', function () {
+        $(".right-panel").scrollTop(0);
+        $('.right-panel').perfectScrollbar('update');
+      });
+
       ko.applyBindings(viewModel);
 
       if (location.getParameter('refresh') === 'true') {
