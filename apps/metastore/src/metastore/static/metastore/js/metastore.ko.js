@@ -126,6 +126,7 @@
 
   MetastoreDatabase.prototype.setTable = function (metastoreTable, callback) {
     var self = this;
+    huePubSub.publish('metastore.scroll.to.top');
     self.table(metastoreTable);
     if (!metastoreTable.loaded()) {
       metastoreTable.load();
@@ -648,6 +649,7 @@
 
   MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase, callback) {
     var self = this;
+    huePubSub.publish('metastore.scroll.to.top');
     self.database(metastoreDatabase);
 
     if (!metastoreDatabase.loaded()) {
