@@ -1150,9 +1150,6 @@ def upload_file(request):
     else:
         response['data'] = _('A POST request is required.')
 
-    if response['status'] == 0:
-        request.info(_('%(destination)s upload succeeded') % {'destination': response['path']})
-
     return HttpResponse(json.dumps(response), content_type="text/plain")
 
 def _upload_file(request):
@@ -1228,11 +1225,6 @@ def upload_archive(request):
                 hdfs_file.remove()
     else:
         response['data'] = _('A POST request is required.')
-
-    if response['status'] == 0:
-        request.info(_('%(destination)s upload succeeded.') % {'destination': response['path']})
-    else:
-        request.error(_('Upload failed: %(data)s.') % {'data': response['data']})
 
     return HttpResponse(json.dumps(response), content_type="text/plain")
 
