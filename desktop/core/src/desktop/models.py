@@ -782,7 +782,7 @@ class Document2Manager(models.Manager):
     if not include_history:
       docs = docs.exclude(is_history=True)
 
-    return docs.distinct().order_by('-last_modified')
+    return docs.defer('description', 'data', 'extra').distinct().order_by('-last_modified')
 
   def refine_documents(self, documents, types=None, search_text=None, order_by=None):
     """
