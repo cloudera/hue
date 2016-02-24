@@ -37,8 +37,8 @@ LOG = logging.getLogger(__name__)
 def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
 
-  dir_ids = [directory.doc.get().id for directory in Directory.objects.filter(doc__isnull=False).distinct()]
-  editor_ids = [document.doc.get().id for document in Document2.objects.filter(type__startswith='query').distinct()]
+  dir_ids = [directory.doc.get().id for directory in Directory.objects.filter(doc__isnull=False)]
+  editor_ids = [document.doc.get().id for document in Document2.objects.filter(type__startswith='query')]
 
   query = Document.objects.get_docs(user) \
       .exclude(tags__in=[history_tag]) \
