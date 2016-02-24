@@ -136,7 +136,7 @@ from django.utils.translation import ugettext as _
   <div id="purgeTrashModal" class="modal hide fade">
     <div class="modal-header">
       <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Confirm Empty Trash')}</h3>
+      <h3>${_('Confirm empty trash')}</h3>
     </div>
 
     <div class="modal-body">
@@ -147,7 +147,7 @@ from django.utils.translation import ugettext as _
       <form id="purgeTrashForm" action="/filebrowser/trash/purge" method="POST" enctype="multipart/form-data" class="form-stacked">
         ${ csrf_token(request) | n,unicode }
         <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-        <input type="submit" value="${_('Delete')}" class="btn btn-primary" />
+        <input type="submit" value="${_('Delete all')}" class="btn btn-danger" />
       </form>
     </div>
   </div>
