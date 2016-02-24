@@ -574,26 +574,26 @@ ${ dashboard.layout_skeleton() }
           <ul class="dropdown-menu">
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); }"
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
                  class="active">
                 <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="hcha hcha-line-chart"></i> ${_('Lines')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
               </a>
             </li>
             <li>
               <a href="javascript:void(0)"
-                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); }">
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
                 <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
               </a>
             </li>
