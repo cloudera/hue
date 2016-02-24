@@ -669,7 +669,7 @@ from desktop.views import _ko
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
-          <i class="fa fa-external-link"></i> ${ _('View in Metastore Browser') }
+          <i class="fa fa-external-link"></i> ${ _('View more...') }
         </a>
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
