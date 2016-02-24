@@ -403,7 +403,7 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
                             {'column': 'before_alter', 'new_column_name': 'foo'})
     json_resp = json.loads(resp.content)
     assert_equal(1, json_resp['status'], json_resp)
-    assert_true('Failed to alter column' in json_resp['data'], json_resp)
+    assert_true('Failed to alter column' in json_resp['message'], json_resp)
 
 
 class TestParser(object):
