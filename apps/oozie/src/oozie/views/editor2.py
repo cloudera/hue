@@ -39,6 +39,7 @@ from oozie.forms import ParameterForm
 from oozie.models import Workflow as OldWorklow, Coordinator as OldCoordinator, Bundle as OldBundle, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
+from oozie.utils import convert_to_server_timezone
 from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
 
 
@@ -764,6 +765,11 @@ def _submit_bundle(request, bundle, properties):
       coord_dir = Submission(request.user, coordinator, request.fs, request.jt, properties).deploy()
       deployment_mapping['coord_%s_dir' % i] = request.fs.get_hdfs_path(coord_dir)
       deployment_mapping['coord_%s' % i] = coord
+
+      # Convert start/end dates of coordinator to server timezone
+      for prop in bundled['properties']:
+        if prop['name'] in ('end_date', 'start_date'):
+          prop['value'] = convert_to_server_timezone(prop['value'], local_tz=coordinator.data['properties']['timezone'])
 
     properties.update(deployment_mapping)
 
