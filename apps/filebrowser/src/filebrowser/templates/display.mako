@@ -386,8 +386,8 @@ ${ fb_components.menubar() }
 
     _hashPage = 1;
     _hashUpperPage = 1;
-    if (_hash != "") {
 
+    if (_hash != "") {
       if (_hash.indexOf("-") > -1) {
         _hashPage = _hash.split("-")[0].substr(2) * 1;
         _hashUpperPage = _hash.split("-")[1].substr(1) * 1;
@@ -432,6 +432,10 @@ ${ fb_components.menubar() }
         resizeText();
         renderPages();
       }, 300);
+    });
+
+    $("#refreshBtn").click(function(){
+      window.location.reload();
     });
 
     $("#fileArea").jHueScrollUp();
