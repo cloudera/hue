@@ -438,6 +438,12 @@
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
+    huePubSub.subscribe("assist.db.panel.ready", function () {
+      huePubSub.publish('assist.set.database', {
+        source: 'hive',
+        name: null
+      });
+    });
 
     self.reloading = ko.observable(false);
     self.loading = ko.observable(false);
