@@ -246,7 +246,7 @@ ${ assist.assistPanel() }
         <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
         <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
         <!-- /ko -->
-        <span data-bind="visible: ! details.stats.COLUMN_STATS_ACCURATE && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
+        <span data-bind="visible: details.stats.COLUMN_STATS_ACCURATE == 'false' && ! is_view" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }"><i class="fa fa-exclamation-triangle"></i></span>
       <!-- /ko -->
     </h4>
     <div class="row-fluid">
