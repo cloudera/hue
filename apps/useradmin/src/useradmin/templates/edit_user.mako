@@ -44,7 +44,7 @@ ${ layout.menubar(section='users') }
           % endif
           </a>
         </li>
-        <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Names and Groups') or _('Step 2: Names') }</a>
+        <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
         </li>
         % if user.is_superuser:
             <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
@@ -75,6 +75,9 @@ ${ layout.menubar(section='users') }
                 % endif
 
                 ${layout.render_field(form["email"])}
+
+                ${layout.render_field(form["language"])}
+
                 % if user.is_superuser:
                   ${layout.render_field(form["groups"])}
                 % endif
