@@ -259,6 +259,8 @@
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
 
+    self.loadingDetails = ko.observable(false);
+    self.loadingColumns = ko.observable(false);
     self.columns = ko.observableArray();
     self.favouriteColumns = ko.observableArray();
     self.samples = new MetastoreTableSamples({
@@ -311,12 +313,14 @@
 
     self.fetchFields = function () {
       var self = this;
+      self.loadingColumns(true);
       self.assistHelper.fetchFields({
         sourceType: "hive",
         databaseName: self.database.name,
         tableName: self.name,
         fields: [],
         successCallback: function (data) {
+          self.loadingColumns(false);
           self.columns($.map(data.extended_columns, function (column) {
             return new MetastoreColumn({
               extendedColumn: column,
@@ -324,17 +328,22 @@
             })
           }));
           self.favouriteColumns(self.columns().slice(0, 3));
+        },
+        errorCallback: function () {
+          self.loadingColumns(false);
         }
       })
     };
 
     self.fetchDetails = function () {
       var self = this;
+      self.loadingDetails(true);
       self.assistHelper.fetchTableDetails({
         sourceType: "hive",
         databaseName: self.database.name,
         tableName: self.name,
         successCallback: function (data) {
+          self.loadingDetails(false);
           if ((typeof data === 'object') && (data !== null)) {
             self.tableDetails(data);
             self.tableStats(data.details.stats);
@@ -357,6 +366,7 @@
         },
         errorCallback: function (data) {
           self.refreshingTableStats(false);
+          self.loadingDetails(false);
           self.loading(false);
         }
       })
