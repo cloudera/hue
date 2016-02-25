@@ -45,7 +45,7 @@
     self.isSearchVisible = ko.observable(false);
     self.editingSearch = ko.observable(false);
 
-    self.invalidateOnRefresh = ko.observable(false);
+    self.invalidateOnRefresh = ko.observable('cache');
 
     self.filter = {
       query: ko.observable("").extend({ rateLimit: 150 })
@@ -189,7 +189,7 @@
         clearAll: true,
         invalidateImpala: self.invalidateOnRefresh()
       });
-      self.invalidateOnRefresh(false);
+      self.invalidateOnRefresh('cache');
       self.initDatabases();
     };
 

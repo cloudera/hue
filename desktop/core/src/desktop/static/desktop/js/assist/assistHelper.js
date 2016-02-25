@@ -45,7 +45,7 @@
     self.user = user;
     self.lastKnownDatabases = {};
     self.fetchQueue = {};
-    self.invalidateImpala = false;
+    self.invalidateImpala = 'cache';
 
     huePubSub.subscribe('assist.clear.db.cache', function (options) {
       self.clearDbCache(options);
@@ -447,7 +447,7 @@
    */
   AssistHelper.prototype.clearDbCache = function (options) {
     var self = this;
-    self.invalidateImpala = options.invalidateImpala || false;
+    self.invalidateImpala = options.invalidateImpala || 'cache';
     if (options.clearAll) {
       $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
     } else {
@@ -479,7 +479,7 @@
     var self = this;
 
     var loadFunction = function () {
-      self.invalidateImpala = false;
+      self.invalidateImpala = 'cache';
       fetchAssistData.bind(self)($.extend({}, options, {
         url: AUTOCOMPLETE_API_PREFIX,
         successCallback: function (data) {
@@ -508,8 +508,10 @@
       }));
     };
 
-    if (options.sourceType === 'impala' && self.invalidateImpala) {
+    if (options.sourceType === 'impala' && self.invalidateImpala == 'invalidateAndFlush') {
       $.post(IMPALA_INVALIDATE_API, { flush_all: true }, loadFunction);
+    } else if (options.sourceType === 'impala' && self.invalidateImpala == 'invalidate') {
+      $.post(IMPALA_INVALIDATE_API, {flush_all: false}, loadFunction);
     } else {
       loadFunction();
     }
