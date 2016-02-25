@@ -133,6 +133,12 @@
   font-size: 16px;
 }
 
+.login-content select {
+  width: 100%;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
 .login-box input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px white inset !important;
 }
