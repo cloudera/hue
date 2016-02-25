@@ -621,10 +621,12 @@
           setDatabaseByName(path[3]);
           break;
         case 'table':
-          loadTableDef({
-            name: path[4],
-            database: path[3]
-          });
+          window.setTimeout(function() {
+            loadTableDef({
+              name: path[4],
+              database: path[3]
+            });
+          }, 200);
           break;
       }
     }
