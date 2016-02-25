@@ -216,6 +216,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="metastore-table-properties">
+  <i data-bind="visible: loadingDetails" class="fa fa-spinner fa-spin fa-2x muted" style="display: none;"></i>
   <!-- ko with: tableDetails -->
   <h4>${ _('Properties') }</h4>
   <div class="row-fluid">
@@ -509,7 +510,7 @@ ${ assist.assistPanel() }
   </div>
 
   <div class="tile">
-    <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>)</h4>
+    <h4>${ _('Columns') } (<span data-bind="text: columns().length"></span>) <i data-bind="visible: loadingColumns" class="fa fa-spinner fa-spin" style="display: none;"></i></h4>
     <!-- ko with: favouriteColumns -->
     <!-- ko template: "metastore-columns-table" --><!-- /ko -->
     <!-- /ko -->
