@@ -2766,7 +2766,7 @@ viewModel.design.fileResources.values.subscribe(function() {
     else if (viewModel.design.results.errors().length == 0) {
       window.setTimeout(function(){
         window.location.href = successUrl + (successUrl.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
-      }, 200);
+      }, 1000);
     }
   });
 % elif action == 'editor-results':
