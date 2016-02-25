@@ -908,7 +908,7 @@ function BeeswaxViewModel(server, assistHelper) {
             self.design.results.save.errors(null);
 
             var redirect_fn = function() {
-              window.location.href = data.success_url;
+              window.location.href = data.success_url + (data.success_url.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
               self.design.isRunning(false);
             };
             if (data.id) {
