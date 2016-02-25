@@ -1165,14 +1165,19 @@ function reinitializeTableExtenders() {
      includeNavigator: false
   });
 }
-
 var CURRENT_CODEMIRROR_SIZE = 100;
+var INITIAL_CODEMIRROR_SIZE = CURRENT_CODEMIRROR_SIZE;
+var CODEMIRROR_MANUALLY_RESIZED = false;
 var INITIAL_HORIZONTAL_RESIZE_POSITION = -1;
 
 // Navigator, recent queries
 $(document).ready(function () {
   $("#resizePanel a").draggable({
     axis: "y",
+    start: function (e, ui) {
+      CODEMIRROR_MANUALLY_RESIZED = true;
+      draggableHelper($(this), e, ui);
+    },
     drag: function (e, ui) {
       draggableHelper($(this), e, ui);
       $(".jHueTableExtenderClonedContainer").hide();
@@ -1180,10 +1185,10 @@ $(document).ready(function () {
       $(".jHueTableExtenderClonedContainerCell").hide();
     },
     stop: function (e, ui) {
+      draggableHelper($(this), e, ui);
       $(".jHueTableExtenderClonedContainer").show();
       $(".jHueTableExtenderClonedContainerColumn").show();
       $(".jHueTableExtenderClonedContainerCell").show();
-      draggableHelper($(this), e, ui);
       reinitializeTableExtenders();
     }
   });
@@ -1198,17 +1203,18 @@ $(document).ready(function () {
   checkForInitialSplitterPosition();
 
   function resizeCodeMirror(el) {
-    CURRENT_CODEMIRROR_SIZE = 100 + (el.position().top - INITIAL_HORIZONTAL_RESIZE_POSITION);
+    CURRENT_CODEMIRROR_SIZE = INITIAL_CODEMIRROR_SIZE + (el.position().top - INITIAL_HORIZONTAL_RESIZE_POSITION);
+    if (CURRENT_CODEMIRROR_SIZE < 100) {
+      CURRENT_CODEMIRROR_SIZE = 100;
+    }
     codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
   }
 
   function draggableHelper(el, e, ui) {
-    if (el.position().top > INITIAL_HORIZONTAL_RESIZE_POSITION) {
-      resizeCodeMirror(el);
-    }
-    if (ui.position.top < INITIAL_HORIZONTAL_RESIZE_POSITION) {
-      ui.position.top = INITIAL_HORIZONTAL_RESIZE_POSITION;
-      resizeCodeMirror(el);
+    resizeCodeMirror(el);
+    var minHandlePosition = $('.card-heading.simple').is(':visible') ? 248 : 205;
+    if (ui.position.top < minHandlePosition) {
+      ui.position.top = minHandlePosition;
     }
   }
 
@@ -1574,6 +1580,7 @@ $(document).ready(function () {
     value: queryEditor.value,
     readOnly: false,
     lineNumbers: true,
+    viewportMargin: Infinity,
     % if app_name == 'impala':
     mode: "text/x-impalaql",
     % else:
@@ -1660,12 +1667,18 @@ $(document).ready(function () {
     $(document.body).off("contextmenu");
   });
 
-  codeMirror.on("update", function () {
-    if (CURRENT_CODEMIRROR_SIZE == 100 && codeMirror.lineCount() > 7){
-      CURRENT_CODEMIRROR_SIZE = 270;
-      codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
-      reinitializeTableExtenders();
-    }
+  codeMirror.on("change", function () {
+    window.setTimeout(function () {
+      if (!CODEMIRROR_MANUALLY_RESIZED && $('.CodeMirror').height() < 270 && codeMirror.lineCount() > 7) {
+        CURRENT_CODEMIRROR_SIZE = 270;
+        if ($('.card-heading.simple').is(':visible')) {
+          INITIAL_CODEMIRROR_SIZE = 270;
+          INITIAL_HORIZONTAL_RESIZE_POSITION = 418;
+        }
+        codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
+        reinitializeTableExtenders();
+      }
+    }, 200);
   });
 
   $("#download-excel").click(function () {
