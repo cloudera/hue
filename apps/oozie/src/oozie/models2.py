@@ -488,7 +488,7 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
         properties['class'] = node.get('spark').get('class')
         properties['jars'] = node.get('spark').get('jar')
       elif node['node_type'] == 'hive' or node['node_type'] == 'hive2':
-        properties['script_path'] = node.get('hive2').get('script')
+        properties['script_path'] = node.get('hive').get('script')
       elif node['node_type'] == 'java':
         properties['main_class'] = node.get('java').get('main-class')
       elif node['node_type'] == 'sqoop':

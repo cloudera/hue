@@ -3,14 +3,24 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:workflow="uri:oozie:workflow:0.5" exclude-result-prefixes="workflow">
 
 <xsl:import href="extensions/distcp.0.1.xslt"/>
+<xsl:import href="extensions/distcp.0.2.xslt"/>
 <xsl:import href="extensions/email.0.1.xslt"/>
 <xsl:import href="extensions/email.0.2.xslt"/>
-<xsl:import href="extensions/hive.0.1.xslt"/>
 <xsl:import href="extensions/hive.0.2.xslt"/>
+<xsl:import href="extensions/hive.0.3.xslt"/>
+<xsl:import href="extensions/hive.0.4.xslt"/>
+<xsl:import href="extensions/hive.0.5.xslt"/>
+<xsl:import href="extensions/hive.0.6.xslt"/>
+<xsl:import href="extensions/hive2.0.1.xslt"/>
+<xsl:import href="extensions/hive2.0.2.xslt"/>
 <xsl:import href="extensions/shell.0.1.xslt"/>
-<xsl:import href="extensions/sqoop.0.1.xslt"/>
+<xsl:import href="extensions/shell.0.2.xslt"/>
+<xsl:import href="extensions/shell.0.3.xslt"/>
 <xsl:import href="extensions/sqoop.0.2.xslt"/>
+<xsl:import href="extensions/sqoop.0.3.xslt"/>
+<xsl:import href="extensions/sqoop.0.4.xslt"/>
 <xsl:import href="extensions/ssh.0.1.xslt"/>
+<xsl:import href="extensions/ssh.0.2.xslt"/>
 <xsl:import href="extensions/spark.0.1.xslt"/>
 <xsl:import href="nodes/fs.xslt"/>
 <xsl:import href="nodes/java.xslt"/>

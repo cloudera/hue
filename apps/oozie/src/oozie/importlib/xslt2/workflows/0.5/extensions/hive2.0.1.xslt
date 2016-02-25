@@ -4,7 +4,7 @@
 
 <xsl:template match="hive2:hive2">
 
-  ,"hive2": {"script": "<xsl:value-of select="*[local-name()='script']"/>"}
+  ,"hive": {"script": "<xsl:value-of select="*[local-name()='script']"/>"}
 
 </xsl:template>
 
