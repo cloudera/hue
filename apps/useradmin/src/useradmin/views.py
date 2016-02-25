@@ -33,7 +33,7 @@ from django.forms.util import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.encoding import smart_str
-from django.utils.translation import ugettext as _
+from django.utils.translation import get_language, ugettext as _
 
 import desktop.conf
 from desktop.conf import LDAP
@@ -271,6 +271,10 @@ def edit_user(request, username=None):
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
 
+      # Change langugage preference, if necessary
+      if form.cleaned_data.get('language') and form.cleaned_data.get('language') != get_language():
+        request.session['django_language'] = form.cleaned_data.get('language')
+
       # Audit log
       if username is not None:
         request.audit = {
@@ -296,14 +300,18 @@ def edit_user(request, username=None):
       else:
         return redirect(reverse(edit_user, kwargs={'username': username}))
   else:
+    # Initialize form values
     default_user_group = get_default_user_group()
     initial = {
+      'language': request.session.get('django_language', get_language()),
       'ensure_home_directory': instance is None,
       'groups': default_user_group and [default_user_group] or []
     }
     form = form_class(instance=instance, initial=initial)
+
     if request.user.is_superuser and request.user.username != username:
       form.fields.pop("password_old")
+
   if require_change_password(userprofile):
     return render('change_password.mako', request, dict(form=form, username=username))
   else:

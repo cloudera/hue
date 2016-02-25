@@ -23,10 +23,11 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms import ValidationError
 from django.forms.util import ErrorList
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import get_language, ugettext as _, ugettext_lazy as _t
 
 from desktop import conf as desktop_conf
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
+from desktop.settings import LANGUAGES
 
 from useradmin.models import GroupPermission, HuePermission
 from useradmin.models import get_default_user_group
@@ -105,12 +106,16 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                                             help_text=_t("Create home directory if one doesn't already exist."),
                                             initial=True,
                                             required=False)
-
+  language = forms.ChoiceField(label=_t("Language Preference"),
+                               choices=LANGUAGES,
+                               required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def __init__(self, *args, **kwargs):
+
+
     super(UserChangeForm, self).__init__(*args, **kwargs)
 
     if self.instance.id:
