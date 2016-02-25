@@ -380,7 +380,7 @@ class TestExternalWorkflowGraph():
     node_hierarchy = ['start']
     _get_hierarchy_from_adj_list(adj_list, adj_list['start']['ok_to'], node_hierarchy)
 
-    assert_equal(node_hierarchy, ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['kill'], ['end']])
+    assert_equal(node_hierarchy, ['start', [u'fork-fe93', [[u'shell-bd90'], [u'shell-d64c'], [u'shell-5429'], [u'shell-d8cc']], u'join-7f80'], ['Kill'], ['End']])
 
   def test_gen_workflow_data_from_xml(self):
     self.wf.definition = """<workflow-app name="fork-fork-test" xmlns="uri:oozie:workflow:0.5">
