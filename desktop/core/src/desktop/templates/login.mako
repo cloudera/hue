@@ -123,15 +123,8 @@ ${ commonheader(_("Welcome to Hue"), "login", user, "50px", True) | n,unicode }
   </div>
 </div>
 
-<script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script>
   $(document).ready(function () {
-    $("#id_server").chosen({
-      disable_search_threshold: 5,
-      width: "90%",
-      no_results_text: "${_('Oops, no database found!')}"
-    });
-
     $("form").on("submit", function () {
       window.setTimeout(function () {
         $(".logo").find("img").addClass("waiting");
