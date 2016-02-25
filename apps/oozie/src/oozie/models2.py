@@ -587,8 +587,9 @@ def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
     return curr_node
 
   elif adj_list[curr_node]['node_type'] == 'end':
-    node_hierarchy.append(['kill'])
-    node_hierarchy.append(['end'])
+    kill_node_name = [k for (k, v) in adj_list.iteritems() if v['node_type'] == 'kill']
+    node_hierarchy.append(kill_node_name)
+    node_hierarchy.append([adj_list[curr_node]['name']])
     return node_hierarchy
 
   elif adj_list[curr_node]['node_type'] == 'fork':
