@@ -27,7 +27,7 @@ from desktop.views import _ko
       <!-- ko if: statRows().length -->
       <table class="table table-striped">
         <tbody data-bind="foreach: statRows">
-          <tr><th data-bind="text: data_type"></th><td data-bind="text: comment"></td></tr>
+          <tr><th data-bind="text: data_type, style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th><td data-bind="text: comment, style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td></tr>
         </tbody>
       </table>
       <!-- /ko -->
