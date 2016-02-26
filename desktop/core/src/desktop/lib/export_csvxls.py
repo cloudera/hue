@@ -64,8 +64,8 @@ class XlsWrapper():
 def xls_dataset(headers, data, encoding=None):
   output = StringIO.StringIO()
 
-  workbook = openpyxl.Workbook(write_only=False)
-  worksheet = workbook.active
+  workbook = openpyxl.Workbook(write_only=True)
+  worksheet = workbook.create_sheet()
 
   if headers:
     worksheet.append(format(headers, encoding))
