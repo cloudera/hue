@@ -76,7 +76,9 @@ ${ layout.menubar(section='users') }
 
                 ${layout.render_field(form["email"])}
 
-                ${layout.render_field(form["language"])}
+                %if request.user.username == username:
+                  ${layout.render_field(form["language"])}
+                % endif
 
                 % if user.is_superuser:
                   ${layout.render_field(form["groups"])}
