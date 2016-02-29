@@ -76,7 +76,7 @@ checkout and build Livy, run:
 
 .. code:: shell
 
-    % git clone git@github.com:cloudera/hue.git
+    % git clone git@github.com/cloudera/hue.git
     % cd hue
     % cd apps/spark/java
     % mvn -DskipTests clean package
