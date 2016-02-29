@@ -127,15 +127,15 @@
       var inside = false;
 
       var show = function () {
-        $element.find(selector).fadeTo("normal", 1);
+        $element.find(selector).fadeTo("fast", 1);
         clearTimeout(hideTimeout);
       };
 
       var hide = function () {
         if (! inside) {
           hideTimeout = window.setTimeout(function () {
-            $element.find(selector).fadeTo("normal", 0);
-          }, 50);
+            $element.find(selector).fadeTo("fast", 0);
+          }, 10);
         }
       };
 
