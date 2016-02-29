@@ -44,7 +44,8 @@ from desktop.conf import \
     AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
     AUTH_PASSWORD_SCRIPT as DEFAULT_AUTH_PASSWORD_SCRIPT, \
     LDAP_USERNAME, \
-    LDAP_PASSWORD
+    LDAP_PASSWORD, \
+    USE_NEW_EDITOR
 from desktop import redaction
 from desktop.redaction import logfilter
 from desktop.redaction.engine import RedactionPolicy, RedactionRule
@@ -1219,7 +1220,7 @@ for x in sys.stdin:
     assert_true(data['rows'], data)
     resp = self.client.get(reverse('beeswax:get_sample_data', kwargs={'database': 'default', 'table': 'customers'}))
 
-    if conf.USE_NEW_EDITOR.get():
+    if USE_NEW_EDITOR.get():
       # New queries exist
       resp = self.client.get('/desktop/api2/docs/')
       data = json.loads(resp.content)

@@ -20,12 +20,9 @@ from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
 
 home_url = url('desktop.views.home')
-try:
-  from beeswax.conf import USE_NEW_EDITOR
-  if USE_NEW_EDITOR.get():
-    home_url = url('desktop.views.home2')
-except:
-  pass
+from desktop.conf import USE_NEW_EDITOR
+if USE_NEW_EDITOR.get():
+  home_url = url('desktop.views.home2')
 %>
 
 <%def name="is_selected(selected)">
@@ -431,7 +428,7 @@ except:
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
              <%
-               from beeswax.conf import USE_NEW_EDITOR
+               from desktop.conf import USE_NEW_EDITOR
              %>
              % if USE_NEW_EDITOR.get():
              <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
@@ -470,7 +467,7 @@ except:
        % endif
        % if 'beeswax' in apps:
         <%
-          from beeswax.conf import USE_NEW_EDITOR
+          from desktop.conf import USE_NEW_EDITOR
         %>
         % if USE_NEW_EDITOR.get():
          <% from desktop.models import Document2, Document %>

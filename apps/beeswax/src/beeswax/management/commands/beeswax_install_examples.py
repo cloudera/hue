@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Directory, Document, Document2, Document2Permission, import_saved_beeswax_query
 from hadoop import cluster
 from useradmin.models import get_default_user_group, install_sample_user
@@ -305,7 +306,7 @@ class SampleQuery(object):
       query.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))
 
-    if beeswax.conf.USE_NEW_EDITOR.get():
+    if USE_NEW_EDITOR.get():
       try:
         # Don't overwrite
         doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
