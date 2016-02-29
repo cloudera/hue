@@ -40,6 +40,7 @@ import desktop.conf
 import desktop.log.log_buffer
 
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
+from desktop.conf import USE_NEW_EDITOR
 from desktop.converters import DocumentConverter
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
@@ -297,7 +298,10 @@ def index(request):
   if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home':
     return redirect(reverse('about:index'))
   else:
-    return home(request)
+    if USE_NEW_EDITOR.get():
+      return home2(request)
+    else:
+      return home(request)
 
 def csrf_failure(request, reason=None):
   """Registered handler for CSRF."""
