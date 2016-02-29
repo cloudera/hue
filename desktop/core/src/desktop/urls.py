@@ -38,7 +38,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from desktop import appmanager
-from desktop.conf import METRICS
+from desktop.conf import METRICS, USE_NEW_EDITOR
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
@@ -60,14 +60,7 @@ dynamic_patterns = patterns('desktop.auth.views',
 )
 
 
-use_new_home = False
-try:
-  from beeswax.conf import USE_NEW_EDITOR
-  use_new_home = USE_NEW_EDITOR.get()
-except:
-  logging.debug('Beeswax is disabled, using old home')
-
-if use_new_home:
+if USE_NEW_EDITOR.get():
   dynamic_patterns += patterns('desktop.views',
     (r'^home$','home2'),
     (r'^home2$','home')

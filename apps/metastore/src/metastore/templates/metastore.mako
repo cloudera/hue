@@ -18,10 +18,9 @@ from django.utils.html import escape
 from django.utils.translation import ugettext as _
 
 from desktop import conf
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
-
-from beeswax.conf import USE_NEW_EDITOR
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
