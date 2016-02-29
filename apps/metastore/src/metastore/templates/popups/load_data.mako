@@ -129,6 +129,7 @@ from django.utils.translation import ugettext as _
       $.post("${ url('metastore:load_table', database=database, table=table.name) }",
               $("#load-data-form").serialize(),
               function (response) {
+                $("#load-data-submit-btn").button('reset');
                 if (response['status'] != 0) {
                   if (response['status'] == 1) {
                     $('#load-data-error').html(response['data']);
