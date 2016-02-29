@@ -1070,7 +1070,7 @@ from desktop.views import _ko
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('hdfs') !== -1
           }));
           <%
-            from beeswax.conf import USE_NEW_EDITOR
+            from desktop.conf import USE_NEW_EDITOR
           %>
           % if USE_NEW_EDITOR.get():
           self.availablePanels.push(new AssistInnerPanel({

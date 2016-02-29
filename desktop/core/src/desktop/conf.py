@@ -1077,6 +1077,13 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
+USE_NEW_EDITOR = Config( # To remove in Hue 4
+  key='use_new_editor',
+  default=True,
+  type=coerce_bool,
+  help=_('Choose whether to show the new SQL editor.')
+)
+
 def validate_ldap(user, config):
   res = []
 

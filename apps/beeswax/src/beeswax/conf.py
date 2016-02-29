@@ -124,13 +124,6 @@ THRIFT_VERSION = Config(
   default=7
 )
 
-USE_NEW_EDITOR = Config( # To remove in Hue 4
-  key='use_new_editor',
-  default=True,
-  type=coerce_bool,
-  help=_t('Choose whether to show the new SQL editor.')
-)
-
 CONFIG_WHITELIST = Config(
   key='config_whitelist',
   default='hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename',
