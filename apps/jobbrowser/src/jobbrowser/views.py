@@ -120,7 +120,7 @@ def jobs(request):
       elif 'Could not connect to' in ex_message:
         raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
       else:
-        raise ex
+        raise PopupException(ex)
     json_jobs = {
       'jobs': [massage_job_for_json(job, request) for job in jobs],
     }
