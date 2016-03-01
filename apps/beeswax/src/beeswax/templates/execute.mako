@@ -2124,30 +2124,30 @@ $(document).on('error.query', function () {
   });
 
   // Move error to codeMirror if we know the line number
-  $.each($(".queryErrorMessage"), function(index, el) {
-    var err = $(el).text();
-    var firstPos = err.toLowerCase().indexOf("line");
-    if (firstPos > -1) {
-      selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
-      if (codeMirror.getSelection()) {
-        selectedLine += codeMirror.getCursor(true).line;
-      }
-      errorWidgets.push(
-        codeMirror.addLineWidget(
-          selectedLine > 0 ? selectedLine - 1 : selectedLine,
-          $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {
-            coverGutter: true,
-            noHScroll: true
-          }
-        )
-      );
-      codeMirror.scrollTo(null, codeMirror.charCoords({
-            line: selectedLine > 0 ? selectedLine - 1 : selectedLine,
-            ch: 0
-          }, "local").top - codeMirror.getScrollerElement().offsetHeight / 2 - 5);
-      $(el).hide();
-    }
-  });
+  $.each($(".queryErrorMessage"), function(index, el) {
+    var err = $(el).text();
+    var firstPos = err.toLowerCase().indexOf("line");
+    if (firstPos > -1) {
+      selectedLine = $.trim(err.substring(err.indexOf(" ", firstPos), err.indexOf(":", firstPos))) * 1;
+      if (codeMirror.getSelection()) {
+        selectedLine += codeMirror.getCursor(true).line;
+      }
+      errorWidgets.push(
+        codeMirror.addLineWidget(
+          selectedLine > 0 ? selectedLine - 1 : selectedLine,
+          $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {
+            coverGutter: true,
+            noHScroll: true
+          }
+        )
+      );
+      codeMirror.scrollTo(null, codeMirror.charCoords({
+            line: selectedLine > 0 ? selectedLine - 1 : selectedLine,
+            ch: 0
+          }, "local").top - codeMirror.getScrollerElement().offsetHeight / 2 - 5);
+      $(el).hide();
+    }
+  });
 
 
   reinitializeTableExtenders();
