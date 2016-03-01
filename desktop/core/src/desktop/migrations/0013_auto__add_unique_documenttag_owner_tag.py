@@ -14,28 +14,43 @@ class Migration(SchemaMigration):
         # If there are duplicated document tags, we'll have an error when we
         # try to create this index. So to protect against that, we should
         # delete those documents before we create the index.
-        duplicated_records = DocumentTag.objects \
-            .values('owner_id', 'tag') \
-            .annotate(id_count=models.Count('id')) \
-            .filter(id_count__gt=1)
 
-        # Delete all but the first document.
-        for record in duplicated_records:
-            docs = DocumentTag.objects \
-                .values_list('id', flat=True) \
-                .filter(
-                    owner_id=record['owner_id'],
-                    tag=record['tag'],
-                )[1:]
+        # We need to wrap the data migration and alter operation in separate transactions for PostgreSQL
+        # See: http://south.readthedocs.org/en/latest/migrationstructure.html#transactions
+        try:
+            db.start_transaction()
+            duplicated_records = DocumentTag.objects \
+                .values('owner_id', 'tag') \
+                .annotate(id_count=models.Count('id')) \
+                .filter(id_count__gt=1)
 
-            docs = list(docs)
+            # Delete all but the first document.
+            for record in duplicated_records:
+                docs = DocumentTag.objects \
+                    .values_list('id', flat=True) \
+                    .filter(
+                        owner_id=record['owner_id'],
+                        tag=record['tag'],
+                    )[1:]
 
-            logging.warn('Deleting tags %s' % docs)
+                docs = list(docs)
 
-            DocumentTag.objects.filter(id__in=docs).delete()
+                logging.warn('Deleting tags %s' % docs)
 
-        # Adding unique constraint on 'DocumentTag', fields ['owner', 'tag']
-        db.create_unique(u'desktop_documenttag', ['owner_id', 'tag'])
+                DocumentTag.objects.filter(id__in=docs).delete()
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
+
+        try:
+            db.start_transaction()
+            # Adding unique constraint on 'DocumentTag', fields ['owner', 'tag']
+            db.create_unique(u'desktop_documenttag', ['owner_id', 'tag'])
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
 
 
     def backwards(self, orm):
