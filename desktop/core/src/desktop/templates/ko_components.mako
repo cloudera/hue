@@ -513,12 +513,12 @@ from desktop.views import _ko
       </a>
       <ul class="dropdown-menu">
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv" title="${ _('Download first rows as CSV') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as CSV') }">
             <i class="fa fa-file-o"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls" title="${ _('Download first rows as XLS') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as XLS') }">
             <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
