@@ -14,28 +14,43 @@ class Migration(SchemaMigration):
         # If there are duplicated documents, we'll have an error when we try to
         # create this index. So to protect against that, we should delete those
         # documents before we create the index.
-        duplicated_records = Document.objects \
-            .values('content_type_id', 'object_id') \
-            .annotate(id_count=models.Count('id')) \
-            .filter(id_count__gt=1)
 
-        # Delete all but the first document.
-        for record in duplicated_records:
-            docs = Document.objects \
-                .values_list('id', flat=True) \
-                .filter(
-                    content_type_id=record['content_type_id'],
-                    object_id=record['object_id'],
-                )[1:]
+        # We need to wrap the data migration and alter operation in separate transactions for PostgreSQL
+        # See: http://south.readthedocs.org/en/latest/migrationstructure.html#transactions
+        try:
+            db.start_transaction()
+            duplicated_records = Document.objects \
+                .values('content_type_id', 'object_id') \
+                .annotate(id_count=models.Count('id')) \
+                .filter(id_count__gt=1)
 
-            docs = list(docs)
+            # Delete all but the first document.
+            for record in duplicated_records:
+                docs = Document.objects \
+                    .values_list('id', flat=True) \
+                    .filter(
+                        content_type_id=record['content_type_id'],
+                        object_id=record['object_id'],
+                    )[1:]
 
-            logging.warn('Deleting documents %s' % docs)
+                docs = list(docs)
 
-            Document.objects.filter(id__in=docs).delete()
+                logging.warn('Deleting documents %s' % docs)
 
-        # Adding unique constraint on 'Document', fields ['content_type', 'object_id']
-        db.create_unique(u'desktop_document', ['content_type_id', 'object_id'])
+                Document.objects.filter(id__in=docs).delete()
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
+
+        try:
+            db.start_transaction()
+            # Adding unique constraint on 'Document', fields ['content_type', 'object_id']
+            db.create_unique(u'desktop_document', ['content_type_id', 'object_id'])
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
 
 
     def backwards(self, orm):

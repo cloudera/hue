@@ -14,28 +14,43 @@ class Migration(SchemaMigration):
         # If there are duplicated document permissions, we'll have an error
         # when we try to create this index. So to protect against that, we
         # should delete those documents before we create the index.
-        duplicated_records = DocumentPermission.objects \
-            .values('doc_id', 'perms') \
-            .annotate(id_count=models.Count('id')) \
-            .filter(id_count__gt=1)
 
-        # Delete all but the first document.
-        for record in duplicated_records:
-            docs = DocumentPermission.objects \
-                .values_list('id', flat=True) \
-                .filter(
-                    doc_id=record['doc_id'],
-                    perms=record['perms'],
-                )[1:]
+        # We need to wrap the data migration and alter operation in separate transactions for PostgreSQL
+        # See: http://south.readthedocs.org/en/latest/migrationstructure.html#transactions
+        try:
+            db.start_transaction()
+            duplicated_records = DocumentPermission.objects \
+                .values('doc_id', 'perms') \
+                .annotate(id_count=models.Count('id')) \
+                .filter(id_count__gt=1)
 
-            docs = list(docs)
+            # Delete all but the first document.
+            for record in duplicated_records:
+                docs = DocumentPermission.objects \
+                    .values_list('id', flat=True) \
+                    .filter(
+                        doc_id=record['doc_id'],
+                        perms=record['perms'],
+                    )[1:]
 
-            logging.warn('Deleting permissions %s' % docs)
+                docs = list(docs)
 
-            DocumentPermission.objects.filter(id__in=docs).delete()
+                logging.warn('Deleting permissions %s' % docs)
 
-        # Adding unique constraint on 'DocumentPermission', fields ['doc', 'perms']
-        db.create_unique(u'desktop_documentpermission', ['doc_id', 'perms'])
+                DocumentPermission.objects.filter(id__in=docs).delete()
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
+
+        try:
+            db.start_transaction()
+            # Adding unique constraint on 'DocumentPermission', fields ['doc', 'perms']
+            db.create_unique(u'desktop_documentpermission', ['doc_id', 'perms'])
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
 
 
     def backwards(self, orm):
