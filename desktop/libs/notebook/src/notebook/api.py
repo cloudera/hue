@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.forms import ValidationError
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
@@ -383,12 +384,8 @@ def get_sample_data(request, server=None, database=None, table=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  try:
-    sample_data = get_api(request, snippet).get_sample_data(snippet, database, table)
-    response.update(sample_data)
-  except QueryExpired, e:
-    LOG.debug('get_sample_data query expired: %s' % e)
-    pass
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table)
+  response.update(sample_data)
 
   response['status'] = 0
 
@@ -451,3 +448,29 @@ def github_callback(request):
     return HttpResponseRedirect(redirect_base + "0&github_fetch=" + request.session['github_callback_fetch'])
   else:
     return HttpResponseRedirect(redirect_base + "-1&github_fetch=" + request.session['github_callback_fetch'])
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def export_result(request):
+  response = {'status': -1, 'message': _('Exporting result failed.')}
+
+  # Passed by check_document_access_permission but unused by APIs
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+  format = json.loads(request.POST.get('format', 'hdfs-file'))
+  destination = json.loads(request.POST.get('destination', ''))
+  overwrite = json.loads(request.POST.get('overwrite', False))
+
+  if format == 'hdfs-file':
+    if overwrite and request.fs.exists(destination):
+      if request.fs.isfile(destination):
+        request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
+      else:
+        raise ValidationError(_("The target path is a directory"))
+
+    response['success_url'] = get_api(request, snippet).export_data_as_csv_file(snippet, destination, overwrite)
+    response['status'] = 0
+
+  return JsonResponse(response)
