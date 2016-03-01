@@ -27,51 +27,66 @@ class Migration(SchemaMigration):
         #
         # Note we reset the `order_by` to make sure that if a default ordering
         # is ever added, it's never included in the group by.
-        duplicated_records = Document2.objects \
-            .values('uuid', 'version', 'is_history') \
-            .annotate(id_count=models.Count('id')) \
-            .filter(id_count__gt=1) \
-            .order_by()
 
-        for record in duplicated_records:
-            # We found some duplicates, now actually fetch the duplicated
-            # documents for these values.
-            docs = Document2.objects \
-                .filter(
+        # We need to wrap the data migration and alter operation in separate transactions for PostgreSQL
+        # See: http://south.readthedocs.org/en/latest/migrationstructure.html#transactions
+        try:
+            db.start_transaction()
+            duplicated_records = Document2.objects \
+                .values('uuid', 'version', 'is_history') \
+                .annotate(id_count=models.Count('id')) \
+                .filter(id_count__gt=1) \
+                .order_by()
+
+            for record in duplicated_records:
+                # We found some duplicates, now actually fetch the duplicated
+                # documents for these values.
+                docs = Document2.objects \
+                    .filter(
                     uuid=record['uuid'],
                     version=record['version'],
                     is_history=record['is_history'],
                 ) \
-                .order_by('-version', '-last_modified')
+                    .order_by('-version', '-last_modified')
 
-            # Grab all but the first document, which we're preserving as the
-            # current version.
-            docs = list(docs[1:])
+                # Grab all but the first document, which we're preserving as the
+                # current version.
+                docs = list(docs[1:])
 
-            logging.warn('Modifying version number of these duplicated docs %s' %
-                [doc.id for doc in docs])
+                logging.warn('Modifying version number of these duplicated docs %s' %
+                             [doc.id for doc in docs])
 
-            # Update all these document's version numbers. To be safe, we want
-            # to give them a unique negative number so there's no collision and
-            # also so they're easily discoverable.
-            version = Document2.objects \
-                .values_list('version') \
-                .filter(uuid=record['uuid']) \
-                .earliest('version')[0]
+                # Update all these document's version numbers. To be safe, we want
+                # to give them a unique negative number so there's no collision and
+                # also so they're easily discoverable.
+                version = Document2.objects \
+                    .values_list('version') \
+                    .filter(uuid=record['uuid']) \
+                    .earliest('version')[0]
 
-            version = min(0, version) - 1
+                version = min(0, version) - 1
 
-            # Finally, update the version numbers.
-            for doc in docs:
-              doc.version = version
+                # Finally, update the version numbers.
+                for doc in docs:
+                    doc.version = version
 
-              if not db.dry_run:
-                doc.save()
+                    if not db.dry_run:
+                        doc.save()
 
-              version -= 1
+                    version -= 1
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
 
-        # Adding unique constraint on 'Document2', fields ['uuid', 'version', 'is_history']
-        db.create_unique(u'desktop_document2', ['uuid', 'version', 'is_history'])
+        try:
+            db.start_transaction()
+            # Adding unique constraint on 'Document2', fields ['uuid', 'version', 'is_history']
+            db.create_unique(u'desktop_document2', ['uuid', 'version', 'is_history'])
+            db.commit_transaction()
+        except Exception, e:
+            db.rollback_transaction()
+            raise e
 
 
     def backwards(self, orm):
