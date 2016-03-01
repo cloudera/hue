@@ -2221,6 +2221,7 @@ ${ require.config() }
       window.onbeforeunload = function (e) {
         viewModel.selectedNotebook().close();
       };
+      $(window).data('beforeunload', window.onbeforeunload);
 
       $(".preview-sample").css("right", (10 + $.scrollbarWidth()) + "px");
 
