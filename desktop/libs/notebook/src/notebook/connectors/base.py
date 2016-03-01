@@ -94,7 +94,7 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   if interface == 'hiveserver2':
-    return HS2Api(user=request.user)
+    return HS2Api(user=request.user, request=request)
   elif interface == 'livy':
     return SparkApi(request.user)
   elif interface == 'livy-batch':
@@ -155,3 +155,5 @@ class Api(object):
 
   def get_jobs(self, notebook, snippet, logs):
     return []
+
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()

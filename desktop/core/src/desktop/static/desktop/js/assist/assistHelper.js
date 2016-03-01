@@ -634,8 +634,7 @@
             pollRefresh(url);
           }, 1000);
         }
-      })
-        .fail(self.assistErrorCallback(options));
+      }).fail(self.assistErrorCallback(options));
     };
 
     $.post("/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/analyze/" + options.databaseName + "/" + options.tableName + "/"  + (options.columnName || ""), function (data) {
@@ -644,8 +643,7 @@
       } else {
         self.assistErrorCallback(options)(data);
       }
-    })
-      .fail(self.assistErrorCallback(options));
+    }).fail(self.assistErrorCallback(options));
   };
 
   /**

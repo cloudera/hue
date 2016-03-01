@@ -33,6 +33,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import data_export
   from beeswax.api import _autocomplete, _get_sample_data
+  from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
@@ -331,3 +332,14 @@ class HS2Api(Api):
       name = 'spark-sql'
 
     return dbms.get(self.user, query_server=get_query_server_config(name=name))
+
+
+  @query_error_handler
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
+    db = self._get_db(snippet)
+
+    handle = self._get_handle(snippet)
+
+    upload(target_file, handle, self.request.user, db, self.request.fs)
+
+    return '/filebrowser/view=%s' % target_file

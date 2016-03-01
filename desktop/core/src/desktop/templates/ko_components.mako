@@ -522,7 +522,58 @@ from desktop.views import _ko
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
+        <liv>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the results to HDFS or a new table') }">
+            <i class="fa fa-save"></i> ${ _('Export') }
+          </a>
+        </li>
       </ul>
+    </div>
+
+    <div id="saveResultsModal" class="modal hide fade">
+      <div class="loader hide">
+        <div class="overlay"></div>
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
+        <!--[if IE]><img class="spinner" src="${ static('desktop/art/spinner-big-inverted.gif') }"/><![endif]-->
+      </div>
+
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Save Query Results')}</h3>
+      </div>
+      <div class="modal-body" style="padding: 4px">
+        <form id="saveResultsForm" method="POST" class="form form-inline">
+          ${ csrf_token(request) | n,unicode }
+          <fieldset>
+            <div class="control-group">
+              <div class="controls">
+                <label class="radio">
+                  <input data-bind="checked: saveTarget() == 'hdfs-file'" type="radio" name="save-results-type">
+                  &nbsp;${ _('In an HDFS file') }
+                </label>
+                <span data-bind="visible: saveTarget() == 'hdfs-file'">
+                  <input data-bind="value: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser">
+                </span>
+                <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
+                  <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
+                  ${ _('Overwrite') }
+                </label>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+        <div id="hdfs-directory-help-content" class="hide">
+          <p>${ _("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        % if app_name != 'impala':
+        <a id="save-results-advanced" href="javascript:void(0)" class="pull-left">${ _('Show advanced fields') }</a>
+        % endif
+        <a id="save-results-simple" href="javascript:void(0)" class="pull-left hide">${ _('Hide advanced fields') }</a>
+        <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+        <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
+      </div>
     </div>
   </script>
 
@@ -539,7 +590,48 @@ from desktop.views import _ko
         self.$downloadForm = $(element).find(".download-form");
         self.snippet = params.snippet;
         self.notebook = params.notebook;
-      }
+
+        self.saveTarget = ko.observable('hdfs-file');
+        self.savePath = ko.observable('');
+        self.saveOverwrite = ko.observable(true);
+
+        self.trySaveResults = function() {
+          self.saveResults();
+
+          $("#saveResultsModal button.btn-primary").button('loading');
+          $("#saveResultsModal .loader").show();
+        };
+
+        self.saveResults = function() {
+          var self = this;
+
+           $.post("${ url('notebook:export_result') }", {
+            notebook: ko.mapping.toJSON(self.notebook.getContext()),
+            snippet: ko.mapping.toJSON(self.snippet.getContext()),
+            format: ko.mapping.toJSON(self.saveTarget()),
+            destination: ko.mapping.toJSON(self.savePath()),
+            overwrite: ko.mapping.toJSON(self.saveOverwrite())
+          },
+          function(data) {
+            if (data.status == 0) {
+              if (data.id) {
+                // Not used yet
+                self.design.watch.url(data.watch_url);
+                self.watchQueryLoop(redirect_fn);
+              } else {
+                window.location.href = data.success_url;
+              }
+            } else {
+              $(document).trigger('error', data.message);
+            }
+          }).fail(function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+          }).done(function() {
+            $("#saveResultsModal button.btn-primary").button('reset');
+            $("#saveResultsModal .loader").hide();
+          });
+        };
+      };
 
       DownloadResultsViewModel.prototype.download = function (format) {
         var self = this;
