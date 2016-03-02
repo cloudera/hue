@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import json
 import time
 
 from nose.tools import assert_true, assert_false, assert_equal, assert_raises
@@ -23,6 +24,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.models import Document
 
 from liboozie.oozie_api_tests import OozieServerProvider
@@ -107,6 +109,17 @@ class TestJobsubWithHadoop(OozieServerProvider):
       kwargs={'design_id': self.design.id}),
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 200)
+
+    client_note_me = make_logged_in_client(username='jobsub_test_note_me', is_superuser=False)
+    grant_access("jobsub_test_note_me", "jobsub_test_note_me", "jobsub")
+    add_to_group("jobsub_test_note_me")
+
+    response = client_note_me.get(reverse('jobsub.views.get_design',
+      kwargs={'design_id': self.design.id}),
+      HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    assert_equal(response.status_code, 500)
+    data = json.loads(response.content)
+    assert_true('does not have the permissions required to access document' in data.get('message', ''), response.content)
 
   def test_delete_design(self):
     # Trash

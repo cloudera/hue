@@ -111,10 +111,10 @@ def list_designs(request):
     })
 
 
-def _get_design(design_id):
+def _get_design(user, design_id):
   """Raise PopupException if design doesn't exist"""
   try:
-    return Workflow.objects.get(pk=design_id)
+    return Document.objects.can_read_or_exception(user, Workflow, doc_id=design_id).content_object
   except Workflow.DoesNotExist:
     raise PopupException(_("Workflow not found"))
 
@@ -135,7 +135,7 @@ def delete_design(request, design_id):
   skip_trash = 'skip_trash' in request.GET
 
   try:
-    workflow = _get_design(design_id)
+    workflow = _get_design(request.user, design_id)
     _check_permission(request, workflow.owner.username,
                       _("Access denied: delete design %(id)s.") % {'id': design_id},
                       allow_root=True)
@@ -157,7 +157,7 @@ def restore_design(request, design_id):
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be POST request.'), error_code=405)
 
   try:
-    workflow = _get_design(design_id)
+    workflow = _get_design(request.user, design_id)
     _check_permission(request, workflow.owner.username,
                       _("Access denied: delete design %(id)s.") % {'id': design_id},
                       allow_root=True)
@@ -173,7 +173,8 @@ def restore_design(request, design_id):
 
 
 def get_design(request, design_id):
-  workflow = _get_design(design_id)
+  workflow = _get_design(request.user, design_id)
+
   node = workflow.start.get_child('to')
   node_dict = model_to_dict(node)
   node_dict['id'] = design_id
@@ -181,11 +182,12 @@ def get_design(request, design_id):
   node_dict['editable'] = workflow.owner.id == request.user.id
   node_dict['parameters'] = workflow.parameters
   node_dict['description'] = workflow.description
-  return render_json(node_dict, js_safe=True);
+
+  return render_json(node_dict, js_safe=True)
 
 
 def save_design(request, design_id):
-  workflow = _get_design(design_id)
+  workflow = _get_design(request.user, design_id)
   _check_permission(request, workflow.owner.username, _("Access denied: edit design %(id)s.") % {'id': workflow.id})
 
   ActionForm = design_form_by_type(request.POST.get('node_type', None), request.user, workflow)
@@ -195,14 +197,14 @@ def save_design(request, design_id):
     raise StructuredException(code="INVALID_REQUEST_ERROR", message=_('Error saving design'), data={'errors': form.errors}, error_code=400)
 
   data = format_dict_field_values(request.POST.copy())
-  _save_design(design_id, data)
+  _save_design(request.user, design_id, data)
 
   return get_design(request, design_id);
 
 
-def _save_design(design_id, data):
+def _save_design(user, design_id, data):
   sanitize_node_dict(data)
-  workflow = _get_design(design_id)
+  workflow = _get_design(user, design_id)
 
   workflow.name = data['name']
   workflow.description = data.setdefault('description', '')
@@ -266,7 +268,7 @@ def new_design(request, node_type):
 
   # Save design again to update all fields.
   data = format_dict_field_values(request.POST.copy())
-  _save_design(workflow.id, data)
+  _save_design(request.user, workflow.id, data)
 
   return get_design(request, workflow.id)
 
@@ -275,7 +277,7 @@ def clone_design(request, design_id):
   if request.method != 'POST':
     raise StructuredException(code="METHOD_NOT_ALLOWED_ERROR", message=_('Must be a POST request.'), error_code=405)
 
-  workflow = _get_design(design_id)
+  workflow = _get_design(request.user, design_id)
   clone = workflow.clone(request.fs, request.user)
   doc = clone.doc.get()
   doc.extra = 'jobsub'
