@@ -373,6 +373,28 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
   return JsonResponse(response)
 
 
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def get_sample_data(request, server=None, database=None, table=None):
+  response = {'status': -1}
+
+  # Passed by check_document_access_permission but unused by APIs
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  try:
+    sample_data = get_api(request, snippet).get_sample_data(snippet, database, table)
+    response.update(sample_data)
+  except QueryExpired, e:
+    LOG.debug('get_sample_data query expired: %s' % e)
+    pass
+
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
 @require_GET
 @api_error_handler
 def github_fetch(request):

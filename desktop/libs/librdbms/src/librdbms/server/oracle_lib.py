@@ -107,3 +107,7 @@ class OracleClient(BaseRDMSClient):
     else:
       columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
     return columns
+
+  def get_sample_data(self, database, table, limit=100):
+    statement = 'SELECT * FROM "%s"."%s" LIMIT %d' % (database, table, limit)
+    return self.execute_statement(statement)

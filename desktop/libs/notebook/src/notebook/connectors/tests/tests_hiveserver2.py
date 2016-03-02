@@ -30,7 +30,7 @@ from beeswax.server import dbms
 from beeswax.test_base import get_query_server_config
 
 
-class TestNotebookApi(object):
+class TestHiveserver2Api(object):
 
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=False, is_superuser=False)

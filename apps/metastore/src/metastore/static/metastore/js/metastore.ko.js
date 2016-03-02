@@ -214,10 +214,9 @@
       return;
     }
     self.assistHelper.fetchTableSample({
-      sourceType: "hive",
+      type: "hive",
       databaseName: self.metastoreTable.database.name,
       tableName: self.metastoreTable.name,
-      dataType: "json",
       successCallback: function (data) {
         self.rows(data.rows);
         self.headers(data.headers);

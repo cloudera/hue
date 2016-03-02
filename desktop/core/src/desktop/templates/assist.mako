@@ -674,9 +674,11 @@ from desktop.views import _ko
     <div id="assistQuickLook" class="modal hide fade">
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
           <i class="fa fa-external-link"></i> ${ _('View more...') }
         </a>
+        <!-- /ko -->
         <h3>${_('Data sample for')} <span class="tableName"></span></h3>
       </div>
       <div class="modal-body" style="min-height: 100px">

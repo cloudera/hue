@@ -25,6 +25,7 @@
   var TIME_TO_LIVE_IN_MILLIS = $.totalStorage('hue.cacheable.ttl.override') || $.totalStorage('hue.cacheable.ttl'); // 1 day by default, configurable with desktop.custom.cacheable_ttl in the .ini or $.totalStorage('hue.cacheable.ttl.override', 1234567890)
 
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
+  var SAMPLE_API_PREFIX = "/notebook/api/sample/";
   var DOCUMENTS_API = "/desktop/api2/doc/";
   var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
@@ -589,26 +590,26 @@
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
-   * @param {string} options.dataType - html or json
+   * @param {string} options.type
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     var self = this;
-    $.ajax({
-      url: "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + options.databaseName + "/" + options.tableName + "/sample",
-      data: {},
-      beforeSend: function (xhr) {
-        xhr.setRequestHeader("X-Requested-With", "Hue");
-      },
-      success: function (response) {
-        if (! self.successResponseIsError(response)) {
-          options.successCallback(response);
-        } else {
-          self.assistErrorCallback(options)(response);
-        }
-      },
-      error: self.assistErrorCallback(options)
-    });
+    var url = SAMPLE_API_PREFIX + options.databaseName + '/' + options.tableName;
+
+    $.post(url, {
+      notebook: {},
+      snippet: ko.mapping.toJSON({
+        type: options.type
+      }),
+    }, function (data) {
+      if (! self.successResponseIsError(data)) {
+        options.successCallback(data);
+      } else {
+        self.assistErrorCallback(options)(data);
+      }
+    }).fail(self.assistErrorCallback(options));
   };
+
 
   /**
    * @param {Object} options
