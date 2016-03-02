@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax import data_export
-  from beeswax.api import _autocomplete
+  from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
@@ -256,6 +256,12 @@ class HS2Api(Api):
   def autocomplete(self, snippet, database=None, table=None, column=None, nested=None):
     db = self._get_db(snippet)
     return _autocomplete(db, database, table, column, nested)
+
+
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None):
+    db = self._get_db(snippet)
+    return _get_sample_data(db, database, table)
 
 
   def _get_current_statement(self, db, snippet):

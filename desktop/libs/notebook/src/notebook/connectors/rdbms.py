@@ -132,6 +132,26 @@ class RdbmsApi(Api):
     response['status'] = 0
     return response
 
+
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None):
+    query_server = dbms.get_query_server_config(server=self.interpreter)
+    db = dbms.get(self.user, query_server)
+
+    assist = Assist(db)
+    response = {'status': -1}
+
+    sample_data = assist.get_sample_data(database, table)
+
+    if sample_data:
+      response['status'] = 0
+      response['headers'] = sample_data.columns
+      response['rows'] = list(sample_data.rows())
+    else:
+      response['message'] = _('Failed to get sample data.')
+
+    return response
+
   @query_error_handler
   def get_select_star_query(self, snippet, database, table):
     return "SELECT * FROM `%s`.`%s`" % (database, table)
@@ -150,3 +170,6 @@ class Assist():
 
   def get_columns(self, database, table):
     return self.db.get_columns(database, table, names_only=False)
+
+  def get_sample_data(self, database, table):
+    return self.db.get_sample_data(database, table)

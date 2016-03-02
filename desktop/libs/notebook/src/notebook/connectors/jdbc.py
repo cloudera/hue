@@ -135,26 +135,40 @@ class JdbcApi(Api):
       raise AuthenticationRequired()
 
     assist = Assist(self.db)
-    response = {'error': 0}
+    response = {'status': -1}
 
-    try:
-      if database is None:
-        response['databases'] = assist.get_databases()
-      elif table is None:
-        response['tables'] = assist.get_tables(database)
-      else:
-        columns = assist.get_columns(database, table)
-        response['columns'] = [col[0] for col in columns]
-        response['extended_columns'] = [{
-            'name': col[0],
-            'type': col[1],
-            'comment': col[5]
-          } for col in columns
-        ]
-    except Exception, e:
-      LOG.warn('Autocomplete data fetching error: %s' % e)
-      response['code'] = -1
-      response['error'] = str(e)
+    if database is None:
+      response['databases'] = assist.get_databases()
+    elif table is None:
+      response['tables'] = assist.get_tables(database)
+    else:
+      columns = assist.get_columns(database, table)
+      response['columns'] = [col[0] for col in columns]
+      response['extended_columns'] = [{
+        'name': col[0],
+        'type': col[1],
+        'comment': col[5]
+      } for col in columns]
+
+    response['status'] = 0
+    return response
+
+  @query_error_handler
+  def get_sample_data(self, snippet, database=None, table=None):
+    if self.db is None:
+      raise AuthenticationRequired()
+
+    assist = Assist(self.db)
+    response = {'status': -1}
+
+    sample_data, description = assist.get_sample_data(database, table)
+
+    if sample_data:
+      response['status'] = 0
+      response['headers'] = [col[0] for col in description] if description else []
+      response['rows'] = sample_data
+    else:
+      response['message'] = _('Failed to get sample data.')
 
     return response
 
@@ -179,3 +193,6 @@ class Assist():
   def get_columns(self, database, table):
     columns, description = query_and_fetch(self.db, 'SHOW COLUMNS FROM %s.%s' % (database, table))
     return columns
+
+  def get_sample_data(self, database, table):
+    return query_and_fetch(self.db, 'SELECT * FROM %s.%s' % (database, table))

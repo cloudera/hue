@@ -334,10 +334,9 @@
     $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
 
     self.assistDbSource.assistHelper.fetchTableSample({
-      sourceType: self.assistDbSource.sourceType === "hive" ? "beeswax" : self.assistDbSource.sourceType,
+      type: self.assistDbSource.sourceType,
       databaseName: databaseName,
       tableName: tableName,
-      dataType: "html",
       successCallback: function(data) {
         if (! data.rows) {
           data.rows = [];
