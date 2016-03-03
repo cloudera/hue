@@ -228,9 +228,12 @@ ${ require.config() }
               % elif editor_type == 'pig':
                 <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
                 Pig
-              % else:
+              % elif editor_type == 'beeswax':
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
+              % else:
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                SQL
               % endif
               </a>
             % else:
