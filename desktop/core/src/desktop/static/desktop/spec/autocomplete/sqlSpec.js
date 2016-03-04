@@ -26,6 +26,14 @@ define([
       sql.yy.parseError = function (msg) {
         throw Error(msg);
       };
+      sql.yy.callbacks = {
+        tableLister: function (options) {
+          if (options.includeFrom) {
+            return [ { value: '? FROM table_one', meta: 'table' }, { value: '? FROM table_two', meta: 'table' } ];
+          }
+          return [ { value: 'table_one', meta: 'table' }, { value: 'table_two', meta: 'table' } ];
+        }
+      };
       jasmine.addMatchers(testUtils.autocompleteMatcher);
     });
 
@@ -33,7 +41,7 @@ define([
     });
 
     var assertAutoComplete = function(testDefinition) {
-      var result = sql.parse(testDefinition.beforeCursor + '|CURSOR|' + testDefinition.afterCursor);
+      var result = sql.parse(testDefinition.beforeCursor + ' |CURSOR| ' + testDefinition.afterCursor);
       expect(result).toEqualAutocompleteValues(testDefinition.expectedSuggestions);
     };
 
@@ -45,12 +53,20 @@ define([
       });
     });
 
-    it("should suggest keywords for started statement", function() {
+    it("should suggest keywords for partial statement", function() {
       assertAutoComplete({
         beforeCursor: 'se',
         afterCursor: '',
         expectedSuggestions: [ 'SELECT' ]
       });
-    })
+    });
+
+    it("should suggest tables after SELECT", function() {
+      assertAutoComplete({
+        beforeCursor: 'SELECT ',
+        afterCursor: '',
+        expectedSuggestions: [ '? FROM table_one', '? FROM table_two' ]
+      });
+    });
   });
 });
