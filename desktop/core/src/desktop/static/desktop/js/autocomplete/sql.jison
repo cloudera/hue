@@ -17,64 +17,71 @@
 %lex
 %%
 
-\s+                   { /* skip whitespace */ }
-'|CURSOR|'            { return '|CURSOR|'; }
-'SELECT'              { return 'SELECT'; }
-'USE'                 { return 'USE'; }
-'FROM'                { return 'FROM'; }
-[a-zA-Z0-9_]*\b       { return 'STRING_IDENTIFIER'; }
-','                   { return ','; }
-'*'                   { return '*'; }
-';'                   { return ';'; }
-<<EOF>>               { return 'EOF'; }
+\s+                       { /* skip whitespace */ }
+'|CURSOR|'                { return '|CURSOR|'; }
+[Ss][Ee][Ll][Ee][Cc][Tt]  { return 'SELECT'; }
+[Uu][Ss][Ee]              { return 'USE'; }
+[Ff][Rr][Oo][Mm]          { return 'FROM'; }
+[a-zA-Z0-9_]*\b           { return 'STRING_IDENTIFIER'; }
+','                       { return ','; }
+'*'                       { return '*'; }
+';'                       { return ';'; }
+<<EOF>>                   { return 'EOF'; }
 
 /lex
 
-%start SqlStatement
-
-%{
-  var suggestions = {
-    statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
-  }
-
-  var filterStartsWith = function (suggestions, start) {
-    var startLower = start.toLowerCase();
-    return suggestions.filter(function (suggestion) {
-      return suggestion.value.toLowerCase().indexOf(startLower) === 0;
-    });
-  }
-%}
+%start Sql
 
 %%
 
+Sql
+ : SqlStatements EOF
+ ;
+
+SqlStatements
+ : SqlStatement
+ | SqlStatements ';' SqlStatement
+ ;
+
 SqlStatement
- : SelectStatement EOF
- | UseStatement EOF
- | STRING_IDENTIFIER '|CURSOR|' EOF
+ : SelectStatement
+ | UseStatement
+ | STRING_IDENTIFIER '|CURSOR|'
    {
-     return filterStartsWith(suggestions.statements, $1);
+     return filterStartsWith(adjustKeywordCase(isLowerCase($1), suggestions.statements), $1);
    }
- | '|CURSOR|' EOF
+ | '|CURSOR|'
    {
-     return suggestions.statements;
+     return adjustKeywordCase(false, suggestions.statements);
    }
  ;
 
 UseStatement
-  : 'USE' STRING_IDENTIFIER ';' '|CURSOR|'
+  : 'USE' STRING_IDENTIFIER ';'
   ;
 
 SelectStatement
- : 'SELECT' SelectExpression 'FROM' TableReference ';' '|CURSOR|'
+ : 'SELECT' SelectExpression 'FROM' TableReference ';'
  | 'SELECT' '|CURSOR|'
    {
-     return parser.yy.callbacks.tableLister({ includeFrom: true });
+     return parser.yy.callbacks.tableLister({
+       prependQuestionMark: true,
+       prependFrom: true,
+       lowerCase: isLowerCase($1)
+     });
    }
  ;
 
 SelectExpression
- : '*'
- | SelectExpressionList
+ : SelectExpressionList
+ | '*' '|CURSOR|'
+   {
+     return parser.yy.callbacks.tableLister({
+       prependFrom: true,
+       lowerCase: isLowerCase($1)
+     });
+   }
+ | '*'
  ;
 
 SelectExpressionList
@@ -91,6 +98,38 @@ TableReference
  ;
 
 %%
+
+var suggestions = {
+  statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
+}
+
+var filterStartsWith = function (suggestions, start) {
+  var startLower = start.toLowerCase();
+  return suggestions.filter(function (suggestion) {
+    return suggestion.value.toLowerCase().indexOf(startLower) === 0;
+  });
+}
+
+var adjustKeywordCase = function (lowerCase, suggestions) {
+  if (lowerCase) {
+    suggestions.forEach(function (suggestion) {
+      if (suggestion.meta === 'keyword') {
+        suggestion.value = suggestion.value.toLowerCase();
+      }
+    });
+  } else {
+    suggestions.forEach(function (suggestion) {
+      if (suggestion.meta === 'keyword') {
+        suggestion.value = suggestion.value.toUpperCase();
+      }
+    });
+  }
+  return suggestions;
+}
+
+var isLowerCase = function (text) {
+  return text.toLowerCase() === text;
+}
 
 /*
  Hive Select syntax from https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
