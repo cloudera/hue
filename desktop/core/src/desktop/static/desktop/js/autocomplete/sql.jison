@@ -34,7 +34,14 @@
 
 %{
   var suggestions = {
-    statements: [{ value: 'SELECT' }, { value: 'USE' }]
+    statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
+  }
+
+  var filterStartsWith = function (suggestions, start) {
+    var startLower = start.toLowerCase();
+    return suggestions.filter(function (suggestion) {
+      return suggestion.value.toLowerCase().indexOf(startLower) === 0;
+    });
   }
 %}
 
@@ -45,10 +52,7 @@ SqlStatement
  | UseStatement EOF
  | STRING_IDENTIFIER '|CURSOR|' EOF
    {
-     var upperCase = $1.toUpperCase();
-     return suggestions.statements.filter(function (statement) {
-       return statement.value.indexOf(upperCase) === 0;
-     });
+     return filterStartsWith(suggestions.statements, $1);
    }
  | '|CURSOR|' EOF
    {
@@ -57,11 +61,15 @@ SqlStatement
  ;
 
 UseStatement
-  : 'USE' STRING_IDENTIFIER ';'
+  : 'USE' STRING_IDENTIFIER ';' '|CURSOR|'
   ;
 
 SelectStatement
- : 'SELECT' SelectExpression 'FROM' TableReference ';'
+ : 'SELECT' SelectExpression 'FROM' TableReference ';' '|CURSOR|'
+ | 'SELECT' '|CURSOR|'
+   {
+     return parser.yy.callbacks.tableLister({ includeFrom: true });
+   }
  ;
 
 SelectExpression

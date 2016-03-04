@@ -15,12 +15,12 @@
 // limitations under the License.
 
 define(function(require){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[13,18];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,17],$V1=[13,18];
 var parser = {trace: function trace() { },
 yy: {},
 symbols_: {"error":2,"SqlStatement":3,"SelectStatement":4,"EOF":5,"UseStatement":6,"STRING_IDENTIFIER":7,"|CURSOR|":8,"USE":9,";":10,"SELECT":11,"SelectExpression":12,"FROM":13,"TableReference":14,"*":15,"SelectExpressionList":16,"DerivedColumn":17,",":18,"$accept":0,"$end":1},
 terminals_: {2:"error",5:"EOF",7:"STRING_IDENTIFIER",8:"|CURSOR|",9:"USE",10:";",11:"SELECT",13:"FROM",15:"*",18:","},
-productions_: [0,[3,2],[3,2],[3,3],[3,2],[6,3],[4,5],[12,1],[12,1],[16,1],[16,3],[17,1],[14,1]],
+productions_: [0,[3,2],[3,2],[3,3],[3,2],[6,4],[4,6],[4,2],[12,1],[12,1],[16,1],[16,3],[17,1],[14,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
@@ -28,10 +28,7 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 3:
 
-     var upperCase = $$[$0-2].toUpperCase();
-     return suggestions.statements.filter(function (statement) {
-       return statement.value.indexOf(upperCase) === 0;
-     });
+     return filterStartsWith(suggestions.statements, $$[$0-2]);
    
 break;
 case 4:
@@ -39,10 +36,15 @@ case 4:
      return suggestions.statements;
    
 break;
+case 7:
+
+     return parser.yy.callbacks.tableLister({ includeFrom: true });
+   
+break;
 }
 },
-table: [{3:1,4:2,6:3,7:[1,4],8:[1,5],9:[1,7],11:[1,6]},{1:[3]},{5:[1,8]},{5:[1,9]},{8:[1,10]},{5:[1,11]},{7:$V0,12:12,15:[1,13],16:14,17:15},{7:[1,17]},{1:[2,1]},{1:[2,2]},{5:[1,18]},{1:[2,4]},{13:[1,19]},{13:[2,7]},{13:[2,8],18:[1,20]},o($V1,[2,9]),o($V1,[2,11]),{10:[1,21]},{1:[2,3]},{7:[1,23],14:22},{7:$V0,17:24},{5:[2,5]},{10:[1,25]},{10:[2,12]},o($V1,[2,10]),{5:[2,6]}],
-defaultActions: {8:[2,1],9:[2,2],11:[2,4],13:[2,7],18:[2,3],21:[2,5],23:[2,12],25:[2,6]},
+table: [{3:1,4:2,6:3,7:[1,4],8:[1,5],9:[1,7],11:[1,6]},{1:[3]},{5:[1,8]},{5:[1,9]},{8:[1,10]},{5:[1,11]},{7:$V0,8:[1,13],12:12,15:[1,14],16:15,17:16},{7:[1,18]},{1:[2,1]},{1:[2,2]},{5:[1,19]},{1:[2,4]},{13:[1,20]},{5:[2,7]},{13:[2,8]},{13:[2,9],18:[1,21]},o($V1,[2,10]),o($V1,[2,12]),{10:[1,22]},{1:[2,3]},{7:[1,24],14:23},{7:$V0,17:25},{8:[1,26]},{10:[1,27]},{10:[2,13]},o($V1,[2,11]),{5:[2,5]},{8:[1,28]},{5:[2,6]}],
+defaultActions: {8:[2,1],9:[2,2],11:[2,4],13:[2,7],14:[2,8],19:[2,3],24:[2,13],26:[2,5],28:[2,6]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -195,7 +197,14 @@ parse: function parse(input) {
 }};
 
   var suggestions = {
-   statements: [{ value: 'SELECT' }, { value: 'USE' }]
+    statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
+  }
+
+  var filterStartsWith = function (suggestions, start) {
+    var startLower = start.toLowerCase();
+    return suggestions.filter(function (suggestion) {
+      return suggestion.value.toLowerCase().indexOf(startLower) === 0;
+    });
   }
 
 
