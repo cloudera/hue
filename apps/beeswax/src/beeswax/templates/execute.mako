@@ -268,7 +268,7 @@ ${ layout.menubar(section='query') }
                data-placement="right">
             </a>
             <br />
-            <div style="display: inline-block; margin: 0 10px 0 20px; line-height: 20px; ">
+            <div style="display: inline-block; margin: 0 10px 0 46px; line-height: 20px; ">
               <a href="javascript:void(0);"
                  id="query-description"
                  data-type="textarea"
@@ -1216,7 +1216,7 @@ $(document).ready(function () {
 
   function draggableHelper(el, e, ui) {
     resizeCodeMirror(el);
-    var minHandlePosition = $('.card-heading.simple').is(':visible') ? 248 : 205;
+    var minHandlePosition = $('.card-heading.simple').is(':visible') ? $('.card-heading.simple').outerHeight() + 205 : 205;
     if (ui.position.top < minHandlePosition) {
       ui.position.top = minHandlePosition;
     }
@@ -1677,7 +1677,7 @@ $(document).ready(function () {
         CURRENT_CODEMIRROR_SIZE = 270;
         if ($('.card-heading.simple').is(':visible')) {
           INITIAL_CODEMIRROR_SIZE = 270;
-          INITIAL_HORIZONTAL_RESIZE_POSITION = 418;
+          INITIAL_HORIZONTAL_RESIZE_POSITION = $('.card-heading.simple').outerHeight() + 374;
         }
         codeMirror.setSize("99%", CURRENT_CODEMIRROR_SIZE);
         reinitializeTableExtenders();
