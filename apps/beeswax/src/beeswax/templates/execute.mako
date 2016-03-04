@@ -267,14 +267,18 @@ ${ layout.menubar(section='query') }
                data-original-title="${ _('Query name') }"
                data-placement="right">
             </a>
-            <a href="javascript:void(0);"
-               id="query-description"
-               data-type="textarea"
-               data-name="description"
-               data-value="${design.desc}"
-               data-original-title="${ _('Query description') }"
-               data-placement="right" style="font-size: 14px; margin-left: 10px">
-            </a>
+            <br />
+            <div style="display: inline-block; margin: 0 10px 0 20px; line-height: 20px; ">
+              <a href="javascript:void(0);"
+                 id="query-description"
+                 data-type="textarea"
+                 data-name="description"
+                 data-value="${design.desc}"
+                 data-original-title="${ _('Query description') }"
+                 data-placement="bottom"
+                 style="font-size: 14px; line-height: 20px; white-space: normal; " >
+              </a>
+            </div>
           </h1>
           %endif
       </div>
