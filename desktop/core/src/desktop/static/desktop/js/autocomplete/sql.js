@@ -15,36 +15,48 @@
 // limitations under the License.
 
 define(function(require){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,17],$V1=[13,18];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,6],$V1=[1,7],$V2=[1,9],$V3=[1,8],$V4=[5,7],$V5=[1,18],$V6=[15,20];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"SqlStatement":3,"SelectStatement":4,"EOF":5,"UseStatement":6,"STRING_IDENTIFIER":7,"|CURSOR|":8,"USE":9,";":10,"SELECT":11,"SelectExpression":12,"FROM":13,"TableReference":14,"*":15,"SelectExpressionList":16,"DerivedColumn":17,",":18,"$accept":0,"$end":1},
-terminals_: {2:"error",5:"EOF",7:"STRING_IDENTIFIER",8:"|CURSOR|",9:"USE",10:";",11:"SELECT",13:"FROM",15:"*",18:","},
-productions_: [0,[3,2],[3,2],[3,3],[3,2],[6,4],[4,6],[4,2],[12,1],[12,1],[16,1],[16,3],[17,1],[14,1]],
+symbols_: {"error":2,"Sql":3,"SqlStatements":4,"EOF":5,"SqlStatement":6,";":7,"SelectStatement":8,"UseStatement":9,"STRING_IDENTIFIER":10,"|CURSOR|":11,"USE":12,"SELECT":13,"SelectExpression":14,"FROM":15,"TableReference":16,"SelectExpressionList":17,"*":18,"DerivedColumn":19,",":20,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:";",10:"STRING_IDENTIFIER",11:"|CURSOR|",12:"USE",13:"SELECT",15:"FROM",18:"*",20:","},
+productions_: [0,[3,2],[4,1],[4,3],[6,1],[6,1],[6,2],[6,1],[9,3],[8,5],[8,2],[14,1],[14,2],[14,1],[17,1],[17,3],[19,1],[16,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
-case 3:
+case 6:
 
-     return filterStartsWith(suggestions.statements, $$[$0-2]);
-   
-break;
-case 4:
-
-     return suggestions.statements;
+     return filterStartsWith(adjustKeywordCase(isLowerCase($$[$0-1]), suggestions.statements), $$[$0-1]);
    
 break;
 case 7:
 
-     return parser.yy.callbacks.tableLister({ includeFrom: true });
+     return adjustKeywordCase(false, suggestions.statements);
+   
+break;
+case 10:
+
+     return parser.yy.callbacks.tableLister({
+       prependQuestionMark: true,
+       prependFrom: true,
+       lowerCase: isLowerCase($$[$0-1])
+     });
+   
+break;
+case 12:
+
+     return parser.yy.callbacks.tableLister({
+       prependFrom: true,
+       lowerCase: isLowerCase($$[$0-1])
+     });
    
 break;
 }
 },
-table: [{3:1,4:2,6:3,7:[1,4],8:[1,5],9:[1,7],11:[1,6]},{1:[3]},{5:[1,8]},{5:[1,9]},{8:[1,10]},{5:[1,11]},{7:$V0,8:[1,13],12:12,15:[1,14],16:15,17:16},{7:[1,18]},{1:[2,1]},{1:[2,2]},{5:[1,19]},{1:[2,4]},{13:[1,20]},{5:[2,7]},{13:[2,8]},{13:[2,9],18:[1,21]},o($V1,[2,10]),o($V1,[2,12]),{10:[1,22]},{1:[2,3]},{7:[1,24],14:23},{7:$V0,17:25},{8:[1,26]},{10:[1,27]},{10:[2,13]},o($V1,[2,11]),{5:[2,5]},{8:[1,28]},{5:[2,6]}],
-defaultActions: {8:[2,1],9:[2,2],11:[2,4],13:[2,7],14:[2,8],19:[2,3],24:[2,13],26:[2,5],28:[2,6]},
+table: [{3:1,4:2,6:3,8:4,9:5,10:$V0,11:$V1,12:$V2,13:$V3},{1:[3]},{5:[1,10],7:[1,11]},o($V4,[2,2]),o($V4,[2,4]),o($V4,[2,5]),{11:[1,12]},o($V4,[2,7]),{10:$V5,11:[1,14],14:13,17:15,18:[1,16],19:17},{10:[1,19]},{1:[2,1]},{6:20,8:4,9:5,10:$V0,11:$V1,12:$V2,13:$V3},o($V4,[2,6]),{15:[1,21]},o($V4,[2,10]),{15:[2,11],20:[1,22]},{11:[1,23],15:[2,13]},o($V6,[2,14]),o($V6,[2,16]),{7:[1,24]},o($V4,[2,3]),{10:[1,26],16:25},{10:$V5,19:27},{15:[2,12]},o($V4,[2,8]),{7:[1,28]},{7:[2,17]},o($V6,[2,15]),o($V4,[2,9])],
+defaultActions: {10:[2,1],23:[2,12],26:[2,17]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -196,17 +208,38 @@ parse: function parse(input) {
     return true;
 }};
 
-  var suggestions = {
-    statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
-  }
 
-  var filterStartsWith = function (suggestions, start) {
-    var startLower = start.toLowerCase();
-    return suggestions.filter(function (suggestion) {
-      return suggestion.value.toLowerCase().indexOf(startLower) === 0;
+var suggestions = {
+  statements: [{ value: 'SELECT', meta: 'keyword' }, { value: 'USE', meta: 'keyword' }]
+}
+
+var filterStartsWith = function (suggestions, start) {
+  var startLower = start.toLowerCase();
+  return suggestions.filter(function (suggestion) {
+    return suggestion.value.toLowerCase().indexOf(startLower) === 0;
+  });
+}
+
+var adjustKeywordCase = function (lowerCase, suggestions) {
+  if (lowerCase) {
+    suggestions.forEach(function (suggestion) {
+      if (suggestion.meta === 'keyword') {
+        suggestion.value = suggestion.value.toLowerCase();
+      }
+    });
+  } else {
+    suggestions.forEach(function (suggestion) {
+      if (suggestion.meta === 'keyword') {
+        suggestion.value = suggestion.value.toUpperCase();
+      }
     });
   }
+  return suggestions;
+}
 
+var isLowerCase = function (text) {
+  return text.toLowerCase() === text;
+}
 
 /*
  Hive Select syntax from https://cwiki.apache.org/confluence/display/Hive/LanguageManual+Select
@@ -551,27 +584,27 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0: /* skip whitespace */ 
 break;
-case 1: return 8; 
+case 1: return 11; 
 break;
-case 2: return 11; 
+case 2: return 13; 
 break;
-case 3: return 9; 
+case 3: return 12; 
 break;
-case 4: return 13; 
+case 4: return 15; 
 break;
-case 5: return 7; 
+case 5: return 10; 
 break;
-case 6: return 18; 
+case 6: return 20; 
 break;
-case 7: return 15; 
+case 7: return 18; 
 break;
-case 8: return 10; 
+case 8: return 7; 
 break;
 case 9: return 5; 
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:\|CURSOR\|)/,/^(?:SELECT\b)/,/^(?:USE\b)/,/^(?:FROM\b)/,/^(?:[a-zA-Z0-9_]*\b)/,/^(?:,)/,/^(?:\*)/,/^(?:;)/,/^(?:$)/],
+rules: [/^(?:\s+)/,/^(?:\|CURSOR\|)/,/^(?:[Ss][Ee][Ll][Ee][Cc][Tt])/,/^(?:[Uu][Ss][Ee])/,/^(?:[Ff][Rr][Oo][Mm])/,/^(?:[a-zA-Z0-9_]*\b)/,/^(?:,)/,/^(?:\*)/,/^(?:;)/,/^(?:$)/],
 conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9],"inclusive":true}}
 });
 return lexer;
