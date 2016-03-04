@@ -2514,3 +2514,7 @@ body {
 .hue-scrollbar-x:hover {
   background-color: #999;
 }
+
+.dropdown-menu.less-padding > li > a {
+  padding-left: 6px
+}
