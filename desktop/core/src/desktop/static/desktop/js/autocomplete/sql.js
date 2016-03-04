@@ -15,21 +15,34 @@
 // limitations under the License.
 
 define(function(require){
-var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,7],$V1=[6,13];
+var o=function(k,v,o,l){for(o=o||{},l=k.length;l--;o[k[l]]=v);return o},$V0=[1,16],$V1=[13,18];
 var parser = {trace: function trace() { },
 yy: {},
-symbols_: {"error":2,"SqlStatement":3,"SELECT":4,"SelectExpression":5,"FROM":6,"TableReference":7,";":8,"EOF":9,"*":10,"SelectExpressionList":11,"DerivedColumn":12,",":13,"STRING_IDENTIFIER":14,"$accept":0,"$end":1},
-terminals_: {2:"error",4:"SELECT",6:"FROM",8:";",9:"EOF",10:"*",13:",",14:"STRING_IDENTIFIER"},
-productions_: [0,[3,6],[5,1],[5,1],[11,1],[11,3],[12,1],[7,1]],
+symbols_: {"error":2,"SqlStatement":3,"SelectStatement":4,"EOF":5,"UseStatement":6,"STRING_IDENTIFIER":7,"|CURSOR|":8,"USE":9,";":10,"SELECT":11,"SelectExpression":12,"FROM":13,"TableReference":14,"*":15,"SelectExpressionList":16,"DerivedColumn":17,",":18,"$accept":0,"$end":1},
+terminals_: {2:"error",5:"EOF",7:"STRING_IDENTIFIER",8:"|CURSOR|",9:"USE",10:";",11:"SELECT",13:"FROM",15:"*",18:","},
+productions_: [0,[3,2],[3,2],[3,3],[3,2],[6,3],[4,5],[12,1],[12,1],[16,1],[16,3],[17,1],[14,1]],
 performAction: function anonymous(yytext, yyleng, yylineno, yy, yystate /* action[1] */, $$ /* vstack */, _$ /* lstack */) {
 /* this == yyval */
 
 var $0 = $$.length - 1;
 switch (yystate) {
+case 3:
+
+     var upperCase = $$[$0-2].toUpperCase();
+     return suggestions.statements.filter(function (statement) {
+       return statement.value.indexOf(upperCase) === 0;
+     });
+   
+break;
+case 4:
+
+     return suggestions.statements;
+   
+break;
 }
 },
-table: [{3:1,4:[1,2]},{1:[3]},{5:3,10:[1,4],11:5,12:6,14:$V0},{6:[1,8]},{6:[2,2]},{6:[2,3],13:[1,9]},o($V1,[2,4]),o($V1,[2,6]),{7:10,14:[1,11]},{12:12,14:$V0},{8:[1,13]},{8:[2,7]},o($V1,[2,5]),{9:[1,14]},{1:[2,1]}],
-defaultActions: {4:[2,2],11:[2,7],14:[2,1]},
+table: [{3:1,4:2,6:3,7:[1,4],8:[1,5],9:[1,7],11:[1,6]},{1:[3]},{5:[1,8]},{5:[1,9]},{8:[1,10]},{5:[1,11]},{7:$V0,12:12,15:[1,13],16:14,17:15},{7:[1,17]},{1:[2,1]},{1:[2,2]},{5:[1,18]},{1:[2,4]},{13:[1,19]},{13:[2,7]},{13:[2,8],18:[1,20]},o($V1,[2,9]),o($V1,[2,11]),{10:[1,21]},{1:[2,3]},{7:[1,23],14:22},{7:$V0,17:24},{5:[2,5]},{10:[1,25]},{10:[2,12]},o($V1,[2,10]),{5:[2,6]}],
+defaultActions: {8:[2,1],9:[2,2],11:[2,4],13:[2,7],18:[2,3],21:[2,5],23:[2,12],25:[2,6]},
 parseError: function parseError(str, hash) {
     if (hash.recoverable) {
         this.trace(str);
@@ -180,6 +193,10 @@ parse: function parse(input) {
     }
     return true;
 }};
+
+  var suggestions = {
+   statements: [{ value: 'SELECT' }, { value: 'USE' }]
+  }
 
 
 /*
@@ -525,24 +542,28 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0: /* skip whitespace */ 
 break;
-case 1: return 4; 
+case 1: return 8; 
 break;
-case 2: return 6; 
+case 2: return 11; 
 break;
-case 3: return 14; 
+case 3: return 9; 
 break;
 case 4: return 13; 
 break;
-case 5: return 10; 
+case 5: return 7; 
 break;
-case 6: return 8; 
+case 6: return 18; 
 break;
-case 7: return 9; 
+case 7: return 15; 
+break;
+case 8: return 10; 
+break;
+case 9: return 5; 
 break;
 }
 },
-rules: [/^(?:\s+)/,/^(?:SELECT\b)/,/^(?:FROM\b)/,/^(?:[a-zA-Z0-9_]*\b)/,/^(?:,)/,/^(?:\*)/,/^(?:;)/,/^(?:$)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7],"inclusive":true}}
+rules: [/^(?:\s+)/,/^(?:\|CURSOR\|)/,/^(?:SELECT\b)/,/^(?:USE\b)/,/^(?:FROM\b)/,/^(?:[a-zA-Z0-9_]*\b)/,/^(?:,)/,/^(?:\*)/,/^(?:;)/,/^(?:$)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6,7,8,9],"inclusive":true}}
 });
 return lexer;
 })();

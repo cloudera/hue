@@ -15,5 +15,6 @@
 ## limitations under the License.
 ##
 
+<<<<<<< HEAD
 <%include file="jasmineRunner.html"/>
 

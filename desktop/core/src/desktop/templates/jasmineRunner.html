@@ -92,7 +92,8 @@
       require([
         'desktop/spec/sqlAutocompleterSpec',
         'desktop/spec/hdfsAutocompleterSpec',
-        'desktop/spec/apiHelperSpec'
+        'desktop/spec/apiHelperSpec',
+        'desktop/spec/autocomplete/sqlSpec'
       ], function () {
         if (/PhantomJS/.test(window.navigator.userAgent)) {
           console.log("Running Jasmine tests with JUnitXmlReporter and TerminalReporter");
