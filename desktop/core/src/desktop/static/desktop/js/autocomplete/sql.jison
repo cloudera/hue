@@ -18,31 +18,60 @@
 %%
 
 \s+                   { /* skip whitespace */ }
-"SELECT"              { return 'SELECT'; }
-"FROM"                { return 'FROM'; }
+'|CURSOR|'            { return '|CURSOR|'; }
+'SELECT'              { return 'SELECT'; }
+'USE'                 { return 'USE'; }
+'FROM'                { return 'FROM'; }
 [a-zA-Z0-9_]*\b       { return 'STRING_IDENTIFIER'; }
-","                   { return ','; }
-"*"                   { return '*'; }
-";"                   { return ';'; }
+','                   { return ','; }
+'*'                   { return '*'; }
+';'                   { return ';'; }
 <<EOF>>               { return 'EOF'; }
 
 /lex
 
 %start SqlStatement
+
+%{
+  var suggestions = {
+    statements: [{ value: 'SELECT' }, { value: 'USE' }]
+  }
+%}
+
 %%
 
 SqlStatement
- : "SELECT" SelectExpression "FROM" TableReference ";" EOF
+ : SelectStatement EOF
+ | UseStatement EOF
+ | STRING_IDENTIFIER '|CURSOR|' EOF
+   {
+     var upperCase = $1.toUpperCase();
+     return suggestions.statements.filter(function (statement) {
+       return statement.value.indexOf(upperCase) === 0;
+     });
+   }
+ | '|CURSOR|' EOF
+   {
+     return suggestions.statements;
+   }
+ ;
+
+UseStatement
+  : 'USE' STRING_IDENTIFIER ';'
+  ;
+
+SelectStatement
+ : 'SELECT' SelectExpression 'FROM' TableReference ';'
  ;
 
 SelectExpression
- : "*"
+ : '*'
  | SelectExpressionList
  ;
 
 SelectExpressionList
  : DerivedColumn
- | SelectExpressionList "," DerivedColumn
+ | SelectExpressionList ',' DerivedColumn
  ;
 
 DerivedColumn
