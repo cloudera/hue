@@ -26,14 +26,6 @@ define([
       sql.yy.parseError = function (msg) {
         throw Error(msg);
       };
-      sql.yy.callbacks = {
-        tableLister: function (options) {
-          if (options.includeFrom) {
-            return [ { value: '? FROM table_one', meta: 'table' }, { value: '? FROM table_two', meta: 'table' } ];
-          }
-          return [ { value: 'table_one', meta: 'table' }, { value: 'table_two', meta: 'table' } ];
-        }
-      };
       jasmine.addMatchers(testUtils.autocompleteMatcher);
     });
 
@@ -57,15 +49,39 @@ define([
       assertAutoComplete({
         beforeCursor: 'se',
         afterCursor: '',
-        expectedSuggestions: [ 'SELECT' ]
+        expectedSuggestions: [ 'select' ]
       });
     });
 
-    it("should suggest tables after SELECT", function() {
-      assertAutoComplete({
-        beforeCursor: 'SELECT ',
-        afterCursor: '',
-        expectedSuggestions: [ '? FROM table_one', '? FROM table_two' ]
+    describe("table completion", function() {
+      it("should suggest tables after SELECT", function () {
+        sql.yy.callbacks = {
+          tableLister: function (options) {
+            if (options.prependQuestionMark && options.prependFrom) {
+              return [{value: '? FROM table_one', meta: 'table'}, {value: '? FROM table_two', meta: 'table'}];
+            }
+          }
+        };
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: '',
+          expectedSuggestions: ['? FROM table_one', '? FROM table_two']
+        });
+      });
+
+      it("should follow keyword case for table name completion", function() {
+        sql.yy.callbacks = {
+          tableLister: function (options) {
+            if (options.prependQuestionMark && options.prependFrom && options.lowerCase) {
+              return [{value: '? from table_one', meta: 'table'}, {value: '? from table_two', meta: 'table'}];
+            }
+          }
+        };
+        assertAutoComplete({
+          beforeCursor: 'select ',
+          afterCursor: '',
+          expectedSuggestions: ['? from table_one', '? from table_two']
+        });
       });
     });
   });
