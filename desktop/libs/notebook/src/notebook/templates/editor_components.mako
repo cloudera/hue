@@ -968,9 +968,34 @@ ${ require.config() }
     <a class="snippet-side-btn" data-bind="click: execute, visible: status() != 'running' && status() != 'loading', css: {'blue': $parent.history().length == 0 || $root.editorMode, 'disabled': statement() === '' }" title="${ _('Execute or CTRL + ENTER') }">
       <i class="fa fa-fw fa-play"></i>
     </a>
-    <a class="snippet-side-btn" data-bind="click: format, visible: status() != 'running' && status() != 'loading', css: {'disabled': statement() === '' }" title="${ _('Format the current SQL query') }">
-      <i class="fa fa-fw fa-indent"></i>
-    </a>
+    <div class="dropdown">
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="click: clear, visible: status() != 'running' && status() != 'loading', css: {'disabled': statement() === '' }" title="${ _('Clear the current editor') }">
+        <i class="fa fa-fw fa-eraser"></i>
+      </a>
+      <!-- ko if: isSqlDialect -->
+      <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '' }">
+        <i class="fa fa-caret-down"></i>
+      </a>
+
+      <ul class="dropdown-menu less-padding">
+        <li>
+          <a href="javascript:void(0)" data-bind="click: clear" title="${ _('Clear the current editor') }">
+            <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: format, visible: status() != 'running' && status() != 'loading', css: {'disabled': statement() === '' }" title="${ _('Format the current SQL query') }">
+            <i class="fa fa-fw fa-indent"></i> ${_('Format')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: explain" title="${ _('Explain the current SQL query') }">
+            <i class="fa fa-fw fa-code-fork fa-rotate-90"></i> ${_('Explain')}
+          </a>
+        </li>
+      </ul>
+      <!-- /ko -->
+    </div>
     <!-- ko if: $root.editorMode -->
       <a class="snippet-side-btn" data-bind="click: function() { hideFixedHeaders(); $parent.showHistory(!$parent.showHistory()); }, css: {'blue': $parent.showHistory() }" title="${ _('Show query history') }">
         <i class="fa fa-fw fa-history"></i>

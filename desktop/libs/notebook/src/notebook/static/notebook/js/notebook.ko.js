@@ -585,6 +585,16 @@
       logGA('format');
     };
 
+    self.clear = function () {
+      self.ace().setValue('', 1);
+      logGA('clear');
+    };
+
+    self.explain = function () {
+      console.log('Explain call here.');
+      logGA('explain');
+    }
+
     self.fetchResult = function (rows, startOver) {
       if (typeof startOver == "undefined") {
         startOver = true;
