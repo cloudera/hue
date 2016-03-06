@@ -115,7 +115,7 @@ ${ comps.menubar() }
           <li class="nav-header">${_('Status')}</li>
           <li class="white" id="jobStatus">&nbsp;</li>
           <li class="nav-header">${_('Logs')}</li>
-          <li><a href="${job.trackingUrl }" target="_blank"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
+          <li><a href="${job.logs_url }" target="_blank"><i class="fa fa-tasks"></i> ${_('Logs')}</a></li>
           <li class="nav-header">${_('Progress')}</li>
           <li class="white">${job.progress}%</li>
           <li class="nav-header">${_('Duration')}</li>
@@ -131,7 +131,7 @@ ${ comps.menubar() }
         <div class="card-body">
           <ul class="nav nav-tabs">
             <li  class="active"><a href="#metadata" data-toggle="tab">${_('Metadata')}</a></li>
-            % if job.scrapedData.get('metrics'):
+            % if hasattr(job, 'metrics') and job.metrics:
               <li><a href="#metrics" data-toggle="tab">${_('Metrics')}</a></li>
             % endif
           </ul>
@@ -182,22 +182,34 @@ ${ comps.menubar() }
                 </tbody>
               </table>
             </div>
+            % if hasattr(job, 'metrics') and job.metrics:
             <div class="tab-pane" id="metrics">
               <table class="table table-condensed">
                 <thead>
-                  <th>${_('Metric')}</th>
-                  <th>${_('Value')}</th>
+                  % for header in job.metrics.get('headers', []):
+                  <th>${ header }</th>
+                  % endfor
                 </thead>
                 <tbody>
-                % for metric in job.scrapedData.get('metrics', []):
+                % for executor in job.metrics.get('executors', []):
                   <tr>
-                    <td>${_(metric['header'])}</td>
-                    <td>${metric['value']}</td>
+                    % for val in executor:
+                    % if isinstance(val, dict):
+                      <td>
+                      % for name, link in val.items():
+                        <a href="${ link }">${ name }</a>
+                      % endfor
+                      </td>
+                    % else:
+                      <td>${ val }</td>
+                    % endif
+                    % endfor
                   </tr>
                 % endfor
                 </tbody>
               </table>
             </div>
+            % endif
         </div>
       </div>
     </div>
