@@ -16,24 +16,25 @@
 # limitations under the License.
 
 import logging
+import os
 import re
 import time
-import urlparse
 import urllib2
+import urlparse
 
 from lxml import html
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.rest.resource import Resource
-from desktop.lib.view_util import format_duration_in_millis
+from desktop.lib.view_util import big_filesizeformat, format_duration_in_millis
 
 from hadoop.yarn.clients import get_log_client
 
 from jobbrowser.models import format_unixtime_ms
 
 
-LOGGER = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class Application(object):
@@ -99,40 +100,70 @@ class Application(object):
 
 class SparkJob(Application):
 
-  def __init__(self, job, api=None):
-    super(SparkJob, self).__init__(job, api)
-    self._scrape()
+  def __init__(self, job, rm_api=None, hs_api=None):
+    super(SparkJob, self).__init__(job, rm_api)
+    self._resolve_tracking_url()
+    if self.state not in ('NEW', 'SUBMITTED', 'ACCEPTED', 'RUNNING') and hs_api:
+      self.history_server_api = hs_api
+      self._get_metrics()
 
-  def _history_application_metrics(self, html_doc):
-    metrics = []
-    root = html.fromstring(html_doc)
-    tables = root.findall('.//table')
-    metrics_table = tables[2].findall('.//tr')
-    for tr in metrics_table:
-        header = tr.find('.//th')
-        value = tr.findall('.//td')
-        if value:
-          header = header.text.strip().replace(':', '')
-          value = value[0].text.strip()
-          metrics.append({
-            'header': header,
-            'value': value
-          })
-    return metrics
+  @property
+  def logs_url(self):
+    return os.path.join(self.trackingUrl, 'executors')
 
-  def _scrape(self):
-    # XXX: we have to scrape the tracking URL directly because
-    # spark jobs don't have a JSON api via YARN or app server
-    # see YARN-1530, SPARK-1537 for progress on these apis
-    self.scrapedData = {}
+  @property
+  def attempt_id(self):
+    return self.trackingUrl.strip('/').split('/')[-1]
+
+  def _resolve_tracking_url(self):
     try:
-      res = urllib2.urlopen(self.trackingUrl)
-      html_doc = res.read()
-      if self.trackingUI == 'History':
-        self.scrapedData['metrics'] = self._history_application_metrics(html_doc)
+      resp = urllib2.urlopen(self.trackingUrl)
+      actual_url = resp.url
+      if actual_url.strip('/').split('/')[-1] == 'jobs':
+        actual_url = actual_url.strip('/').replace('jobs', '')
+      self.trackingUrl = actual_url
     except Exception, e:
+      LOG.warn("Failed to resolve Spark Job's actual tracking URL: %s" % e)
+
+  def _get_metrics(self):
+    self.metrics = {}
+    try:
+      executors = self.history_server_api.executors(self.jobId, self.attempt_id)
+      if executors:
+        self.metrics['headers'] = [
+          _('Executor Id'),
+          _('Address'),
+          _('RDD Blocks'),
+          _('Storage Memory'),
+          _('Disk Used'),
+          _('Active Tasks'),
+          _('Failed Tasks'),
+          _('Complete Tasks'),
+          _('Task Time'),
+          _('Input'),
+          _('Shuffle Read'),
+          _('Shuffle Write'),
+          _('Logs')]
+        self.metrics['executors'] = []
+        for e in executors:
+          self.metrics['executors'].append([
+            e.get('id', 'N/A'),
+            e.get('hostPort', ''),
+            e.get('rddBlocks', ''),
+            '%s / %s' % (big_filesizeformat(e.get('memoryUsed', 0)), big_filesizeformat(e.get('maxMemory', 0))),
+            big_filesizeformat(e.get('diskUsed', 0)),
+            e.get('activeTasks', ''),
+            e.get('failedTasks', ''),
+            e.get('completedTasks', ''),
+            format_duration_in_millis(e.get('totalDuration', 0)),
+            big_filesizeformat(e.get('totalInputBytes', 0)),
+            big_filesizeformat(e.get('totalShuffleRead', 0)),
+            big_filesizeformat(e.get('totalShuffleWrite', 0)),
+            e.get('executorLogs', '')
+          ])
+    except Exception, e:
+      LOG.error('Failed to get Spark Job executors: %s' % e)
       # Prevent a nosedive. Don't create metrics if api changes or url is unreachable.
-      self.scrapedData['metrics'] = []
 
 
 class Job(object):
@@ -143,7 +174,7 @@ class Job(object):
     for attr in attrs.keys():
       if attr == 'acls':
         # 'acls' are actually not available in the API
-        LOGGER.warn('Not using attribute: %s' % attrs[attr])
+        LOG.warn('Not using attribute: %s' % attrs[attr])
       else:
         setattr(self, attr, attrs[attr])
 
@@ -379,7 +410,7 @@ class Attempt:
         try:
           debug_info = '\nLog Link: %s' % log_link
           debug_info += '\nHTML Response: %s' % response
-          LOGGER.error(debug_info)
+          LOG.error(debug_info)
         except:
           LOG.exception('failed to build debug info')
 
