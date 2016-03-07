@@ -724,7 +724,6 @@ ${ assist.assistPanel() }
                 }],
                 navigationSettings: {
                   openItem: true,
-                  showPreview: true,
                   showStats: false
                 }
               },

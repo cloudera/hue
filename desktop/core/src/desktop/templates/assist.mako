@@ -318,7 +318,6 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-entry-actions">
     <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable || definition.isView, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: (definition.isTable || definition.isView) && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
       <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
           sourceType: sourceType,
@@ -336,7 +335,6 @@ from desktop.views import _ko
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
-        <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
         <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
@@ -670,53 +668,6 @@ from desktop.views import _ko
     <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
       <span class="assist-errors">${ _('Error loading tables.') }</span>
     </div>
-
-    <div id="assistQuickLook" class="modal hide fade">
-      <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
-        <a class="tableLink pull-right" href="#" target="_blank" style="margin-right: 20px;margin-top:6px">
-          <i class="fa fa-external-link"></i> ${ _('View more...') }
-        </a>
-        <!-- /ko -->
-        <h3>${_('Data sample for')} <span class="tableName"></span></h3>
-      </div>
-      <div class="modal-body" style="min-height: 100px">
-        <!-- ko hueSpinner: { spin: assistDbSource.loadingSamples, center: true, size: 'large' } --><!-- /ko -->
-        <!-- ko ifnot: assistDbSource.loadingSamples -->
-        <div style="overflow: auto">
-          <!-- ko with: assistDbSource.samples -->
-          <!-- ko if: rows.length == 0 -->
-          <div class="alert">${ _('The selected table has no data.') }</div>
-          <!-- /ko -->
-          <!-- ko if: rows.length > 0 -->
-          <table class="table table-striped table-condensed">
-            <tr>
-              <th style="width: 10px"></th>
-              <!-- ko foreach: headers -->
-              <th data-bind="text: $data"></th>
-              <!-- /ko -->
-            </tr>
-            <tbody>
-            <!-- ko foreach: rows -->
-            <tr>
-              <td data-bind="text: $index()+1"></td>
-              <!-- ko foreach: $data -->
-              <td style="white-space: pre;" data-bind="text: $data"></td>
-              <!-- /ko -->
-            </tr>
-            <!-- /ko -->
-            </tbody>
-          </table>
-          <!-- /ko -->
-          <!-- /ko -->
-        </div>
-        <!-- /ko -->
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
-      </div>
-    </div>
   </script>
 
   <script type="text/html" id="assist-panel-switches">
@@ -838,7 +789,6 @@ from desktop.views import _ko
        * @param {string} [options.activeSourceType] - Example: hive
        * @param {Object} options.navigationSettings - enable/disable the links
        * @param {boolean} options.navigationSettings.openItem
-       * @param {boolean} options.navigationSettings.showPreview
        * @param {boolean} options.navigationSettings.showStats
 
        * @constructor
@@ -1021,7 +971,6 @@ from desktop.views import _ko
        * @param {string} [params.sql.activeSourceType] - Example: hive
        * @param {Object} params.sql.navigationSettings - enable/disable the links
        * @param {boolean} params.sql.navigationSettings.openItem - Example: true
-       * @param {boolean} params.sql.navigationSettings.showPreview - Example: true
        * @param {boolean} params.sql.navigationSettings.showStats - Example: true
        * @constructor
        */

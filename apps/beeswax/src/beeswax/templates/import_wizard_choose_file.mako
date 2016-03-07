@@ -76,7 +76,6 @@ ${ assist.assistPanel() }
                   }],
                   navigationSettings: {
                     openItem: false,
-                    showPreview: true,
                     showStats: true
                   }
                 },

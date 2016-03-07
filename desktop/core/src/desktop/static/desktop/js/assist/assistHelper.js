@@ -590,7 +590,6 @@
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
-   * @param {string} options.type
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     var self = this;
@@ -599,7 +598,7 @@
     $.post(url, {
       notebook: {},
       snippet: ko.mapping.toJSON({
-        type: options.type
+        type: options.sourceType
       }),
     }, function (data) {
       if (! self.successResponseIsError(data)) {

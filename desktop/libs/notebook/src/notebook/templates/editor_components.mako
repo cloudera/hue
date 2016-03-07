@@ -331,7 +331,6 @@ ${ require.config() }
             navigationSettings: {
               openDatabase: true,
               openItem: false,
-              showPreview: true,
               showStats: true
             },
           },
