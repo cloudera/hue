@@ -184,7 +184,6 @@ ${ fileBrowser.fileBrowser() }
               }],
               navigationSettings: {
                 openItem: false,
-                showPreview: true,
                 showStats: true
               },
             },

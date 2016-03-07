@@ -319,40 +319,5 @@
     }
   };
 
-  AssistDbEntry.prototype.showPreview = function () {
-    var self = this;
-    var $assistQuickLook = $("#assistQuickLook");
-
-    var hierarchy = self.getHierarchy();
-    var databaseName = hierarchy[0];
-    var tableName = hierarchy[1];
-
-    $assistQuickLook.find(".tableName").text(self.definition.name);
-    $assistQuickLook.find(".tableLink").attr("href", "/metastore/table/" + databaseName + "/" + tableName);
-    self.assistDbSource.loadingSamples(true);
-    self.assistDbSource.samples({});
-    $assistQuickLook.attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
-
-    self.assistDbSource.assistHelper.fetchTableSample({
-      type: self.assistDbSource.sourceType,
-      databaseName: databaseName,
-      tableName: tableName,
-      successCallback: function(data) {
-        if (! data.rows) {
-          data.rows = [];
-        } else if (! data.headers) {
-          data.headers = [];
-        }
-        self.assistDbSource.samples(data);
-        self.assistDbSource.loadingSamples(false);
-      },
-      errorCallback: function(e) {
-        $("#assistQuickLook").modal("hide");
-      }
-    });
-
-    $assistQuickLook.modal("show");
-  };
-
   return AssistDbEntry;
 }));

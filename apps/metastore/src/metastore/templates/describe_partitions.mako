@@ -74,7 +74,6 @@ ${ assist.assistPanel() }
                   user: '${user.username}',
                   navigationSettings: {
                     openItem: false,
-                    showPreview: true,
                     showStats: true
                   }
                 },

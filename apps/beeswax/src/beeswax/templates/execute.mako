@@ -55,7 +55,6 @@ ${ layout.menubar(section='query') }
                   activeSourceType: snippetType,
                   navigationSettings: {
                     openItem: false,
-                    showPreview: true,
                     showStats: true
                   }
                 },

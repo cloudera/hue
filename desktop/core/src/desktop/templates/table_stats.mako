@@ -22,6 +22,17 @@ from desktop.views import _ko
 %>
 
 <%def name="tableStats()">
+
+  <style>
+    .more-link:focus,
+    .more-link:hover {
+      background-color: #FFF !important;
+      border-top: 1px solid transparent !important;
+      border-right: 1px solid transparent !important;
+      border-left: 1px solid transparent !important;
+    }
+  </style>
+
   <script type="text/html" id="table-stats">
     <div class="content">
       <!-- ko if: statRows().length -->
@@ -64,34 +75,85 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="stats-popover">
-    <div style="position: fixed; display: none;" class="popover show mega-popover right" data-bind="style: { 'top': popoverTop() + 'px', 'left': popoverLeft() + 'px' }, visible: analysisStats, with: analysisStats">
+    <div style="position: fixed; display: none; z-index: 5000;" class="popover show mega-popover right" data-bind="style: { 'top': popoverTop() + 'px', 'left': popoverLeft() + 'px' }, visible: analysisStats, with: analysisStats">
       <div class="arrow" data-bind="style: { 'top': $parent.popoverArrowTop() + 'px'}"></div>
       <h3 class="popover-title" style="text-align: left">
         <a class="pull-right pointer close-popover" style="margin-left: 8px" data-bind="click: $parent.toggleStats"><i class="fa fa-times"></i></a>
-        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType && !isView, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a>
-        <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span>
-        <i data-bind="visible: loading" class='fa fa-spinner fa-spin'></i>
+        <a class="pull-right pointer stats-refresh" style="margin-left: 8px" data-bind="visible: !isComplexType && !isView, click: refresh"><i class="fa fa-refresh" data-bind="css: { 'fa-spin' : refreshing }"></i></a> <i data-bind="visible: loadingStats" class='fa fa-spinner fa-spin'></i>
         <!-- ko if: column == null -->
-        <strong class="table-name" data-bind="text: table"></strong> ${ _(' table analysis') }
+        <strong class="table-name" data-bind="text: table"></strong> ${ _(' table') }
         <!-- /ko -->
         <!-- ko ifnot: column == null -->
-        <strong class="table-name" data-bind="text: column"></strong> ${ _(' column analysis') }
+        <strong class="table-name" data-bind="text: column"></strong> ${ _(' column') }
         <!-- /ko -->
       </h3>
       <div class="popover-content">
-        <div class="alert" style="text-align: left; display:none" data-bind="visible: hasError">${ _('There is no analysis available') }</div>
-        <!-- ko if: isComplexType && sourceType == 'impala' -->
-        <div class="alert" style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
-        <!-- /ko -->
-        <!-- ko template: {if: column == null && ! hasError() && ! (isComplexType && sourceType == 'impala'), name: 'table-stats' } --><!-- /ko -->
-        <!-- ko template: {if: column != null && ! hasError() && ! (isComplexType && sourceType == 'impala'), name: 'column-stats' } --><!-- /ko -->
+        <ul class="nav nav-tabs">
+          <li class="active" data-bind="click: function () { activeTab('sample'); }, visible: column === null">
+            <a class="inactive-action" href="#sampleTab" data-toggle="tab">${_('Sample')}</a>
+          </li>
+          <li data-bind="click: function () { activeTab('analysis'); }">
+            <a class="inactive-action" href="#analysisTab" data-toggle="tab">${_('Analysis')} <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span></a>
+          </li>
+          <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
+          <li class="pull-right">
+            <a class="more-link" target="_blank" data-bind="attr: { 'href': '/metastore/table/' + database + '/' + table }">
+              <i class="fa fa-external-link" ></i> ${ _('View more...') }
+            </a>
+          </li>
+          <!-- /ko -->
+        </ul>
+        <div class="tab-content" style="border: none">
+          <div class="tab-pane active" id="sampleTab">
+            <!-- ko hueSpinner: { spin: loadingSamples, center: true, size: 'large' } --><!-- /ko -->
+            <!-- ko ifnot: loadingSamples -->
+            <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;">
+              <!-- ko with: samples -->
+              <!-- ko if: rows.length == 0 -->
+              <div class="alert">${ _('The selected table has no data.') }</div>
+              <!-- /ko -->
+              <!-- ko if: rows.length > 0 -->
+              <table class="table table-striped table-condensed">
+                <tr>
+                  <th style="width: 10px"></th>
+                  <!-- ko foreach: headers -->
+                  <th data-bind="text: $data"></th>
+                  <!-- /ko -->
+                </tr>
+                <tbody>
+                <!-- ko foreach: rows -->
+                <tr>
+                  <td data-bind="text: $index()+1"></td>
+                  <!-- ko foreach: $data -->
+                  <td style="white-space: pre;" data-bind="text: $data"></td>
+                  <!-- /ko -->
+                </tr>
+                <!-- /ko -->
+                </tbody>
+              </table>
+              <!-- /ko -->
+              <!-- /ko -->
+            </div>
+            <!-- /ko -->
+          </div>
+          <div class="tab-pane" id="analysisTab">
+            <!-- ko hueSpinner: { spin: loadingStats, center: true, size: 'large' } --><!-- /ko -->
+            <!-- ko ifnot: loadingStats -->
+            <div class="alert" style="text-align: left; display:none" data-bind="visible: statsHasError">${ _('There is no analysis available') }</div>
+            <!-- ko if: isComplexType && sourceType == 'impala' -->
+            <div class="alert" style="text-align: left">${ _('Column analysis is currently not supported for columns of type:') } <span data-bind="text: type"></span></div>
+            <!-- /ko -->
+            <!-- ko template: {if: column == null && ! statsHasError() && ! (isComplexType && sourceType == 'impala'), name: 'table-stats' } --><!-- /ko -->
+            <!-- ko template: {if: column != null && ! statsHasError() && ! (isComplexType && sourceType == 'impala'), name: 'column-stats' } --><!-- /ko -->
+            <!-- /ko -->
+          </div>
+        </div>
       </div>
     </div>
   </script>
 
   <script type="text/html" id="table-stats-link">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: enabled, click: toggleStats, css: { 'blue': analysisStats() || alwaysActive }"><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
-    <!-- ko template: { if: analysisStats, name: 'stats-popover'} --><!-- /ko -->
+    <a class="inactive-action" href="javascript:void(0)" data-bind="visible: enabled, click: toggleStats, css: { 'blue': analysisStats() || alwaysActive }, "><i class='fa fa-bar-chart' title="${_('View statistics') }"></i></a>
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -107,6 +169,8 @@ from desktop.views import _ko
         var self = this;
         self.params = params;
         var $targetElement = $(element);
+        var $statsContainer = $('<div>').appendTo($('body'));
+
         self.i18n = {
           errorLoadingStats: "${ _('There was a problem loading the stats.') }",
           errorRefreshingStats: "${ _('There was a problem refreshing the stats.') }",
@@ -129,7 +193,7 @@ from desktop.views import _ko
 
         var lastOffset = { top: -1, left: -1 };
         self.refreshPopoverPosition = function () {
-          var $popover = $targetElement.find(".popover");
+          var $popover = $statsContainer.find(".popover");
           if ($targetElement.is(":visible")) {
             var newTop = $targetElement.offset().top - $(window).scrollTop();
             if (lastOffset.left != $targetElement.offset().left || lastOffset.top != newTop) {
@@ -171,13 +235,8 @@ from desktop.views import _ko
           }
         });
 
-        $(document).click(function(event) {
-          if(!$(event.target).closest($targetElement).length) {
-            self.analysisStats(null)
-          }
-        })
-
         self.toggleStats = function (data, event) {
+          $statsContainer.empty();
           if (self.analysisStats()) {
             self.analysisStats(null);
           } else {
@@ -190,9 +249,28 @@ from desktop.views import _ko
               assistHelper: self.params.assistHelper,
               type: self.params.fieldType
             }));
+
+            var $popover = $('<div>');
+            $statsContainer.append($popover)
+
+            ko.renderTemplate('stats-popover', self, {
+              afterRender: function(renderedElement) {
+                var hideWhenClickOutside = function (event) {
+                  if(!$(event.target).closest($statsContainer).length) {
+                    self.analysisStats(null)
+                    $(document).off('click', hideWhenClickOutside);
+                  }
+                }
+
+                window.setTimeout(function () {
+                  $(document).on('click', hideWhenClickOutside);
+                }, 0)
+              }
+            }, $popover[0]);
           }
         };
       }
+
       ko.components.register('table-stats', {
         viewModel: {
           createViewModel: function(params, componentInfo) {

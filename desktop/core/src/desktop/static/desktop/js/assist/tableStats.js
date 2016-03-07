@@ -49,8 +49,8 @@
     self.isComplexType = /^(map|array|struct)/i.test(options.type);
     self.isView = /view/i.test(options.type);
 
-    self.loading = ko.observable(false);
-    self.hasError = ko.observable(false);
+    self.loadingStats = ko.observable(false);
+    self.statsHasError = ko.observable(false);
     self.refreshing = ko.observable(false);
     self.loadingTerms = ko.observable(false);
     self.inaccurate = ko.observable(false);
@@ -58,6 +58,16 @@
     self.terms = ko.observableArray();
     self.termsTabActive = ko.observable(false);
     self.prefixFilter = ko.observable().extend({'throttle': 500});
+
+    self.activeTab = ko.observable("sample");
+    self.loadingSamples = ko.observable(false);
+    self.samples = ko.observable(null);
+
+    self.activeTab.subscribe(function (newValue) {
+      if (newValue === "analysis" && self.statRows().length === 0) {
+        self.fetchData();
+      }
+    });
 
     self.prefixFilter.subscribe(function (newValue) {
       self.fetchTerms();
@@ -69,13 +79,17 @@
       }
     });
 
-    self.fetchData();
+    if (typeof self.column === 'undefined' || self.column === null) {
+      self.fetchSamples();
+    } else {
+      self.fetchData();
+    }
   }
 
   TableStats.prototype.fetchData = function () {
     var self = this;
-    self.loading(true);
-    self.hasError(false);
+    self.loadingStats(true);
+    self.statsHasError(false);
 
     var successCallback = function (data) {
       if (data && data.status == 0) {
@@ -90,17 +104,17 @@
         self.inaccurate(inaccurate);
       } else if (data && data.message) {
         $(document).trigger("error", data.message);
-        self.hasError(true);
+        self.statsHasError(true);
       } else {
         $(document).trigger("error", self.i18n.errorLoadingStats);
-        self.hasError(true);
+        self.statsHasError(true);
       }
-      self.loading(false);
+      self.loadingStats(false);
     };
 
     var errorCallback = function (e) {
-      self.hasError(true);
-      self.loading(false);
+      self.statsHasError(true);
+      self.loadingStats(false);
     };
 
     self.assistHelper.fetchStats({
@@ -118,26 +132,31 @@
     if (self.refreshing()) {
       return;
     }
-    var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
     self.refreshing(true);
 
-    self.assistHelper.refreshTableStats({
-      sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
-      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
-      tableName: ko.isObservable(self.table) ? self.table() : self.table,
-      columnName: ko.isObservable(self.column) ? self.column() : self.column,
-      successCallback: function() {
-        self.refreshing(false);
-        self.fetchData();
-        if (shouldFetchTerms) {
-          self.fetchTerms();
+    if (self.activeTab() === "sample") {
+      self.samples(null);
+      self.fetchSamples();
+    } else {
+      var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
+      self.assistHelper.refreshTableStats({
+        sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
+        databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+        tableName: ko.isObservable(self.table) ? self.table() : self.table,
+        columnName: ko.isObservable(self.column) ? self.column() : self.column,
+        successCallback: function() {
+          self.refreshing(false);
+          self.fetchData();
+          if (shouldFetchTerms) {
+            self.fetchTerms();
+          }
+        },
+        errorCallback: function(message) {
+          self.refreshing(false);
+          $(document).trigger("error", message || self.i18n.errorRefreshingStats);
         }
-      },
-      errorCallback: function(message) {
-        self.refreshing(false);
-        $(document).trigger("error", message || self.i18n.errorRefreshingStats);
-      }
-    });
+      });
+    }
   };
 
   TableStats.prototype.fetchTerms = function () {
@@ -171,6 +190,36 @@
       },
       errorCallback: function (e) {
         self.loadingTerms(false);
+      }
+    });
+  };
+
+  TableStats.prototype.fetchSamples = function () {
+    var self = this;
+    if (self.loadingSamples()) {
+      return;
+    }
+
+    self.loadingSamples(true);
+    self.samples({});
+
+    self.assistHelper.fetchTableSample({
+      sourceType: self.sourceType,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      successCallback: function(data) {
+        if (! data.rows) {
+          data.rows = [];
+        } else if (! data.headers) {
+          data.headers = [];
+        }
+        self.samples(data);
+        self.loadingSamples(false);
+        self.refreshing(false);
+      },
+      errorCallback: function() {
+        self.loadingSamples(false);
+        self.refreshing(false);
       }
     });
   };
