@@ -245,6 +245,9 @@ def split_statements(hql):
   between_quotes = None
   is_comment = None
 
+  if hql.find(';') in (-1, len(hql) - 1):
+    return [hql]
+
   lines = hql.splitlines()
 
   for line in lines:
