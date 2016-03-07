@@ -509,17 +509,17 @@ from desktop.views import _ko
 
     <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
       <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown">
-        <i class="fa fa-download"></i>
+        <i class="fa fa-fw fa-download"></i>
       </a>
       <ul class="dropdown-menu">
         <li>
           <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as CSV') }">
-            <i class="fa fa-file-o"></i> ${ _('CSV') }
+            <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
           <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as XLS') }">
-            <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
+            <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
       </ul>
