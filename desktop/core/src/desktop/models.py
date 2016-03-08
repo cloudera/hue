@@ -55,6 +55,9 @@ def uuid_default():
   return str(uuid.uuid4())
 
 
+###################################################################################################
+# Custom Settings
+###################################################################################################
 class UserPreferences(models.Model):
   """Holds arbitrary key/value strings."""
   user = models.ForeignKey(auth_models.User)
@@ -72,6 +75,69 @@ class Settings(models.Model):
     return settings
 
 
+class DefaultConfigurationManager(models.Manager):
+
+  def get_configuration_for_user(self, app, user):
+    """
+    :param app: app name
+    :param user: User object
+    :return: DefaultConfiguration for user, or first group found, or default for app, or None
+    """
+    try:
+      return super(DefaultConfigurationManager, self).get(app=app, user=user)
+    except DefaultConfiguration.DoesNotExist:
+      pass
+
+    configs = super(DefaultConfigurationManager, self).get_queryset().filter(app=app, group__in=user.groups.all())
+    if configs.count() > 0:
+      return configs[0]
+
+    try:
+      return super(DefaultConfigurationManager, self).get(app=app, is_default=True)
+    except DefaultConfiguration.DoesNotExist:
+      pass
+
+    return None
+
+
+class DefaultConfiguration(models.Model):
+  """
+  Default values for configuration properties for a given app/editor
+  Can be designated as default for all users by is_default flag, or for a specific group or user
+  """
+  app = models.CharField(max_length=32, null=False, db_index=True, help_text=_t('App that this configuration belongs to.'))
+  properties = models.TextField(default='{}', help_text=_t('JSON-formatted default properties values.'))
+
+  is_default = models.BooleanField(default=False, db_index=True)
+  group = models.ForeignKey(auth_models.Group, blank=True, null=True, db_index=True)
+  user = models.ForeignKey(auth_models.User, blank=True, null=True, db_index=True)
+
+  objects = DefaultConfigurationManager()
+
+  class Meta:
+    unique_together = ('app', 'is_default', 'group', 'user')
+    ordering = ["app", "-is_default", "group", "user"]
+
+
+  @property
+  def properties_dict(self):
+    if not self.properties:
+      self.properties = json.dumps({})
+    return json.loads(self.properties)
+
+  def to_dict(self):
+    return {
+      'app': self.app,
+      'properties': self.properties_dict,
+      'is_default': self.is_default,
+      'group': self.group.name if self.group else None,
+      'user': self.user.username if self.user else None
+    }
+
+
+###################################################################################################
+# Document1
+###################################################################################################
 class DocumentTagManager(models.Manager):
 
   def get_tags(self, user):
