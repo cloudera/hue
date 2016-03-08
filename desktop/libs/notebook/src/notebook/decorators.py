@@ -37,7 +37,7 @@ LOG = logging.getLogger(__name__)
 def check_document_access_permission():
   def inner(view_func):
     def decorate(request, *args, **kwargs):
-      notebook_id = request.GET.get('notebook')
+      notebook_id = request.GET.get('notebook', request.GET.get('editor'))
       if not notebook_id:
         notebook_id = json.loads(request.POST.get('notebook', '{}')).get('id')
 

@@ -22,6 +22,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import render, JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
 
@@ -117,6 +118,36 @@ def browse(request, database, table):
   })
 
 
+@check_document_access_permission()
+def execute_and_watch(request):
+  notebook_id = request.GET.get('editor', request.GET.get('notebook'))
+  snippet_id = int(request.GET['snippet'])
+  action = request.GET['action']
+  destination = request.GET['destination']
+
+  notebook = Notebook(document=Document2.objects.get(id=notebook_id))
+  snippet = notebook.get_data()['snippets'][snippet_id]
+  editor_type = snippet['type']
+
+  api = get_api(request, snippet)
+
+  if action == 'save_as_table':
+    sql, success_url = api.export_data_as_table(snippet, destination)
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
+  else:
+    raise PopupException(_('Action %s is unknown') % action)
+
+  return render('editor.mako', request, {
+      'notebooks_json': json.dumps([editor.get_data()]),
+      'options_json': json.dumps({
+          'languages': [{"name": "%s SQL" % editor_type.title(), "type": editor_type}],
+          'mode': 'editor',
+          'success_url': success_url
+      }),
+      'editor_type': editor_type,
+  })
+
+
 @check_document_modify_permission()
 def delete(request):
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
@@ -171,4 +202,3 @@ def install_examples(request):
     response['message'] = _('A POST request is required.')
 
   return JsonResponse(response)
-

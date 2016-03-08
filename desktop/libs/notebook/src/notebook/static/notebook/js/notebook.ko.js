@@ -695,6 +695,9 @@
                 }, 1000);
               }
             }
+            if (vm.successUrl()) {
+              window.location.href = vm.successUrl();
+            }
           }
           else if (self.status() == 'success') {
             self.progress(99);
@@ -1217,6 +1220,7 @@
     self.selectedNotebook = ko.observable();
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
+    self.successUrl = ko.observable(options.success_url);
 
     self.sqlSourceTypes = [];
 
