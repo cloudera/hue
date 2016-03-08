@@ -2285,7 +2285,7 @@ def test_search_log_line():
 
 
 def test_split_statements():
-  assert_equal([], hql_query(";;;").statements)
+  assert_equal([''], hql_query(";;;").statements)
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10'").statements)
   assert_equal(["select * where id == '10'"], hql_query("select * where id == '10';").statements)
   assert_equal(['select', "select * where id == '10;' limit 100"], hql_query("select; select * where id == '10;' limit 100;").statements)
