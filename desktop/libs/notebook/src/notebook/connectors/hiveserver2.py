@@ -343,3 +343,25 @@ class HS2Api(Api):
     upload(target_file, handle, self.request.user, db, self.request.fs)
 
     return '/filebrowser/view=%s' % target_file
+
+
+  def export_data_as_table(self, snippet, destination):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+
+    statement = response.pop('statement')
+
+    if not statement.strip().lower().startswith('select'):
+      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': statement})
+
+    database = snippet.get('database') or 'default'
+    table = destination
+
+    if '.' in table:
+      database, table = table.split('.', 1)
+
+    hql = 'CREATE TABLE `%s`.`%s` AS %s' % (database, table, statement)
+    success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
+
+    return hql, success_url

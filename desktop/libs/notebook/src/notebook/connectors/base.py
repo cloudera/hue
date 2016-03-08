@@ -157,3 +157,5 @@ class Api(object):
     return []
 
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite): raise NotImplementedError()
+
+  def export_data_as_table(self, snippet, destination): raise NotImplementedError()

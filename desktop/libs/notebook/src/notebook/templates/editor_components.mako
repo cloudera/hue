@@ -228,7 +228,7 @@ ${ require.config() }
               % elif editor_type == 'pig':
                 <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
                 Pig
-              % elif editor_type == 'beeswax':
+              % elif editor_type in ('beeswax', 'hive'):
                 <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
                 Hive
               % else:
@@ -387,7 +387,7 @@ ${ require.config() }
         }">
       </div>
       %if hasattr(caller, "addSnippetHTML"):
-        ${caller.addSnippetHTML()}
+        ${ caller.addSnippetHTML() }
       %endif
     </div>
   </div>

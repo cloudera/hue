@@ -548,7 +548,7 @@ from desktop.views import _ko
             <div class="control-group">
               <div class="controls">
                 <label class="radio">
-                  <input data-bind="checked: saveTarget() == 'hdfs-file'" type="radio" name="save-results-type">
+                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
                   &nbsp;${ _('In an HDFS file') }
                 </label>
                 <span data-bind="visible: saveTarget() == 'hdfs-file'">
@@ -558,6 +558,15 @@ from desktop.views import _ko
                   <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
                   ${ _('Overwrite') }
                 </label>
+              </div>
+              <div class="controls">
+                <label class="radio">
+                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
+                  &nbsp;${ _('In a new table') }
+                </label>
+                <span data-bind="visible: saveTarget() == 'hive-table'">
+                  <input data-bind="value: savePath" type="text" name="target_table" class="input-xlarge" placeholder="${_('Table name or <database>.<table>')}">
+                </span>
               </div>
             </div>
           </fieldset>
@@ -605,7 +614,7 @@ from desktop.views import _ko
         self.saveResults = function() {
           var self = this;
 
-           $.post("${ url('notebook:export_result') }", {
+          $.post("${ url('notebook:export_result') }", {
             notebook: ko.mapping.toJSON(self.notebook.getContext()),
             snippet: ko.mapping.toJSON(self.snippet.getContext()),
             format: ko.mapping.toJSON(self.saveTarget()),
@@ -614,13 +623,7 @@ from desktop.views import _ko
           },
           function(data) {
             if (data.status == 0) {
-              if (data.id) {
-                // Not used yet
-                self.design.watch.url(data.watch_url);
-                self.watchQueryLoop(redirect_fn);
-              } else {
-                window.location.href = data.success_url;
-              }
+              window.location.href = data.watch_url;
             } else {
               $(document).trigger('error', data.message);
             }

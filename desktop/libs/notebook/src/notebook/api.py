@@ -18,6 +18,7 @@
 import json
 import logging
 
+from django.core.urlresolvers import reverse
 from django.forms import ValidationError
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
@@ -459,18 +460,23 @@ def export_result(request):
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
-  format = json.loads(request.POST.get('format', 'hdfs-file'))
+  data_format = json.loads(request.POST.get('format', 'hdfs-file'))
   destination = json.loads(request.POST.get('destination', ''))
   overwrite = json.loads(request.POST.get('overwrite', False))
 
-  if format == 'hdfs-file':
+  api = get_api(request, snippet)
+
+  if data_format == 'hdfs-file':
     if overwrite and request.fs.exists(destination):
       if request.fs.isfile(destination):
         request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
       else:
         raise ValidationError(_("The target path is a directory"))
-
-    response['success_url'] = get_api(request, snippet).export_data_as_csv_file(snippet, destination, overwrite)
+    response['watch_url'] = api.export_data_as_csv_file(snippet, destination, overwrite)
+    response['status'] = 0
+  elif data_format == 'hive-table':
+    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
     response['status'] = 0
 
   return JsonResponse(response)
