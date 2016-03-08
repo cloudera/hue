@@ -971,8 +971,8 @@ ${ require.config() }
       <i class="fa fa-fw fa-play"></i>
     </a>
     <div class="dropdown">
-      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="click: clear, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Clear the current editor') }">
-        <i class="fa fa-fw fa-eraser"></i>
+      <a class="snippet-side-btn" style="padding-right:0" href="javascript: void(0)" data-bind="click: explain, css: {'disabled': statement() === '' || status() === 'running' || status() === 'loading' }" title="${ _('Explain the current SQL query') }">
+        <i class="fa fa-fw fa-code-fork fa-rotate-90"></i>
       </a>
       <!-- ko if: isSqlDialect -->
       <a class="dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0)" data-bind="css: {'disabled': statement() === '' }">
@@ -981,8 +981,8 @@ ${ require.config() }
 
       <ul class="dropdown-menu less-padding">
         <li>
-          <a href="javascript:void(0)" data-bind="click: clear" title="${ _('Clear the current editor') }">
-            <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
+          <a href="javascript:void(0)" data-bind="click: explain" title="${ _('Explain the current SQL query') }">
+            <i class="fa fa-fw fa-code-fork fa-rotate-90"></i> ${_('Explain')}
           </a>
         </li>
         <li>
@@ -991,8 +991,8 @@ ${ require.config() }
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: explain" title="${ _('Explain the current SQL query') }">
-            <i class="fa fa-fw fa-code-fork fa-rotate-90"></i> ${_('Explain')}
+          <a href="javascript:void(0)" data-bind="click: clear" title="${ _('Clear the current editor') }">
+            <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
           </a>
         </li>
       </ul>
