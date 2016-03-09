@@ -135,9 +135,15 @@ def get_document(request):
   # Get children documents if this is a directory
   if document.is_directory:
     directory = Directory.objects.get(id=document.id)
-    children = directory.get_children_documents()
+
+    # If this is the user's home directory, fetch shared docs too
+    if document.is_home_directory:
+      children = directory.get_children_and_shared_documents(user=request.user)
+    else:
+      children = directory.get_children_documents()
+
     # Filter and order results
-    response.update(_filter_documents(request, queryset=children))
+    response.update(_filter_documents(request, queryset=children, flatten=False))
 
   # Paginate and serialize Results
   if 'documents' in response:
