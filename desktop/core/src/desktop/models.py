@@ -806,15 +806,28 @@ class Document2Manager(models.Manager):
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
-  def get_by_uuid(self, uuid):
+  def get_by_uuid(self, uuid, owner=None):
     """
     Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
     This should always be used in place of Document2.objects.get(uuid=) when a single document is expected
-    WARNING: This does not check for read/write pernissions!
+    WARNING: This does not check for read/write permissions!
+
+    :param uuid
+    :param owner: optional filter
     """
-    docs = self.filter(uuid=uuid).order_by('-last_modified')
+    docs = self.filter(uuid=uuid)
+
+    if owner:
+      docs = docs.filter(owner=owner)
+
+    docs = docs.order_by('-last_modified')
+
     if not docs.exists():
-      raise FilesystemException(_('Document with UUID %s not found.') % uuid)
+      clause = ''
+      if owner:
+        clause = _(' and owner %s ') % owner.username
+      raise FilesystemException(_('Document with UUID %(uuid)s%(clause)s not found.') % {'uuid': uuid, 'clause': clause})
+
     return docs[0]
 
   def get_history(self, user, doc_type):
