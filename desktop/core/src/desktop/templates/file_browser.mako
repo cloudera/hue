@@ -39,6 +39,8 @@ from desktop.views import _ko
       overflow: hidden;
       padding: 2px;
       clear: both;
+      display:flex;
+      flex-wrap: nowrap;
     }
 
     .fb-header {
@@ -149,13 +151,21 @@ from desktop.views import _ko
       margin-left: 5px;
     }
 
+    .fb-row {
+      display:flex;
+      flex-wrap: nowrap;
+      width: 100%;
+      height: 100%;
+    }
+
     .fb-primary-col {
-      float: left;
-      display: inline-block;
+      flex: 1;
       height: 30px;
       vertical-align: middle;
       padding-left: 8px;
+      white-space: nowrap;
       text-overflow: ellipsis;
+      overflow: hidden;
     }
 
     .fb-primary-col .fa {
@@ -163,6 +173,8 @@ from desktop.views import _ko
     }
 
     .fb-attr-group {
+      flex: 1;
+      white-space: nowrap;
       float: right;
       display: inline-block;
       height: 30px;
@@ -494,10 +506,12 @@ from desktop.views import _ko
       <div class="fb-header">
         <div class="fb-primary-col">${ _('Name') }</div>
         <div class="fb-attr-group">
-          <div class="fb-attr-col fb-share" data-bind="visible: !isTrash()">${ _('Sharing') }</div>
-          <div class="fb-attr-col fb-type">${ _('Type') }</div>
-          <div class="fb-attr-col fb-owner">${ _('Owner') }</div>
-          <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
+          <div class="pull-right">
+            <div class="fb-attr-col fb-share" data-bind="visible: !isTrash()">${ _('Sharing') }</div>
+            <div class="fb-attr-col fb-type">${ _('Type') }</div>
+            <div class="fb-attr-col fb-owner">${ _('Owner') }</div>
+            <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
+          </div>
         </div>
       </div>
       <!-- /ko -->
@@ -523,7 +537,7 @@ from desktop.views import _ko
       <div class="fb-list" data-bind="with: activeEntry">
         <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list', scrollYFixedTop: true }">
           <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
-            <div style="width: 100%; height: 100%" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
+            <div class="fb-row" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
@@ -538,15 +552,17 @@ from desktop.views import _ko
               </ul>
               <div class="fb-primary-col">
                 <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : isDirectory, 'fa-file-o': ! isDirectory() }"></i>
-                <a href="javascript: void(0);" data-bind="text: definition().name, click: open"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }"></a>
               </div>
               <div class="fb-attr-group">
-                <div class="fb-attr-col fb-share" data-bind="visible: !$parent.isTrash()"><i class="fa fa-fw fa-users fb-shared-icon" data-bind="click: function (entry, event) { $parent.showSharingModal($data); event.stopPropagation(); }, css: { 'fb-shared-icon-active': isShared }"></i></div>
-                <!-- ko with: definition -->
-                <div class="fb-attr-col fb-type" data-bind="text: type"></div>
-                <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
-                <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
-                <!-- /ko -->
+                <div class="pull-right">
+                  <div class="fb-attr-col fb-share" data-bind="visible: !$parent.isTrash()"><i class="fa fa-fw fa-users fb-shared-icon" data-bind="click: function (entry, event) { $parent.showSharingModal($data); event.stopPropagation(); }, css: { 'fb-shared-icon-active': isShared }"></i></div>
+                  <!-- ko with: definition -->
+                  <div class="fb-attr-col fb-type" data-bind="text: type"></div>
+                  <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
+                  <div class="fb-attr-col fb-modified" data-bind="text: last_modified"></div>
+                  <!-- /ko -->
+                </div>
               </div>
             </div>
           </li>
