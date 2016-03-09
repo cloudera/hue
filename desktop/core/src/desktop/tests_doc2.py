@@ -606,12 +606,12 @@ class TestDocument2Permissions(object):
     assert_true('query3.sql' in doc_names)
     assert_false('query1.sql' in doc_names)
 
-    # they should not appear in the other user's regular get_documents response
+    # they should also appear in user's home directory get_documents response
     response = self.client_not_me.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     doc_names = [doc['name'] for doc in data['children']]
-    assert_false('query2.sql' in doc_names)
-    assert_false('query3.sql' in doc_names)
+    assert_true('query2.sql' in doc_names)
+    assert_true('query3.sql' in doc_names)
 
 
   def test_get_shared_directories(self):

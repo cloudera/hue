@@ -1174,6 +1174,22 @@ class Directory(Document2):
     documents = self.children.filter(is_history=False)  # TODO: perms
     return documents
 
+  def get_children_and_shared_documents(self, user):
+    """
+    Returns the children and shared documents for a given directory, excluding history documents
+    """
+    # Get documents that are direct children, or shared with but not owned by the current user
+    documents = Document2.objects.filter(
+        Q(parent_directory=self) |
+        ( (Q(document2permission__users=user) | Q(document2permission__groups__in=user.groups.all())) &
+          ~Q(owner=user) )
+      )
+
+    documents = documents.exclude(is_history=True)
+
+    return documents.defer('description', 'data', 'extra').distinct().order_by('-last_modified')
+
+
   def save(self, *args, **kwargs):
     self.type = 'directory'
     super(Directory, self).save(*args, **kwargs)
