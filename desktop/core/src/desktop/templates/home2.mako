@@ -256,6 +256,8 @@ ${ fileBrowser.fileBrowser() }
       viewModel.activeEntry.subscribe(function (newEntry) {
         if (newEntry.definition().uuid && ! newEntry.isRoot()) {
           hueUtils.changeURL('/home?uuid=' + newEntry.definition().uuid);
+        } else if (newEntry.isRoot()) {
+          hueUtils.changeURL('/home');
         }
       });
 
