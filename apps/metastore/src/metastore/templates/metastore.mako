@@ -246,6 +246,9 @@ ${ assist.assistPanel() }
     <h4>${ _('Stats') }
       <!-- ko ifnot: partition_keys.length -->
         % if has_write_access:
+         <!-- ko if: $parent.refreshingTableStats -->		
+ -        <i class="fa fa-refresh fa-spin"></i>		
+ -        <!-- /ko -->
         <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
         <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
         <!-- /ko -->
