@@ -187,15 +187,6 @@ from desktop.views import _ko
       vertical-align: middle;
     }
 
-    .fb-share {
-      width: 80px;
-    }
-
-    .fb-share i {
-      font-size: 12px;
-      color: #ddd;
-    }
-
     .fb-shared-icon-active {
       color: #338BB8 !important;
     }
@@ -507,7 +498,6 @@ from desktop.views import _ko
         <div class="fb-primary-col">${ _('Name') }</div>
         <div class="fb-attr-group">
           <div class="pull-right">
-            <div class="fb-attr-col fb-share" data-bind="visible: !isTrash()">${ _('Sharing') }</div>
             <div class="fb-attr-col fb-type">${ _('Type') }</div>
             <div class="fb-attr-col fb-owner">${ _('Owner') }</div>
             <div class="fb-attr-col fb-modified">${ _('Last Modified') }</div>
@@ -556,7 +546,6 @@ from desktop.views import _ko
               </div>
               <div class="fb-attr-group">
                 <div class="pull-right">
-                  <div class="fb-attr-col fb-share" data-bind="visible: !$parent.isTrash()"><i class="fa fa-fw fa-users fb-shared-icon" data-bind="click: function (entry, event) { $parent.showSharingModal($data); event.stopPropagation(); }, css: { 'fb-shared-icon-active': isShared }"></i></div>
                   <!-- ko with: definition -->
                   <div class="fb-attr-col fb-type" data-bind="text: type"></div>
                   <div class="fb-attr-col fb-owner" data-bind="text: owner"></div>
