@@ -89,10 +89,10 @@ from desktop.views import _ko
       </h3>
       <div class="popover-content">
         <ul class="nav nav-tabs">
-          <li class="active" data-bind="click: function () { activeTab('sample'); }, visible: column === null">
+          <li data-bind="click: function () { activeTab('sample'); }, css: { 'active' : activeTab() === 'sample' }, visible: column === null">
             <a class="inactive-action" href="#sampleTab" data-toggle="tab">${_('Sample')}</a>
           </li>
-          <li data-bind="click: function () { activeTab('analysis'); }">
+          <li data-bind="click: function () { activeTab('analysis'); }, css: { 'active' : activeTab() === 'analysis' }">
             <a class="inactive-action" href="#analysisTab" data-toggle="tab">${_('Analysis')} <span class="pull-right stats-warning muted" data-bind="visible: inaccurate() && column == null && !isComplexType && !isView" rel="tooltip" data-placement="top" title="${ _('The column stats for this table are not accurate') }" style="margin-left: 8px"><i class="fa fa-exclamation-triangle"></i></span></a>
           </li>
           <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
@@ -104,7 +104,7 @@ from desktop.views import _ko
           <!-- /ko -->
         </ul>
         <div class="tab-content" style="border: none">
-          <div class="tab-pane active" id="sampleTab">
+          <div class="tab-pane" id="sampleTab" data-bind="css: { 'active' : activeTab() === 'sample' }">
             <!-- ko hueSpinner: { spin: loadingSamples, center: true, size: 'large' } --><!-- /ko -->
             <!-- ko ifnot: loadingSamples -->
             <div style="max-height: 320px; overflow: auto; text-align: left; padding: 3px;">
@@ -136,7 +136,7 @@ from desktop.views import _ko
             </div>
             <!-- /ko -->
           </div>
-          <div class="tab-pane" id="analysisTab">
+          <div class="tab-pane" id="analysisTab" data-bind="css: { 'active' : activeTab() === 'analysis' }">
             <!-- ko hueSpinner: { spin: loadingStats, center: true, size: 'large' } --><!-- /ko -->
             <!-- ko ifnot: loadingStats -->
             <div class="alert" style="text-align: left; display:none" data-bind="visible: statsHasError">${ _('There is no analysis available') }</div>
