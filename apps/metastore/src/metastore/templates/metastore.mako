@@ -246,15 +246,6 @@ ${ assist.assistPanel() }
     <h4>${ _('Stats') }
       <!-- ko ifnot: partition_keys.length -->
         % if has_write_access:
-        <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>		
- -    % endif		
- -    % if USE_NEW_EDITOR.get():		
- -      <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>		
- -    % else:		
- -      <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
-        <!-- ko if: $parent.refreshingTableStats -->
-        <i class="fa fa-refresh fa-spin"></i>
-        <!-- /ko -->
         <!-- ko ifnot: $parent.refreshingTableStats() || is_view  -->
         <a class="pointer" href="javascript: void(0);" data-bind="click: $parent.refreshTableStats"><i class="fa fa-refresh"></i></a>
         <!-- /ko -->
