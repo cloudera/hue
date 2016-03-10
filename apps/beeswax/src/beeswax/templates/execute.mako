@@ -55,10 +55,6 @@ ${ layout.menubar(section='query') }
                   activeSourceType: snippetType,
                   navigationSettings: {
                     openItem: false,
-<<<<<<< HEAD
-                    showPreview: true,
-=======
->>>>>>> upstream/master
                     showStats: true
                   }
                 },
