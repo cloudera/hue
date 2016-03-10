@@ -98,7 +98,7 @@ from desktop.views import _ko
           <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
           <li class="pull-right">
             <a class="more-link" target="_blank" data-bind="attr: { 'href': '/metastore/table/' + database + '/' + table }">
-              <i class="fa fa-external-link" ></i> ${ _('View more...') }
+              <span class="fa fa-external-link" ></span> ${ _('View more...') }
             </a>
           </li>
           <!-- /ko -->
