@@ -568,6 +568,16 @@ from desktop.views import _ko
                   <input data-bind="value: savePath" type="text" name="target_table" class="input-xlarge" placeholder="${_('Table name or <database>.<table>')}">
                 </span>
               </div>
+              <div class="controls">
+                <label class="radio">
+                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
+                  &nbsp;${ _('Big Query in HDFS') }
+                </label>
+                <span data-bind="visible: saveTarget() == 'hdfs-directory'">
+                  <input data-bind="value: savePath" type="text" name="target_dir" placeholder="${_('Path to directory')}" class="folderChooser">
+                  <i class="fa fa-question-circle" id="hdfs-directory-help"></i>
+                </span>
+              </div>
             </div>
           </fieldset>
         </form>

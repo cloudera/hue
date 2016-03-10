@@ -134,6 +134,9 @@ def execute_and_watch(request):
   if action == 'save_as_table':
     sql, success_url = api.export_data_as_table(snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
+  elif action == 'insert_as_query':
+    sql, success_url = api.export_large_data_to_hdfs(snippet, destination)
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
   else:
     raise PopupException(_('Action %s is unknown') % action)
 

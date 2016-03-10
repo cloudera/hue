@@ -349,11 +349,10 @@ class HS2Api(Api):
     db = self._get_db(snippet)
 
     response = self._get_current_statement(db, snippet)
+    query = self._prepare_hql_query(snippet, response.pop('statement'))
 
-    statement = response.pop('statement')
-
-    if not statement.strip().lower().startswith('select'):
-      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': statement})
+    if not query.hql_query.strip().lower().startswith('select'):
+      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
 
     database = snippet.get('database') or 'default'
     table = destination
@@ -361,7 +360,27 @@ class HS2Api(Api):
     if '.' in table:
       database, table = table.split('.', 1)
 
-    hql = 'CREATE TABLE `%s`.`%s` AS %s' % (database, table, statement)
+    db.use(query.database)
+
+    hql = 'CREATE TABLE `%s`.`%s` AS %s' % (database, table, query.hql_query)
     success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
 
     return hql, success_url
+
+
+  def export_large_data_to_hdfs(self, snippet, destination):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    query = self._prepare_hql_query(snippet, response.pop('statement'))
+
+    if not query.hql_query.strip().lower().startswith('select'):
+      raise Exception(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+
+    db.use(query.database)
+
+    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (destination, query.hql_query)
+    success_url = '/filebrowser/view=%s' % destination
+
+    return hql, success_url
+
