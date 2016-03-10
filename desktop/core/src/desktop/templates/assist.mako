@@ -318,7 +318,10 @@ from desktop.views import _ko
 
   <script type="text/html" id="assist-entry-actions">
     <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable || definition.isView, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
+<<<<<<< HEAD
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: (definition.isTable || definition.isView) && navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+=======
+>>>>>>> upstream/master
       <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: {
           statsVisible: statsVisible,
           sourceType: sourceType,
@@ -336,7 +339,10 @@ from desktop.views import _ko
   <script type="text/html" id="assist-table-entry">
     <li class="assist-table" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }">
       <div class="assist-actions table-actions" style="opacity: 0">
+<<<<<<< HEAD
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showPreview, click: showPreview"><i class="fa fa-list" title="${_('Preview Sample data')}"></i></a>
+=======
+>>>>>>> upstream/master
         <span data-bind="visible: navigationSettings.showStats, component: { name: 'table-stats', params: { statsVisible: statsVisible, sourceType: sourceType, snippet: assistDbSource.snippet, databaseName: databaseName, tableName: tableName, columnName: columnName, fieldType: definition.type, assistHelper: assistDbSource.assistHelper }}"></span>
         <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
       </div>
@@ -670,6 +676,7 @@ from desktop.views import _ko
     <div class="assist-flex-fill" data-bind="visible: hasErrors() && ! loading() && ! $parent.loading()" style="display: none;">
       <span class="assist-errors">${ _('Error loading tables.') }</span>
     </div>
+<<<<<<< HEAD
 
     <div id="assistQuickLook" class="modal hide fade">
       <div class="modal-header">
@@ -717,6 +724,8 @@ from desktop.views import _ko
         <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
       </div>
     </div>
+=======
+>>>>>>> upstream/master
   </script>
 
   <script type="text/html" id="assist-panel-switches">
@@ -838,7 +847,10 @@ from desktop.views import _ko
        * @param {string} [options.activeSourceType] - Example: hive
        * @param {Object} options.navigationSettings - enable/disable the links
        * @param {boolean} options.navigationSettings.openItem
+<<<<<<< HEAD
        * @param {boolean} options.navigationSettings.showPreview
+=======
+>>>>>>> upstream/master
        * @param {boolean} options.navigationSettings.showStats
 
        * @constructor
@@ -1021,7 +1033,10 @@ from desktop.views import _ko
        * @param {string} [params.sql.activeSourceType] - Example: hive
        * @param {Object} params.sql.navigationSettings - enable/disable the links
        * @param {boolean} params.sql.navigationSettings.openItem - Example: true
+<<<<<<< HEAD
        * @param {boolean} params.sql.navigationSettings.showPreview - Example: true
+=======
+>>>>>>> upstream/master
        * @param {boolean} params.sql.navigationSettings.showStats - Example: true
        * @constructor
        */

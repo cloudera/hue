@@ -21,6 +21,11 @@ import tempfile
 import StringIO
 import zipfile
 
+<<<<<<< HEAD
+=======
+from datetime import datetime
+
+>>>>>>> upstream/master
 from django.contrib.auth.models import Group, User
 from django.core import management
 
@@ -33,7 +38,11 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
+<<<<<<< HEAD
 from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException
+=======
+from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException, uuid_default
+>>>>>>> upstream/master
 
 
 LOG = logging.getLogger(__name__)
@@ -135,9 +144,21 @@ def get_document(request):
   # Get children documents if this is a directory
   if document.is_directory:
     directory = Directory.objects.get(id=document.id)
+<<<<<<< HEAD
     children = directory.get_children_documents()
     # Filter and order results
     response.update(_filter_documents(request, queryset=children))
+=======
+
+    # If this is the user's home directory, fetch shared docs too
+    if document.is_home_directory:
+      children = directory.get_children_and_shared_documents(user=request.user)
+    else:
+      children = directory.get_children_documents()
+
+    # Filter and order results
+    response.update(_filter_documents(request, queryset=children, flatten=False))
+>>>>>>> upstream/master
 
   # Paginate and serialize Results
   if 'documents' in response:
@@ -340,20 +361,54 @@ def import_documents(request):
   documents = json.loads(documents)
   docs = []
 
+  home_dir = Directory.objects.get_home_directory(request.user)
+
   for doc in documents:
-    if not request.user.is_superuser:
+    # If doc is not owned by current user, make a copy of the document
+    if doc['fields']['owner'][0] != request.user.username:
       doc['fields']['owner'] = [request.user.username]
+<<<<<<< HEAD
     owner = doc['fields']['owner'][0]
 
     # TODO: Check if this should be replaced by get_by_uuid
     if Document2.objects.filter(uuid=doc['fields']['uuid'], owner__username=owner).exists():
       doc['pk'] = Document2.objects.get(uuid=doc['fields']['uuid'], owner__username=owner).pk
     else:
+=======
+>>>>>>> upstream/master
       doc['pk'] = None
+      doc['fields']['version'] = 1
+      doc['fields']['uuid'] = uuid_default()
+      doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+    else:  # Update existing doc or create new
+      try:
+        existing_doc = Document2.objects.get_by_uuid(doc['fields']['uuid'], owner=request.user)
+        doc['pk'] = existing_doc.pk
+      except FilesystemException, e:
+        LOG.warn('Could not find document with UUID: %s, will create a new document on import.', doc['fields']['uuid'])
+        doc['pk'] = None
+        doc['fields']['version'] = 1
+
+      # Verify that parent exists, log warning and nullify parent if not found
+      if doc['fields']['parent_directory']:
+        uuid, version, is_history = doc['fields']['parent_directory']
+        if not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
+          LOG.warn('Could not find parent document with UUID: %s, will set parent to home directory' % uuid)
+          doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
+
+    # Verify that dependencies exist, raise critical error if any dependency not found
+    if doc['fields']['dependencies']:
+      for uuid, version, is_history in doc['fields']['dependencies']:
+        if not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
+          raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+
+    # Set last modified date to now
+    doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
 
     docs.append(doc)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
+
   f.write(json.dumps(docs))
   f.flush()
 

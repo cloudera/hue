@@ -319,6 +319,7 @@
     }
   };
 
+<<<<<<< HEAD
   AssistDbEntry.prototype.showPreview = function () {
     var self = this;
     var $assistQuickLook = $("#assistQuickLook");
@@ -354,5 +355,7 @@
     $assistQuickLook.modal("show");
   };
 
+=======
+>>>>>>> upstream/master
   return AssistDbEntry;
 }));

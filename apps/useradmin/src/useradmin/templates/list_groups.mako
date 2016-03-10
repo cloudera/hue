@@ -117,7 +117,11 @@ ${layout.menubar(section='groups')}
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
     <div class="hide">
+<<<<<<< HEAD
       <select name="group_names" data-bind="options: availableGroups, selectedOptions: chosenGroups" multiple="true"></select>
+=======
+      <select name="group_names" data-bind="options: chosenGroups, selectedOptions: chosenGroups" multiple="true"></select>
+>>>>>>> upstream/master
     </div>
   </form>
 </div>

@@ -26,8 +26,9 @@ from hadoop.api.jobtracker.ttypes import ThriftJobPriority, TaskTrackerNotFoundE
 
 import hadoop.yarn.history_server_api as history_server_api
 import hadoop.yarn.mapreduce_api as mapreduce_api
-import hadoop.yarn.resource_manager_api as resource_manager_api
 import hadoop.yarn.node_manager_api as node_manager_api
+import hadoop.yarn.resource_manager_api as resource_manager_api
+import hadoop.yarn.spark_history_server_api as spark_history_server_api
 
 from jobbrowser.conf import SHARE_JOBS
 from jobbrowser.models import Job, JobLinkage, TaskList, Tracker
@@ -173,6 +174,7 @@ class YarnApi(JobBrowserApi):
     self.resource_manager_api = resource_manager_api.get_resource_manager(user.username)
     self.mapreduce_api = mapreduce_api.get_mapreduce_api(user.username)
     self.history_server_api = history_server_api.get_history_server_api()
+    self.spark_history_server_api = spark_history_server_api.get_history_server_api()
 
   def get_job_link(self, job_id):
     return self.get_job(job_id)
@@ -225,11 +227,10 @@ class YarnApi(JobBrowserApi):
 
       if job['state'] == 'ACCEPTED':
         raise ApplicationNotRunning(jobid, job)
+      elif job.get('applicationType') == 'SPARK':
+        job = SparkJob(job, rm_api=self.resource_manager_api, hs_api=self.spark_history_server_api)
       elif job['state'] == 'KILLED':
         return KilledYarnJob(self.resource_manager_api, job)
-
-      if job.get('applicationType') == 'SPARK':
-        job = SparkJob(job, self.resource_manager_api)
       elif job.get('applicationType') == 'MAPREDUCE':
         jobid = jobid.replace('application', 'job')
 

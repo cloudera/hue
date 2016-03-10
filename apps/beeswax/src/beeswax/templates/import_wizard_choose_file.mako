@@ -76,7 +76,10 @@ ${ assist.assistPanel() }
                   }],
                   navigationSettings: {
                     openItem: false,
+<<<<<<< HEAD
                     showPreview: true,
+=======
+>>>>>>> upstream/master
                     showStats: true
                   }
                 },
