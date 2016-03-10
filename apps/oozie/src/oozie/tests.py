@@ -37,6 +37,8 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_permission, add_to_group, reformat_json, reformat_xml
 from desktop.models import Document, Document2
 
+from hadoop import cluster as originalCluster
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from jobsub.models import OozieDesign, OozieMapreduceAction
 from liboozie import oozie_api
 from liboozie.conf import OOZIE_URL
@@ -48,7 +50,7 @@ from oozie.conf import ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.models import Dataset, Workflow, Node, Kill, Link, Job, Coordinator, History,\
   find_parameters, NODE_TYPES, Bundle
 from oozie.models2 import _get_hiveserver2_url
-from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink
+from oozie.utils import workflow_to_dict, model_to_dict, smart_path, contains_symlink, convert_to_server_timezone
 from oozie.importlib.workflows import import_workflow
 from oozie.importlib.jobdesigner import convert_jobsub_design
 
@@ -63,7 +65,10 @@ class MockOozieApi:
   JSON_WORKFLOW_LIST = [{u'status': u'RUNNING', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'appName': u'WordCount1', u'lastModTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': 'job_201208072118_0044', u'consoleUrl': u'http://runreal:11000/oozie?job=0000012-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'toString': u'Workflow id[0000012-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'id': u'0000012-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
                         {u'status': u'KILLED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'appName': u'WordCount2', u'lastModTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': '-', u'consoleUrl': u'http://runreal:11000/oozie?job=0000011-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:31:08 GMT', u'toString': u'Workflow id[0000011-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:32:20 GMT', u'id': u'0000011-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
                         {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'appName': u'WordCount3', u'lastModTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': '', u'consoleUrl': u'http://runreal:11000/oozie?job=0000009-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:20:48 GMT', u'toString': u'Workflow id[0000009-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:22:00 GMT', u'id': u'0000009-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
-                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'appName': u'WordCount4', u'lastModTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000008-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'toString': u'Workflow id[0000008-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'id': u'0000008-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'}]
+                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'appName': u'WordCount4', u'lastModTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000008-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:16:58 GMT', u'toString': u'Workflow id[0000008-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:18:10 GMT', u'id': u'0000008-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
+                        {u'status': u'SUCCEEDED', u'run': 0, u'startTime': u'Fri, 24 Jul 2015 14:56:08 AEST', u'appName': u'WordCount5', u'lastModTime': u'Fri, 24 Jul 2015 14:57:17 AEST', u'actions': [], u'acl': None, u'appPath': None, u'externalId': None, u'consoleUrl': u'http://runreal:11000/oozie?job=0000008-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Fri, 24 Jul 2015 14:56:08 AEST', u'toString': u'Workflow id[0000007-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Fri, 24 Jul 2015 14:57:17 AEST', u'id': u'0000007-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'},
+                        {u'status': u'RUNNING', u'run': 0, u'startTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'appName': u'WordCount1', u'lastModTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'actions': [], u'acl': None, u'appPath': None, u'externalId': 'job_201208072118_0044', u'consoleUrl': u'http://runreal:11000/oozie?job=0000006-120725142744176-oozie-oozi-W', u'conf': None, u'parentId': None, u'createdTime': u'Mon, 30 Jul 2012 22:35:48 GMT', u'toString': u'Workflow id[0000006-120725142744176-oozie-oozi-W] status[SUCCEEDED]', u'endTime': u'Mon, 30 Jul 2012 22:37:00 GMT', u'id': u'0000006-120725142744176-oozie-oozi-W', u'group': None, u'user': u'test'}]
+
   WORKFLOW_IDS = [wf['id'] for wf in JSON_WORKFLOW_LIST]
   WORKFLOW_DICT = dict([(wf['id'], wf) for wf in JSON_WORKFLOW_LIST])
 
@@ -124,7 +129,7 @@ class MockOozieApi:
     if user_filters:
       workflows = filter(lambda wf: wf['user'] == user_filters[0], workflows)
 
-    return WorkflowList(self, {'offset': 0, 'total': 4, 'workflows': workflows})
+    return WorkflowList(self, {'offset': 0, 'total': 5, 'workflows': workflows})
 
   def get_coordinators(self, **kwargs):
     coordinatorjobs = MockOozieApi.JSON_COORDINATOR_LIST
@@ -193,8 +198,24 @@ class MockOozieApi:
     else:
       return """<workflow-app name="MapReduce" xmlns="uri:oozie:workflow:0.4">BAD</workflow-app>"""
 
-  def get_job_log(self, jobid):
-    return '2013-01-08 16:28:06,487  INFO ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+  def get_job_log(self, jobid, logfilter=None):
+    rows = {}
+    rows['INFO'] = '2013-01-08 16:28:06,487  INFO ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+    rows['DEBUG'] = '2013-01-08 16:28:06,487  DEBUG ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+    rows['ERROR'] = '2013-01-08 16:28:06,487  ERROR ActionStartXCommand:539 - USER[romain] GROUP[-] TOKEN[] APP[MapReduce] JOB[0000002-130108101138395-oozie-oozi-W] ACTION[0000002-130108101138395-oozie-oozi-W@:start:] Start action [0000002-130108101138395-oozie-oozi-W@:start:] with user-retry state : userRetryCount [0], userRetryMax [0], userRetryInterval [10]'
+
+    filterMap = {}
+    for key, val in logfilter:
+      filterMap[key] = val
+
+    if 'loglevel' in filterMap:
+      row = rows.get(filterMap['loglevel'])
+    if 'text' in filterMap:
+      row = '' if filterMap['text'] not in row else row
+    if 'limit' in filterMap:
+      row = ((row + '\n') * int(filterMap['limit'])).strip()
+
+    return row
 
   def get_oozie_slas(self, **kwargs):
     return MockOozieApi.WORKFLOWS_SLAS
@@ -208,6 +229,44 @@ class MockOozieApi:
     return {
         'oozie.credentials.credentialclasses': oozie_credentialclasses
     }
+
+  def get_job_status(self, job_id):
+    return {'status': "RUNNING"}
+
+
+class MockFs():
+  def __init__(self, logical_name=None):
+
+    self.fs_defaultfs = 'hdfs://curacao:8020'
+    self.logical_name = logical_name if logical_name else ''
+    self.DEFAULT_USER = 'test'
+
+  def setuser(self, user):
+    pass
+
+  def join(self, path1, path2):
+    return path1 + path2
+
+  def do_as_user(self, username, fn, *args, **kwargs):
+    return ''
+
+  def read(self, length=1024*1024):
+    return 'data'
+
+  def exists(self, path):
+    return True
+
+  def mkdir(self):
+    pass
+
+  def chmod(self):
+    pass
+
+  def stats(self, path):
+    class MockWebHdfsStat(object):
+      def __init__(self):
+        self.isDir = True
+    return MockWebHdfsStat()
 
 
 class OozieMockBase(object):
@@ -226,15 +285,22 @@ class OozieMockBase(object):
     grant_access("test", "test", "oozie")
     add_to_group("test")
     self.user = User.objects.get(username='test')
+
     self.wf = create_workflow(self.c, self.user)
+    self.original_fs = originalCluster.FS_CACHE["default"]
+    originalCluster.FS_CACHE["default"] = MockFs()
 
 
   def tearDown(self):
     oozie_api.OozieApi = oozie_api.OriginalOozieApi
+    if originalCluster.FS_CACHE is None:
+      originalCluster.FS_CACHE = {}
+    originalCluster.FS_CACHE["default"] = self.original_fs
     Workflow.objects.check_workspace = Workflow.objects.original_check_workspace
     oozie_api._api_cache = None
 
     History.objects.all().delete()
+
     for coordinator in Coordinator.objects.all():
       coordinator.delete(skip_trash=True)
     for bundle in Bundle.objects.all():
@@ -326,6 +392,7 @@ class OozieBase(OozieServerProvider):
     grant_access("test", "test", "oozie")
     add_to_group("test")
     self.cluster = OozieServerProvider.cluster
+
     self.install_examples()
 
   def install_examples(self):
@@ -333,7 +400,12 @@ class OozieBase(OozieServerProvider):
     if _INITIALIZED:
       return
 
-    self.c.post(reverse('oozie:install_examples'))
+    reset = ENABLE_V2.set_for_testing(True) # Somewhere this is reseted
+    try:
+      self.c.post(reverse('oozie:install_examples'))
+    finally:
+      reset()
+
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
     _INITIALIZED = True
@@ -391,6 +463,9 @@ class TestAPI(OozieMockBase):
     self.wf = Workflow.objects.get(name='wf-name-1', managed=True)
 
   def test_workflow_save(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2897: Skipping because DB may not support unicode')
+
     self.setup_simple_workflow()
 
     workflow_dict = workflow_to_dict(self.wf)
@@ -1195,6 +1270,9 @@ class TestEditor(OozieMockBase):
     wf2.delete(skip_trash=True)
 
   def test_workflow_flatten_list(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2899: Needs to make results in a consistent order')
+
     assert_equal('[<Start: start>, <Mapreduce: action-name-1>, <Mapreduce: action-name-2>, <Mapreduce: action-name-3>, '
                  '<Kill: kill>, <End: end>]',
                  str(self.wf.node_list))
@@ -2214,6 +2292,9 @@ class TestImportWorkflow04(OozieMockBase):
 
 
   def test_import_workflow_decision_complex(self):
+    if is_live_cluster():
+      raise SkipTest()
+
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-decision-complex.xml')
@@ -2342,14 +2423,15 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.save()
     assert_equal(5, len(Node.objects.filter(workflow=workflow)))
     assert_equal(6, len(Link.objects.filter(parent__workflow=workflow)))
-    nodes = [Node.objects.filter(workflow=workflow, node_type='java')[0].get_full_node(),
-             Node.objects.filter(workflow=workflow, node_type='java')[1].get_full_node()]
-    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', nodes[0].main_class)
-    assert_equal('${records} ${output_dir}/teragen', nodes[0].args)
-    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', nodes[1].main_class)
-    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', nodes[1].args)
-    assert_true(nodes[0].capture_output)
-    assert_false(nodes[1].capture_output)
+    java_nodes = Node.objects.filter(workflow=workflow, node_type='java').order_by('name')
+    tera_gen_node = java_nodes[0].get_full_node()
+    tera_sort_node = java_nodes[1].get_full_node()
+    assert_equal('org.apache.hadoop.examples.terasort.TeraGen', tera_gen_node.main_class)
+    assert_equal('${records} ${output_dir}/teragen', tera_gen_node.args)
+    assert_equal('org.apache.hadoop.examples.terasort.TeraSort', tera_sort_node.main_class)
+    assert_equal('-Dmapred.reduce.tasks=${terasort_reducers} ${output_dir}/teragen ${output_dir}/terasort', tera_sort_node.args)
+    assert_true(tera_gen_node.capture_output)
+    assert_false(tera_sort_node.capture_output)
     workflow.delete(skip_trash=True)
 
 
@@ -2362,15 +2444,16 @@ class TestImportWorkflow04(OozieMockBase):
     workflow.save()
     assert_equal(5, len(Node.objects.filter(workflow=workflow)))
     assert_equal(6, len(Link.objects.filter(parent__workflow=workflow)))
-    nodes = [Node.objects.filter(workflow=workflow, node_type='shell')[0].get_full_node(),
-             Node.objects.filter(workflow=workflow, node_type='shell')[1].get_full_node()]
-    assert_equal('shell-1', nodes[0].name)
-    assert_equal('shell-2', nodes[1].name)
-    assert_equal('my-job.xml', nodes[0].job_xml)
-    assert_equal('hello.py', nodes[0].command)
-    assert_equal('[{"type":"argument","value":"World!"}]', nodes[0].params)
-    assert_true(nodes[0].capture_output)
-    assert_false(nodes[1].capture_output)
+    shell_nodes = Node.objects.filter(workflow=workflow, node_type='shell').order_by('name')
+    shell_1_node = shell_nodes[0].get_full_node()
+    shell_2_node = shell_nodes[1].get_full_node()
+    assert_equal('shell-1', shell_1_node.name)
+    assert_equal('shell-2', shell_2_node.name)
+    assert_equal('my-job.xml', shell_1_node.job_xml)
+    assert_equal('hello.py', shell_1_node.command)
+    assert_equal('[{"type":"argument","value":"World!"}]', shell_1_node.params)
+    assert_true(shell_1_node.capture_output)
+    assert_false(shell_2_node.capture_output)
     workflow.delete(skip_trash=True)
 
 
@@ -2463,6 +2546,10 @@ class TestImportWorkflow04(OozieMockBase):
 
     If an error link cannot be resolved, default to 'kill' node.
     """
+
+    if is_live_cluster():
+      raise SkipTest('HUE-2899: Needs to make results in a consistent order')
+
     workflow = Workflow.objects.new_workflow(self.user)
     workflow.save()
     f = open('apps/oozie/src/oozie/test_data/workflows/0.4/test-java-different-error-links.xml')
@@ -2516,7 +2603,7 @@ class TestImportCoordinator02(OozieMockBase):
     assert_equal(1, coordinator.frequency_number)
     assert_equal(None, coordinator.timeout)
     assert_equal(None, coordinator.concurrency)
-    assert_equal(None, coordinator.execution)
+    assert_false(coordinator.execution)  # coordinator.execution can be None or empty string
     assert_equal(None, coordinator.throttle)
     assert_not_equal(None, coordinator.deployment_dir)
 
@@ -3052,7 +3139,7 @@ class TestOozieSubmissions(OozieBase):
 
   def test_submit_hiveserver2_action(self):
     wf_uuid = "c1c3cba9-edec-fb6f-a526-9f80b66fe993"
-    wf = Document2.objects.get(uuid=wf_uuid)
+    wf = Document2.objects.get_by_uuid(uuid=wf_uuid)
     wf.data.replace('hive2://localhost:10000/default', _get_hiveserver2_url())
     wf.save()
 
@@ -3076,7 +3163,7 @@ class TestOozieSubmissions(OozieBase):
 
   def test_submit_spark_action(self):
     wf_uuid = "2d667ab2-70f9-c2bf-0726-abe84fa7130d"
-    wf = Document2.objects.get(uuid=wf_uuid)
+    wf = Document2.objects.get_by_uuid(uuid=wf_uuid)
 
     # Somewhere we delete those by mistake
     doc = Document.objects.link(wf, owner=wf.owner, name=wf.name, description=wf.description, extra='workflow2')
@@ -3101,6 +3188,9 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_oozie_page(self):
+    if is_live_cluster():
+      raise SkipTest('HUE-2898: Skipping test until it can be debugged')
+
     response = self.c.get(reverse('oozie:list_oozie_info'))
     assert_true('version' in response.content, response.content)
     assert_true('NORMAL' in response.content, response.content)
@@ -3167,7 +3257,19 @@ my_prop_not_filtered=10
         u'form-2-value': [u'/path/output'],
     }, follow=True)
     assert_true(response.context['oozie_workflow'], response.content)
+    wf_id = response.context['oozie_workflow'].id
 
+    # Check if response contains log data
+    response = self.c.get(reverse('oozie:get_oozie_job_log', args=[response.context['oozie_workflow'].id]) + "?format=json&limit=100&loglevel=INFO&recent=2h:30m")
+    data = json.loads(response.content)
+    assert_true(len(data['log'].split('\n')) <= 100)
+    assert_equal('RUNNING', data['status'])
+    assert_true("INFO" in data['log'])
+
+    # Clean-up
+    response = self.c.post(reverse('oozie:manage_oozie_jobs', args=[wf_id, 'kill']))
+    data = json.loads(response.content)
+    assert_equal(0, data.get('status'), data)
 
   def test_oozie_not_running_message(self):
     raise SkipTest # Not reseting the oozie url for some reason
@@ -3203,6 +3305,15 @@ class TestDashboard(OozieMockBase):
     assert_true(('%s/suspend' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
     assert_true(('%s/resume' % MockOozieApi.COORDINATOR_IDS[0]) in response.content, response.content)
 
+    # Test log filtering
+    url = reverse('oozie:get_oozie_job_log', args=[MockOozieApi.COORDINATOR_IDS[0]])
+    assert_true(url in response.content, response.content)
+    response = self.c.get(url + "?format=json&limit=100&loglevel=INFO&text=MapReduce")
+    data = json.loads(response.content)
+    assert_true(len(data['log'].split('\n')) <= 100)
+    assert_equal('RUNNING', data['status'])
+    assert_true("INFO" in data['log'])
+
 
   def test_manage_bundles_dashboard(self):
     # Display of buttons happens in js now
@@ -3217,6 +3328,15 @@ class TestDashboard(OozieMockBase):
     response = self.c.get(reverse('oozie:rerun_oozie_coord', args=[MockOozieApi.WORKFLOW_IDS[0], '/path']))
     assert_true('Rerun' in response.content, response.content)
 
+  def test_sync_coord_workflow(self):
+    wf_doc = save_temp_workflow(MockOozieApi.JSON_WORKFLOW_LIST[5], self.user)
+    reset = ENABLE_V2.set_for_testing(True)
+    try:
+      response = self.c.get(reverse('oozie:sync_coord_workflow', args=[MockOozieApi.WORKFLOW_IDS[5]]))
+      assert_equal([{'name':'Dryrun', 'value': False}, {'name':'ls_arg', 'value': '-l'}], response.context['params_form'].initial)
+    finally:
+      wf_doc.delete()
+      reset()
 
   def test_rerun_coordinator_permissions(self):
     post_data = {
@@ -3298,15 +3418,14 @@ class TestDashboard(OozieMockBase):
     assert_true('Running' in response.content, response.content)
     assert_true('Completed' in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json")
+    assert_true(len(json.loads(response.content)['jobs']) == 0)
+
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=RUNNING&status=PREP&status=SUSPENDED")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
-    for coord_id in MockOozieApi.COORDINATOR_IDS:
-      assert_true(coord_id in response.content, response.content)
-
-    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=SUCCEEDED")
+    response = self.c.get(reverse('oozie:list_oozie_coordinators') + "?format=json&status=KILLED&status=FAILED&status=DONEWITHERROR")
     for coord_id in MockOozieApi.COORDINATOR_IDS:
       assert_true(coord_id in response.content, response.content)
 
@@ -3375,6 +3494,9 @@ class TestDashboard(OozieMockBase):
     assert_true('Bundle MyBundle1' in response.content, response.content)
     assert_true('Coordinators' in response.content, response.content)
 
+  def test_workflow_timezones(self):
+    job = MockOozieApi.get_job(MockOozieApi(), '0000007-120725142744176-oozie-oozi-W')
+    assert_equal(job.appName, 'WordCount5')
 
   def test_manage_oozie_jobs(self):
     try:
@@ -3671,6 +3793,19 @@ class TestUtils(OozieMockBase):
     assert_false(contains_symlink('${output}', {'output': '${path}'}))
     assert_true(contains_symlink('${output_dir}', {'output': '/path/out', 'output_dir': 'hdfs://nn/path/out#out'}))
 
+  def test_convert_to_server_timezone(self):
+    # To UTC
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='America/Los_Angeles', server_tz='UTC', user='test'), u'2015-07-01T17:10Z')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='Europe/Paris', server_tz='UTC', user='test'), u'2015-07-01T08:10Z')
+    # To GMT(+/-)####
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='Asia/Jayapura', server_tz='GMT+0800', user='test'), u'2015-07-01T09:10+0800')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10', local_tz='Australia/LHI', server_tz='GMT-0530', user='test'), u'2015-06-30T18:10+0530')
+    # Previously created coordinators might have 'Z' appended, we consider them as UTC local time
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10Z', local_tz='America/Los_Angeles', server_tz='UTC', user='test'), u'2015-07-01T10:10Z')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10Z', local_tz='Asia/Jayapura', server_tz='GMT+0800', user='test'), u'2015-07-01T18:10+0800')
+    assert_equal(convert_to_server_timezone('2015-07-01T10:10Z', local_tz='Australia/LHI', server_tz='GMT-0530', user='test'), u'2015-07-01T04:40+0530')
+
+
 # Utils
 WORKFLOW_DICT = {
     u'deployment_dir': [u''], u'name': [u'wf-name-1'], u'description': [u''],
@@ -3845,3 +3980,55 @@ def synchronize_workflow_attributes(workflow_json, correct_workflow_json):
     workflow_dict['attributes']['deployment_dir'] = correct_workflow_dict['attributes']['deployment_dir']
 
   return reformat_json(workflow_dict)
+
+def save_temp_workflow(wf, user):
+    data = json.dumps({
+          'layout': [{
+              "size":12, "rows":[
+                  {"widgets":[{"size":12, "name":"Start", "id":"3f107997-04cc-8733-60a9-a4bb62cebffc", "widgetType":"start-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
+                  {"widgets":[{"size":12, "name":"Shell", "id":"3f107997-04cc-8733-60a9-a4bb62cebabc", "widgetType":"shell-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
+                  {"widgets":[{"size":12, "name":"End", "id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a", "widgetType":"end-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]},
+                  {"widgets":[{"size":12, "name":"Kill", "id":"17c9c895-5a16-7443-bb81-f34b30b21548", "widgetType":"kill-widget", "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span12"}]}
+              ],
+              "drops":[ "temp"],
+              "klass":"card card-home card-column span12"
+          }],
+          'workflow': {
+              "id": None,
+              "uuid": None,
+              "name": "My Workflow",
+              "properties": {
+                  "deployment_dir": "",
+                  "description": "",
+                  "job_xml": "",
+                  "sla_enabled": False,
+                  "schema_version": "uri:oozie:workflow:0.5",
+                  "properties": [],
+                  "parameters": [{'name':'Dryrun', 'value': False}, {'name':'ls_arg', 'value': '-l'}],
+                  "sla":  [
+      {'key': 'enabled', 'value': False}, # Always first element
+      {'key': 'nominal-time', 'value': '${nominal_time}'},
+      {'key': 'should-start', 'value': ''},
+      {'key': 'should-end', 'value': '${30 * MINUTES}'},
+      {'key': 'max-duration', 'value': ''},
+      {'key': 'alert-events', 'value': ''},
+      {'key': 'alert-contact', 'value': ''},
+      {'key': 'notification-msg', 'value': ''},
+      {'key': 'upstream-apps', 'value': ''},
+  ],
+                  "show_arrows": True,
+                  "wf1_id": None
+              },
+              "nodes":[
+                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebffc","name":"Start","type":"start-widget","properties":{},"children":[{'to': '3f107997-04cc-8733-60a9-a4bb62cebabc'}]},
+                  {"id":"3f107997-04cc-8733-60a9-a4bb62cebabc","name":"shell-fc94","type":"shell-widget","properties":{'archives': [], 'arguments': [], 'capture_output': True, 'credentials': [], 'env_var': [], 'files': [], 'job_properties': [], 'job_xml': u'', 'prepares': [], 'retry_interval': [], 'retry_max': [], 'shell_command': 'ls', 'sla': []},"children":[{'to': '33430f0f-ebfa-c3ec-f237-3e77efa03d0a'}]},
+                  {"id":"33430f0f-ebfa-c3ec-f237-3e77efa03d0a","name":"End","type":"end-widget","properties":{},"children":[]},
+                  {"id":"17c9c895-5a16-7443-bb81-f34b30b21548","name":"Kill","type":"kill-widget","properties":{'message': 'Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]'},"children":[]}
+              ]
+          }
+      })
+    workflow_doc = Document2.objects.create(name='test', type='oozie-workflow2', owner=user, data=data)
+    Document.objects.link(workflow_doc, owner=workflow_doc.owner, name=workflow_doc.name, description=workflow_doc.description, extra='workflow2')
+
+    wf[u'conf'] = u'<configuration><property><name>hue-id-w</name><value>' + str(workflow_doc.id) + u'</value></property></configuration>'
+    return workflow_doc

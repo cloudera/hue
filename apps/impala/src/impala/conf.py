@@ -20,7 +20,10 @@ import sys
 import socket
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
-from desktop.lib.conf import ConfigSection, Config, coerce_bool
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAME as DEFAULT_AUTH_USERNAME,\
+  AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
+from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_password_from_script
+from desktop.lib.exceptions import StructuredThriftTransportException
 
 from impala.settings import NICE_NAME
 
@@ -80,6 +83,14 @@ QUERY_TIMEOUT_S = Config(
   default=600
 )
 
+SESSION_TIMEOUT_S = Config(
+  key="session_timeout_s",
+  help=_t("If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work"
+          " (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."),
+  type=int,
+  default=12 * 60 * 60
+)
+
 SSL = ConfigSection(
   key='ssl',
   help=_t('SSL configuration for the server.'),
@@ -95,7 +106,7 @@ SSL = ConfigSection(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
-      default="/etc/hue/cacerts.pem"
+      dynamic_default=default_ssl_cacerts,
     ),
 
     KEY = Config(
@@ -116,10 +127,42 @@ SSL = ConfigSection(
       key="validate",
       help=_t("Choose whether Hue should validate certificates received from the server."),
       type=coerce_bool,
-      default=True
+      dynamic_default=default_ssl_validate,
     )
   )
 )
+
+def get_auth_username():
+  """Get from top level default from desktop"""
+  return DEFAULT_AUTH_USERNAME.get()
+
+AUTH_USERNAME = Config(
+  key="auth_username",
+  help=_t("Auth username of the hue user used for authentications."),
+  private=True,
+  dynamic_default=get_auth_username)
+
+def get_auth_password():
+  """Get from script or backward compatibility"""
+  password = AUTH_PASSWORD_SCRIPT.get()
+  if password:
+    return password
+
+  return DEFAULT_AUTH_PASSWORD.get()
+
+AUTH_PASSWORD = Config(
+  key="auth_password",
+  help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
+  private=True,
+  dynamic_default=get_auth_password)
+
+AUTH_PASSWORD_SCRIPT = Config(
+  key="auth_password_script",
+  help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
@@ -129,14 +172,21 @@ def config_validator(user):
 
   res = []
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
-      query_server = get_query_server_config(name='impala')
-      server = dbms.get(user, query_server)
-      server.get_databases()
-  except:
+    try:
+      if not 'test' in sys.argv: # Avoid tests hanging
+        query_server = get_query_server_config(name='impala')
+        server = dbms.get(user, query_server)
+        server.get_databases()
+    except StructuredThriftTransportException, ex:
+      if 'TSocket read 0 bytes' in str(ex):  # this message appears when authentication fails
+        msg = "Failed to authenticate to Impalad, check authentication configurations."
+        LOG.exception(msg)
+        res.append((NICE_NAME, _(msg)))
+      else:
+       raise ex
+  except Exception, ex:
     msg = "No available Impalad to send queries to."
     LOG.exception(msg)
-
     res.append((NICE_NAME, _(msg)))
 
   return res

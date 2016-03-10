@@ -21,14 +21,10 @@ import logging
 import os
 import subprocess
 import sys
-import tempfile
 import time
 
-import desktop
-import desktop.conf
-import desktop.urls
-import desktop.views as views
 import proxy.conf
+import tempfile
 
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
@@ -39,9 +35,17 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.db.models import query, CharField, SmallIntegerField
 
+from beeswax.conf import HIVE_SERVER_HOST
+from pig.models import PigScript
 from useradmin.models import GroupPermission
 
-from beeswax.conf import HIVE_SERVER_HOST
+import desktop
+import desktop.conf
+import desktop.urls
+import desktop.redaction as redaction
+import desktop.views as views
+
+from desktop.appmanager import DESKTOP_APPS
 from desktop.lib import django_mako
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paginator import Paginator
@@ -49,9 +53,10 @@ from desktop.lib.conf import validate_path
 from desktop.lib.django_util import TruncatingModel
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document
+from desktop.models import Directory, Document, Document2, get_data_link
+from desktop.redaction import logfilter
+from desktop.redaction.engine import RedactionPolicy, RedactionRule
 from desktop.views import check_config, home
-from pig.models import PigScript
 
 
 def setup_test_environment():
@@ -126,7 +131,6 @@ def test_home():
   assert_equal([], tags['mine'][0]['docs'], tags)
   assert_equal([], tags['trash']['docs'], tags)
   assert_equal([], tags['history']['docs'], tags) # We currently don't fetch [doc.id]
-
 
 def test_skip_wizard():
   c = make_logged_in_client() # is_superuser
@@ -443,35 +447,41 @@ def test_app_permissions():
   # Reset all perms
   GroupPermission.objects.filter(group__name=GROUPNAME).delete()
 
+  def check_app(status_code, app_name):
+    if app_name in DESKTOP_APPS:
+      assert_equal(
+          status_code,
+          c.get('/' + app_name, follow=True).status_code,
+          'status_code=%s app_name=%s' % (status_code, app_name))
+
   # Access to nothing
-  assert_equal(401, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(401, 'beeswax')
+  check_app(401, 'impala')
+  check_app(401, 'hbase')
 
   # Add access to beeswax
   grant_access(USERNAME, GROUPNAME, "beeswax")
-  assert_equal(200, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(200, 'beeswax')
+  check_app(401, 'impala')
+  check_app(401, 'hbase')
 
   # Add access to hbase
   grant_access(USERNAME, GROUPNAME, "hbase")
-  assert_equal(200, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(200, c.get('/hbase', follow=True).status_code)
+  check_app(200, 'beeswax')
+  check_app(401, 'impala')
+  check_app(200, 'hbase')
 
   # Reset all perms
   GroupPermission.objects.filter(group__name=GROUPNAME).delete()
-
-  assert_equal(401, c.get('/beeswax', follow=True).status_code)
-  assert_equal(401, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(401, 'beeswax')
+  check_app(401, 'impala')
+  check_app(401, 'hbase')
 
   # Test only impala perm
   grant_access(USERNAME, GROUPNAME, "impala")
-  assert_equal(401, c.get('/beeswax', follow=True).status_code)
-  assert_equal(200, c.get('/impala', follow=True).status_code)
-  assert_equal(401, c.get('/hbase', follow=True).status_code)
+  check_app(401, 'beeswax')
+  check_app(200, 'impala')
+  check_app(401, 'hbase')
 
 
 def test_error_handling_failure():
@@ -512,7 +522,7 @@ def test_404_handling():
   c = make_logged_in_client()
   response = c.get(view_name)
   assert_true(any(['404.mako' in _template.filename for _template in response.templates]), response.templates)
-  assert_true('Not Found' in response.content)
+  assert_true('not found' in response.content)
   assert_true(view_name in response.content)
 
 class RecordingHandler(logging.Handler):
@@ -551,41 +561,47 @@ def test_log_event():
   root.removeHandler(handler)
 
 def test_validate_path():
-  reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/')
-  assert_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
-  reset()
+  with tempfile.NamedTemporaryFile() as local_file:
+    reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing(local_file.name)
+    assert_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=False))
+    reset()
 
-  reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/tmm/does_not_exist')
-  assert_not_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
-  reset()
+  try:
+    reset = desktop.conf.SSL_PRIVATE_KEY.set_for_testing('/tmm/does_not_exist')
+    assert_not_equal([], validate_path(desktop.conf.SSL_PRIVATE_KEY, is_dir=True))
+    assert_true(False)
+  except Exception, ex:
+    assert_true('does not exist' in str(ex), ex)
+  finally:
+    reset()
 
 @attr('requires_hadoop')
 def test_config_check():
-  reset = (
-    desktop.conf.SECRET_KEY.set_for_testing(''),
-    desktop.conf.SSL_CERTIFICATE.set_for_testing('foobar'),
-    desktop.conf.SSL_PRIVATE_KEY.set_for_testing(''),
-    desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
-  )
+  with tempfile.NamedTemporaryFile() as cert_file:
+    with tempfile.NamedTemporaryFile() as key_file:
+      reset = (
+        desktop.conf.SECRET_KEY.set_for_testing(''),
+        desktop.conf.SECRET_KEY_SCRIPT.set_for_testing(present=False),
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.DEFAULT_SITE_ENCODING.set_for_testing('klingon')
+      )
 
-  try:
-    cli = make_logged_in_client()
-    resp = cli.get('/desktop/debug/check_config')
-    assert_true('Secret key should be configured' in resp.content, resp)
-    assert_true('desktop.ssl_certificate' in resp.content, resp)
-    assert_true('Path does not exist' in resp.content, resp)
-    assert_true('SSL private key file should be set' in resp.content, resp)
-    assert_true('klingon' in resp.content, resp)
-    assert_true('Encoding not supported' in resp.content, resp)
+      try:
+        cli = make_logged_in_client()
+        resp = cli.get('/desktop/debug/check_config')
+        assert_true('Secret key should be configured' in resp.content, resp)
+        assert_true('klingon' in resp.content, resp)
+        assert_true('Encoding not supported' in resp.content, resp)
 
-    # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
-    os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
-    resp = cli.get('/desktop/debug/check_config')
-    del os.environ["HUE_CONF_DIR"]
-    assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
-  finally:
-    for old_conf in reset:
-      old_conf()
+        # Set HUE_CONF_DIR and make sure check_config returns appropriate conf
+        os.environ["HUE_CONF_DIR"] = "/tmp/test_hue_conf_dir"
+        resp = cli.get('/desktop/debug/check_config')
+        del os.environ["HUE_CONF_DIR"]
+        assert_true('/tmp/test_hue_conf_dir' in resp.content, resp)
+      finally:
+        for old_conf in reset:
+          old_conf()
 
 
 def test_last_access_time():
@@ -609,15 +625,18 @@ def test_last_access_time():
 
 
 def test_ui_customizations():
-  custom_banner = 'test ui customization'
+  custom_message = 'test ui customization'
   reset = (
-    desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_banner),
+    desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_message),
+    desktop.conf.CUSTOM.LOGIN_SPLASH_HTML.set_for_testing(custom_message),
   )
 
   try:
     c = make_logged_in_client()
+    resp = c.get('/accounts/login/', follow=False)
+    assert_true(custom_message in resp.content, resp)
     resp = c.get('/about', follow=True)
-    assert_true(custom_banner in resp.content, resp)
+    assert_true(custom_message in resp.content, resp)
   finally:
     for old_conf in reset:
       old_conf()
@@ -696,20 +715,24 @@ class BaseTestPasswordConfig(object):
   def get_password(self):
     raise NotImplementedError
 
-  @nottest
-  def run_test_read_password_from_script(self):
+  def test_read_password_from_script(self):
+    self._run_test_read_password_from_script_with(present=False)
+    self._run_test_read_password_from_script_with(data=None)
+    self._run_test_read_password_from_script_with(data='')
+
+  def _run_test_read_password_from_script_with(self, **kwargs):
     resets = [
-      self.get_config_password_script().set_for_testing(self.SCRIPT)
+      self.get_config_password().set_for_testing(**kwargs),
+      self.get_config_password_script().set_for_testing(self.SCRIPT),
     ]
 
     try:
-      assert_equal(self.get_password(), ' password from script ')
+      assert_equal(self.get_password(), ' password from script ', 'pwd: %s, kwargs: %s' % (self.get_password(), kwargs))
     finally:
       for reset in resets:
         reset()
 
-  @nottest
-  def run_test_config_password_overrides_script_password(self):
+  def test_config_password_overrides_script_password(self):
     resets = [
       self.get_config_password().set_for_testing(' password from config '),
       self.get_config_password_script().set_for_testing(self.SCRIPT),
@@ -721,9 +744,9 @@ class BaseTestPasswordConfig(object):
       for reset in resets:
         reset()
 
-  @nottest
-  def run_test_password_script_raises_exception(self):
+  def test_password_script_raises_exception(self):
     resets = [
+      self.get_config_password().set_for_testing(present=False),
       self.get_config_password_script().set_for_testing(
           '%s -c "import sys; sys.exit(1)"' % sys.executable
       ),
@@ -736,7 +759,8 @@ class BaseTestPasswordConfig(object):
         reset()
 
     resets = [
-      self.get_config_password_script().set_for_testing('/does-not-exist')
+      self.get_config_password().set_for_testing(present=False),
+      self.get_config_password_script().set_for_testing('/does-not-exist'),
     ]
 
     try:
@@ -757,15 +781,6 @@ class TestSecretKeyConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_secret_key()
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
-
 
 class TestDatabasePasswordConfig(BaseTestPasswordConfig):
 
@@ -778,35 +793,21 @@ class TestDatabasePasswordConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_database_password()
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
-
 
 class TestLDAPPasswordConfig(BaseTestPasswordConfig):
 
   def get_config_password(self):
-    return desktop.conf.LDAP_PASSWORD
+    return desktop.conf.AUTH_PASSWORD
 
   def get_config_password_script(self):
-    return desktop.conf.LDAP_PASSWORD_SCRIPT
+    return desktop.conf.AUTH_PASSWORD_SCRIPT
 
   def get_password(self):
-    return desktop.conf.get_ldap_password()
-
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
+    # We are using dynamic_default now, so we need to cheat for the tests as only using set_for_testing(present=False) will trigger it.
+    if desktop.conf.AUTH_PASSWORD.get():
+      return desktop.conf.AUTH_PASSWORD.get()
+    else:
+      return self.get_config_password_script().get()
 
 
 class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
@@ -826,15 +827,6 @@ class TestLDAPBindPasswordConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_ldap_bind_password(desktop.conf.LDAP.LDAP_SERVERS['test'])
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
-
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
-
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
-
 
 class TestSMTPPasswordConfig(BaseTestPasswordConfig):
 
@@ -847,11 +839,213 @@ class TestSMTPPasswordConfig(BaseTestPasswordConfig):
   def get_password(self):
     return desktop.conf.get_smtp_password()
 
-  def test_read_password_from_script(self):
-    self.run_test_read_password_from_script()
 
-  def test_config_password_overrides_script_password(self):
-    self.run_test_config_password_overrides_script_password()
+class TestDocument(object):
 
-  def test_password_script_raises_exception(self):
-    self.run_test_password_script_raises_exception()
+  def setUp(self):
+    make_logged_in_client(username="original_owner", groupname="test_doc", recreate=True, is_superuser=False)
+    self.user = User.objects.get(username="original_owner")
+
+    make_logged_in_client(username="copy_owner", groupname="test_doc", recreate=True, is_superuser=False)
+    self.copy_user = User.objects.get(username="copy_owner")
+
+    self.document2 = Document2.objects.create(name='Test Document2',
+                                              type='search-dashboard',
+                                              owner=self.user,
+                                              description='Test Document2')
+
+    self.document = Document.objects.link(content_object=self.document2,
+                                          owner=self.user,
+                                          name='Test Document',
+                                          description='Test Document',
+                                          extra='test')
+
+    self.document.save()
+    self.document2.doc.add(self.document)
+
+  def tearDown(self):
+    # Get any Doc2 objects that were created and delete them, Doc1 child objects will be deleted in turn
+    test_docs = Document2.objects.filter(name__contains='Test Document2')
+    test_docs.delete()
+
+  def test_document_create(self):
+    assert_true(Document2.objects.filter(name='Test Document2').exists())
+    assert_true(Document.objects.filter(name='Test Document').exists())
+    assert_equal(Document2.objects.get(name='Test Document2').id, self.document2.id)
+    assert_equal(Document.objects.get(name='Test Document').id, self.document.id)
+
+  def test_document_copy(self):
+    name = 'Test Document2 Copy'
+
+    self.doc2_count = Document2.objects.count()
+    self.doc1_count = Document.objects.count()
+
+    doc2 = self.document2.copy(name=name, owner=self.copy_user, description=self.document2.description)
+    doc = self.document.copy(doc2, name=name, owner=self.copy_user, description=self.document2.description)
+
+    # Test that copying creates another object
+    assert_equal(Document2.objects.count(), self.doc2_count + 1)
+    assert_equal(Document.objects.count(), self.doc1_count + 1)
+
+    # Test that the content object is not pointing to the same object
+    assert_not_equal(self.document2.doc, doc2.doc)
+
+    # Test that the owner is attributed to the new user
+    assert_equal(doc2.owner, self.copy_user)
+
+    # Test that copying enables attribute overrides
+    assert_equal(Document2.objects.filter(name=name).count(), 1)
+    assert_equal(doc2.description, self.document2.description)
+
+    # Test that the content object is not pointing to the same object
+    assert_not_equal(self.document.content_object, doc.content_object)
+
+    # Test that the owner is attributed to the new user
+    assert_equal(doc.owner, self.copy_user)
+
+    # Test that copying enables attribute overrides
+    assert_equal(Document.objects.filter(name=name).count(), 1)
+    assert_equal(doc.description, self.document.description)
+
+
+  def test_redact_statements(self):
+    old_policies = redaction.global_redaction_engine.policies
+    redaction.global_redaction_engine.policies = [
+      RedactionPolicy([
+        RedactionRule('', 'ssn=\d{3}-\d{2}-\d{4}', 'ssn=XXX-XX-XXXX'),
+      ])
+    ]
+
+    logfilter.add_log_redaction_filter_to_logger(redaction.global_redaction_engine, logging.root)
+
+    sensitive_query = 'SELECT "ssn=123-45-6789"'
+    redacted_query = 'SELECT "ssn=XXX-XX-XXXX"'
+    nonsensitive_query = 'SELECT "hello"'
+
+    snippets = [
+      {
+        'status': 'ready',
+        'viewSettings': {
+          'sqlDialect': True,
+          'snippetImage': '/static/beeswax/art/icon_beeswax_48.png',
+          'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
+          'aceMode': 'ace/mode/hive'
+         },
+        'id': '10a29cda-063f-1439-4836-d0c460154075',
+        'statement_raw': sensitive_query,
+        'statement': sensitive_query,
+        'type': 'hive'
+      },
+      {
+        'status': 'ready',
+        'viewSettings': {
+          'sqlDialect': True,
+          'snippetImage': '/static/impala/art/icon_impala_48.png',
+          'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
+          'aceMode': 'ace/mode/impala'
+         },
+        'id': 'e17d195a-beb5-76bf-7489-a9896eeda67a',
+        'statement_raw': sensitive_query,
+        'statement': sensitive_query,
+        'type': 'impala'
+      },
+      {
+        'status': 'ready',
+        'viewSettings': {
+          'sqlDialect': True,
+          'snippetImage': '/static/beeswax/art/icon_beeswax_48.png',
+          'placeHolder': 'Example: SELECT * FROM tablename, or press CTRL + space',
+          'aceMode': 'ace/mode/hive'
+         },
+        'id': '10a29cda-063f-1439-4836-d0c460154075',
+        'statement_raw': nonsensitive_query,
+        'statement': nonsensitive_query,
+        'type': 'hive'
+      },
+    ]
+
+    try:
+      self.document2.type = 'notebook'
+      self.document2.update_data({'snippets': snippets})
+      self.document2.save()
+      saved_snippets = self.document2.data_dict['snippets']
+
+      # Make sure redacted queries are redacted.
+      assert_equal(redacted_query, saved_snippets[0]['statement'])
+      assert_equal(redacted_query, saved_snippets[0]['statement_raw'])
+      assert_equal(True, saved_snippets[0]['is_redacted'])
+
+      assert_equal(redacted_query, saved_snippets[1]['statement'])
+      assert_equal(redacted_query, saved_snippets[1]['statement_raw'])
+      assert_equal(True, saved_snippets[1]['is_redacted'])
+
+      # Make sure unredacted queries are not redacted.
+      assert_equal(nonsensitive_query, saved_snippets[2]['statement'])
+      assert_equal(nonsensitive_query, saved_snippets[2]['statement_raw'])
+      assert_false('is_redacted' in saved_snippets[2])
+    finally:
+      redaction.global_redaction_engine.policies = old_policies
+
+
+def test_session_secure_cookie():
+  with tempfile.NamedTemporaryFile() as cert_file:
+    with tempfile.NamedTemporaryFile() as key_file:
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.SESSION.SECURE.set_for_testing(False),
+      ]
+      try:
+        assert_true(desktop.conf.is_https_enabled())
+        assert_false(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.SESSION.SECURE.set_for_testing(True),
+      ]
+      try:
+        assert_true(desktop.conf.is_https_enabled())
+        assert_true(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(cert_file.name),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(key_file.name),
+        desktop.conf.SESSION.SECURE.set_for_testing(present=False),
+      ]
+      try:
+        assert_true(desktop.conf.is_https_enabled())
+        assert_true(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
+
+      resets = [
+        desktop.conf.SSL_CERTIFICATE.set_for_testing(present=None),
+        desktop.conf.SSL_PRIVATE_KEY.set_for_testing(present=None),
+        desktop.conf.SESSION.SECURE.set_for_testing(present=False),
+      ]
+      try:
+        assert_false(desktop.conf.is_https_enabled())
+        assert_false(desktop.conf.SESSION.SECURE.get())
+      finally:
+        for reset in resets:
+          reset()
+
+
+def test_get_data_link():
+  assert_equal(None, get_data_link({}))
+  assert_equal('gethue.com', get_data_link({'type': 'link', 'link': 'gethue.com'}))
+
+  assert_equal('/hbase/#Cluster/document_demo/query/20150527', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527'}))
+  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1'}))
+  assert_equal('/hbase/#Cluster/document_demo/query/20150527[f1:c1]', get_data_link({'type': 'hbase', 'table': 'document_demo', 'row_key': '20150527', 'fam': 'f1', 'col': 'c1'}))
+
+  assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
+  assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))

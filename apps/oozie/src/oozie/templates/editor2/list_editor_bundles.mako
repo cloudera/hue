@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
 <%namespace name="actionbar" file="../actionbar.mako" />
@@ -45,7 +45,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
         <span style="padding-right:40px"></span>
 
         <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: function(e){ oneSelected() ? prepareShareModal(e) : void(0) },
-          attr: {'data-original-title': '${ _("Share") } ' + name},
+          attr: {'data-original-title': '${ _ko("Share") } ' + name},
           css: {'disabled': ! oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
@@ -86,7 +86,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
     <tbody data-bind="foreach: { data: jobs }">
       <tr>
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
-          <div data-bind="css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
+          <div data-bind="multiCheck: '#workflowTable', css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <!-- ko if: ! uuid() -->
             <a data-bind="attr: { 'href': '${ url('oozie:open_old_bundle') }?bundle=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->
@@ -142,6 +142,7 @@ ${ commonimportexport(request) | n,unicode }
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -293,4 +294,4 @@ ${ commonimportexport(request) | n,unicode }
   });
 </script>
 
-${commonfooter(messages) | n,unicode}
+${commonfooter(request, messages) | n,unicode}

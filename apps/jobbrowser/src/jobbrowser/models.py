@@ -148,7 +148,7 @@ class Job(JobLinkage):
     self._init_attributes()
     self.is_retired = hasattr(thriftJob, 'is_retired')
     self.is_mr2 = False
-    self.applicationType = 'MR2'
+    self.applicationType = 'MAPREDUCE'
 
   @property
   def counters(self):
@@ -569,13 +569,13 @@ class LinkJobLogs(object):
   @classmethod
   def _make_mr_links(cls, log):
     escaped_logs = escape(log)
-    return re.sub('(job_[0-9_]+(/|\.)?)', LinkJobLogs._replace_mr_link, escaped_logs)
+    return re.sub('(job_[0-9]{12}_[0-9]+)', LinkJobLogs._replace_mr_link, escaped_logs)
 
   @classmethod
   def _make_links(cls, log):
     escaped_logs = escape(log)
     hdfs_links = re.sub('((?<= |;)/|hdfs://)[^ <&\t;,\n]+', LinkJobLogs._replace_hdfs_link, escaped_logs)
-    return re.sub('(job_[0-9_]+(/|\.)?)', LinkJobLogs._replace_mr_link, hdfs_links)
+    return re.sub('(job_[0-9]{12}_[0-9]+)', LinkJobLogs._replace_mr_link, hdfs_links)
 
   @classmethod
   def _replace_hdfs_link(self, match):

@@ -57,12 +57,12 @@ input[type="text"].filechooser-input, input[type="text"].half {
   width: 50%;
 }
 
-input[type="text"].seventy {
-  width: 70%;
+input[type="text"].seventy, textarea.seventy {
+  width: 70%!important;
 }
 
 input[type="text"].thirty {
-  width: 30%;
+  width: 30%!important;
 }
 
 input[type="text"].with-errors, textarea.with-errors {

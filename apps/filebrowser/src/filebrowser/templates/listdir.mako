@@ -53,32 +53,41 @@ ${ fb_components.menubar() }
             </button>
             <ul class="dropdown-menu" style="top: auto">
               <li><a href="#" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1, click: renameFile,
-              enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-font"></i>
+              enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
               ${_('Rename')}</a></li>
               <li><a href="#"title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
-              isCurrentDirSelected().length == 0"><i class="fa fa-random"></i> ${_('Move')}</a></li>
+              isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
               <li><a href="#" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
-              isCurrentDirSelected().length == 0"><i class="fa fa-files-o"></i> ${_('Copy')}</a></li>
+              isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
+              % if show_download_button:
               <li>
                 <a href="#" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
-                  <i class="fa fa-arrow-circle-o-down"></i> ${_('Download')}
+                  <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}
                 </a>
               </li>
+              % endif
               <li class="divider"></li>
               % if is_fs_superuser:
               <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
                 <a href="#" data-bind="visible: ! inTrash(), click: changeOwner, enable: selectedFiles().length > 0">
-                  <i class="fa fa-user"></i> ${_('Change owner / group')}
+                  <i class="fa fa-fw fa-user"></i> ${_('Change owner / group')}
                 </a>
               </li>
               % endif
               <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
                 <a href="#" data-bind="visible: ! inTrash(), click: changePermissions, enable: selectedFiles().length > 0">
-                  <i class="fa fa-list-alt"></i> ${_('Change permissions')}
+                  <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
+                </a>
+              </li>
+              <li class="divider"></li>
+              <li data-bind="css: {'disabled': inTrash() || selectedFiles().length > 1 }">
+                <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}">
+                  <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
                 </a>
               </li>
             </ul>
           </div>
+          
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
           <div id="delete-dropdown" class="btn-group" style="vertical-align: middle">
@@ -91,16 +100,19 @@ ${ fb_components.menubar() }
             </ul>
           </div>
           <!-- /ko -->
+          % if 'oozie' in apps:
           <button class="btn fileToolbarBtn" title="${_('Submit')}"
             data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
             <i class="fa fa-play"></i> ${_('Submit')}
           </button>
+          % endif
         </div>
       </%def>
 
       <%def name="creation()">
         <button class="btn fileToolbarBtn" title="${_('Empty trash')}" data-bind="visible: inTrash(), click: purgeTrash"><i class="fa fa-fire"></i> ${_('Empty trash')}</button>
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
+          % if show_upload_button:
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
             <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash()">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
@@ -111,6 +123,7 @@ ${ fb_components.menubar() }
               <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="fa fa-gift"></i> ${_('Zip/Tgz/Bz2 file')}</a></li>
             </ul>
           </div>
+          % endif
           <div class="btn-group" style="vertical-align: middle">
             <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
               <i class="fa fa-plus-circle"></i> ${_('New')}
@@ -143,7 +156,7 @@ ${ fb_components.menubar() }
       %endif
 
       <div style="padding-left: 6px">
-        ${dir.list_table_browser(files, path_enc, current_request_path, cwd_set)}
+        ${dir.list_table_browser(files, path_enc, current_request_path, show_download_button, cwd_set)}
       </div>
     </div>
   </div>
@@ -154,4 +167,4 @@ ${ fb_components.menubar() }
 </div>
 
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

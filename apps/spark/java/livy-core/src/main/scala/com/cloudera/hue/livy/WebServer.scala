@@ -22,26 +22,52 @@ import java.net.{InetAddress, InetSocketAddress}
 import javax.servlet.ServletContextListener
 
 import ch.qos.logback.access.jetty.RequestLogImpl
-import org.eclipse.jetty.server.{NetworkConnector, Server}
+import org.eclipse.jetty.server._
 import org.eclipse.jetty.server.handler.{HandlerCollection, RequestLogHandler}
 import org.eclipse.jetty.servlet.{ServletContextHandler, DefaultServlet}
+import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.scalatra.servlet.AsyncSupport
 
 import scala.concurrent.ExecutionContext
 
-class WebServer(var host: String, var port: Int) extends Logging {
-  val address = new InetSocketAddress(host, port)
-  val server = new Server(address)
+object WebServer {
+  val KeystoreKey = "livy.keystore"
+  val KeystorePasswordKey = "livy.keystore.password"
+}
+
+class WebServer(livyConf: LivyConf, var host: String, var port: Int) extends Logging {
+  val server = new Server()
 
   server.setStopTimeout(1000)
   server.setStopAtShutdown(true)
 
+  val connector = livyConf.getOption(WebServer.KeystoreKey) match {
+    case None =>
+      new ServerConnector(server)
+
+    case Some(keystore) =>
+      val https = new HttpConfiguration()
+      https.addCustomizer(new SecureRequestCustomizer())
+
+      val sslContextFactory = new SslContextFactory()
+      sslContextFactory.setKeyStorePath(keystore)
+      livyConf.getOption(WebServer.KeystorePasswordKey).foreach(sslContextFactory.setKeyStorePassword)
+      livyConf.getOption(WebServer.KeystorePasswordKey).foreach(sslContextFactory.setKeyManagerPassword)
+
+      new ServerConnector(server,
+        new SslConnectionFactory(sslContextFactory, "http/1.1"),
+        new HttpConnectionFactory(https))
+  }
+
+  connector.setHost(host)
+  connector.setPort(port)
+
+  server.setConnectors(Array(connector))
+
   val context = new ServletContextHandler()
 
   context.setContextPath("/")
-
   context.addServlet(classOf[DefaultServlet], "/")
-
   context.setAttribute(AsyncSupport.ExecutionContextKey, ExecutionContext.global)
 
   val handlers = new HandlerCollection

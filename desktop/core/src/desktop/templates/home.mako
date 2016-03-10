@@ -14,8 +14,11 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, _ko
   from django.utils.translation import ugettext as _
+
+  from desktop.conf import USE_NEW_EDITOR
+  use_new_home = USE_NEW_EDITOR.get()
 %>
 
 ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
@@ -93,6 +96,18 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
            </li>
         </ul>
       </div>
+      % if use_new_home:
+      <div class="nav-collapse pull-right">
+        <ul class="nav">
+          <li class="currentApp">
+            <a href="${ url('desktop.views.home2') }">
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              ${ _('New Home') }
+            </a>
+           </li>
+        </ul>
+      </div>
+      % endif
     </div>
   </div>
 </div>
@@ -116,15 +131,15 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
                   <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'spark' in apps:
-                  <li><a href="${ url('spark:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
                   <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
-                    <li><a href="${ url('oozie:create_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
-                    <li><a href="${ url('oozie:create_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Coordinator')}</a></li>
-                    <li><a href="${ url('oozie:create_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Bundle')}</a></li>
+                    <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
+                    <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Coordinator')}</a></li>
+                    <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Bundle')}</a></li>
                   </ul>
                 </li>
                 % endif
@@ -265,7 +280,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
     <td data-bind="html: description"></td>
     <td data-bind="text: lastModified"></td>
     <td style="text-align: center; white-space: nowrap">
-      <a href="javascript:void(0)" rel="tooltip" data-placement="left" data-bind="click: moveDoc, attr: {'data-original-title': '${ _("Change project for") } '+name}" style="padding-left:8px; padding-right: 8px">
+      <a href="javascript:void(0)" rel="tooltip" data-placement="left" data-bind="click: moveDoc, attr: {'data-original-title': '${ _ko("Change project for") } '+name}" style="padding-left:8px; padding-right: 8px">
         <span data-bind="foreach: tags">
           <!-- ko if: name != 'trash'-->
           <span class="badge" data-bind="html: name"></span>
@@ -274,7 +289,7 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       </a>
     </td>
     <td style="width: 40px; text-align: center">
-      <a class="share-link" rel="tooltip" data-placement="left" style="padding-left:10px; padding-right: 10px" data-bind="click: shareDoc, attr: {'data-original-title': '${ _("Share") } '+name}, visible: isMine , css: {'baseShared': true, 'isShared': perms.read.users.length + perms.read.groups.length + perms.write.users.length + perms.write.groups.length > 0}">
+      <a class="share-link" rel="tooltip" data-placement="left" style="padding-left:10px; padding-right: 10px" data-bind="click: shareDoc, attr: {'data-original-title': '${ _ko("Share") } '+name}, visible: isMine , css: {'baseShared': true, 'isShared': perms.read.users.length + perms.read.groups.length + perms.write.users.length + perms.write.groups.length > 0}">
         <i class="fa fa-users"></i>
       </a>
       <i class="fa fa-ban" style="padding-left:8px; padding-right: 8px" data-bind="visible: !isMine"></i>
@@ -296,6 +311,9 @@ ${ commonheader(_('Welcome Home'), "home", user) | n,unicode }
       </p>
     </div>
     <div class="modal-footer">
+      <div id="saveProjectAlert" class="alert-message error hide" style="position: absolute; left: 78px;">
+        <span class="label label-important"></span>
+      </div>
       <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
       <a id="tagsNewBtn" href="#" class="btn btn-primary disable-feedback">${ _('Add') }</a>
     </div>
@@ -378,16 +396,32 @@ ${ commonshare() | n,unicode }
 
     $("#tagsNewBtn").on("click", function () {
       var tag_name = $("#tagsNew").val();
-      $.post("/desktop/api/tag/add_tag", {
+  
+    if ($.trim(tag_name) == "") {
+      $("#saveProjectAlert span").text("${_('File name is required.')}");
+      $("#saveProjectAlert").show();
+      $("#tagsNew").addClass("fieldError");
+      resetPrimaryButtonsStatus(); // Globally available
+      return false;
+    }
+
+    $.post("/desktop/api/tag/add_tag", {
         name: tag_name
-      },function (data) {
-        data.name = hue.htmlEncode(data.name);
-        viewModel.createTag(data);
-        $("#tagsNew").val("");
-        $(document).trigger("info", "${_('Project created')}");
-        $("#addTagModal").modal("hide");
+      }, function (data) {
+        if (data.status == -1) {
+          $("#saveProjectAlert span").text("${_('project name already exists')}");
+          $("#saveProjectAlert").show();
+          resetPrimaryButtonsStatus(); //globally available
+        }
+        else {
+          data.name = hueUtils.htmlEncode(data.name);
+          viewModel.createTag(data);
+          $("#tagsNew").val("");
+          $(document).trigger("info", "${_('Project created')}");
+          $("#addTagModal").modal("hide");
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText); // reserved name, duplicate etc
+        $(document).trigger("error", "${_("There was an error processing your action: ")}" + xhr.responseText); // reserved name, duplicate etc
       });
     });
 
@@ -400,7 +434,9 @@ ${ commonshare() | n,unicode }
   });
 
   function addTag() {
+    $("#tagsNew").val('');
     $("#addTagModal").modal("show");
+    $("#saveProjectAlert").hide();
   }
 
   function removeTag() {
@@ -424,6 +460,8 @@ ${ commonshare() | n,unicode }
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
       }
+    }).fail(function (response) {
+      $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.responseText);
     });
   }
 
@@ -444,7 +482,7 @@ ${ commonshare() | n,unicode }
         tag_ids: [tag.id()]
       })
     }, function (response) {
-      if (response != null){
+      if (response != null) {
         if (response.status != 0) {
           $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.message);
         }
@@ -454,7 +492,9 @@ ${ commonshare() | n,unicode }
         }
       }
       $("#documentMoveModal").modal("hide");
-    })
+    }).fail(function (response) {
+      $(document).trigger("error", "${_("There was an error processing your action: ")}" + response.responseText);
+    });
   }
 
 </script>
@@ -573,4 +613,4 @@ $(document).ready(function(){
      </div>
    </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

@@ -330,4 +330,4 @@ ${ utils.decorate_datetime_fields() }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

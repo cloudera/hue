@@ -21,12 +21,11 @@ import urllib
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms import FileField, CharField, BooleanField, Textarea
-from django.forms.formsets import formset_factory, BaseFormSet, ManagementForm
+from django.forms.formsets import formset_factory, BaseFormSet
 
 from desktop.lib import i18n
-from filebrowser.lib import rwx
 from hadoop.fs import normpath
-
+from filebrowser.lib import rwx
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -62,6 +61,7 @@ class PathField(CharField):
 
   def clean(self, value):
     return normpath(CharField.clean(self, value))
+
 
 class EditorForm(forms.Form):
   path = PathField(label=_("File to edit"))

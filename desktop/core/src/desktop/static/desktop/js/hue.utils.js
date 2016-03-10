@@ -26,8 +26,8 @@ if (!('clean' in Array.prototype)) {
     return this;
   };
 }
-
 if (!('move' in Array.prototype)) {
+
   Array.prototype.move = function (old_index, new_index) {
     if (new_index >= this.length) {
       var k = new_index - this.length;
@@ -39,8 +39,8 @@ if (!('move' in Array.prototype)) {
     return this;
   };
 }
-
 if (!('indexOf' in Array.prototype)) {
+
   Array.prototype.indexOf = function (needle) {
     for (var i = 0; i < this.length; i++) {
       if (this[i] === needle) {
@@ -50,14 +50,16 @@ if (!('indexOf' in Array.prototype)) {
     return -1;
   };
 }
-
 // adding missing .filter for IE8
+
 if (!('filter' in Array.prototype)) {
   Array.prototype.filter = function (filter, that /*opt*/) {
     var other = [], v;
-    for (var i = 0, n = this.length; i < n; i++)
-      if (i in this && filter.call(that, v = this[i], i, this))
+    for (var i = 0, n = this.length; i < n; i++) {
+      if (i in this && filter.call(that, v = this[i], i, this)) {
         other.push(v);
+      }
+    }
     return other;
   };
 }
@@ -67,18 +69,18 @@ Array.prototype.diff = function (a) {
     return a.indexOf(i) < 0;
   });
 };
-
 /*
  * Add utility methods to the HUE object
 */
-(function (hue) {
+
+(function (hueUtils) {
   'use strict';
 
   /*
    * Convert text to URLs
    * Selector arg can be jQuery or document.querySelectorAll()
   */
-  hue.text2Url = function (selectors) {
+  hueUtils.text2Url = function (selectors) {
     var i = 0,
       len = selectors.length;
 
@@ -110,14 +112,82 @@ Array.prototype.diff = function (a) {
    * then grab the encoded contents back out.
   */
 
-  hue.htmlEncode = function (value){
+  hueUtils.htmlEncode = function (value){
     return $('<div/>').text(value).html();
   };
 
-}(hue = window.hue || {}));
+  hueUtils.html2text = function (value){
+    return $('<div/>').html(value).text();
+  };
 
+  hueUtils.goFullScreen = function () {
+    if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.msRequestFullscreen) {
+        document.documentElement.msRequestFullscreen();
+      } else if (document.documentElement.mozRequestFullScreen) {
+        document.documentElement.mozRequestFullScreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+      }
+    }
+  }
+
+  hueUtils.exitFullScreen = function () {
+    if (document.fullscreenElement ||
+        document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
+    }
+  }
+
+  hueUtils.changeURL = function (newURL) {
+    window.history.pushState(null, null, newURL);
+  }
+
+  hueUtils.replaceURL = function (newURL) {
+    window.history.replaceState(null, null, newURL);
+  }
+
+  /**
+   * @param {string} pseudoJson
+   * @constructor
+   */
+  hueUtils.parseHivePseudoJson = function (pseudoJson) {
+    // Hive returns a pseudo-json with parameters, like
+    // "{Lead Developer=John Foo, Lead Developer Email=jfoo@somewhere.com, date=2013-07-11 }"
+    var parsedParams = {};
+    if (pseudoJson && pseudoJson.length > 2){
+      var splits = pseudoJson.substring(1, pseudoJson.length-2).split(', ');
+      splits.forEach(function(part){
+        if (part.indexOf('=') > -1){
+          parsedParams[part.split('=')[0]] = part.split('=')[1];
+        }
+      });
+    }
+    return parsedParams;
+  }
+
+  hueUtils.isOverflowing = function (element) {
+    if (element instanceof jQuery) {
+      element = element[0];
+    }
+    return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
+  }
+
+
+}(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {
+
   Object.keys = (function () {
     'use strict';
     var hasOwnProperty = Object.prototype.hasOwnProperty,
@@ -169,7 +239,6 @@ function s4() {
 function UUID() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
-
 // Based on original pub/sub implementation from http://davidwalsh.name/pubsub-javascript
 var huePubSub = (function () {
   var topics = {};
@@ -177,7 +246,7 @@ var huePubSub = (function () {
 
   return {
     subscribe: function (topic, listener) {
-      if(! hOP.call(topics, topic)) {
+      if (!hOP.call(topics, topic)) {
         topics[topic] = [];
       }
 
@@ -189,14 +258,46 @@ var huePubSub = (function () {
         }
       };
     },
+    subscribeOnce: function (topic, listener) {
+      var ephemeral = this.subscribe(topic, function () {
+        listener.apply(arguments);
+        ephemeral.remove();
+      });
+
+    },
     publish: function (topic, info) {
-      if (! hOP.call(topics, topic)) {
+      if (!hOP.call(topics, topic)) {
         return;
       }
 
       topics[topic].forEach(function (item) {
-        item(info != undefined ? info : {});
+        item(info);
       });
+    },
+    getTopics: function () {
+      return topics;
     }
   };
 })();
+
+
+Number.prototype.toHHMMSS = function () {
+  var _s = this;
+  var _ms = _s % 1000;
+  _s = (_s - _ms) / 1000;
+  var _secs = _s % 60;
+  _s = (_s - _secs) / 60;
+  var _mins = _s % 60;
+  var _hrs = (_s - _mins) / 60;
+  return (_hrs > 0 ? _hrs + "h, " : "") + (_mins > 0 ? _mins + "m, " : "") + _secs + "." + _ms + "s";
+
+}
+
+if (!('getParameter' in window.location)) {
+  window.location.getParameter = function (name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(window.location.search);
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  };
+}

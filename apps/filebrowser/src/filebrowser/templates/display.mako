@@ -35,7 +35,7 @@ ${ fb_components.menubar() }
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
-      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, view) }
+      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, show_download_button, view) }
     </div>
     <div class="span10">
       <div class="card card-small" style="margin-bottom: 5px">
@@ -386,8 +386,8 @@ ${ fb_components.menubar() }
 
     _hashPage = 1;
     _hashUpperPage = 1;
-    if (_hash != "") {
 
+    if (_hash != "") {
       if (_hash.indexOf("-") > -1) {
         _hashPage = _hash.split("-")[0].substr(2) * 1;
         _hashUpperPage = _hash.split("-")[1].substr(1) * 1;
@@ -434,6 +434,10 @@ ${ fb_components.menubar() }
       }, 300);
     });
 
+    $("#refreshBtn").click(function(){
+      window.location.reload();
+    });
+
     $("#fileArea").jHueScrollUp();
 
     if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING && viewModel.mode() == "text") { // enable scrolling
@@ -469,4 +473,4 @@ ${ fb_components.menubar() }
 }());
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

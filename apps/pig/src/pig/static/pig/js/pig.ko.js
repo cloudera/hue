@@ -66,13 +66,16 @@ var PigScript = function (pigScript) {
     self.parameters.remove(this);
     self.updateParentModel();
   };
+  self.scriptContent = ko.computed(function() {
+    return self.script().replace(/\/\* .+? \*\//g, ''); // Trim comments, no multiline
+  });
   self.getParameters = function () {
     var params = {};
-    var variables = this.script().match(/([^\\]|^)\$[^\d'"](\w*)/g);
-    var declares = this.script().match(/%declare +([^ ])+/gi);
-    var defaults = this.script().match(/%default +([^;])+/gi);
-    var macro_defines = this.script().match(/define [^ ]+ *\(([^\)]*)\)/gi); // no multiline
-    var macro_returns = this.script().match(/returns +([^\{]*)/gi); // no multiline
+    var variables = self.scriptContent().match(/([^\\]|^)\$[^\d'"](\w*)/g);
+    var declares = self.scriptContent().match(/%declare +([^ ])+/gi);
+    var defaults = self.scriptContent().match(/%default +([^;])+/gi);
+    var macro_defines = self.scriptContent().match(/define [^ ]+ *\(([^\)]*)\)/gi); // no multiline
+    var macro_returns = self.scriptContent().match(/returns +([^\{]*)/gi); // no multiline
 
     if (variables) {
       $.each(variables, function(index, param) {

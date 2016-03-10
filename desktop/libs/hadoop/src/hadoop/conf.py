@@ -15,15 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _t
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 import fnmatch
 import logging
 import os
 
-DEFAULT_NN_HTTP_PORT = 50070
+from django.utils.translation import ugettext_lazy as _t
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from desktop.conf import default_ssl_validate
 
 LOG = logging.getLogger(__name__)
+DEFAULT_NN_HTTP_PORT = 50070
+
 
 def find_file_recursive(desired_glob, root):
   def f():
@@ -71,7 +73,7 @@ HDFS_CLUSTERS = UnspecifiedConfigSection(
                               default=False, type=coerce_bool),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
-                  default=True,
+                  dynamic_default=default_ssl_validate,
                   type=coerce_bool),
       TEMP_DIR=Config("temp_dir", help="HDFS directory for temporary files",
                       default='/tmp', type=str),
@@ -146,7 +148,7 @@ YARN_CLUSTERS = UnspecifiedConfigSection(
                   help="URL of the HistoryServer API"),
       SSL_CERT_CA_VERIFY=Config("ssl_cert_ca_verify",
                   help="In secure mode (HTTPS), if SSL certificates from YARN Rest APIs have to be verified against certificate authority",
-                  default=True,
+                  dynamic_default=default_ssl_validate,
                   type=coerce_bool)
     )
   )
@@ -159,8 +161,8 @@ def config_validator(user):
 
   Called by core check_config() view.
   """
-  from hadoop.fs import webhdfs
   from hadoop import job_tracker
+  from hadoop.fs import webhdfs
 
   res = []
   submit_to = []
@@ -187,10 +189,11 @@ def config_validator(user):
     res.extend(mr_down)
 
   # YARN_CLUSTERS
+  if YARN_CLUSTERS.keys():
+    res.extend(test_yarn_configurations(user))
   for name in YARN_CLUSTERS.keys():
     cluster = YARN_CLUSTERS[name]
     if cluster.SUBMIT_TO.get():
-      res.extend(test_yarn_configurations())
       submit_to.append('yarn_clusters.' + name)
 
   if not submit_to:
@@ -200,19 +203,19 @@ def config_validator(user):
   return res
 
 
-def test_yarn_configurations():
-  # Single cluster for now
-  from hadoop.yarn.resource_manager_api import get_resource_manager
-
+def test_yarn_configurations(user):
   result = []
 
   try:
-    url = ''
-    api = get_resource_manager()
-    url = api._url
-    api.apps()
+    from jobbrowser.api import get_api # Required for cluster HA testing
   except Exception, e:
-    msg = 'Failed to contact Resource Manager at %s: %s' % (url, e)
+    LOG.warn('Jobbrowser is disabled, skipping test_yarn_configurations')
+    return result
+
+  try:
+    get_api(user, None).get_jobs(user, username=user.username, state='all', text='')
+  except Exception, e:
+    msg = 'Failed to contact an active Resource Manager: %s' % e
     LOG.exception(msg)
     result.append(('Resource Manager', msg))
 

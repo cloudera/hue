@@ -127,7 +127,7 @@ var jobs = (function($) {
             });
           }
         });
-        return (output_directory) ? '/filebrowser/view' + output_directory : null;
+        return (output_directory) ? '/filebrowser/view=' + output_directory : null;
       });
       self.inputDirectoryFilebrowserURL = ko.computed(function() {
         var input_directory = null;
@@ -140,7 +140,7 @@ var jobs = (function($) {
             });
           }
         });
-        return (input_directory) ? '/filebrowser/view' + input_directory : null;
+        return (input_directory) ? '/filebrowser/view=' + input_directory : null;
       });
       self.storageType = ko.computed(function() {
         var storage_type = null;

@@ -94,9 +94,9 @@
     <% path = Hdfs.urlsplit(url)[2] %>
     % if path:
       % if path.startswith(posixpath.sep):
-        <a href="/filebrowser/view${path}">${ url }</a>
+        <a href="/filebrowser/view=${path}">${ url }</a>
       % else:
-        <a href="/filebrowser/home_relative_view/${path}">${ url }</a>
+        <a href="/filebrowser/home_relative_view=/${path}">${ url }</a>
       % endif
     % else:
       ${ url }
@@ -111,9 +111,9 @@
     <% path = Hdfs.urlsplit(url)[2] %>
     % if path:
       % if path.startswith(posixpath.sep):
-        /filebrowser/view${path}
+        /filebrowser/view=${path}
       % else:
-        /filebrowser/home_relative_view/${path}
+        /filebrowser/home_relative_view=/${path}
       % endif
     % else:
       javascript:void(0)
@@ -360,7 +360,7 @@
         // check if it's a relative path
         var pathAddition = "";
         if ($.trim(inputElement.val()) != "") {
-          var checkPath = "/filebrowser/chooser${ workflow.deployment_dir }" + "/" + inputElement.val();
+          var checkPath = "/filebrowser/chooser=${ workflow.deployment_dir }" + "/" + inputElement.val();
           $.getJSON(checkPath, function (data) {
             pathAddition = "${ workflow.deployment_dir }/";
             callFileChooser();
@@ -598,13 +598,13 @@ function renderCrons() {
 
   $(document).ready(function(){
     $(".bulkToolbarBtn").on("click", function(){
-      $(".btn-toolbar").find(".loader").removeClass("hide");
-      $(".bulkToolbarBtn").hide();
       if ($(this).data("operation") == "kill"){
         bulkOperationConfirmation($(this).data("operation"));
       }
       else {
         bulkOperation($(this).data("operation"));
+        $(".btn-toolbar").find(".loader").removeClass("hide");
+        $(".bulkToolbarBtn").hide();
       }
     });
 
@@ -635,15 +635,14 @@ function renderCrons() {
 
     $("#bulkConfirmation").modal({
       show: false
-    }).on("hidden", function(){
-      $(".btn-toolbar").find(".loader").addClass("hide");
-      $(".bulkToolbarBtn").show();
     });
-
 
     function bulkOperationConfirmation(what){
       $("#bulkConfirmation").modal("show");
+      $("#bulkConfirmation a.btn-danger").off("click");
       $("#bulkConfirmation a.btn-danger").on("click", function(){
+        $(".btn-toolbar").find(".loader").removeClass("hide");
+        $(".bulkToolbarBtn").hide();
         bulkOperation(what);
         $("#bulkConfirmation").modal("hide");
       });

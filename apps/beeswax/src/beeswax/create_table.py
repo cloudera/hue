@@ -40,10 +40,12 @@ from beeswax.forms import CreateTableForm, ColumnTypeFormSet,\
   PartitionTypeFormSet, CreateByImportFileForm, CreateByImportDelimForm,\
   TERMINATOR_CHOICES
 from beeswax.server import dbms
+from beeswax.server.dbms import QueryServerException
 from beeswax.views import execute_directly
 
 
 LOG = logging.getLogger(__name__)
+
 
 def create_table(request, database='default'):
   """Create a table by specifying its attributes manually"""
@@ -178,7 +180,7 @@ def import_wizard(request, database='default'):
                                                             (s2_delim_form.cleaned_data['delimiter'],))
 
       if do_s2_auto_delim or do_s2_user_delim or cancel_s3_column_def:
-        return render('choose_delimiter.mako', request, {
+        return render('import_wizard_choose_delimiter.mako', request, {
           'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
           'delim_readable': DELIMITER_READABLE.get(s2_delim_form['delimiter'].data[0], s2_delim_form['delimiter'].data[1]),
           'initial': delim_is_auto,
@@ -208,7 +210,7 @@ def import_wizard(request, database='default'):
           if fields_list_for_json:
             fields_list_for_json[0] = map(lambda a: re.sub('[^\w]', '', a), fields_list_for_json[0]) # Cleaning headers
 
-          return render('define_columns.mako', request, {
+          return render('import_wizard_define_columns.mako', request, {
             'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
             'file_form': s1_file_form,
             'delim_form': s2_delim_form,
@@ -233,7 +235,8 @@ def import_wizard(request, database='default'):
                 'name': table_name,
                 'comment': s1_file_form.cleaned_data['comment'],
                 'row_format': 'Delimited',
-                'field_terminator': delim
+                'field_terminator': delim,
+                'file_format': 'TextFile'
              },
             'columns': [ f.cleaned_data for f in s3_col_formset.forms ],
             'partition_columns': [],
@@ -244,11 +247,14 @@ def import_wizard(request, database='default'):
 
         do_load_data = s1_file_form.cleaned_data.get('do_import')
         path = s1_file_form.cleaned_data['path']
-        return _submit_create_and_load(request, proposed_query, table_name, path, do_load_data, database=database)
+        try:
+          return _submit_create_and_load(request, proposed_query, table_name, path, do_load_data, database=database)
+        except QueryServerException, e:
+          raise PopupException(_('The table could not be created.'), detail=e.message)
   else:
     s1_file_form = CreateByImportFileForm()
 
-  return render('choose_file.mako', request, {
+  return render('import_wizard_choose_file.mako', request, {
     'action': reverse(app_name + ':import_wizard', kwargs={'database': database}),
     'file_form': s1_file_form,
     'database': database,

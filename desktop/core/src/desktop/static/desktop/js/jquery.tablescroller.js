@@ -29,6 +29,7 @@
   var pluginName = "jHueTableScroller",
       defaults = {
         minHeight: 300,
+        maxHeight: -1,
         heightAfterCorrection: 40
       };
 
@@ -54,22 +55,15 @@
     if (disableScrollingTable == null || disableScrollingTable != true) {
       resizeScrollingTable(_this);
       var _resizeTimeout = -1;
-      var winWidth = $(window).width();
-      var winHeight = $(window).height();
       $(window).resize(function () {
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(function(){
-          // prevents endless loop in IE8
-          if (winWidth != $(window).width() || winHeight != $(window).height()) {
-            resizeScrollingTable(_this);
-            winWidth = $(window).width();
-            winHeight = $(window).height();
-          }
+          resizeScrollingTable(_this);
         }, 400);
       });
     }
-
   };
+
   function resizeScrollingTable(_this) {
     var el = _this.element;
     $(el).css("overflow-y", "").css("height", "");
@@ -85,7 +79,7 @@
       heightCondition = true;
     }
 
-    var fixedHeight = $(_this.element).find("table").eq(0).data("tablescroller-fixed-height") || -1;
+    var fixedHeight = $(_this.element).find("table").eq(0).data("tablescroller-fixed-height") || _this.options.maxHeight;
 
     if (heightCondition) {
       var specificMinHeight = $(el).find("table").eq(0).data("tablescroller-min-height");

@@ -35,6 +35,16 @@ class ArchiveTest(unittest.TestCase):
     assert_true(os.path.isfile(directory + '/test.txt'))
     assert_equal(os.path.getsize(directory + '/test.txt'), 4)
 
+    FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test5.zip')
+
+    # Extract the file
+    # This file should only have 'test.txt' in it
+    directory = archives.archive_factory(FILE, 'zip').extract()
+    assert_true(os.path.exists(directory))
+    assert_true(os.path.isdir(directory))
+    assert_true(os.path.isfile(directory + '/tmp/temp/test.txt'))
+    assert_equal(os.path.getsize(directory + '/tmp/temp/test.txt'), 5)
+
   def test_tgz(self):
     FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.tar.gz')
 

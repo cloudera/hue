@@ -17,7 +17,6 @@
 
 import json
 import logging
-import math
 import re
 import sys
 import time
@@ -39,17 +38,16 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.django_util import copy_query_dict, format_preserving_redirect, render
 from desktop.lib.django_util import login_notrequired, get_desktop_uri_prefix
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_unicode
 from desktop.models import Document
-
-from jobsub.parameterization import find_variables
+from desktop.lib.parameterization import find_variables
+from notebook.models import escape_rows
 
 import beeswax.forms
 import beeswax.design
 import beeswax.management.commands.beeswax_install_examples
 
 from beeswax import common, data_export, models
-from beeswax.models import SavedQuery, QueryHistory
+from beeswax.models import QueryHistory, SavedQuery, Session
 from beeswax.server import dbms
 from beeswax.server.dbms import expand_exception, get_query_server_config, QueryServerException
 
@@ -141,6 +139,7 @@ def _save_design(user, design, type_, design_obj, explicit_save, name=None, desc
 
   return design
 
+
 def delete_design(request):
   if request.method == 'POST':
     ids = request.POST.getlist('designs_selection')
@@ -188,11 +187,8 @@ def clone_design(request, design_id):
   copy = design.clone(request.user)
   copy.save()
 
-  copy_doc = Document.objects.link(copy,
-      owner=copy.owner,
-      name=copy.name,
-      description=copy.desc,
-      extra=copy.type)
+  name = copy.name + '-copy'
+  design.doc.get().copy(content_object=copy, name=name, owner=request.user)
 
   messages.info(request, _('Copied design: %(name)s') % {'name': design.name})
 
@@ -221,11 +217,17 @@ def list_designs(request):
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_query[ prefix + 'type' ] = app_name
+  # Get search filter input if any
+  search_filter = request.GET.get('text', None)
+  if search_filter is not None:
+    querydict_query[ prefix + 'text' ] = search_filter
+
   page, filter_params = _list_designs(request.user, querydict_query, DEFAULT_PAGE_SIZE, prefix)
 
   return render('list_designs.mako', request, {
     'page': page,
     'filter_params': filter_params,
+    'prefix': prefix,
     'user': request.user,
     'designs_json': json.dumps([query.id for query in page.object_list])
   })
@@ -242,15 +244,20 @@ def list_trashed_designs(request):
   querydict_query = _copy_prefix(prefix, request.GET)
   # Manually limit up the user filter.
   querydict_query[ prefix + 'type' ] = app_name
+  # Get search filter input if any
+  search_filter = request.GET.get('text', None)
+  if search_filter is not None:
+    querydict_query[ prefix + 'text' ] = search_filter
+
   page, filter_params = _list_designs(user, querydict_query, DEFAULT_PAGE_SIZE, prefix, is_trashed=True)
 
   return render('list_trashed_designs.mako', request, {
     'page': page,
     'filter_params': filter_params,
+    'prefix': prefix,
     'user': request.user,
     'designs_json': json.dumps([query.id for query in page.object_list])
   })
-
 
 
 def my_queries(request):
@@ -342,14 +349,18 @@ def list_query_history(request):
     'filter': filter,
   })
 
+
 def massage_query_history_for_json(app_name, query_history):
   return {
+    'id': query_history.id,
+    'design_id': query_history.design.id,
     'query': escape(query_history.query),
     'timeInMs': time.mktime(query_history.submission_date.timetuple()),
     'timeFormatted': query_history.submission_date.strftime("%x %X"),
     'designUrl': reverse(app_name + ':execute_design', kwargs={'design_id': query_history.design.id}),
     'resultsUrl': not query_history.is_failure() and reverse(app_name + ':watch_query_history', kwargs={'query_history_id': query_history.id}) or ""
   }
+
 
 def download(request, id, format):
   try:
@@ -470,25 +481,9 @@ def view_results(request, id, first_row=0):
       downloadable = False
     else:
       results = db.fetch(handle, start_over, 100)
-      data = []
 
       # Materialize and HTML escape results
-      # TODO: use Number + list comprehension
-      for row in results.rows():
-        escaped_row = []
-        for field in row:
-          if isinstance(field, (int, long, float, complex, bool)):
-            if math.isnan(field) or math.isinf(field):
-              escaped_field = json.dumps(field)
-            else:
-              escaped_field = field
-          elif field is None:
-            escaped_field = 'NULL'
-          else:
-            field = smart_unicode(field, errors='replace') # Prevent error when getting back non utf8 like charset=iso-8859-1
-            escaped_field = escape(field).replace(' ', '&nbsp;')
-          escaped_row.append(escaped_field)
-        data.append(escaped_row)
+      data = escape_rows(results.rows())
 
       # We display the "Download" button only when we know that there are results:
       downloadable = first_row > 0 or data
@@ -560,12 +555,19 @@ def view_results(request, id, first_row=0):
 def configuration(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
-  config_values = dbms.get(request.user, query_server).get_default_configuration(
-                      bool(request.REQUEST.get("include_hadoop", False)))
-  for value in config_values:
-    if 'password' in value.key.lower():
-      value.value = "*" * 10
-  return render("configuration.mako", request, {'config_values': config_values})
+
+  session = Session.objects.get_session(request.user, query_server['server_name'])
+
+  if session:
+    properties = json.loads(session.properties)
+    # Redact passwords
+    for key, value in properties.items():
+      if 'password' in key.lower():
+        properties[key] = '*' * len(value)
+  else:
+    properties = {}
+
+  return render("configuration.mako", request, {'configuration': properties})
 
 
 """
@@ -635,7 +637,6 @@ def query_done_cb(request, server_id):
 """
 Utils
 """
-
 def massage_columns_for_json(cols):
   massaged_cols = []
   for column in cols:
@@ -645,6 +646,7 @@ def massage_columns_for_json(cols):
       'comment': column.comment
     })
   return massaged_cols
+
 
 def authorized_get_design(request, design_id, owner_only=False, must_exist=False):
   if design_id is None and not must_exist:
@@ -664,6 +666,7 @@ def authorized_get_design(request, design_id, owner_only=False, must_exist=False
     design.doc.get().can_read_or_exception(request.user)
 
   return design
+
 
 def authorized_get_query_history(request, query_history_id, owner_only=False, must_exist=False):
   if query_history_id is None and not must_exist:
@@ -840,7 +843,7 @@ def _list_designs(user, querydict, page_size, prefix="", is_trashed=False):
   page = paginator.page(pagenum)
 
   # We need to pass the parameters back to the template to generate links
-  keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort') ]
+  keys_to_copy = [ prefix + key for key in ('user', 'type', 'sort', 'text') ]
   filter_params = copy_query_dict(querydict, keys_to_copy)
 
   return page, filter_params
@@ -951,6 +954,11 @@ def _list_query_history(user, querydict, page_size, prefix=""):
     else:
       db_queryset = db_queryset.filter(design__type=SavedQuery.TYPES_MAPPING[d_type])
 
+  # If recent query
+  recent = querydict.get('recent')
+  if recent:
+    db_queryset = db_queryset.filter(is_cleared=False)
+
   # Ordering
   sort_key = querydict.get(prefix + 'sort')
   if sort_key:
@@ -987,6 +995,7 @@ def _list_query_history(user, querydict, page_size, prefix=""):
 
   return page, filter_params
 
+
 def _update_query_state(query_history):
   """
   Update the last_state for a QueryHistory object. Returns success as True/False.
@@ -1008,12 +1017,14 @@ def _update_query_state(query_history):
     query_history.save_state(state_enum)
   return True
 
+
 def get_db_choices(request):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
   dbs = db.get_databases()
   return [(db, db) for db in dbs]
+
 
 WHITESPACE = re.compile("\s+", re.MULTILINE)
 def collapse_whitespace(s):

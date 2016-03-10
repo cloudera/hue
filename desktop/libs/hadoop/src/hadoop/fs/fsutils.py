@@ -23,21 +23,17 @@ import stat as stat_module
 logger = logging.getLogger(__name__)
 
 
-def do_overwrite_save(fs, path, data, encoding):
+def do_overwrite_save(fs, path, data):
 
     def copy_data(path_dest):
-        new_file = fs.open(path_dest, "w")
         try:
-            try:
-                new_file.write(data.encode(encoding))
-                logging.info("Wrote to " + path_dest)
-            finally:
-                new_file.close()
+            fs.create(path_dest, overwrite=False, data=data)
+            logging.info("Wrote to " + path_dest)
         except Exception, e:
             # An error occurred in writing, we should clean up
             # the tmp file if it exists, before re-raising
             try:
-                fs.remove(path_dest)
+                fs.remove(path_dest, skip_trash=True)
             except:
                 logger.exception('failed to remove %s' % path_dest)
             raise e
@@ -84,7 +80,7 @@ def _do_overwrite(fs, path, copy_data):
         # but not the end of the world - keep going
 
     # Now delete the old - nothing we can do here to recover
-    fs.remove(path)
+    fs.remove(path, skip_trash=True)
 
     # Now move the new one into place
     # If this fails, then we have no reason to assume
@@ -92,16 +88,4 @@ def _do_overwrite(fs, path, copy_data):
     # destination shouldn't already exist (we just deleted it above)
     fs.rename(path_dest, path)
 
-
-def do_newfile_save(fs, path, data, encoding):
-    """
-    Save data to the path 'path' on the filesystem 'fs'.
-
-    There must not be a pre-existing file at that path.
-    """
-    new_file = fs.open(path, "w")
-    try:
-        new_file.write(data.encode(encoding))
-    finally:
-        new_file.close()
 

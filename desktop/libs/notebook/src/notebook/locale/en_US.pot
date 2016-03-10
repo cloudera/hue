@@ -1,0 +1,346 @@
+# Translations template for Hue.
+# Copyright (C) 2014 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2014-01-16 13:47-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/spark/api.py:61 src/spark/views.py:109
+msgid "Requires a POST"
+msgstr ""
+
+#: src/spark/api.py:84
+msgid "Requires a DELETE"
+msgstr ""
+
+#: src/spark/api.py:120 src/spark/api.py:175
+msgid "A POST request is required."
+msgstr ""
+
+#: src/spark/api.py:162
+#, python-format
+msgid "There was an error with your query: %s"
+msgstr ""
+
+#: src/spark/api.py:205
+msgid "A GET request is required."
+msgstr ""
+
+#: src/spark/api.py:234
+msgid "Missing application jar list."
+msgstr ""
+
+#: src/spark/conf.py:28
+msgid "URL of the Spark Job Server."
+msgstr ""
+
+#: src/spark/conf.py:56
+msgid "The app won't work without a running Job Server"
+msgstr ""
+
+#: src/spark/decorators.py:34
+msgid "An error happened with the Spark Server"
+msgstr ""
+
+#: src/spark/forms.py:25
+msgid "Script parameters"
+msgstr ""
+
+#: src/spark/forms.py:27 src/spark/templates/editor.mako:79
+#: src/spark/templates/list_jobs.mako:36
+msgid "Class path"
+msgstr ""
+
+#: src/spark/views.py:94
+msgid "Delete context(s)?"
+msgstr ""
+
+#: src/spark/templates/common.mako:38
+msgid "Spark Igniter"
+msgstr ""
+
+#: src/spark/templates/common.mako:41
+msgid "Editor"
+msgstr ""
+
+#: src/spark/templates/common.mako:43
+#: src/spark/templates/list_applications.mako:23
+#: src/spark/templates/list_applications.mako:29
+msgid "Applications"
+msgstr ""
+
+#: src/spark/templates/common.mako:45
+msgid "Dashboard"
+msgstr ""
+
+#: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
+msgid "Contexts"
+msgstr ""
+
+#: src/spark/templates/common.mako:47
+msgid "Uploads"
+msgstr ""
+
+#: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
+#: src/spark/templates/list_contexts.mako:41
+msgid "Create context"
+msgstr ""
+
+#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:132
+#: src/spark/templates/editor.mako:220
+#: src/spark/templates/list_applications.mako:45
+#: src/spark/templates/list_contexts.mako:48
+msgid "Name"
+msgstr ""
+
+#: src/spark/templates/common.mako:70
+msgid "Num cpu cores"
+msgstr ""
+
+#: src/spark/templates/common.mako:76
+msgid "Memory per node"
+msgstr ""
+
+#: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
+#: src/spark/templates/editor.mako:234
+#: src/spark/templates/list_contexts.mako:85
+msgid "Cancel"
+msgstr ""
+
+#: src/spark/templates/common.mako:85
+msgid "Create"
+msgstr ""
+
+#: src/spark/templates/common.mako:96
+msgid "Upload application"
+msgstr ""
+
+#: src/spark/templates/common.mako:99
+msgid "One class of the jar should implement SparkJob."
+msgstr ""
+
+#: src/spark/templates/common.mako:101
+msgid "Local jar file"
+msgstr ""
+
+#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:63
+msgid "App name"
+msgstr ""
+
+#: src/spark/templates/common.mako:115
+msgid "Upload"
+msgstr ""
+
+#: src/spark/templates/editor.mako:23
+msgid "Query"
+msgstr ""
+
+#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:486
+msgid "Application name"
+msgstr ""
+
+#: src/spark/templates/editor.mako:48
+msgid "Application description"
+msgstr ""
+
+#: src/spark/templates/editor.mako:58
+#: src/spark/templates/list_applications.mako:36
+msgid "Upload app"
+msgstr ""
+
+#: src/spark/templates/editor.mako:66
+msgid "Missing, add one?"
+msgstr ""
+
+#: src/spark/templates/editor.mako:83 src/spark/templates/list_contexts.mako:23
+#: src/spark/templates/list_jobs.mako:37
+msgid "Context"
+msgstr ""
+
+#: src/spark/templates/editor.mako:86
+msgid "Automatic"
+msgstr ""
+
+#: src/spark/templates/editor.mako:92
+msgid "Create one?"
+msgstr ""
+
+#: src/spark/templates/editor.mako:115
+msgid "Parameters"
+msgstr ""
+
+#: src/spark/templates/editor.mako:121
+msgid "Your application has the following error(s):"
+msgstr ""
+
+#: src/spark/templates/editor.mako:127
+msgid "No parameters defined yet."
+msgstr ""
+
+#: src/spark/templates/editor.mako:133 src/spark/templates/editor.mako:176
+msgid "Value"
+msgstr ""
+
+#: src/spark/templates/editor.mako:147
+msgid "Delete"
+msgstr ""
+
+#: src/spark/templates/editor.mako:153
+msgid "Add"
+msgstr ""
+
+#: src/spark/templates/editor.mako:159
+msgid "Executing..."
+msgstr ""
+
+#: src/spark/templates/editor.mako:160
+msgid "Execute"
+msgstr ""
+
+#: src/spark/templates/editor.mako:162 src/spark/templates/editor.mako:235
+msgid "Save"
+msgstr ""
+
+#: src/spark/templates/editor.mako:163
+msgid "Save as..."
+msgstr ""
+
+#: src/spark/templates/editor.mako:164
+msgid "or create a"
+msgstr ""
+
+#: src/spark/templates/editor.mako:164
+msgid "New application"
+msgstr ""
+
+#: src/spark/templates/editor.mako:166
+msgid "Download"
+msgstr ""
+
+#: src/spark/templates/editor.mako:175
+msgid "Key"
+msgstr ""
+
+#: src/spark/templates/editor.mako:188
+msgid "The server returned no results."
+msgstr ""
+
+#: src/spark/templates/editor.mako:215
+msgid "Save your query"
+msgstr ""
+
+#: src/spark/templates/editor.mako:226
+msgid "Description"
+msgstr ""
+
+#: src/spark/templates/editor.mako:242
+msgid "Choose a file"
+msgstr ""
+
+#: src/spark/templates/editor.mako:378
+msgid "Did you know?"
+msgstr ""
+
+#: src/spark/templates/editor.mako:480
+msgid "This field is required."
+msgstr ""
+
+#: src/spark/templates/editor.mako:493
+msgid "Empty description"
+msgstr ""
+
+#: src/spark/templates/editor.mako:499
+msgid "Application saved successfully!"
+msgstr ""
+
+#: src/spark/templates/editor.mako:527
+#: src/spark/templates/list_applications.mako:93
+#: src/spark/templates/list_contexts.mako:131
+#: src/spark/templates/list_jobs.mako:96
+msgid "No data available"
+msgstr ""
+
+#: src/spark/templates/editor.mako:528
+#: src/spark/templates/list_applications.mako:94
+#: src/spark/templates/list_contexts.mako:132
+#: src/spark/templates/list_jobs.mako:97
+msgid "No matching records"
+msgstr ""
+
+#: src/spark/templates/editor.mako:579
+msgid "Server error occured: "
+msgstr ""
+
+#: src/spark/templates/editor.mako:582
+msgid "Unmanageable server error occured: "
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:33
+#: src/spark/templates/list_contexts.mako:33
+msgid "Search for name"
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:46
+msgid "Upload time"
+msgstr ""
+
+#: src/spark/templates/list_applications.mako:53
+msgid "Click to open and execute"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:36
+msgid "Delete forever"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:37
+msgid "Delete selected"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:82
+msgid "Confirm action"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:86
+msgid "Yes"
+msgstr ""
+
+#: src/spark/templates/list_contexts.mako:208
+msgid "Delete the selected contexts?"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
+msgid "Jobs"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:34
+msgid "Status"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:35
+msgid "Job id"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:38
+msgid "Start time"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:39
+msgid "Duration"
+msgstr ""
+
+#: src/spark/templates/list_jobs.mako:51
+msgid "Click to open"
+msgstr ""
+

@@ -24,6 +24,7 @@ from nose.tools import assert_equal, assert_true, assert_not_equal
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
+from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
 from oozie.models2 import Node
 from oozie.tests import OozieMockBase
@@ -135,6 +136,10 @@ def test_copy_files():
     assert_not_equal(stats_udf5['fileId'], cluster.fs.stats(deployment_dir + '/udf5.jar')['fileId'])
     assert_equal(stats_udf6['fileId'], cluster.fs.stats(deployment_dir + '/udf6.jar')['fileId'])
 
+    # Test _create_file()
+    submission._create_file(deployment_dir, 'test.txt', data='Test data')
+    assert_true(cluster.fs.exists(deployment_dir + '/test.txt'), list_dir_workspace)
+
   finally:
     try:
       cluster.fs.rmtree(prefix)
@@ -187,7 +192,9 @@ class TestSubmission(OozieMockBase):
 
   def test_update_properties(self):
     finish = []
+    finish.append(MR_CLUSTERS.set_for_testing({'default': {}}))
     finish.append(MR_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
+    finish.append(YARN_CLUSTERS.set_for_testing({'default': {}}))
     finish.append(YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True))
     try:
       properties = {
@@ -204,7 +211,7 @@ class TestSubmission(OozieMockBase):
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
 
-      cluster.clear_caches()
+      clear_sys_caches()
       fs = cluster.get_hdfs()
       jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
@@ -219,7 +226,7 @@ class TestSubmission(OozieMockBase):
 
       finish.append(HDFS_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('namenode'))
       finish.append(MR_CLUSTERS['default'].LOGICAL_NAME.set_for_testing('jobtracker'))
-      cluster.clear_caches()
+      clear_sys_caches()
       fs = cluster.get_hdfs()
       jt = cluster.get_next_ha_mrcluster()[1]
       final_properties = properties.copy()
@@ -232,7 +239,7 @@ class TestSubmission(OozieMockBase):
       submission._update_properties('jtaddress', 'deployment-directory')
       assert_equal(final_properties, submission.properties)
     finally:
-      cluster.clear_caches()
+      clear_sys_caches()
       for reset in finish:
         reset()
 

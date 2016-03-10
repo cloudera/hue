@@ -18,43 +18,40 @@
 
 package com.cloudera.hue.livy.repl
 
+import java.util.concurrent.TimeUnit
+
+import com.cloudera.hue.livy.repl
 import com.cloudera.hue.livy.sessions._
 import org.json4s.JsonAST.{JArray, JString}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
-import org.json4s.{DefaultFormats, Extraction}
+import org.json4s.{JValue, DefaultFormats, Extraction}
 import org.scalatest.{BeforeAndAfter, FunSpecLike}
 import org.scalatra.test.scalatest.ScalatraSuite
 
-import _root_.scala.concurrent.Future
+import _root_.scala.concurrent.duration.Duration
+import _root_.scala.concurrent.{Await, Future}
 
 class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
 
   implicit val formats = DefaultFormats
 
-  class MockSession extends Session {
-    var _state: State = Idle()
-    var _history = IndexedSeq[Statement]()
+  class MockInterpreter extends Interpreter {
+    override def kind: String = "mock"
 
-    override def kind: Kind = Spark()
+    override def start() = {}
 
-    override def state = _state
-
-    override def execute(code: String): Statement = {
-      val rep = render(Map("hi" -> "there"))
-      val statement = Statement(0, Future.successful(rep))
-      _history :+= statement
-      statement
+    override def execute(code: String) = {
+      Thread.sleep(1000)
+      Interpreter.ExecuteSuccess(repl.TEXT_PLAIN -> "1")
     }
 
-    override def close(): Unit = {
-      _state = Dead()
-    }
-
-    override def history: IndexedSeq[Statement] = _history
+    override def close() = {}
   }
 
-  val session = new MockSession
+  val interpreter = new MockInterpreter()
+  val session = new Session(new MockInterpreter())
+
   val servlet = new WebApp(session)
 
   addServlet(servlet, "/*")
@@ -68,7 +65,7 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
         parsedBody \ "state" should equal (JString("idle"))
       }
 
-      session._state = Busy()
+      session.execute("")
 
       get("/") {
         status should equal (200)
@@ -90,24 +87,30 @@ class WebAppSpec extends ScalatraSuite with FunSpecLike with BeforeAndAfter {
     }
 
     it("GET /history with history should return something") {
-      val history = Extraction.decompose(Map(
-          "data" -> Map("text/plain" -> "1")
-      ))
-      session._history = IndexedSeq(Statement(0, Future.successful(history)))
+      Await.ready(session.execute("").result, Duration(10, TimeUnit.SECONDS))
 
       get("/history") {
         status should equal (200)
         header("Content-Type") should include("application/json")
         parse(body) should equal (
-          ("from", 0) ~
-            ("total", 1) ~
-            ("statements", JArray(List( ("id", 0) ~ ("result", history)))))
+          ("from" -> 0) ~
+          ("total" -> 1) ~
+          (
+            "statements" -> List[JValue](
+              ("id" -> 0) ~
+              ("result" ->
+                ("status" -> "ok") ~
+                ("execution_count" -> 0) ~
+                ("data" -> (repl.TEXT_PLAIN -> "1"))
+              )
+            )
+          )
+        )
       }
     }
-  }
 
-  after {
-    session._state = Idle()
-    session._history = IndexedSeq()
+    after {
+      session.clearHistory()
+    }
   }
 }

@@ -18,6 +18,11 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+
+home_url = url('desktop.views.home')
+from desktop.conf import USE_NEW_EDITOR
+if USE_NEW_EDITOR.get():
+  home_url = url('desktop.views.home2')
 %>
 
 <%def name="is_selected(selected)">
@@ -41,18 +46,19 @@ from django.utils.translation import ugettext as _
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta charset="utf-8">
   <title>Hue ${get_nice_name(current_app, section)} ${get_title(title)}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="${ static('desktop/art/favicon.ico') }" />
   <meta name="description" content="">
   <meta name="author" content="">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
   <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/fileuploader.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/perfect-scrollbar.min.css') }" rel="stylesheet">
 
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -141,6 +147,11 @@ from django.utils.translation import ugettext as _
       }
     };
 
+    LeafletGlobals = {
+      layer: '${ leaflet['layer'] |n,unicode }',
+      attribution: '${ leaflet['attribution'] |n,unicode }'
+    };
+
   </script>
 
   <!--[if lt IE 9]>
@@ -183,6 +194,8 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
+  <script src="${ static('desktop/js/perfect-scrollbar.jquery.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/floatlabels.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
@@ -200,12 +213,14 @@ from django.utils.translation import ugettext as _
 
     $.fn.dataTableExt.sErrMode = "throw";
 
+    // sets global assistHelper TTL
+    $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
+
     $(document).ready(function () {
       // forces IE's ajax calls not to cache
       if ($.browser.msie) {
         $.ajaxSetup({ cache: false });
       }
-
 
       // prevents framebusting and clickjacking
       if (self == top){
@@ -272,7 +287,7 @@ from django.utils.translation import ugettext as _
         window.clearTimeout(closeTimeout);
         openTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
-          $(".navigator ul.dropdown-menu").hide();
+          $(".navigator .nav-pills li.dropdown > ul.dropdown-menu").hide();
           $("[rel='navigator-tooltip']").tooltip("hide");
           _this.find("ul.dropdown-menu:eq(0)").show();
         }, _timeout);
@@ -286,7 +301,6 @@ from django.utils.translation import ugettext as _
         openDropdown($(this));
       },
       function () {
-        var _this = $(this);
         window.clearTimeout(openTimeout);
         closeTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
@@ -318,7 +332,8 @@ from django.utils.translation import ugettext as _
         var _lastShown = $(this).find(".dropdown-menu").data("lastShown");
         if (_lastShown == null || (new Date()).getTime() - _lastShown > 300) {
           var _el = $(this);
-          window.setTimeout(function () {
+          _el.hideTimeout = window.setTimeout(function () {
+            window.clearTimeout(_el.hideTimeout);
             _el.find(".dropdown-menu").hide();
           }, 50);
         }
@@ -357,7 +372,7 @@ from django.utils.translation import ugettext as _
        count += 1
     return found_app, count
 %>
-
+% if not skip_topbar:
 <div class="navigator">
   <div class="pull-right">
 
@@ -372,8 +387,16 @@ from django.utils.translation import ugettext as _
     % endif
     <li class="dropdown">
       <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-cogs"></i>&nbsp;<span class="hideable">${user.username}&nbsp;</span><b class="caret"></b></a>
-      <ul class="dropdown-menu">
-        <li><a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;${_('Edit Profile')}</a></li>
+      <ul class="dropdown-menu pull-right">
+        <li>
+          <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
+            % if is_ldap_setup:
+              ${_('View Profile')}
+            % else:
+              ${_('Edit Profile')}
+            % endif
+          </a>
+        </li>
         % if user.is_superuser:
           <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
         % endif
@@ -395,7 +418,7 @@ from django.utils.translation import ugettext as _
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /></a>
     % if user.is_authenticated() and section != 'login':
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ url('desktop.views.home') }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
+       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
        <%
          query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
        %>
@@ -404,34 +427,76 @@ from django.utils.translation import ugettext as _
          <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Query Editors <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
+             <%
+               from desktop.conf import USE_NEW_EDITOR
+             %>
+             % if USE_NEW_EDITOR.get():
+             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+             % else:
              <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+             % endif
            % endif
            % if 'impala' in apps:
+             % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
+             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+             % else:
              <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+             % endif
            % endif
            % if 'rdbms' in apps:
-            <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             % if USE_NEW_EDITOR.get():
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             % else:
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             % endif
            % endif
            % if 'pig' in apps:
+             % if USE_NEW_EDITOR.get() and False:
+             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+             % else:
              <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+             % endif
            % endif
            % if 'jobsub' in apps:
              <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
-           % endif
-           % if 'spark' in apps:
-             <li class="dropdown-submenu">
-               <a href="/${apps['spark'].display_name}"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark (beta)')}</a>
-               <ul class="dropdown-menu">
-                 <li><a href="${ url('spark:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
-                 <li><a href="${ url('spark:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
-               </ul>
-             </li>
            % endif
          </ul>
        </li>
        % elif query_apps[1] == 1:
           <li><a href="/${apps[query_apps[0]].display_name}">${apps[query_apps[0]].nice_name}</a></li>
        % endif
+       % if 'beeswax' in apps:
+        <%
+          from desktop.conf import USE_NEW_EDITOR
+        %>
+        % if USE_NEW_EDITOR.get():
+         <% from desktop.models import Document2, Document %>
+         <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
+         % if not notebooks:
+           <li>
+             <a title="${_('Notebook')}" rel="navigator-tooltip" href="${ url('notebook:new') }">${_('Notebooks')}</a>
+           </li>
+         % else:
+           <li class="dropdown">
+             <a title="${_('Notebook')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+               ${_('Notebooks')} <b class="caret"></b>
+             </a>
+             <ul role="menu" class="dropdown-menu">
+               <li><a href="${ url('notebook:new') }"><i class="fa fa-fw fa-plus" style="vertical-align: middle"></i>${_('Notebook')}</a></li>
+               <li><a href="${ url('notebook:notebooks') }"><i class="fa fa-fw fa-tags" style="vertical-align: middle"></i>${_('Notebooks')}</a></li>
+               <li class="divider"></li>
+               % for notebook in notebooks:
+                 <li>
+                   <a href="${ url('notebook:notebook') }?notebook=${ notebook['id'] }">
+                     <i class="fa fa-file-text-o" style="vertical-align: middle"></i> ${ notebook['name'] |n }
+                   </a>
+                 </li>
+               % endfor
+             </ul>
+           </li>
+          % endif
+        % endif
+      % endif
        <%
          data_apps = count_apps(apps, ['metastore', 'hbase', 'sqoop', 'zookeeper']);
        %>
@@ -497,7 +562,7 @@ from django.utils.translation import ugettext as _
          <% collections = controller.get_shared_search_collections() %>
          % if not collections:
            <li>
-             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">Search</a>
+             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
            </li>
          % else:
            <li class="dropdown">
@@ -505,15 +570,7 @@ from django.utils.translation import ugettext as _
                ${_('Search')} <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
-               % for collection in collections:
-                 <li>
-                   <a href="${ url('search:index') }?collection=${ collection.id }">
-                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon"/> ${ collection.name }
-                   </a>
-                 </li>
-               % endfor
                % if 'indexer' in apps or 'search' in apps:
-                 <li class="divider"></li>
                  % if 'search' in apps:
                  <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
                  <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
@@ -521,16 +578,33 @@ from django.utils.translation import ugettext as _
                  % if 'indexer' in apps:
                  <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
                  % endif
+                 <li class="divider"></li>
                % endif
+               % for collection in collections:
+                 <li>
+                   <a href="${ url('search:index') }?collection=${ collection.id }">
+                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon"/> ${ collection.name }
+                   </a>
+                 </li>
+               % endfor
              </ul>
            </li>
          % endif
        % endif
        % if 'security' in apps:
+         <% from security.conf import HIVE_V1, HIVE_V2, SOLR_V2 %>
          <li class="dropdown">
            <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">Security <b class="caret"></b></a>
            <ul role="menu" class="dropdown-menu">
-             <li><a href="${ url('security:hive') }">&nbsp;<i class="fa fa-database"></i>&nbsp;&nbsp;${_('Sentry Tables')}</a></li>
+             % if HIVE_V1.get():
+             <li><a href="${ url('security:hive') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"></img>&nbsp;&nbsp;${_('Sentry Tables')}</a></li>
+             % endif
+             % if HIVE_V2.get():
+             <li><a href="${ url('security:hive2') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"></img>&nbsp;&nbsp;${_('Sentry Tables v2')}</a></li>
+             % endif
+             % if SOLR_V2.get():
+             <li><a href="${ url('security:solr') }">&nbsp;<i class="fa fa-database"></i>&nbsp;&nbsp;${_('Solr Collections')}</a></li>
+             % endif
              <li><a href="${ url('security:hdfs') }">&nbsp;<i class="fa fa-file"></i>&nbsp;&nbsp;${_('File ACLs')}</a></li>
            </ul>
          </li>
@@ -549,6 +623,7 @@ from django.utils.translation import ugettext as _
    % endif
 
 </div>
+% endif
 
 % if is_demo:
   <ul class="side-labels unstyled">

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 DJANGO_APPS = ['impala']
-NICE_NAME = 'Impala Editor'
+NICE_NAME = 'Impala'
 MENU_INDEX = 11
 ICON = 'impala/art/icon_impala_48.png'
 

@@ -15,18 +15,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
 import logging
 import os
 import socket
 import stat
-import subprocess
 
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
-                             validate_path, list_of_compiled_res, coerce_str_lowercase
+                             validate_path, list_of_compiled_res, coerce_str_lowercase, \
+                             coerce_password_from_script
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -52,16 +53,23 @@ def coerce_port(port):
     return port
 
 
-def coerce_password_from_script(script):
-  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
-  password = p.communicate()[0]
+def coerce_file(path):
+  if path and not os.path.isfile(path):
+    raise Exception('File %s does not exist.' % path)
+  return path
 
-  if p.returncode != 0:
-    raise subprocess.CalledProcessError(p.returncode, script)
 
-  # whitespace may be significant in the password, but most files have a
-  # trailing newline.
-  return password.strip('\n')
+def coerce_timedelta(value):
+  return datetime.timedelta(seconds=int(value))
+
+
+def coerce_positive_integer(integer):
+  integer = int(integer)
+
+  if integer <= 0:
+    raise Exception('integer is not positive')
+
+  return integer
 
 
 HTTP_HOST = Config(
@@ -83,24 +91,55 @@ HTTP_ALLOWED_METHODS = Config(
   private=True,
   default=['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT'])
 
+X_FRAME_OPTIONS = Config(
+  key="http_x_frame_options",
+  help=_("X-Frame-Options HTTP header value."),
+  type=str,
+  default="SAMEORIGIN")
+
 SSL_CERTIFICATE = Config(
   key="ssl_certificate",
   help=_("Filename of SSL Certificate"),
+  type=coerce_file,
   default=None)
 
 SSL_PRIVATE_KEY = Config(
   key="ssl_private_key",
   help=_("Filename of SSL RSA Private Key"),
+  type=coerce_file,
+  default=None)
+
+SSL_CERTIFICATE_CHAIN = Config(
+  key="ssl_certificate_chain",
+  help=_("Filename of SSL Certificate Chain"),
+  type=coerce_file,
   default=None)
 
 SSL_CIPHER_LIST = Config(
   key="ssl_cipher_list",
   help=_("List of allowed and disallowed ciphers"),
-  default="DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2")
+
+  # From https://wiki.mozilla.org/Security/Server_Side_TLS v3.7 default
+  # recommendation, which should be compatible with Firefox 1, Chrome 1, IE 7,
+  # Opera 5 and Safari 1.
+  default=(
+      "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES128-GCM-SHA256:"
+      "ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES256-GCM-SHA384:"
+      "DHE-RSA-AES128-GCM-SHA256:DHE-DSS-AES128-GCM-SHA256:"
+      "kEDH+AESGCM:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA256:"
+      "ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:"
+      "ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA:"
+      "ECDHE-ECDSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:"
+      "DHE-DSS-AES128-SHA256:DHE-RSA-AES256-SHA256:DHE-DSS-AES256-SHA:"
+      "DHE-RSA-AES256-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:"
+      "AES256-SHA256:AES128-SHA:AES256-SHA:AES:CAMELLIA:DES-CBC3-SHA:!aNULL:"
+      "!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!EDH-DSS-DES-CBC3-SHA:"
+      "!EDH-RSA-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA"
+  ))
 
 SSL_PASSWORD = Config(
   key="ssl_password",
-  help=_("SSL password of the the certificate"),
+  help=_("SSL password of the certificate"),
   default=None)
 
 SSL_PASSWORD_SCRIPT = Config(
@@ -109,12 +148,26 @@ SSL_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+SSL_CACERTS = Config(
+  key="ssl_cacerts",
+  help=_('Path to default Certificate Authority certificates.'),
+  type=str,
+  default='')
+
+SSL_VALIDATE = Config(
+  key="ssl_validate",
+  help=_('Choose whether Hue should validate certificates received from the server.'),
+  type=coerce_bool,
+  default=True)
+
+# Deprecated by AUTH_PASSWORD
 LDAP_PASSWORD = Config(
   key="ldap_password",
   help=_("LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   default=None)
 
+# Deprecated by AUTH_PASSWORD_SCRIPT
 LDAP_PASSWORD_SCRIPT = Config(
   key="ldap_password_script",
   help=_("Execute this script to produce the LDAP password. This will be used when `ldap_password` is not set."),
@@ -122,11 +175,55 @@ LDAP_PASSWORD_SCRIPT = Config(
   type=coerce_password_from_script,
   default=None)
 
+# Deprecated by by AUTH_USERNAME
 LDAP_USERNAME = Config(
   key="ldap_username",
   help=_("LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."),
   private=True,
   default="hue")
+
+def get_auth_username():
+  """Backward compatibility"""
+  return LDAP_USERNAME.get()
+
+AUTH_USERNAME = Config(
+  key="auth_username",
+  help=_("Auth username of the hue user used for authentications. For example for LDAP Authentication with HiveServer2/Impala."),
+  dynamic_default=get_auth_username)
+
+def get_auth_password():
+  """Get from script or backward compatibility"""
+
+  password = os.environ.get('HUE_AUTH_PASSWORD')
+  if password is not None:
+    return password
+
+  password = AUTH_PASSWORD_SCRIPT.get()
+  if password:
+    return password
+
+  password = os.environ.get('HUE_LDAP_PASSWORD')
+  if password is not None:
+    return password
+
+  password = LDAP_PASSWORD.get() # 2 levels for backward compatibility
+  if password:
+    return password
+
+  return LDAP_PASSWORD_SCRIPT.get()
+
+AUTH_PASSWORD = Config(
+  key="auth_password",
+  help=_("LDAP/PAM/.. password of the hue user used for authentications. Inactive if empty. For example for LDAP Authentication with HiveServer2/Impala."),
+  private=True,
+  dynamic_default=get_auth_password)
+
+AUTH_PASSWORD_SCRIPT = Config(
+  key="auth_password_script",
+  help=_("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
 
 ENABLE_SERVER = Config(
   key="enable_server",
@@ -143,14 +240,14 @@ CHERRYPY_SERVER_THREADS = Config(
 SECRET_KEY = Config(
   key="secret_key",
   help=_("Used in hashing algorithms for sessions."),
-  default=None)
+  default="")
 
 SECRET_KEY_SCRIPT = Config(
   key="secret_key_script",
   help=_("Execute this script to produce the Django secret key. This will be used when `secret_key` is not set."),
   type=coerce_password_from_script,
   private=True,
-  default=None)
+  default="")
 
 USER_ACCESS_HISTORY_SIZE = Config(
   key="user_access_history_size",
@@ -164,6 +261,18 @@ COLLECT_USAGE = Config(
          "Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."),
   type=coerce_bool,
   default=True)
+
+LEAFLET_TILE_LAYER = Config(
+  key="leaflet_tile_layer",
+  help=_("Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer"),
+  type=coerce_str_lowercase,
+  default="http://{s}.tile.osm.org/{z}/{x}/{y}.png")
+
+LEAFLET_TILE_LAYER_ATTRIBUTION = Config(
+  key="leaflet_tile_layer_attribution",
+  help=_("The copyright message for the specified Leaflet maps Tile Layer"),
+  type=coerce_str_lowercase,
+  default='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors')
 
 POLL_ENABLED = Config(
   key="poll_enabled",
@@ -187,6 +296,12 @@ REDIRECT_WHITELIST = Config(
          "  ^\/.*$,^http:\/\/www.mydomain.com\/.*$"),
   type=list_of_compiled_res(skip_empty=True),
   default='^\/.*$')
+
+USE_X_FORWARDED_HOST = Config(
+  key="use_x_forwarded_host",
+  help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
+  type=coerce_bool,
+  default=False)
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
@@ -250,6 +365,21 @@ def default_database_options():
     return {}
 
 
+def default_secure_cookie():
+  """Enable secure cookies if HTTPS is enabled."""
+  return is_https_enabled()
+
+
+def default_ssl_cacerts():
+  """Path to default Certificate Authority certificates"""
+  return SSL_CACERTS.get()
+
+
+def default_ssl_validate():
+  """Choose whether Hue should validate certificates received from the server."""
+  return SSL_VALIDATE.get()
+
+
 SMTP = ConfigSection(
   key='smtp',
   help=_('Configuration options for connecting to an external SMTP server.'),
@@ -280,7 +410,7 @@ SMTP = ConfigSection(
       help=_("The password for the SMTP user."),
       type=str,
       private=True,
-      default=None,
+      default="",
     ),
 
     PASSWORD_SCRIPT = Config(
@@ -288,7 +418,7 @@ SMTP = ConfigSection(
       help=_("Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."),
       type=coerce_password_from_script,
       private=True,
-      default=None,
+      default="",
     ),
 
     USE_TLS = Config(
@@ -304,6 +434,27 @@ SMTP = ConfigSection(
       type=str,
       dynamic_default=default_from_email
     ),
+  )
+)
+
+METRICS = ConfigSection(
+  key='metrics',
+  help=_("""Configuration options for metrics"""),
+  members=dict(
+    ENABLE_WEB_METRICS=Config(
+      key='enable_web_metrics',
+      help=_('Enable metrics URL "desktop/metrics"'),
+      default=True,
+      type=coerce_bool),
+    LOCATION=Config(
+      key='location',
+      help=_('If specified, Hue will write metrics to this file'),
+      type=str),
+    COLLECTION_INTERVAL=Config(
+      key='collection_interval',
+      help=_('Time in milliseconds on how frequently to collect metrics'),
+      type=coerce_positive_integer,
+      default=30000),
   )
 )
 
@@ -335,14 +486,14 @@ DATABASE = ConfigSection(
       help=_('Database password.'),
       private=True,
       type=str,
-      default=None,
+      default="",
     ),
     PASSWORD_SCRIPT=Config(
       key='password_script',
       help=_('Execute this script to produce the database password. This will be used when `password` is not set.'),
       private=True,
       type=coerce_password_from_script,
-      default=None,
+      default="",
     ),
     HOST=Config(
       key='host',
@@ -380,13 +531,13 @@ SESSION = ConfigSection(
       key='secure',
       help=_("The cookie containing the users' session ID will be secure. This should only be enabled with HTTPS."),
       type=coerce_bool,
-      default=False,
+      dynamic_default=default_secure_cookie,
     ),
     HTTP_ONLY=Config(
       key='http_only',
       help=_("The cookie containing the users' session ID will use the HTTP only flag."),
       type=coerce_bool,
-      default=False
+      default=True,
     ),
     EXPIRE_AT_BROWSER_CLOSE=Config(
       key='expire_at_browser_close',
@@ -481,6 +632,14 @@ CUSTOM = ConfigSection(
                    help=_("Top banner HTML code. This code will be placed in the navigation bar "
                         "so that it will reside at the top of the page in a fixed position. " +
                         "One common value is `<img src=\"http://www.example.com/example.gif\" />`")),
+    LOGIN_SPLASH_HTML=Config("login_splash_html",
+                   default="",
+                   help=_("The login splash HTML code. This code will be placed in the login page, "
+                        "useful for security warning messages.")),
+    CACHEABLE_TTL=Config("cacheable_ttl",
+                   default=86400000,
+                   type=int,
+                   help=_("The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache.")),
 ))
 
 AUTH = ConfigSection(
@@ -488,11 +647,13 @@ AUTH = ConfigSection(
   help=_("Configuration options for user authentication into the web application."),
   members=dict(
     BACKEND=Config("backend",
-                   default="desktop.auth.backend.AllowFirstUserDjangoBackend",
+                   default=["desktop.auth.backend.AllowFirstUserDjangoBackend"],
+                   type=coerce_csv,
                    help=_("Authentication backend.  Common settings are "
                         "django.contrib.auth.backends.ModelBackend (fully Django backend), " +
                         "desktop.auth.backend.AllowAllBackend (allows everyone), " +
-                        "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). ")),
+                        "desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). " +
+                        "Multiple Authentication backends are supported by specifying a comma-separated list in order of priority.")),
     USER_AUGMENTOR=Config("user_augmentor",
                    default="desktop.auth.backend.DefaultUserAugmentor",
                    help=_("Class which defines extra accessor methods for User objects.")),
@@ -513,7 +674,7 @@ AUTH = ConfigSection(
                                   type=coerce_bool,
                                   default=True),
     FORCE_USERNAME_LOWERCASE = Config("force_username_lowercase",
-                                      help=_("Force usernames to lowercase when creating new users from LDAP."),
+                                      help=_("Force usernames to lowercase when creating new users."),
                                       type=coerce_bool,
                                       default=True),
     EXPIRES_AFTER = Config("expires_after",
@@ -525,6 +686,11 @@ AUTH = ConfigSection(
                                 help=_("Apply 'expires_after' to superusers."),
                                 type=coerce_bool,
                                 default=True),
+    IDLE_SESSION_TIMEOUT = Config("idle_session_timeout",
+                            help=_("Users will automatically be logged out after 'n' seconds of inactivity."
+                                   "A negative number means that idle sessions will not be timed out."),
+                            type=int,
+                            default=-1),
     CHANGE_DEFAULT_PASSWORD = Config(
                             key="change_default_password",
                             help=_("When set to true this will allow you to specify a password for "
@@ -532,7 +698,37 @@ AUTH = ConfigSection(
                                    "their password upon first login.  The default is false."),
                             type=coerce_bool,
                             default=False,
-    )
+    ),
+    LOGIN_FAILURE_LIMIT = Config(
+      key="login_failure_limit",
+      help=_("Number of login attempts allowed before a record is created for failed logins"),
+      type=int,
+      default=3,
+    ),
+    LOGIN_LOCK_OUT_AT_FAILURE = Config(
+      key="login_lock_out_at_failure",
+      help=_("After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?"),
+      type=coerce_bool,
+      default=False,
+    ),
+    LOGIN_COOLOFF_TIME = Config(
+      key="login_cooloff_time",
+      help=_("If set, defines period of inactivity in seconds after which failed logins will be forgotten"),
+      type=coerce_timedelta,
+      default=None,
+    ),
+    LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP = Config(
+      key="login_lock_out_by_combination_browser_user_agent_and_ip",
+      help=_("If True, lock out based on IP and browser user agent"),
+      type=coerce_bool,
+      default=False,
+    ),
+    LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP = Config(
+      key="login_lock_out_by_combination_user_and_ip",
+      help=_("If True, lock out based on IP and user"),
+      type=coerce_bool,
+      default=False,
+    ),
 ))
 
 LDAP = ConfigSection(
@@ -881,6 +1077,12 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
+USE_NEW_EDITOR = Config( # To remove in Hue 4
+  key='use_new_editor',
+  default=True,
+  type=coerce_bool,
+  help=_('Choose whether to show the new SQL editor.')
+)
 
 def validate_ldap(user, config):
   res = []
@@ -888,7 +1090,7 @@ def validate_ldap(user, config):
   if config.SEARCH_BIND_AUTHENTICATION.get():
     if config.LDAP_URL.get() is not None:
       bind_dn = config.BIND_DN.get()
-      bind_password = config.BIND_PASSWORD.get() or config.BIND_PASSWORD_SCRIPT.get()
+      bind_password = get_ldap_bind_password(config)
 
       if bool(bind_dn) != bool(bind_password):
         if bind_dn == None:
@@ -919,7 +1121,7 @@ def validate_ldap(user, config):
 
   return res
 
-def validate_mysql_storage():
+def validate_database():
 
   from django.db import connection
 
@@ -950,7 +1152,8 @@ def validate_mysql_storage():
                                                         storage engine type (preferably InnoDB).'''))))
       except Exception, ex:
         LOG.exception("Error in config validation of MYSQL_STORAGE_ENGINE: %s", ex)
-
+  elif 'sqlite' in connection.vendor:
+    res.append(('SQLITE_NOT_FOR_PRODUCTION_USE', unicode(_('SQLite is only recommended for small development environments with a few users.'))))
   return res
 
 
@@ -998,7 +1201,7 @@ def config_validator(user):
     res.extend(validate_ldap(user, LDAP))
 
   # Validate MYSQL storage engine of all tables
-  res.extend(validate_mysql_storage())
+  res.extend(validate_database())
 
   return res
 
@@ -1011,48 +1214,60 @@ def get_redaction_policy():
 
 
 def get_secret_key():
+  secret_key = os.environ.get('HUE_SECRET_KEY')
+  if secret_key is not None:
+    return secret_key
+
   secret_key = SECRET_KEY.get()
-  if secret_key is None:
+  if not secret_key:
     secret_key = SECRET_KEY_SCRIPT.get()
 
   return secret_key
 
 
 def get_ssl_password():
+  password = os.environ.get('HUE_SSL_PASSWORD')
+  if password is not None:
+    return password
+
   password = SSL_PASSWORD.get()
-  if password is None:
+  if not password:
     password = SSL_PASSWORD_SCRIPT.get()
 
   return password
 
 
 def get_database_password():
+  password = os.environ.get('HUE_DATABASE_PASSWORD')
+  if password is not None:
+    return password
+
   password = DATABASE.PASSWORD.get()
-  if password is None:
+  if not password:
     password = DATABASE.PASSWORD_SCRIPT.get()
 
   return password
 
 
 def get_smtp_password():
+  password = os.environ.get('HUE_SMTP_PASSWORD')
+  if password is not None:
+    return password
+
   password = SMTP.PASSWORD.get()
-  if password is None:
+  if not password:
     password = SMTP.PASSWORD_SCRIPT.get()
 
   return password
 
 
-def get_ldap_password():
-  password = LDAP_PASSWORD.get()
-  if password is None:
-    password = LDAP_PASSWORD_SCRIPT.get()
-
-  return password
-
-
 def get_ldap_bind_password(ldap_config):
+  password = os.environ.get('HUE_LDAP_BIND_PASSWORD')
+  if password is not None:
+    return password
+
   password = ldap_config.BIND_PASSWORD.get()
-  if password is None:
+  if not password:
     password = ldap_config.BIND_PASSWORD_SCRIPT.get()
 
   return password

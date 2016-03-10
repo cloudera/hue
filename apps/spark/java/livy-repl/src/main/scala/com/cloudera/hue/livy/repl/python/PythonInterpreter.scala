@@ -20,53 +20,82 @@ package com.cloudera.hue.livy.repl.python
 
 import java.io._
 import java.lang.ProcessBuilder.Redirect
-import java.nio.file.Files
-import java.util.concurrent.{SynchronousQueue, TimeUnit}
+import java.nio.file.{Paths, Files}
 
+import com.cloudera.hue.livy.Logging
 import com.cloudera.hue.livy.repl.Interpreter
-import com.cloudera.hue.livy.sessions._
-import com.cloudera.hue.livy.{Logging, Utils}
-import org.apache.spark.SparkContext
-import org.json4s.{DefaultFormats, JValue}
+import com.cloudera.hue.livy.repl.process.ProcessInterpreter
+import org.json4s.JsonAST.JObject
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
+import org.json4s.{DefaultFormats, JValue}
 import py4j.GatewayServer
 
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
-import scala.collection.mutable.ArrayBuffer
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future, Promise}
 
-object PythonInterpreter {
-  def create(): Interpreter = {
+object PythonInterpreter extends Logging {
+  def apply(): Interpreter = {
     val pythonExec = sys.env.getOrElse("PYSPARK_DRIVER_PYTHON", "python")
 
     val gatewayServer = new GatewayServer(null, 0)
     gatewayServer.start()
 
-    val builder = new ProcessBuilder(Seq(
-      pythonExec,
-      createFakeShell().toString
-    ))
+    val builder = new ProcessBuilder(Seq(pythonExec, createFakeShell().toString))
 
     val env = builder.environment()
+
+    val pythonPath = sys.env.getOrElse("PYTHONPATH", "")
+      .split(File.pathSeparator)
+      .++(findPySparkArchives())
+      .++(findPyFiles())
+
     env.put("PYTHONPATH", pythonPath.mkString(File.pathSeparator))
     env.put("PYTHONUNBUFFERED", "YES")
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     env.put("SPARK_HOME", sys.env.getOrElse("SPARK_HOME", "."))
 
-    builder.redirectError(Redirect.INHERIT)
+    builder.redirectError(Redirect.PIPE)
 
     val process = builder.start()
 
     new PythonInterpreter(process, gatewayServer)
   }
 
-  private def pythonPath = {
-    val pythonPath = new ArrayBuffer[String]
-    pythonPath ++= Utils.jarOfClass(classOf[SparkContext])
-    pythonPath
+  private def findPySparkArchives(): Seq[String] = {
+    sys.env.get("PYSPARK_ARCHIVES_PATH")
+      .map(_.split(",").toSeq)
+      .getOrElse {
+        sys.env.get("SPARK_HOME").map { sparkHome =>
+          val pyLibPath = Seq(sparkHome, "python", "lib").mkString(File.separator)
+          val pyArchivesFile = new File(pyLibPath, "pyspark.zip")
+          require(pyArchivesFile.exists(),
+            "pyspark.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
+
+          val py4jFile = Files.newDirectoryStream(Paths.get(pyLibPath), "py4j-*-src.zip")
+            .iterator()
+            .next()
+            .toFile
+
+          require(py4jFile.exists(),
+            "py4j-*-src.zip not found in Spark environment; cannot run pyspark application in YARN mode.")
+          Seq(pyArchivesFile.getAbsolutePath, py4jFile.getAbsolutePath)
+        }.getOrElse(Seq())
+      }
+  }
+
+  private def findPyFiles(): Seq[String] = {
+    val pyFiles = sys.props.getOrElse("spark.submit.pyFiles", "").split(",")
+
+    if (sys.env.getOrElse("SPARK_YARN_MODE", "") == "true") {
+      // In spark mode, these files have been localized into the current directory.
+      pyFiles.map { file =>
+        val name = new File(file).getName
+        new File(name).getAbsolutePath
+      }
+    } else {
+      pyFiles
+    }
   }
 
   private def createFakeShell(): File = {
@@ -89,73 +118,26 @@ object PythonInterpreter {
 
     file
   }
-
-  private def createFakePySpark(): File = {
-    val source: InputStream = getClass.getClassLoader.getResourceAsStream("fake_pyspark.sh")
-
-    val file = Files.createTempFile("", "").toFile
-    file.deleteOnExit()
-
-    file.setExecutable(true)
-
-    val sink = new FileOutputStream(file)
-    val buf = new Array[Byte](1024)
-    var n = source.read(buf)
-
-    while (n > 0) {
-      sink.write(buf, 0, n)
-      n = source.read(buf)
-    }
-
-    source.close()
-    sink.close()
-
-    file
-  }
 }
 
 private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
-  extends Interpreter
+  extends ProcessInterpreter(process)
   with Logging
 {
   implicit val formats = DefaultFormats
 
-  private val stdin = new PrintWriter(process.getOutputStream)
-  private val stdout = new BufferedReader(new InputStreamReader(process.getInputStream), 1)
-
-  private[this] var _state: State = Starting()
-  private[this] val _queue = new SynchronousQueue[Request]
-
-  override def state: State = _state
-
-  override def execute(code: String): Future[JValue] = {
-    val promise = Promise[JValue]()
-    _queue.put(ExecuteRequest(code, promise))
-    promise.future
-  }
+  override def kind = "pyspark"
 
   override def close(): Unit = {
-    _state match {
-      case Dead() =>
-      case ShuttingDown() =>
-        // Another thread must be tearing down the process.
-        waitForStateChange(ShuttingDown(), Duration(10, TimeUnit.SECONDS))
-      case _ =>
-        val promise = Promise[Unit]()
-        _queue.put(ShutdownRequest(promise))
-
-        // Give ourselves 10 seconds to tear down the process.
-        try {
-          Await.result(promise.future, Duration(10, TimeUnit.SECONDS))
-          thread.join()
-        } finally {
-          gatewayServer.shutdown()
-        }
+    try {
+      super.close()
+    } finally {
+      gatewayServer.shutdown()
     }
   }
 
   @tailrec
-  private def waitUntilReady(): Unit = {
+  final override protected def waitUntilReady(): Unit = {
     val line = stdout.readLine()
     line match {
       case null | "READY" =>
@@ -163,88 +145,45 @@ private class PythonInterpreter(process: Process, gatewayServer: GatewayServer)
     }
   }
 
-  private[this] val thread = new Thread {
-    override def run() = {
-      waitUntilReady()
+  override protected def sendExecuteRequest(code: String): Interpreter.ExecuteResponse = {
+    sendRequest(Map("msg_type" -> "execute_request", "content" -> Map("code" -> code))) match {
+      case Some(response) =>
+        assert((response \ "msg_type").extract[String] == "execute_reply")
 
-      _state = Idle()
+        val content = response \ "content"
 
-      loop()
-    }
+        (content \ "status").extract[String] match {
+          case "ok" =>
+            Interpreter.ExecuteSuccess((content \ "data").extract[JObject])
+          case "error" =>
+            val ename = (content \ "ename").extract[String]
+            val evalue = (content \ "evalue").extract[String]
+            val traceback = (content \ "traceback").extract[Seq[String]]
 
-    @tailrec
-    private def waitUntilReady(): Unit = {
-      val line = stdout.readLine()
-      line match {
-        case null | "READY" =>
-        case _ => waitUntilReady()
-      }
-    }
-
-    private def sendRequest(request: Map[String, Any]): Option[JValue] = {
-      stdin.println(write(request))
-      stdin.flush()
-
-      Option(stdout.readLine()).map { case line => parse(line) }
-    }
-
-    @tailrec
-    def loop(): Unit = {
-      (_state, _queue.take()) match {
-        case (Error(), ExecuteRequest(code, promise)) =>
-          promise.failure(new Exception("session has been terminated"))
-          loop()
-
-        case (state, ExecuteRequest(code, promise)) =>
-          require(state == Idle())
-
-          _state = Busy()
-
-          sendRequest(Map("msg_type" -> "execute_request", "content" -> Map("code" -> code))) match {
-            case Some(rep) =>
-              assert((rep \ "msg_type").extract[String] == "execute_reply")
-
-              val content: JValue = rep \ "content"
-
-              _state = Idle()
-
-              promise.success(content)
-              loop()
-            case None =>
-              _state = Error()
-              promise.failure(new Exception("session has been terminated"))
-          }
-
-        case (_, ShutdownRequest(promise)) =>
-          require(state == Idle() || state == Error())
-
-          _state = ShuttingDown()
-
-          try {
-            sendRequest(Map("msg_type" -> "shutdown_request", "content" -> ())) match {
-              case Some(rep) =>
-                warn(f"process failed to shut down while returning $rep")
-              case None =>
-            }
-
-            // Ignore IO errors, such as if the stream is already closed.
-            try {
-              process.getInputStream.close()
-              process.getOutputStream.close()
-            } catch {
-              case _: IOException =>
-            }
-
-            try {
-              process.destroy()
-            } finally {
-              _state = Dead()
-              promise.success(())
-            }
-          }
-      }
+            Interpreter.ExecuteError(ename, evalue, traceback)
+          case status =>
+            Interpreter.ExecuteError("Internal Error", f"Unknown status $status")
+        }
+      case None =>
+        Interpreter.ExecuteAborted(takeErrorLines())
     }
   }
 
-  thread.start()
+  override protected def sendShutdownRequest(): Unit = {
+    sendRequest(Map(
+      "msg_type" -> "shutdown_request",
+      "content" -> ()
+    )).foreach { case rep =>
+      warn(f"process failed to shut down while returning $rep")
+    }
+  }
+
+  private def sendRequest(request: Map[String, Any]): Option[JValue] = {
+    stdin.println(write(request))
+    stdin.flush()
+
+    Option(stdout.readLine()).map { case line =>
+      parse(line)
+    }
+  }
 }

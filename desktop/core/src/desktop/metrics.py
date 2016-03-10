@@ -21,163 +21,123 @@ import multiprocessing
 import threading
 
 from django.contrib.auth.models import User
-from django.contrib.auth.signals import user_logged_in, user_logged_out
-from django.db.models.signals import post_save, post_delete
-from django.dispatch import receiver
 
 from desktop.lib.metrics import global_registry
 
 global_registry().gauge_callback(
-    name='python.threads.count',
+    name='threads.total',
     callback=lambda: len(threading.enumerate()),
-    label='Thread count',
-    description='Number of threads',
+    label='Threads',
+    description='The total number of threads',
+    numerator='threads',
 )
 
 global_registry().gauge_callback(
-    name='python.threads.active',
-    callback=lambda: threading.active_count(),
-    label='Active thread count',
-    description='Number of active threads',
-)
-
-global_registry().gauge_callback(
-    name='python.threads.daemon',
+    name='threads.daemon',
     callback=lambda: sum(1 for thread in threading.enumerate() if thread.isDaemon()),
-    label='Daemon thread count',
-    description='Number of daemon threads',
+    label='Daemon Threads',
+    description='The number of daemon threads',
+    numerator='threads',
 )
 
 # ------------------------------------------------------------------------------
 
 global_registry().gauge_callback(
-    name='python.multiprocessing.count',
+    name='multiprocessing.processes.total',
     callback=lambda: len(multiprocessing.active_children()),
-    label='Process count',
+    label='Multiprocessing Processes',
     description='Number of multiprocessing processes',
+    numerator='processes',
 )
 
 global_registry().gauge_callback(
-    name='python.multiprocessing.active',
-    callback=lambda: sum(1 for proc in multiprocessing.active_children() if proc.is_alive()),
-    label='Active multiprocessing processes',
-    description='Number of active multiprocessing processes',
-)
-
-global_registry().gauge_callback(
-    name='python.multiprocessing.daemon',
+    name='multiprocessing.processes.daemon',
     callback=lambda: sum(1 for proc in multiprocessing.active_children() if proc.daemon),
-    label='Daemon processes count',
+    label='Daemon Multiprocessing Processes',
     description='Number of daemon multiprocessing processes',
+    numerator='processes',
 )
 
 # ------------------------------------------------------------------------------
 
 for i in xrange(3):
   global_registry().gauge_callback(
-      name='python.gc.collection.count%s' % i,
+      name='python.gc.generation.%s' % i,
       callback=lambda: gc.get_count()[i],
-      label='GC collection count %s' % i,
-      description='Current collection counts',
+      label='GC Object Count in Generation %s' % i,
+      description='Total number of objects in garbage collection generation %s' % i,
+      numerator='objects',
   )
 
 global_registry().gauge_callback(
-    name='python.gc.objects.count',
-    callback=lambda: len(gc.get_objects()),
-    label='GC tracked object count',
-    description='Number of objects being tracked by the garbage collector',
-)
-
-global_registry().gauge_callback(
-    name='python.gc.referrers.count',
-    callback=lambda: len(gc.get_referrers()),
-    label='GC tracked object referrers',
-    description='Number of objects that directly refer to any objects',
-)
-
-global_registry().gauge_callback(
-    name='python.gc.referents.count',
-    callback=lambda: len(gc.get_referrers()),
-    label='GC tracked object referents',
-    description='Number of objects that directly referred to any objects',
+    name='python.gc.objects',
+    callback=lambda: sum(gc.get_count()),
+    label='GC Object Count',
+    description='Total number of objects in the Python process',
+    numerator='objects',
 )
 
 # ------------------------------------------------------------------------------
 
 active_requests = global_registry().counter(
-    name='desktop.requests.active.count',
-    label='Active requests',
+    name='requests.active',
+    label='Active Requests',
     description='Number of currently active requests',
+    numerator='requests',
+    treat_counter_as_gauge=True,
 )
 
 request_exceptions = global_registry().counter(
-    name='desktop.requests.exceptions.count',
-    label='Request exceptions',
+    name='requests.exceptions',
+    label='Request Exceptions',
     description='Number requests that resulted in an exception',
+    numerator='requests',
 )
 
 response_time = global_registry().timer(
-    name='desktop.requests.aggregate-response-time',
-    label='Request aggregate response time',
-    description='Time taken to respond to requests'
+    name='requests.response-time',
+    label='Request Response Time',
+    description='Time taken to respond to requests across all Hue endpoints',
+    numerator='seconds',
+    counter_numerator='requests',
+    rate_denominator='seconds',
 )
 
 # ------------------------------------------------------------------------------
 
-user_count = global_registry().gauge(
-    name='desktop.users.count',
-    label='User count',
-    description='Total number of users',
+user_count = global_registry().gauge_callback(
+    name='users',
+    callback=lambda: User.objects.count(),
+    label='Users',
+    description='Total number of user accounts',
+    numerator='users',
 )
-
-# Initialize with the current user count.
-user_count.set_value(User.objects.all().count())
-
-@receiver(post_save, sender=User)
-def user_post_save_handler(sender, **kwargs):
-  if 'created' in kwargs:
-    user_count.set_value(User.objects.all().count())
-
-@receiver(post_delete, sender=User)
-def user_post_delete_handler(sender, **kwargs):
-  user_count.set_value(User.objects.all().count())
-
-logged_in_users = global_registry().counter(
-    name='desktop.users.logged-in.count',
-    label='Number of logged in users',
-    description='Number of logged in users',
-)
-
-@receiver(user_logged_in)
-def user_logged_in_handler(sender, **kwargs):
-  logged_in_users.inc()
-
-@receiver(user_logged_out)
-def user_logged_out_handler(sender, **kwargs):
-  logged_in_users.dec()
 
 # ------------------------------------------------------------------------------
 
 ldap_authentication_time = global_registry().timer(
-    name='desktop.auth.ldap.authentication-time',
-    label='LDAP Authentication time',
-    description='Time taken to authenticate a user with LDAP',
-)
-
-oauth_authentication_time = global_registry().timer(
-    name='desktop.auth.oauth.authentication-time',
-    label='OAUTH Authentication time',
-    description='Time taken to authenticate a user with OAUTH',
+    name='auth.ldap.auth-time',
+    label='LDAP Authentication Time',
+    description='The time spent waiting for LDAP to authenticate a user',
+    numerator='seconds',
+    counter_numerator='authentications',
+    rate_denominator='seconds',
 )
 
 pam_authentication_time = global_registry().timer(
-    name='desktop.auth.pam.authentication-time',
-    label='PAM Authentication time',
-    description='Time taken to authenticate a user with PAM',
+    name='auth.pam.auth-time',
+    label='PAM Authentication Time',
+    description='The time spent waiting for PAM to authenticate a user',
+    numerator='seconds',
+    counter_numerator='authentications',
+    rate_denominator='seconds',
 )
 
 spnego_authentication_time = global_registry().timer(
-    name='desktop.auth.spnego.authentication-time',
-    label='SPNEGO Authentication time',
-    description='Time taken to authenticate a user with SPNEGO',
+    name='auth.spnego.auth-time',
+    label='SPNEGO Authentication Time',
+    description='The time spent waiting for SPNEGO to authenticate a user',
+    numerator='seconds',
+    counter_numerator='authentications',
+    rate_denominator='seconds',
 )

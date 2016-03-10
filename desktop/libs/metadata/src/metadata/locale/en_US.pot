@@ -1,0 +1,41 @@
+# Translations template for Hue.
+# Copyright (C) 2015 Cloudera, Inc
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:40
+msgid "Configuration options for Navigator API"
+msgstr ""
+
+#: src/metadata/conf.py:44
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+msgstr ""
+
+#: src/metadata/conf.py:48
+msgid "Auth username of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:53
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:58
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+

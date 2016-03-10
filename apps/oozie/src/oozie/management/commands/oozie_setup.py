@@ -25,14 +25,14 @@ from django.utils.translation import ugettext as _
 
 from hadoop import cluster
 
-from desktop.models import Document
+from desktop.models import Directory, Document, Document2, Document2Permission
 from liboozie.submittion import create_directories
 from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR, ENABLE_V2
 from oozie.models import Workflow, Coordinator, Bundle
 from oozie.importlib.workflows import import_workflow_root
 from oozie.importlib.coordinators import import_coordinator_root
 from oozie.importlib.bundles import import_bundle_root
-from useradmin.models import install_sample_user
+from useradmin.models import get_default_user_group, install_sample_user
 
 
 LOG = logging.getLogger(__name__)
@@ -41,11 +41,14 @@ LOG = logging.getLogger(__name__)
 class Command(NoArgsCommand):
 
   def _import_workflows(self, directory, managed=True):
+
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'workflow.zip')) as fp:
           workflow_xml, metadata = Workflow.decompress(fp)
+
         workflow_root = etree.fromstring(workflow_xml)
+
         try:
           Workflow.objects.get(name=workflow_root.get('name'), managed=managed)
         except Workflow.DoesNotExist:
@@ -61,11 +64,14 @@ class Command(NoArgsCommand):
           workflow.doc.all().delete() # Delete doc as it messes up the example sharing
 
   def _import_coordinators(self, directory):
+
     for example_directory_name in os.listdir(directory):
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'coordinator.zip')) as fp:
           coordinator_xml, metadata = Coordinator.decompress(fp)
+
         coordinator_root = etree.fromstring(coordinator_xml)
+
         try:
           Coordinator.objects.get(name=coordinator_root.get('name'))
         except Coordinator.DoesNotExist:
@@ -77,11 +83,15 @@ class Command(NoArgsCommand):
           import_coordinator_root(coordinator=coordinator, coordinator_definition_root=coordinator_root, metadata=metadata)
 
   def _import_bundles(self, directory):
+
     for example_directory_name in os.listdir(directory):
+
       if os.path.isdir(os.path.join(directory, example_directory_name)):
         with open(os.path.join(directory, example_directory_name, 'bundle.zip')) as fp:
           bundle_xml, metadata = Bundle.decompress(fp)
+
         bundle_root = etree.fromstring(bundle_xml)
+
         try:
           Bundle.objects.get(name=bundle_root.get('name'))
         except Bundle.DoesNotExist:
@@ -126,6 +136,23 @@ class Command(NoArgsCommand):
 
     if ENABLE_V2.get():
       management.call_command('loaddata', 'initial_oozie_examples.json', verbosity=2)
+
+    # Get or create sample user directories
+    home_dir = Directory.objects.get_home_directory(self.user)
+    examples_dir, created = Directory.objects.get_or_create(
+      parent_directory=home_dir,
+      owner=self.user,
+      name=Document2.EXAMPLES_DIR
+    )
+
+    # Share oozie examples with default group
+    oozie_examples = Document2.objects.filter(
+      type__in=['oozie-workflow2', 'oozie-coordinator2', 'oozie-bundle2'],
+      owner=self.user,
+      parent_directory=None
+    )
+    oozie_examples.update(parent_directory=examples_dir)
+    examples_dir.share(self.user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
 
     self.install_examples()
 

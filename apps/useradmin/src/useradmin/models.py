@@ -49,17 +49,18 @@ what models you may or may not edit, and there are elaborations (especially
 in Django 1.2) to manipulate this row by row.  This does not map nicely
 onto actions which may not relate to database models.
 """
-from enum import Enum
 import logging
+from datetime import datetime
+from enum import Enum
 
-from django.db import connection, models
+from django.db import connection, models, transaction
 from django.contrib.auth import models as auth_models
 from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import SAMPLE_USERNAME
+from desktop.models import SAMPLE_USER_ID, SAMPLE_USER_INSTALL
 from hadoop import cluster
 
 import useradmin.conf
@@ -92,9 +93,10 @@ class UserProfile(models.Model):
 
   user = models.ForeignKey(auth_models.User, unique=True)
   home_directory = models.CharField(editable=True, max_length=1024, null=True)
-  creation_method = models.CharField(editable=True, null=False, max_length=64, default=CreationMethod.HUE)
+  creation_method = models.CharField(editable=True, null=False, max_length=64, default=str(CreationMethod.HUE))
   first_login = models.BooleanField(default=True, verbose_name=_t('First Login'),
                                    help_text=_t('If this is users first login.'))
+  last_activity = models.DateTimeField(default=datetime.fromtimestamp(0), db_index=True)
 
   def get_groups(self):
     return self.user.groups.all()
@@ -160,6 +162,7 @@ def group_permissions(group):
 def create_profile_for_user(user):
   p = UserProfile()
   p.user = user
+  p.last_activity = datetime.now()
   p.home_directory = "/user/%s" % p.user.username
   try:
     p.save()
@@ -205,12 +208,14 @@ class HuePermission(models.Model):
 
 def get_default_user_group(**kwargs):
   default_user_group = useradmin.conf.DEFAULT_USER_GROUP.get()
-  if default_user_group is not None:
-    group, created = auth_models.Group.objects.get_or_create(name=default_user_group)
-    if created:
-      group.save()
+  if default_user_group is None:
+    return None
 
-    return group
+  group, created = auth_models.Group.objects.get_or_create(name=default_user_group)
+  if created:
+    group.save()
+
+  return group
 
 def update_app_permissions(**kwargs):
   """
@@ -293,19 +298,38 @@ def install_sample_user():
   """
   Setup the de-activated sample user with a certain id. Do not create a user profile.
   """
-
+  user = None
   try:
-    user = auth_models.User.objects.get(username=SAMPLE_USERNAME)
+    user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
+    LOG.info('Sample user found: %s' % user.username)
+    if user.username != SAMPLE_USER_INSTALL:
+      with transaction.atomic():
+        user = auth_models.User.objects.get(id=SAMPLE_USER_ID)
+        user.username = SAMPLE_USER_INSTALL
+        user.save()
   except auth_models.User.DoesNotExist:
-    try:
-      user = auth_models.User.objects.create(username=SAMPLE_USERNAME, password='!', is_active=False, is_superuser=False, id=1100713, pk=1100713)
-      LOG.info('Installed a user called "%s"' % (SAMPLE_USERNAME,))
-    except Exception, e:
-      LOG.info('Sample user race condition: %s' % e)
-      user = auth_models.User.objects.get(username=SAMPLE_USERNAME)
-      LOG.info('Sample user race condition, got: %s' % user)
+    user, created = auth_models.User.objects.get_or_create(
+      username=SAMPLE_USER_INSTALL,
+      password='!',
+      is_active=False,
+      is_superuser=False,
+      id=SAMPLE_USER_ID,
+      pk=SAMPLE_USER_ID)
+
+    if created:
+      LOG.info('Installed a user called "%s"' % SAMPLE_USER_INSTALL)
+  except Exception, ex:
+    LOG.exception('Failed to get or create sample user')
 
   fs = cluster.get_hdfs()
-  fs.do_as_user(SAMPLE_USERNAME, fs.create_home_dir)
+  # If home directory doesn't exist for sample user, create it
+  try:
+    if not fs.do_as_user(SAMPLE_USER_INSTALL, fs.get_home_dir):
+      fs.do_as_user(SAMPLE_USER_INSTALL, fs.create_home_dir)
+      LOG.info('Created home directory for user: %s' % SAMPLE_USER_INSTALL)
+    else:
+      LOG.info('Home directory already exists for user: %s' % SAMPLE_USER_INSTALL)
+  except Exception, ex:
+    LOG.exception('Failed to create home directory for user %s: %s' % (SAMPLE_USER_INSTALL, str(ex)))
 
   return user

@@ -293,7 +293,9 @@ def ssl_wrap_socket(sock, keyfile=None, certfile=None, cert_reqs=None,
     ctx.set_cipher_list(DEFAULT_SSL_CIPHER_LIST)
 
     cnx = OpenSSL.SSL.Connection(ctx, sock)
-    cnx.set_tlsext_host_name(server_hostname)
+    # Hue Patch: Only set the SNI hostname if PyOpenSSL supports it.
+    if hasattr(cnx, 'set_tlsext_host_name'):
+        cnx.set_tlsext_host_name(server_hostname)
     cnx.set_connect_state()
     while True:
         try:

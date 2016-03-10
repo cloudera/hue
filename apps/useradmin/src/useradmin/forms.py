@@ -21,11 +21,13 @@ import re
 import django.contrib.auth.forms
 from django import forms
 from django.contrib.auth.models import User, Group
+from django.forms import ValidationError
 from django.forms.util import ErrorList
-from django.utils.translation import ugettext as _, ugettext_lazy as _t
+from django.utils.translation import get_language, ugettext as _, ugettext_lazy as _t
 
 from desktop import conf as desktop_conf
 from desktop.lib.django_util import get_username_re_rule, get_groupname_re_rule
+from desktop.settings import LANGUAGES
 
 from useradmin.models import GroupPermission, HuePermission
 from useradmin.models import get_default_user_group
@@ -43,21 +45,36 @@ def get_server_choices():
     return []
 
 def validate_dn(dn):
-  assert dn is not None, _('Full Distinguished Name required.')
+  if not dn:
+    raise ValidationError(_('Full Distinguished Name required.'))
 
 def validate_username(username_pattern):
   validator = re.compile(r"^%s$" % get_username_re_rule())
 
-  assert username_pattern is not None, _('Username is required.')
-  assert len(username_pattern) <= 30, _('Username must be fewer than 30 characters.')
-  assert validator.match(username_pattern), _("Username must not contain whitespaces and ':'")
+  if not username_pattern:
+    raise ValidationError(_('Username is required.'))
+  if len(username_pattern) > 30:
+    raise ValidationError(_('Username must be fewer than 30 characters.'))
+  if not validator.match(username_pattern):
+    raise ValidationError(_("Username must not contain whitespaces and ':'"))
 
 def validate_groupname(groupname_pattern):
   validator = re.compile(r"^%s$" % get_groupname_re_rule())
 
-  assert groupname_pattern is not None, _('Group name required.')
-  assert len(groupname_pattern) <= 80, _('Group name must be 80 characters or fewer.')
-  assert validator.match(groupname_pattern), _("Group name can be any character as long as it's 80 characters or fewer.")
+  if not groupname_pattern:
+    raise ValidationError(_('Group name required.'))
+  if len(groupname_pattern) > 80:
+    raise ValidationError(_('Group name must be 80 characters or fewer.'))
+  if not validator.match(groupname_pattern):
+    raise ValidationError(_("Group name can be any character as long as it's 80 characters or fewer."))
+
+def validate_first_name(first_name):
+  if first_name and len(first_name) > 30:
+    raise ValidationError(_('first_name must be fewer than 30 characters.'))
+
+def validate_last_name(last_name):
+  if last_name and len(last_name) > 30:
+    raise ValidationError(_('last_name must be fewer than 30 characters.'))
 
 
 class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
@@ -65,6 +82,9 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
   This is similar, but not quite the same as djagno.contrib.auth.forms.UserChangeForm
   and UserCreationForm.
   """
+
+  GENERIC_VALIDATION_ERROR = _("Username or password is invalid.")
+
   username = forms.RegexField(
       label=_t("Username"),
       max_length=30,
@@ -72,7 +92,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       help_text = _t("Required. 30 characters or fewer. No whitespaces or colons."),
       error_messages = {'invalid': _t("Whitespaces and ':' not allowed") })
 
-  password1 = forms.CharField(label=_t("Password"),
+  password1 = forms.CharField(label=_t("New Password"),
                               widget=forms.
                               PasswordInput,
                               required=False,
@@ -81,28 +101,50 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
                               widget=forms.PasswordInput,
                               required=False,
                               validators=get_password_validators())
-  password_old = forms.CharField(label=_t("Previous Password"), widget=forms.PasswordInput, required=False)
+  password_old = forms.CharField(label=_t("Current password"), widget=forms.PasswordInput, required=False)
   ensure_home_directory = forms.BooleanField(label=_t("Create home directory"),
                                             help_text=_t("Create home directory if one doesn't already exist."),
                                             initial=True,
                                             required=False)
+  language = forms.ChoiceField(label=_t("Language Preference"),
+                               choices=LANGUAGES,
+                               required=False)
 
   class Meta(django.contrib.auth.forms.UserChangeForm.Meta):
     fields = ["username", "first_name", "last_name", "email", "ensure_home_directory"]
 
   def __init__(self, *args, **kwargs):
+
+
     super(UserChangeForm, self).__init__(*args, **kwargs)
 
     if self.instance.id:
       self.fields['username'].widget.attrs['readonly'] = True
 
-    if desktop_conf.AUTH.BACKEND.get() == 'desktop.auth.backend.LdapBackend':
+    if 'desktop.auth.backend.LdapBackend' in desktop_conf.AUTH.BACKEND.get():
       self.fields['password1'].widget.attrs['readonly'] = True
       self.fields['password2'].widget.attrs['readonly'] = True
       self.fields['password_old'].widget.attrs['readonly'] = True
       self.fields['first_name'].widget.attrs['readonly'] = True
       self.fields['last_name'].widget.attrs['readonly'] = True
       self.fields['email'].widget.attrs['readonly'] = True
+      if 'is_active' in self.fields:
+        self.fields['is_active'].widget.attrs['readonly'] = True
+      if 'is_superuser' in self.fields:
+        self.fields['is_superuser'].widget.attrs['readonly'] = True
+      if 'groups' in self.fields:
+        self.fields['groups'].widget.attrs['readonly'] = True
+
+  def clean_username(self):
+    username = self.cleaned_data["username"]
+    if self.instance.username == username:
+      return username
+
+    try:
+      User._default_manager.get(username=username)
+    except User.DoesNotExist:
+      return username
+    raise forms.ValidationError(self.GENERIC_VALIDATION_ERROR, code='duplicate_username')
 
   def clean_password(self):
     return self.cleaned_data["password"]
@@ -125,7 +167,7 @@ class UserChangeForm(django.contrib.auth.forms.UserChangeForm):
       password1 = self.cleaned_data.get("password1", "")
       password_old = self.cleaned_data.get("password_old", "")
       if password1 != '' and not self.instance.check_password(password_old):
-        raise forms.ValidationError(_("The old password does not match the current password."))
+        raise forms.ValidationError(self.GENERIC_VALIDATION_ERROR)
     return self.cleaned_data.get("password_old", "")
 
   def save(self, commit=True):
@@ -202,7 +244,7 @@ class AddLdapUsersForm(forms.Form):
         validate_dn(username_pattern)
       else:
         validate_username(username_pattern)
-    except AssertionError, e:
+    except ValidationError, e:
       errors = self._errors.setdefault('username_pattern', ErrorList())
       errors.append(e.message)
       raise forms.ValidationError(e.message)
@@ -249,7 +291,7 @@ class AddLdapGroupsForm(forms.Form):
         validate_dn(groupname_pattern)
       else:
         validate_groupname(groupname_pattern)
-    except AssertionError, e:
+    except ValidationError, e:
       errors = self._errors.setdefault('groupname_pattern', ErrorList())
       errors.append(e.message)
       raise forms.ValidationError(e.message)

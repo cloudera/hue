@@ -725,8 +725,9 @@ class OracleParam(object):
         if hasattr(param, 'input_size'):
             # If parameter has `input_size` attribute, use that.
             self.input_size = param.input_size
-        elif isinstance(param, six.string_types) and len(param) > 4000:
-            # Mark any string param greater than 4000 characters as a CLOB.
+        elif isinstance(param, six.string_types) and len(param) > 1000:
+            # Mark any string param greater than 1000 characters as a CLOB.
+            # loaddata does not convert long strings < 4000 to required CLOB type, so reduce to 1000
             self.input_size = Database.CLOB
         else:
             self.input_size = None

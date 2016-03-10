@@ -1,0 +1,201 @@
+====================
+BeautifulSoup Parser
+====================
+
+BeautifulSoup_ is a Python package that parses broken HTML, just like
+lxml supports it based on the parser of libxml2.  BeautifulSoup uses a
+different parsing approach.  It is not a real HTML parser but uses
+regular expressions to dive through tag soup.  It is therefore more
+forgiving in some cases and less good in others.  It is not uncommon
+that lxml/libxml2 parses and fixes broken HTML better, but
+BeautifulSoup has superiour `support for encoding detection`_.  It
+very much depends on the input which parser works better.
+
+.. _BeautifulSoup: http://www.crummy.com/software/BeautifulSoup/
+.. _`support for encoding detection`: http://www.crummy.com/software/BeautifulSoup/documentation.html#Beautiful%20Soup%20Gives%20You%20Unicode%2C%20Dammit
+.. _ElementSoup: http://effbot.org/zone/element-soup.htm
+
+To prevent users from having to choose their parser library in
+advance, lxml can interface to the parsing capabilities of
+BeautifulSoup through the ``lxml.html.soupparser`` module.  It
+provides three main functions: ``fromstring()`` and ``parse()`` to
+parse a string or file using BeautifulSoup into an ``lxml.html``
+document, and ``convert_tree()`` to convert an existing BeautifulSoup
+tree into a list of top-level Elements.
+
+.. contents::
+..
+   1  Parsing with the soupparser
+   2  Entity handling
+   3  Using soupparser as a fallback
+   4  Using only the encoding detection
+
+
+Parsing with the soupparser
+===========================
+
+The functions ``fromstring()`` and ``parse()`` behave as known from
+ElementTree.  The first returns a root Element, the latter returns an
+ElementTree.
+
+There is also a legacy module called ``lxml.html.ElementSoup``, which
+mimics the interface provided by ElementTree's own ElementSoup_
+module.  Note that the ``soupparser`` module was added in lxml 2.0.3.
+Previous versions of lxml 2.0.x only have the ``ElementSoup`` module.
+
+Here is a document full of tag soup, similar to, but not quite like, HTML:
+
+.. sourcecode:: pycon
+
+    >>> tag_soup = '<meta><head><title>Hello</head><body onload=crash()>Hi all<p>'
+
+all you need to do is pass it to the ``fromstring()`` function:
+
+.. sourcecode:: pycon
+
+    >>> from lxml.html.soupparser import fromstring
+    >>> root = fromstring(tag_soup)
+
+To see what we have here, you can serialise it:
+
+.. sourcecode:: pycon
+
+    >>> from lxml.etree import tostring
+    >>> print(tostring(root, pretty_print=True).strip())
+    <html>
+      <meta/>
+      <head>
+        <title>Hello</title>
+      </head>
+      <body onload="crash()">Hi all<p/></body>
+    </html>
+
+Not quite what you'd expect from an HTML page, but, well, it was broken
+already, right?  BeautifulSoup did its best, and so now it's a tree.
+
+To control which Element implementation is used, you can pass a
+``makeelement`` factory function to ``parse()`` and ``fromstring()``.
+By default, this is based on the HTML parser defined in ``lxml.html``.
+
+For a quick comparison, libxml2 2.6.32 parses the same tag soup as
+follows.  The main difference is that libxml2 tries harder to adhere
+to the structure of an HTML document and moves misplaced tags where
+they (likely) belong.  Note, however, that the result can vary between
+parser versions.
+
+.. sourcecode:: html
+
+    <html>
+      <head>
+        <meta/>
+        <title>Hello</title>
+      </head>
+      <body>
+        <p>Hi all</p>
+        <p/>
+      </body>
+    </html>
+
+
+Entity handling
+===============
+
+By default, the BeautifulSoup parser also replaces the entities it
+finds by their character equivalent.
+
+.. sourcecode:: pycon
+
+    >>> tag_soup = '<body>&copy;&euro;&#45;&#245;&#445;<p>'
+    >>> body = fromstring(tag_soup).find('.//body')
+    >>> body.text
+    u'\xa9\u20ac-\xf5\u01bd'
+
+If you want them back on the way out, you can just serialise with the
+default encoding, which is 'US-ASCII'.
+
+.. sourcecode:: pycon
+
+    >>> tostring(body)
+    '<body>&#169;&#8364;-&#245;&#445;<p/></body>'
+
+    >>> tostring(body, method="html")
+    '<body>&#169;&#8364;-&#245;&#445;<p></p></body>'
+
+Any other encoding will output the respective byte sequences.
+
+.. sourcecode:: pycon
+
+    >>> tostring(body, encoding="utf-8")
+    '<body>\xc2\xa9\xe2\x82\xac-\xc3\xb5\xc6\xbd<p/></body>'
+
+    >>> tostring(body, method="html", encoding="utf-8")
+    '<body>\xc2\xa9\xe2\x82\xac-\xc3\xb5\xc6\xbd<p></p></body>'
+
+    >>> tostring(body, encoding='unicode')
+    u'<body>\xa9\u20ac-\xf5\u01bd<p/></body>'
+
+    >>> tostring(body, method="html", encoding='unicode')
+    u'<body>\xa9\u20ac-\xf5\u01bd<p></p></body>'
+
+
+Using soupparser as a fallback
+==============================
+
+The downside of using this parser is that it is `much slower`_ than
+the HTML parser of lxml.  So if performance matters, you might want to
+consider using ``soupparser`` only as a fallback for certain cases.
+
+.. _`much slower`: http://blog.ianbicking.org/2008/03/30/python-html-parser-performance/
+
+One common problem of lxml's parser is that it might not get the
+encoding right in cases where the document contains a ``<meta>`` tag
+at the wrong place.  In this case, you can exploit the fact that lxml
+serialises much faster than most other HTML libraries for Python.
+Just serialise the document to unicode and if that gives you an
+exception, re-parse it with BeautifulSoup to see if that works
+better.
+
+.. sourcecode:: pycon
+
+    >>> tag_soup = '''\
+    ... <meta http-equiv="Content-Type"
+    ...       content="text/html;charset=utf-8" />
+    ... <html>
+    ...   <head>
+    ...     <title>Hello W\xc3\xb6rld!</title>
+    ...   </head>
+    ...   <body>Hi all</body>
+    ... </html>'''
+
+    >>> import lxml.html
+    >>> import lxml.html.soupparser
+
+    >>> root = lxml.html.fromstring(tag_soup)
+    >>> try:
+    ...     ignore = tostring(root, encoding='unicode')
+    ... except UnicodeDecodeError:
+    ...     root = lxml.html.soupparser.fromstring(tag_soup)
+
+
+Using only the encoding detection
+=================================
+
+If you prefer a 'real' (and fast) HTML parser instead of the regular
+expression based one in BeautifulSoup, you can still benefit from
+BeautifulSoup's `support for encoding detection`_ in the
+``UnicodeDammit`` class.
+
+.. sourcecode:: pycon
+
+    >>> from BeautifulSoup import UnicodeDammit
+
+    >>> def decode_html(html_string):
+    ...     converted = UnicodeDammit(html_string, isHTML=True)
+    ...     if not converted.unicode:
+    ...         raise UnicodeDecodeError(
+    ...             "Failed to detect encoding, tried [%s]",
+    ...             ', '.join(converted.triedEncodings))
+    ...     # print converted.originalEncoding
+    ...     return converted.unicode
+
+    >>> root = lxml.html.fromstring(decode_html(tag_soup))

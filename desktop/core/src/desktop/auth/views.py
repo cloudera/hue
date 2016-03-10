@@ -22,10 +22,11 @@ except:
   oauth = None
 
 import cgi
-import datetime
 import logging
 import urllib
+from datetime import datetime
 
+from axes.decorators import watch_login
 import django.contrib.auth.views
 from django.core import urlresolvers
 from django.core.exceptions import SuspiciousOperation
@@ -34,15 +35,17 @@ from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
-from hadoop.fs.exceptions import WebHdfsException
-from useradmin.models import get_profile
-from useradmin.views import ensure_home_directory, require_change_password
 
 from desktop.auth import forms as auth_forms
 from desktop.lib.django_util import render
 from desktop.lib.django_util import login_notrequired
+from desktop.lib.django_util import JsonResponse
 from desktop.log.access import access_warn, last_access_map
-from desktop.conf import AUTH, LDAP, OAUTH, DEMO_ENABLED
+from desktop.conf import LDAP, OAUTH, DEMO_ENABLED
+
+from hadoop.fs.exceptions import WebHdfsException
+from useradmin.models import get_profile
+from useradmin.views import ensure_home_directory, require_change_password
 
 
 LOG = logging.getLogger(__name__)
@@ -77,16 +80,17 @@ def first_login_ever():
   return False
 
 
-def get_backend_name():
-  return get_backends() and get_backends()[0].__class__.__name__
+def get_backend_names():
+  return get_backends and [backend.__class__.__name__ for backend in get_backends()]
 
 
 @login_notrequired
-def dt_login(request):
+@watch_login
+def dt_login(request, from_modal=False):
   redirect_to = request.REQUEST.get('next', '/')
   is_first_login_ever = first_login_ever()
-  backend_name = get_backend_name()
-  is_active_directory = backend_name == 'LdapBackend' and ( bool(LDAP.NT_DOMAIN.get()) or bool(LDAP.LDAP_SERVERS.get()) )
+  backend_names = get_backend_names()
+  is_active_directory = 'LdapBackend' in backend_names and ( bool(LDAP.NT_DOMAIN.get()) or bool(LDAP.LDAP_SERVERS.get()) )
 
   if is_active_directory:
     UserCreationForm = auth_forms.LdapUserCreationForm
@@ -96,6 +100,11 @@ def dt_login(request):
     AuthenticationForm = auth_forms.AuthenticationForm
 
   if request.method == 'POST':
+    request.audit = {
+      'operation': 'USER_LOGIN',
+      'username': request.POST.get('username')
+    }
+
     # For first login, need to validate user info!
     first_user_form = is_first_login_ever and UserCreationForm(data=request.POST) or None
     first_user = first_user_form and first_user_form.is_valid()
@@ -114,7 +123,7 @@ def dt_login(request):
         if request.session.test_cookie_worked():
           request.session.delete_test_cookie()
 
-        if is_first_login_ever or backend_name in ('AllowAllBackend', 'LdapBackend'):
+        if is_first_login_ever or 'AllowAllBackend' in backend_names or 'LdapBackend' in backend_names:
           # Create home directory for first user.
           try:
             ensure_home_directory(request.fs, user.username)
@@ -126,13 +135,23 @@ def dt_login(request):
           return HttpResponseRedirect(urlresolvers.reverse('useradmin.views.edit_user', kwargs={'username': user.username}))
 
         userprofile.first_login = False
+        userprofile.last_activity = datetime.now()
         userprofile.save()
 
-        access_warn(request, '"%s" login ok' % (user.username,))
-        return HttpResponseRedirect(redirect_to)
-
+        msg = 'Successful login for user: %s' % user.username
+        request.audit['operationText'] = msg
+        access_warn(request, msg)
+        if from_modal or request.REQUEST.get('fromModal', 'false') == 'true':
+          return JsonResponse({'auth': True})
+        else:
+          return HttpResponseRedirect(redirect_to)
       else:
-        access_warn(request, 'Failed login for user "%s"' % (request.POST.get('username'),))
+        request.audit['allowed'] = False
+        msg = 'Failed login for user: %s' % request.POST.get('username')
+        request.audit['operationText'] = msg
+        access_warn(request, msg)
+        if from_modal or request.REQUEST.get('fromModal', 'false') == 'true':
+          return JsonResponse({'auth': False})
 
   else:
     first_user_form = None
@@ -145,19 +164,30 @@ def dt_login(request):
     return HttpResponseRedirect(redirect_to)
 
   request.session.set_test_cookie()
-  return render('login.mako', request, {
+
+  renderable_path = 'login.mako'
+  if from_modal:
+    renderable_path = 'login_modal.mako'
+
+  return render(renderable_path, request, {
     'action': urlresolvers.reverse('desktop.auth.views.dt_login'),
     'form': first_user_form or auth_form,
     'next': redirect_to,
     'first_login_ever': is_first_login_ever,
     'login_errors': request.method == 'POST',
-    'backend_name': backend_name,
+    'backend_names': backend_names,
     'active_directory': is_active_directory
   })
 
 
 def dt_logout(request, next_page=None):
   """Log out the user"""
+  username = request.user.get_username()
+  request.audit = {
+    'username': username,
+    'operation': 'USER_LOGOUT',
+    'operationText': 'Logged out user: %s' % username
+  }
   backends = get_backends()
   if backends:
     for backend in backends:

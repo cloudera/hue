@@ -174,6 +174,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
   </div>
 </div>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -366,7 +369,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
     }
 
     function getStatuses(type) {
-      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED'] : ['SUCCEEDED', 'KILLED', 'FAILED'];
+      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR'] : ['SUCCEEDED', 'KILLED', 'FAILED', 'DONEWITHERROR'];
       var btnStatuses = [];
 
       var statusBtns = $("a.btn-status.active");
@@ -375,9 +378,9 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         if (val == 'SUCCEEDED') {
           btnStatuses = btnStatuses.concat(['SUCCEEDED']);
         } else if (val == 'RUNNING') {
-          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED']);
+          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']);
         } else if (val == 'ERROR') {
-          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED']);
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'DONEWITHERROR']);
         }
       });
 
@@ -503,6 +506,8 @@ ${layout.menubar(section='coordinators', dashboard=True)}
         }
         numRunning = data.jobs.length;
         window.setTimeout(refreshRunning, 20000);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseJSON['detail']);
       });
     }
 
@@ -583,6 +588,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               % endif
             });
             if (foundRow != null) {
+              runningTable.fnUpdate('<span data-sort-value="' + coord.nextMaterializedTimeInMillis + '" data-type="date">' + emptyStringIfNull(coord.nextMaterializedTime) + '</span>', foundRow, 1, false);
               runningTable.fnUpdate('<span class="' + coord.statusClass + '" data-type="status">' + coord.status + '</span>', foundRow, 2, false);
               if (coord.progress == 0){
                 runningTable.fnUpdate('<div class="progress"><div class="bar bar-warning" style="width: 1%"></div></div>', foundRow, 4, false);
@@ -592,6 +598,7 @@ ${layout.menubar(section='coordinators', dashboard=True)}
               }
             }
           });
+        ko.bindingHandlers.multiCheck.init(runningTable[0], function() { return '#' + runningTable[0].id})
         window.setTimeout(refreshProgress, 30000);
       });
     }
@@ -603,4 +610,4 @@ ${layout.menubar(section='coordinators', dashboard=True)}
 </script>
 ${ utils.bulk_dashboard_functions() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

@@ -38,8 +38,13 @@
 </%def>
 
 
-<%def name="breadcrumbs(breadcrumbs)">
+<%def name="breadcrumbs(breadcrumbs, icon='')">
   <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
+    %if icon != '':
+      <li>
+        <i class="${icon}"></i>
+      </li>
+    %endif
     <li>
       <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
     </li>

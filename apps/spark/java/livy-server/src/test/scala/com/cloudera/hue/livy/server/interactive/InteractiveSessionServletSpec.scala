@@ -21,13 +21,15 @@ package com.cloudera.hue.livy.server.interactive
 import java.net.URL
 import java.util.concurrent.atomic.AtomicInteger
 
-import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.SessionManager
+import com.cloudera.hue.livy.{ExecuteRequest, LivyConf}
 import com.cloudera.hue.livy.sessions._
-import org.json4s.{DefaultFormats, Formats}
-import org.json4s.JsonAST.{JInt, JArray, JObject, JString}
+import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement}
+import com.cloudera.hue.livy.spark.interactive.{CreateInteractiveRequest, InteractiveSessionFactory}
+import com.cloudera.hue.livy.spark.{SparkProcess, SparkProcessBuilderFactory}
+import org.json4s.JsonAST.{JArray, JInt, JObject, JString}
 import org.json4s.jackson.JsonMethods._
 import org.json4s.jackson.Serialization.write
+import org.json4s.{DefaultFormats, Formats}
 import org.scalatest.FunSpecLike
 import org.scalatra.test.scalatest.ScalatraSuite
 
@@ -38,7 +40,7 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
   protected implicit def jsonFormats: Formats = DefaultFormats ++ Serializers.SessionFormats
 
   class MockInteractiveSession(val id: Int) extends InteractiveSession {
-    var _state: State = Idle()
+    var _state: SessionState = SessionState.Idle()
 
     var _idCounter = new AtomicInteger()
     var _statements = IndexedSeq[Statement]()
@@ -74,13 +76,19 @@ class InteractiveSessionServletSpec extends ScalatraSuite with FunSpecLike {
     override def interrupt(): Future[Unit] = ???
   }
 
-  class MockInteractiveSessionFactory() extends InteractiveSessionFactory {
-    override def create(id: Int, createInteractiveRequest: CreateInteractiveRequest): Future[InteractiveSession] = {
-      Future.successful(new MockInteractiveSession(id))
+  class MockInteractiveSessionFactory(processFactory: SparkProcessBuilderFactory)
+    extends InteractiveSessionFactory(processFactory) {
+
+    protected override def create(id: Int,
+                                  process: SparkProcess,
+                                  request: CreateInteractiveRequest): InteractiveSession = {
+      new MockInteractiveSession(id)
     }
   }
 
-  val sessionManager = new SessionManager(new MockInteractiveSessionFactory())
+  val livyConf = new LivyConf()
+  val processFactory = new SparkProcessBuilderFactory(livyConf)
+  val sessionManager = new SessionManager(livyConf, new MockInteractiveSessionFactory(processFactory))
   val servlet = new InteractiveSessionServlet(sessionManager)
 
   addServlet(servlet, "/*")

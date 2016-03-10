@@ -19,14 +19,16 @@
 package com.cloudera.hue.livy.server
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
+import com.cloudera.hue.livy.sessions.{SessionManager, Session}
+import com.cloudera.hue.livy.sessions.interactive.InteractiveSession.SessionFailedToStart
+import com.cloudera.hue.livy.spark.ConfigOptionNotAllowed
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.JsonDSL._
-import org.json4s.{MappingException, DefaultFormats, Formats, JValue}
+import org.json4s.{DefaultFormats, Formats, JValue, MappingException}
 import org.scalatra._
 import org.scalatra.json.JacksonJsonSupport
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 object SessionServlet extends Logging
 
@@ -109,17 +111,19 @@ abstract class SessionServlet[S <: Session](sessionManager: SessionManager[S])
 
   post("/") {
     new AsyncResult {
-      val is = for {
-        session <- sessionManager.create(parsedBody)
-      } yield Created(session,
+      val is = Future {
+        val session = sessionManager.create(parsedBody)
+        Created(session,
           headers = Map("Location" -> url(getSession, "id" -> session.id.toString))
         )
+      }
     }
   }
 
   error {
     case e: JsonParseException => BadRequest(e.getMessage)
     case e: MappingException => BadRequest(e.getMessage)
+    case e: ConfigOptionNotAllowed => BadRequest(e.getMessage)
     case e: SessionFailedToStart => InternalServerError(e.getMessage)
     case e: dispatch.StatusCode => ActionResult(ResponseStatus(e.code), e.getMessage, Map.empty)
     case e =>

@@ -30,9 +30,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Task ID')}</li>
-          <li class="white hellipsify">${task.taskId_short}</li>
+          <li class="white truncate" title="${task.taskId_short}">${task.taskId_short}</li>
           <li class="nav-header">${_('Job')}</li>
-          <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" class="hellipsify">${joblnk.jobId_short}</a></li>
+          <li><a href="${url('jobbrowser.views.single_job', job=joblnk.jobId)}" class="truncate" title="${joblnk.jobId_short}">${joblnk.jobId_short}</a></li>
           <li class="nav-header">${_('Status')}</li>
           <li class="white">
             % if task.state.lower() == 'running' or task.state.lower() == 'pending':
@@ -223,11 +223,9 @@ ${ comps.menubar() }
       }
     });
 
-    hellipsify();
-
     $("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, _ko
 from django.utils.translation import ugettext as _
 %>
 
@@ -53,11 +53,11 @@ ${ layout.menubar(section='hdfs') }
     </label>
     <div style="margin-left: 6px">
       <div data-bind="visible: type() == 'user'">
-        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: name, type: 'user'}" style="width: 200px"></select>
+        <select class="user-list-acl" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _ko("Select a user") }', update: name, type: 'user'}" style="width: 200px"></select>
       </div>
 
       <div data-bind="visible: type() == 'group'">
-        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
+        <select class="group-list-acl" data-bind="options: $root.selectableHadoopGroups, select2: { placeholder: '${ _ko("Select a group") }', update: name, type: 'group'}" style="width: 200px"></select>
       </div>
 
       <input type="text" data-bind="value: name, valueUpdate: 'afterkeydown', visible: type() == 'mask' || type() == 'other'" placeholder="${ _('name ...') }" style="width: 180px; margin-bottom: 0px; height: 26px; min-height: 26px"/>
@@ -97,7 +97,7 @@ ${ layout.menubar(section='hdfs') }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" data-bind="value: $root.assist.path" autocomplete="off" />
-                  <a data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
+                  <a data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
@@ -112,7 +112,7 @@ ${ layout.menubar(section='hdfs') }
                         <li data-bind="visible: $root.assist.isDiffMode(), click: function() { $root.assist.isDiffMode(false); }"><a tabindex="-1" href="#">${ _('Impersonate the user') }</a></li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
@@ -145,7 +145,7 @@ ${ layout.menubar(section='hdfs') }
 
                   <div class="acl-panel-content">
                     <span class="fake-pre" data-bind="visible: $root.assist.showAclsAsText">
-                      # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
+                      # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
                       # owner: <span data-bind="text: $root.assist.owner"></span><br/>
                       # group: <span data-bind="text: $root.assist.group"></span><br/>
                       <div data-bind="foreach: $root.assist.regularAcls">
@@ -158,7 +158,7 @@ ${ layout.menubar(section='hdfs') }
 
                     <span data-bind="visible: ! $root.assist.showAclsAsText()">
                       <h4>${ _('Path') }</h4>
-                      <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a>
+                      <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }, text: $root.assist.path()" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a>
 
                       <h4>${ _('User/Group') }</h4>
                       <i class="fa fa-user" style="color: #999999" title="${_('User')}"></i> <span title="${_('User')}" data-bind="text: $root.assist.owner"></span>&nbsp;
@@ -231,7 +231,7 @@ ${ layout.menubar(section='hdfs') }
       <div class="span4">
         <h4>${ _('to apply to the selection') }</h4>
         <ul class="unstyled modal-panel" data-bind="foreach: $root.assist.checkedItems">
-          <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + path }, text: path" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
+          <li><a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + path }, text: path" target="_blank" title="${ _('Open in File Browser') }" rel="tooltip"></a></li>
         </ul>
       </div>
     </div>
@@ -242,7 +242,7 @@ ${ layout.menubar(section='hdfs') }
         <h4>${ _('ACLs to apply') }</h4>
 
         <span class="fake-pre modal-panel">
-          # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
+          # file: <a class="force-word-break" data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }, text: $root.assist.path()" target="_blank"></a><br/>
           # owner: <span data-bind="text: $root.assist.owner"></span><br/>
           # group: <span data-bind="text: $root.assist.group"></span><br/>
           <div data-bind="foreach: $root.assist.regularAcls">
@@ -383,4 +383,4 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 </script>
 
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

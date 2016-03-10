@@ -38,18 +38,3 @@
   padding: 20px;
   display: none;
 }
-
-.nochrome::-moz-focus-inner {
-  border: 0;
-  padding: 0
-}
-
-.nochrome {
-  width: auto;
-  border: 0 none;
-  margin: 0;
-  margin-top: -4px;
-  padding: 0;
-  background: transparent;
-  overflow: visible;
-}

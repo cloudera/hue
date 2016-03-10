@@ -20,16 +20,16 @@ import json
 import logging
 import os
 import shutil
-import subprocess
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
 from libzookeeper.conf import ENSEMBLE
+from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.conf import SOLRCTL_PATH, CORE_INSTANCE_DIR
+from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file
 
 
@@ -37,15 +37,7 @@ LOG = logging.getLogger(__name__)
 MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored')]
-
-
-def get_solrctl_path():
-  solrctl_path = SOLRCTL_PATH.get()
-  if solrctl_path is None:
-    LOG.error("Could not find solrctl executable")
-    raise PopupException(_('Could not find solrctl executable'))
-
-  return solrctl_path
+ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 
 
 def get_solr_ensemble():
@@ -134,51 +126,54 @@ class CollectionManagerController(object):
     Create schema.xml file so that we can set UniqueKey field.
     """
     if self.is_solr_cloud_mode():
-      # solrcloud mode
+      self._create_solr_cloud_collection(name, fields, unique_key_field, df)
+    else:
+      self._create_non_solr_cloud_collection(name, fields, unique_key_field, df)
 
-      # Need to remove path afterwards
+  def _create_solr_cloud_collection(self, name, fields, unique_key_field, df):
+    with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+      root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+
       tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
-
-      # Create instance directory.
-      solrctl_path = get_solrctl_path()
-
-      process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--create", name, solr_config_path],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE)
-      status = process.wait()
-
-      # Don't want directories laying around
-      shutil.rmtree(tmp_path)
-
-      if status != 0:
-        LOG.error("Could not create instance directory.\nOutput: %s\nError: %s" % process.communicate())
-        raise PopupException(_('Could not create instance directory. '
-                               'Check if [libzookeeper]ensemble and [indexer]solrctl_path are correct in Hue config.'))
+      try:
+        config_root_path = '%s/%s' % (solr_config_path, 'conf')
+        try:
+          zc.copy_path(root_node, config_root_path)
+        except Exception, e:
+          zc.delete_path(root_node)
+          raise PopupException(_('Error in copying Solr configurations.'), detail=e)
+      finally:
+        # Don't want directories laying around
+        shutil.rmtree(tmp_path)
 
       api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
       if not api.create_collection(name):
         # Delete instance directory if we couldn't create a collection.
-        process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--delete", name],
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
-        if process.wait() != 0:
-          LOG.error("Cloud not delete collection.\nOutput: %s\nError: %s" % process.communicate())
+        try:
+          zc.delete_path(root_node)
+        except Exception, e:
+          raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
         raise PopupException(_('Could not create collection. Check error logs for more info.'))
-    else:
-      # Non-solrcloud mode
-      # Create instance directory locally.
-      instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
-      if os.path.exists(instancedir):
-        raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
-      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
+
+  def _create_non_solr_cloud_collection(self, name, fields, unique_key_field, df):
+    # Non-solrcloud mode
+    # Create instance directory locally.
+    instancedir = os.path.join(CORE_INSTANCE_DIR.get(), name)
+    if os.path.exists(instancedir):
+      raise PopupException(_("Instance directory %s already exists! Please remove it from the file system.") % instancedir)
+
+    tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, False)
+    try:
       shutil.move(solr_config_path, instancedir)
+    finally:
       shutil.rmtree(tmp_path)
 
-      api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-      if not api.create_core(name, instancedir):
-        # Delete instance directory if we couldn't create a collection.
-        shutil.rmtree(instancedir)
-        raise PopupException(_('Could not create collection. Check error logs for more info.'))
+    api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
+    if not api.create_core(name, instancedir):
+      # Delete instance directory if we couldn't create a collection.
+      shutil.rmtree(instancedir)
+      raise PopupException(_('Could not create collection. Check error logs for more info.'))
+
 
   def delete_collection(self, name, core):
     """
@@ -190,15 +185,14 @@ class CollectionManagerController(object):
 
     if api.remove_collection(name):
       # Delete instance directory.
-      solrctl_path = get_solrctl_path()
-
-      process = subprocess.Popen([solrctl_path, "--zk", get_solr_ensemble(), "instancedir", "--delete", name],
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE
-                                 )
-      if process.wait() != 0:
-        LOG.error("Cloud not delete instance directory.\nOutput stream: %s\nError stream: %s" % process.communicate())
-        raise PopupException(_('Could not create instance directory. Check error logs for more info.'))
+      try:
+        root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+        with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+          zc.delete_path(root_node)
+      except Exception, e:
+        # Re-create collection so that we don't have an orphan config
+        api.add_collection(name)
+        raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
     else:
       raise PopupException(_('Could not remove collection. Check error logs for more info.'))
 
@@ -264,20 +258,24 @@ class CollectionManagerController(object):
       table = db.get_table(database, table)
       hql = "SELECT %s FROM `%s.%s` %s" % (','.join(columns), database, table.name, db._get_browse_limit_clause(table))
       query = dbms.hql_query(hql)
-      handle = db.execute_and_wait(query)
 
-      if handle:
-        result = db.fetch(handle, rows=100)
-        db.close(handle)
+      try:
+        handle = db.execute_and_wait(query)
 
-        dataset = tablib.Dataset()
-        dataset.append(columns)
-        for row in result.rows():
-          dataset.append(row)
+        if handle:
+          result = db.fetch(handle, rows=100)
+          db.close(handle)
 
-        if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
-          raise PopupException(_('Could not update index. Check error logs for more info.'))
-      else:
-        raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
+          dataset = tablib.Dataset()
+          dataset.append(columns)
+          for row in result.rows():
+            dataset.append(row)
+
+          if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
+            raise PopupException(_('Could not update index. Check error logs for more info.'))
+        else:
+          raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
+      except Exception, e:
+        raise PopupException(_('Could not update index.'), detail=e)
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)

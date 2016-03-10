@@ -119,7 +119,7 @@ class HttpClient(object):
       self._session.headers.update(headers)
     return self._session.headers.copy()
 
-  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True):
+  def execute(self, http_method, path, params=None, data=None, headers=None, allow_redirects=False, urlencode=True, files=None):
     """
     Submit an HTTP request.
     @param http_method: GET, POST, PUT, DELETE
@@ -129,6 +129,7 @@ class HttpClient(object):
     @param headers: The headers to set for this request.
     @param allow_redirects: requests should automatically resolve redirects.
     @param urlencode: percent encode paths.
+    @param files: for posting Multipart-Encoded files
 
     @return: The result of urllib2.urlopen()
     """
@@ -146,7 +147,8 @@ class HttpClient(object):
       request_kwargs['headers'] = headers
     if data:
       request_kwargs['data'] = data
-
+    if files:
+      request_kwargs['files'] = files
     try:
       resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
       if resp.status_code >= 300:

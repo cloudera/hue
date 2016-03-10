@@ -45,7 +45,7 @@ class AuthenticationForm(AuthAuthenticationForm):
     'inactive': _t("Account deactivated. Please contact an administrator."),
   }
 
-  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), "autofocus": "autofocus"}))
+  username = CharField(label=_t("Username"), max_length=30, widget=TextInput(attrs={'maxlength': 30, 'placeholder': _t("Username"), 'autocomplete': 'off', 'autofocus': 'autofocus'}))
   password = CharField(label=_t("Password"), widget=PasswordInput(attrs={'placeholder': _t("Password"), 'autocomplete': 'off'}))
 
   def authenticate(self):

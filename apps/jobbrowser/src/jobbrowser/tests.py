@@ -31,6 +31,7 @@ from desktop.lib.test_utils import grant_access, add_to_group
 from desktop.models import Document
 from hadoop import cluster
 from hadoop.conf import YARN_CLUSTERS
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from hadoop.yarn import resource_manager_api, mapreduce_api, history_server_api
 from liboozie.oozie_api_tests import OozieServerProvider
 from oozie.models import Workflow
@@ -79,39 +80,31 @@ def get_hadoop_job_id(oozie_api, oozie_jobid, action_index=1, timeout=60, step=5
 class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
 
   requires_hadoop = True
-  user_count = 0
 
   @classmethod
   def setup_class(cls):
     OozieServerProvider.setup_class()
 
-  def setUp(self):
-    """
-    To clean: creating test1, test2, test3...users
-    """
-    TestJobBrowserWithHadoop.user_count += 1
-    self.username = 'test' + str(TestJobBrowserWithHadoop.user_count)
-    self.home_dir = '/user/%s' % self.username
-    self.cluster.fs.do_as_user(self.username, self.cluster.fs.create_home_dir, self.home_dir)
+    cls.username = 'hue_jobbrowser_test'
+    cls.home_dir = '/user/%s' % cls.username
+    cls.cluster.fs.do_as_user(cls.username, cls.cluster.fs.create_home_dir, cls.home_dir)
 
-    self.client = make_logged_in_client(username=self.username, is_superuser=False, groupname='test')
-    self.user = User.objects.get(username=self.username)
-    grant_access(self.username, 'test', 'jobsub')
-    grant_access(self.username, 'test', 'jobbrowser')
-    grant_access(self.username, 'test', 'oozie')
-    add_to_group(self.username)
+    cls.client = make_logged_in_client(username=cls.username, is_superuser=False, groupname='test')
+    cls.user = User.objects.get(username=cls.username)
+    grant_access(cls.username, 'test', 'jobsub')
+    grant_access(cls.username, 'test', 'jobbrowser')
+    grant_access(cls.username, 'test', 'oozie')
+    add_to_group(cls.username)
 
-    self.prev_user = self.cluster.fs.user
-    self.cluster.fs.setuser(self.username)
+    cls.prev_user = cls.cluster.fs.user
+    cls.cluster.fs.setuser(cls.username)
 
-    self.install_examples()
-    self.design = self.create_design()
-
-    raise SkipTest
+    cls.install_examples()
+    cls.design = cls.create_design()
 
     # Run the sleep example, since it doesn't require user home directory
-    design_id = self.design.id
-    response = self.client.post(reverse('oozie:submit_workflow',
+    design_id = cls.design.id
+    response = cls.client.post(reverse('oozie:submit_workflow',
                                 args=[design_id]),
                                 data={u'form-MAX_NUM_FORMS': [u''],
                                       u'form-INITIAL_FORMS': [u'1'],
@@ -120,26 +113,29 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                                       u'form-TOTAL_FORMS': [u'1']},
                                 follow=True)
     oozie_jobid = response.context['oozie_workflow'].id
-    OozieServerProvider.wait_until_completion(oozie_jobid, timeout=120, step=1)
+    OozieServerProvider.wait_until_completion(oozie_jobid)
 
-    self.hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
-    self.hadoop_job_id_short = views.get_shorter_id(self.hadoop_job_id)
+    cls.hadoop_job_id = get_hadoop_job_id(cls.oozie, oozie_jobid, 1)
+    cls.hadoop_job_id_short = views.get_shorter_id(cls.hadoop_job_id)
 
-  def tearDown(self):
+  @classmethod
+  def teardown_class(cls):
     try:
-      Document.objects.all().delete()
-      Workflow.objects.all().delete()
+      Document.objects.filter(name__contains=cls.username).delete()
+      Workflow.objects.filter(name__contains=cls.username).delete()
       # Remove user home directories.
-      self.cluster.fs.do_as_superuser(self.cluster.fs.rmtree, self.home_dir)
+      cls.cluster.fs.do_as_superuser(cls.cluster.fs.rmtree, cls.home_dir)
     except:
-      LOG.exception('failed to teardown %s' % self.home_dir)
-    self.cluster.fs.setuser(self.prev_user)
+      LOG.exception('failed to teardown %s' % cls.home_dir)
+    cls.cluster.fs.setuser(cls.prev_user)
 
-  def create_design(self):
-    if not Document.objects.available_docs(Workflow, self.user).filter(name='sleep_job').exists():
-      response = self.client.post(reverse('jobsub.views.new_design',
+  @classmethod
+  def create_design(cls):
+    job_name = '%s_%s' % (cls.username, 'sleep_job')
+    if not Document.objects.available_docs(Workflow, cls.user).filter(name=job_name).exists():
+      response = cls.client.post(reverse('jobsub.views.new_design',
         kwargs={'node_type': 'mapreduce'}),
-        data={'name': 'sleep_job',
+        data={'name': job_name,
               'description': '',
               'node_type': 'mapreduce',
               'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
@@ -151,16 +147,17 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
       assert_equal(response.status_code, 200)
 
-    return Document.objects.available_docs(Workflow, self.user).get(name='sleep_job').content_object
+    return Document.objects.available_docs(Workflow, cls.user).get(name=job_name).content_object
 
-  def install_examples(self):
+  @classmethod
+  def install_examples(cls):
     global _INITIALIZED
     if _INITIALIZED:
       return
 
-    self.client.post(reverse('oozie:install_examples'))
-    self.cluster.fs.do_as_user(self.username, self.cluster.fs.create_home_dir, self.home_dir)
-    self.cluster.fs.do_as_superuser(self.cluster.fs.chmod, self.home_dir, 0777, True)
+    cls.client.post(reverse('oozie:install_examples'))
+    cls.cluster.fs.do_as_user(cls.username, cls.cluster.fs.create_home_dir, cls.home_dir)
+    cls.cluster.fs.do_as_superuser(cls.cluster.fs.chmod, cls.home_dir, 0777, True)
 
     _INITIALIZED = True
 
@@ -170,26 +167,31 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     """
     raise SkipTest
 
-    self.client.get("/jobbrowser/clusterstatus")
-    self.client.get("/jobbrowser/queues")
-    self.client.get("/jobbrowser/jobbrowser")
+    TestJobBrowserWithHadoop.client.get("/jobbrowser/clusterstatus")
+    TestJobBrowserWithHadoop.client.get("/jobbrowser/queues")
+    TestJobBrowserWithHadoop.client.get("/jobbrowser/jobbrowser")
 
   def test_failed_jobs(self):
     """
     Test jobs with genuine failure, not just killed
     """
+
+    if is_live_cluster():
+      raise SkipTest('HUE-2902: Skipping because test is not reentrant')
+
     # Create design that will fail because the script file isn't there
-    INPUT_DIR = self.home_dir + '/input'
-    OUTPUT_DIR = self.home_dir + '/output'
+    INPUT_DIR = TestJobBrowserWithHadoop.home_dir + '/input'
+    OUTPUT_DIR = TestJobBrowserWithHadoop.home_dir + '/output'
     try:
-      self.cluster.fs.mkdir(self.home_dir + "/jt-test_failed_jobs")
-      self.cluster.fs.mkdir(INPUT_DIR)
-      self.cluster.fs.rmtree(OUTPUT_DIR)
+      TestJobBrowserWithHadoop.cluster.fs.mkdir(TestJobBrowserWithHadoop.home_dir + "/jt-test_failed_jobs")
+      TestJobBrowserWithHadoop.cluster.fs.mkdir(INPUT_DIR)
+      TestJobBrowserWithHadoop.cluster.fs.rmtree(OUTPUT_DIR)
     except:
       LOG.exception('failed to teardown tests')
 
-    response = self.client.post(reverse('jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
-        'name': ['test_failed_jobs-1'],
+    job_name = '%s_%s' % (TestJobBrowserWithHadoop.username, 'test_failed_jobs-1')
+    response = TestJobBrowserWithHadoop.client.post(reverse('jobsub.views.new_design', kwargs={'node_type': 'mapreduce'}), {
+        'name': [job_name],
         'description': ['description test_failed_jobs-1'],
         'args': '',
         'jar_path': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
@@ -206,7 +208,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     # Submit the job
     design_dict = json.loads(response.content)
     design_id = int(design_dict['id'])
-    response = self.client.post(reverse('oozie:submit_workflow',
+    response = TestJobBrowserWithHadoop.client.post(reverse('oozie:submit_workflow',
                                 args=[design_id]),
                                 data={u'form-MAX_NUM_FORMS': [u''],
                                       u'form-INITIAL_FORMS': [u'1'],
@@ -215,84 +217,84 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
                                       u'form-TOTAL_FORMS': [u'1']},
                                 follow=True)
     oozie_jobid = response.context['oozie_workflow'].id
-    job = OozieServerProvider.wait_until_completion(oozie_jobid, timeout=120, step=1)
-    self.hadoop_job_id = get_hadoop_job_id(self.oozie, oozie_jobid, 1)
-    self.hadoop_job_id_short = views.get_shorter_id(self.hadoop_job_id)
+    job = OozieServerProvider.wait_until_completion(oozie_jobid)
+    hadoop_job_id = get_hadoop_job_id(TestJobBrowserWithHadoop.oozie, oozie_jobid, 1)
+    hadoop_job_id_short = views.get_shorter_id(hadoop_job_id)
 
     # Select only killed jobs (should be absent)
     # Taking advantage of the fact new jobs are at the top of the list!
-    response = self.client.get('/jobbrowser/jobs/?format=json&state=killed')
-    assert_false(self.hadoop_job_id_short in response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=killed')
+    assert_false(hadoop_job_id_short in response.content)
 
     # Select only failed jobs (should be present)
     # Map job should succeed. Reduce job should fail.
-    response = self.client.get('/jobbrowser/jobs/?format=json&state=failed')
-    assert_true(self.hadoop_job_id_short in response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=failed')
+    assert_true(hadoop_job_id_short in response.content)
 
     raise SkipTest # Not compatible with MR2
 
     # The single job view should have the failed task table
-    response = self.client.get('/jobbrowser/jobs/%s' % (self.hadoop_job_id,))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s' % (hadoop_job_id,))
     html = response.content.lower()
     assert_true('failed task' in html, html)
 
     # The map task should say success (empty input)
-    map_task_id = self.hadoop_job_id.replace('job', 'task') + '_m_000000'
-    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (self.hadoop_job_id, map_task_id))
+    map_task_id = TestJobBrowserWithHadoop.hadoop_job_id.replace('job', 'task') + '_m_000000'
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, map_task_id))
     assert_true('succeed' in response.content)
     assert_true('failed' not in response.content)
 
     # The reduce task should say failed
-    reduce_task_id = self.hadoop_job_id.replace('job', 'task') + '_r_000000'
-    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (self.hadoop_job_id, reduce_task_id))
+    reduce_task_id = hadoop_job_id.replace('job', 'task') + '_r_000000'
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks/%s' % (hadoop_job_id, reduce_task_id))
     assert_true('succeed' not in response.content)
     assert_true('failed' in response.content)
 
     # Selecting by failed state should include the failed map
-    response = self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (self.hadoop_job_id,))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?taskstate=failed' % (hadoop_job_id,))
     assert_true('r_000000' in response.content)
     assert_true('m_000000' not in response.content)
 
   def test_jobs_page(self):
     # All jobs page and fetch job ID
     # Taking advantage of the fact new jobs are at the top of the list!
-    response = self.client.get('/jobbrowser/jobs/?format=json')
-    assert_true(self.hadoop_job_id_short in response.content, response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json')
+    assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content, response.content)
 
     # Make sure job succeeded
-    response = self.client.get('/jobbrowser/jobs/?format=json&state=completed')
-    assert_true(self.hadoop_job_id_short in response.content)
-    response = self.client.get('/jobbrowser/jobs/?format=json&state=failed')
-    assert_false(self.hadoop_job_id_short in response.content)
-    response = self.client.get('/jobbrowser/jobs/?format=json&state=running')
-    assert_false(self.hadoop_job_id_short in response.content)
-    response = self.client.get('/jobbrowser/jobs/?format=json&state=killed')
-    assert_false(self.hadoop_job_id_short in response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=completed')
+    assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=failed')
+    assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=running')
+    assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&state=killed')
+    assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
 
   def test_tasks_page(self):
     raise SkipTest
 
     # Test tracker page
-    early_task_id = self.hadoop_job_id.replace('job', 'task') + '_m_000000'
-    response = self.client.get('/jobbrowser/jobs/%s/tasks/%s' % (self.hadoop_job_id, early_task_id))
+    early_task_id = TestJobBrowserWithHadoop.hadoop_job_id.replace('job', 'task') + '_m_000000'
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks/%s' % (TestJobBrowserWithHadoop.hadoop_job_id, early_task_id))
 
     tracker_url = re.search('<a href="(/jobbrowser/trackers/.+?)"', response.content).group(1)
-    response = self.client.get(tracker_url)
+    response = TestJobBrowserWithHadoop.client.get(tracker_url)
     assert_true('Tracker at' in response.content)
 
   def test_job_permissions(self):
     # Login as ourself
     finish = SHARE_JOBS.set_for_testing(True)
     try:
-      response = self.client.get('/jobbrowser/jobs/?format=json&user=')
-      assert_true(self.hadoop_job_id_short in response.content)
+      response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&user=')
+      assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
-      response = self.client.get('/jobbrowser/jobs/?format=json&user=')
-      assert_true(self.hadoop_job_id_short in response.content)
+      response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/?format=json&user=')
+      assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
 
@@ -303,14 +305,14 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     finish = SHARE_JOBS.set_for_testing(True)
     try:
       response = client_not_me.get('/jobbrowser/jobs/?format=json&user=')
-      assert_true(self.hadoop_job_id_short in response.content)
+      assert_true(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
 
     finish = SHARE_JOBS.set_for_testing(False)
     try:
       response = client_not_me.get('/jobbrowser/jobs/?format=json&user=')
-      assert_false(self.hadoop_job_id_short in response.content)
+      assert_false(TestJobBrowserWithHadoop.hadoop_job_id_short in response.content)
     finally:
       finish()
 
@@ -318,7 +320,7 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
     raise SkipTest
 
     # Single job page
-    response = self.client.get('/jobbrowser/jobs/%s' % self.hadoop_job_id)
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s' % TestJobBrowserWithHadoop.hadoop_job_id)
     # Check some counters for single job.
     counters = response.context['job'].counters
     counters_file_bytes_written = counters['org.apache.hadoop.mapreduce.FileSystemCounter']['counters']['FILE_BYTES_WRITTEN']
@@ -328,22 +330,22 @@ class TestJobBrowserWithHadoop(unittest.TestCase, OozieServerProvider):
   def test_task_page(self):
     raise SkipTest
 
-    response = self.client.get('/jobbrowser/jobs/%s/tasks' % (self.hadoop_job_id,))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks' % (TestJobBrowserWithHadoop.hadoop_job_id,))
     assert_true(len(response.context['page'].object_list), 4)
     # Select by tasktype
-    response = self.client.get('/jobbrowser/jobs/%s/tasks?tasktype=reduce' % (self.hadoop_job_id,))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktype=reduce' % (TestJobBrowserWithHadoop.hadoop_job_id,))
     assert_true(len(response.context['page'].object_list), 1)
     # Select by taskstate
-    response = self.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (self.hadoop_job_id,))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?taskstate=succeeded' % (TestJobBrowserWithHadoop.hadoop_job_id,))
     assert_true(len(response.context['page'].object_list), 4)
     # Select by text
-    response = self.client.get('/jobbrowser/jobs/%s/tasks?tasktext=clean' % (self.hadoop_job_id,))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/tasks?tasktext=clean' % (TestJobBrowserWithHadoop.hadoop_job_id,))
     assert_true(len(response.context['page'].object_list), 1)
 
   def test_job_single_logs_page(self):
     raise SkipTest
 
-    response = self.client.get('/jobbrowser/jobs/%s/single_logs' % (self.hadoop_job_id))
+    response = TestJobBrowserWithHadoop.client.get('/jobbrowser/jobs/%s/single_logs' % (TestJobBrowserWithHadoop.hadoop_job_id))
     assert_true('syslog' in response.content, response.content)
     assert_true('<div class="tab-pane active" id="logsSysLog">' in response.content or
                 '<div class="tab-pane active" id="logsStdErr">' in response.content or # Depending on Hadoop
@@ -385,10 +387,6 @@ class TestMapReduce2NoHadoop:
     if not hasattr(history_server_api, 'old_get_history_server_api'):
       history_server_api.old_get_history_server_api = history_server_api.get_history_server_api
 
-    resource_manager_api.get_resource_manager = lambda: MockResourceManagerApi()
-    mapreduce_api.get_mapreduce_api = lambda: MockMapreduceApi()
-    history_server_api.get_history_server_api = lambda: HistoryServerApi()
-
     self.c = make_logged_in_client(is_superuser=False)
     grant_access("test", "test", "jobbrowser")
     self.user = User.objects.get(username='test')
@@ -396,6 +394,10 @@ class TestMapReduce2NoHadoop:
     self.c2 = make_logged_in_client(is_superuser=False, username="test2")
     grant_access("test2", "test2", "jobbrowser")
     self.user2 = User.objects.get(username='test2')
+
+    resource_manager_api.get_resource_manager = lambda username: MockResourceManagerApi(username)
+    mapreduce_api.get_mapreduce_api = lambda username: MockMapreduceApi(username)
+    history_server_api.get_history_server_api = lambda: HistoryServerApi()
 
     self.finish = [
         YARN_CLUSTERS['default'].SUBMIT_TO.set_for_testing(True),
@@ -421,14 +423,31 @@ class TestMapReduce2NoHadoop:
     response_content = json.loads(response.content)
     assert_equal(len(response_content['jobs']), 1)
 
+  def test_applications_no_start_time(self):
+    response = self.c.get('/jobbrowser/?format=json')
+    data = json.loads(response.content)
+    job = [j for j in data['jobs'] if j['id'] == 'application_1428442704693_0007']
+    assert_true(job, job)
+    job = job[0]
+
+    assert_equal('', job['startTimeFormatted'], data)
+    assert_equal('', job['durationFormatted'], data)
+
   def test_running_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0054')
-    assert_true('job_1356251510842_0054' in response.content)
+    assert_true('job_1356251510842_0054' in response.content, response.content)
     assert_true('RUNNING' in response.content)
 
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0054')
     assert_true('job_1356251510842_0054' in response.content)
     assert_true('RUNNING' in response.content)
+
+  def test_application_no_start_time(self):
+    response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007?format=json')
+    data = json.loads(response.content)
+
+    assert_equal('', data['job']['startTimeFormatted'], data)
+    assert_equal('', data['job']['durationFormatted'], data)
 
   def test_finished_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1356251510842_0009')
@@ -566,7 +585,7 @@ class MockResourceManagerApi:
         u'progress': 100.0,
         u'queue': u'root.erickt',
         u'runningContainers': -1,
-        u'startedTime': 1428454941315,
+        u'startedTime': 0,
         u'state': u'FINISHED',
         u'trackingUI': u'History',
         u'trackingUrl': u'http://N/A',
@@ -575,7 +594,7 @@ class MockResourceManagerApi:
     },
   }
 
-  def __init__(self, oozie_url=None): pass
+  def __init__(self, user, rm_url=None): pass
 
   def apps(self, **kwargs):
     return {
@@ -604,7 +623,7 @@ class MockMapreduce2Api(object):
   MockMapreduceApi and HistoryServerApi are very similar and inherit from it.
   """
 
-  def __init__(self, oozie_url=None): pass
+  def __init__(self, mr_url=None): pass
 
   def tasks(self, job_id):
     return {
@@ -744,7 +763,7 @@ class MockMapreduceApi(MockMapreduce2Api):
 
 class HistoryServerApi(MockMapreduce2Api):
 
-  def __init__(self, oozie_url=None): pass
+  def __init__(self, hs_url=None): pass
 
   def job(self, user, job_id):
     if '1356251510842_0054' == job_id:
@@ -780,35 +799,35 @@ def test_make_log_links():
 
   # FileBrowser
   assert_equal(
-      """<a href="/filebrowser/view/user/romain/tmp" target="_blank">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
+      """<a href="/filebrowser/view=/user/romain/tmp" target="_blank">hdfs://localhost:8020/user/romain/tmp</a>  &lt;dir&gt;""",
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp  <dir>')
   )
   assert_equal(
-      """<a href="/filebrowser/view/user/romain/tmp" target="_blank">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
+      """<a href="/filebrowser/view=/user/romain/tmp" target="_blank">hdfs://localhost:8020/user/romain/tmp</a>&lt;dir&gt;""",
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/tmp<dir>')
   )
   assert_equal(
-      """output: <a href="/filebrowser/view/user/romain/tmp" target="_blank">/user/romain/tmp</a>  &lt;dir&gt;""",
+      """output: <a href="/filebrowser/view=/user/romain/tmp" target="_blank">/user/romain/tmp</a>  &lt;dir&gt;""",
       LinkJobLogs._make_links('output: /user/romain/tmp  <dir>')
   )
   assert_equal(
-      'Successfully read 3760 records (112648 bytes) from: &quot;<a href="/filebrowser/view/user/hue/pig/examples/data/midsummer.txt" target="_blank">/user/hue/pig/examples/data/midsummer.txt</a>&quot;',
+      'Successfully read 3760 records (112648 bytes) from: &quot;<a href="/filebrowser/view=/user/hue/pig/examples/data/midsummer.txt" target="_blank">/user/hue/pig/examples/data/midsummer.txt</a>&quot;',
       LinkJobLogs._make_links('Successfully read 3760 records (112648 bytes) from: "/user/hue/pig/examples/data/midsummer.txt"')
   )
   assert_equal(
-      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view/user/romain/out/fffff" target="_blank">hdfs://localhost:8020/user/romain/out/fffff</a>,',
+      'data,upper_case  MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff" target="_blank">hdfs://localhost:8020/user/romain/out/fffff</a>,',
       LinkJobLogs._make_links('data,upper_case  MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff,')
   )
   assert_equal(
-      'MAP_ONLY  <a href="/filebrowser/view/user/romain/out/fffff" target="_blank">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
+      'MAP_ONLY  <a href="/filebrowser/view=/user/romain/out/fffff" target="_blank">hdfs://localhost:8020/user/romain/out/fffff</a>\n2013',
       LinkJobLogs._make_links('MAP_ONLY  hdfs://localhost:8020/user/romain/out/fffff\n2013')
   )
   assert_equal(
-      ' <a href="/filebrowser/view/jobs.tsv" target="_blank">/jobs.tsv</a> ',
+      ' <a href="/filebrowser/view=/jobs.tsv" target="_blank">/jobs.tsv</a> ',
       LinkJobLogs._make_links(' /jobs.tsv ')
   )
   assert_equal(
-      '<a href="/filebrowser/view/user/romain/job_pos_2012.tsv" target="_blank">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
+      '<a href="/filebrowser/view=/user/romain/job_pos_2012.tsv" target="_blank">hdfs://localhost:8020/user/romain/job_pos_2012.tsv</a>',
       LinkJobLogs._make_links('hdfs://localhost:8020/user/romain/job_pos_2012.tsv')
   )
 
@@ -830,10 +849,14 @@ def test_make_log_links():
       LinkJobLogs._make_links('- More information at: http://localhost:50030/jobdetails.jsp?jobid=job_201306261521_0058')
   )
   assert_equal(
-      """ Logging error messages to: job_201307091553_0028/attempt_201307091553_002""",
+      """ Logging error messages to: <a href="/jobbrowser/jobs/job_201307091553_0028" target="_blank">job_201307091553_0028</a>/attempt_201307091553_002""",
       LinkJobLogs._make_links(' Logging error messages to: job_201307091553_0028/attempt_201307091553_002')
   )
   assert_equal(
-      """ pig-job_201307091553_0028.log""",
+      """ pig-<a href="/jobbrowser/jobs/job_201307091553_0028" target="_blank">job_201307091553_0028</a>.log""",
       LinkJobLogs._make_links(' pig-job_201307091553_0028.log')
+  )
+  assert_equal(
+      """MapReduceLauncher  - HadoopJobId: <a href="/jobbrowser/jobs/job_201306261521_0058" target="_blank">job_201306261521_0058</a>. Look at the UI""",
+      LinkJobLogs._make_links('MapReduceLauncher  - HadoopJobId: job_201306261521_0058. Look at the UI')
   )

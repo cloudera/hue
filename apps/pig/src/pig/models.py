@@ -25,7 +25,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document as Doc
+from desktop.models import Document as Doc, SAMPLE_USER_ID
 from hadoop.fs.hadoopfs import Hdfs
 
 
@@ -59,6 +59,8 @@ class PigScript(Document):
 
   doc = generic.GenericRelation(Doc, related_name='pig_doc')
 
+  isV2 = False
+
   def update_from_dict(self, attrs):
     data_dict = self.dict
 
@@ -90,10 +92,52 @@ class PigScript(Document):
     return 'org.apache.pig.backend.hadoop.hbase.HBaseStorage' in script
 
 
+class PigScript2(object):
+  isV2 = True     # V2 is for the Notebook app
+
+  def __init__(self, attrs=None):
+    self.data = json.dumps({
+        'script': '',
+        'name': '',
+        'properties': [],
+        'job_id': None,
+        'parameters': [],
+        'resources': [],
+        'hadoopProperties': []
+    })
+
+    if attrs:
+      self.update_from_dict(attrs)
+
+  def update_from_dict(self, attrs):
+    data_dict = self.dict
+
+    data_dict.update(attrs)
+
+    self.data = json.dumps(data_dict)
+
+  @property
+  def dict(self):
+    return json.loads(self.data)
+
+  @property
+  def use_hcatalog(self):
+    script = self.dict['script']
+
+    return ('org.apache.hcatalog.pig.HCatStorer' in script or 'org.apache.hcatalog.pig.HCatLoader' in script) or \
+        ('org.apache.hive.hcatalog.pig.HCatLoader' in script or 'org.apache.hive.hcatalog.pig.HCatStorer' in script) # New classes
+
+  @property
+  def use_hbase(self):
+    script = self.dict['script']
+
+    return 'org.apache.pig.backend.hadoop.hbase.HBaseStorage' in script
+
+
 def create_or_update_script(id, name, script, user, parameters, resources, hadoopProperties, is_design=True):
   try:
     pig_script = PigScript.objects.get(id=id)
-    if id == '1100713': # Special case for the Example, just create an history
+    if id == str(SAMPLE_USER_ID): # Special case for the Example, just create an history
       is_design = False
       raise PigScript.DoesNotExist()
     pig_script.doc.get().can_write_or_exception(user)
@@ -160,9 +204,9 @@ def hdfs_link(url):
     path = Hdfs.urlsplit(url)[2]
     if path:
       if path.startswith(posixpath.sep):
-        return "/filebrowser/view" + path
+        return "/filebrowser/view=" + path
       else:
-        return "/filebrowser/home_relative_view/" + path
+        return "/filebrowser/home_relative_view=/" + path
     else:
       return url
   else:

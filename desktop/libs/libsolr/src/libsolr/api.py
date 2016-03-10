@@ -18,6 +18,7 @@
 
 import json
 import logging
+import re
 import urllib
 
 from itertools import groupby
@@ -25,13 +26,14 @@ from itertools import groupby
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import smart_str
+from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
 from search.api import _compute_range_facet
-import re
+
+from libsolr.conf import SSL_CERT_CA_VERIFY
 
 
 LOG = logging.getLogger(__name__)
@@ -47,14 +49,25 @@ class SolrApi(object):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
-  def __init__(self, solr_url, user, security_enabled=SECURITY_ENABLED.get()):
+  def __init__(self, solr_url, user, security_enabled=SECURITY_ENABLED.get(), ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
     self._url = solr_url
     self._user = user
     self._client = HttpClient(self._url, logger=LOG)
     self.security_enabled = security_enabled
+
     if self.security_enabled:
       self._client.set_kerberos_auth()
+
+    self._client.set_verify(ssl_cert_ca_verify)
+
     self._root = resource.Resource(self._client)
+
+    # The Kerberos handshake requires two requests in order to authenticate,
+    # but if our first request is a PUT/POST, it might flat-out reject the
+    # first request if the body is too large. So, connect here in order to get
+    # a cookie so future PUT/POSTs will be pre-authenticated.
+    if self.security_enabled:
+      self._root.invoke('HEAD', '/')
 
   def _get_params(self):
     if self.security_enabled:
@@ -82,61 +95,73 @@ class SolrApi(object):
         '5MINUTES': {
             'histogram-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
             'bucket-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
+            'bar-widget': {'coeff': '+3', 'unit': 'SECONDS'}, # ~100 slots
             'facet-widget': {'coeff': '+1', 'unit': 'MINUTES'}, # ~10 slots
         },
         '30MINUTES': {
             'histogram-widget': {'coeff': '+20', 'unit': 'SECONDS'},
             'bucket-widget': {'coeff': '+20', 'unit': 'SECONDS'},
+            'bar-widget': {'coeff': '+20', 'unit': 'SECONDS'},
             'facet-widget': {'coeff': '+5', 'unit': 'MINUTES'},
         },
         '1HOURS': {
             'histogram-widget': {'coeff': '+30', 'unit': 'SECONDS'},
             'bucket-widget': {'coeff': '+30', 'unit': 'SECONDS'},
+            'bar-widget': {'coeff': '+30', 'unit': 'SECONDS'},
             'facet-widget': {'coeff': '+10', 'unit': 'MINUTES'},
         },
         '12HOURS': {
             'histogram-widget': {'coeff': '+7', 'unit': 'MINUTES'},
             'bucket-widget': {'coeff': '+7', 'unit': 'MINUTES'},
+            'bar-widget': {'coeff': '+7', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+1', 'unit': 'HOURS'},
         },
         '1DAYS': {
             'histogram-widget': {'coeff': '+15', 'unit': 'MINUTES'},
             'bucket-widget': {'coeff': '+15', 'unit': 'MINUTES'},
+            'bar-widget': {'coeff': '+15', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+3', 'unit': 'HOURS'},
         },
         '2DAYS': {
             'histogram-widget': {'coeff': '+30', 'unit': 'MINUTES'},
             'bucket-widget': {'coeff': '+30', 'unit': 'MINUTES'},
+            'bar-widget': {'coeff': '+30', 'unit': 'MINUTES'},
             'facet-widget': {'coeff': '+6', 'unit': 'HOURS'},
         },
         '7DAYS': {
             'histogram-widget': {'coeff': '+3', 'unit': 'HOURS'},
             'bucket-widget': {'coeff': '+3', 'unit': 'HOURS'},
+            'bar-widget': {'coeff': '+3', 'unit': 'HOURS'},
             'facet-widget': {'coeff': '+1', 'unit': 'DAYS'},
         },
         '1MONTHS': {
             'histogram-widget': {'coeff': '+12', 'unit': 'HOURS'},
             'bucket-widget': {'coeff': '+12', 'unit': 'HOURS'},
+            'bar-widget': {'coeff': '+12', 'unit': 'HOURS'},
             'facet-widget': {'coeff': '+5', 'unit': 'DAYS'},
         },
         '3MONTHS': {
             'histogram-widget': {'coeff': '+1', 'unit': 'DAYS'},
             'bucket-widget': {'coeff': '+1', 'unit': 'DAYS'},
+            'bar-widget': {'coeff': '+1', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+30', 'unit': 'DAYS'},
         },
         '1YEARS': {
             'histogram-widget': {'coeff': '+3', 'unit': 'DAYS'},
             'bucket-widget': {'coeff': '+3', 'unit': 'DAYS'},
+            'bar-widget': {'coeff': '+3', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+12', 'unit': 'MONTHS'},
         },
         '2YEARS': {
             'histogram-widget': {'coeff': '+7', 'unit': 'DAYS'},
             'bucket-widget': {'coeff': '+7', 'unit': 'DAYS'},
+            'bar-widget': {'coeff': '+7', 'unit': 'DAYS'},
             'facet-widget': {'coeff': '+3', 'unit': 'MONTHS'},
         },
         '10YEARS': {
             'histogram-widget': {'coeff': '+1', 'unit': 'MONTHS'},
             'bucket-widget': {'coeff': '+1', 'unit': 'MONTHS'},
+            'bar-widget': {'coeff': '+1', 'unit': 'MONTHS'},
             'facet-widget': {'coeff': '+1', 'unit': 'YEARS'},
         }
     }
@@ -211,8 +236,8 @@ class SolrApi(object):
             if fields.index(field) < len(values): # Lowest common field denominator
               value = values[fields.index(field)]
               exclude = '-' if _filter['exclude'] else ''
-              if value is not None and ' ' in smart_str(value):
-                value = smart_str(value).replace('"', '\\"')
+              if value is not None and ' ' in force_unicode(value):
+                value = force_unicode(value).replace('"', '\\"')
                 f.append('%s%s:"%s"' % (exclude, field, value))
               else:
                 f.append('%s{!field f=%s}%s' % (exclude, field, value))
@@ -225,6 +250,12 @@ class SolrApi(object):
         params += (('fq', '{!tag=%(id)s}' % fq + ' '.join([urllib.unquote(
                     utf_quoter('%s%s:[%s TO %s}' % ('-' if field['exclude'] else '', fq['field'], f['from'] if fq['is_up'] else '*', '*' if fq['is_up'] else f['from'])))
                                                           for field, f in zip(fq['filter'], fq['properties'])])),)
+      elif fq['type'] == 'map':
+        _keys = fq.copy()
+        _keys.update(fq['properties'])
+        params += (('fq', '{!tag=%(id)s}' % fq + urllib.unquote(
+                    utf_quoter('%(lat)s:[%(lat_sw)s TO %(lat_ne)s} AND %(lon)s:[%(lon_sw)s TO %(lon_ne)s}' % _keys))),)
+
     return params
 
   def query(self, collection, query):
@@ -400,19 +431,25 @@ class SolrApi(object):
     return self._get_json(response)
 
 
-  def suggest(self, solr_query, hue_core):
+  def suggest(self, collection, query):
     try:
       params = self._get_params() + (
-          ('q', solr_query['q']),
+          ('suggest', 'true'),
+          ('suggest.build', 'true'),
+          ('suggest.q', query['q']),
           ('wt', 'json'),
       )
-      response = self._root.get('%(collection)s/suggest' % solr_query, params)
+      if query.get('dictionary'):
+        params += (
+            ('suggest.dictionary', query['dictionary']),
+        )
+      response = self._root.get('%s/suggest' % collection, params)
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
-  def collections(self):
+  def collections(self): # To drop, used in indexer v1
     try:
       params = self._get_params() + (
           ('detail', 'true'),
@@ -424,9 +461,31 @@ class SolrApi(object):
       raise PopupException(e, title=_('Error while accessing Solr'))
 
 
-  def aliases(self):
+  def collections2(self):
     try:
       params = self._get_params() + (
+          ('action', 'LIST'),
+          ('wt', 'json'),
+      )
+      return self._root.get('admin/collections', params=params)['collections']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def configs(self):
+    try:
+      params = self._get_params() + (
+          ('action', 'LIST'),
+          ('wt', 'json'),
+      )
+      return self._root.get('admin/configs', params=params)['configSets']
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def aliases(self):
+    try:
+      params = self._get_params() + ( # Waiting for SOLR-4968
           ('detail', 'true'),
           ('path', '/aliases.json'),
       )
@@ -480,7 +539,7 @@ class SolrApi(object):
       )
 
       response = self._root.post('admin/cores', params=params, contenttype='application/json')
-      if response.get('responseHeader',{}).get('status',-1) == 0:
+      if response.get('responseHeader', {}).get('status', -1) == 0:
         return True
       else:
         LOG.error("Could not create core. Check response:\n%s" % json.dumps(response, indent=2))
@@ -490,6 +549,39 @@ class SolrApi(object):
         LOG.warn("Could not create collection.", exc_info=True)
         return False
       else:
+        raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def create_or_modify_alias(self, name, collections):
+    try:
+      params = self._get_params() + (
+        ('action', 'CREATEALIAS'),
+        ('name', name),
+        ('collections', ','.join(collections)),
+        ('wt', 'json'),
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if response.get('responseHeader', {}).get('status', -1) != 0:
+        msg = _("Could not create or edit alias. Check response:\n%s") % json.dumps(response, indent=2)
+        LOG.error(msg)
+        raise PopupException(msg)
+    except RestException, e:
+        raise PopupException(e, title=_('Error while accessing Solr'))
+
+  def delete_alias(self, name):
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETEALIAS'),
+        ('name', name),
+        ('wt', 'json'),
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if response.get('responseHeader', {}).get('status', -1) != 0:
+        msg = _("Could not delete alias. Check response:\n%s") % json.dumps(response, indent=2)
+        LOG.error(msg)
+        raise PopupException(msg)
+    except RestException, e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
   def remove_collection(self, name, replication=1):
@@ -668,24 +760,25 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def update(self, collection_or_core_name, data, content_type='csv'):
+  def update(self, collection_or_core_name, data, content_type='csv', version=None):
     try:
       if content_type == 'csv':
-        params = self._get_params() + (
-          ('wt', 'json'),
-          ('overwrite', 'true'),
-        )
         content_type = 'application/csv'
       elif content_type == 'json':
-        params = self._get_params() + (
-          ('wt', 'json'),
-          ('overwrite', 'true'),
-        )
         content_type = 'application/json'
       else:
         LOG.error("Could not update index for %s. Unsupported content type %s. Allowed content types: csv" % (collection_or_core_name, content_type))
         return False
 
+      params = self._get_params() + (
+          ('wt', 'json'),
+          ('overwrite', 'true'),
+      )
+      if version is not None:
+        params += (
+          ('_version_', version),
+          ('versions', 'true')
+        )
       self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
       return True
     except RestException, e:

@@ -14,10 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from django.http import HttpRequest
 from django.utils.translation import ugettext as _
 from django.template.defaultfilters import escape, escapejs
+from desktop.lib.i18n import smart_unicode
+from desktop.views import login_modal
 %>
 
+% if request is not None:
+${ smart_unicode(login_modal(request).content) | n,unicode }
+% endif
 
 <script type="text/javascript">
   $(document).ready(function () {
@@ -42,6 +48,33 @@ from django.template.defaultfilters import escape, escapejs
         %endif
       %endfor
     %endif
+
+    // global catch for ajax calls after the user has logged out
+    var isLoginRequired = false;
+    $(document).ajaxSuccess(function (event, xhr, settings, data) {
+      if (data === '/* login required */' && !isLoginRequired) {
+        isLoginRequired = true;
+        $('#login-modal').modal('show');
+        window.setTimeout(function () {
+          $('.jHueNotify').remove();
+        }, 200);
+      }
+    });
+
+    $('#login-modal').on('hidden', function () {
+      isLoginRequired = false;
+    });
+
+    huePubSub.subscribe('hue.login.result', function (response) {
+      if (response.auth) {
+        $('#login-modal').modal('hide');
+        $.jHueNotify.info('${ _('You have signed in successfully!') }');
+        $('#login-modal .login-error').addClass('hide');
+      }
+      else {
+        $('#login-modal .login-error').removeClass('hide');
+      }
+    });
 
 
     $("div.navigator ul.dropdown-menu").css("maxHeight", $(window).height() - 50);

@@ -84,6 +84,8 @@ class WebHdfsContentSummary(object):
   Content summary info on a directory
   """
   def __init__(self, summary):
+    self.summary = summary
+
     for k, v in summary.iteritems():
       setattr(self, k, v)
 

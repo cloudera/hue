@@ -82,12 +82,22 @@ var Coordinator = function (vm, coordinator) {
         "uuid": self.properties.workflow(),
       }, function (data) {
         self.workflowParameters(data.parameters);
-        // Pre-add the variables
-        $.each(data.parameters, function (index, param) {
-          if (self.variables().length < data.parameters.length) {
-            self.addVariable();
+
+        // Remove Uncommon params
+        prev_variables = self.variables.slice();
+        $.each(prev_variables, function (index, variable) {
+          if (data.parameters.filter(function(param) { return param['name'] == variable.workflow_variable() }).length == 0) {
+            self.variables.remove(variable);
           }
-          self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+        });
+
+        // Append the new variables
+        prev_variables = self.variables.slice();
+        $.each(data.parameters, function (index, param) {
+          if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable() }).length == 0) {
+            self.addVariable();
+            self.variables()[self.variables().length - 1].workflow_variable(param['name']);
+          }
         });
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
@@ -114,7 +124,7 @@ var Coordinator = function (vm, coordinator) {
       'show_advanced': false,
       'use_done_flag': false,
       'done_flag': '_SUCCESS',
-      'timezone': 'America/Los_Angeles',
+      'timezone': tzdetect.matches()[0],
       'same_timezone': true,
       'instance_choice': 'default',
       'is_advanced_start_instance': false,
@@ -126,7 +136,7 @@ var Coordinator = function (vm, coordinator) {
       'same_frequency': true,
       'frequency_number': 1,
       'frequency_unit': 'days',
-      'start': new Date(),
+      'start': moment().format("YYYY-MM-DD[T]HH:mm"),
       'same_start': true,
 
       'shared_dataset_uuid': '' // If reusing a shared dataset
@@ -144,6 +154,9 @@ var Coordinator = function (vm, coordinator) {
 var CoordinatorEditorViewModel = function (coordinator_json, credentials_json, workflows_json, can_edit_json) {
   var self = this;
 
+  if (! coordinator_json['properties']['timezone']) {
+    coordinator_json['properties']['timezone'] = tzdetect.matches()[0];
+   }
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(coordinator_json.id == null);
   self.isEditing.subscribe(function (newVal) {

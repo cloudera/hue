@@ -22,18 +22,21 @@ import json
 import logging
 import os
 import subprocess
+import threading
 import time
 
 from nose.tools import assert_true, assert_false
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
-
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.paths import get_run_root
 from desktop.lib.python_util import find_unused_port
+from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.security_util import get_localhost_name
-from hadoop import pseudo_hdfs4
+from desktop.lib.test_utils import add_to_group, grant_access
+from hadoop import cluster, pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster, get_db_prefix
 
 import beeswax.conf
 
@@ -45,10 +48,15 @@ HIVE_SERVER_TEST_PORT = find_unused_port()
 _INITIALIZED = False
 _SHARED_HIVE_SERVER_PROCESS = None
 _SHARED_HIVE_SERVER = None
+_SHARED_HIVE_SERVER_LOCK = threading.Lock()
 _SHARED_HIVE_SERVER_CLOSER = None
 
 
 LOG = logging.getLogger(__name__)
+
+
+def is_hive_on_spark():
+  return os.environ.get('ENABLE_HIVE_ON_SPARK', 'false').lower() == 'true'
 
 
 def _start_server(cluster):
@@ -86,60 +94,19 @@ def _start_server(cluster):
   return subprocess.Popen(args=args, env=env, cwd=cluster._tmpdir, stdin=subprocess.PIPE)
 
 
-def get_shared_beeswax_server():
+def get_shared_beeswax_server(db_name='default'):
   global _SHARED_HIVE_SERVER
   global _SHARED_HIVE_SERVER_CLOSER
-  if _SHARED_HIVE_SERVER is None:
 
-    cluster = pseudo_hdfs4.shared_cluster()
+  with _SHARED_HIVE_SERVER_LOCK:
+    if _SHARED_HIVE_SERVER is None:
+      cluster = pseudo_hdfs4.shared_cluster()
 
-    HIVE_CONF = cluster.hadoop_conf_dir
-    finish = (
-      beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
-      beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
-      beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
-      beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
-    )
-
-    default_xml = """<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-
-<configuration>
-
-<property>
-  <name>javax.jdo.option.ConnectionURL</name>
-  <value>jdbc:derby:;databaseName=%(root)s/metastore_db;create=true</value>
-  <description>JDBC connect string for a JDBC metastore</description>
-</property>
-
- <property>
-   <name>hive.server2.enable.impersonation</name>
-   <value>false</value>
- </property>
-
-<property>
-  <name>hive.querylog.location</name>
-  <value>%(querylog)s</value>
-</property>
-
-</configuration>
-""" % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
-
-    file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
-
-    global _SHARED_HIVE_SERVER_PROCESS
-
-    if _SHARED_HIVE_SERVER_PROCESS is None:
-      p = _start_server(cluster)
-      LOG.info("started")
-      cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
-
-      _SHARED_HIVE_SERVER_PROCESS = p
-      def kill():
-        LOG.info("Killing server (pid %d)." % p.pid)
-        os.kill(p.pid, 9)
-        p.wait()
-      atexit.register(kill)
+      if is_live_cluster():
+        def s():
+          pass
+      else:
+        s = _start_mini_hs2(cluster)
 
       start = time.time()
       started = False
@@ -150,29 +117,90 @@ def get_shared_beeswax_server():
       query_server = get_query_server_config()
       db = dbms.get(user, query_server)
 
-      while not started and time.time() - start <= 30:
+      while not started and time.time() - start <= 60:
         try:
           db.open_session(user)
+        except StructuredThriftTransportException, e:
+          LOG.exception('Failed to open Hive Server session')
+
+          # Don't loop if we had an authentication error.
+          if 'Bad status: 3' in e.message:
+            raise
+        except Exception, e:
+          LOG.exception('Failed to open Hive Server session')
+        else:
           started = True
           break
-        except Exception, e:
-          LOG.info('HiveServer2 server status not started yet after: %s' % e)
-          time.sleep(sleep)
+
+        time.sleep(sleep)
+        sleep *= 2
 
       if not started:
         raise Exception("Server took too long to come up.")
 
-    def s():
-      for f in finish:
-        f()
-      cluster.stop()
+      _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER = cluster, s
 
-    _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER = cluster, s
-
-  return _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER
+    return _SHARED_HIVE_SERVER, _SHARED_HIVE_SERVER_CLOSER
 
 
-def wait_for_query_to_finish(client, response, max=30.0):
+def _start_mini_hs2(cluster):
+  HIVE_CONF = cluster.hadoop_conf_dir
+  finish = (
+     beeswax.conf.HIVE_SERVER_HOST.set_for_testing(get_localhost_name()),
+     beeswax.conf.HIVE_SERVER_PORT.set_for_testing(HIVE_SERVER_TEST_PORT),
+     beeswax.conf.HIVE_SERVER_BIN.set_for_testing(get_run_root('ext/hive/hive') + '/bin/hiveserver2'),
+     beeswax.conf.HIVE_CONF_DIR.set_for_testing(HIVE_CONF)
+   )
+
+  default_xml = """<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+
+<property>
+ <name>javax.jdo.option.ConnectionURL</name>
+ <value>jdbc:derby:;databaseName=%(root)s/metastore_db;create=true</value>
+ <description>JDBC connect string for a JDBC metastore</description>
+</property>
+
+<property>
+  <name>hive.server2.enable.impersonation</name>
+  <value>false</value>
+</property>
+
+<property>
+ <name>hive.querylog.location</name>
+ <value>%(querylog)s</value>
+</property>
+
+</configuration>
+""" % {'root': cluster._tmpdir, 'querylog': cluster.log_dir + '/hive'}
+
+  file(HIVE_CONF + '/hive-site.xml', 'w').write(default_xml)
+
+  global _SHARED_HIVE_SERVER_PROCESS
+
+  if _SHARED_HIVE_SERVER_PROCESS is None:
+    p = _start_server(cluster)
+    LOG.info("started")
+    cluster.fs.do_as_superuser(cluster.fs.chmod, '/tmp', 01777)
+
+    _SHARED_HIVE_SERVER_PROCESS = p
+    def kill():
+      LOG.info("Killing server (pid %d)." % p.pid)
+      os.kill(p.pid, 9)
+      p.wait()
+    atexit.register(kill)
+
+  def s():
+    for f in finish:
+      f()
+    cluster.stop()
+
+  return s
+
+
+def wait_for_query_to_finish(client, response, max=60.0):
   # Take a async API execute_query() response in input
 
   start = time.time()
@@ -182,6 +210,7 @@ def wait_for_query_to_finish(client, response, max=30.0):
     return response
 
   content = json.loads(response.content)
+
   watch_url = content['watch_url']
 
   response = client.get(watch_url, follow=True)
@@ -202,7 +231,10 @@ def wait_for_query_to_finish(client, response, max=30.0):
 
 def is_finished(response):
   status = json.loads(response.content)
-  return 'error' in status or status.get('isSuccess') or status.get('isFailure')
+  return 'error' in status \
+      or status.get('isSuccess') \
+      or status.get('isFailure') \
+      or status.get('status') == -1
 
 
 def fetch_query_result_data(client, status_response, n=0, server_name='beeswax'):
@@ -217,7 +249,7 @@ def fetch_query_result_data(client, status_response, n=0, server_name='beeswax')
 def make_query(client, query, submission_type="Execute",
                udfs=None, settings=None, resources=None,
                wait=False, name=None, desc=None, local=True,
-               is_parameterized=True, max=30.0, database='default', email_notify=False, params=None, server_name='beeswax', **kwargs):
+               is_parameterized=True, max=60.0, database='default', email_notify=False, params=None, server_name='beeswax', **kwargs):
   """
   Prepares arguments for the execute view.
 
@@ -299,9 +331,9 @@ def verify_history(client, fragment, design=None, reverse=False, server_name='be
   """
   resp = client.get('/%(server_name)s/query_history' % {'server_name': server_name})
   my_assert = reverse and assert_false or assert_true
-  my_assert(fragment in resp.content)
+  my_assert(fragment in resp.content, resp.content)
   if design:
-    my_assert(design in resp.content)
+    my_assert(design in resp.content, resp.content)
 
   if resp.context:
     try:
@@ -319,11 +351,59 @@ class BeeswaxSampleProvider(object):
   """
   @classmethod
   def setup_class(cls):
-    cls.cluster, shutdown = get_shared_beeswax_server()
-    cls.client = make_logged_in_client()
+    cls.db_name = get_db_prefix(name='hive')
+    cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
+    cls.set_execution_engine()
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
+    add_to_group('test', 'test')
+    grant_access('test', 'test', 'beeswax')
+    grant_access('test', 'test', 'metastore')
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()
+
+  @classmethod
+  def teardown_class(cls):
+    if is_live_cluster():
+      # Delete test DB and tables
+      query_server = get_query_server_config()
+      client = make_logged_in_client()
+      user = User.objects.get(username='test')
+
+      db = dbms.get(user, query_server)
+
+      # Kill Spark context if running
+      if is_hive_on_spark() and cluster.is_yarn():
+        # TODO: We should clean up the running Hive on Spark job here
+        pass
+
+      for db_name in [cls.db_name, '%s_other' % cls.db_name]:
+        databases = db.get_databases()
+
+        if db_name in databases:
+          tables = db.get_tables(database=db_name)
+          for table in tables:
+            make_query(client, 'DROP TABLE IF EXISTS `%(db)s`.`%(table)s`' % {'db': db_name, 'table': table}, wait=True)
+          make_query(client, 'DROP VIEW IF EXISTS `%(db)s`.`myview`' % {'db': db_name}, wait=True)
+          make_query(client, 'DROP DATABASE IF EXISTS %(db)s' % {'db': db_name}, wait=True)
+
+          # Check the cleanup
+          databases = db.get_databases()
+          assert_false(db_name in databases)
+
+      global _INITIALIZED
+      _INITIALIZED = False
+
+  @classmethod
+  def set_execution_engine(cls):
+    query_server = get_query_server_config()
+
+    if query_server['server_name'] == 'beeswax' and is_hive_on_spark():
+      user = User.objects.get(username='test')
+      db = dbms.get(user, query_server)
+
+      LOG.info("Setting Hive execution engine to Spark")
+      db.execute_statement('SET hive.execution.engine=spark')
 
   @classmethod
   def init_beeswax_db(cls):
@@ -334,37 +414,38 @@ class BeeswaxSampleProvider(object):
     if _INITIALIZED:
       return
 
-    make_query(cls.client, 'CREATE DATABASE other_db', wait=True)
+    make_query(cls.client, 'CREATE DATABASE IF NOT EXISTS %(db)s' % {'db': cls.db_name}, wait=True)
+    make_query(cls.client, 'CREATE DATABASE IF NOT EXISTS %(db)s_other' % {'db': cls.db_name}, wait=True)
 
-    data_file = u'/tmp/beeswax/sample_data_échantillon_%d.tsv'
+    data_file = cls.cluster.fs_prefix + u'/beeswax/sample_data_échantillon_%d.tsv'
 
     # Create a "test_partitions" table.
     CREATE_PARTITIONED_TABLE = """
-      CREATE TABLE test_partitions (foo INT, bar STRING)
+      CREATE TABLE `%(db)s`.`test_partitions` (foo INT, bar STRING)
       PARTITIONED BY (baz STRING, boom STRING)
       ROW FORMAT DELIMITED
         FIELDS TERMINATED BY '\t'
         LINES TERMINATED BY '\n'
-    """
+    """ % {'db': cls.db_name}
     make_query(cls.client, CREATE_PARTITIONED_TABLE, wait=True)
     cls._make_data_file(data_file % 1)
 
     LOAD_DATA = """
-      LOAD DATA INPATH '%s'
-      OVERWRITE INTO TABLE test_partitions
+      LOAD DATA INPATH '%(data_file)s'
+      OVERWRITE INTO TABLE `%(db)s`.`test_partitions`
       PARTITION (baz='baz_one', boom='boom_two')
-    """ % (data_file % 1,)
+    """ % {'db': cls.db_name, 'data_file': data_file % 1}
     make_query(cls.client, LOAD_DATA, wait=True, local=False)
 
     # Insert additional partition data into "test_partitions" table
     ADD_PARTITION = """
-      ALTER TABLE test_partitions ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '/tmp/beeswax/baz_foo/boom_bar'
-    """
+      ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '%(fs_prefix)s/baz_foo/boom_bar'
+    """ % {'db': cls.db_name, 'fs_prefix': cls.cluster.fs_prefix}
     make_query(cls.client, ADD_PARTITION, wait=True, local=False)
 
     # Create a bunch of other tables
     CREATE_TABLE = """
-      CREATE TABLE `%(name)s` (foo INT, bar STRING)
+      CREATE TABLE `%(db)s`.`%(name)s` (foo INT, bar STRING)
       COMMENT "%(comment)s"
       ROW FORMAT DELIMITED
         FIELDS TERMINATED BY '\t'
@@ -372,22 +453,25 @@ class BeeswaxSampleProvider(object):
     """
 
     # Create a "test" table.
-    table_info = dict(name='test', comment='Test table')
+    table_info = {'db': cls.db_name, 'name': 'test', 'comment': 'Test table'}
     cls._make_data_file(data_file % 2)
     cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
 
-    # Create a "test_utf8" table.
-    table_info = dict(name='test_utf8', comment=cls.get_i18n_table_comment())
-    cls._make_i18n_data_file(data_file % 3, 'utf-8')
-    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
+    if is_live_cluster():
+      LOG.warn('HUE-2884: We cannot create Hive UTF8 tables when live cluster testing at the moment')
+    else:
+      # Create a "test_utf8" table.
+      table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}
+      cls._make_i18n_data_file(data_file % 3, 'utf-8')
+      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
 
-    # Create a "test_latin1" table.
-    table_info = dict(name='test_latin1', comment=cls.get_i18n_table_comment())
-    cls._make_i18n_data_file(data_file % 4, 'latin1')
-    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
+      # Create a "test_latin1" table.
+      table_info = {'db': cls.db_name, 'name': 'test_latin1', 'comment': cls.get_i18n_table_comment()}
+      cls._make_i18n_data_file(data_file % 4, 'latin1')
+      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
 
     # Create a "myview" view.
-    make_query(cls.client, "CREATE VIEW myview (foo, bar) as SELECT * FROM test", wait=True)
+    make_query(cls.client, "CREATE VIEW `%(db)s`.`myview` (foo, bar) as SELECT * FROM `%(db)s`.`test`" % {'db': cls.db_name}, wait=True)
 
     _INITIALIZED = True
 
@@ -397,11 +481,11 @@ class BeeswaxSampleProvider(object):
 
   @classmethod
   def _make_table(cls, table_name, create_ddl, filename):
-    make_query(cls.client, create_ddl, wait=True)
+    make_query(cls.client, create_ddl, wait=True, database=cls.db_name)
     LOAD_DATA = """
-      LOAD DATA INPATH '%s' OVERWRITE INTO TABLE %s
-    """ % (filename, table_name)
-    make_query(cls.client, LOAD_DATA, wait=True, local=False)
+      LOAD DATA INPATH '%(filename)s' OVERWRITE INTO TABLE `%(db)s`.`%(table_name)s`
+    """ % {'filename': filename, 'table_name': table_name, 'db': cls.db_name}
+    make_query(cls.client, LOAD_DATA, wait=True, local=False, database=cls.db_name)
 
   @classmethod
   def _make_data_file(cls, filename):

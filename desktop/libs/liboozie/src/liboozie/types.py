@@ -87,7 +87,7 @@ class ControlFlowAction(Action):
 
   @classmethod
   def is_control_flow(self, action_type):
-    return action_type is not None and ( ':' in action_type or action_type == 'switch' )
+    return action_type is not None and (':' in action_type)
 
   def _fixup(self):
     """
@@ -274,6 +274,9 @@ class BundleAction(Action):
 
   def get_progress(self):
     """How much more time before the next action."""
+    if self.lastAction is None:
+      return 0
+      
     next = mktime(parse_timestamp(self.lastAction))
     start = mktime(parse_timestamp(self.startTime))
     end = mktime(parse_timestamp(self.endTime))

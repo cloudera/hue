@@ -18,7 +18,6 @@
 from __future__ import absolute_import
 
 import logging
-import os
 import re
 
 # FIXME: This could be replaced with hooking into the `AppConfig.ready()`
@@ -30,17 +29,21 @@ import re
 # this file has been loaded after `desktop.settings` has been loaded.
 import desktop.monkey_patches
 
+import desktop.lib.metrics.file_reporter
+desktop.lib.metrics.file_reporter.start_file_reporter()
+
 from django.conf import settings
 from django.conf.urls import include, patterns
 from django.conf.urls.static import static
 from django.contrib import admin
 
 from desktop import appmanager
-from desktop import metrics
+from desktop.conf import METRICS, USE_NEW_EDITOR
 
 # Django expects handler404 and handler500 to be defined.
 # django.conf.urls provides them. But we want to override them.
 # Also see http://code.djangoproject.com/ticket/5350
+handler403 = 'desktop.views.serve_403_error'
 handler404 = 'desktop.views.serve_404_error'
 handler500 = 'desktop.views.serve_500_error'
 
@@ -56,9 +59,20 @@ dynamic_patterns = patterns('desktop.auth.views',
   (r'^login/oauth_authenticated/?$', 'oauth_authenticated'),
 )
 
+
+if USE_NEW_EDITOR.get():
+  dynamic_patterns += patterns('desktop.views',
+    (r'^home$','home2'),
+    (r'^home2$','home')
+  )
+else:
+  dynamic_patterns += patterns('desktop.views',
+    (r'^home$','home'),
+    (r'^home2$','home2')
+  )
+
 dynamic_patterns += patterns('desktop.views',
   (r'^logs$','log_view'),
-  (r'^home$','home'),
   (r'^desktop/dump_config$','dump_config'),
   (r'^desktop/download_logs$','download_log_view'),
   (r'^bootstrap.js$', 'bootstrap'), # unused
@@ -95,9 +109,17 @@ dynamic_patterns += patterns('desktop.api',
 )
 
 dynamic_patterns += patterns('desktop.api2',
-  (r'^desktop/api2/doc/get$', 'get_document'),
-  (r'^desktop/api2/doc/export$', 'export_documents'),
-  (r'^desktop/api2/doc/import$', 'import_documents'),
+  (r'^desktop/api2/docs/?$', 'search_documents'),  # search documents for current user
+  (r'^desktop/api2/doc/?$', 'get_document'),  # get doc/dir by path or UUID
+
+  (r'^desktop/api2/doc/move/?$', 'move_document'),
+  (r'^desktop/api2/doc/mkdir/?$', 'create_directory'),
+  (r'^desktop/api2/doc/update/?$', 'update_document'),
+  (r'^desktop/api2/doc/delete/?$', 'delete_document'),
+  (r'^desktop/api2/doc/share/?$', 'share_document'),
+
+  (r'^desktop/api2/doc/export/?$', 'export_documents'),
+  (r'^desktop/api2/doc/import/?$', 'import_documents'),
 )
 
 dynamic_patterns += patterns('useradmin.views',
@@ -105,9 +127,10 @@ dynamic_patterns += patterns('useradmin.views',
 )
 
 # Metrics specific
-dynamic_patterns += patterns('',
-  (r'^desktop/metrics/', include('desktop.lib.metrics.urls'))
-)
+if METRICS.ENABLE_WEB_METRICS.get():
+  dynamic_patterns += patterns('',
+    (r'^desktop/metrics/', include('desktop.lib.metrics.urls'))
+  )
 
 dynamic_patterns += patterns('',
   (r'^admin/', include(admin.site.urls)),
@@ -126,20 +149,16 @@ if settings.OPENID_AUTHENTICATION:
 if settings.OAUTH_AUTHENTICATION:
   static_patterns.append((r'^oauth/', include('liboauth.urls')))
 
-# Add indexer app
-if 'search' in [app.name for app in appmanager.DESKTOP_APPS]:
-  namespace = {'namespace': 'indexer', 'app_name': 'indexer'}
-  dynamic_patterns.extend( patterns('', ('^indexer/', include('indexer.urls', **namespace))) )
-
 # Root each app at /appname if they have a "urls" module
-for app in appmanager.DESKTOP_APPS:
+for app in appmanager.DESKTOP_MODULES:
   if app.urls:
     if app.is_url_namespaced:
       namespace = {'namespace': app.name, 'app_name': app.name}
     else:
       namespace = {}
-    dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
-    app.urls_imported = True
+    if namespace or app in appmanager.DESKTOP_APPS:
+      dynamic_patterns.extend( patterns('', ('^' + re.escape(app.name) + '/', include(app.urls, **namespace))) )
+      app.urls_imported = True
 
 static_patterns.append(
     (r'^%s(?P<path>.*)$' % re.escape(settings.STATIC_URL.lstrip('/')),

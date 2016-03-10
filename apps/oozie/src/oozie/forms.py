@@ -40,15 +40,10 @@ LOG = logging.getLogger(__name__)
 
 class ParameterForm(forms.Form):
   name = forms.CharField(max_length=1024, widget=forms.widgets.HiddenInput())
-  value = forms.CharField(max_length=4096, required=False)
+  value = forms.CharField(max_length=12288, required=False)
 
   NON_PARAMETERS = (
       'user.name',
-      'oozie.wf.rerun.failnodes',
-      'oozie.wf.rerun.skip.nodes',
-      'oozie.wf.application.path',
-      'oozie.coord.application.path',
-      'oozie.bundle.application.path',
       'mapreduce.job.user.name',
       'wf_application_path',
       'jobTracker',
@@ -56,6 +51,11 @@ class ParameterForm(forms.Form):
       'hue-id-w',
       'hue-id-c',
       'hue-id-b',
+  )
+
+  RERUN_HIDE_PARAMETERS = (
+      'security_enabled',
+      'dryrun'
   )
 
   @staticmethod

@@ -154,4 +154,4 @@ ${layout.menubar(section='log_view')}
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

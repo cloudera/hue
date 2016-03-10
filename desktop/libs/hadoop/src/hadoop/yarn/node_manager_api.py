@@ -32,12 +32,12 @@ _JSON_CONTENT_TYPE = 'application/json'
 
 
 
-def get_resource_manager_api(api_url):
+def get_node_manager_api(api_url):
   yarn_cluster = cluster.get_cluster_conf_for_job_submission()
-  return ResourceManagerApi(api_url, yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
+  return NodeManagerApi(api_url, yarn_cluster.SECURITY_ENABLED.get(), yarn_cluster.SSL_CERT_CA_VERIFY.get())
 
 
-class ResourceManagerApi(object):
+class NodeManagerApi(object):
   def __init__(self, oozie_url, security_enabled=False, ssl_cert_ca_verify=True):
     self._url = posixpath.join(oozie_url, 'ws', _API_VERSION)
     self._client = HttpClient(self._url, logger=LOG)

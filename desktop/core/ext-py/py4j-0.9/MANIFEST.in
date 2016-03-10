@@ -1,0 +1,5 @@
+include setup.py
+include LICENSE.txt
+include nose.cfg
+recursive-include doc *.*
+recursive-include py4j-java *.*

@@ -39,11 +39,12 @@ import django.views.debug
 import desktop.conf
 import desktop.log.log_buffer
 
-from desktop.api import massaged_tags_for_json, massaged_documents_for_json,\
-  _get_docs
+from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
+from desktop.conf import USE_NEW_EDITOR
+from desktop.converters import DocumentConverter
 from desktop.lib import django_mako
-from desktop.lib.conf import GLOBAL_CONFIG
-from desktop.lib.django_util import login_notrequired, render_json, render
+from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
+from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
@@ -73,6 +74,21 @@ def home(request):
   })
 
 
+def home2(request):
+  try:
+    converter = DocumentConverter(request.user)
+    converter.convert()
+  except Exception, e:
+    LOG.warning("Failed to convert and import documents: %s" % e)
+
+  apps = appmanager.get_apps_dict(request.user)
+
+  return render('home2.mako', request, {
+    'apps': apps,
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+  })
+
+
 @access_log_level(logging.WARN)
 def log_view(request):
   """
@@ -88,7 +104,7 @@ def log_view(request):
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
       return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", "")))
 
-  return render('logs.mako', request, dict(log=[_("No logs found!")]))
+  return render('logs.mako', request, dict(log=[_("No logs found!")], query=''))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
@@ -108,7 +124,7 @@ def download_log_view(request):
         tmp = tempfile.NamedTemporaryFile()
         log_tmp = tempfile.NamedTemporaryFile("w+t")
         for l in h.buf:
-          log_tmp.write(smart_str(l) + '\n')
+          log_tmp.write(smart_str(l, errors='replace') + '\n')
         # This is not just for show - w/out flush, we often get truncated logs
         log_tmp.flush()
         t = time.time()
@@ -166,10 +182,10 @@ def bootstrap(request):
   """Concatenates bootstrap.js files from all installed Hue apps."""
 
   # Has some None's for apps that don't have bootsraps.
-  all_bootstraps = [ (app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name) ]
+  all_bootstraps = [(app, app.get_bootstrap_file()) for app in appmanager.DESKTOP_APPS if request.user.has_hue_permission(action="access", app=app.name)]
 
   # Iterator over the streams.
-  concatenated = [ "\n/* %s */\n%s" % (app.name, b.read()) for app, b in all_bootstraps if b is not None ]
+  concatenated = ["\n/* %s */\n%s" % (app.name, b.read()) for app, b in all_bootstraps if b is not None]
 
   # HttpResponse can take an iteratable as the first argument, which
   # is what happens here.
@@ -282,7 +298,20 @@ def index(request):
   if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home':
     return redirect(reverse('about:index'))
   else:
-    return home(request)
+    if USE_NEW_EDITOR.get():
+      return home2(request)
+    else:
+      return home(request)
+
+def csrf_failure(request, reason=None):
+  """Registered handler for CSRF."""
+  access_warn(request, reason)
+  return render("403_csrf.mako", request, dict(uri=request.build_absolute_uri()), status=403)
+
+def serve_403_error(request, *args, **kwargs):
+  """Registered handler for 403. We just return a simple error"""
+  access_warn(request, "403 access forbidden")
+  return render("403.mako", request, dict(uri=request.build_absolute_uri()), status=403)
 
 def serve_404_error(request, *args, **kwargs):
   """Registered handler for 404. We just return a simple error"""
@@ -343,7 +372,7 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
-def commonheader(title, section, user, padding="90px"):
+def commonheader(title, section, user, padding="90px", skip_topbar=False):
   """
   Returns the rendered common header
   """
@@ -355,7 +384,7 @@ def commonheader(title, section, user, padding="90px"):
     for app in apps:
       if app.display_name not in [
           'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
-          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security']:
+          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'] and app.menu_index != -1:
         other_apps.append(app)
       if section == app.display_name:
         current_app = app
@@ -370,16 +399,28 @@ def commonheader(title, section, user, padding="90px"):
     'section': section,
     'padding': padding,
     'user': user,
-    'is_demo': desktop.conf.DEMO_ENABLED.get()
+    'skip_topbar': skip_topbar,
+    'leaflet': {
+      'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
+      'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
+    },
+    'is_demo': desktop.conf.DEMO_ENABLED.get(),
+    'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
   })
 
 def commonshare():
   return django_mako.render_to_string("common_share.mako", {})
 
+def commonshare2():
+  return django_mako.render_to_string("common_share2.mako", {})
+
 def commonimportexport(request):
   return django_mako.render_to_string("common_import_export.mako", {'request': request})
 
-def commonfooter(messages=None):
+def login_modal(request):
+  return desktop.auth.views.dt_login(request, True)
+
+def commonfooter(request, messages=None):
   """
   Returns the rendered common footer
   """
@@ -389,6 +430,7 @@ def commonfooter(messages=None):
   hue_settings = Settings.get_settings()
 
   return django_mako.render_to_string("common_footer.mako", {
+    'request': request,
     'messages': messages,
     'version': settings.HUE_DESKTOP_VERSION,
     'collect_usage': collect_usage(),
@@ -431,7 +473,16 @@ def _get_config_errors(request, cache=True):
         continue
 
       try:
-        error_list.extend(validator(request.user))
+        for confvar, error in validator(request.user):
+          error = {
+            'name': confvar if isinstance(confvar, str) else confvar.get_fully_qualifying_key(),
+            'message': error,
+          }
+
+          if isinstance(confvar, BoundConfig):
+            error['value'] = confvar.get()
+
+          error_list.append(error)
       except Exception, ex:
         LOG.exception("Error in config validation by %s: %s" % (module.nice_name, ex))
     _CONFIG_ERROR_LIST = error_list
@@ -443,12 +494,15 @@ def check_config(request):
   if not request.user.is_superuser:
     return HttpResponse(_("You must be a superuser."))
 
-  conf_dir = os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf")))
-  return render('check_config.mako', request, {
-                  'error_list': _get_config_errors(request, cache=False),
-                  'conf_dir': conf_dir
-              },
-              force_template=True)
+  context = {
+    'conf_dir': os.path.realpath(os.getenv("HUE_CONF_DIR", get_desktop_root("conf"))),
+    'error_list': _get_config_errors(request, cache=False),
+  }
+
+  if request.GET.get('format') == 'json':
+    return JsonResponse(context)
+  else:
+    return render('check_config.mako', request, context, force_template=True)
 
 
 def check_config_ajax(request):
@@ -464,3 +518,12 @@ def check_config_ajax(request):
                 request,
                 dict(error_list=error_list),
                 force_template=True)
+
+# This is a global non-view for inline KO i18n
+def _ko(str=""):
+  return _(str).replace("'", "\\'")
+
+# This global Mako filtering option, use it with ${ yourvalue | n,antixss }
+def antixss(value):
+  xss_regex = re.compile(r'<[^>]+>')
+  return xss_regex.sub('', value)

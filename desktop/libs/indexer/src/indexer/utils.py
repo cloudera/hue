@@ -83,33 +83,38 @@ def copy_configs(fields, unique_key_field, df, solr_cloud_mode=True):
   # Create temporary copy of solr configs
   tmp_path = tempfile.mkdtemp()
 
-  config_template_path = get_config_template_path(solr_cloud_mode)
+  try:
+    config_template_path = get_config_template_path(solr_cloud_mode)
 
-  solr_config_path = os.path.join(tmp_path, 'solr_configs')
-  shutil.copytree(config_template_path, solr_config_path)
+    solr_config_path = os.path.join(tmp_path, 'solr_configs')
+    shutil.copytree(config_template_path, solr_config_path)
 
-  if fields or unique_key_field:
-    # Get complete schema.xml
-    with open(os.path.join(config_template_path, 'conf/schema.xml')) as f:
-      schemaxml = SchemaXml(f.read())
-      schemaxml.uniqueKeyField(unique_key_field)
-      schemaxml.fields(fields)
+    if fields or unique_key_field:
+      # Get complete schema.xml
+      with open(os.path.join(config_template_path, 'conf/schema.xml')) as f:
+        schemaxml = SchemaXml(f.read())
+        schemaxml.uniqueKeyField(unique_key_field)
+        schemaxml.fields(fields)
 
-    # Write complete schema.xml to copy
-    with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
-      f.write(smart_str(schemaxml.xml))
+      # Write complete schema.xml to copy
+      with open(os.path.join(solr_config_path, 'conf/schema.xml'), 'w') as f:
+        f.write(smart_str(schemaxml.xml))
 
-  if df:
-    # Get complete solrconfig.xml
-    with open(os.path.join(config_template_path, 'conf/solrconfig.xml')) as f:
-      solrconfigxml = SolrConfigXml(f.read())
-      solrconfigxml.defaultField(df)
+    if df:
+      # Get complete solrconfig.xml
+      with open(os.path.join(config_template_path, 'conf/solrconfig.xml')) as f:
+        solrconfigxml = SolrConfigXml(f.read())
+        solrconfigxml.defaultField(df)
 
-    # Write complete solrconfig.xml to copy
-    with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
-      f.write(smart_str(solrconfigxml.xml))
+      # Write complete solrconfig.xml to copy
+      with open(os.path.join(solr_config_path, 'conf/solrconfig.xml'), 'w') as f:
+        f.write(smart_str(solrconfigxml.xml))
 
-  return tmp_path, solr_config_path
+    return tmp_path, solr_config_path
+  except Exception:
+    # Don't leak the tempdir if there was an exception.
+    shutil.rmtree(tmp_path)
+    raise
 
 
 def get_field_types(field_list, iterations=3):
@@ -131,8 +136,7 @@ def get_field_types(field_list, iterations=3):
 
     try:
       parse(value)
-    except:
-      LOG.exception('failed to parse value %s' % value)
+    except OverflowError:
       raise ValueError()
 
   def test_int(value):
@@ -225,16 +229,17 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
   while content:
     last_newline = content.rfind('\n')
     if last_newline > -1:
+      next_chunk = fh.read()
       # If new line is quoted, skip this iteration and try again.
-      if content[:last_newline].count('"') % 2 != 0:
-        content += fh.read()
+      if content[last_newline - 1] == '"' and next_chunk:
+        content += next_chunk
         continue
       else:
         if headers is None:
           csvfile = StringIO.StringIO(content[:last_newline])
         else:
           csvfile = StringIO.StringIO('\n' + content[:last_newline])
-        content = content[last_newline + 1:] + fh.read()
+        content = content[last_newline + 1:] + next_chunk
     else:
       if headers is None:
         csvfile = StringIO.StringIO(content)
@@ -252,6 +257,8 @@ def field_values_from_separated_file(fh, delimiter, quote_character, fields=None
 
     remove_keys = None
     for row in reader:
+      row = dict([(force_unicode(k), force_unicode(v, errors='ignore')) for k, v in row.iteritems()]) # Get rid of invalid binary chars and convert to unicode from DictReader
+
       # Remove keys that aren't in collection
       if remove_keys is None:
         if field_names is None:
@@ -360,3 +367,13 @@ def fields_from_log(fh):
   fields.append(('message', 'text_general'))
 
   return fields
+
+
+def get_default_fields():
+  """
+  Returns a list of default fields for the Solr schema.xml
+  :return:
+  """
+  default_field = DEFAULT_FIELD
+  default_field.update({'name': 'id', 'type': 'string', 'multiValued': 'false'})
+  return [default_field]

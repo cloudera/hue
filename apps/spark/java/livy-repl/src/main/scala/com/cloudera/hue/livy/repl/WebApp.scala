@@ -20,8 +20,7 @@ package com.cloudera.hue.livy.repl
 
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.msgs.ExecuteRequest
+import com.cloudera.hue.livy.{ExecuteRequest, Logging}
 import com.cloudera.hue.livy.sessions._
 import com.fasterxml.jackson.core.JsonParseException
 import org.json4s.{DefaultFormats, JsonDSL, MappingException, _}
@@ -42,8 +41,8 @@ class WebApp(session: Session) extends ScalatraServlet with FutureSupport with J
     contentType = formats("json")
 
     session.state match {
-      case ShuttingDown() => halt(500, "Shutting down")
-      case _ => {}
+      case SessionState.ShuttingDown() => halt(500, "Shutting down")
+      case _ =>
     }
   }
 
@@ -95,18 +94,7 @@ private object Serializers {
   def Formats: List[CustomSerializer[_]] = List(StatementSerializer)
 
   def serializeSession(session: Session): JValue = {
-    val state = session.state match {
-      case NotStarted() => "not_started"
-      case Starting() => "starting"
-      case Idle() => "idle"
-      case Busy() => "busy"
-      case Running() => "running"
-      case Error() => "error"
-      case ShuttingDown() => "shutting_down"
-      case Dead() => "dead"
-      case Success() => "success"
-    }
-    Map("state" -> state)
+    Map("state" -> session.state.toString)
   }
 
   def serializeHistory(history: IndexedSeq[Statement],

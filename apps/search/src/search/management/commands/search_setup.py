@@ -20,7 +20,7 @@ import logging
 from django.core import management
 from django.core.management.base import NoArgsCommand
 
-from desktop.models import Document, Document2, SAMPLE_USERNAME
+from desktop.models import Document, Document2, SAMPLE_USER_OWNERS
 from useradmin.models import install_sample_user
 
 
@@ -30,7 +30,7 @@ LOG = logging.getLogger(__name__)
 class Command(NoArgsCommand):
   def handle_noargs(self, **options):
 
-    if not Document2.objects.filter(type='search-dashboard', owner__username=SAMPLE_USERNAME).exists():
+    if not Document2.objects.filter(type='search-dashboard', owner__username__in=SAMPLE_USER_OWNERS).exists():
       install_sample_user()
 
       management.call_command('loaddata', 'initial_search_examples.json', verbosity=2)

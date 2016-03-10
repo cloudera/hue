@@ -24,12 +24,11 @@ import time
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from libzookeeper.conf import PRINCIPAL_NAME
-from libzookeeper.models import get_children_data
+from libzookeeper.models import ZookeeperClient
 
 from libsentry.client import SentryClient
 from libsentry.conf import HOSTNAME, PORT
-from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_has_security, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
+from libsentry.sentry_site import get_sentry_server_ha_enabled, get_sentry_server_ha_zookeeper_quorum, get_sentry_server_ha_zookeeper_namespace
 
 
 LOG = logging.getLogger(__name__)
@@ -94,8 +93,8 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
-    response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege)
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege=None, tSentryPrivileges=None):
+    response = self.client.alter_sentry_role_grant_privilege(roleName, tSentryPrivilege, tSentryPrivileges)
 
     if response.status.value == 0:
       return response
@@ -103,8 +102,8 @@ class SentryApi(object):
       raise SentryException(response)
 
   @ha_error_handler
-  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
-    response = self.client.alter_sentry_role_revoke_privilege(roleName, tSentryPrivilege)
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege=None, tSentryPrivileges=None):
+    response = self.client.alter_sentry_role_revoke_privilege(roleName, tSentryPrivilege, tSentryPrivileges)
 
     if response.status.value == 0:
       return response
@@ -149,7 +148,7 @@ class SentryApi(object):
     response = self.client.list_sentry_privileges_by_role(roleName, authorizableHierarchy)
 
     if response.status.value == 0:
-      return [self._massage_priviledge(privilege) for privilege in response.privileges]
+      return [self._massage_privilege(privilege) for privilege in response.privileges]
     else:
       raise SentryException(response)
 
@@ -166,18 +165,18 @@ class SentryApi(object):
   def list_sentry_privileges_by_authorizable(self, authorizableSet, groups=None, roleSet=None):
     response = self.client.list_sentry_privileges_by_authorizable(authorizableSet, groups, roleSet)
 
+    if response.status.value != 0:
+      raise SentryException(response)
+
     _privileges = []
 
     for authorizable, roles in response.privilegesMapByAuth.iteritems():
       _roles = {}
       for role, privileges in roles.privilegeMap.iteritems():
-        _roles[role] = [self._massage_priviledge(privilege) for privilege in privileges]
+        _roles[role] = [self._massage_privilege(privilege) for privilege in privileges]
       _privileges.append((self._massage_authorizable(authorizable), _roles))
 
-    if response.status.value == 0:
-      return _privileges
-    else:
-      raise SentryException(response)
+    return _privileges
 
   @ha_error_handler
   def drop_sentry_privileges(self, authorizableHierarchy):
@@ -198,7 +197,7 @@ class SentryApi(object):
       raise SentryException(response)
 
 
-  def _massage_priviledge(self, privilege):
+  def _massage_privilege(self, privilege):
     return {
         'scope': privilege.privilegeScope,
         'server': privilege.serverName,
@@ -208,6 +207,7 @@ class SentryApi(object):
         'action': 'ALL' if privilege.action == '*' else privilege.action.upper(),
         'timestamp': privilege.createTime,
         'grantOption': privilege.grantOption == 1,
+        'column': privilege.columnName,
     }
 
 
@@ -217,6 +217,7 @@ class SentryApi(object):
         'database': authorizable.db,
         'table': authorizable.table,
         'URI': authorizable.uri,
+        'column': authorizable.column,
     }
 
 
@@ -255,13 +256,16 @@ def _get_server_properties():
       if not _api_cache:
 
         servers = []
-        sentry_servers = get_children_data(ensemble=get_sentry_server_ha_zookeeper_quorum(), namespace=get_sentry_server_ha_zookeeper_namespace())
+        with ZookeeperClient(hosts=get_sentry_server_ha_zookeeper_quorum()) as client:
+          sentry_servers = client.get_children_data(namespace=get_sentry_server_ha_zookeeper_namespace())
 
         for data in sentry_servers:
           server = json.loads(data.decode("utf-8"))
           servers.append({'hostname': server['address'], 'port': server['sslPort'] if server['sslPort'] else server['port']})
 
         _api_cache = servers
+    except Exception, e:
+      raise PopupException(_('Error in retrieving Sentry server properties from Zookeeper.'), detail=e)
     finally:
       _api_cache_lock.release()
 

@@ -18,7 +18,7 @@
 import logging
 import unittest
 
-from nose.tools import assert_equals, assert_true, assert_not_equal
+from nose.tools import assert_equals, assert_not_equal
 
 from desktop.lib import i18n
 
@@ -60,7 +60,7 @@ curacao\t?"""
     f.close()
 
     encoding = i18n.get_site_encoding()
-    do_overwrite_save(fs, path, data, encoding)
+    do_overwrite_save(fs, path, data.encode(encoding))
 
     assert_not_equal(data_body, fs.open(path).read())
 

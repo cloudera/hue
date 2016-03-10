@@ -79,7 +79,7 @@
 
   % if coord.dataset_set.exists():
   <datasets>
-    % for dataset in coord.dataset_set.all():
+    % for dataset in coord.dataset_set.all().order_by('name'):
     <dataset name="${ dataset.name }" frequency="${ dataset.frequency }"
              initial-instance="${ dataset.start_utc }" timezone="${ dataset.timezone }">
       <uri-template>${ smart_path(dataset.uri, mapping) }</uri-template>

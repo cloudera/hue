@@ -21,15 +21,14 @@ import time
 
 from collections import defaultdict
 
-from django.core.urlresolvers import reverse
-
 from django.utils import html
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_GET, require_POST
 
 import desktop.conf
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
-from desktop.models import Document, DocumentTag
+from desktop.models import Document, DocumentTag, Document2, Directory
 
 
 LOG = logging.getLogger(__name__)
@@ -38,8 +37,13 @@ LOG = logging.getLogger(__name__)
 def _get_docs(user):
   history_tag = DocumentTag.objects.get_history_tag(user)
 
+  dir_ids = [directory.doc.get().id for directory in Directory.objects.filter(doc__isnull=False)]
+  editor_ids = [document.doc.get().id for document in Document2.objects.filter(type__startswith='query', doc__isnull=False)]
+
   query = Document.objects.get_docs(user) \
-      .exclude(tags__in=[history_tag])
+      .exclude(tags__in=[history_tag]) \
+      .exclude(id__in=dir_ids) \
+      .exclude(id__in=editor_ids)
 
   # Work around Oracle not supporting SELECT DISTINCT with the CLOB type.
   if desktop.conf.DATABASE.ENGINE.get() == 'django.db.backends.oracle':
@@ -182,14 +186,13 @@ def massaged_documents_for_json(documents, user):
 
   return docs
 
+
+@require_GET
 def get_document(request):
-  if request.method == 'POST':
-    return Http404()
-  elif request.method == 'GET':
-    doc_id = request.GET['id']
-    doc = Document.objects.get(id=doc_id)
-    response = massage_doc_for_json(doc, request.user)
-    return JsonResponse(response)
+  doc_id = request.GET['id']
+  doc = Document.objects.get(id=doc_id)
+  response = massage_doc_for_json(doc, request.user)
+  return JsonResponse(response)
 
 def massage_doc_for_json(document, user, url=''):
   read_perms = document.list_permissions(perm='read')
@@ -214,91 +217,101 @@ def massage_doc_for_json(document, user, url=''):
   return massaged_doc
 
 
+def valid_project(name):
+  project_doc = DocumentTag.objects.filter(tag=name)
+  return len(project_doc) == 0
+
+
+@require_POST
 def add_tag(request):
   response = {'status': -1, 'message': ''}
 
-  if request.method == 'POST':
-    try:
+  try:
+    validstatus = valid_project(name=request.POST['name'])
+    if validstatus:
       tag = DocumentTag.objects.create_tag(request.user, request.POST['name'])
       response['name'] = request.POST['name']
       response['id'] = tag.id
       response['docs'] = []
       response['owner'] = request.user.username
       response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
+    else:
+      response['status'] = -1
+  except KeyError, e:
+    response['message'] = _('Form is missing %s field') % e.message
+  except Exception, e:
+    response['message'] = force_unicode(e)
 
   return JsonResponse(response)
 
 
+@require_POST
 def tag(request):
   response = {'status': -1, 'message': ''}
 
-  if request.method == 'POST':
-    request_json = json.loads(request.POST['data'])
-    try:
-      tag = DocumentTag.objects.tag(request.user, request_json['doc_id'], request_json.get('tag'), request_json.get('tag_id'))
-      response['tag_id'] = tag.id
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
+  request_json = json.loads(request.POST['data'])
+  try:
+    tag = DocumentTag.objects.tag(request.user, request_json['doc_id'], request_json.get('tag'), request_json.get('tag_id'))
+    response['tag_id'] = tag.id
+    response['status'] = 0
+  except KeyError, e:
+    response['message'] = _('Form is missing %s field') % e.message
+  except Exception, e:
+    response['message'] = force_unicode(e)
 
   return JsonResponse(response)
 
 
+@require_POST
 def update_tags(request):
   response = {'status': -1, 'message': ''}
 
-  if request.method == 'POST':
-    request_json = json.loads(request.POST['data'])
-    try:
-      doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
-      response['doc'] = massage_doc_for_json(doc, request.user)
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
+  request_json = json.loads(request.POST['data'])
+  try:
+    doc = DocumentTag.objects.update_tags(request.user, request_json['doc_id'], request_json['tag_ids'])
+    response['doc'] = massage_doc_for_json(doc, request.user)
+    response['status'] = 0
+  except KeyError, e:
+    response['message'] = _('Form is missing %s field') % e.message
+  except Exception, e:
+    response['message'] = force_unicode(e)
 
   return JsonResponse(response)
 
 
+@require_POST
 def remove_tag(request):
   response = {'status': -1, 'message': _('Error')}
 
-  if request.method == 'POST':
-    try:
-      DocumentTag.objects.delete_tag(request.POST['tag_id'], request.user)
-      response['message'] = _('Project removed!')
-      response['status'] = 0
-    except Exception, e:
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
+  try:
+    DocumentTag.objects.delete_tag(request.POST['tag_id'], request.user)
+    response['message'] = _('Project removed!')
+    response['status'] = 0
+  except KeyError, e:
+    response['message'] = _('Form is missing %s field') % e.message
+  except Exception, e:
+    response['message'] = force_unicode(e)
 
   return JsonResponse(response)
 
 
+@require_POST
 def update_permissions(request):
   response = {'status': -1, 'message': _('Error')}
 
-  if request.method == 'POST':
-    data = json.loads(request.POST['data'])
-    doc_id = request.POST['doc_id']
-    try:
-      doc = Document.objects.get_doc(doc_id, request.user)
-      doc.sync_permissions(data)
-      response['message'] = _('Permissions updated!')
-      response['status'] = 0
-      response['doc'] = massage_doc_for_json(doc, request.user)
-    except Exception, e:
-      LOG.exception(e.message)
-      response['message'] = force_unicode(e)
-  else:
-    response['message'] = _('POST request only')
+  data = json.loads(request.POST['data'])
+  doc_id = request.POST['doc_id']
+  try:
+    doc = Document.objects.get_doc_for_writing(doc_id, request.user)
+    doc.sync_permissions(data)
+
+    response['message'] = _('Permissions updated!')
+    response['status'] = 0
+    response['doc'] = massage_doc_for_json(doc, request.user)
+  except KeyError, e:
+    response['message'] = _('Form is missing %s field') % e.message
+  except Exception, e:
+    LOG.exception(e.message)
+    response['message'] = force_unicode(e)
 
   return JsonResponse(response)

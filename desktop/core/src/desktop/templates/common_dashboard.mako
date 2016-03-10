@@ -33,7 +33,9 @@
   <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
   %if with_deferred:
-  <script src="${ static('desktop/ext/js/knockout-deferred-updates.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript" charset="utf-8">
+    ko.options.deferUpdates = true;
+  </script>
   %endif
 </%def>
 
@@ -254,6 +256,7 @@
 <%def name="import_charts()">
   <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.markercluster.css') }">
+  <link rel="stylesheet" href="${ static('desktop/ext/css/leaflet.zoombox.css') }">
   <link rel="stylesheet" href="${ static('desktop/ext/css/nv.d3.min.css') }">
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
@@ -262,12 +265,23 @@
 
   <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/leaflet/leaflet.zoombox.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/nv.d3.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/topojson.v1.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/topo/world.topo.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/topo/usa.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/chn.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/bra.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/can.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/ind.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/gbr.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/ita.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/fra.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/deu.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/jpn.topo.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/topo/aus.topo.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script src="${ static('desktop/js/nv.d3.datamaps.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/nv.d3.legend.js') }" type="text/javascript" charset="utf-8"></script>

@@ -55,6 +55,7 @@ class Application(object):
     setattr(self, 'jobId', jobid)
     setattr(self, 'jobId_short', re.sub('(application|job)_', '', self.jobId))
     setattr(self, 'jobName', self.name)
+    setattr(self, 'applicationType', self.applicationType)
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', self.progress)
     setattr(self, 'reduces_percent_complete', self.progress)
@@ -64,7 +65,12 @@ class Application(object):
       finishTime = int(time.time() * 1000)
     else:
       finishTime = self.finishedTime
-    setattr(self, 'durationInMillis', finishTime - self.startedTime)
+    if self.finishedTime == 0 or self.startedTime == 0:
+      durationInMillis = None
+    else:
+      durationInMillis = finishTime - self.startedTime
+    setattr(self, 'durationInMillis', durationInMillis)
+    setattr(self, 'durationFormatted', durationInMillis and format_duration_in_millis(self.durationInMillis))
     setattr(self, 'startTimeMs', self.startedTime)
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startedTime))
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(finishTime))
@@ -72,7 +78,10 @@ class Application(object):
     setattr(self, 'desiredMaps', None)
     setattr(self, 'finishedReduces', None)
     setattr(self, 'desiredReduces', None)
-    setattr(self, 'durationFormatted', format_duration_in_millis(self.durationInMillis))
+
+    for attr in ['preemptedResourceVCores', 'vcoreSeconds', 'memorySeconds', 'diagnostics']:
+      if not hasattr(self, attr):
+        setattr(self, attr, 'N/A')
 
     if not hasattr(self, 'acls'):
       setattr(self, 'acls', {})
@@ -165,8 +174,11 @@ class Job(object):
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', None)
     setattr(self, 'reduces_percent_complete', None)
-    setattr(self, 'duration', self.finishTime - self.startTime)
-    setattr(self, 'durationFormatted', format_duration_in_millis(self.duration))
+    if self.finishTime == 0 or self.startTime == 0:
+      setattr(self, 'duration', None)
+    else:
+      setattr(self, 'duration', self.finishTime - self.startTime)
+    setattr(self, 'durationFormatted', self.duration and format_duration_in_millis(self.duration))
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'finishedMaps', self.mapsCompleted)

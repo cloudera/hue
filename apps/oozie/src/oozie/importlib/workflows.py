@@ -675,8 +675,6 @@ def import_workflow_root(workflow, workflow_definition_root, metadata=None, fs=N
     workflow.save()
   except:
     LOG.exception('failed to import workflow root')
-
-    workflow.delete(skip_trash=True)
     raise
 
 
@@ -687,6 +685,7 @@ def import_workflow(workflow, workflow_definition, metadata=None, fs=None):
     raise RuntimeError(_("Could not find any nodes in Workflow definition. Maybe it's malformed?"))
 
   return import_workflow_root(workflow, workflow_definition_root, metadata, fs)
+
 
 def generate_v2_graph_nodes(workflow_definition):
   # Parse Workflow Definition
@@ -715,7 +714,8 @@ def generate_v2_graph_nodes(workflow_definition):
   node_list = str(transformed_root).replace('\n', '').replace(' ', '')
   node_list = json.loads(node_list)
 
-  return node_list
+  return [node for node in node_list if node]
+
 
 
 class MalformedWfDefException(Exception):

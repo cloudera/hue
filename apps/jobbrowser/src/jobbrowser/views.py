@@ -66,7 +66,7 @@ def check_job_permission(view_func):
       job = get_api(request.user, request.jt).get_job(jobid=jobid)
     except ApplicationNotRunning, e:
       if e.job.get('state', '').lower() == 'accepted' and 'kill' in request.path:
-        rm_api = resource_manager_api.get_resource_manager()
+        rm_api = resource_manager_api.get_resource_manager(request.user)
         job = Application(e.job, rm_api)
       else:
         # reverse() seems broken, using request.path but beware, it discards GET and POST info
@@ -74,7 +74,9 @@ def check_job_permission(view_func):
     except JobExpired, e:
       raise PopupException(_('Job %s has expired.') % jobid, detail=_('Cannot be found on the History Server.'))
     except Exception, e:
-      raise PopupException(_('Could not find job %s.') % jobid, detail=e)
+      msg = 'Could not find job %s.'
+      LOGGER.exception(msg % jobid)
+      raise PopupException(_(msg) % jobid, detail=e)
 
     if not SHARE_JOBS.get() and not request.user.is_superuser \
         and job.user != request.user.username and not can_view_job(request.user.username, job):
@@ -118,7 +120,7 @@ def jobs(request):
       elif 'Could not connect to' in ex_message:
         raise PopupException(_('Job Tracker cannot be contacted or might be down.'))
       else:
-        raise ex
+        raise PopupException(ex)
     json_jobs = {
       'jobs': [massage_job_for_json(job, request) for job in jobs],
     }
@@ -168,7 +170,7 @@ def massage_job_for_json(job, request):
     'durationFormatted': hasattr(job, 'durationFormatted') and job.durationFormatted or '',
     'durationMs': hasattr(job, 'durationInMillis') and job.durationInMillis or 0,
     'canKill': can_kill_job(job, request.user),
-    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or ''
+    'killUrl': job.jobId and reverse('jobbrowser.views.kill_job', kwargs={'job': job.jobId}) or '',
   }
   return job
 
@@ -242,7 +244,11 @@ def kill_job(request, job):
     access_warn(request, _('Insufficient permission'))
     raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") % {'username': request.user.username, 'user': job.user})
 
-  job.kill()
+  try:
+    job.kill()
+  except Exception, e:
+    LOGGER.exception('Killing job')
+    raise PopupException(e)
 
   cur_time = time.time()
   api = get_api(request.user, request.jt)
@@ -304,7 +310,6 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=0
   return JsonResponse(response)
 
 
-
 @check_job_permission
 def job_single_logs(request, job):
   """
@@ -319,6 +324,8 @@ def job_single_logs(request, job):
   failed_tasks.sort(cmp_exec_time)
   if failed_tasks:
     task = failed_tasks[0]
+    if not task.taskAttemptIds and len(failed_tasks) > 1: # In some cases the last task ends up without any attempt
+      task = failed_tasks[1]
   else:
     task_states = ['running', 'succeeded']
     if job.is_mr2:
@@ -332,6 +339,7 @@ def job_single_logs(request, job):
     raise PopupException(_("No tasks found for job %(id)s.") % {'id': job.jobId})
 
   return single_task_attempt_logs(request, **{'job': job.jobId, 'taskid': task.taskId, 'attemptid': task.taskAttemptIds[-1]})
+
 
 @check_job_permission
 def tasks(request, job):

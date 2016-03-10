@@ -16,12 +16,17 @@
 # limitations under the License.
 
 import logging
+from datetime import datetime
 
+from django.contrib import messages
 from django.contrib.auth.models import User
+from django.db import DatabaseError
+from django.utils.translation import ugettext as _
 
-from desktop.conf import LDAP
+from desktop.auth.views import dt_logout
+from desktop.conf import AUTH, LDAP
 
-from models import UserProfile
+from models import UserProfile, get_profile
 from views import import_ldap_users
 
 import ldap_access
@@ -57,3 +62,43 @@ class LdapSynchronizationMiddleware(object):
 
       request.session[self.USER_CACHE_NAME] = True
       request.session.modified = True
+
+
+class LastActivityMiddleware(object):
+  """
+  Middleware to track the last activity of a user and automatically log out the user after a specified period of inactivity
+  """
+
+  def process_request(self, request):
+    user = request.user
+
+    if not user or not user.is_authenticated():
+      return
+
+    profile = get_profile(user)
+    expires_after = AUTH.IDLE_SESSION_TIMEOUT.get()
+    now = datetime.now()
+    logout = False
+
+    if profile.last_activity and expires_after > 0 and self._total_seconds(now - profile.last_activity) > expires_after:
+      messages.info(request, _('Your session has been timed out due to inactivity.'))
+      logout = True
+
+    # Save last activity for user except when polling jobbrowser
+    if not (request.path.strip('/') == 'jobbrowser' and request.GET.get('format') == 'json'):
+      try:
+        profile.last_activity = datetime.now()
+        profile.save()
+      except DatabaseError:
+        LOG.exception('Error saving profile information')
+
+    if logout:
+      dt_logout(request, next_page='/')
+
+
+  def _total_seconds(self, dt):
+    # Keep backward compatibility with Python 2.6 which doesn't support total_seconds()
+    if hasattr(dt, 'total_seconds'):
+      return dt.total_seconds()
+    else:
+      return (dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6

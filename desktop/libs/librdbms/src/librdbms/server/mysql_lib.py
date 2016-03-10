@@ -61,7 +61,7 @@ class MySQLClient(BaseRDMSClient):
   def _conn_params(self):
     params = {
       'user': self.query_server['username'],
-      'passwd': self.query_server['password'],
+      'passwd': self.query_server['password'] or '',  # MySQL can accept an empty password
       'host': self.query_server['server_host'],
       'port': self.query_server['server_port']
     }
@@ -80,7 +80,7 @@ class MySQLClient(BaseRDMSClient):
       raise RuntimeError(_("Database '%s' is not allowed. Please use database '%s'.") % (database, self._conn_params['db']))
     else:
       cursor = self.connection.cursor()
-      cursor.execute("USE %s" % database)
+      cursor.execute("USE `%s`" % database)
       self.connection.commit()
 
 
@@ -111,13 +111,26 @@ class MySQLClient(BaseRDMSClient):
 
   def get_tables(self, database, table_names=[]):
     cursor = self.connection.cursor()
-    cursor.execute("SHOW TABLES")
+    query = 'SHOW TABLES'
+    if table_names:
+      clause = ' OR '.join(["`Tables_in_%(database)s` LIKE '%%%(table)s%%'" % {'database': database, 'table': table} for table in table_names])
+      query += ' FROM `%(database)s` WHERE (%(clause)s)' % {'database': database, 'clause': clause}
+    cursor.execute(query)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
-  def get_columns(self, database, table):
+  def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
     cursor.execute("SHOW COLUMNS FROM %s.%s" % (database, table))
     self.connection.commit()
-    return [row[0] for row in cursor.fetchall()]
+    if names_only:
+      columns = [row[0] for row in cursor.fetchall()]
+    else:
+      columns = [dict(name=row[0], type=row[1], comment='') for row in cursor.fetchall()]
+    return columns
+
+
+  def get_sample_data(self, database, table, limit=100):
+    statement = "SELECT * FROM `%s`.`%s` LIMIT %d" % (database, table, limit)
+    return self.execute_statement(statement)

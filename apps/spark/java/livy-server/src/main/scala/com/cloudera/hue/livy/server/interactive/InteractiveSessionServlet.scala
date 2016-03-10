@@ -21,14 +21,11 @@ package com.cloudera.hue.livy.server.interactive
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
-import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.msgs.ExecuteRequest
-import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
-import com.cloudera.hue.livy.server.interactive.InteractiveSession.SessionFailedToStart
+import com.cloudera.hue.livy.{ExecuteRequest, Logging}
+import com.cloudera.hue.livy.server.SessionServlet
 import com.cloudera.hue.livy.sessions._
-import com.fasterxml.jackson.core.JsonParseException
+import com.cloudera.hue.livy.sessions.interactive.{InteractiveSession, Statement, StatementState}
 import org.json4s.JsonAST.JString
-import org.json4s.JsonDSL._
 import org.json4s._
 import org.scalatra._
 
@@ -50,9 +47,11 @@ class InteractiveSessionServlet(sessionManager: SessionManager[InteractiveSessio
 
     sessionManager.get(sessionId) match {
       case Some(session) =>
-        if (session.state == Starting()) {
+        if (session.state == SessionState.Starting()) {
           session.url = new URL(callback.url)
           Accepted()
+        } else if (session.state.isActive) {
+          Ok()
         } else {
           BadRequest("Session is in wrong state")
         }
@@ -146,11 +145,11 @@ private object Serializers {
   def StatementFormats: List[CustomSerializer[_]] = List(StatementSerializer, StatementStateSerializer)
   def Formats: List[CustomSerializer[_]] = SessionFormats ++ StatementFormats
 
-  private def serializeSessionState(state: State) = JString(state.toString)
+  private def serializeSessionState(state: SessionState) = JString(state.toString)
 
   private def serializeSessionKind(kind: Kind) = JString(kind.toString)
 
-  private def serializeStatementState(state: Statement.State) = JString(state.toString)
+  private def serializeStatementState(state: StatementState) = JString(state.toString)
 
   def serializeSession(session: InteractiveSession): JValue = {
     ("id", session.id) ~
@@ -196,11 +195,11 @@ private object Serializers {
     )
   )
 
-  case object SessionStateSerializer extends CustomSerializer[State](implicit formats => ( {
+  case object SessionStateSerializer extends CustomSerializer[SessionState](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case state: State => JString(state.toString)
+    case state: SessionState => JString(state.toString)
   }
     )
   )
@@ -213,11 +212,11 @@ private object Serializers {
       serializeStatement(statement, None, None)
   }))
 
-  case object StatementStateSerializer extends CustomSerializer[Statement.State](implicit formats => ( {
+  case object StatementStateSerializer extends CustomSerializer[StatementState](implicit formats => ( {
     // We don't support deserialization.
     PartialFunction.empty
   }, {
-    case state: Statement.State => JString(state.toString)
+    case state: StatementState => JString(state.toString)
   }
     )
   )

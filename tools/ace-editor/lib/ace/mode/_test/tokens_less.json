@@ -1,0 +1,218 @@
+[[
+   "start",
+  ["comment","/* styles.less */"]
+],[
+   "start"
+],[
+   "start",
+  ["variable","@base"],
+  ["text",": "],
+  ["constant.numeric","#f938ab"],
+  ["text",";"]
+],[
+   "start"
+],[
+   "ruleset",
+  ["variable.language",".box-shadow"],
+  ["paren.lparen","("],
+  ["variable","@style"],
+  ["text",", "],
+  ["variable","@c"],
+  ["paren.rparen",")"],
+  ["text"," "],
+  ["keyword","when"],
+  ["text"," "],
+  ["paren.lparen","("],
+  ["support.function","iscolor"],
+  ["paren.lparen","("],
+  ["variable","@c"],
+  ["paren.rparen","))"],
+  ["paren.lparen"," {"]
+],[
+   "ruleset",
+  ["text","    "],
+  ["support.type.property","box-shadow"],
+  ["text",":"],
+  ["text","         "],
+  ["variable","@style"],
+  ["text"," "],
+  ["variable","@c"],
+  ["text",";"]
+],[
+   "ruleset",
+  ["text","    "],
+  ["support.type.unknownProperty","-webkit-box-shadow"],
+  ["text",":"],
+  ["text"," "],
+  ["variable","@style"],
+  ["text"," "],
+  ["variable","@c"],
+  ["text",";"]
+],[
+   "ruleset",
+  ["text","    "],
+  ["support.type.unknownProperty","-moz-box-shadow"],
+  ["text",":"],
+  ["text","    "],
+  ["variable","@style"],
+  ["text"," "],
+  ["variable","@c"],
+  ["text",";"]
+],[
+   "start",
+  ["paren.rparen","}"]
+],[
+   "ruleset",
+  ["variable.language",".box-shadow"],
+  ["paren.lparen","("],
+  ["variable","@style"],
+  ["text",", "],
+  ["variable","@alpha"],
+  ["text",": "],
+  ["constant.numeric","50"],
+  ["keyword","%"],
+  ["paren.rparen",")"],
+  ["text"," "],
+  ["keyword","when"],
+  ["text"," "],
+  ["paren.lparen","("],
+  ["support.function","isnumber"],
+  ["paren.lparen","("],
+  ["variable","@alpha"],
+  ["paren.rparen","))"],
+  ["paren.lparen"," {"]
+],[
+   "ruleset",
+  ["text","    "],
+  ["variable.language",".box-shadow"],
+  ["paren.lparen","("],
+  ["variable","@style"],
+  ["text",", "],
+  ["support.function","rgba"],
+  ["paren.lparen","("],
+  ["constant.numeric","0"],
+  ["text",", "],
+  ["constant.numeric","0"],
+  ["text",", "],
+  ["constant.numeric","0"],
+  ["text",", "],
+  ["variable","@alpha"],
+  ["paren.rparen","))"],
+  ["text",";"]
+],[
+   "start",
+  ["paren.rparen","}"]
+],[
+   "start"
+],[
+   "start",
+  ["comment","// Box styles"]
+],[
+   "ruleset",
+  ["variable.language",".box"],
+  ["paren.lparen"," {"],
+  ["text"," "]
+],[
+   "ruleset",
+  ["text","    "],
+  ["support.type.property","color"],
+  ["text",":"],
+  ["text"," "],
+  ["support.function","saturate"],
+  ["paren.lparen","("],
+  ["variable","@base"],
+  ["text",", "],
+  ["constant.numeric","5"],
+  ["keyword","%"],
+  ["paren.rparen",")"],
+  ["text",";"]
+],[
+   "ruleset",
+  ["text","    "],
+  ["support.type.property","border-color"],
+  ["text",":"],
+  ["text"," "],
+  ["support.function","lighten"],
+  ["paren.lparen","("],
+  ["variable","@base"],
+  ["text",", "],
+  ["constant.numeric","30"],
+  ["keyword","%"],
+  ["paren.rparen",")"],
+  ["text",";"]
+],[
+   "ruleset",
+  ["text","    "]
+],[
+   "ruleset",
+  ["text","    "],
+  ["identifier","div"],
+  ["paren.lparen"," {"],
+  ["text"," "],
+  ["variable.language",".box-shadow"],
+  ["paren.lparen","("],
+  ["constant.numeric","0"],
+  ["text"," "],
+  ["constant.numeric","0"],
+  ["text"," "],
+  ["constant.numeric","5"],
+  ["keyword","px"],
+  ["text",", "],
+  ["constant.numeric","30"],
+  ["keyword","%"],
+  ["paren.rparen",")"],
+  ["text"," "],
+  ["paren.rparen","}"]
+],[
+   "ruleset",
+  ["text","  "]
+],[
+   ["ruleset","ruleset"],
+  ["text","    "],
+  ["identifier","a"],
+  ["paren.lparen"," {"]
+],[
+   ["ruleset","ruleset"],
+  ["text","        "],
+  ["support.type.property","color"],
+  ["text",":"],
+  ["text"," "],
+  ["variable","@base"],
+  ["text",";"]
+],[
+   ["ruleset","ruleset"],
+  ["text","        "]
+],[
+   ["ruleset","ruleset","ruleset","ruleset"],
+  ["text","        "],
+  ["keyword","&"],
+  ["variable.language",":hover"],
+  ["paren.lparen"," {"]
+],[
+   ["ruleset","ruleset","ruleset","ruleset"],
+  ["text","            "],
+  ["support.type.property","color"],
+  ["text",":"],
+  ["text"," "],
+  ["support.function","lighten"],
+  ["paren.lparen","("],
+  ["variable","@base"],
+  ["text",", "],
+  ["constant.numeric","50"],
+  ["keyword","%"],
+  ["paren.rparen",")"],
+  ["text",";"]
+],[
+   ["ruleset","ruleset"],
+  ["text","        "],
+  ["paren.rparen","}"]
+],[
+   "ruleset",
+  ["text","    "],
+  ["paren.rparen","}"]
+],[
+   "start",
+  ["paren.rparen","}"]
+],[
+   "start"
+]]

@@ -34,12 +34,7 @@ class LineBufferedProcess(process: Process) extends Logging {
   }
 
   /** Returns if the process is still actively running. */
-  def isAlive: Boolean = try {
-    exitValue()
-    false
-  } catch {
-    case _: IllegalStateException => true
-  }
+  def isAlive: Boolean = Utils.isProcessAlive(process)
 
   def exitValue(): Int = {
     process.exitValue()

@@ -46,6 +46,10 @@ Want SSL support? Just set these attributes:
     
     server.ssl_certificate = <filename>
     server.ssl_private_key = <filename>
+
+Supports also SSL certificate chains with this attribute:
+
+    server.ssl_certificate_chain = <filename>
     
     if __name__ == '__main__':
         try:
@@ -315,6 +319,7 @@ class HTTPRequest(object):
         self.wsgi_app = wsgi_app
         
         self.ready = False
+        self.started_request = False
         self.started_response = False
         self.status = ""
         self.outheaders = []
@@ -342,6 +347,9 @@ class HTTPRequest(object):
         # (although your TCP stack might suffer for it: cf Apache's history
         # with FIN_WAIT_2).
         request_line = self.rfile.readline()
+        # Set started_request to True so communicate() knows to send 408
+        # from here on out.
+        self.started_request = True
         if not request_line:
             # Force self.ready = False so the connection will close.
             self.ready = False
@@ -827,7 +835,15 @@ if not _fileobject_uses_str_type:
                         buf.write(data)
                         del data  # explicit free
                         break
-                    assert n <= left, "recv(%d) returned %d bytes" % (left, n)
+                    # NOTE: (HUE-2893) This was backported from CherryPy PR
+                    # #14, which fixes uploading chunked files with SSL.
+                    elif n > left:
+                        # Could happen with SSL transport. Differ
+                        # extra data read to the next call
+                        buf.write(data[:left])
+                        self._rbuf.write(data[left:])
+                        del data
+                        break
                     buf.write(data)
                     buf_len += n
                     del data  # explicit free
@@ -1191,6 +1207,9 @@ class HTTPConnection(object):
                 # This order of operations should guarantee correct pipelining.
                 req.parse_request()
                 if not req.ready:
+                    # Something went wrong in the parsing (and the server has
+                    # probably already made a simple_response). Return and
+                    # let the conn close.
                     return
                 
                 req.respond()
@@ -1200,7 +1219,10 @@ class HTTPConnection(object):
         except socket.error, e:
             errnum = e.args[0]
             if errnum == 'timed out':
-                if req and not req.sent_headers:
+                # Don't send a 408 if there is no outstanding request; only
+                # if we're in the middle of a request.
+                # See http://www.cherrypy.org/ticket/853
+                if req and req.started_request and not req.sent_headers:
                     req.simple_response("408 Request Timeout")
             elif errnum not in socket_errors_to_ignore:
                 if req and not req.sent_headers:
@@ -1506,6 +1528,7 @@ class CherryPyWSGIServer(object):
     # Paths to certificate and private key files
     ssl_certificate = None
     ssl_private_key = None
+    ssl_certificate_chain = None
     ssl_cipher_list = "DEFAULT:!aNULL:!eNULL:!LOW:!EXPORT:!SSLv2"
     ssl_password_cb = None
     
@@ -1672,12 +1695,18 @@ class CherryPyWSGIServer(object):
               ctx.set_passwd_cb(self.ssl_password_cb)
 
             ctx.set_cipher_list(self.ssl_cipher_list)
-            ctx.use_privatekey_file(self.ssl_private_key)
-            ctx.use_certificate_file(self.ssl_certificate)
+            try:
+              ctx.use_privatekey_file(self.ssl_private_key)
+              ctx.use_certificate_file(self.ssl_certificate)
+              if self.ssl_certificate_chain:
+                ctx.use_certificate_chain_file(self.ssl_certificate_chain)
+            except Exception, ex:
+              logging.exception('SSL key and certificate could not be found or have a problem')
+              raise ex
             ctx.set_options(SSL.OP_NO_SSLv2 | SSL.OP_NO_SSLv3)
             self.socket = SSLConnection(ctx, self.socket)
             self.populate_ssl_environ()
-            
+ 
             # If listening on the IPV6 any address ('::' = IN6ADDR_ANY),
             # activate dual-stack. See http://www.cherrypy.org/ticket/871.
             if (not isinstance(self.bind_addr, basestring)

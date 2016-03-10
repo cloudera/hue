@@ -40,6 +40,7 @@ DESKTOP_ROOT := $(realpath .)
 include $(ROOT)/Makefile.vars.priv
 
 APPS := core \
+	libs/aws \
 	libs/hadoop \
 	libs/indexer \
 	libs/liboauth \
@@ -49,7 +50,9 @@ APPS := core \
 	libs/libsaml \
 	libs/libsentry \
 	libs/libsolr \
-	libs/libzookeeper
+	libs/libzookeeper \
+	libs/metadata \
+	libs/notebook
 
 .PHONY: default
 default:: hue syncdb

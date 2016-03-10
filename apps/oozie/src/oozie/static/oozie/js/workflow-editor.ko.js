@@ -459,7 +459,7 @@ var Workflow = function (vm, workflow) {
   };
 }
 
-var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_json) {
+var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_json, history_json) {
   var self = this;
 
   self.isNested = ko.observable(true);
@@ -516,6 +516,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.subworkflows = ko.observableArray(getOtherSubworkflows(self, subworkflows_json));
+  self.history = ko.mapping.fromJS(history_json);
 
   self.getSubWorkflow = function (uuid) {
     var wf = $.grep(self.subworkflows(), function (wf, i) {
@@ -1188,6 +1189,16 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     });
   };
 
+  self.showSubmitActionPopup = function (w) {
+    $(".jHueNotify").hide();
+    $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
+    }, function (data) {
+      $(document).trigger("showSubmitPopup", data);
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  };
+
   self.schedule = function () {
     window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
   };
@@ -1215,6 +1226,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableStreamingAction = ko.observable(bareWidgetBuilder("Streaming", "streaming-widget"));
   self.draggableDistCpAction = ko.observable(bareWidgetBuilder("Distcp", "distcp-widget"));
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
+  self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
 
   self.draggableKillNode = ko.observable(bareWidgetBuilder("Kill", "kill-widget"));
 };
@@ -1311,5 +1323,6 @@ var ExtendedWidget = function (params) {
   self.progress = ko.observable(0);
   self.actionURL = ko.observable("");
   self.logsURL = ko.observable("");
+  self.externalIdUrl = ko.observable("");
   return self;
 }

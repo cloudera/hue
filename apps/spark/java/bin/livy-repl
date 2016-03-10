@@ -23,9 +23,15 @@ set -e
 export LIVY_HOME=$(cd $(dirname $0)/.. && pwd)
 cd $LIVY_HOME
 
+if [ "$SPARK_HOME" ]; then
+	SPARK_SUBMIT="$SPARK_HOME/bin/spark-submit"
+else
+	SPARK_SUBMIT=spark-submit
+fi
+
 source ./bin/setup-classpath
 
-exec spark-submit \
+exec $SPARK_SUBMIT \
 	--driver-java-options "$LIVY_REPL_JAVA_OPTS" \
 	--class com.cloudera.hue.livy.repl.Main \
 	"$ASSEMBLY_JAR" \

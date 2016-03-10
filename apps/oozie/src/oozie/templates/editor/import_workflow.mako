@@ -88,4 +88,4 @@ ${ layout.menubar(section='workflows') }
 
 ${ utils.path_chooser_libs(False) }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

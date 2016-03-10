@@ -4,7 +4,7 @@
 
 <xsl:template match="sqoop:sqoop">
 
-  ,"sqoop": {"script_path": "<xsl:value-of select="*[local-name()='command']"/>"}
+  ,"sqoop": {"command": "<xsl:value-of select="*[local-name()='command']"/>"}
 
 </xsl:template>
 

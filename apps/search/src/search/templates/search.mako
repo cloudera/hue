@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, _ko
 from desktop import conf
 from django.utils.translation import ugettext as _
 %>
@@ -36,8 +36,12 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
   }
 </script>
 
-<div class="search-bar">
+<div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="pull-right" style="padding-right:50px">
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+      <i class="fa fa-expand"></i>
+    </a>
+    &nbsp;&nbsp;
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
@@ -92,7 +96,7 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
@@ -262,9 +266,26 @@ ${ commonheader(_('Search'), "search", user, "80px") | n,unicode }
       </%def>
 </%dashboard:layout_toolbar>
 
+<div class="player-toolbar" data-bind="visible: $root.isPlayerMode">
+  <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
+  <img src="${ static('desktop/art/icon_hue_48.png') }" />
+  <h4 data-bind="text: collection.label"></h4>
+  <form class="form-search" data-bind="submit: searchBtn">
+  <span data-bind="foreach: query.qs">
+    <input data-bind="clearable: q, typeahead: { target: q, source: $root.collection.template.fieldsNames, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
+    <!-- ko if: $parent.query.qs().length > 1 -->
+    <div class="pointer muted link" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></div>
+    <!-- /ko -->
+  </span>
+  <div class="pointer muted link" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></div>
+  <div class="pointer muted link" data-bind="click: $root.searchBtn"><i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i></div>
+  <!--[if !IE]> --><i class="fa fa-spinner fa-spin muted" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
+  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
+  </form>
+</div>
+
 
 ${ dashboard.layout_skeleton() }
-
 
 <script type="text/html" id="empty-widget">
   ${ _('This is an empty widget.')}
@@ -347,6 +368,16 @@ ${ dashboard.layout_skeleton() }
           </span>
           <select data-bind="selectedOptions: properties.scope" class="input-small">
             <option value="world">${ _("World") }</option>
+            <option value="europe">${ _("Europe") }</option>
+            <option value="aus">${ _("Australia") }</option>
+            <option value="bra">${ _("Brazil") }</option>
+            <option value="can">${ _("Canada") }</option>
+            <option value="chn">${ _("China") }</option>
+            <option value="fra">${ _("France") }</option>
+            <option value="deu">${ _("Germany") }</option>
+            <option value="ita">${ _("Italy") }</option>
+            <option value="jpn">${ _("Japan") }</option>
+            <option value="gbr">${ _("UK") }</option>
             <option value="usa">${ _("USA") }</option>
           </select>
         </span>
@@ -367,7 +398,7 @@ ${ dashboard.layout_skeleton() }
             <span class="facet-field-label facet-field-label-fixed-width">
               ${ _('Field') }
             </span>
-            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Choose...') }'"></select>
+            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Choose...') }'"></select>
           </span>
         </div>
 
@@ -427,8 +458,8 @@ ${ dashboard.layout_skeleton() }
                 <!-- ko if: ! $data.selected -->
                   <a class="exclude pointer" data-bind="click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id(), 'exclude': true}) }" title="${ _('Exclude this value') }"><i class="fa fa-minus"></i></a>
                   <div class="hellip">
-                    <a class="pointer" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
-                    <span class="pointer counter" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
+                    <a class="pointer" dir="ltr" data-bind="html: prettifyDate($data.value), click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }, attr: {'title': $data.value + ' (' + $data.count + ')'}"></a>
+                    <span class="pointer counter" dir="rtl" data-bind="text: ' (' + $data.count + ')', click: function(){ $root.query.toggleFacet({facet: $data, widget_id: $parent.id()}) }"></span>
                   </div>
                 <!-- /ko -->
                 <!-- ko if: $data.selected -->
@@ -511,21 +542,107 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="resultset-widget">
   <!-- ko if: $root.collection.template.isGridLayout() -->
-    <div style="float:left; margin-right: 10px">
-      <div data-bind="visible: ! $root.collection.template.showFieldList()" style="padding-top: 5px; display: inline-block">
-        <a href="javascript: void(0)"  data-bind="click: function(){ $root.collection.template.showFieldList(true) }">
-          <i class="fa fa-chevron-right"></i>
-        </a>
+
+  <div class="grid-row">
+
+    <div class="grid-left-bar">
+      <div>
+        <!-- ko if: $root.response && $root.response().response && $root.response().response.numFound > 0 -->
+        <div style="margin-top:3px">
+          <a class="grid-side-btn active" href="javascript: void(0)"
+             data-bind="click: function(){ $root.collection.template.showChart(false); $root.collection.template.showGrid(true); }, css: {'active': $root.collection.template.showGrid() }" title="${_('Grid')}">
+            <i class="fa fa-th"></i>
+          </a>
+        </div>
+
+        <div class="dropdown">
+          <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
+             data-bind="css: {'active': $root.collection.template.showChart() }, click: function(){ $root.collection.template.showChart(true); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
+            <i class="hcha hcha-bar-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-line-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
+               style="display: none;"></i>
+            <i class="hcha hcha-pie-chart" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
+               style="display: none;"></i>
+            <i class="fa fa-fw fa-map-marker" data-bind="visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP"
+               style="display: none;"></i>
+          </a>
+          <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
+             href="javascript: void(0)" data-bind="css: {'active': $root.collection.template.showChart()}">
+            <i class="fa fa-caret-down"></i>
+          </a>
+
+          <ul class="dropdown-menu">
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 class="active">
+                <i class="hcha hcha-bar-chart"></i> ${_('Bars')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="hcha hcha-line-chart"></i> ${_('Lines')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="hcha hcha-pie-chart"></i> ${_('Pie')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ $root.collection.template.showChart(true); $root.collection.template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); $root.collection.template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ $root.collection.template.showFieldList(!$root.collection.template.showFieldList())}, css: { 'blue' : $root.collection.template.showFieldList() }"><i
+              class="fa fa-cog"></i></a>
+        </div>
+        <form method="POST" action="${ url('search:download') }" style="display:inline">
+          ${ csrf_token(request) | n,unicode }
+          <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
+          <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
+          <input type="hidden" name="download">
+          <input type="hidden" name="type" value="">
+          <div class="dropdown">
+            <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
+              <i class="fa fa-download"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('csv'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="hfo hfo-file-csv"></i> CSV
+                </a>
+              </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('xls'); $f.submit()}" title="${ _('Download first rows as XLS') }">
+                  <i class="hfo hfo-file-xls"></i> Excel
+                </a>
+              </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="hfo hfo-file-json"></i> JSON
+                </a>
+              </li>
+            </ul>
+          </div>
+        </form>
+        <!-- /ko -->
+
       </div>
     </div>
-    <div data-bind="visible: $root.collection.template.showFieldList()" style="float:left; margin-right: 10px; background-color: #F6F6F6; padding: 5px">
-      <span data-bind="visible: $root.collection.template.showFieldList()">
-        <div>
-          <a href="javascript: void(0)" class="pull-right" data-bind="click: function(){ $root.collection.template.showFieldList(false) }">
-            <i class="fa fa-chevron-left"></i>
-          </a>
-          <input type="text" data-bind="clearable: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width: 70%; margin-bottom: 10px" />
-        </div>
+  </div>
+
+  <div class="grid-results">
+    <span data-bind="visible: $root.hasRetrievedResults() && $root.response().response">
+      <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showGrid()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px; border-right:1px solid #EEE">
+        <input type="text" data-bind="clearable: $root.collection.template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width:180px; margin-bottom:10px" />
         <div style="margin-bottom: 8px">
           <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(true)}, style: {'font-weight': $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: $root.collection.template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: $root.collection.template.fields().length"></span>)</a>
         </div>
@@ -539,31 +656,34 @@ ${ dashboard.layout_skeleton() }
         </div>
         <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields">
           <div style="margin-bottom: 3px; white-space: nowrap">
-            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr:{'title': '${ _('Click to analyze field') } ' + name()}"></i>
+            <i class="fa fa-question-circle pull-right muted pointer analysis" data-bind="click: function() { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(); }, attr: {'title': '${ _ko('Click to analyze field') } ' + name() + ' (' + type() + ')'}"></i>
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
-            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right: 10px"></div>
+            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
           </div>
         </div>
-        <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left: 4px; padding-top: 5px; font-size: 40px; color: #CCC">
+        <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
           <i class="fa fa-frown-o"></i>
         </div>
-      </span>
-    </div>
+      </div>
 
-    <div>
-      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
+      <div data-bind="visible: $root.collection.template.showFieldList() && $root.collection.template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px; border-right: 1px solid #EEE">
+        <span data-bind="template: {name: 'grid-chart-settings', data: $root.collection.template.chartSettings}"></span>
+      </div>
+    </span>
+
+      <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults() || !$root.response().response">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
       </div>
 
-      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0 && $root.response().response">
         <br/>
         ${ _('Your search did not match any documents.') }
       </div>
 
-      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0">
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showGrid()">
         <!-- ko if: $root.response().response -->
-          <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding: 8px; color: #666"></div>
+          <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding:8px; color:#666"></div>
         <!-- /ko -->
 
         <div id="result-main" style="overflow-x: auto">
@@ -577,7 +697,7 @@ ${ dashboard.layout_skeleton() }
               </tr>
             </thead>
             <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
-              <tr class="result-row">
+              <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
                 <td>
                   <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
                     <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
@@ -587,32 +707,81 @@ ${ dashboard.layout_skeleton() }
                   <td data-bind="html: $data"></td>
                 <!-- /ko -->
               </tr>
-              <tr data-bind="visible: doc.showDetails">
+              <tr data-bind="visible: doc.showDetails" class="show-details">
+                <td>&nbsp;</td>
                 <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
-                  <!-- ko if: $data.details().length == 0 -->
-                    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-                    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
-                  <!-- /ko -->
-                  <!-- ko if: $data.details().length > 0 -->
-                    <div class="document-details">
-                      <table>
-                        <tbody data-bind="foreach: details">
-                          <tr>
-                             <th style="text-align: left; white-space: nowrap; vertical-align:top; padding-right:20px" data-bind="text: key"></th>
-                             <td width="100%" data-bind="text: value"></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  <!-- /ko -->
+                  <span data-bind="template: {name: 'document-details', data: $data}"></span>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
+
+      <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showChart()">
+        <div data-bind="visible: !$root.collection.template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
+        <div class="grid-chart-container" data-bind="visible: $root.collection.template.hasDataForChart" style="overflow-x: auto">
+          <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
+                transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+
+          <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+
+          <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+                transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+
+          <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+                transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+
+        </div>
+      </div>
     </div>
+  </div>
   <!-- /ko -->
+</script>
+
+<script type="text/html" id="grid-chart-settings">
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+    <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
+    <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
+    <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
+    <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
+  </ul>
+  <div data-bind="visible: chartType() != ''">
+    <select data-bind="options: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.PIECHART) ? $root.collection.template.cleanedMeta : $root.collection.template.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX}" class="input-medium"></select>
+  </div>
+
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+    <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
+    <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
+    <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
+  </ul>
+
+  <div style="overflow-y: scroll; max-height: 220px" data-bind="visible: chartType() != '' && (chartType() == ko.HUE_CHARTS.TYPES.BARCHART || chartType() == ko.HUE_CHARTS.TYPES.LINECHART)">
+    <ul class="unstyled" data-bind="foreach: $root.collection.template.cleanedNumericMeta">
+      <li><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></li>
+    </ul>
+  </div>
+  <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP">
+    <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? $root.collection.template.cleanedMeta : $root.collection.template.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartYSingle}" class="input-medium"></select>
+  </div>
+
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.MAP">
+    <li class="nav-header">${_('label')}</li>
+  </ul>
+  <div data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP">
+    <select data-bind="options: $root.collection.template.cleanedMeta, value: chartMapLabel, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartMapLabel}" class="input-medium"></select>
+  </div>
+
+
+  <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP">
+    <li class="nav-header">${_('sorting')}</li>
+  </ul>
+  <div class="btn-group" data-toggle="buttons-radio" data-bind="visible: chartType() != '' && chartType() != ko.HUE_CHARTS.TYPES.MAP">
+    <a rel="tooltip" data-placement="top" title="${_('No sorting')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'none'}, click: function(){ chartSorting('none'); }"><i class="fa fa-align-left fa-rotate-270"></i></a>
+    <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
+    <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
+  </div>
 </script>
 
 <script type="text/html" id="html-resultset-widget">
@@ -719,9 +888,29 @@ ${ dashboard.layout_skeleton() }
         <div data-bind="template: {name: 'resultset-pagination', data: $root.response() }"></div>
       <!-- /ko -->
 
-      <div id="result-container" data-bind="foreach: $root.results">
-        <div class="result-row" data-bind="html: $data"></div>
-      </div>
+
+      <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody data-bind="foreach: {data: $root.results, as: 'doc'}" class="result-tbody">
+          <tr data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+            <td><div data-bind="html: content" style="margin-bottom: -20px"></div></td>
+          </tr>
+          <tr>
+            <td class="show-details-icon pointer" data-bind="click: toggleDocDetails">
+              <i class="fa" data-bind="css: {'fa-caret-down' : ! doc.showDetails(), 'fa-caret-up': doc.showDetails()}"></i>
+            </td>
+          </tr>
+          <tr data-bind="visible: doc.showDetails" class="show-details">
+            <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
+              <span data-bind="template: {name: 'document-details', data: $data}"></span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
       <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
@@ -731,6 +920,48 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 </script>
 
+
+<script type="text/html" id="document-details">
+  <!-- ko if: $data.details().length == 0 -->
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  <!-- /ko -->
+  <!-- ko if: $data.details().length > 0 -->
+    <div class="document-details-actions pull-left" data-bind="visible: ${ 'true' if can_edit_index else 'false' } || externalLink()">
+      <a href="javascript:void(0)" data-bind="visible: ! showEdit(), click: function() { showEdit(true); }" title="${ _('Edit this document') }">
+        <i class="fa fa-edit fa-fw"></i>
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: showEdit(), click: function(data, e) { $(e.currentTarget).parent().css('marginTop', '8px'); $root.getDocument($data); showEdit(false); }" title="${ _('Undo changes') }">
+        <i class="fa fa-undo fa-fw"></i>
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: showEdit() && originalDetails() != ko.toJSON(details), click: $root.updateDocument" title="${ _('Update this document') }">
+        <i class="fa fa-save fa-fw"></i>
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: externalLink(), attr: { href: externalLink}" target="_blank" title="${ _('Show original document') }">
+        <i class="fa fa-external-link fa-fw"></i>
+      </a>
+    </div>
+    <div class="document-details pull-left">
+      <table>
+        <tbody data-bind="foreach: details">
+          <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
+             <th class="grid-th" data-bind="text: key"></th>
+             <td width="100%">
+               <span data-bind="text: value, visible: ! $parent.showEdit()"></span>
+               <input data-bind="value: value, visible: $parent.showEdit, valueUpdate: 'afterkeydown',
+               click: function(detail, e){
+                var target = $(e.currentTarget);
+                target.parents('.show-details').find('.document-details-actions').animate({
+                  'marginTop': (target.position().top - target.parents('table').position().top) + 'px'
+                }, 200)
+               }" class="input-xxlarge" style="width: 600px" />
+             </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  <!-- /ko -->
+</script>
 
 <script type="text/html" id="result-sorting">
 <th style="width: 18px">&nbsp;</th>
@@ -760,20 +991,6 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="resultset-pagination">
-<!-- ko if: $data.response.numFound > 0 -->
-<div class="pull-right" style="display:inline">
-  <form method="POST" action="${ url('search:download') }" style="display:inline">
-    ${ csrf_token(request) | n,unicode }
-    <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
-    <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
-    <input type="hidden" name="download">
-    <button class="btn" type="submit" name="json" title="${ _('Download first rows as JSON') }"><i class="hfo hfo-file-json"></i></button>
-    <button class="btn" type="submit" name="csv" title="${ _('Download first rows as CSV') }"><i class="hfo hfo-file-csv"></i></button>
-    <button class="btn" type="submit" name="xls" title="${ _('Download first rows as XLS') }"><i class="hfo hfo-file-xls"></i></button>
-  </form>
-</div>
-<!-- /ko -->
-
 <div style="text-align: center; margin-top: 4px">
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
@@ -955,7 +1172,7 @@ ${ dashboard.layout_skeleton() }
           <a data-bind="visible: ko.toJSON(properties.facets_form.field) != '', click: $root.collection.addPivotFacetValue" class="pull-right" href="javascript:void(0)">
             <i class="fa fa-plus"></i> ${ _('Add') }
           </a>
-          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
+          <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0; height: 20px"></select>
           <div class="clearfix"></div>
         </div>
         <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
@@ -1199,7 +1416,7 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: properties.scope() == 'tree' -->
         <div data-bind="partitionChart: {datum: {counts: $parent.counts(), widget_id: $parent.id(), label: $parent.label()},
           fqs: $root.query.fqs,
-          tooltip: '${ _('Click to zoom, double click to select') }',
+          tooltip: '${ _ko('Click to zoom, double click to select') }',
           transformer: partitionChartDataTransformer,
           onStateChange: function(state){ },
           onClick: function(d) {
@@ -1374,6 +1591,33 @@ ${ dashboard.layout_skeleton() }
       </div>
     </div>
     <!-- /ko -->
+
+    <!-- ko if: $data.type() == 'map' -->
+    <div class="filter-box">
+      <div class="title">
+        <a href="javascript:void(0)" class="pull-right" data-bind="click: function(){ chartsUpdatingState(); $root.query.removeFilter($data); $root.search() }">
+          <i class="fa fa-times"></i>
+        </a>
+        <span data-bind="text: $data.lat"></span>, <span data-bind="text: $data.lon"></span>
+        &nbsp;
+      </div>
+      <div class="content">
+        <strong>${_('selected')}</strong>
+        <span class="label label-info">
+          [
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_sw, attr: {'title': '${ _ko('Latitude South West') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_sw, attr: {'title': '${ _ko('Longitude South West') }'"></span>
+          ]
+          ${ _("TO") }
+          [
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lat_ne, attr: {'title': '${ _ko('Latitude North East') }'"></span>
+          <span class="label label-info" style="margin-left: 4px" data-bind="text: $data.properties.lon_ne, attr: {'title': '${ _ko('Longitude North East') }'"></span>
+          ]
+        </span>
+      </div>
+    </div>
+    <!-- /ko -->
+
   </div>
   <div class="clearfix"></div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
@@ -1461,19 +1705,20 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px;" class="leaflet-align">
       <span class="facet-field-label">${_('Latitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _ko('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Longitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _ko('Choose...') }'"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Label')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedFieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _ko('Choose...') }'"></select>
     </div>
 
-    <div data-bind="leafletMapChart: {visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
+    <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
+      onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); },
       onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
   </div>
@@ -1618,6 +1863,14 @@ ${ dashboard.layout_skeleton() }
               <label class="control-label" for="settingsdescription">${ _('Description') }</label>
               <div class="controls">
                 <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label">${ _('Autocomplete') }</label>
+              <div class="controls">
+                <label class="checkbox" style="padding-top:0">
+                  <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled"> ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="value: $root.collection.suggest.dictionary" placeholder="${ _('Dictionary name or blank for default') }">
+                </label>
               </div>
             </div>
           </fieldset>
@@ -1794,13 +2047,14 @@ ${ dashboard.layout_skeleton() }
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
 
+<script src="${ static('desktop/js/hue.json.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_layout(True) }
 
 <script src="${ static('search/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('search/js/lzstring.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1808,6 +2062,7 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
+<script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('search/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -1825,13 +2080,21 @@ ${ dashboard.import_charts() }
   #emptyDashboardEditing {
     top: 190px!important;
   }
+  .dashboard {
+    margin-top: 20px;
+  }
+  .dashboard.with-top-margin {
+    margin-top: 80px;
+  }
 % endif
 </style>
 
 <script type="text/javascript" charset="utf-8">
+
 var viewModel;
 
 nv.dev = false;
+moment.suppressDeprecationWarnings = true;
 
 var HIT_OPTIONS = [
   { value: "count", label: "${ _('Count') }" },
@@ -1983,6 +2246,23 @@ function rangePieChartDataTransformer(data) {
 
 function rangeUpPieChartDataTransformer(data) {
   return _rangePieChartDataTransformer(data, true);
+}
+
+function pieChartDataTransformerGrid(data) {
+  var _data = [];
+  var chartX = viewModel.collection.template.chartSettings.chartX();
+  var chartY = viewModel.collection.template.chartSettings.chartYSingle();
+  $(data.counts).each(function (cnt, item) {
+    item.widget_id = data.widget_id;
+    if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
+      _data.push({
+        label: item.item[chartX](),
+        value: item.item[chartY](),
+        obj: item
+      });
+    }
+  });
+  return _data;
 }
 
 function _barChartDataTransformer(rawDatum, isUp) {
@@ -2235,6 +2515,115 @@ function leafletMapChartDataTransformer(data) {
   return _data;
 }
 
+function leafletMapChartDataTransformerGrid(data) {
+  var _data = [];
+  $(data.counts).each(function (cnt, item) {
+    var chartX = viewModel.collection.template.chartSettings.chartX();
+    var chartY = viewModel.collection.template.chartSettings.chartYSingle();
+    var chartMapLabel = viewModel.collection.template.chartSettings.chartMapLabel();
+    if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
+      var _obj = {
+        lat: item.item[chartX](),
+        lng: item.item[chartY]()
+      }
+      if (chartMapLabel != "" && item.item[chartMapLabel]) {
+        _obj.label = item.item[chartMapLabel]();
+      }
+      _data.push(_obj);
+    }
+  });
+  return _data;
+}
+
+
+function multiSerieDataTransformer(rawDatum) {
+  var _datum = [];
+
+  if (rawDatum.snippet.chartX() != null && rawDatum.snippet.chartYMulti().length > 0) {
+    var _plottedSerie = 0;
+    rawDatum.snippet.chartYMulti().forEach(function (col) {
+      var _idxValue = -1;
+      var _idxLabel = -1;
+      rawDatum.snippet.result.meta().forEach(function (icol, idx) {
+        if (icol.name == rawDatum.snippet.chartX()) {
+          _idxLabel = idx;
+        }
+        if (icol.name == col) {
+          _idxValue = idx;
+        }
+      });
+
+      if (_idxValue > -1) {
+        var _data = [];
+        $(rawDatum.counts()).each(function (cnt, item) {
+          _data.push({
+            series: _plottedSerie,
+            x: item[_idxLabel],
+            y: item[_idxValue],
+            obj: item
+          });
+        });
+        if (rawDatum.sorting == "asc") {
+          _data.sort(function (a, b) {
+            return a.y - b.y
+          });
+        }
+        if (rawDatum.sorting == "desc") {
+          _data.sort(function (a, b) {
+            return b.y - a.y
+          });
+        }
+        _datum.push({
+          key: col,
+          values: _data
+        });
+        _plottedSerie++;
+      }
+    });
+  }
+  return _datum;
+}
+
+
+function multiSerieDataTransformerGrid(rawDatum) {
+  var _datum = [];
+
+  var chartX = viewModel.collection.template.chartSettings.chartX();
+  var chartY = viewModel.collection.template.chartSettings.chartYMulti();
+
+  if (chartX != null && chartY.length > 0 && rawDatum.counts.length > 0) {
+    var _plottedSerie = 0;
+    chartY.forEach(function (col) {
+      var _data = [];
+      $(rawDatum.counts).each(function (cnt, item) {
+        if (item.item[chartX] && item.item[col]) {
+          _data.push({
+            series: _plottedSerie,
+            x: item.item[chartX](),
+            y: item.item[col](),
+            obj: item.item
+          });
+        }
+      });
+      if (rawDatum.sorting == "asc") {
+        _data.sort(function (a, b) {
+          return a.y - b.y
+        });
+      }
+      if (rawDatum.sorting == "desc") {
+        _data.sort(function (a, b) {
+          return b.y - a.y
+        });
+      }
+      _datum.push({
+        key: col,
+        values: _data
+      });
+      _plottedSerie++;
+    });
+  }
+  return _datum;
+}
 
 function toggleDocDetails(doc) {
   doc.showDetails(! doc.showDetails());
@@ -2253,6 +2642,27 @@ function resizeFieldsList() {
       $(".fields-list").css("max-height", _fillHeight);
     }
   }, 100);
+}
+
+function queryTypeahead(query, process) {
+  var _source = viewModel.collection.template.fieldsNames();
+  _source = _source.concat("AND OR TO".split(" "))
+
+  if (viewModel.collection.suggest.enabled()) {
+    viewModel.suggest(query, function (data) {
+      var _tmp = [];
+      if (typeof data != "undefined" && data.response && data.response.suggest && data.response.suggest[viewModel.collection.suggest.dictionary()]) {
+        var suggestions = data.response.suggest[viewModel.collection.suggest.dictionary()][query].suggestions;
+        suggestions.forEach(function (sugg) {
+          _tmp.push(sugg.term + "<i class='muted fa fa-search'></i>");
+        });
+      }
+      process(_tmp.concat(_source));
+    });
+  }
+  else {
+    return _source;
+  }
 }
 
 $(document).ready(function () {
@@ -2304,19 +2714,13 @@ $(document).ready(function () {
     resizeFieldsList();
   });
 
-  var _query = ${ query | n,unicode };
-  if (window.location.hash != ""){
-    if (window.location.hash.indexOf("collection") == -1){
-      try {
-        var _decompress = LZString.decompressFromBase64(window.location.hash.substr(1));
-        if (_decompress != null && $.trim(_decompress) != ""){
-          _query = ko.mapping.fromJSON(LZString.decompressFromBase64(window.location.hash.substr(1)));
-        }
-      }
-      catch (e){}
-    }
-  }
+  huePubSub.subscribe('gridChartForceUpdate', function () {
+    window.setTimeout(function () {
+      $('.grid-chart-container').children().trigger('forceUpdate')
+    }, 200);
+  });
 
+  var _query = ${ query | n,unicode };
   viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, _query, ${ initial | n,unicode });
 
   viewModel.timelineChartTypes = ko.observableArray([
@@ -2349,6 +2753,17 @@ $(document).ready(function () {
           $(".slider-cnt").slider("redraw");
         }
       }, 300);
+    }
+  });
+
+  viewModel.isPlayerMode.subscribe(function(value) {
+    if (value){
+      $(".navigator").hide();
+      $("body").css("paddingTop", "40px");
+    }
+    else {
+      $(".navigator").show();
+      $("body").css("paddingTop", "80px");
     }
   });
 
@@ -2411,14 +2826,20 @@ $(document).ready(function () {
     }
   });
 
-  if (window.location.hash != "") {
-    if (window.location.hash.indexOf("q=") > -1) {
-      var _qdef = viewModel.collection.getQDefinition(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "").split("=")[1]);
-      if (_qdef != null){
-        viewModel.collection.loadQDefinition(_qdef);
-      }
+  function loadQueryDefinition(id) {
+    var _qdef = viewModel.collection.getQDefinition(id);
+    if (_qdef != null) {
+      viewModel.collection.loadQDefinition(_qdef);
     }
   }
+
+  if (window.location.hash != "" && window.location.hash.indexOf("qd=") > -1) {
+    loadQueryDefinition(window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "").split("=")[1]);
+  }
+  else if (_query.qd) {
+    loadQueryDefinition(_query.qd);
+  }
+
 });
 
 
@@ -2548,4 +2969,4 @@ $(document).ready(function () {
   }
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

@@ -54,6 +54,12 @@
          % endfor
       </div>
     </fieldset>
+
+    % if show_dryrun:
+      <label class="checkbox" style="display: inline-block; margin-top: 5px">
+        <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job?') }
+      </label>
+    % endif
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>

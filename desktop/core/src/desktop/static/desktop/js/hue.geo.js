@@ -282,6 +282,10 @@ var HueGeo = {
     }
     return null;
   },
+  getISOAlpha2: function (code) {
+    var _country = HueGeo.getCountryFromCode(code);
+    return _country ? _country.alpha2 : "AQ";
+  },
   getISOAlpha3: function (code) {
     var _country = HueGeo.getCountryFromCode(code);
     return _country ? _country.alpha3 : "ATA";
@@ -308,6 +312,18 @@ var HueGeo = {
       }
     });
   },
+  getAddressFromCoordinates: function (lat, lng, callback) {
+    var api = new NominatimAPI();
+    api.lookupAddress(lat + "," + lng, function (rawdata) {
+      if (rawdata.length > 1) {
+        callback(rawdata);
+      }
+      else {
+        callback(rawdata[0].display_name);
+      }
+    });
+  },
+
   getAddressCoordinates: function (address, callback) {
     var api = new NominatimAPI();
     api.lookupAddress(address, function (rawdata) {

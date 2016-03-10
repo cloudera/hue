@@ -22,12 +22,16 @@ import time
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
+from desktop.models import SAMPLE_USER_ID
 from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
+from liboozie.conf import SECURITY_ENABLED
 from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
@@ -86,6 +90,43 @@ class TestMock(TestPigBase):
     wf = api._create_workflow(pig_script, '[]')
     assert_true({'name': u'oozie.action.sharelib.for.pig', 'value': u'pig,hcatalog'} in wf.find_all_parameters(), wf.find_all_parameters())
 
+    start_link = wf.start.get_link()
+    pig_action = start_link.child
+    assert_equal([], pig_action.credentials)
+
+  def test_check_automated_hcatalogs_credentials(self):
+    reset = SECURITY_ENABLED.set_for_testing(True)
+
+    try:
+      api = get(None, None, self.user)
+      pig_script = self.create_script()
+      pig_script.update_from_dict({
+          'script':"""
+            a = LOAD 'sample_07' USING org.apache.hcatalog.pig.HCatLoader();
+            dump a;
+
+            STORE raw_data INTO 'students' USING
+            org.apache.pig.backend.hadoop.hbase.HBaseStorage
+            org.apache.pig.backend.hadoop.hbase.HBaseStorage (
+            'info:first_name info:last_name info:age info:gpa info:part');
+            raw_data = LOAD 'students' USING PigStorage( ' ' ) AS (
+            id: chararray,
+            first_name: chararray,
+            last_name: chararray,
+            age: int,
+            gpa: float,
+            part: int );
+      """})
+      pig_script.save()
+
+      wf = api._create_workflow(pig_script, '[]')
+      start_link = wf.start.get_link()
+      pig_action = start_link.child
+      assert_equal([{u'name': u'hcat', u'value': True}, {u'name': u'hbase', u'value': True}], pig_action.credentials)
+    finally:
+      reset()
+
+
   def test_editor_view(self):
     response = self.c.get(reverse('pig:app'))
     assert_true('Unsaved script' in response.content)
@@ -138,13 +179,13 @@ class TestWithHadoop(OozieBase):
     self.user = User.objects.get(username='test')
     self.c.post(reverse('pig:install_examples'))
 
-  def test_create_workflow(self):
-    cluster = pseudo_hdfs4.shared_cluster()
-    api = OozieApi(cluster.fs, cluster.jt, self.user)
+    self.cluster = pseudo_hdfs4.shared_cluster()
+    self.api = OozieApi(self.cluster.fs, self.cluster.jt, self.user)
 
+  def test_create_workflow(self):
     xattrs = {
       'parameters': [
-        {'name': 'output', 'value': '/tmp'},
+        {'name': 'output', 'value': self.cluster.fs_prefix + '/test_pig_script_workflow'},
         {'name': '-param', 'value': 'input=/data'}, # Alternative way for params
         {'name': '-optimizer_off', 'value': 'SplitFilter'},
         {'name': '-v', 'value': ''},
@@ -160,15 +201,17 @@ class TestWithHadoop(OozieBase):
     }
 
     pig_script = create_script(self.user, xattrs)
+
+    output_path = self.cluster.fs_prefix + '/test_pig_script_2'
     params = json.dumps([
-      {'name': 'output', 'value': '/tmp2'},
+      {'name': 'output', 'value': output_path},
     ])
 
-    workflow = api._create_workflow(pig_script, params)
+    workflow = self.api._create_workflow(pig_script, params)
     pig_action = workflow.start.get_child('to').get_full_node()
 
     assert_equal([
-        {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'output=/tmp2'},
+        {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'output=%s' % output_path},
         {u'type': u'argument', u'value': u'-param'}, {u'type': u'argument', u'value': u'input=/data'},
         {u'type': u'argument', u'value': u'-optimizer_off'}, {u'type': u'argument', u'value': u'SplitFilter'},
         {u'type': u'argument', u'value': u'-v'},
@@ -203,12 +246,18 @@ class TestWithHadoop(OozieBase):
 
     if response['workflow']['status'] != expected_status:
       msg = "[%d] %s took more than %d to complete or %s: %s" % (time.time(), job_id, timeout, response['workflow']['status'], logs)
+
+      self.api.stop(job_id)
+
       raise Exception(msg)
 
     return pig_script_id
 
   def test_submit(self):
-    script = PigScript.objects.get(id=1100713)
+    if is_live_cluster():
+      raise SkipTest('HUE-2909: Skipping because test is not reentrant')
+
+    script = PigScript.objects.get(id=SAMPLE_USER_ID)
     script_dict = script.dict
 
     post_data = {
@@ -219,7 +268,7 @@ class TestWithHadoop(OozieBase):
       'parameters': json.dumps(script_dict['parameters']),
       'resources': json.dumps(script_dict['resources']),
       'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
-      'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
+      'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_submit'}]),
     }
 
     response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
@@ -228,7 +277,7 @@ class TestWithHadoop(OozieBase):
     self.wait_until_completion(job_id)
 
   def test_stop(self):
-    script = PigScript.objects.get(id=1100713)
+    script = PigScript.objects.get(id=SAMPLE_USER_ID)
     script_dict = script.dict
 
     post_data = {
@@ -239,7 +288,7 @@ class TestWithHadoop(OozieBase):
       'parameters': json.dumps(script_dict['parameters']),
       'resources': json.dumps(script_dict['resources']),
       'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
-      'submissionVariables': json.dumps([{"name": "output", "value": '/tmp/test_pig'}]),
+      'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_stop'}]),
     }
 
     submit_response = self.c.post(reverse('pig:run'), data=post_data, follow=True)

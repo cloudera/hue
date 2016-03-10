@@ -3,7 +3,7 @@
 #include "crypto.h"
 
 
-static X509_REVOKED * X509_REVOKED_dup(X509_REVOKED *orig) {
+X509_REVOKED * X509_REVOKED_dup(X509_REVOKED *orig) {
     X509_REVOKED *dupe = NULL;
 
     dupe = X509_REVOKED_new();

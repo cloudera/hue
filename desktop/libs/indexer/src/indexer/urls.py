@@ -20,6 +20,9 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('indexer.views',
   url(r'^$', 'collections', name='collections'),
   url(r'^install_examples$', 'install_examples', name='install_examples'),
+  
+  # V2
+  url(r'^indexes/$', 'indexes', name='indexes'),
 )
 
 urlpatterns += patterns('indexer.api',
@@ -30,5 +33,16 @@ urlpatterns += patterns('indexer.api',
   url(r'^api/collections/remove/$', 'collections_remove', name='api_collections_remove'),
   url(r'^api/collections/(?P<collection>[^/]+)/fields/$', 'collections_fields', name='api_collections_fields'),
   url(r'^api/collections/(?P<collection>[^/]+)/update/$', 'collections_update', name='api_collections_update'),
-  url(r'^api/collections/(?P<collection>[^/]+)/data/$', 'collections_data', name='api_collections_data')
+  url(r'^api/collections/(?P<collection>[^/]+)/data/$', 'collections_data', name='api_collections_data'),
+)
+
+
+urlpatterns += patterns('indexer.api2',
+  # V2
+  url(r'^api/aliases/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
+  url(r'^api/indexes/create/$', 'create_index', name='create_index'),
+  url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes'),
+  url(r'^api/indexes/create_wizard_get_sample/$', 'create_wizard_get_sample', name='create_wizard_get_sample'),
+  url(r'^api/indexes/create_wizard_create/$', 'create_wizard_create', name='create_wizard_create'),
+  url(r'^api/indexes/(?P<index>\w+)/schema/$', 'design_schema', name='design_schema')
 )

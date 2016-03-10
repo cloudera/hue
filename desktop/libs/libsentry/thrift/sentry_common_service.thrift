@@ -25,6 +25,9 @@ namespace php sentry.service.thrift
 namespace cpp Apache.Sentry.Service.Thrift
 
 const i32 TSENTRY_SERVICE_V1 = 1;
+// Made a backward incompatible change when adding column level privileges.
+// We also added generalized model in this version
+const i32 TSENTRY_SERVICE_V2 = 2;
 
 const i32 TSENTRY_STATUS_OK = 0;
 const i32 TSENTRY_STATUS_ALREADY_EXISTS = 1;
@@ -32,6 +35,7 @@ const i32 TSENTRY_STATUS_NO_SUCH_OBJECT = 2;
 const i32 TSENTRY_STATUS_RUNTIME_ERROR = 3;
 const i32 TSENTRY_STATUS_INVALID_INPUT = 4;
 const i32 TSENTRY_STATUS_ACCESS_DENIED = 5;
+const i32 TSENTRY_STATUS_THRIFT_VERSION_MISMATCH = 6;
 
 struct TSentryResponseStatus {
 1: required i32 value,

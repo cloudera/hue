@@ -26,8 +26,6 @@ In addition, the User classes they return must support:
  - has_hue_permission(action, app) -> boolean
 Because Django's models are sometimes unfriendly, you'll want
 User to remain a django.contrib.auth.models.User object.
-
-In Desktop, only one authentication backend may be specified.
 """
 from django.contrib.auth.models import User
 import django.contrib.auth.backends
@@ -44,6 +42,7 @@ import pam
 from django_auth_ldap.backend import LDAPBackend
 import ldap
 from django_auth_ldap.config import LDAPSearch
+from liboauth.metrics import oauth_authentication_time
 
 
 LOG = logging.getLogger(__name__)
@@ -125,6 +124,14 @@ def find_or_create_user(username, password=None):
     user = create_user(username, password)
   return user
 
+def ensure_has_a_group(user):
+  default_group = get_default_user_group()
+
+  if not user.groups.exists() and default_group is not None:
+    user.groups.add(default_group)
+    user.save()
+
+
 class DesktopBackendBase(object):
   """
   Abstract base class for providing external authentication schemes.
@@ -175,10 +182,7 @@ class AllowFirstUserDjangoBackend(django.contrib.auth.backends.ModelBackend):
       userprofile.first_login = False
       userprofile.save()
 
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
-        user.save()
+      ensure_has_a_group(user)
 
       return user
 
@@ -205,7 +209,7 @@ class OAuthBackend(DesktopBackendBase):
   build/env/bin/pip install httplib2
   """
 
-  @metrics.oauth_authentication_time
+  @oauth_authentication_time
   def authenticate(self, access_token):
     username = access_token['screen_name']
     password = access_token['oauth_token_secret']
@@ -216,9 +220,7 @@ class OAuthBackend(DesktopBackendBase):
     user.is_superuser = False
     user.save()
 
-    default_group = get_default_user_group()
-    if default_group is not None:
-      user.groups.add(default_group)
+    ensure_has_a_group(user)
 
     return user
 
@@ -241,10 +243,9 @@ class AllowAllBackend(DesktopBackendBase):
       user = create_user(username, password)
       user.is_superuser = False
       user.save()
-      
-    default_group = get_default_user_group()
-    if default_group is not None:
-      user.groups.add(default_group)
+
+    ensure_has_a_group(user)
+
     return user
 
   @classmethod
@@ -266,9 +267,8 @@ class DemoBackend(django.contrib.auth.backends.ModelBackend):
 
       user.is_superuser = False
       user.save()
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
+
+      ensure_has_a_group(user)
 
     user = rewrite_user(user)
 
@@ -310,9 +310,7 @@ class PamBackend(DesktopBackendBase):
           profile.save()
           user.is_superuser = is_super
 
-          default_group = get_default_user_group()
-          if default_group is not None:
-            user.groups.add(default_group)
+          ensure_has_a_group(user)
 
           user.save()
 
@@ -366,8 +364,8 @@ class LdapBackend(object):
         setattr(self._backend.settings, 'BIND_DN', bind_dn)
 
         bind_password = ldap_config.BIND_PASSWORD.get()
-        if bind_password is None:
-          password = ldap_config.BIND_PASSWORD_SCRIPT.get()
+        if not bind_password:
+          bind_password = ldap_config.BIND_PASSWORD_SCRIPT.get()
         setattr(self._backend.settings, 'BIND_PASSWORD', bind_password)
 
       if user_filter is None:
@@ -447,10 +445,7 @@ class LdapBackend(object):
       user.is_superuser = is_super
       user = rewrite_user(user)
 
-      default_group = get_default_user_group()
-      if default_group is not None:
-        user.groups.add(default_group)
-        user.save()
+      ensure_has_a_group(user)
 
       if desktop.conf.LDAP.SYNC_GROUPS_ON_LOGIN.get():
         self.import_groups(server, user)
@@ -485,12 +480,16 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
   @metrics.spnego_authentication_time
   def authenticate(self, username=None):
     username = self.clean_username(username)
+    username = desktop.conf.AUTH.FORCE_USERNAME_LOWERCASE.get() and username.lower() or username
     is_super = False
     if User.objects.count() == 0:
       is_super = True
 
     try:
-      user = User.objects.get(username=username)
+      if desktop.conf.AUTH.IGNORE_USERNAME_CASE.get():
+        user = User.objects.get(username__iexact=username)
+      else:
+        user = User.objects.get(username=username)
     except User.DoesNotExist:
       user = find_or_create_user(username, None)
       if user is not None and user.is_active:
@@ -499,13 +498,13 @@ class SpnegoDjangoBackend(django.contrib.auth.backends.ModelBackend):
         profile.save()
         user.is_superuser = is_super
 
-        default_group = get_default_user_group()
-        if default_group is not None:
-          user.groups.add(default_group)
+        ensure_has_a_group(user)
 
         user.save()
 
-    user = rewrite_user(user)
+    if user is not None:
+      user = rewrite_user(user)
+
     return user
 
   def clean_username(self, username):
@@ -544,9 +543,7 @@ class RemoteUserDjangoBackend(django.contrib.auth.backends.RemoteUserBackend):
         profile.save()
         user.is_superuser = is_super
 
-        default_group = get_default_user_group()
-        if default_group is not None:
-          user.groups.add(default_group)
+        ensure_has_a_group(user)
 
         user.save()
 

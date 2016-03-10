@@ -71,11 +71,12 @@ urlpatterns += patterns(
 
   url(r'^editor/workflow/list/$', 'list_editor_workflows', name='list_editor_workflows'),
   url(r'^editor/workflow/edit/$', 'edit_workflow', name='edit_workflow'),
-  url(r'^editor/workflow/new/$', 'new_workflow', name='new_workflow'),  
+  url(r'^editor/workflow/new/$', 'new_workflow', name='new_workflow'),
   url(r'^editor/workflow/delete/$', 'delete_job', name='delete_editor_workflow'),
   url(r'^editor/workflow/copy/$', 'copy_workflow', name='copy_workflow'),
   url(r'^editor/workflow/save/$', 'save_workflow', name='save_workflow'),
   url(r'^editor/workflow/submit/(?P<doc_id>\d+)$', 'submit_workflow', name='editor_submit_workflow'),
+  url(r'^editor/workflow/submit_single_action/(?P<doc_id>\d+)/(?P<node_id>.+)$', 'submit_single_action', name='submit_single_action'),
   url(r'^editor/workflow/new_node/$', 'new_node', name='new_node'),
   url(r'^editor/workflow/add_node/$', 'add_node', name='add_node'),
   url(r'^editor/workflow/parameters/$', 'workflow_parameters', name='workflow_parameters'),
@@ -133,6 +134,7 @@ urlpatterns += patterns(
   url(r'^rerun_oozie_job/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_job', name='rerun_oozie_job'),
   url(r'^rerun_oozie_coord/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_coordinator', name='rerun_oozie_coord'),
   url(r'^rerun_oozie_bundle/(?P<job_id>[-\w]+)/(?P<app_path>.+?)$', 'rerun_oozie_bundle', name='rerun_oozie_bundle'),
+  url(r'^sync_coord_workflow/(?P<job_id>[-\w]+)$', 'sync_coord_workflow', name='sync_coord_workflow'),
   url(r'^manage_oozie_jobs/(?P<job_id>[-\w]+)/(?P<action>(start|suspend|resume|kill|rerun|change|ignore))$', 'manage_oozie_jobs', name='manage_oozie_jobs'),
   url(r'^bulk_manage_oozie_jobs/$', 'bulk_manage_oozie_jobs', name='bulk_manage_oozie_jobs'),
 

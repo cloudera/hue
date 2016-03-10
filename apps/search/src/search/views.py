@@ -36,7 +36,7 @@ from search.data_export import download as export_download
 from search.decorators import allow_owner_only, allow_viewer_only
 from search.management.commands import search_setup
 from search.models import Collection2, augment_solr_response, augment_solr_exception, pairwise2
-from search.search_controller import SearchController
+from search.search_controller import SearchController, can_edit_index
 
 
 LOG = logging.getLogger(__name__)
@@ -59,11 +59,19 @@ def index(request):
 
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
+  if request.method == 'GET':
+    if 'q' in request.GET:
+      query['qs'][0]['q'] = request.GET.get('q')
+    if 'qd' in request.GET:
+      query['qd'] = request.GET.get('qd')
+
+
   return render('search.mako', request, {
     'collection': collection,
-    'query': query,
+    'query': json.dumps(query),
     'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
-    'is_owner': collection_doc.doc.get().can_write(request.user)
+    'is_owner': collection_doc.doc.get().can_write(request.user),
+    'can_edit_index': can_edit_index(request.user)
   })
 
 
@@ -90,9 +98,10 @@ def new_search(request):
                    "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
                  "drops":["temp"],"klass":"card card-home card-column span10"},
          ],
-         'is_latest': LATEST.get()
+         'is_latest': LATEST.get(),
      }),
-    'is_owner': True
+    'is_owner': True,
+    'can_edit_index': can_edit_index(request.user)
   })
 
 
@@ -118,7 +127,8 @@ def browse(request, name):
          ],
          'is_latest': LATEST.get()
      }),
-     'is_owner': True
+     'is_owner': True,
+     'can_edit_index': can_edit_index(request.user)
   })
 
 
@@ -188,41 +198,10 @@ def save(request):
   return JsonResponse(response)
 
 
-@allow_owner_only
-def save_definition(request):
-  response = {'status': -1}
-
-  collection = json.loads(request.POST.get('collection', '{}')) # id
-  query = json.loads(request.POST.get('query', '{}'))
-
-  query['name'] = 'My def'
-  query['uuid'] = 'uuid'
-  query['name'] = 'My def'
-
-  if collection and query:
-    collection = Collection.objects.get(id=collection['id'])
-
-    if query['id']:
-      definition_doc = Document2.objects.get(id=collection['id'])
-    else:
-      definition_doc = Document2.objects.create(name=query['name'], uuid=query['uuid'], type='search-definition', owner=request.user, dependencies=[collection])
-      #Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
-
-    definition_doc.update_data(query)
-    definition_doc.save()
-    response['status'] = 0
-    response['id'] = definition_doc.id
-    response['message'] = _('Definition saved !')
-  else:
-    response['message'] = _('There is no collection to search.')
-
-  return JsonResponse(response)
-
-
 @allow_viewer_only
 def download(request):
   try:
-    file_format = 'csv' if 'csv' in request.POST else 'xls' if 'xls' in request.POST else 'json'
+    file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
     response = search(request)
 
     if file_format == 'json':
@@ -284,17 +263,22 @@ def admin_collection_copy(request):
   return JsonResponse(response)
 
 
-def query_suggest(request, collection_id, query=""):
-  hue_collection = Collection.objects.get(id=collection_id)
-  result = {'status': -1, 'message': 'Error'}
+def query_suggest(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = request.POST.get('query', '')
+
+  result = {'status': -1, 'message': ''}
 
   solr_query = {}
-  solr_query['collection'] = hue_collection.name
   solr_query['q'] = query
+  solr_query['dictionary'] = collection['suggest']['dictionary']
 
   try:
-    response = SolrApi(SOLR_URL.get(), request.user).suggest(solr_query, hue_collection)
-    result['message'] = response
+    response = SolrApi(SOLR_URL.get(), request.user).suggest(collection['name'], solr_query)
+    result['response'] = response
     result['status'] = 0
   except Exception, e:
     result['message'] = force_unicode(e)
@@ -311,10 +295,14 @@ def index_fields_dynamic(request):
     dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(name)
 
     result['message'] = ''
-    result['fields'] = [Collection2._make_field(name, properties)
-                        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
-    result['gridlayout_header_fields'] = [Collection2._make_gridlayout_header_field({'name': name}, True)
-                                          for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties]
+    result['fields'] = [
+        Collection2._make_field(name, properties)
+        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+    ]
+    result['gridlayout_header_fields'] = [
+        Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
+        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+    ]
     result['status'] = 0
   except Exception, e:
     result['message'] = force_unicode(e)
@@ -341,6 +329,44 @@ def get_document(request):
     else:
       result['message'] = _('This document does not have any index id.')
       result['status'] = 1
+
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
+def update_document(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  if not can_edit_index(request.user):
+    result['message'] = _('Permission to edit the document denied')
+    return JsonResponse(result)
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    document = json.loads(request.POST.get('document', '{}'))
+    doc_id = request.POST.get('id')
+
+    if document['hasChanged']:
+      edits = {
+          "id": doc_id,
+      }
+      version = None # If there is a version, use it to avoid potential concurrent update conflicts
+
+      for field in document['details']:
+        if field['hasChanged']:
+          edits[field['key']] = {"set": field['value']}
+        if field['key'] == '_version_':
+          version = field['value']
+
+      if SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version):
+        result['status'] = 0
+        result['message'] = _('Document successfully updated.')
+    else:
+      result['status'] = 0
+      result['message'] = _('Document has no modifications to change.')
 
   except Exception, e:
     result['message'] = force_unicode(e)

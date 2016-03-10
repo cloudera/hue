@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
+from desktop.conf import TIME_ZONE
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions_renderable import PopupException
@@ -39,16 +40,17 @@ from desktop.lib.view_util import format_duration_in_millis
 from desktop.log.access import access_warn
 from desktop.models import Document, Document2
 
+from hadoop.fs.hadoopfs import Hdfs
 from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
-from liboozie.submittion import Submission
-from liboozie.types import Workflow as OozieWorkflow, Coordinator as CoordinatorWorkflow, Bundle as BundleWorkflow
+from liboozie.submission2 import Submission
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateCoordinatorForm
 from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
+from oozie.utils import convert_to_server_timezone
 
 
 def get_history():
@@ -107,7 +109,12 @@ def manage_oozie_jobs(request, job_id, action):
       if request.POST.get('clear_pause_time') == 'true':
         pause_time_val = ''
 
-      params = {'value': 'endtime=%s' % (request.POST.get('end_time')) + ';'
+      end_time_val = request.POST.get('end_time')
+      if end_time_val:
+        end_time_val = convert_to_server_timezone(end_time_val, TIME_ZONE.get())
+      if pause_time_val:
+        pause_time_val = convert_to_server_timezone(pause_time_val, TIME_ZONE.get())
+      params = {'value': 'endtime=%s' % (end_time_val) + ';'
                             'pausetime=%s' % (pause_time_val) + ';'
                             'concurrency=%s' % (request.POST.get('concurrency'))}
     elif action == 'ignore':
@@ -168,8 +175,8 @@ def show_oozie_error(view_func):
       LOG.exception("Error communicating with Oozie in %s", view_func.__name__)
 
       detail = ex._headers.get('oozie-error-message', ex)
-      if 'Max retries exceeded with url' in str(detail):
-        detail = '%s: %s' % (_('The Oozie server is not running'), detail)
+      if 'Max retries exceeded with url' in str(detail) or 'Connection refused' in str(detail):
+        detail = _('The Oozie server is not running')
       raise PopupException(_('An error occurred with Oozie.'), detail=detail)
   return wraps(view_func)(decorate)
 
@@ -318,7 +325,6 @@ def list_oozie_workflow(request, job_id):
       if hue_workflow: hue_workflow.document.doc.get().can_read_or_exception(request.user)
 
       if hue_workflow:
-        workflow_graph = hue_workflow.gen_status_graph(oozie_workflow)
         full_node_list = hue_workflow.nodes
         workflow_id = hue_workflow.id
         wid = {
@@ -327,14 +333,15 @@ def list_oozie_workflow(request, job_id):
         doc = Document2.objects.get(type='oozie-workflow2', **wid)
         new_workflow = get_workflow()(document=doc)
         workflow_data = new_workflow.get_data()
-        credentials = Credentials()
       else:
         try:
-          Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
+          workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
         except Exception, e:
-          LOG.exception(_('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e)))
+          LOG.exception('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e))
+      workflow_graph = ''
+      credentials = Credentials()
     except:
-      LOG.exception("Ignoring error updating Document2 record for job_id=%s", job_id)
+      LOG.exception("Error generating full page for running workflow %s" % job_id)
   else:
     history = get_history().cross_reference_submission_history(request.user, job_id)
 
@@ -526,12 +533,27 @@ def list_oozie_workflow_action(request, action):
 
 @show_oozie_error
 def get_oozie_job_log(request, job_id):
-  oozie_job = check_job_access_permission(request, job_id)
+  oozie_api = get_oozie(request.user, api_version="v2")
+  check_job_access_permission(request, job_id)
+  kwargs = {'logfilter' : []}
+
+  if request.GET.get('format') == 'json':
+    if request.GET.get('recent'):
+      kwargs['logfilter'].extend([('recent', val) for val in request.GET.get('recent').split(':')])
+    if request.GET.get('limit'):
+      kwargs['logfilter'].extend([('limit', request.GET.get('limit'))])
+    if request.GET.get('loglevel'):
+      kwargs['logfilter'].extend([('loglevel', request.GET.get('loglevel'))])
+    if request.GET.get('text'):
+      kwargs['logfilter'].extend([('text', request.GET.get('text'))])
+
+  status_resp = oozie_api.get_job_status(job_id)
+  log = oozie_api.get_job_log(job_id, **kwargs)
 
   return_obj = {
-    'id': oozie_job.id,
-    'status':  oozie_job.status,
-    'log': oozie_job.log,
+    'id': job_id,
+    'status': status_resp['status'],
+    'log': log,
   }
 
   return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
@@ -623,6 +645,61 @@ def massaged_sla_for_json(sla, request):
 
   return massaged_sla
 
+
+@show_oozie_error
+def sync_coord_workflow(request, job_id):
+  ParametersFormSet = formset_factory(ParameterForm, extra=0)
+  job = check_job_access_permission(request, job_id)
+  check_job_edition_permission(job, request.user)
+
+  hue_coord = get_history().get_coordinator_from_config(job.conf_dict)
+  hue_wf = (hue_coord and hue_coord.workflow) or get_history().get_workflow_from_config(job.conf_dict)
+  wf_application_path = job.conf_dict.get('wf_application_path') and Hdfs.urlsplit(job.conf_dict['wf_application_path'])[2] or ''
+  coord_application_path = job.conf_dict.get('oozie.coord.application.path') and Hdfs.urlsplit(job.conf_dict['oozie.coord.application.path'])[2] or ''
+  properties = hue_coord and hue_coord.properties and dict([(param['name'], param['value']) for param in hue_coord.properties]) or None
+
+  if request.method == 'POST':
+    params_form = ParametersFormSet(request.POST)
+    if params_form.is_valid():
+      mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+
+      # Update workflow params in coordinator
+      hue_coord.clear_workflow_params()
+      properties = dict([(param['name'], param['value']) for param in hue_coord.properties])
+
+      # Deploy WF XML
+      submission = Submission(user=request.user, job=hue_wf, fs=request.fs, jt=request.jt, properties=properties)
+      submission._create_file(wf_application_path, hue_wf.XML_FILE_NAME, hue_wf.to_xml(mapping=properties), do_as=True)
+
+      # Deploy Coordinator XML
+      job.conf_dict.update(mapping)
+      submission = Submission(user=request.user, job=hue_coord, fs=request.fs, jt=request.jt, properties=job.conf_dict, oozie_id=job.id)
+      submission._create_file(coord_application_path, hue_coord.XML_FILE_NAME, hue_coord.to_xml(mapping=job.conf_dict), do_as=True)
+      # Server picks up deployed Coordinator XML changes after running 'update' action
+      submission.update_coord()
+
+      request.info(_('Successfully updated Workflow definition'))
+      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+    else:
+      request.error(_('Invalid submission form: %s' % params_form.errors))
+  else:
+    new_params = hue_wf and hue_wf.find_all_parameters() or []
+    new_params = dict([(param['name'], param['value']) for param in new_params])
+
+    # Set previous values
+    if properties:
+      new_params = dict([(key, properties[key]) if key in properties.keys() else (key, new_params[key]) for key, value in new_params.iteritems()])
+
+    initial_params = ParameterForm.get_initial_params(new_params)
+    params_form = ParametersFormSet(initial=initial_params)
+
+  popup = render('editor2/submit_job_popup.mako', request, {
+             'params_form': params_form,
+             'name': _('Job'),
+             'header': _('Sync Workflow definition?'),
+             'action': reverse('oozie:sync_coord_workflow', kwargs={'job_id': job_id})
+           }, force_template=True).content
+  return JsonResponse(popup, safe=False)
 
 @show_oozie_error
 def rerun_oozie_job(request, job_id, app_path):
@@ -806,6 +883,7 @@ def submit_external_job(request, application_path):
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       application_name = os.path.basename(application_path)
       application_class = Bundle if application_name == 'bundle.xml' else Coordinator if application_name == 'coordinator.xml' else get_workflow()
       mapping[application_class.get_application_path_key()] = application_path
@@ -835,7 +913,8 @@ def submit_external_job(request, application_path):
   popup = render('editor/submit_job_popup.mako', request, {
                    'params_form': params_form,
                    'name': _('Job'),
-                   'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path})
+                   'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path}),
+                   'show_dryrun': os.path.basename(application_path) != 'bundle.xml'
                  }, force_template=True).content
   return JsonResponse(popup, safe=False)
 
@@ -994,7 +1073,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'frequency': hasattr(job, 'frequency') and Coordinator.CRON_MAPPING.get(job.frequency, job.frequency) or None,
         'timeUnit': hasattr(job, 'timeUnit') and job.timeUnit or None,
         'parentUrl': hasattr(job, 'parentId') and job.parentId and get_link(job.parentId) or '',
-        'submittedManually': hasattr(job, 'parentId') and _submitted_manually(job, user)
+        'submittedManually': hasattr(job, 'parentId') and (job.parentId is None or 'C@' not in job.parentId)
       }
       jobs.append(massaged_job)
 
@@ -1028,8 +1107,7 @@ def check_job_access_permission(request, job_id, **kwargs):
       msg = _("Error accessing Oozie job %s.") % (job_id,)
       LOG.exception(msg)
 
-      raise PopupException(msg,
-                           detail=ex._headers['oozie-error-message', ''])
+      raise PopupException(msg, detail=ex._headers['oozie-error-message', ''])
 
   if request.user.is_superuser \
       or oozie_job.user == request.user.username \
@@ -1057,27 +1135,3 @@ def has_job_edition_permission(oozie_job, user):
 
 def has_dashboard_jobs_access(user):
   return user.is_superuser or user.has_hue_permission(action="dashboard_jobs_access", app=DJANGO_APPS[0])
-
-
-def _submitted_manually(job, user):
-  parent_id = job.parentId
-  if not parent_id:
-    return True
-  if 'C@' in parent_id:
-    return False
-
-  oozie_api = get_oozie(user)
-  if parent_id.endswith('W'):
-    get_job = oozie_api.get_job
-  elif parent_id.endswith('C'):
-    get_job = oozie_api.get_coordinator
-  else:
-    get_job = oozie_api.get_bundle
-
-  try:
-    job = get_job(parent_id)
-  except:
-    LOG.exception('failed to get job')
-    return True
-
-  return _submitted_manually(job, user)

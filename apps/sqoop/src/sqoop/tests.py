@@ -15,48 +15,35 @@
 # limitations under the License.
 
 import logging
+import json
+
+from django.contrib.auth.models import User
+from nose.tools import assert_true, assert_equal
+from nose.plugins.skip import SkipTest
+
+from django.core.urlresolvers import reverse
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_to_group, grant_access
 
 from sqoop.client.link import Link
 from sqoop.client.job import Job
 from sqoop.test_base import SqoopServerProvider
 
-from nose.tools import assert_true, assert_equal
-from nose.plugins.skip import SkipTest
-
 
 LOG = logging.getLogger(__name__)
 
 
-LINK_CONFIG_VALUES = {
-  'linkConfig.jdbcDriver': 'org.apache.derby.jdbc.EmbeddedDriver',
-  'linkConfig.String': 'jdbc%3Aderby%3A%2Ftmp%2Ftest',
-  'linkConfig.username': 'abe',
-  'linkConfig.password': 'test',
-  'linkConfig.jdbcProperties': None
-}
-
-FROM_JOB_CONFIG_VALUES = {
-  'fromJobConfig.schemaName': None,
-  'fromJobConfig.tableName': 'test',
-  'fromJobConfig.sql': None,
-  'fromJobConfig.columns': 'name',
-  'fromJobConfig.partitionColumn': 'id',
-  'fromJobConfig.boundaryQuery': None,
-  'fromJobConfig.allowNullValueInPartitionColumn': None
-}
-
-TO_JOB_CONFIG_VALUES = {
-  'toJobConfig.outputFormat': 'TEXT_FILE',
-  'toJobConfig.outputDirectory': '/tmp/test.out',
-  'toJobConfig.storageType': 'HDFS'
-}
-
-DRIVER_CONFIG_VALUES = {
-  'throttlingConfig.numExtractor': '3',
-  'throttlingConfig.numLoaders': '3'
-}
-
 class TestSqoopServerBase(SqoopServerProvider):
+
+  @classmethod
+  def setup_class(cls):
+    SqoopServerProvider.setup_class()
+
+    cls.client = make_logged_in_client(username='test', is_superuser=False)
+    cls.user = User.objects.get(username='test')
+    add_to_group('test')
+    grant_access("test", "test", "sqoop")
+
   def create_link(self, name='test1', connector_id=1):
     link = Link(name, connector_id)
     link.linkConfig = self.client.get_connectors()[0].link_config
@@ -109,9 +96,25 @@ class TestSqoopServerBase(SqoopServerProvider):
     for obj in objects:
       self.delete_sqoop_object(obj)
 
+
+class TestWithSqoopServer(TestSqoopServerBase):
+
+  def test_list_jobs(self):
+
+    resp = self.client.get(reverse('sqoop:jobs'))
+    content = json.loads(resp.content)
+
+    assert_true('jobs' in content, content)
+
+
 class TestSqoopClientLinks(TestSqoopServerBase):
+
+  def setUp(self):
+    raise SkipTest() # These tests are outdated
+
   def test_link(self):
-    raise SkipTest
+    link3 = None
+
     try:
       # Create
       link = self.create_link(name='link1')
@@ -125,22 +128,28 @@ class TestSqoopClientLinks(TestSqoopServerBase):
       link3 = self.client.get_link(link2.id)
       assert_true(link3.id)
       assert_equal(link3.name, link3.name)
-    except:
-      LOG.exception('failed to test link')
-      self.client.delete_link(link3)
+    finally:
+      if link3:
+        self.client.delete_link(link3)
 
   def test_get_links(self):
-    raise SkipTest
+    link = None
+
     try:
       link = self.create_link(name='link2')
       links = self.client.get_links()
       assert_true(len(links) > 0)
     finally:
-      self.client.delete_link(link)
+      if link:
+        self.client.delete_link(link)
+
 
 class TestSqoopClientJobs(TestSqoopServerBase):
+
+  def setUp(self):
+    raise SkipTest() # These tests are outdated
+
   def test_job(self):
-    raise SkipTest
     removable = []
     # Create
     from_link = self.create_link(name='link3from')
@@ -166,12 +175,11 @@ class TestSqoopClientJobs(TestSqoopServerBase):
       self.delete_sqoop_objects(removable)
 
   def test_get_jobs(self):
-    raise SkipTest
     removable = []
     from_link = self.create_link(name='link4from')
     to_link = self.create_link(name='link4to')
-    try:
 
+    try:
       removable.append(from_link)
       removable.append(to_link)
 
@@ -183,3 +191,33 @@ class TestSqoopClientJobs(TestSqoopServerBase):
       assert_true(len(jobs) > 0)
     finally:
       self.delete_sqoop_objects(removable)
+
+
+LINK_CONFIG_VALUES = {
+  'linkConfig.jdbcDriver': 'org.apache.derby.jdbc.EmbeddedDriver',
+  'linkConfig.String': 'jdbc%3Aderby%3A%2Ftmp%2Ftest',
+  'linkConfig.username': 'abe',
+  'linkConfig.password': 'test',
+  'linkConfig.jdbcProperties': None
+}
+
+FROM_JOB_CONFIG_VALUES = {
+  'fromJobConfig.schemaName': None,
+  'fromJobConfig.tableName': 'test',
+  'fromJobConfig.sql': None,
+  'fromJobConfig.columns': 'name',
+  'fromJobConfig.partitionColumn': 'id',
+  'fromJobConfig.boundaryQuery': None,
+  'fromJobConfig.allowNullValueInPartitionColumn': None
+}
+
+TO_JOB_CONFIG_VALUES = {
+  'toJobConfig.outputFormat': 'TEXT_FILE',
+  'toJobConfig.outputDirectory': '/tmp/test.out',
+  'toJobConfig.storageType': 'HDFS'
+}
+
+DRIVER_CONFIG_VALUES = {
+  'throttlingConfig.numExtractor': '3',
+  'throttlingConfig.numLoaders': '3'
+}

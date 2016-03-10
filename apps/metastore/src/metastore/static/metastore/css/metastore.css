@@ -17,12 +17,12 @@
 */
 
 .hueBreadcrumb {
-  padding: 12px 14px;
+  /*padding: 12px 14px;*/
 }
 
 .hueBreadcrumbBar {
   padding: 0;
-  margin: 12px;
+  /*margin: 12px;*/
 }
 
 .hueBreadcrumbBar a {
@@ -43,6 +43,84 @@
   border-bottom: none !important;
 }
 
-.sampleTable td, .sampleTable th {
+.sampleTable td, .sampleTable th, .table-nowrap td, .table-nowrap th {
   white-space: nowrap;
+}
+
+h2.card-heading {
+  border-bottom: 1px solid #e5e5e5!important;
+  font-size: 12px!important;
+  font-weight: bold!important;
+}
+
+.filter-box {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding: 4px;
+  background-color: #F5F5F5;
+}
+
+.filter-box a.pull-right {
+  margin: 4px;
+}
+
+.filter-box select, .filter-box input {
+  margin-bottom: 0;
+}
+
+.add-filter {
+  margin: 5px;
+  float: left;
+}
+
+.checkbox.inline.pulled {
+  margin-right: 10px;
+  padding-top: 1px;
+}
+
+.checkbox.inline.pulled input {
+  margin-left: 0;
+  margin-right: 4px;
+}
+
+.metastore-main {
+  padding: 20px;
+}
+
+.metastore-main h3 {
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.empty-header-col,
+.metastore-main h4 {
+  font-weight: bold;
+  color: #999;
+  font-size: 14px;
+  text-transform: uppercase;
+  padding-left: 4px;
+  border-bottom: 1px solid #DDD;
+  padding-bottom: 3px;
+}
+
+.tile {
+  margin-bottom: 20px;
+  min-height: 124px;
+}
+
+.properties-table {
+  width: 100%;
+}
+
+.properties-table td {
+  padding-top: 5px;
+}
+
+.property-name {
+  padding-left: 10px;
+}
+
+.empty-message {
+  padding: 10px;
 }

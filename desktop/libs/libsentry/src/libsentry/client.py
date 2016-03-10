@@ -24,7 +24,7 @@ from sentry_policy_service.ttypes import TListSentryRolesRequest, TListSentryPri
     TDropSentryRoleRequest, TAlterSentryRoleGrantPrivilegeRequest, TSentryPrivilege, TAlterSentryRoleGrantPrivilegeResponse, \
     TAlterSentryRoleRevokePrivilegeRequest, TAlterSentryRoleAddGroupsRequest, TSentryGroup, TAlterSentryRoleDeleteGroupsRequest, \
     TListSentryPrivilegesForProviderRequest, TSentryActiveRoleSet, TSentryAuthorizable, TDropPrivilegesRequest, TRenamePrivilegesRequest, \
-    TListSentryPrivilegesByAuthRequest
+    TListSentryPrivilegesByAuthRequest, TSentryConfigValueRequest
 
 from libsentry.sentry_site import get_sentry_server_authentication,\
   get_sentry_server_principal
@@ -105,15 +105,25 @@ class SentryClient(object):
     return self.client.drop_sentry_role(request)
 
 
-  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege):
-    privilege = TSentryPrivilege(**tSentryPrivilege)
-    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
+  def alter_sentry_role_grant_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
+    if tSentryPrivilege is not None:
+      tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
+
+    if tSentryPrivileges is not None:
+      tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
+
+    request = TAlterSentryRoleGrantPrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
     return self.client.alter_sentry_role_grant_privilege(request)
 
 
-  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege):
-    privilege = TSentryPrivilege(**tSentryPrivilege)
-    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=privilege)
+  def alter_sentry_role_revoke_privilege(self, roleName, tSentryPrivilege, tSentryPrivileges):
+    if tSentryPrivilege is not None:
+      tSentryPrivilege = TSentryPrivilege(**tSentryPrivilege)
+
+    if tSentryPrivileges is not None:
+      tSentryPrivileges = [TSentryPrivilege(**tSentryPrivilege) for tSentryPrivilege in tSentryPrivileges]
+
+    request = TAlterSentryRoleRevokePrivilegeRequest(requestorUserName=self.username, roleName=roleName, privilege=tSentryPrivilege, privileges=tSentryPrivileges)
     return self.client.alter_sentry_role_revoke_privilege(request)
 
 
@@ -182,3 +192,9 @@ class SentryClient(object):
     request = TListSentryPrivilegesByAuthRequest(requestorUserName=self.username, authorizableSet=authorizableSet, groups=groups, roleSet=roleSet)
     return self.client.list_sentry_privileges_by_authorizable(request)
 
+
+  def get_sentry_config_value(self, propertyName, defaultValue=None):
+    # Note there is no requestorUserName in Sentry API
+
+    request = TSentryConfigValueRequest(propertyName=propertyName, defaultValue=defaultValue)
+    return self.client.get_sentry_config_value(request)

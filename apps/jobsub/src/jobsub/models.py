@@ -20,9 +20,10 @@ import logging
 from django.db import models
 from django.core import urlresolvers
 from django.contrib.auth.models import User
-from jobsub.parameterization import find_parameters, bind_parameters
+from desktop.lib.parameterization import find_parameters, bind_parameters
 
 from django.utils.translation import ugettext_lazy as _
+
 
 LOG = logging.getLogger(__name__)
 

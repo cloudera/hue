@@ -26,4 +26,4 @@ ${ commonheader(title, "useradmin", user) | n,unicode }
 		<input type="submit" value="${_('Yes')}">
 	</form>
 </div>
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

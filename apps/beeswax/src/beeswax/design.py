@@ -27,9 +27,10 @@ import urlparse
 
 import django.http
 from django import forms
+from django.forms import ValidationError
+from django.utils.translation import ugettext as _
 
 from desktop.lib.django_forms import BaseSimpleFormSet, MultiForm
-from desktop.lib.django_mako import render_to_string
 from hadoop.cluster import get_hdfs
 
 
@@ -38,16 +39,27 @@ LOG = logging.getLogger(__name__)
 SERIALIZATION_VERSION = '0.4.1'
 
 
-def hql_query(hql, database='default', query_type=None):
-  data_dict = json.loads('{"query": {"email_notify": false, "query": null, "type": 0, "is_parameterized": true, "database": "default"}, '
-                               '"functions": [], "VERSION": "0.4.1", "file_resources": [], "settings": []}')
+def hql_query(hql, database='default', query_type=None, settings=None, file_resources=None, functions=None):
+  data_dict = HQLdesign.get_default_data_dict()
+
   if not (isinstance(hql, str) or isinstance(hql, unicode)):
     raise Exception('Requires a SQL text query of type <str>, <unicode> and not %s' % type(hql))
 
   data_dict['query']['query'] = strip_trailing_semicolon(hql)
   data_dict['query']['database'] = database
+
   if query_type:
     data_dict['query']['type'] = query_type
+
+  if settings is not None and HQLdesign.validate_properties('settings', settings, HQLdesign._SETTINGS_ATTRS):
+    data_dict['settings'] = settings
+
+  if file_resources is not None and HQLdesign.validate_properties('file resources', file_resources, HQLdesign._FILE_RES_ATTRS):
+    data_dict['file_resources'] = file_resources
+
+  if functions is not None and HQLdesign.validate_properties('functions', functions, HQLdesign._FUNCTIONS_ATTRS):
+    data_dict['functions'] = functions
+
   hql_design = HQLdesign()
   hql_design._data_dict = data_dict
 
@@ -80,11 +92,9 @@ class HQLdesign(object):
       if query_type is not None:
         self._data_dict['query']['type'] = query_type
 
-  def dumps(self):
-    """Returns the serialized form of the design in a string"""
-    dic = self._data_dict.copy()
-    dic['VERSION'] = SERIALIZATION_VERSION
-    return json.dumps(dic)
+  @property
+  def database(self):
+    return self._data_dict['query']['database']
 
   @property
   def hql_query(self):
@@ -100,47 +110,40 @@ class HQLdesign(object):
 
   @property
   def settings(self):
-    return list(self._data_dict['settings'])
+    return list(self._data_dict.get('settings', []))
 
   @property
   def file_resources(self):
-    return list(self._data_dict['file_resources'])
+    return list(self._data_dict.get('file_resources', []))
 
   @property
   def functions(self):
-    return list(self._data_dict['functions'])
+    return list(self._data_dict.get('functions', []))
 
-  def get_configuration_statements(self):
-    configuration = []
+  @property
+  def statement_count(self):
+    return len(self.statements)
 
-    for f in self.file_resources:
-      if not urlparse.urlsplit(f['path']).scheme:
-        scheme = get_hdfs().fs_defaultfs
-      else:
-        scheme = ''
-      configuration.append(render_to_string("hql_resource.mako", dict(type=f['type'], path=f['path'], scheme=scheme)))
+  @property
+  def statements(self):
+    hql_query = strip_trailing_semicolon(self.hql_query)
+    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
-    for f in self.functions:
-      configuration.append(render_to_string("hql_function.mako", f))
-
-    return configuration
-
-  def get_query_dict(self):
-    # We construct the mform to use its structure and prefix. We don't actually bind data to the forms.
-    from beeswax.forms import QueryForm
-    mform = QueryForm()
-    mform.bind()
-
-    res = django.http.QueryDict('', mutable=True)
-    res.update(denormalize_form_dict(
-                self._data_dict['query'], mform.query, HQLdesign._QUERY_ATTRS))
-    res.update(denormalize_formset_dict(
-                self._data_dict['settings'], mform.settings, HQLdesign._SETTINGS_ATTRS))
-    res.update(denormalize_formset_dict(
-                self._data_dict['file_resources'], mform.file_resources, HQLdesign._FILE_RES_ATTRS))
-    res.update(denormalize_formset_dict(
-                self._data_dict['functions'], mform.functions, HQLdesign._FUNCTIONS_ATTRS))
-    return res
+  @staticmethod
+  def get_default_data_dict():
+    return {
+      'query': {
+        'email_notify': False,
+        'query': None,
+        'type': 0,
+        'is_parameterized': True,
+        'database': 'default'
+      },
+      'functions': [],
+      'VERSION': SERIALIZATION_VERSION,
+      'file_resources': [],
+      'settings': []
+    }
 
   @staticmethod
   def loads(data):
@@ -161,20 +164,66 @@ class HQLdesign(object):
     design._data_dict = dic
     return design
 
+  @staticmethod
+  def validate_properties(property_type, properties, req_attr_list):
+    """
+    :param property_type: 'Settings', 'File Resources', or 'Functions'
+    :param properties: list of properties as dict
+    :param req_attr_list: list of attributes that are required keys for each dict item
+    """
+    if isinstance(properties, list) and all(isinstance(item, dict) for item in properties):
+      for item in properties:
+        if not all(attr in item for attr in req_attr_list):
+          raise ValidationError(_("Invalid %s, missing required attributes: %s.") % (property_type, ', '.join(req_attr_list)))
+    else:
+      raise ValidationError(_('Invalid settings, expected list of dict items.'))
+    return True
+
+  def dumps(self):
+    """Returns the serialized form of the design in a string"""
+    dic = self._data_dict.copy()
+    dic['VERSION'] = SERIALIZATION_VERSION
+    return json.dumps(dic)
+
+  def get_configuration_statements(self):
+    configuration = []
+
+    for f in self.file_resources:
+      if not urlparse.urlsplit(f['path']).scheme:
+        scheme = get_hdfs().fs_defaultfs
+      else:
+        scheme = ''
+      configuration.append('ADD %(type)s %(scheme)s%(path)s' %
+                           {'type': f['type'].upper(), 'path': f['path'], 'scheme': scheme})
+
+    for f in self.functions:
+      configuration.append("CREATE TEMPORARY FUNCTION %(name)s AS '%(class_name)s'" %
+                           {'name': f['name'], 'class_name': f['class_name']})
+
+    return configuration
+
+  def get_query_dict(self):
+    # We construct the mform to use its structure and prefix. We don't actually bind data to the forms.
+    from beeswax.forms import QueryForm
+    mform = QueryForm()
+    mform.bind()
+
+    res = django.http.QueryDict('', mutable=True)
+    res.update(denormalize_form_dict(
+                self._data_dict['query'], mform.query, HQLdesign._QUERY_ATTRS))
+    res.update(denormalize_formset_dict(
+                self._data_dict['settings'], mform.settings, HQLdesign._SETTINGS_ATTRS))
+    res.update(denormalize_formset_dict(
+                self._data_dict['file_resources'], mform.file_resources, HQLdesign._FILE_RES_ATTRS))
+    res.update(denormalize_formset_dict(
+                self._data_dict['functions'], mform.functions, HQLdesign._FUNCTIONS_ATTRS))
+    return res
+
   def get_query(self):
     return self._data_dict["query"]
 
-  @property
-  def statement_count(self):
-    return len(self.statements)
-
   def get_query_statement(self, n=0):
     return self.statements[n]
-
-  @property
-  def statements(self):
-    hql_query = strip_trailing_semicolon(self.hql_query)
-    return [strip_trailing_semicolon(statement.strip()) for statement in split_statements(hql_query)]
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.__dict__ == other.__dict__)

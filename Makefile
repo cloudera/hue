@@ -98,6 +98,8 @@ default:
 	@echo '  docs        : Build documentation'
 	@echo '  prod        : Generate a tar file for production distribution'
 	@echo '  locales     : Extract strings and update dictionary of each locale'
+	@echo '  theme       : Builds the Hue Bootstrap Theme'
+	@echo '  ace         : Builds the Ace Editor tool'
 # END DEV ONLY >>>>
 
 .PHONY: all
@@ -129,7 +131,7 @@ virtual-env: $(BLD_DIR_ENV)/stamp
 $(BLD_DIR_ENV)/stamp:
 	@echo "--- Creating virtual environment at $(BLD_DIR_ENV)"
 	$(SYS_PYTHON) $(VIRTUAL_BOOTSTRAP) \
-		$(VIRTUALENV_OPTS) --no-site-packages $(BLD_DIR_ENV)
+		$(VIRTUALENV_OPTS) --system-site-packages $(BLD_DIR_ENV)
 	@touch $@
 	@echo "--- $(BLD_DIR_ENV) ready"
 
@@ -216,6 +218,28 @@ install-env:
 locales:
 	@$(MAKE) -C desktop compile-locales
 	@$(MAKE) -C apps compile-locales
+# END DEV ONLY >>>>
+
+
+###################################
+# Hue Bootstrap Theme
+###################################
+
+# <<<< DEV ONLY
+.PHONY: theme
+theme:
+	@cd tools/bootplus && make
+# END DEV ONLY >>>>
+
+
+###################################
+# Ace Editor
+###################################
+
+# <<<< DEV ONLY
+.PHONY: ace
+ace:
+	@cd tools/ace-editor && ./hue-ace.sh
 # END DEV ONLY >>>>
 
 

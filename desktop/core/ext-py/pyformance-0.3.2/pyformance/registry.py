@@ -137,10 +137,12 @@ class MetricsRegistry(object):
             histogram = self._histograms[key]
             snapshot = histogram.get_snapshot()
             res = {"avg": histogram.get_mean(),
+                   "sum": histogram.get_sum(),
                    "count": histogram.get_count(),
                    "max": histogram.get_max(),
                    "min": histogram.get_min(),
                    "std_dev": histogram.get_stddev(),
+                   "median": snapshot.get_median(),
                    "75_percentile": snapshot.get_75th_percentile(),
                    "95_percentile": snapshot.get_95th_percentile(),
                    "99_percentile": snapshot.get_99th_percentile(),
@@ -173,6 +175,7 @@ class MetricsRegistry(object):
                    "5m_rate": timer.get_five_minute_rate(),
                    "1m_rate": timer.get_one_minute_rate(),
                    "mean_rate": timer.get_mean_rate(),
+                   "median": snapshot.get_median(),
                    "75_percentile": snapshot.get_75th_percentile(),
                    "95_percentile": snapshot.get_95th_percentile(),
                    "99_percentile": snapshot.get_99th_percentile(),

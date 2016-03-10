@@ -26,7 +26,11 @@
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
+    % if header:
+      <h3>${header}</h3>
+    % else:
+      <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
+    % endif
   </div>
   <div class="modal-body">
 
@@ -40,7 +44,7 @@
           % endfor
 
           <div class="control-group"
-            % if form['name'].form.initial.get('name') == 'oozie.use.system.libpath':
+            % if form['name'].form.initial.get('name').startswith('oozie.'):
                 style="display: none"
             % endif
           >
@@ -69,6 +73,12 @@
          % endfor
       </div>
       <div class="clearfix"></div>
+
+      % if show_dryrun:
+         <label class="checkbox" style="display: inline-block; margin-top: 5px">
+           <input type="checkbox" name="dryrun_checkbox" /> ${ _('Do a dryrun before submitting the job?') }
+         </label>
+      % endif
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
@@ -119,7 +129,7 @@
   });
 
   $(".now-link").on("click", function(){
-    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm") + 'Z');
+    $(this).parents(".controls").find("input[type='text']").val(moment().format("YYYY-MM-DD[T]HH:mm"));
   });
 
   $(".calendar-link").on("click", function(){

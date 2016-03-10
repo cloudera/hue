@@ -18,28 +18,126 @@
 
 package com.cloudera.hue.livy.repl
 
-import com.cloudera.hue.livy.Utils
-import com.cloudera.hue.livy.sessions.{Kind, State}
-import org.json4s.JValue
+import java.util.concurrent.Executors
+
+import com.cloudera.hue.livy.{Utils, Logging}
+import com.cloudera.hue.livy.sessions._
+import org.json4s.JsonDSL._
+import org.json4s.{JValue, DefaultFormats, Extraction}
 
 import _root_.scala.concurrent.duration.Duration
-import _root_.scala.concurrent.{Future, TimeoutException}
+import _root_.scala.concurrent.{TimeoutException, ExecutionContext, Future}
 
-trait Session {
-  def kind: Kind
+object Session {
+  val STATUS = "status"
+  val OK = "ok"
+  val ERROR = "error"
+  val EXECUTION_COUNT = "execution_count"
+  val DATA = "data"
+  val ENAME = "ename"
+  val EVALUE = "evalue"
+  val TRACEBACK = "traceback"
 
-  def state: State
+  def apply(interpreter: Interpreter): Session = new Session(interpreter)
+}
 
-  def execute(code: String): Statement
+class Session(interpreter: Interpreter)
+  extends Logging
+{
+  import Session._
 
-  def history: IndexedSeq[Statement]
+  private implicit val executor = ExecutionContext.fromExecutorService(Executors.newSingleThreadExecutor())
+  private implicit val formats = DefaultFormats
 
-  def close(): Unit
+  private var _state: SessionState = SessionState.NotStarted()
+  private var _history = IndexedSeq[Statement]()
+
+  Future {
+    _state = SessionState.Starting()
+    interpreter.start()
+    _state = SessionState.Idle()
+  }.onFailure { case _ =>
+    _state = SessionState.Error(System.currentTimeMillis())
+  }
+
+  def kind: String = interpreter.kind
+
+  def state = _state
+
+  def history: IndexedSeq[Statement] = _history
+
+  def execute(code: String): Statement = synchronized {
+    val executionCount = _history.length
+    val statement = Statement(executionCount, Future { executeCode(executionCount, code) })
+    _history :+= statement
+    statement
+  }
+
+  def close(): Unit = {
+    executor.shutdown()
+    interpreter.close()
+  }
+
+  def clearHistory() = synchronized {
+    _history = IndexedSeq()
+  }
 
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  final def waitForStateChange(oldState: State, atMost: Duration) = {
+  def waitForStateChange(oldState: SessionState, atMost: Duration) = {
     Utils.waitUntil({ () => state != oldState }, atMost)
+  }
+
+  private def executeCode(executionCount: Int, code: String) = {
+    _state = SessionState.Busy()
+
+    try {
+
+      interpreter.execute(code) match {
+        case Interpreter.ExecuteSuccess(data) =>
+          _state = SessionState.Idle()
+
+          (STATUS -> OK) ~
+          (EXECUTION_COUNT -> executionCount) ~
+          (DATA -> data)
+        case Interpreter.ExecuteIncomplete() =>
+          _state = SessionState.Idle()
+
+          (STATUS -> ERROR) ~
+          (EXECUTION_COUNT -> executionCount) ~
+          (ENAME -> "Error") ~
+          (EVALUE -> "incomplete statement") ~
+          (TRACEBACK -> List())
+        case Interpreter.ExecuteError(ename, evalue, traceback) =>
+          _state = SessionState.Idle()
+
+          (STATUS -> ERROR) ~
+          (EXECUTION_COUNT -> executionCount) ~
+          (ENAME -> ename) ~
+          (EVALUE -> evalue) ~
+          (TRACEBACK -> traceback)
+        case Interpreter.ExecuteAborted(message) =>
+          _state = SessionState.Error(System.currentTimeMillis())
+
+          (STATUS -> ERROR) ~
+          (EXECUTION_COUNT -> executionCount) ~
+          (ENAME -> "Error") ~
+          (EVALUE -> f"Interpreter died:\n$message") ~
+          (TRACEBACK -> List())
+      }
+    } catch {
+      case e: Throwable =>
+        error("Exception when executing code", e)
+
+        _state = SessionState.Idle()
+
+
+        (STATUS -> ERROR) ~
+        (EXECUTION_COUNT -> executionCount) ~
+        (ENAME -> f"Internal Error: ${e.getClass.getName}") ~
+        (EVALUE -> e.getMessage) ~
+        (TRACEBACK -> List())
+    }
   }
 }
 

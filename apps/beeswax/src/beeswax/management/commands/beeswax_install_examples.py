@@ -24,15 +24,14 @@ from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 
-from hadoop import cluster
-
 from desktop.lib.exceptions_renderable import PopupException
-from useradmin.models import install_sample_user
-from desktop.models import Document
+from desktop.conf import USE_NEW_EDITOR
+from desktop.models import Directory, Document, Document2, Document2Permission, import_saved_beeswax_query
+from hadoop import cluster
+from useradmin.models import get_default_user_group, install_sample_user
 
 import beeswax.conf
-
-from beeswax.models import SavedQuery, IMPALA
+from beeswax.models import SavedQuery, HQL, IMPALA
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config, QueryServerException
@@ -102,10 +101,12 @@ class Command(BaseCommand):
     design_list = json.load(design_file)
     design_file.close()
 
+    # Filter design list to app-specific designs
+    app_type = HQL if app_name == 'beeswax' else IMPALA
+    design_list = filter(lambda d: int(d['type']) == app_type, design_list)
+
     for design_dict in design_list:
-      if app_name == 'impala':
-        design_dict['type'] = IMPALA
-      design = SampleDesign(design_dict)
+      design = SampleQuery(design_dict)
       try:
         design.install(django_user)
       except Exception, ex:
@@ -118,22 +119,34 @@ class SampleTable(object):
   """
   def __init__(self, data_dict, app_name):
     self.name = data_dict['table_name']
-    self.filename = data_dict['data_file']
+    if 'partition_files' in data_dict:
+      self.partition_files = data_dict['partition_files']
+    else:
+      self.partition_files = None
+      self.filename = data_dict['data_file']
     self.hql = data_dict['create_hql']
     self.query_server = get_query_server_config(app_name)
     self.app_name = app_name
 
     # Sanity check
     self._data_dir = beeswax.conf.LOCAL_EXAMPLES_DATA_DIR.get()
-    self._contents_file = os.path.join(self._data_dir, self.filename)
-    if not os.path.isfile(self._contents_file):
-      msg = _('Cannot find table data in "%(file)s".') % {'file': self._contents_file}
-      LOG.error(msg)
-      raise ValueError(msg)
+    if self.partition_files:
+      for partition_spec, filename in self.partition_files.items():
+        filepath = os.path.join(self._data_dir, filename)
+        self.partition_files[partition_spec] = filepath
+        self._check_file_contents(filepath)
+    else:
+      self._contents_file = os.path.join(self._data_dir, self.filename)
+      self._check_file_contents(self._contents_file)
+
 
   def install(self, django_user):
     if self.create(django_user):
-      self.load(django_user)
+      if self.partition_files:
+        for partition_spec, filepath in self.partition_files.items():
+          self.load_partition(django_user, partition_spec, filepath)
+      else:
+        self.load(django_user)
 
   def create(self, django_user):
     """
@@ -145,7 +158,7 @@ class SampleTable(object):
     try:
       # Already exists?
       if self.app_name == 'impala':
-        db.invalidate_tables('default', [self.name])
+        db.invalidate(database='default', flush_all=False)
       db.get_table('default', self.name)
       msg = _('Table "%(table)s" already exists.') % {'table': self.name}
       LOG.error(msg)
@@ -164,6 +177,25 @@ class SampleTable(object):
         LOG.error(msg)
         raise InstallException(msg)
 
+  def load_partition(self, django_user, partition_spec, filepath):
+    """
+    Upload data found at filepath to HDFS home of user, the load intto a specific partition
+    """
+    LOAD_PARTITION_HQL = \
+      """
+      ALTER TABLE %(tablename)s ADD PARTITION(%(partition_spec)s) LOCATION '%(filepath)s'
+      """
+
+    partition_dir = self._get_partition_dir(partition_spec)
+    hdfs_root_destination = self._get_hdfs_root_destination(django_user, subdir=partition_dir)
+    filename = filepath.split('/')[-1]
+    hdfs_file_destination = self._upload_to_hdfs(django_user, filepath, hdfs_root_destination, filename)
+
+    hql = LOAD_PARTITION_HQL % {'tablename': self.name, 'partition_spec': partition_spec, 'filepath': hdfs_root_destination}
+    LOG.info('Running load query: %s' % hql)
+    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+
+
   def load(self, django_user):
     """
     Upload data to HDFS home of user then load (aka move) it into the Hive table (in the Hive metastore in HDFS).
@@ -174,6 +206,30 @@ class SampleTable(object):
       '%(filename)s' OVERWRITE INTO TABLE %(tablename)s
       """
 
+    hdfs_root_destination = self._get_hdfs_root_destination(django_user)
+    hdfs_file_destination = self._upload_to_hdfs(django_user, self._contents_file, hdfs_root_destination)
+
+    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_file_destination}
+    LOG.info('Running load query: %s' % hql)
+    self._load_data_to_table(django_user, hql, hdfs_file_destination)
+
+
+  def _check_file_contents(self, filepath):
+    if not os.path.isfile(filepath):
+      msg = _('Cannot find table data in "%(file)s".') % {'file': filepath}
+      LOG.error(msg)
+      raise ValueError(msg)
+
+
+  def _get_partition_dir(self, partition_spec):
+    parts = partition_spec.split(',')
+    last_part = parts[-1]
+    part_value = last_part.split('=')[-1]
+    part_dir = part_value.strip("'").replace('-', '_')
+    return part_dir
+
+
+  def _get_hdfs_root_destination(self, django_user, subdir=None):
     fs = cluster.get_hdfs()
 
     if self.app_name == 'impala':
@@ -181,18 +237,34 @@ class SampleTable(object):
       from impala.conf import IMPERSONATION_ENABLED
       if not IMPERSONATION_ENABLED.get():
         tmp_public = '/tmp/public_hue_examples'
+        if subdir:
+          tmp_public += '/%s' % subdir
         fs.do_as_user(django_user, fs.mkdir, tmp_public, '0777')
         hdfs_root_destination = tmp_public
     else:
       hdfs_root_destination = fs.do_as_user(django_user, fs.get_home_dir)
+      if subdir:
+        hdfs_root_destination += '/%s' % subdir
+        fs.do_as_user(django_user, fs.mkdir, hdfs_root_destination, '0777')
 
-    hdfs_destination = os.path.join(hdfs_root_destination, self.name)
+    return hdfs_root_destination
 
-    LOG.info('Uploading local data %s to HDFS table "%s"' % (self.name, hdfs_destination))
-    fs.do_as_user(django_user, fs.copyFromLocal, self._contents_file, hdfs_destination)
 
+  def _upload_to_hdfs(self, django_user, local_filepath, hdfs_root_destination, filename=None):
+    fs = cluster.get_hdfs()
+
+    if filename is None:
+      filename = self.name
+    hdfs_destination = '%s/%s' % (hdfs_root_destination, filename)
+
+    LOG.info('Uploading local data %s to HDFS path "%s"' % (self.name, hdfs_destination))
+    fs.do_as_user(django_user, fs.copyFromLocal, local_filepath, hdfs_destination)
+
+    return hdfs_destination
+
+
+  def _load_data_to_table(self, django_user, hql, hdfs_destination):
     LOG.info('Loading data into table "%s"' % (self.name,))
-    hql = LOAD_HQL % {'tablename': self.name, 'filename': hdfs_destination}
     query = hql_query(hql)
 
     try:
@@ -207,7 +279,8 @@ class SampleTable(object):
       raise InstallException(msg)
 
 
-class SampleDesign(object):
+class SampleQuery(object):
+
   """Represents a query loaded from the designs.json file"""
   def __init__(self, data_dict):
     self.name = data_dict['name']
@@ -215,20 +288,61 @@ class SampleDesign(object):
     self.type = int(data_dict['type'])
     self.data = data_dict['data']
 
+
   def install(self, django_user):
     """
     Install queries. Raise InstallException on failure.
     """
     LOG.info('Installing sample query: %s' % (self.name,))
+
     try:
       # Don't overwrite
-      model = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
+      query = SavedQuery.objects.get(owner=django_user, name=self.name, type=self.type)
     except SavedQuery.DoesNotExist:
-      model = SavedQuery(owner=django_user, name=self.name)
-      model.type = self.type
+      query = SavedQuery(owner=django_user, name=self.name, type=self.type, desc=self.desc)
       # The data field needs to be a string. The sample file writes it
       # as json (without encoding into a string) for readability.
-      model.data = json.dumps(self.data)
-      model.desc = self.desc
-      model.save()
+      query.data = json.dumps(self.data)
+      query.save()
       LOG.info('Successfully installed sample design: %s' % (self.name,))
+
+    if USE_NEW_EDITOR.get():
+      try:
+        # Don't overwrite
+        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
+      except Document2.DoesNotExist:
+        # Create document from saved query
+        notebook = import_saved_beeswax_query(query)
+        data = notebook.get_json()
+
+        # Get or create sample user directories
+        home_dir = Directory.objects.get_home_directory(django_user)
+        examples_dir, created = Directory.objects.get_or_create(
+          parent_directory=home_dir,
+          owner=django_user,
+          name=Document2.EXAMPLES_DIR
+        )
+
+        doc2 = Document2.objects.create(
+          owner=django_user,
+          parent_directory=examples_dir,
+          name=self.name,
+          type=self._document_type(self.type),
+          description=self.desc,
+          data=data
+        )
+
+        # Share with default group
+        examples_dir.share(django_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
+        doc2.save()
+
+        LOG.info('Successfully installed sample query: %s' % (self.name,))
+
+
+  def _document_type(self, type):
+    if type == HQL:
+      return 'query-hive'
+    elif type == IMPALA:
+      return 'query-impala'
+    else:
+      return None

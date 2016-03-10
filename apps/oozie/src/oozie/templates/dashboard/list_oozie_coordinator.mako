@@ -16,7 +16,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter
+  from desktop.views import commonheader, commonfooter, _ko
   from django.utils.translation import ugettext as _
   
   from oozie.conf import ENABLE_V2
@@ -93,32 +93,46 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               % endif
               % endif
 
-              % if has_job_edition_permission(oozie_coordinator, user) and oozie_coordinator.status not in ('KILLED', 'SUCCEEDED'):
-                <li class="nav-header">${ _('Manage') }</li>
-                <li class="white">
-                  <div id="rerun-coord-modal" class="modal hide"></div>
-                  <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
-                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
-                     data-confirmation-header="${ _('Are you sure you want to suspend this job?') }"
-                     data-confirmation-footer="normal"
-                     class="btn btn-small confirmationModal
-                     % if not oozie_coordinator.is_running():
-                       hide
-                     % endif
-                     " rel="tooltip" data-placement="right" style="margin-bottom: 5px">
-                    ${ _('Suspend') }
-                  </button>
+              % if oozie_coordinator.status not in ('KILLED', 'SUCCEEDED'):
+              <li class="nav-header">${ _('Manage') }</li>
+              <li class="white">
+                % if has_job_edition_permission(oozie_coordinator, user):
+                <div id="rerun-coord-modal" class="modal hide"></div>
+                <div class="btn-group action-button-group" style="display: block; margin-bottom: 10px">
                   <button title="${ _('Resume the coordinator') }" id="resume-btn"
-                     data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
-                     data-confirmation-header="${ _('Are you sure you want to resume this job?') }"
-                     data-confirmation-footer="normal"
-                     class="btn btn-small confirmationModal
-                     % if oozie_coordinator.is_running():
-                       hide
-                     % endif
-                     " style="margin-bottom: 5px">
-                    ${ _('Resume') }
-                  </button>
+                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='resume') }"
+                      data-confirmation-header="${ _('Are you sure you want to resume this job?') }"
+                      data-confirmation-footer="normal"
+                      class="btn btn-small confirmationModal
+                      % if oozie_coordinator.is_running():
+                      hide
+                      % endif
+                      ">${ _('Resume') }</button>
+                  <button title="${ _('Suspend the coordinator after finishing the current running actions') }" id="suspend-btn"
+                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='suspend') }"
+                      data-confirmation-header="${ _('Are you sure you want to suspend this job?') }"
+                      data-confirmation-footer="normal"
+                      class="btn btn-small confirmationModal
+                      % if not oozie_coordinator.is_running():
+                      hide
+                      % endif
+                      " rel="tooltip" data-placement="right">${ _('Suspend') }</button>
+                  <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}" id="kill-btn"
+                      alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
+                      href="javascript:void(0)"
+                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
+                      data-message="${ _('The coordinator was killed!') }"
+                      data-confirmation-footer="danger"
+                      data-confirmation-header="${ _('Are you sure you want to kill this job?') }"
+                      class="btn btn-small btn-danger disable-feedback confirmationModal
+                      % if not oozie_coordinator.is_running():
+                      hide
+                      % endif
+                      ">${_('Kill')}</button>
+                </div>
+                % endif
+                <div class="btn-group" style="margin-left: 0; margin-bottom: 5px">
+                  % if has_job_edition_permission(oozie_coordinator, user):
                   <button title="${ _('Update Coordinator Job properties') }" id="edit-coord-btn"
                      data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='change') }"
                      data-message="${ _('Successfully updated Coordinator Job Properties') }"
@@ -126,33 +140,20 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                      data-confirmation-footer="update"
                      class="btn btn-small confirmationModal
                      % if not oozie_coordinator.is_running():
-                       hide
+                     hide
                      % endif
-                     " style="margin-bottom: 5px">
-                    ${ _('Edit') }
-                  </button>
-                  <br/>
-                  <button title="${_('Kill %(coordinator)s') % dict(coordinator=oozie_coordinator.id)}"
-                   id="kill-btn"
-                    class="btn btn-small btn-danger disable-feedback confirmationModal
-                     % if not oozie_coordinator.is_running():
-                       hide
-                     % endif
-                    "
-                    alt="${ _('Are you sure you want to kill coordinator %s?') % oozie_coordinator.id }"
-                    href="javascript:void(0)"
-                    data-url="${ url('oozie:manage_oozie_jobs', job_id=oozie_coordinator.id, action='kill') }"
-                    data-message="${ _('The coordinator was killed!') }"
-                    data-confirmation-footer="danger"
-                    data-confirmation-header="${ _('Are you sure you want to kill this job?') }" style="margin-bottom: 5px">
-                      ${_('Kill')}
-                  </button>
-                </li>
+                     ">${ _('Edit') }</button>
+                  % endif
+                  <button title="${ _('Sync Workflow') }" id="sync-wf-btn"
+                     data-sync-url="${ url('oozie:sync_coord_workflow', job_id=oozie_coordinator.id) }"
+                     class="btn btn-small sync-wf-btn">${ _('Sync Workflow') }</button>
+                </div>
+              </li>
               % endif
             </ul>
           </div>
         </div>
-        <div class="span10">
+        <div class="span10" id="tab-panel">
           <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
             % if oozie_bundle:
               ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :
@@ -211,14 +212,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <tr>
                   <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
                   <th width="200">${ _('Day') }</th>
-                  <th>${ _('Comment') }</th>
+                  <th>${ _('Warning message') }</th>
                 </tr>
                 </thead>
                 <tbody data-bind="template: { name: 'calendarTemplate', foreach: filteredActions}" >
                 </tbody>
                 <tfoot>
                   <tr data-bind="visible: isLoading()">
-                    <td colspan="2" class="left">
+                    <td colspan="3" class="left">
                       <img src="${ static('desktop/art/spinner.gif') }" />
                     </td>
                   </tr>
@@ -244,11 +245,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               <tr data-bind="css: { disabled: url == '' }">
                 <td data-bind="click: handleSelect"><div data-bind="css: { 'fa-check': selected }" class="hueCheckbox fa"></div></td>
                 <td data-bind="css: { disabled: url == '' }">
-                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
+                  <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" data-row-selector="true">
                     <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
                   </a>
                 </td>
-                <td data-bind="css: { disabled: url == '' }"><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == ''">${ _('Workflow not available or instantiated yet') }</em><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url != ''">${_('-')}</em> <span data-bind="visible: errorMessage != null && errorMessage != '', text: errorMessage"></span> <span data-bind="visible:missingDependencies !='' && missingDependencies != null, text: '${ _('Missing')} ' + missingDependencies"></span></td>
+                <td data-bind="css: { disabled: url == '' }"><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == ''">${ _('Workflow not available or instantiated yet') }</em><em data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url != ''">${_('-')}</em> <span data-bind="visible: errorMessage != null && errorMessage != '', text: errorMessage"></span> <span data-bind="visible:missingDependencies !='' && missingDependencies != null, text: '${ _ko('Missing')} ' + missingDependencies"></span></td>
               </tr>
             </script>
 
@@ -361,10 +362,41 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             </div>
 
             <div class="tab-pane" id="log">
-              <pre></pre>
+              <div data-bind="visible: isLogFilterVisible()" class="margin-bottom-10">
+                <label class="spinedit">
+                  ${ _("Last") }
+                  <input type="text" class="input-medium" style="margin-left: 10px" data-bind="spinedit: logFilterRecentHours, override: { minimum: 0, maximum: 1000, step: 1 }" placeholder="${_('ie. 2')}"/>
+                  ${ _("hours and") }
+                  <input type="text" class="input-medium" style="margin-left: 10px" data-bind="spinedit: logFilterRecentMinutes, override: { minimum: 0, maximum: 59, step: 5 }" placeholder="${_('ie. 30')}"/>
+                  ${ _("minutes") }
+                </label>
+                <label class="spinedit" style="margin-left: 30px">
+                  ${ _("Number of lines") }
+                  <input type="text" class="input-medium" data-bind="spinedit: logFilterLimit" placeholder="${_('ie. 10')}"/>
+                </label>
+                <input type="text" data-bind="clearable: logFilterText, valueUpdate: 'afterkeydown'" class="input-xlarge search-query" placeholder="${_('String to search in logs')}">
+
+                <span class="btn-group" style="float:right;">
+                  <a class="btn log-status btn-success" data-value="DEBUG|INFO|TRACE">${ _('Debug') }</a>
+                  <a class="btn log-status btn-warning" data-value="WARN">${ _('Warning') }</a>
+                  <a class="btn log-status btn-danger disable-feedback" data-value="ERROR|FATAL">${ _('Error') }</a>
+                </span>
+
+                <div class="inline" style="margin: 10px"><a class="pointer" data-bind="click: $root.toggleLogFilterVisible"><i class="fa fa-times"></i></a></div>
+                <div class="clearfix"></div>
+              </div>
+              <div style="position:relative">
+                <div class="spinner-overlay" data-bind="visible: isRefreshingLogs()">
+                  <i class="fa fa-spinner fa-spin"></i>
+                </div>
+                <ul class="pointer unstyled settings-overlay" data-bind="click: $root.toggleLogFilterVisible, visible: !isLogFilterVisible()">
+                  <li><a class="pointer"><i class="fa fa-filter"></i> ${ _("Filter") }</a></li>
+                </ul>
+                <pre></pre>
+              </div>
             </div>
 
-            <div class="tab-pane" id="definition">
+            <div class="tab-pane" id="definition" style="margin-bottom: 10px;">
               <textarea id="definitionEditor">${ oozie_coordinator.definition.decode('utf-8', 'replace') }</textarea>
             </div>
 
@@ -460,6 +492,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 % endif
 
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-spinedit.css') }">
+<link rel="stylesheet" href="${ static('desktop/css/bootstrap-slider.css') }">
+
+<script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
+
+
 <script>
 
   var setupjHueRowSelector = function () {
@@ -492,36 +532,68 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     };
   };
 
-  var RunningCoordinatorActionsModel = function (actions) {
+  var RunningCoordinatorModel = function (actions) {
     var self = this;
-    this.isLoading = ko.observable(true);
 
-    this.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
+    self.isLoading = ko.observable(true);
+
+    self.actions = ko.observableArray(ko.utils.arrayMap(actions), function (action) {
       return new Action(action);
     });
 
-    this.allSelected = ko.observable(false);
+    self.allSelected = ko.observable(false);
 
-    this.filter = ko.observableArray([]);
+    self.filter = ko.observableArray([]);
 
-    this.searchFilter = ko.observable('');
+    self.searchFilter = ko.observable("");
 
-    this.select = function (filter) {
-      ko.utils.arrayFilter(self.actions(), function(action) {
+    self.isRefreshingLogs = ko.observable(false);
+    self.logFilterRecentHours = ko.observable("");
+    self.logFilterRecentMinutes = ko.observable("");
+    self.logFilterRecent = ko.computed(function () {
+      var _h = self.logFilterRecentHours();
+      var _m = self.logFilterRecentMinutes();
+      return (_h != "" ? _h + "h" : "") + (_h != "" && _m != "" ? ":" : "") +  (_m != "" ? _m + "m" : "");
+    }).extend({ throttle: 500 });
+
+    self.logFilterLimit = ko.observable("5000").extend({ throttle: 500 });
+
+    self.logFilterText = ko.observable("").extend({ throttle: 500 });
+
+    self.logFilterRecent.subscribe(function(){
+      refreshLogs();
+    });
+
+    self.logFilterLimit.subscribe(function(){
+      refreshLogs();
+    });
+
+    self.logFilterText.subscribe(function(){
+      refreshLogs();
+    });
+
+    self.isLogFilterVisible = ko.observable(false);
+
+    self.toggleLogFilterVisible = function () {
+      self.isLogFilterVisible(!self.isLogFilterVisible());
+    };
+
+    self.select = function (filter) {
+      ko.utils.arrayFilter(self.actions(), function (action) {
         if (action.status.toLowerCase() === filter) {
           action.selected(true);
         }
       });
     };
 
-    this.clearAllSelections = function () {
+    self.clearAllSelections = function () {
       ko.utils.arrayFilter(self.actions(), function (action) {
         action.selected(false);
       });
       self.allSelected(false);
     };
 
-    this.clearSelections = function (filter) {
+    self.clearSelections = function (filter) {
       ko.utils.arrayFilter(self.actions(), function (action) {
         if (action.status.toLowerCase() === filter) {
           action.selected(false);
@@ -530,23 +602,23 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       self.allSelected(false);
     };
 
-    this.selectAll = function () {
+    self.selectAll = function () {
       var regexp;
 
-      if (! Array.isArray(self.filter())) {
+      if (!Array.isArray(self.filter())) {
         ko.utils.arrayForEach(self.actions(), function (action) {
           regexp = new RegExp(self.filter());
 
-          self.allSelected(! self.allSelected());
+          self.allSelected(!self.allSelected());
 
           if (regexp.test(action.title.toLowerCase())) {
-            action.selected(! action.selected());
+            action.selected(!action.selected());
           }
         });
         return true;
       }
 
-      self.allSelected(! self.allSelected());
+      self.allSelected(!self.allSelected());
 
       ko.utils.arrayForEach(self.actions(), function (action) {
         if (action.id) {
@@ -556,7 +628,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return true;
     };
 
-    this.selectedActions = ko.computed(function () {
+    self.selectedActions = ko.computed(function () {
       var actionlist = [];
 
       ko.utils.arrayFilter(self.actions(), function (action) {
@@ -567,7 +639,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return actionlist;
     });
 
-    this.searchFilter.subscribe(function () {
+    self.searchFilter.subscribe(function () {
       if (self.searchFilter().length === 0) {
         self.filter([]);
       } else {
@@ -581,11 +653,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       }
     });
 
-    this.filteredActions = ko.computed(function () {
+    self.filteredActions = ko.computed(function () {
       var filter = self.filter(),
-        actions = [],
-        regexp,
-        data;
+          actions = [],
+          regexp,
+          data;
 
       if (self.filter().length === 0) {
         return self.actions();
@@ -610,7 +682,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     });
   };
 
-  var viewModel = new RunningCoordinatorActionsModel([]);
+  var viewModel = new RunningCoordinatorModel([]);
   ko.applyBindings(viewModel);
 
   var CHART_LABELS = {
@@ -621,10 +693,9 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     ACTUAL_END: "${_('Actual End')}",
     TOOLTIP_ADDON: "${_('click for the SLA dashboard')}"
   }
-  var slaTable, refreshViewTimer;
+  var slaTable, refreshViewTimer, refreshLogs;
   var PAGE_SIZE = 50;
   var actionTableOffset = 1;
-
 
   $(document).ready(function(){
     $("a[data-row-selector='true']").jHueRowSelector();
@@ -689,6 +760,14 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       refreshView();
     });
 
+    $("a.log-status").click(function () {
+      var val = $(this).data("value")
+      var btn = $("a.log-status[data-value='"+ val + "']");
+
+      btn.toggleClass("active");
+      refreshLogs();
+    });
+
     $("a.btn-actions-pagination").on("click", function () {
       if (!$(this).parent().hasClass("disabled")) {
         var _additionalOffset = 0;
@@ -729,7 +808,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     $(".confirmationModal").bind('confirmation', function () {
       var _this = this;
       var IN_DATETIME_FORMAT = "MM/DD/YYYY hh:mm A";
-      var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm[Z]";
+      var OUT_DATETIME_FORMAT = "YYYY-MM-DD[T]HH:mm";
 
       var params = { 'notification': $(_this).attr("data-message") };
       if ($(this).attr("id") == "edit-coord-btn") {
@@ -787,6 +866,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       });
     });
 
+    $('#sync-wf-btn, .sync-wf-btn').click(function () {
+
+      $.get($(this).data("sync-url"), function (response) {
+        $('#rerun-coord-modal').html(response);
+        $('#rerun-coord-modal').modal('show');
+      });
+
+    });
+
     function refreshActionsPagination() {
       actionTableOffset = 1;
     }
@@ -801,7 +889,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
         } else if (val == 'RUNNING') {
           btnStatuses = btnStatuses.concat(['RUNNING', 'READY', 'SUBMITTED', 'SUSPENDED', 'WAITING']);
         } else if (val == 'ERROR') {
-          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'TIMEDOUT', 'IGNORED', 'SKIPPED']);
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'TIMEDOUT', 'SKIPPED']);
         }
       });
 
@@ -811,25 +899,60 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       return selectedStatuses;
     }
 
-    resizeLogs();
-    refreshView();
-    refreshLogs();
+    function getLogLevels() {
+      var logStatuses = '';
+      $.each($("a.log-status.active"), function () {
+        val = $(this).data('value');
+        if (logStatuses == '') {
+          logStatuses = val;
+        } else {
+          logStatuses += '|' + val;
+        }
+      });
+
+      return logStatuses;
+    }
+
+    function getLogFilterParams() {
+      return "?format=json" +
+             "&recent=" + viewModel.logFilterRecent() +
+             "&limit=" + viewModel.logFilterLimit() +
+             "&loglevel=" + getLogLevels() +
+             "&text=" + viewModel.logFilterText();
+    }
 
     var logsAtEnd = true;
-    function refreshLogs() {
-      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }", function (data) {
+    refreshLogs = function () {
+      window.clearTimeout(refreshLogs);
+      viewModel.isRefreshingLogs(true);
+      $.getJSON("${ url('oozie:get_oozie_job_log', job_id=oozie_coordinator.id) }" + getLogFilterParams(), function (data) {
         var _logsEl = $("#log pre");
         _logsEl.text(data.log);
 
         if (logsAtEnd) {
           _logsEl.scrollTop(_logsEl[0].scrollHeight - _logsEl.height());
         }
+        viewModel.isRefreshingLogs(false);
         if (data.status != "RUNNING" && data.status != "PREP"){
           return;
         }
         window.setTimeout(refreshLogs, 20000);
       });
+    };
+
+    var $codeMirror = $(".CodeMirror");
+    var tabPanelTop = $("#tab-panel").position().top;
+    var $logPre = $("#log pre").css("overflow", "auto");
+    var $window = $(window);
+
+    function resizeTabs() {
+      $codeMirror.height($window.height() - tabPanelTop - 185);
+      $logPre.height($window.height() - tabPanelTop - 204);
     }
+
+    resizeTabs();
+    refreshView();
+    refreshLogs();
 
     function refreshActionPaginationButtons(totalJobs) {
       var prevBtnActions = $("a.btn-actions-pagination[data-table='actions'][data-value='prev']");
@@ -908,6 +1031,13 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
           $("#resume-btn").hide();
         }
 
+
+        if ($(".action-button-group").find(".btn:visible").length > 0) {
+          $(".action-button-group").show();
+        } else {
+          $(".action-button-group").hide();
+        }
+
         $("#progress .bar").text(data.progress + "%").css("width", data.progress + "%").attr("class", "bar " + getStatusClass(data.status, "bar-"));
 
         if (data.status != "RUNNING" && data.status != "PREP"){
@@ -919,11 +1049,11 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
     }
 
     $(window).resize(function () {
-      resizeLogs();
+      resizeTabs();
     });
 
     $("a[href='#log']").on("shown", function () {
-      resizeLogs();
+      resizeTabs();
     });
 
     $("#log pre").scroll(function () {
@@ -935,10 +1065,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       }
     });
 
-    function resizeLogs() {
-      $("#log pre").css("overflow", "auto").height($(window).height() - $("#log pre").position().top - 80);
-    }
-
     if (window.location.hash == "#showSla") {
       $("a[href='#sla']").click();
     }
@@ -947,4 +1073,4 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 ${ utils.decorate_datetime_fields() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

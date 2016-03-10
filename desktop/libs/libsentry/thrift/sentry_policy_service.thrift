@@ -22,7 +22,7 @@
 # Thrift Service that the MetaStore is built on
 #
 
-#include "share/fb303/if/fb303.thrift"
+# include "share/fb303/if/fb303.thrift"
 include "sentry_common_service.thrift"
 
 namespace java org.apache.sentry.provider.db.service.thrift
@@ -41,7 +41,7 @@ enum TSentryGrantOption {
 
 # Represents a Privilege in transport from the client to the server
 struct TSentryPrivilege {
-1: required string privilegeScope, # Valid values are SERVER, DATABASE, TABLE
+1: required string privilegeScope, # Valid values are SERVER, DATABASE, TABLE, COLUMN, URI
 3: required string serverName,
 4: optional string dbName = "",
 5: optional string tableName = "",
@@ -49,6 +49,7 @@ struct TSentryPrivilege {
 7: required string action = "",
 8: optional i64 createTime, # Set on server side
 9: optional TSentryGrantOption grantOption = TSentryGrantOption.FALSE
+10: optional string columnName = "",
 }
 
 # TODO can this be deleted? it's not adding value to TAlterSentryRoleAddGroupsRequest
@@ -58,7 +59,7 @@ struct TSentryGroup {
 
 # CREATE ROLE r1
 struct TCreateSentryRoleRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName, # TSentryRole is not required for this request
 }
@@ -68,7 +69,7 @@ struct TCreateSentryRoleResponse {
 
 # DROP ROLE r1
 struct TDropSentryRoleRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName # role to drop
 }
@@ -78,7 +79,7 @@ struct TDropSentryRoleResponse {
 
 # GRANT ROLE r1 TO GROUP g1
 struct TAlterSentryRoleAddGroupsRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName,
 5: required set<TSentryGroup> groups
@@ -90,7 +91,7 @@ struct TAlterSentryRoleAddGroupsResponse {
 
 # REVOLE ROLE r1 FROM GROUP g1
 struct TAlterSentryRoleDeleteGroupsRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName,
 5: required set<TSentryGroup> groups
@@ -101,22 +102,25 @@ struct TAlterSentryRoleDeleteGroupsResponse {
 
 # GRANT ... ON ... TO ROLE ...
 struct TAlterSentryRoleGrantPrivilegeRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName,
-5: required TSentryPrivilege privilege
+5: optional TSentryPrivilege privilege,
+6: optional set<TSentryPrivilege> privileges
 }
 struct TAlterSentryRoleGrantPrivilegeResponse {
 1: required sentry_common_service.TSentryResponseStatus status
 2: optional TSentryPrivilege privilege
+3: optional set<TSentryPrivilege> privileges
 }
 
 # REVOKE ... ON ... FROM ROLE ...
 struct TAlterSentryRoleRevokePrivilegeRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required string roleName,
-5: required TSentryPrivilege privilege
+5: optional TSentryPrivilege privilege,
+6: optional set<TSentryPrivilege> privileges
 }
 struct TAlterSentryRoleRevokePrivilegeResponse {
 1: required sentry_common_service.TSentryResponseStatus status
@@ -124,7 +128,7 @@ struct TAlterSentryRoleRevokePrivilegeResponse {
 
 # SHOW ROLE GRANT
 struct TListSentryRolesRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: optional string groupName # for this group, or all roles for all groups if null
 }
@@ -144,11 +148,12 @@ struct TSentryAuthorizable {
 2: optional string uri,
 3: optional string db,
 4: optional string table,
+5: optional string column,
 }
 
 # SHOW GRANT
 struct TListSentryPrivilegesRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 4: required string roleName, # get privileges assigned for this role
 5: optional TSentryAuthorizable authorizableHierarchy # get privileges assigned for this role
@@ -160,7 +165,7 @@ struct TListSentryPrivilegesResponse {
 
 # Drop privilege
 struct TDropPrivilegesRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required TSentryAuthorizable authorizable
 }
@@ -170,7 +175,7 @@ struct TDropPrivilegesResponse {
 }
 
 struct TRenamePrivilegesRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required TSentryAuthorizable oldAuthorizable
 4: required TSentryAuthorizable newAuthorizable
@@ -189,7 +194,7 @@ struct TSentryActiveRoleSet {
 2: required set<string> roles,
 }
 struct TListSentryPrivilegesForProviderRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required set<string> groups,
 3: required TSentryActiveRoleSet roleSet,
 4: optional TSentryAuthorizable authorizableHierarchy,
@@ -205,7 +210,7 @@ struct TSentryPrivilegeMap {
 1: required map<string, set<TSentryPrivilege>> privilegeMap
 }
 struct TListSentryPrivilegesByAuthRequest {
-1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V1,
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
 2: required string requestorUserName, # user on whose behalf the request is issued
 3: required set<TSentryAuthorizable> authorizableSet,
 4: optional set<string> groups,
@@ -214,6 +219,17 @@ struct TListSentryPrivilegesByAuthRequest {
 struct TListSentryPrivilegesByAuthResponse {
 1: required sentry_common_service.TSentryResponseStatus status,
 2: optional map<TSentryAuthorizable, TSentryPrivilegeMap> privilegesMapByAuth # will not be set in case of an error
+}
+
+# Obtain a config value from the Sentry service
+struct TSentryConfigValueRequest {
+1: required i32 protocol_version = sentry_common_service.TSENTRY_SERVICE_V2,
+2: required string propertyName, # Config attribute to obtain
+3: optional string defaultValue # Value if propertyName not found
+}
+struct TSentryConfigValueResponse {
+1: required sentry_common_service.TSentryResponseStatus status
+2: optional string value
 }
 
 service SentryPolicyService
@@ -239,4 +255,6 @@ service SentryPolicyService
  TRenamePrivilegesResponse rename_sentry_privilege(1:TRenamePrivilegesRequest request);
 
  TListSentryPrivilegesByAuthResponse list_sentry_privileges_by_authorizable(1:TListSentryPrivilegesByAuthRequest request);
+
+ TSentryConfigValueResponse get_sentry_config_value(1:TSentryConfigValueRequest request)
 }

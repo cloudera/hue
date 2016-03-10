@@ -1,0 +1,326 @@
+# Chinese (China) translations for Hue.
+# Copyright (C) 2012 Cloudera
+# This file is distributed under the same license as the Hue project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  项目版本\n"
+"Report-Msgid-Bugs-To: 电子邮件地址\n"
+"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"Last-Translator: 全名 <电子邮件地址>\n"
+"Language-Team: zh_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: src/metadata/conf.py:40
+msgid "Configuration options for Navigator API"
+msgstr ""
+
+#: src/metadata/conf.py:44
+msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+msgstr ""
+
+#: src/metadata/conf.py:48
+msgid "Auth username of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:53
+msgid "LDAP/PAM/.. password of the hue user used for authentications."
+msgstr ""
+
+#: src/metadata/conf.py:58
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+
+#~ msgid "Notebook saved !"
+#~ msgstr "笔记本已保存！"
+
+#~ msgid "Notebook closed !"
+#~ msgstr "笔记本已关闭！"
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr "Spark 作业服务器的 URL。"
+
+#~ msgid "List of available types of snippets."
+#~ msgstr "可用代码段类型列表"
+
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr "Job Server 不运行的情况下应用程序不工作"
+
+#~ msgid "Example: 1 + 1, or press CTRL + space"
+#~ msgstr "示例：1 + 1 或按 CTRL + 空格"
+
+#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+#~ msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
+
+#~ msgid "<h2>This is a text snippet</h2>Type your text here"
+#~ msgstr "<h2>这是文本代码段</h2>在此处键入您的文本"
+
+#~ msgid "Query"
+#~ msgstr "查询"
+
+#~ msgid "Execute all snippets"
+#~ msgstr "执行所有代码段"
+
+#~ msgid "Clear all results"
+#~ msgstr "清除所有结果"
+
+#~ msgid "Edit"
+#~ msgstr "编辑"
+
+#~ msgid "Save"
+#~ msgstr "保存"
+
+#~ msgid "Saving..."
+#~ msgstr "正在保存..."
+
+#~ msgid "Brand New"
+#~ msgstr "全新"
+
+#~ msgid "Notebooks"
+#~ msgstr "笔记本"
+
+#~ msgid "Add a new notebook"
+#~ msgstr "添加新笔记本"
+
+#~ msgid "Toggle Assist"
+#~ msgstr "切换帮助"
+
+#~ msgid "Data sample for"
+#~ msgstr "数据示例"
+
+#~ msgid "Ok"
+#~ msgstr "确定"
+
+#~ msgid "Manually refresh the table list"
+#~ msgstr "手动刷新表列表"
+
+#~ msgid "database"
+#~ msgstr "数据库"
+
+#~ msgid "Choose a database..."
+#~ msgstr "选择数据库..."
+
+#~ msgid "Table name..."
+#~ msgstr "表名..."
+
+#~ msgid "The selected database has no tables."
+#~ msgstr "所选数据库没有表。"
+
+#~ msgid "The database list cannot be loaded."
+#~ msgstr "无法加载数据库列表。"
+
+#~ msgid "Add a snippet to start your new notebook"
+#~ msgstr "添加代码段以启动您的新笔记本、"
+
+#~ msgid "Add a new snippet"
+#~ msgstr "添加新代码段"
+
+#~ msgid "Text"
+#~ msgstr "文本"
+
+#~ msgid "Creating session"
+#~ msgstr "创建会话"
+
+#~ msgid "CTRL + ENTER"
+#~ msgstr "CTRL + ENTER"
+
+#~ msgid "Cancel"
+#~ msgstr "取消"
+
+#~ msgid "Grid"
+#~ msgstr "网格"
+
+#~ msgid "Bars"
+#~ msgstr "条"
+
+#~ msgid "Lines"
+#~ msgstr "线"
+
+#~ msgid "Pie"
+#~ msgstr "圆形"
+
+#~ msgid "Scatter"
+#~ msgstr "散点图"
+
+#~ msgid "Marker Map"
+#~ msgstr "Marker Map"
+
+#~ msgid "Gradient Map"
+#~ msgstr "Gradient Map"
+
+#~ msgid "Show Logs"
+#~ msgstr "显示日志"
+
+#~ msgid "Download first rows as CSV"
+#~ msgstr "以 CSV 格式下载第一行"
+
+#~ msgid "CSV"
+#~ msgstr "CSV"
+
+#~ msgid "Download first rows as XLS"
+#~ msgstr "以 XLS 格式下载第一行"
+
+#~ msgid "Excel"
+#~ msgstr "Excel"
+
+#~ msgid "Loading..."
+#~ msgstr "正在加载..."
+
+#~ msgid "Success."
+#~ msgstr "成功。"
+
+#~ msgid "Success but empty results."
+#~ msgstr "成功但结果为空。"
+
+#~ msgid "Hide columns"
+#~ msgstr "隐藏列"
+
+#~ msgid "columns"
+#~ msgstr "列"
+
+#~ msgid "Show columns"
+#~ msgstr "显示列"
+
+#~ msgid "Hide"
+#~ msgstr "隐藏"
+
+#~ msgid "Hide settings"
+#~ msgstr "隐藏设置"
+
+#~ msgid "x-axis"
+#~ msgstr "X 轴"
+
+#~ msgid "region"
+#~ msgstr "区域"
+
+#~ msgid "latitude"
+#~ msgstr "纬度"
+
+#~ msgid "legend"
+#~ msgstr "图例"
+
+#~ msgid "Choose a column..."
+#~ msgstr "选择列..."
+
+#~ msgid "y-axis"
+#~ msgstr "Y 轴"
+
+#~ msgid "value"
+#~ msgstr "值"
+
+#~ msgid "longitude"
+#~ msgstr "经度"
+
+#~ msgid "label"
+#~ msgstr "标签"
+
+#~ msgid "scatter group"
+#~ msgstr "散点图组"
+
+#~ msgid "scatter size"
+#~ msgstr "散点图大小"
+
+#~ msgid "sorting"
+#~ msgstr "排序"
+
+#~ msgid "No sorting"
+#~ msgstr "不排序"
+
+#~ msgid "Sort ascending"
+#~ msgstr "升序"
+
+#~ msgid "Sort descending"
+#~ msgstr "降序"
+
+#~ msgid "Show settings"
+#~ msgstr "显示设置"
+
+#~ msgid "Paste or type a link"
+#~ msgstr "粘贴或键入链接"
+
+#~ msgid "Open in new window"
+#~ msgstr "在新窗口中打开"
+
+#~ msgid "No data available"
+#~ msgstr "没有可用数据"
+
+#~ msgid "No matching records"
+#~ msgstr "没有匹配记录"
+
+#~ msgid "Distribution"
+#~ msgstr "贡献"
+
+#~ msgid "There was a problem loading the table preview."
+#~ msgstr "加载表预览时出现问题。"
+
+#~ msgid "Spark Editor"
+#~ msgstr "Spark Editor"
+
+#~ msgid "Search for name, description, etc..."
+#~ msgstr "搜索名称、描述等..."
+
+#~ msgid "Submit"
+#~ msgstr "提交"
+
+#~ msgid "Share"
+#~ msgstr "共享"
+
+#~ msgid "Copy"
+#~ msgstr "复制"
+
+#~ msgid "Delete"
+#~ msgstr "删除"
+
+#~ msgid "Create"
+#~ msgstr "创建"
+
+#~ msgid "Name"
+#~ msgstr "名称"
+
+#~ msgid "Description"
+#~ msgstr "描述"
+
+#~ msgid "Owner"
+#~ msgstr "所有者"
+
+#~ msgid "Last Modified"
+#~ msgstr "上次修改"
+
+#~ msgid "Delete the selected notebook(s)?"
+#~ msgstr "删除所选笔记本？"
+
+#~ msgid "No"
+#~ msgstr "否"
+
+#~ msgid "Yes"
+#~ msgstr "是"
+
+#~ msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+#~ msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
+
+#~ msgid "Showing 0 to 0 of 0 entries"
+#~ msgstr "显示 0－0，共 0 个条目"
+
+#~ msgid "(filtered from _MAX_ total entries)"
+#~ msgstr "（已从 _MAX_ 个总条目中过滤）"
+
+#~ msgid "First"
+#~ msgstr "第一个"
+
+#~ msgid "Last"
+#~ msgstr "最后一个"
+
+#~ msgid "Next"
+#~ msgstr "下一页"
+
+#~ msgid "Previous"
+#~ msgstr "上一页"
+

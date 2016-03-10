@@ -30,9 +30,14 @@ case class PySpark() extends Kind {
   override def toString = "pyspark"
 }
 
+case class SparkR() extends Kind {
+  override def toString = "sparkr"
+}
+
 case object SessionKindSerializer extends CustomSerializer[Kind](implicit formats => ( {
   case JString("spark") | JString("scala") => Spark()
   case JString("pyspark") | JString("python") => PySpark()
+  case JString("sparkr") | JString("r") => SparkR()
 }, {
   case kind: Kind => JString(kind.toString)
 }

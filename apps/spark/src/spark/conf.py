@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import logging
 import os
 import sys
@@ -28,25 +27,6 @@ from spark.settings import NICE_NAME
 
 LOG = logging.getLogger(__name__)
 
-
-def coerce_json(j):
-  return json.loads(j)
-
-
-LANGUAGES = Config(
-  key="languages",
-  help=_t("List of available types of snippets."),
-  type=coerce_json,
-  default="""[
-      {"name": "Scala Shell", "type": "scala"},
-      {"name": "PySpark Shell", "type": "python"},
-      {"name": "Jar", "type": "jar"},
-      {"name": "Python", "type": "py"},
-      {"name": "Impala SQL", "type": "impala"},
-      {"name": "Hive SQL", "type": "hive"},
-      {"name": "Text", "type": "text"}
-  ]"""
-)
 
 LIVY_ASSEMBLY_JAR = Config(
   key="livy_assembly_jar",
@@ -66,7 +46,7 @@ LIVY_SERVER_PORT = Config(
 
 LIVY_SERVER_SESSION_KIND = Config(
   key="livy_server_session_kind",
-  help=_t("Configure livy to start with process, thread, or yarn workers"),
+  help=_t("Configure livy to start in local 'process' mode, or 'yarn' workers."),
   default="process")
 
 LIVY_YARN_JAR = Config(
@@ -86,6 +66,19 @@ START_LIVY_SERVER = Config(
   default=False,
   type=coerce_bool,
   private=True)
+
+
+SQL_SERVER_HOST = Config(
+  key="sql_server_host",
+  help=_t("Host where SparkSQL server is running."),
+  default="localhost")
+
+SQL_SERVER_PORT = Config(
+  key="sql_server_port",
+  help=_t("Port the SparkSQL server runs on."),
+  default=10000,
+  type=int)
+
 
 def get_livy_server_url():
   return 'http://%s:%s' % (LIVY_SERVER_HOST.get(), LIVY_SERVER_PORT.get())

@@ -29,6 +29,9 @@ function getStatusClass(status, prefix) {
     'PAUSEDWITHERROR'].indexOf(status) > -1) {
     klass = prefix + "warning";
   }
+  else if (status == "IGNORED") {
+    klass = prefix + "ignored";
+  }
   else {
     klass = prefix + "important";
     if (prefix == "bar-") {

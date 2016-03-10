@@ -20,24 +20,40 @@ import logging
 import os
 import time
 
+from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
+from desktop.lib.parameterization import find_variables
+from desktop.models import Document2
 from hadoop import cluster
 from hadoop.fs.hadoopfs import Hdfs
-
-from desktop.models import Document2
-
-from jobsub.parameterization import find_variables
+from oozie.utils import convert_to_server_timezone
 
 from liboozie.oozie_api import get_oozie
 from liboozie.conf import REMOTE_DEPLOYMENT_DIR
 from liboozie.credentials import Credentials
 
 
-
 LOG = logging.getLogger(__name__)
+
+def submit_dryrun(run_func):
+  def decorate(self, deployment_dir=None):
+    if self.oozie_id is not None:
+      raise Exception(_("Submission already submitted (Oozie job id %s)") % (self.oozie_id,))
+
+    jt_address = cluster.get_cluster_addr_for_job_submission()
+
+    if deployment_dir is None:
+      self._update_properties(jt_address) # Needed as we need to set some properties like Credentials before
+      deployment_dir = self.deploy()
+
+    self._update_properties(jt_address, deployment_dir)
+    if self.properties.get('dryrun'):
+      self.api.dryrun(self.properties)
+    return run_func(self, deployment_dir)
+  return wraps(run_func)(decorate)
 
 
 class Submission(object):
@@ -48,7 +64,7 @@ class Submission(object):
   - submit
   - rerun
   """
-  def __init__(self, user, job=None, fs=None, jt=None, properties=None, oozie_id=None):
+  def __init__(self, user, job=None, fs=None, jt=None, properties=None, oozie_id=None, local_tz=None):
     self.job = job
     self.user = user
     self.fs = fs
@@ -61,6 +77,13 @@ class Submission(object):
     else:
       self.properties = {}
 
+    if local_tz and isinstance(self.job.data, dict):
+      local_tz = self.job.data.get('properties')['timezone']
+    if 'start_date' in self.properties:
+      properties['start_date'] = convert_to_server_timezone(self.properties['start_date'], local_tz)
+    if 'end_date' in self.properties:
+      properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
+
     self.properties['security_enabled'] = self.api.security_enabled
 
   def __str__(self):
@@ -72,21 +95,12 @@ class Submission(object):
       res += " -- " + self.oozie_id
     return res
 
+  @submit_dryrun
   def run(self, deployment_dir=None):
     """
     Take care of all the actions of submitting a Oozie workflow.
     Returns the oozie job id if all goes well.
     """
-    if self.oozie_id is not None:
-      raise Exception(_("Submission already submitted (Oozie job id %s)") % (self.oozie_id,))
-
-    jt_address = cluster.get_cluster_addr_for_job_submission()
-
-    if deployment_dir is None:
-      self._update_properties(jt_address) # Needed as we need to set some properties like Credentials before
-      deployment_dir = self.deploy()
-
-    self._update_properties(jt_address, deployment_dir)
 
     self.oozie_id = self.api.submit_job(self.properties)
     LOG.info("Submitted: %s" % (self,))
@@ -128,6 +142,12 @@ class Submission(object):
 
     return self.oozie_id
 
+  def update_coord(self):
+    self.api = get_oozie(self.user, api_version="v2")
+    self.api.job_control(self.oozie_id, action='update', properties=self.properties, parameters=None)
+    LOG.info("Update: %s" % (self,))
+
+    return self.oozie_id
 
   def rerun_bundle(self, deployment_dir, params):
     jt_address = cluster.get_cluster_addr_for_job_submission()
@@ -158,7 +178,7 @@ class Submission(object):
         # Don't support more than one level sub-workflow
         if action.data['type'] == 'subworkflow':
           from oozie.models2 import Workflow
-          workflow = Workflow(document=Document2.objects.get(uuid=action.data['properties']['workflow']))
+          workflow = Workflow(document=Document2.objects.get_by_uuid(uuid=action.data['properties']['workflow']))
           sub_deploy = Submission(self.user, workflow, self.fs, self.jt, self.properties)
           workspace = sub_deploy.deploy()
 
@@ -271,13 +291,9 @@ class Submission(object):
     Copy XML and the jar_path files from Java or MR actions to the deployment directory.
     This should run as the workflow user.
     """
-    xml_path = self.fs.join(deployment_dir, self.job.XML_FILE_NAME)
-    self.fs.create(xml_path, overwrite=True, permission=0644, data=smart_str(oozie_xml))
-    LOG.debug("Created %s" % (xml_path,))
 
-    properties_path = self.fs.join(deployment_dir, 'job.properties')
-    self.fs.create(properties_path, overwrite=True, permission=0644, data=smart_str('\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.iteritems()])))
-    LOG.debug("Created %s" % (properties_path,))
+    self._create_file(deployment_dir, self.job.XML_FILE_NAME, oozie_xml)
+    self._create_file(deployment_dir, 'job.properties', data='\n'.join(['%s=%s' % (key, val) for key, val in oozie_properties.iteritems()]))
 
     # List jar files
     files = []
@@ -331,7 +347,13 @@ class Submission(object):
     from oozie.models2 import Coordinator
     return Coordinator.PROPERTY_APP_PATH in self.properties
 
-
+  def _create_file(self, deployment_dir, file_name, data, do_as=False):
+   file_path = self.fs.join(deployment_dir, file_name)
+   if do_as:
+     self.fs.do_as_user(self.user, self.fs.create, file_path, overwrite=True, permission=0644, data=smart_str(data))
+   else:
+     self.fs.create(file_path, overwrite=True, permission=0644, data=smart_str(data))
+   LOG.debug("Created/Updated %s" % (file_path,))
 
 def create_directories(fs, directory_list=[]):
   # If needed, create the remote home, deployment and data directories

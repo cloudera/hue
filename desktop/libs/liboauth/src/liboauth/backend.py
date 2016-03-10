@@ -30,13 +30,13 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 
-from desktop import metrics
 from desktop.auth.backend import DesktopBackendBase
 from desktop.auth.backend import rewrite_user
 from useradmin.models import get_profile, get_default_user_group, UserProfile
 from hadoop.fs.exceptions import WebHdfsException
 
 import liboauth.conf
+import liboauth.metrics
 
 try:
   import oauth2 as oauth

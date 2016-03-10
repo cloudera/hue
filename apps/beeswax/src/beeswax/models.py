@@ -83,7 +83,8 @@ class QueryHistory(models.Model):
   notify = models.BooleanField(default=False)                        # Notify on completion
 
   is_redacted = models.BooleanField(default=False)
-
+  extra = models.TextField(default='{}')                   # Json fields for extra properties
+  is_cleared = models.BooleanField(default=False)
 
   class Meta:
     ordering = ['-submission_date']
@@ -116,8 +117,8 @@ class QueryHistory(models.Model):
     query_server = get_query_server_config(QueryHistory.get_type_name(self.query_type))
     query_server.update({
         'server_name': self.server_name,
-        'server_host': self.server_host,
-        'server_port': self.server_port,
+#         'server_host': self.server_host, # Always use the live server configuration as the session is currently tied to the connection
+#         'server_port': int(self.server_port),
         'server_type': self.server_type,
     })
 
@@ -137,7 +138,7 @@ class QueryHistory(models.Model):
     query.hql_query = hql_query
     self.design.data = query.dumps()
     self.query = hql_query
- 
+
   def is_finished(self):
     is_statement_finished = not self.is_running()
 
@@ -187,6 +188,14 @@ class QueryHistory(models.Model):
         self.is_redacted = True
 
     super(QueryHistory, self).save(*args, **kwargs)
+
+  def update_extra(self, key, val):
+    extra = json.loads(self.extra)
+    extra[key] = val
+    self.extra = json.dumps(extra)
+
+  def get_extra(self, key):
+    return json.loads(self.extra).get(key)
 
 
 def make_query_context(type, info):
@@ -376,11 +385,15 @@ class SavedQuery(models.Model):
 
 
 class SessionManager(models.Manager):
-  def get_session(self, user, application='beeswax'):
+
+  def get_session(self, user, application='beeswax', filter_open=True):
     try:
-      return self.filter(owner=user, application=application).latest("last_used")
-    except Session.DoesNotExist:
-      pass
+      q = self.filter(owner=user, application=application)
+      if filter_open:
+        q = q.filter(status_code=0)
+      return q.latest("last_used")
+    except Session.DoesNotExist, e:
+      return None
 
 
 class Session(models.Model):
@@ -388,12 +401,13 @@ class Session(models.Model):
   A sessions is bound to a user and an application (e.g. Bob with the Impala application).
   """
   owner = models.ForeignKey(User, db_index=True)
-  status_code = models.PositiveSmallIntegerField()
+  status_code = models.PositiveSmallIntegerField()  # ttypes.TStatusCode
   secret = models.TextField(max_length='100')
   guid = models.TextField(max_length='100')
   server_protocol_version = models.SmallIntegerField(default=0)
   last_used = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Last used'))
   application = models.CharField(max_length=128, help_text=_t('Application we communicate with.'), default='beeswax')
+  properties = models.TextField(default='{}')
 
   objects = SessionManager()
 
@@ -403,10 +417,14 @@ class Session(models.Model):
     handle_id = THandleIdentifier(secret=secret, guid=guid)
     return TSessionHandle(sessionId=handle_id)
 
+  def get_properties(self):
+    return json.loads(self.properties)
+
+  def get_formatted_properties(self):
+    return [dict({'key': key, 'value': value}) for key, value in self.get_properties().items()]
+
   def __str__(self):
     return '%s %s' % (self.owner, self.last_used)
-
-
 
 
 class QueryHandle(object):

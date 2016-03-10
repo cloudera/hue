@@ -4,7 +4,11 @@
 
 <xsl:template match="email:email">
 
-  ,"email": {"subject": "<xsl:value-of select="*[local-name()='subject']"/>"}
+  ,"email": {
+    "to": "<xsl:value-of select="*[local-name()='to']"/>",
+    "subject": "<xsl:value-of select="*[local-name()='subject']"/>",
+    "body": "<xsl:value-of select="*[local-name()='body']"/>"
+   }
 
 </xsl:template>
 

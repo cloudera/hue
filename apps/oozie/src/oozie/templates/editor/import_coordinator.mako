@@ -65,4 +65,4 @@ ${ layout.menubar(section='coordinators') }
 </div>
 </div>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

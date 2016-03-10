@@ -22,7 +22,10 @@ import beeswax.hive_site
 
 from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import ConfigSection, Config, coerce_bool
+from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD,\
+  AUTH_USERNAME as DEFAULT_AUTH_USERNAME
+from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
+from desktop.lib.exceptions import StructuredThriftTransportException
 
 from beeswax.settings import NICE_NAME
 
@@ -71,17 +74,40 @@ USE_GET_LOG_API = Config( # To remove in Hue 4
           'If false, use the FetchResults() thrift call from Hive 1.0 or more instead.')
 )
 
-BROWSE_PARTITIONED_TABLE_LIMIT = Config(
+BROWSE_PARTITIONED_TABLE_LIMIT = Config( # Deprecated, to remove in Hue 4
   key='browse_partitioned_table_limit',
-  default=250,
+  default=1000,
   type=int,
-  help=_t('Set a LIMIT clause when browsing a partitioned table. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
+  help=_t('Limit the number of partitions to list on the partitions page. A positive value will be set as the LIMIT. If 0 or negative, do not set any limit.'))
+
+QUERY_PARTITIONS_LIMIT = Config(
+  key='query_partitions_limit',
+  default=10,
+  type=int,
+  help=_t('The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.'))
+
+def get_browse_partitioned_table_limit():
+  """Get the old default"""
+  return BROWSE_PARTITIONED_TABLE_LIMIT.get()
+
+LIST_PARTITIONS_LIMIT = Config(
+  key='list_partitions_limit',
+  dynamic_default=get_browse_partitioned_table_limit,
+  type=int,
+  help=_t('Limit the number of partitions that can be listed. A positive value will be set as the LIMIT.'))
 
 DOWNLOAD_ROW_LIMIT = Config(
   key='download_row_limit',
   default=1000000,
   type=int,
-  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 65,000 is applied to XLS downloads.'))
+  help=_t('A limit to the number of rows that can be downloaded from a query. A value of -1 means there will be no limit. A maximum of 30,000 is applied to XLS downloads.'))
+
+APPLY_NATURAL_SORT_MAX = Config(
+  key="apply_natural_sort_max",
+  help=_t("The max number of records in the result set permitted to apply a natural sort to the database or tables list."),
+  type=int,
+  default=2000
+)
 
 CLOSE_QUERIES = Config(
   key="close_queries",
@@ -98,6 +124,12 @@ THRIFT_VERSION = Config(
   default=7
 )
 
+CONFIG_WHITELIST = Config(
+  key='config_whitelist',
+  default='hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename',
+  type=coerce_csv,
+  help=_t('A comma-separated list of white-listed Hive configuration properties that users are authorized to set.')
+)
 
 SSL = ConfigSection(
   key='ssl',
@@ -107,7 +139,7 @@ SSL = ConfigSection(
       key="cacerts",
       help=_t("Path to Certificate Authority certificates."),
       type=str,
-      default="/etc/hue/cacerts.pem"
+      dynamic_default=default_ssl_cacerts,
     ),
 
     KEY = Config(
@@ -128,10 +160,41 @@ SSL = ConfigSection(
       key="validate",
       help=_t("Choose whether Hue should validate certificates received from the server."),
       type=coerce_bool,
-      default=True
+      dynamic_default=default_ssl_validate,
     )
   )
 )
+
+def get_auth_username():
+  """Get from top level default from desktop"""
+  return DEFAULT_AUTH_USERNAME.get()
+
+AUTH_USERNAME = Config(
+  key="auth_username",
+  help=_t("Auth username of the hue user used for authentications."),
+  dynamic_default=get_auth_username)
+
+def get_auth_password():
+  """Get from script or backward compatibility"""
+  password = AUTH_PASSWORD_SCRIPT.get()
+  if password:
+    return password
+
+  return DEFAULT_AUTH_PASSWORD.get()
+
+AUTH_PASSWORD = Config(
+  key="auth_password",
+  help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
+  private=True,
+  dynamic_default=get_auth_password)
+
+AUTH_PASSWORD_SCRIPT = Config(
+  key="auth_password_script",
+  help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+  private=True,
+  type=coerce_password_from_script,
+  default=None)
+
 
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
@@ -140,19 +203,26 @@ def config_validator(user):
 
   res = []
   try:
-    if not 'test' in sys.argv: # Avoid tests hanging
-      server = dbms.get(user)
-      server.get_databases()
-  except:
+    try:
+      if not 'test' in sys.argv: # Avoid tests hanging
+        server = dbms.get(user)
+        server.get_databases()
+    except StructuredThriftTransportException, e:
+      if 'Error validating the login' in str(e):
+        msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
+        LOG.exception(msg)
+        res.append((NICE_NAME, _(msg)))
+      else:
+        raise e
+  except Exception, e:
     msg = "The application won't work without a running HiveServer2."
     LOG.exception(msg)
-
     res.append((NICE_NAME, _(msg)))
 
   try:
-    from hadoop import cluster
+    from desktop.lib.fsmanager import get_filesystem
     warehouse = beeswax.hive_site.get_metastore_warehouse_dir()
-    fs = cluster.get_hdfs()
+    fs = get_filesystem()
     fs.stats(warehouse)
   except Exception:
     msg = 'Failed to access Hive warehouse: %s'

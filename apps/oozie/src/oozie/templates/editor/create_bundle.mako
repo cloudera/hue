@@ -66,4 +66,4 @@ ${ layout.menubar(section='bundles') }
 
 ${ utils.decorate_datetime_fields(False) }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

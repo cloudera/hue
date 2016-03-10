@@ -88,14 +88,20 @@ class Rdbms(object):
   def get_databases(self):
     return self.client.get_databases()
 
-  def get_tables(self, database):
+  def get_tables(self, database, table_names=None):
     return self.client.get_tables(database)
 
   def get_table(self, database, table_name):
     return self.client.get_table(database, table_name)
 
-  def get_columns(self, database, table_name):
-    return self.client.get_columns(database, table_name)
+  def get_columns(self, database, table_name, names_only=True):
+    return self.client.get_columns(database, table_name, names_only)
+
+  def get_sample_data(self, database, table_name, limit=100):
+    return self.client.get_sample_data(database, table_name, limit)
+
+  def execute_statement(self, statement):
+    return self.client.execute_statement(statement)
 
   def execute_query(self, query, design):
     from beeswax.models import QueryHistory

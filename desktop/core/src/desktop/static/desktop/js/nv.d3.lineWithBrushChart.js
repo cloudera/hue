@@ -303,7 +303,7 @@ nv.models.lineWithBrushChart = function() {
       }
 
       function disableBrush() {
-        g.selectAll('.nv-brush').attr('display', 'none');
+        if (g) g.selectAll('.nv-brush').attr('display', 'none');
       }
 
 

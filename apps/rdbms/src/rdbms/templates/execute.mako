@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare
+  from desktop.views import commonheader, commonfooter, commonshare, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -26,8 +26,8 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 <div id="rdbms-query-editor">
   <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span2" id="navigator">
+    <div class="panel-container">
+      <div class="left-panel" id="navigator">
         <ul class="nav nav-tabs" style="margin-bottom: 0">
           <li class="active"><a href="#navigatorTab" data-toggle="tab" class="sidetab">${ _('Assist') }</a></li>
         </ul>
@@ -66,36 +66,44 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
 
 
       </div>
-
-      <div class="span10">
+      <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div class="right-panel">
         <div id="query">
           <div class="card card-small">
-            <div style="margin-bottom: 10px">
-              <h1 class="card-heading simple">
-                <a id="collapse-editor" href="javascript:void(0)" class="pull-right"><i class="fa fa-caret-up"></i></a>
-                % if can_edit_name:
 
-                  <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
-                    attr: {'data-original-title': '${ _("Share") } '+name},
-                    css: {'baseShared': true, 'isShared': isShared()}">
-                    <i class="fa fa-users"></i>
-                  </a>
-                  <a href="javascript:void(0);"
-                     id="query-name"
-                     data-type="text"
-                     data-name="name"
-                     data-value="${design.name}"
-                     data-original-title="${ _('Query name') }"
-                     data-placement="right">
-                  </a>
-                  <a href="javascript:void(0);"
-                     id="query-description"
-                     data-type="textarea"
-                     data-name="description"
-                     data-value="${design.desc}"
-                     data-original-title="${ _('Query description') }"
-                     data-placement="right" style="font-size: 14px; margin-left: 10px">
-                  </a>
+            <div class="pull-right" style="
+            % if can_edit_name:
+              margin: 10px
+            % else:
+              margin-top: -6px; margin-right: 8px
+            % endif
+            ">
+              <a id="collapse-editor" href="javascript:void(0)"><i class="fa fa-caret-up"></i></a>
+            </div>
+            <div style="margin-bottom: 10px">
+              % if can_edit_name:
+              <h1 class="card-heading simple">
+                <a class="share-link" rel="tooltip" data-placement="bottom" style="padding-left:10px; padding-right: 10px" data-bind="click: openShareModal,
+                  attr: {'data-original-title': '${ _ko("Share") } '+name},
+                  css: {'baseShared': true, 'isShared': isShared()}">
+                  <i class="fa fa-users"></i>
+                </a>
+                <a href="javascript:void(0);"
+                   id="query-name"
+                   data-type="text"
+                   data-name="name"
+                   data-value="${design.name}"
+                   data-original-title="${ _('Query name') }"
+                   data-placement="right">
+                </a>
+                <a href="javascript:void(0);"
+                   id="query-description"
+                   data-type="textarea"
+                   data-name="description"
+                   data-value="${design.desc}"
+                   data-original-title="${ _('Query description') }"
+                   data-placement="right" style="font-size: 14px; margin-left: 10px">
+                </a>
               </h1>
               % endif
             </div>
@@ -131,7 +139,7 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
             <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
               <thead>
                 <tr data-bind="foreach: columns">
-                  <th data-bind="text: $data"></th>
+                  <th data-bind="text: $data, css:{'datatables-counter-col': $index() == 0}"></th>
                 </tr>
               </thead>
             </table>
@@ -161,7 +169,6 @@ ${ commonheader(_('Query'), app_name, user) | n,unicode }
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -201,6 +208,32 @@ ${ commonshare() | n,unicode }
 <style type="text/css">
   h1 {
     margin-bottom: 5px;
+  }
+
+  .panel-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .left-panel {
+    position: absolute;
+  }
+
+  .resizer {
+    position: absolute;
+    width: 20px;
+    text-align: center;
+    z-index: 1000;
+  }
+
+  .resize-bar {
+    top: 50%;
+    position: relative;
+    cursor: ew-resize;
+  }
+
+  .right-panel {
+    position: absolute;
   }
 
   #filechooser {
@@ -325,8 +358,10 @@ ${ commonshare() | n,unicode }
 
 </style>
 
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.draggable-droppable-sortable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('rdbms/js/rdbms.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
@@ -372,21 +407,17 @@ ${ commonshare() | n,unicode }
     $("#navigatorTables").css("max-height", ($(window).height() - 340) + "px").css("overflow-y", "auto");
 
     var resizeTimeout = -1;
-    var winWidth = $(window).width();
-    var winHeight = $(window).height();
+
+    var resizeNavigator = function() {
+      $("#navigatorTables").css("max-height", ($(window).height() - 380) + "px").css("overflow-y", "auto");
+      $(".resizer").css("height", ($(window).height() - 110) + "px");
+    }
 
     $(window).on("resize", function () {
-      window.clearTimeout(resizeTimeout);
-      resizeTimeout = window.setTimeout(function () {
-        // prevents endless loop in IE8
-        if (winWidth != $(window).width() || winHeight != $(window).height()) {
-          codeMirror.setSize("95%", 100);
-          winWidth = $(window).width();
-          winHeight = $(window).height();
-          $("#navigatorTables").css("max-height", ($(window).height() - 340) + "px").css("overflow-y", "auto");
-        }
-      }, 200);
+      codeMirror.setSize("95%", 100);
+      resizeNavigator();
     });
+    resizeNavigator();
 
     var queryEditor = $("#queryField")[0];
 
@@ -821,7 +852,7 @@ ${ commonshare() | n,unicode }
       var ordered_row = [];
       $.each(viewModel.columns(), function (col_index, col) {
         if (col_index == 0) {
-          ordered_row.push(index + row_index);
+          ordered_row.push(index + row_index + 1);
         }
         else {
           ordered_row.push(row[col]);
@@ -885,4 +916,4 @@ ${ commonshare() | n,unicode }
 
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

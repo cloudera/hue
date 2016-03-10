@@ -18,229 +18,553 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from desktop.views import _ko
 %>
 
-<%def name="assistPanel()">
-  <template id="assist-panel-template">
-    <div class="assist-container" data-bind="visible: isAssistVisible() && isAssistAvailable(), css:{'span2': isAssistVisible(), 'hidden': !isAssistVisible() }">
-      <div id="assistQuickLook" class="modal hide fade">
-        <div class="modal-header">
-          <a href="#" class="close" data-dismiss="modal">&times;</a>
-          <h3>${_('Data sample for')} <span class="tableName"></span></h3>
-        </div>
-        <div class="modal-body" style="min-height: 100px">
-          <div class="loader">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
-            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-          </div>
-          <div class="sample"></div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Ok')}</button>
-        </div>
-      </div>
-      <div class="span2 assist">
+<%def name="jvmMemoryInput()">
+  <script type="text/html" id="jvm-memory-input-template">
+    <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 0, allowEmpty: true }" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
+  </script>
 
-        <a title="${_('Toggle Assist')}" class="pull-right pointer assist-action" data-bind="click: toggleAssist">
-          <i class="fa fa-chevron-left"></i>
-        </a>
-        <a title="${_('Manually refresh the table list')}" rel="tooltip" data-placement="top" class="pull-right pointer assist-action" data-bind="click: reloadAssist">
-          <i class="fa fa-refresh"></i>
-        </a>
-        <ul class="nav nav-list" style="border: none; padding: 0; background-color: #FFF; margin-bottom: 1px;">
-          <li class="nav-header">${_('database')}</li>
-        </ul>
-        <!-- ko if: assist.mainObjects().length > 0 -->
-        <select data-bind="options: assist.mainObjects, select2: { width: '100%', placeholder: '${ _("Choose a database...") }', update: assist.selectedMainObject}" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
-        <input type="text" placeholder="${ _('Table name...') }" style="width:90%; margin-top: 20px" data-bind="value: assist.filter, valueUpdate: 'afterkeydown'"/>
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+        var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
+        var UNITS = {'MB': 'M', 'GB': 'G'};
 
-        <div data-bind="visible: Object.keys(assist.firstLevelObjects()).length == 0">${_('The selected database has no tables.')}</div>
-        <ul data-bind="visible: Object.keys(assist.firstLevelObjects()).length > 0, foreach: assist.filteredFirstLevelObjects()" class="unstyled assist-main">
-          <li data-bind="event: { mouseover: function(){ $('#assistHover_' + $data).show(); }, mouseout: function(){ $('#assistHover_' + $data).hide(); } }">
-            <a href="javascript:void(0)" data-bind="attr: {'id': 'assistHover_' + $data}, click: $parent.showTablePreview" style="display: none; position: absolute; right: 10px; margin-left: auto; background-color: #FFF" class="preview-sample"><i class="fa fa-list" title="${'Preview Sample data'}" style="margin-left:5px"></i></a>
-            <a href="javascript:void(0)" data-bind="click: $parent.loadAssistSecondLevel, event: { 'dblclick': function(){ huePubSub.publish('assist.dblClickItem', $data); } }"><span data-bind="text: $data"></span></a>
-            <div data-bind="visible: $parent.assist.firstLevelObjects()[$data].loaded() && $parent.assist.firstLevelObjects()[$data].open()">
-              <ul data-bind="visible: $parent.assist.firstLevelObjects()[$data].items().length > 0, foreach: $parent.assist.firstLevelObjects()[$data].items()" class="unstyled">
-                <li><a data-bind="attr: {'title': $parents[1].secondLevelTitle($data)}" style="padding-left:10px" href="javascript:void(0)"><span data-bind="html: $parents[1].truncateSecondLevel($data), event: { 'dblclick': function() { huePubSub.publish('assist.dblClickItem', $data.name +', '); } }"></span></a></li>
-              </ul>
-            </div>
-          </li>
-        </ul>
-        <!-- /ko -->
+        function JvmMemoryInputViewModel(params) {
+          this.valueObservable = params.value;
+          this.units = Object.keys(UNITS);
+          this.selectedUnit = ko.observable();
+          this.value = ko.observable('');
 
-        <div id="navigatorLoader" class="center"  data-bind="visible: assist.isLoading">
-          <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+          var match = JVM_MEM_PATTERN.exec(this.valueObservable());
+          if (match && match.length === 3) {
+            this.value(match[1]);
+            this.selectedUnit(match[2] === 'M' ? 'MB' : 'GB');
+          }
+
+          this.value.subscribe(this.updateValueObservable, this);
+          this.selectedUnit.subscribe(this.updateValueObservable, this);
+        }
+
+        JvmMemoryInputViewModel.prototype.updateValueObservable = function () {
+          if (isNaN(this.value()) || this.value() === '') {
+            this.valueObservable(undefined);
+          } else {
+            this.valueObservable(this.value() + UNITS[this.selectedUnit()]);
+          }
+        };
+
+        ko.components.register('jvm-memory-input', {
+          viewModel: JvmMemoryInputViewModel,
+          template: { element: 'jvm-memory-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
+<%def name="keyValueListInput()">
+  <script type="text/html" id="key-value-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li>
+        <div class="input-append" style="margin-bottom: 4px">
+          <input type="text" style="width: 130px" placeholder="${ _('Key') }" data-bind="textInput: key, valueUpdate: 'afterkeydown'"/>
+          <input type="text" style="width: 130px" placeholder="${ _('Value') }" data-bind="textInput: value, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
         </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
 
-        <div class="center" data-bind="visible: assist.hasErrors">
-          ${ _('The database list cannot be loaded.') }
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function KeyValueListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.key() && value.value();
+              }))
+            }
+          });
+        }
+
+        KeyValueListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            key: ko.observable(''),
+            value: ko.observable('')
+          };
+          self.values.push(newValue);
+        };
+
+        KeyValueListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('key-value-list-input', {
+          viewModel: KeyValueListInputViewModel,
+          template: { element: 'key-value-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
+<%def name="functionListInput()">
+  <script type="text/html" id="function-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li>
+        <div class="input-append" style="margin-bottom: 4px">
+          <input type="text" style="width: 110px" placeholder="${ _('Name, e.g. foo') }" data-bind="textInput: name, valueUpdate: 'afterkeydown'"/>
+          <input type="text" style="width: 150px" placeholder="${ _('Class, e.g. org.hue.Bar') }" data-bind="textInput: class_name, valueUpdate: 'afterkeydown'"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        function FunctionListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.name() && value.class_name();
+              }))
+            }
+          });
+        }
+
+        FunctionListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            name: ko.observable(''),
+            class_name: ko.observable('')
+          };
+          self.values.push(newValue);
+        };
+
+        FunctionListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('function-list-input', {
+          viewModel: FunctionListInputViewModel,
+          template: { element: 'function-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
+<%def name="hdfsFileListInput()">
+  <script type="text/html" id="hdfs-file-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li>
+        <div class="input-append" style="margin-bottom: 4px">
+          <input type="text" class="filechooser-input" data-bind="value: path, valueUpdate:'afterkeydown', filechooser: { value: path, isAddon: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue') }"/>
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+
+        var identifyType = function (path) {
+          switch (path.substr(path.lastIndexOf('.') + 1).toLowerCase()) {
+            case 'jar':
+              return 'jar'
+            case 'zip':
+            case 'tar':
+            case 'rar':
+            case 'bz2':
+            case 'gz':
+            case 'tgz':
+              return 'archive';
+          }
+          return 'file';
+        }
+
+        function HdfsFileListInputViewModel(params) {
+          var self = this;
+          self.values = params.values;
+          $.each(self.values(), function (idx, value) {
+            value.path.subscribe(function (newPath) {
+              value.type(identifyType(newPath));
+            });
+          })
+          params.visibleObservable.subscribe(function (newValue) {
+            if (!newValue) {
+              self.values($.grep(self.values(), function (value) {
+                return value.path();
+              }))
+            }
+          });
+        }
+
+        HdfsFileListInputViewModel.prototype.addValue = function () {
+          var self = this;
+          var newValue = {
+            path: ko.observable(''),
+            type: ko.observable('')
+          };
+          newValue.path.subscribe(function (newPath) {
+            newValue.type(identifyType(newPath));
+          })
+          self.values.push(newValue);
+        };
+
+        HdfsFileListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          var self = this;
+          self.values.remove(valueToRemove);
+        };
+
+        ko.components.register('hdfs-file-list-input', {
+          viewModel: HdfsFileListInputViewModel,
+          template: { element: 'hdfs-file-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
+<%def name="csvListInput()">
+  <script type="text/html" id="csv-list-input-template">
+    <ul data-bind="sortable: { data: values, options: { axis: 'y', containment: 'parent' }}, visible: values().length" class="unstyled">
+      <li style="margin-bottom: 4px">
+        <div class="input-append">
+          <!-- ko ifnot: $parent.inputTemplate -->
+          <input type="text" data-bind="textInput: value, valueUpdate: 'afterkeydown', attr: { placeholder: $parent.placeholder }"/>
+          <!-- /ko -->
+          <!-- ko template: { if: $parent.inputTemplate, name: $parent.inputTemplate } --><!-- /ko -->
+          <span class="add-on move-widget muted"><i class="fa fa-arrows"></i></span>
+          <a class="add-on muted" href="javascript: void(0);" data-bind="click: function(){ $parent.removeValue($data); }"><i class="fa fa-minus"></i></a>
+        </div>
+      </li>
+    </ul>
+    <div style="min-width: 280px; margin-top: 5px;">
+      <a class="inactive-action pointer" style="padding: 3px 10px 3px 3px;;" data-bind="click: addValue">
+        <i class="fa fa-plus"></i>
+      </a>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+        function CsvListInputViewModel(params) {
+          this.valueObservable = params.value;
+          this.isArray = $.isArray(this.valueObservable());
+          this.placeholder = params.placeholder || '';
+          this.inputTemplate = params.inputTemplate || null;
+
+          var initialValues;
+          if (this.isArray) {
+            initialValues = ko.mapping.toJS(this.valueObservable());
+          } else {
+            initialValues = this.valueObservable() != null ? this.valueObservable().split(",") : [];
+          }
+          for (var i = 0; i < initialValues.length; i++) {
+            initialValues[i] = {value: ko.observable(initialValues[i].trim())};
+            initialValues[i].value.subscribe(this.updateValueObservable, this);
+          }
+          this.values = ko.observableArray(initialValues);
+          this.values.subscribe(this.updateValueObservable, this);
+        }
+
+        CsvListInputViewModel.prototype.addValue = function () {
+          var newValue = {value: ko.observable('')};
+          newValue.value.subscribe(this.updateValueObservable, this);
+          this.values.push(newValue);
+        };
+
+        CsvListInputViewModel.prototype.removeValue = function (valueToRemove) {
+          this.values.remove(valueToRemove);
+        };
+
+        CsvListInputViewModel.prototype.updateValueObservable = function () {
+          var cleanValues = $.map(this.values(), function (item) {
+            return item.value();
+          });
+          cleanValues = $.grep(cleanValues, function (value) {
+            return value;
+          });
+          this.valueObservable(this.isArray ? cleanValues : cleanValues.join(','));
+        };
+
+        ko.components.register('csv-list-input', {
+          viewModel: CsvListInputViewModel,
+          template: { element: 'csv-list-input-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
+<%def name="addSnippetMenu()">
+  <script type="text/html" id="add-snippet-menu-template">
+    <div class="add-snippet-button" style="position:relative; width:65px; text-align: center;">
+      <i class="pointer fa fa-plus-circle fa-5x" title="${ _('Add a new snippet') }" data-bind="click: addLastUsedSnippet, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }"></i>
+      <div class="select-snippet-button" title="${ _('Select snippet') }" data-bind="fadeVisible: { value: hasAdditionalSnippets && showingSelectSnippet(), fadeOut: true }, click: showSnippetModal, event: { 'mouseenter': showHistory, 'mouseleave': hideHistory }">...</div>
+      <div class="all-alternatives" data-bind="foreach: snippetHistory">
+        <div class="add-snippet-alt pointer" style="display:none;" data-bind="
+            event: { 'mouseenter': $parent.showHistory, 'mouseleave': $parent.hideHistory },
+            fadeVisible: { value: $parent.showingHistory(), fadeOut: true, speed: 'slow' },
+            style: { 'left': $parent.positions[$index()].left, 'top': $parent.positions[$index()].top },
+            click: $parent.addNewSnippet">
+          <div data-bind="text: name()"></div>
         </div>
       </div>
     </div>
-  </template>
+
+    <div id="addSnippetModal" class="modal hide fade">
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${ _('Add Snippet') }</h3>
+      </div>
+      <div class="modal-body" style="min-height: 100px">
+        <ul class="snippet-list-alts" data-bind="foreach: availableSnippets">
+          <li data-bind="click: function() { $parent.addNewSnippet($data) }">
+            <div style="width: 30px; display:inline-block;">
+            <!-- ko if: $root.getSnippetViewSettings(type()).snippetImage -->
+            <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }">
+            <!-- /ko -->
+            <!-- ko if: $root.getSnippetViewSettings(type()).snippetIcon -->
+            <i style="margin-left: 6px; color: #338bb8;" class="fa snippet-icon" data-bind="css: $root.getSnippetViewSettings(type()).snippetIcon"></i>
+            <!-- /ko -->
+            </div>
+            <span data-bind="text: name"></span>
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary disable-feedback" data-dismiss="modal">${_('Close')}</button>
+      </div>
+    </div>
+  </script>
 
   <script type="text/javascript" charset="utf-8">
-    (function() {
-      function AssistPanel(params) {
-        var self = this;
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      (function () {
+        var WHEEL_RADIUS = 75;
+        var PLUS_ICON_RADIUS = 27.859; // FA-5X
 
-        self.assist = params.assist;
+        var calculatePositions = function (alternativeCount) {
+          var radius = WHEEL_RADIUS;
+          var radIncrements = 2 * Math.PI / alternativeCount;
+          var currentRad = -0.5 * Math.PI;
 
-        self.isAssistVisible = params.isAssistVisible;
-        self.isAssistAvailable = params.isAssistAvailable;
+          var result = [];
 
-        self.isAssistVisible($.totalStorage(params.totalStorageId) != null && $.totalStorage(params.totalStorageId));
-
-        self.isAssistVisible.subscribe(function(newValue) {
-          $.totalStorage(params.totalStorageId, newValue);
-        });
-
-        self.toggleAssist = function () {
-          self.isAssistVisible(!self.isAssistVisible());
-        };
-
-        self.modalItem = ko.observable();
-
-        self.secondLevelTitle = function(level) {
-          var _title = "";
-
-          if (level.comment && needsTruncation(level)) {
-            _title = level.name + " (" + level.type + "): " + level.comment;
-          } else if (needsTruncation(level)) {
-            _title = level.name + " (" + level.type + ")";
-          } else if (level.comment) {
-            _title = level.comment;
+          for (var i = 0; i < alternativeCount; i++) {
+            result.push({
+              left: radius * Math.cos(currentRad) + PLUS_ICON_RADIUS + 'px',
+              top: radius * Math.sin(currentRad) + PLUS_ICON_RADIUS + 'px'
+            });
+            currentRad += radIncrements;
           }
-          return _title;
+
+          return result;
         };
 
-        var needsTruncation = function(level) {
-          return (level.name.length + level.type.length) > 20;
-        };
-
-        self.truncateSecondLevel = function(level) {
-          var escapeString = function (str) {
-            return $("<span>").text(str).html().trim()
-          };
-          if (needsTruncation(level)) {
-            return escapeString(level.name + " (" + level.type + ")").substr(0, 20) + "&hellip;";
-          }
-          return escapeString(level.name + " (" + level.type + ")");
-        };
-
-        function resizeAssist() {
-          $(".assist").parents(".span2").height($(".assist").height() + 100);
-          $(".assist-main").height($(window).height() - 230);
-        }
-
-        $(window).on("resize", function(){
-          window.clearTimeout(_resizeTimeout);
-          _resizeTimeout = window.setTimeout(resizeAssist, 200);
-        });
-
-        self.loadAssistMain = function(force) {
-          self.assist.options.onDataReceived = function (data) {
-            if (data.databases) {
-              self.assist.mainObjects(data.databases);
-              if (force) {
-                self.loadAssistFirstLevel(force);
-              }
-              else if (self.assist.mainObjects().length > 0 && !self.assist.selectedMainObject()) {
-                self.assist.selectedMainObject(self.assist.mainObjects()[0]);
-                self.loadAssistFirstLevel();
-              }
-            }
-          };
-          self.assist.options.onError = function() {
-            self.assist.isLoading(false);
-          };
-          self.assist.getData(null, force);
-
-          self.assist.selectedMainObject.subscribe(function() {
-            self.loadAssistFirstLevel();
-          });
-        };
-
-        self.loadAssistFirstLevel = function(force) {
+        function AddSnippetMenuViewModel(params) {
           var self = this;
-          self.assist.options.onDataReceived = function (data) {
-            if (data.tables) {
-              var _obj = {};
-              data.tables.forEach(function (item) {
-                _obj[item] = {
-                  items: ko.observableArray([]),
-                  open: ko.observable(false),
-                  loaded: ko.observable(false)
-                }
-              });
-              self.assist.firstLevelObjects(_obj);
-            }
-            self.assist.isLoading(false);
+          self.notebook = params.notebook;
+          self.availableSnippets = params.availableSnippets;
+          self.snippetHistory = ko.observableArray([].concat(self.availableSnippets.slice(0, 5)));
+          self.lastUsedSnippet = self.snippetHistory()[0];
+          self.roundCount = 0;
+          self.positions = calculatePositions(self.snippetHistory().length);
+          self.showingHistory = ko.observable(false);
+          self.hasAdditionalSnippets = params.availableSnippets().length > 5;
+          self.showingSelectSnippet = ko.observable(false);
+
+          self.addLastUsedSnippet = function () {
+            self.addNewSnippet(self.lastUsedSnippet);
           };
-          self.assist.getData(self.assist.selectedMainObject(), force);
-        };
 
-        self.loadAssistSecondLevel = function(first) {
-          if (!self.assist.firstLevelObjects()[first].loaded()) {
-            self.assist.isLoading(true);
-            self.assist.options.onDataReceived = function (data) {
-              if (data.columns) {
-                var _cols = data.extended_columns ? data.extended_columns : data.columns;
-                self.assist.firstLevelObjects()[first].items(_cols);
-                self.assist.firstLevelObjects()[first].loaded(true);
-              }
-              self.assist.isLoading(false);
-            };
-            self.assist.getData(self.assist.selectedMainObject() + "/" + first);
-          }
-          self.assist.firstLevelObjects()[first].open(!self.assist.firstLevelObjects()[first].open());
-          window.setTimeout(self.resizeAssist, 100);
-        };
+          self.showSnippetModal = function () {
+            $("#addSnippetModal").modal('show');
+          };
 
-        self.reloadAssist = function() {
-          self.loadAssistMain(true);
-        };
+          self.addNewSnippet = function (alternative) {
+            clearTimeout(hideTimeout);
+            self.showingHistory(false);
+            self.showingSelectSnippet(false);
+            $("#addSnippetModal").modal('hide');
 
-        self.showTablePreview = function(table) {
-          var tableUrl = "/beeswax/api/table/" + self.assist.selectedMainObject() + "/" + table;
-          $("#assistQuickLook").find(".tableName").text(table);
-          $("#assistQuickLook").find(".tableLink").attr("href", "/metastore/table/" + self.assist.selectedMainObject() + "/" + table);
-          $("#assistQuickLook").find(".sample").empty("");
-          $("#assistQuickLook").attr("style", "width: " + ($(window).width() - 120) + "px;margin-left:-" + (($(window).width() - 80) / 2) + "px!important;");
-          $.ajax({
-            url: tableUrl,
-            data: {"sample": true},
-            beforeSend: function (xhr) {
-              xhr.setRequestHeader("X-Requested-With", "Hue");
-            },
-            dataType: "html",
-            success: function (data) {
-              $("#assistQuickLook").find(".loader").hide();
-              $("#assistQuickLook").find(".sample").html(data);
-            },
-            error: function (e) {
-              if (e.status == 500) {
-                $(document).trigger("error", "${ _('There was a problem loading the table preview.') }");
-                $("#assistQuickLook").modal("hide");
-              }
+            // When fewer than 5 it's always in history
+            if (self.snippetHistory().indexOf(alternative) == -1) {
+              self.snippetHistory.splice(4 - self.roundCount, 1, alternative);
+              self.roundCount = (self.roundCount + 1) % 5;
             }
-          });
-          $("#assistQuickLook").modal("show");
-        };
 
-        if (self.assist.options.baseURL != ""){
-          self.loadAssistMain();
-        } else {
-          self.isAssistVisible(false);
-          self.isAssistAvailable(false);
+            self.lastUsedSnippet = alternative;
+            self.notebook.newSnippet(alternative.type())
+          };
+
+          var hideTimeout = -1;
+
+          self.showHistory = function () {
+            clearTimeout(hideTimeout);
+            self.showingHistory(true);
+            self.showingSelectSnippet(true);
+          };
+
+          self.hideHistory = function () {
+            clearTimeout(hideTimeout);
+            hideTimeout = window.setTimeout(function () {
+              self.showingHistory(false);
+              self.showingSelectSnippet(false);
+            }, 500);
+          };
         }
+
+        ko.components.register('add-snippet-menu', {
+          viewModel: AddSnippetMenuViewModel,
+          template: { element: 'add-snippet-menu-template' }
+        });
+      }());
+    }));
+  </script>
+</%def>
+
+<%def name="downloadSnippetResults()">
+  <script type="text/html" id="download-results-template">
+    <form method="POST" action="${ url('notebook:download') }" class="download-form" style="display: inline">
+      ${ csrf_token(request) | n,unicode }
+      <input type="hidden" name="notebook"/>
+      <input type="hidden" name="snippet"/>
+      <input type="hidden" name="format"/>
+    </form>
+
+    <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
+      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown">
+        <i class="fa fa-download"></i>
+      </a>
+      <ul class="dropdown-menu">
+        <li>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as CSV') }">
+            <i class="fa fa-file-o"></i> ${ _('CSV') }
+          </a>
+        </li>
+        <li>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first rows as XLS') }">
+            <i class="fa fa-file-excel-o"></i> ${ _('Excel') }
+          </a>
+        </li>
+      </ul>
+    </div>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function (factory) {
+      if(typeof require === "function") {
+        require(['knockout'], factory);
+      } else {
+        factory(ko);
+      }
+    }(function (ko) {
+      function DownloadResultsViewModel (params, element) {
+        var self = this;
+        self.$downloadForm = $(element).find(".download-form");
+        self.snippet = params.snippet;
+        self.notebook = params.notebook;
       }
 
-      ko.components.register('assist-panel', {
-        viewModel: AssistPanel,
-        template: { element: 'assist-panel-template' }
+      DownloadResultsViewModel.prototype.download = function (format) {
+        var self = this;
+        self.$downloadForm.find('input[name=\'format\']').val(format);
+        self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));
+        self.$downloadForm.find('input[name=\'snippet\']').val(ko.mapping.toJSON(self.snippet.getContext()));
+        self.$downloadForm.submit();
+      };
+
+      DownloadResultsViewModel.prototype.downloadXls = function () {
+        var self = this;
+        self.download("xls");
+      };
+
+      DownloadResultsViewModel.prototype.downloadCsv = function () {
+        var self = this;
+        self.download("csv");
+      };
+
+      ko.components.register('downloadSnippetResults', {
+        viewModel: { createViewModel: function (params, componentInfo) {
+          return new DownloadResultsViewModel(params, componentInfo.element);
+        }},
+        template: { element: 'download-results-template' }
       });
-    }());
+    }));
   </script>
 </%def>

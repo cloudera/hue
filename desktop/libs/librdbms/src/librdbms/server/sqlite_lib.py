@@ -88,13 +88,25 @@ class SQLiteClient(BaseRDMSClient):
   def get_tables(self, database, table_names=[]):
     # Doesn't use database and only retrieves tables for database currently in use.
     cursor = self.connection.cursor()
-    cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+    query = "SELECT name FROM sqlite_master WHERE type='table'"
+    if table_names:
+      clause = ' OR '.join(["tablename LIKE '%%%(table)s%%'" % {'table': table} for table in table_names])
+      query += ' AND (%s)' % clause
+    cursor.execute(query)
     self.connection.commit()
     return [row[0] for row in cursor.fetchall()]
 
 
-  def get_columns(self, database, table):
+  def get_columns(self, database, table, names_only=True):
     cursor = self.connection.cursor()
     cursor.execute("PRAGMA table_info(%s)" % table)
     self.connection.commit()
-    return [row[1] for row in cursor.fetchall()]
+    if names_only:
+      columns = [row[1] for row in cursor.fetchall()]
+    else:
+      columns = [dict(name=row[1], type=row[2], comment='') for row in cursor.fetchall()]
+    return columns
+
+  def get_sample_data(self, database, table, limit=100):
+    statement = 'SELECT * FROM %s LIMIT %d' % (table, limit)
+    return self.execute_statement(statement)

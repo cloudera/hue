@@ -15,17 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_string
 
 
-def coerce_string(value):
-  if type(value) == list:
-    return ','.join(value)
-  else:
-    return value
-
-
-# Used only for ZooKeeper app proeprties, ZooKeeper specific properties should come from libzookeeper
+# Used only for ZooKeeper app properties, ZooKeeper specific properties should come from libzookeeper
 CLUSTERS = UnspecifiedConfigSection(
   "clusters",
   help="One entry for each Zookeeper cluster",

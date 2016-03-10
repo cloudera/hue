@@ -107,9 +107,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
-          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white hellipsify">${job.applicationType}</li>
+          <li class="white truncate" title="${job.applicationType}">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -212,9 +212,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('Job ID')}</li>
-          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white hellipsify">${job.applicationType or 'MR2'}</li>
+          <li class="white truncate" title="${job.applicationType or 'MR2'}">${job.applicationType or 'MR2'}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -429,9 +429,9 @@ ${ comps.menubar() }
       <div class="sidebar-nav" style="padding-top: 0">
         <ul class="nav nav-list">
           <li class="nav-header">${_('App ID')}</li>
-          <li class="white hellipsify">${job.jobId_short}</li>
+          <li class="white truncate" title="${job.jobId_short}">${job.jobId_short}</li>
           <li class="nav-header">${_('Type')}</li>
-          <li class="white hellipsify">${job.applicationType}</li>
+          <li class="white truncate" title="${job.applicationType}">${job.applicationType}</li>
           <li class="nav-header">${_('User')}</li>
           <li class="white">${job.user}</li>
           <li class="nav-header">${_('Status')}</li>
@@ -655,7 +655,7 @@ $(document).ready(function () {
     if (_title != ""){
       $.jHueTitleUpdater.set(_title);
     }
-    $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
+    $("#jobDuration").html('<span title="' + emptyStringIfNull(job.durationMs) + '">' + (job.isRetired || ! job.durationFormatted ? '${_('N/A')}' : emptyStringIfNull(job.durationFormatted)) + '</span>');
 
     if (Utils.RUNNING_ARRAY.indexOf(job.status.toUpperCase()) == -1) {
       window.clearInterval(_runningInterval);
@@ -757,10 +757,8 @@ $(document).ready(function () {
     }
   }, 2000);
 
-  hellipsify();
-
   $("a[data-row-selector='true']").jHueRowSelector();
 });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

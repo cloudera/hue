@@ -31,7 +31,7 @@
             <main-class>${ node['properties']['main_class'] }</main-class>
 
             % if node['properties']['java_opts']:
-            <java-opts>${ node['properties']['java_opts'] }</java-opts>
+            <java-opts>${ ' '.join([prop['value'] for prop in node['properties']['java_opts']]) }</java-opts>
             % endif
 
             % for arg in node['properties']['arguments']:

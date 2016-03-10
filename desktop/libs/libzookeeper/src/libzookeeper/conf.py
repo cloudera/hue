@@ -19,7 +19,7 @@ import logging
 
 from urlparse import urlparse
 
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection
+from desktop.lib.conf import Config, coerce_string
 
 
 LOG = logging.getLogger(__name__)
@@ -29,21 +29,26 @@ def zkensemble():
   """
   Try to guess the value if no values are specified.
   """
-  try:
-    # Backward compatibility until Hue 4
-    from zookeeper.conf import CLUSTERS
-    clusters = CLUSTERS.get()
-    if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
-      return '%s/solr' % clusters['default'].HOST_PORTS.get()
-  except:
-    LOG.exception('failed to get zookeeper ensemble')
 
-  try:
-    from search.conf import SOLR_URL
-    parsed = urlparse(SOLR_URL.get())
-    return "%s:2181/solr" % (parsed.hostname or 'localhost')
-  except:
-    LOG.exception('failed to get solr url')
+  from django.conf import settings
+
+  if 'zookeeper' in settings.INSTALLED_APPS:
+    try:
+      # Backward compatibility until Hue 4
+      from zookeeper.conf import CLUSTERS
+      clusters = CLUSTERS.get()
+      if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
+        return '%s' % clusters['default'].HOST_PORTS.get()
+    except:
+      LOG.warn('Could not get zookeeper ensemble from the zookeeper app')
+
+  if 'search' in settings.INSTALLED_APPS:
+    try:
+      from search.conf import SOLR_URL
+      parsed = urlparse(SOLR_URL.get())
+      return "%s:2181" % (parsed.hostname or 'localhost')
+    except:
+      LOG.warn('Could not get zookeeper ensemble from the search app')
 
   return "localhost:2181"
 
@@ -52,7 +57,7 @@ ENSEMBLE=Config(
     "ensemble",
     help="ZooKeeper ensemble. Comma separated list of Host/Port, e.g. localhost:2181,localhost:2182,localhost:2183",
     dynamic_default=zkensemble,
-    type=str,
+    type=coerce_string,
 )
 
 PRINCIPAL_NAME=Config(

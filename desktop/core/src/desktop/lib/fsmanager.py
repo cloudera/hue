@@ -15,39 +15,66 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from hadoop.cluster import get_all_hdfs
+from __future__ import absolute_import
 
-_filesystems = None
+import sys
+import logging
 
-def _init_filesystems():
-  """Initialize the module-scoped filesystem dictionary."""
-  global _filesystems
-  if _filesystems is not None:
-    return
-  _filesystems = get_all_hdfs()
+import aws
+
+from desktop.lib.fs import ProxyFS
+from hadoop import cluster
+
+FS_CACHE = {}
+
+DEFAULT_SCHEMA = 'hdfs'
+
+FS_GETTERS = {
+  "hdfs": cluster.get_hdfs,
+#   "s3": aws.get_s3fs
+}
 
 
-def get_filesystem(name):
-  """Return the filesystem with the given name. If the filesystem is not defined,
-  raises KeyError"""
-  _init_filesystems()
-  return _filesystems[name]
-
-def get_default_hdfs():
+def get_filesystem(name='default'):
   """
-  Return the (name, fs) for the default hdfs.
-  Return (None, None) if no hdfs cluster configured
+  Return the filesystem with the given name.
+  If the filesystem is not defined, raises KeyError
   """
-  _init_filesystems()
-  for name, fs in _filesystems.iteritems():
-    # Return the first HDFS encountered
-    if fs.uri.startswith('hdfs') or fs.uri.startswith('http'):
-      return name, fs
-  return None, None
+  if name not in FS_CACHE:
+    FS_CACHE[name] = _make_fs(name)
+  return FS_CACHE[name]
 
-def reset():
+
+def _make_fs(name):
+  fs_dict = {}
+  for schema, getter in FS_GETTERS.iteritems():
+    try:
+      fs = getter(name)
+      fs_dict[schema] = fs
+    except KeyError:
+      if DEFAULT_SCHEMA == schema:
+        logging.error('Can not get filesystem called "%s" for default schema "%s"' % (name, schema))
+        exc_class, exc, tb = sys.exc_info()
+        raise exc_class, exc, tb
+      else:
+        logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, schema))
+  return ProxyFS(fs_dict, DEFAULT_SCHEMA)
+
+
+def clear_cache():
   """
-  reset() -- Forget all cached filesystems and go to a pristine state.
+  Clears internal cache.  Returns
+  something that can be given back to restore_cache.
   """
-  global _filesystems
-  _filesystems = None
+  global FS_CACHE
+  old = FS_CACHE
+  FS_CACHE = {}
+  return old
+
+
+def restore_cache(old_cache):
+  """
+  Restores cache from the result of a previous clear_cache call.
+  """
+  global FS_CACHE
+  FS_CACHE = old_cache

@@ -17,11 +17,10 @@
 # limitations under the License.
 
 import logging
-import uuid
 
 from django.db.models import Q
 
-from desktop.models import Document2, Document, SAMPLE_USERNAME
+from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
@@ -43,7 +42,7 @@ class SearchController(object):
 
   def get_shared_search_collections(self):
     # Those are the ones appearing in the menu
-    docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username=SAMPLE_USERNAME), extra='search-dashboard')
+    docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), extra='search-dashboard')
 
     return [d.content_object for d in docs.order_by('-id')]
 
@@ -85,24 +84,18 @@ class SearchController(object):
     try:
       for doc2 in self.get_shared_search_collections():
         if doc2.id in collection_ids:
+          doc2 = Document2.objects.get_by_uuid(uuid=doc2.uuid)
+          doc = doc2.doc.get()
+
           name = doc2.name + '-copy'
+          doc2 = doc2.copy(name=name, owner=self.user)
 
-          doc2.pk = None
-          doc2.id = None
-          doc2.uuid = str(uuid.uuid4())
-          doc2.name = name
-          doc2.owner = self.user
-          doc2.save()
+          doc.copy(content_object=doc2, name=name, owner=self.user)
 
-          copy_doc = Document.objects.link(doc2,
-              owner=copy.owner,
-              name=copy.name,
-              description=copy.description)
+          collection = Collection2(self.user, document=doc2)
+          collection.data['collection']['label'] = name
 
-          copy = Collection2(self.user, document=doc2)
-          copy.data['collection']['label'] = name
-
-          doc2.update_data({'collection': copy.data['collection']})
+          doc2.update_data({'collection': collection.data['collection']})
           doc2.save()
       result['status'] = 0
     except Exception, e:
@@ -112,20 +105,19 @@ class SearchController(object):
     return result
 
   def is_collection(self, collection_name):
-    solr_collections = SolrApi(SOLR_URL.get(), self.user).collections()
-    return collection_name in solr_collections
+    return collection_name in self.get_solr_collections()
 
   def is_core(self, core_name):
     solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
     return core_name in solr_cores
 
-  def get_solr_collection(self):
+  def get_solr_collections(self):
     return SolrApi(SOLR_URL.get(), self.user).collections()
 
   def get_all_indexes(self, show_all=False):
     indexes = []
     try:
-      indexes = self.get_solr_collection().keys()
+      indexes = self.get_solr_collections().keys()
     except:
       LOG.exception('failed to get indexes')
 
@@ -138,3 +130,7 @@ class SearchController(object):
       return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
     else:
       return indexes
+
+
+def can_edit_index(user):
+  return user.is_superuser

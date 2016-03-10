@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function BeeswaxViewModel(server) {
+function BeeswaxViewModel(server, assistHelper) {
   var self = this;
 
   var DESIGN_DEFAULTS = {
@@ -72,27 +72,51 @@ function BeeswaxViewModel(server) {
     'isRedacted': false
   };
 
+  self.database = ko.observable(null);
+
+  var type = server === "beeswax" ? "hive" : "impala";
+  huePubSub.subscribe("assist.db.panel.ready", function () {
+    huePubSub.publish('assist.set.database', {
+      source: type,
+      name: self.database()
+    });
+  });
+
+  huePubSub.subscribe("assist.database.selected", function (database) {
+    if (database.sourceType === type && self.database() !== database.name) {
+      self.database(database.name);
+    }
+  });
+
+  huePubSub.subscribe("assist.database.set", function (database) {
+    if (database.source === type && self.database() !== database.name) {
+      self.database(database.name);
+    }
+  });
+
   self.design = ko.mapping.fromJS(DESIGN_DEFAULTS);
 
   self.design.inlineErrors = ko.computed(function() {
     return ko.utils.arrayFilter(self.design.errors(), function(err) {
-        return err.toLowerCase().indexOf("line") > -1;
+        return err && err.toLowerCase().indexOf("line") > -1;
     });
   });
 
   self.design.watch.inlineErrors = ko.computed(function() {
     return ko.utils.arrayFilter(self.design.watch.errors(), function(err) {
-        return err.toLowerCase().indexOf("line") > -1;
+        return err && err.toLowerCase().indexOf("line") > -1;
     });
   });
+
+  self.impalaSessionLink = ko.observable("");
+
+  self.isEditor = ko.observable(true);
 
   self.chartType = ko.observable("bars");
   self.chartSorting = ko.observable("none");
   self.chartData = ko.observableArray();
 
   self.server = ko.observable(server);
-  self.databases = ko.observableArray();
-  self.selectedDatabase = ko.observable(0);
   self.isReady = ko.observable(false);
   // Use a view model attribute so that we don't have to override KO.
   // This allows Hue to disable the execute button until the query placeholder dies.
@@ -121,22 +145,6 @@ function BeeswaxViewModel(server) {
 
   self.design.results.save.targetFileError = ko.computed(function() {
     return (self.design.results.save.errors() && 'target_file' in self.design.results.save.errors()) ? self.design.results.save.errors()['target_file'] : null;
-  });
-
-  self.database = ko.computed({
-    'read': function() {
-      if (self.databases()) {
-        return self.databases()[self.selectedDatabase()];
-      } else{
-        return "";
-      }
-    },
-    'write': function(value) {
-      if (value) {
-        self.selectedDatabase(self.databases.indexOf(value));
-      }
-    },
-    'deferEvaluation': true
   });
 
   self.hasParametersFilled = ko.computed(function() {
@@ -175,16 +183,6 @@ function BeeswaxViewModel(server) {
       self.design.settings.errors.push.apply(self.design.settings.errors, errors.settings);
       self.design.fileResources.errors.push.apply(self.design.fileResources.errors, errors.file_resources);
       self.design.functions.errors.push.apply(self.design.functions.errors, errors.functions);
-    }
-  };
-
-  self.updateDatabases = function(databases) {
-    if (databases) {
-      var i = databases.indexOf("_impala_builtins"); // Blacklist of system databases
-      if (i != -1) {
-        databases.splice(i, 1);
-      }
-      self.databases(databases);
     }
   };
 
@@ -378,6 +376,31 @@ function BeeswaxViewModel(server) {
     }
   };
 
+  self.fetchingImpalaSession = ko.observable(false);
+  self.fetchImpalaSession = function () {
+    self.fetchingImpalaSession(true);
+    var request = {
+      url: '/impala/api/session/',
+      dataType: 'json',
+      type: 'GET',
+      success: function (data) {
+        if (data && data.properties && data.properties.http_addr) {
+          if (!data.properties.http_addr.match(/^(https?):\/\//)) {
+            data.properties.http_addr = window.location.protocol + "//" + data.properties.http_addr;
+          }
+          self.impalaSessionLink(data.properties.http_addr);
+        }
+        else {
+          self.impalaSessionLink("");
+        }
+        self.fetchingImpalaSession(false);
+      },
+      error: error_fn,
+      cache: false
+    };
+    $.ajax(request);
+  }
+
   self.fetchDesign = function() {
     $(document).trigger('fetch.design');
 
@@ -405,7 +428,9 @@ function BeeswaxViewModel(server) {
       type: 'GET',
       success: function(data) {
         self.updateHistory(data.query_history);
-        self.database(data.query_history.database);
+        if (data.query_history.database) {
+          self.database(data.query_history.database);
+        }
         $(document).trigger('fetched.query', [data]);
       },
       error: error_fn,
@@ -414,6 +439,19 @@ function BeeswaxViewModel(server) {
     $.ajax(request);
   };
 
+  self.clearQueryHistory = function() {
+    var request = {
+      url: '/' + self.server() + '/api/query/clear_history/',
+      dataType: 'json',
+      type: 'POST',
+      success: function(data) {
+        $(document).trigger('clear.history', [data]);
+      },
+      error: error_fn,
+      cache: false
+    };
+    $.ajax(request);
+  };
 
   self.fetchParameters = function() {
     $(document).trigger('fetch.parameters');
@@ -516,9 +554,7 @@ function BeeswaxViewModel(server) {
         self.design.errors.removeAll();
         self.design.watch.errors.removeAll();
         if (data.status == 0) {
-          if (typeof history.pushState != 'undefined') {
-            history.pushState(null, null, '/' + self.server() + '/execute/query/' + data.id + '#query/logs');
-          }
+          hueUtils.changeURL('/' + self.server() + '/execute/query/' + data.id + '#query/logs');
           self.design.results.url('/' + self.server() + '/results/' + data.id + '/0?format=json');
           self.design.watch.url(data.watch_url);
           self.design.statement(data.statement);
@@ -651,12 +687,15 @@ function BeeswaxViewModel(server) {
           }
           if (! failed) {
             $(document).trigger('stop_watch.query');
-
             if (fn) {
               fn(data);
             } else {
               self.fetchResults();
             }
+          }
+          else {
+            self.design.watch.errors.push(data.message);
+            $(document).trigger('stop_watch.query');
           }
         } else {
           self.design.statement(data.statement); // In case new no result statement executed
@@ -682,43 +721,58 @@ function BeeswaxViewModel(server) {
     timer = setTimeout(_fn, TIMEOUT);
   };
 
-  self.fetchResults = function() {
-    $(document).trigger('fetch.results');
-    self.design.errors.removeAll();
-    self.design.results.errors.removeAll();
-    var request = {
-      url: self.design.results.url(),
-      dataType: 'text',
-      type: 'GET',
-      success: function(data) {
-        data = JSON.bigdataParse(data);
-        if (data.error) {
-          self.design.results.errors.push(data.message);
-          self.design.isRunning(false);
-          self.design.results.empty(true);
-        } else {
-          self.design.isRunning(false);
-          self.design.isFinished(data.is_finished);
-          if (self.design.results.columns().length == 0){
-            if (data.columns != null){
-              data.columns.unshift({ type:"INT_TYPE", name:"", comment:null});
+  self.isFetchingResults = ko.observable(false);
+  self.fetchResults = function () {
+    if (!self.isFetchingResults()) {
+      self.isFetchingResults(true);
+      $(document).trigger('fetch.results');
+      self.design.errors.removeAll();
+      self.design.results.errors.removeAll();
+      var request = {
+        url: self.design.results.url(),
+        dataType: 'text',
+        type: 'GET',
+        success: function (data) {
+          data = JSON.bigdataParse(data);
+          if (data.traceback) {
+            self.design.isRunning(false);
+            $(document).trigger('server.unmanageable_error', data.traceback.length > 0 ? data.traceback[data.traceback.length - 1].join("\n") : "");
+          }
+          else if (data.error) {
+            self.design.results.errors.push(data.message);
+            self.design.isRunning(false);
+            self.design.results.empty(true);
+          }
+          else {
+            self.design.isRunning(false);
+            self.design.isFinished(data.is_finished);
+            if (self.design.results.columns().length == 0) {
+              if (data.columns != null) {
+                data.columns.unshift({ type: "INT_TYPE", name: "", comment: null});
+              }
+              self.design.results.columns(data.columns ? data.columns : []); // Some querysets have empty or null for columns
             }
-            self.design.results.columns(data.columns ? data.columns : []); // Some querysets have empty or null for columns
+            self.design.results.rows.push.apply(self.design.results.rows, data.results);
+            self.design.results.empty(self.design.results.rows().length == 0);
+            if (data.has_more) {
+              self.design.results.url(data.next_json_set);
+            } else {
+              self.design.results.url(null);
+            }
           }
-          self.design.results.rows.push.apply(self.design.results.rows, data.results);
-          self.design.results.empty(self.design.results.rows().length == 0);
-          if (data.has_more) {
-            self.design.results.url(data.next_json_set);
-          } else {
-            self.design.results.url(null);
+          self.isFetchingResults(false);
+          if (!data.traceback) {
+            $(document).trigger('fetched.results', [data]);
           }
-        }
-        $(document).trigger('fetched.results', [data]);
-      },
-      error: error_fn,
-      cache: false
-    };
-    $.ajax(request);
+        },
+        error: function (jqXHR, status, errorThrown) {
+          self.isFetchingResults(false);
+          error_fn(jqXHR, status, errorThrown);
+        },
+        cache: false
+      };
+      $.ajax(request);
+    }
   };
 
   self.saveDesign = function() {
@@ -752,7 +806,7 @@ function BeeswaxViewModel(server) {
             $(document).trigger('saved.design', [data.design_id]);
           } else {
             self.setErrors("", data.errors);
-            $(document).trigger('error_save.design', [data.message]);
+            $(document).trigger('error_save.design', [data.message ? data.message : data.errors]);
           }
         },
         error: function() {
@@ -854,7 +908,7 @@ function BeeswaxViewModel(server) {
             self.design.results.save.errors(null);
 
             var redirect_fn = function() {
-              window.location.href = data.success_url;
+              window.location.href = data.success_url + (data.success_url.indexOf("?") > -1 ? "&" : "?") + "refresh=true";
               self.design.isRunning(false);
             };
             if (data.id) {

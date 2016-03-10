@@ -19,7 +19,10 @@
 package com.cloudera.hue.livy.server.batch
 
 import com.cloudera.hue.livy.Logging
-import com.cloudera.hue.livy.server.{SessionManager, SessionServlet}
+import com.cloudera.hue.livy.server.SessionServlet
+import com.cloudera.hue.livy.sessions.SessionManager
+import com.cloudera.hue.livy.sessions.batch.BatchSession
+import org.json4s.JsonDSL._
 import org.json4s._
 
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
@@ -37,7 +40,6 @@ class BatchSessionServlet(batchManager: SessionManager[BatchSession])
 }
 
 private object Serializers {
-  import org.json4s.JsonDSL._
 
   def Formats: List[CustomSerializer[_]] = List(BatchSerializer)
 

@@ -18,13 +18,16 @@
 
 package com.cloudera.hue.livy.server
 
-import java.io.IOException
+import java.io.{File, IOException}
 import javax.servlet.ServletContext
 
 import com.cloudera.hue.livy._
-import com.cloudera.hue.livy.server.batch._
-import com.cloudera.hue.livy.server.interactive._
+import com.cloudera.hue.livy.server.batch.BatchSessionServlet
+import com.cloudera.hue.livy.server.interactive.InteractiveSessionServlet
+import com.cloudera.hue.livy.spark.SparkManager
 import org.scalatra._
+import org.scalatra.metrics.MetricsBootstrap
+import org.scalatra.metrics.MetricsSupportExtensions._
 import org.scalatra.servlet.ScalatraListener
 import org.slf4j.LoggerFactory
 
@@ -43,9 +46,10 @@ object Main {
     val port = livyConf.getInt("livy.server.port", 8998)
 
     // Make sure the `spark-submit` program exists, otherwise much of livy won't work.
+    testSparkHome(livyConf)
     testSparkSubmit(livyConf)
 
-    val server = new WebServer(host, port)
+    val server = new WebServer(livyConf, host, port)
 
     server.context.setResourceBase("src/main/com/cloudera/hue/livy/server")
     server.context.setInitParameter(ScalatraListener.LifeCycleKey, classOf[ScalatraBootstrap].getCanonicalName)
@@ -54,7 +58,9 @@ object Main {
     server.start()
 
     try {
-      System.setProperty("livy.server.callback-url", f"http://${server.host}:${server.port}")
+      if (!sys.props.contains("livy.server.serverUrl")) {
+        sys.props("livy.server.serverUrl") = f"http://${server.host}:${server.port}"
+      }
     } finally {
       server.join()
       server.stop()
@@ -65,18 +71,46 @@ object Main {
   }
 
   /**
+   * Sets the spark-submit path if it's not configured in the LivyConf
+   */
+  private def testSparkHome(livyConf: LivyConf) = {
+    val sparkHome = livyConf.sparkHome().getOrElse {
+      System.err.println("Livy requires the SPARK_HOME environment variable")
+      sys.exit(1)
+    }
+
+    val sparkHomeFile = new File(sparkHome)
+
+    if (!sparkHomeFile.exists) {
+      System.err.println("SPARK_HOME path does not exist")
+      sys.exit(1)
+    }
+  }
+
+  /**
    * Test that the configured `spark-submit` executable exists.
    *
    * @param livyConf
    */
   private def testSparkSubmit(livyConf: LivyConf) = {
     try {
-      // Ignore the version for now.
+      val versions_regex = (
+        """^(?:""" +
+          """(1\.3\.0)|""" +
+          """(1\.3\.1)|""" +
+          """(1\.4\.0)|""" +
+          """(1\.4\.1)|""" +
+          """(1\.5\.0)|""" +
+          """(1\.5\.1)""" +
+        """)(-.*)?"""
+      ).r
+
       val version = sparkSubmitVersion(livyConf)
-      version match {
-        case "1.3.0" | "1.3.1" =>
+
+      versions_regex.findFirstIn(version) match {
+        case Some(_) =>
           logger.info(f"Using spark-submit version $version")
-        case _ =>
+        case None =>
           logger.warn(f"Warning, livy has not been tested with spark-submit version $version")
       }
     } catch {
@@ -102,58 +136,44 @@ object Main {
     val exitCode = process.waitFor()
     val output = process.inputIterator.mkString("\n")
 
-    if (exitCode != 1) {
-      throw new IOException(f"spark-submit had an unexpected exit [$exitCode]:\n$output]")
-    }
-
     val regex = """version (.*)""".r.unanchored
 
     output match {
       case regex(version) => version
-      case _ => throw new IOException(f"Unable to determing spark-submit version:\n$output")
+      case _ => throw new IOException(f"Unable to determine spark-submit version [$exitCode]:\n$output")
     }
   }
+
 }
 
-class ScalatraBootstrap extends LifeCycle with Logging {
+class ScalatraBootstrap
+  extends LifeCycle
+  with Logging
+  with MetricsBootstrap {
 
-  var sessionManager: SessionManager[InteractiveSession] = null
-  var batchManager: SessionManager[BatchSession] = null
+  var sparkManager: SparkManager = null
 
   override def init(context: ServletContext): Unit = {
-    val livyConf = new LivyConf()
+    try {
+      val livyConf = new LivyConf()
+      sparkManager = SparkManager(livyConf)
 
-    val sessionFactoryKind = try {
-      livyConf.sessionKind()
+      context.mount(new InteractiveSessionServlet(sparkManager.interactiveManager), "/sessions/*")
+      context.mount(new BatchSessionServlet(sparkManager.batchManager), "/batches/*")
+      context.mountMetricsAdminServlet("/")
+
+      context.initParameters(org.scalatra.EnvironmentKey) = livyConf.get("livy.environment", "development")
     } catch {
-      case e: IllegalStateException =>
-        println(f"Unknown session factory: $e}")
+      case e: Throwable =>
+        println(f"Exception thrown when initializing server: $e")
         sys.exit(1)
     }
-
-    info(f"Using $sessionFactoryKind sessions")
-
-    val (sessionFactory, batchFactory) = sessionFactoryKind match {
-      case LivyConf.Process() =>
-        (new InteractiveSessionProcessFactory(livyConf), new BatchSessionProcessFactory(livyConf))
-      case LivyConf.Yarn() =>
-        (new InteractiveSessionYarnFactory(livyConf), new BatchSessionYarnFactory(livyConf))
-    }
-
-    sessionManager = new SessionManager(sessionFactory)
-    batchManager = new SessionManager(batchFactory)
-
-    context.mount(new InteractiveSessionServlet(sessionManager), "/sessions/*")
-    context.mount(new BatchSessionServlet(batchManager), "/batches/*")
   }
 
   override def destroy(context: ServletContext): Unit = {
-    if (sessionManager != null) {
-      sessionManager.shutdown()
-    }
-
-    if (batchManager != null) {
-      batchManager.shutdown()
+    if (sparkManager != null) {
+      sparkManager.shutdown()
+      sparkManager = null
     }
   }
 }

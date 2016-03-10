@@ -44,6 +44,7 @@ from hadoop.api.common.ttypes import RequestContext, IOException
 import hadoop.conf
 from hadoop.fs import normpath, SEEK_SET, SEEK_CUR, SEEK_END
 from hadoop.fs.exceptions import PermissionDeniedException
+from useradmin.conf import HOME_DIR_PERMISSIONS
 
 
 LOG = logging.getLogger(__name__)
@@ -238,13 +239,14 @@ class Hdfs(object):
     if home_path is None:
       home_path = self.get_home_dir()
 
+    mode = int(HOME_DIR_PERMISSIONS.get(), 8)
     if not self.exists(home_path):
       user = self.user
       try:
         try:
           self.setuser(self.superuser)
           self.mkdir(home_path)
-          self.chmod(home_path, 0755)
+          self.chmod(home_path, mode)
           self.chown(home_path, user, user)
         except IOError:
           msg = 'Failed to create home dir ("%s") as superuser %s' % (home_path, self.superuser)

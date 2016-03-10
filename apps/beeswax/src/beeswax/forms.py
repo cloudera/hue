@@ -130,24 +130,32 @@ class SaveResultsTableForm(forms.Form):
 
   def clean(self):
     cleaned_data = super(SaveResultsTableForm, self).clean()
-
     target_table = cleaned_data.get('target_table')
-    if target_table:
-      try:
-        if self.db is not None:
-          name_parts = target_table.split(".")
-          if len(name_parts) == 1:
-            pass
-          elif len(name_parts) == 2:
-            self.target_database, target_table = name_parts
-          else:
-            self._errors['target_table'] = self.error_class([_('Invalid table prefix name')])
-          cleaned_data['target_table'] = target_table # Update table name without the DB prefix
-          self.db.get_table(self.target_database, target_table)
-        self._errors['target_table'] = self.error_class([_('Table already exists')])
-        del cleaned_data['target_table']
-      except Exception:
-        pass
+
+    if not target_table:
+      raise forms.ValidationError(_("Table name is required."))
+    else:
+      if self.db is None:
+        raise forms.ValidationError(_("Cannot validate form, db object is required."))
+      else:
+        # Table field may be set to <database>.<table> so we need to parse it before validation
+        name_parts = target_table.split(".")
+        if len(name_parts) == 1:
+          pass
+        elif len(name_parts) == 2:   # Update table name without the DB prefix
+          self.target_database, target_table = name_parts
+        else:
+          raise forms.ValidationError(_("Invalid table prefix name."))
+
+        # Check if table already exists
+        table = None
+        try:
+          table = self.db.get_table(self.target_database, target_table)
+        except Exception:
+          cleaned_data['target_table'] = target_table
+
+        if table is not None:
+          raise forms.ValidationError(_("Table %s.%s already exists") % (self.target_database, target_table))
 
     return cleaned_data
 
@@ -341,8 +349,20 @@ HIVE_PRIMITIVE_TYPES = \
       "float", "double", "timestamp", "date", "char", "varchar")
 
 class PartitionTypeForm(forms.Form):
+  dependencies = [
+    ("column_type", "char", "char_length"),
+    ("column_type", "varchar", "varchar_length")
+  ]
   column_name = common.HiveIdentifierField(required=True)
   column_type = forms.ChoiceField(required=True, choices=common.to_choices(HIVE_PRIMITIVE_TYPES))
+  char_length = forms.IntegerField(required=False, initial=1,
+                                   widget=NumberInput(attrs={'min': 1, 'max': 255}),
+                                   validators=[MinValueValidator(1), MaxValueValidator(255)],
+                                   help_text=_t("Specify if column_type is char"))
+  varchar_length = forms.IntegerField(required=False, initial=1,
+                                      widget=NumberInput(attrs={'min': 1, 'max': 65355}),
+                                      validators=[MinValueValidator(1), MaxValueValidator(65355)],
+                                      help_text=_t("Specify if column_is varchar"))
 
 class ColumnTypeForm(DependencyAwareForm):
   """

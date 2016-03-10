@@ -23,15 +23,15 @@ import logging
 import os.path
 import re
 import tempfile
+import time
 
 import kerberos
-
-from datetime import datetime
 
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import REDIRECT_FIELD_NAME, BACKEND_SESSION_KEY, authenticate, load_backend, login
 from django.contrib.auth.middleware import RemoteUserMiddleware
+from django.contrib.auth.models import User
 from django.core import exceptions, urlresolvers
 import django.db
 from django.http import HttpResponseNotAllowed
@@ -39,21 +39,21 @@ from django.core.urlresolvers import resolve
 from django.http import HttpResponseRedirect, HttpResponse
 from django.utils.translation import ugettext as _
 from django.utils.http import urlquote, is_safe_url
-from django.utils.encoding import iri_to_uri
 import django.views.static
 
 import desktop.views
 import desktop.conf
 from desktop.context_processors import get_app_name
-from desktop.lib import apputil, i18n
-from desktop.lib.django_util import render, render_json, is_jframe_request
+from desktop.lib import apputil, i18n, fsmanager
+from desktop.lib.django_util import render, render_json
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.log import get_audit_logger
 from desktop.log.access import access_log, log_page_hit
 from desktop import appmanager
 from desktop import metrics
 from hadoop import cluster
-from desktop.log import get_audit_logger
+
 
 
 LOG = logging.getLogger(__name__)
@@ -120,10 +120,7 @@ class ClusterMiddleware(object):
     if "fs" in view_kwargs:
       del view_kwargs["fs"]
 
-    try:
-      request.fs = cluster.get_hdfs(request.fs_ref)
-    except KeyError:
-      raise KeyError(_('Cannot find HDFS called "%(fs_ref)s".') % {'fs_ref': request.fs_ref})
+    request.fs = fsmanager.get_filesystem(request.fs_ref)
 
     if request.user.is_authenticated():
       if request.fs is not None:
@@ -308,7 +305,7 @@ class LoginAndPermissionMiddleware(object):
         app_accessed = ui_app_accessed
 
       if app_accessed and \
-          app_accessed not in ("desktop", "home", "about") and \
+          app_accessed not in ("desktop", "home", "home2", "about") and \
           not (request.user.has_hue_permission(action="access", app=app_accessed) or
                request.user.has_hue_permission(action=access_view, app=app_accessed)):
         access_log(request, 'permission denied', level=access_log_level)
@@ -342,30 +339,61 @@ class JsonMessage(object):
 class AuditLoggingMiddleware(object):
 
   def __init__(self):
-    from desktop.conf import AUDIT_EVENT_LOG_DIR
+    from desktop.conf import AUDIT_EVENT_LOG_DIR, SERVER_USER
+
+    self.impersonator = SERVER_USER.get()
 
     if not AUDIT_EVENT_LOG_DIR.get():
       LOG.info('Unloading AuditLoggingMiddleware')
       raise exceptions.MiddlewareNotUsed
 
   def process_response(self, request, response):
+    response['audited'] = False
     try:
-      audit_logger = get_audit_logger()
-      audit_logger.debug(JsonMessage(**{
-          datetime.utcnow().strftime('%s'): {
-            'user': request.user.username  if hasattr(request, 'user') else 'anonymous',
-            "status": response.status_code,
-            "impersonator": None,
-            "ip_address": request.META.get('REMOTE_ADDR'),
-            "authorization_failure": response.status_code == 401,
-            "service": get_app_name(request),
-            "url": request.path,
-          }
-      }))
-      response['audited'] = True
+      if hasattr(request, 'audit') and request.audit is not None:
+        self._log_message(request, response)
+        response['audited'] = True
     except Exception, e:
       LOG.error('Could not audit the request: %s' % e)
     return response
+
+  def _log_message(self, request, response=None):
+    audit_logger = get_audit_logger()
+
+    audit_logger.debug(JsonMessage(**{
+      'username': self._get_username(request),
+      'impersonator': self.impersonator,
+      'ipAddress': self._get_client_ip(request),
+      'operation': request.audit['operation'],
+      'operationText': request.audit.get('operationText', ''),
+      'eventTime': self._milliseconds_since_epoch(),
+      'allowed': self._get_allowed(request, response),
+      'service': get_app_name(request),
+      'url': request.path
+    }))
+
+  def _get_client_ip(self, request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        x_forwarded_for = x_forwarded_for.split(',')[0]
+    return request.META.get('HTTP_CLIENT_IP') or x_forwarded_for or request.META.get('REMOTE_ADDR')
+
+  def _get_username(self, request):
+    username = 'anonymous'
+    if request.audit.get('username', None):
+      username = request.audit.get('username')
+    elif hasattr(request, 'user') and not request.user.is_anonymous():
+      username = request.user.get_username()
+    return username
+
+  def _milliseconds_since_epoch(self):
+    return int(time.time() * 1000)
+
+  def _get_allowed(self, request, response=None):
+    allowed = response.status_code != 401
+    if 'allowed' in request.audit:
+      return request.audit['allowed']
+    return allowed
 
 
 try:
@@ -480,7 +508,7 @@ class SpnegoMiddleware(object):
   """
 
   def __init__(self):
-    if not 'SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.SpnegoDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading SpnegoMiddleware')
       raise exceptions.MiddlewareNotUsed
 
@@ -588,7 +616,7 @@ class HueRemoteUserMiddleware(RemoteUserMiddleware):
   in use.
   """
   def __init__(self):
-    if not 'RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
+    if not 'desktop.auth.backend.RemoteUserDjangoBackend' in desktop.conf.AUTH.BACKEND.get():
       LOG.info('Unloading HueRemoteUserMiddleware')
       raise exceptions.MiddlewareNotUsed
     self.header = desktop.conf.AUTH.REMOTE_USER_HEADER.get()

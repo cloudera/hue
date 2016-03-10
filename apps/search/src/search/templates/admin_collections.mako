@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
 
@@ -41,14 +41,14 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
 </div>
 
 <div class="container-fluid">
-  <div class="card card-home card-small">
+  <div class="card card-home card-small" style="min-height: 400px">
     <%actionbar:render>
       <%def name="search()">
         <input type="text" placeholder="${_('Filter dashboards...')}" class="input-xlarge search-query" id="filterInput" data-bind="visible: collections().length > 0 && !isLoading()">
       </%def>
 
       <%def name="actions()">
-        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': ! atLeastOneSelected()}">
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: $root.copyCollections, clickBubble: false, css: {'btn': true, 'disabled': selectedCollections().length == 0}">
           <i class="fa fa-files-o"></i> ${_('Copy')}
         </a>
 
@@ -56,13 +56,13 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
           <i class="fa fa-times"></i> ${_('Delete')}
         </a>
 
-        <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="click: function(e){ $root.oneSelected() ? prepareShareModal(e) : void(0) },
-          attr: {'data-original-title': '${ _("Share") } ' + name},
+        <a class="share-link btn" rel="tooltip" data-placement="bottom" style="margin-left:20px" data-bind="visible: collections().length > 0 && !isLoading(), click: function(e){ $root.oneSelected() ? prepareShareModal(e) : void(0) },
+          attr: {'data-original-title': '${ _ko("Share") } ' + name},
           css: {'disabled': ! $root.oneSelected(), 'btn': true}">
           <i class="fa fa-users"></i> ${ _('Share') }
         </a>
 
-        <a data-bind="click: function() { atLeastOneSelected() ? exportDocuments() : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
+        <a data-bind="visible: collections().length > 0 && !isLoading(), click: function() { atLeastOneSelected() ? exportDocuments() : void(0) }, css: {'btn': true, 'disabled': ! atLeastOneSelected() }">
           <i class="fa fa-download"></i> ${ _('Export') }
         </a>
       </%def>
@@ -71,7 +71,7 @@ ${ commonheader(_('Search'), "search", user, "29px") | n,unicode }
         <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }">
           <i class="fa fa-plus-circle"></i> ${ _('Create') }
         </a>
-        <a data-bind="click: function() { $('#import-documents').modal('show'); }" class="btn">
+        <a data-bind="visible: !isLoading(), click: function() { $('#import-documents').modal('show'); }" class="btn">
           <i class="fa fa-upload"></i> ${ _('Import') }
         </a>
       </%def>
@@ -233,4 +233,4 @@ ${ commonimportexport(request) | n,unicode }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

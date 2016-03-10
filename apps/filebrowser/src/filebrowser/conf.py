@@ -17,7 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.lib.conf import Config
+from desktop.lib.conf import Config, coerce_bool
 
 
 MAX_SNAPPY_DECOMPRESSION_SIZE = Config(
@@ -32,3 +32,15 @@ ARCHIVE_UPLOAD_TEMPDIR = Config(
   help=_("Location on local filesystem where the uploaded archives are temporary stored."),
   default=None,
   type=str)
+
+SHOW_DOWNLOAD_BUTTON = Config(
+  key="show_download_button",
+  help=_("whether to show the download button in hdfs file browser."),
+  type=coerce_bool,
+  default=True)
+
+SHOW_UPLOAD_BUTTON = Config(
+  key="show_upload_button",
+  help=_("whether to show the upload button in hdfs file browser."),
+  type=coerce_bool,
+  default=True)

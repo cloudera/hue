@@ -15,11 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
+import sys
 
-from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import ugettext_lazy as _t, ugettext as _
 
-from desktop.lib.conf import Config, validate_thrift_transport, coerce_str_lowercase, coerce_bool
+from desktop.lib.conf import Config, validate_thrift_transport, coerce_bool
+from desktop.lib.exceptions import StructuredThriftTransportException
+
+LOG = logging.getLogger(__name__)
 
 
 HBASE_CLUSTERS = Config(
@@ -63,6 +68,26 @@ USE_DOAS = Config(
 
 def config_validator(user):
   res = []
+
+  from hbase.api import HbaseApi
+  from hbase.settings import NICE_NAME
+
+  try:
+    if not 'test' in sys.argv: # Avoid tests hanging
+      api = HbaseApi(user=user)
+      cluster_name = api.getClusters()[0]['name'] # Currently pick first configured cluster
+      # Check connectivity
+      api.connectCluster(cluster_name)
+      api.getTableList(cluster_name)
+  except Exception, e:
+    print e
+    if 'Could not connect' in str(e):
+      msg = "The application won't work without a running HBase Thrift Server v1."
+    else:
+      msg = 'Failed to authenticate to HBase Thrift Server, check authentication configurations.'
+    LOG.exception(msg)
+    res.append((NICE_NAME, _(msg)))
+
 
   res.extend(validate_thrift_transport(THRIFT_TRANSPORT))
 

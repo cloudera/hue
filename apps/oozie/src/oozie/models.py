@@ -27,7 +27,7 @@ from datetime import datetime,  timedelta
 from string import Template
 from itertools import chain
 
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.core.validators import RegexValidator
@@ -109,7 +109,7 @@ class Job(models.Model):
   Base class for Oozie Workflows, Coordinators and Bundles.
   """
   owner = models.ForeignKey(User, db_index=True, verbose_name=_t('Owner'), help_text=_t('Person who can modify the job.')) # Deprecated
-  name = models.CharField(max_length=40, blank=False, validators=[name_validator], # Deprecated
+  name = models.CharField(max_length=255, blank=False, validators=[name_validator], # Deprecated
       help_text=_t('Name of the job, which must be unique per user.'), verbose_name=_t('Name'))
   description = models.CharField(max_length=1024, blank=True, verbose_name=_t('Description'), # Deprecated
                                  help_text=_t('The purpose of the job.'))
@@ -543,18 +543,20 @@ class Workflow(Job):
   @classmethod
   def gen_status_graph_from_xml(cls, user, oozie_workflow):
     from oozie.importlib.workflows import import_workflow # Circular dependency
+
     try:
-      workflow = Workflow.objects.new_workflow(user)
-      workflow.save()
-      try:
+      with transaction.atomic():
+        workflow = Workflow.objects.new_workflow(user)
+        workflow.save()
+
         import_workflow(workflow, oozie_workflow.definition)
         graph =  workflow.gen_status_graph(oozie_workflow)
-        return graph, workflow.node_list
-      except Exception, e:
-        LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
-    finally:
-      if workflow.pk is not None:
+        node_list = workflow.node_list
         workflow.delete(skip_trash=True)
+        return graph, node_list
+    except Exception, e:
+      LOG.warn('Workflow %s could not be converted to a graph: %s' % (oozie_workflow.id, e))
+
     return None, []
 
   def to_xml(self, mapping=None):
@@ -635,7 +637,7 @@ class Node(models.Model):
   """
   PARAM_FIELDS = ()
 
-  name = models.CharField(max_length=40, validators=[name_validator], verbose_name=_t('Name'),
+  name = models.CharField(max_length=255, validators=[name_validator], verbose_name=_t('Name'),
                           help_text=_t('Name of the action, which must be unique by workflow.'))
   description = models.CharField(max_length=1024, blank=True, default='', verbose_name=_t('Description'),
                                  help_text=_t('The purpose of the action.'))
@@ -1422,7 +1424,7 @@ class Coordinator(Job):
     '0,15,30,45 * * * *': _('Every 15 minutes'),
     '0,30 * * * *': _('Every 30 minutes'),
     '0 * * * *': _('Every hour'),
-    '0 0 * * *': _('Every day at midnight'),
+    '0 0 * * *': _('Every day'),
     '0 0 * * 0': _('Every week'),
     '0 0 1 * *': _('Every month'),
     '0 0 1 1 *': _('Every year'),

@@ -84,6 +84,7 @@ def HS2DataAdapter(handle, db, max_rows=0, start_over=True):
     for row in results.rows():
       num_rows_seen += 1
       if limit_rows and num_rows_seen > max_rows:
+        LOG.warn('The query results exceeded the maximum row limit of %d. Data has been truncated.' % max_rows)
         break
       data.append(row)
 

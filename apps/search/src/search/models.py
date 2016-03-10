@@ -28,8 +28,8 @@ from django.db import models
 from django.utils.html import escape
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-
 from desktop.lib.i18n import smart_unicode, smart_str
+from desktop.models import get_data_link
 
 from libsolr.api import SolrApi
 
@@ -283,6 +283,7 @@ class Collection(models.Model):
       props['collection']['enabled'] = True
     if 'leafletmap' not in props['collection']['template']:
       props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
+
     for facet in props['collection']['facets']:
       properties = facet['properties']
       if 'gap' in properties and not 'initial_gap' in properties:
@@ -468,6 +469,23 @@ class Collection2(object):
     # For backward compatibility
     if 'rows' not in props['collection']['template']:
       props['collection']['template']['rows'] = 10
+    if 'showGrid' not in props['collection']['template']:
+      props['collection']['template']['showGrid'] = True
+    if 'showChart' not in props['collection']['template']:
+      props['collection']['template']['showChart'] = False
+    if 'chartSettings' not in props['collection']['template']:
+      props['collection']['template']['chartSettings'] = {
+        'chartType': 'bars',
+        'chartSorting': 'none',
+        'chartScatterGroup': None,
+        'chartScatterSize': None,
+        'chartScope': 'world',
+        'chartX': None,
+        'chartYSingle': None,
+        'chartYMulti': [],
+        'chartData': [],
+        'chartMapLabel': None,
+      }
     if 'enabled' not in props['collection']:
       props['collection']['enabled'] = True
     if 'leafletmap' not in props['collection']['template']:
@@ -481,6 +499,11 @@ class Collection2(object):
         'to': 'NOW',
         'truncate': True
       }
+    if 'suggest' not in props['collection']:
+      props['collection']['suggest'] = {'enabled': False, 'dictionary': ''}
+    for field in props['collection']['template']['fieldsAttributes']:
+      if 'type' not in field:
+        field['type'] = 'string'
 
     for facet in props['collection']['facets']:
       properties = facet['properties']
@@ -526,6 +549,20 @@ class Collection2(object):
       </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
       "isGridLayout": True,
       "showFieldList": True,
+      "showGrid": True,
+      "showChart": False,
+      "chartSettings" : {
+        'chartType': 'bars',
+        'chartSorting': 'none',
+        'chartScatterGroup': None,
+        'chartScatterSize': None,
+        'chartScope': 'world',
+        'chartX': None,
+        'chartYSingle': None,
+        'chartYMulti': [],
+        'chartData': [],
+        'chartMapLabel': None,
+      },
       "fieldsAttributes": [self._make_gridlayout_header_field(field) for field in fields],
       "fieldsSelected": [],
       "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None},
@@ -556,7 +593,20 @@ class Collection2(object):
 
   @classmethod
   def _make_gridlayout_header_field(cls, field, isDynamic=False):
-    return {'name': field['name'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
+    return {'name': field['name'], 'type': field['type'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
+
+
+  @classmethod
+  def _make_luke_from_schema_fields(cls, schema_fields):
+    return dict([
+          (f['name'], {
+              'copySources': [],
+              'type': f['type'],
+              'required': True,
+              'uniqueKey': f.get('uniqueKey'),
+              'flags': u'%s-%s-----OF-----l' % ('I' if f['indexed'] else '-', 'S' if f['stored'] else '-'), u'copyDests': []
+          })
+        for f in schema_fields['fields']])
 
   def get_absolute_url(self):
     return reverse('search:index') + '?collection=%s' % self.id
@@ -565,8 +615,14 @@ class Collection2(object):
     return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
 
   def fields_data(self, user, name):
-    schema_fields = SolrApi(SOLR_URL.get(), user).fields(name)
-    schema_fields = schema_fields['schema']['fields']
+    api = SolrApi(SOLR_URL.get(), user)
+    try:
+      schema_fields = api.fields(name)
+      schema_fields = schema_fields['schema']['fields']
+    except Exception, e:
+      LOG.warn('/luke call did not succeed: %s' % e)
+      fields = api.schema_fields(name)
+      schema_fields = Collection2._make_luke_from_schema_fields(fields)
 
     return sorted([self._make_field(field, attributes) for field, attributes in schema_fields.iteritems()])
 
@@ -802,32 +858,41 @@ def augment_solr_response(response, collection, query):
       response.pop('facets')
 
   # HTML escaping
-  for doc in response['response']['docs']:
-    for field, value in doc.iteritems():
-      if isinstance(value, numbers.Number):
-        escaped_value = value
-      else:
-        value = smart_unicode(value, errors='replace')
-        escaped_value = escape(value)
-      doc[field] = escaped_value
+  if not query.get('download'):
+    id_field = collection.get('idField', '')
+    for doc in response['response']['docs']:
+      for field, value in doc.iteritems():
+        if isinstance(value, numbers.Number):
+          escaped_value = value
+        elif isinstance(value, list): # Multivalue field
+          escaped_value = [smart_unicode(val, errors='replace') for val in value]
+        else:
+          value = smart_unicode(value, errors='replace')
+          escaped_value = escape(value)
+        doc[field] = escaped_value
 
-    if not query.get('download'):
-      doc['showDetails'] = False
+      link = None
+      if 'link-meta' in doc:
+        meta = json.loads(doc['link-meta'])
+        link = get_data_link(meta)
+
+      doc['externalLink'] = link
       doc['details'] = []
+      doc['hueId'] = smart_unicode(doc.get(id_field, ''))
 
   highlighted_fields = response.get('highlighting', {}).keys()
   if highlighted_fields and not query.get('download'):
     id_field = collection.get('idField')
     if id_field:
       for doc in response['response']['docs']:
-        if id_field in doc and str(doc[id_field]) in highlighted_fields:
-          highlighting = response['highlighting'][str(doc[id_field])]
+        if id_field in doc and smart_unicode(doc[id_field]) in highlighted_fields:
+          highlighting = response['highlighting'][smart_unicode(doc[id_field])]
 
           if highlighting:
             escaped_highlighting = {}
             for field, hls in highlighting.iteritems():
               _hls = [escape(smart_unicode(hl, errors='replace')).replace('&lt;em&gt;', '<em>').replace('&lt;/em&gt;', '</em>') for hl in hls]
-              escaped_highlighting[field] = _hls
+              escaped_highlighting[field] = _hls[0] if len(_hls) == 1 else _hls
 
             doc.update(escaped_highlighting)
     else:

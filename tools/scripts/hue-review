@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if [ $# -lt 3 ]; then
 	echo "Usage: hue-review rev-list reviewer(s) summary ..." 1>&2
@@ -23,5 +23,5 @@ exec $RBT post \
 	--target-groups=hue \
 	--target-people="$REVIEWER" \
 	--summary="$SUMMARY" \
-	$REVLIST \
-	$@
+	$@ \
+	$REVLIST

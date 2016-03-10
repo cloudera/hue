@@ -31,7 +31,6 @@ from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth.models import User, Group
-from django.core import urlresolvers
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified
@@ -47,16 +46,20 @@ from cStringIO import StringIO
 from gzip import GzipFile
 from avro import datafile, io
 
+from desktop import appmanager
 from desktop.lib import i18n, paginator
 from desktop.lib.conf import coerce_bool
-from desktop.lib.django_util import make_absolute, render, render_json, format_preserving_redirect
+from desktop.lib.django_util import make_absolute, render, format_preserving_redirect
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.fs import splitpath
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
-from hadoop.fs.fsutils import do_newfile_save, do_overwrite_save
+from hadoop.fs.fsutils import do_overwrite_save
 
 from filebrowser.conf import MAX_SNAPPY_DECOMPRESSION_SIZE
+from filebrowser.conf import SHOW_DOWNLOAD_BUTTON
+from filebrowser.conf import SHOW_UPLOAD_BUTTON
 from filebrowser.lib.archives import archive_factory
 from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
@@ -234,9 +237,9 @@ def edit(request, path, form=None):
         path=path,
         filename=os.path.basename(path),
         dirname=os.path.dirname(path),
-        breadcrumbs = parse_breadcrumbs(path))
+        breadcrumbs = parse_breadcrumbs(path),
+        show_download_button = SHOW_DOWNLOAD_BUTTON.get())
     return render("edit.mako", request, data)
-
 
 def save_file(request):
     """
@@ -259,14 +262,18 @@ def save_file(request):
     if not is_valid:
         return edit(request, path, form=form)
 
-    if request.fs.exists(path):
-        do_overwrite_save(request.fs, path,
-                           form.cleaned_data['contents'],
-                           form.cleaned_data['encoding'])
-    else:
-        do_newfile_save(request.fs, path,
-                         form.cleaned_data['contents'],
-                         form.cleaned_data['encoding'])
+    encoding = form.cleaned_data['encoding']
+    data = form.cleaned_data['contents'].encode(encoding)
+
+    try:
+        if request.fs.exists(path):
+            do_overwrite_save(request.fs, path, data)
+        else:
+            request.fs.create(path, overwrite=False, data=data)
+    except WebHdfsException, e:
+        raise PopupException(_("The file could not be saved"), detail=e.message.splitlines()[0])
+    except Exception, e:
+        raise PopupException(_("The file could not be saved"), detail=e)
 
     messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
     request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
@@ -274,14 +281,13 @@ def save_file(request):
 
 
 def parse_breadcrumbs(path):
-    breadcrumbs_parts = Hdfs.normpath(path).split('/')
-    i = 1
-    breadcrumbs = [{'url': '', 'label': '/'}]
-    while (i < len(breadcrumbs_parts)):
-        breadcrumb_url = breadcrumbs[i - 1]['url'] + '/' + breadcrumbs_parts[i]
-        if breadcrumb_url != '/':
-            breadcrumbs.append({'url': breadcrumb_url, 'label': breadcrumbs_parts[i]})
-        i = i + 1
+    parts = splitpath(path)
+    url, breadcrumbs = '', []
+    for part in parts:
+      if url and not url.endswith('/'):
+        url += '/'
+      url += part
+      breadcrumbs.append({'url': url, 'label': part})
     return breadcrumbs
 
 
@@ -316,13 +322,15 @@ def listdir(request, path, chooser):
         'groups': request.user.username == request.fs.superuser and [str(x) for x in Group.objects.values_list('name', flat=True)] or [],
         'users': request.user.username == request.fs.superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
-        'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0]
+        'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
+        'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
     }
 
     stats = request.fs.listdir_stats(path)
 
     # Include parent dir, unless at filesystem root.
-    if Hdfs.normpath(path) != posixpath.sep:
+    if not request.fs.isroot(path):
         parent_path = request.fs.join(path, "..")
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
@@ -406,7 +414,7 @@ def listdir_paged(request, path):
     shown_stats = page.object_list
 
     # Include parent dir always as second option, unless at filesystem root.
-    if Hdfs.normpath(path) != posixpath.sep:
+    if not request.fs.isroot(path):
         parent_path = request.fs.join(path, "..")
         parent_stat = request.fs.stats(parent_path)
         # The 'path' field would be absolute, but we want its basename to be
@@ -445,7 +453,10 @@ def listdir_paged(request, path):
         'users': is_fs_superuser and [str(x) for x in User.objects.values_list('username', flat=True)] or [],
         'superuser': request.fs.superuser,
         'supergroup': request.fs.supergroup,
-        'is_sentry_managed': request.fs.is_sentry_managed(path)
+        'is_sentry_managed': request.fs.is_sentry_managed(path),
+        'apps': appmanager.get_apps_dict(request.user).keys(),
+        'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
     }
     return render('listdir.mako', request, data)
 
@@ -475,7 +486,7 @@ def _massage_stats(request, stats):
     into the format that the views would like it in.
     """
     path = stats['path']
-    normalized = Hdfs.normpath(path)
+    normalized = request.fs.normpath(path)
     return {
         'path': normalized,
         'name': stats['name'],
@@ -503,6 +514,13 @@ def stat(request, path):
     return JsonResponse(_massage_stats(request, stats))
 
 
+def content_summary(request, path):
+    if not request.fs.exists(path):
+        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
+    stats = request.fs.get_content_summary(path)
+    return JsonResponse(stats.summary)
+
+
 def display(request, path):
     """
     Implements displaying part of a file.
@@ -526,8 +544,7 @@ def display(request, path):
       mimetype = mimetypes.guess_type(path)[0]
 
       if mimetype is not None and INLINE_DISPLAY_MIMETYPE.search(mimetype):
-        path_enc = urlencode(path)
-        return redirect(reverse('filebrowser.views.download', args=[path_enc]) + '?disposition=inline')
+        return redirect(reverse('filebrowser.views.download', args=[path]) + '?disposition=inline')
 
     stats = request.fs.stats(path)
     encoding = request.GET.get('encoding') or i18n.get_site_encoding()
@@ -616,6 +633,7 @@ def display(request, path):
         data['view']['masked_binary_data'] = is_binary
 
     data['breadcrumbs'] = parse_breadcrumbs(path)
+    data['show_download_button'] = SHOW_DOWNLOAD_BUTTON.get()
 
     return render("display.mako", request, data)
 
@@ -1125,15 +1143,12 @@ def upload_file(request):
             resp = _upload_file(request)
             response.update(resp)
         except Exception, ex:
-            response['data'] = str(ex)
+            response['data'] = str(ex).split('\n', 1)[0]
             hdfs_file = request.FILES.get('hdfs_file')
             if hdfs_file:
                 hdfs_file.remove()
     else:
         response['data'] = _('A POST request is required.')
-
-    if response['status'] == 0:
-        request.info(_('%(destination)s upload succeeded') % {'destination': response['path']})
 
     return HttpResponse(json.dumps(response), content_type="text/plain")
 
@@ -1210,11 +1225,6 @@ def upload_archive(request):
                 hdfs_file.remove()
     else:
         response['data'] = _('A POST request is required.')
-
-    if response['status'] == 0:
-        request.info(_('%(destination)s upload succeeded.') % {'destination': response['path']})
-    else:
-        request.error(_('Upload failed: %(data)s.') % {'data': response['data']})
 
     return HttpResponse(json.dumps(response), content_type="text/plain")
 
@@ -1302,6 +1312,7 @@ def status(request):
 def location_to_url(location, strict=True):
     """
     If possible, returns a file browser URL to the location.
+    Prunes HDFS URI to path.
     Location is a URI, if strict is True.
 
     Python doesn't seem to have a readily-available URI-comparison
@@ -1313,7 +1324,11 @@ def location_to_url(location, strict=True):
     if strict and not split_path[1] or not split_path[2]:
       # No netloc not full url or no URL
       return None
-    return reverse("filebrowser.views.view", kwargs=dict(path=split_path[2]))
+    path = location
+    if split_path[0] == 'hdfs':
+      path = split_path[2]
+    return reverse("filebrowser.views.view", kwargs=dict(path=path))
+
 
 def truncate(toTruncate, charsToKeep=50):
     """
@@ -1324,6 +1339,7 @@ def truncate(toTruncate, charsToKeep=50):
         return truncated
     else:
         return toTruncate
+
 
 def _is_hdfs_superuser(request):
   return request.user.username == request.fs.superuser or request.user.groups.filter(name__exact=request.fs.supergroup).exists()

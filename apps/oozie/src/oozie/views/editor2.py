@@ -17,7 +17,6 @@
 
 import json
 import logging
-import uuid
 
 from django.core.urlresolvers import reverse
 from django.forms.formsets import formset_factory
@@ -40,6 +39,7 @@ from oozie.forms import ParameterForm
 from oozie.models import Workflow as OldWorklow, Coordinator as OldCoordinator, Bundle as OldBundle, Job
 from oozie.models2 import Node, Workflow, Coordinator, Bundle, NODES, WORKFLOW_NODE_PROPERTIES, import_workflow_from_hue_3_7,\
     find_dollar_variables, find_dollar_braced_variables
+from oozie.utils import convert_to_server_timezone
 from oozie.views.editor import edit_workflow as old_edit_workflow, edit_coordinator as old_edit_coordinator, edit_bundle as old_edit_bundle
 
 
@@ -104,7 +104,13 @@ def _edit_workflow(request, doc, workflow):
       'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
       'doc1_id': doc.doc.get().id if doc else -1,
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user)),
+      'history_json': json.dumps([{
+          'history': hist.data_dict.get('history', '{}'),
+          'id': hist.id,
+          'expanded': False,
+          'date': hist.last_modified.strftime('%Y-%m-%dT%H:%M')
+        } for hist in doc.get_history()] if doc else [], cls=JSONEncoderForHTML)
   })
 
 
@@ -151,20 +157,12 @@ def copy_workflow(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-workflow2', id=job['id'])
+    doc = doc2.doc.get()
 
     name = doc2.name + '-copy'
-    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+    doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc2.pk = None
-    doc2.id = None
-    doc2.uuid = str(uuid.uuid4())
-    doc2.name = name
-    doc2.owner = request.user
-    doc2.save()
-
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
-    doc2.save()
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
     workflow = Workflow(document=doc2)
     workflow.update_name(name)
@@ -342,6 +340,29 @@ def gen_xml_workflow(request):
 @check_document_access_permission()
 def submit_workflow(request, doc_id):
   workflow = Workflow(document=Document2.objects.get(id=doc_id))
+
+  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id}))
+
+
+@check_document_access_permission()
+def submit_single_action(request, doc_id, node_id):
+  parent_doc = Document2.objects.get(id=doc_id)
+  parent_wf = Workflow(document=parent_doc)
+  workflow_data = parent_wf.create_single_action_workflow_data(node_id)
+  _data = json.loads(workflow_data)
+
+  # Create separate wf object for the submit node with new deployment_dir
+  workflow = Workflow(data=workflow_data)
+  workflow.set_workspace(request.user)
+
+  workflow.check_workspace(request.fs, request.user)
+  workflow.import_workspace(request.fs, parent_wf.deployment_dir, request.user)
+  workflow.document = parent_doc
+
+  return _submit_workflow_helper(request, workflow, submit_action=reverse('oozie:submit_single_action', kwargs={'doc_id': doc_id, 'node_id': node_id}))
+
+
+def _submit_workflow_helper(request, workflow, submit_action):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
 
   if request.method == 'POST':
@@ -349,22 +370,26 @@ def submit_workflow(request, doc_id):
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
 
-      job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
-
+      try:
+        job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
+      except Exception, e:
+        raise PopupException(_('Workflow submission failed'), detail=smart_str(e))
       request.info(_('Workflow submitted'))
       return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
-    parameters = workflow.find_all_parameters()
+    parameters = workflow and workflow.find_all_parameters() or []
     initial_params = ParameterForm.get_initial_params(dict([(param['name'], param['value']) for param in parameters]))
     params_form = ParametersFormSet(initial=initial_params)
 
     popup = render('editor2/submit_job_popup.mako', request, {
                      'params_form': params_form,
                      'name': workflow.name,
-                     'action': reverse('oozie:editor_submit_workflow', kwargs={'doc_id': workflow.id})
+                     'action': submit_action,
+                     'show_dryrun': True
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
@@ -373,13 +398,16 @@ def _submit_workflow(user, fs, jt, workflow, mapping):
   try:
     submission = Submission(user, workflow, fs, jt, mapping)
     job_id = submission.run()
+
+    workflow.document.add_to_history(submission.user, {'properties': submission.properties, 'oozie_id': submission.oozie_id})
+
     return job_id
   except RestException, ex:
     detail = ex._headers.get('oozie-error-message', ex)
     if 'Max retries exceeded with url' in str(detail):
       detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-    LOG.error(smart_str(detail))
-    raise PopupException(_("Error submitting workflow %s") % (workflow,), detail=detail)
+    LOG.exception('Error submitting workflow: %s' % smart_str(detail))
+    raise PopupException(_("Error submitting workflow %s: %s") % (workflow, detail))
 
   return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
 
@@ -427,7 +455,7 @@ def edit_coordinator(request):
     LOG.error(smart_str(e))
 
   workflows = [dict([('uuid', d.content_object.uuid), ('name', d.content_object.name)])
-                    for d in Document.objects.get_docs(request.user, Document2, extra='workflow2')]
+                    for d in Document.objects.available_docs(Document2, request.user).filter(extra='workflow2')]
 
   if coordinator_id and not filter(lambda a: a['uuid'] == coordinator.data['properties']['workflow'], workflows):
     raise PopupException(_('You don\'t have access to the workflow of this coordinator.'))
@@ -461,19 +489,12 @@ def copy_coordinator(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-coordinator2', id=job['id'])
+    doc = doc2.doc.get()
 
     name = doc2.name + '-copy'
-    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+    doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc2.pk = None
-    doc2.id = None
-    doc2.uuid = str(uuid.uuid4())
-    doc2.name = name
-    doc2.owner = request.user
-    doc2.save()
-
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
     coordinator_data = Coordinator(document=doc2).get_data_for_json()
     coordinator_data['name'] = name
@@ -556,6 +577,7 @@ def submit_coordinator(request, doc_id):
 
     if params_form.is_valid():
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
+      mapping['dryrun'] = request.POST.get('dryrun_checkbox') == 'on'
       job_id = _submit_coordinator(request, coordinator, mapping)
 
       request.info(_('Coordinator submitted.'))
@@ -570,15 +592,16 @@ def submit_coordinator(request, doc_id):
   popup = render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': coordinator.name,
-                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id})
+                 'action': reverse('oozie:editor_submit_coordinator',  kwargs={'doc_id': coordinator.id}),
+                 'show_dryrun': True
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)
 
 
 def _submit_coordinator(request, coordinator, mapping):
   try:
-    wf_doc = Document2.objects.get(uuid=coordinator.data['properties']['workflow'])
-    wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping).deploy()
+    wf_doc = Document2.objects.get_by_uuid(uuid=coordinator.data['properties']['workflow'])
+    wf_dir = Submission(request.user, Workflow(document=wf_doc), request.fs, request.jt, mapping, local_tz=coordinator.data['properties']['timezone']).deploy()
 
     properties = {'wf_application_path': request.fs.get_hdfs_path(wf_dir)}
     properties.update(mapping)
@@ -588,10 +611,8 @@ def _submit_coordinator(request, coordinator, mapping):
 
     return job_id
   except RestException, ex:
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,),
-                         detail=ex._headers.get('oozie-error-message', ex))
-
-
+    LOG.exception('Error submitting coordinator')
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex))
 
 
 def list_editor_bundles(request):
@@ -681,19 +702,12 @@ def copy_bundle(request):
 
   for job in jobs:
     doc2 = Document2.objects.get(type='oozie-bundle2', id=job['id'])
+    doc = doc2.doc.get()
 
     name = doc2.name + '-copy'
-    copy_doc = doc2.doc.get().copy(name=name, owner=request.user)
+    doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc2.pk = None
-    doc2.id = None
-    doc2.uuid = str(uuid.uuid4())
-    doc2.name = name
-    doc2.owner = request.user
-    doc2.save()
-
-    doc2.doc.all().delete()
-    doc2.doc.add(copy_doc)
+    doc.copy(content_object=doc2, name=name, owner=request.user)
 
     bundle_data = Bundle(document=doc2).get_data_for_json()
     bundle_data['name'] = name
@@ -730,7 +744,8 @@ def submit_bundle(request, doc_id):
   popup = render('editor2/submit_job_popup.mako', request, {
                  'params_form': params_form,
                  'name': bundle.name,
-                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id})
+                 'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
+                 'show_dryrun': False
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)
 
@@ -742,14 +757,19 @@ def _submit_bundle(request, bundle, properties):
 
     for i, bundled in enumerate(bundle.data['coordinators']):
       coord = coords[bundled['coordinator']]
-      workflow = Workflow(document=coord.dependencies.all()[0])
+      workflow = Workflow(document=coord.dependencies.filter(type='oozie-workflow2')[0])
       wf_dir = Submission(request.user, workflow, request.fs, request.jt, properties).deploy()
       deployment_mapping['wf_%s_dir' % i] = request.fs.get_hdfs_path(wf_dir)
 
       coordinator = Coordinator(document=coord)
       coord_dir = Submission(request.user, coordinator, request.fs, request.jt, properties).deploy()
-      deployment_mapping['coord_%s_dir' % i] = coord_dir
+      deployment_mapping['coord_%s_dir' % i] = request.fs.get_hdfs_path(coord_dir)
       deployment_mapping['coord_%s' % i] = coord
+
+      # Convert start/end dates of coordinator to server timezone
+      for prop in bundled['properties']:
+        if prop['name'] in ('end_date', 'start_date'):
+          prop['value'] = convert_to_server_timezone(prop['value'], local_tz=coordinator.data['properties']['timezone'])
 
     properties.update(deployment_mapping)
 
@@ -758,5 +778,6 @@ def _submit_bundle(request, bundle, properties):
 
     return job_id
   except RestException, ex:
+    LOG.exception('Error submitting bundle')
     raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex))
 

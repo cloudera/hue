@@ -63,4 +63,4 @@ ${ commonheader(_('Search'), "search", user, "120px") | n,unicode }
 </div>
 
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

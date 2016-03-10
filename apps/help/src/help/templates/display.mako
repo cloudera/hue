@@ -76,4 +76,4 @@ ${ commonheader("Hue Help", "help", user, "40px") | n,unicode }
   });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

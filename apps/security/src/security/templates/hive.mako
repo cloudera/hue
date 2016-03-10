@@ -15,7 +15,7 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter
+from desktop.views import commonheader, commonfooter, _ko
 from django.utils.translation import ugettext as _
 %>
 
@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="tree" file="common_tree.mako" />
 
 ${ commonheader(_('Hadoop Security'), "security", user) | n,unicode }
-${ layout.menubar(section='hive') }
+${ layout.menubar(section='hive1') }
 
 
 <script type="text/html" id="role">
@@ -35,7 +35,7 @@ ${ layout.menubar(section='hive') }
   <!-- ko ifnot: $root.isApplyingBulk() -->
   <div class="acl-block acl-actions">
     <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
-    <span class="pointer" data-bind="click: addPrivilege" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
+    <span class="pointer" data-bind="click: addPrivilege, visible: $root.is_sentry_admin" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: function() { $root.list_sentry_privileges_by_authorizable() }, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
     <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
@@ -77,8 +77,7 @@ ${ layout.menubar(section='hive') }
     </div>
 
     <div class="acl-block-section" data-bind="visible: showAdvanced" style="margin-top: 0">
-      <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 6px">
-      <select data-bind="options: $root.availablePrivileges, select2: { update: $data.privilegeScope, type: 'scope'}" style="width: 100px"></select>
+      ${ _('Server') } <input type="text" data-bind="value: serverName" placeholder="serverName" style="margin-left: 6px">
     </div>
   <!-- /ko -->
 
@@ -95,21 +94,27 @@ ${ layout.menubar(section='hive') }
     <!-- ko if: grantOption -->
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
+    <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
+      <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
+    </span>
     <br/>
 
     server=<span data-bind="text: serverName"></span>
 
     <!-- ko if: privilegeType() == 'db' -->
       <span data-bind="visible: dbName">
-        <i class="fa fa-long-arrow-right"></i> db=<a data-bind="attr: { href: '/metastore/tables/' + dbName() }" target="_blank"><span data-bind="text: dbName"></span></a>
+        <i class="fa fa-long-arrow-right"></i> db=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName()) }" title="${ _('Browse db privileges') }"><span data-bind="text: dbName"></span></a>
       </span>
       <span data-bind="visible: tableName">
-        <i class="fa fa-long-arrow-right"></i> table=<a data-bind="attr: { href: '/metastore/table/' + dbName() + '/' + tableName() }" target="_blank"><span data-bind="text: tableName"></span></a>
+        <i class="fa fa-long-arrow-right"></i> table=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName()) }" title="${ _('Browse table privileges') }"><span data-bind="text: tableName"></span></a>
+      </span>
+      <span data-bind="visible: columnName">
+        <i class="fa fa-long-arrow-right"></i> column=<a class="pointer" data-bind="click: function(){ $root.linkToBrowse(dbName() + '.' + tableName() + '.' + columnName()) }" title="${ _('Browse column privileges') }"><span data-bind="text: columnName"></span></a>
       </span>
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
     <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
@@ -129,7 +134,7 @@ ${ layout.menubar(section='hive') }
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             <div>
             <br/>
-             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
+             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
             </div>
           </li>
         </ul>
@@ -160,7 +165,7 @@ ${ layout.menubar(section='hive') }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
-                  <a data-bind="attr: { href: '/metastore/table/' + $root.assist.path().replace('.', '/') }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
@@ -184,7 +189,7 @@ ${ layout.menubar(section='hive') }
                         </li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
@@ -321,7 +326,7 @@ ${ layout.menubar(section='hive') }
                     <a class="pointer" data-bind="visible: groupsChanged() && ! $root.isLoadingRoles(), click: resetGroups">
                       <i class="fa fa-undo"></i>
                     </a>
-                    <a class="pointer" data-bind="visible: groupsChanged && ! $root.isLoadingRoles(), click: saveGroups">
+                    <a class="pointer" data-bind="visible: groupsChanged() && ! $root.isLoadingRoles(), click: saveGroups">
                       <i class="fa fa-save"></i>
                     </a>
                   </div>
@@ -372,7 +377,7 @@ ${ layout.menubar(section='hive') }
       </div>
       <div class="span6">
         <h4>${ _('Groups') }</h4>
-        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', placeholder: '${ _("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { update: groups, type: 'group', placeholder: '${ _ko("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
       </div>
     </div>
 
@@ -384,8 +389,8 @@ ${ layout.menubar(section='hive') }
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role().create, visible: ! $root.role().isEditing()">${ _('Save') }</button>
-    <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.role().update, visible: $root.role().isEditing()">${ _('Update') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading()}">${ _('Save') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading()}"">${ _('Update') }</button>
   </div>
 </div>
 
@@ -403,7 +408,7 @@ ${ layout.menubar(section='hive') }
 
     <br/>
     <span>${ _('To role') }&nbsp;&nbsp;</span>
-    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { update: $root.grantToPrivilegeRole, placeholder: '${ _("Select a role") }', type: 'role' }" style="width: 360px"></select>
+    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role' }" style="width: 360px"></select>
     <br/>
 
   </div>
@@ -480,6 +485,11 @@ ${ layout.menubar(section='hive') }
             <i class="fa fa-long-arrow-right muted"></i>
             <i class="fa fa-table muted"></i>
             <span data-bind="text: path.split('.')[1]"></span>
+            <span data-bind="visible: path.split('.')[2]">
+              <i class="fa fa-long-arrow-right muted"></i>
+              <i class="fa fa-columns muted"></i>
+              <span data-bind="text: path.split('.')[2]"></span>
+            </span>
           </li>
           <li data-bind="visible: path.indexOf('.') == -1" class="force-word-break">
             <i class="fa fa-database muted"></i> <span data-bind="text: path.split('.')[0]"></span>
@@ -552,6 +562,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 <script type="text/javascript" charset="utf-8">
 
+    ko.options.deferUpdates = true;
+
     function deletePrivilegeModal(role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
           return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE'); }
@@ -589,7 +601,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.assist.fetchHivePath();
       }
 
-      $("#path").jHueHiveAutocomplete({
+      $("#path").jHueGenericAutocomplete({
         skipColumns: true,
         home: viewModel.assist.path(),
         onPathChange: function (path) {
@@ -662,6 +674,10 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       showMainSection(viewModel.getSectionHash());
 
+      $(document).on("show.mainSection", function(){
+        showMainSection(viewModel.getSectionHash());
+      });
+
       $(document).on("show.role", function(e, role) {
         if (typeof role != "undefined" && role.name != null){
           $("#bulkActionsModal").modal("hide");
@@ -691,7 +707,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $("#createRoleModal").on("hidden", function () {
-        $('#jHueHiveAutocomplete').hide();
+        $('#jHueGenericAutocomplete').hide();
         viewModel.resetCreateRole();
       });
 
@@ -762,4 +778,4 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

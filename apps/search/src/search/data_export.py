@@ -32,7 +32,7 @@ def download(results, format, collection):
   """
   download(results, format) -> HttpResponse
 
-  Transform the search result set to the specified format and dwonload.
+  Transform the search result set to the specified format and download.
   """
   if format not in DL_FORMATS:
     LOG.error('Unknown download format "%s"' % format)
@@ -64,6 +64,8 @@ def SearchDataAdapter(results, format, collection):
           row.append("")
         elif isinstance(data[column], basestring) or isinstance(data[column], (int, long, float, complex)):
           row.append(data[column])
+        elif isinstance(data[column], list): # Multivalue field
+          row.append([smart_str(val, errors='replace') for val in data[column]])
         else:
           row.append(smart_str(data[column]))
       rows.append(row)

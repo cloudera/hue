@@ -27,11 +27,11 @@ import sys
 
 from guppy import hpy
 
+from django.utils.translation import ugettext_lazy as _
 
 import desktop.conf
 import desktop.log
 import desktop.redaction
-
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
@@ -80,6 +80,18 @@ desktop.log.fancy_logging()
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
+LANGUAGES = [
+  ('de', _('German')),
+  ('en-us', _('English')),
+  ('es', _('Spanish')),
+  ('fr', _('French')),
+  ('ja', _('Japanese')),
+  ('ko', _('Korean')),
+  ('pt', _('Portuguese')),
+  ('pt_BR', _('Brazilian Portuguese')),
+  ('zh_CN', _('Simplified Chinese')),
+]
+
 SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
@@ -106,6 +118,7 @@ MEDIA_URL = ''
 # Additional locations of static files
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'desktop', 'libs', 'indexer', 'src', 'indexer', 'static'),
+    os.path.join(BASE_DIR, 'desktop', 'libs', 'notebook', 'src', 'notebook', 'static'),
     os.path.join(BASE_DIR, 'desktop', 'libs', 'liboauth', 'src', 'liboauth', 'static'),
 )
 
@@ -135,6 +148,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.locale.LocaleMiddleware',
     'babeldjango.middleware.LocaleMiddleware',
     'desktop.middleware.AjaxMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Must be after Session, Auth, and Ajax. Before everything else.
     'desktop.middleware.LoginAndPermissionMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -145,11 +159,12 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.middleware.http.ConditionalGetMiddleware',
+    'axes.middleware.FailedLoginMiddleware',
 ]
 
-if os.environ.get(ENV_DESKTOP_DEBUG):
-  MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
-  logging.debug("Will try to validate generated HTML.")
+# if os.environ.get(ENV_DESKTOP_DEBUG):
+#   MIDDLEWARE_CLASSES.append('desktop.middleware.HtmlValidationMiddleware')
+#   logging.debug("Will try to validate generated HTML.")
 
 ROOT_URLCONF = 'desktop.urls'
 
@@ -178,7 +193,10 @@ INSTALLED_APPS = [
     'babeldjango',
 
     # Desktop injects all the other installed apps into here magically.
-    'desktop'
+    'desktop',
+
+    # App that keeps track of failed logins.
+    'axes',
 ]
 
 LOCALE_PATHS = [
@@ -216,6 +234,9 @@ FILE_UPLOAD_HANDLERS = (
   'django.core.files.uploadhandler.MemoryFileUploadHandler',
   'django.core.files.uploadhandler.TemporaryFileUploadHandler',
 )
+
+# Custom CSRF Failure View
+CSRF_FAILURE_VIEW = 'desktop.views.csrf_failure'
 
 ############################################################
 # Part 4: Installation of apps
@@ -255,6 +276,10 @@ conf.initialize(_app_conf_modules, _config_dir)
 # Now that we've loaded the desktop conf, set the django DEBUG mode based on the conf.
 DEBUG = desktop.conf.DJANGO_DEBUG_MODE.get()
 TEMPLATE_DEBUG = DEBUG
+if DEBUG: # For simplification, force all DEBUG when django_debug_mode is True and re-apply the loggers
+  os.environ[ENV_DESKTOP_DEBUG] = 'True'
+  desktop.log.basic_logging(os.environ[ENV_HUE_PROCESS_NAME])
+  desktop.log.fancy_logging()
 
 ############################################################
 # Part 4a: Django configuration that requires bound Desktop
@@ -263,6 +288,8 @@ TEMPLATE_DEBUG = DEBUG
 
 # Configure allowed hosts
 ALLOWED_HOSTS = desktop.conf.ALLOWED_HOSTS.get()
+
+X_FRAME_OPTIONS = desktop.conf.X_FRAME_OPTIONS.get()
 
 # Configure hue admins
 ADMINS = []
@@ -286,7 +313,14 @@ if os.getenv('DESKTOP_DB_CONFIG'):
   default_db = dict(zip(
     ["ENGINE", "NAME", "TEST_NAME", "USER", "PASSWORD", "HOST", "PORT"],
     conn_string.split(':')))
+  default_db['NAME'] = default_db['NAME'].replace('#', ':') # For is_db_alive command
 else:
+  test_name = os.environ.get('DESKTOP_DB_TEST_NAME', get_desktop_root('desktop-test.db'))
+  logging.debug("DESKTOP_DB_TEST_NAME SET: %s" % test_name)
+
+  test_user = os.environ.get('DESKTOP_DB_TEST_USER', 'hue_test')
+  logging.debug("DESKTOP_DB_TEST_USER SET: %s" % test_user)
+
   default_db = {
     "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
     "NAME" : desktop.conf.DATABASE.NAME.get(),
@@ -296,7 +330,8 @@ else:
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
     "OPTIONS": force_dict_to_strings(desktop.conf.DATABASE.OPTIONS.get()),
     # DB used for tests
-    "TEST_NAME" : get_desktop_root('desktop-test.db'),
+    "TEST_NAME" : test_name,
+    "TEST_USER" : test_user,
     # Wrap each request in a transaction.
     "ATOMIC_REQUESTS" : True,
   }
@@ -326,11 +361,19 @@ TEST_RUNNER = 'desktop.lib.test_runners.HueTestRunner'
 if 'test' in sys.argv:
   CACHE_MIDDLEWARE_SECONDS = 0
 
+# Limit Nose coverage to Hue apps
+NOSE_ARGS = [
+  '--cover-package=%s' % ','.join([app.name for app in appmanager.DESKTOP_APPS + appmanager.DESKTOP_LIBS]),
+  '--no-path-adjustment',
+  '--traverse-namespace'
+]
+
 TIME_ZONE = desktop.conf.TIME_ZONE.get()
-# Desktop supports only one authentication backend.
-AUTHENTICATION_BACKENDS = (desktop.conf.AUTH.BACKEND.get(),)
+
 if desktop.conf.DEMO_ENABLED.get():
   AUTHENTICATION_BACKENDS = ('desktop.auth.backend.DemoBackend',)
+else:
+  AUTHENTICATION_BACKENDS = tuple(desktop.conf.AUTH.BACKEND.get())
 
 EMAIL_HOST = desktop.conf.SMTP.HOST.get()
 EMAIL_PORT = desktop.conf.SMTP.PORT.get()
@@ -346,6 +389,13 @@ if SECRET_KEY:
 else:
   import uuid
   SECRET_KEY = str(uuid.uuid4())
+
+# Axes
+AXES_LOGIN_FAILURE_LIMIT = desktop.conf.AUTH.LOGIN_FAILURE_LIMIT.get()
+AXES_LOCK_OUT_AT_FAILURE = desktop.conf.AUTH.LOGIN_LOCK_OUT_AT_FAILURE.get()
+AXES_COOLOFF_TIME = desktop.conf.AUTH.LOGIN_COOLOFF_TIME.get()
+AXES_USE_USER_AGENT = desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_BROWSER_USER_AGENT_AND_IP.get()
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = desktop.conf.AUTH.LOGIN_LOCK_OUT_BY_COMBINATION_USER_AND_IP.get()
 
 # SAML
 SAML_AUTHENTICATION = 'libsaml.backend.SAML2Backend' in AUTHENTICATION_BACKENDS
@@ -378,9 +428,16 @@ if OAUTH_AUTHENTICATION:
 if desktop.conf.REDIRECT_WHITELIST.get():
   MIDDLEWARE_CLASSES.append('desktop.middleware.EnsureSafeRedirectURLMiddleware')
 
-#Support HTTPS load-balancing
+# Enable X-Forwarded-Host header if the load balancer requires it
+USE_X_FORWARDED_HOST = desktop.conf.USE_X_FORWARDED_HOST.get()
+
+# Support HTTPS load-balancing
 if desktop.conf.SECURE_PROXY_SSL_HEADER.get():
   SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+
+# Add last activity tracking and idle session timeout
+if 'useradmin' in [app.name for app in appmanager.DESKTOP_APPS]:
+  MIDDLEWARE_CLASSES.append('useradmin.middleware.LastActivityMiddleware')
 
 ############################################################
 
@@ -390,6 +447,16 @@ SKIP_SOUTH_TESTS = True
 # Set up environment variable so Kerberos libraries look at our private
 # ticket cache
 os.environ['KRB5CCNAME'] = desktop.conf.KERBEROS.CCACHE_PATH.get()
+
+# If Hue is configured to use a CACERTS truststore, make sure that the
+# REQUESTS_CA_BUNDLE is set so that we can use it when we make external requests.
+# This is for the REST calls made by Hue with the requests library.
+if desktop.conf.SSL_CACERTS.get() and os.environ.get('REQUESTS_CA_BUNDLE') is None:
+  os.environ['REQUESTS_CA_BUNDLE'] = desktop.conf.SSL_CACERTS.get()
+
+# Preventing local build failure by not validating the default value of REQUESTS_CA_BUNDLE
+if os.environ.get('REQUESTS_CA_BUNDLE') and os.environ.get('REQUESTS_CA_BUNDLE') != desktop.conf.SSL_CACERTS.config.default and not os.path.isfile(os.environ['REQUESTS_CA_BUNDLE']):
+  raise Exception(_('SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s') % os.environ['REQUESTS_CA_BUNDLE'])
 
 # Memory
 if desktop.conf.MEMORY_PROFILER.get():

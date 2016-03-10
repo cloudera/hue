@@ -75,7 +75,14 @@ import logging
 import os
 import textwrap
 import re
+import subprocess
 import sys
+
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
+
 
 # Magical object for use as a "symbol"
 _ANONYMOUS = ("_ANONYMOUS")
@@ -246,12 +253,12 @@ class Config(object):
     @throws ValueError if it does not validate correctly.
     """
     if self.required and not present:
-      raise KeyError("Configuration key %s not in configuration!"
-                     % self.key)
+      raise KeyError("Configuration key %s not in configuration!" % self.key)
     if present:
       raw_val = val
     else:
       raw_val = self.default
+
     if coerce_type:
       return self._coerce_type(raw_val, prefix)
     else:
@@ -466,7 +473,7 @@ class UnspecifiedConfigSection(Config):
 
     The keys are the keys specified by the user in the config file.
     """
-    return dict([(key, self.get_member(raw, key, prefix))
+    return OrderedDict([(key, self.get_member(raw, key, prefix))
                  for key in raw.iterkeys()])
 
   def get_member(self, data, attr, prefix=''):
@@ -482,8 +489,7 @@ class UnspecifiedConfigSection(Config):
     print >>out, self.get_presentable_help_text(indent=indent)
     print >>out
     print >>out, indent_str + "  Consists of some number of sections like:"
-    self.each.print_help(out=out,
-                         indent=indent+2)
+    self.each.print_help(out=out, indent=indent+2)
 
 def _configs_from_dir(conf_dir):
   """
@@ -497,8 +503,7 @@ def _configs_from_dir(conf_dir):
     try:
       conf = configobj.ConfigObj(os.path.join(conf_dir, filename))
     except configobj.ConfigObjError, ex:
-      LOG.error("Error in configuration file '%s': %s" %
-                    (os.path.join(conf_dir, filename), ex))
+      LOG.error("Error in configuration file '%s': %s" % (os.path.join(conf_dir, filename), ex))
       raise
     conf['DEFAULT'] = dict(desktop_root=get_desktop_root(), build_dir=get_build_dir())
     yield conf
@@ -572,9 +577,7 @@ def bind_module_config(mod, conf_data, config_key):
     bind_data = conf_data.get(config_key, {})
 
   members = _bind_module_members(mod, bind_data, section)
-  return ConfigSection(section,
-                       members=members,
-                       help=mod.__doc__)
+  return ConfigSection(section, members=members, help=mod.__doc__)
 
 def initialize(modules, config_dir):
   """
@@ -623,6 +626,12 @@ def coerce_bool(value):
   if upper in ("TRUE", "1", "YES", "ON", "YEA"):
     return True
   raise Exception("Could not coerce %r to boolean value" % (value,))
+
+def coerce_string(value):
+  if type(value) == list:
+    return ','.join(value)
+  else:
+    return value
 
 def coerce_csv(value):
   if isinstance(value, str):
@@ -693,3 +702,17 @@ def validate_thrift_transport(confvar):
     return error_res
 
   return []
+
+def coerce_password_from_script(script):
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
+  stdout, stderr = p.communicate()
+
+  if p.returncode != 0:
+    if os.environ.get('HUE_IGNORE_PASSWORD_SCRIPT_ERRORS') is None:
+      raise subprocess.CalledProcessError(p.returncode, script)
+    else:
+      return None
+
+  # whitespace may be significant in the password, but most files have a
+  # trailing newline.
+  return stdout.strip('\n')

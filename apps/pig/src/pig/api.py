@@ -69,6 +69,7 @@ class OozieApi(object):
 
   def _create_workflow(self, pig_script, params):
     workflow = Workflow.objects.new_workflow(self.user)
+    workflow.schema_version = 'uri:oozie:workflow:0.5'
     workflow.name = OozieApi.WORKFLOW_NAME
     workflow.is_history = True
     if pig_script.use_hcatalog:
@@ -86,20 +87,33 @@ class OozieApi(object):
     popup_params = json.loads(params)
     popup_params_names = [param['name'] for param in popup_params]
     pig_params = self._build_parameters(popup_params)
-    script_params = [param for param in pig_script.dict['parameters'] if param['name'] not in popup_params_names]
 
-    pig_params += self._build_parameters(script_params)
+    if pig_script.isV2:
+      pig_params += [{"type": "argument", "value": param} for param in pig_script.dict['parameters']]
 
-    job_properties = [{"name": prop['name'], "value": prop['value']} for prop in pig_script.dict['hadoopProperties']]
+      job_properties = [{"name": prop.split('=', 1)[0], "value": prop.split('=', 1)[1]} for prop in pig_script.dict['hadoopProperties']]
 
-    for resource in pig_script.dict['resources']:
-      if resource['type'] == 'file':
-        files.append(resource['value'])
-      if resource['type'] == 'archive':
-        archives.append({"dummy": "", "name": resource['value']})
+      for resource in pig_script.dict['resources']:
+        if resource.endswith('.zip') or resource.endswith('.tgz') or resource.endswith('.tar') or resource.endswith('.gz'):
+          archives.append({"dummy": "", "name": resource})
+        else:
+          files.append(resource)
+
+    else:
+      script_params = [param for param in pig_script.dict['parameters'] if param['name'] not in popup_params_names]
+
+      pig_params += self._build_parameters(script_params)
+
+      job_properties = [{"name": prop['name'], "value": prop['value']} for prop in pig_script.dict['hadoopProperties']]
+
+      for resource in pig_script.dict['resources']:
+        if resource['type'] == 'file':
+          files.append(resource['value'])
+        if resource['type'] == 'archive':
+          archives.append({"dummy": "", "name": resource['value']})
 
     action = Pig.objects.create(
-        name='pig',
+        name='pig-5760',
         script_path=script_path,
         workflow=workflow,
         node_type='pig',
@@ -109,11 +123,13 @@ class OozieApi(object):
         job_properties=json.dumps(job_properties)
     )
 
+    credentials = []
     if pig_script.use_hcatalog and self.oozie_api.security_enabled:
-      action.credentials.append([{'name': 'hcat', 'value': True}])
-      action.save()
+      credentials.append({'name': 'hcat', 'value': True})
     if pig_script.use_hbase and self.oozie_api.security_enabled:
-      action.credentials.append([{'name': 'hbase', 'value': True}])
+      credentials.append({'name': 'hbase', 'value': True})
+    if credentials:
+      action.credentials = credentials # Note, action.credentials is a @setter here
       action.save()
 
     action.add_node(workflow.end)
@@ -255,7 +271,6 @@ def get_progress(job, log):
     try:
       return int(re.findall("MapReduceLauncher  - (1?\d?\d)% complete", log)[-1])
     except:
-      LOG.exception('failed to get progress')
       return 0
 
 

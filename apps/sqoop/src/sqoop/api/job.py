@@ -17,10 +17,10 @@
 
 import json
 import logging
-import socket
 
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+from django.views.decorators.cache import never_cache
 
 from sqoop import client, conf
 from sqoop.client.exception import SqoopException
@@ -30,7 +30,6 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.rest.http_client import RestException
 from exception import handle_rest_exception
 from utils import list_to_dict
-from django.views.decorators.cache import never_cache
 
 
 __all__ = ['get_jobs', 'create_job', 'update_job', 'job', 'jobs', 'job_clone', 'job_delete', 'job_start', 'job_stop', 'job_status']

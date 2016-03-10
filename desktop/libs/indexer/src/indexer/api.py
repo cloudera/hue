@@ -20,15 +20,15 @@ import json
 import logging
 import re
 
-from django.utils.decorators import available_attrs
 from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from search.models import Collection
 
-from controller import CollectionManagerController
-from utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, get_field_types
+from indexer.controller import CollectionManagerController
+from indexer.utils import fields_from_log, field_values_from_separated_file, get_type_from_morphline_type, \
+  get_field_types
 
 
 LOG = logging.getLogger(__name__)
@@ -185,7 +185,7 @@ def collections_import(request):
 
   return JsonResponse(response)
 
-
+# Deprecated
 def collections_remove(request):
   if request.method != 'POST':
     raise PopupException(_('POST request required.'))

@@ -83,9 +83,22 @@ class JobServerApi(object):
   def get_status(self):
     return self._root.get('sessions')
 
+  def get_log(self, uuid, startFrom=None, size=None):
+    params = {}
+
+    if startFrom is not None:
+      params['from'] = startFrom
+
+    if size is not None:
+      params['size'] = size
+
+    response = self._root.get('sessions/%s/log' % uuid, params=params)
+
+    return '\n'.join(response['log'])
+
   def create_session(self, **properties):
     properties['proxyUser'] = self.user
-    return self._root.post('sessions', data=json.dumps(properties), contenttype='application/json')
+    return self._root.post('sessions', data=json.dumps(properties), contenttype=_JSON_CONTENT_TYPE)
 
   def get_session(self, uuid):
     return self._root.get('sessions/%s' % uuid)

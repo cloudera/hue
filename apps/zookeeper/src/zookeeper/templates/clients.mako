@@ -60,4 +60,4 @@ ${ shared.header(_breadcrumbs, clusters) }
 
 ${ shared.footer() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

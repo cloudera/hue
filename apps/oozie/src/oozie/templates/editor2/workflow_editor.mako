@@ -14,7 +14,7 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, commonshare
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 from desktop import conf
 from django.utils.translation import ugettext as _
 %>
@@ -53,9 +53,13 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
       <i class="fa fa-fw fa-cog"></i>
     </a>
 
+    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}, visible: workflow.id() != null && history().length > 0">
+      <i class="fa fa-fw fa-history"></i>
+    </a>
+
     <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory on HDFS') }"
-        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view' + $root.workflow.properties.deployment_dir() }">
+        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }">
       <i class="fa fa-fw fa-folder-open"></i>
     </a>
 
@@ -66,7 +70,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, "40px") | n,unicode }
     </a>
 
     <a class="share-link btn" rel="tooltip" data-placement="bottom" data-bind="click: openShareModal,
-        attr: {'data-original-title': '${ _("Share") } ' + name},
+        attr: {'data-original-title': '${ _ko("Share") } ' + name},
         css: {'isShared': isShared(), 'btn': true},
         visible: workflow.id() != null && canEdit()">
       <i class="fa fa-users"></i>
@@ -202,6 +206,13 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableGenericAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableGenericAction());}}}"
+         title="${_('Generic')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><i class="fa fa-code"></i></a>
+    </div>
+
+    <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableKillNode());}}}"
          title="${_('Kill')}" rel="tooltip" data-placement="top">
@@ -218,7 +229,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
     <div class="object-description" style="text-align: center; margin-top: 10px">
-      <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_('Add a description...')}'}"></span>
+      <span data-bind="editable: $root.workflow.properties.description, editableOptions: {enabled: $root.isEditing(), placement: 'right', emptytext: '${_ko('Add a description...')}'}"></span>
     </div>
     </div>
   </div>
@@ -291,7 +302,6 @@ ${ workflow.render() }
   <div class="modal-body">
       <h4>${ _('Variables') }</h4>
       <ul data-bind="foreach: $root.workflow.properties.parameters" class="unstyled">
-        <!-- ko if: name() != 'oozie.use.system.libpath' -->
         <li>
           <input type="text" data-bind="value: name" placeholder="${ _('Name, e.g. market') }"/>
           <input type="text" data-bind="value: value" placeholder="${ _('Value, e.g. US') }"/>
@@ -299,7 +309,6 @@ ${ workflow.render() }
             <i class="fa fa-minus"></i>
           </a>
         </li>
-        <!-- /ko -->
       </ul>
       <a class="pointer" data-bind="click: function(){ $root.workflow.properties.parameters.push(ko.mapping.fromJS({'name': '', 'value': ''})); }">
         <i class="fa fa-plus"></i> ${ _('Add parameter') }
@@ -337,6 +346,50 @@ ${ workflow.render() }
       <div class="sla-form" data-bind="with: $root.workflow.properties">
         ${ utils.slaForm() }
       </div>
+  </div>
+</div>
+
+
+<div id="historyModal" class="modal fade hide">
+  <div class="modal-header" style="padding-bottom: 2px">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${ _('Submission History') }</h3>
+  </div>
+  <div class="modal-body">
+    <table class="table table-condensed margin-top-20">
+      <tr>
+        <th width="30%">${ _('Date') }</th>
+        <th>${ _('ID') }</th>
+        <th width="20">&nbsp;</th>
+      </tr>
+      <!-- ko foreach: $root.history -->
+      <tr>
+        <td data-bind="text: $data.date"></td>
+        <td><a data-bind="attr:{'href': '/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/' }, text: $data.history.oozie_id" target="_blank"></a></td>
+        <td><a class="pointer" data-bind="click: function(){$data.expanded(!$data.expanded())}"><i class="fa fa-info-circle"></i></a></td>
+      </tr>
+      <tr data-bind="slideVisible: $data.expanded">
+        <td colspan="3" style="padding-left: 20px;border-left: 5px solid #DDD;">
+        <dl>
+          <!-- ko foreach: Object.keys($data.history.properties) -->
+          <dt data-bind="text: $data"></dt>
+          <dd>
+            <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
+              <a data-bind="text: $parent.history.properties[$data], attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
+            <!-- /ko -->
+            <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
+            <span data-bind="text: $parent.history.properties[$data]"></span>
+            <!-- /ko -->
+          </dd>
+          <!-- /ko -->
+          </dl>
+        </td>
+      </tr>
+      <!-- /ko -->
+    </table>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -397,7 +450,7 @@ ${ dashboard.import_bindings() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }, ${ history_json | n,unicode });
   ko.applyBindings(viewModel, $("#editor")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
@@ -505,28 +558,45 @@ ${ dashboard.import_bindings() }
     if (viewModel.workflow.properties.show_arrows()){
       drawArrows();
     }
+    $(".widget-main-section").removeClass("zoom-in");
+    $(".widget-main-section").each(function(){
+      var $el = $(this);
+      if (!$el.is("a") && !$el.is("input") && !$el.is("i") && !$el.is("button")) {
+        var w = ko.dataFor($el.parents(".card-widget")[0]);
+        if (!w.oozieExpanded() && !w.ooziePropertiesExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget"].indexOf(w.widgetType()) == -1 && $el.width() < 500){
+          $el.addClass("zoom-in");
+        }
+      }
+    });
   }
 
   var lastSeenPosition = null;
   var lastExpandedWidget = null;
   function setLastExpandedWidget(widget) {
     lastExpandedWidget = widget;
-    if (! widget.oozieExpanded()){
+    if (! widget.oozieExpanded() && ["start-widget", "end-widget", "fork-widget", "join-widget"].indexOf(widget.widgetType()) == -1){
       var _el = $("#wdg_" + widget.id());
-      if (_el.width() < 400){
+      _el.find(".widget-main-section").removeClass("zoom-in");
+      if (_el.width() < 500){
         _el.css("z-index", "1032");
         lastSeenPosition = _el.position();
         var _width = _el.width();
-
+        _el.parent().css("height", viewModel.isEditing() ? _el.height() : (_el.height() + 17) + "px");
         _el.css("position", "absolute");
         _el.css({
           "top": (lastSeenPosition.top) + "px",
           "left": lastSeenPosition.left + "px",
           "width": _width
         });
-        _el.width(500);
         $("#exposeOverlay").fadeIn(300);
-        widget.oozieExpanded(true);
+        _el.animate({
+          "width": "500px"
+        }, 200, function(){
+          widget.oozieExpanded(true);
+          if ($(document).width() > $(window).width()){
+            $("html, body").scrollLeft($(document).width() - $(window).width());
+          }
+        });
       }
       else {
         widget.oozieExpanded(false);
@@ -539,6 +609,7 @@ ${ dashboard.import_bindings() }
       var _el = $("#wdg_" + lastExpandedWidget.id());
       _el.find(".prop-editor").hide();
       _el.removeAttr("style");
+      _el.parent().removeAttr("style");
       lastExpandedWidget.ooziePropertiesExpanded(false);
       lastExpandedWidget.oozieExpanded(false);
     }
@@ -549,6 +620,19 @@ ${ dashboard.import_bindings() }
 
   function validateAndSave() {
     validateFields();
+    if (viewModel.isInvalid() && viewModel.isEditing()) {
+      var $firstElWithErrors = $("[validate].with-errors").eq(0);
+      if (!$firstElWithErrors.is(":visible")) {
+        var widgetId = $firstElWithErrors.parents(".card-widget").attr("id").substr(4);
+        viewModel.getWidgetById(widgetId).ooziePropertiesExpanded(true);
+      }
+      window.setTimeout(function () {
+        $("html,body").animate({
+          "scrollTop": ($firstElWithErrors.offset().top - 150) + "px"
+        }, 500);
+      }, 200);
+    }
+
     viewModel.save();
   }
 
@@ -557,12 +641,10 @@ ${ dashboard.import_bindings() }
     $("[validate]").each(function () {
       if ($(this).attr("validate") == "nonempty" && $.trim($(this).val()) == "") {
         $(this).addClass("with-errors");
-        //$(this).next(".btn").addClass("btn-danger");
         _hasErrors = true;
       }
       else {
         $(this).removeClass("with-errors");
-        //$(this).next(".btn").removeClass("btn-danger");
       }
     });
     viewModel.isInvalid(_hasErrors);
@@ -571,7 +653,7 @@ ${ dashboard.import_bindings() }
   $(document).ready(function(){
     renderChangeables();
 
-    $(document).on("viewmodelHasChanged", function () {
+    $(document).on("blur", "[validate]", function() {
       validateFields();
     });
 
@@ -605,4 +687,4 @@ ${ dashboard.import_bindings() }
 
 </script>
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }

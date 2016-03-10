@@ -23,6 +23,7 @@ import re
 import sys
 
 from cStringIO import StringIO
+from logging import FileHandler
 from logging.handlers import RotatingFileHandler
 
 from desktop.lib.paths import get_desktop_root
@@ -175,6 +176,12 @@ def basic_logging(proc_name, log_dir=None):
       handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
       root_logger.addHandler(handler)
     handler.setLevel(lvl)
+
+    # Set all loggers but error.log to the same logging level
+    error_handler = logging.getLogger('handler_errorlog')
+    for h in root_logger.handlers:
+      if isinstance(h, (FileHandler, RotatingFileHandler)) and h != error_handler:
+        h.setLevel(lvl)
 
 
 def fancy_logging():

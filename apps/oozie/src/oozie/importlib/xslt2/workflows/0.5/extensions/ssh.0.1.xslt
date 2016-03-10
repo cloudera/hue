@@ -6,7 +6,11 @@
 
 <xsl:template match="ssh:ssh">
 
-  ,"ssh": "<xsl:call-template name="command"/>"
+  ,"ssh": {
+    <xsl:call-template name="command"/>,
+    "user":"<xsl:value-of select="*[local-name()='user']"/>",
+    "host":"<xsl:value-of select="*[local-name()='host']"/>"
+    }
 
 </xsl:template>
 

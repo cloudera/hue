@@ -1,7 +1,7 @@
 import array
 import math
 import struct
-import StringIO
+import cStringIO
 import logging
 
 from ttypes import Type
@@ -130,41 +130,39 @@ def _mask_for_bits(i):
 def read_bitpacked(fo, header, width):
     """Reads a bitpacked run of the rle/bitpack hybrid.
 
-    Currently only supports width <=8 (doesn't support crossing bytes).
+    Supports width >8 (crossing bytes).
     """
-    assert width <= 8
     num_groups = header >> 1
-    logger.debug("Reading a bit-packed run with: %s groups", num_groups)
     count = num_groups * 8
-    raw_bytes = array.array('B', fo.read(count)).tolist()
+    byte_count = (width * count)/8
+    logger.debug("Reading a bit-packed run with: %s groups, count %s, bytes %s",
+        num_groups, count, byte_count)
+    raw_bytes = array.array('B', fo.read(byte_count)).tolist()
     current_byte = 0
     b = raw_bytes[current_byte]
     mask = _mask_for_bits(width)
-    bits_in_byte = 8
+    bits_wnd_l = 8
+    bits_wnd_r = 0
     res = []
-    while current_byte < len(raw_bytes):
+    total = len(raw_bytes)*8;
+    while (total >= width):
         # TODO zero-padding could produce extra zero-values
-        logger.debug("  read bitpacked: width=%s bits_in_byte=%s b=%s,"
+        logger.debug("  read bitpacked: width=%s window=(%s %s) b=%s,"
                      " current_byte=%s",
-                     width, bits_in_byte, bin(b), current_byte)
-        if bits_in_byte >= width:
-            res.append(b & mask)
-            b >>= width
-            bits_in_byte -= width
-        else:
-            if current_byte + 1 == len(raw_bytes):
-                break  # partial results / padding at the end.
-            next_b = raw_bytes[current_byte + 1]
-            borrowed_bits = next_b & _mask_for_bits(width - bits_in_byte)
-            logger.debug("    borrowing %d bits", width - bits_in_byte)
-            logger.debug("    next_b=%s, borrowed_bits=%s",
-                         bin(next_b), bin(borrowed_bits))
-            res.append((borrowed_bits << bits_in_byte) | b)
-            b = next_b >> (width - bits_in_byte)
-            logger.debug("  shifting away: %d", width - bits_in_byte)
-            bits_in_byte = 8 - (width - bits_in_byte)
+                     width, bits_wnd_l, bits_wnd_r, bin(b), current_byte)
+        if bits_wnd_r >= 8:
+            bits_wnd_r -= 8
+            bits_wnd_l -= 8
+            b >>= 8
+        elif bits_wnd_l - bits_wnd_r >= width:
+            res.append((b >> bits_wnd_r) & mask)
+            total -= width
+            bits_wnd_r += width
+            logger.debug("  read bitpackage: added: %s", res[-1])
+        elif current_byte + 1 < len(raw_bytes):
             current_byte += 1
-        logger.debug("  read bitpackage: added: %s", res[-1])
+            b |= (raw_bytes[current_byte] << bits_wnd_l)
+            bits_wnd_l += 8
     return res
 
 
@@ -210,7 +208,7 @@ def read_rle_bit_packed_hybrid(fo, width, length=None):
         raw_bytes = fo.read(length)
         if raw_bytes == '':
             return None
-        io_obj = StringIO.StringIO(raw_bytes)
+        io_obj = cStringIO.StringIO(raw_bytes)
     res = []
     while io_obj.tell() < length:
         header = read_unsigned_var_int(io_obj)

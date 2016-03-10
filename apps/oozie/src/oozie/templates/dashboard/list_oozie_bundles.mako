@@ -152,6 +152,9 @@ ${layout.menubar(section='bundles', dashboard=True)}
   </div>
 </div>
 
+<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
@@ -330,7 +333,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
     }
 
     function getStatuses(type) {
-      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED'] : ['SUCCEEDED', 'KILLED', 'FAILED'];
+      var selectedStatuses = (type == 'running') ? ['RUNNING', 'PREP', 'SUSPENDED', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR'] : ['SUCCEEDED', 'KILLED', 'FAILED', 'DONEWITHERROR'];
       var btnStatuses = [];
       var statusBtns = $("a.btn-status.active");
       $.each(statusBtns, function () {
@@ -338,9 +341,9 @@ ${layout.menubar(section='bundles', dashboard=True)}
         if (val == 'SUCCEEDED') {
           btnStatuses = btnStatuses.concat(['SUCCEEDED']);
         } else if (val == 'RUNNING') {
-          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED']);
+          btnStatuses = btnStatuses.concat(['RUNNING', 'PREP', 'SUSPENDED', 'RUNNINGWITHERROR', 'PREPSUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']);
         } else if (val == 'ERROR') {
-          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED']);
+          btnStatuses = btnStatuses.concat(['KILLED', 'FAILED', 'DONEWITHERROR']);
         }
       });
       if (btnStatuses.length > 0) {
@@ -448,7 +451,10 @@ ${layout.menubar(section='bundles', dashboard=True)}
         }
         numRunning = data.jobs.length;
 
+        ko.bindingHandlers.multiCheck.init(runningTable[0], function() { return '#' + runningTable[0].id})
         window.setTimeout(refreshRunning, 20000);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseJSON['detail']);
       });
     }
 
@@ -534,4 +540,4 @@ ${layout.menubar(section='bundles', dashboard=True)}
 
 ${ utils.bulk_dashboard_functions() }
 
-${ commonfooter(messages) | n,unicode }
+${ commonfooter(request, messages) | n,unicode }
