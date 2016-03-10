@@ -74,10 +74,6 @@ ${ assist.assistPanel() }
                   user: '${user.username}',
                   navigationSettings: {
                     openItem: false,
-<<<<<<< HEAD
-                    showPreview: true,
-=======
->>>>>>> upstream/master
                     showStats: true
                   }
                 },
