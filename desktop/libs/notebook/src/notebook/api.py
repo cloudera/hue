@@ -472,7 +472,7 @@ def export_result(request):
         request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
       else:
         raise ValidationError(_("The target path is a directory"))
-    response['watch_url'] = api.export_data_as_csv_file(snippet, destination, overwrite)
+    response['watch_url'] = api.export_data_as_hdfs_file(snippet, destination, overwrite)
     response['status'] = 0
   elif data_format == 'hive-table':
     notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
