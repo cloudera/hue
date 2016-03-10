@@ -539,7 +539,7 @@ from desktop.views import _ko
 
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Save Query Results')}</h3>
+        <h3>${_('Save query result in')}</h3>
       </div>
       <div class="modal-body" style="padding: 4px">
         <form id="saveResultsForm" method="POST" class="form form-inline">
@@ -549,7 +549,7 @@ from desktop.views import _ko
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('In an HDFS file') }
+                  &nbsp;${ _('In HDFS (small csv)') }
                 </label>
                 <span data-bind="visible: saveTarget() == 'hdfs-file'">
                   <input data-bind="value: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser">
@@ -559,23 +559,23 @@ from desktop.views import _ko
                   ${ _('Overwrite') }
                 </label>
               </div>
-              <div class="controls">
-                <label class="radio">
-                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
-                  &nbsp;${ _('In a new table') }
-                </label>
-                <span data-bind="visible: saveTarget() == 'hive-table'">
-                  <input data-bind="value: savePath" type="text" name="target_table" class="input-xlarge" placeholder="${_('Table name or <database>.<table>')}">
-                </span>
-              </div>
-              <div class="controls">
+              <div class="controls" data-bind="visible: snippet.type() == 'hive'">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('Big Query in HDFS') }
+                  &nbsp;${ _('In HDFS (large file)') }
                 </label>
                 <span data-bind="visible: saveTarget() == 'hdfs-directory'">
                   <input data-bind="value: savePath" type="text" name="target_dir" placeholder="${_('Path to directory')}" class="folderChooser">
                   <i class="fa fa-question-circle" id="hdfs-directory-help"></i>
+                </span>
+              </div>
+              <div class="controls">
+                <label class="radio">
+                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
+                  &nbsp;${ _('A new table') }
+                </label>
+                <span data-bind="visible: saveTarget() == 'hive-table'">
+                  <input data-bind="value: savePath" type="text" name="target_table" class="input-xlarge" placeholder="${_('Table name or <database>.<table>')}">
                 </span>
               </div>
             </div>
@@ -586,10 +586,6 @@ from desktop.views import _ko
         </div>
       </div>
       <div class="modal-footer">
-        % if app_name != 'impala':
-        <a id="save-results-advanced" href="javascript:void(0)" class="pull-left">${ _('Show advanced fields') }</a>
-        % endif
-        <a id="save-results-simple" href="javascript:void(0)" class="pull-left hide">${ _('Hide advanced fields') }</a>
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
         <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
       </div>
