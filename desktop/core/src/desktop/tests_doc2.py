@@ -691,3 +691,83 @@ class TestDocument2Permissions(object):
     assert_equal(4, data['count'])
     doc_names = [doc['name'] for doc in data['documents']]
     assert_true('history.sql' in doc_names)
+
+
+class TestDocument2ImportExport(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="perm_user", groupname="default", recreate=True, is_superuser=False)
+    self.client_not_me = make_logged_in_client(username="not_perm_user", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="perm_user")
+    self.user_not_me = User.objects.get(username="not_perm_user")
+
+    grant_access(self.user.username, self.user.username, "desktop")
+    grant_access(self.user_not_me.username, self.user_not_me.username, "desktop")
+
+    self.default_group = get_default_user_group()
+
+    # This creates the user directories for the new user
+    response = self.client.get('/desktop/api2/doc/')
+    data = json.loads(response.content)
+    assert_equal('/', data['document']['path'], data)
+
+    self.home_dir = Document2.objects.get_home_directory(user=self.user)
+    self.not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
+
+  def test_import_owned_document(self):
+    owned_query = Document2.objects.create(
+      name='query.sql',
+      type='query-hive',
+      owner=self.user,
+      data={'description': 'original_query'},
+      parent_directory=self.home_dir
+    )
+
+    # Test that importing existing doc updates it and retains owner, UUID
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([owned_query.id]), 'format': 'json'})
+    documents = response.content
+
+    response = self.client.post('/desktop/api2/doc/import/', {'documents': documents})
+    data = json.loads(response.content)
+
+    assert_true('message' in data, data)
+    assert_true('Installed 1 object' in data['message'], data)
+
+    assert_equal(1, Document2.objects.filter(name='query.sql').count())
+    imported_doc = Document2.objects.get(name='query.sql')
+    assert_equal(owned_query.uuid, imported_doc.uuid)
+    assert_equal(owned_query.owner, imported_doc.owner)
+
+    # Test that import non-existing doc creates it, sets parent to home
+    Document2.objects.get(name='query.sql').delete()
+    assert_equal(0, Document2.objects.filter(name='query.sql').count())
+
+    response = self.client.post('/desktop/api2/doc/import/', {'documents': documents})
+
+    assert_equal(1, Document2.objects.filter(name='query.sql').count())
+    imported_doc = Document2.objects.get(name='query.sql')
+    assert_equal(owned_query.uuid, imported_doc.uuid)
+    assert_equal(owned_query.owner, imported_doc.owner)
+    assert_equal(owned_query.parent_directory, imported_doc.parent_directory)
+
+  def test_import_nonowned_document(self):
+    owned_query = Document2.objects.create(
+      name='query.sql',
+      type='query-hive',
+      owner=self.user,
+      data={'description': 'original_query'},
+      parent_directory=self.home_dir
+    )
+
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([owned_query.id]), 'format': 'json'})
+    documents = response.content
+
+    # Test that importing non-owned doc copies it, sets parent to home
+    response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents})
+
+    assert_equal(2, Document2.objects.filter(name='query.sql').count())
+    imported_doc = Document2.objects.get(name='query.sql', owner=self.user_not_me)
+    assert_true(owned_query.uuid != imported_doc.uuid)
+    assert_equal(self.user_not_me, imported_doc.owner)
+    assert_equal(self.not_me_home_dir.uuid, imported_doc.parent_directory.uuid)
