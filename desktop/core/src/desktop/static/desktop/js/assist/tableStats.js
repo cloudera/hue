@@ -59,12 +59,12 @@
     self.termsTabActive = ko.observable(false);
     self.prefixFilter = ko.observable().extend({'throttle': 500});
 
-    self.activeTab = ko.observable("sample");
+    self.activeTab = ko.observable(self.column === null ? 'sample' : 'analysis');
     self.loadingSamples = ko.observable(false);
     self.samples = ko.observable(null);
 
     self.activeTab.subscribe(function (newValue) {
-      if (newValue === "analysis" && self.statRows().length === 0) {
+      if (newValue === 'analysis' && self.statRows().length === 0) {
         self.fetchData();
       }
     });
