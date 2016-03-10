@@ -22,8 +22,13 @@
   }
 }(this, function (ko, AssistHelper, Autocompleter) {
 
+<<<<<<< HEAD
+  var SPARK_MAPPING = {
+    ignore: ["ace", "images", "autocompleter", "selectedStatement", "assistHelpers", "user", "inFocus", "history", "availableSnippets"]
+=======
   var NOTEBOOK_MAPPING = {
     ignore: ["ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "isResultSettingsVisible", "selectedStatement", "settingsVisible", "user"]
+>>>>>>> upstream/master
   };
 
   var Result = function (snippet, result) {
@@ -555,7 +560,11 @@
       .always(function() {
         if (notebook.type() != 'notebook') {
           $.post("/notebook/api/historify", {
+<<<<<<< HEAD
+            notebook: ko.mapping.toJSON(notebook, SPARK_MAPPING)
+=======
             notebook: ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING)
+>>>>>>> upstream/master
           }, function(data){
             if (vm.editorMode && data && data.status == 0 && data.id){
               hueUtils.changeURL('/notebook/editor?editor=' + data.id);
@@ -1029,7 +1038,11 @@
 
     self.save = function () {
       $.post("/notebook/api/notebook/save", {
+<<<<<<< HEAD
+        "notebook": ko.mapping.toJSON(self, SPARK_MAPPING),
+=======
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
+>>>>>>> upstream/master
         "editorMode": vm.editorMode
       }, function (data) {
         if (data.status == 0) {
@@ -1052,7 +1065,11 @@
 
     self.close = function () {
       $.post("/notebook/api/notebook/close", {
+<<<<<<< HEAD
+        "notebook": ko.mapping.toJSON(self, SPARK_MAPPING),
+=======
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
+>>>>>>> upstream/master
         "editorMode": vm.editorMode
       });
     };

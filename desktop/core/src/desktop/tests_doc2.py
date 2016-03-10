@@ -606,12 +606,21 @@ class TestDocument2Permissions(object):
     assert_true('query3.sql' in doc_names)
     assert_false('query1.sql' in doc_names)
 
+<<<<<<< HEAD
+    # they should not appear in the other user's regular get_documents response
+    response = self.client_not_me.get('/desktop/api2/doc/')
+    data = json.loads(response.content)
+    doc_names = [doc['name'] for doc in data['children']]
+    assert_false('query2.sql' in doc_names)
+    assert_false('query3.sql' in doc_names)
+=======
     # they should also appear in user's home directory get_documents response
     response = self.client_not_me.get('/desktop/api2/doc/')
     data = json.loads(response.content)
     doc_names = [doc['name'] for doc in data['children']]
     assert_true('query2.sql' in doc_names)
     assert_true('query3.sql' in doc_names)
+>>>>>>> upstream/master
 
 
   def test_get_shared_directories(self):
@@ -691,6 +700,8 @@ class TestDocument2Permissions(object):
     assert_equal(4, data['count'])
     doc_names = [doc['name'] for doc in data['documents']]
     assert_true('history.sql' in doc_names)
+<<<<<<< HEAD
+=======
 
 
 class TestDocument2ImportExport(object):
@@ -771,3 +782,4 @@ class TestDocument2ImportExport(object):
     assert_true(owned_query.uuid != imported_doc.uuid)
     assert_equal(self.user_not_me, imported_doc.owner)
     assert_equal(self.not_me_home_dir.uuid, imported_doc.parent_directory.uuid)
+>>>>>>> upstream/master

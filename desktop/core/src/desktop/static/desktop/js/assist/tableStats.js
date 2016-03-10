@@ -49,8 +49,13 @@
     self.isComplexType = /^(map|array|struct)/i.test(options.type);
     self.isView = /view/i.test(options.type);
 
+<<<<<<< HEAD
+    self.loading = ko.observable(false);
+    self.hasError = ko.observable(false);
+=======
     self.loadingStats = ko.observable(false);
     self.statsHasError = ko.observable(false);
+>>>>>>> upstream/master
     self.refreshing = ko.observable(false);
     self.loadingTerms = ko.observable(false);
     self.inaccurate = ko.observable(false);
@@ -59,6 +64,8 @@
     self.termsTabActive = ko.observable(false);
     self.prefixFilter = ko.observable().extend({'throttle': 500});
 
+<<<<<<< HEAD
+=======
     self.activeTab = ko.observable("sample");
     self.loadingSamples = ko.observable(false);
     self.samples = ko.observable(null);
@@ -69,6 +76,7 @@
       }
     });
 
+>>>>>>> upstream/master
     self.prefixFilter.subscribe(function (newValue) {
       self.fetchTerms();
     });
@@ -79,17 +87,26 @@
       }
     });
 
+<<<<<<< HEAD
+    self.fetchData();
+=======
     if (typeof self.column === 'undefined' || self.column === null) {
       self.fetchSamples();
     } else {
       self.fetchData();
     }
+>>>>>>> upstream/master
   }
 
   TableStats.prototype.fetchData = function () {
     var self = this;
+<<<<<<< HEAD
+    self.loading(true);
+    self.hasError(false);
+=======
     self.loadingStats(true);
     self.statsHasError(false);
+>>>>>>> upstream/master
 
     var successCallback = function (data) {
       if (data && data.status == 0) {
@@ -104,6 +121,19 @@
         self.inaccurate(inaccurate);
       } else if (data && data.message) {
         $(document).trigger("error", data.message);
+<<<<<<< HEAD
+        self.hasError(true);
+      } else {
+        $(document).trigger("error", self.i18n.errorLoadingStats);
+        self.hasError(true);
+      }
+      self.loading(false);
+    };
+
+    var errorCallback = function (e) {
+      self.hasError(true);
+      self.loading(false);
+=======
         self.statsHasError(true);
       } else {
         $(document).trigger("error", self.i18n.errorLoadingStats);
@@ -115,6 +145,7 @@
     var errorCallback = function (e) {
       self.statsHasError(true);
       self.loadingStats(false);
+>>>>>>> upstream/master
     };
 
     self.assistHelper.fetchStats({
@@ -132,6 +163,28 @@
     if (self.refreshing()) {
       return;
     }
+<<<<<<< HEAD
+    var shouldFetchTerms = self.termsTabActive() || self.terms().length > 0;
+    self.refreshing(true);
+
+    self.assistHelper.refreshTableStats({
+      sourceType: self.sourceType === "hive" ? "beeswax" : self.sourceType,
+      databaseName: ko.isObservable(self.database) ? self.database() : self.database,
+      tableName: ko.isObservable(self.table) ? self.table() : self.table,
+      columnName: ko.isObservable(self.column) ? self.column() : self.column,
+      successCallback: function() {
+        self.refreshing(false);
+        self.fetchData();
+        if (shouldFetchTerms) {
+          self.fetchTerms();
+        }
+      },
+      errorCallback: function(message) {
+        self.refreshing(false);
+        $(document).trigger("error", message || self.i18n.errorRefreshingStats);
+      }
+    });
+=======
     self.refreshing(true);
 
     if (self.activeTab() === "sample") {
@@ -157,6 +210,7 @@
         }
       });
     }
+>>>>>>> upstream/master
   };
 
   TableStats.prototype.fetchTerms = function () {
@@ -194,6 +248,8 @@
     });
   };
 
+<<<<<<< HEAD
+=======
   TableStats.prototype.fetchSamples = function () {
     var self = this;
     if (self.loadingSamples()) {
@@ -224,5 +280,6 @@
     });
   };
 
+>>>>>>> upstream/master
   return TableStats;
 }));

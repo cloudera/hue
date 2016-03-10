@@ -590,6 +590,10 @@
    *
    * @param {string} options.databaseName
    * @param {string} options.tableName
+<<<<<<< HEAD
+   * @param {string} options.type
+=======
+>>>>>>> upstream/master
    */
   AssistHelper.prototype.fetchTableSample = function (options) {
     var self = this;
@@ -598,7 +602,11 @@
     $.post(url, {
       notebook: {},
       snippet: ko.mapping.toJSON({
+<<<<<<< HEAD
+        type: options.type
+=======
         type: options.sourceType
+>>>>>>> upstream/master
       }),
     }, function (data) {
       if (! self.successResponseIsError(data)) {

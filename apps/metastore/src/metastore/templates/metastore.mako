@@ -473,12 +473,21 @@ ${ assist.assistPanel() }
     <!-- ko with: table -->
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
+<<<<<<< HEAD
+    <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
+    % endif
+    % if USE_NEW_EDITOR.get():
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+    % else:
+    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+=======
       <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     % endif
     % if USE_NEW_EDITOR.get():
       <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % else:
       <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+>>>>>>> upstream/master
     % endif
     % if has_write_access:
       <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
@@ -724,6 +733,10 @@ ${ assist.assistPanel() }
                 }],
                 navigationSettings: {
                   openItem: true,
+<<<<<<< HEAD
+                  showPreview: true,
+=======
+>>>>>>> upstream/master
                   showStats: false
                 }
               },

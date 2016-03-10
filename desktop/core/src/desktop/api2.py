@@ -21,8 +21,11 @@ import tempfile
 import StringIO
 import zipfile
 
+<<<<<<< HEAD
+=======
 from datetime import datetime
 
+>>>>>>> upstream/master
 from django.contrib.auth.models import Group, User
 from django.core import management
 
@@ -35,7 +38,11 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
+<<<<<<< HEAD
+from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException
+=======
 from desktop.models import Document2, Document, Directory, DocumentTag, FilesystemException, uuid_default
+>>>>>>> upstream/master
 
 
 LOG = logging.getLogger(__name__)
@@ -137,6 +144,11 @@ def get_document(request):
   # Get children documents if this is a directory
   if document.is_directory:
     directory = Directory.objects.get(id=document.id)
+<<<<<<< HEAD
+    children = directory.get_children_documents()
+    # Filter and order results
+    response.update(_filter_documents(request, queryset=children))
+=======
 
     # If this is the user's home directory, fetch shared docs too
     if document.is_home_directory:
@@ -146,6 +158,7 @@ def get_document(request):
 
     # Filter and order results
     response.update(_filter_documents(request, queryset=children, flatten=False))
+>>>>>>> upstream/master
 
   # Paginate and serialize Results
   if 'documents' in response:
@@ -354,6 +367,15 @@ def import_documents(request):
     # If doc is not owned by current user, make a copy of the document
     if doc['fields']['owner'][0] != request.user.username:
       doc['fields']['owner'] = [request.user.username]
+<<<<<<< HEAD
+    owner = doc['fields']['owner'][0]
+
+    # TODO: Check if this should be replaced by get_by_uuid
+    if Document2.objects.filter(uuid=doc['fields']['uuid'], owner__username=owner).exists():
+      doc['pk'] = Document2.objects.get(uuid=doc['fields']['uuid'], owner__username=owner).pk
+    else:
+=======
+>>>>>>> upstream/master
       doc['pk'] = None
       doc['fields']['version'] = 1
       doc['fields']['uuid'] = uuid_default()

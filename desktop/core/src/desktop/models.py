@@ -47,9 +47,15 @@ LOG = logging.getLogger(__name__)
 SAMPLE_USER_ID = 1100713
 SAMPLE_USER_INSTALL = 'hue'
 SAMPLE_USER_OWNERS = ['hue', 'sample']
+<<<<<<< HEAD
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
 
+=======
+
+UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
+
+>>>>>>> upstream/master
 
 def uuid_default():
   return str(uuid.uuid4())
@@ -388,6 +394,7 @@ class DocumentManager(models.Manager):
         with transaction.atomic():
           for doc in Document.objects.filter(owner__username__in=SAMPLE_USER_OWNERS):
             doc.share_to_default()
+<<<<<<< HEAD
 
             tag = DocumentTag.objects.get_example_tag(user=doc.owner)
             doc.tags.add(tag)
@@ -464,6 +471,84 @@ class DocumentManager(models.Manager):
           # Next, filter these from our document query.
           docs = docs.exclude(id__in=docs_from_content)
 
+=======
+
+            tag = DocumentTag.objects.get_example_tag(user=doc.owner)
+            doc.tags.add(tag)
+
+            doc.save()
+      except Exception, e:
+        LOG.exception('error sharing sample user documents')
+
+      # For now remove the default tag from the examples
+      try:
+        for doc in Document.objects.filter(tags__tag=DocumentTag.EXAMPLE):
+          default_tag = DocumentTag.objects.get_default_tag(doc.owner)
+          doc.tags.remove(default_tag)
+      except Exception, e:
+        LOG.exception('error removing default tags')
+
+      # ------------------------------------------------------------------------
+
+      LOG.info('Looking for documents that have no object')
+
+      # Delete documents with no object.
+      with transaction.atomic():
+        # First, delete all the documents that don't have a content type
+        docs = Document.objects.filter(content_type=None)
+
+        if docs:
+          LOG.info('Deleting %s doc(s) that do not have a content type' % docs.count())
+          docs.delete()
+
+        # Next, it's possible that there are documents pointing at a non-existing
+        # content_type. We need to do a left join to find these records, but we
+        # can't do this directly in django. To get around writing wrap sql (which
+        # might not be portable), we'll use an aggregate to count up all the
+        # associated content_types, and delete the documents that have a count of
+        # zero.
+        #
+        # Note we're counting `content_type__name` to force the join.
+        docs = Document.objects \
+            .values('id') \
+            .annotate(content_type_count=models.Count('content_type__name')) \
+            .filter(content_type_count=0)
+
+        if docs:
+          LOG.info('Deleting %s doc(s) that have invalid content types' % docs.count())
+          docs.delete()
+
+        # Finally we need to delete documents with no associated content object.
+        # This is tricky because of our use of generic foreign keys. So to do
+        # this a bit more efficiently, we'll start with a query of all the
+        # documents, then step through each content type and and filter out all
+        # the documents it's referencing from our document query. Messy, but it
+        # works.
+
+        docs = Document.objects.all()
+
+        for content_type in ContentType.objects.all():
+          model_class = content_type.model_class()
+
+          # Ignore any types that don't have a model.
+          if model_class is None:
+            continue
+
+          # Ignore types that don't have a table yet.
+          if model_class._meta.db_table not in table_names:
+            continue
+
+          # Ignore classes that don't have a 'doc'.
+          if not hasattr(model_class, 'doc'):
+            continue
+
+          # First create a query that grabs all the document ids for this type.
+          docs_from_content = model_class.objects.values('doc__id')
+
+          # Next, filter these from our document query.
+          docs = docs.exclude(id__in=docs_from_content)
+
+>>>>>>> upstream/master
         if docs.exists():
           LOG.info('Deleting %s documents' % docs.count())
           docs.delete()
@@ -806,6 +891,19 @@ class Document2Manager(models.Manager):
   def get_by_natural_key(self, uuid, version, is_history):
     return self.get(uuid=uuid, version=version, is_history=is_history)
 
+<<<<<<< HEAD
+  def get_by_uuid(self, uuid):
+    """
+    Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
+    This should always be used in place of Document2.objects.get(uuid=) when a single document is expected
+    WARNING: This does not check for read/write pernissions!
+    """
+    docs = self.filter(uuid=uuid).order_by('-last_modified')
+    if not docs.exists():
+      raise FilesystemException(_('Document with UUID %s not found.') % uuid)
+    return docs[0]
+
+=======
   def get_by_uuid(self, uuid, owner=None):
     """
     Since UUID is not a unique field, but part of a composite unique key, this returns the latest version by UUID
@@ -830,6 +928,7 @@ class Document2Manager(models.Manager):
 
     return docs[0]
 
+>>>>>>> upstream/master
   def get_history(self, user, doc_type):
     return self.documents(user, perms='owned', include_history=True).filter(type=doc_type, is_history=True)
 
@@ -1187,6 +1286,8 @@ class Directory(Document2):
     documents = self.children.filter(is_history=False)  # TODO: perms
     return documents
 
+<<<<<<< HEAD
+=======
   def get_children_and_shared_documents(self, user):
     """
     Returns the children and shared documents for a given directory, excluding history documents
@@ -1203,6 +1304,7 @@ class Directory(Document2):
     return documents.defer('description', 'data', 'extra').distinct().order_by('-last_modified')
 
 
+>>>>>>> upstream/master
   def save(self, *args, **kwargs):
     self.type = 'directory'
     super(Directory, self).save(*args, **kwargs)
