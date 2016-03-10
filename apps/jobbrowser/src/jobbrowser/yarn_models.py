@@ -46,6 +46,13 @@ class Application(object):
 
     self._fixup()
 
+  @property
+  def logs_url(self):
+    url = self.trackingUrl
+    if self.applicationType == 'SPARK':
+      url = os.path.join(self.trackingUrl, 'executors')
+    return url
+
   def _fixup(self):
     self.is_mr2 = True
     jobid = self.id

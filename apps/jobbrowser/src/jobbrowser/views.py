@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 import re
 import time
 import logging
@@ -44,7 +43,6 @@ from hadoop.yarn.clients import get_log_client
 import hadoop.yarn.resource_manager_api as resource_manager_api
 
 from jobbrowser.conf import SHARE_JOBS
-from jobbrowser.conf import DISABLE_KILLING_JOBS
 from jobbrowser.api import get_api, ApplicationNotRunning, JobExpired
 from jobbrowser.models import Job, JobLinkage, Tracker, Cluster, can_view_job, can_modify_job, LinkJobLogs, can_kill_job
 from jobbrowser.yarn_models import Application
