@@ -214,11 +214,7 @@
       return;
     }
     self.assistHelper.fetchTableSample({
-<<<<<<< HEAD
-      type: "hive",
-=======
       sourceType: "hive",
->>>>>>> upstream/master
       databaseName: self.metastoreTable.database.name,
       tableName: self.metastoreTable.name,
       successCallback: function (data) {
