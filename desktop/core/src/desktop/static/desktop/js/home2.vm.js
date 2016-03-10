@@ -27,9 +27,18 @@
   }
 }(this, function (ko, AssistHelper, HueFileEntry) {
 
+
+  /**
+   * @param {Object} options
+   * @param {string} options.user
+   * @param {Object} options.i18n
+   *
+   * @constructor
+   */
   function HomeViewModel(options) {
     var self = this;
 
+    self.user = options.user;
     self.assistHelper = AssistHelper.getInstance(options);
     self.isLeftPanelVisible = ko.observable();
     self.assistHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -41,6 +50,7 @@
       trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
+      user: self.user,
       definition: {
         name: '/'
       }
@@ -63,6 +73,7 @@
       trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
+      user: self.user,
       definition: {
         uuid: location.getParameter('uuid'),
         name: 'unknown',
@@ -95,6 +106,7 @@
       trashEntry: self.trashEntry,
       assistHelper: self.assistHelper,
       app: 'documents',
+      user: self.user,
       definition: {
         name: '',
         type: 'directory',

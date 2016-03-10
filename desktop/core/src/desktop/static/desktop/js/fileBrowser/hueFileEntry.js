@@ -34,6 +34,7 @@
    * @param {Function} options.trashEntry - The observable keeping track of the trash directory
    * @param {HueFolder} options.parent
    * @param {string} options.app - Currently only 'documents' is supported
+   * @param {string} options.user
    *
    * @constructor
    */
@@ -45,6 +46,7 @@
     self.definition = ko.observable(options.definition);
     self.assistHelper = options.assistHelper;
     self.app = options.app;
+    self.user = options.user;
 
     self.document = ko.observable();
 
@@ -70,6 +72,10 @@
     self.isShared = ko.pureComputed(function () {
       var perms = self.definition().perms;
       return perms && (perms.read.users.length || perms.read.groups.length || perms.write.users.length || perms.write.groups.length);
+    });
+
+    self.isSharedWithMe = ko.pureComputed(function () {
+      return self.user !== self.definition().owner;
     });
 
     self.entriesToDelete = ko.observableArray();
@@ -205,6 +211,7 @@
         name: '"' + query + '"'
       },
       app: self.app,
+      user: self.user,
       parent: owner
     });
 
@@ -226,6 +233,7 @@
             assistHelper: self.assistHelper,
             definition: definition,
             app: self.app,
+            user: self.user,
             parent: self
           });
           if (!entry.isTrash()) {
@@ -292,6 +300,7 @@
               assistHelper: self.assistHelper,
               definition: definition,
               app: self.app,
+              user: self.user,
               parent: self
             });
             if (entry.isTrash()) {
@@ -318,12 +327,17 @@
               assistHelper: self.assistHelper,
               definition: data.parent,
               app: self.app,
+              user: self.user,
               parent: null
             });
           }
           self.loading(false);
           self.loaded(true);
-          if (callback && typeof callback === 'function') {
+
+          if (self.isRoot() && self.entries().length === 1 && self.entries()[0].definition().type === 'directory' && self.entries()[0].isSharedWithMe()) {
+            self.activeEntry(self.entries()[0]);
+            self.activeEntry().load(callback);
+          } else if (callback && typeof callback === 'function') {
             callback();
           }
         },

@@ -897,6 +897,7 @@ from desktop.views import _ko
       /**
        * @param {Object} options
        * @param {AssistHelper} options.assistHelper
+       * @param {string} options.user
        * @param {Object} options.i18n
        * @constructor
        **/
@@ -909,6 +910,7 @@ from desktop.views import _ko
           trashEntry: ko.observable,
           assistHelper: options.assistHelper,
           app: 'documents',
+          user: options.user,
           definition: {
             name: '/',
             type: 'directory'
@@ -1026,6 +1028,7 @@ from desktop.views import _ko
           % if USE_NEW_EDITOR.get():
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistDocumentsPanel({
+              user: params.user,
               assistHelper: self.assistHelper,
               i18n: i18n
             }),
