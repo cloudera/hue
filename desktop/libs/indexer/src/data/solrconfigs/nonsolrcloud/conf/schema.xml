@@ -55,15 +55,15 @@
 
     <fieldtype name="binary" class="solr.BinaryField"/>
 
-    <fieldType name="pint" class="solr.IntField"/>
+    <fieldType name="pint" class="solr.TrieIntField"/>
 
-    <fieldType name="plong" class="solr.LongField"/>
+    <fieldType name="plong" class="solr.TriLongField"/>
 
-    <fieldType name="pfloat" class="solr.FloatField"/>
+    <fieldType name="pfloat" class="solr.TriFloatField"/>
 
-    <fieldType name="pdouble" class="solr.DoubleField"/>
+    <fieldType name="pdouble" class="solr.TriDoubleField"/>
 
-    <fieldType name="pdate" class="solr.DateField" sortMissingLast="true"/>
+    <fieldType name="pdate" class="solr.TriDateField" sortMissingLast="true"/>
 
     <fieldType name="random" class="solr.RandomSortField" indexed="true" />
 
