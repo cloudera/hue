@@ -774,7 +774,7 @@ ${ require.config() }
     <ul class="unstyled" data-bind="foreach: result.meta">
       <li data-bind="visible: name != ''">
         <input type="checkbox" checked="checked" data-bind="event: { change: function(){toggleColumn($element, $index());}}" />
-        <a class="pointer" title="${ _('Click to scroll to column') }" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }"></a>
+        <a class="pointer" data-bind="text: $data.name, click: function(){ scrollToColumn($element, $index()); }, attr: { title: $data.type + ' ' + '${ _('Click to scroll to data') }'}"></a>
       </li>
     </ul>
   </div>
@@ -822,7 +822,7 @@ ${ require.config() }
               <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
-                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': $index() == 0 ? '1%' : ''}"></th>
+                  <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type)}, attr: {'width': ($index() == 0 ? '1%' : ''), title: $data.type }"></th>
                 </tr>
                 </thead>
                 <tbody>
