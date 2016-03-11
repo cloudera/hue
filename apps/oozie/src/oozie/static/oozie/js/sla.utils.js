@@ -74,7 +74,9 @@ function msToTime(millis) {
 function updateSLAChart(slaTable, labels, limit) {
   $("#slaChart").jHueBlueprint("reset");
   var rows = slaTable.fnGetNodes();
-  for (var i = 0; i < (limit != null && limit < rows.length ? limit : rows.length); i++) {
+  var from = limit != null && limit < rows.length ? rows.length - limit : 0;
+  var to = rows.length;
+  for (var i = from; i < to; i++) {
     function getOptions(differenceCellValue, label, color) {
       return {
         data: [
