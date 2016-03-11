@@ -2518,3 +2518,10 @@ body {
 .dropdown-menu.less-padding > li > a {
   padding-left: 6px
 }
+
+.hi {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
