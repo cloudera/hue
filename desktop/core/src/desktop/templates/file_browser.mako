@@ -494,7 +494,7 @@ from desktop.views import _ko
             </span>
           <!-- /ko -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { showNewDirectoryModal() }, css: { 'disabled': isTrash() || isTrashed() }"><span class="fa-stack fa-fw" style="width: 1.28571429em;"><i class="fa fa-folder-o fa-stack-1x" ></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 7px; margin-top: 3px;"></i></span></a>
-          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed()) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 }"><i class="fa fa-fw fa-times"></i></a>
+          <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function () { if (isTrash() || isTrashed()) { showDeleteConfirmation() } else { moveToTrash() } }, css: { 'disabled': selectedEntries().length === 0 || sharedWithMeSelected() }"><i class="fa fa-fw fa-times"></i></a>
           <!-- ko if: app === 'documents' -->
           <a class="inactive-action fb-action" href="javascript:void(0);" data-bind="click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a>
           <!-- /ko -->
@@ -550,9 +550,9 @@ from desktop.views import _ko
                 <!-- ko ifnot: isTrashed -->
                 <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: open, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-file-o"></i> ${ _('Open') }</a></li>
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: ! $altDown()"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Remove') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="visible: $altDown()"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
+                <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() }"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }, css: { 'disabled' : $parent.sharedWithMeSelected() }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Remove') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Sharing') }</a> </li>
                 <!-- /ko -->
               </ul>
               <div class="fb-primary-col">
@@ -643,9 +643,13 @@ from desktop.views import _ko
           $element.droppable({
             drop: function (ev, ui) {
               if (! dragToSelect && boundEntry.isDirectory()) {
-                boundEntry.moveHere($.grep(allEntries(), function (entry) {
-                  return entry.selected();
-                }));
+                var entriesToMove = $.grep(allEntries(), function (entry) {
+                  return entry.selected() && ! entry.isSharedWithMe();
+                });
+                if (entriesToMove.length > 0) {
+                  boundEntry.moveHere(entriesToMove);
+                  boundEntry.load();
+                }
               }
               $element.removeClass('fb-drop-hover');
             },
@@ -653,7 +657,12 @@ from desktop.views import _ko
               if (dragToSelect && ! disableSelect) {
                 boundEntry.selected(true);
               } else if (! dragToSelect && boundEntry.isDirectory()) {
-                $element.addClass('fb-drop-hover');
+                var movableCount = allEntries().filter(function (entry) {
+                  return entry.selected() && ! entry.isSharedWithMe();
+                }).length;
+                if (movableCount > 0) {
+                  $element.addClass('fb-drop-hover');
+                }
               }
             },
             out: function (event, ui) {
@@ -715,7 +724,15 @@ from desktop.views import _ko
 
               if (! dragToSelect) {
                 var $helper = $('.fb-drag-helper').clone().show();
-                if (selectedEntries.length > 1) {
+                var sharedCount = selectedEntries.filter(function (entry) {
+                  return entry.isSharedWithMe();
+                }).length;
+                if (sharedCount === selectedEntries.length) {
+                  $helper.hide();
+                } else if (selectedEntries.length > 1 && sharedCount > 0) {
+                  $helper.find('.drag-text').text(selectedEntries.length + ' ${ _('selected') } (' + sharedCount + ' ${ _('shared ignored') })');
+                  $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
+                } else if (selectedEntries.length > 1) {
                   $helper.find('.drag-text').text(selectedEntries.length + ' ${ _('selected') }');
                   $helper.find('i').removeClass().addClass('fa fa-fw fa-clone');
                 } else {
