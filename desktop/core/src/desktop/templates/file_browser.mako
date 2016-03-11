@@ -21,7 +21,11 @@ from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
+<%namespace name="hueIcons" file="/hue_icons.mako" />
+
 <%def name="fileBrowser()">
+  ${ hueIcons.symbols() }
+
   <style>
     .fb-container {
       position: absolute;
@@ -140,10 +144,15 @@ from desktop.views import _ko
     }
 
     .fb-list i {
-      color: #666;
+      color: #338BB8;
       font-size: 20px;
-      margin-right: 8px;
       font-weight: lighter;
+    }
+
+    .fb-list .hi {
+      color: #338BB8;
+      font-size: 20px;
+      width: 1.28571429em
     }
 
     .fb-action {
@@ -170,6 +179,12 @@ from desktop.views import _ko
 
     .fb-primary-col .fa {
       vertical-align: middle;
+    }
+
+    .fb-primary-col .hi {
+      vertical-align: middle;
+      display: inline-block;
+      margin-bottom: 0.2em;
     }
 
     .fb-attr-group {
@@ -541,7 +556,18 @@ from desktop.views import _ko
                 <!-- /ko -->
               </ul>
               <div class="fb-primary-col">
-                <i class="fa fa-fw" data-bind="css: { 'fa-folder-o' : isDirectory, 'fa-file-o': ! isDirectory() }"></i>
+                <!-- ko if: isDirectory() -->
+                <i class="fa fa-fw fa-folder-o"></i>
+                <!-- /ko -->
+                <!-- ko if: ! isDirectory() && definition().type === 'query-hive' -->
+                <svg class="hi"><use xlink:href="#hi-file-hive"></use></svg>
+                <!-- /ko -->
+                <!-- ko if: ! isDirectory() && definition().type === 'query-impala' -->
+                <svg class="hi"><use xlink:href="#hi-file-impala"></use></svg>
+                <!-- /ko -->
+                <!-- ko if: ! isDirectory() && definition().type !== 'query-impala' && definition().type !== 'query-hive' -->
+                <i class="fa fa-fw fa-file-o"></i>
+                <!-- /ko -->
                 <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }"></a>
               </div>
               <div class="fb-attr-group">
