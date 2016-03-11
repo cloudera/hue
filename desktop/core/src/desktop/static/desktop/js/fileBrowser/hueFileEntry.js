@@ -226,7 +226,7 @@
         resultEntry.hasErrors(false);
         var newEntries = [];
 
-        $.each(data.children, function (idx, definition) {
+        $.each(data.documents, function (idx, definition) {
           var entry = new HueFileEntry({
             activeEntry: self.activeEntry,
             trashEntry: self.trashEntry,
@@ -241,7 +241,7 @@
           }
         });
 
-        resultEntry.entries(entries);
+        resultEntry.entries(newEntries);
         resultEntry.loading(false);
         resultEntry.loaded(true);
       },
