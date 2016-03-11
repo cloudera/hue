@@ -393,6 +393,20 @@ def get_sample_data(request, server=None, database=None, table=None):
   return JsonResponse(response)
 
 
+@require_POST
+@check_document_access_permission()
+@api_error_handler
+def explain(request):
+  response = {'status': -1}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+
+  response = get_api(request, snippet).explain(notebook, snippet)
+
+  return JsonResponse(response)
+
+
 @require_GET
 @api_error_handler
 def github_fetch(request):

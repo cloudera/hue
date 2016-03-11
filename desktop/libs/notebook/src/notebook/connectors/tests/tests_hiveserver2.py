@@ -16,18 +16,24 @@
 # limitations under the License.
 
 import json
+import logging
 import re
 
 from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
+from desktop.models import Document2
 from notebook.connectors.hiveserver2 import HS2Api
 
 from beeswax.server import dbms
-from beeswax.test_base import get_query_server_config
+from beeswax.test_base import BeeswaxSampleProvider, get_query_server_config
+
+
+LOG = logging.getLogger(__name__)
 
 
 class TestHiveserver2Api(object):
@@ -35,11 +41,11 @@ class TestHiveserver2Api(object):
   def setUp(self):
     self.client = make_logged_in_client(username="test", groupname="test", recreate=False, is_superuser=False)
     self.user = User.objects.get(username='test')
+
     add_to_group('test')
     grant_access("test", "test", "notebook")
 
     self.db = dbms.get(self.user, get_query_server_config())
-    #self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.api = HS2Api(self.user)
 
 
@@ -96,3 +102,58 @@ class TestHiveserver2Api(object):
     pattern = re.compile("ADD JAR hdfs://[A-Za-z0-9.:_-]+/user/test/myudfs.jar")
     assert_true(pattern.search(config_statements), config_statements)
     assert_true("CREATE TEMPORARY FUNCTION myUpper AS 'org.hue.udf.MyUpper'" in config_statements, config_statements)
+
+
+class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
+
+  @classmethod
+  def setup_class(cls):
+    super(TestHiveserver2ApiWithHadoop, cls).setup_class(load_data=False)
+
+  def setUp(self):
+    self.user = User.objects.get(username='test')
+
+    grant_access("test", "test", "notebook")
+
+    self.db = dbms.get(self.user, get_query_server_config())
+    self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
+    self.api = HS2Api(self.user)
+
+
+  def test_explain(self):
+    notebook_json = """
+      {
+        "uuid": "f5d6394d-364f-56e8-6dd3-b1c5a4738c52",
+        "id": 1234,
+        "sessions": [{"type": "hive", "properties": [], "id": null}]
+      }
+    """
+    statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
+    snippet_json = """
+      {
+          "status": "running",
+          "database": "default",
+          "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+          "result": {
+              "type": "table",
+              "handle": {},
+              "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+          },
+          "statement": "%(statement)s",
+          "type": "hive",
+          "properties": {
+              "files": [],
+              "functions": [],
+              "settings": []
+          }
+      }
+    """ % {'statement': statement}
+
+    Document2.objects.create(id=1234, name='Test Hive Query', type='query-hive', owner=self.user, is_history=True, data=notebook_json)
+
+    response = self.client.post(reverse('notebook:explain'), {'notebook': notebook_json, 'snippet': snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_true('STAGE DEPENDENCIES' in data['explanation'], data)
+    assert_equal(statement, data['statement'], data)
