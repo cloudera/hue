@@ -255,7 +255,7 @@
         bindingContext.$altDown(false);
       });
 
-      element.addEventListener("contextmenu", function(e) {
+      element.addEventListener("contextmenu", function(event) {
         if(document.selection && document.selection.empty) {
           document.selection.empty();
         } else if(window.getSelection) {
@@ -285,8 +285,8 @@
         $menu.css('opacity', 1);
         active = true;
         huePubSub.publish('contextmenu-active', element);
-        e.preventDefault();
-        e.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
       });
 
       var hideMenu = function () {
@@ -311,8 +311,11 @@
         hideMenu();
         e.stopPropagation();
       });
-      $element.click(hideMenu);
-      $(document).click(hideMenu);
+      $(document).click(function (event) {
+        if ($element.find($(event.target)).length === 0) {
+          hideMenu();
+        };
+      });
     }
   };
 
