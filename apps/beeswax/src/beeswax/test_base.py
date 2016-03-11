@@ -350,14 +350,18 @@ class BeeswaxSampleProvider(object):
   Setup the test db and install sample data
   """
   @classmethod
-  def setup_class(cls):
+  def setup_class(cls, load_data=True):
+    cls.load_data = load_data
+
     cls.db_name = get_db_prefix(name='hive')
     cls.cluster, shutdown = get_shared_beeswax_server(cls.db_name)
     cls.set_execution_engine()
+
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     add_to_group('test', 'test')
     grant_access('test', 'test', 'beeswax')
     grant_access('test', 'test', 'metastore')
+
     # Weird redirection to avoid binding nonsense.
     cls.shutdown = [ shutdown ]
     cls.init_beeswax_db()
@@ -417,61 +421,63 @@ class BeeswaxSampleProvider(object):
     make_query(cls.client, 'CREATE DATABASE IF NOT EXISTS %(db)s' % {'db': cls.db_name}, wait=True)
     make_query(cls.client, 'CREATE DATABASE IF NOT EXISTS %(db)s_other' % {'db': cls.db_name}, wait=True)
 
-    data_file = cls.cluster.fs_prefix + u'/beeswax/sample_data_échantillon_%d.tsv'
+    if cls.load_data:
 
-    # Create a "test_partitions" table.
-    CREATE_PARTITIONED_TABLE = """
-      CREATE TABLE `%(db)s`.`test_partitions` (foo INT, bar STRING)
-      PARTITIONED BY (baz STRING, boom STRING)
-      ROW FORMAT DELIMITED
-        FIELDS TERMINATED BY '\t'
-        LINES TERMINATED BY '\n'
-    """ % {'db': cls.db_name}
-    make_query(cls.client, CREATE_PARTITIONED_TABLE, wait=True)
-    cls._make_data_file(data_file % 1)
+      data_file = cls.cluster.fs_prefix + u'/beeswax/sample_data_échantillon_%d.tsv'
 
-    LOAD_DATA = """
-      LOAD DATA INPATH '%(data_file)s'
-      OVERWRITE INTO TABLE `%(db)s`.`test_partitions`
-      PARTITION (baz='baz_one', boom='boom_two')
-    """ % {'db': cls.db_name, 'data_file': data_file % 1}
-    make_query(cls.client, LOAD_DATA, wait=True, local=False)
+      # Create a "test_partitions" table.
+      CREATE_PARTITIONED_TABLE = """
+        CREATE TABLE `%(db)s`.`test_partitions` (foo INT, bar STRING)
+        PARTITIONED BY (baz STRING, boom STRING)
+        ROW FORMAT DELIMITED
+          FIELDS TERMINATED BY '\t'
+          LINES TERMINATED BY '\n'
+      """ % {'db': cls.db_name}
+      make_query(cls.client, CREATE_PARTITIONED_TABLE, wait=True)
+      cls._make_data_file(data_file % 1)
 
-    # Insert additional partition data into "test_partitions" table
-    ADD_PARTITION = """
-      ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '%(fs_prefix)s/baz_foo/boom_bar'
-    """ % {'db': cls.db_name, 'fs_prefix': cls.cluster.fs_prefix}
-    make_query(cls.client, ADD_PARTITION, wait=True, local=False)
+      LOAD_DATA = """
+        LOAD DATA INPATH '%(data_file)s'
+        OVERWRITE INTO TABLE `%(db)s`.`test_partitions`
+        PARTITION (baz='baz_one', boom='boom_two')
+      """ % {'db': cls.db_name, 'data_file': data_file % 1}
+      make_query(cls.client, LOAD_DATA, wait=True, local=False)
 
-    # Create a bunch of other tables
-    CREATE_TABLE = """
-      CREATE TABLE `%(db)s`.`%(name)s` (foo INT, bar STRING)
-      COMMENT "%(comment)s"
-      ROW FORMAT DELIMITED
-        FIELDS TERMINATED BY '\t'
-        LINES TERMINATED BY '\n'
-    """
+      # Insert additional partition data into "test_partitions" table
+      ADD_PARTITION = """
+        ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '%(fs_prefix)s/baz_foo/boom_bar'
+      """ % {'db': cls.db_name, 'fs_prefix': cls.cluster.fs_prefix}
+      make_query(cls.client, ADD_PARTITION, wait=True, local=False)
 
-    # Create a "test" table.
-    table_info = {'db': cls.db_name, 'name': 'test', 'comment': 'Test table'}
-    cls._make_data_file(data_file % 2)
-    cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
+      # Create a bunch of other tables
+      CREATE_TABLE = """
+        CREATE TABLE `%(db)s`.`%(name)s` (foo INT, bar STRING)
+        COMMENT "%(comment)s"
+        ROW FORMAT DELIMITED
+          FIELDS TERMINATED BY '\t'
+          LINES TERMINATED BY '\n'
+      """
 
-    if is_live_cluster():
-      LOG.warn('HUE-2884: We cannot create Hive UTF8 tables when live cluster testing at the moment')
-    else:
-      # Create a "test_utf8" table.
-      table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}
-      cls._make_i18n_data_file(data_file % 3, 'utf-8')
-      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
+      # Create a "test" table.
+      table_info = {'db': cls.db_name, 'name': 'test', 'comment': 'Test table'}
+      cls._make_data_file(data_file % 2)
+      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 2)
 
-      # Create a "test_latin1" table.
-      table_info = {'db': cls.db_name, 'name': 'test_latin1', 'comment': cls.get_i18n_table_comment()}
-      cls._make_i18n_data_file(data_file % 4, 'latin1')
-      cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
+      if is_live_cluster():
+        LOG.warn('HUE-2884: We cannot create Hive UTF8 tables when live cluster testing at the moment')
+      else:
+        # Create a "test_utf8" table.
+        table_info = {'db': cls.db_name, 'name': 'test_utf8', 'comment': cls.get_i18n_table_comment()}
+        cls._make_i18n_data_file(data_file % 3, 'utf-8')
+        cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 3)
 
-    # Create a "myview" view.
-    make_query(cls.client, "CREATE VIEW `%(db)s`.`myview` (foo, bar) as SELECT * FROM `%(db)s`.`test`" % {'db': cls.db_name}, wait=True)
+        # Create a "test_latin1" table.
+        table_info = {'db': cls.db_name, 'name': 'test_latin1', 'comment': cls.get_i18n_table_comment()}
+        cls._make_i18n_data_file(data_file % 4, 'latin1')
+        cls._make_table(table_info['name'], CREATE_TABLE % table_info, data_file % 4)
+
+      # Create a "myview" view.
+      make_query(cls.client, "CREATE VIEW `%(db)s`.`myview` (foo, bar) as SELECT * FROM `%(db)s`.`test`" % {'db': cls.db_name}, wait=True)
 
     _INITIALIZED = True
 

@@ -279,7 +279,7 @@ def close_operation(request, query_history_id):
 
 
 @error_handler
-def explain_directly(request, query, design, query_server):
+def explain_directly(request, query_server, query):
   explanation = dbms.get(request.user, query_server).explain(query)
 
   response = {
@@ -325,7 +325,7 @@ def execute(request, design_id=None):
 
             try:
               if explain:
-                return explain_directly(request, query, design, query_server)
+                return explain_directly(request, query_server, query)
               else:
                 return execute_directly(request, query, design, query_server, parameters=parameters)
 
@@ -341,7 +341,7 @@ def execute(request, design_id=None):
       # Non-parameterized query
       query = HQLdesign(query_form, query_type=query_type)
       if request.GET.get('explain', 'false').lower() == 'true':
-        return explain_directly(request, query, design, query_server)
+        return explain_directly(request, query_server, query)
       else:
         return execute_directly(request, query, design, query_server)
     else:

@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax import data_export
-  from beeswax.api import _autocomplete, _get_sample_data
+  from beeswax.api import _autocomplete, _get_sample_data, explain_directly
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf
@@ -127,6 +127,7 @@ class HS2Api(Api):
     })
 
     return response
+
 
   def _get_statements(self, hql_query):
     hql_query = strip_trailing_semicolon(hql_query)
@@ -263,6 +264,21 @@ class HS2Api(Api):
   def get_sample_data(self, snippet, database=None, table=None):
     db = self._get_db(snippet)
     return _get_sample_data(db, database, table)
+
+
+  @query_error_handler
+  def explain(self, notebook, snippet):
+    db = self._get_db(snippet)
+    response = self._get_current_statement(db, snippet)
+    query = self._prepare_hql_query(snippet, response.pop('statement'))
+
+    explanation = db.explain(query)
+
+    return {
+      'status': 0,
+      'explanation': explanation.textual,
+      'statement': query.get_query_statement(0),
+    }
 
 
   def _get_current_statement(self, db, snippet):
