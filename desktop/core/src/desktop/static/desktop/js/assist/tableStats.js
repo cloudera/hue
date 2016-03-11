@@ -43,7 +43,7 @@
     self.sourceType = options.sourceType;
     self.database = options.databaseName;
     self.table = options.tableName;
-    self.column = options.columnName;
+    self.column = options.columnName || null;
     self.assistHelper = options.assistHelper;
     self.type = options.type;
     self.isComplexType = /^(map|array|struct)/i.test(options.type);
