@@ -288,7 +288,7 @@ from desktop.views import _ko
     .fb-search-container {
       position: absolute;
       top: 26px;
-      right: 300px;
+      right: 350px;
 
       -webkit-animation-name: fb-search-visible;
       animation-name: fb-search-visible;
