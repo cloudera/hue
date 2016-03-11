@@ -98,6 +98,12 @@
       });
     });
 
+    self.sharedWithMeSelected = ko.pureComputed(function () {
+      return self.selectedEntries().filter(function (entry) {
+        return entry.isSharedWithMe();
+      }).length > 0;
+    });
+
     self.selectedEntry = ko.pureComputed(function () {
       if (self.selectedEntries().length === 1) {
         return self.selectedEntries()[0];
@@ -359,7 +365,7 @@
 
   HueFileEntry.prototype.moveToTrash = function () {
     var self = this;
-    if (self.selectedEntries().length > 0) {
+    if (self.selectedEntries().length > 0 && ! self.sharedWithMeSelected()) {
       self.entriesToDelete(self.selectedEntries());
       self.removeDocuments(false);
     }
@@ -367,7 +373,7 @@
 
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
-    if (self.selectedEntries().length > 0) {
+    if (self.selectedEntries().length > 0 && ! self.sharedWithMeSelected()) {
       self.entriesToDelete(self.selectedEntries());
       $('#deleteEntriesModal').modal('show');
     }
