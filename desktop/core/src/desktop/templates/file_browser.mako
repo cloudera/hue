@@ -556,18 +556,23 @@ from desktop.views import _ko
                 <!-- /ko -->
               </ul>
               <div class="fb-primary-col">
-                <!-- ko if: isDirectory() -->
-                <i class="fa fa-fw fa-folder-o"></i>
-                <!-- /ko -->
-                <!-- ko if: ! isDirectory() && definition().type === 'query-hive' -->
-                <svg class="hi"><use xlink:href="#hi-file-hive"></use></svg>
-                <!-- /ko -->
-                <!-- ko if: ! isDirectory() && definition().type === 'query-impala' -->
-                <svg class="hi"><use xlink:href="#hi-file-impala"></use></svg>
-                <!-- /ko -->
-                <!-- ko if: ! isDirectory() && definition().type !== 'query-impala' && definition().type !== 'query-hive' -->
-                <i class="fa fa-fw fa-file-o"></i>
-                <!-- /ko -->
+                <svg class="hi">
+                  <!-- ko if: isDirectory() -->
+                  <use xlink:href="#hi-folder"></use>
+                  <!-- /ko -->
+                  <!-- ko if: ! isDirectory() && definition().type === 'query-hive' -->
+                  <use xlink:href="#hi-file-hive"></use>
+                  <!-- /ko -->
+                  <!-- ko if: ! isDirectory() && definition().type === 'query-impala' -->
+                  <use xlink:href="#hi-file-impala"></use>
+                  <!-- /ko -->
+                  <!-- ko if: ! isDirectory() && definition().type !== 'query-impala' && definition().type !== 'query-hive' -->
+                  <use xlink:href="#hi-file"></use>
+                  <!-- /ko -->
+                  <!-- ko if: isSharedWithMe -->
+                  <use xlink:href="#hi-share-addon"></use>
+                  <!-- /ko -->
+                </svg>
                 <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }"></a>
               </div>
               <div class="fb-attr-group">
