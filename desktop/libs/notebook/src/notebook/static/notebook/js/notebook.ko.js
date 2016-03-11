@@ -1121,7 +1121,7 @@
           data.history.forEach(function(nbk){
             parsedHistory.push({
               url: nbk.absoluteUrl,
-              query: nbk.data.snippets[0].statement_raw,
+              query: nbk.data.snippets[0].statement_raw.substring(0, 1000) + (nbk.data.snippets[0].statement_raw.length > 1000 ? '...' : ''),
               lastExecuted: nbk.data.snippets[0].lastExecuted,
               status: nbk.data.snippets[0].status
             });
