@@ -239,6 +239,10 @@ class YarnApi(JobBrowserApi):
       else:
         if app['state'] == 'ACCEPTED':
           raise ApplicationNotRunning(app_id, app)
+        # The MapReduce API only returns JSON when the application is in a RUNNING state
+        elif app['state'] in ('NEW', 'SUBMITTED', 'RUNNING') and app['applicationType'] == 'MAPREDUCE':
+          resp = self.mapreduce_api.job(self.user, job_id)
+          job = YarnJob(self.mapreduce_api, resp['job'])
         else:
           job = Application(app, self.resource_manager_api)
     except RestException, e:

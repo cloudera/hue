@@ -462,7 +462,7 @@ class TestMapReduce2NoHadoop:
 
   def test_yarn_job(self):
     response = self.c.get('/jobbrowser/jobs/application_1428442704693_0007')
-    assert_equal(response.context['job'].jobId, 'application_1428442704693_0007')
+    assert_equal(response.context['job'].jobId, 'job_1356251510842_0009')
 
   def job_not_assigned(self):
     response = self.c.get('/jobbrowser/jobs/job_1356251510842_0009/job_not_assigned//my_url')
@@ -591,7 +591,7 @@ class MockResourceManagerApi:
         u'trackingUrl': u'http://N/A',
         u'user': u'test',
         u'vcoreSeconds': 1,
-    },
+    }
   }
 
   def __init__(self, user, rm_url=None): pass
@@ -785,7 +785,7 @@ class HistoryServerApi(MockMapreduce2Api):
               u'successfulReduceAttempts': 1, u'successfulMapAttempts': 2, u'uberized': False, u'reducesTotal': 1,
               u'state': u'SUCCEEDED', u'failedReduceAttempts': 0, u'mapsCompleted': 2,
               u'killedMapAttempts': 0, u'diagnostics': u'', u'mapsTotal': 2, u'user': u'test',
-              u'startTime': 1357151916268, u'avgReduceTime': 137,
+              u'startTime': 0, u'avgReduceTime': 137,
               u'finishTime': 1357151923925, u'name': u'oozie:action:T=map-reduce:W=MapReduce-copy:A=Sleep:ID=0000004-121223003201296-oozie-oozi-W',
               u'avgShuffleTime': 1421, u'queue': u'default', u'killedReduceAttempts': 0, u'failedMapAttempts': 0
           }
