@@ -48,7 +48,7 @@ LOG = logging.getLogger(__name__)
 
 class OAuthBackend(DesktopBackendBase):
 
-  @metrics.oauth_authentication_time
+  @liboauth.metrics.oauth_authentication_time
   def authenticate(self, access_token):
     username = access_token['screen_name']
     password = access_token['oauth_token_secret']
