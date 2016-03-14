@@ -654,6 +654,9 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="code-editor-snippet-body">
+  <div class="alert alert-gradient" data-bind="visible: is_redacted">
+    ${ _('The current query has been redacted to hide sensitive information.') }
+  </div>
   <div class="row-fluid" style="margin-bottom: 5px">
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode }, clickForAceFocus: ace">
       <div class="ace-editor" data-bind="css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode, 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
@@ -924,7 +927,7 @@ ${ require.config() }
         <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : progress()) + '%'}"></div>
       </div>
     </div>
-    <div class="snippet-error-container alert alert-error" data-bind="visible: errors().length > 0">
+    <div class="snippet-error-container alert alert-error alert-error-gradient" data-bind="visible: errors().length > 0">
       <ul class="unstyled" data-bind="foreach: errors">
         <li data-bind="text: message"></li>
       </ul>
