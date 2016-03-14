@@ -710,7 +710,7 @@ table.airy tr td {
   position: relative;
 }
 
-.results.alert-error {
+.results.alert-error, .alert-error-gradient {
   border: none;
   margin-top: -3px;
   background: -moz-linear-gradient(left, rgba(242, 222, 222, 1) 0%, rgba(255, 255, 255, 0) 100%);
@@ -721,13 +721,14 @@ table.airy tr td {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#f2dede', endColorstr='#00ffffff', GradientType=1)
 }
 
+
 .results-images {
   border-left: 5px solid #DDD;
   background-color: #f5f5f5;
   padding: 5px;
 }
 
-.alert-notebook {
+.alert-notebook, .alert-gradient {
   border: none;
   margin-top: -3px;
   background: -moz-linear-gradient(left, rgba(252, 248, 227, 1) 0%, rgba(255, 255, 255, 0) 100%);
