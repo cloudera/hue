@@ -1470,10 +1470,20 @@ a#advanced-btn:hover {
   padding-top: 0 !important;
 }
 
+.hideMoreThan950, .hideMoreThan1180, .hideMoreThan1380 {
+  display: none;
+}
+
 @media (max-width: 1180px) {
   .navigator .nav-tabs > li > a, .navigator .nav-pills > li > a {
     padding-right: 6px;
     padding-left: 6px;
+  }
+  .hide1180 {
+    display: none;
+  }
+  .hideMoreThan1180 {
+    display: block;
   }
 }
 
@@ -1481,11 +1491,23 @@ a#advanced-btn:hover {
   .navigator .hideable {
     display: none;
   }
+  .hide1380 {
+    display: none;
+  }
+  .hideMoreThan1380 {
+    display: block;
+  }
 }
 
 @media (max-width: 950px) {
   .brand {
     display: none;
+  }
+  .hide950 {
+    display: none;
+  }
+  .hideMoreThan950 {
+    display: block;
   }
 }
 

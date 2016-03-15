@@ -379,10 +379,12 @@ if USE_NEW_EDITOR.get():
   <ul class="nav nav-pills">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
-    <li><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i><span class="hideable">&nbsp;${_('File Browser')}&nbsp;</span></a></li>
+    <li class="hide1380"><a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;</a></li>
+    <li class="hideMoreThan1380"><a title="${_('File Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}"><i class="fa fa-file"></i></a></li>
     % endif
     % if 'jobbrowser' in apps:
-    <li><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i><span class="hideable">&nbsp;${_('Job Browser')}&nbsp;</span><span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li class="hide1380"><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+    <li class="hideMoreThan1380"><a title="${_('Job Browser')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i></a></li>
     % endif
     <li class="dropdown">
       <a title="${ _('Administration') }" rel="navigator-tooltip" href="index.html#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-cogs"></i>&nbsp;<span class="hideable">${user.username}&nbsp;</span><b class="caret"></b></a>
