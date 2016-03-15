@@ -97,8 +97,8 @@ class Rdbms(object):
   def get_columns(self, database, table_name, names_only=True):
     return self.client.get_columns(database, table_name, names_only)
 
-  def get_sample_data(self, database, table_name, limit=100):
-    return self.client.get_sample_data(database, table_name, limit)
+  def get_sample_data(self, database, table_name, column=None, limit=100):
+    return self.client.get_sample_data(database, table_name, column, limit)
 
   def execute_statement(self, statement):
     return self.client.execute_statement(statement)

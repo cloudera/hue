@@ -378,14 +378,14 @@ def autocomplete(request, server=None, database=None, table=None, column=None, n
 @require_POST
 @check_document_access_permission()
 @api_error_handler
-def get_sample_data(request, server=None, database=None, table=None):
+def get_sample_data(request, server=None, database=None, table=None, column=None):
   response = {'status': -1}
 
   # Passed by check_document_access_permission but unused by APIs
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table)
+  sample_data = get_api(request, snippet).get_sample_data(snippet, database, table, column)
   response.update(sample_data)
 
   response['status'] = 0

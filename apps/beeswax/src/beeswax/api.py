@@ -623,18 +623,18 @@ def clear_history(request):
 
 
 @error_handler
-def get_sample_data(request, database, table):
+def get_sample_data(request, database, table, column=None):
   app_name = get_app_name(request)
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
 
-  response = _get_sample_data(db, database, table)
+  response = _get_sample_data(db, database, table, column)
   return JsonResponse(response)
 
 
-def _get_sample_data(db, database, table):
+def _get_sample_data(db, database, table, column):
   table_obj = db.get_table(database, table)
-  sample_data = db.get_sample(database, table_obj)
+  sample_data = db.get_sample(database, table_obj, column)
   response = {'status': -1}
 
   if sample_data:

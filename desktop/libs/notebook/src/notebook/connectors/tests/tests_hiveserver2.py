@@ -110,29 +110,29 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def setup_class(cls):
     super(TestHiveserver2ApiWithHadoop, cls).setup_class(load_data=False)
 
-  def setUp(self):
-    self.user = User.objects.get(username='test')
 
+  def setUp(self):
+    self.client.post('/beeswax/install_examples')
+
+    self.user = User.objects.get(username='test')
     grant_access("test", "test", "notebook")
 
     self.db = dbms.get(self.user, get_query_server_config())
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
     self.api = HS2Api(self.user)
 
-
-  def test_explain(self):
-    notebook_json = """
+    self.notebook_json = """
       {
         "uuid": "f5d6394d-364f-56e8-6dd3-b1c5a4738c52",
         "id": 1234,
         "sessions": [{"type": "hive", "properties": [], "id": null}]
       }
     """
-    statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
-    snippet_json = """
+    self.statement = 'SELECT description, salary FROM sample_07 WHERE (sample_07.salary > 100000) ORDER BY salary DESC LIMIT 1000'
+    self.snippet_json = """
       {
           "status": "running",
-          "database": "default",
+          "database": "%(database)s",
           "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
           "result": {
               "type": "table",
@@ -147,13 +147,44 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
               "settings": []
           }
       }
-    """ % {'statement': statement}
+    """ % {'database': self.db_name, 'statement': self.statement}
 
-    Document2.objects.create(id=1234, name='Test Hive Query', type='query-hive', owner=self.user, is_history=True, data=notebook_json)
+    doc, created = Document2.objects.get_or_create(
+      id=1234,
+      name='Test Hive Query',
+      type='query-hive',
+      owner=self.user,
+      is_history=True,
+      data=self.notebook_json)
 
-    response = self.client.post(reverse('notebook:explain'), {'notebook': notebook_json, 'snippet': snippet_json})
+
+  def test_explain(self):
+    response = self.client.post(reverse('notebook:explain'), {'notebook': self.notebook_json, 'snippet': self.snippet_json})
     data = json.loads(response.content)
 
     assert_equal(0, data['status'], data)
     assert_true('STAGE DEPENDENCIES' in data['explanation'], data)
-    assert_equal(statement, data['statement'], data)
+    assert_equal(self.statement, data['statement'], data)
+
+
+  def test_get_sample(self):
+    response = self.client.post(reverse('notebook:api_sample_data',
+      kwargs={'database': 'default', 'table': 'sample_07'}),
+      {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_true('headers' in data)
+    assert_true('rows' in data)
+    assert_true(len(data['rows']) > 0)
+
+    response = self.client.post(reverse('notebook:api_sample_data_column',
+      kwargs={'database': 'default', 'table': 'sample_07', 'column': 'code'}),
+      {'notebook': self.notebook_json, 'snippet': self.snippet_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    assert_true('headers' in data)
+    assert_equal(['code'], data['headers'])
+    assert_true('rows' in data)
+    assert_true(len(data['rows']) > 0)
