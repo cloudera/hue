@@ -1252,6 +1252,7 @@
             }
           });
         }
+        $('.assist-flex-fill').getNiceScroll().resize();
       };
 
       resizeByRatio();
@@ -1352,7 +1353,7 @@
               panelRatios[panelDefinitions()[idx].type] = $(panel).outerHeight(true) / totalHeightForPanels;
             });
             assistHelper.setInTotalStorage('assist', 'innerPanelRatios', panelRatios);
-            $('.ps-container').perfectScrollbar('update');
+            $('.assist-flex-fill').getNiceScroll().resize();
           }
         });
       });
@@ -3133,32 +3134,18 @@
           'width': '100%'
         }).appendTo($wrapper);
 
-        $container.perfectScrollbar({
-          minScrollbarLength: options.minScrollbarLength || 20,
-          suppressScrollX: options.suppressScrollX || true,
-          scrollYFixedTop: options.scrollYFixedTop ? (typeof options.scrollYFixedTop == 'boolean' ? $container.position().top : options.scrollYFixedTop) : null
-        });
-        $container.on('ps-scroll-x', function () {
-          $(element).trigger('scroll');
-        });
-        $container.on('ps-scroll-y', function () {
-          $(element).trigger('scroll');
+        $container.niceScroll({
+          cursorcolor: "#CCC",
+          cursorborder: "1px solid #CCC",
+          cursoropacitymin: 0,
+          cursoropacitymax: 0.75,
+          cursorminheight: options.cursorminheight || 20,
+          horizrailenabled: options.horizrailenabled || false
         });
       }
       else {
         window.setTimeout(function(){
-          $container.perfectScrollbar('destroy');
-          $container.perfectScrollbar({
-            minScrollbarLength: options.minScrollbarLength || 20,
-            suppressScrollX: options.suppressScrollX || true,
-            scrollYFixedTop: options.scrollYFixedTop ? (typeof options.scrollYFixedTop == 'boolean' ? $container.position().top : options.scrollYFixedTop) : null
-          });
-          $container.on('ps-scroll-x', function () {
-            $(element).trigger('scroll');
-          });
-          $container.on('ps-scroll-y', function () {
-            $(element).trigger('scroll');
-          });
+          $container.getNiceScroll().resize();
         }, 200);
       }
 
@@ -3181,7 +3168,7 @@
           totalHeight += height;
         });
         $wrapper.height(totalHeight + 'px');
-        $container.perfectScrollbar('update');
+        $container.getNiceScroll().resize();
       };
       resizeWrapper();
 
@@ -3360,9 +3347,6 @@
         $parentFVOwnerElement.data('disposalFunction', null);
       });
 
-      ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], function () {
-        $container.perfectScrollbar('destroy')
-      });
       ko.utils.domNodeDisposal.addDisposeCallback($wrapper[0], $parentFVOwnerElement.data('disposalFunction'));
 
       setStartAndEndFromScrollTop();
@@ -3515,19 +3499,17 @@
     }
   };
 
-  ko.bindingHandlers.perfectScrollbar = {
+  ko.bindingHandlers.niceScroll = {
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       if (typeof options.enable === 'undefined' || options.enable) {
-        $(element).perfectScrollbar({
-          minScrollbarLength: options.minScrollbarLength || 20,
-          suppressScrollX: options.suppressScrollX || true
-        });
-        $(element).on('ps-scroll-x', function () {
-          $(element).trigger('scroll');
-        });
-        $(element).on('ps-scroll-y', function () {
-          $(element).trigger('scroll');
+        $(element).niceScroll({
+          cursorcolor: "#CCC",
+          cursorborder: "1px solid #CCC",
+          cursoropacitymin: 0,
+          cursoropacitymax: 0.75,
+          cursorminheight: options.cursorminheight || 20,
+          horizrailenabled: options.horizrailenabled || true
         });
       }
     }

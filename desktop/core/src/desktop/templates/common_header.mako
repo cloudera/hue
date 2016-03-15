@@ -58,7 +58,6 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/fileuploader.css') }" rel="stylesheet">
-  <link href="${ static('desktop/css/perfect-scrollbar.min.css') }" rel="stylesheet">
 
   <style type="text/css">
     % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -194,7 +193,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
-  <script src="${ static('desktop/js/perfect-scrollbar.jquery.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.nicescroll.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/floatlabels.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
