@@ -942,6 +942,11 @@ ${ require.config() }
         <li data-bind="text: message"></li>
       </ul>
     </div>
+    <div class="snippet-error-container alert alert-error alert-error-gradient" data-bind="visible: status() == 'canceled'">
+      <ul class="unstyled">
+        <li>${ _("The statement was canceled.") }</li>
+      </ul>
+    </div>
   </div>
 </script>
 
