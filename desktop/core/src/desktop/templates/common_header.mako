@@ -232,6 +232,22 @@ if USE_NEW_EDITOR.get():
         top.location = self.location;
       }
 
+      %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
+      var idleTimer;
+      function resetIdleTimer() {
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(function () {
+          // Check if logged out
+          $.get('/desktop/debug/is_idle');
+        }, (${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000) + 1000);
+      }
+
+      $(document).on('mousemove', resetIdleTimer);
+      $(document).on('keydown', resetIdleTimer);
+      $(document).on('click', resetIdleTimer);
+      resetIdleTimer();
+      %endif
+
       $("input, textarea").placeholder();
       $(".submitter").keydown(function (e) {
         if (e.keyCode == 13) {

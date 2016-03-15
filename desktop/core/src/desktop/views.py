@@ -372,7 +372,7 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
-def commonheader(title, section, user, padding="90px", skip_topbar=False):
+def commonheader(title, section, user, padding="90px", skip_topbar=False, skip_idle_timeout=False):
   """
   Returns the rendered common header
   """
@@ -400,6 +400,7 @@ def commonheader(title, section, user, padding="90px", skip_topbar=False):
     'padding': padding,
     'user': user,
     'skip_topbar': skip_topbar,
+    'skip_idle_timeout': skip_idle_timeout,
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
       'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
@@ -419,6 +420,9 @@ def commonimportexport(request):
 
 def login_modal(request):
   return desktop.auth.views.dt_login(request, True)
+
+def is_idle(request):
+  return HttpResponse("no!")
 
 def commonfooter(request, messages=None):
   """
