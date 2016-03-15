@@ -68,6 +68,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     ],
     'selectedSnippet': editor_type,
     'type': 'query-%s' % editor_type,
+    'showHistory': True,
 
     'snippets': [
       {
