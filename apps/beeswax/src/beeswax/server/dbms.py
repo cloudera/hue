@@ -343,7 +343,7 @@ class HiveServer2Dbms(object):
     return result
 
 
-  def _get_sample_partition_query(self, database, table, column=None, limit=100):
+  def _get_sample_partition_query(self, database, table, column='*', limit=100):
     max_parts = QUERY_PARTITIONS_LIMIT.get()
     partitions = self.get_partitions(database, table, partition_spec=None, max_parts=max_parts)
 
