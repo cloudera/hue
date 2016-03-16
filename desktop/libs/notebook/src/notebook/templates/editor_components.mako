@@ -420,7 +420,7 @@ ${ require.config() }
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _('Success.') }</pre>
     </div>
 
-    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce(), css: resultsKlass" style="display:none;">
+    <div data-bind="visible: result.hasResultset() && status() == 'available' && result.data().length == 0 && result.fetchedOnce() && result.explanation().length <= 0, css: resultsKlass" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Done. 0 results.") }</pre>
     </div>
 
@@ -792,6 +792,14 @@ ${ require.config() }
 </script>
 
 <script type="text/html" id="snippet-results">
+  <!-- ko if: result.explanation().length > 0 -->
+    <div class="snippet-row">
+      <div class="result-body">
+        <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
+      </div>
+    </div>
+  <!-- /ko -->
+
   <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
     <div class="snippet-left-bar">
       <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls' }--><!-- /ko -->
@@ -863,9 +871,11 @@ ${ require.config() }
   </div>
 </script>
 
+
 <script type="text/html" id="text-snippet-body">
   <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
 </script>
+
 
 <script type="text/html" id="markdown-snippet-body">
   <!-- ko if: $root.isEditing() -->
