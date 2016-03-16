@@ -23,6 +23,7 @@ from django.forms.formsets import formset_factory
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
@@ -132,11 +133,15 @@ def delete_job(request):
   for job in jobs:
     if job.get('uuid'):
       doc2 = Document2.objects.get(id=job['id'])
-      doc = doc2.doc.get()
-      doc.can_write_or_exception(request.user)
-
-      doc.delete()
-      doc2.delete()
+      if USE_NEW_EDITOR.get():
+        doc2 = Document2.objects.get(id=job['id'])
+        doc2.can_write_or_exception(request.user)
+        doc2.trash()
+      else:
+        doc = doc2.doc.get()
+        doc.can_write_or_exception(request.user)
+        doc.delete()
+        doc2.delete()
     else: # Old version
       job = Job.objects.can_read_or_exception(request, job['object_id'])
       Job.objects.can_edit_or_exception(request, job)
