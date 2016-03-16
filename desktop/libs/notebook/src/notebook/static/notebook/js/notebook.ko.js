@@ -538,7 +538,7 @@
       }
 
       $.post("/notebook/api/execute", {
-        notebook: ko.mapping.toJSON(notebook.getContext()),
+        notebook: vm.editorMode ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {
         self.statusForButtons('executed');
@@ -562,20 +562,12 @@
         } else {
           self._ajaxError(data, self.execute);
         }
+        if (vm.editorMode && data.history_id){
+          hueUtils.changeURL('/notebook/editor?editor=' + data.history_id);
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
         self.status('failed');
-      })
-      .always(function() {
-        if (notebook.type() != 'notebook') {
-          $.post("/notebook/api/historify", {
-            notebook: ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING)
-          }, function(data){
-            if (vm.editorMode && data && data.status == 0 && data.id){
-              hueUtils.changeURL('/notebook/editor?editor=' + data.id);
-            }
-          });
-        }
       });
     };
 
