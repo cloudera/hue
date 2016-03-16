@@ -82,6 +82,7 @@
 
     self.data = ko.observableArray(typeof result.data != "undefined" && result.data != null ? result.data : []);
     self.data.extend({ rateLimit: 50 });
+    self.explanation = ko.observable(typeof result.explanation != "undefined" && result.explanation != null ? result.explanation : '');
     self.images = ko.observableArray(typeof result.images != "undefined" && result.images != null ? result.images : []);
     self.images.extend({ rateLimit: 50 });
     self.logs = ko.observable('');
@@ -107,6 +108,7 @@
       self.logs('');
       self.startTime(new Date());
       self.endTime(new Date());
+      self.explanation('');
     };
   };
 
@@ -600,8 +602,22 @@
     };
 
     self.explain = function () {
-      console.log('Explain call here.');
       logGA('explain');
+      self.result.clear();
+      self.status('ready');
+
+      $.post("/notebook/api/explain", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext())
+      }, function(data) {
+        if (data.status == 0) {
+          notebook.showHistory(false);
+          self.result.fetchedOnce(true);
+          self.result.explanation(data.explanation);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
     }
 
     self.fetchResult = function (rows, startOver) {
