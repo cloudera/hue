@@ -32,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from beeswax import data_export
-  from beeswax.api import _autocomplete, _get_sample_data, explain_directly
+  from beeswax.api import _autocomplete, _get_sample_data
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax import conf as beeswax_conf

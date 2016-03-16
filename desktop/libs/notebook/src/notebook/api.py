@@ -82,7 +82,12 @@ def execute(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  response['handle'] = get_api(request, snippet).execute(notebook, snippet)
+  try:
+    response['handle'] = get_api(request, snippet).execute(notebook, snippet)
+  finally:
+    if notebook['type'].startswith('query-'):
+      history = _historify(notebook, request.user)
+      response['history_id'] = history.id
 
   # Materialize and HTML escape results
   if response['handle'].get('sync') and response['handle']['result'].get('data'):
@@ -233,19 +238,14 @@ def save_notebook(request):
   return JsonResponse(response)
 
 
-@require_POST
-@api_error_handler
-@check_document_access_permission()
-def historify(request):
-  response = {'status': -1}
 
-  notebook = json.loads(request.POST.get('notebook', '{}'))
+def _historify(notebook, user):
   query_type = notebook['type']
 
   history_doc = Document2.objects.create(
     name=notebook['name'],
     type=query_type,
-    owner=request.user,
+    owner=user,
     is_history=True
   )
   Document.objects.link(
@@ -259,11 +259,7 @@ def historify(request):
   history_doc.update_data(notebook)
   history_doc.save()
 
-  response['status'] = 0
-  response['id'] = history_doc.id
-  response['message'] = _('Query notebook history saved !')
-
-  return JsonResponse(response)
+  return history_doc
 
 
 @require_GET
