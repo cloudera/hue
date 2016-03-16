@@ -4,12 +4,27 @@ from south.db import db
 from south.v2 import DataMigration
 from django.db import models
 
+from desktop.conf import DATABASE
+
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        "Write your forwards methods here."
-        orm.Job.objects.filter(data='').update(data='{}')
-        orm.Node.objects.filter(data='').update(data='{}')
+        if DATABASE.ENGINE.get() == 'django.db.backends.oracle':
+            # Need to do this in pure Python to avoid the Oracle ORA-00904: : invalid identifier error
+            jobs = orm.Job.objects.all()
+            jobs = [j for j in jobs if j.data == '']
+            for job in jobs:
+              job.data = '{}'
+              job.save()
+
+            nodes = orm.Node.objects.all()
+            nodes = [n for n in nodes if n.data == '']
+            for node in nodes:
+              node.data = '{}'
+              node.save()
+        else:
+            orm.Job.objects.filter(data='').update(data='{}')
+            orm.Node.objects.filter(data='').update(data='{}')
 
     def backwards(self, orm):
         "Write your backwards methods here."
