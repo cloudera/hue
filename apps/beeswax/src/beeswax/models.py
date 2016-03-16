@@ -388,7 +388,7 @@ class SessionManager(models.Manager):
 
   def get_session(self, user, application='beeswax', filter_open=True):
     try:
-      q = self.filter(owner=user, application=application)
+      q = self.filter(owner=user, application=application).exclude(guid='').exclude(secret='')
       if filter_open:
         q = q.filter(status_code=0)
       return q.latest("last_used")
