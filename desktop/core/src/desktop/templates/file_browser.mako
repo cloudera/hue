@@ -130,13 +130,17 @@ from desktop.views import _ko
 
     .fb-list li {
       clear: both;
-      height: 35px;
-      line-height: 35px;
+      height: 42px;
+      line-height: 42px;
       border: 1px solid transparent;
       margin: 1px;
       color: #444;
-      font-size: 13px;
+      font-size: 14px;
       cursor: pointer;
+    }
+
+    .fb-list li:hover {
+      background-color: #E8F5FE;
     }
 
     .fb-selected {
@@ -151,8 +155,7 @@ from desktop.views import _ko
 
     .fb-list .hi {
       color: #338BB8;
-      font-size: 20px;
-      width: 1.28571429em
+      font-size: 24px;
     }
 
     .fb-action {
@@ -169,7 +172,7 @@ from desktop.views import _ko
 
     .fb-primary-col {
       flex: 1;
-      height: 30px;
+      height: 42px;
       vertical-align: middle;
       padding-left: 8px;
       white-space: nowrap;
@@ -540,7 +543,7 @@ from desktop.views import _ko
 
 
       <div class="fb-list" data-bind="with: activeEntry">
-        <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list', scrollYFixedTop: true }">
+        <ul data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.fb-list' }">
           <li data-bind="fileSelect: $parent.entries, fileDroppable: { entries: $parent.entries }, css: { 'fb-selected': selected }">
             <div class="fb-row" data-bind="contextMenu: { menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
@@ -552,7 +555,7 @@ from desktop.views import _ko
                 <li><a href="javascript:void(0);" data-bind="click: contextMenuDownload"><i class="fa fa-download"></i> ${ _('Download') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="visible: ! $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() }"><a href="javascript:void(0);" data-bind="click: function () { $parent.moveToTrash(); }, css: { 'disabled' : $parent.sharedWithMeSelected() }"><i class="fa fa-fw fa-trash-o"></i> ${ _('Remove') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <li data-bind="visible: $altDown(), css: { 'disabled' : $parent.sharedWithMeSelected() }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showDeleteConfirmation(); }, css: { 'disabled' : $parent.sharedWithMeSelected() }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
-                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Sharing') }</a> </li>
+                <li data-bind="css: { 'disabled': $parent.selectedEntries().length !== 1 }"><a href="javascript:void(0);" data-bind="click: function() { $parent.showSharingModal(); }, css: { 'disabled': $parent.selectedEntries().length !== 1 }"><i class="fa fa-fw fa-users"></i> ${ _('Share') }</a> </li>
                 <!-- /ko -->
               </ul>
               <div class="fb-primary-col">
@@ -573,7 +576,7 @@ from desktop.views import _ko
                   <use xlink:href="#hi-share-addon"></use>
                   <!-- /ko -->
                 </svg>
-                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }"></a>
+                <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name }" class="margin-left-5"></a>
               </div>
               <div class="fb-attr-group">
                 <div class="pull-right">
