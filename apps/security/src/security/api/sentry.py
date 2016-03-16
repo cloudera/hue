@@ -23,7 +23,6 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
-from beeswax.api import autocomplete
 from hadoop.cluster import get_defaultfs
 
 from libsentry.api2 import get_api
@@ -43,6 +42,8 @@ def fetch_authorizables(request):
 
 
 def _fetch_hive_path(request):
+  from beeswax.api import autocomplete
+
   path = request.GET['path']
 
   database = None
