@@ -44,12 +44,10 @@ ${ commonheader(_('500 - Server error'), "", user) | n,unicode }
       <p>${_("Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience.")}</p>
       <br/>
 
-      % if traceback:
+      % if traceback and user.is_superuser:
         <a href="javascript:toggleDisplay('#traceback');" title="${ _('See the stacktrace') }">${_('More info...')}</a>
-        % if user.is_superuser:
           &nbsp;|&nbsp;
-          <a href="/logs" target="_new" title="${ _('View server logs') }">${_('View logs')}</a>
-        % endif
+        <a href="/logs" target="_new" title="${ _('View server logs') }">${_('View logs')}</a>
         <div id="traceback" class="hide">
           <table class="table table-striped table-condensed margin-top-30" style="background: white; border: 1px solid #DDDDDD;">
             <thead>
