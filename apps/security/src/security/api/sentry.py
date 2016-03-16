@@ -25,7 +25,6 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from beeswax.api import autocomplete
 from hadoop.cluster import get_defaultfs
-from libsolr.api import SolrApi
 
 from libsentry.api2 import get_api
 from libsentry.sentry_site import get_sentry_server_admin_groups
@@ -69,6 +68,7 @@ def _fetch_hive_path(request):
 
 
 def _fetch_collections(request):
+  from libsolr.api import SolrApi
   from search.conf import SOLR_URL
 
   path = request.GET['path']
