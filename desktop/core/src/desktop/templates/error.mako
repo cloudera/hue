@@ -31,7 +31,7 @@ ${ commonheader(_('Error'), app_name, user, "40px") | n,unicode }
             <p>
               <pre>${ smart_unicode(error) }</pre>
 
-              %if traceback:
+              %if traceback and user.is_superuser:
                 <textarea style="width: 100%;" rows=80 readonly="readonly">
                 ${ smart_unicode(traceback) }
                 </textarea>
