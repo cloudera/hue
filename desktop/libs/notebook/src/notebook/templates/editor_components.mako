@@ -338,7 +338,7 @@ ${ require.config() }
         }
       }"></div>
   </div>
-  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   <div class="right-panel" data-bind="event: { scroll: function(){ $(document).trigger('hideAutocomplete'); } }, niceScroll: { enable: $root.editorMode }">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
@@ -1382,36 +1382,31 @@ ${ require.config() }
 
   function createXScrollbar(el) {
     if ($(el).parents('.dataTables_wrapper').length > 0) {
-      var scrollingRatio = function() { return ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width() / 2) / $(el).parents('.dataTables_wrapper').width(); };
+      var scrollingRatio = function() { return $(el).parents('.dataTables_wrapper').width() - $(el).parents('.dataTables_wrapper').find('hue-scrollbar-x').width() };
       if ($(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').length == 0 && $(el).parents('.dataTables_wrapper').width() < $(el).parents('.dataTables_wrapper')[0].scrollWidth) {
-        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
+        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 5;
         var scrollbarRail = $('<div>');
         var scrollbar = $('<div>').addClass('hue-scrollbar-x');
-        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper')[0].scrollWidth / $(el).parents('.dataTables_wrapper').width()));
+        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper').width() * ($(el).parents('.dataTables_wrapper').width() / $(el).parents('.dataTables_wrapper')[0].scrollWidth)));
         scrollbar.appendTo(scrollbarRail);
         scrollbar.draggable({
           axis: 'x',
           containment: 'parent',
-          drag: function () {
-            $(el).parents('.dataTables_wrapper').scrollLeft($(this).position().left * scrollingRatio())
+          drag: function (e, ui) {
+            $(el).parents('.dataTables_wrapper').scrollLeft(($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()) * (ui.position.left/(scrollbarRail.width() - $(this).width())))
           }
         });
         scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
         scrollbarRail.width($(el).parents(".dataTables_wrapper").width() - colWidth);
         scrollbarRail.css("marginLeft", (colWidth) + "px");
-        $(el).parents('.dataTables_wrapper').off('mousewheel');
-        $(el).parents('.dataTables_wrapper').on('mousewheel', function (e) {
-          if (e.deltaY > -2 && e.deltaY < 2) {
-            e.preventDefault();
-          }
-          $(el).parents('.dataTables_wrapper').scrollLeft($(el).parents('.dataTables_wrapper').scrollLeft() + e.deltaX * scrollingRatio());
-          $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x').css('left', $(el).parents('.dataTables_wrapper').scrollLeft() / scrollingRatio());
-        });
       }
       else {
-        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 2;
+        var colWidth = $(el).parents('.dataTables_wrapper').find('.jHueTableExtenderClonedContainerColumn').width() + 5;
         $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').width($(el).parents(".dataTables_wrapper").width() - colWidth);
-        $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x').width(Math.max(20, $(el).parents('.dataTables_wrapper')[0].scrollWidth / $(el).parents('.dataTables_wrapper').width()));
+        var scrollbarRail = $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail');
+        var scrollbar = $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x');
+        scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper').width() * ($(el).parents('.dataTables_wrapper').width() / $(el).parents('.dataTables_wrapper')[0].scrollWidth)));
+        scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
       }
     }
   }
@@ -1981,6 +1976,14 @@ ${ require.config() }
       }
       $('.right-panel').jHueScrollUp();
     };
+
+    var splitDraggableTimeout = -1;
+    huePubSub.subscribe('split.draggable.position', function(){
+      window.clearTimeout(splitDraggableTimeout);
+      splitDraggableTimeout = window.setTimeout(function(){
+        redrawFixedHeaders(100);
+      }, 200);
+    });
 
     window.redrawFixedHeaders = redrawFixedHeaders;
 
