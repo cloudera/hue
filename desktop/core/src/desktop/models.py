@@ -29,7 +29,7 @@ from django.contrib.auth import models as auth_models
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.template.defaultfilters import urlencode
@@ -975,24 +975,29 @@ class Document2(models.Model):
     self.data = json.dumps(data_dict)
 
   def get_absolute_url(self):
-    if self.type == 'oozie-coordinator2':
-      return reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
-    elif self.type == 'oozie-bundle2':
-      return reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
-    elif self.type.startswith('query'):
-      return reverse('notebook:editor') + '?editor=' + str(self.id)
-    elif self.type == 'directory':
-      return '/home2' + '?uuid=' + self.uuid
-    elif self.type == 'notebook':
-      return reverse('notebook:notebook') + '?notebook=' + str(self.id)
-    elif self.type == 'search-dashboard':
-      return reverse('search:index') + '?collection=' + str(self.id)
-    elif self.type == 'link-pigscript':
-      return reverse('pig:index') + '#edit/%s' % self.data_dict.get('object_id', '')
-    elif self.type == 'link-workflow':
-      return '/jobsub/#edit-design/%s' % self.data_dict.get('object_id', '')
-    else:
-      return reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    url = None
+    try:
+      if self.type == 'oozie-coordinator2':
+        url = reverse('oozie:edit_coordinator') + '?coordinator=' + str(self.id)
+      elif self.type == 'oozie-bundle2':
+        url = reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
+      elif self.type.startswith('query'):
+        url = reverse('notebook:editor') + '?editor=' + str(self.id)
+      elif self.type == 'directory':
+        url = '/home2' + '?uuid=' + self.uuid
+      elif self.type == 'notebook':
+        url = reverse('notebook:notebook') + '?notebook=' + str(self.id)
+      elif self.type == 'search-dashboard':
+        url = reverse('search:index') + '?collection=' + str(self.id)
+      elif self.type == 'link-pigscript':
+        url = reverse('pig:index') + '#edit/%s' % self.data_dict.get('object_id', '')
+      elif self.type == 'link-workflow':
+        url = '/jobsub/#edit-design/%s' % self.data_dict.get('object_id', '')
+      else:
+        url = reverse('oozie:edit_workflow') + '?workflow=' + str(self.id)
+    except NoReverseMatch, e:
+      LOG.warn('Could not perform reverse lookup for type %s, app may be blacklisted.' % self.type)
+    return url
 
   def to_dict(self):
     return {
