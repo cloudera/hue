@@ -24,7 +24,7 @@ from django.core.urlresolvers import reverse
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
-from desktop.models import Document, Document2
+from desktop.models import Directory, Document, Document2
 
 
 class TestNotebookApi(object):
@@ -63,6 +63,52 @@ class TestNotebookApi(object):
     self.doc2 = Document2.objects.create(id=50010, name=self.notebook['name'], type=self.notebook['type'], owner=self.user)
     self.doc1 = Document.objects.link(self.doc2, owner=self.user, name=self.doc2.name,
                                       description=self.doc2.description, extra=self.doc2.type)
+
+
+  def test_save_notebook(self):
+    # Test that saving an existing document with a new parent will update the parent_directory
+    home_dir = Document2.objects.get_home_directory(self.user)
+    assert_equal(home_dir.uuid, self.doc2.parent_directory.uuid)
+
+    new_dir = Directory.objects.create(name='new_dir', owner=self.user, parent_directory=home_dir)
+    self.notebook['parent_uuid'] = new_dir.uuid
+    notebook_json = json.dumps(self.notebook)
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json, 'parent_uuid': new_dir.uuid})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    doc = Document2.objects.get(pk=self.doc2.id)
+    assert_equal(new_dir.uuid, doc.parent_directory.uuid)
+
+    # Test that saving a new document with a specific parent will map it to that parent directory
+    notebook_json = """
+      {
+        "selectedSnippet": "hive",
+        "showHistory": false,
+        "description": "Test Hive Query",
+        "name": "Test Hive Query",
+        "sessions": [
+            {
+                "type": "hive",
+                "properties": [],
+                "id": null
+            }
+        ],
+        "type": "query-hive",
+        "id": null,
+        "parent_uuid": "%(uuid)s",
+        "snippets": [],
+        "uuid": "d9efdee1-ef25-4d43-b8f9-1a170f69a05a"
+    }
+    """ % {'uuid': new_dir.uuid}
+
+    response = self.client.post(reverse('notebook:save_notebook'), {'notebook': notebook_json})
+    data = json.loads(response.content)
+
+    assert_equal(0, data['status'], data)
+    id = data['id']
+    doc = Document2.objects.get(pk=id)
+    assert_equal(new_dir.uuid, doc.parent_directory.uuid)
 
 
   def test_historify(self):
