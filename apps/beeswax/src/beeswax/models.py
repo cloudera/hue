@@ -386,7 +386,7 @@ class SavedQuery(models.Model):
 class SessionManager(models.Manager):
   def get_session(self, user, application='beeswax'):
     try:
-      return self.filter(owner=user, application=application).latest("last_used")
+      return self.filter(owner=user, application=application).exclude(guid='').exclude(secret='').latest("last_used")
     except Session.DoesNotExist:
       pass
 
