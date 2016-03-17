@@ -134,7 +134,9 @@ ${ require.config() }
       <div class="pull-right">
 
         <div class="btn-group">
-          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: saveNotebook"><i class="fa fa-save"></i></a>
+          <a class="btn" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.selectedNotebook() && $root.selectedNotebook().id()) { saveNotebook() } else { $('#saveAsModal').modal('show');} }"><i class="fa fa-save"></i></a>
+
+          <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().id() -->
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li>
@@ -143,6 +145,7 @@ ${ require.config() }
               </a>
             </li>
           </ul>
+          <!-- /ko -->
         </div>
 
 
@@ -243,7 +246,7 @@ ${ require.config() }
           </li>
           <!-- ko foreach: notebooks -->
           <li class="query-name">
-            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right'}"></span></a>
+            <a href="javascript:void(0)"><span data-bind="editable: name, editableOptions: {enabled: true, placement: 'right', emptytext: '${_ko('Add a name...')}'}"></span></a>
           </li>
           <li>
             <a href="javascript:void(0)">
@@ -1212,14 +1215,16 @@ ${ require.config() }
 <div id="saveAsModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    % if mode == 'editor':
+    <!-- ko if: $root.editorMode -->
       <h3>${_('Save query as...')}</h3>
-    %else:
+    <!-- /ko -->
+    <!-- ko ifnot: $root.editorMode -->
       <h3>${_('Save notebook as...')}</h3>
-    %endif
+    <!-- /ko -->
   </div>
+
+  <!-- ko if: $root.selectedNotebook() -->
   <div class="modal-body">
-    <!-- ko if: $root.selectedNotebook() -->
     <form class="form-horizontal">
       <div class="control-group">
         <label class="control-label">${_('Name')}</label>
@@ -1230,16 +1235,16 @@ ${ require.config() }
       <div class="control-group">
         <label class="control-label">${_('Description')}</label>
         <div class="controls">
-          <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('No description') }"/>
+          <input type="text" class="input-xlarge" data-bind="value: $root.selectedNotebook().description, valueUpdate:'afterkeydown'" placeholder="${ _('(optional)') }"/>
         </div>
       </div>
     </form>
-    <!-- /ko -->
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
-    <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: saveAsNotebook">${_('Save')}</a>
+    <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAsNotebook, enable: $root.selectedNotebook().name().length > 0"></input>
   </div>
+  <!-- /ko -->
 </div>
 
 
