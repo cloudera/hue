@@ -21,6 +21,11 @@ Helper for parsing a Hive metastore column type
 import re
 
 
+SIMPLE_SCALAR = '[a-z]+'
+DECIMAL_SCALAR = 'decimal\(\d+,\d+\)'
+DOUBLE_SCALAR = 'double\(\d+,\d+\)'
+
+
 def parse_column(name, type_string, comment=None):
   """
   Returns a dictionary of a Hive column's type metadata and
@@ -42,7 +47,10 @@ def is_scalar_type(type_string):
 
 
 def _parse_type(type_string):
-  pattern = re.compile('^([a-z]+)(<(.+)>)?$', re.IGNORECASE)
+  pattern = re.compile('^(%(simple)s|%(decimal)s|%(double)s)(<(.+)>)?$' % {
+    'simple': SIMPLE_SCALAR,
+    'decimal': DECIMAL_SCALAR,
+    'double': DOUBLE_SCALAR}, re.IGNORECASE)
   match = re.search(pattern, type_string)
   return match.group(1), match.group(3)
 
@@ -112,7 +120,7 @@ def _get_next_struct_field(fields_string):
   fieldname, rest = fields_string.split(':', 1)
   balanced = 0
   for pos, char in enumerate(rest):
-    balanced += {'<': 1, '>': -1}.get(char, 0)
+    balanced += {'<': 1, '>': -1, '(': 1, ')': -1}.get(char, 0)
     if balanced == 0 and char in ['>', ',']:
       return (fieldname, rest[:pos+1].strip(',')), rest[pos+1:]
   return (fieldname, rest), None

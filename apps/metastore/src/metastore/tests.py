@@ -417,6 +417,15 @@ class TestParser(object):
     assert_equal(parse_tree, column)
 
 
+  def test_parse_decimal(self):
+    name = 'simple'
+    type = 'decimal(12,2)'
+    comment = 'test_parse_decimal'
+    column = {'name': name, 'type': type, 'comment': comment}
+    parse_tree = parser.parse_column(name, type, comment)
+    assert_equal(parse_tree, column)
+
+
   def test_parse_array(self):
     name = 'array'
     type = 'array<string>'
