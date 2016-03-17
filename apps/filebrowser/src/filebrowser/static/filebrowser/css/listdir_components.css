@@ -221,6 +221,10 @@
   background: #e5e5e5;
 }
 
+.row-highlighted {
+  background: #d9edf7;
+}
+
 .context-menu {
   display: none;
   position: absolute;

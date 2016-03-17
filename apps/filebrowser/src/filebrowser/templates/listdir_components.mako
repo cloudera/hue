@@ -501,7 +501,7 @@ from django.utils.translation import ugettext as _
 </div>
 
   <script id="fileTemplate" type="text/html">
-    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file', value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected() }">
+    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file', value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
         <div data-bind="visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -759,10 +759,12 @@ from django.utils.translation import ugettext as _
           mtime: file.mtime
         },
         selected: ko.observable(false),
+        highlighted: ko.observable(file.highlighted || false),
         handleSelect: function (row, e) {
           e.preventDefault();
           e.stopPropagation();
           this.selected(! this.selected());
+          this.highlighted(false);
           viewModel.allSelected(false);
         },
         // display the context menu when an item is right/context clicked
@@ -828,6 +830,7 @@ from django.utils.translation import ugettext as _
       self.searchQuery = ko.observable("");
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.pendingUploads = ko.observable(0);
+      self.lastUploadBatch = ko.observableArray([]);
 
       self.fileNameSorting = function (l, r) {
         if (l.name == "..") {
@@ -984,8 +987,10 @@ from django.utils.translation import ugettext as _
         self.page(new Page(page));
 
         self.files(ko.utils.arrayMap(files, function (file) {
+          file.highlighted = self.lastUploadBatch.indexOf(file.path) > -1;
           return new File(file);
         }));
+        self.lastUploadBatch([]);
         if (self.sortBy() == "name"){
           self.files.sort(self.fileNameSorting);
         }
@@ -1384,6 +1389,7 @@ from django.utils.translation import ugettext as _
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+              self.lastUploadBatch.push(response.path);
             }
             if (self.pendingUploads() == 0) {
               $('#uploadFileModal').modal('hide');
@@ -1455,6 +1461,7 @@ from django.utils.translation import ugettext as _
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+              self.lastUploadBatch.push(response.path);
             }
             if (self.pendingUploads() == 0) {
               $('#uploadArchiveModal').modal('hide');
@@ -1663,6 +1670,7 @@ from django.utils.translation import ugettext as _
                   }
                   else {
                     $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                    viewModel.lastUploadBatch.push(response.path);
                   }
                 }
               }
