@@ -287,3 +287,24 @@
 .qq-upload-failed-text {
   color: #b94a48;
 }
+
+.editable-breadcrumbs {
+  cursor: text;
+}
+
+.editable-breadcrumbs:hover {
+  background-color: #F0F0F0;
+}
+
+#hueBreadcrumbText {
+  font-size: 1.25em;
+  margin-left: 25px;
+  margin-top: 6px;
+  padding-left: 14px;
+  border-radius: 2px;
+  border: 1px solid #EEE;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  font-weight: bold;
+}

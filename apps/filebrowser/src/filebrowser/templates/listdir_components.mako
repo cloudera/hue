@@ -1951,10 +1951,12 @@ from django.utils.translation import ugettext as _
         viewModel.filter();
       }, 500);
 
-      $("#editBreadcrumb").click(function () {
-        $(this).hide();
-        $(".hueBreadcrumb").hide();
-        $("#hueBreadcrumbText").show().focus();
+      $("#editBreadcrumb").click(function (e) {
+        if ($(e.target).is('ul')){
+          $(this).hide();
+          $(".hueBreadcrumb").hide();
+          $("#hueBreadcrumbText").show().focus();
+        }
       });
 
       $("#hueBreadcrumbText").jHueHdfsAutocomplete({
