@@ -1008,6 +1008,7 @@ class Document2(models.Model):
       'uuid': self.uuid,
       'id': self.id,
       'doc1_id': self.doc.get().id if self.doc.exists() else -1,
+      'parent_uuid': self.parent_directory.uuid if self.parent_directory else None,
       'type': self.type,
       'perms': self._massage_permissions(),
       'last_modified': self.last_modified.strftime(UTC_TIME_FORMAT),

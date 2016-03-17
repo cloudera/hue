@@ -207,6 +207,10 @@ def save_notebook(request):
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
   notebook_type = notebook.get('type', 'notebook')
+  parent_uuid = notebook.get('parent_uuid', None)
+  parent = Document2.objects.get_home_directory(request.user)
+  if parent_uuid:
+    parent = Document2.objects.get_by_uuid(parent_uuid)
 
   if notebook.get('id'):
     notebook_doc = Document2.objects.get(id=notebook['id'])
@@ -218,6 +222,7 @@ def save_notebook(request):
   notebook_doc.update_data(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']
   notebook_doc.description = notebook_doc1.description = notebook['description']
+  notebook_doc.parent_directory = parent
   notebook_doc.save()
   notebook_doc1.save()
 
