@@ -255,9 +255,9 @@
 
     clonedTableContainer.css("marginTop", (-$(plugin.element).parent().scrollTop()) + "px");
 
-    $(mainScrollable).scroll(function () {
-      if (plugin.options.stickToTopPosition > -1){
-        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition){
+    function positionClones() {
+      if (plugin.options.stickToTopPosition > -1) {
+        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition) {
           clonedCellVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
         }
         else {
@@ -269,8 +269,13 @@
         clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
         clonedCellVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
       }
-    });
+    }
 
+    positionClones();
+
+    $(mainScrollable).scroll(function () {
+      positionClones();
+    });
   }
 
 
@@ -329,9 +334,9 @@
       clonedTableVisibleContainer.width($(this).width());
     });
 
-    $(mainScrollable).scroll(function () {
-      if (plugin.options.stickToTopPosition > -1){
-        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition){
+    function positionClones() {
+      if (plugin.options.stickToTopPosition > -1) {
+        if ($(plugin.element).offset().top < plugin.options.stickToTopPosition) {
           clonedTableVisibleContainer.css("top", plugin.options.stickToTopPosition + "px");
         }
         else {
@@ -341,6 +346,12 @@
       else {
         clonedTableVisibleContainer.css("top", ($(plugin.element).parent().offset().top - $(mainScrollable).scrollTop()) + "px");
       }
+    }
+
+    positionClones();
+
+    $(mainScrollable).scroll(function () {
+      positionClones();
     });
   }
 
