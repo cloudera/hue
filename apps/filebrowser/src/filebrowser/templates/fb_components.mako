@@ -20,16 +20,15 @@ from django.utils.translation import ugettext as _
 %>
 
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
-    <ul class="nav nav-pills hueBreadcrumbBar">
-        % if from_listdir:
+    % if from_listdir:
+      <ul class="nav nav-pills hueBreadcrumbBar">
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
-            <span style="float:right; margin-top:10px;"><i id="editBreadcrumb" class="fa fa-pencil hand" rel="tooltip" title="${_('Edit path')}"></i></span>
-            <ul class="hueBreadcrumb" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px">
+            <ul id="editBreadcrumb" class="hueBreadcrumb editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
                 <li data-bind="visible: label.slice(-1) == '/'"><a href="#" data-bind="click: show"><span class="divider" data-bind="text: label"></span></a></li>
                 <li data-bind="visible: label.slice(-1) != '/'"><a href="#" data-bind="text: label, click: show"></a><span class="divider">/</span></li>
             </ul>
-            <input id="hueBreadcrumbText" type="text" class="input-xxlarge" style="margin-top:4px;margin-right:4px;display:none" data-bind="value: currentPath" autocomplete="off" />
+            <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" />
         </li>
         <li class="pull-right">
           <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" class="trashLink" title="${_('View trash')}">
@@ -43,7 +42,9 @@ from django.utils.translation import ugettext as _
             </a>
           </div>
         </li>
-        % else:
+      </ul>
+    % else:
+      <ul class="nav nav-pills hueBreadcrumbBar">
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
             <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
@@ -63,8 +64,8 @@ from django.utils.translation import ugettext as _
                     % endfor
             </ul>
         </li>
-        % endif
-    </ul>
+      </ul>
+    % endif
 </%def>
 
 
