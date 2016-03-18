@@ -141,7 +141,7 @@ from desktop.views import _ko
         <span>${_('The selected database has no tables.')}</span>
       </li>
       <li data-bind="visible: definition.isTable">
-        <span>${_('The selected table has no columns.')}</span>
+        <span>${_('No columns could be fetched, check permissions.')}</span>
       </li>
     </ul>
   </script>
@@ -176,7 +176,7 @@ from desktop.views import _ko
           </div>
         </li>
 
-        <li data-bind="visible: ! hasErrors() && ! loadingDatabases()" >
+        <li data-bind="visible: ! loadingDatabases()" >
           <select data-bind="options: availableDatabaseNames, select2: { width: '100%', placeholder: '${ _ko("Choose a database...") }', update: assistHelper.activeDatabase }" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
         </li>
 
@@ -185,7 +185,7 @@ from desktop.views import _ko
           <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
         </li>
 
-        <li data-bind="visible: hasErrors">
+        <li data-bind="visible: hasErrors && availableDatabaseNames.length != 0">
           <span>${ _('The database list cannot be loaded.') }</span>
         </li>
 
