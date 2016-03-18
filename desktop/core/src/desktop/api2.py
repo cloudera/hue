@@ -29,6 +29,7 @@ from django.core import management
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
@@ -298,6 +299,7 @@ def share_document(request):
   })
 
 
+@ensure_csrf_cookie
 def export_documents(request):
   if request.GET.get('documents'):
     selection = json.loads(request.GET.get('documents'))
@@ -339,6 +341,7 @@ def export_documents(request):
     return make_response(f.getvalue(), 'json', 'hue-documents')
 
 
+@ensure_csrf_cookie
 def import_documents(request):
   if request.FILES.get('documents'):
     documents = request.FILES['documents'].read()
