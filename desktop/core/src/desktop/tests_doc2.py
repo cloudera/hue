@@ -438,6 +438,42 @@ class TestDocument2Permissions(object):
     data = json.loads(response.content)
     assert_equal(doc.uuid, data['document']['uuid'], data)
 
+    # other user can share document with read permissions
+    response = self.client_not_me.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(doc.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': [
+            self.default_group.id
+          ],
+        },
+        'write': {
+          'user_ids': [],
+          'group_ids': [],
+        }
+      })
+    })
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+
+    # other user cannot share document with write permissions
+    response = self.client_not_me.post("/desktop/api2/doc/share", {
+      'uuid': json.dumps(doc.uuid),
+      'data': json.dumps({
+        'read': {
+          'user_ids': [],
+          'group_ids': [],
+        },
+        'write': {
+          'user_ids': [],
+          'group_ids': [
+            self.default_group.id
+          ],
+        }
+      })
+    })
+    assert_equal(-1, json.loads(response.content)['status'], response.content)
+
 
   def test_share_document_read_by_group(self):
     doc = Document2.objects.create(name='new_doc', type='query-hive', owner=self.user, data={}, parent_directory=self.home_dir)
